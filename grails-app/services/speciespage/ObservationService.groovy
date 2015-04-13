@@ -370,7 +370,8 @@ class ObservationService extends AbstractObjectService {
         int offset = params.offset ? params.offset.toInteger() : 0
         def relatedObv = [observations:[],max:max];
         if(params.filterProperty == "speciesName") {
-            relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset)
+            UserGroup userGroupInstance = getUserGroup(params);
+            relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset, userGroupInstance)
         } else if(params.filterProperty == "speciesGroup"){
             relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
         } else if(params.filterProperty == "featureBy") {
@@ -438,8 +439,8 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @return
      */
-    Map getRelatedObservationBySpeciesName(long obvId, int limit, int offset){
-        return getRelatedObservationBySpeciesNames(obvId, limit, offset)
+    Map getRelatedObservationBySpeciesName(long obvId, int limit, int offset, UserGroup userGroupInstance = null){
+        return getRelatedObservationBySpeciesNames(obvId, limit, offset, userGroupInstance)
     }
     /**
      * 
@@ -542,15 +543,15 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @return
      */
-    Map getRelatedObservationBySpeciesNames(long obvId, int limit, int offset){
+    Map getRelatedObservationBySpeciesNames(long obvId, int limit, int offset, UserGroup userGroupInstance = null){
         Observation parentObv = Observation.read(obvId);
         if(!parentObv.maxVotedReco) {
             return ["observations":[], "count":0];
         }
-        return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset)
+        return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset, userGroupInstance)
     }
 
-    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset) {
+    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset , UserGroup userGroupInstance = null) {
         def observations = Observation.withCriteria () {
             projections {
                 groupProperty('sourceId')
@@ -561,6 +562,11 @@ class ObservationService extends AbstractObjectService {
                 eq("maxVotedReco", maxVotedReco)
                 eq("isDeleted", false)
                 if(obvId) ne("id", obvId)
+                if(userGroupInstance){
+                    userGroups{
+                        eq('id', userGroupInstance.id)
+                    }
+                }
             }
             order("isShowable", "desc")
             order("lastRevised", "desc")
@@ -584,6 +590,11 @@ class ObservationService extends AbstractObjectService {
                 eq("maxVotedReco", maxVotedReco)
                 eq("isDeleted", false)
                 if(obvId) ne("id", obvId)
+                if(userGroupInstance){
+                    userGroups{
+                        eq('id', userGroupInstance.id)
+                    }
+                }    
             }
         }
         return ["observations":result, "count":count]
