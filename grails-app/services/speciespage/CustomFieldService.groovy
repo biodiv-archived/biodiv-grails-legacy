@@ -160,9 +160,12 @@ class CustomFieldService {
 		return sql.rows(query, [tableName:tableName, dbName:'biodiv']).isEmpty()		
 	}
 	
+	private boolean isRowExist(String tableName , obvId){
+		def query = ''' SELECT * FROM  ''' + tableName + ''' where  observation_id = :obvId '''
+		Sql sql = Sql.newInstance(dataSource)
+		return !sql.rows(query, [obvId:obvId]).isEmpty()
+	}
 
-
-	
 	private boolean deleteRow(ug, obvId){
 		String query = "delete from "+ utilsService.getTableNameForGroup(ug) + " where observation_id =:observationId "
 		return executeQuery(query, [observationId:obvId] )
@@ -176,9 +179,13 @@ class CustomFieldService {
 	}
 		
 	private boolean updateRow(cf, Map m){
-		List keyList = m.keySet().collect{it}
-		
-		String query = "update "+ utilsService.getTableNameForGroup(cf.userGroup) +  " set " + m.remove('columnName') + " = :columnValue where observation_id = :obvId "
+		String query
+		if(isRowExist(utilsService.getTableNameForGroup(cf.userGroup), m.obvId)){
+			query = "update "+ utilsService.getTableNameForGroup(cf.userGroup) +  " set " + m.remove('columnName') + " = :columnValue where observation_id = :obvId "
+		}else{
+			query = "insert into "+ utilsService.getTableNameForGroup(cf.userGroup) +  " ( observation_id, " +  m.remove('columnName') + " ) "   +  " values (:obvId,  :columnValue ) "
+			m = [obvId: m.obvId, columnValue:m.columnValue]
+		}
 		return executeQuery(query, m)
 	}
 	
