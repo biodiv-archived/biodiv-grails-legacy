@@ -14,20 +14,24 @@ class CustomFieldService {
 	def dataSource
 	def springSecurityService
 	
-	def List fetchAllCustomFields(Observation obv){
-		List result = []
+	def Map fetchAllCustomFields(Observation obv){
+		Map result = [:]
 		obv.userGroups.collect{it}.each { ug ->
 			CustomField.fetchCustomFields(ug).each { cf ->
-				def val = fetchValue(cf, obv.id)
-				if(val && (cf.dataType == CustomField.DataType.DATE)){
-					val = val.format('MMMM d, y')
-				}
-				result << [key:cf.name, value : val]
+				def val = fetchForDisplay(cf, obv.id)
+				result[cf] = [key:cf.name, value : val, ugId:ug.id]
 			}
 		}
 		return result
 	}
 	
+	private fetchForDisplay(CustomField cf,  observationId){
+		def val = fetchValue(cf, observationId)
+		if(val && (cf.dataType == CustomField.DataType.DATE)){
+			val = val.format('MMMM d, y')
+		}
+		return val
+	}
 	
 	def fetchValue(CustomField cf,  observationId){
 		if(!observationId)
@@ -78,7 +82,7 @@ class CustomFieldService {
 				def dataType = CustomField.DataType.getDataType(m.dataType) 
 				boolean allowedMultiple = (dataType == CustomField.DataType.TEXT)?m.allowedMultiple:false
 				def options = m.options? m.options.split(",").collect{it.trim()}.join(","):""
-				CustomField cf =  new CustomField(userGroup:ug, name:m.name, dataType:dataType, isMandatory:m.isMandatory, allowedMultiple:m.allowedMultiple, defaultValue:m.defaultValue, options:options, notes:m.description, author:author)
+				CustomField cf =  new CustomField(userGroup:ug, name:m.name, dataType:dataType, isMandatory:m.isMandatory, allowedParticipation:m.allowedParticipation, allowedMultiple:m.allowedMultiple, defaultValue:m.defaultValue, options:options, notes:m.description, author:author)
 				if(!cf.save(flush:true)){
 					cf.errors.allErrors.each { log.error it }
 				}else{
@@ -171,6 +175,27 @@ class CustomFieldService {
 		return executeQuery(query, m)
 	}
 		
+	private boolean updateRow(cf, Map m){
+		List keyList = m.keySet().collect{it}
+		
+		String query = "update "+ utilsService.getTableNameForGroup(cf.userGroup) +  " set " + m.remove('columnName') + " = :columnValue where observation_id = :obvId "
+		return executeQuery(query, m)
+	}
+	
+	def Map updateInlineCf(params){
+		CustomField cf = CustomField.get(params.cfId?.toLong())
+		if(!cf){
+			return
+		}
+		def v = params.fieldValue ?  params.fieldValue :  params.get('fieldValue[]')
+		if(v && !(v instanceof String)){
+			v = v.join(",")
+		}
+		
+		def m = ['columnName': cf.fetchSqlColName(), 'columnValue' :cf.fetchTypeCastValue(v), 'obvId':params.obvId?.toLong()]
+		updateRow(cf, m)
+		return [ 'fieldName' : fetchForDisplay(cf, params.obvId?.toLong())]
+	}
 	
 	def test1(){
 		def m = [webaddress : 'bangalore_birdrace_2013', 'CustomField_Name' : 'sandeep', 'CustomField_Age': '100', 'CustomField_Status' : 'false']

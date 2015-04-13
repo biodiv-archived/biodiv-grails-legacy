@@ -329,3 +329,6 @@ update species_field SET description = 'dummy' where field_id = 81 and descripti
 # Observation enhancement
 #update location scale colum  in checklist and observation (write actual sql)
 ALTER TABLE observation ADD COLUMN location_scale character varying(255);
+ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
+
+

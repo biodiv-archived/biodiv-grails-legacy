@@ -1813,4 +1813,15 @@ class ObservationController extends AbstractObjectController {
     def filePickerSecurityCodes() {
         utilsService.filePickerSecurityCodes();
     }
+	
+	@Secured(['ROLE_USER'])
+	def updateCustomField(){
+		log.debug params
+		def result = observationService.updateInlineCf(params)
+		def model = utilsService.getSuccessModel('success', null, OK.value(), result);
+		withFormat {
+			json { render model as JSON }
+			xml { render model as XML }
+		}
+	}
 }

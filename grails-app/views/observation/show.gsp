@@ -441,6 +441,7 @@ $(document).ready(function(){
             $('.iAgree button').removeClass("disabled");
         } 
         initializeLanguage(); 
+         $(".CustomField_multiselectcombo").multiselect();
     });
     function deleteObservation(){
         var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";

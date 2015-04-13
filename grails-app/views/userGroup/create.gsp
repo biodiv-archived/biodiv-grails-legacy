@@ -508,14 +508,14 @@ $(document).ready(function() {
 	function getCustomFields(){
 		var result = [];
 		var cPrefixClass = '.CustomField_';
-		var fieldList = ['name', 'description','dataType', 'isMandatory', 'allowedMultiple' , 'options', 'defaultValue'];
+		var fieldList = ['name', 'description','dataType', 'isMandatory', 'allowedMultiple' , 'options', 'defaultValue', 'allowedParticipation'];
 		$("ul.customFieldList li").each( function (index){
 			var thisli = $(this);
 			var cfMap = {};
 			$.each(fieldList, function(index, value){
 				var key = cPrefixClass + value;
 				var val = $(thisli).find(key).val();
-				if(key == '.CustomField_isMandatory' || key == '.CustomField_allowedMultiple' ){
+				if(key == '.CustomField_isMandatory' || key == '.CustomField_allowedMultiple' ||  key == '.CustomField_allowedParticipation' ){
 					var val = $(thisli).find(key).prop('checked');
 				}
 				cfMap[value] = val;

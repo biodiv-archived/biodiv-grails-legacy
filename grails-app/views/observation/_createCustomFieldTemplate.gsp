@@ -100,6 +100,18 @@
       </div>
 </div>
 
+<div class="control-group customField"  style="margin-top:5px;">
+      <label for="customField" class="control-label"> <g:message
+          code="customField.allowedParticipation.label" default="Allow Participation" />
+      </label>
+      <div class="controls">
+          <div>
+          	<input type="checkbox" style="margin-left:0px;" class="${CustomField.PREFIX + 'allowedParticipation'}" value="${false}"/>
+          </div>
+      </div>
+</div>
+
+
 
 <hr>
 </li>

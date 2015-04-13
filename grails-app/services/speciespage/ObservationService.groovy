@@ -2338,4 +2338,9 @@ class ObservationService extends AbstractObjectService {
         def taxCon = observationInstance.maxVotedReco?.taxonConcept 
         return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
     }
+	
+	def Map updateInlineCf(params){
+		return customFieldService.updateInlineCf(params)
+	}
+	
 }

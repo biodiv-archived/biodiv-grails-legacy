@@ -32,12 +32,3 @@
 
 </div>
 </sec:ifLoggedIn>
-<r:script>
-$(document).ready(function(){
-    $( ".date" ).datepicker({ 
-        changeMonth: true,
-        changeYear: true,
-        dateFormat: 'dd/mm/yy' 
-    });
-});
-</r:script>

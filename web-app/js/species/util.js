@@ -209,3 +209,73 @@ function setLanguage(language){
     window.location.href = new_url;
 }
 
+//////////////////////////// custom field related ////////////////////////////////////////////////////
+
+function cfValidation(comp){
+	function customFieldNumericValidation(comp){
+		var result = true;
+		var selector;
+		if(comp != undefined){
+			selector = comp.find("input.CustomField_number");
+		}else{
+			selector = $("input.CustomField_number");
+		}
+		$(selector).each(function( index ) {
+			var comp = $(this).closest('.control-group');
+			comp.removeClass('error');
+			var val = $(this).val();
+			if(val && !$.isNumeric(val)){
+				comp.addClass('error');
+				result = false;
+			}
+		});
+		return result;
+	}
+
+	function customFieldMandatoryValidation(comp){
+		var result = true;
+		var selector;
+		if(comp != undefined){
+			selector = comp.find(".customField .mandatoryField");
+		}else{
+			selector = $(".customField .mandatoryField");
+		}
+		$(selector).each(function( index ) {
+			var comp = $(this).closest('.control-group');
+			comp.removeClass('error');
+			var val = $(this).val();
+			if(!val){
+				comp.addClass('error');
+				result = false;
+			}
+		});
+		
+		return result;
+	}
+
+	function scrollToCustomForm(){
+		if($(".customFieldForm") != undefined){
+		$('html, body').animate({
+	        scrollTop: $(".customFieldForm").offset().top
+	    }, 800);
+		}
+	}
+	
+	if(!customFieldMandatoryValidation(comp)) {
+	    alert(window.i8ln.observation.bulkObvCreate.failedMandatoryFieldValidation);
+	    event.preventDefault();
+	    scrollToCustomForm();
+	    return false; 		 		
+	}
+	
+	if(!customFieldNumericValidation(comp)) {
+	    alert(window.i8ln.observation.bulkObvCreate.failedNumericFieldValidation);
+	    event.preventDefault();
+	    scrollToCustomForm();
+	    return false; 		 		
+	}
+	
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
