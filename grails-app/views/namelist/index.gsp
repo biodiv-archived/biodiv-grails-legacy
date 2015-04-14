@@ -283,6 +283,8 @@
                             </div>
                             <input type="hidden" class="taxonRegId" value="">
                             <input type="hidden" class="taxonId" value="">
+                            <input type="hidden" class="recoId" value="">
+                            <input type="hidden" class="isOrphanName" value="">
                             <input type="hidden" class="fromCOL" value=false>
                             <input type="hidden" class="id_details" value="">
 							<div class="row-fluid">	
@@ -437,8 +439,12 @@
                                     {{/if}}
                                 {{/if}}    
                                     <div class="span2">
-                                        <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this,"{{>typeClass}}");' rel="add"><i class="icon-ok icon-white"></i></button>
-                                        <button class="btn btn-mini delete" onClick='modifyContent(this,"{{>typeClass}}");' rel='delete'><i class="icon-remove"></i></button>
+                                        {{if typeClass == "aid"}}
+                                            <button class="btn btn-mini btn-primary addEdit" onClick='validateName(this);'>Validate Name</button>
+                                        {{else}}
+                                            <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this,"{{>typeClass}}");' rel="add"><i class="icon-ok icon-white"></i></button>
+                                            <button class="btn btn-mini delete" onClick='modifyContent(this,"{{>typeClass}}");' rel='delete'><i class="icon-remove"></i></button>
+                                        {{/if}}
                                     </div>
 
                                 </span>

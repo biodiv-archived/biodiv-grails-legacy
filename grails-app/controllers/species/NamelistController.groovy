@@ -8,6 +8,7 @@ import species.TaxonomyDefinition;
 import grails.plugin.springsecurity.annotation.Secured;
 import species.NamesParser;
 import species.sourcehandler.XMLConverter;
+import species.participation.Recommendation;
 
 class NamelistController {
     
@@ -151,11 +152,16 @@ class NamelistController {
         def acceptedMatch = JSON.parse(params.acceptedMatch);
         acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
         println "=============ACCEPTED MATCH=========== " + acceptedMatch
-        
-        ScientificName sciName = TaxonomyDefinition.get(acceptedMatch.taxonId.toLong());
-        println "=============SCIENTIFIC NAME ========= " + sciName;
-        def res = namelistService.processDataFromUI(sciName, acceptedMatch)
-        render res as JSON
+        if(acceptedMatch.isOrphanName){
+            Recommendation reco = Recommendation.get(acceptedMatch.recoId?.toLong());
+            def res = namelistService.processRecoName(reco, acceptedMatch);
+            render res as JSON
+        } else {
+            ScientificName sciName = TaxonomyDefinition.get(acceptedMatch.taxonId.toLong());
+            println "=============SCIENTIFIC NAME ========= " + sciName;
+            def res = namelistService.processDataFromUI(sciName, acceptedMatch)
+            render res as JSON
+        }
     }
 
     def getOrphanRecoNames() {

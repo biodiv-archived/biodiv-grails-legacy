@@ -1387,6 +1387,7 @@ def sql= session.createSQLQuery(query)
         if(acceptedMatch) {
             println "================ACCEPTED MATCH=========================== " + acceptedMatch
             log.debug "There is an acceptedMatch ${acceptedMatch} for recommendation ${reco.name}. Updating link"
+            //processRecoName(reco, acceptedMatch);
             ScientificName sciName;
             //Search on IBP that name with status
             NameStatus nameStatus = getNewNameStatus(acceptedMatch.nameStatus);
@@ -1431,6 +1432,7 @@ def sql= session.createSQLQuery(query)
             } 
             //processDataForMigration(sciName, acceptedMatch);            
             syncReco(reco, sciName);
+            
         } else {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
         }
@@ -1452,4 +1454,51 @@ def sql= session.createSQLQuery(query)
         }
         return result;
     }
+
+    def processRecoName(Recommendation reco, Map acceptedMatch) {
+        ScientificName sciName;
+        //Search on IBP that name with status
+        NameStatus nameStatus = getNewNameStatus(acceptedMatch.nameStatus);
+        int rank = acceptedMatch['parsedRank'];
+        List res = searchIBP(acceptedMatch.canonicalForm, acceptedMatch.authorString, nameStatus, rank)
+        if(res.size() == 0) {
+            if(nameStatus == NameStatus.SYNONYM){
+                def acceptedNames = [];
+                acceptedMatch.acceptedNamesList.each { colAcceptedNameData ->
+                    println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
+                    //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
+                    //colAcceptedNameData.curatingTaxonId = sciName.id;
+                    ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
+                    acceptedNames.add(acceptedName)
+                    println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
+                    //acceptedName.addSynonym(synonym);
+                }
+                def otherParams = ['taxonId':acceptedNames[0].id]
+                def result = speciesService.updateSynonym(null, null,ScientificName.RelationShip.SYNONYM.value(),acceptedMatch.canonicalForm +" "+ acceptedMatch.authorString , otherParams);
+                sciName = result.dataInstance;
+                acceptedNames.each { acceptedName ->
+                    if(acceptedName != acceptedNames[0]){
+                        acceptedName.addSynonym(sciName);
+                    }
+                }
+            } else {
+                sciName = saveAcceptedName(acceptedMatch);
+            }
+        } else if(res.size() == 1) {
+            sciName = res[0]
+        } else {
+            //picking one by default
+            sciName = res[0]
+            //flagging recommendation
+            reco.isFlagged = true;
+            String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+            res.each {
+                flaggingReason = flaggingReason + it.id.toString() + ", ";
+            }
+            println "########### Flagging reco ============== "
+            reco.flaggingReason = reco.flaggingReason + " ### " + flaggingReason;
+        } 
+        syncReco(reco, sciName);
+    }
+
 }

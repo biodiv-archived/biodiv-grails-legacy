@@ -101,54 +101,57 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
     processingStart();
     $(ele).parent("ul").find("a").css('background-color','inherit');
     $(ele).find("a").css('background-color','#3399FF');
-    $('.taxonId').val(taxonId);
     if(isOrphanName) {
+        $('.recoId').val(taxonId);
+        $('.isOrphanName').val(true);
         $('.name').val($(ele).text());
         $('.queryDatabase option[value="col"]').attr("selected", "selected");
         $('.queryString').trigger("click");
     } else {
-    var url = window.params.curation.getNameDetailsUrl;
-    var choosenName = ''
-    if(nameType == 2 || nameType == 3) {
-        choosenName = $(ele).text();
+        $('.taxonId').val(taxonId);
+        $('.isOrphanName').val(false);
+        var url = window.params.curation.getNameDetailsUrl;
+        var choosenName = ''
+            if(nameType == 2 || nameType == 3) {
+                choosenName = $(ele).text();
+            }
+        $.ajax({
+            url: url,
+            dataType: "json",
+            type: "POST",
+            data: {taxonId:taxonId, nameType:nameType, classificationId:classificationId, choosenName: choosenName},	
+            success: function(data) {
+                changeEditingMode(false);
+                populateNameDetails(data);
+                populateTabDetails(data, false);
+                showProperTabs();
+                $(".countSp").text(data["countSp"]);
+                $(".countObv").text(data["countObv"]);
+                $(".countCKL").text(data["countCKL"]);
+                $(".taxonRegId").val(data['taxonRegId']);
+                if($("#statusDropDown").val() == 'synonym' || $("#nameStatus").val()== 'common') {
+                    $('.lt_family input').val('');
+                    $('.lt_family input').prop("disabled", true);
+                }
+                processingStop();
+                if(ele == undefined) {
+                    return;
+                }
+                if($(ele).parents(".dl_content").length) {
+                    $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, auto-querying CoL for up-to-date name attributes.");
+                    $("#dialogMsg").modal('show');
+                    $('.queryDatabase option[value="col"]').attr("selected", "selected");
+                    $('.queryString').trigger("click");
+                }
+                oldStatus = $("#statusDropDown").val();
+                oldName = $("."+$("#rankDropDown").val()).val();
+                oldRank = $("#rankDropDown").val();
+            }, error: function(xhr, status, error) {
+                processingStop()
+                    alert(xhr.responseText);
+            } 
+        });
     }
-    $.ajax({
-        url: url,
-        dataType: "json",
-        type: "POST",
-        data: {taxonId:taxonId, nameType:nameType, classificationId:classificationId, choosenName: choosenName},	
-        success: function(data) {
-            changeEditingMode(false);
-            populateNameDetails(data);
-            populateTabDetails(data, false);
-            showProperTabs();
-            $(".countSp").text(data["countSp"]);
-            $(".countObv").text(data["countObv"]);
-            $(".countCKL").text(data["countCKL"]);
-            $(".taxonRegId").val(data['taxonRegId']);
-            if($("#statusDropDown").val() == 'synonym' || $("#nameStatus").val()== 'common') {
-                $('.lt_family input').val('');
-                $('.lt_family input').prop("disabled", true);
-            }
-            processingStop();
-            if(ele == undefined) {
-                return;
-            }
-            if($(ele).parents(".dl_content").length) {
-                $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, auto-querying CoL for up-to-date name attributes.");
-                $("#dialogMsg").modal('show');
-                $('.queryDatabase option[value="col"]').attr("selected", "selected");
-                $('.queryString').trigger("click");
-            }
-            oldStatus = $("#statusDropDown").val();
-            oldName = $("."+$("#rankDropDown").val()).val();
-            oldRank = $("#rankDropDown").val();
-        }, error: function(xhr, status, error) {
-            processingStop()
-            alert(xhr.responseText);
-        } 
-    });
-}
 }
 
 function populateTabDetails(data, appendData) {
@@ -752,11 +755,13 @@ function dataToProcess(moveToWKG) {
     result['externalId'] = $('.id').val();
     result['abortOnNewName'] = true;
     result['fromCOL'] = $('.fromCOL').val();
+    result['isOrphanName'] = $('.isOrphanName').val();
     if($('.fromCOL').val() == "true") {
         result['abortOnNewName'] = false;
         result['id_details'] = JSON.parse($(".id_details").val());
     }
     result['taxonId'] = $('.taxonId').val();
+    result['recoId'] = $('.recoId').val();
     result['moveToWKG'] = moveToWKG
     //check for spell check
     if(oldName == $("."+$("#rankDropDown").val()).val()) {
@@ -794,4 +799,43 @@ function getOrphanRecoNames(){
             alert(xhr.responseText);
         } 
     });
+}
+
+function validateName(ele) {
+    processingStart()
+    var name = "";
+    name = $(ele).parents(".singleRow").find("input[name='value']").val();
+    if(name == "") {
+        alert("Please provide a name to validate!!");
+        return;
+    }
+    var dbName = "col";
+    var url = window.params.curation.searchExternalDbUrl;
+    $.ajax({
+        url: url,
+        dataType: "json",
+        type: "POST",
+        data: {name:name, dbName:dbName},	
+        success: function(data) {
+            processingStop()
+            //show the popup
+            if(data.length != 0) {
+                $("#dialogMsg").modal('hide');
+                $("#externalDbResults").modal('show');
+                //TODO : for synonyms
+                $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
+                fillPopupTable(data , $("#externalDbResults"), "externalData");
+            }else {
+                $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                if(addNewName) {
+                    alert("Searching name in IBP Database");
+                    searchIBP(name);
+                }
+            }
+        }, error: function(xhr, status, error) {
+            processingStop()
+            alert(xhr.responseText);
+        } 
+    }); 
 }

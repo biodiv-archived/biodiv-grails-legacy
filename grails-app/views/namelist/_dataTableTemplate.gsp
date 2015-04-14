@@ -37,8 +37,13 @@
   <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
   <div class="span4"><input type="text" class="nameInputs span12" name="contributor"></div>
   <div class="span2">
-    <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this, "${type}");' rel="add"><i class="icon-ok icon-white"></i></button>
-    <button class="btn btn-mini delete" onClick='modifyContent(this, "${type}");' rel='delete'><i class="icon-remove"></i></button>
+    <g:if test="${type == 'a'}">
+        <button class="btn btn-mini btn-primary addEdit" onClick='validateName(this);'>Validate Name</button>
+    </g:if>
+    <g:else>
+        <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this, "${type}");' rel="add"><i class="icon-ok icon-white"></i></button>
+        <button class="btn btn-mini delete" onClick='modifyContent(this, "${type}");' rel='delete'><i class="icon-remove"></i></button>
+    </g:else>
   </div>
  </span> 
 </div>
