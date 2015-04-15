@@ -13,6 +13,7 @@ class CustomFieldService {
 	def utilsService
 	def dataSource
 	def springSecurityService
+	def activityFeedService
 	
 	def Map fetchAllCustomFields(Observation obv){
 		Map result = [:]
@@ -200,7 +201,16 @@ class CustomFieldService {
 		}
 		
 		def m = ['columnName': cf.fetchSqlColName(), 'columnValue' :cf.fetchTypeCastValue(v), 'obvId':params.obvId?.toLong()]
+		def oldValue = fetchValue(cf, params.obvId?.toLong())
 		updateRow(cf, m)
+		def newValue = fetchValue(cf, params.obvId?.toLong())
+		
+		if(oldValue != newValue){
+			def observationInstance = Observation.read(params.obvId?.toLong())
+			log.debug "Adding feed and sending mail for custom field update ${cf.name} ::: ${oldValue}  =>  ${newValue}"
+			def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.CUSTOM_FIELD_EDITED, "${cf.name} : " + fetchForDisplay(cf, params.obvId?.toLong()));
+			utilsService.sendNotificationMail(activityFeedService.CUSTOM_FIELD_EDITED, observationInstance, null, params.webaddress, activityFeed);
+		}
 		return [ 'fieldName' : fetchForDisplay(cf, params.obvId?.toLong())]
 	}
 	

@@ -500,13 +500,7 @@ class UtilsService {
 
 			
                 case [ActivityFeedService.FEATURED, ActivityFeedService.UNFEATURED]:
-                boolean a
-                if(notificationType == ActivityFeedService.FEATURED) {
-                    a = true
-                }
-                else { 
-                    a = false
-                }               
+                boolean a = (notificationType == ActivityFeedService.FEATURED)               
                 mailSubject = getDescriptionForFeature(obv, null , a)
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -614,6 +608,13 @@ class UtilsService {
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
                 break
+				
+				case ActivityFeedService.CUSTOM_FIELD_EDITED :
+				mailSubject = messageSource.getMessage("custom.field.edited", null, LCH.getLocale())
+				bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				toUsers.add(getOwner(obv))
+				break
                 
                 default:
                 log.debug "invalid notification type"

@@ -204,6 +204,7 @@ function customFieldInlineEdit(comp, url, cfId, obvId){
 				finalComp.hide();
 				valComp.show();
 				$(comp).text('Edit');
+				 updateFeeds();
 				return true;
 			},
 			error:function (xhr, ajaxOptions, thrownError){
