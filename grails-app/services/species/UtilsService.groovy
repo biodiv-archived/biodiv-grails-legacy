@@ -613,6 +613,7 @@ class UtilsService {
 				mailSubject = messageSource.getMessage("custom.field.edited", null, LCH.getLocale())
 				bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
 				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				templateMap["message"] = messageSource.getMessage("mail.customfieldedit.message", null, LCH.getLocale())
 				toUsers.add(getOwner(obv))
 				break
                 
