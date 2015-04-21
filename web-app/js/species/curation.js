@@ -277,10 +277,11 @@ function searchDatabase(addNewName) {
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
-                fillPopupTable(data , $("#externalDbResults"), "externalData");
+                fillPopupTable(data , $("#externalDbResults"), "externalData", true);
             }else {
                 $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                $("#dialogMsg").modal('show');
                 if(addNewName) {
                     alert("Searching name in IBP Database");
                     searchIBP(name);
@@ -309,7 +310,7 @@ function searchIBP(name) {
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
-                fillPopupTable(data , $("#externalDbResults"), "IBPData");
+                fillPopupTable(data , $("#externalDbResults"), "IBPData", true);
             } else {
                 alert("Sorry no results found from IBP Database. Fill in details manually");
             }
@@ -321,7 +322,7 @@ function searchIBP(name) {
 
 }
 
-function fillPopupTable(data, $ele, dataFrom) {
+function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
     if(data.length == 0) {
         alert("Sorry No results found!!");
     }
@@ -351,7 +352,7 @@ function fillPopupTable(data, $ele, dataFrom) {
             }else {
                 rows+= "<tr><td>"+value['name'] +"</td>"
             }
-            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+")'>Select this</button></td></tr>"        
+            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+", "+showNameDetails+")'>Select this</button></td></tr>"        
         }else {
             rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getNameDetails("+value['taxonId'] +","+ classificationId+",1, undefined)'>Select this</button></td></tr>"
         }
@@ -361,9 +362,13 @@ function fillPopupTable(data, $ele, dataFrom) {
 }
 
 //takes COL id
-function getExternalDbDetails(externalId) {
+function getExternalDbDetails(externalId, showNameDetails) {
     var url = window.params.curation.getExternalDbDetailsUrl;
     var dbName = $("#queryDatabase").val();
+    if(externalId == undefined && !showNameDetails) {
+        alert("Could not find details as no ID present");
+        return;
+    }
     //IN case of TNRS no id comes
     //so search by name
     if(externalId == undefined) {
@@ -377,21 +382,28 @@ function getExternalDbDetails(externalId) {
         success: function(data) {
             //show the popup
             $("#externalDbResults").modal('hide');
-            populateNameDetails(data);
-            populateTabDetails(data, true);
-            showProperTabs();
-            if(dbName == 'col') {
-                changeEditingMode(true);
-                $(".id_details").val(JSON.stringify(data['id_details']));
-            }else {
-                changeEditingMode(false);
-            }
-            oldStatus = $("#statusDropDown").val();
-            oldName = $("."+$("#rankDropDown").val()).val();
-            oldRank = $("#rankDropDown").val();
-            if($("#statusDropDown").val() == 'synonym' || $("#nameStatus").val()== 'common') {
-                $('.lt_family input').val('');
-                $('.lt_family input').prop("disabled", true);
+            if(!showNameDetails) {
+                //create accepted match and saveAcceptedName
+                $(".fromCOL").val(true);
+                saveAcceptedName(createNewAcceptedNameData(data));
+                return;
+            } else {
+                populateNameDetails(data);
+                populateTabDetails(data, true);
+                showProperTabs();
+                if(dbName == 'col') {
+                    changeEditingMode(true);
+                    $(".id_details").val(JSON.stringify(data['id_details']));
+                }else {
+                    changeEditingMode(false);
+                }
+                oldStatus = $("#statusDropDown").val();
+                oldName = $("."+$("#rankDropDown").val()).val();
+                oldRank = $("#rankDropDown").val();
+                if($("#statusDropDown").val() == 'synonym' || $("#nameStatus").val()== 'common') {
+                    $('.lt_family input').val('');
+                    $('.lt_family input').prop("disabled", true);
+                }
             }
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
@@ -462,12 +474,13 @@ function saveHierarchy(moveToWKG) {
     if(oldStatus == 'accepted') {
         postProcessOnAcceptedName();
     }
-    var url = window.params.curateNameURL;
+    var url = window.params.curation.curateNameURL;
+    var acceptedMatch = JSON.stringify(dataToProcess(moveToWKG));
     $.ajax({
         url: url,
         type: "POST",
         dataType: "json",
-        data: {acceptedMatch: JSON.stringify(dataToProcess(moveToWKG))},	
+        data: {acceptedMatch: acceptedMatch},	
         success: function(data) {
             console.log("============YUHU ===");
             console.log(data);
@@ -801,15 +814,18 @@ function getOrphanRecoNames(){
     });
 }
 
-function validateName(ele) {
-    processingStart()
+function validateName(ele, showNameDetails) {
+    processingStart();
+    $(ele).parents(".singleRow").find("input[name='aid']").addClass('validating');
+    $('.queryDatabase option[value="col"]').attr("selected", "selected");
     var name = "";
     name = $(ele).parents(".singleRow").find("input[name='value']").val();
     if(name == "") {
         alert("Please provide a name to validate!!");
+        processingStop();
         return;
     }
-    var dbName = "col";
+    var dbName = $("#queryDatabase").val();
     var url = window.params.curation.searchExternalDbUrl;
     $.ajax({
         url: url,
@@ -817,25 +833,91 @@ function validateName(ele) {
         type: "POST",
         data: {name:name, dbName:dbName},	
         success: function(data) {
-            processingStop()
+            processingStop();
             //show the popup
             if(data.length != 0) {
                 $("#dialogMsg").modal('hide');
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
-                fillPopupTable(data , $("#externalDbResults"), "externalData");
+                fillPopupTable(data , $("#externalDbResults"), "externalData", showNameDetails);
             }else {
-                $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                $(".dialogMsgText").html("Sorry no results found from COL. Please query an alternative database or input name-attributes manually.");
+                $("#dialogMsg").modal('show');
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
-                if(addNewName) {
-                    alert("Searching name in IBP Database");
-                    searchIBP(name);
-                }
             }
         }, error: function(xhr, status, error) {
-            processingStop()
+            processingStop();
             alert(xhr.responseText);
         } 
     }); 
+}
+
+function createNewAcceptedNameData(data) {
+    var result = {}
+    result['kingdom'] = data['kingdom'];
+    result['phylum'] = data['phylum'];
+    result['class'] = data['class'];
+    result['order'] = data['order'];
+    result['superfamily'] = data['superfamily'];
+    result['family'] = data['family'];
+    result['subfamily'] = data['subfamily']; 
+    result['genus'] = data['genus'];
+    result['subgenus'] = data['subgenus'];
+    result['species'] = data['species'];
+
+    result['name'] = data['name'];
+    result['group'] = data['kingdom'];
+    result['rank'] = data['rank'];
+    result['authorString'] = data['authorString'];
+    result['nameStatus'] = data['nameStatus'];
+    result['source'] = data['sourceDatabase'];
+    result['sourceDatabase'] = data['sourceDatabase'];
+    result['via'] = data['sourceDatabase'];
+    result['id'] = data['externalId']; 
+    result['externalId'] = data['externalId'];
+    result['abortOnNewName'] = true;
+    result['fromCOL'] = $('.fromCOL').val();
+    result['isOrphanName'] = $('.isOrphanName').val();
+    if($('.fromCOL').val() == "true") {
+        result['abortOnNewName'] = false;
+        result['id_details'] = data['id_details'];
+    }
+    /*
+    result['taxonId'] = $('.taxonId').val();
+    result['recoId'] = $('.recoId').val();
+    result['moveToWKG'] = moveToWKG
+    //check for spell check
+    if(oldName == $("."+$("#rankDropDown").val()).val()) {
+        result['spellCheck'] = false;
+    }else if(oldName != $("."+$("#rankDropDown").val()).val() && oldRank == $("#rankDropDown").val()){
+        result['spellCheck'] = true;
+        result['oldTaxonId'] = $('.taxonId').val();
+    }
+    */
+    return result;
+}
+
+function saveAcceptedName(acceptedMatch) {
+    //call namelist controller saveAcceptedName
+    processingStart();
+    var url = window.params.curation.saveAcceptedNameURL;
+    $.ajax({
+        url: url,
+        dataType: "json",
+        type: "POST",
+        data: {acceptedMatch: JSON.stringify(acceptedMatch)},	
+        success: function(data) {
+            if(data.acceptedNameId != "") {
+                alert("Successfully validated name");
+            } else {
+                alert("Failed validating name");
+            }
+            $(".validating").val(data.acceptedNameId);
+            $(".validating").removeClass('validating');
+        }, error: function(xhr, status, error) {
+            processingStop();
+            alert(xhr.responseText);
+        } 
+    });
 }

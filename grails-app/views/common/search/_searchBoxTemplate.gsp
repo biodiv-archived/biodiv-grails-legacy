@@ -20,7 +20,6 @@
 <script type="text/javascript">
 $(document).ready(function() {    
     window.params = {
-                'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
                 'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",
@@ -36,7 +35,9 @@ $(document).ready(function() {
                     'searchExternalDbUrl' : "${uGroup.createLink('controller':'namelist', action:'searchExternalDb')}",
                     'getExternalDbDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getExternalDbDetails')}",
                     'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
-                    'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}"
+                    'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
+                    'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
+                    'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}"
                 },
 		'speciesName':"${params.speciesName }",
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",

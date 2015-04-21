@@ -440,7 +440,7 @@
                                 {{/if}}    
                                     <div class="span2">
                                         {{if typeClass == "aid"}}
-                                            <button class="btn btn-mini btn-primary addEdit" onClick='validateName(this);'>Validate Name</button>
+                                            <button class="btn btn-mini btn-primary addEdit" onClick='validateName(this, false);'>Validate Name</button>
                                         {{else}}
                                             <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this,"{{>typeClass}}");' rel="add"><i class="icon-ok icon-white"></i></button>
                                             <button class="btn btn-mini delete" onClick='modifyContent(this,"{{>typeClass}}");' rel='delete'><i class="icon-remove"></i></button>

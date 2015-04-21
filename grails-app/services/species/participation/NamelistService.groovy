@@ -1400,7 +1400,12 @@ def sql= session.createSQLQuery(query)
                         println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
                         //TODO Pass on id information of last nodesciName.errors.allErrors.each { log.error it }
                         //colAcceptedNameData.curatingTaxonId = sciName.id;
-                        ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
+                        ScientificName acceptedName;
+                        if(acceptedMatch.fromUI) {
+                            acceptedName = ScientificName.get(colAcceptedNameData.acceptedNameId)
+                        } else {
+                            acceptedName = saveAcceptedName(colAcceptedNameData);
+                        }
                         acceptedNames.add(acceptedName)
                         println "======SAVED THIS ACCEPTED NAME ==== " + acceptedName;
                         //acceptedName.addSynonym(synonym);
