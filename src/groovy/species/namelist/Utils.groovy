@@ -18,7 +18,7 @@ import species.NamesMetadata;
 class Utils {
 
 	private static final String COL_SITE = 'http://www.catalogueoflife.org'
-	private static final String COL_URI = '/annual-checklist/2014/webservice'
+	private static final String COL_URI = '/annual-checklist/2015/webservice'
 	
 	private static final int BATCH_SIZE = 100
 	private static final log = LogFactory.getLog(this);

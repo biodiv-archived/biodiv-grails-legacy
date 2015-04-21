@@ -32,7 +32,7 @@ import species.participation.Recommendation;
 class NamelistService {
    
     private static final String COL_SITE = 'http://www.catalogueoflife.org'
-	private static final String COL_URI = '/annual-checklist/2014/webservice'
+	private static final String COL_URI = '/annual-checklist/2015/webservice'
     
     private static final String GBIF_SITE = 'http://api.gbif.org'
 	private static final String GBIF_URI = '/v1/species'
