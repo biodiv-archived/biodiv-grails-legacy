@@ -543,7 +543,7 @@ class ObvUtilService {
 		
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
-			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, params.author);
 			observationInstance.lastRevised = new Date();
 			//saving max voted species name for observation instance
 			observationInstance.calculateMaxVotedSpeciesName();
