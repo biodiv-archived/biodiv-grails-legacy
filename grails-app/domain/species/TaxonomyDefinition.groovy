@@ -6,6 +6,7 @@ import species.ScientificName.TaxonomyRank
 import species.groups.SpeciesGroup;
 import species.utils.Utils;
 import species.NamesMetadata.NameStatus;
+import species.NamesMetadata.COLNameStatus;
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -18,6 +19,7 @@ class TaxonomyDefinition extends ScientificName {
 	ExternalLinks externalLinks;
     boolean isFlagged = false;
 	String flaggingReason;
+    NamesMetadata.COLNameStatus colNameStatus;
 
 	static hasMany = [author:String, year:String]
 
@@ -29,6 +31,7 @@ class TaxonomyDefinition extends ScientificName {
 		threatenedStatus nullable:true;
 		flaggingReason nullable:true;
 		externalLinks nullable:true;
+		colNameStatus nullable:true;
 	}
 
 	static mapping = {

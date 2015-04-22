@@ -14,6 +14,7 @@ import species.ScientificName.TaxonomyRank
 import species.Synonyms;
 import species.CommonNames;
 import species.NamesMetadata.NameStatus;
+import species.NamesMetadata.COLNameStatus;
 import species.NamesMetadata.NamePosition;
 import species.auth.SUser;
 
@@ -142,6 +143,7 @@ class NamelistService {
             Map temp = new HashMap();
             Map id_details = new HashMap();
             temp['externalId'] = r?.id?.text()
+            temp['matchDatabaseName'] = "COL"
             temp['canonicalForm'] = r?.name?.text(); 
             temp['name'] = r?.name?.text() 
             if(searchBy == 'name') {
@@ -150,7 +152,15 @@ class NamelistService {
             temp['rank'] = r?.rank?.text()?.toLowerCase()
             temp[r?.rank?.text()?.toLowerCase()] = r?.name?.text()
             id_details[r?.name?.text()] = r?.id?.text();
-            temp['nameStatus'] = r?.name_status?.text()?.tokenize(' ')[0]
+            def cs = r?.name_status?.text()?.tokenize(' ')[0]
+            if(cs == 'provisionally' || cs == 'accepted') {
+                temp['nameStatus'] = 'accepted'
+            } else if (cs == 'misapplied' || cs == 'ambiguous' || cs == 'synonym') {
+                temp['nameStatus'] = 'synonym'
+            } else {
+                temp['nameStatus'] = cs
+            }
+            temp['colNameStatus'] = r?.name_status?.text()?.tokenize(' ')[0]
             temp['authorString'] = r?.author?.text()
             temp['sourceDatabase'] = r?.source_database?.text()
 
@@ -421,7 +431,11 @@ class NamelistService {
 
             //CANONICAL ZERO MATCH OR SINGLE MATCH
             if(res.size() < 2) { 
-                println "====CANONICAL - ZERO/SINGLE MATCH ====== "
+                if(res.size() == 0 ) {
+                    println "====CANONICAL - ZERO MATCH ====== "
+                } else {
+                    println "====CANONICAL - SINGLE MATCH ====== "
+                }
                 return res;
             }
             //CANONICAL MULTIPLE MATCH
@@ -719,7 +733,8 @@ class NamelistService {
     //also updates IBP Hierarchy if no status change and its accepted name
     def updateStatus(ScientificName sciName, Map colMatch) {
         println "===========SCIENTIFIC NAME === " + sciName
-        def result;
+        println "===========COL STATUS === " + colMatch.nameStatus
+        def result = [:];
         if(!sciName.status.value().equalsIgnoreCase(colMatch.nameStatus)) {
             log.debug "Changing status from ${sciName.status} to ${colMatch.nameStatus}"
             //NOW WILL BE FLAGGING IT
@@ -733,6 +748,7 @@ class NamelistService {
             */
             //changing status
             def newStatus = getNewNameStatus(colMatch.nameStatus);
+            println "===========NEW STATUS  === " + newStatus
             switch(newStatus) {
                 case NameStatus.ACCEPTED :
                     result = changeSynonymToAccepted(sciName, colMatch);
@@ -763,6 +779,7 @@ class NamelistService {
             //handling inside the cases only
             //sciName.status = newStatus;
         } else {        //Do when status does not change and its accepted
+            println "=========STATUS SAME  === "
             if(sciName.status == NameStatus.ACCEPTED) {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
@@ -808,6 +825,15 @@ class NamelistService {
         if(!nameStatus) return null;
 		for(NameStatus s : NameStatus){
 			if(s.value().equalsIgnoreCase(nameStatus))
+				return s
+		}
+        return null;
+    }
+    
+    public COLNameStatus getCOLNameStatus(String colNameStatus) {
+        if(!colNameStatus) return null;
+		for(COLNameStatus s : COLNameStatus){
+			if(s.value().equalsIgnoreCase(colNameStatus))
 				return s
 		}
         return null;
@@ -904,73 +930,73 @@ class NamelistService {
         sciName.position = position;
     }
 
-	List processColData(File f) {
-		if(!f.exists()){
-			log.debug "File not found skipping now..."
-			return
-		}
-		def results = new XmlParser().parse(f)
-		
-		String errMsg = results.'@error_message'
-		int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
-		 if(errMsg != ""){
-			log.debug "Error in col response " + errMsg
-			return
-		}
-		
-		/*if(resCount != 1 ){
-			log.debug "Multiple result found [${resCount}]. so skipping this ${f.name} for manual curation"
-			return
-		}*/
-		
-		//Every thing is fine so now populating CoL info
-		List res = responseAsMap(results, "id")
-		
-		log.debug "================   Response map   =================="
-		log.debug res
-		/*log.debug "=========ui map ==========="
-		def newRes = fetchTaxonRegistryData(res[0])
-		//newRes['nameDbInstance'] = sciName
-		log.debug newRes
-		log.debug "================   Response map   =================="
-        */
+    List processColData(File f) {
+        if(!f.exists()){
+            log.debug "File not found skipping now..."
+            return
+        }
+        def results = new XmlParser().parse(f)
+
+        String errMsg = results.'@error_message'
+        int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
+        if(errMsg != ""){
+            log.debug "Error in col response " + errMsg
+            return
+        }
+
+        /*if(resCount != 1 ){
+          log.debug "Multiple result found [${resCount}]. so skipping this ${f.name} for manual curation"
+          return
+          }*/
+
+        //Every thing is fine so now populating CoL info
+        List res = responseAsMap(results, "id")
+
+        log.debug "================   Response map   =================="
+        log.debug res
+        /*log.debug "=========ui map ==========="
+        def newRes = fetchTaxonRegistryData(res[0])
+        //newRes['nameDbInstance'] = sciName
+        log.debug newRes
+        log.debug "================   Response map   =================="
+         */
         return res
-	}
-	
-	private Map fetchTaxonRegistryData(Map m) {
-		println "=======MAP M ========= " + m
+    }
+
+    private Map fetchTaxonRegistryData(Map m) {
+        println "=======MAP M ========= " + m
         def result = [:]
-		def res = [:]
-		
-		result['taxonRegistry.0'] = res['0'] = m['kingdom']
-		result['taxonRegistry.1'] = res['1'] = m['phylum']
-		result['taxonRegistry.2'] = res['2'] = m['class']
-		result['taxonRegistry.3'] = res['3'] = m['order']
-		result['taxonRegistry.4'] = res['4'] = m['superfamily']
-		result['taxonRegistry.5'] = res['5'] = m['family']
-		result['taxonRegistry.6'] = res['6'] = m['subfamily']
-		result['taxonRegistry.7'] = res['7'] = m['genus']
-		result['taxonRegistry.8'] = res['8'] = m['subgenus']
-		result['taxonRegistry.9'] = res['9'] = m['species']
-		
-		result['taxonRegistry'] = res;
-		result['reg'] = m["taxonRegId"]          //$('#taxaHierarchy option:selected').val();
-		result['classification'] = 817; //for author contributed
-		
-		
-	
-		def metadata1 = [:]
-		metadata1['name'] = m['name']
-		metadata1['rank'] = m['rank']
-		metadata1['authorString'] = m['authorString']
-		metadata1['nameStatus'] = m['nameStatus']
-		metadata1['source'] = m['source'] //col
-		metadata1['via'] = m['sourceDatabase']
-		metadata1['id'] = m['externalId']
-		result['metadata'] = metadata1;
-		
-		return result;
-	}
+        def res = [:]
+
+        result['taxonRegistry.0'] = res['0'] = m['kingdom']
+        result['taxonRegistry.1'] = res['1'] = m['phylum']
+        result['taxonRegistry.2'] = res['2'] = m['class']
+        result['taxonRegistry.3'] = res['3'] = m['order']
+        result['taxonRegistry.4'] = res['4'] = m['superfamily']
+        result['taxonRegistry.5'] = res['5'] = m['family']
+        result['taxonRegistry.6'] = res['6'] = m['subfamily']
+        result['taxonRegistry.7'] = res['7'] = m['genus']
+        result['taxonRegistry.8'] = res['8'] = m['subgenus']
+        result['taxonRegistry.9'] = res['9'] = m['species']
+
+        result['taxonRegistry'] = res;
+        result['reg'] = m["taxonRegId"]          //$('#taxaHierarchy option:selected').val();
+        result['classification'] = 817; //for author contributed
+
+
+
+        def metadata1 = [:]
+        metadata1['name'] = m['name']
+        metadata1['rank'] = m['rank']
+        metadata1['authorString'] = m['authorString']
+        metadata1['nameStatus'] = m['nameStatus']
+        metadata1['source'] = m['source'] //col
+        metadata1['via'] = m['sourceDatabase']
+        metadata1['id'] = m['externalId']
+        result['metadata'] = metadata1;
+
+        return result;
+    }
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -1349,7 +1375,11 @@ def sql= session.createSQLQuery(query)
             sciName.name = pn.name
         }
         sciName.authorYear = colMatch.authorString;
-	    sciName = sciName.merge();
+	    sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
+        sciName.matchId = colMatch.externalId;
+        sciName.matchDatabaseName = colMatch.matchDatabaseName;
+        sciName.viaDatasource = colMatch.sourceDatabase;
+        sciName = sciName.merge();
         if(!sciName.save()) {
             sciName.errors.allErrors.each { log.error it }
         }

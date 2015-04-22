@@ -196,18 +196,19 @@ class Utils {
 		
 	static void downloadColXml(String sourceDir){
 		println "================ strating "
-		
+	    List errors = [];	
 		File f = new File(sourceDir)
 		if(!f.exists()){
 			f.mkdirs()
 		}
 		
-		saveInBatch(new File(f, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
+		saveInBatch(new File(f, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class, errors)
 		//saveInBatch(new File(f, Synonyms.class.simpleName), Synonyms.class)
+        println "========ERRORS IN DOWNLOAD ========= " + errors; 
 
 	}
 
-	private static saveInBatch(File sourceDir, domainClass){
+	private static saveInBatch(File sourceDir, domainClass, List errors){
 		if(!sourceDir.exists()){
 			sourceDir.mkdirs()
 		}
@@ -223,9 +224,10 @@ class Utils {
         }
 	
         println "========= STARTING HERE #######  ====== " 
-        List tds;
+        List tds = [];
         while(true){ 
             tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+            //tds.add(domainClass.get(144107L));//max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
             println "========= OFFSET  ====== " + offset
             tds.each {
                 println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 
@@ -233,8 +235,8 @@ class Utils {
             offset += BATCH_SIZE
             tds.each { 
                 domainClass.withNewTransaction { status ->
-                    println "===== Searching name " + it.canonicalForm + "   index >>>>>> " + (++i)  	
-                    saveFile(sourceDir, it)
+                    println "===== Searching name " + it.canonicalForm + "   index >>>>>> " + (++i) 
+                    saveFile(sourceDir, it, errors)
                 }
             }
             if(tds.isEmpty()){
@@ -244,7 +246,7 @@ class Utils {
 		}
 	}
 	
-	private static saveFile(File sourceDir, taxon){
+	private static saveFile(File sourceDir, taxon, List errors){
 		def name = taxon.canonicalForm
         def id = taxon.id
         File f11 = new File(sourceDir, "" + id + ".xml")
@@ -254,7 +256,16 @@ class Utils {
             //f.delete()
             //f.createNewFile()
         }
-		def http = new HTTPBuilder()
+		def http;
+        try { 
+            http = new HTTPBuilder()
+        } catch(Exception e) {
+            def temp = [:];
+            temp.id = id;
+            temp.name = name;
+            temp.errorMsg = e.message;
+            errors.add(temp); 
+        }
 		http.request( COL_SITE, GET, TEXT ) { req ->
 			uri.path = COL_URI
 			uri.query = [ name:name, response:'full', format:'xml']

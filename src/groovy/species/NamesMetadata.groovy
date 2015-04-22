@@ -3,65 +3,65 @@ package species
 import species.auth.SUser
 
 abstract class NamesMetadata extends NamesSorucedata {
-	
-	public enum NamePosition {
-		CLEAN("Clean"),
-		WORKING("Working"),
-		DIRTY("Dirty");
 
-		private String value;
+    public enum NamePosition {
+        CLEAN("Clean"),
+        WORKING("Working"),
+        DIRTY("Dirty");
 
-		NamePosition(String value) {
-			this.value = value;
-		}
+        private String value;
 
-		static list() {
-			[
-				CLEAN,
-				WORKING,
-				DIRTY
-			]
-		}
+        NamePosition(String value) {
+            this.value = value;
+        }
 
-		String value() {
-			return this.value;
-		}
+        static list() {
+            [
+            CLEAN,
+            WORKING,
+            DIRTY
+            ]
+        }
 
-		String toString() {
-			return this.value();
-		}
-	}
-	
-	public enum NameStatus {
-		ACCEPTED("Accepted"),
-		SYNONYM("Synonym"),
-		PROV_ACCEPTED("ProvAccepted"),
-		COMMON("Common");
-		private String value;
+        String value() {
+            return this.value;
+        }
 
-		NameStatus(String value) {
-			this.value = value;
-		}
+        String toString() {
+            return this.value();
+        }
+    }
 
-		static list() {
-			[
-				ACCEPTED,
-				SYNONYM,
-				PROV_ACCEPTED,
-				COMMON
-			]
-		}
+    public enum NameStatus {
+        ACCEPTED("Accepted"),
+        SYNONYM("Synonym"),
+        PROV_ACCEPTED("ProvAccepted"),
+        COMMON("Common");
+        private String value;
 
-		String value() {
-			return this.value;
-		}
+        NameStatus(String value) {
+            this.value = value;
+        }
 
-		String toString() {
-			return this.value();
-		}
-	}
+        static list() {
+            [
+            ACCEPTED,
+            SYNONYM,
+            PROV_ACCEPTED,
+            COMMON
+            ]
+        }
 
-	public enum COLNameStatus {
+        String value() {
+            return this.value;
+        }
+
+        String toString() {
+            return this.value();
+        }
+    }
+
+    public enum COLNameStatus {
         ACCEPTED("accepted"),
         COMMON("common"),
         SYNONYM("synonym"),
@@ -69,58 +69,58 @@ abstract class NamesMetadata extends NamesSorucedata {
         AMBIGUOUS_SYNONYM("ambiguous"),
         PROV_ACCEPTED("provisionally");
 
-		private String value;
+        private String value;
 
-		COLNameStatus(String value) {
-			this.value = value;
-		}
+        COLNameStatus(String value) {
+            this.value = value;
+        }
 
-		static list() {
-			[
-				ACCEPTED,
-				SYNONYM,
-                AMBIGUOUS_SYNONYM,
-				PROV_ACCEPTED,
-				COMMON
-			]
-		}
+        static list() {
+            [
+            ACCEPTED,
+            SYNONYM,
+            AMBIGUOUS_SYNONYM,
+            PROV_ACCEPTED,
+            COMMON
+            ]
+        }
 
-		String value() {
-			return this.value;
-		}
+        String value() {
+            return this.value;
+        }
 
-		String toString() {
-			return this.value();
-		}
-	}
+        String toString() {
+            return this.value();
+        }
+    }
 
-	public enum IbpSource {
-		SPECIES("Species"),
-		OBSERVATION("Observation"),
-		CURATOR("Curator")
-		
-		private String value;
+    public enum IbpSource {
+        SPECIES("Species"),
+        OBSERVATION("Observation"),
+        CURATOR("Curator")
 
-		IbpSource(String value) {
-			this.value = value;
-		}
+        private String value;
 
-		static list() {
-			[
-				SPECIES,
-				OBSERVATION,
-				CURATOR
-			]
-		}
+        IbpSource(String value) {
+            this.value = value;
+        }
 
-		String value() {
-			return this.value;
-		}
+        static list() {
+            [
+            SPECIES,
+            OBSERVATION,
+            CURATOR
+            ]
+        }
 
-		String toString() {
-			return this.value();
-		}
-	}
+        String value() {
+            return this.value;
+        }
+
+        String toString() {
+            return this.value();
+        }
+    }
 
 	
 	//String name

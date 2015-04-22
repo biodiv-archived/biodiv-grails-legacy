@@ -44,11 +44,11 @@ def curateName(taxonId, domainSourceDir) {
     }
 }
 
-//File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
-File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
+File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
+//File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(62044, domainSourceDir);
+curateName(144107, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -385,5 +385,5 @@ def curateRecoName() {
         if(!recoList) break;  
     }
 }
-curateRecoName()
+//curateRecoName()
 
