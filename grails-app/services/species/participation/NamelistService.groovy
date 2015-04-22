@@ -65,6 +65,8 @@ class NamelistService {
     def speciesService;
     def utilsService;
 	def sessionFactory;
+    def activityFeedService;
+
     List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
 
@@ -678,6 +680,7 @@ class NamelistService {
     }
 
     def processDataForMigration(ScientificName sciName, Map acceptedMatch) {
+        sciName.tempActivityDescription = "";
         sciName = updateAttributes(sciName, acceptedMatch);
         //if sciName_status != colData[nameStatus] -> update status
         sciName = updateStatus(sciName, acceptedMatch).sciName;
@@ -698,6 +701,8 @@ class NamelistService {
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"        
+            def feedInstance = activityFeedService.addActivityFeed(sciName, sciName, springSecurityService.currentUser?:SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, sciName.tempActivityDescription);
+            sciName.tempActivityDescription = "";
             utilsService.cleanUpGorm(true);
         } else {
             sciName.errors.allErrors.each { log.error it }
@@ -706,6 +711,7 @@ class NamelistService {
     }
    
     def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
+        sciName.tempActivityDescription = "";
         sciName = updateAttributes(sciName, acceptedMatch);
         //if sciName_status != colData[nameStatus] -> update status
         def result =  updateStatus(sciName, acceptedMatch);
@@ -720,8 +726,9 @@ class NamelistService {
         println "=====SCI NAME ==== " + sciName
         sciName = sciName.merge();
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
-            println sciName.position
             log.debug "Saved sciname ${sciName}"        
+            def feedInstance = activityFeedService.addActivityFeed(sciName, sciName, springSecurityService.currentUser?:SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, sciName.tempActivityDescription);
+            sciName.tempActivityDescription = "";
             //utilsService.cleanUpGorm(true);
         } else {
             sciName.errors.allErrors.each { log.error it }
@@ -747,6 +754,7 @@ class NamelistService {
             }
             */
             //changing status
+            sciName.tempActivityDescription += createNameActivityDescription("IBP status", sciName.status.value(), colMatch.nameStatus);
             def newStatus = getNewNameStatus(colMatch.nameStatus);
             println "===========NEW STATUS  === " + newStatus
             switch(newStatus) {
@@ -881,6 +889,7 @@ class NamelistService {
     private void updateRank(ScientificName sciName, int rank) {
         if(sciName.rank != rank) {
             log.debug "Updating rank from ${sciName.rank} to ${rank}"
+            sciName.tempActivityDescription += createNameActivityDescription("Rank ", sciName.rank, rank);
             sciName.rank = rank;
         }
     }
@@ -927,6 +936,7 @@ class NamelistService {
 
     boolean updatePosition(ScientificName sciName, NamePosition position) {
         log.debug "Updating position from ${sciName.position} to ${position}"
+        sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position.value(), position.value());
         sciName.position = position;
     }
 
@@ -1368,16 +1378,26 @@ def sql= session.createSQLQuery(query)
         def pn = parsedNames[0];
         if(pn.canonicalForm) {
             println "============= " + pn.canonicalForm +"============= "+ pn.name
+            sciName.tempActivityDescription += createNameActivityDescription("Canonical Name", sciName.canonicalForm, pn.canonicalForm);
             sciName.canonicalForm = pn.canonicalForm
+            sciName.tempActivityDescription += createNameActivityDescription("Binomial Name", sciName.binomialForm, pn.binomialForm);
             sciName.binomialForm = pn.binomialForm
+            sciName.tempActivityDescription += createNameActivityDescription("Normalized Name", sciName.normalizedForm, pn.normalizedForm);
             sciName.normalizedForm = pn.normalizedForm
+            sciName.tempActivityDescription += createNameActivityDescription("Italicised Name", sciName.italicisedForm, pn.italicisedForm);
             sciName.italicisedForm = pn.italicisedForm
+            sciName.tempActivityDescription += createNameActivityDescription("Verbatim Name", sciName.name, pn.name);
             sciName.name = pn.name
         }
+        sciName.tempActivityDescription += createNameActivityDescription("Author Year", sciName.authorYear, colMatch.authorString);
         sciName.authorYear = colMatch.authorString;
+        sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus.value(), colMatch.colNameStatus);
 	    sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
+        sciName.tempActivityDescription += createNameActivityDescription("Match Id", sciName.matchId, colMatch.externalId);
         sciName.matchId = colMatch.externalId;
+        sciName.tempActivityDescription += createNameActivityDescription("Match Database Name", sciName.matchDatabaseName, colMatch.matchDatabaseName);
         sciName.matchDatabaseName = colMatch.matchDatabaseName;
+        sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
         sciName.viaDatasource = colMatch.sourceDatabase;
         sciName = sciName.merge();
         if(!sciName.save()) {
@@ -1534,6 +1554,16 @@ def sql= session.createSQLQuery(query)
             reco.flaggingReason = reco.flaggingReason + " ### " + flaggingReason;
         } 
         syncReco(reco, sciName);
+    }
+
+    public String createNameActivityDescription(String fieldName, String oldValue, String newValue) {
+        String desc = "";
+        if(oldValue.toLowerCase() != newValue.toLowerCase()) {
+            if(oldValue == "") oldValue = "-"
+            if(newValue == "") newValue = "-"
+            desc = fieldName + " changed from " + oldValue + " to " + newValue +" .";
+        }
+        return desc;
     }
 
 }

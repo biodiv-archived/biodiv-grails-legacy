@@ -336,7 +336,7 @@ ALTER TABLE recommendation add column is_flagged boolean;
 update recommendation set is_flagged = false;
 ALTER TABLE recommendation DROP COLUMN flagging_reason;
 ALTER TABLE recommendation ADD COLUMN flagging_reason varchar(1500);
-
+alter table activity_feed alter column activity_descrption type varchar(1500);
 
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 

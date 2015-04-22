@@ -112,6 +112,7 @@ class ActivityFeedService {
 	static final String SPECIES_COMMON_NAMES = "species_Common Names"
 	static final String SPECIES_MAPS = "species_Occurrence Records"
 	static final String SPECIES_TAXON_RECORD_NAME = "species_Taxon Record Name"
+	static final String TAXON_NAME_UPDATED = "Taxon name updated"
 	
 	
 	private static DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
