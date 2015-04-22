@@ -40,6 +40,7 @@ class ObvUtilService {
 	static final String HABITAT = "habitat"
 	static final String OBSERVED_ON   = "observed on"
 	static final String CN    = "common name"
+	static final String LANGUAGE    = "language"
 	static final String SN    = "scientific name"
 	static final String GEO_PRIVACY   = "Geoprivacy enabled"
 	static final String LOCATION   = "location title"
@@ -441,6 +442,7 @@ class ObvUtilService {
 		//reco related
 		obvParams['recoName'] = m[SN]
 		obvParams['commonName'] = m[CN] 
+		obvParams['languageName'] = m[LANGUAGE]
 		obvParams['recoComment'] = m[COMMENT]
 		
 		//tags, grouplist, notes
