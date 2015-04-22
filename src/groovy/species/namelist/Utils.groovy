@@ -256,9 +256,34 @@ class Utils {
             //f.delete()
             //f.createNewFile()
         }
-		def http;
         try { 
-            http = new HTTPBuilder()
+            def http = new HTTPBuilder()
+
+            http.request( COL_SITE, GET, TEXT ) { req ->
+                uri.path = COL_URI
+                uri.query = [ name:name, response:'full', format:'xml']
+                //headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
+                headers.Accept = 'text/xml'
+
+                response.success = { resp, reader ->
+                    assert resp.statusLine.statusCode == 200
+                    println "Got response: ${resp.statusLine}"
+                    //println "Content-Type: ${resp.headers.'Content-Type'}"
+                    def xmlText =  reader.text
+                    try{
+                        File f = new File(sourceDir, "" + id + ".xml")
+                        if(f.exists()){
+                            f.delete()
+                            f.createNewFile()
+                        }
+                        println "-- Writing to file " + f.getAbsolutePath() 
+                        f.write(xmlText)
+                    }catch(Exception e){
+                        println e.message
+                    }
+                }
+                response.'404' = { println 'Not found' }
+            }
         } catch(Exception e) {
             def temp = [:];
             temp.id = id;
@@ -266,31 +291,6 @@ class Utils {
             temp.errorMsg = e.message;
             errors.add(temp); 
         }
-		http.request( COL_SITE, GET, TEXT ) { req ->
-			uri.path = COL_URI
-			uri.query = [ name:name, response:'full', format:'xml']
-			//headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
-			headers.Accept = 'text/xml'
-
-			response.success = { resp, reader ->
-				assert resp.statusLine.statusCode == 200
-				println "Got response: ${resp.statusLine}"
-				//println "Content-Type: ${resp.headers.'Content-Type'}"
-				def xmlText =  reader.text
-				try{
-					File f = new File(sourceDir, "" + id + ".xml")
-					if(f.exists()){
-						f.delete()
-						f.createNewFile()
-					}
-					println "-- Writing to file " + f.getAbsolutePath() 
-					f.write(xmlText)
-				}catch(Exception e){
-					println e.message
-				}
-			}
-			response.'404' = { println 'Not found' }
-		}
 	}
 
 	static void searchCol(String name){

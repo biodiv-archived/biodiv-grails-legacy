@@ -1522,9 +1522,24 @@ class XMLConverter extends SourceConverter {
                                     if(otherParams.curatingTaxonId) {
                                         TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
                                         if(sciName.status == NameStatus.ACCEPTED) {
-                                            if(!searchIBP.contains(sciName)){
+                                            //couldnot use contains()
+                                            boolean isPresent = false;
+                                            searchIBP.each {
+                                                if(it.id == sciName.id){
+                                                    isPresent = true;
+                                                }
+                                            }
+                                            if(!isPresent) {
                                                 searchIBP.add(sciName);
                                             }
+                                            /*
+                                            if(!searchIBP.contains(sciName)){
+                                                println "=======############SEARCH IBP DOESNOT CONTAIN ========== " + searchIBP;
+                                                searchIBP.add(sciName);
+                                                searchIBP.unique();
+                                                println "=======###########ADDED TO SEARCH IBP result  ========== " + searchIBP;
+                                            }
+                                             */
                                         }
                                     }
                                 }
