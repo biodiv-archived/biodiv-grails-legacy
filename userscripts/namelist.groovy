@@ -42,13 +42,14 @@ def curateName(taxonId, domainSourceDir) {
     } else {
         println "=====NO COL DATA === " 
     }
+    
 }
 
 File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-curateName(144107, domainSourceDir);
+//curateName(144107, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -339,17 +340,20 @@ def createAcceptedSynonym(){
 //createAcceptedSynonym()
 
 def curateAllNames() {
-    int limit = 50, offset = 36047 ;
+    int limit = 50, offset = 0;
     int counter = 0;
-    while(true){
-        println "=====offset == "+ offset + " ===== limit == " + limit     
-        def taxDefList = TaxonomyDefinition.list (max: limit , offset:offset, sort: "rank", order: "asc");
+    while(offset < 10000){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def taxDefList;
+        TaxonomyDefinition.withNewTransaction {
+            taxDefList = TaxonomyDefinition.list (max: limit , offset:offset, sort: "rank", order: "asc");
+        }
         for(taxDef in taxDefList) {
-		TaxonomyDefinition.withNewSession {
+		    TaxonomyDefinition.withNewSession {
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
                 counter++;
-                File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
-                //File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
+                //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
+                File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
                 curateName(taxDef.id, domainSourceDir);
             }
         }
@@ -357,9 +361,14 @@ def curateAllNames() {
         //utilsService.cleanUpGorm(true); 
         if(!taxDefList) break;  
     }
+    println "======NUM OF TIMES SEARCH IBP CALLED==== " + nSer.SEARCH_IBP_COUNTER;
+    println "======CAN_MULTIPLE==== " + nSer.CAN_MULTIPLE;
+    println "======AFTER_CAN_MULTI_ZERO==== " + nSer.AFTER_CAN_MULTI_ZERO;
+    println "======AFTER_CAN_MULTI_SINGLE==== " + nSer.AFTER_CAN_MULTI_SINGLE;
+    println "======AFTER_CAN_MULTI_MULTI==== " + nSer.AFTER_CAN_MULTI_MULTI;
 }
 
-//curateAllNames()
+curateAllNames()
 
 def curateRecoName() {
     println "=======SCRIPT FOR RECO NAMES======"

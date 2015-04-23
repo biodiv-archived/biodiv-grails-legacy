@@ -57,6 +57,12 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
+    private static long SEARCH_IBP_COUNTER = 0;
+    private static long CAN_MULTIPLE = 0;
+    private static long AFTER_CAN_MULTI_ZERO = 0;
+    private static long AFTER_CAN_MULTI_SINGLE = 0;
+    private static long AFTER_CAN_MULTI_MULTI = 0;
+
 	def dataSource
     def groupHandlerService
     def springSecurityService;
@@ -94,7 +100,6 @@ class NamelistService {
         }
     }
 
-
     List searchGBIF(String input, String searchBy){
         //http://api.gbif.org/v1/species/match?verbose=true&name=Mangifera
 
@@ -126,12 +131,10 @@ class NamelistService {
         }
     }
 
-
     List responseAsMap(String xmlText, String searchBy) {
         def results = new XmlParser().parseText(xmlText)
         return responseAsMap(results, searchBy)
     }
-
 
     List responseAsMap(results, String searchBy) {
         List finalResult = []
@@ -416,6 +419,7 @@ class NamelistService {
     //Searches IBP accepted and synonym
     List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank) {  
         //utilsService.cleanUpGorm(true);
+        SEARCH_IBP_COUNTER ++;
         println "========SEARCH IBP CALLED======="
         println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "=--- "+ rank;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
@@ -442,12 +446,16 @@ class NamelistService {
             }
             //CANONICAL MULTIPLE MATCH
             else {
+                //COUNTER INCREASE FOR CANONICAL MULTIPLE
+                CAN_MULTIPLE ++;
                 //FINDING BY VERBATIM
                 if(!authorYear) authorYear = '';
                 res = clazz.findAllWhere(name: (canonicalForm + " " + authorYear), status: status);
 
                 //VERBATIM SINGLE MATCH
                 if(res.size() == 1) {
+                    //COUNTER INCREASE FOR prune to 1 result
+                    AFTER_CAN_MULTI_SINGLE ++;
                     println "====VERBATIM - SINGLE MATCH ====== "
                     return res;
                 }
@@ -461,23 +469,32 @@ class NamelistService {
                     if(res.size() == 0) {
                         if(authorYear) {
                             println "====TRYING VERBATIM + RANK - ZERO MATCH AND ALSO HAS AUTHOR YEAR"
+                            AFTER_CAN_MULTI_ZERO ++;
                             return res;
                         }
                         else {
                             //FINDING BY CANONICAL + RANK
                             println "====TRYING VERBATIM + RANK - ZERO MATCH & NO AUTHOR YEAR - SO MATCHED ON CANONICAL + RANK"
                             res = clazz.findAllWhere(canonicalForm:canonicalForm ,rank: rank, status: status);
+                            
+                            if(res.size() == 0) {AFTER_CAN_MULTI_ZERO ++;}
+                            else if(res.size() == 1) {AFTER_CAN_MULTI_SINGLE ++;}
+                            else {AFTER_CAN_MULTI_MULTI ++;}
+                            
                             return res;
                         }
                     }
                     //VERBATIM + RANK SINGLE MATCH
                     if(res.size() == 1) {
+                        //COUNTER INCREASE FOR prune to 1 result
+                        AFTER_CAN_MULTI_SINGLE ++;
                         println "====TRYING VERBATIM + RANK - SINGLE MATCH"
                         return res;
                     }
 
                     //VERBATIM + RANK MULTIPLE MATCH
                     else {
+                        AFTER_CAN_MULTI_MULTI ++;
                         println "====TRYING VERBATIM + RANK - MULTIPLE MATCH"
                         return res;
                     }
@@ -511,39 +528,39 @@ class NamelistService {
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
 	
-	def populateInfoFromCol(File sourceDir){
-		if(!sourceDir.exists()){
-			log.debug "Source dir does not exist. ${sourceDir} Aborting now..." 
-			return
-		}
-		
-		curateName(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
-		//curateName(new File(sourceDir, Synon//TaxonomyDefinition.findAllByCanonicalForm(canonicalForm)yms.class.simpleName), Synonyms.class)
-	}
-	
-	void curateName(File domainSourceDir, domainClass){
-		if(!domainSourceDir.exists()){
-			log.debug "Source dir does not exist. ${domainSourceDir} Aborting now..."
-			return
-		}
+    def populateInfoFromCol(File sourceDir){
+        if(!sourceDir.exists()){
+            log.debug "Source dir does not exist. ${sourceDir} Aborting now..." 
+            return
+        }
 
-		long offset = 0
-		int i = 0
-		while(true && (offset == 0)){
-			List tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: "rank", order: "desc")
-			tds.each {
-				log.debug  it.rank +  "    " + it.id + "   " +  it.canonicalForm
-			}
-			if(tds.isEmpty()){
-				break
-			}
-			offset += BATCH_SIZE
-			tds.each {
+        curateName(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
+        //curateName(new File(sourceDir, Synon//TaxonomyDefinition.findAllByCanonicalForm(canonicalForm)yms.class.simpleName), Synonyms.class)
+    }
+
+    void curateName(File domainSourceDir, domainClass){
+        if(!domainSourceDir.exists()){
+            log.debug "Source dir does not exist. ${domainSourceDir} Aborting now..."
+            return
+        }
+
+        long offset = 0
+        int i = 0
+        while(true && (offset == 0)){
+            List tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: "rank", order: "desc")
+            tds.each {
+                log.debug  it.rank +  "    " + it.id + "   " +  it.canonicalForm
+            }
+            if(tds.isEmpty()){
+                break
+            }
+            offset += BATCH_SIZE
+            tds.each {
                 curateName(it, domainSourceDir);
-			}
-		}
-	}
-	
+            }
+        }
+    }
+
     void curateName (ScientificName sciName, File domainSourceDir) {
         File f = new File(domainSourceDir, "" + sciName.id + ".xml")
         log.debug  "===== starting " + f
@@ -945,32 +962,36 @@ class NamelistService {
             log.debug "File not found skipping now..."
             return
         }
-        def results = new XmlParser().parse(f)
+        try{
+            def results = new XmlParser().parse(f)
 
-        String errMsg = results.'@error_message'
-        int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
-        if(errMsg != ""){
-            log.debug "Error in col response " + errMsg
-            return
+            String errMsg = results.'@error_message'
+            int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
+            if(errMsg != ""){
+                log.debug "Error in col response " + errMsg
+                return
+            }
+
+            /*if(resCount != 1 ){
+              log.debug "Multiple result found [${resCount}]. so skipping this ${f.name} for manual curation"
+              return
+              }*/
+
+            //Every thing is fine so now populating CoL info
+            List res = responseAsMap(results, "id")
+
+            log.debug "================   Response map   =================="
+            log.debug res
+            /*log.debug "=========ui map ==========="
+            def newRes = fetchTaxonRegistryData(res[0])
+            //newRes['nameDbInstance'] = sciName
+            log.debug newRes
+            log.debug "================   Response map   =================="
+             */
+            return res
+        } catch(Exception e) {
+            return;
         }
-
-        /*if(resCount != 1 ){
-          log.debug "Multiple result found [${resCount}]. so skipping this ${f.name} for manual curation"
-          return
-          }*/
-
-        //Every thing is fine so now populating CoL info
-        List res = responseAsMap(results, "id")
-
-        log.debug "================   Response map   =================="
-        log.debug res
-        /*log.debug "=========ui map ==========="
-        def newRes = fetchTaxonRegistryData(res[0])
-        //newRes['nameDbInstance'] = sciName
-        log.debug newRes
-        log.debug "================   Response map   =================="
-         */
-        return res
     }
 
     private Map fetchTaxonRegistryData(Map m) {
@@ -1391,7 +1412,7 @@ def sql= session.createSQLQuery(query)
         }
         sciName.tempActivityDescription += createNameActivityDescription("Author Year", sciName.authorYear, colMatch.authorString);
         sciName.authorYear = colMatch.authorString;
-        sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus.value(), colMatch.colNameStatus);
+        sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus?.value(), colMatch.colNameStatus);
 	    sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
         sciName.tempActivityDescription += createNameActivityDescription("Match Id", sciName.matchId, colMatch.externalId);
         sciName.matchId = colMatch.externalId;
@@ -1557,13 +1578,12 @@ def sql= session.createSQLQuery(query)
     }
 
     public String createNameActivityDescription(String fieldName, String oldValue, String newValue) {
+        if(oldValue == "" || oldValue == null) oldValue = "-";
+        if(newValue == "" || newValue == null) newValue = "-";
         String desc = "";
-        if(oldValue.toLowerCase() != newValue.toLowerCase()) {
-            if(oldValue == "") oldValue = "-"
-            if(newValue == "") newValue = "-"
+        if(oldValue?.toLowerCase() != newValue?.toLowerCase()) {
             desc = fieldName + " changed from " + oldValue + " to " + newValue +" .";
         }
         return desc;
     }
-
 }
