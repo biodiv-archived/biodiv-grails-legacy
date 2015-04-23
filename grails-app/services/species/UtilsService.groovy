@@ -285,7 +285,7 @@ class UtilsService {
 
             def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
             //println "testing obs====================="+userLanguage;
-            templateMap["currentUser"] = springSecurityService.currentUser
+            templateMap["currentUser"] = feedInstance ? feedInstance.author : springSecurityService.currentUser
             templateMap["action"] = notificationType;
             templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
             def mailSubject = ""

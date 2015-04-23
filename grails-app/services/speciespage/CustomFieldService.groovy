@@ -30,6 +30,8 @@ class CustomFieldService {
 		def val = fetchValue(cf, observationId)
 		if(val && (cf.dataType == CustomField.DataType.DATE)){
 			val = val.format('MMMM d, y')
+		}else if (val && cf.allowedMultiple){
+			val = val.split(",").join(", ")
 		}
 		return val
 	}
