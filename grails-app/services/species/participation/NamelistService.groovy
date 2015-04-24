@@ -587,7 +587,7 @@ class NamelistService {
         //check if this is a single direct match
         if(colData.size() == 1 ) {
             //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
-            if(sciName.status != NameStatus.COMMON && colData['nameStatus'] == NamesMetadata.COLNameStatus.COMMON.value()) {
+            if(sciName.status != NameStatus.COMMON && colData[0].nameStatus == NamesMetadata.COLNameStatus.COMMON.value()) {
                 //reject ... position remains DIRTY
                 log.debug "[REJECTING AS NAME IS COMMON NAME] ${sciName} is a sciname but it is common name as per COL. So leaving this name for curation"
                 return;
