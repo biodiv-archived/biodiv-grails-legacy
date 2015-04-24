@@ -63,9 +63,21 @@ class TaxonController {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
             Long regId = classSystem;
+            println "======IN EXPAND SPECIES===="
             getSpeciesHierarchy(speciesid, rs, regId);
         } else {
+            println "======NOT IN EXPAND SPECIES==== " + classSystem
+            def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
+            println "========RES SIZE ========== " + rs.size() 
+            if(cl == classification) {
+                println "mil gaya========="
+                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                getHierarchyNodes(rs, level, level+3, parentId, authorClass.id, expandAll, expandSpecies, null,"DIRTY");
+                println "========RES SIZE ========== " + rs.size() 
+            }
         }
         log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
         render(contentType: "text/xml", text:buildHierarchyResult(rs, classSystem))
@@ -80,7 +92,7 @@ class TaxonController {
      * @param expandAll
      * @param taxonIds
      */
-    private void getHierarchyNodes(List<GroovyRowResult> resultSet, int level, int tillLevel, String parentId, Long classSystem, boolean expandAll, boolean expandSpecies, List taxonIds) {
+    private void getHierarchyNodes(List<GroovyRowResult> resultSet, int level, int tillLevel, String parentId, Long classSystem, boolean expandAll, boolean expandSpecies, List taxonIds, String position = null) {
         def sql = new Sql(dataSource)
         def rs;
         String sqlStr;
@@ -89,62 +101,68 @@ class TaxonController {
 
         if(classSystem) {
             if(!parentId) {
-                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classsystem \
+                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classsystem, t.position as position \
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
-                    (classSystem?"s.classification_id = :classSystem and ":"")+
+                    (classSystem?"s.classification_id = :classSystem and ":"")+ 
+                    (position?"t.position = :position and ": "")+
                     "t.rank = 0";
-                rs = sql.rows(sqlStr, [classSystem:classSystem])
+                rs = sql.rows(sqlStr, [classSystem:classSystem, position:position])
             }
             else if(level == TaxonomyRank.SPECIES.ordinal()) {
-                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem\
+                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
+                    (position?"t.position = :position and ": "")+
                     +"t.rank = "+level+" and \
                     s.path ~ '^"+parentId+"_[0-9]+\$' "
-                    rs = sql.rows(sqlStr , [classSystem:classSystem]);
+                    rs = sql.rows(sqlStr , [classSystem:classSystem, position:position]);
             } else {
-                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem\
+                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
+                    (position?"t.position = :position and ": "")+
                     "s.path ~ '^"+parentId+"_[0-9]+\$' " +
                     "order by t.rank, t.name asc";
-                rs = sql.rows(sqlStr, [classSystem:classSystem])
+                rs = sql.rows(sqlStr, [classSystem:classSystem, position:position])
             }
         } else {
             if(!parentId) {
-                sqlStr = "select t.id as taxonid, 1 as count, 0 as rank, t.name as name, s.path as path , ${classSystem} as classsystem\
+                sqlStr = "select t.id as taxonid, 1 as count, 0 as rank, t.name as name, s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
+                    (position?"t.position = :position and ": "")+
                     "t.rank = 0 group by s.path, t.id, t.name";
-                rs = sql.rows(sqlStr)
+                rs = sql.rows(sqlStr, [position:position])
             }
             else if(level == TaxonomyRank.SPECIES.ordinal()) {
-                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem\
+                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
+                    (position?"t.position = :position and ": "")
                     +"t.rank = "+level+" and \
                     s.path ~ '^"+parentId+"_[0-9]+\$' group by s.path, t.id, t.name";
-                rs = sql.rows(sqlStr );
+                rs = sql.rows(sqlStr, [position:position]);
             } else {
-                sqlStr =  "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem\
+                sqlStr =  "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
+                    (position?"t.position = :position and ": "")+
                     "s.path ~ '^"+parentId+"_[0-9]+\$' group by s.path, t.rank, t.id, t.name" +
                     " order by t.rank asc, t.name"
-                    rs = sql.rows(sqlStr)
+                    rs = sql.rows(sqlStr, [position:position])
             }
         }
         log.debug "Time taken to execute taxon hierarchy query : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
@@ -359,6 +377,7 @@ class TaxonController {
                     } else {
                         cell (false) //for edit/delete
                     }
+                    cell (r["position"])
                 }
             }
             records (size)

@@ -45,17 +45,19 @@ class AcceptedSynonym {
         println "===========REMOVING ENTRY ====== "
         println "===========ACCEPTED ====== " + accepted
         println "===========SYNONYM  ====== " + synonym
-        def ent = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
-        println "=======ENTRY ========= " + ent
-        if(ent) {
-            try {
-                println "deleting"
-                if(!ent.delete(failOnError:true)){
-                    ent.errors.allErrors.each { log.error it }
+        AcceptedSynonym.withNewSession {
+            def ent = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
+            println "=======ENTRY ========= " + ent
+            if(ent) {
+                try {
+                    println "deleting"
+                    if(!ent.delete(failOnError:true)){
+                        ent.errors.allErrors.each { log.error it }
+                    }
+                    println "deleted"
+                }catch (Exception e) {
+                    e.printStackTrace()
                 }
-                println "deleted"
-            }catch (Exception e) {
-                e.printStackTrace()
             }
         }
     }

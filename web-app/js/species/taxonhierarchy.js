@@ -22,6 +22,7 @@
                 var taxonId = $.trim($(cells[0]).text());
                 var speciesId = $.trim($(cells[4]).text());
                 var level = $(cells[6]).text();
+                var position = $(cells[12]).text();
                 var levelTxt;
                 $.each(taxonRanks, function(i,v) {
                     if(level == v.value) {
@@ -32,11 +33,11 @@
 
                 //el+= taxonId;
                 if(speciesId && speciesId != -1) {
-                    el = levelTxt+": "+"<span class='rank rank"+level+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
+                    el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
                 } else {
                     // el = "<a href='${createLink(action:"taxon")}/"+taxonId+"'
                     // class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
-                    el = levelTxt+": "+"<span class='rank rank"+level+"'>"+el;
+                    el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'>"+el;
                 }
                 
                 if(this.expandAllIcon) {
@@ -88,6 +89,7 @@
                 postData:{n_level:-1, expand_species:me.options.expandSpecies, expand_all:me.options.expandAll, speciesid:me.options.speciesId, classSystem:$.trim($('#taxaHierarchy option:selected').val())},
                 sortable:false,
                 loadComplete:function(data) {
+                    console.log(data);
                     var postData = $("#taxonHierarchy").getGridParam('postData');
                     postData["expand_species"] = false;
                     postData["expand_all"] = false;

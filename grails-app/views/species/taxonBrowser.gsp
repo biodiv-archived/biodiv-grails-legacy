@@ -11,6 +11,13 @@
 <title><g:message code="taxonbrowser.taxonomy.browser" /></title>
 
 <r:require modules="species_show"/>
+<style type="text/css">
+    .DIRTY {
+        background-color:red;
+    }
+    .WORKING {
+    }
+</style>
 
 </head>
 <body>
