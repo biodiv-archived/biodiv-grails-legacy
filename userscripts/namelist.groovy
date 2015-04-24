@@ -362,6 +362,8 @@ def curateAllNames() {
         if(!taxDefList) break;  
     }
     println "======NUM OF TIMES SEARCH IBP CALLED==== " + nSer.SEARCH_IBP_COUNTER;
+    println "======CAN_ZERO==== " + nSer.CAN_ZERO;
+    println "======CAN_SINGLE==== " + nSer.CAN_SINGLE;
     println "======CAN_MULTIPLE==== " + nSer.CAN_MULTIPLE;
     println "======AFTER_CAN_MULTI_ZERO==== " + nSer.AFTER_CAN_MULTI_ZERO;
     println "======AFTER_CAN_MULTI_SINGLE==== " + nSer.AFTER_CAN_MULTI_SINGLE;

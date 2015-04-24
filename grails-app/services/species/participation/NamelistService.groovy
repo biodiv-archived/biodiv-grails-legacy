@@ -58,6 +58,8 @@ class NamelistService {
 	private static final String MIS_APP_NAME = "misapplied name"
 
     private static long SEARCH_IBP_COUNTER = 0;
+    private static long CAN_ZERO = 0;
+    private static long CAN_SINGLE = 0;
     private static long CAN_MULTIPLE = 0;
     private static long AFTER_CAN_MULTI_ZERO = 0;
     private static long AFTER_CAN_MULTI_SINGLE = 0;
@@ -438,8 +440,10 @@ class NamelistService {
             //CANONICAL ZERO MATCH OR SINGLE MATCH
             if(res.size() < 2) { 
                 if(res.size() == 0 ) {
+                    CAN_ZERO ++;
                     println "====CANONICAL - ZERO MATCH ====== "
                 } else {
+                    CAN_SINGLE ++;
                     println "====CANONICAL - SINGLE MATCH ====== "
                 }
                 return res;
@@ -906,7 +910,7 @@ class NamelistService {
     private void updateRank(ScientificName sciName, int rank) {
         if(sciName.rank != rank) {
             log.debug "Updating rank from ${sciName.rank} to ${rank}"
-            sciName.tempActivityDescription += createNameActivityDescription("Rank ", sciName.rank, rank);
+            sciName.tempActivityDescription += createNameActivityDescription("Rank ", TaxonomyRank.getTRFromInt(sciName.rank).value(), TaxonomyRank.getTRFromInt(rank).value());
             sciName.rank = rank;
         }
     }
