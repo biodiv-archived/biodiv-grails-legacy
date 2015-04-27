@@ -539,9 +539,9 @@ environments {
             warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.app'
-            info   'org.springframework.security'
-            info   'org.springframework.security.web'
-            info   'org.springframework.security.authentication'
+            debug   'org.springframework.security'
+            debug   'org.springframework.security.web'
+            debug   'org.springframework.security.authentication'
             debug   'speciespage',
                     'species'
             debug   'com.the6hours', 
@@ -556,8 +556,8 @@ environments {
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
 
-
-            info    'grails.app.filters.species'
+            debug   'grails.plugin.springsecurity.openid'
+            debug    'grails.app.filters.species'
             fatal    'jdbc.sqltiming'
             info    'jdbc.connection'
             fatal   'jdbc.sqlonly'
@@ -578,6 +578,9 @@ environments {
             */
             trace   'com.grailsrocks.emailconfirmation'
             debug   'com.odobo.grails.plugin.springsecurity.rest'
+            debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
+            debug   'uk.co.desirableobjects.oauth.scribe'
+            debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
        }
     }
 	test {
@@ -605,7 +608,7 @@ environments {
             'grails.app',
             'species'
             info   'grails.app.filters.species.SecurityFilters'
-            info    'species.auth',
+            debug    'species.auth',
             'com.mchange.v2.resourcepool.BasicResourcePool'
             info    'com.linkedin.grails'
         }
@@ -1501,6 +1504,9 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/plugins/ckeditor-3.6.3.0/**':   ['permitAll'],
     '/bootstrap/img/*':['permitAll'],
     '/plugins/jquery-ui-1.10.3/**':['permitAll'],
+    '/login/**':        ['permitAll'],
+    '/logout/**':       ['permitAll'],
+    '/oauth/**':        ['permitAll'],
     '/**':['permitAll']
  ]
 
@@ -1673,3 +1679,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 grails.mime.use.accept.header = true // Default value is true.
 grails.mime.disable.accept.header.userAgents = []
 
+
+// Added by the Spring Security OAuth plugin:
+grails.plugin.springsecurity.oauth.domainClass = 'species.auth.OAuthID'
+grails.plugin.springsecurity.oauth.registration.askToLinkOrCreateAccountUri = '/login/openIdCreateAccount'

@@ -1807,8 +1807,11 @@ class ObservationController extends AbstractObjectController {
 	    //setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
 	    println speciesService.checking();
     	//return false;
-        //render springSecurityFilterChain
     }
+
+def filterChain() {
+    render springSecurityFilterChain
+}
 
     def filePickerSecurityCodes() {
         utilsService.filePickerSecurityCodes();

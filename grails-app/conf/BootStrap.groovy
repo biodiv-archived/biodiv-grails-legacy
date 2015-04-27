@@ -140,6 +140,10 @@ class BootStrap {
 	 * 
 	 */
 	def initFilters() {
+        //SpringSecurityUtils.clientRegisterFilter('openIDAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+50)
+//        SpringSecurityUtils.registerProvider 'openIDAuthProvider'
+//        SpringSecurityUtils.clientRegisterFilter 'openIDAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+50
+
 	}
 
 	def initEmailConfirmationService() {

@@ -132,6 +132,7 @@ grails.project.dependency.resolution = {
         runtime ('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
+
     }
 
     plugins { 
@@ -162,9 +163,11 @@ grails.project.dependency.resolution = {
             excludes 'spring-web' 
         } 
 
+
         compile ":spring-security-openid:2.0-RC2"
         compile ":spring-security-ui:1.0-RC2"
 
+        compile ':spring-security-oauth-google:0.3.1'
 
         runtime ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'
@@ -178,7 +181,7 @@ grails.project.dependency.resolution = {
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
-        compile ":grails-melody:1.47.2"
+        //compile ":grails-melody:1.47.2"
         compile ":jcaptcha:1.5.0"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
@@ -191,7 +194,8 @@ grails.project.dependency.resolution = {
         compile ":taggable:1.0.1"
         runtime ":yui-minify-resources:0.1.5"
         runtime ":zipped-resources:1.0"
-    
+
+   
     } 
 
     grails.war.resources = { stagingDir ->

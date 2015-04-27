@@ -30,6 +30,7 @@ import species.auth.SUserRole
 import species.utils.Utils;
 import species.auth.CustomRegisterCommand;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import grails.plugin.springsecurity.oauth.OAuthToken;
 
 /**
  * Manages associating OpenIDs with application users, both by creating a new local user
@@ -61,11 +62,11 @@ class OpenIdController {
 	 * a new account, or click through to linkAccount to associate the OpenID with an
 	 * existing local account.
 	 */
-	def auth = {
+ 	def auth = {
 
 		def config = SpringSecurityUtils.securityConfig
 
-		if (springSecurityService.isLoggedIn()) {
+ 		if (springSecurityService.isLoggedIn()) {
 			redirect uri: config.successHandler.defaultTargetUrl
 			return
 		}
@@ -119,22 +120,24 @@ class OpenIdController {
 
 		String openId = session[OIAFH.LAST_OPENID_USERNAME]
 		List attributes = session[OIAFH.LAST_OPENID_ATTRIBUTES] ?: []
-
-		if (!openId) {
+        OAuthToken oAuthToken = session[SpringSecurityOAuthController.SPRING_SECURITY_OAUTH_TOKEN]
+            
+ 		if (!openId && !oAuthToken) {
 			flash.error = messageSource.getMessage("login.errors.openid.found", null, RCU.getLocale(request))
 			return
 		}
 
 		log.debug "Processing OpenId authentication in createAccount/merge"
-
-		def emailAttribute = attributes.find { l ->
-			if(l.name == 'email') {
-				return l;
-			}
-		}
-
-		//TODO: if there are multiple email accounts available choose among them
-		String email = emailAttribute.values[0];
+		String email
+        if(openId) {
+            emailAttribute = attributes.find { l ->
+                if(l.name == 'email') {
+                    email = l.values[0]
+                }
+            }
+        } else if(oAuthToken) {
+            email = oAuthToken.email
+        }
 
 		if (!email) {
 			flash.error = messageSource.getMessage("login.errors.emailId.necessary", null, RCU.getLocale(request))
@@ -149,14 +152,22 @@ class OpenIdController {
 		if(user) {
 			log.info "Found existing user with same emailId $email"
 			log.info "Merging details with existing account $user"
-			registerAccountOpenId user.email, openId
+            if(openId) {
+		    	registerAccountOpenId user.email, openId
+            } else if(oAuthToken) {
+		    	registerAccountOAuth user.email, oAuthToken
+            }
 			def usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 			authenticateAndRedirect user."$usernamePropertyName", request, response
 		} else {
 			log.info "Redirecting to register"
 			CustomRegisterCommand command = new CustomRegisterCommand();
-			copyFromAttributeExchange command
-			command.openId = openId;
+            if(openId) {
+    			copyFromAttributeExchange command
+            } else if(oAuthToken) {
+                command.email = oAuthToken.email
+            }
+			command.openId = openId?:oAuthToken.email;
 			log.debug "register command : $command"
 			flash.chainedParams = [command: command]
 			chain ( controller:"register");
@@ -256,6 +267,7 @@ class OpenIdController {
 		session.removeAttribute OIAFH.LAST_OPENID_USERNAME
 		session.removeAttribute OIAFH.LAST_OPENID_ATTRIBUTES
 		session.removeAttribute "LAST_FACEBOOK_USER"
+		session.removeAttribute SpringSecurityOAuthController.SPRING_SECURITY_OAUTH_TOKEN
 
 		springSecurityService.reauthenticate username
 
@@ -270,36 +282,7 @@ class OpenIdController {
 		}
 	}
 
-	/**
-	 * Create the user instance and grant any roles that are specified in the config
-	 * for new users.
-	 * @param username  the username
-	 * @param password  the password
-	 * @param openId  the associated OpenID
-	 * @return  true if successful
-	 */
-	private boolean createNewAccount(String username, String password, String openId) {
-		boolean created = SUser.withTransaction { status ->
-			def config = SpringSecurityUtils.securityConfig
-
-			password = springSecurityService.encodePassword(password)
-			def user = new SUser(username: username, password: password, enabled: true)
-
-			user.addToOpenIds(url: openId)
-
-			if (!user.save()) {
-				return false
-			}
-
-			for (roleName in config.openid.registration.roleNames) {
-				SUserRole.create user, Role.findByAuthority(roleName)
-			}
-			return true
-		}
-		return created
-	}
-
-	/**
+    /**
 	 * Associates an OpenID with an existing account. Needs the user's password to ensure
 	 * that the user owns that account, and authenticates to verify before linking.
 	 * @param username  the username
@@ -319,12 +302,7 @@ class OpenIdController {
 	private void registerAccountOpenId(String email, String openId) {
 		SUser.withTransaction { status ->
 			def user = SUser.findByEmail(email);
-			def securityConf = SpringSecurityUtils.securityConfig
-			user[securityConf.userLookup.enabledPropertyName] = true
-			user[securityConf.userLookup.accountExpiredPropertyName] = false
-			user[securityConf.userLookup.accountLockedPropertyName] = false
-			user[securityConf.userLookup.passwordExpiredPropertyName] = false
-			
+		
 			user.addToOpenIds(url: openId)
 			if (!user.save(flush:true, failOnError:true)) {
 				log.error "Coudn't save user openIds"
@@ -337,6 +315,20 @@ class OpenIdController {
 	}
 
 
+    private void registerAccountOAuth(String email, OAuthToken oAuthToken) {
+        SUser.withTransaction { status ->
+            SUser user = SUser.findByEmail(email)
+            if (user) {
+                user.addToOAuthIDs(provider: oAuthToken.providerName, accessToken: oAuthToken.socialId, user: user)
+                if (user.validate() && user.save()) {
+                    SUserService.assignRoles(user);
+                    return true
+                }
+            } 
+            status.setRollbackOnly()
+            return false
+        }
+    }
 
 	/**
 	 * For the initial form display, copy any registered AX values into the command.

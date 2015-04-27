@@ -13,17 +13,7 @@
 	</g:if>
 	<g:else>
 		<div class="sign_in_external_bttn">
-			<form action='${openIdPostUrl}' method='POST' autocomplete='off'
-				name='google_openIdLoginForm'>
-				<input type="hidden" name="${openidIdentifier}"
-					class="openid-identifier"
-					value="https://www.google.com/accounts/o8/id" />
-				<g:if test="${targetUrl}">
-					<input type="hidden" name="spring-security-redirect"
-						value="${targetUrl}" />
-				</g:if>
-				<input type="submit" value="" class="external_bttn googleButton" />
-			</form>
+            <a href="/biodiv/oauth/google/authenticate?redirectUrl=${targetUrl}" provider="google" class="external_bttn googleButton"></a>
 		</div>
 		
 		<div class="sign_in_external_bttn">
