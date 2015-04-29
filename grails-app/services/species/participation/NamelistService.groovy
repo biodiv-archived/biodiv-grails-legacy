@@ -1024,7 +1024,12 @@ class NamelistService {
         result['taxonRegistry.6'] = res['6'] = m['subfamily']
         result['taxonRegistry.7'] = res['7'] = m['genus']
         result['taxonRegistry.8'] = res['8'] = m['subgenus']
-        result['taxonRegistry.9'] = res['9'] = m['species'] + " " + m['authorString']
+        if(m['rank'] == 'species'){
+            result['taxonRegistry.9'] = res['9'] = m['species'] + " " + m['authorString']
+        } else {
+            result['taxonRegistry.9'] = res['9'] = m['species'] 
+            
+        }
 
         result['taxonRegistry'] = res;
         result['reg'] = m["taxonRegId"]          //$('#taxaHierarchy option:selected').val();
