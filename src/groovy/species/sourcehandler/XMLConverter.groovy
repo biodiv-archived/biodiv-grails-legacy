@@ -1617,9 +1617,9 @@ class XMLConverter extends SourceConverter {
                                     //get its data from col and save
                                     println "=======NAME======== " + name
                                     println "========NAME KA ID ======= " + otherParams.id_details[name]
-                                    def externalId = otherParams.id_details[name].trim();
-                                    println "=========EXTERNAL ID===== " + externalId
-                                    String nameStatus = otherParams.nameStatus //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
+                                    //def externalId = otherParams.id_details[name].trim();
+                                    //println "=========EXTERNAL ID===== " + externalId
+                                    String nameStatus = otherParams.nameStatus?:NameStatus.ACCEPTED //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
                                     println "=========NAMESTATUS===== " + nameStatus
                                     println "=========NAME STATUS============ " + nameStatus +"======= " + nameStatus.getClass();
                                     def finalNameStatus;
