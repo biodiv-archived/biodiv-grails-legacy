@@ -49,7 +49,7 @@ File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefin
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(144107, domainSourceDir);
+curateName(182038, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -346,8 +346,13 @@ def curateAllNames() {
         println "=====offset == "+ offset + " ===== limit == " + limit  
         def taxDefList;
         TaxonomyDefinition.withNewTransaction {
-            taxDefList = TaxonomyDefinition.list (max: limit , offset:offset, sort: "rank", order: "asc");
-        }
+            def c = TaxonomyDefinition.createCriteria()
+            taxDefList = c.list (max: limit , offset:offset) {
+                and {
+                    order('rank','asc')
+                    order('id','asc')                    
+                }
+            }
         for(taxDef in taxDefList) {
 		    TaxonomyDefinition.withNewSession {
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
@@ -370,7 +375,7 @@ def curateAllNames() {
     println "======AFTER_CAN_MULTI_MULTI==== " + nSer.AFTER_CAN_MULTI_MULTI;
 }
 
-curateAllNames()
+//curateAllNames()
 
 def curateRecoName() {
     println "=======SCRIPT FOR RECO NAMES======"
