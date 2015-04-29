@@ -287,6 +287,13 @@ class NamelistService {
                 (classSystem?"s.classification_id = :classSystem and ":"")+
                 "t.rank = 0";
             rs = sql.rows(sqlStr, [classSystem:classSystem])
+            def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            def cl = Classification.read(classSystem.toLong());
+            if(cl == classification) {
+                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
+            }
         } else {
             sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
                 from taxonomy_registry s, \
@@ -297,6 +304,13 @@ class NamelistService {
                 "s.path like '"+parentId+"%' " +
                 "order by t.rank, t.name asc limit :limit offset :offset";
             rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
+            def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            def cl = Classification.read(classSystem.toLong());
+            if(cl == classification) {
+                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
+            }
         }
 
         println "total result size === " + rs.size()
@@ -578,8 +592,8 @@ class NamelistService {
     }
 
     void curateName (ScientificName sciName, List colData) {
-        println "================LIST OF COL DATA=========================== " + colData
-        log.debug "Curating name ${sciName} with col data ${colData}"
+        //println "================LIST OF COL DATA=========================== " + colData
+        log.debug "=========== Curating name ${sciName} with col data ${colData}"
         def acceptedMatch;
 
         if(!colData) return;
@@ -631,7 +645,6 @@ class NamelistService {
                 }
                 colNames[colMatchVerbatim] << colMatch;
             }
-
             if(!colNames[sciName.normalizedForm]) {
                 log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
             }
@@ -999,7 +1012,6 @@ class NamelistService {
     }
 
     private Map fetchTaxonRegistryData(Map m) {
-        println "=======MAP M ========= " + m
         def result = [:]
         def res = [:]
 
@@ -1012,7 +1024,7 @@ class NamelistService {
         result['taxonRegistry.6'] = res['6'] = m['subfamily']
         result['taxonRegistry.7'] = res['7'] = m['genus']
         result['taxonRegistry.8'] = res['8'] = m['subgenus']
-        result['taxonRegistry.9'] = res['9'] = m['species']
+        result['taxonRegistry.9'] = res['9'] = m['species'] + " " + m['authorString']
 
         result['taxonRegistry'] = res;
         result['reg'] = m["taxonRegId"]          //$('#taxaHierarchy option:selected').val();

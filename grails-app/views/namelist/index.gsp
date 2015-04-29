@@ -13,11 +13,15 @@
 
 <title>NameList - Curation Interface</title>
 <style type="text/css">
+    .DIRTY {
+        background-color:red;
+    }
+    .WORKING {
+    }
     a.not_in_use {
         cursor:not-allowed;
     }
-    input[type=text], select
-    {
+    input[type=text], select {
         min-height:22px !important;
     }
     .languageDropDown {
