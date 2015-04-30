@@ -335,7 +335,7 @@ ALTER TABLE taxonomy_definition ADD COLUMN flagging_reason varchar(1500);
 ALTER TABLE recommendation add column is_flagged boolean;
 update recommendation set is_flagged = false;
 ALTER TABLE recommendation ALTER COLUMN flagging_reason type varchar(1500);
-alter table activity_feed alter column activity_descrption type varchar(1500);
+alter table activity_feed alter column activity_descrption type varchar(2000);
 
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 

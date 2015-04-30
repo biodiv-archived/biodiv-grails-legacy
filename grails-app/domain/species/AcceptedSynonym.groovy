@@ -51,7 +51,7 @@ class AcceptedSynonym {
             if(ent) {
                 try {
                     println "deleting"
-                    if(!ent.delete(failOnError:true)){
+                    if(!ent.delete(flush:true,failOnError:true)){
                         ent.errors.allErrors.each { log.error it }
                     }
                     println "deleted"

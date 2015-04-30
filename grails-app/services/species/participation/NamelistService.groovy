@@ -1442,7 +1442,7 @@ def sql= session.createSQLQuery(query)
         sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
         sciName.viaDatasource = colMatch.sourceDatabase;
         sciName = sciName.merge();
-        if(!sciName.save()) {
+        if(!sciName.save(flush:true)) {
             sciName.errors.allErrors.each { log.error it }
         }
         println "=========DONE UPDATING ATTRIBUTES ========"

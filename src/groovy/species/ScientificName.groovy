@@ -69,7 +69,7 @@ abstract class ScientificName extends NamesMetadata {
 		GENUS("Genus"),
 		SUB_GENUS("Sub-Genus"),
 		SPECIES("Species"),
-		INFRA_SPECIFIC_TAXA("infra-specific-taxa");
+		INFRA_SPECIFIC_TAXA("Infraspecies");
 
 		private String value;
 
