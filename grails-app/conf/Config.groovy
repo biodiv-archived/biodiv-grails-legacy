@@ -219,7 +219,7 @@ speciesPortal {
 	}
 	observations {
 		rootDir = "${app.rootDir}/observations"
-		observationDownloadDir = "${download.rootDir}/observations"
+		observationDownloadDir = "/apps/biodiv/app-conf/data/datarep/downloads/observations"
 		serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
 		//serverURL = "http://localhost/${appName}/observations"
 		MAX_IMAGE_SIZE = 104857600
