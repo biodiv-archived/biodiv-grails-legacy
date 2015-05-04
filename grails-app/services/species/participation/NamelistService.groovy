@@ -153,7 +153,7 @@ class NamelistService {
             temp['matchDatabaseName'] = "COL"
             temp['canonicalForm'] = r?.name?.text(); 
             temp['name'] = r?.name?.text() 
-            if(searchBy == 'name') {
+            if(searchBy == 'name' || searchBy == 'id') {
                 temp['name'] += " " +r?.author?.text()
             }
             temp['rank'] = r?.rank?.text()?.toLowerCase()
@@ -633,9 +633,9 @@ class NamelistService {
             NamesParser namesParser = new NamesParser();
             colData.each { colMatch ->
                 def colMatchVerbatim = colMatch.name;
-                if(colMatch.authorString) {
+                /*if(colMatch.authorString) {
                     colMatchVerbatim = colMatch.name + " " + colMatch.authorString
-                }
+                }*/
                 def parsedNames = namesParser.parse([colMatchVerbatim]);
                 colMatchVerbatim = parsedNames[0].normalizedForm;
                 colMatch['parsedName'] = parsedNames[0];
@@ -1027,10 +1027,15 @@ class NamelistService {
         if(m['rank'] == 'species'){
             result['taxonRegistry.9'] = res['9'] = m['species'] + " " + m['authorString']
         } else {
-            result['taxonRegistry.9'] = res['9'] = m['species'] 
-            
+            result['taxonRegistry.9'] = res['9'] = m['species'];    
         }
-
+        if(m['rank'] == 'infraspecies'){
+            def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
+            result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
+            result['taxonRegistry.10'] = res['10'] = m['infraspecies'] + " " + m['authorString'];
+        } else {
+            result['taxonRegistry.10'] = res['10'] = m['infraspecies'];     
+        }
         result['taxonRegistry'] = res;
         result['reg'] = m["taxonRegId"]          //$('#taxaHierarchy option:selected').val();
         result['classification'] = 817; //for author contributed
@@ -1608,5 +1613,33 @@ def sql= session.createSQLQuery(query)
             desc = fieldName + " changed from " + oldValue + " to " + newValue +" .";
         }
         return desc;
+    }
+
+    //suggest names from IBP and COL
+    public Map nameMapper(List<String> names) {
+        Map finalResult = [:]
+        NamesParser namesParser = new NamesParser();
+        def parsedNames = namesParser.parse(names);
+        int speciesRank = TaxonomyRank.SPECIES.ordinal();
+        int i = 0
+        parsedNames.each { pn ->
+            def res = searchIBP(pn.canonicalForm, pn.authorString, NameStatus.ACCEPTED, speciesRank);
+            if(res.size() == 0){
+                //COL results
+                def r = searchCOL(pn.canonicalForm, "name");
+                List temp = []
+                r.each {
+                    temp.add(['name':it.name, 'id':it.externalId, 'status':it.nameStatus])
+                }
+                finalResult[names[i]] = temp; 
+            } else {
+                List temp = []
+                res.each {
+                    temp.add(['name':it.name, 'id':it.id, 'status': it.status])
+                }
+                finalResult[names[i]] = temp; 
+            }
+        }
+        return finalResult;
     }
 }
