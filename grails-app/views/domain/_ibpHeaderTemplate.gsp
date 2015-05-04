@@ -78,10 +78,10 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
 <%--	</div>--%>
 
-	<div class="alertMsg alert alert-info"
-		style="clear: both; margin: 0px; text-align: center;">
-		The <a target="_blank" href="http://treesindia.indiabiodiversity.org/show">Neighborhood Trees Campaign 2015</a> is on from 22nd to 28th April. Participate by <a target="_blank" href="http://treesindia.indiabiodiversity.org/observation/create">uploading observations</a> and win <a target="_blank" href="http://treesindia.indiabiodiversity.org/page/126">prizes</a>. Observation uploaded so far:<b>${Stats.getTreeGroupObvCount()}</b>.
-	</div>
+<%--	<div class="alertMsg alert alert-info"--%>
+<%--		style="clear: both; margin: 0px; text-align: center;">--%>
+<%--		The <a target="_blank" href="http://treesindia.indiabiodiversity.org/show">Neighborhood Trees Campaign 2015</a> is on from 22nd to 28th April. Participate by <a target="_blank" href="http://treesindia.indiabiodiversity.org/observation/create">uploading observations</a> and win <a target="_blank" href="http://treesindia.indiabiodiversity.org/page/126">prizes</a>. Observation uploaded so far:<b>${Stats.getTreeGroupObvCount()}</b>.--%>
+<%--	</div>--%>
 
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
