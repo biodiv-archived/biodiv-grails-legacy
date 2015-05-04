@@ -1401,52 +1401,54 @@ def sql= session.createSQLQuery(query)
 
     ScientificName updateAttributes(ScientificName sciName, Map colMatch) {
         println "=========UPDATING ATTRIBUTES ========"
-        NamesParser namesParser = new NamesParser();
-        def name = sciName.canonicalForm + " " + colMatch.authorString
-        def res1 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
-        def res2 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
-        res2.addAll(res1);
-        if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
-            sciName.isFlagged = true;
-            String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
-            res2.each {
-                flaggingReason = flaggingReason + it.id.toString() + ", ";
+        TaxonomyDefinition.withNewSession {
+            NamesParser namesParser = new NamesParser();
+            def name = sciName.canonicalForm + " " + colMatch.authorString
+            def res1 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
+            def res2 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
+            res2.addAll(res1);
+            if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
+                sciName.isFlagged = true;
+                String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+                res2.each {
+                    flaggingReason = flaggingReason + it.id.toString() + ", ";
+                }
+                println "########### Flagging becoz of Udating attributes ============== " + sciName
+                sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
             }
-            println "########### Flagging becoz of Udating attributes ============== " + sciName
-            sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
+            def parsedNames = namesParser.parse([name]);
+            println "=============PARSING THIS ========== " + name
+            def pn = parsedNames[0];
+            if(pn.canonicalForm) {
+                println "============= " + pn.canonicalForm +"============= "+ pn.name
+                sciName.tempActivityDescription += createNameActivityDescription("Canonical Name", sciName.canonicalForm, pn.canonicalForm);
+                sciName.canonicalForm = pn.canonicalForm
+                sciName.tempActivityDescription += createNameActivityDescription("Binomial Name", sciName.binomialForm, pn.binomialForm);
+                sciName.binomialForm = pn.binomialForm
+                sciName.tempActivityDescription += createNameActivityDescription("Normalized Name", sciName.normalizedForm, pn.normalizedForm);
+                sciName.normalizedForm = pn.normalizedForm
+                sciName.tempActivityDescription += createNameActivityDescription("Italicised Name", sciName.italicisedForm, pn.italicisedForm);
+                sciName.italicisedForm = pn.italicisedForm
+                sciName.tempActivityDescription += createNameActivityDescription("Verbatim Name", sciName.name, pn.name);
+                sciName.name = pn.name
+            }
+            sciName.tempActivityDescription += createNameActivityDescription("Author Year", sciName.authorYear, colMatch.authorString);
+            sciName.authorYear = colMatch.authorString;
+            sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus?.value(), colMatch.colNameStatus);
+            sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
+            sciName.tempActivityDescription += createNameActivityDescription("Match Id", sciName.matchId, colMatch.externalId);
+            sciName.matchId = colMatch.externalId;
+            sciName.tempActivityDescription += createNameActivityDescription("Match Database Name", sciName.matchDatabaseName, colMatch.matchDatabaseName);
+            sciName.matchDatabaseName = colMatch.matchDatabaseName;
+            sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
+            sciName.viaDatasource = colMatch.sourceDatabase;
+            sciName = sciName.merge();
+            if(!sciName.save()) {
+                sciName.errors.allErrors.each { log.error it }
+            }
+            println "=========DONE UPDATING ATTRIBUTES ========"
+            return sciName
         }
-        def parsedNames = namesParser.parse([name]);
-        println "=============PARSING THIS ========== " + name
-        def pn = parsedNames[0];
-        if(pn.canonicalForm) {
-            println "============= " + pn.canonicalForm +"============= "+ pn.name
-            sciName.tempActivityDescription += createNameActivityDescription("Canonical Name", sciName.canonicalForm, pn.canonicalForm);
-            sciName.canonicalForm = pn.canonicalForm
-            sciName.tempActivityDescription += createNameActivityDescription("Binomial Name", sciName.binomialForm, pn.binomialForm);
-            sciName.binomialForm = pn.binomialForm
-            sciName.tempActivityDescription += createNameActivityDescription("Normalized Name", sciName.normalizedForm, pn.normalizedForm);
-            sciName.normalizedForm = pn.normalizedForm
-            sciName.tempActivityDescription += createNameActivityDescription("Italicised Name", sciName.italicisedForm, pn.italicisedForm);
-            sciName.italicisedForm = pn.italicisedForm
-            sciName.tempActivityDescription += createNameActivityDescription("Verbatim Name", sciName.name, pn.name);
-            sciName.name = pn.name
-        }
-        sciName.tempActivityDescription += createNameActivityDescription("Author Year", sciName.authorYear, colMatch.authorString);
-        sciName.authorYear = colMatch.authorString;
-        sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus?.value(), colMatch.colNameStatus);
-	    sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
-        sciName.tempActivityDescription += createNameActivityDescription("Match Id", sciName.matchId, colMatch.externalId);
-        sciName.matchId = colMatch.externalId;
-        sciName.tempActivityDescription += createNameActivityDescription("Match Database Name", sciName.matchDatabaseName, colMatch.matchDatabaseName);
-        sciName.matchDatabaseName = colMatch.matchDatabaseName;
-        sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
-        sciName.viaDatasource = colMatch.sourceDatabase;
-        sciName = sciName.merge();
-        if(!sciName.save(flush:true)) {
-            sciName.errors.allErrors.each { log.error it }
-        }
-        println "=========DONE UPDATING ATTRIBUTES ========"
-        return sciName
     }
 
 ///////////////////OBV RECO NAMES/////////////////////////
