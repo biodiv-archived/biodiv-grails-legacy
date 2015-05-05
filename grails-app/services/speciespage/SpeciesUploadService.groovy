@@ -705,7 +705,9 @@ class SpeciesUploadService {
             int sheetNo = 0;
             Sheet sheet = wb.getSheetAt(sheetNo);
             Iterator<Row> rowIterator = sheet.iterator();
+            int rowNum = 0;
             Row row = rowIterator.next();
+            rowNum++;
             def arr = ['Names','No. of Results' ,'IBP name', 'IBP ID', 'IBP status', 'COL name', 'COL ID', 'COL status']
             Cell cell;
             int k = 0;
@@ -719,7 +721,12 @@ class SpeciesUploadService {
                 def ibpValues = value['IBP'];
                 if(ibpValues) {
                     ibpValues.each { iVal ->
-                        row = rowIterator.next();
+                        if(rowIterator.hasNext()) {
+                            row = rowIterator.next();
+                        } else {
+                            row = sheet.createRow(rowNum);
+                        }
+                        rowNum++;
                         cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
                         cell.setCellValue(name);
                         cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
@@ -742,7 +749,12 @@ class SpeciesUploadService {
                 def colValues = value['COL'];
                 if(colValues) {
                     colValues.each { cVal ->
-                        row = rowIterator.next();
+                        if(rowIterator.hasNext()) {
+                            row = rowIterator.next();
+                        } else {
+                            row = sheet.createRow(rowNum);
+                        }
+                        rowNum++;
                         cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
                         cell.setCellValue(name);
                         println "======ADDED NAME col ===== " + name;

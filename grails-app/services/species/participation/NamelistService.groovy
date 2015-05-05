@@ -1624,6 +1624,8 @@ def sql= session.createSQLQuery(query)
         int i = 0
         parsedNames.each { pn ->
             def res = searchIBP(pn.canonicalForm, pn.authorYear, NameStatus.ACCEPTED, speciesRank);
+            def res1 = searchIBP(pn.canonicalForm, pn.authorYear, NameStatus.SYNONYM, speciesRank);
+            res.addAll(res1);
             if(res.size() == 0){
                 //COL results
                 def r = searchCOL(pn.canonicalForm, "name");
