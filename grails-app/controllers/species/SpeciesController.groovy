@@ -1351,6 +1351,14 @@ class SpeciesController extends AbstractObjectController {
         */
     }
     
+    def downloadNamesMapper () {
+        File file = speciesUploadService.downloadNamesMapper(params);
+        if(!file) {    
+            return render(text: [success:false, downloadFile: ""] as JSON, contentType:'text/html')
+        }
+        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+    }
+
     @Secured(['ROLE_USER'])
     def getSpeciesFieldMedia() {
         def resList = []

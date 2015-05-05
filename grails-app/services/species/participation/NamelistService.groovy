@@ -1448,7 +1448,7 @@ def sql= session.createSQLQuery(query)
             sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
             sciName.viaDatasource = colMatch.sourceDatabase;
             sciName = sciName.merge();
-            if(!sciName.save()) {
+            if(!sciName.save(flush:true)) {
                 sciName.errors.allErrors.each { log.error it }
             }
             println "=========DONE UPDATING ATTRIBUTES ========"
@@ -1623,7 +1623,7 @@ def sql= session.createSQLQuery(query)
         int speciesRank = TaxonomyRank.SPECIES.ordinal();
         int i = 0
         parsedNames.each { pn ->
-            def res = searchIBP(pn.canonicalForm, pn.authorString, NameStatus.ACCEPTED, speciesRank);
+            def res = searchIBP(pn.canonicalForm, pn.authorYear, NameStatus.ACCEPTED, speciesRank);
             if(res.size() == 0){
                 //COL results
                 def r = searchCOL(pn.canonicalForm, "name");
@@ -1631,14 +1631,16 @@ def sql= session.createSQLQuery(query)
                 r.each {
                     temp.add(['name':it.name, 'id':it.externalId, 'status':it.nameStatus])
                 }
-                finalResult[names[i]] = temp; 
+                if(r.size() == 0) temp = null;
+                finalResult[names[i]] = ['COL' : temp, 'IBP': null]; 
             } else {
                 List temp = []
                 res.each {
-                    temp.add(['name':it.name, 'id':it.id, 'status': it.status])
+                    temp.add(['name':it.name, 'id':it.id, 'status': it.status.value()])
                 }
-                finalResult[names[i]] = temp; 
+                finalResult[names[i]] = ['IBP' : temp, 'COL' : null]; 
             }
+            i++;
         }
         return finalResult;
     }

@@ -62,6 +62,13 @@ import species.groups.SpeciesGroupMapping
 import species.groups.UserGroup
 import org.codehaus.groovy.grails.web.json.JSONObject;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+
 class SpeciesUploadService {
 
     private static def log = LogFactory.getLog(this);
@@ -81,7 +88,8 @@ class SpeciesUploadService {
 	def speciesSearchService;
 	def springSecurityService
 	def speciesPermissionService;
-	
+    def namelistService;
+
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	static int BATCH_SIZE = 10;
@@ -655,7 +663,119 @@ class SpeciesUploadService {
             log.error e.getMessage();
         }
     }
-	
+
+    File downloadNamesMapper(params) {
+        try{
+            String fileName = "NamesMapper"
+            String uploadDir = "species"
+            def ext = params.xlsxFileUrl.split("\\.")[-1];
+            List<Map> names = SpreadsheetReader.readSpreadSheet(params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir), 0 , 0);
+
+            println "======CONTENT ======= " + names
+            def namesList = [];
+
+            for (Map<String, String> map : names) {
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    namesList.add(entry.getValue());
+                }
+            }
+
+            def content = namelistService.nameMapper(namesList);
+            println "=====NAMES MAPPED ===== " + content
+            log.debug "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+            log.debug "=========THE SPLITED LIST ================ " + ext
+            String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
+            log.debug "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
+            fileName = fileName + "."+ext;
+            log.debug "===FILE NAME CREATED ================ " + fileName
+            File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
+            log.debug "=== NEW MODIFIED SPECIES FILE === " + file
+            InputStream input = new FileInputStream(xlsxFileUrl);
+            writeNamesMapperSheet(file, input, content);
+            return file
+        } catch(Exception e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+        }
+    }
+    
+    void writeNamesMapperSheet(File f, InputStream inp, Map content) {
+        try {
+            Workbook wb = WorkbookFactory.create(inp);
+            int sheetNo = 0;
+            Sheet sheet = wb.getSheetAt(sheetNo);
+            Iterator<Row> rowIterator = sheet.iterator();
+            Row row = rowIterator.next();
+            def arr = ['Names','No. of Results' ,'IBP name', 'IBP ID', 'IBP status', 'COL name', 'COL ID', 'COL status']
+            Cell cell;
+            int k = 0;
+            arr.each {
+                cell = row.getCell(k, Row.CREATE_NULL_AS_BLANK);
+                cell.setCellValue(it);
+                k++;
+            }
+            content.each { key,value ->
+                String name = key;
+                def ibpValues = value['IBP'];
+                if(ibpValues) {
+                    ibpValues.each { iVal ->
+                        row = rowIterator.next();
+                        cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
+                        cell.setCellValue(name);
+                        cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
+                        if(ibpValues.size() == 0) {
+                            cell.setCellValue("ZERO");
+                        } else if(ibpValues.size() == 1) {
+                            cell.setCellValue("SINGLE");
+                        } else {
+                            cell.setCellValue("MULTIPLE");
+                        }
+                        println "======ADDED NAME ibp ===== " + name;
+                        int i = 2;
+                        iVal.each { k1,v1 ->
+                            cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
+                            cell.setCellValue(v1);
+                            i++;
+                        }
+                    }
+                }
+                def colValues = value['COL'];
+                if(colValues) {
+                    colValues.each { cVal ->
+                        row = rowIterator.next();
+                        cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
+                        cell.setCellValue(name);
+                        println "======ADDED NAME col ===== " + name;
+                        cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
+                        if(colValues.size() == 0) {
+                            cell.setCellValue("ZERO");
+                        } else if(colValues.size() == 1) {
+                            cell.setCellValue("SINGLE");
+                        } else {
+                            cell.setCellValue("MULTIPLE");
+                        }
+                        int i = 5;
+                        cVal.each { k1,v1 ->
+                            cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
+                            cell.setCellValue(v1);
+                            i++;
+                        }
+                    }
+                }
+            }
+            FileOutputStream out = new FileOutputStream(f);
+            wb.write(out);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
 	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null){
 		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes)
