@@ -41,14 +41,8 @@ def curateName(taxonId, domainSourceDir) {
     if(colData) {
         ScientificName sciName = TaxonomyDefinition.get(taxonId);
         nSer.curateName(sciName, colData);
-        sciName.noOfCOLMatches = colData.size();
     } else {
         println "=====NO COL DATA === " 
-        sciName.noOfCOLMatches = 0;
-    }
-    if(!sciName.hasErrors() && sciName.save(flush:true)) {
-    } else {
-        sciName.errors.allErrors.each { log.error it }
     }
 }
 
