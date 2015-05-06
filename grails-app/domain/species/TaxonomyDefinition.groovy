@@ -33,6 +33,7 @@ class TaxonomyDefinition extends ScientificName {
 		flaggingReason nullable:true;
 		externalLinks nullable:true;
 		colNameStatus nullable:true;
+		noOfCOLMatches nullable:true;
 	}
 
 	static mapping = {
