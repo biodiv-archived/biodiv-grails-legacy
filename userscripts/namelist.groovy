@@ -17,10 +17,12 @@ import species.NamesParser;
 import species.auth.SUser;
 import species.NamesMetadata;
 import species.ScientificName.RelationShip
-
+import species.NamesMetadata.NamePosition;
 import groovy.io.FileType
 
 nSer = ctx.getBean("namelistService");
+utilsService = ctx.getBean("utilsService");
+
 import species.Language;
 
 def migrate(){
@@ -39,17 +41,23 @@ def curateName(taxonId, domainSourceDir) {
     if(colData) {
         ScientificName sciName = TaxonomyDefinition.get(taxonId);
         nSer.curateName(sciName, colData);
+        sciName.noOfCOLMatches = colData.size();
     } else {
         println "=====NO COL DATA === " 
+        sciName.noOfCOLMatches = 0;
     }
-    
+    if(!sciName.hasErrors() && sciName.save(flush:true)) {
+    } else {
+        sciName.errors.allErrors.each { log.error it }
+    }
 }
 
-File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
+//File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
+File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-curateName(182038, domainSourceDir);
+//curateName(156829, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -342,7 +350,7 @@ def createAcceptedSynonym(){
 def curateAllNames() {
     int limit = 50, offset = 0;
     int counter = 0;
-    while(offset < 10000){
+    while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit  
         def taxDefList;
         TaxonomyDefinition.withNewTransaction {
@@ -353,17 +361,20 @@ def curateAllNames() {
                     order('id','asc')                    
                 }
             }
+        }
         for(taxDef in taxDefList) {
 		    TaxonomyDefinition.withNewSession {
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
                 counter++;
                 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
-                File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
+                File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
+                //File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
                 curateName(taxDef.id, domainSourceDir);
             }
         }
+
         offset = offset + limit; 
-        //utilsService.cleanUpGorm(true); 
+        utilsService.cleanUpGorm(true); 
         if(!taxDefList) break;  
     }
     println "======NUM OF TIMES SEARCH IBP CALLED==== " + nSer.SEARCH_IBP_COUNTER;
@@ -375,7 +386,7 @@ def curateAllNames() {
     println "======AFTER_CAN_MULTI_MULTI==== " + nSer.AFTER_CAN_MULTI_MULTI;
 }
 
-//curateAllNames()
+curateAllNames()
 
 def curateRecoName() {
     println "=======SCRIPT FOR RECO NAMES======"
@@ -402,4 +413,8 @@ def curateRecoName() {
     }
 }
 //curateRecoName()
+
+def namesMapper() {
+    
+}
 

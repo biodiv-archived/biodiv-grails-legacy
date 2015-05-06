@@ -647,6 +647,20 @@ class NamelistService {
             }
             if(!colNames[sciName.normalizedForm]) {
                 log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
+                int noOfMatches = 0;
+                log.debug "Comparing now with CANONICAL + RANK"
+                colData.each { colMatch ->
+                    if(colMatch.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
+                        noOfMatches++;
+                        acceptedMatch = colMatch;
+                    }
+                }
+                if(noOfMatches != 1) {
+                    log.debug "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
+                    acceptedMatch = null;
+                } else {
+                    log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                }
             }
             else if(colNames[sciName.normalizedForm].size() == 1) {
                 //generate and compare verbatim. If verbatim matches with a single match accept. 

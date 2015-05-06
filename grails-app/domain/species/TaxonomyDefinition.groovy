@@ -20,6 +20,7 @@ class TaxonomyDefinition extends ScientificName {
     boolean isFlagged = false;
 	String flaggingReason;
     NamesMetadata.COLNameStatus colNameStatus;
+    int noOfCOLMatches = 0;
 
 	static hasMany = [author:String, year:String]
 

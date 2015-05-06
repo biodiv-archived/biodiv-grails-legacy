@@ -1606,6 +1606,7 @@ class XMLConverter extends SourceConverter {
                                 log.debug "Saving taxon definition"
                                 taxon = parsedName;
                                 taxon.rank = rank;
+                                taxon.uploadTime = new Date();
                                 if(fieldNode == fieldNodes.last()){
                                     taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
                                     taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
@@ -1613,7 +1614,7 @@ class XMLConverter extends SourceConverter {
                                 }
                                 if(fromCOL) {
                                     println "=========COL SE REQUIRED==============="
-                                    taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"COL";
+                                    taxon.matchDatabaseName = "COL";
                                     //get its data from col and save
                                     println "=======NAME======== " + name
                                     println "========NAME KA ID ======= " + otherParams.id_details[name]
@@ -1633,7 +1634,7 @@ class XMLConverter extends SourceConverter {
                                         break
                                         */
 
-                                        case ["synonyms", "ambiguous", "misapplied"]:
+                                        case ["synonym", "ambiguous", "misapplied"]:
                                         finalNameStatus = null  //NameStatus.SYNONYM;
                                         break
 
@@ -1672,6 +1673,10 @@ class XMLConverter extends SourceConverter {
                                     taxon.errors.each { log.error it }
                                 }
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
+                                if(fromCOL) {
+                                    def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
+                                    taxon = namelistService.updateAttributes(taxon, res);
+                                }
                             } else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
                                 def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
                                 spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
@@ -1692,6 +1697,8 @@ class XMLConverter extends SourceConverter {
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
+                                def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
+                                taxon = namelistService.updateAttributes(taxon, res);
                             }
                             //Moving name to Working list, so all names should be in working list,
                             //even if a single name in hierarchy is in dirty list
