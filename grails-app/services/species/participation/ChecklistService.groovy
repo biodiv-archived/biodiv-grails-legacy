@@ -63,7 +63,7 @@ class ChecklistService {
 	static final String MEDIA_COLUMN = "Media"
 	static final String SPECIES_TITLE_COLUMN = "speciesTitle"
 	static final String SPECIES_ID_COLUMN = "speciesId"
-	private static final int  BATCH_SIZE = 100
+	private static final int  BATCH_SIZE = 20
 	
 	def grailsApplication
 	def observationService
@@ -236,13 +236,11 @@ class ChecklistService {
 	                        obsParams.fromDate = m.get(params.obvDate)
 	                        obsParams.toDate = m.get(params.obvDate)
 	                    }
-						log.debug "-------------- Taking lat long from marked column ======= " + params.latitude +   params.longitude 
 						if(params.latitude != '' && params.longitude != '') {
 							//Generating point string if lat long columns marked for each rows
-	                        if(m.get(params.latitude) != '' && m.get(params.longitude) != '') {
+	                        if(!m.isNull(params.latitude) && !m.isNull(params.longitude)) {
 	                            obsParams.areas = "POINT("+m.get(params.longitude)+" " + m.get(params.latitude)+")"
-								log.debug "---------- Taking lat long from marked column ======= " + obsParams.areas
-	                        }
+							}
 	                    }
 						obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())
 	                    log.debug "saving observation ${obsParams}"

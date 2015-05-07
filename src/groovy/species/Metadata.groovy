@@ -24,7 +24,7 @@ abstract class Metadata {
 		APPROXIMATE ("Approximate"),
 		ACCURATE ("Accurate"),
 		LOCAL ("Local"),
-		REGION ("REGION"),
+		REGION ("Region"),
 		COUNTRY ("Country")
 		
 		private String value;
