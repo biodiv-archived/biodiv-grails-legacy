@@ -238,8 +238,9 @@ class ObservationController extends AbstractObjectController {
 	def create() {
 		def observationInstance = new Observation()
 		observationInstance.properties = params;
+		observationInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
 		def author = springSecurityService.currentUser;
-		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
+		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted and obv.id = obv.sourceId and obv.isChecklist = false order by obv.createdOn desc ",[author:author, isDeleted:false]);
 		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
         return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}

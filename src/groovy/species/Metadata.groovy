@@ -24,7 +24,7 @@ abstract class Metadata {
 		APPROXIMATE ("Approximate"),
 		ACCURATE ("Accurate"),
 		LOCAL ("Local"),
-		REGION ("Region"),
+		REGION ("REGION"),
 		COUNTRY ("Country")
 		
 		private String value;
@@ -35,6 +35,29 @@ abstract class Metadata {
 
 		String value() {
 			return this.value;
+		}
+		
+		static LocationScale getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof LocationScale)
+				return value
+			
+			value = value.toUpperCase().trim()
+			switch(value){
+				case 'APPROXIMATE':
+					return LocationScale.APPROXIMATE
+				case 'ACCURATE':
+					return LocationScale.ACCURATE
+				case 'LOCAL':
+					return LocationScale.LOCAL
+				case 'REGION':
+					return LocationScale.REGION
+				case 'COUNTRY':
+					return LocationScale.COUNTRY
+				default:
+					return null	
+			}
 		}
 	}
 
@@ -76,7 +99,6 @@ abstract class Metadata {
 		latitude(nullable: true)
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
-		locationScale(nullable: true)
 		topology nullable:true, validator : { val, obj ->
 			if(!val){
 				return true

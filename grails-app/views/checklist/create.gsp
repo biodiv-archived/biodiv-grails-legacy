@@ -28,7 +28,6 @@
         <div class="observation_create">
             <div class="span12">
                 <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit List':'Add List']"/>
-
                 <%
                 def allowedExtensions = "['csv', 'xls', 'xlsx']"
                 def fileParams = [uploadDir:'checklist',fileConvert:true, fromChecklist: true]
@@ -121,11 +120,11 @@
                                     <!--span class="pull-left span3"><g:message
                                         code="observation.mark.sciNameColumn.label" default="Marked Scientific & Common Name Columns:" /></span-->
                                     <div class="controls">
-                                        <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"/>
-                                        <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"/>
-                                        <input type="hidden" id="latitude" class="markColumn" name="latitude" value=""/>
-                                        <input type="hidden" id="longitude" class="markColumn" name="longitude" value=""/>
-                                        <input type="hidden" id="obvDate" class="markColumn" name="obvDate" value=""/>
+                                        <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance?.sciNameColumn}"/>
+                                        <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance?.commonNameColumn}"/>
+                                        <input type="hidden" id="latitude" class="markColumn" name="latitude" value="${latitude}"/>
+                                        <input type="hidden" id="longitude" class="markColumn" name="longitude" value="${longitude}"/>
+                                        <input type="hidden" id="obvDate" class="markColumn" name="obvDate" value="${obvDate}"/>
                                         <div class="help-inline">
                                             <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
                                             <g:message code="checklist.scientific_name.validator.invalid" />

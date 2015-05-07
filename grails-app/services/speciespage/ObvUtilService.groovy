@@ -44,6 +44,7 @@ class ObvUtilService {
 	static final String SN    = "scientific name"
 	static final String GEO_PRIVACY   = "Geoprivacy enabled"
 	static final String LOCATION   = "location title"
+	static final String LOCATION_SCALE   = "location scale"
 	static final String LONGITUDE    = "longitude"
 	static final String LATITUDE   = "latitude"
 	static final String LICENSE   = "license"
@@ -436,6 +437,7 @@ class ObvUtilService {
 		obvParams['longitude'] = (m[LONGITUDE] ?:"76.658279")
 		obvParams['latitude'] = (m[LATITUDE] ?: "12.32112")
 		obvParams['location_accuracy'] = 'Approximate'
+		obvParams['locationScale'] = m[LOCATION_SCALE]
 		obvParams['placeName'] = m[LOCATION]
 		obvParams['reverse_geocoded_name'] = (m[LOCATION] ?: "National Highway 6, Maharashtra, India")
 		

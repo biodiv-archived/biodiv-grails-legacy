@@ -1,5 +1,6 @@
 package species
 
+import species.participation.Checklists
 import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote;
@@ -225,6 +226,17 @@ class ObservationTagLib {
 		model.sourceInstance = model.sourceInstance ?: model.observationInstance
 		model.placeNameField = (model.sourceInstance && model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.placeName' : 'placeName'
 		model.topologyNameField = (model.sourceInstance && model.sourceInstance.class.getCanonicalName() == Document.class.getCanonicalName()) ? 'coverage.topology' : 'topology'
+		
+		def obj = model.sourceInstance
+		String sourceType
+		if(obj.instanceOf(Checklists) || obj.instanceOf(Document)){
+			sourceType = 'checklist'
+		}else if(obj.instanceOf(Observation) && (obj.id != obj.sourceId)){ 
+			sourceType = 'checklist-obv'
+		}else
+			sourceType = 'observation'
+		 
+		model.sourceType = sourceType
         out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	

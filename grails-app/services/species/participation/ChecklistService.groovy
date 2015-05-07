@@ -236,10 +236,12 @@ class ChecklistService {
 	                        obsParams.fromDate = m.get(params.obvDate)
 	                        obsParams.toDate = m.get(params.obvDate)
 	                    }
-	                    if(params.latitude != '' && params.longitude != '') {
-	                        //Generating point string if lat long columns marked for each rows
+						log.debug "-------------- Taking lat long from marked column ======= " + params.latitude +   params.longitude 
+						if(params.latitude != '' && params.longitude != '') {
+							//Generating point string if lat long columns marked for each rows
 	                        if(m.get(params.latitude) != '' && m.get(params.longitude) != '') {
 	                            obsParams.areas = "POINT("+m.get(params.longitude)+" " + m.get(params.latitude)+")"
+								log.debug "---------- Taking lat long from marked column ======= " + obsParams.areas
 	                        }
 	                    }
 						obsParams.checklistAnnotations =  getSafeAnnotation(m, checklistInstance.fetchColumnNames())

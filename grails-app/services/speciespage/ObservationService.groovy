@@ -47,6 +47,7 @@ import java.beans.Introspector;
 import species.CommonNames;
 import species.Language;
 import species.Species;
+import species.Metadata
 import species.SpeciesPermission;
 
 
@@ -103,7 +104,7 @@ class ObservationService extends AbstractObjectService {
     Observation createObservation(params) {
         //log.info "Creating observations from params : "+params
         Observation observation = new Observation();
-        updateObservation(params, observation);
+		updateObservation(params, observation);
         return observation;
     }
     /**
@@ -130,8 +131,10 @@ class ObservationService extends AbstractObjectService {
         observation.placeName = params.placeName//?:observation.reverseGeocodedName;
         observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
 
-        //observation.location = 'POINT(' + params.longitude + ' ' + params.latitude + ')'
-        observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
+        //XXX remove this line and column from domain class and database after all migration in wikwio and bhutan
+		observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
+		
+		observation.locationScale = Metadata.LocationScale.getEnum(params.locationScale)
         observation.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
 
         observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
@@ -456,21 +459,21 @@ class ObservationService extends AbstractObjectService {
         //getting count
         def count
         if(userGroupInstance) {
-            count = sql.rows("select count(*) from observation obv , user_group_observations ugo where obv.author_id = :userId and ugo.observation_id = obv.id and ugo.user_group_id =:ugId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true , ugId:userGroupInstance.id]);
+            count = sql.rows("select count(*) from observation obv , user_group_observations ugo where obv.author_id = :userId and ugo.observation_id = obv.id and ugo.user_group_id =:ugId and obv.is_deleted = :isDeleted ", [isDeleted:false, userId:userId, isDeleted: false, ugId:userGroupInstance.id]);
         } else {
-            count = sql.rows("select count(*) from observation obv where obv.author_id = :userId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true]);
+            count = sql.rows("select count(*) from observation obv where obv.author_id = :userId and obv.is_deleted = :isDeleted ", [isDeleted:false, userId:userId, isDeleted: false]);
                  
         }
         
         def queryParams = [isDeleted:false]
-        def countQuery = "select count(*) from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted and obv.isShowable = :isShowable "
+        def countQuery = "select count(*) from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted  "
         queryParams["userId"] = userId
         queryParams["isDeleted"] = false;
-        queryParams["isShowable"] = true;
+        //queryParams["isShowable"] = true;
         //def count = Observation.executeQuery(countQuery, queryParams)
         
         //getting observations
-        def query = "from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted and obv.isShowable = :isShowable "
+        def query = "from Observation obv where obv.author.id = :userId and obv.isDeleted = :isDeleted "
         def orderByClause = "order by obv." + (sort ? sort : "createdOn") +  " desc"
         query += orderByClause
 
@@ -478,9 +481,9 @@ class ObservationService extends AbstractObjectService {
         queryParams["offset"] = offset
         def observationsRows
         if(userGroupInstance) {
-            observationsRows = sql.rows("select obv.id from observation obv , user_group_observations ugo where obv.author_id = :userId and ugo.observation_id = obv.id and ugo.user_group_id =:ugId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable " + "order by obv." + (sort ? sort : "created_on") +  " desc limit :max offset :offset", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true , ugId:userGroupInstance.id , max:limit, offse:offset]);
+            observationsRows = sql.rows("select obv.id from observation obv , user_group_observations ugo where obv.author_id = :userId and ugo.observation_id = obv.id and ugo.user_group_id =:ugId and obv.is_deleted = :isDeleted  " + "order by obv." + (sort ? sort : "created_on") +  " desc limit :max offset :offset", [isDeleted:false, userId:userId, isDeleted: false, ugId:userGroupInstance.id , max:limit, offse:offset]);
         } else {
-            observationsRows = sql.rows("select obv.id from observation obv where obv.author_id = :userId and obv.is_deleted = :isDeleted and obv.is_showable = :isShowable " + "order by obv." + (sort ? sort : "created_on") +  " desc limit :max offset :offset", [isDeleted:false, userId:userId, isDeleted: false, isShowable : true, max:limit, offset:offset]);
+            observationsRows = sql.rows("select obv.id from observation obv where obv.author_id = :userId and obv.is_deleted = :isDeleted  " + "order by obv." + (sort ? sort : "created_on") +  " desc limit :max offset :offset", [isDeleted:false, userId:userId, isDeleted: false, max:limit, offset:offset]);
                  
         }
         //def observations = Observation.findAll(query, queryParams);
@@ -553,11 +556,11 @@ class ObservationService extends AbstractObjectService {
 
     private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset , UserGroup userGroupInstance = null) {
         def observations = Observation.withCriteria () {
-            projections {
-                groupProperty('sourceId')
-                groupProperty('isShowable')
-				groupProperty('lastRevised')
-            }
+//            projections {
+//                groupProperty('sourceId')
+//                groupProperty('isShowable')
+//				groupProperty('lastRevised')
+//            }
             and {
                 eq("maxVotedReco", maxVotedReco)
                 eq("isDeleted", false)
@@ -575,7 +578,7 @@ class ObservationService extends AbstractObjectService {
         }
         def result = [];
         observations.each {
-            def obv = Observation.get(it[0])
+            def obv = it
             result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
         }
 
@@ -583,9 +586,9 @@ class ObservationService extends AbstractObjectService {
             return ["observations":result];
 
         def count = Observation.createCriteria().count {
-            projections {
-                count(groupProperty('sourceId'))
-            }
+//            projections {
+//                count(groupProperty('sourceId'))
+//            }
             and {
                 eq("maxVotedReco", maxVotedReco)
                 eq("isDeleted", false)
@@ -643,7 +646,7 @@ class ObservationService extends AbstractObjectService {
                 and {
                     'in'("maxVotedReco", scientificNameRecos)
                         eq("isDeleted", false)
-                        eq("isShowable", true)
+                        //eq("isShowable", true)
                 }
                 order("lastRevised", "desc")
             }
@@ -769,10 +772,10 @@ class ObservationService extends AbstractObjectService {
         def nearbyObservations = []
 
         try {
-            def rows = sql.rows("select count(*) as count from observation as g1, observation as g2 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
+            def rows = sql.rows("select count(*) as count from observation as g1, observation as g2 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
-            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) as distance from observation as g1, observation as g2 where  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.topology, g2.topology), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
+            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) as distance from observation as g1, observation as g2 where  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance(g1.topology, g2.topology), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
 
             for (row in resultSet){
                 nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
@@ -794,10 +797,10 @@ class ObservationService extends AbstractObjectService {
         def sql =  Sql.newInstance(dataSource);
         try {
             String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-            def rows = sql.rows("select count(*) as count from observation as g2 where ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true", [maxRadius:maxRadius]);
+            def rows = sql.rows("select count(*) as count from observation as g2 where ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false", [maxRadius:maxRadius]);
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
-            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g2.is_showable = true order by ST_Distance(${point}, g2.topology), g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
+            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false order by ST_Distance(${point}, g2.topology), g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
 
             for (row in resultSet){
                 nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
@@ -998,6 +1001,7 @@ class ObservationService extends AbstractObjectService {
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
+		params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         //params.userName = springSecurityService.currentUser.username;
 
         def queryParams = [isDeleted : false]
@@ -1222,7 +1226,7 @@ class ObservationService extends AbstractObjectService {
             }
             nearByRelatedObvQuery = ', Observation as g2';
             query += nearByRelatedObvQuery;
-            filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and g2.isShowable = true and obv.id = :parentId '                                              //removed check for not equal to parentId to include it in show page
+            filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and obv.id = :parentId '                                              //removed check for not equal to parentId to include it in show page
             queryParams['parentId'] = params.parentId
             queryParams['maxNearByRadius'] = params.maxNearByRadius?params.int('maxNearByRadius'):200;
             
@@ -1248,7 +1252,18 @@ class ObservationService extends AbstractObjectService {
                 }
             }
         }
+		
+		if(params.isMediaFilter.toBoolean()){
+			filterQuery += " and obv.isShowable = true ";
+		}
+		
+		if(params.areaFilter && (!params.areaFilter.trim().equalsIgnoreCase('all'))){
+			filterQuery += " and obv.locationScale = :locationScale "
+			activeFilters["areaFilter"] = params.areaFilter.toLowerCase()
+			queryParams['locationScale'] = Metadata.LocationScale.getEnum(params.areaFilter)
+		}
 
+				
         String checklistObvCond = ""
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
             checklistObvCond = " and obv.id != obv.sourceId "
@@ -1259,9 +1274,7 @@ class ObservationService extends AbstractObjectService {
 
         def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 
-        if(params.filterProperty != 'speciesName'){
-            filterQuery += " and obv.isShowable = true ";
-        }
+		
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
             filterQuery += " and obv.isChecklist = true "
             activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
@@ -1272,10 +1285,8 @@ class ObservationService extends AbstractObjectService {
         if(params.filterProperty != 'speciesName') {
             checklistCountQuery += " and obv.isChecklist = true "
         }
-        else { 
-            checklistCountQuery += " and obv.isShowable = false "
-        }
-        def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
+        
+		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
 
         orderByClause = " order by " + orderByClause;
         return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
@@ -1325,7 +1336,7 @@ class ObservationService extends AbstractObjectService {
             and {
                 eq("author", user)
                 eq("isDeleted", false)
-                eq("isShowable", true)
+                //eq("isShowable", true)
             }
             if(userGroupInstance){
                 userGroups{
@@ -1344,9 +1355,9 @@ class ObservationService extends AbstractObjectService {
         def sql =  Sql.newInstance(dataSource);
         def result
         if(userGroupInstance){
-            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o, user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable and ugo.observation_id = o.id and ugo.user_group_id =:ugId", [userId:user.id, isDeleted:false, isShowable:true, ugId:userGroupInstance.id]);
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o, user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and ugo.observation_id = o.id and ugo.user_group_id =:ugId", [userId:user.id, isDeleted:false, ugId:userGroupInstance.id]);
         } else {
-            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted ", [userId:user.id, isDeleted:false]);
         }
   //      def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
         return (long)result[0]["count"];
@@ -1357,9 +1368,9 @@ class ObservationService extends AbstractObjectService {
         if(max == -1) {
             def recommendationVotesList
             if(userGroupInstance){
-                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o , user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable and ugo.observation_id = o.id and ugo.user_group_id =:ugId order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, isShowable:true , ugId:userGroupInstance.id]);
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o , user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and ugo.observation_id = o.id and ugo.user_group_id =:ugId order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, ugId:userGroupInstance.id]);
             } else {
-                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, isShowable:true]);
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted order by recoVote.voted_on desc", [userId:user.id, isDeleted:false]);
             }
             //def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true], [max:max, offset:offset]);
             def finalResult = []
@@ -1378,9 +1389,9 @@ class ObservationService extends AbstractObjectService {
         } else {
             def recommendationVotesList
             if(userGroupInstance){
-                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o , user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable and ugo.observation_id = o.id and ugo.user_group_id =:ugId order by recoVote.voted_on desc limit :max offset :offset", [userId:user.id, isDeleted:false, isShowable:true ,max:max, offset:offset, ugId:userGroupInstance.id]);
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o , user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and ugo.observation_id = o.id and ugo.user_group_id =:ugId order by recoVote.voted_on desc limit :max offset :offset", [userId:user.id, isDeleted:false, max:max, offset:offset, ugId:userGroupInstance.id]);
             } else {
-                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable order by recoVote.voted_on desc limit :max offset :offset", [userId:user.id, isDeleted:false, isShowable:true ,max:max, offset:offset]);
+                recommendationVotesList = sql.rows("select recoVote.id from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted order by recoVote.voted_on desc limit :max offset :offset", [userId:user.id, isDeleted:false,max:max, offset:offset]);
             }
             //def recommendationVotesList = RecommendationVote.executeQuery("select recoVote from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable order by recoVote.votedOn desc", [userId:user.id, isDeleted:false, isShowable:true], [max:max, offset:offset]);
             def finalResult = []

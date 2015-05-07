@@ -332,3 +332,8 @@ ALTER TABLE observation ADD COLUMN location_scale character varying(255);
 ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
 
 
+# 6th may 2015
+# Observation enhancement
+update observation set location_scale = 'APPROXIMATE' where  location_scale is null;
+biodiv=#  alter table observation  alter column location_scale set not null;
+

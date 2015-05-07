@@ -321,18 +321,18 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
-        else {
-            $('#sciNameColumn').val(sciNameColumn);
-            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
-        }
+//        else {
+//            $('#sciNameColumn').val(sciNameColumn);
+//            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+//        }
         if(commonNameColumn) {
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
-        else{
-            $('#commonNameColumn').val(commonNameColumn);
-            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
-        }
+//        else{
+//            $('#commonNameColumn').val(commonNameColumn);
+//            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
+//        }
     });
 } 
 

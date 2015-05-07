@@ -503,11 +503,11 @@ class UserGroupService {
             case Observation.simpleName:
             queryParams['isDeleted'] = false;
             queryParams['isChecklist'] = false;
-            queryParams['isShowable'] = true;
+            //queryParams['isShowable'] = true;
             query = "select count(*) from Observation obv "
             if(userGroupInstance)
                 query += "join obv.userGroups userGroup where userGroup=:userGroup and "
-            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
+            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist "// and obv.isShowable = :isShowable"
             count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
             break;
             case Checklists.simpleName:

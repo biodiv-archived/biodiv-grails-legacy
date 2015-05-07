@@ -50,7 +50,7 @@ $(document).ready(function(){
         $("#observationChecklistOnlyButton").addClass('active')
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    return false;
+        return false;
     });
 
     $("#observationAllButton").click(function() {
@@ -146,6 +146,85 @@ $(document).ready(function(){
         $("#speciesNameFilter").val('Unknown');
         $("#speciesNameFilterButton").addClass('active');
         $("#speciesNameAllButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+    
+    $('#areaFilter').button();
+    if(window.params.areaFilter ==  undefined || window.params.areaFilter == 'all' ){
+    	$("#allAreaButton").addClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+    }else if(window.params.areaFilter == 'local'){
+    	$("#allAreaButton").removeClass('active');
+        $("#localAreaButton").addClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+    }else if(window.params.areaFilter == 'region'){
+    	$("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").addClass('active');
+        $("#countryAreaButton").removeClass('active');
+    }else{
+    	$("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").addClass('active');
+    }
+    
+    $("#allAreaButton").click(function() {
+        if($("#allAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('all');
+        $("#allAreaButton").addClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+    
+    $("#localAreaButton").click(function() {
+        if($("#localAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('local');
+        $("#allAreaButton").removeClass('active');
+        $("#localAreaButton").addClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#regionAreaButton").click(function() {
+        if($("#regionAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('region');
+        $("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").addClass('active');
+        $("#countryAreaButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#countryAreaButton").click(function() {
+        if($("#countryAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('country');
+        $("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").addClass('active');
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
@@ -562,6 +641,15 @@ function getSelectedMedia() {
     }	
 }
 
+function getSelectedAreaFilter() {
+    var area = ''; 
+    area = $("#areaFilter").attr('value');
+    if(area) {
+        area = area.replace(/\s*\,\s*$/,'');
+        return area;
+    }	
+}
+
 function getSelectedSpeciesName() {
     var sName = ''; 
     sName = $("#speciesNameFilter").attr('value');
@@ -642,10 +730,15 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['isChecklistOnly'] = allChecklistFlag;
     }
 
-    //    var mediaFilter = getSelectedMedia();
-    //    if(mediaFilter) {
-    //            params['isMediaFilter'] = mediaFilter;
-    //    }
+    var mediaFilter = getSelectedMedia();
+    if(mediaFilter) {
+    	params['isMediaFilter'] = mediaFilter;
+    }
+
+    var areaFilter = getSelectedAreaFilter();
+    if(areaFilter) {
+    	params['areaFilter'] = areaFilter;
+    }
 
     var grp = getSelectedGroup();
     if(grp) {
