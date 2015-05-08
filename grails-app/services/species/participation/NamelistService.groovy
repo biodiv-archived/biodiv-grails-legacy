@@ -725,6 +725,11 @@ class NamelistService {
             processDataForMigration(sciName, acceptedMatch, colDataSize);            
         } else {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
+            sciName.noOfCOLMatches = colDataSize;
+            if(!sciName.hasErrors() && sciName.save(flush:true)) {
+            } else {
+                sciName.errors.allErrors.each { log.error it }
+            }
         }
     }
 
@@ -738,7 +743,7 @@ class NamelistService {
         //WHY required here??
         //addIBPHierarchyFromCol(sciName, acceptedMatch);
         updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
-        sciName.noOfMatches = colDataSize;
+        sciName.noOfCOLMatches = colDataSize;
         /*else if(sciName.status == NameStatus.ACCEPTED) {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def cl = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);

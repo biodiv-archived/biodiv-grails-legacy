@@ -20,8 +20,8 @@ class TaxonomyDefinition extends ScientificName {
     boolean isFlagged = false;
 	String flaggingReason;
     NamesMetadata.COLNameStatus colNameStatus;
-    int noOfCOLMatches = 0;
-
+    int noOfCOLMatches = -99;
+    String oldId;
 	static hasMany = [author:String, year:String]
 
 	static constraints = {
@@ -34,6 +34,7 @@ class TaxonomyDefinition extends ScientificName {
 		externalLinks nullable:true;
 		colNameStatus nullable:true;
 		noOfCOLMatches nullable:true;
+		oldId nullable:true;
 	}
 
 	static mapping = {

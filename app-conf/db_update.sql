@@ -337,7 +337,7 @@ update recommendation set is_flagged = false;
 ALTER TABLE recommendation ALTER COLUMN flagging_reason type varchar(1500);
 alter table activity_feed alter column activity_descrption type varchar(2000);
 
-ALTER TABLE taxonomy_definition ADD COLUMN no_ofcolmatches int not null;
+ALTER TABLE taxonomy_definition ADD COLUMN no_ofcolmatches int;
 update taxonomy_definition set no_ofcolmatches = 0;
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
