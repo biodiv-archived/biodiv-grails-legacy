@@ -555,6 +555,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset , UserGroup userGroupInstance = null) {
+		
         def observations = Observation.withCriteria () {
 //            projections {
 //                groupProperty('sourceId')
@@ -592,7 +593,8 @@ class ObservationService extends AbstractObjectService {
             and {
                 eq("maxVotedReco", maxVotedReco)
                 eq("isDeleted", false)
-                if(obvId) ne("id", obvId)
+				eq("isChecklist", false)
+				if(obvId) ne("id", obvId)
                 if(userGroupInstance){
                     userGroups{
                         eq('id', userGroupInstance.id)
@@ -600,6 +602,7 @@ class ObservationService extends AbstractObjectService {
                 }    
             }
         }
+		
         return ["observations":result, "count":count]
     }
     
@@ -1025,9 +1028,7 @@ class ObservationService extends AbstractObjectService {
             }
             query = query [0..-2];
             queryParams['fetchField'] = params.fetchField
-        } else if(params.filterProperty == 'speciesName') {
-            query += " obv.sourceId as sid "
-        } else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
+        }else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
             query += " g2 "
         } 
         else {
@@ -2074,8 +2075,7 @@ class ObservationService extends AbstractObjectService {
         def distinctRecoList = [];
         def queryParts = getFilteredObservationsFilterQuery(params) 
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
-
-        log.debug "distinctRecoQuery  : "+queryParts.distinctRecoQuery;
+		log.debug "distinctRecoQuery  : "+queryParts.distinctRecoQuery;
         log.debug "distinctRecoCountQuery  : "+queryParts.distinctRecoCountQuery;
 
         def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)

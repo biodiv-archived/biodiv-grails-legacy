@@ -177,25 +177,25 @@ class ObservationController extends AbstractObjectController {
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
         
-        //Because returning source Ids instead of actual obv ins
-        if(params.filterProperty == 'speciesName') {
-            //def fetchedCklCount = filteredObservation.checklistCount;
-            def results = []
-            //def cklCount = 0;
-            observationInstanceList.each {
-                def obv = Observation.read(it);
-                //if(fetchedCklCount != 0 && obv.isChecklist) {
-                  //  cklCount += 1;
-                //}
-                results.add(obv)
-            }
-            filteredObservation.observationInstanceList = results;
-            observationInstanceList = results;
-            //if(fetchedCklCount != 0 ) {
-              //  filteredObservation.checklistCount = cklCount;
-            //}
-            //println "=============CKL COUNT========= " + cklCount
-        }
+//        //Because returning source Ids instead of actual obv ins
+//        if(params.filterProperty == 'speciesName') {
+//            //def fetchedCklCount = filteredObservation.checklistCount;
+//            def results = []
+//            //def cklCount = 0;
+//            observationInstanceList.each {
+//                def obv = Observation.read(it);
+//                //if(fetchedCklCount != 0 && obv.isChecklist) {
+//                  //  cklCount += 1;
+//                //}
+//                results.add(obv)
+//            }
+//            filteredObservation.observationInstanceList = results;
+//            observationInstanceList = results;
+//            //if(fetchedCklCount != 0 ) {
+//              //  filteredObservation.checklistCount = cklCount;
+//            //}
+//            //println "=============CKL COUNT========= " + cklCount
+//        }
 
 		def queryParams = filteredObservation.queryParams
 		def activeFilters = filteredObservation.activeFilters
