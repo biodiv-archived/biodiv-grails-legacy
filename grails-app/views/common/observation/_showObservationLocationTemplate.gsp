@@ -24,6 +24,10 @@
             </td>
         </tr>
         <tr>
+        	<td colspan="2">
+        		<div title="${observationInstance.locationScale.value()}"> ${observationInstance.locationScale.value()} </div>
+        </tr>    
+        <tr>
             <td colspan="2">
                 <%
                 def latitude='',longitude='',areas='';

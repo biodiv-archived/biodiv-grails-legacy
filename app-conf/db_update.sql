@@ -327,7 +327,6 @@ update species_field SET description = 'dummy' where field_id = 81 and descripti
 
 # 2nd march 2015
 # Observation enhancement
-#update location scale colum  in checklist and observation (write actual sql)
 ALTER TABLE observation ADD COLUMN location_scale character varying(255);
 ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
 
@@ -335,5 +334,5 @@ ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
 # 6th may 2015
 # Observation enhancement
 update observation set location_scale = 'APPROXIMATE' where  location_scale is null;
-biodiv=#  alter table observation  alter column location_scale set not null;
+alter table observation  alter column location_scale set not null;
 

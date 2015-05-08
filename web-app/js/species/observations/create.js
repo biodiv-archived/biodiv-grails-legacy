@@ -1,6 +1,7 @@
 var grid;
 var dirtyRows;
 var prevNameColumn = {};
+var columnUpdated = false;
 
 function isEmptyRow(rowEntry){
     var emptyRow = true;
@@ -28,7 +29,7 @@ function isEmptyRow(rowEntry){
 
 //only returning modified data
 function getDataFromGrid(){
-    if(!dirtyRows){
+    if(!dirtyRows || columnUpdated){
         return grid.getData();
     }
     var selectedRows = grid.getSelectedRows();
@@ -136,6 +137,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
 
                 grid.setColumns(columns);
                 grid.render();
+                columnUpdated = true;
                 return newColumn;
             }
         };
@@ -189,6 +191,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             selectNameColumn($('#latitude'), null);
             selectNameColumn($('#longitude'), null);
             selectNameColumn($('#obvDate'), null);
+            columnUpdated = true;
 
         });
         grid.registerPlugin(headerMenuPlugin);
