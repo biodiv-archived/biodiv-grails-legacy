@@ -339,6 +339,9 @@ alter table activity_feed alter column activity_descrption type varchar(2000);
 
 ALTER TABLE taxonomy_definition ADD COLUMN no_ofcolmatches int;
 update taxonomy_definition set no_ofcolmatches = 0;
+
+ALTER TABLE taxonomy_definition add column is_deleted boolean;
+update taxonomy_definition set is_deleted = false;
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 

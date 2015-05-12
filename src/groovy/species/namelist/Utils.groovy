@@ -215,7 +215,7 @@ class Utils {
 
 		long offset = 0
 		int i = 0
-        def sortBy = "rank"
+        def sortBy = 'id'
         println "=========DOMAIN CLASS ==== " + domainClass
         println "=========Synonyms class ==== " + Synonyms.class.simpleName
 
@@ -227,7 +227,7 @@ class Utils {
         List tds = [];
         while(true){ 
             tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
-            //tds.add(domainClass.get(144107L));//max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+            //tds.add(domainClass.get(158685L));//max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
             println "========= OFFSET  ====== " + offset
             tds.each {
                 println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 

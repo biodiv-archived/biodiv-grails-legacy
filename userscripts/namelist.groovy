@@ -7,6 +7,7 @@ import species.namelist.Utils
 import species.Classification
 import species.ScientificName
 import species.SynonymsMerged
+import species.SpeciesField
 import species.Synonyms
 import species.participation.Recommendation;
 import species.participation.TestA;
@@ -136,7 +137,7 @@ update  synonyms set position = 'DIRTY';
 def addIBPTaxonHie() {
     println "====ADDING IBP TAXON HIERARCHY======"
     def cl = new Classification();
-    cl.name = "Test Hierarchy";
+    cl.name = "IBP Taxonomy Hierarchy";
     cl.language = Language.read(205L);
     if(!cl.save(flush:true)) {
         cl.errors.allErrors.each { println it }
@@ -214,7 +215,7 @@ def migrateSynonyms() {
     def nonParsedSyns = [];
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit //+ " =========COUNTER ====== " + conter;    
-        def oldSynList = Synonyms.list (max: limit , offset:offset);
+        def oldSynList = Synonyms.list (max: limit , offset:offset, , sort: "id", order: "asc");
         //def oldSynList = Synonyms.read(39985L) //(max: limit , offset:offset);
         def synMer;
         for(oldSyn in oldSynList) {
@@ -261,6 +262,7 @@ def migrateSynonyms() {
                     synMer.matchId = oldSyn.matchId
                     synMer.matchDatabaseName = oldSyn.matchDatabaseName
                     synMer.rank = oldSyn.taxonConcept.rank;
+                    synMer.oldId = "syn_"+oldSyn.id.toString();
                     oldSyn.contributors.each {
                         synMer.addToContributors(it);
                     }         
@@ -351,9 +353,10 @@ def curateAllNames() {
             def c = TaxonomyDefinition.createCriteria()
             taxDefList = c.list (max: limit , offset:offset) {
                 and {
-                    order('rank','asc')
-                    order('id','asc')                    
+                    eq('position', NamesMetadata.NamePosition.DIRTY)
                 }
+                order('rank','asc')
+                order('id','asc')                    
             }
         }
         for(taxDef in taxDefList) {
@@ -361,8 +364,8 @@ def curateAllNames() {
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
                 counter++;
                 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
-                File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
-                //File domainSourceDir = new File("/home/rahulk/git/biodiv/col_Mar20/TaxonomyDefinition");
+                //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
+                File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
                 curateName(taxDef.id, domainSourceDir);
             }
         }
@@ -408,7 +411,79 @@ def curateRecoName() {
 }
 //curateRecoName()
 
-def namesMapper() {
-    
+def speciesDetails() {
+    int limit = 50, offset = 0;
+    int counter = 0;
+    spUpSer = ctx.getBean("speciesUploadService");
+    def columns  = spUpSer.getDataColumnsMap(Language.read(205L));
+
+    File reportFile = new File("/home/rahulk/species_details.csv")
+    if(reportFile.exists()){
+        reportFile.delete()
+        reportFile.createNewFile()
+    }
+    String str = "Species Id|Species Title|Species Percent Info|Classification";
+    columns.each { key,value ->
+        str = str + "|" + value;
+    }
+    str = str + "\n";
+    reportFile << str;
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def spList;
+        Species.withNewTransaction {
+            spList = Species.list (max: limit , offset:offset, sort: 'id', order: "asc")
+        }
+        for(sp in spList) {
+            println "=====WORKING ON THIS SPECIES============== " + sp + " =========COUNTER ====== " + counter;
+            counter++;
+            StringBuilder sb = new StringBuilder();
+            sb.append(sp.id + "|");
+            sb.append(sp.title + "|");
+            sb.append(sp.percentOfInfo + "|");
+            def path = "";
+            def authClass = Classification.read(817L);
+            def reg = sp.taxonConcept.longestParentTaxonRegistry(authClass);
+            def taxonList = reg.authClass
+            if(taxonList.size() > 0) {
+                taxonList.each{
+                    path += it.name + " -> "
+                }
+            } else {
+                def iucnClass = Classification.read(819L);
+                reg = sp.taxonConcept.longestParentTaxonRegistry(iucnClass);
+                taxonList = reg.iucnClass
+                if(taxonList.size() > 0) {
+                    taxonList.each{
+                        path += it.name + " -> "
+                    }
+                } else {
+                    def gbifClass = Classification.read(818L);
+                    reg = sp.taxonConcept.longestParentTaxonRegistry(gbifClass);
+                    taxonList = reg.gbifClass;
+                    if(taxonList.size() > 0) {
+                        taxonList.each{
+                            path += it.name + " -> "
+                        }
+                    }
+                }
+            }
+            sb.append(path + "|");
+            columns.each { key, value ->
+                def c = SpeciesField.createCriteria().count {
+                    and {
+                        eq("species", sp)
+                        eq("field", Field.read(key))
+                    }
+                }
+                sb.append(c + "|");
+            }
+		    reportFile << sb.toString() + "\n";
+        }
+
+        offset = offset + limit; 
+        if(!spList) break;  
+    }
 }
 
+//speciesDetails();

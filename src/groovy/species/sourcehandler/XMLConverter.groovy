@@ -1618,6 +1618,7 @@ class XMLConverter extends SourceConverter {
                                     //get its data from col and save
                                     println "=======NAME======== " + name
                                     println "========NAME KA ID ======= " + otherParams.id_details[name]
+                                    taxon.matchId = otherParams.id_details[taxon.canonicalForm];
                                     //def externalId = otherParams.id_details[name].trim();
                                     //println "=========EXTERNAL ID===== " + externalId
                                     String nameStatus = otherParams.nameStatus?:NameStatus.ACCEPTED //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
@@ -1674,8 +1675,8 @@ class XMLConverter extends SourceConverter {
                                 }
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
                                 if(fromCOL) {
-                                    def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
-                                    taxon = namelistService.updateAttributes(taxon, res);
+                                    //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
+                                    //taxon = namelistService.updateAttributes(taxon, res);
                                 }
                             } else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
                                 def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
@@ -1693,12 +1694,14 @@ class XMLConverter extends SourceConverter {
                                 */
                             } else if(taxon && fromCOL) {
                                 taxon.position = NamePosition.WORKING
+                                taxon.matchDatabaseName = "COL";
+                                taxon.matchId = otherParams.id_details[taxon.canonicalForm];
                                 taxon = taxon.merge();
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
-                                def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
-                                taxon = namelistService.updateAttributes(taxon, res);
+                                //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
+                                //taxon = namelistService.updateAttributes(taxon, res);
                             }
                             //Moving name to Working list, so all names should be in working list,
                             //even if a single name in hierarchy is in dirty list

@@ -22,6 +22,8 @@ class TaxonomyDefinition extends ScientificName {
     NamesMetadata.COLNameStatus colNameStatus;
     int noOfCOLMatches = -99;
     String oldId;
+    boolean isDeleted = false;
+
 	static hasMany = [author:String, year:String]
 
 	static constraints = {
@@ -29,6 +31,7 @@ class TaxonomyDefinition extends ScientificName {
 		canonicalForm nullable:false;
 		group nullable:true;
 		isFlagged nullable:true;
+		isDeleted nullable:true;
 		threatenedStatus nullable:true;
 		flaggingReason nullable:true;
 		externalLinks nullable:true;
@@ -101,6 +104,27 @@ class TaxonomyDefinition extends ScientificName {
 	   return result;
    }
    
+    Map<Classification, List<TaxonomyDefinition>> longestParentTaxonRegistry(Classification classification) {
+	    Map<List<TaxonomyDefinition>> result = [:];
+        def res = TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, classification)
+	    def longest;
+        int max = 0;
+        res.each { TaxonomyRegistry reg ->
+		   //TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
+		    def tokens = reg.path.tokenize('_')
+            if(tokens.size()>max) {
+                longest = reg
+                max = tokens.size();
+            }
+        }
+        def l = []
+        longest.path.tokenize('_').each { taxonDefinitionId ->
+            l.add(TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId)));
+        }
+        result.put(longest.classification , l);
+        return result;
+    }
+
    Map fetchGeneralInfo(){
 	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }

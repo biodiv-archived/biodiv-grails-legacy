@@ -735,9 +735,15 @@ class NamelistService {
 
     def processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize) {
         sciName.tempActivityDescription = "";
-        sciName = updateAttributes(sciName, acceptedMatch);
-        //if sciName_status != colData[nameStatus] -> update status
+        def upAt = updateAttributes(sciName, acceptedMatch);
+        println  "====UP AT == " + upAt 
+        if(upAt.isDeleted) {
+            log.debug "MARKED AS DELETED ${sciName}"
+            return;
+        }
+        sciName = upAt.sciName; //updateAttributes(sciName, acceptedMatch);
         sciName = updateStatus(sciName, acceptedMatch).sciName;
+        println "========THE SCI NAME======== " + sciName
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
         updateRank(sciName, acceptedMatch.parsedRank);            
         //WHY required here??
@@ -767,8 +773,13 @@ class NamelistService {
    
     def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
         sciName.tempActivityDescription = "";
-        sciName = updateAttributes(sciName, acceptedMatch);
-        //if sciName_status != colData[nameStatus] -> update status
+        def upAt = updateAttributes(sciName, acceptedMatch);
+        println  "====UP AT == " + upAt 
+        if(upAt.isDeleted) {
+            log.debug "MARKED AS DELETED ${sciName}"
+            return;
+        }
+        sciName = upAt.sciName; //updateAttributes(sciName, acceptedMatch);
         def result =  updateStatus(sciName, acceptedMatch);
         sciName = result.sciName;
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
@@ -847,7 +858,8 @@ class NamelistService {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
                 result = addIBPHierarchyFromCol(colMatch);
-                sciName = result.lastTaxonInIBPHierarchy;            
+                sciName = result.lastTaxonInIBPHierarchy; 
+                println "======STATUS MEIN SCINAME==== " + sciName
                 result.sciName = sciName
 
             } else {
@@ -1425,7 +1437,7 @@ def sql= session.createSQLQuery(query)
         return sciName;
     }
 
-    ScientificName updateAttributes(ScientificName sciName, Map colMatch) {
+    Map updateAttributes(ScientificName sciName, Map colMatch) {
         println "=========UPDATING ATTRIBUTES ========"
         TaxonomyDefinition.withNewSession {
             NamesParser namesParser = new NamesParser();
@@ -1441,6 +1453,15 @@ def sql= session.createSQLQuery(query)
                 }
                 println "########### Flagging becoz of Udating attributes ============== " + sciName
                 sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
+                if(!sciName.findSpeciesId()) {
+                    sciName.isDeleted = true;
+                    sciName = sciName.merge();
+                    if(!sciName.save(flush:true)) {
+                        sciName.errors.allErrors.each { log.error it }
+                    }
+                    println "=========DONE UPDATING ATTRIBUTES ========"
+                    return [sciName:sciName,isDeleted:true];
+                }
             }
             def parsedNames = namesParser.parse([name]);
             println "=============PARSING THIS ========== " + name
@@ -1473,7 +1494,7 @@ def sql= session.createSQLQuery(query)
                 sciName.errors.allErrors.each { log.error it }
             }
             println "=========DONE UPDATING ATTRIBUTES ========"
-            return sciName
+            return [sciName:sciName,isDeleted:false];
         }
     }
 

@@ -625,6 +625,21 @@ class SpeciesUploadService {
     	return columnList
     }
 
+    def getDataColumnsMap(Language languageInstance){
+        def columns = [:]
+        Field.findAllByLanguageAndCategoryNotEqual(languageInstance, "Catalogue of Life Taxonomy Hierarchy", [sort:"displayOrder", order:"asc"]).each {
+            def tmpList = []
+            tmpList << it.concept
+            if(it.category)
+                tmpList << it.category
+                if(it.subCategory)
+                    tmpList << it.subCategory
+
+                    columns[it.id] = tmpList.join(" ")
+        }
+        return columns
+    }
+
     File saveModifiedSpeciesFile(params){
         try{
         def gData = JSON.parse(params.gridData)
