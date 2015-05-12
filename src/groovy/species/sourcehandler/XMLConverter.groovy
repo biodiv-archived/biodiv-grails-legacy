@@ -675,7 +675,7 @@ class XMLConverter extends SourceConverter {
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
         List<Resource> resources = [];
-		println "========b============== imagesNode "
+		println "======================= imagesNode "
 		println resourcesXML.images;
 		println '----------------------------'
 		if(resourcesXML) {
