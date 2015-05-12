@@ -84,7 +84,7 @@ class SpeciesUploadService {
 	
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
-	static int BATCH_SIZE = 5;
+	static int BATCH_SIZE = 10;
 	//int noOfFields = Field.count();
     String contentRootDir = config.speciesPortal.content.rootDir
 
@@ -424,13 +424,13 @@ class SpeciesUploadService {
 
 		for(Species s in batch) {
 			try {
-                //def taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
-                if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
-                    s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
-//                    if(!s.taxonConcept.isAttached())
-//                        s.taxonConcept.attach();
-                }
-
+//                //def taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
+//                if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
+//                    s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
+////                    if(!s.taxonConcept.isAttached())
+////                        s.taxonConcept.attach();
+//                }
+//
 				//externalLinksService.updateExternalLinks(taxonConcept);
 				
 				s.percentOfInfo = calculatePercentOfInfo(s);
@@ -480,8 +480,13 @@ class SpeciesUploadService {
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
 		try{
-			//TaxonomyDefinition.withNewSession{
-				for(Species s : species) {
+			for(Species s : species) {
+				//TaxonomyDefinition.withNewTransaction{
+					
+					if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
+						s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
+					}
+					
                     s.afterInsert();
 					def taxonConcept = s.taxonConcept;
 					if(!taxonConcept.isAttached()) {
@@ -494,8 +499,8 @@ class SpeciesUploadService {
                         s.updateHasMediaValue(true);
                     }
 					log.info "post processed spcecies ${s}"
-				}
-			//}
+				//}
+			}
 		} catch(e) {
 			log.error "$e.message"
 			e.printStackTrace()
