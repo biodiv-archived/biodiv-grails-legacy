@@ -481,7 +481,7 @@ class SpeciesUploadService {
 		//TODO: got to move this to the end of taxon creation
 		try{
 			for(Species s : species) {
-				//TaxonomyDefinition.withNewTransaction{
+				TaxonomyDefinition.withNewTransaction{
 					
 					if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
 						s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
@@ -499,7 +499,7 @@ class SpeciesUploadService {
                         s.updateHasMediaValue(true);
                     }
 					log.info "post processed spcecies ${s}"
-				//}
+				}
 			}
 		} catch(e) {
 			log.error "$e.message"
@@ -782,8 +782,7 @@ class SpeciesUploadService {
 	}
  
  	boolean unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
-        println "++++++++++++++++++++++"
- 		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
+        List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
 		List sFieldToDelete = specificSFields.intersect(sFields)
 		
 		List taxonReg = TaxonomyRegistry.withCriteria(){
@@ -793,11 +792,7 @@ class SpeciesUploadService {
 				if(sbu) between("uploadTime", sbu.startDate, sbu.endDate)
 			}
 		}
-        println specificSFields
-        println sFieldToDelete
-        println taxonReg
-        println  TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept)
-		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
+        boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			try{
 				Featured.deleteFeatureOnObv(s, user)

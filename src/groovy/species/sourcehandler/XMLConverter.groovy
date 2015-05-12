@@ -160,8 +160,7 @@ class XMLConverter extends SourceConverter {
                             return;
                         }
                     }
-					println "------------------------------------------- RESSSS"
-                    List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
+					List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
                     log.debug "Resources ${resources}"
                     resources.each { 
                         it.saveResourceContext(s)
@@ -675,9 +674,6 @@ class XMLConverter extends SourceConverter {
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
         List<Resource> resources = [];
-		println "======================= imagesNode "
-		println resourcesXML.images;
-		println '----------------------------'
 		if(resourcesXML) {
             //saving media
             def imagesNode = resourcesXML.images;
@@ -685,8 +681,7 @@ class XMLConverter extends SourceConverter {
             def audiosNode = resourcesXML.audios;
             def videosNode = resourcesXML.videos;
 
-			println "====================== imagesNode  " + imagesNode[0]
-            resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
+			resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
             resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, "icons"));
             resources.addAll(createResourceByType(audiosNode[0], ResourceType.AUDIO, relResFolder));
             resources.addAll(createResourceByType(videosNode[0], ResourceType.VIDEO, relResFolder));
@@ -706,8 +701,7 @@ class XMLConverter extends SourceConverter {
         if(resourceNode) {
             switch(resourceType) {
                 case ResourceType.IMAGE:
-				println "inside case --------------  "
-                resourceNode?.image.each {
+				resourceNode?.image.each {
                     if(!it?.id) {
                         //TODO done because each image in bulk upload goes to separate folder.
                         if(resourcesRootDir == config.speciesPortal.usersResource.rootDir){
@@ -715,8 +709,7 @@ class XMLConverter extends SourceConverter {
                             relResFolder = new File(relFolder).getParent();
                         }
 						
-						println "=================^^^^^^^^^^^^^^^^^^66 = inside creatting ressssss"
-                        def resource = createImage(it, relResFolder, ResourceType.IMAGE);
+						def resource = createImage(it, relResFolder, ResourceType.IMAGE);
                         if(resource) {
                             resources.add(resource);
                         }
@@ -765,9 +758,7 @@ class XMLConverter extends SourceConverter {
         log.debug "Creating image resource : "+tempFile;
         if(tempFile && tempFile.exists()) {
 			
-			println "=================^^^^^^^^^^^^^^^^^^22 = inside creatting ressssss"
-			
-            //copying file
+			//copying file
             relImagesFolder = relImagesFolder.trim();
             File root = new File(resourcesRootDir , relImagesFolder);
             if(!root.exists() && !root.mkdirs()) {
