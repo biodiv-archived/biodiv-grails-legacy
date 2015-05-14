@@ -134,7 +134,8 @@ class ObservationService extends AbstractObjectService {
         //XXX remove this line and column from domain class and database after all migration in wikwio and bhutan
 		observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
 		
-		observation.locationScale = Metadata.LocationScale.getEnum(params.locationScale)
+		def locScale =  Metadata.LocationScale.getEnum(params.locationScale)
+		observation.locationScale = locScale?:Metadata.LocationScale.APPROXIMATE
         observation.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
 
         observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
