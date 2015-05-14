@@ -71,10 +71,9 @@ class ExternalLinksService {
 	//to avoid jdbc connection time out.
 	private boolean saveInNewDBConnection(TaxonomyDefinition taxonConcept){
 		TaxonomyDefinition.withNewTransaction{
-			if(!taxonConcept.isAttached())
-				taxonConcept.attach();
+			taxonConcept = taxonConcept.merge()
 			
-			if(!taxonConcept.save()) {
+			if(!taxonConcept.save(flush:true)) {
 				taxonConcept.errors.each { log.error it};
 				return false;
 			}
