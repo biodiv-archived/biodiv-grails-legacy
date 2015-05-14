@@ -1672,6 +1672,7 @@ class XMLConverter extends SourceConverter {
                                 taxon=taxon.merge();
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
+                                    namelistService.namesInWKG.add(taxon.id)
                                 }
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
                                 if(fromCOL) {
@@ -1693,6 +1694,7 @@ class XMLConverter extends SourceConverter {
                                     synonym.updateContributors(getUserContributors(fieldNode.data))
                                 */
                             } else if(taxon && fromCOL) {
+                                namelistService.namesInWKG.add(taxon.id)
                                 taxon.position = NamePosition.WORKING
                                 taxon.matchDatabaseName = "COL";
                                 taxon.matchId = otherParams.id_details[taxon.canonicalForm];

@@ -151,14 +151,12 @@ class NamelistController {
     def curateName() {
         def acceptedMatch = JSON.parse(params.acceptedMatch);
         acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
-        println "=============ACCEPTED MATCH=========== " + acceptedMatch
-        if(acceptedMatch.isOrphanName){
+        if(acceptedMatch.isOrphanName == "true"){
             Recommendation reco = Recommendation.get(acceptedMatch.recoId?.toLong());
             def res = namelistService.processRecoName(reco, acceptedMatch);
             render res as JSON
         } else {
             ScientificName sciName = TaxonomyDefinition.get(acceptedMatch.taxonId.toLong());
-            println "=============SCIENTIFIC NAME ========= " + sciName;
             def res = namelistService.processDataFromUI(sciName, acceptedMatch)
             render res as JSON
         }

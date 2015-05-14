@@ -348,11 +348,11 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
                 });
             }
             if(value['rank'] == 'species') {
-                rows+= "<tr><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
+                rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
             }else {
-                rows+= "<tr><td>"+value['name'] +"</td>"
+                rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td>"+value['name'] +"</td>"
             }
-            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails("+value['externalId']+", "+showNameDetails+")'>Select this</button></td></tr>"        
+            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails(this,"+showNameDetails+")'>Select this</button></td></tr>"        
         }else {
             rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getNameDetails("+value['taxonId'] +","+ classificationId+",1, undefined)'>Select this</button></td></tr>"
         }
@@ -362,7 +362,8 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
 }
 
 //takes COL id
-function getExternalDbDetails(externalId, showNameDetails) {
+function getExternalDbDetails(ele, showNameDetails) {
+    var externalId = $(ele).parents('tr').find('input').val();
     var url = window.params.curation.getExternalDbDetailsUrl;
     var dbName = $("#queryDatabase").val();
     if(externalId == undefined && !showNameDetails) {
@@ -371,7 +372,7 @@ function getExternalDbDetails(externalId, showNameDetails) {
     }
     //IN case of TNRS no id comes
     //so search by name
-    if(externalId == undefined) {
+    if(externalId == undefined || externalId == "") {
         externalId = $(".name").val();
     }
     $.ajax({

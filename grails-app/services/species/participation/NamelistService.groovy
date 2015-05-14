@@ -43,6 +43,7 @@ class NamelistService {
 	
     private static final String EOL_SITE = 'http://eol.org'
     private static final String EOL_URI = '/api/search/1.0.json'
+    private static final String EOL_URI_ID = '/api/hierarchy_entries/1.0/'
     
     private static final String WORMS_SITE = 'http://www.marinespecies.org/'
     private static final String WORMS_URI = 'aphia.php'
@@ -64,6 +65,8 @@ class NamelistService {
     private static long AFTER_CAN_MULTI_ZERO = 0;
     private static long AFTER_CAN_MULTI_SINGLE = 0;
     private static long AFTER_CAN_MULTI_MULTI = 0;
+    
+    public static Set namesInWKG = [];
 
 	def dataSource
     def groupHandlerService
@@ -149,7 +152,7 @@ class NamelistService {
         results.result.each { r ->
             Map temp = new HashMap();
             Map id_details = new HashMap();
-            temp['externalId'] = r?.id?.text()
+            temp['externalId'] = r?.id?.text()//+"'"
             temp['matchDatabaseName'] = "COL"
             temp['canonicalForm'] = r?.name?.text(); 
             temp['name'] = r?.name?.text() 
@@ -721,6 +724,15 @@ class NamelistService {
        
         if(acceptedMatch) {
             println "================ACCEPTED MATCH=========================== " + acceptedMatch
+            if(acceptedMatch.parsedRank != sciName.rank) {
+                log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. But REJECTED AS RANK WAS CHANGING"
+                sciName.noOfCOLMatches = colDataSize;
+                if(!sciName.hasErrors() && sciName.save(flush:true)) {
+                } else {
+                    sciName.errors.allErrors.each { log.error it }
+                }
+                return;
+            }
             log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
             processDataForMigration(sciName, acceptedMatch, colDataSize);            
         } else {
@@ -735,13 +747,13 @@ class NamelistService {
 
     def processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize) {
         sciName.tempActivityDescription = "";
-        def upAt = updateAttributes(sciName, acceptedMatch);
+        /*def upAt = updateAttributes(sciName, acceptedMatch);
         println  "====UP AT == " + upAt 
         if(upAt.isDeleted) {
             log.debug "MARKED AS DELETED ${sciName}"
             return;
-        }
-        sciName = upAt.sciName; //updateAttributes(sciName, acceptedMatch);
+        }*/
+        sciName = updateAttributes(sciName, acceptedMatch);
         sciName = updateStatus(sciName, acceptedMatch).sciName;
         println "========THE SCI NAME======== " + sciName
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
@@ -773,13 +785,13 @@ class NamelistService {
    
     def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
         sciName.tempActivityDescription = "";
-        def upAt = updateAttributes(sciName, acceptedMatch);
+        /*def upAt = updateAttributes(sciName, acceptedMatch);
         println  "====UP AT == " + upAt 
         if(upAt.isDeleted) {
             log.debug "MARKED AS DELETED ${sciName}"
             return;
-        }
-        sciName = upAt.sciName; //updateAttributes(sciName, acceptedMatch);
+        }*/
+        sciName = updateAttributes(sciName, acceptedMatch);
         def result =  updateStatus(sciName, acceptedMatch);
         sciName = result.sciName;
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
@@ -1002,6 +1014,7 @@ class NamelistService {
     }
 
     boolean updatePosition(ScientificName sciName, NamePosition position) {
+        namesInWKG.add(sciName.id)
         log.debug "Updating position from ${sciName.position} to ${position}"
         sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position.value(), position.value());
         sciName.position = position;
@@ -1296,13 +1309,15 @@ class NamelistService {
         
         def http = new HTTPBuilder()
         println "========EOL SITE===== " + EOL_SITE
+        println "========INPUT===== " + EOL_URI_ID + input+'.json'
         http.request( EOL_SITE, GET, TEXT ) { req ->
             if(searchBy == 'name') {
                 uri.path = EOL_URI;
+                uri.query = [ exact:'true', q :input]
             } else {
-                uri.path = EOL_URI;
+                uri.path = EOL_URI_ID + input+'.json';
+                uri.query = [common_names :false, synonyms :false]
             }
-            uri.query = [ exact:'true', q :input]
             headers.Accept = '*/*'
 
             response.success = { resp, reader ->
@@ -1313,7 +1328,7 @@ class NamelistService {
                 println "========TNRS RESULT====== " + xmlText
                 return responseFromEOLAsMap(xmlText, searchBy);
             }
-            response.'404' = { println 'Not found' }
+            response.'404' = { println '404 - Not found' }
         }
     }
 
@@ -1323,7 +1338,7 @@ class NamelistService {
         def finalResult = []
         allResults.each { result ->
             Map temp = new HashMap()
-            temp['externalId'] = "" 
+            temp['externalId'] = result['id'] 
             temp['name'] = result['title'];
             temp['rank'] = result['rank']?result['rank'].toLowerCase() : "";
             temp['nameStatus'] = "";
@@ -1437,7 +1452,7 @@ def sql= session.createSQLQuery(query)
         return sciName;
     }
 
-    Map updateAttributes(ScientificName sciName, Map colMatch) {
+    ScientificName updateAttributes(ScientificName sciName, Map colMatch) {
         println "=========UPDATING ATTRIBUTES ========"
         TaxonomyDefinition.withNewSession {
             NamesParser namesParser = new NamesParser();
@@ -1455,12 +1470,13 @@ def sql= session.createSQLQuery(query)
                 sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
                 if(!sciName.findSpeciesId()) {
                     sciName.isDeleted = true;
-                    sciName = sciName.merge();
+                    /*sciName = sciName.merge();
                     if(!sciName.save(flush:true)) {
                         sciName.errors.allErrors.each { log.error it }
                     }
                     println "=========DONE UPDATING ATTRIBUTES ========"
                     return [sciName:sciName,isDeleted:true];
+                    */
                 }
             }
             def parsedNames = namesParser.parse([name]);
@@ -1494,7 +1510,7 @@ def sql= session.createSQLQuery(query)
                 sciName.errors.allErrors.each { log.error it }
             }
             println "=========DONE UPDATING ATTRIBUTES ========"
-            return [sciName:sciName,isDeleted:false];
+            return sciName //:sciName,isDeleted:false];
         }
     }
 
@@ -1688,4 +1704,10 @@ def sql= session.createSQLQuery(query)
         }
         return finalResult;
     }
-}
+/*
+    def checkzz1() {
+        return List s2 = [872, 2998, 64231, 94899, 122888, 123467, 124658, 874, 3000, 5572, 20218, 33364, 64233, 64284, 76313, 76954, 76967, 77026, 77115, 78262, 78725, 80105, 80146, 94599, 94632, 94681, 94748, 94794, 94901, 96642, 96988, 97001, 103806, 103829, 103854, 104006, 104681, 104732, 105227, 106787, 106815, 106939, 106968, 107021, 107288, 122890, 123295, 123332, 123350, 123469, 124110, 124660, 124673, 124853, 125326, 125488, 125566, 161765, 162123, 187763, 187801, 211188, 213340, 267945, 275441, 288913, 293758, 876, 3002, 3352, 3964, 5574, 20220, 22426, 22723, 33366, 47444, 47771, 64235, 64256, 64267, 64286, 64327, 64422, 64567, 73791, 74437, 74453, 74927, 76203, 76237, 76315, 76326, 76340, 76956, 76969, 76994, 77117, 77941, 77999, 78264, 78374, 78392, 78559, 78570, 78613, 78696, 78727, 78744, 79096, 79245, 80030, 80148, 80228, 81099, 81164, 86930, 87199, 88718, 89945, 94547, 94601, 94612, 94634, 94683, 94694, 94796, 94861, 94903, 94914, 94930, 95120, 95676, 95736, 96328, 96403, 96428, 96631, 96990, 97003, 98845, 99114, 99125, 99151, 99912, 99928, 99951, 100053, 100498, 100572, 101942, 103808, 103831, 103842, 103856, 104008, 104019, 104030, 104039, 104113, 104228, 104364, 104683, 104734, 104745, 104756, 105229, 105261, 106789, 106941, 106957, 106970, 107023, 107064, 107277, 107290, 107311, 122892, 123023, 123034, 123048, 123284, 123302, 123334, 123352, 123471, 123568, 123639, 124112, 124123, 124662, 124855, 124923, 125040, 125110, 125328, 125490, 125504, 125568, 125591, 126929, 156511, 156522, 156660, 158054, 161754, 161767, 168730, 187803, 210777, 210826, 211190, 211297, 212994, 213342, 217233, 219639, 219751, 222850, 263533, 263534, 267949, 267966, 293754, 293757, 293759, 878, 3004, 3035, 3053, 3061, 3087, 3179, 3203, 3252, 3297, 3326, 3354, 3440, 3494, 3514, 3554, 3677, 3736, 3770, 3899, 3966, 4025, 4343, 4355, 4744, 5051, 5576, 5927, 6029, 6136, 6707, 6728, 20222, 22428, 22439, 22454, 22607, 22622, 22632, 22642, 22662, 22685, 22697, 22725, 22815, 33664, 34048, 47446, 47455, 47507, 47519, 47632, 47749, 47773, 47849, 47869, 47883, 47972, 47978, 47986, 48083, 48221, 48302, 48347, 48380, 48544, 48757, 48855, 48861, 49223, 49267, 49329, 49341, 49392, 50120, 50563, 50602, 50608, 50734, 50796, 50905, 51639, 52192, 52797, 52857, 54096, 57895, 59286, 64237, 64258, 64269, 64288, 64329, 64424, 64470, 64486, 64507, 64531, 64550, 64569, 64579, 65253, 66590, 66611, 66632, 66655, 66763, 66931, 66985, 69969, 70513, 72606, 72672, 72681, 72690, 73758, 73793, 73877, 74065, 74092, 74301, 74359, 74428, 74455, 74478, 74487, 74529, 74829, 74838, 74890, 74906, 74929, 75178, 75187, 75228, 75338, 75434, 75443, 76194, 76205, 76221, 76239, 76277, 76317, 76328, 76342, 76418, 76587, 76761, 76804, 76818, 76847, 76884, 76938, 76958, 76971, 76985, 76996, 77028, 77049, 77119, 77261, 77273, 77282, 77291, 77712, 77932, 77943, 77957, 77966, 78076, 78149, 78161, 78266, 78282, 78376, 78394, 78561, 78572, 78602, 78615, 78624, 78666, 78675, 78687, 78698, 78707, 78716, 78729,78746, 78772, 78789, 78822, 78869, 78905, 79027, 79036, 79098, 79107, 79116, 79163, 79227, 79236, 79247, 79263, 79289, 79308, 79317, 79387, 79396, 79448, 79465, 79747, 80032, 80150, 80159, 80175, 80191, 80219, 80230, 80531, 80549, 80704, 80802, 80899, 81028, 81101, 81150, 81166, 82117, 82142, 85766, 86552, 86932, 87201, 87525, 87535, 87892, 87901, 88009, 88032, 88105, 88156, 88469, 88537, 88720, 88740, 88898, 89947, 90100, 90218, 90236, 90245, 90394, 90711, 91636, 94160, 94234, 94243, 94378, 94538, 94549, 94590, 94603, 94614, 94623, 94636, 94645, 94685, 94696, 94705, 94714, 94723, 94732, 94798, 94813, 94863, 94877, 94905, 94916, 94932, 94958, 94967, 95001, 95053, 95060, 95122, 95131, 95146, 95262, 95660, 95669, 95683, 95692, 95738, 95810, 95824, 95846, 96000, 96194, 96235, 96254, 96263, 96319, 96330, 96389, 96405, 96430, 96446, 96633, 96644, 96653, 96684, 96837, 96902, 96911, 96992, 97005, 97127, 97574, 97644, 97679, 97688, 97697, 97947, 97973, 97988, 98043, 98468, 98631, 98816, 98847, 98957, 98986, 99000, 99100, 99116, 99127, 99153, 99914, 99930, 99953, 100055, 100087, 100258, 100274, 100425, 100489, 100500, 100574, 100583, 100592, 100601, 100630, 100639, 100651, 100660, 100862, 100950, 100979, 101687, 101803, 101944, 101953, 101963, 101997, 102102, 102116, 102125, 102139, 102199, 102232, 102278, 102303, 103236, 103810, 103833, 103844, 103858, 103877, 103889, 103909, 103918, 103961, 104010, 104021, 104032, 104041, 104062, 104071, 104115, 104230, 104291, 104300, 104329, 104346, 104355, 104366, 104399, 104408, 104436, 104685, 104708, 104736, 104747, 104758, 104832, 104862, 104988, 105015, 105075, 105090, 105135, 105144, 105158, 105167, 105231, 105263, 105333, 105564, 105683, 105692, 105733, 105860, 106063, 106283, 106308, 106724, 106749, 106791, 106943, 106959, 106972, 106993, 107025, 107055, 107066, 107082, 107127, 107268, 107279, 107292, 107301, 107313, 109855, 109935, 110067, 110075, 110417, 110594, 112715, 112729, 113212, 113289, 113454, 113510, 113558, 113647, 115110, 115425, 117791, 117899, 117919, 118178, 118186, 118705, 118713, 119660, 119669, 119686, 119965, 119980, 121557, 121955, 122672, 122853, 122894, 122903, 122925, 122950, 122969, 122978, 122987, 122996, 123005, 123014, 123025, 123036, 123050, 123150, 123173, 123233, 123272, 123286, 123314, 123323, 123336, 123354, 123383, 123406, 123487, 123496, 123519, 123534, 123557, 123570, 123582, 123612, 123621, 123641, 124114, 124125, 124213, 124243, 124300, 124575, 124664, 124675, 124691, 124749, 124812, 124857, 124925, 125042, 125065, 125084, 125101, 125112, 125181, 125190, 125199, 125208, 125255, 125330, 125375, 125492, 125506, 125522, 125531, 125570, 125593, 125941, 126931, 129778, 131117, 131209, 131320, 134500, 140482, 141218, 143714, 149232, 150184, 150323, 151191, 151476, 151640, 151654, 151695, 151704, 151713, 151725, 151756, 151772, 151786, 151844, 151853, 152035, 152051, 152988, 153798, 153807, 153823, 154582, 154596, 154649, 154658, 155602, 155991, 156030, 156179, 156513, 156524, 156540, 156596, 156636, 156662, 158056, 158604, 158667, 158861, 158896, 158924, 159042, 161176, 161592, 161665, 161677, 161756, 162114, 162133, 162197, 162400, 162436, 162452, 162485, 162661, 163330, 163371, 164709, 164732, 165331, 166326, 166341, 166712, 167020, 168331, 168340, 168358, 168421, 168435, 168444, 168453, 168462, 168580, 168732, 168826, 168939, 168948, 169495, 169803, 169829, 173443, 175736, 175745, 175767, 175868, 175877, 175891, 175961, 176106, 187692, 187805, 188331, 188930, 189053, 189062, 189071, 189162, 189171, 210779, 210878, 210959, 211192, 211224, 211762, 211836, 211884, 212084, 212094, 212163, 212202, 212368, 212469, 212622, 212681, 212718, 212909, 212996, 213621, 213884, 214967, 215747, 216197, 217093, 217313, 217888, 218044, 218268, 218582, 219753, 220394, 220722, 222189, 222407, 222852, 223214, 263277, 263426, 263430, 263469, 263530, 263561, 263574, 263576, 263586, 263751, 263763, 263786, 263796, 265350, 265359, 265419, 265422, 267289, 267323, 267326, 267977, 268818, 268875, 270068, 275443, 275444, 275473, 275491, 289792, 293755, 293762, 293763, 293764, 293765, 293751, 293761, 880, 3006, 3037, 3055, 3063, 3089, 3099, 3154, 3169, 3181, 3205, 3239, 3254, 3299, 3328, 3356, 3419, 3442, 3464, 3496, 3507, 3516, 3542, 3556, 3601, 3679, 3738, 3772, 3901, 3968, 4018, 4027, 4033, 4058, 4192, 4274, 4345, 4357, 4391, 4406, 4648, 4671, 4711, 4717, 4746, 4752, 4953, 4994, 5031, 5053, 5185]
+
+    }
+    */
+    }
