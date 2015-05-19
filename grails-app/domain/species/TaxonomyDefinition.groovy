@@ -107,7 +107,7 @@ class TaxonomyDefinition extends ScientificName {
     Map<Classification, List<TaxonomyDefinition>> longestParentTaxonRegistry(Classification classification) {
 	    Map<List<TaxonomyDefinition>> result = [:];
         def res = TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, classification)
-	    def longest;
+	    def longest= null;
         int max = 0;
         res.each { TaxonomyRegistry reg ->
 		   //TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
@@ -118,10 +118,15 @@ class TaxonomyDefinition extends ScientificName {
             }
         }
         def l = []
+if(!longest) {
+	result.put(classification , l);
+        return result;
+
+}
         longest.path.tokenize('_').each { taxonDefinitionId ->
             l.add(TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId)));
         }
-        result.put(longest.classification , l);
+        result.put(classification , l);
         return result;
     }
 
