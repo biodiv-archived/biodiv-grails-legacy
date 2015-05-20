@@ -1430,6 +1430,7 @@ class NamelistService {
         //Change status and class for this row entry in database
         sciName = updateStatusAndClass(sciName, NameStatus.SYNONYM)
         println "======CHANGED STATUS AND CLASS ==== " + sciName.status +" ===== " + sciName.class
+        oldSynonyms.add(sciName);
         //Save all the new accepted names or update its hierarchy
         colMatch.acceptedNamesList.each { colAcceptedNameData ->
             println "======SAVING THIS ACCEPTED NAME ==== " + colAcceptedNameData;
