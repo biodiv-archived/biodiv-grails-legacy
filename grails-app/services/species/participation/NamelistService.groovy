@@ -782,7 +782,10 @@ class NamelistService {
         updateRank(sciName, acceptedMatch.parsedRank);            
         //WHY required here??
         //addIBPHierarchyFromCol(sciName, acceptedMatch);
-        updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
+
+        //already updated in update attributes
+        //updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
+        
         sciName.noOfCOLMatches = colDataSize;
         /*else if(sciName.status == NameStatus.ACCEPTED) {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
@@ -1533,6 +1536,8 @@ def sql= session.createSQLQuery(query)
             sciName.matchDatabaseName = colMatch.matchDatabaseName;
             sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
             sciName.viaDatasource = colMatch.sourceDatabase;
+            sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position?.value(), NamePosition.WORKING.value());
+            sciName.position = NamePosition.WORKING.value();
             sciName = sciName.merge();
             println "==========SCI NAME AFTER MERGE ======== " + sciName
             if(!sciName.save(flush:true)) {
