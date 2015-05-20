@@ -40,7 +40,7 @@ class Utils {
 			return
 		}
 		generateReport(f, TaxonomyDefinition.class)
-		generateReport(f, Synonyms.class)
+		//generateReport(f, Synonyms.class)
 	}
 	
 	private static generateReport(File soruceDir, Class c){
@@ -63,7 +63,17 @@ class Utils {
 		long offset = 0
 		int i = 0
 		while(true){
-			List tds = c.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+            def cri = TaxonomyDefinition.createCriteria()
+            List tds = cri.list (max: BATCH_SIZE , offset:offset) {
+                and {
+                    //lt('id', 293748L)
+                    eq('position', NamesMetadata.NamePosition.DIRTY)
+                    eq('isDeleted', false)//isNull('matchId')
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            }
+			//List tds = c.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
 			if(tds.isEmpty()){
 				break
 			}
@@ -91,9 +101,11 @@ class Utils {
 			println "========== File not available for taxon " + taxon.id + "   name " + taxon.canonicalForm
 			return
 		}
-		
-		def results = new XmlParser().parse(f)
-		/*StringBuilder sb = new StringBuilder()
+        def results ;
+		try {
+		    results = new XmlParser().parse(f)
+        } catch(Exception e) {return;}
+        /*StringBuilder sb = new StringBuilder()
 		sb.append(taxon.id + "|") 
 		sb.append(taxon.canonicalForm + "|")
 		sb.append(results.'@total_number_of_results' + "|")

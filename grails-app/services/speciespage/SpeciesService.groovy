@@ -1986,5 +1986,128 @@ def checking(){
    return "Passed!" 
 }
 
+    def updateSynonymOld(def synonymId, def speciesId, String relationship, String value) {
+
+        if(!value || !relationship) {
+            return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
+        }
+        Species speciesInstance = Species.get(speciesId);
+
+        if(!speciesInstance) {
+            def messagesourcearg = new Object[1];
+            messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
+        }
+
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+
+            if(!oldSynonym) {
+                //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
+            } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
+                return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
+            } else if(!oldSynonym.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+            }
+        }
+
+        Species.withTransaction { status ->
+            if(oldSynonym) {
+                def result = deleteSynonymOld(oldSynonym, speciesInstance);
+                if(!result.success) {
+                    def messagesourcearg = new Object[1];
+                    messagesourcearg[0] = result.msg;
+                    return [success:false, msg:messageSource.getMessage("info.error.updating.synonym", messagesourcearg, LCH.getLocale())]
+                }
+            } 
+            XMLConverter converter = new XMLConverter();
+
+            NodeBuilder builder = NodeBuilder.newInstance();
+            def synonym = builder.createNode("synonym");
+            Node data = new Node(synonym, 'data', value)
+            new Node(data, "relationship", relationship);
+            new Node(data, "contributor", springSecurityService.currentUser.email);
+
+            List<Synonyms> synonyms = converter.createSynonymsOld(synonym, speciesInstance.taxonConcept);
+
+            if(!synonyms) {
+                return [success:false, msg:messageSource.getMessage("info.error.update.synonym", null, LCH.getLocale())]
+            } else {
+                String msg = '';
+                def content;
+                msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                String activityType, mailType;
+                if(oldSynonym) {
+                    activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                    mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
+                } else {
+                    activityType = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
+                }
+
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
+            }
+        }
+    }
+
+    def deleteSynonymOld(long synonymId, long speciesId) {
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+        }
+        Species speciesInstance = Species.get(speciesId);
+
+        return deleteSynonymOld(oldSynonym, speciesInstance);
+    }
     
+    def deleteSynonymOld(Synonyms oldSynonym, Species speciesInstance) {
+        
+        if(!oldSynonym) {
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = synonymId;
+            return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
+        } 
+
+        if(!oldSynonym.isContributor()) {
+            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+        }
+
+        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
+        }
+
+        Synonyms.withTransaction { status ->
+            String msg = '';
+            def content;
+            try{
+                oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                
+                if(oldSynonym.contributors.size() == 0) {
+                    oldSynonym.delete(failOnError:true)
+                } else {
+                    if(!oldSynonym.save()) {
+                        oldSynonym.errors.each { log.error it }
+                        return [success:false, msg:messageSource.getMessage("info.error.deleting.synonym", null, LCH.getLocale())]
+                    }
+                }
+                msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+            } 
+            catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = e.getMessage();
+                return [success:false, msg:messageSource.getMessage("info.error.synonym.deletion", messagesourcearg, LCH.getLocale())]
+            }
+        }
+    }
+
 }

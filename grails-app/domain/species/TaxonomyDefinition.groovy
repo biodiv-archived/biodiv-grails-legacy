@@ -20,7 +20,7 @@ class TaxonomyDefinition extends ScientificName {
     boolean isFlagged = false;
 	String flaggingReason;
     NamesMetadata.COLNameStatus colNameStatus;
-    int noOfCOLMatches = -99;
+    int noOfCOLMatches = -50;
     String oldId;
     boolean isDeleted = false;
 

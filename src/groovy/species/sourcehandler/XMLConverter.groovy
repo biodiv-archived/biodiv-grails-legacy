@@ -1601,6 +1601,9 @@ class XMLConverter extends SourceConverter {
                                 flag = false;
                                 return;
                             }
+                            if(taxon && taxon.position != NamePosition.WORKING) {
+                                taxon = null;
+                            }
                             if(!taxon && saveTaxonHierarchy) {
                                 println "=====SAVING NEW TAXON================================== "
                                 log.debug "Saving taxon definition"
@@ -1672,8 +1675,8 @@ class XMLConverter extends SourceConverter {
                                 taxon=taxon.merge();
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
-                                    namelistService.namesInWKG.add(taxon.id)
                                 }
+                                namelistService.namesInWKG.add(taxon.id)
                                 taxon.updateContributors(getUserContributors(fieldNode.data))
                                 if(fromCOL) {
                                     //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
@@ -1695,6 +1698,9 @@ class XMLConverter extends SourceConverter {
                                 */
                             } else if(taxon && fromCOL) {
                                 namelistService.namesInWKG.add(taxon.id)
+                                /*if(fieldNode == fieldNodes.last()){
+                                    namelistService.namesBeforeSave[taxon.id] = "Working"
+                                }*/
                                 taxon.position = NamePosition.WORKING
                                 taxon.matchDatabaseName = "COL";
                                 taxon.matchId = otherParams.id_details[taxon.canonicalForm];
@@ -1702,6 +1708,10 @@ class XMLConverter extends SourceConverter {
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }
                                 }
+
+                                /*if(fieldNode == fieldNodes.last()){
+                                    namelistService.namesAfterSave[taxon.id] = taxon.position.value();
+                                }*/
                                 //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
                                 //taxon = namelistService.updateAttributes(taxon, res);
                             }
@@ -1964,5 +1974,63 @@ class XMLConverter extends SourceConverter {
             Logger LOG = Logger.getLogger(this.class);
             LOG.addAppender(fa);
         }
+    }
+
+    List<Synonyms> createSynonymsOld(Node fieldNode, TaxonomyDefinition taxonConcept) {
+        log.debug "Creating synonyms";
+        List<Synonyms> synonyms = new ArrayList<Synonyms>();
+        //List<SpeciesField> sfields = createSpeciesFields(fieldNode, Synonyms.class, null, null, null, null,null);
+        fieldNode.data.eachWithIndex { n, index ->
+            RelationShip rel = getRelationship(n.relationship?.text());
+            if(rel) {
+                def cleanName = Utils.cleanName(n.text()?.trim());
+                def parsedNames = namesParser.parse([cleanName]);
+                def sfield = saveSynonymOld(parsedNames[0], rel, taxonConcept);
+                if(sfield) {
+                    //adding contributors
+                    sfield.updateContributors(getUserContributors(n))
+                    synonyms.add(sfield);
+                }
+            } else {
+                log.warn "NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text();
+                addToSummary("NOT A SUPPORTED RELATIONSHIP: "+n.relationship?.text())
+            }
+        }
+        return synonyms;
+    }
+
+    private Synonyms saveSynonymOld(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept) {
+
+        if(parsedName && parsedName.canonicalForm) {
+            //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
+            //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
+            def criteria = Synonyms.createCriteria();
+            Synonyms sfield = criteria.get {
+                ilike("canonicalForm", parsedName.canonicalForm);
+                eq("relationship", rel);
+                eq("taxonConcept", taxonConcept);
+            }
+            if(!sfield) {
+                log.debug "Saving synonym : "+parsedName.name;
+                sfield = new Synonyms();
+                sfield.name = parsedName.name;
+                sfield.relationship = rel;
+                sfield.taxonConcept = taxonConcept;
+
+                sfield.canonicalForm = parsedName.canonicalForm;
+                sfield.normalizedForm = parsedName.normalizedForm;;
+                sfield.italicisedForm = parsedName.italicisedForm;;
+                sfield.binomialForm = parsedName.binomialForm;;
+
+                if(!sfield.save(flush:true)) {
+                    sfield.errors.each { log.error it }
+                }
+            }
+            return sfield;
+        } else {
+            log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name
+            addToSummary("Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name)
+        }
+
     }
 }

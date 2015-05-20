@@ -144,7 +144,7 @@ abstract class NamesMetadata extends NamesSorucedata {
 	
 	
     static constraints = {
-		//name blank:false
+		position nullable:true;
 		authorYear nullable:true;
 		viaDatasource nullable:true;
 		ibpSource nullable:true;
