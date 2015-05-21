@@ -1107,6 +1107,7 @@ class NamelistService {
         if(m['rank'] == 'infraspecies'){
             def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
             result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
+            m.id_details[res['9']] = m.id_details[m['species']]
             result['taxonRegistry.10'] = res['10'] = m['infraspecies'] + " " + m['authorString'];
         } else {
             result['taxonRegistry.10'] = res['10'] = m['infraspecies'];     
@@ -1537,7 +1538,7 @@ def sql= session.createSQLQuery(query)
             sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
             sciName.viaDatasource = colMatch.sourceDatabase;
             sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position?.value(), NamePosition.WORKING.value());
-            sciName.position = NamePosition.WORKING.value();
+            sciName.position = NamePosition.WORKING;
             sciName = sciName.merge();
             println "==========SCI NAME AFTER MERGE ======== " + sciName
             if(!sciName.save(flush:true)) {

@@ -1566,7 +1566,18 @@ class XMLConverter extends SourceConverter {
                                                 }
                                             } else {
                                                 println "############==== Flagging synonym " + sciName;
-                                                taxon = searchIBP[0];
+                                                //Pick any working list name if available
+                                                def workingTaxon = null
+                                                searchIBP.each {
+                                                    if(it.position == NamePosition.WORKING && !workingTaxon) {
+                                                        workingTaxon = it;
+                                                    }
+                                                }
+                                                if(workingTaxon) {
+                                                    taxon = workingTaxon
+                                                } else {
+                                                    taxon = searchIBP[0];
+                                                }
                                                 sciName.isFlagged = true;
                                                 String flaggingReason = "The accepted name for this is a system default.Multiple potential matches exist.IDs- ";
                                                 searchIBP.each {
