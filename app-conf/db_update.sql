@@ -342,6 +342,8 @@ update taxonomy_definition set no_ofcolmatches = 0;
 
 ALTER TABLE taxonomy_definition add column is_deleted boolean;
 update taxonomy_definition set is_deleted = false;
+
+alter table taxonomy_definition add column dirty_list_reason  varchar(1000);
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 

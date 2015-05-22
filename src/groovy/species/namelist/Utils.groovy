@@ -68,7 +68,7 @@ class Utils {
                 and {
                     //lt('id', 293748L)
                     eq('position', NamesMetadata.NamePosition.DIRTY)
-                    eq('isDeleted', false)//isNull('matchId')
+                    //eq('isDeleted', false)//isNull('matchId')
                 }
                 order('rank','asc')
                 order('id','asc')                    
