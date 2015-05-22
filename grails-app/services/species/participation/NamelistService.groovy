@@ -160,7 +160,7 @@ class NamelistService {
             temp['canonicalForm'] = r?.name?.text(); 
             temp['name'] = r?.name?.text() 
             if(searchBy == 'name' || searchBy == 'id') {
-                temp['name'] += " " +r?.author?.text()
+                temp['name'] += " " +r?.author?.text().capitalize();
             }
             temp['rank'] = r?.rank?.text()?.toLowerCase()
             temp[r?.rank?.text()?.toLowerCase()] = r?.name?.text()
@@ -174,7 +174,7 @@ class NamelistService {
                 temp['nameStatus'] = cs
             }
             temp['colNameStatus'] = r?.name_status?.text()?.tokenize(' ')[0]
-            temp['authorString'] = r?.author?.text()
+            temp['authorString'] = r?.author?.text().capitalize();
             temp['sourceDatabase'] = r?.source_database?.text()
 
             temp['group'] = (r?.classification?.taxon[0]?.name?.text())?r?.classification?.taxon[0]?.name?.text():''
@@ -184,11 +184,11 @@ class NamelistService {
                 r.accepted_name.each {
                     def m = [:]
                     m['id'] = it.id.text()
-                    m['name'] = it.name.text() + " " + it.author.text();
+                    m['name'] = it.name.text() + " " + it.author.text().capitalize();;
                     m['canonicalForm'] = it.name.text();
                     m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
                     m['rank'] = it.rank?.text()?.toLowerCase();
-                    m['authorString'] = it.author.text();
+                    m['authorString'] = it.author.text().capitalize();;
                     m['source'] = "COL"
                     aList.add(m);
                 }
@@ -619,7 +619,7 @@ class NamelistService {
         log.debug "=========== Curating name ${sciName} with col data ${colData}"
         def acceptedMatch;
         int colDataSize = colData.size();
-
+        String dirtyListReason;
         if(!colData) return;
 
         //check if this is a single direct match
@@ -627,7 +627,15 @@ class NamelistService {
             //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
             if(sciName.status != NameStatus.COMMON && colData[0].nameStatus == NamesMetadata.COLNameStatus.COMMON.value()) {
                 //reject ... position remains DIRTY
+                dirtyListReason = "[REJECTING AS NAME IS COMMON NAME]. So leaving this name for curation"
                 log.debug "[REJECTING AS NAME IS COMMON NAME] ${sciName} is a sciname but it is common name as per COL. So leaving this name for curation"
+                sciName.noOfCOLMatches = colDataSize;
+                sciName.position = NamesMetadata.NamePosition.DIRTY;
+                sciName.dirtyListReason = dirtyListReason;
+                if(!sciName.hasErrors() && sciName.save(flush:true)) {
+                } else {
+                    sciName.errors.allErrors.each { log.error it }
+                }
                 return;
             } else {
                 log.debug "[CANONICAL : SINGLE MATCH] There is only a single match on col for this name. So accepting name match"
@@ -681,6 +689,7 @@ class NamelistService {
                 }
                 if(noOfMatches != 1) {
                     log.debug "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
+                    dirtyListReason = "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
                     acceptedMatch = null;
                 } else {
                     log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
@@ -714,6 +723,7 @@ class NamelistService {
                     
                         //If original has author year and no match exists, leave for curation (if author info exists and only canonical+rank match is considered, errors may occur eg: Aq matched with Ax, Ay and Az)(comparing hierarchies to further match will not help as a single name on IBP can have multiple hierarchies).
                         log.debug "As there is author year info .. leaving name for manual curation"
+                        dirtyListReason = "[VERBATIM+RANK : NO MATCH] - As there is author year info .. leaving name for manual curation"
                     } else {
                         //comparing Canonical + rank
                         log.debug "Comparing now with canonical + rank"
@@ -732,11 +742,13 @@ class NamelistService {
                         } else {
                             acceptedMatch = null;
                             log.debug "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
+                            dirtyListReason = "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
                         }
                     }
                 } else if (noOfMatches > 1) {
                     acceptedMatch = null;
                     log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. So leaving name for manual curation"
+                    dirtyListReason = "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. So leaving name for manual curation"
                 }
 
             }
@@ -748,6 +760,7 @@ class NamelistService {
                 log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. But REJECTED AS RANK WAS CHANGING"
                 sciName.noOfCOLMatches = colDataSize;
                 sciName.position = NamesMetadata.NamePosition.DIRTY;
+                sciName.dirtyListReason = "REJECTED AS RANK WAS CHANGING"
                 if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 } else {
                     sciName.errors.allErrors.each { log.error it }
@@ -760,6 +773,7 @@ class NamelistService {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
             sciName.noOfCOLMatches = colDataSize;
             sciName.position = NamesMetadata.NamePosition.DIRTY;
+            sciName.dirtyListReason = dirtyListReason;
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
             } else {
                 sciName.errors.allErrors.each { log.error it }

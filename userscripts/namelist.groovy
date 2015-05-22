@@ -47,6 +47,7 @@ def curateName(taxonId, domainSourceDir) {
         ScientificName sciName = TaxonomyDefinition.get(taxonId);
         sciName.noOfCOLMatches = 0;
         sciName.position = NamesMetadata.NamePosition.DIRTY;
+        sciName.dirtyListReason = "NO XML - NO COL DATA"
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
         } else {
             sciName.errors.allErrors.each { log.error it }
@@ -58,7 +59,8 @@ def curateName(taxonId, domainSourceDir) {
 //File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
-File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
+//File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
+File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinitionNew");
 //migrate()
 //migrateFromDir(domainSourceDir);
 //curateName(156829, domainSourceDir);
@@ -363,7 +365,7 @@ def curateAllNames() {
             def c = TaxonomyDefinition.createCriteria()
             taxDefList = c.list (max: limit , offset:offset) {
                 and {
-                    lt('id', 275702L)
+                    lt('id', 275703L)
                     //eq('position', NamesMetadata.NamePosition.WORKING)
                     //isNull('position')
                 }
@@ -377,8 +379,9 @@ def curateAllNames() {
                 counter++;
                 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
                 //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
-                File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
-                curatingThese.add(taxDef.id);
+                //File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
+                File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinitionNew");
+                //curatingThese.add(taxDef.id);
                 curateName(taxDef.id, domainSourceDir);
             }
         }
@@ -543,7 +546,7 @@ def moveFiles() {
     }
 }
 
-moveFiles()
+//moveFiles()
 
 def checkzz() {
 List s1 = [872, 874, 876, 878, 880, 882, 884, 886, 888, 895, 897, 901, 904, 907, 910, 912, 918, 920, 924, 928, 930, 933, 935, 937, 942, 947, 951, 953, 958, 962, 964, 967, 970, 974, 981, 983, 985, 988, 990, 993, 996, 1000, 1003, 1007, 1011, 1013, 1019, 1023, 1026, 1029, 1033, 1037, 1039, 1043, 1045, 1050, 1052, 1059, 1061, 1070, 1072, 1074, 1077, 1079, 1082, 1084, 1086, 1089, 1093, 1096, 1099, 1101, 1105, 1108, 1113, 1118, 1120, 1123, 1125, 1127, 1130, 1132, 1135, 1137, 1142, 1144, 1147, 1149, 1154, 1157, 1162, 1168, 1171, 1174, 1177, 1180, 1183, 1186, 1189, 1192, 1195, 1198, 1203, 1206, 1209, 1212, 1216, 1219, 1222, 1225, 1228, 1231, 1234, 1240, 1243, 1245, 1248, 1251, 1258, 1260, 1264, 1273, 1279, 1283, 1286, 1289, 1291, 1295, 1297, 1300, 1310, 1312, 2998, 3000, 3002, 3004, 3006, 3008, 3010, 3035, 3037, 3039, 3041, 3053, 3055, 3057, 3059, 3061, 3063, 3065, 3067, 3071, 3075, 3077, 3079, 3085, 3087, 3089, 3091, 3093, 3099, 3101, 3103, 3107, 3109, 3112, 3118, 3126, 3132, 3136, 3142, 3144, 3151, 3154, 3156, 3158, 3169, 3171, 3173, 3175, 3177, 3179, 3181, 3183, 3185, 3203, 3205, 3207, 3209, 3218, 3220, 3223, 3230, 3234, 3236, 3239, 3241, 3243, 3252, 3254, 3256, 3258, 3264, 3266, 3268, 3270, 3276, 3279, 3281, 3297, 3299, 3301, 3303, 3305, 3307, 3314, 3326, 3328, 3330, 3332, 3334, 3338, 3341, 3344, 3352, 3354, 3356, 3358, 3360, 3376, 3378, 3387, 3397, 3405, 3407, 3414, 3419, 3421, 3423, 3427, 3429, 3432, 3434, 3437, 3440, 3442, 3444, 3446, 3452, 3454, 3464, 3466, 3468, 3475, 3477, 3485, 3487, 3489, 3491, 3494, 3496, 3498, 3500, 3507, 3509, 3511, 3514, 3516, 3518, 3520, 3542, 3544, 3546, 3550, 3552, 3554, 3556, 3558, 3560, 3568, 3570, 3581, 3587, 3601, 3603, 3605, 3618, 3620, 3628, 3631, 3635, 3637, 3649, 3651, 3677, 3679, 3681, 3683, 3696, 3698, 3701, 3704, 3706, 3711, 3713, 3726, 3736, 3738, 3740, 3742, 3748, 3753, 3762, 3767, 3770]
@@ -589,5 +592,29 @@ println "defined";
 //checkzz();
 
 
+def updateRanks() {
+    int counter  = 0;
+    def ranks = []
+    new File("/home/rahulk/Desktop/trinomialsFinal.csv").splitEachLine(",") {fields ->
+        if(fields[0] != 'ID') {   
+            println "========COUNTER === " + counter
+            println "=====WORKING ON ==== " + fields[0]
+            counter++
+            TaxonomyDefinition.withNewTransaction {
+                def td = TaxonomyDefinition.get(fields[0].toLong());
+                if(td.rank == 9) {
+                    println "=====================RANK 9======================="
+                    ranks.add(td);
+                }
+                td.rank = 10;
+                if(!td.save(flush:true)){
+                    println "failed update===="
+                }
+            }
+        }
+    }
+    println "=======RANKS ==== " + ranks
+}
 
 
+updateRanks()

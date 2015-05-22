@@ -1631,8 +1631,10 @@ class XMLConverter extends SourceConverter {
                                     taxon.matchDatabaseName = "COL";
                                     //get its data from col and save
                                     println "=======NAME======== " + name
-                                    println "========NAME KA ID ======= " + otherParams.id_details[name]
-                                    taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                                    println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+                                    if(otherParams.id_details[taxon.canonicalForm]) {
+                                        taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                                    }
                                     //def externalId = otherParams.id_details[name].trim();
                                     //println "=========EXTERNAL ID===== " + externalId
                                     String nameStatus = otherParams.nameStatus?:NameStatus.ACCEPTED //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
@@ -1714,7 +1716,10 @@ class XMLConverter extends SourceConverter {
                                 }*/
                                 taxon.position = NamePosition.WORKING
                                 taxon.matchDatabaseName = "COL";
-                                taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                                println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+                                if(otherParams.id_details[taxon.canonicalForm]) {
+                                    taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                                }
                                 taxon = taxon.merge();
                                 if(!taxon.save()) {
                                     taxon.errors.each { log.error it }

@@ -23,6 +23,7 @@ class TaxonomyDefinition extends ScientificName {
     int noOfCOLMatches = -50;
     String oldId;
     boolean isDeleted = false;
+    String dirtyListReason;
 
 	static hasMany = [author:String, year:String]
 
@@ -38,6 +39,7 @@ class TaxonomyDefinition extends ScientificName {
 		colNameStatus nullable:true;
 		noOfCOLMatches nullable:true;
 		oldId nullable:true;
+		dirtyListReason nullable:true;
 	}
 
 	static mapping = {
