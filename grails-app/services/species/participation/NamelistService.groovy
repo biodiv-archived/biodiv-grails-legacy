@@ -1107,7 +1107,7 @@ class NamelistService {
         if(m['rank'] == 'infraspecies'){
             def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
             result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
-            m.id_details[res['9']] = m.id_details[m['species']]
+            m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
             result['taxonRegistry.10'] = res['10'] = m['infraspecies'] + " " + m['authorString'];
         } else {
             result['taxonRegistry.10'] = res['10'] = m['infraspecies'];     
