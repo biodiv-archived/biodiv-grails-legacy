@@ -540,11 +540,6 @@ class NamelistService {
                                     }
                                 }
                             }
-                            res1.each{
-                                if(it.position != null) {
-                                    res.add(it)
-                                }
-                            }
                             if(res.size() == 0) {AFTER_CAN_MULTI_ZERO ++;}
                             else if(res.size() == 1) {AFTER_CAN_MULTI_SINGLE ++;}
                             else {AFTER_CAN_MULTI_MULTI ++;}
@@ -752,11 +747,12 @@ class NamelistService {
                 //checking only inside all matches of verbatim
                 log.debug "[VERBATIM: MULTIPLE MATCHES] There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
                 int noOfMatches = 0;
+                def multiMatches = [];
+                def multiMatches2 = []
                 colNames[sciName.normalizedForm].each { colMatch ->
                     //If Verbatims match with multiple matches, then match with verbatim+rank.
                     //println colMatch
                     //println sciName.rank
-                    def multiMatches2 = []
                     if(colMatch.parsedName.normalizedForm == sciName.normalizedForm && colMatch.parsedRank == sciName.rank) {
                         noOfMatches++;
                         acceptedMatch = colMatch;
@@ -779,7 +775,6 @@ class NamelistService {
                         //comparing Canonical + rank
                         log.debug "Comparing now with canonical + rank"
                         noOfMatches = 0;
-                        def multiMatches = [];
                         colNames[sciName.normalizedForm].each { colMatch ->
                             //If no match exists with Verbatim+rank and there is no author year info then match with canonical+rank.
                             if(colMatch.parsedName.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
@@ -817,10 +812,9 @@ class NamelistService {
                     }
                 } else if (noOfMatches > 1) {
                     acceptedMatch = null;
-                    log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. So leaving name for manual curation"
-                    dirtyListReason = "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. So leaving name for manual curation"
+                    log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. PARENT TAXON MATCH"
                     if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
-                        log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
+                        log.debug "[VERBATIM+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
                         noOfMatches = 0
                         List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
                         println "-==IMMEDIATE TAXONS == " + parentTaxons

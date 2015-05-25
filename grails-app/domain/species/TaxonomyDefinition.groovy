@@ -80,7 +80,7 @@ class TaxonomyDefinition extends ScientificName {
 		TaxonomyRegistry.findAllByTaxonDefinition(this).each { TaxonomyRegistry reg ->
 			//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
 			def tokens = reg.path.tokenize('_')
-			result.add(TaxonomyDefinition.get(Long.parseLong(tokens.last())).canonicalForm);
+			result.add(TaxonomyDefinition.get(Long.parseLong(tokens[-2])).canonicalForm);
 		}
 		return result;
 	}
