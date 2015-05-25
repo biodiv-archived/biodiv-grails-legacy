@@ -756,9 +756,11 @@ class NamelistService {
                     //If Verbatims match with multiple matches, then match with verbatim+rank.
                     //println colMatch
                     //println sciName.rank
+                    def multiMatches2 = []
                     if(colMatch.parsedName.normalizedForm == sciName.normalizedForm && colMatch.parsedRank == sciName.rank) {
                         noOfMatches++;
                         acceptedMatch = colMatch;
+                        multiMatches2.add(colMatch)
                     }
                 }
                 if(noOfMatches == 1) {
@@ -817,6 +819,25 @@ class NamelistService {
                     acceptedMatch = null;
                     log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. So leaving name for manual curation"
                     dirtyListReason = "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. So leaving name for manual curation"
+                    if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
+                        log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
+                        noOfMatches = 0
+                        List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
+                        println "-==IMMEDIATE TAXONS == " + parentTaxons
+                        multiMatches2.each { colMatch ->
+                            println "COL MATCH PARENT TAXON == " + colMatch.parentTaxon
+                            if(parentTaxons.contains(colMatch.parentTaxon)){
+                                noOfMatches++;
+                                acceptedMatch = colMatch
+                            }
+                        }
+                        if(noOfMatches == 1) {
+                            log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
+                        } else {
+                            acceptedMatch = null;
+                            dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
+                        }
+                    }
                 }
 
             }
