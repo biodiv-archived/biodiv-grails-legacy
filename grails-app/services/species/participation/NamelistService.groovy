@@ -708,10 +708,12 @@ class NamelistService {
                 log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
                 int noOfMatches = 0;
                 log.debug "Comparing now with CANONICAL + RANK"
+                def multiMatches = [];
                 colData.each { colMatch ->
                     if(colMatch.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
                         noOfMatches++;
                         acceptedMatch = colMatch;
+                        multiMatches.add(colMatch)
                     }
                 }
                 if(noOfMatches != 1) {
@@ -719,10 +721,22 @@ class NamelistService {
                     dirtyListReason = "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
                     acceptedMatch = null;
                     //
-                    if(sciName.rank < 9) {
-                        log.debug "[CANONICAL+RANK : NO SINGLE MATCH] Checking parents taxons"
-                        dirtyListReason = "[CANONICAL+RANK : NO SINGLE MATCH] Checking parents taxons"
-                        
+                    if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
+                        log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
+                        noOfMatches = 0
+                        List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
+                        multiMatches.each { colMatch ->
+                            if(parentTaxons.contains(colMatch.parentTaxon)){
+                                noOfMatches++;
+                                acceptedMatch = colMatch
+                            }
+                        }
+                        if(noOfMatches == 1) {
+                            log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
+                        } else {
+                            acceptedMatch = null;
+                            dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
+                        }
                     }
                 } else {
                     log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
@@ -738,8 +752,8 @@ class NamelistService {
                 int noOfMatches = 0;
                 colNames[sciName.normalizedForm].each { colMatch ->
                     //If Verbatims match with multiple matches, then match with verbatim+rank.
-                    println colMatch
-                    println sciName.rank
+                    //println colMatch
+                    //println sciName.rank
                     if(colMatch.parsedName.normalizedForm == sciName.normalizedForm && colMatch.parsedRank == sciName.rank) {
                         noOfMatches++;
                         acceptedMatch = colMatch;
@@ -761,13 +775,11 @@ class NamelistService {
                         //comparing Canonical + rank
                         log.debug "Comparing now with canonical + rank"
                         noOfMatches = 0;
-                        def multiMatches = [];
                         colNames[sciName.normalizedForm].each { colMatch ->
                             //If no match exists with Verbatim+rank and there is no author year info then match with canonical+rank.
                             if(colMatch.parsedName.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
                                 noOfMatches++;
                                 acceptedMatch = colMatch;
-                                multiMatches.add(colMatch)
                             }
                         }
                         if(noOfMatches == 1) {
@@ -775,23 +787,7 @@ class NamelistService {
                             log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                         } else {
                             acceptedMatch = null;
-                            if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
-                                log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
-                                noOfMatches = 0
-                                List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
-                                multiMatches.each { colMatch ->
-                                    if(parentTaxons.contains(colMatch.parentTaxon)){
-                                        noOfMatches++;
-                                        acceptedMatch = colMatch
-                                    }
-                                }
-                                if(noOfMatches == 1) {
-                                    log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
-                                } else {
-                                    acceptedMatch = null;
-                                    dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
-                                }
-                            }
+                            
                         }
                     }
                 } else if (noOfMatches > 1) {
