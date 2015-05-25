@@ -70,7 +70,20 @@ class TaxonomyDefinition extends ScientificName {
 		}
 		return result;
 	}
-
+    
+    /**
+	 * Returns immediate parent taxons canonicals as per all classifications
+	 * @return
+	 */
+	List<TaxonomyDefinition> immediateParentTaxonCanonicals() {
+		List<TaxonomyDefinition> result = [];
+		TaxonomyRegistry.findAllByTaxonDefinition(this).each { TaxonomyRegistry reg ->
+			//TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
+			def tokens = reg.path.tokenize('_')
+			result.add(TaxonomyDefinition.get(Long.parseLong(tokens.last())).canonicalForm);
+		}
+		return result;
+	}
 	/**
 	 * Returns parents as per all classifications
 	 * @return

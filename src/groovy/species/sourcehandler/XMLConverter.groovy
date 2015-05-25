@@ -1506,7 +1506,8 @@ class XMLConverter extends SourceConverter {
                             println "@@@@@@@@@@@@@@@@@@@@@@@ " + parsedName.authorYear
                             def ctx = ApplicationHolder.getApplication().getMainContext();
                             namelistService = ctx.getBean("namelistService");
-                            def searchIBP = namelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank)
+                            boolean searchInNull = true;
+                            def searchIBP = namelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull)
                             println "========SEARCH RE #################======== " + searchIBP
                             TaxonomyDefinition taxon = null;
                             
@@ -1516,7 +1517,6 @@ class XMLConverter extends SourceConverter {
                             //if its accepted pick that as taxon & flag it
                             //else if its synonym pick 1st result and flag that synonym
                             if(otherParams) {
-
                                 //DOING THIS BECAUSE IT DIDNT FIND NEWLY MOVED NAME FROM SYNONYM TO ACCEPTED
                                 if(fieldNode == fieldNodes.last()) {
                                     if(otherParams.curatingTaxonId) {
@@ -1532,14 +1532,6 @@ class XMLConverter extends SourceConverter {
                                             if(!isPresent) {
                                                 searchIBP.add(sciName);
                                             }
-                                            /*
-                                            if(!searchIBP.contains(sciName)){
-                                                println "=======############SEARCH IBP DOESNOT CONTAIN ========== " + searchIBP;
-                                                searchIBP.add(sciName);
-                                                searchIBP.unique();
-                                                println "=======###########ADDED TO SEARCH IBP result  ========== " + searchIBP;
-                                            }
-                                             */
                                         }
                                     }
                                 }
@@ -1568,13 +1560,19 @@ class XMLConverter extends SourceConverter {
                                                 println "############==== Flagging synonym " + sciName;
                                                 //Pick any working list name if available
                                                 def workingTaxon = null
+                                                def dirtyTaxon = null
                                                 searchIBP.each {
                                                     if(it.position == NamePosition.WORKING && !workingTaxon) {
                                                         workingTaxon = it;
                                                     }
+                                                    if(it.position == NamePosition.DIRTY && !dirtyTaxon) {
+                                                        dirtyTaxon = it;
+                                                    }
                                                 }
                                                 if(workingTaxon) {
                                                     taxon = workingTaxon
+                                                } else if(dirtyTaxon) {
+                                                    taxon = dirtyTaxon;
                                                 } else {
                                                     taxon = searchIBP[0];
                                                 }
@@ -1590,7 +1588,26 @@ class XMLConverter extends SourceConverter {
                                             }
                                         }
                                     } else {
-                                        taxon = searchIBP[0];
+                                        //Pick any working list name if available
+                                        //then dirty
+                                        //then null
+                                        def workingTaxon = null
+                                        def dirtyTaxon = null
+                                        searchIBP.each {
+                                            if(it.position == NamePosition.WORKING && !workingTaxon) {
+                                                workingTaxon = it;
+                                            }
+                                            if(it.position == NamePosition.DIRTY && !dirtyTaxon) {
+                                                dirtyTaxon = it;
+                                            }
+                                        }
+                                        if(workingTaxon) {
+                                            taxon = workingTaxon
+                                        } else if(dirtyTaxon) {
+                                            taxon = dirtyTaxon;
+                                        } else {
+                                            taxon = searchIBP[0];
+                                        }
                                     }    
                                 }
                             } else {
@@ -1612,7 +1629,7 @@ class XMLConverter extends SourceConverter {
                                 flag = false;
                                 return;
                             }
-                            if(taxon && taxon.position != NamePosition.WORKING) {
+                            if(taxon && taxon.position != NamePosition.WORKING && (rank < TaxonomyRank.SPECIES.ordinal())) {
                                 taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {

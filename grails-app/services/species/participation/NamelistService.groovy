@@ -203,10 +203,16 @@ class NamelistService {
                 }
 
                 println "============= higher taxon  "
+                int maxRank = -1;
                 r.classification.taxon.each { t ->
-                //println t.rank.text() + " == " + t.name.text()
-                temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
-                id_details[t?.name?.text()] = t?.id?.text()
+                    //println t.rank.text() + " == " + t.name.text()
+                    temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
+                    id_details[t?.name?.text()] = t?.id?.text()
+                    int currRank = XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());
+                    if(currRank > maxRank) {
+                        temp['parentTaxon'] =  t?.name?.text()
+                        maxRank = currRank
+                    }
                 }
 
                 println "============= child taxon  "
@@ -438,8 +444,8 @@ class NamelistService {
         }
     }
 
-    //Searches IBP accepted and synonym only in WORKING AND DIRTY LIST
-    List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank) {  
+    //Searches IBP accepted and synonym only in WORKING AND DIRTY LIST and NULL list
+    List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank, boolean searchInNull = false) {  
         //utilsService.cleanUpGorm(true);
         SEARCH_IBP_COUNTER ++;
         println "========SEARCH IBP CALLED======="
@@ -457,9 +463,13 @@ class NamelistService {
         clazz.withNewSession{
             //FINDING BY CANONICAL
             res1 = clazz.findAllWhere(canonicalForm:canonicalForm, status: status);
-            res1.each{
-                if(it.position != null) {
-                    res.add(it)
+            if(searchInNull) {
+                res = res1;
+            } else {
+                res1.each{
+                    if(it.position != null) {
+                        res.add(it)
+                    }
                 }
             }
             //CANONICAL ZERO MATCH OR SINGLE MATCH
@@ -480,9 +490,13 @@ class NamelistService {
                 //FINDING BY VERBATIM
                 if(!authorYear) authorYear = '';
                 res1 = clazz.findAllWhere(name: (canonicalForm + " " + authorYear), status: status);
-                res1.each{
-                    if(it.position != null) {
-                        res.add(it)
+                if(searchInNull) {
+                    res = res1;
+                } else {
+                    res1.each{
+                        if(it.position != null) {
+                            res.add(it)
+                        }
                     }
                 }
                 //VERBATIM SINGLE MATCH
@@ -497,9 +511,13 @@ class NamelistService {
                 else if(res.size() > 2 || res.size() == 0) {
                     //FINDING BY VERBATIM + RANK
                     res1 = clazz.findAllWhere(name:(canonicalForm + " " + authorYear),rank: rank, status: status);
-                    res1.each{
-                        if(it.position != null) {
-                            res.add(it)
+                    if(searchInNull) {
+                        res = res1;
+                    } else {
+                        res1.each{
+                            if(it.position != null) {
+                                res.add(it)
+                            }
                         }
                     }
                     //VERBATIM + RANK ZERO MATCH
@@ -513,6 +531,15 @@ class NamelistService {
                             //FINDING BY CANONICAL + RANK
                             println "====TRYING VERBATIM + RANK - ZERO MATCH & NO AUTHOR YEAR - SO MATCHED ON CANONICAL + RANK"
                             res1 = clazz.findAllWhere(canonicalForm:canonicalForm ,rank: rank, status: status);
+                            if(searchInNull) {
+                                res = res1;
+                            } else {
+                                res1.each{
+                                    if(it.position != null) {
+                                        res.add(it)
+                                    }
+                                }
+                            }
                             res1.each{
                                 if(it.position != null) {
                                     res.add(it)
@@ -691,6 +718,12 @@ class NamelistService {
                     log.debug "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
                     dirtyListReason = "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
                     acceptedMatch = null;
+                    //
+                    if(sciName.rank < 9) {
+                        log.debug "[CANONICAL+RANK : NO SINGLE MATCH] Checking parents taxons"
+                        dirtyListReason = "[CANONICAL+RANK : NO SINGLE MATCH] Checking parents taxons"
+                        
+                    }
                 } else {
                     log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                 }
@@ -728,12 +761,13 @@ class NamelistService {
                         //comparing Canonical + rank
                         log.debug "Comparing now with canonical + rank"
                         noOfMatches = 0;
+                        def multiMatches = [];
                         colNames[sciName.normalizedForm].each { colMatch ->
                             //If no match exists with Verbatim+rank and there is no author year info then match with canonical+rank.
                             if(colMatch.parsedName.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
                                 noOfMatches++;
                                 acceptedMatch = colMatch;
-
+                                multiMatches.add(colMatch)
                             }
                         }
                         if(noOfMatches == 1) {
@@ -741,8 +775,23 @@ class NamelistService {
                             log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                         } else {
                             acceptedMatch = null;
-                            log.debug "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
-                            dirtyListReason = "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
+                            if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
+                                log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
+                                noOfMatches = 0
+                                List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
+                                multiMatches.each { colMatch ->
+                                    if(parentTaxons.contains(colMatch.parentTaxon)){
+                                        noOfMatches++;
+                                        acceptedMatch = colMatch
+                                    }
+                                }
+                                if(noOfMatches == 1) {
+                                    log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
+                                } else {
+                                    acceptedMatch = null;
+                                    dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
+                                }
+                            }
                         }
                     }
                 } else if (noOfMatches > 1) {
