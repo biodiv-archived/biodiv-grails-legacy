@@ -178,7 +178,7 @@ class NamelistService {
             temp['sourceDatabase'] = r?.source_database?.text()
 
             temp['group'] = (r?.classification?.taxon[0]?.name?.text())?r?.classification?.taxon[0]?.name?.text():''
-            println "==========NAME STATUS========= " + temp['nameStatus']
+            //println "==========NAME STATUS========= " + temp['nameStatus']
             if(temp['nameStatus'] == "synonym") {
                 def aList = []
                 r.accepted_name.each {
@@ -192,7 +192,7 @@ class NamelistService {
                     m['source'] = "COL"
                     aList.add(m);
                 }
-                println "======A LIST======== " + aList;
+                //println "======A LIST======== " + aList;
                 temp['acceptedNamesList'] = aList;
             }
             if(searchBy == 'id' || searchBy == 'name') {
@@ -202,7 +202,7 @@ class NamelistService {
                 //println ref.source.text()
                 }
 
-                println "============= higher taxon  "
+                //println "============= higher taxon  "
                 int maxRank = -1;
                 r.classification.taxon.each { t ->
                     //println t.rank.text() + " == " + t.name.text()
@@ -215,13 +215,13 @@ class NamelistService {
                     }
                 }
 
-                println "============= child taxon  "
+                //println "============= child taxon  "
                 r.child_taxa.taxon.each { t ->
                 // println t.name.text()
                 // println t.author.text()
                 }
 
-                println "============= synonyms  "
+                //println "============= synonyms  "
                 r.synonyms.synonym.each { s ->
                 //println s.rank.text() + " == " + s.name.text()
                 //println "============= references  "
@@ -659,6 +659,17 @@ class NamelistService {
                     sciName.errors.allErrors.each { log.error it }
                 }
                 return;
+            } else if (sciName.canonicalForm != colData[0].canonicalForm) {
+                dirtyListReason = "[REJECTING AS CANONICAL DONT MATCH EVEN ON 1 RESULT]."
+                log.debug "[REJECTING AS CANONICAL DONT MATCH EVEN ON 1 RESULT]."
+                sciName.noOfCOLMatches = colDataSize;
+                sciName.position = NamesMetadata.NamePosition.DIRTY;
+                sciName.dirtyListReason = dirtyListReason;
+                if(!sciName.hasErrors() && sciName.save(flush:true)) {
+                } else {
+                    sciName.errors.allErrors.each { log.error it }
+                }
+                return;
             } else {
                 log.debug "[CANONICAL : SINGLE MATCH] There is only a single match on col for this name. So accepting name match"
                 acceptedMatch = colData[0]
@@ -668,7 +679,7 @@ class NamelistService {
                 colMatchVerbatim = parsedNames[0].normalizedForm;
                 acceptedMatch['parsedName'] = parsedNames[0];
                 acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
-                println "============ACCEPTED MATCH ======= " + acceptedMatch
+                //println "============ACCEPTED MATCH ======= " + acceptedMatch
             }
         } else {
             if(sciName.status != NameStatus.COMMON) {
@@ -712,28 +723,16 @@ class NamelistService {
                     }
                 }
                 if(noOfMatches != 1) {
-                    log.debug "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
-                    dirtyListReason = "[CANONICAL+RANK : NO MATCH] No single match on canonical+rank... leaving name for manual curation"
+                    log.debug "[CANONICAL+RANK : NO SINGLE MATCH] No single match on canonical+rank... leaving name for manual curation"
+                    dirtyListReason = "[CANONICAL+RANK: NO SINGLE MATCH] - NO PARENT TAXON MATCH - rank >= 9"
                     acceptedMatch = null;
-                    //
+                    //PARENT TAXON MATCH for rank below species
                     if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
                         log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
-                        noOfMatches = 0
-                        List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
-                        println "-==IMMEDIATE TAXONS == " + parentTaxons
-                        multiMatches.each { colMatch ->
-                            println "COL MATCH PARENT TAXON == " + colMatch.parentTaxon
-                            if(parentTaxons.contains(colMatch.parentTaxon)){
-                                noOfMatches++;
-                                acceptedMatch = colMatch
-                            }
-                        }
-                        if(noOfMatches == 1) {
-                            log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
-                        } else {
-                            acceptedMatch = null;
+                        acceptedMatch = parentTaxonMatch(sciName, multiMatches);
+                        if(!acceptedMatch) {
                             dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
-                        }
+                        } 
                     }
                 } else {
                     log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
@@ -747,7 +746,6 @@ class NamelistService {
                 //checking only inside all matches of verbatim
                 log.debug "[VERBATIM: MULTIPLE MATCHES] There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
                 int noOfMatches = 0;
-                def multiMatches = [];
                 def multiMatches2 = []
                 colNames[sciName.normalizedForm].each { colMatch ->
                     //If Verbatims match with multiple matches, then match with verbatim+rank.
@@ -775,6 +773,7 @@ class NamelistService {
                         //comparing Canonical + rank
                         log.debug "Comparing now with canonical + rank"
                         noOfMatches = 0;
+                        def multiMatches = []
                         colNames[sciName.normalizedForm].each { colMatch ->
                             //If no match exists with Verbatim+rank and there is no author year info then match with canonical+rank.
                             if(colMatch.parsedName.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
@@ -788,52 +787,30 @@ class NamelistService {
                             log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                         } else {
                             acceptedMatch = null;
+                            dirtyListReason = "[CANONICAL+RANK: MULTIPLE MATCH] Multiple matches even on canonical + rank. NO PARENT TAXON MATCH - rank >= 9"
+                            //PARENT TAXON MATCH for rank below species
                             if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
                                 log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
-                                noOfMatches = 0
-                                List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
-                                println "-==IMMEDIATE TAXONS == " + parentTaxons
-                                multiMatches.each { colMatch ->
-                                    println "COL MATCH PARENT TAXON == " + colMatch.parentTaxon
-                                    if(parentTaxons.contains(colMatch.parentTaxon)){
-                                        noOfMatches++;
-                                        acceptedMatch = colMatch
-                                    }
-                                }
-                                if(noOfMatches == 1) {
-                                    log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
-                                } else {
-                                    acceptedMatch = null;
+                                acceptedMatch = parentTaxonMatch(sciName, multiMatches);
+                                if(!acceptedMatch) {
                                     dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
-                                }
+                                } 
                             }
-
                         }
                     }
                 } else if (noOfMatches > 1) {
                     acceptedMatch = null;
                     log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. PARENT TAXON MATCH"
+                    dirtyListReason = "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. NO PARENT TAXON MATCH - rank >= 9"
+                    //PARENT TAXON MATCH for rank below species
                     if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
                         log.debug "[VERBATIM+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] "
-                        noOfMatches = 0
-                        List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
-                        println "-==IMMEDIATE TAXONS == " + parentTaxons
-                        multiMatches2.each { colMatch ->
-                            println "COL MATCH PARENT TAXON == " + colMatch.parentTaxon
-                            if(parentTaxons.contains(colMatch.parentTaxon)){
-                                noOfMatches++;
-                                acceptedMatch = colMatch
-                            }
-                        }
-                        if(noOfMatches == 1) {
-                            log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
-                        } else {
-                            acceptedMatch = null;
-                            dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
+                        acceptedMatch = parentTaxonMatch(sciName, multiMatches2);
+                        if(!acceptedMatch) {
+                            dirtyListReason = "[VERBATIM+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
                         }
                     }
                 }
-
             }
         }
        
@@ -937,6 +914,28 @@ class NamelistService {
             sciName.errors.allErrors.each { log.error it }
         }
         return result;
+    }
+
+    def parentTaxonMatch(ScientificName sciName, List colData) {
+        int noOfMatches = 0
+        def acceptedMatch = null;
+        List parentTaxons = sciName.immediateParentTaxonCanonicals() ;
+        println "-==IMMEDIATE TAXONS == " + parentTaxons
+        colData.each { colMatch ->
+            println "COL MATCH PARENT TAXON == " + colMatch.parentTaxon
+            if(parentTaxons.contains(colMatch.parentTaxon)){
+                noOfMatches++;
+                acceptedMatch = colMatch
+            }
+        }
+        if(noOfMatches == 1) {
+            log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
+            return acceptedMatch;
+        } else {
+            log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
+            acceptedMatch = null;
+            return acceptedMatch;
+        } 
     }
 
     //Handles name moving from accepted to synonym & vice versa

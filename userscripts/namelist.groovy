@@ -60,7 +60,7 @@ def curateName(taxonId, domainSourceDir) {
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
 //File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
-File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinitionNew");
+File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
 //curateName(156829, domainSourceDir);
@@ -358,6 +358,7 @@ def curateAllNames() {
     int limit = 67010, offset = 0;
     int counter = 0;
     List curatingThese = [];
+    File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit  
         def taxDefList;
@@ -375,12 +376,13 @@ def curateAllNames() {
         }
         for(taxDef in taxDefList) {
 		    TaxonomyDefinition.withNewSession {
+                println "###############################################################################################"
+                println "#"
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
                 counter++;
                 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
                 //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
                 //File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
-                File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinitionNew");
                 //curatingThese.add(taxDef.id);
                 curateName(taxDef.id, domainSourceDir);
             }
@@ -617,4 +619,4 @@ def updateRanks() {
 }
 
 
-updateRanks()
+//updateRanks()
