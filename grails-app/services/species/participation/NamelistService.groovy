@@ -480,6 +480,10 @@ class NamelistService {
                 } else {
                     CAN_SINGLE ++;
                     println "====CANONICAL - SINGLE MATCH ====== "
+                    if(res[0].rank != rank) {
+                        println "====CANONICAL - SINGLE MATCH BUT RANK DIFFERENT====== "
+                        res = [];
+                    }
                 }
                 return res;
             }
