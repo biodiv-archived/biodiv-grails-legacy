@@ -89,9 +89,9 @@ class Utils {
 	private static void writeHeader(File f, Class c){
 		println "writing header  " + f
         if(c == Synonyms.class) {
-		    f << "Accepted name Species Id|IBP varbatim|IBP Canonical Form|Accepted name IBP rank|Accepted name Varbatim|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Synonym for accepted name|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
+		    f << "Taxon ID|Accepted name Species Id|IBP varbatim|IBP Canonical Form|Accepted name IBP rank|Accepted name Varbatim|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Synonym for accepted name|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
         } else {
-		    f << "Species Id|IBP varbatim|IBP Canonical Form|IBP rank|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
+		    f << "Taxon ID|Species Id|IBP varbatim|IBP Canonical Form|IBP rank|IBP author year|IBP status|Has species page|Percent Info|Num of Obv|Total Result Found|Col Error Msg|COL canonical|COL verbatim|COL rank|COL ID|COL Name Status|COL Group|Accepted Names|Prov Accepted Name|Synonyms|Ambiguous synonym|Common Name|Misapplied name\n"
         }
     }
 
@@ -134,6 +134,11 @@ class Utils {
             def hasSpPage = q?"True":"False"
             def percInfo = q?q.percentOfInfo:"NAN"
             def numOfObv = q?getRelatedObservationByTaxonConcept(taxon.id,0,0L)?.count:"Not a species" 
+            if(c == Synonyms.class) {
+                sb.append(taxon.taxonConcept?.id + "|")
+            } else {
+                sb.append(taxon.id + "|")
+            }
             sb.append(t + "|") //sp id
             sb.append(taxon.name + "|") //ibp ver
             sb.append(taxon.canonicalForm + "|") //ibp can
