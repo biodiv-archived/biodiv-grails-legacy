@@ -442,9 +442,19 @@ class UserGroupService {
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postObservationToUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
-		userGroup.addToObservations(observation);
+		List obvs = [observation]
+		if(observation.instanceOf(Checklists)){
+			obvs.addAll(observation.observations)
+		}
+		obvs.collate(ResourceUpdate.POST_BATCH_SIZE).each  { subList ->
+			Observation.withNewTransaction{
+				subList.each {
+					userGroup.addToObservations(it);
+				}
+			}
+		}
 		if(!userGroup.save()) {
-			log.error "Could not add ${observation} to ${userGroup}"
+			log.error "Could not add ${obvs} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
@@ -468,9 +478,19 @@ class UserGroupService {
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
-		userGroup.observations.remove(observation);
+		List obvs = [observation]
+		if(observation.instanceOf(Checklists)){
+			obvs.addAll(observation.observations)
+		}
+		obvs.collate(ResourceUpdate.POST_BATCH_SIZE).each  { subList ->
+			Observation.withNewTransaction{
+				subList.each {
+					userGroup.observations.remove(it);
+				}
+			}
+		}
 		if(!userGroup.save()) {
-			log.error "Could not remove ${observation} from ${usergroup}"
+			log.error "Could not remove ${obvs} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false, sendMail);
@@ -1276,7 +1296,13 @@ class UserGroupService {
 			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
 			List obvs = []
 			if(objectIds && objectIds != ""){
-				obvs = objectIds.split(",").collect { domainClass.read(Long.parseLong(it)) }
+				objectIds.split(",").each { 
+					def obj = domainClass.read(Long.parseLong(it))
+					obvs << obj
+					if(obj.instanceOf(Checklists)){
+						obvs.addAll(obj.observations)
+					}
+				}
 			}
 			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
 			
@@ -1346,7 +1372,7 @@ class UserGroupService {
 	}
 	
 	private class ResourceUpdate {
-		private static final int POST_BATCH_SIZE = 50
+		public static final int POST_BATCH_SIZE = 100
 		private static final log = LogFactory.getLog(this);
 		
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
