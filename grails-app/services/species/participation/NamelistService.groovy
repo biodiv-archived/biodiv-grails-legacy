@@ -863,7 +863,7 @@ class NamelistService {
 
         //already updated in update attributes
         //updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
-        
+        sciName.dirtyListReason = null;
         sciName.noOfCOLMatches = colDataSize;
         /*else if(sciName.status == NameStatus.ACCEPTED) {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
@@ -1587,9 +1587,9 @@ def sql= session.createSQLQuery(query)
         TaxonomyDefinition.withNewSession {
             println "=========UPDATING ATTRIBUTES ========"
             NamesParser namesParser = new NamesParser();
-            def name = sciName.canonicalForm + " " + colMatch.authorString
-            def res1 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
-            def res2 = searchIBP(sciName.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
+            def name = colMatch.canonicalForm + " " + colMatch.authorString
+            def res1 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
+            def res2 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
             res2.addAll(res1);
             if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
                 sciName.isFlagged = true;

@@ -1987,7 +1987,6 @@ def checking(){
 }
 
     def updateSynonymOld(def synonymId, def speciesId, String relationship, String value) {
-
         if(!value || !relationship) {
             return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
         }
@@ -1999,21 +1998,29 @@ def checking(){
             return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
         }
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+        /*if(!speciesPermissionService.isSpeciesContributor(speciesInstance, SUser.read(1L))) {
             return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
-        }
-
+        }*/
+        def currentUser
         Synonyms oldSynonym;
         if(synonymId) {
+            println "=====SYN ID HAI== " + synonymId
             oldSynonym = Synonyms.read(synonymId);
-
+            println "=====OLD SYN == " + oldSynonym
+            if(oldSynonym) {
+                println "====CONTRIBUTOR=== " +  oldSynonym.contributors[0]
+                currentUser = oldSynonym.contributors[0]
+            }
             if(!oldSynonym) {
                 //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
-            } else if(!oldSynonym.isContributor()) {
+            } /*else if(!oldSynonym.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
-            }
+            }*/
+        } else {
+            println "====CONTRIBUTOR=== " + SUser.read(1L)
+            currentUser = SUser.read(1L)
         }
 
         Species.withTransaction { status ->
@@ -2021,17 +2028,18 @@ def checking(){
                 def result = deleteSynonymOld(oldSynonym, speciesInstance);
                 if(!result.success) {
                     def messagesourcearg = new Object[1];
+                    println "====FAILED DELETE IN UPDATE===="
                     messagesourcearg[0] = result.msg;
                     return [success:false, msg:messageSource.getMessage("info.error.updating.synonym", messagesourcearg, LCH.getLocale())]
                 }
             } 
             XMLConverter converter = new XMLConverter();
-
+            
             NodeBuilder builder = NodeBuilder.newInstance();
             def synonym = builder.createNode("synonym");
             Node data = new Node(synonym, 'data', value)
             new Node(data, "relationship", relationship);
-            new Node(data, "contributor", springSecurityService.currentUser.email);
+            new Node(data, "contributor", currentUser.email);
 
             List<Synonyms> synonyms = converter.createSynonymsOld(synonym, speciesInstance.taxonConcept);
 
@@ -2067,26 +2075,27 @@ def checking(){
     }
     
     def deleteSynonymOld(Synonyms oldSynonym, Species speciesInstance) {
-        
+        def currentUser
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = synonymId;
             return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 
-        if(!oldSynonym.isContributor()) {
+        /*if(!oldSynonym.isContributor()) {
             return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
-        }
+        }*/
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+        currentUser = oldSynonym.contributors[0];
+        /*if(!speciesPermissionService.isSpeciesContributor(speciesInstance, currentUser)) {
             return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
-        }
+        }*/
 
         Synonyms.withTransaction { status ->
             String msg = '';
             def content;
             try{
-                oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                oldSynonym.removeFromContributors(currentUser);
                 
                 if(oldSynonym.contributors.size() == 0) {
                     oldSynonym.delete(failOnError:true)

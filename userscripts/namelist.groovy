@@ -612,4 +612,47 @@ def curateWithManualIDs() {
     }
 }
 
-curateWithManualIDs()
+//curateWithManualIDs()
+
+def correctSynonyms() {
+    speciesService = ctx.getBean("speciesService");
+    int counter  = 0;
+    new File("/home/rahulk/Desktop/correctedsynonyms.csv").splitEachLine(',') {fields ->
+        if(fields[0] != 'syn_id') {
+            println "#"
+            println "#"
+            println "#"
+            println "=======COUNTER=== " + counter
+            counter++
+            def acc = TaxonomyDefinition.get(fields[1].toLong())
+            def speciesId =  acc.findSpeciesId();
+            switch(fields[3]){
+                case "Correct":
+                println "==CORRECT VALUE====" + fields[2]
+                def res = speciesService.updateSynonymOld(fields[0].toLong(), speciesId, 'SYNONYM', fields[2])
+                println "========RES RESULT ===" + res.success + "=====MSG ====== "  + res.msg
+                break
+
+                case "Delete" :
+                println "==DELETE===="
+                def res = speciesService.deleteSynonymOld(fields[0].toLong(), speciesId)
+                println "========RES RESULT ===" + res.success + "=====MSG ====== "  + res.msg
+
+                break
+
+                case "Create":
+                println "==TO CREATE====" + fields[2]
+                def res = speciesService.updateSynonymOld(null, speciesId, 'SYNONYM', fields[2])
+                println "========RES RESULT ===" + res.success + "=====MSG ====== "  + res.msg
+                break
+
+                default :
+                println "==============INVALID COMMAND============"
+                break
+            }
+            
+        }
+    }
+}
+
+//correctSynonyms()

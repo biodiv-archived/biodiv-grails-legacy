@@ -2059,6 +2059,7 @@ class XMLConverter extends SourceConverter {
                     sfield.errors.each { log.error it }
                 }
             }
+            println "SAVED SYNONYM=========== "  + sfield
             return sfield;
         } else {
             log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name
