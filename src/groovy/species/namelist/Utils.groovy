@@ -135,7 +135,7 @@ class Utils {
             def percInfo = q?q.percentOfInfo:"NAN"
             def numOfObv = q?getRelatedObservationByTaxonConcept(taxon.id,0,0L)?.count:"Not a species" 
             if(c == Synonyms.class) {
-                sb.append(taxon.taxonConcept?.id + "|")
+                sb.append(taxon.id + "|")
             } else {
                 sb.append(taxon.id + "|")
             }

@@ -9,6 +9,7 @@ import species.ScientificName
 import species.SynonymsMerged
 import species.SpeciesField
 import species.Synonyms
+import species.Species
 import species.participation.Recommendation;
 import species.participation.TestA;
 import species.participation.TestC;
@@ -582,7 +583,7 @@ def updateRanks() {
 
 def curateWithManualIDs() {
     int counter  = 0;
-    new File("/home/rahulk/Desktop/dirtynamesMatchedtoCoLpipesep.csv").splitEachLine(",") {fields ->
+    new File("/tmp/dirtynamesMatchedtoCoLpipesep.csv").splitEachLine(",") {fields ->
         if(fields[0] != 'species ID') {
             println "========COUNTER === " + counter
             println "=====WORKING ON ==== " + fields[0]
@@ -590,6 +591,7 @@ def curateWithManualIDs() {
             def s = Species.get(fields[0].toLong())
             def td = s.taxonConcept;
             def colID = fields[-1];
+		println "=====LOOKING FOR THIS COL ID ======= " + colID
             def taxonId = td.id.toString();
             File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
             List colData = nSer.processColData(new File(domainSourceDir, taxonId+'.xml'));
@@ -602,7 +604,7 @@ def curateWithManualIDs() {
             }
             if(acceptedMatch){
                 println "=======ACCEPTED MATCH FOUND ======= " + acceptedMatch
-                //nSer.processDataForMigration(td, acceptedMatch, colDataSize)
+                nSer.processDataForMigration(td, acceptedMatch, colDataSize)
             } else {
                 println "========COULD NOT FIND COL MATCH FOR SPECIES========= " + fields[0]
             }
