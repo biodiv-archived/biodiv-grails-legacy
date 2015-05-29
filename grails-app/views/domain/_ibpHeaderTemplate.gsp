@@ -78,6 +78,12 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
 <%--	</div>--%>
 
+	<div class="alertMsg alert alert-info"
+		style="clear: both; margin: 0px; text-align: center;">
+		This monsoon, <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/show">Frog Watch</a> will be mapping the distribution of the <a target="_blank" href="http://indiabiodiversity.org/species/show/25575">Malabar Torrent Toad</a>. Participate by <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/observation/create">uploading</a> observations of this species.
+	</div>
+
+
 <%--	<div class="alertMsg alert alert-info"--%>
 <%--		style="clear: both; margin: 0px; text-align: center;">--%>
 <%--		The <a target="_blank" href="http://treesindia.indiabiodiversity.org/show">Neighborhood Trees Campaign 2015</a> is on from 22nd to 28th April. Participate by <a target="_blank" href="http://treesindia.indiabiodiversity.org/observation/create">uploading observations</a> and win <a target="_blank" href="http://treesindia.indiabiodiversity.org/page/126">prizes</a>. Observation uploaded so far:<b>${Stats.getTreeGroupObvCount()}</b>.--%>

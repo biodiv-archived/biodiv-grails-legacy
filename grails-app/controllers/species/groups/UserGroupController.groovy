@@ -500,16 +500,8 @@ println "2222222222222222222"
 		params.offset = params.offset ? params.int('offset') : 0
 		
 		def model = observationService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
+		
         def observationInstanceList = model.observationInstanceList
-        if(params.filterProperty == 'speciesName') {
-            def results = []
-            observationInstanceList.each {
-                def obv = Observation.read(it);
-                results.add(obv)
-            }
-            model.observationInstanceList = results;
-            observationInstanceList = results;
-        }
         def checklistCount =  model.checklistCount
 		def allObservationCount =  model.allObservationCount
 		model['checklistCount'] = checklistCount

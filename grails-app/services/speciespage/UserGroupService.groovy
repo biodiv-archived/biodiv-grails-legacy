@@ -1488,9 +1488,7 @@ class UserGroupService {
                                        ug.deleteMember(u)
                                		}else{
                                			println " >>>>>>>>>>>>> Not a member ==== " + uid
-                               		}
-                                       
-                                       
+                               		}  
                                }
                        }
                }catch(Exception e){
