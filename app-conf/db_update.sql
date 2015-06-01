@@ -355,7 +355,7 @@ update synonyms set name = 'Rungia parviflora var. muralis' where id = 45175;
 update synonyms set name = 'Fagopyrum dibotrys D. Don' where id = 198586;
 update synonyms set name = 'Linnaea spaethiana Graebn.' where id = 189883;
 
-
+alter table synonyms add column drop_reason  varchar(500);
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 

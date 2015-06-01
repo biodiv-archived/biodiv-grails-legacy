@@ -874,6 +874,9 @@ class NamelistService {
         sciName = updateStatus(sciName, acceptedMatch).sciName;
         println "========THE SCI NAME======== " + sciName
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
+        if(!acceptedMatch['parsedRank']) {
+            acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
+        }
         updateRank(sciName, acceptedMatch.parsedRank);            
         //WHY required here??
         //addIBPHierarchyFromCol(sciName, acceptedMatch);
@@ -1618,6 +1621,7 @@ def sql= session.createSQLQuery(query)
                 res2.each {
                     if(it != sciName && it.isFlagged) {
                         it.flaggingReason = it.flaggingReason + " ### " + flaggingReason;
+                        it = it.merge();
                         if(!it.save(flush:true)) {
                             it.errors.allErrors.each { log.error it }
                         }
