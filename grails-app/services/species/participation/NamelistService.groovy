@@ -221,15 +221,32 @@ class NamelistService {
                 // println t.author.text()
                 }
 
-                //println "============= synonyms  "
-                r.synonyms.synonym.each { s ->
+                println "============= synonyms  "
+                if(temp['nameStatus'] == "accepted") {
+                    def synList = []
+                    r.synonyms.synonym.each {
+                        def m = [:]
+                        m['id'] = it.id.text()
+                        m['name'] = it.name.text() + " " + it.author.text().capitalize();;
+                        m['canonicalForm'] = it.name.text();
+                        m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
+                        m['rank'] = it.rank?.text()?.toLowerCase();
+                        m['parsedRank'] = XMLConverter.getTaxonRank(m.rank);
+                        m['authorString'] = it.author.text().capitalize();;
+                        m['source'] = "COL"
+                        synList.add(m);
+                    }
+                    //println "======A LIST======== " + aList;
+                    temp['synList'] = synList;
+                }
+                //r.synonyms.synonym.each { s ->
                 //println s.rank.text() + " == " + s.name.text()
                 //println "============= references  "
-                s.references.reference.each { ref ->
+                //s.references.reference.each { ref ->
                 //println ref.author.text()
                 //println ref.source.text()
-                }
-                }
+                //}
+                //}
                 /*
                 println "==========NAME STATUS========= " + temp['nameStatus']
                 if(temp['nameStatus'] == "synonym") {

@@ -223,75 +223,166 @@ def createTestEntry(){
 
 //createTestEntry();
 
+boolean migrateThisSynonym(syn) {
+    NamesParser namesParser = new NamesParser();
+    def parsedNames = namesParser.parse([syn.name]);
+    if (!syn.canonicalForm){
+        println "======MISSING CANONICAL FORM - Parsing to fetch ===== " + syn.name 
+        if(!parsedNames[0]?.canonicalForm) {
+            println "===COULD NOT PARSE copying its name in other name variants - syn id=== " + syn.id
+            syn.canonicalForm = syn.name;
+            syn.normalizedForm = syn.name;
+            syn.italicisedForm = syn.name;
+            syn.binomialForm = syn.name;
+        } else {
+            syn.canonicalForm = parsedNames[0].canonicalForm;
+            syn.normalizedForm = parsedNames[0].normalizedForm;
+            syn.italicisedForm = parsedNames[0].italicisedForm;
+            syn.binomialForm = parsedNames[0].binomialForm;
+        }
+    }
+    if(!syn.authorYear) {
+        println "=========AUTHOR YEAR ====== " + parsedNames[0].authorYear
+        syn.authorYear = parsedNames[0].authorYear;
+        println "=========AUTHOR YEAR ====== " + syn.authorYear
+    }
+    def acc = syn.taxonConcept;
+    List synFamily = [];
+    if(acc.status == NamesMetadata.NameStatus.SYNONYM){
+        def res = acc.fetchAcceptedNames();
+        acc = res[0];
+    }
+    synFamily.add(acc);
+    def synList = acc.fetchSynonyms();
+    synFamily.addAll(synList);
+    def canMatches = []
+    synFamily.each {
+        if(it.canonicalForm == syn.canonicalForm) {
+            canMatches.add(it)
+        }
+    }
+    ////CANONICAL ZERO MATCH - SO ADD
+    if(canMatches.size() == 0 ){
+        println "CANONICAL ZERO MATCH - SO ADD"
+        return true
+    } else {
+        //CANONICAL MATCH MULTIPLE BUT NO AUTHOR YEAR - SO DROP
+        if(syn.authorYear == null || syn.authorYear == '' || syn.authorYear == ' '){
+            println "CANONICAL MATCH MULTIPLE BUT NO AUTHOR YEAR - SO DROP"
+            syn.dropReason = "CANONICAL MATCH MULTIPLE BUT NO AUTHOR YEAR - SO DROP"
+            if(!syn.save(flush:true)){
+                println "FAILED TO SAVE SYNONYM " + syn
+            }
+            return false; 
+        } 
+        else {
+            int noOfMatches = 0;
+            canMatches.each {
+                if(it.normalizedForm == syn.normalizedForm) {
+                    noOfMatches++;
+                }
+            }
+            //NORMALISED ZERO MATCH - SO ADD
+            if(noOfMatches == 0){
+                println "NORMALISED ZERO MATCH - SO ADD"
+                return true;
+            } else {
+                //NORMALISED MULTI MATCH - SO DROP
+                println "NORMALISED MULTI MATCH - SO DROP"
+                syn.dropReason = "NORMALISED MULTI MATCH - SO DROP"
+                if(!syn.save(flush:true)){
+                    println "FAILED TO SAVE SYNONYM " + syn
+                }
+                return false;
+            }
+        }
+        
+    }
+}
+
 def migrateSynonyms() {
     int limit = 50, offset = 0, insert_check = 0,exist_check = 0;
     int counter = 0;
     def nonParsedSyns = [];
+    def notMigrating = [];
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit //+ " =========COUNTER ====== " + conter;    
         def oldSynList = Synonyms.list (max: limit , offset:offset, , sort: "id", order: "asc");
-        //def oldSynList = Synonyms.read(39985L) //(max: limit , offset:offset);
+        //def oldSynList = Synonyms.read(218033L) //(max: limit , offset:offset);
         def synMer;
         for(oldSyn in oldSynList) {
-            def flag = false;
-            SynonymsMerged.withNewTransaction {
-                println "=====WORKING ON THIS SYNONYM============== " + oldSyn + " =========COUNTER ====== " + counter;
-                counter++;
-                synMer = new SynonymsMerged();
-                synMer.name = oldSyn.name
-                synMer.relationship = oldSyn.relationship
-                //oldSyn.taxonConcept
-                if (!oldSyn.canonicalForm){
-                    println "======MISSING CANONICAL FORM - Parsing to fetch ====="
-                    NamesParser namesParser = new NamesParser();
-                    def parsedNames = namesParser.parse([oldSyn.name]);
-                    if(!parsedNames[0]?.canonicalForm) {
-                        nonParsedSyns.add(oldSyn.id);
-                        println "===COULD NOT PARSE copying its name in other name variants==="
-                        oldSyn.canonicalForm = oldSyn.name;
-                        oldSyn.normalizedForm = oldSyn.name;
-                        oldSyn.italicisedForm = oldSyn.name;
-                        oldSyn.binomialForm = oldSyn.name;
-                        flag = true;
+            boolean migrateThisSynonym = migrateThisSynonym(oldSyn);
+            if(migrateThisSynonym) {
+                def flag = false;
+                SynonymsMerged.withNewTransaction {
+                    println "=====WORKING ON THIS SYNONYM============== " + oldSyn + " =========COUNTER ====== " + counter;
+                    counter++;
+                    synMer = new SynonymsMerged();
+                    synMer.name = oldSyn.name
+                    synMer.relationship = oldSyn.relationship
+                    //oldSyn.taxonConcept
+                    if (!oldSyn.canonicalForm){
+                        println "======MISSING CANONICAL FORM - Parsing to fetch ====="
+                        NamesParser namesParser = new NamesParser();
+                        def parsedNames = namesParser.parse([oldSyn.name]);
+                        if(!parsedNames[0]?.canonicalForm) {
+                            nonParsedSyns.add(oldSyn.id);
+                            println "===COULD NOT PARSE copying its name in other name variants==="
+                            oldSyn.canonicalForm = oldSyn.name;
+                            oldSyn.normalizedForm = oldSyn.name;
+                            oldSyn.italicisedForm = oldSyn.name;
+                            oldSyn.binomialForm = oldSyn.name;
+                            flag = true;
+                        }
+                        if(!flag && parsedNames[0]?.canonicalForm) {
+                            oldSyn.canonicalForm = parsedNames[0].canonicalForm;
+                            oldSyn.normalizedForm = parsedNames[0].normalizedForm;
+                            oldSyn.italicisedForm = parsedNames[0].italicisedForm;
+                            oldSyn.binomialForm = parsedNames[0].binomialForm;
+                            oldSyn.authorYear = parsedNames[0].authorYear;
+                        }
                     }
-                    if(!flag && parsedNames[0]?.canonicalForm) {
-                        oldSyn.canonicalForm = parsedNames[0].canonicalForm;
-                        oldSyn.normalizedForm = parsedNames[0].normalizedForm;
-                        oldSyn.italicisedForm = parsedNames[0].italicisedForm;
-                        oldSyn.binomialForm = parsedNames[0].binomialForm;
+                    if(!flag) {
+                        synMer.canonicalForm = oldSyn.canonicalForm
+                        synMer.normalizedForm = oldSyn.normalizedForm
+                        synMer.italicisedForm = oldSyn.italicisedForm
+                        synMer.binomialForm = oldSyn.binomialForm
+                        synMer.status = oldSyn.status
+                        synMer.viaDatasource = oldSyn.viaDatasource
+                        synMer.uploadTime = oldSyn.uploadTime
+
+                        synMer.uploader = oldSyn.uploader
+                        synMer.authorYear = oldSyn.authorYear
+                        synMer.ibpSource = oldSyn.ibpSource
+                        synMer.matchId = oldSyn.matchId
+                        synMer.matchDatabaseName = oldSyn.matchDatabaseName
+                        synMer.rank = oldSyn.taxonConcept.rank;
+                        synMer.oldId = "syn_"+oldSyn.id.toString();
+                        oldSyn.contributors.each {
+                            synMer.addToContributors(it);
+                        }         
+                        //save new syn merged
+                        if(!synMer.save(flush:true)) {
+                            synMer.errors.each { println it }
+                        }
+                        println "========SYN MERGED ======= " + synMer
                     }
                 }
                 if(!flag) {
-                    synMer.canonicalForm = oldSyn.canonicalForm
-                    synMer.normalizedForm = oldSyn.normalizedForm
-                    synMer.italicisedForm = oldSyn.italicisedForm
-                    synMer.binomialForm = oldSyn.binomialForm
-                    synMer.status = oldSyn.status
-                    synMer.viaDatasource = oldSyn.viaDatasource
-                    synMer.uploadTime = oldSyn.uploadTime
-
-                    synMer.uploader = oldSyn.uploader
-                    synMer.authorYear = oldSyn.authorYear
-                    synMer.ibpSource = oldSyn.ibpSource
-                    synMer.matchId = oldSyn.matchId
-                    synMer.matchDatabaseName = oldSyn.matchDatabaseName
-                    synMer.rank = oldSyn.taxonConcept.rank;
-                    synMer.oldId = "syn_"+oldSyn.id.toString();
-                    oldSyn.contributors.each {
-                        synMer.addToContributors(it);
-                    }         
-                    //save new syn merged
-                    if(!synMer.save(flush:true)) {
-                        synMer.errors.each { println it }
+                    SynonymsMerged.withNewTransaction {
+                        //TODO: check whether its old accepted name is still accepted or changed to synonym
+                        if(oldSyn.taxonConcept.status == NamesMetadata.NameStatus.ACCEPTED) {
+                            oldSyn.taxonConcept.addSynonym(synMer);
+                        } else {
+                            def accRes  = oldSyn.taxonConcept.fetchAcceptedNames();
+                            def acc = accRes[0];
+                            acc.addSynonym(synMer);
+                        }
                     }
-                    println "========SYN MERGED ======= " + synMer
                 }
-            }
-            if(!flag) {
-                SynonymsMerged.withNewTransaction {
-                    oldSyn.taxonConcept.addSynonym(synMer);
-                    //oldSyn.taxonConcept.addToSynonyms(synMer);
-                }
+            } else {
+                println "======NOT MIGRATING THIS SYNONYM ====== " + oldSyn
+                notMigrating.add(oldSyn.id);
             }
         }
         offset = offset + limit; 
@@ -299,6 +390,8 @@ def migrateSynonyms() {
         if(!oldSynList) break;  
     }
     println "=======NON PARSED IDS ===== " + nonParsedSyns
+    println "=======NOT MIGRATING ===== " + notMigrating
+    println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
 //migrateSynonyms();
@@ -656,3 +749,96 @@ def correctSynonyms() {
 }
 
 //correctSynonyms()
+
+def addSynToAccName(sciName, synDetails) {
+    NamesParser namesParser = new NamesParser();
+    def parsedNames = namesParser.parse([synDetails.name]);
+
+    def synMer = new SynonymsMerged();
+    synMer.name = synDetails.name;
+    synMer.canonicalForm = synDetails.canonicalForm;
+    synMer.relationship = RelationShip.SYNONYM 
+    if(!parsedNames[0]?.canonicalForm) {
+        synMer.normalizedForm = parsedNames[0].normalizedForm;
+        synMer.italicisedForm = parsedNames[0].italicisedForm;
+        synMer.binomialForm = parsedNames[0].binomialForm;
+    } else {
+        println "=====PUTTING CANONICAL AS BINOMIAL===="
+        synMer.normalizedForm = synMer.canonicalForm
+        synMer.italicisedForm = synMer.canonicalForm 
+        synMer.binomialForm = synMer.canonicalForm;
+    }
+    
+    synMer.status = NamesMetadata.NameStatus.SYNONYM
+    synMer.viaDatasource = ""
+    synMer.uploadTime = new Date()
+    def contributor = SUser.read(1L);
+    synMer.uploader = contributor
+    synMer.authorYear = synDetails.authorString;
+    synMer.ibpSource = null
+    synMer.matchId = synDetails.id
+    synMer.matchDatabaseName = "COL"
+    synMer.rank = synDetails.parsedRank;
+    synMer.addToContributors(contributor);
+    sciName.addSynonym(synMer);
+}
+
+def addSynonymsFromCOL() {
+    int limit = 71800, offset = 0;
+    int counter = 0;
+    List curatingThese = [];
+    File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
+
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def taxDefList;
+        TaxonomyDefinition.withNewTransaction {
+            def c = TaxonomyDefinition.createCriteria()
+            taxDefList = c.list (max: limit , offset:offset) {
+                and {
+                    //lt('id', 275703L)
+                    eq('status', NamesMetadata.NameStatus.ACCEPTED)
+                    eq('position', NamesMetadata.NamePosition.WORKING)
+                    //isNull('position')
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            }
+        }
+        for(taxDef in taxDefList) {
+            println "###############################################################################################"
+            println "#"
+            println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
+            def colID = taxDef.matchId
+            counter++;
+            List colData = nSer.processColData(new File(domainSourceDir, taxonId+'.xml'));
+            def acceptedMatch = null;
+            if(colData.size() > 0 ) {
+                colData.each { colMatch ->
+                    if(colMatch.externalId == colID){
+                        acceptedMatch = colMatch    
+                    }
+                }
+            } else {
+                acceptedMatch = nSer.searchCOL(colID, 'id')[0]
+            }
+            TaxonomyDefinition.withNewTransaction {
+                if(acceptedMatch){
+                    println "=======ACCEPTED MATCH FROM COL ======= " + acceptedMatch
+                    acceptedMatch.synList.each { synDetails ->
+                        println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
+                        addSynToAccName(taxDef, synDetails)    
+                    }
+                } else {
+                    println "=========NO ACCEPTED MATCH======== "
+                }
+            }
+        }
+
+        offset = offset + limit; 
+        utilsService.cleanUpGorm(true); 
+        if(!taxDefList) break;  
+    } 
+}
+
+addSynonymsFromCOL()

@@ -8,12 +8,14 @@ class Synonyms extends ScientificName {
 	String name;
 	RelationShip relationship;
 	TaxonomyDefinition taxonConcept;
-	
+    String dropReason;
+
     NamesMetadata.NameStatus status = NamesMetadata.NameStatus.SYNONYM;
 	static constraints = {
 		name(blank : false);
 		canonicalForm(blank : false, nullable:false, unique:['relationship', 'taxonConcept']);
 		relationship(nullable:true);
+		dropReason(nullable:true);
     }
 	
 	static mapping = {

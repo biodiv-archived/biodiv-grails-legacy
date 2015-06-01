@@ -344,6 +344,18 @@ ALTER TABLE taxonomy_definition add column is_deleted boolean;
 update taxonomy_definition set is_deleted = false;
 
 alter table taxonomy_definition add column dirty_list_reason  varchar(1000);
+
+/**
+6 rows of synonym manually value corrected
+**/
+update synonyms set name = 'Turraea obtusifolia' where id = 209954;
+update synonyms set name = 'Synadenium compactum' where id = 208733;
+update synonyms set name = 'Rungia parviflora var. pectinata' where id = 45174;
+update synonyms set name = 'Rungia parviflora var. muralis' where id = 45175;
+update synonyms set name = 'Fagopyrum dibotrys D. Don' where id = 198586;
+update synonyms set name = 'Linnaea spaethiana Graebn.' where id = 189883;
+
+
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 
