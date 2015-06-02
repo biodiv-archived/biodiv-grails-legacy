@@ -758,7 +758,7 @@ def addSynToAccName(sciName, synDetails) {
     synMer.name = synDetails.name;
     synMer.canonicalForm = synDetails.canonicalForm;
     synMer.relationship = RelationShip.SYNONYM 
-    if(!parsedNames[0]?.canonicalForm) {
+    if(parsedNames[0]?.canonicalForm) {
         synMer.normalizedForm = parsedNames[0].normalizedForm;
         synMer.italicisedForm = parsedNames[0].italicisedForm;
         synMer.binomialForm = parsedNames[0].binomialForm;
@@ -780,7 +780,10 @@ def addSynToAccName(sciName, synDetails) {
     synMer.matchDatabaseName = "COL"
     synMer.rank = synDetails.parsedRank;
     synMer.addToContributors(contributor);
-    sciName.addSynonym(synMer);
+if(!synMer.save(flush:true)) {
+                            synMer.errors.each { println it }
+                        }    
+sciName.addSynonym(synMer);
 }
 
 def addSynonymsFromCOL() {
@@ -796,7 +799,7 @@ def addSynonymsFromCOL() {
             def c = TaxonomyDefinition.createCriteria()
             taxDefList = c.list (max: limit , offset:offset) {
                 and {
-                    //lt('id', 275703L)
+                    gt('rank', 8)
                     eq('status', NamesMetadata.NameStatus.ACCEPTED)
                     eq('position', NamesMetadata.NamePosition.WORKING)
                     //isNull('position')
@@ -811,9 +814,9 @@ def addSynonymsFromCOL() {
             println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
             def colID = taxDef.matchId
             counter++;
-            List colData = nSer.processColData(new File(domainSourceDir, taxonId+'.xml'));
+            List colData = nSer.processColData(new File(domainSourceDir, taxDef.id.toString()+'.xml'));
             def acceptedMatch = null;
-            if(colData.size() > 0 ) {
+            if(colData && colData.size() > 0 ) {
                 colData.each { colMatch ->
                     if(colMatch.externalId == colID){
                         acceptedMatch = colMatch    
