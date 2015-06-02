@@ -751,14 +751,14 @@ def correctSynonyms() {
 //correctSynonyms()
 
 def addSynToAccName(sciName, synDetails) {
-    NamesParser namesParser = new NamesParser();
-    def parsedNames = namesParser.parse([synDetails.name]);
+    //NamesParser namesParser = new NamesParser();
+    //def parsedNames = namesParser.parse([synDetails.name]);
 
     def synMer = new SynonymsMerged();
     synMer.name = synDetails.name;
     synMer.canonicalForm = synDetails.canonicalForm;
     synMer.relationship = RelationShip.SYNONYM 
-    if(parsedNames[0]?.canonicalForm) {
+    /*if(parsedNames[0]?.canonicalForm) {
         synMer.normalizedForm = parsedNames[0].normalizedForm;
         synMer.italicisedForm = parsedNames[0].italicisedForm;
         synMer.binomialForm = parsedNames[0].binomialForm;
@@ -768,7 +768,7 @@ def addSynToAccName(sciName, synDetails) {
         synMer.italicisedForm = synMer.canonicalForm 
         synMer.binomialForm = synMer.canonicalForm;
     }
-    
+    */
     synMer.status = NamesMetadata.NameStatus.SYNONYM
     synMer.viaDatasource = ""
     synMer.uploadTime = new Date()
@@ -797,7 +797,8 @@ def addSynonymsFromCOL() {
         def taxDefList;
         TaxonomyDefinition.withNewTransaction {
             def c = TaxonomyDefinition.createCriteria()
-            taxDefList = c.list (max: limit , offset:offset) {
+            taxDefList = TaxonomyDefinition.get(4135L);
+            /*taxDefList = c.list (max: limit , offset:offset) {
                 and {
                     gt('rank', 8)
                     eq('status', NamesMetadata.NameStatus.ACCEPTED)
@@ -806,7 +807,7 @@ def addSynonymsFromCOL() {
                 }
                 order('rank','asc')
                 order('id','asc')                    
-            }
+            }*/
         }
         for(taxDef in taxDefList) {
             println "###############################################################################################"
