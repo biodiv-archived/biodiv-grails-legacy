@@ -144,6 +144,31 @@ class NamelistService {
         return responseAsMap(results, searchBy)
     }
 
+    String generateVerbatim (colResult) {
+        String verbatim = '';
+        int origRank = XMLConverter.getTaxonRank(colResult.rank?.text()?.toLowerCase()); 
+        if(origRank <= TaxonomyRank.SPECIES.ordinal()) {
+            verbatim = r?.name?.text() + " " +r?.author?.text().capitalize();
+        } else {
+            String genus = r?.genus?.text() + ' ';
+            String species = r?.species?.text() + ' '; 
+            String infraSpeciesMarker = '';
+            if(r?.infraspecies_marker) {
+                infraSpeciesMarker = r?.infraspecies_marker.text() + ' ';
+            }
+            String infraSpecies = '';
+            if(r?.infraspecies) {
+                infraSpecies = r?.infraspecies.text() + ' ';
+            }
+            String authorYear = '';
+            if(r?.author) {
+                authorYear = r?.author.text().capitalize();
+            }
+            verbatim = genus + species + infraSpeciesMarker + infraSpecies + authorYear;
+        }
+        return verbatim
+    }
+
     List responseAsMap(results, String searchBy) {
         List finalResult = []
         //println results.'@total_number_of_results'
@@ -157,13 +182,12 @@ class NamelistService {
             Map id_details = new HashMap();
             temp['externalId'] = r?.id?.text()//+"'"
             temp['matchDatabaseName'] = "COL"
-            temp['canonicalForm'] = r?.name?.text(); 
-            temp['name'] = r?.name?.text() 
-            if(searchBy == 'name' || searchBy == 'id') {
-                temp['name'] += " " +r?.author?.text().capitalize();
-            }
+            temp['canonicalForm'] = r?.name?.text();
             temp['rank'] = r?.rank?.text()?.toLowerCase()
-            temp[r?.rank?.text()?.toLowerCase()] = r?.name?.text()
+            temp[r?.rank?.text()?.toLowerCase()] = generateVerbatim(r);     //r?.name?.text()
+            //GENERATING VERBATIM BASED ON RANK
+            temp['name'] = generateVerbatim(r);
+            
             id_details[r?.name?.text()] = r?.id?.text();
             def cs = r?.name_status?.text()?.tokenize(' ')[0]
             if(cs == 'provisionally' || cs == 'accepted') {
@@ -184,7 +208,7 @@ class NamelistService {
                 r.accepted_name.each {
                     def m = [:]
                     m['id'] = it.id.text()
-                    m['name'] = it.name.text() + " " + it.author.text().capitalize();;
+                    m['name'] = generateVerbatim(it)        //it.name.text() + " " + it.author.text().capitalize();;
                     m['canonicalForm'] = it.name.text();
                     m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
                     m['rank'] = it.rank?.text()?.toLowerCase();
@@ -227,7 +251,7 @@ class NamelistService {
                     r.synonyms.synonym.each {
                         def m = [:]
                         m['id'] = it.id.text()
-                        m['name'] = it.name.text() + " " + it.author.text().capitalize();;
+                        m['name'] = generateVerbatim(it);        //it.name.text() + " " + it.author.text().capitalize();;
                         m['canonicalForm'] = it.name.text();
                         m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
                         m['rank'] = it.rank?.text()?.toLowerCase();
@@ -1220,7 +1244,7 @@ class NamelistService {
         result['taxonRegistry.7'] = res['7'] = m['genus']
         result['taxonRegistry.8'] = res['8'] = m['subgenus']
         if(m['rank'] == 'species'){
-            result['taxonRegistry.9'] = res['9'] = m['species'] + " " + m['authorString']
+            result['taxonRegistry.9'] = res['9'] = m['species']     //TODO:check author year coming or not + " " + m['authorString']
         } else {
             result['taxonRegistry.9'] = res['9'] = m['species'];    
         }
@@ -1228,7 +1252,7 @@ class NamelistService {
             def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
             result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
             m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
-            result['taxonRegistry.10'] = res['10'] = m['infraspecies'] + " " + m['authorString'];
+            result['taxonRegistry.10'] = res['10'] = m['infraspecies']      //TODO:check author year coming or not + " " + m['authorString'];
         } else {
             result['taxonRegistry.10'] = res['10'] = m['infraspecies'];     
         }
