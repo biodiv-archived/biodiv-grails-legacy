@@ -89,7 +89,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                         SecurityContextHolder.context.authentication = authentication;
 
                         // Fire event only if its the authSuccess url
-                        if (this.eventPublisher != null && url == '/login/authSuccess') {
+                        if (this.eventPublisher != null && (url == '/login/authSuccess' || url == '/oauth/google/success')) {
                             eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
                         }
 
@@ -107,7 +107,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                 } catch(UsernameNotFoundException e) {
                     logger.info("UsernameNotFoundException: $e.message")
                     def referer = request.getHeader("referer");
-                    if(url == '/login/authSuccess') {
+                    if(url == '/login/authSuccess' || url == '/oauth/google/success') {
                         handleAuthSuccess(request, response, token, e);
                         return;
                     }
@@ -117,7 +117,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                     return;
                 } catch (AuthenticationServiceException e) {
                     logger.info("Message : $e.message")
-                    if(url == '/login/authSuccess') {
+                    if(url == '/login/authSuccess' || url == '/oauth/google/success') {
                         handleAuthSuccess(request, response, token, e);
                         return;
                     }

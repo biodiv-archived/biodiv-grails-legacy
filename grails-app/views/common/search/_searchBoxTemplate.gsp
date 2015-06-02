@@ -49,6 +49,10 @@ $(document).ready(function() {
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
                 'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
+                'login' : {
+                    googleOAuthSuccessUrl : "/oauth/google/success",
+
+                },
                 'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
                 'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
                 'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",

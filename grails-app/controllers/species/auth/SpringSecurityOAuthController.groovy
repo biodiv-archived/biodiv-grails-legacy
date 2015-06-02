@@ -22,12 +22,16 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.core.authority.GrantedAuthorityImpl
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import species.auth.SUser
 import species.auth.Role
 import species.auth.SUserRole
 import species.auth.OAuthID
-
+import species.utils.Utils;
+import org.scribe.model.Token;
+import grails.converters.JSON;
+import org.grails.plugin.springsecurity.oauth.GoogleApi20;
 /**
  * Simple helper controller for handling OAuth authentication and integrating it
  * into Spring Security.
@@ -39,6 +43,7 @@ class SpringSecurityOAuthController {
     def grailsApplication
     def oauthService
     def springSecurityService
+    def googleSpringSecurityOAuthService;
 
     /**
      * This can be used as a callback for a successful OAuth authentication
@@ -57,17 +62,39 @@ class SpringSecurityOAuthController {
             return
         }
 
-        def sessionKey = oauthService.findSessionKeyForAccessToken(params.provider)
-        if (!session[sessionKey]) {
-            renderError 500, "No OAuth token in the session for provider '${params.provider}'!"
-            return
+            def requestCache = new HttpSessionRequestCache();
+		    def defaultSavedRequest = requestCache.getRequest(request, response);
+			//def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+
+        OAuthToken oAuthToken;
+        boolean isAjaxRequest = request.xhr;
+        if(isAjaxRequest) {
+            Token accessToken = new GoogleApi20().getAccessTokenExtractor().extract(params.response);
+            oAuthToken = googleSpringSecurityOAuthService.createAuthToken(accessToken)
+            oAuthToken = createAuthToken2(params.provider, oAuthToken);
+        } else {
+            def sessionKey = oauthService.findSessionKeyForAccessToken(params.provider)
+            if (!session[sessionKey]) {
+                renderError 500, "No OAuth token in the session for provider '${params.provider}'!"
+                return
+            }
+            
+            // Create the relevant authentication token and attempt to log in.
+            oAuthToken = createAuthToken(params.provider, session[sessionKey])
         }
-
-        // Create the relevant authentication token and attempt to log in.
-        OAuthToken oAuthToken = createAuthToken(params.provider, session[sessionKey])
-
-        if (oAuthToken.principal instanceof GrailsUser) {
-            authenticateAndRedirect(oAuthToken, defaultTargetUrl)
+        if (oAuthToken.principal instanceof GrailsUser || isAjaxRequest) { //isAjaxRequest is a hack
+            if(isAjaxRequest) {
+                SecurityContextHolder.context.authentication = oAuthToken
+                if(defaultSavedRequest) {
+                    (new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+                    return
+                } else { 
+                    render ([success:true] as JSON)
+                    return;
+                }
+            } else {
+                authenticateAndRedirect(oAuthToken, defaultTargetUrl)
+            }
         } else {
             // This OAuth account hasn't been registered against an internal
             // account yet. Give the oAuthID the opportunity to create a new
@@ -183,7 +210,10 @@ class SpringSecurityOAuthController {
     protected OAuthToken createAuthToken(providerName, scribeToken) {
         def providerService = grailsApplication.mainContext.getBean("${providerName}SpringSecurityOAuthService")
         OAuthToken oAuthToken = providerService.createAuthToken(scribeToken)
+        return createAuthToken2(providerName, oAuthToken);
+    }
 
+    protected OAuthToken createAuthToken2(providerName, OAuthToken oAuthToken) {
         def oAuthID = OAuthID.findByProviderAndAccessToken(oAuthToken.providerName, oAuthToken.socialId)
         if (oAuthID) {
             updateOAuthToken(oAuthToken, oAuthID.user)
@@ -337,8 +367,6 @@ class SpringSecurityOAuthController {
         } else {
             dturl = [uri: (config.successHandler.defaultTargetUrl ?: defaultUrlOnNull)]
         }
-        println "%%%%%%%%%%%%%%%%%%%%%%"
-        println dturl;
         return dturl;
     }
 
