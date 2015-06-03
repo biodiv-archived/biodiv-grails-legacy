@@ -318,13 +318,16 @@ def migrateSynonyms() {
         def oldSynList = Synonyms.list (max: limit , offset:offset, , sort: "id", order: "asc");
         //def oldSynList = Synonyms.read(218033L) //(max: limit , offset:offset);
         def synMer;
+        int count200 = 0;
         for(oldSyn in oldSynList) {
+            count200++;
+            println "=====WORKING ON THIS SYNONYM============== " + oldSyn + " =========COUNTER ====== " + counter;
+            counter++;
             boolean migrateThisSynonym = migrateThisSynonym(oldSyn);
             if(migrateThisSynonym) {
                 def flag = false;
                 SynonymsMerged.withNewTransaction {
-                    println "=====WORKING ON THIS SYNONYM============== " + oldSyn + " =========COUNTER ====== " + counter;
-                    counter++;
+                    
                     synMer = new SynonymsMerged();
                     synMer.name = oldSyn.name
                     synMer.relationship = oldSyn.relationship
@@ -392,6 +395,10 @@ def migrateSynonyms() {
             } else {
                 println "======NOT MIGRATING THIS SYNONYM ====== " + oldSyn
                 notMigrating.add(oldSyn.id);
+            }
+            if(count200 == 200) {
+                utilsService.cleanUpGorm(true);
+                count200 = 0;
             }
         }
         offset = offset + limit; 
@@ -919,4 +926,4 @@ def addDetailsFromGNI() {
     }
 }
 
-addDetailsFromGNI()
+//addDetailsFromGNI()
