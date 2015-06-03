@@ -858,3 +858,56 @@ def addSynonymsFromCOL() {
 }
 
 addSynonymsFromCOL()
+
+def addDetailsFromGNI() {
+    int limit = 71800, offset = 0;
+    int counter = 0;
+
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def synMerList;
+        SynonymsMerged.withNewTransaction {
+            def c = SynonymsMerged.createCriteria()
+            //taxDefList = TaxonomyDefinition.get(4135L);
+            synMerList = c.list (max: limit , offset:offset) {
+                and {
+                    gt('id', 280621)
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            }
+        }
+        int count200 = 0;
+        Date startDate = new Date();
+        for(synMer in synMerList) {
+            count200 ++;
+            println "###############################################################################################"
+            println "#"
+            println "=====WORKING ON THIS SYN MER============== " + synMer + " =========COUNTER ====== " + counter;
+            counter++;
+            SynonymsMerged.withNewTransaction { 
+                NamesParser namesParser = new NamesParser();
+                def parsedNames = namesParser.parse([synMer.name]);
+                if(parsedNames[0]?.canonicalForm) {
+                    syn.normalizedForm = parsedNames[0].normalizedForm;
+                    syn.italicisedForm = parsedNames[0].italicisedForm;
+                    syn.binomialForm = parsedNames[0].binomialForm;
+                    if(!synMer.save()) {
+                        synMer.errors.each { println it }
+                    }
+                }
+            }
+            if(count200 == 200){
+                println "==== total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
+                utilsService.cleanUpGorm(true);
+                startDate = new Date();
+                count200 = 0;
+            }
+        }
+        offset = offset + limit; 
+        utilsService.cleanUpGorm(true);
+        if(!taxDefList) break;  
+    }
+}
+
+addDetailsFromGNI()
