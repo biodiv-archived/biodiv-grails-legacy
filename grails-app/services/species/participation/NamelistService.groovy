@@ -148,21 +148,21 @@ class NamelistService {
         String verbatim = '';
         int origRank = XMLConverter.getTaxonRank(colResult.rank?.text()?.toLowerCase()); 
         if(origRank <= TaxonomyRank.SPECIES.ordinal()) {
-            verbatim = r?.name?.text() + " " +r?.author?.text().capitalize();
+            verbatim = colResult?.name?.text() + " " +colResult?.author?.text().capitalize();
         } else {
-            String genus = r?.genus?.text() + ' ';
-            String species = r?.species?.text() + ' '; 
+            String genus = colResult?.genus?.text() + ' ';
+            String species = colResult?.species?.text() + ' '; 
             String infraSpeciesMarker = '';
-            if(r?.infraspecies_marker) {
-                infraSpeciesMarker = r?.infraspecies_marker.text() + ' ';
+            if(colResult?.infraspecies_marker) {
+                infraSpeciesMarker = colResult?.infraspecies_marker.text() + ' ';
             }
             String infraSpecies = '';
-            if(r?.infraspecies) {
-                infraSpecies = r?.infraspecies.text() + ' ';
+            if(colResult?.infraspecies) {
+                infraSpecies = colResult?.infraspecies.text() + ' ';
             }
             String authorYear = '';
-            if(r?.author) {
-                authorYear = r?.author.text().capitalize();
+            if(colResult?.author) {
+                authorYear = colResult?.author.text().capitalize();
             }
             verbatim = genus + species + infraSpeciesMarker + infraSpecies + authorYear;
         }
