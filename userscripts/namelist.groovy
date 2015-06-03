@@ -224,6 +224,14 @@ def createTestEntry(){
 //createTestEntry();
 
 boolean migrateThisSynonym(syn) {
+    if(syn.taxonConcept.position == NamesMetadata.NamePosition.WORKING) {
+        println "ACCEPTED NAME IN WORKING LIST" 
+        syn.dropReason = "ACCEPTED NAME IN WORKING LIST" 
+        if(!syn.save()){
+            println "FAILED TO SAVE SYNONYM " + syn
+        }
+        return false;
+    }
     NamesParser namesParser = new NamesParser();
     def parsedNames = namesParser.parse([syn.name]);
     if (!syn.canonicalForm){
@@ -290,7 +298,7 @@ boolean migrateThisSynonym(syn) {
                 //NORMALISED MULTI MATCH - SO DROP
                 println "NORMALISED MULTI MATCH - SO DROP"
                 syn.dropReason = "NORMALISED MULTI MATCH - SO DROP"
-                if(!syn.save(flush:true)){
+                if(!syn.save()){
                     println "FAILED TO SAVE SYNONYM " + syn
                 }
                 return false;
@@ -362,14 +370,14 @@ def migrateSynonyms() {
                             synMer.addToContributors(it);
                         }         
                         //save new syn merged
-                        if(!synMer.save(flush:true)) {
+                        if(!synMer.save()) {
                             synMer.errors.each { println it }
                         }
                         println "========SYN MERGED ======= " + synMer
                     }
-                }
-                if(!flag) {
-                    SynonymsMerged.withNewTransaction {
+
+                    if(!flag) {
+                        //SynonymsMerged.withNewTransaction {
                         //TODO: check whether its old accepted name is still accepted or changed to synonym
                         if(oldSyn.taxonConcept.status == NamesMetadata.NameStatus.ACCEPTED) {
                             oldSyn.taxonConcept.addSynonym(synMer);
@@ -378,6 +386,7 @@ def migrateSynonyms() {
                             def acc = accRes[0];
                             acc.addSynonym(synMer);
                         }
+                        //}
                     }
                 }
             } else {
