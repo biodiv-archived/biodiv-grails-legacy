@@ -857,10 +857,10 @@ def addSynonymsFromCOL() {
     } 
 }
 
-addSynonymsFromCOL()
+//addSynonymsFromCOL()
 
 def addDetailsFromGNI() {
-    int limit = 71800, offset = 0;
+    int limit = 71800, offset = 71799;
     int counter = 0;
 
     while(true){
@@ -871,7 +871,7 @@ def addDetailsFromGNI() {
             //taxDefList = TaxonomyDefinition.get(4135L);
             synMerList = c.list (max: limit , offset:offset) {
                 and {
-                    gt('id', 280621)
+                    gt('id', 280621L)
                 }
                 order('rank','asc')
                 order('id','asc')                    
@@ -889,9 +889,9 @@ def addDetailsFromGNI() {
                 NamesParser namesParser = new NamesParser();
                 def parsedNames = namesParser.parse([synMer.name]);
                 if(parsedNames[0]?.canonicalForm) {
-                    syn.normalizedForm = parsedNames[0].normalizedForm;
-                    syn.italicisedForm = parsedNames[0].italicisedForm;
-                    syn.binomialForm = parsedNames[0].binomialForm;
+                    synMer.normalizedForm = parsedNames[0].normalizedForm;
+                    synMer.italicisedForm = parsedNames[0].italicisedForm;
+                    synMer.binomialForm = parsedNames[0].binomialForm;
                     if(!synMer.save()) {
                         synMer.errors.each { println it }
                     }
@@ -906,7 +906,7 @@ def addDetailsFromGNI() {
         }
         offset = offset + limit; 
         utilsService.cleanUpGorm(true);
-        if(!taxDefList) break;  
+        if(!synMerList) break;  
     }
 }
 
