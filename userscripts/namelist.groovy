@@ -780,14 +780,14 @@ def addSynToAccName(sciName, synDetails) {
     synMer.matchDatabaseName = "COL"
     synMer.rank = synDetails.parsedRank;
     synMer.addToContributors(contributor);
-if(!synMer.save(flush:true)) {
-                            synMer.errors.each { println it }
-                        }    
-sciName.addSynonym(synMer);
+    if(!synMer.save()) {
+        synMer.errors.each { println it }
+    }    
+    sciName.addSynonym(synMer);
 }
 
 def addSynonymsFromCOL() {
-    int limit = 71800, offset = 0;
+    int limit = 71800, offset = 5594;
     int counter = 0;
     List curatingThese = [];
     File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
@@ -797,8 +797,8 @@ def addSynonymsFromCOL() {
         def taxDefList;
         TaxonomyDefinition.withNewTransaction {
             def c = TaxonomyDefinition.createCriteria()
-            taxDefList = TaxonomyDefinition.get(4135L);
-            /*taxDefList = c.list (max: limit , offset:offset) {
+            //taxDefList = TaxonomyDefinition.get(4135L);
+            taxDefList = c.list (max: limit , offset:offset) {
                 and {
                     gt('rank', 8)
                     eq('status', NamesMetadata.NameStatus.ACCEPTED)
@@ -807,9 +807,13 @@ def addSynonymsFromCOL() {
                 }
                 order('rank','asc')
                 order('id','asc')                    
-            }*/
+            }
         }
+        int count5 = 0;
+        int synCount = 0;
+        Date startDate = new Date();
         for(taxDef in taxDefList) {
+            count5 ++;
             println "###############################################################################################"
             println "#"
             println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
@@ -818,9 +822,10 @@ def addSynonymsFromCOL() {
             List colData = nSer.processColData(new File(domainSourceDir, taxDef.id.toString()+'.xml'));
             def acceptedMatch = null;
             if(colData && colData.size() > 0 ) {
-                colData.each { colMatch ->
+                for(colMatch in colData) {
                     if(colMatch.externalId == colID){
-                        acceptedMatch = colMatch    
+                        acceptedMatch = colMatch
+                        break
                     }
                 }
             } else {
@@ -829,6 +834,7 @@ def addSynonymsFromCOL() {
             TaxonomyDefinition.withNewTransaction {
                 if(acceptedMatch){
                     println "=======ACCEPTED MATCH FROM COL ======= " + acceptedMatch
+                    synCount += acceptedMatch.synList.size();
                     acceptedMatch.synList.each { synDetails ->
                         println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
                         addSynToAccName(taxDef, synDetails)    
@@ -837,10 +843,16 @@ def addSynonymsFromCOL() {
                     println "=========NO ACCEPTED MATCH======== "
                 }
             }
+            if(count5 == 4){
+                utilsService.cleanUpGorm(true);
+                println "=========SYN COUNT PER 5 ACCEPTED NAME ========= " + synCount + "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
+                startDate = new Date();
+                synCount = 0;
+                count5 = 0;
+            }
         }
-
         offset = offset + limit; 
-        utilsService.cleanUpGorm(true); 
+        utilsService.cleanUpGorm(true);
         if(!taxDefList) break;  
     } 
 }

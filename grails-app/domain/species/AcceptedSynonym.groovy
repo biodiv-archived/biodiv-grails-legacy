@@ -16,7 +16,7 @@ class AcceptedSynonym {
         def ent1 = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
         if(ent1) return;
         def ent = new AcceptedSynonym(accepted: accepted, synonym: synonym)
-        if(!ent.save(flush:true)) {
+        if(!ent.save()) {
             ent.errors.allErrors.each { log.error it }
         }
     }
