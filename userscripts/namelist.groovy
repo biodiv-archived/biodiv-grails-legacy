@@ -40,7 +40,8 @@ def migrateFromDir(domainSourceDir) {
 }
 
 def curateName(taxonId, domainSourceDir) {
-    List colData = nSer.processColData(new File(domainSourceDir, taxonId+'.xml'));
+    def taxCan = TaxonomyDefinition.get(taxonId.toLong()).canonicalForm.replaceAll(' ', '_')
+    List colData = nSer.processColData(new File(domainSourceDir, taxCan+'.xml'));
     if(colData) {
         ScientificName sciName = TaxonomyDefinition.get(taxonId);
         nSer.curateName(sciName, colData);
@@ -668,9 +669,9 @@ def incompleteHierarchy() {
             }
             if(incomplete) {
                 def spId = td.findSpeciesId();
-                def sp = Species.read(spId.toLong());
                 StringBuilder sb = new StringBuilder();
-                if(spId) {
+                 if(spId) {
+                    def sp = Species.read(spId.toLong());
                     sb.append(sp.id + "|");
                     sb.append(sp.title + "|");
                     sb.append(sp.percentOfInfo + "|");
@@ -848,10 +849,11 @@ def curateWithManualIDs() {
             def s = Species.get(fields[0].toLong())
             def td = s.taxonConcept;
             def colID = fields[-1];
-		println "=====LOOKING FOR THIS COL ID ======= " + colID
+		    println "=====LOOKING FOR THIS COL ID ======= " + colID
             def taxonId = td.id.toString();
+            def taxCan = td.canonicalForm.replaceAll(' ', '_');
             File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
-            List colData = nSer.processColData(new File(domainSourceDir, taxonId+'.xml'));
+            List colData = nSer.processColData(new File(domainSourceDir, taxCan+'.xml'));
             def colDataSize = colData.size();
             def acceptedMatch = null;
             colData.each { colMatch ->
@@ -987,7 +989,7 @@ def addSynonymsFromCOL() {
             println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
             def colID = taxDef.matchId
             counter++;
-            List colData = nSer.processColData(new File(domainSourceDir, taxDef.id.toString()+'.xml'));
+            List colData = nSer.processColData(new File(domainSourceDir, taxDef.canonicalForm.replaceAll(' ', '_')+'.xml'));
             def acceptedMatch = null;
             if(colData && colData.size() > 0 ) {
                 for(colMatch in colData) {

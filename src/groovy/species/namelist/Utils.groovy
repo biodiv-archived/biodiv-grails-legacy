@@ -96,7 +96,7 @@ class Utils {
     }
 
 	private static void writeStat(sourceDir, reportFile, taxon, Class c){
-		File f = new File(sourceDir, "" + taxon.id + ".xml" )
+		File f = new File(sourceDir, "" + taxon.canonicalForm.replaceAll(' ', '_') + ".xml" )
 		if(!f.exists()){
 			println "========== File not available for taxon " + taxon.id + "   name " + taxon.canonicalForm
 			return
@@ -266,7 +266,7 @@ class Utils {
 	private static saveFile(File sourceDir, taxon, List errors){
 		def name = taxon.canonicalForm
         def id = taxon.id
-        File f11 = new File(sourceDir, "" + id + ".xml")
+        File f11 = new File(sourceDir, "" + name.replaceAll(' ', '_') + ".xml")
         if(f11.exists()){
             println ">>>>> FILE ALREADY EXISTS ======== " + f11
             return
@@ -288,7 +288,7 @@ class Utils {
                     //println "Content-Type: ${resp.headers.'Content-Type'}"
                     def xmlText =  reader.text
                     try{
-                        File f = new File(sourceDir, "" + id + ".xml")
+                        File f = new File(sourceDir, "" + name.replaceAll(' ', '_') + ".xml")
                         if(f.exists()){
                             f.delete()
                             f.createNewFile()
