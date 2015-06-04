@@ -100,7 +100,7 @@ def messageSource;
 			and{
 				// taking undeleted observation
 				eq('isDeleted', false)
-				eq('isShowable', true)
+				//eq('isShowable', true)
 				eq('isChecklist', false)
 
 				//filter by author
@@ -564,7 +564,7 @@ def messageSource;
 			count = Observation.createCriteria().count {
 				and {
 					eq("isDeleted", false)
-					eq("isShowable", true)
+					//eq("isShowable", true)
 					eq("isChecklist", false)
 				}
 			}

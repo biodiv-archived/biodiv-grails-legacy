@@ -165,8 +165,7 @@ class XMLConverter extends SourceConverter {
                             return;
                         }
                     }
-
-                    List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
+					List<Resource> resources = createMedia(species, s.taxonConcept.canonicalForm);
                     log.debug "Resources ${resources}"
                     resources.each { 
                         it.saveResourceContext(s)
@@ -680,16 +679,14 @@ class XMLConverter extends SourceConverter {
      */
     List<Resource> createMedia(resourcesXML, String relResFolder) {
         List<Resource> resources = [];
-
-        if(resourcesXML) {
+		if(resourcesXML) {
             //saving media
             def imagesNode = resourcesXML.images;
             def iconsNode = resourcesXML.icons;
             def audiosNode = resourcesXML.audios;
             def videosNode = resourcesXML.videos;
 
-
-            resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
+			resources.addAll(createResourceByType(imagesNode[0], ResourceType.IMAGE, relResFolder));
             resources.addAll(createResourceByType(iconsNode[0], ResourceType.ICON, "icons"));
             resources.addAll(createResourceByType(audiosNode[0], ResourceType.AUDIO, relResFolder));
             resources.addAll(createResourceByType(videosNode[0], ResourceType.VIDEO, relResFolder));
@@ -709,14 +706,15 @@ class XMLConverter extends SourceConverter {
         if(resourceNode) {
             switch(resourceType) {
                 case ResourceType.IMAGE:
-                resourceNode?.image.each {
+				resourceNode?.image.each {
                     if(!it?.id) {
                         //TODO done because each image in bulk upload goes to separate folder.
                         if(resourcesRootDir == config.speciesPortal.usersResource.rootDir){
                             def relFolder = it.fileName?.getAt(0)?.text()?.replace(resourcesRootDir.toString(), "")?:""
                             relResFolder = new File(relFolder).getParent();
                         }
-                        def resource = createImage(it, relResFolder, ResourceType.IMAGE);
+						
+						def resource = createImage(it, relResFolder, ResourceType.IMAGE);
                         if(resource) {
                             resources.add(resource);
                         }
@@ -764,7 +762,8 @@ class XMLConverter extends SourceConverter {
         
         log.debug "Creating image resource : "+tempFile;
         if(tempFile && tempFile.exists()) {
-            //copying file
+			
+			//copying file
             relImagesFolder = relImagesFolder.trim();
             File root = new File(resourcesRootDir , relImagesFolder);
             if(!root.exists() && !root.mkdirs()) {

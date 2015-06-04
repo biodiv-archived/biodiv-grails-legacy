@@ -410,7 +410,7 @@ def migrateSynonyms() {
     println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
-migrateSynonyms();
+//migrateSynonyms();
 
 def createTaxons() {
     taxSer = ctx.getBean("taxonService");
@@ -558,6 +558,154 @@ def curateRecoName() {
     }
 }
 //curateRecoName()
+
+def incompleteHierarchy() {
+    int limit = 50, offset = 0;
+    int counter = 0;
+
+    File reportFile = new File("/home/rahulk/incomplete_hierarchy.csv")
+    if(reportFile.exists()){
+        reportFile.delete()
+        reportFile.createNewFile()
+    }
+    String str = "Species Id|Species Title|Species Percent Info|Taxon Id|Hierarchy Id|Hierarchy";
+    str = str + "\n";
+    reportFile << str;
+    def namesNoHie = [];
+    def classifications = Classification.list();
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def tdList;
+        TaxonomyDefinition.withNewTransaction {
+            def c = TaxonomyDefinition.createCriteria()
+            tdList = c.list (max: limit , offset:offset) {
+                and {
+                    lt('id', 275703L)
+                    eq('position', NamesMetadata.NamePosition.DIRTY)
+                    //isNull('position')
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            }
+        }
+        for (td in tdList) {
+            println "=====WORKING ON THIS TAX DEF============== " + td + " =========COUNTER ====== " + counter;
+            counter++;
+            boolean incomplete = true;
+            def longestReg = null;
+            def cl = null;
+            int max = 0;
+            classifications.each { 
+                def reg = td.longestParentTaxonRegistry(it);
+                def taxonList = reg.get(it);
+                if(taxonList.size() > max) {
+                    longestReg = reg;
+                    cl = it;
+                    max = taxonList.size();
+                } 
+            }
+            if(!longestReg){
+                namesNoHie.add(td.id);
+                continue;
+            }
+            def finalTaxonList = longestReg.get(cl);
+            switch(td.rank) {
+                case 0 :
+                if(finalTaxonList.size() >= 1){
+                    incomplete = false;
+                }
+                break
+                case 1 :
+                if(finalTaxonList.size() >= 2){
+                    incomplete = false;
+                }
+                break
+                case 2 :
+                if(finalTaxonList.size() >= 3){
+                    incomplete = false;
+                }
+                break
+                case 3 :
+                if(finalTaxonList.size() >= 4){
+                    incomplete = false;
+                }
+                break
+                case 4 :
+                if(finalTaxonList.size() >= 5){
+                    incomplete = false;
+                }
+                break
+                case 5 :
+                if(finalTaxonList.size() >= 5){
+                    incomplete = false;
+                }
+                break
+                case 6 :
+                if(finalTaxonList.size() >= 6){
+                    incomplete = false;
+                }
+                break
+                case 7 :
+                if(finalTaxonList.size() >= 6){
+                    incomplete = false;
+                }
+                break
+                case 8 :
+                if(finalTaxonList.size() >= 7){
+                    incomplete = false;
+                }
+                break
+                case 9 :
+                if(finalTaxonList.size() >= 7){
+                    incomplete = false;
+                }
+                break
+                case 10 :
+                if(finalTaxonList.size() >= 8){
+                    incomplete = false;
+                }
+                break
+            }
+            if(incomplete) {
+                def spId = td.findSpeciesId();
+                def sp = Species.read(spId.toLong());
+                StringBuilder sb = new StringBuilder();
+                if(spId) {
+                    sb.append(sp.id + "|");
+                    sb.append(sp.title + "|");
+                    sb.append(sp.percentOfInfo + "|");
+                } else {
+                    sb.append("null" + "|");
+                    sb.append("null" + "|");
+                    sb.append("null" + "|");
+                }
+                sb.append(td.id + "|")
+                def regId = longestReg.regId;
+                sb.append(regId + "|");
+                def m = [:];
+                finalTaxonList.each {
+                    m[it.rank] = it.name;
+                }
+                String hie = "";
+                for ( i in 0..10 ) {
+                    if(m[i]){
+                        hie += m[i] + "->"
+                    } else {
+                        hie += "null" + "->"
+                    }
+                }
+                sb.append(hie);
+                reportFile << sb.toString() + "\n";
+            }
+        }
+        offset = offset + limit; 
+        if(!tdList) break; 
+    }
+    println "======NO HIE = == " + namesNoHie;
+}
+
+incompleteHierarchy()
+
 
 def speciesDetails() {
     int limit = 50, offset = 0;

@@ -187,6 +187,9 @@ if(r) {
                     <obv:showStory
                         model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
+                    
+                    <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+                     
                         
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
                         <div>
@@ -266,6 +269,9 @@ if(r) {
                                         </div>
                                     </div>  
                                     </g:if>
+                                    
+ 				
+                                    
                                     <%--                    <div class="sidebar_section">--%>
                                         <%--                        <h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
                                         <%--                        <chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
@@ -435,6 +441,7 @@ $(document).ready(function(){
             $('.iAgree button').removeClass("disabled");
         } 
         initializeLanguage(); 
+         $(".CustomField_multiselectcombo").multiselect();
     });
     function deleteObservation(){
         var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";

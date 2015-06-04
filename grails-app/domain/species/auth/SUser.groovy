@@ -20,7 +20,7 @@ import content.eml.Document
 import species.utils.ImageUtils;
 import species.SpeciesPermission;
 import species.Language;
-
+import species.auth.OAuthID;
 class SUser {
 
 	transient springSecurityService
@@ -54,7 +54,7 @@ class SUser {
 	// Language
     Language language;
 
-	static hasMany = [openIds: OpenID, flags:Flag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document ]
+	static hasMany = [openIds: OpenID, flags:Flag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document,oAuthIDs: OAuthID ]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 

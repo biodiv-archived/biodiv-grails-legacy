@@ -82,6 +82,7 @@ class ActivityFeedService {
 	static final String SPECIES_HIERARCHY_CREATED = "Added hierarchy"
 	static final String SPECIES_HIERARCHY_UPDATED = "Updated hierarchy"
 	static final String SPECIES_HIERARCHY_DELETED = "Deleted hierarchy"
+	static final String CUSTOM_FIELD_EDITED = "Custom field edited"
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"
@@ -354,7 +355,10 @@ class ActivityFeedService {
             case SPECIES_UPDATED:
                 activityTitle = getLocalizedMessage(SPECIES_UPDATED)
                 break
-
+			case CUSTOM_FIELD_EDITED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
 			default:
 				activityTitle = getLocalizedMessage(activityType)
 				break

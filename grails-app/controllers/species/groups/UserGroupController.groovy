@@ -40,7 +40,8 @@ class UserGroupController {
 	def namesIndexerService;
 	def activityFeedService;
     def digestService;
-
+	def customFieldService;
+	
     def messageSource;
 	
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
@@ -173,6 +174,7 @@ class UserGroupController {
 		else {
 			log.debug "Successfully created usergroup : "+userGroupInstance
 			activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_CREATED);
+			customFieldService.addToGroup(params.customFieldMapList, userGroupInstance)
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'userGroup.label'), userGroupInstance.webaddress])}"
 			redirect  url: uGroup.createLink(mapping: 'userGroup', action: "show", params:['webaddress': userGroupInstance.webaddress])
 		}
@@ -296,6 +298,7 @@ class UserGroupController {
 			else {
 				log.debug "Successfully updated usergroup : "+userGroupInstance
 				activityFeedService.addActivityFeed(userGroupInstance, null, springSecurityService.currentUser, activityFeedService.USERGROUP_UPDATED);
+				customFieldService.addToGroup(params.customFieldMapList, userGroupInstance)
 				flash.message = "${message(code: 'default.updated.message', args: [message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
 				if(params.founders) {
 					def messagesourcearg = new Object[1];
@@ -497,16 +500,8 @@ println "2222222222222222222"
 		params.offset = params.offset ? params.int('offset') : 0
 		
 		def model = observationService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
+		
         def observationInstanceList = model.observationInstanceList
-        if(params.filterProperty == 'speciesName') {
-            def results = []
-            observationInstanceList.each {
-                def obv = Observation.read(it);
-                results.add(obv)
-            }
-            model.observationInstanceList = results;
-            observationInstanceList = results;
-        }
         def checklistCount =  model.checklistCount
 		def allObservationCount =  model.allObservationCount
 		model['checklistCount'] = checklistCount

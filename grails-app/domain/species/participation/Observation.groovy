@@ -310,7 +310,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 	
 	def beforeInsert(){
-        updateIsShowable()
+		updateLocationScale()
+		updateIsShowable()
 		updateLatLong()
 	}
 	
@@ -327,7 +328,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	def getPageVisitCount(){
 		return visitCount;
 	}
-
+	
 	public static int getCountForGroup(groupId){
 		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
 	}
@@ -362,6 +363,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 		}
 		
 		checklistAnnotations = m as JSON
+	}
+	
+	private updateLocationScale(){
+		locationScale = locationScale?:Metadata.LocationScale.APPROXIMATE
 	}
 	
 	String fetchFormattedSpeciesCall() {
@@ -440,6 +445,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 		
 				
 		res[ObvUtilService.LOCATION] = placeName
+		res[ObvUtilService.LOCATION_SCALE] = locationScale?.value()
+		
 		def geoPrivacyAdjust = fetchGeoPrivacyAdjustment(reqUser)
 		res[ObvUtilService.LONGITUDE] = "" + (this.longitude + geoPrivacyAdjust)
 		res[ObvUtilService.LATITUDE] = "" + (this.latitude + geoPrivacyAdjust)
@@ -575,7 +582,7 @@ class Observation extends Metadata implements Taggable, Rateable {
         def c = Observation.createCriteria();
         def observationCount = c.count {
             eq ('isDeleted', false);
-            eq ('isShowable', true);
+            //eq ('isShowable', true);
             eq ('isChecklist', false);
         }
         return observationCount;

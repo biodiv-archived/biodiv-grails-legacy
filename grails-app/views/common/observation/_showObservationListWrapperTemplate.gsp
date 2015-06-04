@@ -6,6 +6,10 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 
 <div class="">
+
+
+ 	<g:render template="/observation/browseObservationMenu" model="[]"/>
+
 	<!-- main_content -->
 	<div class="list" style="margin-left:0px;clear:both">
 		<div class="filters" style="position: relative;">

@@ -53,6 +53,7 @@ import speciespage.ObvUtilService;
 import java.net.URL;
 import java.lang.Boolean;
 import species.NamesParser;
+import species.Metadata
 
 
 class DocumentService extends AbstractObjectService {
@@ -76,9 +77,10 @@ class DocumentService extends AbstractObjectService {
 	}
 
 
-	def updateDocument(document, params) {
+	def updateDocument(Document document, params) {
 		params.remove('latitude')
 		params.remove('longitude')
+		def locationScale = params.remove('locationScale')
 		document.properties = params
 		document.group = null
 		document.habitat = null
@@ -87,6 +89,7 @@ class DocumentService extends AbstractObjectService {
 		document.placeName = params.placeName
 		document.reverseGeocodedName = params.reverse_geocoded_name
 		document.locationAccuracy = params.location_accuracy
+		document.locationScale = Metadata.LocationScale.getEnum(locationScale)
 		document.language = params.locale_language 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 		if(params.areas) {

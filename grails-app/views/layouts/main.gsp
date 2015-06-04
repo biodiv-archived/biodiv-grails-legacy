@@ -20,8 +20,8 @@
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>
 <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
-
-
+<script src="http://apis.google.com/js/auth.js" type="text/javascript">
+</script>
 <g:set var="userGroupInstance" value="${userGroupInstance}"/>
 <g:if test="${userGroupInstance && userGroupInstance.theme}">
 	<link rel="stylesheet" type="text/css"

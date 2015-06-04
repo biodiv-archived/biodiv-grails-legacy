@@ -167,10 +167,10 @@ class CommentService {
 		params.offset = params.offset ? params.offset.toLong() : 0
 	}
 
-    def addRecoComment(commentHolder, rootHolder, recoComment){
+    def addRecoComment(commentHolder, rootHolder, recoComment, author=springSecurityService.currentUser){
         recoComment = (recoComment?.trim()?.length() > 0)? recoComment.trim():null;
         if(recoComment){
-            def m = [author:springSecurityService.currentUser, commentBody:recoComment, commentHolderId:commentHolder.id, \
+            def m = [author:author, commentBody:recoComment, commentHolderId:commentHolder.id, \
                 commentHolderType:commentHolder.class.getCanonicalName(), rootHolderId:rootHolder.id, rootHolderType:rootHolder.class.getCanonicalName(),locale_language:utilsService.getCurrentLanguage()]
                 addComment(m);
         }

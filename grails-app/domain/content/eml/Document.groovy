@@ -121,6 +121,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		license nullable:false
     	featureCount nullable:false
 		agreeTerms nullable:true
+		locationScale(nullable: true)
 		
 		//coverage related extended from metadata
 		placeName(nullable:true)

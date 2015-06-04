@@ -425,4 +425,19 @@ update observation set is_deleted = true where source_id in (select id from obse
 //2nd feb 2015
 alter table featured add column expire_time timestamp without time zone ;
 
+#added by sathish for add references
+update species_field SET description = 'dummy' where field_id = 81 and description = '';
+
+
+
+# 2nd march 2015
+# Observation enhancement
+ALTER TABLE observation ADD COLUMN location_scale character varying(255);
+ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
+
+
+# 6th may 2015
+# Observation enhancement
+update observation set location_scale = 'APPROXIMATE' where  location_scale is null;
+alter table observation  alter column location_scale set not null;
 

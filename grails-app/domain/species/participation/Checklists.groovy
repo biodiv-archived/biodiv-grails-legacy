@@ -11,11 +11,11 @@ import org.hibernate.criterion.DetachedCriteria
 import species.License;
 import species.Reference;
 import species.Contributor;
-
 import species.auth.SUser
 import species.groups.SpeciesGroup
 import species.groups.UserGroup;
 import species.participation.ActivityFeedService
+
 import org.grails.rateable.*
 
 
@@ -56,7 +56,8 @@ class Checklists extends Observation {
 	String columns;
 	
 	//backword reference to drupal checklist for all old checlist 
-	long drupalId = -1; 
+	long drupalId = -1;
+	
 	
 	static hasMany = [observations:Observation, contributors:SUser, attributions:Contributor, states : String, districts:String, talukas: String]
 	
@@ -99,6 +100,8 @@ class Checklists extends Observation {
 		sourceText type:'text';
 		columns type:'text';
 	}
+	
+	
 
 	def fetchColumnNames(){
 		def itr =  JSON.parse(columns).iterator()
@@ -149,6 +152,7 @@ class Checklists extends Observation {
 		metaDataList.add([keyPrefix + "state" + SEPARATOR,  cl.states.join(", ")])
 		metaDataList.add([keyPrefix + "district" + SEPARATOR,  cl.districts.join(", ")])
 		metaDataList.add([keyPrefix + "taluka" + SEPARATOR,  cl.talukas.join(", ")])
+		metaDataList.add([keyPrefix + "locationScale" + SEPARATOR, ""  + cl.locationScale?.value()])
 		
 		
 		metaDataList.add([keyPrefix + "fromDate" + SEPARATOR,  "" + cl.fromDate])
@@ -203,7 +207,7 @@ class Checklists extends Observation {
 	* List of dirty fields that should update observation.
 	*/
    static List fetchDirtyFields(){
-	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationAccuracy", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
+	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationScale", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
    }
 
     private List fetchObservationsLatLongs() {
@@ -236,4 +240,11 @@ class Checklists extends Observation {
         } 
         return
     }
+	
+	//XXX super class observation has this method to nullify its effect overwriting here.
+	private updateLocationScale(){
+		
+	}
+	
+
 }

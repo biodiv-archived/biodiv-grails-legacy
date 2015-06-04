@@ -119,31 +119,33 @@ class TaxonomyDefinition extends ScientificName {
 	   return result;
    }
    
-    Map<Classification, List<TaxonomyDefinition>> longestParentTaxonRegistry(Classification classification) {
-	    Map<List<TaxonomyDefinition>> result = [:];
-        def res = TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, classification)
-	    def longest= null;
-        int max = 0;
-        res.each { TaxonomyRegistry reg ->
-		   //TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
-		    def tokens = reg.path.tokenize('_')
-            if(tokens.size()>max) {
-                longest = reg
-                max = tokens.size();
-            }
-        }
-        def l = []
-if(!longest) {
-	result.put(classification , l);
-        return result;
+   Map longestParentTaxonRegistry(Classification classification) {
+       def result = [:];
+       def res = TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, classification);
+        def longest= null;
+       int max = 0;
+       res.each { TaxonomyRegistry reg ->
+           //TODO : better way : http://stackoverflow.com/questions/673508/using-hibernate-criteria-is-there-a-way-to-escape-special-characters
+           def tokens = reg.path.tokenize('_')
+           if(tokens.size()>max) {
+               longest = reg
+               max = tokens.size();
+           }
+       }
+       def l = []
+       if(!longest) {
+           result.put(classification , l);
+           result.put('regId', null);
+           return result;
 
-}
-        longest.path.tokenize('_').each { taxonDefinitionId ->
-            l.add(TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId)));
-        }
-        result.put(classification , l);
-        return result;
-    }
+       }
+       longest.path.tokenize('_').each { taxonDefinitionId ->
+           l.add(TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId)));
+       }
+       result.put('regId', longest.id);
+       result.put(classification , l);
+       return result;
+   }
 
    Map fetchGeneralInfo(){
 	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]

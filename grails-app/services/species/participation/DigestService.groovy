@@ -28,7 +28,12 @@ class DigestService {
         def setTime = true
         digestList.each{ dig ->
             log.debug "Sending digest for ${dig}"
-            sendDigestWrapper(dig, setTime)
+			try{
+				sendDigestWrapper(dig, setTime)
+			}catch(Exception e){
+				log.error "Digets failed for ${dig}"
+				log.error e.printStackTrace()
+			}
         }
 
     }
@@ -54,18 +59,18 @@ class DigestService {
             List<SUser> usersEmailList = [];
             Digest.withTransaction { status ->
                 usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
-
-                if(usersEmailList.size() != 0){
-                    sendDigest(digest, usersEmailList, false, digestContent)
-                    offset = offset + max
-                }
-                else{
-                    emailFlag = false
-                }
             }
-            if(emailFlag) 
-                Thread.sleep(600000L);
+            if(usersEmailList.size() != 0){
+                sendDigest(digest, usersEmailList, false, digestContent)
+                offset = offset + max
+            }else{
+                emailFlag = false
+            }
+    	
+			if(emailFlag) 
+            	Thread.sleep(600000L);
         }
+		
         if(setTime) {
             digest.lastSent = lastSent;
             log.debug "Saving digest lastSent ${digest}"

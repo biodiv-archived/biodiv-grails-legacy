@@ -5,10 +5,14 @@ import species.groups.SpeciesGroup
 import species.Habitat
 
 import org.hibernatespatial.GeometryUserType
+
 import com.vividsolutions.jts.geom.Point;
+
 import species.participation.Observation
+
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry;
+
 import speciespage.ObservationService;
 import species.participation.Featured;
 import species.utils.Utils;
@@ -16,12 +20,57 @@ import species.Language;
 
 abstract class Metadata {
 	
+	public enum LocationScale {
+		APPROXIMATE ("Approximate"),
+		ACCURATE ("Accurate"),
+		LOCAL ("Local"),
+		REGION ("Region"),
+		COUNTRY ("Country")
+		
+		private String value;
+
+		LocationScale(String value) {
+			this.value = value;
+		}
+
+		String value() {
+			return this.value;
+		}
+		
+		static LocationScale getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof LocationScale)
+				return value
+			
+			value = value.toUpperCase().trim()
+			switch(value){
+				case 'APPROXIMATE':
+					return LocationScale.APPROXIMATE
+				case 'ACCURATE':
+					return LocationScale.ACCURATE
+				case 'LOCAL':
+					return LocationScale.LOCAL
+				case 'REGION':
+					return LocationScale.REGION
+				case 'COUNTRY':
+					return LocationScale.COUNTRY
+				default:
+					return null	
+			}
+		}
+	}
+
+	
+	
 	//Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
 	
 	boolean geoPrivacy = false;
+	//XXX to be removed after locationScale migration
 	String locationAccuracy;
+	LocationScale locationScale;
     Geometry topology;
      
 	float latitude;

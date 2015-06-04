@@ -285,7 +285,7 @@ class UtilsService {
 
             def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
             //println "testing obs====================="+userLanguage;
-            templateMap["currentUser"] = springSecurityService.currentUser
+            templateMap["currentUser"] = feedInstance ? feedInstance.author : springSecurityService.currentUser
             templateMap["action"] = notificationType;
             templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
             def mailSubject = ""
@@ -500,13 +500,7 @@ class UtilsService {
 
 			
                 case [ActivityFeedService.FEATURED, ActivityFeedService.UNFEATURED]:
-                boolean a
-                if(notificationType == ActivityFeedService.FEATURED) {
-                    a = true
-                }
-                else { 
-                    a = false
-                }               
+                boolean a = (notificationType == ActivityFeedService.FEATURED)               
                 mailSubject = getDescriptionForFeature(obv, null , a)
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -614,6 +608,14 @@ class UtilsService {
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
                 break
+				
+				case ActivityFeedService.CUSTOM_FIELD_EDITED :
+				mailSubject = messageSource.getMessage("custom.field.edited", null, LCH.getLocale())
+				bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				templateMap["message"] = messageSource.getMessage("mail.customfieldedit.message", null, LCH.getLocale())
+				toUsers.add(getOwner(obv))
+				break
                 
                 default:
                 log.debug "invalid notification type"
@@ -995,7 +997,7 @@ class UtilsService {
 //        } 
     }
 	
-	Date parseDate(date, sendNew = true){
+	static Date parseDate(date, sendNew = true){
 		try {
             if(!sendNew) {
                 Date d;
@@ -1015,6 +1017,8 @@ class UtilsService {
 		return null;
 	}
 
-
+	public String getTableNameForGroup(UserGroup ug){
+		return "custom_fields_group_" + ug.id
+	}
 }
 

@@ -92,7 +92,7 @@ class SpeciesUploadService {
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
-	static int BATCH_SIZE = 10;
+	static int BATCH_SIZE = 5;
 	//int noOfFields = Field.count();
     String contentRootDir = config.speciesPortal.content.rootDir
 
@@ -432,13 +432,13 @@ class SpeciesUploadService {
 
 		for(Species s in batch) {
 			try {
-                //def taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
-                if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
-                    s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
-//                    if(!s.taxonConcept.isAttached())
-//                        s.taxonConcept.attach();
-                }
-
+//                //def taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
+//                if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
+//                    s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
+////                    if(!s.taxonConcept.isAttached())
+////                        s.taxonConcept.attach();
+//                }
+//
 				//externalLinksService.updateExternalLinks(taxonConcept);
 				
 				s.percentOfInfo = calculatePercentOfInfo(s);
@@ -487,27 +487,30 @@ class SpeciesUploadService {
 	 */
 	def postProcessSpecies(List<Species> species) {
 		//TODO: got to move this to the end of taxon creation
-		try{
-			//TaxonomyDefinition.withNewSession{
-				for(Species s : species) {
-                    s.afterInsert();
-					def taxonConcept = s.taxonConcept;
-					if(!taxonConcept.isAttached()) {
-						taxonConcept.attach();
-					}
-					groupHandlerService.updateGroup(taxonConcept);
-                    def rCount = s.fetchResourceCount();
-                    def rsfCount = s.fetchSpeciesFieldResourceCount();
-                    if(rCount.size() > 0 || rsfCount > 0) {
-                        s.updateHasMediaValue(true);
-                    }
-					log.info "post processed spcecies ${s}"
+		for(Species s : species) {
+			try{
+				if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
+					s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
 				}
-			//}
-		} catch(e) {
-			log.error "$e.message"
-			e.printStackTrace()
-		}
+				
+				s.afterInsert();
+				def taxonConcept = s.taxonConcept;
+				if(!taxonConcept.isAttached()) {
+					taxonConcept.attach();
+				}
+				groupHandlerService.updateGroup(taxonConcept);
+				def rCount = s.fetchResourceCount();
+	            def rsfCount = s.fetchSpeciesFieldResourceCount();
+	            if(rCount.size() > 0 || rsfCount > 0) {
+					s.updateHasMediaValue(true);
+	            }
+				log.info "post processed spcecies ${s}"
+			}
+			catch(e) {
+				log.error "$e.message"
+				e.printStackTrace()
+			}
+		} 
 
 		try{
 			//namesLoaderService.syncNamesAndRecos(false);
@@ -923,8 +926,7 @@ class SpeciesUploadService {
 	}
  
  	boolean unpostFromUserGroup(Species s, List sFields, SUser user, SpeciesBulkUpload sbu) throws Exception {
-        println "++++++++++++++++++++++"
- 		List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
+        List specificSFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
 		List sFieldToDelete = specificSFields.intersect(sFields)
 		
 		List taxonReg = TaxonomyRegistry.withCriteria(){
@@ -934,11 +936,7 @@ class SpeciesUploadService {
 				if(sbu) between("uploadTime", sbu.startDate, sbu.endDate)
 			}
 		}
-        println specificSFields
-        println sFieldToDelete
-        println taxonReg
-        println  TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept)
-		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
+        boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			try{
 				Featured.deleteFeatureOnObv(s, user)

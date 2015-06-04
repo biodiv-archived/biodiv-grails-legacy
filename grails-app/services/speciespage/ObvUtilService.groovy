@@ -40,9 +40,11 @@ class ObvUtilService {
 	static final String HABITAT = "habitat"
 	static final String OBSERVED_ON   = "observed on"
 	static final String CN    = "common name"
+	static final String LANGUAGE    = "language"
 	static final String SN    = "scientific name"
 	static final String GEO_PRIVACY   = "Geoprivacy enabled"
 	static final String LOCATION   = "location title"
+	static final String LOCATION_SCALE   = "location scale"
 	static final String LONGITUDE    = "longitude"
 	static final String LATITUDE   = "latitude"
 	static final String LICENSE   = "license"
@@ -435,12 +437,14 @@ class ObvUtilService {
 		obvParams['longitude'] = (m[LONGITUDE] ?:"76.658279")
 		obvParams['latitude'] = (m[LATITUDE] ?: "12.32112")
 		obvParams['location_accuracy'] = 'Approximate'
+		obvParams['locationScale'] = m[LOCATION_SCALE]
 		obvParams['placeName'] = m[LOCATION]
 		obvParams['reverse_geocoded_name'] = (m[LOCATION] ?: "National Highway 6, Maharashtra, India")
 		
 		//reco related
 		obvParams['recoName'] = m[SN]
 		obvParams['commonName'] = m[CN] 
+		obvParams['languageName'] = m[LANGUAGE]
 		obvParams['recoComment'] = m[COMMENT]
 		
 		//tags, grouplist, notes
@@ -541,7 +545,7 @@ class ObvUtilService {
 		
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
-			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, params.author);
 			observationInstance.lastRevised = new Date();
 			//saving max voted species name for observation instance
 			observationInstance.calculateMaxVotedSpeciesName();

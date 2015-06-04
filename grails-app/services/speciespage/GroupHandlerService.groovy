@@ -190,7 +190,7 @@ class GroupHandlerService {
 
 			if(!group.equals(taxonConcept.group)) {
 				taxonConcept.group = group;
-				if(taxonConcept.save()) {
+				if(taxonConcept.save(flush:true)) {
 					log.info "Setting group '${group.name}' for taxonConcept '${taxonConcept.name}'"
 					noOfUpdations++;
 				} else {

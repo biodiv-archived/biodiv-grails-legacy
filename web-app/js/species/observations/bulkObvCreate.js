@@ -111,8 +111,8 @@ function submitForms(counter, size, allForms, showListPage){
             dataType : 'json', 
             type : 'POST',
             success : function(data, statusText, xhr, form) {
-                if(data.statusComplete) {
-                    miniObvCreateHtmlSuccess = data.miniObvCreateHtml;
+                if(data.model.statusComplete) {
+                    miniObvCreateHtmlSuccess = data.model.miniObvCreateHtml;
                     $(form).find('input').attr('disabled', 'disabled');
                     $(form).find('button').attr('disabled', 'disabled');
                     $(form).find('.error-message').hide();
@@ -123,7 +123,7 @@ function submitForms(counter, size, allForms, showListPage){
                 } else {
                     gotError = true;
                     errorCount = errorCount + 1;
-                    var miniObvCreateHtmlError = data.miniObvCreateHtml;
+                    var miniObvCreateHtmlError = data.model.miniObvCreateHtml;
                     var wrapper = $(form).parent();
                     $(form).replaceWith(miniObvCreateHtmlError);
                     $(wrapper).find(".imageHolder").append(imagesPulled);
@@ -253,7 +253,9 @@ $(".applyAll").click(function(){
             $(value).find("input[name='help_identify']").trigger("click");    
         }
         $(value).find(".imageHolder li span:contains('"+licenseVal+"')").first().trigger("click");
-        $(value).find('.fromDate').datepicker("setDate", dateVal);
+        if(dateVal != ""){
+            $(value).find('.fromDate').datepicker("setDate", dateVal);
+        }
         $.each(tagValues, function(index, tagVal){
             $(value).find(".obvCreateTags").tagit("createTag", tagVal);
         });
@@ -271,9 +273,42 @@ $(".applyAll").click(function(){
         $(value).find(".placeName").val(placeName);
         //$(value).find(".placeName").trigger("click");
     });
+    $(".togglePropagateDiv").trigger("click");
 });
 
 function initializers(){
+
+    $(".selected_group").unbind('click').click(function(){
+        $(this).closest(".groups_super_div").find(".group_options").toggle();
+        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
+    });
+
+    $(".group_option").unbind('click').click(function(){
+        $(this).closest(".groups_super_div").find(".group").val($(this).val());
+        $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
+        $(this).closest(".group_options").hide();
+        //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
+        if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
+            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
+        }
+    });
+   
+    $(".selected_habitat").unbind('click').click(function(){
+        $(this).closest(".habitat_super_div").find(".habitat_options").toggle();
+        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
+    });
+
+    $(".habitat_option").unbind('click').click(function(){
+        $(this).closest(".habitat_super_div").find(".habitat").val($(this).val());
+        $(this).closest(".habitat_super_div").find(".selected_habitat").html($(this).html());
+        $(this).closest(".habitat_options").hide();
+        //$(this).closest(".habitat_super_div").find(".selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
+        if($(this).closest(".habitat_super_div").find(".selected_habitat b").length == 0){
+            $('<b class="caret"></b>').insertAfter($(this).closest(".habitat_super_div").find(".selected_habitat .display_value"));
+        }
+
+    });
+
     $( ".date" ).datepicker({ 
         changeMonth: true,
         changeYear: true,

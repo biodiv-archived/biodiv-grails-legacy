@@ -81,6 +81,13 @@ function loadObjectInGroups() {
 }
 
 $(document).ready(function(){
+	$( ".date" ).datepicker({ 
+	        changeMonth: true,
+	        changeYear: true,
+	        dateFormat: 'dd/mm/yy',
+	         maxDate:0
+	});
+	
     $('#featureNotes').keydown(function(){
         if(this.value.length > 400){
         return false;

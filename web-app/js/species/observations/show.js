@@ -171,6 +171,53 @@ function preLoadRecos(max, offset, seeAllClicked) {
     });
 }
 
+function customFieldInlineEdit(comp, url, cfId, obvId){
+	var finalComp = $(comp).parent().prev().children(".cfInlineEdit");
+	var valComp = $(comp).parent().prev().children(".cfStaticVal");
+	if($(comp).text() == 'Edit'){
+		valComp.hide();
+		finalComp.show();
+		$(comp).text('Submit');
+	}else{
+		if(!cfValidation(finalComp)){
+			return false;
+		}
+		var inputComp = $(finalComp).find("input");
+		if(inputComp.attr("name") == undefined){
+			inputComp = $(finalComp).find("select");
+		}
+		if(inputComp.attr("name") == undefined){
+			inputComp = $(finalComp).find("textarea");
+		}
+		var value = inputComp.val();
+		var data = new Object();
+		data['fieldValue'] = value;
+		data['cfId'] = cfId;
+		data['obvId'] = obvId;
+		
+		$.ajax({
+			url: url,
+			data:data,
+			success: function(data){
+				console.log(data);
+				valComp.text(data.model.fieldName);
+				finalComp.hide();
+				valComp.show();
+				$(comp).text('Edit');
+				 updateFeeds();
+				return true;
+			},
+			error:function (xhr, ajaxOptions, thrownError){
+				//successHandler is used when ajax login succedes
+				var successHandler = this.success, errorHandler = undefined;
+				handleError(xhr, ajaxOptions, thrownError, successHandler, function(){
+				});
+			}
+		});
+	}	
+	return false;
+}
+
 function showObservationMapView(obvId, observedOn, mapLocationPicker) {
     var params = {filterProperty:'speciesName',limit:-1,id:obvId}
     //var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));

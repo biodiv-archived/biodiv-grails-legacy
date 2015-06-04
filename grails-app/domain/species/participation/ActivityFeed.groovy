@@ -500,8 +500,7 @@ class ActivityFeed {
 		return result
 	}
 	
-	public static dailyStats(UserGroup ug=null){
-		def startDate = new Date()
+	public static dailyStats(UserGroup ug=null, Date startDate = new Date() ){
 		DateGroovyMethods.clearTime(startDate)
 		startDate = new java.sql.Date(startDate.getTime())
 		
