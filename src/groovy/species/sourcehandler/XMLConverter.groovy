@@ -1646,6 +1646,7 @@ class XMLConverter extends SourceConverter {
                                 if(fromCOL) {
                                     println "=========COL SE REQUIRED==============="
                                     taxon.matchDatabaseName = "COL";
+                                    taxon.colNameStatus = NamesMetadata.COLNameStatus.ACCEPTED
                                     //get its data from col and save
                                     println "=======NAME======== " + name
                                     println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm

@@ -211,6 +211,7 @@ class NamelistService {
                     m['name'] = generateVerbatim(it)        //it.name.text() + " " + it.author.text().capitalize();;
                     m['canonicalForm'] = it.name.text();
                     m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
+                    m['colNameStatus'] = it.name_ status?.text()?.tokenize(' ')[0]
                     m['rank'] = it.rank?.text()?.toLowerCase();
                     m['authorString'] = it.author.text().capitalize();;
                     m['source'] = "COL"
@@ -254,6 +255,7 @@ class NamelistService {
                         m['name'] = generateVerbatim(it);        //it.name.text() + " " + it.author.text().capitalize();;
                         m['canonicalForm'] = it.name.text();
                         m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
+                        m['colNameStatus'] = it.name_ status?.text()?.tokenize(' ')[0]
                         m['rank'] = it.rank?.text()?.toLowerCase();
                         m['parsedRank'] = XMLConverter.getTaxonRank(m.rank);
                         m['authorString'] = it.author.text().capitalize();;

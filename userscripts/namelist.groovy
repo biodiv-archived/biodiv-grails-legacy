@@ -774,17 +774,18 @@ def addSynToAccName(sciName, synDetails) {
     synMer.name = synDetails.name;
     synMer.canonicalForm = synDetails.canonicalForm;
     synMer.relationship = RelationShip.SYNONYM 
-    /*if(parsedNames[0]?.canonicalForm) {
+    if(parsedNames[0]?.canonicalForm) {
         synMer.normalizedForm = parsedNames[0].normalizedForm;
         synMer.italicisedForm = parsedNames[0].italicisedForm;
         synMer.binomialForm = parsedNames[0].binomialForm;
-    } else {
+    } 
+    /*else {
         println "=====PUTTING CANONICAL AS BINOMIAL===="
         synMer.normalizedForm = synMer.canonicalForm
         synMer.italicisedForm = synMer.canonicalForm 
         synMer.binomialForm = synMer.canonicalForm;
-    }
-    */
+    }*/
+    
     synMer.status = NamesMetadata.NameStatus.SYNONYM
     synMer.viaDatasource = ""
     synMer.uploadTime = new Date()
@@ -794,8 +795,11 @@ def addSynToAccName(sciName, synDetails) {
     synMer.ibpSource = null
     synMer.matchId = synDetails.id
     synMer.matchDatabaseName = "COL"
+    synMer.position = NamesMetadata.NamePosition.WORKING
     synMer.rank = synDetails.parsedRank;
+    synMer.colNameStatus = nSer.getCOLNameStatus(synDetails.colNameStatus);
     synMer.addToContributors(contributor);
+    
     if(!synMer.save()) {
         synMer.errors.each { println it }
     }    
