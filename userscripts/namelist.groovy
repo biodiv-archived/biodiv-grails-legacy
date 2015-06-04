@@ -224,7 +224,8 @@ def createTestEntry(){
 //createTestEntry();
 
 boolean migrateThisSynonym(syn) {
-    if(syn.taxonConcept.position == NamesMetadata.NamePosition.WORKING) {
+    def acc = syn.taxonConcept;
+    if(acc.position == NamesMetadata.NamePosition.WORKING) {
         println "ACCEPTED NAME IN WORKING LIST" 
         syn.dropReason = "ACCEPTED NAME IN WORKING LIST" 
         if(!syn.save()){
@@ -254,7 +255,6 @@ boolean migrateThisSynonym(syn) {
         syn.authorYear = parsedNames[0].authorYear;
         println "=========AUTHOR YEAR ====== " + syn.authorYear
     }
-    def acc = syn.taxonConcept;
     List synFamily = [];
     if(acc.status == NamesMetadata.NameStatus.SYNONYM){
         def res = acc.fetchAcceptedNames();
@@ -309,7 +309,7 @@ boolean migrateThisSynonym(syn) {
 }
 
 def migrateSynonyms() {
-    int limit = 50, offset = 0, insert_check = 0,exist_check = 0;
+    int limit = 20000, offset = 0, insert_check = 0,exist_check = 0;
     int counter = 0;
     def nonParsedSyns = [];
     def notMigrating = [];
@@ -318,9 +318,9 @@ def migrateSynonyms() {
         def oldSynList = Synonyms.list (max: limit , offset:offset, , sort: "id", order: "asc");
         //def oldSynList = Synonyms.read(218033L) //(max: limit , offset:offset);
         def synMer;
-        int count200 = 0;
+        int count2000 = 0;
         for(oldSyn in oldSynList) {
-            count200++;
+            count2000++;
             println "=====WORKING ON THIS SYNONYM============== " + oldSyn + " =========COUNTER ====== " + counter;
             counter++;
             boolean migrateThisSynonym = migrateThisSynonym(oldSyn);
@@ -396,13 +396,13 @@ def migrateSynonyms() {
                 println "======NOT MIGRATING THIS SYNONYM ====== " + oldSyn
                 notMigrating.add(oldSyn.id);
             }
-            if(count200 == 200) {
-                utilsService.cleanUpGorm(true);
-                count200 = 0;
+            if(count2000 == 2000) {
+                //utilsService.cleanUpGorm(true);
+                count2000 = 0;
             }
         }
         offset = offset + limit; 
-        //utilsService.cleanUpGorm(true); 
+        utilsService.cleanUpGorm(true); 
         if(!oldSynList) break;  
     }
     println "=======NON PARSED IDS ===== " + nonParsedSyns
@@ -410,7 +410,7 @@ def migrateSynonyms() {
     println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
-//migrateSynonyms();
+migrateSynonyms();
 
 def createTaxons() {
     taxSer = ctx.getBean("taxonService");
