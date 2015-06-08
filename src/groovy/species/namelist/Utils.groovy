@@ -243,8 +243,18 @@ class Utils {
         println "========= STARTING HERE #######  ====== " 
         List tds = [];
         while(true){ 
-            tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
-            //tds.add(domainClass.get(158685L));//max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+            //tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
+           def c = domainClass.createCriteria()
+            tds = c.list (max: BATCH_SIZE , offset:offset) {
+                and {
+                    gt('id', 275703L)
+                    //eq('position', NamesMetadata.NamePosition.WORKING)
+                    //isNull('position')
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            } 
+		//tds.add(domainClass.get(158685L));//max: BATCH_SIZE, offset: offset, sort: sortBy, order: "asc")
             println "========= OFFSET  ====== " + offset
             tds.each {
                 println (domainClass != Synonyms.class)?it.rank:"No Rank for ${domainClass}" +  "    " + it.id + "   " +  it.canonicalForm 

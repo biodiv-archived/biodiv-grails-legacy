@@ -35,6 +35,7 @@ import species.utils.HttpUtils
 import species.utils.ImageUtils
 import species.utils.Utils
 import species.auth.SUser
+import species.NamesMetadata;
 import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.NamePosition;
 import species.participation.NamelistService;

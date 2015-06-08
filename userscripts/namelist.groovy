@@ -41,16 +41,19 @@ def migrateFromDir(domainSourceDir) {
 
 def curateName(taxonId, domainSourceDir) {
     def taxCan = TaxonomyDefinition.get(taxonId.toLong()).canonicalForm.replaceAll(' ', '_')
-    List colData = nSer.processColData(new File(domainSourceDir, taxCan+'.xml'));
+    println "=====READING THIS FILE ====== " + taxCan+'.xml'
+	List colData = nSer.processColData(new File(domainSourceDir, taxCan+'.xml'));
     if(colData) {
         ScientificName sciName = TaxonomyDefinition.get(taxonId);
         nSer.curateName(sciName, colData);
     } else {
-        ScientificName sciName = TaxonomyDefinition.get(taxonId);
-        sciName.noOfCOLMatches = 0;
+        ScientificName sciName = TaxonomyDefinition.get(taxonId.toLong())
+	sciName.noOfCOLMatches = 0;
         sciName.position = NamesMetadata.NamePosition.DIRTY;
         sciName.dirtyListReason = "NO XML - NO COL DATA"
-        if(!sciName.hasErrors() && sciName.save(flush:true)) {
+        println "=======NO COL MATCHES==== " + sciName.noOfCOLMatches
+	if(sciName.save(flush:true) && !sciName.hasErrors()) {
+		println "saved====="
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
@@ -62,10 +65,11 @@ def curateName(taxonId, domainSourceDir) {
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
 //File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
-File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
+//File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
+File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(156829, domainSourceDir);
+//curateName(882, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -241,9 +245,9 @@ boolean migrateThisSynonym(syn) {
         if(!parsedNames[0]?.canonicalForm) {
             println "===COULD NOT PARSE copying its name in other name variants - syn id=== " + syn.id
             syn.canonicalForm = syn.name;
-            syn.normalizedForm = syn.name;
-            syn.italicisedForm = syn.name;
-            syn.binomialForm = syn.name;
+            //syn.normalizedForm = syn.name;
+            //syn.italicisedForm = syn.name;
+            //syn.binomialForm = syn.name;
         } else {
             syn.canonicalForm = parsedNames[0].canonicalForm;
             syn.normalizedForm = parsedNames[0].normalizedForm;
@@ -411,7 +415,7 @@ def migrateSynonyms() {
     println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
-//migrateSynonyms();
+migrateSynonyms();
 
 def createTaxons() {
     taxSer = ctx.getBean("taxonService");
@@ -468,24 +472,33 @@ def createAcceptedSynonym(){
 //createAcceptedSynonym()
 
 def curateAllNames() {
-    int limit = 67010, offset = 0;
+    def start = new Date();
+	int limit = 70000, offset = 0;
     int counter = 0;
     List curatingThese = [];
-    File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
-    while(true){
+    File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
+    while(offset < 68000){
         println "=====offset == "+ offset + " ===== limit == " + limit  
-        def taxDefList;
+        def taxDefList = [];
         TaxonomyDefinition.withNewTransaction {
-            def c = TaxonomyDefinition.createCriteria()
+	def dataSoruce = ctx.getBean("dataSource");
+        def sql =  Sql.newInstance(dataSoruce);
+	def query  = "select id from taxonomy_definition where id < 276015 order by rank,id asc limit 70000";
+        sql.rows(query).each{
+                taxDefList.add(TaxonomyDefinition.get(it.getProperty("id")));
+        }   
+	 /*def c = TaxonomyDefinition.createCriteria()
             taxDefList = c.list (max: limit , offset:offset) {
                 and {
-                    lt('id', 275703L)
+                    //lt('id', 275703L)
+                    lt('id', 276015L)
                     //eq('position', NamesMetadata.NamePosition.WORKING)
                     //isNull('position')
                 }
                 order('rank','asc')
                 order('id','asc')                    
-            }
+            }*/
+	//taxDefList = TaxonomyDefinition.list(max: limit, offset: offset, sort: "rank", order: "asc")
         }
         for(taxDef in taxDefList) {
 		    TaxonomyDefinition.withNewSession {
@@ -529,7 +542,8 @@ def curateAllNames() {
 
     println "=======FI RES ===== " + fiRes
     println "=======FI RES size ===== " + fiRes.size()
-
+	println "=======START TIME ===== " + start
+println "========END TIME= ======= " + new Date()
 }
 
 //curateAllNames()
@@ -705,7 +719,7 @@ def incompleteHierarchy() {
     println "======NO HIE = == " + namesNoHie;
 }
 
-incompleteHierarchy()
+//incompleteHierarchy()
 
 
 def speciesDetails() {
@@ -815,7 +829,7 @@ def moveFiles() {
 def updateRanks() {
     int counter  = 0;
     def ranks = []
-    new File("/home/rahulk/Desktop/trinomialsFinal.csv").splitEachLine(",") {fields ->
+    new File("/apps/git/biodiv/trinomialsFinal.csv").splitEachLine(",") {fields ->
         if(fields[0] != 'ID') {   
             println "========COUNTER === " + counter
             println "=====WORKING ON ==== " + fields[0]
@@ -840,7 +854,9 @@ def updateRanks() {
 //updateRanks()
 
 def curateWithManualIDs() {
-    int counter  = 0;
+	def alreadyInWorking = [];
+    def start = new Date()
+	int counter  = 0;
     new File("/tmp/dirtynamesMatchedtoCoLpipesep.csv").splitEachLine(",") {fields ->
         if(fields[0] != 'species ID') {
             println "========COUNTER === " + counter
@@ -852,10 +868,14 @@ def curateWithManualIDs() {
 		    println "=====LOOKING FOR THIS COL ID ======= " + colID
             def taxonId = td.id.toString();
             def taxCan = td.canonicalForm.replaceAll(' ', '_');
-            File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
+		File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
+            //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
             List colData = nSer.processColData(new File(domainSourceDir, taxCan+'.xml'));
-            def colDataSize = colData.size();
-            def acceptedMatch = null;
+            def colDataSize = 0
+	if(colData){ 
+		colDataSize = colData.size();
+            }
+def acceptedMatch = null;
             colData.each { colMatch ->
                 if(colMatch.externalId == colID){
                     acceptedMatch = colMatch    
@@ -863,12 +883,21 @@ def curateWithManualIDs() {
             }
             if(acceptedMatch){
                 println "=======ACCEPTED MATCH FOUND ======= " + acceptedMatch
-                nSer.processDataForMigration(td, acceptedMatch, colDataSize)
+		if(td.position != NamesMetadata.NamePosition.WORKING){
+                	nSer.processDataForMigration(td, acceptedMatch, colDataSize)
+		}else {
+			alreadyInWorking.add(td.id);
+		}
             } else {
                 println "========COULD NOT FIND COL MATCH FOR SPECIES========= " + fields[0]
             }
         }
     }
+println "======ALREADY IN WORKING =========  "+ alreadyInWorking
+println "====ALREADY IN WORKING SIZE =====  " + alreadyInWorking.size();
+println "=======START TIME ===== " + start
+println "========END TIME= ======= " + new Date()
+
 }
 
 //curateWithManualIDs()
@@ -917,8 +946,8 @@ def correctSynonyms() {
 //correctSynonyms()
 
 def addSynToAccName(sciName, synDetails) {
-    //NamesParser namesParser = new NamesParser();
-    //def parsedNames = namesParser.parse([synDetails.name]);
+    NamesParser namesParser = new NamesParser();
+    def parsedNames = namesParser.parse([synDetails.name]);
 
     def synMer = new SynonymsMerged();
     synMer.name = synDetails.name;
@@ -957,11 +986,13 @@ def addSynToAccName(sciName, synDetails) {
 }
 
 def addSynonymsFromCOL() {
-    int limit = 71800, offset = 5594;
+    def start = new Date();
+	int limit = 75000, offset = 0;
     int counter = 0;
     List curatingThese = [];
-    File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
+    //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
 
+	File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
     while(true){
         println "=====offset == "+ offset + " ===== limit == " + limit  
         def taxDefList;
@@ -1024,7 +1055,10 @@ def addSynonymsFromCOL() {
         offset = offset + limit; 
         utilsService.cleanUpGorm(true);
         if(!taxDefList) break;  
-    } 
+    }
+ println "=======START TIME ===== " + start
+println "========END TIME= ======= " + new Date()
+
 }
 
 //addSynonymsFromCOL()
@@ -1081,3 +1115,16 @@ def addDetailsFromGNI() {
 }
 
 //addDetailsFromGNI()
+
+def testCheck(){
+	ScientificName sciName = TaxonomyDefinition.get(882L);
+        sciName.noOfCOLMatches = 0;
+        sciName.position = NamesMetadata.NamePosition.DIRTY;
+        sciName.dirtyListReason = "NO XML - NO COL DATA"
+        println "=======NO COL MATCHES==== " + sciName.noOfCOLMatches
+        if(!sciName.hasErrors() && sciName.save(flush:true)) {
+	println "saved====="
+        }
+}
+
+//testCheck()
