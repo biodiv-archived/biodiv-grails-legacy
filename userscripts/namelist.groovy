@@ -228,6 +228,51 @@ def createTestEntry(){
 
 //createTestEntry();
 
+boolean createThisSynonym(acc, canonicalForm, authorYear, normalizedForm){
+    List synFamily = [];
+    if(acc.status == NamesMetadata.NameStatus.SYNONYM){
+        def res = acc.fetchAcceptedNames();
+        acc = res[0];
+    }
+    synFamily.add(acc);
+    def synList = acc.fetchSynonyms();
+    synFamily.addAll(synList);
+    def canMatches = []
+    synFamily.each {
+        if(it.canonicalForm == canonicalForm) {
+            canMatches.add(it)
+        }
+    }
+    ////CANONICAL ZERO MATCH - SO ADD
+    if(canMatches.size() == 0 ){
+        println "CANONICAL ZERO MATCH - SO ADD"
+        return true
+    } else {
+        //CANONICAL MATCH MULTIPLE BUT NO AUTHOR YEAR - SO DROP
+        if(authorYear == null || authorYear == '' || authorYear == ' '){
+            println "CANONICAL MATCH MULTIPLE BUT NO AUTHOR YEAR - SO DROP"
+            return false; 
+        } 
+        else {
+            int noOfMatches = 0;
+            canMatches.each {
+                if(it.normalizedForm == normalizedForm) {
+                    noOfMatches++;
+                }
+            }
+            //NORMALISED ZERO MATCH - SO ADD
+            if(noOfMatches == 0){
+                println "NORMALISED ZERO MATCH - SO ADD"
+                return true;
+            } else {
+                //NORMALISED MULTI MATCH - SO DROP
+                println "NORMALISED MULTI MATCH - SO DROP"
+                return false;
+            }
+        }
+    }
+}
+
 boolean migrateThisSynonym(syn) {
     def acc = syn.taxonConcept;
     if(acc.position == NamesMetadata.NamePosition.WORKING) {
@@ -1038,7 +1083,19 @@ def addSynonymsFromCOL() {
                     synCount += acceptedMatch.synList.size();
                     acceptedMatch.synList.each { synDetails ->
                         println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
-                        addSynToAccName(taxDef, synDetails)    
+                        NamesParser namesParser = new NamesParser();
+                        def parsedNames = namesParser.parse([synDetails.name]);
+                        boolean createThisSynonym;
+                        if(parsedNames[0]?.canonicalForm) {
+                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
+                        } else {
+                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
+                        }
+                        if(createThisSynonym) {
+                            addSynToAccName(taxDef, synDetails)    
+                        } else {
+                            println "======THIS SYNONYM FROM COL ALREADY EXISTS===="
+                        }
                     }
                 } else {
                     println "=========NO ACCEPTED MATCH======== "
