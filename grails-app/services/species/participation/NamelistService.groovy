@@ -1196,7 +1196,11 @@ class NamelistService {
         println colAcceptedNameData.spellCheck
         //From UI
         //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL.toBoolean(), colAcceptedNameData);
+        
         //From migration script
+        //Also add to catalogue of life hierarchy
+        def colClassification = Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
+        def result1 = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, colClassification, contributor, null, false, true, colAcceptedNameData);
         def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         println result
         return result;
@@ -1312,7 +1316,6 @@ class NamelistService {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
             temp['contributors'] = contri; 
-            println "======TEMP ==== " +temp
             result.add(temp);
         }
         return result
@@ -1335,7 +1338,6 @@ class NamelistService {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
             temp['contributors'] = contri; 
-            println "======TEMP ==== " +temp
             result.add(temp);
         }
         return result
@@ -1361,7 +1363,6 @@ class NamelistService {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
             temp['contributors'] = contri; 
-            println "======TEMP ==== " +temp
             result.add(temp);
         }
         return result
@@ -1372,7 +1373,6 @@ class NamelistService {
         def result = []
         res.each {
             def temp = [:]
-            println "======TEMP ==== " +temp
             temp['id'] = it.id.toString();
             temp['name'] = it.name;
             temp['source'] = it.viaDatasource;
@@ -1385,7 +1385,6 @@ class NamelistService {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
             temp['contributors'] = contri; 
-            println "======TEMP ==== " +temp
             result.add(temp);
         }
         return result

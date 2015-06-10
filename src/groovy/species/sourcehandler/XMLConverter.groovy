@@ -1765,14 +1765,13 @@ class XMLConverter extends SourceConverter {
                             if(taxon.status != NameStatus.ACCEPTED) {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
-                            println "=====THIS IS MY CLASSIFICATION ======== " + classification
                             ent.classification = classification;
                             //all hierarchy from curation interface
                             //to go under IBP tax hie
                             //earlier it was just from COL
-                            if(otherParams) {
+                            /*if(otherParams) {
                                  ent.classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                            }
+                            }*/
                             ent.parentTaxon = getParentTaxon(taxonEntities, rank);
                             log.debug("Parent Taxon : "+ent.parentTaxon)
                             ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
@@ -2061,7 +2060,6 @@ class XMLConverter extends SourceConverter {
                     sfield.errors.each { log.error it }
                 }
             }
-            println "SAVED SYNONYM=========== "  + sfield
             return sfield;
         } else {
             log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name
