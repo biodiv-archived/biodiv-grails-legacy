@@ -1765,6 +1765,7 @@ class XMLConverter extends SourceConverter {
                             if(taxon.status != NameStatus.ACCEPTED) {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
+                            println "=====THIS IS MY CLASSIFICATION ======== " + classification
                             ent.classification = classification;
                             //all hierarchy from curation interface
                             //to go under IBP tax hie

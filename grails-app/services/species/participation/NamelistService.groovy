@@ -333,6 +333,9 @@ class NamelistService {
         def parentId = params.parentId
         def limit = params.limit ? params.limit.toInteger() : 1000
         def offset = params.offset ? params.limit.toLong() : 0
+        def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
+
+        println "============== " + parentId
         if(!parentId) {
             sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
                 from taxonomy_registry s, \
@@ -341,14 +344,19 @@ class NamelistService {
                 s.taxon_definition_id = t.id and "+
                 (classSystem?"s.classification_id = :classSystem and ":"")+
                 "t.rank = 0";
-            rs = sql.rows(sqlStr, [classSystem:classSystem])
+
+            //ALways fetch from IBP Taxonomy Hierarchy
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+
+            rs = sql.rows(sqlStr, [classSystem:IBPclassification.id])
+            /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
             def cl = Classification.read(classSystem.toLong());
             if(cl == classification) {
                 def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
                 rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
-            }
+            }*/
         } else {
             sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
                 from taxonomy_registry s, \
@@ -356,16 +364,22 @@ class NamelistService {
                 where \
                 s.taxon_definition_id = t.id and "+
                 (classSystem?"s.classification_id = :classSystem and ":"")+
-                "s.path like '"+parentId+"%' " +
-                "order by t.rank, t.name asc limit :limit offset :offset";
-            rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
+                "s.path like '"+parentId+"%' and " +
+                "t.rank < " + (parentTaxon.rank + 2) + 
+                " order by t.rank, t.name asc limit :limit offset :offset";
+            
+            //ALways fetch from IBP Taxonomy Hierarchy
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            rs = sql.rows(sqlStr, [classSystem:IBPclassification.id, limit:limit, offset:offset])
+            
+            /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
             def cl = Classification.read(classSystem.toLong());
             if(cl == classification) {
                 def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
                 rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
-            }
+            }*/
         }
 
         println "total result size === " + rs.size()

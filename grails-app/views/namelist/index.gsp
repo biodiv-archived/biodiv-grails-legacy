@@ -260,7 +260,7 @@
     .tab-content>.span*{
         margin-left:2px;
     }
-    .super_family{
+    .super_family, .sub_family, .sub_genus, .infra_species{
         line-height:10px;
     }
     .lt_family{
@@ -309,11 +309,11 @@
 					<div class="span9 canBeDisabled column" style="width: 610px;background:#FF9900">
 							<div class="row-fluid">
 									<div class="span6">
-											Author String :-
+											Author String 
                                             <input type="text" placeholder="Name" class="authorString span8"/>
 									</div>
 									<div class="span6">
-                                        Status :- <select id="statusDropDown" class="statusDropDown span9" >
+                                        Status  <select id="statusDropDown" class="statusDropDown span9" >
                                             <option value="chooseNameStatus">Choose Name Status</option>
                                             <g:each in="${NameStatus.list()}" var="ns">
                                                 <option value="${ns.toString().toLowerCase()}">${ns}</option>
@@ -324,13 +324,13 @@
 							
 							<div class="row-fluid">
 									<div class="span4">
-										Source :- <input type="text" placeholder="" class="source span8"/>
+										Source  <input type="text" placeholder="" class="source span8"/>
 									</div>															
 									<div class="span4">
-										via :- <input type="text" placeholder="" class="via span9"/>
+										via  <input type="text" placeholder="" class="via span9"/>
 									</div>
 									<div class="span4">
-										ID :- <input type="text" placeholder="" class="id span9"/>
+										ID  <input type="text" placeholder="" class="id span9"/>
 									</div>			
 							</div>
 							
@@ -368,12 +368,25 @@
                                 <td><input type="text" class="family span12"></td> 
                             </tr>
                             <tr>
+                                <td class="sub_family">Sub-Family</td>
+                                <td><input type="text" class="subfamily span12"></td> 
+                            </tr>
+                            <tr>
                                 <td>Genus</td>
                                 <td><input type="text" class="genus span12"></td> 
+                            </tr>
+
+                            <tr>
+                                <td class="sub_genus">Sub-Genus</td>
+                                <td><input type="text" class="subgenus span12"></td> 
                             </tr>
                             <tr>
                                 <td>Species</td>
                                 <td><input type="text" class="species span12"></td> 
+                            </tr>
+                            <tr>
+                                <td class="infra_species">Infra-Species</td>
+                                <td><input type="text" class="infraspecies span12"></td> 
                             </tr>
 
                         </table>
@@ -387,7 +400,7 @@
                             <li id="names-li0" class="active"><a href="#names-tab0" class="btn" data-toggle="tab">Accepted Name</a></li>
                             <li id="names-li1"><a href="#names-tab1" class="btn" data-toggle="tab">Synonyms</a></li>
                             <li id="names-li2"><a href="#names-tab2" class="btn" data-toggle="tab">Common Names</a></li>   
-                            <li id="names-li3"><a href="#names-tab3" class="btn" data-toggle="tab">Reference(s)</a></li>   
+                            <!--li id="names-li3"><a href="#names-tab3" class="btn" data-toggle="tab">Reference(s)</a></li-->   
                         </ul>
 
                         <div class="tab-content" id="names-tab-content">
@@ -401,9 +414,9 @@
                             <div class="tab-pane" id="names-tab2" style="">
                                 <g:render template="/namelist/dataTableCommonTemplate" model="['type':'c']"/>
                             </div>
-                            <div class="tab-pane" id="names-tab3" style="">
+                            <!--div class="tab-pane" id="names-tab3" style="">
                                 <g:render template="/namelist/dataTableReferenceTemplate" model="['type':'r']"/>
-                            </div>
+                            </div-->
                         </div>
 
 
