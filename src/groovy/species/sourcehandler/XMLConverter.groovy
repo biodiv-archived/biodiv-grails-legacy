@@ -1458,11 +1458,12 @@ class XMLConverter extends SourceConverter {
             println "===NAME=== " + name 
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             Language language = fieldNode.language[0].value();
-            if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
-                def cleanSciName = Utils.cleanSciName(scientificName);
-                name = cleanSciName
-                println "===NAME=== " + name 
-            } else if(name) {
+            //if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
+            //    def cleanSciName = Utils.cleanSciName(scientificName);
+            //    name = cleanSciName
+            //    println "===NAME=== " + name 
+            //} else 
+            if(name) {
                 name = Utils.cleanSciName(name);
                 println "===NAME=== " + name 
             }
@@ -1692,7 +1693,8 @@ class XMLConverter extends SourceConverter {
                                 // if single synonym take its acc name and show msg, change return or this function,
                                 //if multiple reject save name with null status.
                                 else {
-                                    curateName(taxon)
+                                    //TODO: chk commenting curate here
+                                    //namelistService.curateName(taxon)
                                     if(!taxon.id){
                                         taxon.status = null;
                                         //even no proper match from COL

@@ -88,6 +88,10 @@ class SourceConverter {
     }
 
     public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor, Language language) {
+        return createTaxonRegistryNodes(names, classification, [contributor], language);
+    }
+
+    public List<Node> createTaxonRegistryNodes(List names, String classification, List<SUser> contributors, Language language) {
         println "======CREATE TAXON REG NODES ========= " +names;
         NodeBuilder builder = NodeBuilder.newInstance();
         List nodes = [];
@@ -99,7 +103,9 @@ class SourceConverter {
                 new Node(field, "language", language);
 
                 Node data = new Node(field, "data", name);
-                new Node(data, "contributor", contributor.email);
+                contributors.each {contributor ->
+                    new Node(data, "contributor", contributor.email);
+                }
                 
                 nodes << field;
             }

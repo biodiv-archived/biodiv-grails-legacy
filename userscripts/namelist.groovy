@@ -2,10 +2,12 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
 import species.TaxonomyRegistry
 import species.TaxonomyDefinition
+import species.SpeciesController
 
 import species.namelist.Utils
 import species.Classification
 import species.ScientificName
+import species.ScientificName.TaxonomyRank;
 import species.SynonymsMerged
 import species.SpeciesField
 import species.Synonyms
@@ -22,11 +24,14 @@ import species.ScientificName.RelationShip
 import species.NamesMetadata.NamePosition;
 import groovy.io.FileType
 import java.nio.file.*
+import species.Language;
 
 nSer = ctx.getBean("namelistService");
 utilsService = ctx.getBean("utilsService");
+speciesUploadService = ctx.getBean("speciesUploadService");
+speciesSearchService = ctx.getBean("speciesSearchService");
+taxonService = ctx.getBean("taxonService");
 
-import species.Language;
 
 def migrate(){
     nSer.populateInfoFromCol(new File('col_feb24'));
@@ -460,7 +465,7 @@ def migrateSynonyms() {
     println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
-migrateSynonyms();
+//migrateSynonyms();
 
 def createTaxons() {
     taxSer = ctx.getBean("taxonService");
@@ -1185,3 +1190,128 @@ def testCheck(){
 }
 
 //testCheck()
+
+//IBPhierarchyDirtlistSpsWithInfo : contains names in the dirty list for at species or infra-species level for which the ccomplete hierarchy needs to be populated into the IBP TAXONOMIC HIERARCHY
+def IBPhierarchyDirtlistSpsWithInfo() {
+	File file = new File("/home/sravanthi/git/biodiv/IBPhierarchyDirtlistSpsWithInfo.txt");
+    def lines = file.readLines();
+    int i=0;
+    SUser admin = SUser.read(1L);
+    def trr = new TaxonomyDefinition[11];
+    lines.each { line ->
+            if(i++ == 0) return;
+            arr = line.split('\\t');
+            println arr;
+            def reg = TaxonomyRegistry.get(Long.parseLong(arr[5]));
+
+            def result = taxonService.deleteTaxonHierarchy(reg, true, false);
+            if(result.success) {
+                String speciesName= (arr.size() == 17) ? arr[6+TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]: arr[6+TaxonomyRank.SPECIES.ordinal()];
+                def taxonNames= [];
+                int j=0;
+                arr.each {
+                    if(j++<6) return;
+                    if(it != 'null')
+                        taxonNames << it
+                    else 
+                        taxonNames << null
+                }
+                println taxonNames
+                println  taxonService.addTaxonHierarchy(speciesName, taxonNames, reg.classification, reg.contributors, null, false, false, null);
+            } else {
+                println "ERROR : "+result;
+            }
+    } 
+}
+
+//IBPhierarchyDirtlistSpsToDrop: contains names in the dirty list for at species or infra-species level which need to be dropped and stubs deleted.
+def IBPhierarchyDirtlistSpsToDrop() {
+    println "IBPhierarchyDirtlistSpsToDrop"
+	File file = new File("/home/sravanthi/git/biodiv/IBPhierarchyDirtlistSpsToDrop.txt");
+    def lines = file.readLines();
+    int i=0;
+    def sc = new SpeciesController();
+    SUser admin = SUser.read(1L);
+    int ns = 0, nt=0;
+    lines.each { line ->
+        if(i++ <140) return;
+        def arr = line.split('\\t');
+        println arr;
+        def speciesInstance = Species.get(Long.parseLong(arr[0]));
+        if(speciesInstance) {
+            Species.withTransaction {
+                try {
+                    boolean success = speciesUploadService.unpostFromUserGroup(speciesInstance, [], admin, null);
+                    if(success) {
+                        if(speciesInstance.delete(flush: true)) ns++;
+                        speciesSearchService.delete(speciesInstance.id);
+    
+                        def reg = TaxonomyRegistry.read(Long.parseLong(arr[4]));
+                        if(reg) {
+                            def result = taxonService.deleteTaxonHierarchy(reg, true, false);
+                        }
+                       
+                        def taxon = TaxonomyDefinition.read(Long.parseLong(arr[3]));
+                        if (taxon) {
+                            taxon.isDeleted = true;
+                            if(taxon.save(flush:true)) nt++;
+                        }
+                    }
+                } catch(e) {
+                    e.printStackTrace()
+                    println "ERRRRORRRR : "+e.getMessage();
+
+                }
+            }
+        }
+    }
+    println "deleted "+ns+" species "+ nt + " taxon ";
+}
+
+//IBPhierarchyDirtlistABOVESpsToDrop: contains names in the dirty list for above species level, which needs to be dropped only if they have no reference in other places.
+def IBPhierarchyDirtlistABOVESpsToDrop() {
+    println "IBPhierarchyDirtlistABOVESpsToDrop"
+
+    def taxonService = ctx.getBean("taxonService");
+	File file = new File("/home/sravanthi/git/biodiv/IBPhierarchyDirtlistABOVESpsToDrop.txt");
+    def lines = file.readLines();
+    int i=0;
+    int no=0;
+    TaxonomyDefinition.withNewSession {
+        lines.each { line ->
+            if(i++ == 0) return;
+            def arr = line.split('\\t');
+            println arr;
+            TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(arr[3]));
+            TaxonomyRegistry reg = TaxonomyRegistry.read(Long.parseLong(arr[4]));
+            def r = taxonService.deleteTaxonEntries(reg, true, false);
+            if(r.success && r.status != 401) {
+                t.isDeleted = true;
+                if(t.save(flush:true)) {
+                    no++;
+                } else {
+		        	t.errors.each { println it }
+                }
+            }
+        }
+    }
+    println "deleted "+no+" taxonNames";
+}
+
+def createIBPHierarchyForDirtylist() {
+    //for all names in dirty list
+    def taxons = TaxonomyDefinition.findAllByPosition(NamePosition.DIRTY);
+    taxons.each { taxon ->
+        reg = taxon.parentTaxonRegistry();
+        reg.each { classification, parentTaxonList ->
+            parentTaxonList.list {
+                
+            }
+        }
+    }
+}
+
+IBPhierarchyDirtlistSpsWithInfo() 
+//IBPhierarchyDirtlistSpsToDrop();
+//IBPhierarchyDirtlistABOVESpsToDrop();
+createIBPHierarchy();
