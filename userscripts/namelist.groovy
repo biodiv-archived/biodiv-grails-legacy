@@ -233,7 +233,7 @@ def createTestEntry(){
 
 //createTestEntry();
 
-boolean createThisSynonym(acc, canonicalForm, authorYear, normalizedForm){
+def createThisSynonym(TaxonomyDefinition acc, String canonicalForm, String authorYear, String normalizedForm){
     List synFamily = [];
     if(acc.status == NamesMetadata.NameStatus.SYNONYM){
         def res = acc.fetchAcceptedNames();
@@ -996,18 +996,18 @@ def correctSynonyms() {
 //correctSynonyms()
 
 def addSynToAccName(sciName, synDetails) {
-    NamesParser namesParser = new NamesParser();
-    def parsedNames = namesParser.parse([synDetails.name]);
+    //NamesParser namesParser = new NamesParser();
+    //def parsedNames = namesParser.parse([synDetails.name]);
 
     def synMer = new SynonymsMerged();
     synMer.name = synDetails.name;
     synMer.canonicalForm = synDetails.canonicalForm;
     synMer.relationship = RelationShip.SYNONYM 
-    if(parsedNames[0]?.canonicalForm) {
-        synMer.normalizedForm = parsedNames[0].normalizedForm;
-        synMer.italicisedForm = parsedNames[0].italicisedForm;
-        synMer.binomialForm = parsedNames[0].binomialForm;
-    } 
+    //if(parsedNames[0]?.canonicalForm) {
+        synMer.normalizedForm = synDetails.normalizedForm;
+        synMer.italicisedForm = synDetails.italicisedForm;
+        synMer.binomialForm = synDetails.binomialForm;
+    //} 
     /*else {
         println "=====PUTTING CANONICAL AS BINOMIAL===="
         synMer.normalizedForm = synMer.canonicalForm
@@ -1090,13 +1090,18 @@ def addSynonymsFromCOL() {
                         println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
                         NamesParser namesParser = new NamesParser();
                         def parsedNames = namesParser.parse([synDetails.name]);
-                        boolean createThisSynonym;
-                        if(parsedNames[0]?.canonicalForm) {
-                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
+                        def createSynonym = false;
+			 if(parsedNames[0]?.canonicalForm) {
+                            def normalizedForm = parsedNames[0]?.normalizedForm
+				synDetails.normalizedForm = parsedNames[0]?.normalizedForm
+				synDetails.italicisedForm = parsedNames[0]?.italicisedForm
+				synDetails.binomialForm = parsedNames[0]?.binomialForm
+	
+				createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorString, normalizedForm)
                         } else {
-                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
+                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorString, synDetails.name)
                         }
-                        if(createThisSynonym) {
+                        if(createSynonym) {
                             addSynToAccName(taxDef, synDetails)    
                         } else {
                             println "======THIS SYNONYM FROM COL ALREADY EXISTS===="
@@ -1123,7 +1128,7 @@ println "========END TIME= ======= " + new Date()
 
 }
 
-//addSynonymsFromCOL()
+addSynonymsFromCOL()
 
 def addDetailsFromGNI() {
     int limit = 71800, offset = 71799;
