@@ -1630,7 +1630,7 @@ class XMLConverter extends SourceConverter {
                                 flag = false;
                                 return;
                             }
-                            if(taxon && taxon.position != NamePosition.WORKING && (rank < TaxonomyRank.SPECIES.ordinal())) {
+                            if(fromCOL && taxon && taxon.position != NamePosition.WORKING && (rank < TaxonomyRank.SPECIES.ordinal())) {
                                 taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
