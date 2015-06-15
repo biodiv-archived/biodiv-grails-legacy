@@ -1227,7 +1227,7 @@ def IBPhierarchyDirtlistSpsWithInfo() {
 //IBPhierarchyDirtlistSpsToDrop: contains names in the dirty list for at species or infra-species level which need to be dropped and stubs deleted.
 def IBPhierarchyDirtlistSpsToDrop() {
     println "IBPhierarchyDirtlistSpsToDrop"
-	File file = new File("/home/sravanthi/git/biodiv/IBPhierarchyDirtlistSpsToDrop.txt");
+	File file = new File("/home/sandeept/IBPhierarchyDirtlistSpsToDrop.txt");
     def lines = file.readLines();
     int i=0;
     def sc = new SpeciesController();
@@ -1236,16 +1236,14 @@ def IBPhierarchyDirtlistSpsToDrop() {
     lines.each { line ->
         if(i++ <140) return;
         def arr = line.split('\\t');
-        println arr;
+        //println arr;
         def speciesInstance = Species.get(Long.parseLong(arr[0]));
         if(speciesInstance) {
-            Species.withTransaction {
+            //Species.withTransaction {
                 try {
-                    boolean success = speciesUploadService.unpostFromUserGroup(speciesInstance, [], admin, null);
+                    boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, admin);
                     if(success) {
-                        if(speciesInstance.delete(flush: true)) ns++;
-                        speciesSearchService.delete(speciesInstance.id);
-    
+                        ns++;
                         def reg = TaxonomyRegistry.read(Long.parseLong(arr[4]));
                         if(reg) {
                             def result = taxonService.deleteTaxonHierarchy(reg, true, false);
@@ -1262,11 +1260,13 @@ def IBPhierarchyDirtlistSpsToDrop() {
                     println "ERRRRORRRR : "+e.getMessage();
 
                 }
-            }
+            //}
         }
     }
     println "deleted "+ns+" species "+ nt + " taxon ";
 }
+
+IBPhierarchyDirtlistSpsToDrop()
 
 //IBPhierarchyDirtlistABOVESpsToDrop: contains names in the dirty list for above species level, which needs to be dropped only if they have no reference in other places.
 def IBPhierarchyDirtlistABOVESpsToDrop() {
@@ -1366,4 +1366,4 @@ def createIBPHierarchyForDirtylist() {
 //IBPhierarchyDirtlistSpsWithInfo() 
 //IBPhierarchyDirtlistSpsToDrop();
 //IBPhierarchyDirtlistABOVESpsToDrop();
-createIBPHierarchyForDirtylist();
+//createIBPHierarchyForDirtylist();

@@ -1069,10 +1069,13 @@ class SpeciesUploadService {
 	
 	boolean deleteSpeciesWrapper(Species s, SUser user){
 		List sFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
-	
+		boolean success = false
+		
 		try{	
 			Species.withTransaction{
-				boolean success = unpostFromUserGroup(s, sFields, user, null);
+				success = unpostFromUserGroup(s, sFields, user, null);
+			}
+			Species.withTransaction{
 				if(success){
 					rollBackSpeciesUpdate(s, sFields, s.resources.collect{it}, user, null)
 					speciesSearchService.delete(s.id);
