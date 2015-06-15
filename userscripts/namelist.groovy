@@ -233,7 +233,7 @@ def createTestEntry(){
 
 //createTestEntry();
 
-def createThisSynonym(TaxonomyDefinition acc, String canonicalForm, String authorYear, String normalizedForm){
+boolean createThisSynonym(acc, canonicalForm, authorYear, normalizedForm){
     List synFamily = [];
     if(acc.status == NamesMetadata.NameStatus.SYNONYM){
         def res = acc.fetchAcceptedNames();
@@ -996,18 +996,18 @@ def correctSynonyms() {
 //correctSynonyms()
 
 def addSynToAccName(sciName, synDetails) {
-    //NamesParser namesParser = new NamesParser();
-    //def parsedNames = namesParser.parse([synDetails.name]);
+    NamesParser namesParser = new NamesParser();
+    def parsedNames = namesParser.parse([synDetails.name]);
 
     def synMer = new SynonymsMerged();
     synMer.name = synDetails.name;
     synMer.canonicalForm = synDetails.canonicalForm;
     synMer.relationship = RelationShip.SYNONYM 
-    //if(parsedNames[0]?.canonicalForm) {
-        synMer.normalizedForm = synDetails.normalizedForm;
-        synMer.italicisedForm = synDetails.italicisedForm;
-        synMer.binomialForm = synDetails.binomialForm;
-    //} 
+    if(parsedNames[0]?.canonicalForm) {
+        synMer.normalizedForm = parsedNames[0].normalizedForm;
+        synMer.italicisedForm = parsedNames[0].italicisedForm;
+        synMer.binomialForm = parsedNames[0].binomialForm;
+    } 
     /*else {
         println "=====PUTTING CANONICAL AS BINOMIAL===="
         synMer.normalizedForm = synMer.canonicalForm
@@ -1090,18 +1090,13 @@ def addSynonymsFromCOL() {
                         println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
                         NamesParser namesParser = new NamesParser();
                         def parsedNames = namesParser.parse([synDetails.name]);
-                        def createSynonym = false;
-			 if(parsedNames[0]?.canonicalForm) {
-                            def normalizedForm = parsedNames[0]?.normalizedForm
-				synDetails.normalizedForm = parsedNames[0]?.normalizedForm
-				synDetails.italicisedForm = parsedNames[0]?.italicisedForm
-				synDetails.binomialForm = parsedNames[0]?.binomialForm
-	
-				createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorString, normalizedForm)
+                        boolean createThisSynonym;
+                        if(parsedNames[0]?.canonicalForm) {
+                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
                         } else {
-                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorString, synDetails.name)
+                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
                         }
-                        if(createSynonym) {
+                        if(createThisSynonym) {
                             addSynToAccName(taxDef, synDetails)    
                         } else {
                             println "======THIS SYNONYM FROM COL ALREADY EXISTS===="
@@ -1128,7 +1123,7 @@ println "========END TIME= ======= " + new Date()
 
 }
 
-addSynonymsFromCOL()
+//addSynonymsFromCOL()
 
 def addDetailsFromGNI() {
     int limit = 71800, offset = 71799;
@@ -1204,7 +1199,7 @@ def IBPhierarchyDirtlistSpsWithInfo() {
     SUser admin = SUser.read(1L);
     def trr = new TaxonomyDefinition[11];
     lines.each { line ->
-            if(i++ == 0) return;
+            if(i++ == 0 || i>2) return;
             arr = line.split('\\t');
             println arr;
             def reg = TaxonomyRegistry.get(Long.parseLong(arr[5]));
@@ -1303,20 +1298,72 @@ def IBPhierarchyDirtlistABOVESpsToDrop() {
     println "deleted "+no+" taxonNames";
 }
 
+def getTaxonMap(taxon) {
+    println "cheking author"
+    def classifi = Classification.findByName("Author Contributed Taxonomy Hierarchy");
+    def map = taxon.longestParentTaxonRegistry(classifi);
+    if(map.regId) {
+        hierarchyNodes = map.get(classifi);
+    } else {
+        println "checking IUCN"
+        classifi = Classification.findByName('IUCN Taxonomy Hierarchy (2010)');
+        map = taxon.longestParentTaxonRegistry(classifi);
+        if(map.regId) {
+        } else {
+            println "chking GBIF"
+            println grailsApplication.config.soeciesPortal.fields.GBIF_TAXONOMIC_HIERARCHY;
+
+            classifi = Classification.findByName("GBIF Taxonomy Hierarchy");
+            println classifi;
+            map = taxon.longestParentTaxonRegistry(classifi);
+        }
+    }
+    map.put('classification', classifi);
+    println map
+    return map;
+}
+
 def createIBPHierarchyForDirtylist() {
     //for all names in dirty list
     def taxons = TaxonomyDefinition.findAllByPosition(NamePosition.DIRTY);
+    println "----------------------"
+    int i=0;
     taxons.each { taxon ->
-        reg = taxon.parentTaxonRegistry();
-        reg.each { classification, parentTaxonList ->
-            parentTaxonList.list {
-                
+        if(i++ == 0) return;
+        println taxon;
+        def map = getTaxonMap(taxon);
+        def hierarchyNodes;
+        def reg;
+        if(map.regId) {
+            hierarchyNodes = map.get(map.get('classification'));
+        }
+        if(hierarchyNodes) {
+            def taxonNames = new ArrayList(10);
+            def classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+            int j
+            for(j = hierarchyNodes.size()-2; j>=0; j--) {
+                //check which node high up in the hierarchy is in WORKING status
+                if(hierarchyNodes[j].position == NamePosition.WORKING) {
+                    //update path from the node with WORKING path.
+                    def map2 = hierarchyNodes[j].parentTaxonRegistry(classifi);
+                    def reg2 = map2.get(classifi);
+                    reg2.each{
+                        taxonNames << it.name;
+                    }
+                    break;
+                } 
             }
+            for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
+                taxonNames << hierarchyNodes[k].name;
+            }
+            println  taxonService.addTaxonHierarchy(null, taxonNames, classifi, SUser.read(1L), null, false, false, null);
+        } else {
+            println "No hierarchy"
         }
     }
 }
 
-IBPhierarchyDirtlistSpsWithInfo() 
+//IBPhierarchyDirtlistSpsWithInfo() 
 //IBPhierarchyDirtlistSpsToDrop();
 //IBPhierarchyDirtlistABOVESpsToDrop();
-createIBPHierarchy();
+createIBPHierarchyForDirtylist();
