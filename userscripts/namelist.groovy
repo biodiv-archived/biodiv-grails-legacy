@@ -74,7 +74,7 @@ File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-curateName(73451, domainSourceDir);
+//curateName(73451, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -1267,7 +1267,7 @@ def IBPhierarchyDirtlistSpsToDrop() {
     println "deleted "+ns+" species "+ nt + " taxon ";
 }
 
-IBPhierarchyDirtlistSpsToDrop()
+//IBPhierarchyDirtlistSpsToDrop()
 
 //IBPhierarchyDirtlistABOVESpsToDrop: contains names in the dirty list for above species level, which needs to be dropped only if they have no reference in other places.
 def IBPhierarchyDirtlistABOVESpsToDrop() {
@@ -1366,7 +1366,21 @@ def createIBPHierarchyForDirtylist() {
     }
 }
 
-IBPhierarchyDirtlistSpsWithInfo() 
+//IBPhierarchyDirtlistSpsWithInfo() 
 //IBPhierarchyDirtlistSpsToDrop();
 //IBPhierarchyDirtlistABOVESpsToDrop();
 //createIBPHierarchyForDirtylist();
+
+def deleteAllCOLHierarchies() {
+    println "=====DELETING COL HIERARCHY=="
+    def colClassification = Classification.findByName("Catalogue of Life Taxonomy Hierarchy");
+    def regList = TaxonomyRegistry.findAllWhere(classification:colClassification);
+    int counter = 0;
+    regList.each { reg ->
+        println "=====COUNTER == " + counter++;
+        def result = taxonService.deleteTaxonHierarchy(reg, true, false);
+        println "==AFTER DELETE RESULT======= "  + result
+    }
+}
+
+deleteAllCOLHierarchies()
