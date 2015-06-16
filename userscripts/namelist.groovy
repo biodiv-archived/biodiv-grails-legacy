@@ -533,7 +533,7 @@ def curateAllNames() {
         TaxonomyDefinition.withNewTransaction {
 	def dataSoruce = ctx.getBean("dataSource");
         def sql =  Sql.newInstance(dataSoruce);
-	def query  = "select id from taxonomy_definition where id < 276015 order by rank,id asc limit 70000";
+	def query  = "select id from taxonomy_definition where id <= 276064 order by rank,id asc limit 70000";
         sql.rows(query).each{
                 taxDefList.add(TaxonomyDefinition.get(it.getProperty("id")));
         }   
@@ -596,7 +596,7 @@ def curateAllNames() {
 println "========END TIME= ======= " + new Date()
 }
 
-//curateAllNames()
+curateAllNames()
 
 def curateRecoName() {
     println "=======SCRIPT FOR RECO NAMES======"

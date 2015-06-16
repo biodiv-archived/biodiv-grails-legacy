@@ -1409,10 +1409,10 @@ class XMLConverter extends SourceConverter {
             println "==CREATING FIELD NODES === " + taxonNodes
             println "=========YAHAN SE AYA====="
             def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
-            println "USING OLD TAXON HIERARCHY CREATION"
+            //println "USING OLD TAXON HIERARCHY CREATION"
             //def getTaxonHierarchyRes = getTaxonHierarchyOld(taxonNodes, it, scientificName, saveHierarchy)
-            def t = getTaxonHierarchyRes;//.taxonRegistry;
-            spellCheckMsg ="";//+= getTaxonHierarchyRes.spellCheckMsg;
+            def t = getTaxonHierarchyRes.taxonRegistry;
+            spellCheckMsg = getTaxonHierarchyRes.spellCheckMsg;
             if(t) {
                 cleanUpGorm();
                 taxonHierarchies.addAll(t);
