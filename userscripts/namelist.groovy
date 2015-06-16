@@ -64,12 +64,12 @@ def curateName(taxonId, domainSourceDir) {
 //File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
-//File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
+File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
-File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
+//File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(882, domainSourceDir);
+curateName(73451, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -1123,7 +1123,7 @@ println "========END TIME= ======= " + new Date()
 
 }
 
-addSynonymsFromCOL()
+//addSynonymsFromCOL()
 
 def addDetailsFromGNI() {
     int limit = 71800, offset = 71799;

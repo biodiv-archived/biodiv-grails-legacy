@@ -61,7 +61,7 @@ function getNamesFromTaxon(ele , parentId) {
                 synDLContent = createListHTML(data.dirtyList.synDL, 2, false); 
             }
             if(data.dirtyList.comDL){
-                comDLContent = createListHTML(data.dirtyList.comDL, 3, false); 
+                //comDLContent = createListHTML(data.dirtyList.comDL, 3, false); 
             }
             //WORKING LIST
             if(data.workingList.accWL){
@@ -73,7 +73,7 @@ function getNamesFromTaxon(ele , parentId) {
                 synWLContent = createListHTML(data.workingList.synWL, 2, false); 
             }
             if(data.workingList.comWL){
-                comWLContent = createListHTML(data.workingList.comWL, 3, false); 
+                //comWLContent = createListHTML(data.workingList.comWL, 3, false); 
             }
             //CLEAN LIST
             if(data.cleanList.accCL){
@@ -85,7 +85,7 @@ function getNamesFromTaxon(ele , parentId) {
                 synCLContent = createListHTML(data.cleanList.synCL, 2, false);
             }
             if(data.cleanList.comCL){
-                comCLContent = createListHTML(data.cleanList.comCL, 3, false);
+                //comCLContent = createListHTML(data.cleanList.comCL, 3, false);
             }
             processingStop(); 
         }, error: function(xhr, status, error) {
@@ -233,8 +233,12 @@ function populateNameDetails(data){
         if(key != "rank" && key!= "status"){
             $("."+key).val(data[key]);
         }
-    }  
+    }
+    if($(".source").val() == 'COL') {
+        changeEditingMode(true);
+    }
     $(".via").val(data["sourceDatabase"]);
+    $(".id").val(data["matchId"]);
     if(data["externalId"]) {
         $(".source").val($("#queryDatabase option:selected ").text());
         $(".id").val(data["externalId"]);
@@ -279,7 +283,8 @@ function searchDatabase(addNewName) {
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData", true);
             }else {
-                $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                var oldText = $(".dialogMsgText").html();
+                $(".dialogMsgText").html(oldText + "<br /> <b>RESPONSE</b> <br /> Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 $("#dialogMsg").modal('show');
                 if(addNewName) {
@@ -843,7 +848,8 @@ function validateName(ele, showNameDetails) {
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData", showNameDetails);
             }else {
-                $(".dialogMsgText").html("Sorry no results found from COL. Please query an alternative database or input name-attributes manually.");
+                var oldText = $(".dialogMsgText").html();
+                $(".dialogMsgText").html(oldText + "<br /> <b>RESPONSE</b> <br />  Sorry no results found from COL. Please query an alternative database or input name-attributes manually.");
                 $("#dialogMsg").modal('show');
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
             }

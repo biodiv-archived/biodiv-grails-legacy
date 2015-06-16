@@ -661,8 +661,6 @@ function createReference(content, sourceData) {
 }
 
 function createSynonym(content, sourceData) {
-    console.log(content);
-    console.log(sourceData);
     return '<li><div class="span3"><a href="#" class="synRel span3 '+(content.isContributor?'selector':'')+'" data-type="select" data-name="relationship" data-original-title="Edit Synonym Relationship">'+content.relationship.name+'</a></div><div class="span8"><a href="#" class="'+(content.isContributor?'editField':'')+'" data-type="text" data-pk="'+sourceData.id+'" data-sid="'+content.id+'" data-url="'+window.params.species.updateUrl+'" data-name="'+sourceData.type+'" data-original-title="Edit '+sourceData.type+' name">'+ content.italicisedForm+'</a></div></li>' ;
 }
 
