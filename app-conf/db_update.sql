@@ -359,6 +359,15 @@ alter table synonyms add column drop_reason  varchar(500);
 
 update taxonomy_definition set no_ofcolmatches = -99;
 update taxonomy_definition set position = NULL;
+
+/**
+    Delete col hierarchies
+ **/
+
+ delete from taxonomy_registry_suser where taxonomy_registry_contributors_id in (select id from taxonomy_registry where classification_id = 821);
+update taxonomy_registry set parent_taxon_id  = null where classification_id = 821;
+delete from taxonomy_registry where id in (select id from taxonomy_registry where classification_id = 821 limit 1000);
+
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
 

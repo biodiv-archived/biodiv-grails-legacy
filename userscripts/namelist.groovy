@@ -1193,7 +1193,7 @@ def testCheck(){
 
 //IBPhierarchyDirtlistSpsWithInfo : contains names in the dirty list for at species or infra-species level for which the ccomplete hierarchy needs to be populated into the IBP TAXONOMIC HIERARCHY
 def IBPhierarchyDirtlistSpsWithInfo() {
-	File file = new File("/home/sravanthi/git/biodiv/IBPhierarchyDirtlistSpsWithInfo.txt");
+	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistSpsWithInfo.txt");
     def lines = file.readLines();
     int i=0;
     SUser admin = SUser.read(1L);
@@ -1228,7 +1228,7 @@ def IBPhierarchyDirtlistSpsWithInfo() {
 //IBPhierarchyDirtlistSpsToDrop: contains names in the dirty list for at species or infra-species level which need to be dropped and stubs deleted.
 def IBPhierarchyDirtlistSpsToDrop() {
     println "IBPhierarchyDirtlistSpsToDrop"
-	File file = new File("/home/sandeept/IBPhierarchyDirtlistSpsToDrop.txt");
+	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistSpsToDrop.txt");
     def lines = file.readLines();
     int i=0;
     def sc = new SpeciesController();
@@ -1245,12 +1245,12 @@ def IBPhierarchyDirtlistSpsToDrop() {
                     boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, admin);
                     if(success) {
                         ns++;
-                        def reg = TaxonomyRegistry.read(Long.parseLong(arr[4]));
+                        def reg = TaxonomyRegistry.get(Long.parseLong(arr[4]));
                         if(reg) {
                             def result = taxonService.deleteTaxonHierarchy(reg, true, false);
                         }
                        
-                        def taxon = TaxonomyDefinition.read(Long.parseLong(arr[3]));
+                        def taxon = TaxonomyDefinition.get(Long.parseLong(arr[3]));
                         if (taxon) {
                             taxon.isDeleted = true;
                             if(taxon.save(flush:true)) nt++;
@@ -1267,14 +1267,13 @@ def IBPhierarchyDirtlistSpsToDrop() {
     println "deleted "+ns+" species "+ nt + " taxon ";
 }
 
-//IBPhierarchyDirtlistSpsToDrop()
 
 //IBPhierarchyDirtlistABOVESpsToDrop: contains names in the dirty list for above species level, which needs to be dropped only if they have no reference in other places.
 def IBPhierarchyDirtlistABOVESpsToDrop() {
     println "IBPhierarchyDirtlistABOVESpsToDrop"
 
     def taxonService = ctx.getBean("taxonService");
-	File file = new File("/home/sravanthi/git/biodiv/IBPhierarchyDirtlistABOVESpsToDrop.txt");
+	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistABOVESpsToDrop.txt");
     def lines = file.readLines();
     int i=0;
     int no=0;
@@ -1283,8 +1282,8 @@ def IBPhierarchyDirtlistABOVESpsToDrop() {
             if(i++ == 0) return;
             def arr = line.split('\\t');
             println arr;
-            TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(arr[3]));
-            TaxonomyRegistry reg = TaxonomyRegistry.read(Long.parseLong(arr[4]));
+            TaxonomyDefinition t = TaxonomyDefinition.get(Long.parseLong(arr[3]));
+            TaxonomyRegistry reg = TaxonomyRegistry.get(Long.parseLong(arr[4]));
             def r = taxonService.deleteTaxonEntries(reg, true, false);
             if(r.success && r.status != 401) {
                 t.isDeleted = true;
@@ -1371,16 +1370,3 @@ def createIBPHierarchyForDirtylist() {
 //IBPhierarchyDirtlistABOVESpsToDrop();
 //createIBPHierarchyForDirtylist();
 
-def deleteAllCOLHierarchies() {
-    println "=====DELETING COL HIERARCHY=="
-    def colClassification = Classification.findByName("Catalogue of Life Taxonomy Hierarchy");
-    def regList = TaxonomyRegistry.findAllWhere(classification:colClassification);
-    int counter = 0;
-    regList.each { reg ->
-        println "=====COUNTER == " + counter++;
-        def result = taxonService.deleteTaxonHierarchy(reg, true, false);
-        println "==AFTER DELETE RESULT======= "  + result
-    }
-}
-
-deleteAllCOLHierarchies()
