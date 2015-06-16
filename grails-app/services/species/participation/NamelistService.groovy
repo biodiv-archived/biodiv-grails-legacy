@@ -10,6 +10,7 @@ import species.NamesMetadata;
 import species.TaxonomyRegistry
 import species.Classification;
 import species.Species;
+import species.SpeciesField;
 import species.ScientificName.TaxonomyRank
 import species.Synonyms;
 import species.CommonNames;
@@ -17,7 +18,6 @@ import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.COLNameStatus;
 import species.NamesMetadata.NamePosition;
 import species.auth.SUser;
-
 import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.ContentType.TEXT
@@ -29,6 +29,7 @@ import wslite.soap.*
 import species.NamesParser;
 import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
+import speciespage.SpeciesUploadService;
 
 class NamelistService {
    
@@ -80,7 +81,8 @@ class NamelistService {
     def utilsService;
 	def sessionFactory;
     def activityFeedService;
-
+	def speciesUploadService;
+	
     List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
 
@@ -1909,5 +1911,110 @@ def sql= session.createSQLQuery(query)
         //s2.addAll(s1);
         return s2
     }
+	
+	
+	def mergeAcceptedName(long oldId, long newId){
+		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
+		TaxonomyDefinition newName = TaxonomyDefinition.get(newId)
+		
+		if(oldName ||  newName){
+			log.debug "One of name is not exist in the system " + oldId + "  " +  newId
+			return
+		}
+		
+		def oldTrList = TaxonomyRegistry.findAllByTaxonDefinition(oldName)
+		
+		
+		//update all paths for this taxon defintion
+		List trList = TaxonomyRegistry.findAllByPath('%_' + oldId + '_%')
+		trList.addAll(TaxonomyRegistry.findAllByPath(oldId + '_%'))
+		trList.addAll(TaxonomyRegistry.findAllByPath(oldId))
+		trList.addAll(oldTrList)
+		trList.unique()
+		
+		trList.each { TaxonomyRegistry tr ->
+			tr.path = tr.path.replaceAll('_' + oldId + '_', '_' + newId + '_')
+			
+			if(tr.path.startsWith(oldId + '_'))
+				tr.path.replaceFirst(oldId + '_', newId + '_')
+			
+			if(tr.path == ('' + oldId) )
+				tr.path = '' + newId
+			
+			if(tr.path.endsWith('_' + oldId))
+				tr.path = tr.path.substring(0, tr.path.lastIndexOf('_') + newId)
+		}
+		
+		//updating taxon def so that new hirarchy should be shown
+		oldTrList.each {TaxonomyRegistry tr ->
+			tr.taxonDefinition = newName
+			
+		}
+		
+		trList.each {TaxonomyRegistry tr ->
+			if(!tr.save(flush:true)){
+				tr.errors.allErrors.each { log.error it }
+			}
+		}
+		
+		oldTrList.each {TaxonomyRegistry tr ->
+			tr.delete(flush:true)
+		}
+		
+		
+		//moving synonym
+		oldName.fetchSynonyms().each {
+			newName.addSynonym(it)
+			oldName.removeSynonym(it)
+		}
+		
+		
+		Species oldSpecies = Species.findByTaxonConcept(oldName)
+		Species newSpecies = Species.findByTaxonConcept(newName)
+		
+		//updating species for names
+		if(!newSpecies && oldSpecies){
+			oldSpecies.taxonConcept = newName
+			if(!oldSpecies.save(flush:true)){
+				oldSpecies.errors.allErrors.each { log.error it }
+			}
+		}
+		
+		if(newSpecies && oldSpecies){
+			//move sfield
+			SpeciesField.findAllBySpecies(oldSpecies).each {sf ->
+				sf.species = newSpecies
+				if(!sf.save(flush:true)){
+					sf.errors.allErrors.each { log.error it }
+				}
+			}
+			
+			//move resources
+			oldSpecies.resources.each { res ->
+				log.debug "Removing resource " + res
+				newSpecies.addToResources(res)
+				oldSpecies.removeFromResources(res)
+			}
+			
+			//add hyper link for redirect
+			
+			
+			//saving new species
+			if(!newSpecies.save(flush:true)){
+				newSpecies.errors.allErrors.each { log.error it }
+			}
+			
+			//deleting speices
+			oldSpecies.taxonConcept = null
+			speciesUploadService.deleteSpecies(oldSpecies, SUser.read(1))
+		}
+		
+		//setting delete flag true on name
+		oldName.isDeleted = true
+		if(!oldName.save(flush:true)){
+			oldName.errors.allErrors.each { log.error it }
+		}
+		
+	}
     
-    }
+}
