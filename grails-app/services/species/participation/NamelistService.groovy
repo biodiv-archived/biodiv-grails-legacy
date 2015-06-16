@@ -300,7 +300,11 @@ class NamelistService {
 
     List responseFromGBIFAsMap(String xmlText , String searchBy) {
         def result = JSON.parse(xmlText)
+        println "=====RESULT ===== " + result
         def finalResult = []
+        if(!result['usageKey']) {
+            return finalResult
+        }
         Map temp = new HashMap()
         temp['externalId'] = result['usageKey'];
         temp['name'] = result['scientificName'];
@@ -336,7 +340,8 @@ class NamelistService {
         def limit = params.limit ? params.limit.toInteger() : 1000
         def offset = params.offset ? params.limit.toLong() : 0
         def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
-
+        def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
+        println "===========NEXT PRIMARY RANK ====== " + nextPrimaryRank
         println "============== " + parentId
         if(!parentId) {
             sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
@@ -367,7 +372,7 @@ class NamelistService {
                 s.taxon_definition_id = t.id and "+
                 (classSystem?"s.classification_id = :classSystem and ":"")+
                 "s.path like '"+parentId+"%' and " +
-                "t.rank < " + (parentTaxon.rank + 2) + 
+                "t.rank <= " + nextPrimaryRank + 
                 " order by t.rank, t.name asc limit :limit offset :offset";
             
             //ALways fetch from IBP Taxonomy Hierarchy
@@ -421,7 +426,7 @@ class NamelistService {
                 from common_names c where c.taxon_concept_id = :taxonId";
 
             def q2 = sql.rows(s2, [taxonId:it.taxonid])
-            q2.each {
+            /*q2.each {
                 if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
                     comDL << it
                 }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
@@ -429,7 +434,7 @@ class NamelistService {
                 }else{
                     comCL << it
                 }
-            }
+            }*/
         }
 
         println "==========SYN DL============= " + synDL

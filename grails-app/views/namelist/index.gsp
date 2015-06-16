@@ -8,7 +8,7 @@
     
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="layout" content="main" />
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <r:require modules="species_show,curation"/>
 
 <title>NameList - Curation Interface</title>
@@ -50,13 +50,16 @@
         height: 197px;
         overflow-x: hidden !important;
      }   
-	.listarea{
+     .listarea{
+        width:25% !important;
 		border:1px solid #ccc;
 		height:288px;
-		margin:0px !important;
+        margin:0px !important;
+        resize: horizontal;
+        overflow: auto;
 	}
 	.taxon_selector_wrapper{
-		width:285px!important;
+		//width:285px!important;
 	}
 
 	.taxon_selector_wrapper_span{
@@ -79,7 +82,7 @@
         position: relative;
         overflow-y: scroll;        
         height: 196px;
-        width: 222px;
+        width: 470px;
         margin: 0px;
 	}
     .listarea_content ul {
@@ -87,7 +90,7 @@
         cursor:pointer;
     }
     .taxonomyBrowser{    
-        width: 283px;    
+        width: 392px;    
     }
 	.taxon_selector_list{
 
@@ -97,6 +100,10 @@
     }
     .namelist_wrapper {
         background : white;
+        width:100% !important;
+    }
+    .outer-wrapper {
+        padding-left:26px !important;
     }
 </style>
 
@@ -108,7 +115,7 @@
   		<div class="taxon_selector_span taxon_selector_wrapper_span">
             Taxon Selector
         </div>
-        <div class="taxonomyBrowser listarea_content" style="position: relative;height:199px;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+        <div class="taxonomyBrowser listarea_content" style="position: relative;height:255px;" data-name="classification" data-speciesid="${speciesInstance?.id}">
             <div id="taxaHierarchy">
                 <%
                 def classifications = [];
@@ -123,7 +130,7 @@
 
             </div>
         </div>
-        <div class="taxon_selector_final">
+        <!--div class="taxon_selector_final">
             <div>
                 <button type="button" class="save_button btn" style="height:20px;line-height:11px;" onClick='getOrphanRecoNames()'>Show orphan names</button> 
             </div>
@@ -132,7 +139,7 @@
                     <input type="text" placeholder="Search" class="span12" style="min-height:22px;"/>
                 </div> 
             </div>
-        </div>
+        </div-->
     </div>
     <div class="span3 listarea">
         <span class="dirty_list_span taxon_selector_wrapper_span">
@@ -141,14 +148,14 @@
         <select class="span12 listSelector">
             <option value='accDLContent'>Accepted Names</option>
             <option value='synDLContent'>Synonyms</option>
-            <option value='comDLContent'>Common Names</option>
+            <!--option value='comDLContent'>Common Names</option-->
         </select>
         <div class="dl_content taxon_selector_list listarea_content">
         </div>
 
-        <div class="row-fluid">
+        <!--div class="row-fluid">
             <g:render template="/namelist/actionFieldsTemplate" model="['showArrow':false]"/>
-        </div>
+        </div-->
 
 
     </div>
@@ -159,15 +166,15 @@
         <select class="span12 listSelector">
             <option value='accWLContent'>Accepted Names</option>
             <option value='synWLContent'>Synonyms</option>
-            <option value='comWLContent'>Common Names</option>
+            <!--option value='comWLContent'>Common Names</option-->
         </select>
 
         <div class="wl_content taxon_selector_list listarea_content">
         </div>
 
-        <div class="row-fluid">
+        <!--div class="row-fluid">
             <g:render template="/namelist/actionFieldsTemplate" model="['showArrow':true]"/>
-        </div>
+        </div-->
     </div>
     <div class="span3 listarea">
         <span class="clean_list_span taxon_selector_wrapper_span">
@@ -176,15 +183,15 @@
         <select class="span12 listSelector">
             <option value='accCLContent'>Accepted Names</option>
             <option value='synCLContent'>Synonyms</option>
-            <option value='comCLContent'>Common Names</option>
+            <!--option value='comCLContent'>Common Names</option-->
         </select>
 
         <div class="cl_content taxon_selector_list listarea_content">
         </div>
 
-        <div class="row-fluid">
+        <!--div class="row-fluid">
             <g:render template="/namelist/actionFieldsTemplate" model="['showArrow':true]"/>
-        </div>
+        </div-->
 
 
     </div>
@@ -206,7 +213,7 @@
 	.detailsareaRight{
 	    margin: 0px !important;
 	    border: 1px solid #ccc;
-	    width: 161px !important;
+	    width: 17% !important;
 	    text-align:center;
         height: 328px;
 	}
@@ -278,70 +285,8 @@
 	<div class="span10 metadataDetails">
 	
 	
-				<div class="row-fluid">
-					
-					<div class="span3 canBeDisabled column" style="background:#FF9900">
-							<div class ="row-fluid">
-								<div class="span3"><label>Name</label></div>
-								<div class="span9"> <input type="text" placeholder="Name" class="name span12"/></div>
-                            </div>
-                            <input type="hidden" class="taxonRegId" value="">
-                            <input type="hidden" class="taxonId" value="">
-                            <input type="hidden" class="recoId" value="">
-                            <input type="hidden" class="isOrphanName" value="">
-                            <input type="hidden" class="fromCOL" value=false>
-                            <input type="hidden" class="id_details" value="">
-							<div class="row-fluid">	
-                                <div class="span3"><label>Rank</label></div>
-                                <div class="span9"> 
-                                    <select id="rankDropDown" class="rankDropDown span12" >
-                                        <option value="chooseRank">Choose Rank</option>
-                                        <% def rankCount = 0 %>
-                                        <g:each in="${TaxonomyRank.list()}" var="t">
-                                            <option value="${t.toString().toLowerCase()}">${t}</option>
-                                        </g:each>
-                                    </select>
-                                </div>
-							</div>	
-							
-					</div>
-				
-					<div class="span9 canBeDisabled column" style="width: 610px;background:#FF9900">
-							<div class="row-fluid">
-									<div class="span6">
-											Author String 
-                                            <input type="text" placeholder="Name" class="authorString span8"/>
-									</div>
-									<div class="span6">
-                                        Status  <select id="statusDropDown" class="statusDropDown span9" >
-                                            <option value="chooseNameStatus">Choose Name Status</option>
-                                            <g:each in="${NameStatus.list()}" var="ns">
-                                                <option value="${ns.toString().toLowerCase()}">${ns}</option>
-                                            </g:each>
-                                        </select>
-									</div>
-							</div>
-							
-							<div class="row-fluid">
-									<div class="span4">
-										Source  <input type="text" placeholder="" class="source span8"/>
-									</div>															
-									<div class="span4">
-										via  <input type="text" placeholder="" class="via span9"/>
-									</div>
-									<div class="span4">
-										ID  <input type="text" placeholder="" class="id span9"/>
-									</div>			
-							</div>
-							
-							
-					
-					</div>
-				</div>
-				
-                <div class="row-fluid">
-
-                    <div class="span3 canBeDisabled column lt_family" style="background:#C0504D">
+        <div class="row-fluid">
+            <div class="span3 canBeDisabled column lt_family" style="width:30%;background:#C0504D">
                         <table style="width:100% ;color:white">
                             <tr>
                                 <td>Kingdom</td>
@@ -392,8 +337,55 @@
                         </table>
 
                     </div>
-						
-					<div class="span9 column rt_family" style="width: 610px;background:#3D6798">
+                    <div class="span9 canBeDisabled column" style="width:70%;background:#FF9900">
+                        <input type="hidden" class="taxonRegId" value="">
+                        <input type="hidden" class="taxonId" value="">
+                        <input type="hidden" class="recoId" value="">
+                        <input type="hidden" class="isOrphanName" value="">
+                        <input type="hidden" class="fromCOL" value=false>
+                        <input type="hidden" class="id_details" value="">
+
+                        <div class="row-fluid">
+                            <div class="span4" style="width:39%;">
+                                Name 
+                                <input type="text" placeholder="Name" class="name span10" style="height:100%;width:70%;"/>
+                            </div>
+                            <div class="span4" style="width:29%;">
+                                AuthorString 
+                                <input type="text" placeholder="Author string" class="authorString span8" style="height:100%;width:60%;"/>
+                            </div>
+                            <div class="span4" style="width:25%;">
+                                Status  <select id="statusDropDown" class="statusDropDown span9" style="height:100%;width:70%;" >
+                                    <option value="chooseNameStatus">Choose Name Status</option>
+                                    <g:each in="${NameStatus.list()}" var="ns">
+                                    <option value="${ns.toString().toLowerCase()}">${ns}</option>
+                                    </g:each>
+                                </select>
+                            </div>
+                        </div>
+
+                            <div class="row-fluid">
+                                <div class="span3">Rank
+                                    <select id="rankDropDown" class="rankDropDown span9" >
+                                        <option value="chooseRank">Choose Rank</option>
+                                        <% def rankCount = 0 %>
+                                        <g:each in="${TaxonomyRank.list()}" var="t">
+                                        <option value="${t.toString().toLowerCase()}">${t}</option>
+                                        </g:each>
+                                    </select>
+                                </div>
+                                <div class="span3">
+										Source  <input type="text" placeholder="" class="source span8" style="height:100%;"/>
+									</div>															
+									<div class="span3">
+										via  <input type="text" placeholder="" class="via span9"/>
+									</div>
+									<div class="span3">
+										ID  <input type="text" placeholder="" class="id span9"/>
+									</div>			
+							</div>
+						    <div class="row-fluid">	
+                                <div class="span12 column rt_family" style="background:#3D6798">
 						
 
                         <ul class="nav nav-tabs" id="" style="margin:0px;">
@@ -476,8 +468,14 @@
                     </div>
 
 
-                </div>
+                            </div>
 
+
+							
+					
+					</div>
+				</div>
+				
 	
 	</div>
   	<div class="span2 column detailsareaRight" >
@@ -538,7 +536,8 @@
         taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
         </g:each>
     <r:script>
-        $(document).ready(function() {
+    $(document).ready(function() {
+            //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
                 expandAll:false,
                 showCheckBox:false
@@ -557,7 +556,7 @@
                         $(list_content).append(synDLContent);
                     break;
                     case 'comDLContent':
-                        $(list_content).append(comDLContent);
+                        //$(list_content).append(comDLContent);
                     break;
                     case 'accWLContent':
                         $(list_content).append(accWLContent);
@@ -566,7 +565,7 @@
                         $(list_content).append(synWLContent);
                     break;
                     case 'comWLContent':
-                        $(list_content).append(comWLContent);
+                        //$(list_content).append(comWLContent);
                     break;
                     case 'accCLContent':
                         $(list_content).append(accCLContent);
@@ -575,7 +574,7 @@
                         $(list_content).append(synCLContent);
                     break;
                     case 'comCLContent':
-                        $(list_content).append(comCLContent);
+                        //$(list_content).append(comCLContent);
                     break;
                     default: alert('Wrong option selected!!')
                 }

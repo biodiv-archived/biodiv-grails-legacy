@@ -69,12 +69,12 @@ def curateName(taxonId, domainSourceDir) {
 //File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
-//File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
+File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
-File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
+//File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(882, domainSourceDir);
+curateName(73451, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -1198,8 +1198,9 @@ def IBPhierarchyDirtlistSpsWithInfo() {
     int i=0;
     SUser admin = SUser.read(1L);
     def trr = new TaxonomyDefinition[11];
+    def classifi = Classification.findByName("Author Contributed Taxonomy Hierarchy");
     lines.each { line ->
-            if(i++ == 0 || i>2) return;
+            if(i++ == 0) return;
             arr = line.split('\\t');
             println arr;
             def reg = TaxonomyRegistry.get(Long.parseLong(arr[5]));
@@ -1217,7 +1218,7 @@ def IBPhierarchyDirtlistSpsWithInfo() {
                         taxonNames << null
                 }
                 println taxonNames
-                println  taxonService.addTaxonHierarchy(speciesName, taxonNames, reg.classification, reg.contributors, null, false, false, null);
+                println  taxonService.addTaxonHierarchy(speciesName, taxonNames, classifi, admin, null, false, false, null);
             } else {
                 println "ERROR : "+result;
             }
@@ -1234,7 +1235,7 @@ def IBPhierarchyDirtlistSpsToDrop() {
     SUser admin = SUser.read(1L);
     int ns = 0, nt=0;
     lines.each { line ->
-        if(i++ <140) return;
+        if(i++ == 0) return;
         def arr = line.split('\\t');
         //println arr;
         def speciesInstance = Species.get(Long.parseLong(arr[0]));
@@ -1331,39 +1332,41 @@ def createIBPHierarchyForDirtylist() {
     taxons.each { taxon ->
         if(i++ == 0) return;
         println taxon;
-        def map = getTaxonMap(taxon);
-        def hierarchyNodes;
-        def reg;
-        if(map.regId) {
-            hierarchyNodes = map.get(map.get('classification'));
-        }
-        if(hierarchyNodes) {
-            def taxonNames = new ArrayList(10);
-            def classifi = Classification.findByName("IBP Taxonomy Hierarchy");
-            int j
-            for(j = hierarchyNodes.size()-2; j>=0; j--) {
-                //check which node high up in the hierarchy is in WORKING status
-                if(hierarchyNodes[j].position == NamePosition.WORKING) {
-                    //update path from the node with WORKING path.
-                    def map2 = hierarchyNodes[j].parentTaxonRegistry(classifi);
-                    def reg2 = map2.get(classifi);
-                    reg2.each{
-                        taxonNames << it.name;
-                    }
-                    break;
-                } 
+        TaxonomyDefinition.withNewTransaction { 
+            def map = getTaxonMap(taxon);
+            def hierarchyNodes;
+            def reg;
+            if(map.regId) {
+                hierarchyNodes = map.get(map.get('classification'));
             }
-            for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
-                taxonNames << hierarchyNodes[k].name;
+            if(hierarchyNodes) {
+                def taxonNames = new ArrayList(10);
+                def classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+                int j
+                for(j = hierarchyNodes.size()-2; j>=0; j--) {
+                    //check which node high up in the hierarchy is in WORKING status
+                    if(hierarchyNodes[j].position == NamePosition.WORKING) {
+                        //update path from the node with WORKING path.
+                        def map2 = hierarchyNodes[j].parentTaxonRegistry(classifi);
+                        def reg2 = map2.get(classifi);
+                        reg2.each{
+                            taxonNames << it.name;
+                        }
+                        break;
+                    } 
+                }
+                for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
+                    taxonNames << hierarchyNodes[k].name;
+                }
+                println  taxonService.addTaxonHierarchy(null, taxonNames, classifi, SUser.read(1L), null, false, false, null);
+            } else {
+                println "No hierarchy"
             }
-            println  taxonService.addTaxonHierarchy(null, taxonNames, classifi, SUser.read(1L), null, false, false, null);
-        } else {
-            println "No hierarchy"
         }
     }
 }
 
-//IBPhierarchyDirtlistSpsWithInfo() 
+IBPhierarchyDirtlistSpsWithInfo() 
 //IBPhierarchyDirtlistSpsToDrop();
 //IBPhierarchyDirtlistABOVESpsToDrop();
 //createIBPHierarchyForDirtylist();
