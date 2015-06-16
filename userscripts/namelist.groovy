@@ -372,13 +372,24 @@ def migrateSynonyms() {
         println "=====offset == "+ offset + " ===== limit == " + limit //+ " =========COUNTER ====== " + conter;    
         def oldSynList = Synonyms.list (max: limit , offset:offset, , sort: "id", order: "asc");
         //def oldSynList = Synonyms.read(218033L) //(max: limit , offset:offset);
-        def synMer;
+        def synMer = null;
         int count2000 = 0;
         for(oldSyn in oldSynList) {
             count2000++;
             println "=====WORKING ON THIS SYNONYM============== " + oldSyn + " =========COUNTER ====== " + counter;
             counter++;
             boolean migrateThisSynonym = migrateThisSynonym(oldSyn);
+            synMer = SynonymsMerged.findByName(oldSyn.name);
+            if(synMer) {
+                migrateThisSynonym = false;
+                if(oldSyn.taxonConcept.status == NamesMetadata.NameStatus.ACCEPTED) {
+                    oldSyn.taxonConcept.addSynonym(synMer);
+                } else {
+                    def accRes  = oldSyn.taxonConcept.fetchAcceptedNames();
+                    def acc = accRes[0];
+                    acc.addSynonym(synMer);
+                }
+            }
             if(migrateThisSynonym) {
                 def flag = false;
                 SynonymsMerged.withNewTransaction {
@@ -999,39 +1010,43 @@ def addSynToAccName(sciName, synDetails) {
     NamesParser namesParser = new NamesParser();
     def parsedNames = namesParser.parse([synDetails.name]);
 
-    def synMer = new SynonymsMerged();
-    synMer.name = synDetails.name;
-    synMer.canonicalForm = synDetails.canonicalForm;
-    synMer.relationship = RelationShip.SYNONYM 
-    if(parsedNames[0]?.canonicalForm) {
-        synMer.normalizedForm = parsedNames[0].normalizedForm;
-        synMer.italicisedForm = parsedNames[0].italicisedForm;
-        synMer.binomialForm = parsedNames[0].binomialForm;
-    } 
-    /*else {
-        println "=====PUTTING CANONICAL AS BINOMIAL===="
-        synMer.normalizedForm = synMer.canonicalForm
-        synMer.italicisedForm = synMer.canonicalForm 
-        synMer.binomialForm = synMer.canonicalForm;
-    }*/
-    
-    synMer.status = NamesMetadata.NameStatus.SYNONYM
-    synMer.viaDatasource = ""
-    synMer.uploadTime = new Date()
-    def contributor = SUser.read(1L);
-    synMer.uploader = contributor
-    synMer.authorYear = synDetails.authorString;
-    synMer.ibpSource = null
-    synMer.matchId = synDetails.id
-    synMer.matchDatabaseName = "COL"
-    synMer.position = NamesMetadata.NamePosition.WORKING
-    synMer.rank = synDetails.parsedRank;
-    synMer.colNameStatus = nSer.getCOLNameStatus(synDetails.colNameStatus);
-    synMer.addToContributors(contributor);
-    
-    if(!synMer.save()) {
-        synMer.errors.each { println it }
-    }    
+    def synMer = null; 
+    synMer = SynonymsMerged.findByName(synDetails.name);
+    if(!synMer) {
+        synMer = new SynonymsMerged();
+        synMer.name = synDetails.name;
+        synMer.canonicalForm = synDetails.canonicalForm;
+        synMer.relationship = RelationShip.SYNONYM 
+        if(parsedNames[0]?.canonicalForm) {
+            synMer.normalizedForm = parsedNames[0].normalizedForm;
+            synMer.italicisedForm = parsedNames[0].italicisedForm;
+            synMer.binomialForm = parsedNames[0].binomialForm;
+        } 
+        /*else {
+          println "=====PUTTING CANONICAL AS BINOMIAL===="
+          synMer.normalizedForm = synMer.canonicalForm
+          synMer.italicisedForm = synMer.canonicalForm 
+          synMer.binomialForm = synMer.canonicalForm;
+          }*/
+
+        synMer.status = NamesMetadata.NameStatus.SYNONYM
+        synMer.viaDatasource = ""
+        synMer.uploadTime = new Date()
+        def contributor = SUser.read(1L);
+        synMer.uploader = contributor
+        synMer.authorYear = synDetails.authorString;
+        synMer.ibpSource = null
+        synMer.matchId = synDetails.id
+        synMer.matchDatabaseName = "COL"
+        synMer.position = NamesMetadata.NamePosition.WORKING
+        synMer.rank = synDetails.parsedRank;
+        synMer.colNameStatus = nSer.getCOLNameStatus(synDetails.colNameStatus);
+        synMer.addToContributors(contributor);
+
+        if(!synMer.save()) {
+            synMer.errors.each { println it }
+        }
+    }
     sciName.addSynonym(synMer);
 }
 
