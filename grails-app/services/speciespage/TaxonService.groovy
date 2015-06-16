@@ -812,9 +812,9 @@ class TaxonService {
             TaxonomyRegistry reg;
             String hier = ""
             taxonRegistry.each { 
-                if(it.errors.getErrorCount() > 0)
+                if(it.errors && it.errors.getErrorCount() > 0)
                     errors.addAll(it.errors.collect {it.toString()})
-                if(it.taxonDefinition.rank > maxRank) {
+                if(it.taxonDefinition && it.taxonDefinition.rank > maxRank) {
                     reg = it;
                     maxRank = it.taxonDefinition.rank;
                 }
