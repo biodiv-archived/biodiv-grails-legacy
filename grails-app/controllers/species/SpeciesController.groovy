@@ -848,14 +848,12 @@ class SpeciesController extends AbstractObjectController {
 	} 
 
 	@Secured(['ROLE_ADMIN'])
-	def delete() {
+	def deleteSpecies() {
 		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
-                boolean success = speciesUploadService.unpostFromUserGroup(speciesInstance, [], springSecurityService.currentUser, null);
-                if(success) {
-				    speciesInstance.delete(flush: true)
-				    speciesSearchService.delete(speciesInstance.id);
+				boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, springSecurityService.currentUser);
+				if(success) {
 				    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                     def model = utilsService.getSuccessModel(msg, null, OK.value());
                     withFormat {

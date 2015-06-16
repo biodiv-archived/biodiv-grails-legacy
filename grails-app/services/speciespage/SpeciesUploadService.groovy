@@ -994,7 +994,7 @@ class SpeciesUploadService {
 			and{
 				eq('taxonDefinition', s.taxonConcept)
 				eq('uploader', user)
-				between("uploadTime", sbu.startDate, sbu.endDate)
+				if(sbu) between("uploadTime", sbu.startDate, sbu.endDate)
 			}
 		}
 		log.debug "Taxonomy registry to be deleted as  " + taxonReg
@@ -1064,5 +1064,27 @@ class SpeciesUploadService {
 			throw e
 		}
 		return false
+	}
+	
+	
+	boolean deleteSpeciesWrapper(Species s, SUser user){
+		List sFields = SpeciesField.findAllBySpecies(s).collect{it} .unique()
+		boolean success = false
+		
+		try{	
+			Species.withTransaction{
+				success = unpostFromUserGroup(s, sFields, user, null);
+			}
+			Species.withTransaction{
+				if(success){
+					rollBackSpeciesUpdate(s, sFields, s.resources.collect{it}, user, null)
+					speciesSearchService.delete(s.id);
+				}
+			}
+		}catch(e){
+			log.error e.printStackTrace()
+			return false
+		}
+		return true	
 	}		
 }

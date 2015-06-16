@@ -782,6 +782,10 @@ class TaxonService {
     */
 
     def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
+        return addTaxonHierarchy(speciesName, taxonRegistryNames, classification, [contributor], language, abortOnNewName, fromCOL, otherParams);
+    }
+
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, List<SUser> contributors, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
         List errors = [];
         if(!classification) {
         	def messagesourcearg = new Object[1];
@@ -791,7 +795,7 @@ class TaxonService {
         
         XMLConverter converter = new XMLConverter();
         println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributors, language);
         println "======YAHAN HAI=========";
 
         def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
@@ -874,23 +878,34 @@ class TaxonService {
 
         try {
             if(reg) {
-                println "====REG HERE=== " + reg
+                println "====REG HERE=== ----------------------" + reg
                 String hier = "";
+                println "=========================================="
+                println "=========================================="
                 def contributor = springSecurityService.currentUser;
                 while(reg != null) {
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println contributor
                     def c = TaxonomyRegistry.withCriteria () {
                         projections {
                             count('id')
                         }
                         eq('parentTaxon', reg)
-                        contributors {
-                            eq('id', contributor.id)
+                        if(checkContributor && contributor) { 
+                            contributors {
+                                eq('id', contributor.id)
+                            }
                         }
                     }
-                    if(c[0] > 1) {
+                    if(c[0] > 0) {
                         //there is another hierarchy sharing same nodes and with same contributor.
                         // so leaving this portion untouched
+                        toDelete = [];
                         r.success = true;
+                        r.status = 401
                         r.msg = 'Successfully removed registry';
                         r.errors << errors
                         println "=====ITS BREAKING HERE====== " + c[0]
@@ -915,7 +930,12 @@ class TaxonService {
                             maxRank = r2.taxonDefinition.rank;
                         }
 
-                        r2.removeFromContributors(contributor);
+                        if(contributor) {
+                            println "00000000000000000000000000000000000000000"
+                            r2.removeFromContributors(contributor);
+                        } else if(force) {
+                            r2.contributors.clear();
+                        }
 
                         if(r2.contributors.size() == 0) {
                             r2.delete(failOnError:true)

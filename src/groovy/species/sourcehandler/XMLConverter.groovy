@@ -1408,9 +1408,11 @@ class XMLConverter extends SourceConverter {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
             println "==CREATING FIELD NODES === " + taxonNodes
             println "=========YAHAN SE AYA====="
-            def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
-            def t = getTaxonHierarchyRes.taxonRegistry;
-            spellCheckMsg += getTaxonHierarchyRes.spellCheckMsg;
+            //def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
+            println "USING OLD TAXON HIERARCHY CREATION"
+            def getTaxonHierarchyRes = getTaxonHierarchyOld(taxonNodes, it, scientificName, saveHierarchy)
+            def t = getTaxonHierarchyRes;//.taxonRegistry;
+            spellCheckMsg ="";//+= getTaxonHierarchyRes.spellCheckMsg;
             if(t) {
                 cleanUpGorm();
                 taxonHierarchies.addAll(t);
@@ -1433,6 +1435,117 @@ class XMLConverter extends SourceConverter {
         return result;
     }
 
+    List<TaxonomyRegistry> getTaxonHierarchyOld(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
+        log.debug "Getting classification hierarchy : "+classification.name;
+
+        List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
+
+        List<String> names = new ArrayList<String>();
+        List<TaxonomyDefinition> parsedNames;
+        List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
+
+        fieldNodes.each { fieldNode ->
+            String name = getData(fieldNode.data);
+            int rank = getTaxonRank(fieldNode?.subcategory?.text());
+            Language language = fieldNode.language[0].value();
+            //if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
+            //    def cleanSciName = Utils.cleanSciName(scientificName);
+            //    name = cleanSciName
+            //} else 
+            if(name) {
+                name = Utils.cleanSciName(name);
+            }
+            if(name) {
+                names.putAt(rank, name);
+            }
+            sortedFieldNodes.putAt(rank, fieldNode)
+        }
+        parsedNames = namesParser.parse(names);
+        fieldNodes = sortedFieldNodes;
+
+        int i=0;
+        fieldNodes.each { fieldNode ->
+            if(fieldNode) {
+                log.debug "Adding taxonomy registry from node: "+fieldNode;
+                int rank = getTaxonRank(fieldNode?.subcategory?.text());
+                String name = getData(fieldNode.data);
+
+                log.debug "Taxon : "+name+" and rank : "+rank;
+                if(name && rank >= 0) {
+                    //TODO:HACK to populate sciName in species level of taxon hierarchy
+                    //              if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {// && rank == TaxonomyRank.SPECIES.ordinal() {
+                    //                  def cleanSciName = cleanSciName(scientificName);
+                    //                  name = cleanSciName
+                    //              }
+
+                    def parsedName = parsedNames.get(i++);
+                    log.debug "Parsed name ${parsedName?.canonicalForm}"
+                    if(parsedName?.canonicalForm) {
+                        //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
+                        //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
+                        def taxonCriteria = TaxonomyDefinition.createCriteria();
+                        TaxonomyDefinition taxon = taxonCriteria.get {
+                            eq("rank", rank);
+                            ilike("canonicalForm", parsedName.canonicalForm);
+                        }
+
+                        if(!taxon && saveTaxonHierarchy) {
+                            log.debug "Saving taxon definition"
+                            taxon = parsedName;
+                            taxon.rank = rank;
+                            if(!taxon.save()) {
+                                taxon.errors.each { log.error it }
+                            }
+
+                            taxon.updateContributors(getUserContributors(fieldNode.data))
+                        } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
+                            def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+                            if(synonym)
+                                synonym.updateContributors(getUserContributors(fieldNode.data))
+                        }
+
+                        def ent = new TaxonomyRegistry();
+                        ent.taxonDefinition = taxon
+                        ent.classification = classification;
+                        ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+                        log.debug("Parent Taxon : "+ent.parentTaxon)
+                        ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
+                        //same taxon at same parent and same path may exist from same classification.
+                        def criteria = TaxonomyRegistry.createCriteria()
+                        TaxonomyRegistry registry = criteria.get {
+                            eq("taxonDefinition", ent.taxonDefinition);
+                            eq("path", ent.path);
+                            eq("classification", ent.classification);
+                        }
+
+                        if(registry) {
+                            log.debug "Taxon registry already exists : "+registry;
+                            if(saveTaxonHierarchy)
+                                registry.updateContributors(getUserContributors(fieldNode.data))
+                                taxonEntities.add(registry);
+                        } else if(saveTaxonHierarchy) {
+                            log.debug "Saving taxon registry entity : "+ent;
+                            if(!ent.save()) {
+                                ent.errors.each { log.error it }
+                            } else {
+                                log.debug "Saved taxon registry entity : "+ent;
+                            }
+                            ent.updateContributors(getUserContributors(fieldNode.data))
+                            taxonEntities.add(ent);
+                        }
+
+                    } else {
+                        log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
+                        addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
+                    }
+                }
+            }
+        }
+        //      if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {
+        //          updateSpeciesGroup(taxonEntities);
+        //      }
+        return taxonEntities;
+    }
     /**
      * 
      * @param fieldNodes
@@ -1458,11 +1571,12 @@ class XMLConverter extends SourceConverter {
             println "===NAME=== " + name 
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             Language language = fieldNode.language[0].value();
-            if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
-                def cleanSciName = Utils.cleanSciName(scientificName);
-                name = cleanSciName
-                println "===NAME=== " + name 
-            } else if(name) {
+            //if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
+            //    def cleanSciName = Utils.cleanSciName(scientificName);
+            //    name = cleanSciName
+            //    println "===NAME=== " + name 
+            //} else 
+            if(name) {
                 name = Utils.cleanSciName(name);
                 println "===NAME=== " + name 
             }
@@ -1629,7 +1743,7 @@ class XMLConverter extends SourceConverter {
                                 flag = false;
                                 return;
                             }
-                            if(taxon && taxon.position != NamePosition.WORKING && (rank < TaxonomyRank.SPECIES.ordinal())) {
+                            if(fromCOL && taxon && taxon.position != NamePosition.WORKING && (rank < TaxonomyRank.SPECIES.ordinal())) {
                                 taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
@@ -1692,7 +1806,8 @@ class XMLConverter extends SourceConverter {
                                 // if single synonym take its acc name and show msg, change return or this function,
                                 //if multiple reject save name with null status.
                                 else {
-                                    curateName(taxon)
+                                    //TODO: chk commenting curate here
+                                    //namelistService.curateName(taxon)
                                     if(!taxon.id){
                                         taxon.status = null;
                                         //even no proper match from COL
