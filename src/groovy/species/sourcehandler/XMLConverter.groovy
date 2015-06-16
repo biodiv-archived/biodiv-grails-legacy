@@ -1408,9 +1408,9 @@ class XMLConverter extends SourceConverter {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
             println "==CREATING FIELD NODES === " + taxonNodes
             println "=========YAHAN SE AYA====="
-            //def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
+            def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
             println "USING OLD TAXON HIERARCHY CREATION"
-            def getTaxonHierarchyRes = getTaxonHierarchyOld(taxonNodes, it, scientificName, saveHierarchy)
+            //def getTaxonHierarchyRes = getTaxonHierarchyOld(taxonNodes, it, scientificName, saveHierarchy)
             def t = getTaxonHierarchyRes;//.taxonRegistry;
             spellCheckMsg ="";//+= getTaxonHierarchyRes.spellCheckMsg;
             if(t) {
@@ -1499,9 +1499,10 @@ class XMLConverter extends SourceConverter {
 
                             taxon.updateContributors(getUserContributors(fieldNode.data))
                         } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
-                            def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+                            /*def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
                             if(synonym)
                                 synonym.updateContributors(getUserContributors(fieldNode.data))
+                            */
                         }
 
                         def ent = new TaxonomyRegistry();
