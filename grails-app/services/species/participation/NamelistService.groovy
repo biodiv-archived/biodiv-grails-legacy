@@ -81,7 +81,7 @@ class NamelistService {
     def utilsService;
 	def sessionFactory;
     def activityFeedService;
-	def speciesUploadService;
+	//def speciesUploadService;
 	
     List searchCOL(String input, String searchBy) {
         //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
@@ -2011,7 +2011,7 @@ def sql= session.createSQLQuery(query)
 			
 			//deleting speices
 			oldSpecies.taxonConcept = null
-			speciesUploadService.deleteSpecies(oldSpecies, SUser.read(1))
+			oldSpecies.deleteSpecies(SUser.read(1))
 		}
 		
 		//setting delete flag true on name

@@ -458,5 +458,9 @@ class Species implements Rateable {
             this.errors.each { log.error it }
         }
     }
+	
+	def boolean deleteSpecies(SUser user){
+		return speciesUploadService.deleteSpeciesWrapper(this, user)
+	}
  
 }
