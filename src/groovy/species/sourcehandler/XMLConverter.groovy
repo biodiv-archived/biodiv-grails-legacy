@@ -1414,7 +1414,9 @@ class XMLConverter extends SourceConverter {
             def t = getTaxonHierarchyRes.taxonRegistry;
             spellCheckMsg = getTaxonHierarchyRes.spellCheckMsg;
             if(t) {
-                cleanUpGorm();
+                //def ctx = ApplicationHolder.getApplication().getMainContext();
+                //def utilsService = ctx.getBean("utilsService");
+    		cleanUpGorm();
                 taxonHierarchies.addAll(t);
             }
         }
