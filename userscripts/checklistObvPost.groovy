@@ -19,4 +19,12 @@ def migrate(){
 	}
 }
 
-migrate()
+//migrate()
+
+def mergeAcceptedName(){
+	def ns = ctx.getBean("namelistService");
+    println "============ started =========="
+	ns.mergeAcceptedName(46873, 173051)
+}
+
+mergeAcceptedName()
