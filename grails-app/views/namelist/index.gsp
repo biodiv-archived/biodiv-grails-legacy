@@ -227,7 +227,7 @@
 	}
 	.connection_wrapper_row2{		
         background-color: beige;
-        height: 17px;
+        height: 19px;
         text-align: center;
         padding: 2.4px;
     }
@@ -464,7 +464,7 @@
 
                         <!--button type="button" class="save_button" style="background-color:#C0504D;" onClick='saveHierarchy(false)'>Save & Retain</button--!> 
                         <button type="button" class="save_button" style="background-color:#FF9900;" onClick='saveHierarchy(true)'>Save & Move to Working List</button> 
-                        <button type="button" class="save_button" style="background-color:#009933;">Save & Move to Clean List</button> 
+                        <!--button type="button" class="save_button" style="background-color:#009933;">Save & Move to Clean List</button--!> 
                     </div>
 
 
@@ -520,7 +520,8 @@
 		  <div class="connection_wrapper_row2 countDocs">xx</div>
       </div>
 
-	</div>
+  </div>
+
 </div>
 
     <g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
@@ -530,6 +531,9 @@
     <div id="dialog" title="Basic dialog" style="display:none;">
         <p id="dialogMsg"></p>
     </div>
+
+  <div class='row-fluid feedComment' style="margin-top:10px">
+  </div>
 <script type="text/javascript">
     var taxonRanks = [];
     <g:each in="${TaxonomyRank.list()}" var="t">

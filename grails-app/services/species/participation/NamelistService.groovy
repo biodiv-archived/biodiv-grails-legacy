@@ -479,12 +479,12 @@ class NamelistService {
             }
             result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
             result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
-            /*def counts = getObvCKLCountsOfTaxon(taxonDef);
+            def counts = getObvCKLCountsOfTaxon(taxonDef);
             result['countObv'] = counts['countObv'];
             result['countCKL'] = counts['countCKL'];
             result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
             println "=========COUNTS============= " + counts
-            */return result
+            return result
         }else if(params.nameType == '2') {
             if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of synonyms table

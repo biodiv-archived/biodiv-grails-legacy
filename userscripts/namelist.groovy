@@ -74,7 +74,7 @@ File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
 //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
-//curateName(73451, domainSourceDir);
+//curateName(1273, domainSourceDir);
 
 def updatePosition(){
     println "====update status called=";
@@ -364,7 +364,7 @@ boolean migrateThisSynonym(syn) {
 }
 
 def migrateSynonyms() {
-    int limit = 20000, offset = 0, insert_check = 0,exist_check = 0;
+    int limit = 20000, offset = 17795, insert_check = 0,exist_check = 0;
     int counter = 0;
     def nonParsedSyns = [];
     def notMigrating = [];
@@ -476,7 +476,7 @@ def migrateSynonyms() {
     println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
-//migrateSynonyms();
+migrateSynonyms();
 
 def createTaxons() {
     taxSer = ctx.getBean("taxonService");
@@ -1105,13 +1105,13 @@ def addSynonymsFromCOL() {
                         println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
                         NamesParser namesParser = new NamesParser();
                         def parsedNames = namesParser.parse([synDetails.name]);
-                        boolean createThisSynonym;
+                        boolean createSynonym;
                         if(parsedNames[0]?.canonicalForm) {
-                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
+                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
                         } else {
-                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
+                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
                         }
-                        if(createThisSynonym) {
+                        if(createSynonym) {
                             addSynToAccName(taxDef, synDetails)    
                         } else {
                             println "======THIS SYNONYM FROM COL ALREADY EXISTS===="
@@ -1388,3 +1388,54 @@ def createIBPHierarchyForDirtylist() {
 //IBPhierarchyDirtlistABOVESpsToDrop();
 createIBPHierarchyForDirtylist();
 
+
+def copyIBPHierarchyToCOLClassification() {
+    def classifi = Classification.findByName("Catalogue of Life Taxonomy Hierarchy");
+    def ibpClass = Classification.findByName("IBP Taxonomy Hierarchy");
+    def start = new Date();
+	int limit = 50, offset = 0;
+    int counter = 0;
+    SUser admin = SUser.read(1L);
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def taxRegList = [];
+        TaxonomyRegistry.withNewTransaction {
+	        def taxReg = TaxonomyRegistry.createCriteria()
+            taxRegList = taxReg.list (max: limit , offset:offset) {
+                and {
+                    eq('classification', ibpClass)
+                }
+                order('id','asc')                    
+            }
+        }
+        for(reg in taxRegList) {
+            println "=====WORKING ON THIS REGISTRY============== " + reg + " =========COUNTER ====== " + counter;
+            counter++;
+            List taxonNames = [];
+            List taxIds = reg.path.tokenize('_');
+            def m = [:]
+            taxIds.each {
+                def tax = TaxonomyDefinition.read(it.toLong());
+                m[tax.rank] = tax.name;
+            }
+            for (index in 0..10) {
+                if(m[index]) {
+                    taxonNames.add(m[index]);
+                } else {
+                    taxonNames.add(null);
+                }
+            }
+            def otherParams = [:];
+            otherParams['nameStatus'] = 'accepted';
+            println "=====TAXON NAMES ====== " + taxonNames
+            println  taxonService.addTaxonHierarchy(taxonNames.last(), taxonNames, classifi, admin, null, false, true, otherParams);
+        }
+
+        offset = offset + limit; 
+        //utilsService.cleanUpGorm(true); 
+        if(!taxRegList) break;  
+    }
+    println "=====START === " + start + "====END === " + new Date()
+}
+
+copyIBPHierarchyToCOLClassification()
