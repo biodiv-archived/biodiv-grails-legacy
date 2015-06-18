@@ -121,6 +121,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
             type: "POST",
             data: {taxonId:taxonId, nameType:nameType, classificationId:classificationId, choosenName: choosenName},	
             success: function(data) {
+                $('.feedComment').html(data.feedCommentHtml);
                 changeEditingMode(false);
                 populateNameDetails(data);
                 populateTabDetails(data, false);

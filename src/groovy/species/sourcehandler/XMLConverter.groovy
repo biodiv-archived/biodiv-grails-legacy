@@ -1766,8 +1766,8 @@ class XMLConverter extends SourceConverter {
                                     taxon.colNameStatus = NamesMetadata.COLNameStatus.ACCEPTED
                                     //get its data from col and save
                                     println "=======NAME======== " + name
-                                    println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
-                                    if(otherParams.id_details[taxon.canonicalForm]) {
+                                    if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
+                                        println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
                                         taxon.matchId = otherParams.id_details[taxon.canonicalForm];
                                     }
                                     //def externalId = otherParams.id_details[name].trim();
@@ -1852,8 +1852,8 @@ class XMLConverter extends SourceConverter {
                                 }*/
                                 taxon.position = NamePosition.WORKING
                                 taxon.matchDatabaseName = "COL";
+                                if(otherParams.id_details && otherParams.id_detailstaxon.canonicalForm) {
                                 println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
-                                if(otherParams.id_details[taxon.canonicalForm]) {
                                     taxon.matchId = otherParams.id_details[taxon.canonicalForm];
                                 }
                                 taxon = taxon.merge();

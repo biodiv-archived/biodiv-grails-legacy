@@ -16,6 +16,7 @@ class NamelistController {
     def index() { }
 
     def namelistService
+    def utilsService
 	
 	/**
 	 * input : taxon id ,classification id of ibp 
@@ -39,6 +40,14 @@ class NamelistController {
 	def getNameDetails(){
         //input in params.taxonId
 		//[name:'aa', kingdom:'kk', .....]
+		def userLanguage = utilsService.getCurrentLanguage(request);   
+        def instance;
+        if(params.nameType == '1') {
+            instance = TaxonomyDefinition.read(params.taxonId.toLong())
+        } else if (params.nameType == '2') {
+            instance = SynonymsMerged.read(params.taxonId.toLong())
+        }
+        def feedCommentHtml = g.render(template:"/common/feedCommentTemplate", model:[instance: instance, userLanguage:userLanguage]);
         def res = namelistService.getNameDetails(params);
 	    println "====CALL HERE NAME DETAILS====== " + res
 		println "========================================="
@@ -51,6 +60,7 @@ class NamelistController {
         } else {
             println "======TAXON REGISTRY NULL====="
         }*/
+        res['feedCommentHtml'] = feedCommentHtml
         render res as JSON
 	}
 	

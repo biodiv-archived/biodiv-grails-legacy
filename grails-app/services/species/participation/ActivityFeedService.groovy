@@ -359,6 +359,10 @@ class ActivityFeedService {
 				activityTitle = getLocalizedMessage(activityType)
 				text = feedInstance.activityDescrption
 				break
+            case TAXON_NAME_UPDATED :
+                activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+                break
 			default:
 				activityTitle = getLocalizedMessage(activityType)
 				break

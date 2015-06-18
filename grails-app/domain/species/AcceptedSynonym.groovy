@@ -10,12 +10,14 @@ class AcceptedSynonym {
     }
 
     static createEntry(TaxonomyDefinition accepted, SynonymsMerged synonym) {
-        def ent1 = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
-        if(ent1) return;
-        def ent = new AcceptedSynonym(accepted: accepted, synonym: synonym)
-        if(!ent.save()) {
-            ent.errors.allErrors.each { log.error it }
-        }
+	AcceptedSynonym.withNewSession {
+		def ent1 = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
+			if(ent1) return;
+		def ent = new AcceptedSynonym(accepted: accepted, synonym: synonym)
+			if(!ent.save()) {
+				ent.errors.allErrors.each { log.error it }
+			}
+	}
     }
     
     static List<SynonymsMerged> fetchSynonyms(TaxonomyDefinition accepted) {
