@@ -1944,7 +1944,7 @@ def sql= session.createSQLQuery(query)
 		Map updateTrMap = [:]
 		
 		Species.withTransaction {
-		
+		println "================ starting things now "
 		trList.each { TaxonomyRegistry tr ->
 			String newPath = tr.path
 			newPath = newPath.replaceAll('_' + oldId + '_', '_' + newId + '_')
@@ -1977,6 +1977,7 @@ def sql= session.createSQLQuery(query)
 		
 
 		updateTrList.each {TaxonomyRegistry tr ->
+			println "================ updating tr " + tr
 			if(!tr.save(flush:true)){
 				tr.errors.allErrors.each { log.error it }
 			}
@@ -1984,11 +1985,13 @@ def sql= session.createSQLQuery(query)
 
 				
 		oldTrToBeDeleted.each {TaxonomyRegistry tr ->
+			println "================ deleting tr " + tr
 			tr.delete(flush:true)
 		}
 		
 		//updating taxon def so that new hirarchy should be shown
 		oldTrList.each {TaxonomyRegistry tr ->
+			println "================ taxon def for tr " + tr
 			tr.taxonDefinition = newName
 			
 		}
@@ -1997,9 +2000,21 @@ def sql= session.createSQLQuery(query)
 		
 		//moving synonym
 		oldName.fetchSynonyms().each {
+			println "================ synonym move " + it
 			newName.addSynonym(it)
 			oldName.removeSynonym(it)
 		}
+		
+		//moving common names
+		List cns = CommonNames.findAllByTaxonConcept(oldName)
+		cns.each { cn ->
+			println "================ common name update " + cn
+			cn.taxonConcept = newName
+			if(!cn.save(flush:true)){
+				cn.errors.allErrors.each { log.error it }
+			}
+		}
+		
 		
 		
 		Species oldSpecies = Species.findByTaxonConcept(oldName)
@@ -2011,6 +2026,7 @@ def sql= session.createSQLQuery(query)
 			if(!oldSpecies.save(flush:true)){
 				oldSpecies.errors.allErrors.each { log.error it }
 			}
+			log.debug "  new speices not available"
 		}
 		
 		if(newSpecies && oldSpecies){
@@ -2023,7 +2039,8 @@ def sql= session.createSQLQuery(query)
 			}
 			
 			//move resources
-			oldSpecies.resources.each { res ->
+			def ress = oldSpecies.resources.collect { it}
+			ress.each { res ->
 				log.debug "Removing resource " + res
 				newSpecies.addToResources(res)
 				oldSpecies.removeFromResources(res)
@@ -2045,6 +2062,7 @@ def sql= session.createSQLQuery(query)
 		
 		//setting delete flag true on name
 		oldName.isDeleted = true
+		println "======= for delete " + oldName
 		if(!oldName.save(flush:true)){
 			oldName.errors.allErrors.each { log.error it }
 		}
