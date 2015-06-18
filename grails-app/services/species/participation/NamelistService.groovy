@@ -1922,7 +1922,7 @@ def sql= session.createSQLQuery(query)
 		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
 		TaxonomyDefinition newName = TaxonomyDefinition.get(newId)
 		
-		if(oldName ||  newName){
+		if(!oldName &&  !newName){
 			log.debug "One of name is not exist in the system " + oldId + "  " +  newId
 			return
 		}
@@ -1937,17 +1937,54 @@ def sql= session.createSQLQuery(query)
 		trList.addAll(oldTrList)
 		trList.unique()
 		
+		
+		List oldTrToBeDeleted = []
+		List updateTrList = []
+		
+		Map updateTrMap = [:]
+		
+		Species.withTransaction {
+		
 		trList.each { TaxonomyRegistry tr ->
-			tr.path = tr.path.replaceAll('_' + oldId + '_', '_' + newId + '_')
+			String newPath = tr.path
+			newPath = newPath.replaceAll('_' + oldId + '_', '_' + newId + '_')
 			
-			if(tr.path.startsWith(oldId + '_'))
-				tr.path.replaceFirst(oldId + '_', newId + '_')
+			if(newPath.startsWith(oldId + '_'))
+				newPath.replaceFirst(oldId + '_', newId + '_')
 			
-			if(tr.path == ('' + oldId) )
-				tr.path = '' + newId
+			if(newPath == ('' + oldId) )
+				newPath = '' + newId
 			
-			if(tr.path.endsWith('_' + oldId))
-				tr.path = tr.path.substring(0, tr.path.lastIndexOf('_') + newId)
+			if(newPath.endsWith('_' + oldId))
+				newPath = newPath.substring(0, newPath.lastIndexOf('_') + 1) +  newId
+				
+			if(isDuplicateTr(tr, newPath, newName)){
+				oldTrToBeDeleted << tr
+			}else{
+				updateTrMap.put(tr, newPath)
+			}	
+		}
+		
+		trList.clear()
+		updateTrMap.each { k, v ->
+			k.path = v
+			updateTrList << k
+		}
+		updateTrMap.clear()
+		
+		oldTrList.removeAll(oldTrToBeDeleted)
+		//trList.removeAll(oldTrToBeDeleted)
+		
+
+		updateTrList.each {TaxonomyRegistry tr ->
+			if(!tr.save(flush:true)){
+				tr.errors.allErrors.each { log.error it }
+			}
+		}
+
+				
+		oldTrToBeDeleted.each {TaxonomyRegistry tr ->
+			tr.delete(flush:true)
 		}
 		
 		//updating taxon def so that new hirarchy should be shown
@@ -1956,15 +1993,6 @@ def sql= session.createSQLQuery(query)
 			
 		}
 		
-		trList.each {TaxonomyRegistry tr ->
-			if(!tr.save(flush:true)){
-				tr.errors.allErrors.each { log.error it }
-			}
-		}
-		
-		oldTrList.each {TaxonomyRegistry tr ->
-			tr.delete(flush:true)
-		}
 		
 		
 		//moving synonym
@@ -2002,7 +2030,8 @@ def sql= session.createSQLQuery(query)
 			}
 			
 			//add hyper link for redirect
-			
+			log.debug "================= old species id " + oldSpecies + " ............ " + newSpecies
+			ResourceRedirect.addLink(oldSpecies, newSpecies)
 			
 			//saving new species
 			if(!newSpecies.save(flush:true)){
@@ -2010,7 +2039,7 @@ def sql= session.createSQLQuery(query)
 			}
 			
 			//deleting speices
-			oldSpecies.taxonConcept = null
+			//oldSpecies.taxonConcept = null
 			oldSpecies.deleteSpecies(SUser.read(1))
 		}
 		
@@ -2019,7 +2048,30 @@ def sql= session.createSQLQuery(query)
 		if(!oldName.save(flush:true)){
 			oldName.errors.allErrors.each { log.error it }
 		}
+		}
 		
+	}
+	
+	
+	private boolean isDuplicateTr(tr, newPath, newName){
+		//update all paths for this taxon defintion
+		def id = newName.id
+		List trList = TaxonomyRegistry.findAllByPath('%_' + id + '_%')
+		trList.addAll(TaxonomyRegistry.findAllByPath(id + '_%'))
+		trList.addAll(TaxonomyRegistry.findAllByPath(id))
+		trList.addAll(TaxonomyRegistry.findAllByTaxonDefinition(newName))
+		trList.unique()
+		
+		boolean isDuplicate = false
+		
+		trList.each { nTr ->
+			
+				if((nTr.classification == tr.classification) && (nTr.path == newPath) ){
+					isDuplicate = true
+				}
+				
+		}
+		return isDuplicate
 	}
     
 }
