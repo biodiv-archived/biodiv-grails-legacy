@@ -364,7 +364,7 @@ boolean migrateThisSynonym(syn) {
 }
 
 def migrateSynonyms() {
-    int limit = 20000, offset = 0, insert_check = 0,exist_check = 0;
+    int limit = 20000, offset = 17795, insert_check = 0,exist_check = 0;
     int counter = 0;
     def nonParsedSyns = [];
     def notMigrating = [];
@@ -476,7 +476,7 @@ def migrateSynonyms() {
     println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
-//migrateSynonyms();
+migrateSynonyms();
 
 def createTaxons() {
     taxSer = ctx.getBean("taxonService");
@@ -1105,13 +1105,13 @@ def addSynonymsFromCOL() {
                         println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
                         NamesParser namesParser = new NamesParser();
                         def parsedNames = namesParser.parse([synDetails.name]);
-                        boolean createThisSynonym;
+                        boolean createSynonym;
                         if(parsedNames[0]?.canonicalForm) {
-                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
+                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
                         } else {
-                            createThisSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
+                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
                         }
-                        if(createThisSynonym) {
+                        if(createSynonym) {
                             addSynToAccName(taxDef, synDetails)    
                         } else {
                             println "======THIS SYNONYM FROM COL ALREADY EXISTS===="
