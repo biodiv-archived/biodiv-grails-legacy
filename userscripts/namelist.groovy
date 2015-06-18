@@ -1340,9 +1340,11 @@ def getTaxonMap(taxon) {
 
 def createIBPHierarchyForDirtylist() {
     //for all names in dirty list
-    def taxons = TaxonomyDefinition.findAllByPosition(NamePosition.DIRTY);
+
+    Date startDate = new Date();
+    def taxons = TaxonomyDefinition.findAllByPositionAndStatus(NamePosition.DIRTY, NamesMetadata.NameStatus.ACCEPTED);
     println "----------------------"
-    int i=0;
+    int i = 0;
     taxons.each { taxon ->
         if(i++ == 0) return;
         println taxon;
@@ -1378,12 +1380,13 @@ def createIBPHierarchyForDirtylist() {
             }
         }
     }
+    println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
 }
 
 //IBPhierarchyDirtlistSpsWithInfo() 
 //IBPhierarchyDirtlistSpsToDrop();
 //IBPhierarchyDirtlistABOVESpsToDrop();
-//createIBPHierarchyForDirtylist();
+createIBPHierarchyForDirtylist();
 
 
 def copyIBPHierarchyToCOLClassification() {
@@ -1435,4 +1438,4 @@ def copyIBPHierarchyToCOLClassification() {
     println "=====START === " + start + "====END === " + new Date()
 }
 
-copyIBPHierarchyToCOLClassification()
+//copyIBPHierarchyToCOLClassification()
