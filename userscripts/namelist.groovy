@@ -476,7 +476,7 @@ def migrateSynonyms() {
     println "=======NOT MIGRATING SIZE ===== " + notMigrating.size()
 }
 
-migrateSynonyms();
+//migrateSynonyms();
 
 def createTaxons() {
     taxSer = ctx.getBean("taxonService");
@@ -1313,28 +1313,25 @@ def IBPhierarchyDirtlistABOVESpsToDrop() {
     println "deleted "+no+" taxonNames";
 }
 
-def getTaxonMap(taxon) {
+def getTaxonMap(taxon, author, iucn, gbif) {
     println "cheking author"
-    def classifi = Classification.findByName("Author Contributed Taxonomy Hierarchy");
-    def map = taxon.longestParentTaxonRegistry(classifi);
+    def classifi
+    def map = taxon.longestParentTaxonRegistry(author);
     if(map.regId) {
-        hierarchyNodes = map.get(classifi);
+        classifi = author
+        hierarchyNodes = map.get(author);
     } else {
         println "checking IUCN"
-        classifi = Classification.findByName('IUCN Taxonomy Hierarchy (2010)');
-        map = taxon.longestParentTaxonRegistry(classifi);
+        classifi = iucn
+        map = taxon.longestParentTaxonRegistry(iucn);
         if(map.regId) {
         } else {
             println "chking GBIF"
-            println grailsApplication.config.soeciesPortal.fields.GBIF_TAXONOMIC_HIERARCHY;
-
-            classifi = Classification.findByName("GBIF Taxonomy Hierarchy");
-            println classifi;
-            map = taxon.longestParentTaxonRegistry(classifi);
+            classifi = gbif
+            map = taxon.longestParentTaxonRegistry(gbif);
         }
     }
     map.put('classification', classifi);
-    println map
     return map;
 }
 
@@ -1342,14 +1339,24 @@ def createIBPHierarchyForDirtylist() {
     //for all names in dirty list
 
     Date startDate = new Date();
-    def taxons = TaxonomyDefinition.findAllByPositionAndStatus(NamePosition.DIRTY, NamesMetadata.NameStatus.ACCEPTED);
+    /*def taxons = TaxonomyDefinition.findAllByPositionAndStatus(NamePosition.DIRTY, NamesMetadata.NameStatus.ACCEPTED);
+    TaxonomyDefinition.executeQuery("from TaxonomyDefinition t left join TaxonomyRegistry reg with reg.classification=:classifi and t.id = reg.taxonDefinition where t.position='DIRTY' and t.status='ACCEPTED' and reg.id is null");
+    import species.TaxonomyDefinition
+    println TaxonomyDefinition.executeQuery("select count(*) from TaxonomyRegistry reg right  join reg.taxonDefinition as t with reg.classification=265799  where t.position='DIRTY' and t.status='ACCEPTED' and reg.id is null ");
+    */
+    def taxons = [TaxonomyDefinition.read(186979L)];//findAllByPositionAndStatus(NamePosition.DIRTY, NamesMetadata.NameStatus.ACCEPTED);
     println "----------------------"
+    println taxons
     int i = 0;
+    def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+    def author = Classification.findByName("Author Contributed Taxonomy Hierarchy");
+    def iucn = Classification.findByName('IUCN Taxonomy Hierarchy (2010)');
+    def gbif = Classification.findByName("GBIF Taxonomy Hierarchy");
+    def admin = SUser.read(1L);
     taxons.each { taxon ->
-        if(i++ == 0) return;
         println taxon;
         TaxonomyDefinition.withNewTransaction { 
-            def map = getTaxonMap(taxon);
+            def map = getTaxonMap(taxon, author, iucn, gbif);
             def hierarchyNodes;
             def reg;
             if(map.regId) {
@@ -1357,24 +1364,23 @@ def createIBPHierarchyForDirtylist() {
             }
             if(hierarchyNodes) {
                 def taxonNames = new ArrayList(10);
-                def classifi = Classification.findByName("IBP Taxonomy Hierarchy");
                 int j
                 for(j = hierarchyNodes.size()-2; j>=0; j--) {
                     //check which node high up in the hierarchy is in WORKING status
                     if(hierarchyNodes[j].position == NamePosition.WORKING) {
                         //update path from the node with WORKING path.
-                        def map2 = hierarchyNodes[j].parentTaxonRegistry(classifi);
-                        def reg2 = map2.get(classifi);
+                        def map2 = hierarchyNodes[j].parentTaxonRegistry(ibp_classifi);
+                        def reg2 = map2.get(ibp_classifi);
                         reg2.each{
-                            taxonNames << it.name;
+                            taxonNames[it.rank] = it.name;
                         }
                         break;
                     } 
                 }
                 for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
-                    taxonNames << hierarchyNodes[k].name;
+                    taxonNames[hierarchyNodes[k].rank] =  hierarchyNodes[k].name;
                 }
-                println  taxonService.addTaxonHierarchy(null, taxonNames, classifi, SUser.read(1L), null, false, false, null);
+                println  taxonService.addTaxonHierarchy(null, taxonNames, ibp_classifi, admin, null, false, false, null);
             } else {
                 println "No hierarchy"
             }
