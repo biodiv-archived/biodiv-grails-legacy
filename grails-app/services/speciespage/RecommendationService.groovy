@@ -32,8 +32,8 @@ class RecommendationService {
 	 */
 	boolean save(Recommendation reco) {
 		def dupReco = searchReco(reco.name, reco.isScientificName, reco.languageId, reco.taxonConcept)
-		if(dupReco){
-			log.debug "Same reco found in database so igonoring save $reco"
+		if(dupReco && (reco.id == dupReco.id)){
+			log.debug "Same reco found in database so igonoring save $reco  ... duplicate reco $dupReco"
 			return true
 		}
 		
@@ -41,7 +41,7 @@ class RecommendationService {
 		if(reco.save(flush:flushImmediately)) {
 			log.debug "creating new recommendation $reco"
 			//XXX uncomment this
-			namesIndexerService.add(reco);
+			//namesIndexerService.add(reco);
 			return true;
 		}
 		log.error "Error saving recommendation"
@@ -55,18 +55,19 @@ class RecommendationService {
 	 * @return
 	 */
 	int save(List<Recommendation> recos) {
-		log.info "Saving recos : "+recos.size()
+		log.info "Saving recos >>> : "+recos.size()
 
 		int noOfRecords = 0;
 		def startTime = System.currentTimeMillis()
 		recos.eachWithIndex { Recommendation reco, index ->
 			def dupReco = searchReco(reco.name, reco.isScientificName, reco.languageId, reco.taxonConcept)
-			if(dupReco){
-				log.debug "Same reco found in database so igonoring save $reco"
+			if(dupReco && (reco.id == dupReco.id)){
+				log.debug "Same reco found in database so igonoring save $reco   ... duplicate reco $dupReco"
 			}else{
 				if(reco.save()) {
 					noOfRecords++;
-					namesIndexerService.add(reco);
+					//XXX uncomment this
+					//namesIndexerService.add(reco);
 				} else {
 					reco.errors.allErrors.each { log.error it }
 					log.error "Coundn't save the recommendation : "+reco				
@@ -79,7 +80,8 @@ class RecommendationService {
 		}
 		if(noOfRecords) {
 			def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
-			namesIndexerService.store(indexStoreDir);
+			//XXX uncomment this
+			//namesIndexerService.store(indexStoreDir);
 			cleanUpGorm();
 		}
 		log.info "Time taken to save : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
