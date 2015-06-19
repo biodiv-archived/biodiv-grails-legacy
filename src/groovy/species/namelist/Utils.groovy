@@ -67,7 +67,7 @@ class Utils {
             List tds = cri.list (max: BATCH_SIZE , offset:offset) {
                 and {
                     //lt('id', 293748L)
-                    eq('position', NamesMetadata.NamePosition.DIRTY)
+                    eq('position', NamesMetadata.NamePosition.RAW)
                     //eq('isDeleted', false)//isNull('matchId')
                 }
                 order('rank','asc')

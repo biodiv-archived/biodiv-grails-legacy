@@ -13,7 +13,7 @@
 
 <title>NameList - Curation Interface</title>
 <style type="text/css">
-    .DIRTY {
+    .RAW {
         background-color:red;
     }
     .WORKING {
@@ -143,7 +143,7 @@
     </div>
     <div class="span3 listarea">
         <span class="dirty_list_span taxon_selector_wrapper_span">
-            Dirty List
+            Raw List
         </span>
         <select class="span12 listSelector">
             <option value='accDLContent'>Accepted Names</option>
@@ -278,6 +278,13 @@
   .lt_family input{
     margin-bottom:3px;
   }
+    
+    .canBeDisabled .rankStrings {
+        padding-left:4px;
+    }
+    .canBeDisabled .rankValues {
+        padding-right:4px;
+    }
 
 </style>
 
@@ -289,49 +296,49 @@
             <div class="span3 canBeDisabled column lt_family" style="width:30%;background:#C0504D">
                         <table style="width:100% ;color:white">
                             <tr>
-                                <td>Kingdom</td>
-                                <td><input type="text" class="kingdom span12"></td> 
+                                <td class='rankStrings'>Kingdom</td>
+                                <td class='rankValues'><input type="text" class="kingdom span12"></td> 
                             </tr>
                             <tr>
-                                <td>Phylum</td>
-                                <td><input type="text" class="phylum span12"></td> 
+                                <td class='rankStrings'>Phylum</td>
+                                <td class='rankValues'><input type="text" class="phylum span12 "></td> 
                             </tr>
                             <tr>
-                                <td>Class</td>
-                                <td><input type="text" class="class span12"></td> 
+                                <td class='rankStrings'>Class</td>
+                                <td class='rankValues'><input type="text" class="class span12 "></td> 
                             </tr>
                             <tr>
-                                <td>Order</td>
-                                <td><input type="text" class="order span12"></td> 
+                                <td class='rankStrings'>Order</td>
+                                <td class='rankValues'><input type="text" class="order span12 "></td> 
                             </tr>
                             <tr>
-                                <td class="super_family">Super-Family</td>
-                                <td><input type="text" class="superfamily span12"></td> 
+                                <td class="super_family rankStrings">Super-Family</td>
+                                <td class='rankValues'><input type="text" class="superfamily span12 "></td> 
                             </tr>
                             <tr>
-                                <td>Family</td>
-                                <td><input type="text" class="family span12"></td> 
+                                <td class='rankStrings'>Family</td>
+                                <td class='rankValues'><input type="text" class="family span12 "></td> 
                             </tr>
                             <tr>
-                                <td class="sub_family">Sub-Family</td>
-                                <td><input type="text" class="subfamily span12"></td> 
+                                <td class="sub_family rankStrings">Sub-Family</td>
+                                <td class='rankValues'><input type="text" class="subfamily span12 "></td> 
                             </tr>
                             <tr>
-                                <td>Genus</td>
-                                <td><input type="text" class="genus span12"></td> 
+                                <td class='rankStrings'>Genus</td>
+                                <td class='rankValues'><input type="text" class="genus span12 "></td> 
                             </tr>
 
                             <tr>
-                                <td class="sub_genus">Sub-Genus</td>
-                                <td><input type="text" class="subgenus span12"></td> 
+                                <td class="sub_genus rankStrings">Sub-Genus</td>
+                                <td class='rankValues'><input type="text" class="subgenus span12 "></td> 
                             </tr>
                             <tr>
-                                <td>Species</td>
-                                <td><input type="text" class="species span12"></td> 
+                                <td class='rankStrings'>Species</td>
+                                <td class='rankValues'><input type="text" class="species span12 "></td> 
                             </tr>
                             <tr>
-                                <td class="infra_species">Infra-Species</td>
-                                <td><input type="text" class="infraspecies span12"></td> 
+                                <td class="infra_species rankStrings">Infra-Species</td>
+                                <td class='rankValues'><input type="text" class="infraspecies span12"></td> 
                             </tr>
 
                         </table>
@@ -345,17 +352,17 @@
                         <input type="hidden" class="fromCOL" value=false>
                         <input type="hidden" class="id_details" value="">
 
-                        <div class="row-fluid">
+                        <div class="row-fluid" style="color:white">
                             <div class="span4" style="width:39%;">
-                                Name 
+                                <b>Name</b> 
                                 <input type="text" placeholder="Name" class="name span10" style="height:100%;width:70%;"/>
                             </div>
                             <div class="span4" style="width:29%;">
-                                AuthorString 
+                               <b> AuthorString </b>
                                 <input type="text" placeholder="Author string" class="authorString span8" style="height:100%;width:60%;"/>
                             </div>
                             <div class="span4" style="width:25%;">
-                                Status  <select id="statusDropDown" class="statusDropDown span9" style="height:100%;width:70%;" >
+                                <b>Status</b>  <select id="statusDropDown" class="statusDropDown span9" style="height:100%;width:70%;" >
                                     <option value="chooseNameStatus">Choose Name Status</option>
                                     <g:each in="${NameStatus.list()}" var="ns">
                                     <option value="${ns.toString().toLowerCase()}">${ns}</option>
@@ -364,8 +371,8 @@
                             </div>
                         </div>
 
-                            <div class="row-fluid">
-                                <div class="span3">Rank
+                            <div class="row-fluid" style="color:white">
+                                <div class="span3"><b>Rank</b>
                                     <select id="rankDropDown" class="rankDropDown span9" >
                                         <option value="chooseRank">Choose Rank</option>
                                         <% def rankCount = 0 %>
@@ -375,13 +382,13 @@
                                     </select>
                                 </div>
                                 <div class="span3">
-										Source  <input type="text" placeholder="" class="source span8" style="height:100%;"/>
+										<b>Source </b> <input type="text" placeholder="" class="source span8" style="height:100%;"/>
 									</div>															
 									<div class="span3">
-										via  <input type="text" placeholder="" class="via span9"/>
+										<b>via</b>  <input type="text" placeholder="" class="via span9" style="height:100%;"/>
 									</div>
 									<div class="span3">
-										ID  <input type="text" placeholder="" class="id span9"/>
+										<b>ID</b>  <input type="text" placeholder="" class="id span9" style="height:100%;"/>
 									</div>			
 							</div>
 						    <div class="row-fluid">	
@@ -389,9 +396,9 @@
 						
 
                         <ul class="nav nav-tabs" id="" style="margin:0px;">
-                            <li id="names-li0" class="active"><a href="#names-tab0" class="btn" data-toggle="tab">Accepted Name</a></li>
-                            <li id="names-li1"><a href="#names-tab1" class="btn" data-toggle="tab">Synonyms</a></li>
-                            <li id="names-li2"><a href="#names-tab2" class="btn" data-toggle="tab">Common Names</a></li>   
+                            <li id="names-li0" class="active" style="width:175px;"><a href="#names-tab0" class="btn" data-toggle="tab">Accepted Name</a></li>
+                            <li id="names-li1" style="width:175px;"><a href="#names-tab1" class="btn" data-toggle="tab">Synonyms</a></li>
+                            <li id="names-li2" style="width:175px;"><a href="#names-tab2" class="btn" data-toggle="tab">Common Names</a></li>   
                             <!--li id="names-li3"><a href="#names-tab3" class="btn" data-toggle="tab">Reference(s)</a></li-->   
                         </ul>
 
@@ -408,7 +415,7 @@
                             </div>
                             <!--div class="tab-pane" id="names-tab3" style="">
                                 <g:render template="/namelist/dataTableReferenceTemplate" model="['type':'r']"/>
-                            </div-->
+                            </div--!>
                         </div>
 
 
@@ -423,7 +430,7 @@
                                         <input type="text" class="nameInputs span12" name="value">
                                     </div>   
                                {{else}}
-                                    <div class="span3">
+                                    <div class="span4"style ="padding-left:4px;padding-right:4px;">
                                         <input type="hidden" class ="{{>typeClass}}" name="{{>typeClass}}" value=""/>
                                         <input type="text" class="nameInputs span12" name="value">
                                     </div>                                    
@@ -440,19 +447,19 @@
                                             </g:each>
                                         </select>
                                     </div>
-                                          <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
+                                          <div class="span2"><input type="text" class="nameInputs span12" name="source"></div>
                                           <div class="span2"><input type="text" class="nameInputs span12" name="contributor"></div> 
                                     {{else}}
-                                        <div class="span3"><input type="text" class="nameInputs span12" name="source"></div>
-                                        <div class="span4"><input type="text" class="nameInputs span12" name="contributor"></div> 
+                                        <div class="span3"style ="padding-right:4px;"><input type="text" class="nameInputs span12" name="source"></div>
+                                        <div class="span3"style ="padding-right:4px;"><input type="text" class="nameInputs span12" name="contributor"></div> 
                                     {{/if}}
                                 {{/if}}    
-                                    <div class="span2">
+                                    <div class="span2" style="text-align:center;">
                                         {{if typeClass == "aid"}}
-                                            <button class="btn btn-mini btn-primary addEdit" onClick='validateName(this, false);'>Validate Name</button>
+                                            <button class="btn btn-mini btn-primary addEdit disabled" onClick='validateName(this, false);'>Validate Name</button>
                                         {{else}}
-                                            <button class="btn btn-mini btn-primary addEdit" onClick='modifyContent(this,"{{>typeClass}}");' rel="add"><i class="icon-ok icon-white"></i></button>
-                                            <button class="btn btn-mini delete" onClick='modifyContent(this,"{{>typeClass}}");' rel='delete'><i class="icon-remove"></i></button>
+                                            <button class="btn btn-mini btn-primary addEdit disabled" onClick='modifyContent(this,"{{>typeClass}}");' rel="add"><i class="icon-ok icon-white"></i></button>
+                                            <button class="btn btn-mini delete disabled" onClick='modifyContent(this,"{{>typeClass}}");' rel='delete'><i class="icon-remove"></i></button>
                                         {{/if}}
                                     </div>
 
@@ -501,23 +508,23 @@
 		  
 		  <div class="connection_wrapper_row1">Species Page</div>
 		  
-		  <div class="connection_wrapper_row2 countSp">xx</div>
+		  <div class="connection_wrapper_row2 countSp"></div>
 
 		  <div class="connection_wrapper_row1">Observations</div>
 		  
-		  <div class="connection_wrapper_row2 countObv">xx</div>
+		  <div class="connection_wrapper_row2 countObv"></div>
 		  
 		  <div class="connection_wrapper_row1">Lists</div>
 		  
-		  <div class="connection_wrapper_row2 countCKL">xx</div>
+		  <div class="connection_wrapper_row2 countCKL"></div>
 		  
 		  <div class="connection_wrapper_row1">Maps</div>
 		  
-		  <div class="connection_wrapper_row2 countMaps">xx</div>
+		  <div class="connection_wrapper_row2 countMaps"></div>
 		  
 		  <div class="connection_wrapper_row1">Documents</div>
 		  
-		  <div class="connection_wrapper_row2 countDocs">xx</div>
+		  <div class="connection_wrapper_row2 countDocs"></div>
       </div>
 
   </div>

@@ -1682,7 +1682,7 @@ class XMLConverter extends SourceConverter {
                                                     if(it.position == NamePosition.WORKING && !workingTaxon) {
                                                         workingTaxon = it;
                                                     }
-                                                    if(it.position == NamePosition.DIRTY && !dirtyTaxon) {
+                                                    if(it.position == NamePosition.RAW && !dirtyTaxon) {
                                                         dirtyTaxon = it;
                                                     }
                                                 }
@@ -1714,7 +1714,7 @@ class XMLConverter extends SourceConverter {
                                             if(it.position == NamePosition.WORKING && !workingTaxon) {
                                                 workingTaxon = it;
                                             }
-                                            if(it.position == NamePosition.DIRTY && !dirtyTaxon) {
+                                            if(it.position == NamePosition.RAW && !dirtyTaxon) {
                                                 dirtyTaxon = it;
                                             }
                                         }
@@ -1762,7 +1762,7 @@ class XMLConverter extends SourceConverter {
                                 }
                                 if(fromCOL) {
                                     println "=========COL SE REQUIRED==============="
-                                    taxon.matchDatabaseName = "COL";
+                                    taxon.matchDatabaseName = "CatalogueOfLife";
                                     taxon.colNameStatus = NamesMetadata.COLNameStatus.ACCEPTED
                                     //get its data from col and save
                                     println "=======NAME======== " + name
@@ -1851,7 +1851,7 @@ class XMLConverter extends SourceConverter {
                                     namelistService.namesBeforeSave[taxon.id] = "Working"
                                 }*/
                                 taxon.position = NamePosition.WORKING
-                                taxon.matchDatabaseName = "COL";
+                                taxon.matchDatabaseName = "CatalogueOfLife";
                                 if(otherParams.id_details && otherParams.id_detailstaxon.canonicalForm) {
                                 println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
                                     taxon.matchId = otherParams.id_details[taxon.canonicalForm];
@@ -1871,7 +1871,7 @@ class XMLConverter extends SourceConverter {
                             //even if a single name in hierarchy is in dirty list
                             //abort process
                             if(otherParams && otherParams.moveToWKG) {
-                                if(taxon.position == NamePosition.DIRTY) {
+                                if(taxon.position == NamePosition.RAW) {
                                     newNameSaved = true;
                                 }
                             }
