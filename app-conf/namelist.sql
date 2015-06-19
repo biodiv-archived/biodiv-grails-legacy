@@ -105,7 +105,10 @@ delete from taxonomy_registry where id in (select id from taxonomy_registry wher
 
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
-2. Trinomials rank update using updateRanks() in namelist.groovy, sheet provided by Thomas (dirtynamesMatchedtoCoLpipesep.csv).
+//All files under /apps/git/biodiv/namelist
+//All logs under /apps/git/biodiv/namelist/logs
+
+2. Trinomials rank update using updateRanks() in namelist.groovy, sheet provided by Thomas (trinomialsFinal.csv).
 
 3. Add IBP hierarchy using addIBPTaxonHie() in namelist.groovy.
 
@@ -116,7 +119,7 @@ delete from taxonomy_registry where id in (select id from taxonomy_registry wher
 
 6. curateAllNames() in namelist.groovy, check what is the last id in tax_def and use that.
 
-7. curateWithManualIds() in namelist.groovy, sheet provided by thomas //sheet provided by Thomas (dirtynamesMatchedtoCoLpipesep.csv)
+7. curateWithManualIds() in namelist.groovy, sheet provided by Thomas (dirtynamesMatchedtoCoLpipesep.csv)
 
 8. addSynonymsFromCOL() in namelist.groovy
 
