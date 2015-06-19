@@ -1129,7 +1129,7 @@ class TaxonService {
         def taxons = taxonsMap.get(classification);
         taxons.add(taxonDef);
         taxons.each {
-            if(it.position == NamePosition.DIRTY) {
+            if(it.position == NamePosition.RAW) {
                 println "=====CHANGING POSITION to WORKING ====="
                 it.position = NamePosition.WORKING
             }

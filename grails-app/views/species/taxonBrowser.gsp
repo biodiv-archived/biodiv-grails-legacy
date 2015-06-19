@@ -12,7 +12,7 @@
 
 <r:require modules="species_show"/>
 <style type="text/css">
-    .DIRTY {
+    .RAW {
         background-color:red;
     }
     .WORKING {

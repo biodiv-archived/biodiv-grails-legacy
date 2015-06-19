@@ -277,7 +277,7 @@ ALTER TABLE common_names ADD COLUMN  ibp_source varchar(255);
 ALTER TABLE common_names ADD COLUMN  via_datasource varchar(255);
 
 update common_names set status = 'COMMON';
-update  common_names set position = 'DIRTY';
+update  common_names set position = 'RAW';
 
 
 ALTER TABLE taxonomy_definition ADD COLUMN  status varchar(255);
@@ -289,7 +289,7 @@ ALTER TABLE taxonomy_definition ADD COLUMN  ibp_source varchar(255);
 ALTER TABLE taxonomy_definition ADD COLUMN  via_datasource varchar(255);
 
 update  taxonomy_definition set status = 'ACCEPTED';
-update  taxonomy_definition set position = 'DIRTY';
+update  taxonomy_definition set position = 'RAW';
 
 
 ALTER TABLE synonyms ADD COLUMN  status varchar(255);
@@ -301,7 +301,7 @@ ALTER TABLE synonyms ADD COLUMN  ibp_source varchar(255);
 ALTER TABLE synonyms ADD COLUMN  via_datasource varchar(255);
 
 update  synonyms set status = 'SYNONYM';
-update  synonyms set position = 'DIRTY';
+update  synonyms set position = 'RAW';
 
 //added on 25th Feb 2015
 ALTER TABLE taxonomy_definition add column is_flagged boolean;

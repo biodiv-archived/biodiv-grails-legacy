@@ -17,6 +17,7 @@ class NamelistController {
 
     def namelistService
     def utilsService
+    def springSecurityService;
 	
 	/**
 	 * input : taxon id ,classification id of ibp 
@@ -157,8 +158,14 @@ class NamelistController {
         println "========RES ======= " + res
         render res as JSON
     }
-   
+  
+    @Secured(['ROLE_USER'])
     def curateName() {
+        if(!utilsService.isAdmin(springSecurityService.currentUser?.id)) {
+            def res = [:]
+            res['msg'] = "This action is temporarily disabled while feedback on the curation interface is being collected . Please leave comment below with details of correction required so that admins can implement it."
+            render res as JSON
+        }
         def acceptedMatch = JSON.parse(params.acceptedMatch);
         acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
         if(acceptedMatch.isOrphanName == "true"){

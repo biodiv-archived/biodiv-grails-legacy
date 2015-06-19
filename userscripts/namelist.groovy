@@ -54,7 +54,7 @@ def curateName(taxonId, domainSourceDir) {
     } else {
         ScientificName sciName = TaxonomyDefinition.get(taxonId.toLong())
 	sciName.noOfCOLMatches = 0;
-        sciName.position = NamesMetadata.NamePosition.DIRTY;
+        sciName.position = NamesMetadata.NamePosition.RAW;
         sciName.dirtyListReason = "NO XML - NO COL DATA"
         println "=======NO COL MATCHES==== " + sciName.noOfCOLMatches
 	if(sciName.save(flush:true) && !sciName.hasErrors()) {
@@ -80,7 +80,7 @@ def updatePosition(){
     println "====update status called=";
     ScientificName sciName = TaxonomyDefinition.get(7L)
     //nSer.updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
-    sciName.position = NamesMetadata.NamePosition.DIRTY
+    sciName.position = NamesMetadata.NamePosition.RAW
     sciName.save(flush:true)
     println "===pos=== " + sciName.position ; 
 }
@@ -128,7 +128,7 @@ ALTER TABLE common_names ADD COLUMN  ibp_source varchar(255);
 ALTER TABLE common_names ADD COLUMN  via_datasource varchar(255);
 
 update common_names set status = 'COMMON';
-update  common_names set position = 'DIRTY';
+update  common_names set position = 'RAW';
 
 
 ALTER TABLE taxonomy_definition ADD COLUMN  status varchar(255);
@@ -140,7 +140,7 @@ ALTER TABLE taxonomy_definition ADD COLUMN  ibp_source varchar(255);
 ALTER TABLE taxonomy_definition ADD COLUMN  via_datasource varchar(255);
 
 update  taxonomy_definition set status = 'ACCEPTED';
-update  taxonomy_definition set position = 'DIRTY';
+update  taxonomy_definition set position = 'RAW';
 
 
 ALTER TABLE synonyms ADD COLUMN  status varchar(255);
@@ -152,7 +152,7 @@ ALTER TABLE synonyms ADD COLUMN  ibp_source varchar(255);
 ALTER TABLE synonyms ADD COLUMN  via_datasource varchar(255);
 
 update  synonyms set status = 'SYNONYM';
-update  synonyms set position = 'DIRTY';
+update  synonyms set position = 'RAW';
 
 */
 
@@ -364,7 +364,7 @@ boolean migrateThisSynonym(syn) {
 }
 
 def migrateSynonyms() {
-    int limit = 20000, offset = 17795, insert_check = 0,exist_check = 0;
+    int limit = 20000, offset = 0, insert_check = 0,exist_check = 0;
     int counter = 0;
     def nonParsedSyns = [];
     def notMigrating = [];
@@ -657,7 +657,7 @@ def incompleteHierarchy() {
             tdList = c.list (max: limit , offset:offset) {
                 and {
                     lt('id', 275703L)
-                    eq('position', NamesMetadata.NamePosition.DIRTY)
+                    eq('position', NamesMetadata.NamePosition.RAW)
                     //isNull('position')
                 }
                 order('rank','asc')
@@ -1030,14 +1030,14 @@ def addSynToAccName(sciName, synDetails) {
           }*/
 
         synMer.status = NamesMetadata.NameStatus.SYNONYM
-        synMer.viaDatasource = ""
+        synMer.viaDatasource = "CatalogueOfLife"
         synMer.uploadTime = new Date()
         def contributor = SUser.read(1L);
         synMer.uploader = contributor
         synMer.authorYear = synDetails.authorString;
         synMer.ibpSource = null
         synMer.matchId = synDetails.id
-        synMer.matchDatabaseName = "COL"
+        synMer.matchDatabaseName = "CatalogueOfLife"
         synMer.position = NamesMetadata.NamePosition.WORKING
         synMer.rank = synDetails.parsedRank;
         synMer.colNameStatus = nSer.getCOLNameStatus(synDetails.colNameStatus);
@@ -1196,7 +1196,7 @@ def addDetailsFromGNI() {
 def testCheck(){
 	ScientificName sciName = TaxonomyDefinition.get(882L);
         sciName.noOfCOLMatches = 0;
-        sciName.position = NamesMetadata.NamePosition.DIRTY;
+        sciName.position = NamesMetadata.NamePosition.RAW;
         sciName.dirtyListReason = "NO XML - NO COL DATA"
         println "=======NO COL MATCHES==== " + sciName.noOfCOLMatches
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
@@ -1338,11 +1338,15 @@ def getTaxonMap(taxon, author, iucn, gbif) {
 def createIBPHierarchyForDirtylist() {
     //for all names in dirty list
     Date startDate = new Date();
+<<<<<<< HEAD
     def taxons = TaxonomyDefinition.withCriteria {
         eq('position', NamePosition.DIRTY)
         eq('status', NamesMetadata.NameStatus.ACCEPTED)
         order('rank', 'asc')
     }
+=======
+    def taxons = TaxonomyDefinition.findAllByPositionAndStatus(NamePosition.RAW, NamesMetadata.NameStatus.ACCEPTED);
+>>>>>>> 69afe761faa38112302ce17f031f59fe37463cab
     println "----------------------"
     println taxons
     int i = 0;

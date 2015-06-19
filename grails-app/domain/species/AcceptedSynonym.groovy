@@ -10,9 +10,6 @@ class AcceptedSynonym {
     }
 
     static createEntry(TaxonomyDefinition accepted, SynonymsMerged synonym) {
-        println "===========CREATING ENTRY ====== "
-        println "===========ACCEPTED ====== " + accepted
-        println "===========SYNONYM  ====== " + synonym
 	AcceptedSynonym.withNewSession {
 		def ent1 = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
 			if(ent1) return;
@@ -29,7 +26,6 @@ class AcceptedSynonym {
         res.each {
             synonyms.add(it.synonym);
         }
-        println "synonyms for " + accepted +" =========== " + synonyms;
         return synonyms;
     }
 
@@ -44,19 +40,19 @@ class AcceptedSynonym {
     }
 
     static removeEntry(TaxonomyDefinition accepted, SynonymsMerged synonym) {
-        println "===========REMOVING ENTRY ====== "
-        println "===========ACCEPTED ====== " + accepted
-        println "===========SYNONYM  ====== " + synonym
+//        println "===========REMOVING ENTRY ====== "
+//        println "===========ACCEPTED ====== " + accepted
+//        println "===========SYNONYM  ====== " + synonym
         AcceptedSynonym.withNewSession {
             def ent = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
-            println "=======ENTRY ========= " + ent
+//            println "=======ENTRY ========= " + ent
             if(ent) {
                 try {
                     println "deleting"
                     if(!ent.delete(flush:true,failOnError:true)){
                         ent.errors.allErrors.each { log.error it }
                     }
-                    println "deleted"
+//                    println "deleted"
                 }catch (Exception e) {
                     e.printStackTrace()
                 }

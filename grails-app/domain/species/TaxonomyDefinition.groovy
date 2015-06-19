@@ -24,7 +24,10 @@ class TaxonomyDefinition extends ScientificName {
     String oldId;
     boolean isDeleted = false;
     String dirtyListReason;
-
+	
+	// added this column for optimizing case insensitive sql query
+	String lowercaseMatchName
+	
 	static hasMany = [author:String, year:String]
 
 	static constraints = {
@@ -40,6 +43,7 @@ class TaxonomyDefinition extends ScientificName {
 		noOfCOLMatches nullable:true;
 		oldId nullable:true;
 		dirtyListReason nullable:true;
+		lowercaseMatchName nullable:true;
 	}
 
 	static mapping = {
@@ -173,5 +177,15 @@ class TaxonomyDefinition extends ScientificName {
             this.removeSynonym(syn);
         }
     }
-
+	
+	def beforeInsert(){
+		super.beforeInsert()
+		lowercaseMatchName = canonicalForm.toLowerCase()
+	}
+	
+	def beforeUpdate(){
+		super.beforeUpdate()
+		if(lowercaseMatchName != canonicalForm.toLowerCase())
+			lowercaseMatchName = canonicalForm.toLowerCase()
+	}
 }

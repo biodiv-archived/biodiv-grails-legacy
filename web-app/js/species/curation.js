@@ -172,6 +172,9 @@ function populateTabDetails(data, appendData) {
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
+            if(value["source"] == 'CatalogueOfLife') {
+                $(ele).find("input").prop("disabled", true);
+            }
         })
     }
 
@@ -491,7 +494,6 @@ function saveHierarchy(moveToWKG) {
         success: function(data) {
             console.log("============YUHU ===");
             console.log(data);
-            
             if(data['success']) {
                 if(data["newlyCreated"]) {
                     alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
@@ -508,7 +510,9 @@ function saveHierarchy(moveToWKG) {
                 processingStop();
                 //postProcessOnAcceptedName();
             } else {
-                alert(data['msg']);
+                $(".dialogMsgText").html(data['msg']);
+                $("#dialogMsg").modal('show');
+                processingStop();
             }
         }, error: function(xhr, status, error) {
             processingStop();
@@ -581,6 +585,7 @@ function modifySourceOnEdit() {
 
 //====================== SYNONYM/COMMON NAME RELATED ===============================
 function modifyContent(ele, type) {
+    return;
     processingStart();
     var typeName = '';
     var relationship = '';
@@ -822,6 +827,7 @@ function getOrphanRecoNames(){
 }
 
 function validateName(ele, showNameDetails) {
+    return;
     processingStart();
     $(ele).parents(".singleRow").find("input[name='aid']").addClass('validating');
     $('.queryDatabase option[value="col"]').attr("selected", "selected");
