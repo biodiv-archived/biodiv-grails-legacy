@@ -1337,14 +1337,12 @@ def getTaxonMap(taxon, author, iucn, gbif) {
 
 def createIBPHierarchyForDirtylist() {
     //for all names in dirty list
-
     Date startDate = new Date();
-    /*def taxons = TaxonomyDefinition.findAllByPositionAndStatus(NamePosition.DIRTY, NamesMetadata.NameStatus.ACCEPTED);
-    TaxonomyDefinition.executeQuery("from TaxonomyDefinition t left join TaxonomyRegistry reg with reg.classification=:classifi and t.id = reg.taxonDefinition where t.position='DIRTY' and t.status='ACCEPTED' and reg.id is null");
-    import species.TaxonomyDefinition
-    println TaxonomyDefinition.executeQuery("select count(*) from TaxonomyRegistry reg right  join reg.taxonDefinition as t with reg.classification=265799  where t.position='DIRTY' and t.status='ACCEPTED' and reg.id is null ");
-    */
-    def taxons = [TaxonomyDefinition.read(186979L)];//findAllByPositionAndStatus(NamePosition.DIRTY, NamesMetadata.NameStatus.ACCEPTED);
+    def taxons = TaxonomyDefinition.withCriteria {
+        eq('position', NamePosition.DIRTY)
+        eq('status', NamesMetadata.NameStatus.ACCEPTED)
+        order('rank', 'asc')
+    }
     println "----------------------"
     println taxons
     int i = 0;
