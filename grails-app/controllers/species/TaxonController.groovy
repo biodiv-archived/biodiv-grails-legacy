@@ -63,20 +63,16 @@ class TaxonController {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
             Long regId = classSystem;
-            println "======IN EXPAND SPECIES===="
             getSpeciesHierarchy(speciesid, rs, regId);
         } else {
-            println "======NOT IN EXPAND SPECIES==== " + classSystem
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
             def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
             println "========RES SIZE ========== " + rs.size() 
             if(cl == classification) {
-                println "mil gaya========="
                 def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                getHierarchyNodes(rs, level, level+3, parentId, authorClass.id, expandAll, expandSpecies, null,"DIRTY");
-                println "========RES SIZE ========== " + rs.size() 
+                getHierarchyNodes(rs, level, level+3, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
             }
         }
         log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"

@@ -183,7 +183,7 @@ class NamelistService {
             Map temp = new HashMap();
             Map id_details = new HashMap();
             temp['externalId'] = r?.id?.text()//+"'"
-            temp['matchDatabaseName'] = "COL"
+            temp['matchDatabaseName'] = "CatalogueOfLife"
             temp['canonicalForm'] = r?.name?.text();
             temp['rank'] = r?.rank?.text()?.toLowerCase()
             temp[r?.rank?.text()?.toLowerCase()] = generateVerbatim(r);     //r?.name?.text()
@@ -216,7 +216,7 @@ class NamelistService {
                     m['colNameStatus'] = it.name_status?.text()?.tokenize(' ')[0]
                     m['rank'] = it.rank?.text()?.toLowerCase();
                     m['authorString'] = it.author.text().capitalize();;
-                    m['source'] = "COL"
+                    m['source'] = "CatalogueOfLife"
                     aList.add(m);
                 }
                 //println "======A LIST======== " + aList;
@@ -261,7 +261,7 @@ class NamelistService {
                         m['rank'] = it.rank?.text()?.toLowerCase();
                         m['parsedRank'] = XMLConverter.getTaxonRank(m.rank);
                         m['authorString'] = it.author.text().capitalize();;
-                        m['source'] = "COL"
+                        m['source'] = "CatalogueOfLife"
                         synList.add(m);
                     }
                     //println "======A LIST======== " + aList;
@@ -283,7 +283,7 @@ class NamelistService {
                         def m = [:]
                         m['id'] = it.id.text()
                         m['name'] = it.name.text()
-                        m['source'] = "COL"
+                        m['source'] = "CatalogueOfLife"
                         aList.add(m);
                     }
                     println "======A LIST======== " + aList;
@@ -413,7 +413,7 @@ class NamelistService {
             def q1 = sql.rows(s1, [taxonId:it.taxonid])
             q1.each {
                 println "==========TAXA IDS======= " + it.taxonid
-                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                     synDL << it
                 }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
                     synWL << it
@@ -427,7 +427,7 @@ class NamelistService {
 
             def q2 = sql.rows(s2, [taxonId:it.taxonid])
             /*q2.each {
-                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                     comDL << it
                 }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
                     comWL << it
@@ -442,7 +442,7 @@ class NamelistService {
         ///////////////////////////////
         
         rs.each {
-            if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.DIRTY.value())){
+            if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                 accDL << it
             }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
                 accWL << it
@@ -479,11 +479,13 @@ class NamelistService {
             }
             result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
             result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
-            def counts = getObvCKLCountsOfTaxon(taxonDef);
+            /*def counts = getObvCKLCountsOfTaxon(taxonDef);
             result['countObv'] = counts['countObv'];
             result['countCKL'] = counts['countCKL'];
             result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
             println "=========COUNTS============= " + counts
+            */
+            println "----------- "  + result
             return result
         }else if(params.nameType == '2') {
             if(params.choosenName && params.choosenName != '') {
@@ -508,7 +510,7 @@ class NamelistService {
         }
     }
 
-    //Searches IBP accepted and synonym only in WORKING AND DIRTY LIST and NULL list
+    //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank, boolean searchInNull = false) {  
         //utilsService.cleanUpGorm(true);
         SEARCH_IBP_COUNTER ++;
@@ -716,11 +718,11 @@ class NamelistService {
         if(colData.size() == 1 ) {
             //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
             if(sciName.status != NameStatus.COMMON && colData[0].nameStatus == NamesMetadata.COLNameStatus.COMMON.value()) {
-                //reject ... position remains DIRTY
+                //reject ... position remains RAW
                 dirtyListReason = "[REJECTING AS NAME IS COMMON NAME]. So leaving this name for curation"
                 log.debug "[REJECTING AS NAME IS COMMON NAME] ${sciName} is a sciname but it is common name as per COL. So leaving this name for curation"
                 sciName.noOfCOLMatches = colDataSize;
-                sciName.position = NamesMetadata.NamePosition.DIRTY;
+                sciName.position = NamesMetadata.NamePosition.RAW;
                 sciName.dirtyListReason = dirtyListReason;
                 if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 } else {
@@ -731,7 +733,7 @@ class NamelistService {
                 dirtyListReason = "[REJECTING AS CANONICAL DONT MATCH EVEN ON 1 RESULT]."
                 log.debug "[REJECTING AS CANONICAL DONT MATCH EVEN ON 1 RESULT]."
                 sciName.noOfCOLMatches = colDataSize;
-                sciName.position = NamesMetadata.NamePosition.DIRTY;
+                sciName.position = NamesMetadata.NamePosition.RAW;
                 sciName.dirtyListReason = dirtyListReason;
                 if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 } else {
@@ -887,7 +889,7 @@ class NamelistService {
             if(acceptedMatch.parsedRank != sciName.rank) {
                 log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. But REJECTED AS RANK WAS CHANGING"
                 sciName.noOfCOLMatches = colDataSize;
-                sciName.position = NamesMetadata.NamePosition.DIRTY;
+                sciName.position = NamesMetadata.NamePosition.RAW;
                 sciName.dirtyListReason = "REJECTED AS RANK WAS CHANGING"
                 if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 } else {
@@ -900,7 +902,7 @@ class NamelistService {
         } else {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
             sciName.noOfCOLMatches = colDataSize;
-            sciName.position = NamesMetadata.NamePosition.DIRTY;
+            sciName.position = NamesMetadata.NamePosition.RAW;
             sciName.dirtyListReason = dirtyListReason;
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println "=======SAVED SCI NAME==========="
@@ -1201,12 +1203,12 @@ class NamelistService {
         println colAcceptedNameData.abortOnNewName;
         println colAcceptedNameData.fromCOL;
         println colAcceptedNameData.spellCheck
-        //From UI
+        //From UI uncomment
         //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL.toBoolean(), colAcceptedNameData);
         
         //From migration script
         //Also add to catalogue of life hierarchy
-        def colClassification = Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
+        //def colClassification = Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
         //def result1 = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, colClassification, contributor, null, false, true, colAcceptedNameData);
         def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         println result
@@ -1729,7 +1731,7 @@ def sql= session.createSQLQuery(query)
         if(colData.size() == 1 ) {
             //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
             if(colData['nameStatus'] == NamesMetadata.COLNameStatus.COMMON.value()) {
-                //reject ... position remains DIRTY
+                //reject ... position remains RAW
                 log.debug "[REJECTING AS NAME IS COMMON NAME] ${reco.name} is a sciname but it is common name as per COL. So leaving this name for curation"
                 return;
             } else {

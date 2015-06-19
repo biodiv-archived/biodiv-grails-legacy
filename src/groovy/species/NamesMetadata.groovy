@@ -7,7 +7,7 @@ abstract class NamesMetadata extends NamesSorucedata {
     public enum NamePosition {
         CLEAN("Clean"),
         WORKING("Working"),
-        DIRTY("Dirty");
+        RAW("Raw");
 
         private String value;
 
@@ -19,7 +19,7 @@ abstract class NamesMetadata extends NamesSorucedata {
             [
             CLEAN,
             WORKING,
-            DIRTY
+            RAW
             ]
         }
 
@@ -125,7 +125,7 @@ abstract class NamesMetadata extends NamesSorucedata {
 	
 	//String name
 	NameStatus status
-	NamePosition position = NamePosition.DIRTY
+	NamePosition position = NamePosition.RAW
 	String authorYear
 	//Classification will be calculated from path
 	
