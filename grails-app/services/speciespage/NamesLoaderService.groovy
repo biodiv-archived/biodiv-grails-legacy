@@ -27,13 +27,13 @@ class NamesLoaderService {
      * 
      * @param cleanAndUpdate
      */
-    int syncNamesAndRecos(boolean cleanAndUpdate) {
+    int syncNamesAndRecos(boolean cleanAndUpdate, boolean addToTree = false) {
         log.info "Synching names and recommendations"
         int noOfNames = 0;
         int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
         try {
             dataSource.setUnreturnedConnectionTimeout(500);
-			noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate);
+			noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate, addToTree);
             noOfNames += syncSynonyms();
             noOfNames += syncCommonNames();
         } catch(Exception e) {
@@ -51,14 +51,14 @@ class NamesLoaderService {
      * @param minRankToImport : the names of all taxon names above which are available for suggestions
      * @param minRankToSpread : the names of higher rank get same suggestion of the concept at this level
      */
-    int syncRecosFromTaxonConcepts(int minRankToImport, int minRankToSpread, boolean cleanAndUpdate) {
+    int syncRecosFromTaxonConcepts(int minRankToImport, int minRankToSpread, boolean cleanAndUpdate, boolean addToTree) {
         log.info "Importing existing taxon definitions into recommendations"
 
         if(cleanAndUpdate) {
             //TODO:Handle cascading delete recommendations
             recommendationService.deleteAll();
         }
-        updateTaxonConceptForReco();
+        updateTaxonConceptForReco(addToTree);
         
         int limit = BATCH_SIZE, offset = 0, noOfNames = 0;
         def recos = new ArrayList<Recommendation>();
@@ -99,7 +99,7 @@ class NamesLoaderService {
                             //noOfNames++;
                         }
                     }
-                    noOfNames += recommendationService.save(recos);
+                    noOfNames += recommendationService.save(recos, addToTree);
                     recos.clear();
                     offset = offset + limit;
                 }
@@ -119,7 +119,7 @@ class NamesLoaderService {
         return noOfNames;
     }
 
-    private int updateTaxonConceptForReco(){
+    private int updateTaxonConceptForReco(boolean addToTree){
         String taxonDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.lowercase_name = t.lowercase_match_name and r.taxon_concept_id is null and r.is_scientific_name = true and t.status = 'ACCEPTED'";
         String synonymQuery = "select r.id as recoid, asyn.accepted_id as taxonid from recommendation as r, taxonomy_definition as t, accepted_synonym as asyn  where t.id = asyn.synonym_id and r.lowercase_name = t.lowercase_match_name and r.taxon_concept_id is null and r.is_scientific_name = true and t.status = 'SYNONYM'";
         String commnonNameQuery = """
@@ -161,7 +161,7 @@ class NamesLoaderService {
                                 recos.add(rec);
                                 //noOfNames++;
                             }
-                            noOfNames += recommendationService.save(recos);
+                            noOfNames += recommendationService.save(recos, addToTree);
                             recos.clear();
                             offset = offset + limit;
                         }
@@ -193,7 +193,7 @@ class NamesLoaderService {
      * 
      * @return
      */
-    int syncSynonyms() {
+    int syncSynonyms(boolean addToTree) {
         log.info "Importing synonyms into recommendations"
         def recos = new ArrayList<Recommendation>();
         int offset = 0, noOfNames = 0, limit = BATCH_SIZE;
@@ -224,7 +224,7 @@ class NamesLoaderService {
                     }
 
                     offset = offset + limit;		
-                    noOfNames += recommendationService.save(recos);
+                    noOfNames += recommendationService.save(recos, addToTree);
                     recos.clear();
                 }
             } catch(Exception e) {
@@ -250,7 +250,7 @@ class NamesLoaderService {
      * 
      * @return
      */
-    def syncCommonNames() {
+    def syncCommonNames(boolean addToTree) {
         log.info "Importing common names into recommendations"
         def recos = new ArrayList<Recommendation>();
         int offset = 0, noOfNames = 0, limit=BATCH_SIZE;
@@ -282,7 +282,7 @@ class NamesLoaderService {
                         recos.add(new Recommendation(name:cName.name, isScientificName:false, languageId:cName.language, taxonConcept:TaxonomyDefinition.read(cName.taxonconcept)));
                         //noOfNames++
                     }
-                    noOfNames += recommendationService.save(recos);
+                    noOfNames += recommendationService.save(recos, addToTree);
                     recos.clear();
                     offset =  offset + commonNames.size();
                 }

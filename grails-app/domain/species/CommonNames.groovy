@@ -11,6 +11,7 @@ class CommonNames extends NamesMetadata {
 	//i.e. aam
 	String transliteration;
 	
+	// added this column for optimizing case insensitive sql query
 	String lowercaseName;
 	
     static constraints = {

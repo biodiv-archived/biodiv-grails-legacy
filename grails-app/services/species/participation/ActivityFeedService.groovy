@@ -460,7 +460,7 @@ class ActivityFeedService {
 					af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
 					int oldCount = resCountMap.get(r.class.canonicalName)?:0
 					resCountMap.put(r.class.canonicalName, ++oldCount)
-					if(!isBulkPull && sendMail){
+					if(!isBulkPull && !isChecklistObservation(r) && sendMail){
 						utilsService.sendNotificationMail(activityType, r, null, null, af)
 					}
 				}
@@ -475,6 +475,14 @@ class ActivityFeedService {
 			}
 		} 
 		return af
+	}
+	
+	private boolean  isChecklistObservation(r){
+		if(!r.instanceOf(Observation)){
+			return false
+		}
+		//returning true only when its obv from checklist
+		return r.isObvFromChecklist()
 	}
 	
 	private String getDescriptionForBulkResourcePull(isPost, countMap){

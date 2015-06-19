@@ -617,7 +617,7 @@ class Observation extends Metadata implements Taggable, Rateable {
     }
 
     private deleteFromChecklist() {
-        if(id != sourceId) {
+        if(isObvFromChecklist()) {
             def ckl = Checklists.get(sourceId)
             ckl.deleteObservation(this)
         }
@@ -625,5 +625,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 
     SpeciesGroup fetchSpeciesGroup() {
         return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
+	
+	def boolean isObvFromChecklist(){
+		return (id != sourceId)
 	}
 }

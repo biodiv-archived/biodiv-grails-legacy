@@ -48,7 +48,7 @@ def sync(){
 	def startDate = new Date()
 	println "============ strated "
 	def s = ctx.getBean("namesLoaderService");
-	s.syncNamesAndRecos(false)
+	s.syncNamesAndRecos(false, false)
 	println "========done=== start date " + startDate + "  " + new Date()
 }
 

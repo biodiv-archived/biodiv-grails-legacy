@@ -24,6 +24,8 @@ class TaxonomyDefinition extends ScientificName {
     String oldId;
     boolean isDeleted = false;
     String dirtyListReason;
+	
+	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
 	
 	static hasMany = [author:String, year:String]
