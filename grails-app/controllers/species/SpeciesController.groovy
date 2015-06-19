@@ -211,7 +211,12 @@ class SpeciesController extends AbstractObjectController {
             withFormat {
                 html {
                     flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-                    redirect(action: "list")
+					def redirectInstance = getTargetInstance(Species.class, params.id)
+					if(redirectInstance){
+						redirect(action: "show", id: redirectInstance.id)
+					}else{
+						redirect(action: "list")
+					}	
 
                 } json { render model as JSON }
                 xml { render model as XML }

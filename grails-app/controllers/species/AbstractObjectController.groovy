@@ -35,6 +35,8 @@ import species.auth.SUser;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
 import species.participation.Featured
+import species.participation.ResourceRedirect
+
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -87,5 +89,18 @@ abstract class AbstractObjectController {
             }
         }
     }
+	
+	def getTargetInstance(Class clazz, id){
+		if( id instanceof String){
+			id = id.trim().toLong()
+		}
+		def instance = clazz.get(id)
+		
+		if(!instance || (instance.hasProperty('isDeleted') && instance.isDeleted)){
+			instance = new ResourceRedirect().fetchTargetInstance(clazz.canonicalName, id)
+		}
+		
+		return instance
+	}
 
 }
