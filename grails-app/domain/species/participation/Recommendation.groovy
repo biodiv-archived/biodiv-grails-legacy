@@ -20,6 +20,7 @@ class Recommendation {
 	boolean isFlagged = false;
 	String flaggingReason;
 
+	// added this column for optimizing case insensitive sql query 
 	String lowercaseName;
 	
 	static constraints = {
