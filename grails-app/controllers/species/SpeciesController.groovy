@@ -119,9 +119,13 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-		def speciesInstance = new Species()
-		speciesInstance.properties = params
-		return [speciesInstance: speciesInstance]
+		flash.message = "Species page create is currently unavailable."
+		redirect(action: "list")
+		return
+//
+//		def speciesInstance = new Species()
+//		speciesInstance.properties = params
+//		return [speciesInstance: speciesInstance]
 	}
 
     @Secured(['ROLE_USER'])
