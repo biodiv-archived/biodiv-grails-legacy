@@ -217,6 +217,7 @@ class SpeciesController extends AbstractObjectController {
                     flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
 					def redirectInstance = getTargetInstance(Species.class, params.id)
 					if(redirectInstance){
+						flash.message = "${message(code: 'default.resource.redirect.message', args: [message(code: 'species.label', default: 'Species'), params.id, redirectInstance.id])}"
 						redirect(action: "show", id: redirectInstance.id)
 					}else{
 						redirect(action: "list")
