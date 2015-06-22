@@ -453,3 +453,13 @@ ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
 update observation set location_scale = 'APPROXIMATE' where  location_scale is null;
 alter table observation  alter column location_scale set not null;
 
+
+# 22 june 2015
+////////////////////////////// redundant table drop //////////////
+drop table un_curated_scientific_names_un_curated_common_names;
+drop table un_curated_votes;
+drop table un_curated_common_names;
+drop table un_curated_scientific_names;
+
+
+

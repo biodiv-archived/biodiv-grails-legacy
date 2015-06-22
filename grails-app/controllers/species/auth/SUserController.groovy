@@ -25,7 +25,6 @@ import species.SpeciesPermission;
 import species.participation.RecommendationVote;
 import species.participation.Observation;
 
-import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 import species.utils.ImageUtils;
 import species.Habitat;
