@@ -363,7 +363,7 @@ class ActivityFeedService {
 				text = feedInstance.activityDescrption
                 break
 			case[SPECIES_CREATED, SPECIES_FIELD_UPDATED, SPECIES_FIELD_CREATED, SPECIES_FIELD_DELETED, SPECIES_SYNONYM_CREATED,SPECIES_SYNONYM_UPDATED, SPECIES_SYNONYM_DELETED, SPECIES_COMMONNAME_CREATED, SPECIES_COMMONNAME_UPDATED, SPECIES_COMMONNAME_DELETED, SPECIES_HIERARCHY_CREATED,SPECIES_HIERARCHY_DELETED ] :
-				activityTitle = getLocalizedMessage(feedInstance.activityDescrption)
+				activityTitle = feedInstance.activityDescrption
 				break
 			default:
 				activityTitle = getLocalizedMessage(activityType)
