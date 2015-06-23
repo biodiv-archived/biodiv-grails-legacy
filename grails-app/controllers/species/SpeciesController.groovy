@@ -756,9 +756,9 @@ class SpeciesController extends AbstractObjectController {
                 if(result.activityType) {
                     if(result.taxonConcept) {
                         result['dataId'] = result.dataId?:result.dataInstance?.id.toString()
-                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.dataInstance, springSecurityService.currentUser, result.activityType);
+                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.dataInstance, springSecurityService.currentUser, result.activityType, result.activityDesc);
                     } else {
-                        feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                        feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType, result.activityDesc);
                     }
                 }
                 if(result.mailType) {
