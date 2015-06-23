@@ -81,11 +81,11 @@ ALTER TABLE recommendation ALTER COLUMN flagging_reason type varchar(1500);
 alter table activity_feed alter column activity_descrption type varchar(2000);
 
 ALTER TABLE taxonomy_definition ADD COLUMN no_ofcolmatches int;
-update taxonomy_definition set no_ofcolmatches = 0;
 
 ALTER TABLE taxonomy_definition add column is_deleted boolean;
 update taxonomy_definition set is_deleted = false;
 
+alter table taxonomy_definition drop column dirty_list_reason;
 alter table taxonomy_definition add column dirty_list_reason  varchar(1000);
 
 
