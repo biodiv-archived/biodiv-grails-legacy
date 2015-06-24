@@ -51,8 +51,6 @@ class TaxonController {
         def parentId = params.nodeid  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
         def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
-        println "+++++++++++++++++"
-        println params.classSystem
         Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
 
@@ -347,6 +345,7 @@ class TaxonController {
            rs.each { r->
                 size ++;
                 String parentPath = "";
+                println "----------------------__"+r.path
                 if(r.path && r.path.lastIndexOf("_")!=-1) {
                     parentPath = r.path.substring(0, r.path.lastIndexOf("_"))
                 }
@@ -367,7 +366,7 @@ class TaxonController {
                     if(r.containsKey('parentId')) {
                     cell (r.parentId)
                     } else {
-                    cell (null)
+                    cell (parentPath)
                     }
                     cell (r.rank == TaxonomyRank.SPECIES.ordinal() ? true : false)
                     cell (r.expanded?:false) //for expanded
