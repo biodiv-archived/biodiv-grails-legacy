@@ -51,6 +51,7 @@ class SpeciesController extends AbstractObjectController {
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
     def namelistService;
+    def sessionFactory;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -1413,5 +1414,18 @@ class SpeciesController extends AbstractObjectController {
         def sp = Species.read(228424L);
         println "=========!ST COUNT ====== " + sp.fetchResourceCount();
         println "===NEXT COUNT ==== " + sp.fetchSpeciesFieldResourceCount();
+    }
+
+    def test() {
+        utilsService.logSql({
+            def hibSession = sessionFactory?.getCurrentSession();
+            String taxonId=221859;
+            def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
+            println "PppppppppppppppppppppppppppppppP"
+        def speciesInstanceList = hqlQuery.list();
+render speciesInstanceList;
+
+        });
+        println "=====================++++"
     }
 }

@@ -16,6 +16,9 @@ import groovy.xml.MarkupBuilder;
 import java.util.List;
 import java.util.Map;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import species.ScientificName.RelationShip
+import species.NamesMetadata.NamePosition;
+import species.auth.SUser;
 
 class TaxonController {
 
@@ -621,6 +624,109 @@ class TaxonController {
 	///////////////////////////////////Navigator query related ///////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
 	
+
+    private def getTaxonMap(taxon, author, iucn, gbif) {
+        println "cheking author"
+        def classifi
+        def map = taxon.longestParentTaxonRegistry(author);
+        if(map.regId) {
+            classifi = author
+        } else {
+            println "checking IUCN"
+            classifi = iucn
+            map = taxon.longestParentTaxonRegistry(iucn);
+            if(map.regId) {
+            } else {
+                println "chking GBIF"
+                classifi = gbif
+                map = taxon.longestParentTaxonRegistry(gbif);
+            }
+        }
+        map.put('classification', classifi);
+        return map;
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def createIBPHierarchyForDirtylist() {
+        //for all names in dirty list
+        Date startDate = new Date();
+        /*def taxons = TaxonomyDefinition.withCriteria {
+          eq('position', NamePosition.RAW)
+          eq('status', NamesMetadata.NameStatus.ACCEPTED)
+          order('rank', 'asc')
+          }*/
+        int i = 0;
+        def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+        def author = Classification.findByName("Author Contributed Taxonomy Hierarchy");
+        def iucn = Classification.findByName('IUCN Taxonomy Hierarchy (2010)');
+        def gbif = Classification.findByName("GBIF Taxonomy Hierarchy");
+        def admin = SUser.read(1L);
+        def taxons;
+        int limit=10;
+        int offset = 0;
+        def sql = new Sql(dataSource)
+        String query = " select * from taxonomy_definition where id not in (select taxon_definition_id from taxonomy_registry  where classification_id=265799) and position='RAW' and status='ACCEPTED'";
+        def tmpTableName = "tmp_table_ibp_taxonconcept"
+        try {
+            //    sql.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
+        } finally {
+            sql.close();
+        }
+
+        while(offset < limit) {
+            sql = new Sql(dataSource)
+            println limit+"       "+offset;
+            //        taxons = species.TaxonomyDefinition.executeQuery("from TaxonomyDefinition t where t.id not in (select taxonDefinition.id from TaxonomyRegistry r where r.classification.id=265799) and position='RAW' and status = 'ACCEPTED' order by rank", [max:limit, offset:offset]);
+            String sqlStr = "select * from "+tmpTableName;
+            taxons = sql.rows(sqlStr, offset, limit);
+            if(!taxons) break;
+            taxons.each { t -> 
+                println t;
+                def taxon = TaxonomyDefinition.read(t.id);
+                TaxonomyDefinition.withNewTransaction { 
+                    def map = getTaxonMap(taxon, author, iucn, gbif);
+                    def hierarchyNodes;
+                    def reg;
+                    if(map.regId) {
+                        hierarchyNodes = map.get(map.get('classification'));
+                    }
+                    if(hierarchyNodes) {
+                        def taxonNames = new ArrayList(10);
+                        int j
+                        for(j = hierarchyNodes.size()-2; j>=0; j--) {
+                            //check which node high up in the hierarchy is in WORKING status
+                            if(hierarchyNodes[j].position == NamePosition.WORKING) {
+                                //update path from the node with WORKING path.
+                                def map2 = hierarchyNodes[j].parentTaxonRegistry(ibp_classifi);
+                                def reg2 = map2.get(ibp_classifi);
+                                reg2.each{
+                                    taxonNames[it.rank] = it.name;
+                                }
+                                break;
+                            } 
+                        }
+                        for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
+                            taxonNames[hierarchyNodes[k].rank] =  hierarchyNodes[k].name;
+                        }
+                        def r= taxonService.addTaxonHierarchy(null, taxonNames, ibp_classifi, admin, null, false, false, null);
+                    } else {
+                        println "No hierarchy"
+                    }
+                }
+            }
+            offset = offset + limit;
+        }
+
+        sql = new Sql(dataSource)
+        try {
+            //    sql.executeUpdate("DROP TABLE " + tmpTableName +  " as " + query);
+        } finally {
+            sql.close();
+        }
+
+        println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
+    }
+
 
 }
 
