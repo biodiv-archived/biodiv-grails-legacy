@@ -25,6 +25,7 @@ import species.NamesMetadata.NamePosition;
 import groovy.io.FileType
 import java.nio.file.*
 import species.Language;
+import species.participation.ActivityFeedService;
 
 nSer = ctx.getBean("namelistService");
 utilsService = ctx.getBean("utilsService");
@@ -32,6 +33,7 @@ speciesUploadService = ctx.getBean("speciesUploadService");
 speciesSearchService = ctx.getBean("speciesSearchService");
 taxonService = ctx.getBean("taxonService");
 
+//////////FOR MIGRATION////////////////
 
 def migrate(){
     nSer.populateInfoFromCol(new File('col_feb24'));
@@ -66,95 +68,12 @@ def curateName(taxonId, domainSourceDir) {
     }
 }
 
-//File domainSourceDir = new File("/home/rahulk/git/biodiv/col_27mar/TaxonomyDefinition");
-//File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
-//File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
 File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
-//File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
-//File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
 //migrate()
 //migrateFromDir(domainSourceDir);
 //curateName(1273, domainSourceDir);
 
-def updatePosition(){
-    println "====update status called=";
-    ScientificName sciName = TaxonomyDefinition.get(7L)
-    //nSer.updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
-    sciName.position = NamesMetadata.NamePosition.RAW
-    sciName.save(flush:true)
-    println "===pos=== " + sciName.position ; 
-}
-//updatePosition()
 
-/*
-def startDate = new Date()
-println "======== started " 
-species.namelist.Utils.generateColStats("/home/sandeept/col")
-println "======== finish date " + new Date() + "    start date "  + startDate  
-*/
-/*
-def testNav(){
-	def tSer = ctx.getBean("taxonService")
-	GrailsParameterMap m = new GrailsParameterMap([:], null)
-	m.taxonId = "3004"
-	m.classificationId = "817"
-	println "Res === " + tSer.getNodeChildren(m)
-}
-
-ctx.getBean("taxonService").addLevelToTaxonReg()
-
-// #---ALTER TABLE taxonomy_registry ADD COLUMN level integer;
-
-ALTER TABLE taxonomy_definition ALTER COLUMN canonical_form SET NOT NULL;
-
-//addin place for super-family rank
-update taxonomy_definition set rank = 9 where rank = 8 ;
-update taxonomy_definition set rank = 8 where rank = 7 ;
-update taxonomy_definition set rank = 7 where rank = 6 ;
-update taxonomy_definition set rank = 6 where rank = 5 ;
-update taxonomy_definition set rank = 5 where rank = 4 ;
-
-//moved taxonomy rank and relationship to scientific name class. changes requried to change import of this in all groovy and gsp files.
-
-//add columns to common name, synonyms and taxon def
-
-ALTER TABLE common_names ADD COLUMN  transliteration varchar(255);
-ALTER TABLE common_names ADD COLUMN  status varchar(255);
-ALTER TABLE common_names ADD COLUMN  position varchar(255);
-ALTER TABLE common_names ADD COLUMN  author_year varchar(255);
-ALTER TABLE common_names ADD COLUMN  match_database_name varchar(255);
-ALTER TABLE common_names ADD COLUMN  match_id varchar(255);
-ALTER TABLE common_names ADD COLUMN  ibp_source varchar(255);
-ALTER TABLE common_names ADD COLUMN  via_datasource varchar(255);
-
-update common_names set status = 'COMMON';
-update  common_names set position = 'RAW';
-
-
-ALTER TABLE taxonomy_definition ADD COLUMN  status varchar(255);
-ALTER TABLE taxonomy_definition ADD COLUMN  position varchar(255);
-ALTER TABLE taxonomy_definition ADD COLUMN  author_year varchar(255);
-ALTER TABLE taxonomy_definition ADD COLUMN  match_database_name varchar(255);
-ALTER TABLE taxonomy_definition ADD COLUMN  match_id varchar(255);
-ALTER TABLE taxonomy_definition ADD COLUMN  ibp_source varchar(255);
-ALTER TABLE taxonomy_definition ADD COLUMN  via_datasource varchar(255);
-
-update  taxonomy_definition set status = 'ACCEPTED';
-update  taxonomy_definition set position = 'RAW';
-
-
-ALTER TABLE synonyms ADD COLUMN  status varchar(255);
-ALTER TABLE synonyms ADD COLUMN  position varchar(255);
-ALTER TABLE synonyms ADD COLUMN  author_year varchar(255);
-ALTER TABLE synonyms ADD COLUMN  match_database_name varchar(255);
-ALTER TABLE synonyms ADD COLUMN  match_id varchar(255);
-ALTER TABLE synonyms ADD COLUMN  ibp_source varchar(255);
-ALTER TABLE synonyms ADD COLUMN  via_datasource varchar(255);
-
-update  synonyms set status = 'SYNONYM';
-update  synonyms set position = 'RAW';
-
-*/
 
 def addIBPTaxonHie() {
     println "====ADDING IBP TAXON HIERARCHY======"
@@ -168,70 +87,6 @@ def addIBPTaxonHie() {
 }
 
 //addIBPTaxonHie();
-
-/*
-#alter table classification alter column language_id drop not null;
-#UPDATE classification set language_id = 205 where id = (whatever id it gets);
-#alter table classification alter column language_id set not null;
-*/
-
-def createMapping(xid, yid) {
-    def utilsService = ctx.getBean("utilsService");
-    utilsService.cleanUpGorm(true);
-    def x = TestA.get(xid);
-    def y = TestA.get(yid);
-    y.addToTestas(x)
-    if(!y.save(flush:true)){
-        y.errors.allErrors.each { println  it }
-    }
-}
-
-def createTestEntry(){
-    println "=====START=="
-    /*def x, y;
-    //x = TestA.read(3L);
-    x = new TestA(name:'Strand77');
-    //x.id = 100L ;
-    if(!x.save(flush:true)){
-        x.errors.allErrors.each { println  it }
-    }
-    def dataSoruce = ctx.getBean("dataSource");
-	def sql =  Sql.newInstance(dataSoruce);
-    sql.execute("update testa set class = 'species.participation.TestB' where id = 7");
-    //x.refresh();
-    def utilsService = ctx.getBean("utilsService");
-    utilsService.cleanUpGorm(true); 
-    
-    println "===new instance== " + TestB.read(7L) //+ " ==== "+TestB.read(4L).class + " =====" +TestB.read(4L).address;
-    //x = new TestA(name:'Strand77');println "========COUNTER === " + counter
-            println "=====WORKING ON ==== " + fields[0]
-
-    //x.id = 100L ;
-    /*if(!x.save(flush:true)){
-        x.errors.allErrors.each { println  it }
-    }*/
-    
-    /*y = new TestB(id:100L, name:'heaven55', address:'WSWS55');
-    if(!y.save(flush:true)){
-        y.errors.allErrors.each { println  it }
-    }
-    */
-    //def a = TestA.get(x.id);
-    /*println "====A=== " + x
-    //def b = TestB.get(y.id)
-    println "====B=== " + y
-    def c = new TestC(a:x, b:y)
-    if(!c.save(flush:true)){
-        c.errors.allErrors.each { println  it }
-    }
-    println "===C==" + c
-    c.getAs(y);
-    */
-    println "=============== " + TaxonomyDefinition.read(286782L)
-    println "====END =="
-}
-
-//createTestEntry();
 
 boolean createThisSynonym(acc, canonicalForm, authorYear, normalizedForm){
     List synFamily = [];
@@ -478,60 +333,7 @@ def migrateSynonyms() {
 
 //migrateSynonyms();
 
-def createTaxons() {
-    taxSer = ctx.getBean("taxonService");
-    def classification = Classification.read(2L);
-    def taxonRegistryNames = ['Animalia', 'Arthropoda', 'Insecta' ,'Coleoptera', '','Scarabaeidae','Scarabaeinae', 'Catharsius','','Catharsius granulatus (Sharp, 1875)', ''];
-    def otherParams = [:]
-    def metadata = ['source':'script', 'via': 'script', 'authorString':'(Sharp, 1875)'];
-    otherParams.metadata = metadata;
-    otherParams['nameStatus'] = 'accepted';
-    SUser contributor = SUser.read(1L) //findByName('admin');
-    def result = taxSer.addTaxonHierarchy(taxonRegistryNames.last() , taxonRegistryNames, classification, contributor, null, false, true, otherParams);
-}
-
-//createTaxons()
-
-def createSynonyms() {
-    def synMer = new SynonymsMerged();
-    synMer.name = "Catharsius granulatus";
-    synMer.relationship = RelationShip.SYNONYM 
-    synMer.canonicalForm = "Catharsius granulatus"
-    synMer.normalizedForm = "Catharsius granulatus"
-    synMer.italicisedForm = "<i>Catharsius granulatus</i>"
-    synMer.binomialForm = "Catharsius granulatus"
-    synMer.status = NamesMetadata.NameStatus.SYNONYM
-    synMer.viaDatasource = ""
-    synMer.uploadTime = new Date()
-    def contributor = SUser.read(1L);
-    synMer.uploader = contributor
-    synMer.authorYear = ""
-    synMer.ibpSource = null
-    synMer.matchId = ""
-    synMer.matchDatabaseName = ""
-    synMer.rank = 9;
-    synMer.addToContributors(contributor);
-    
-    //create taxon
-    //add it as synonym to that taxon;
-
-    createTaxons();
-    def x = TaxonomyDefinition.list(sort: "id", order: "desc").first();
-    if(!synMer.save(flush:true)) {
-        synMer.errors.each { println it }
-    }
-    x.addSynonym(synMer)
-}
-
-//createSynonyms()
-
-def createAcceptedSynonym(){
-    def x = TaxonomyDefinition.get(58L)
-    def y = SynonymsMerged.get(59L)
-    x.addSynonym(y);
-}
-//createAcceptedSynonym()
-
+//First function to run curation for all accepted names
 def curateAllNames() {
     def start = new Date();
 	int limit = 70000, offset = 0;
@@ -542,27 +344,27 @@ def curateAllNames() {
         println "=====offset == "+ offset + " ===== limit == " + limit  
         def taxDefList = [];
         TaxonomyDefinition.withNewTransaction {
-	def dataSoruce = ctx.getBean("dataSource");
-        def sql =  Sql.newInstance(dataSoruce);
-	def query  = "select id from taxonomy_definition where id <= 276064 order by rank,id asc limit 70000";
-        sql.rows(query).each{
+            def dataSoruce = ctx.getBean("dataSource");
+            def sql =  Sql.newInstance(dataSoruce);
+            def query  = "select id from taxonomy_definition where id <= 276064 order by rank,id asc limit 70000";
+            sql.rows(query).each{
                 taxDefList.add(TaxonomyDefinition.get(it.getProperty("id")));
-        }   
-	 /*def c = TaxonomyDefinition.createCriteria()
+            }   
+            /*def c = TaxonomyDefinition.createCriteria()
             taxDefList = c.list (max: limit , offset:offset) {
-                and {
-                    //lt('id', 275703L)
-                    lt('id', 276015L)
-                    //eq('position', NamesMetadata.NamePosition.WORKING)
-                    //isNull('position')
-                }
-                order('rank','asc')
-                order('id','asc')                    
+            and {
+            //lt('id', 275703L)
+            lt('id', 276015L)
+            //eq('position', NamesMetadata.NamePosition.WORKING)
+            //isNull('position')
+            }
+            order('rank','asc')
+            order('id','asc')                    
             }*/
-	//taxDefList = TaxonomyDefinition.list(max: limit, offset: offset, sort: "rank", order: "asc")
+            //taxDefList = TaxonomyDefinition.list(max: limit, offset: offset, sort: "rank", order: "asc")
         }
         for(taxDef in taxDefList) {
-		    TaxonomyDefinition.withNewSession {
+            TaxonomyDefinition.withNewSession {
                 println "###############################################################################################"
                 println "#"
                 println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
@@ -635,6 +437,702 @@ def curateRecoName() {
 }
 //curateRecoName()
 
+
+def updateRanks() {
+    int counter  = 0;
+    def ranks = []
+    new File("/apps/git/biodiv/trinomialsFinal.csv").splitEachLine(",") {fields ->
+        if(fields[0] != 'ID') {   
+            println "========COUNTER === " + counter
+            println "=====WORKING ON ==== " + fields[0]
+            counter++
+            TaxonomyDefinition.withNewTransaction {
+                def td = TaxonomyDefinition.get(fields[0].toLong());
+                if(td.rank == 9) {
+                    println "=====================RANK 9======================="
+                    ranks.add(td);
+                }
+                td.rank = 10;
+                if(!td.save(flush:true)){
+                    println "failed update===="
+                }
+            }
+        }
+    }
+    println "=======RANKS ==== " + ranks
+}
+
+
+//updateRanks()
+
+def curateWithManualIDs() {
+    def alreadyInWorking = [];
+    def start = new Date()
+    int counter  = 0;
+    new File("/tmp/dirtynamesMatchedtoCoLpipesep.csv").splitEachLine(",") {fields ->
+        if(fields[0] != 'species ID') {
+            println "========COUNTER === " + counter
+            println "=====WORKING ON ==== " + fields[0]
+            counter++
+            def s = Species.get(fields[0].toLong())
+            def td = s.taxonConcept;
+            def colID = fields[-1];
+            println "=====LOOKING FOR THIS COL ID ======= " + colID
+            def taxonId = td.id.toString();
+            def taxCan = td.canonicalForm.replaceAll(' ', '_');
+            File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
+            //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
+            List colData = nSer.processColData(new File(domainSourceDir, taxCan+'.xml'));
+            def colDataSize = 0
+            if(colData){ 
+                colDataSize = colData.size();
+            }
+            def acceptedMatch = null;
+            colData.each { colMatch ->
+                if(colMatch.externalId == colID){
+                    acceptedMatch = colMatch    
+                }
+            }
+            if(acceptedMatch){
+                println "=======ACCEPTED MATCH FOUND ======= " + acceptedMatch
+                if(td.position != NamesMetadata.NamePosition.WORKING){
+                    nSer.processDataForMigration(td, acceptedMatch, colDataSize)
+                }else {
+                    alreadyInWorking.add(td.id);
+                }
+            } else {
+                println "========COULD NOT FIND COL MATCH FOR SPECIES========= " + fields[0]
+            }
+        }
+    }
+    println "======ALREADY IN WORKING =========  "+ alreadyInWorking
+    println "====ALREADY IN WORKING SIZE =====  " + alreadyInWorking.size();
+    println "=======START TIME ===== " + start
+    println "========END TIME= ======= " + new Date()
+
+}
+
+//curateWithManualIDs()
+
+def addSynToAccName(sciName, synDetails) {
+    NamesParser namesParser = new NamesParser();
+    def parsedNames = namesParser.parse([synDetails.name]);
+
+    def synMer = null; 
+    synMer = SynonymsMerged.findByName(synDetails.name);
+    if(!synMer) {
+        synMer = new SynonymsMerged();
+        synMer.name = synDetails.name;
+        synMer.canonicalForm = synDetails.canonicalForm;
+        synMer.relationship = RelationShip.SYNONYM 
+        if(parsedNames[0]?.canonicalForm) {
+            synMer.normalizedForm = parsedNames[0].normalizedForm;
+            synMer.italicisedForm = parsedNames[0].italicisedForm;
+            synMer.binomialForm = parsedNames[0].binomialForm;
+        } 
+        /*else {
+          println "=====PUTTING CANONICAL AS BINOMIAL===="
+          synMer.normalizedForm = synMer.canonicalForm
+          synMer.italicisedForm = synMer.canonicalForm 
+          synMer.binomialForm = synMer.canonicalForm;
+          }*/
+
+        synMer.status = NamesMetadata.NameStatus.SYNONYM
+        synMer.viaDatasource = "CatalogueOfLife"
+        synMer.uploadTime = new Date()
+        def contributor = SUser.read(1L);
+        synMer.uploader = contributor
+        synMer.authorYear = synDetails.authorString;
+        synMer.ibpSource = null
+        synMer.matchId = synDetails.id
+        synMer.matchDatabaseName = "CatalogueOfLife"
+        synMer.position = NamesMetadata.NamePosition.WORKING
+        synMer.rank = synDetails.parsedRank;
+        synMer.colNameStatus = nSer.getCOLNameStatus(synDetails.colNameStatus);
+        synMer.addToContributors(contributor);
+
+        if(!synMer.save()) {
+            synMer.errors.each { println it }
+        }
+    }
+    sciName.addSynonym(synMer);
+}
+
+def addSynonymsFromCOL() {
+    def start = new Date();
+	int limit = 75000, offset = 0;
+    int counter = 0;
+    List curatingThese = [];
+    //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
+
+	File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def taxDefList;
+        TaxonomyDefinition.withNewTransaction {
+            def c = TaxonomyDefinition.createCriteria()
+            //taxDefList = TaxonomyDefinition.get(4135L);
+            taxDefList = c.list (max: limit , offset:offset) {
+                and {
+                    gt('rank', 8)
+                    eq('status', NamesMetadata.NameStatus.ACCEPTED)
+                    eq('position', NamesMetadata.NamePosition.WORKING)
+                    //isNull('position')
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            }
+        }
+        int count5 = 0;
+        int synCount = 0;
+        Date startDate = new Date();
+        for(taxDef in taxDefList) {
+            count5 ++;
+            println "###############################################################################################"
+            println "#"
+            println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
+            def colID = taxDef.matchId
+            counter++;
+            List colData = nSer.processColData(new File(domainSourceDir, taxDef.canonicalForm.replaceAll(' ', '_')+'.xml'));
+            def acceptedMatch = null;
+            if(colData && colData.size() > 0 ) {
+                for(colMatch in colData) {
+                    if(colMatch.externalId == colID){
+                        acceptedMatch = colMatch
+                        break
+                    }
+                }
+            } else {
+                acceptedMatch = nSer.searchCOL(colID, 'id')[0]
+            }
+            TaxonomyDefinition.withNewTransaction {
+                if(acceptedMatch){
+                    println "=======ACCEPTED MATCH FROM COL ======= " + acceptedMatch
+                    synCount += acceptedMatch.synList.size();
+                    acceptedMatch.synList.each { synDetails ->
+                        println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
+                        NamesParser namesParser = new NamesParser();
+                        def parsedNames = namesParser.parse([synDetails.name]);
+                        boolean createSynonym;
+                        if(parsedNames[0]?.canonicalForm) {
+                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
+                        } else {
+                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
+                        }
+                        if(createSynonym) {
+                            addSynToAccName(taxDef, synDetails)    
+                        } else {
+                            println "======THIS SYNONYM FROM COL ALREADY EXISTS===="
+                        }
+                    }
+                } else {
+                    println "=========NO ACCEPTED MATCH======== "
+                }
+            }
+            if(count5 == 4){
+                utilsService.cleanUpGorm(true);
+                println "=========SYN COUNT PER 5 ACCEPTED NAME ========= " + synCount + "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
+                startDate = new Date();
+                synCount = 0;
+                count5 = 0;
+            }
+        }
+        offset = offset + limit; 
+        utilsService.cleanUpGorm(true);
+        if(!taxDefList) break;  
+    }
+ println "=======START TIME ===== " + start
+println "========END TIME= ======= " + new Date()
+
+}
+
+//addSynonymsFromCOL()
+
+def addDetailsFromGNI() {
+    int limit = 71800, offset = 71799;
+    int counter = 0;
+
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def synMerList;
+        SynonymsMerged.withNewTransaction {
+            def c = SynonymsMerged.createCriteria()
+            //taxDefList = TaxonomyDefinition.get(4135L);
+            synMerList = c.list (max: limit , offset:offset) {
+                and {
+                    gt('id', 280621L)
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            }
+        }
+        int count200 = 0;
+        Date startDate = new Date();
+        for(synMer in synMerList) {
+            count200 ++;
+            println "###############################################################################################"
+            println "#"
+            println "=====WORKING ON THIS SYN MER============== " + synMer + " =========COUNTER ====== " + counter;
+            counter++;
+            SynonymsMerged.withNewTransaction { 
+                NamesParser namesParser = new NamesParser();
+                def parsedNames = namesParser.parse([synMer.name]);
+                if(parsedNames[0]?.canonicalForm) {
+                    synMer.normalizedForm = parsedNames[0].normalizedForm;
+                    synMer.italicisedForm = parsedNames[0].italicisedForm;
+                    synMer.binomialForm = parsedNames[0].binomialForm;
+                    if(!synMer.save()) {
+                        synMer.errors.each { println it }
+                    }
+                }
+            }
+            if(count200 == 200){
+                println "==== total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
+                utilsService.cleanUpGorm(true);
+                startDate = new Date();
+                count200 = 0;
+            }
+        }
+        offset = offset + limit; 
+        utilsService.cleanUpGorm(true);
+        if(!synMerList) break;  
+    }
+}
+
+//addDetailsFromGNI()
+
+
+//IBPhierarchyDirtlistSpsWithInfo : contains names in the dirty list for at species or infra-species level for which the ccomplete hierarchy needs to be populated into the IBP TAXONOMIC HIERARCHY
+def IBPhierarchyDirtlistSpsWithInfo() {
+	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistSpsWithInfo.txt");
+    def lines = file.readLines();
+    int i=0;
+    SUser admin = SUser.read(1L);
+    def trr = new TaxonomyDefinition[11];
+    def classifi = Classification.findByName("Author Contributed Taxonomy Hierarchy");
+    lines.each { line ->
+            if(i++ == 0) return;
+            arr = line.split('\\t');
+            println arr;
+            def reg = TaxonomyRegistry.get(Long.parseLong(arr[5]));
+
+            def result = taxonService.deleteTaxonHierarchy(reg, true, false);
+            if(result.success) {
+                String speciesName= (arr.size() == 17) ? arr[6+TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]: arr[6+TaxonomyRank.SPECIES.ordinal()];
+                def taxonNames= [];
+                int j=0;
+                arr.each {
+                    if(j++<6) return;
+                    if(it != 'null')
+                        taxonNames << it
+                    else 
+                        taxonNames << null
+                }
+                println taxonNames
+                println  taxonService.addTaxonHierarchy(speciesName, taxonNames, classifi, admin, null, false, false, null);
+            } else {
+                println "ERROR : "+result;
+            }
+    } 
+}
+
+//IBPhierarchyDirtlistSpsToDrop: contains names in the dirty list for at species or infra-species level which need to be dropped and stubs deleted.
+def IBPhierarchyDirtlistSpsToDrop() {
+    println "IBPhierarchyDirtlistSpsToDrop"
+	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistSpsToDrop.txt");
+    def lines = file.readLines();
+    int i=0;
+    def sc = new SpeciesController();
+    SUser admin = SUser.read(1L);
+    int ns = 0, nt=0;
+    lines.each { line ->
+        if(i++ == 0) return;
+        def arr = line.split('\\t');
+        //println arr;
+        def speciesInstance = Species.get(Long.parseLong(arr[0]));
+        if(speciesInstance) {
+            //Species.withTransaction {
+                try {
+                    boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, admin);
+                    if(success) {
+                        ns++;
+                        def reg = TaxonomyRegistry.get(Long.parseLong(arr[4]));
+                        if(reg) {
+                            def result = taxonService.deleteTaxonHierarchy(reg, true, false);
+                        }
+                       
+                        def taxon = TaxonomyDefinition.get(Long.parseLong(arr[3]));
+                        if (taxon) {
+                            taxon.isDeleted = true;
+                            if(taxon.save(flush:true)) nt++;
+                        }
+                    }
+                } catch(e) {
+                    e.printStackTrace()
+                    println "ERRRRORRRR : "+e.getMessage();
+
+                }
+            //}
+        }
+    }
+    println "deleted "+ns+" species "+ nt + " taxon ";
+}
+
+
+//IBPhierarchyDirtlistABOVESpsToDrop: contains names in the dirty list for above species level, which needs to be dropped only if they have no reference in other places.
+def IBPhierarchyDirtlistABOVESpsToDrop() {
+    println "IBPhierarchyDirtlistABOVESpsToDrop"
+
+    def taxonService = ctx.getBean("taxonService");
+	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistABOVESpsToDrop.txt");
+    def lines = file.readLines();
+    int i=0;
+    int no=0;
+    TaxonomyDefinition.withNewSession {
+        lines.each { line ->
+            if(i++ == 0) return;
+            def arr = line.split('\\t');
+            println arr;
+            TaxonomyDefinition t = TaxonomyDefinition.get(Long.parseLong(arr[3]));
+            TaxonomyRegistry reg = TaxonomyRegistry.get(Long.parseLong(arr[4]));
+            def r = taxonService.deleteTaxonEntries(reg, true, false);
+            if(r.success && r.status != 401) {
+                t.isDeleted = true;
+                if(t.save(flush:true)) {
+                    no++;
+                } else {
+		        	t.errors.each { println it }
+                }
+            }
+        }
+    }
+    println "deleted "+no+" taxonNames";
+}
+
+def getTaxonMap(taxon, author, iucn, gbif) {
+    println "cheking author"
+    def classifi
+    def map = taxon.longestParentTaxonRegistry(author);
+    if(map.regId) {
+        classifi = author
+        hierarchyNodes = map.get(author);
+    } else {
+        println "checking IUCN"
+        classifi = iucn
+        map = taxon.longestParentTaxonRegistry(iucn);
+        if(map.regId) {
+        } else {
+            println "chking GBIF"
+            classifi = gbif
+            map = taxon.longestParentTaxonRegistry(gbif);
+        }
+    }
+    map.put('classification', classifi);
+    return map;
+}
+
+def createIBPHierarchyForDirtylist() {
+    //for all names in dirty list
+    Date startDate = new Date();
+    def taxons = TaxonomyDefinition.withCriteria {
+        eq('position', NamePosition.DIRTY)
+        eq('status', NamesMetadata.NameStatus.ACCEPTED)
+        order('rank', 'asc')
+    }
+    println "----------------------"
+    println taxons
+    int i = 0;
+    def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+    def author = Classification.findByName("Author Contributed Taxonomy Hierarchy");
+    def iucn = Classification.findByName('IUCN Taxonomy Hierarchy (2010)');
+    def gbif = Classification.findByName("GBIF Taxonomy Hierarchy");
+    def admin = SUser.read(1L);
+    taxons.each { taxon ->
+        println taxon;
+        TaxonomyDefinition.withNewTransaction { 
+            def map = getTaxonMap(taxon, author, iucn, gbif);
+            def hierarchyNodes;
+            def reg;
+            if(map.regId) {
+                hierarchyNodes = map.get(map.get('classification'));
+            }
+            if(hierarchyNodes) {
+                def taxonNames = new ArrayList(10);
+                int j
+                for(j = hierarchyNodes.size()-2; j>=0; j--) {
+                    //check which node high up in the hierarchy is in WORKING status
+                    if(hierarchyNodes[j].position == NamePosition.WORKING) {
+                        //update path from the node with WORKING path.
+                        def map2 = hierarchyNodes[j].parentTaxonRegistry(ibp_classifi);
+                        def reg2 = map2.get(ibp_classifi);
+                        reg2.each{
+                            taxonNames[it.rank] = it.name;
+                        }
+                        break;
+                    } 
+                }
+                for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
+                    taxonNames[hierarchyNodes[k].rank] =  hierarchyNodes[k].name;
+                }
+                println  taxonService.addTaxonHierarchy(null, taxonNames, ibp_classifi, admin, null, false, false, null);
+            } else {
+                println "No hierarchy"
+            }
+        }
+    }
+    println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
+}
+
+//IBPhierarchyDirtlistSpsWithInfo() 
+//IBPhierarchyDirtlistSpsToDrop();
+//IBPhierarchyDirtlistABOVESpsToDrop();
+//createIBPHierarchyForDirtylist();
+
+
+def copyIBPHierarchyToCOLClassification() {
+    def classifi = Classification.findByName("Catalogue of Life Taxonomy Hierarchy");
+    def ibpClass = Classification.findByName("IBP Taxonomy Hierarchy");
+    def start = new Date();
+	int limit = 50, offset = 0;
+    int counter = 0;
+    SUser admin = SUser.read(1L);
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def taxRegList = [];
+        TaxonomyRegistry.withNewTransaction {
+	        def taxReg = TaxonomyRegistry.createCriteria()
+            taxRegList = taxReg.list (max: limit , offset:offset) {
+                and {
+                    eq('classification', ibpClass)
+                }
+                order('id','asc')                    
+            }
+        }
+        for(reg in taxRegList) {
+            println "=====WORKING ON THIS REGISTRY============== " + reg + " =========COUNTER ====== " + counter;
+            counter++;
+            List taxonNames = [];
+            List taxIds = reg.path.tokenize('_');
+            def m = [:]
+            taxIds.each {
+                def tax = TaxonomyDefinition.read(it.toLong());
+                m[tax.rank] = tax.name;
+            }
+            for (index in 0..10) {
+                if(m[index]) {
+                    taxonNames.add(m[index]);
+                } else {
+                    taxonNames.add(null);
+                }
+            }
+            def otherParams = [:];
+            otherParams['nameStatus'] = 'accepted';
+            println "=====TAXON NAMES ====== " + taxonNames
+            println  taxonService.addTaxonHierarchy(taxonNames.last(), taxonNames, classifi, admin, null, false, true, otherParams);
+        }
+
+        offset = offset + limit; 
+        //utilsService.cleanUpGorm(true); 
+        if(!taxRegList) break;  
+    }
+    println "=====START === " + start + "====END === " + new Date()
+}
+
+//copyIBPHierarchyToCOLClassification()
+
+
+def addFeedForRawNames(){
+    println "ADDING FEEDS"
+    int limit = 50, offset = 0;
+    int counter = 0;
+
+    def activityFeedService = ctx.getBean("activityFeedService");
+    while(true){
+        println "=====offset == "+ offset + " ===== limit == " + limit  
+        def tdList;
+        TaxonomyDefinition.withNewTransaction {
+            def c = TaxonomyDefinition.createCriteria()
+            tdList = c.list (max: limit , offset:offset) {
+                and {
+                    eq('position', NamesMetadata.NamePosition.RAW)
+                    eq('status', NamesMetadata.NameStatus.ACCEPTED)
+                }
+                order('rank','asc')
+                order('id','asc')                    
+            }
+        }
+        for (td in tdList) {
+            println "=====WORKING ON THIS TAX DEF============== " + td + " =========COUNTER ====== " + counter;
+            counter++;
+            TaxonomyDefinition.withNewTransaction {
+                def feedInstance = activityFeedService.addActivityFeed(td, td, SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, td.dirtyListReason);
+            }
+        }
+
+        offset = offset + limit; 
+        if(!tdList) break; 
+    }
+}
+
+
+//addFeedForRawNames()
+
+
+
+
+//////////// TESTING ////////
+def createMapping(xid, yid) {
+    def utilsService = ctx.getBean("utilsService");
+    utilsService.cleanUpGorm(true);
+    def x = TestA.get(xid);
+    def y = TestA.get(yid);
+    y.addToTestas(x)
+    if(!y.save(flush:true)){
+        y.errors.allErrors.each { println  it }
+    }
+}
+
+def createTestEntry(){
+    println "=====START=="
+    /*def x, y;
+    //x = TestA.read(3L);
+    x = new TestA(name:'Strand77');
+    //x.id = 100L ;
+    if(!x.save(flush:true)){
+        x.errors.allErrors.each { println  it }
+    }
+    def dataSoruce = ctx.getBean("dataSource");
+	def sql =  Sql.newInstance(dataSoruce);
+    sql.execute("update testa set class = 'species.participation.TestB' where id = 7");
+    //x.refresh();
+    def utilsService = ctx.getBean("utilsService");
+    utilsService.cleanUpGorm(true); 
+    
+    println "===new instance== " + TestB.read(7L) //+ " ==== "+TestB.read(4L).class + " =====" +TestB.read(4L).address;
+    //x = new TestA(name:'Strand77');println "========COUNTER === " + counter
+            println "=====WORKING ON ==== " + fields[0]
+
+    //x.id = 100L ;
+    /*if(!x.save(flush:true)){
+        x.errors.allErrors.each { println  it }
+    }*/
+    
+    /*y = new TestB(id:100L, name:'heaven55', address:'WSWS55');
+    if(!y.save(flush:true)){
+        y.errors.allErrors.each { println  it }
+    }
+    */
+    //def a = TestA.get(x.id);
+    /*println "====A=== " + x
+    //def b = TestB.get(y.id)
+    println "====B=== " + y
+    def c = new TestC(a:x, b:y)
+    if(!c.save(flush:true)){
+        c.errors.allErrors.each { println  it }
+    }
+    println "===C==" + c
+    c.getAs(y);
+    */
+    println "=============== " + TaxonomyDefinition.read(286782L)
+    println "====END =="
+}
+
+//createTestEntry();
+
+def updatePosition(){
+    println "====update status called=";
+    ScientificName sciName = TaxonomyDefinition.get(7L)
+    //nSer.updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
+    sciName.position = NamesMetadata.NamePosition.RAW
+    sciName.save(flush:true)
+    println "===pos=== " + sciName.position ; 
+}
+//updatePosition()
+
+def createTaxons() {
+    taxSer = ctx.getBean("taxonService");
+    def classification = Classification.read(2L);
+    def taxonRegistryNames = ['Animalia', 'Arthropoda', 'Insecta' ,'Coleoptera', '','Scarabaeidae','Scarabaeinae', 'Catharsius','','Catharsius granulatus (Sharp, 1875)', ''];
+    def otherParams = [:]
+    def metadata = ['source':'script', 'via': 'script', 'authorString':'(Sharp, 1875)'];
+    otherParams.metadata = metadata;
+    otherParams['nameStatus'] = 'accepted';
+    SUser contributor = SUser.read(1L) //findByName('admin');
+    def result = taxSer.addTaxonHierarchy(taxonRegistryNames.last() , taxonRegistryNames, classification, contributor, null, false, true, otherParams);
+}
+
+//createTaxons()
+
+def createSynonyms() {
+    def synMer = new SynonymsMerged();
+    synMer.name = "Catharsius granulatus";
+    synMer.relationship = RelationShip.SYNONYM 
+    synMer.canonicalForm = "Catharsius granulatus"
+    synMer.normalizedForm = "Catharsius granulatus"
+    synMer.italicisedForm = "<i>Catharsius granulatus</i>"
+    synMer.binomialForm = "Catharsius granulatus"
+    synMer.status = NamesMetadata.NameStatus.SYNONYM
+    synMer.viaDatasource = ""
+    synMer.uploadTime = new Date()
+    def contributor = SUser.read(1L);
+    synMer.uploader = contributor
+    synMer.authorYear = ""
+    synMer.ibpSource = null
+    synMer.matchId = ""
+    synMer.matchDatabaseName = ""
+    synMer.rank = 9;
+    synMer.addToContributors(contributor);
+    
+    //create taxon
+    //add it as synonym to that taxon;
+
+    createTaxons();
+    def x = TaxonomyDefinition.list(sort: "id", order: "desc").first();
+    if(!synMer.save(flush:true)) {
+        synMer.errors.each { println it }
+    }
+    x.addSynonym(synMer)
+}
+
+//createSynonyms()
+
+def createAcceptedSynonym(){
+    def x = TaxonomyDefinition.get(58L)
+    def y = SynonymsMerged.get(59L)
+    x.addSynonym(y);
+}
+//createAcceptedSynonym()
+
+def moveFiles() {
+    def s = "/home/rahulk/col_8May/TaxonomyDefinition"
+    def d = "/home/rahulk/col_8May/TaxonomyDefinitionNew"
+    int maxNum = 275702;
+    File fd = new File(d)
+    if(!fd.exists()){
+        fd.mkdirs()
+    }
+    int counter = 1;
+    File domainSourceDir = new File(s);
+    domainSourceDir.eachFileRecurse (FileType.FILES) { file ->
+        def fileNum = file.name.replace('.xml','').toInteger()
+        if(fileNum < maxNum) {
+            println "========COUNTER ===== " + counter 
+            counter ++
+            //copy it to a new directory
+            Path sp = Paths.get(s+"/"+ file.name);
+            Path dp = Paths.get(d+"/"+ file.name);
+            Files.copy(sp,dp); 
+        }
+    }
+}
+
+//moveFiles()
+
+
+
+
+
+/////////// STATS ///////////////
 def incompleteHierarchy() {
     int limit = 50, offset = 0;
     int counter = 0;
@@ -861,108 +1359,6 @@ def speciesDetails() {
 //speciesDetails();
 
 
-def moveFiles() {
-    def s = "/home/rahulk/col_8May/TaxonomyDefinition"
-    def d = "/home/rahulk/col_8May/TaxonomyDefinitionNew"
-    int maxNum = 275702;
-    File fd = new File(d)
-    if(!fd.exists()){
-        fd.mkdirs()
-    }
-    int counter = 1;
-    File domainSourceDir = new File(s);
-    domainSourceDir.eachFileRecurse (FileType.FILES) { file ->
-        def fileNum = file.name.replace('.xml','').toInteger()
-        if(fileNum < maxNum) {
-            println "========COUNTER ===== " + counter 
-            counter ++
-            //copy it to a new directory
-            Path sp = Paths.get(s+"/"+ file.name);
-            Path dp = Paths.get(d+"/"+ file.name);
-            Files.copy(sp,dp); 
-        }
-    }
-}
-
-//moveFiles()
-
-
-def updateRanks() {
-    int counter  = 0;
-    def ranks = []
-    new File("/apps/git/biodiv/trinomialsFinal.csv").splitEachLine(",") {fields ->
-        if(fields[0] != 'ID') {   
-            println "========COUNTER === " + counter
-            println "=====WORKING ON ==== " + fields[0]
-            counter++
-            TaxonomyDefinition.withNewTransaction {
-                def td = TaxonomyDefinition.get(fields[0].toLong());
-                if(td.rank == 9) {
-                    println "=====================RANK 9======================="
-                    ranks.add(td);
-                }
-                td.rank = 10;
-                if(!td.save(flush:true)){
-                    println "failed update===="
-                }
-            }
-        }
-    }
-    println "=======RANKS ==== " + ranks
-}
-
-
-//updateRanks()
-
-def curateWithManualIDs() {
-	def alreadyInWorking = [];
-    def start = new Date()
-	int counter  = 0;
-    new File("/tmp/dirtynamesMatchedtoCoLpipesep.csv").splitEachLine(",") {fields ->
-        if(fields[0] != 'species ID') {
-            println "========COUNTER === " + counter
-            println "=====WORKING ON ==== " + fields[0]
-            counter++
-            def s = Species.get(fields[0].toLong())
-            def td = s.taxonConcept;
-            def colID = fields[-1];
-		    println "=====LOOKING FOR THIS COL ID ======= " + colID
-            def taxonId = td.id.toString();
-            def taxCan = td.canonicalForm.replaceAll(' ', '_');
-		File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
-            //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
-            List colData = nSer.processColData(new File(domainSourceDir, taxCan+'.xml'));
-            def colDataSize = 0
-	if(colData){ 
-		colDataSize = colData.size();
-            }
-def acceptedMatch = null;
-            colData.each { colMatch ->
-                if(colMatch.externalId == colID){
-                    acceptedMatch = colMatch    
-                }
-            }
-            if(acceptedMatch){
-                println "=======ACCEPTED MATCH FOUND ======= " + acceptedMatch
-		if(td.position != NamesMetadata.NamePosition.WORKING){
-                	nSer.processDataForMigration(td, acceptedMatch, colDataSize)
-		}else {
-			alreadyInWorking.add(td.id);
-		}
-            } else {
-                println "========COULD NOT FIND COL MATCH FOR SPECIES========= " + fields[0]
-            }
-        }
-    }
-println "======ALREADY IN WORKING =========  "+ alreadyInWorking
-println "====ALREADY IN WORKING SIZE =====  " + alreadyInWorking.size();
-println "=======START TIME ===== " + start
-println "========END TIME= ======= " + new Date()
-
-}
-
-//curateWithManualIDs()
-
 def correctSynonyms() {
     speciesService = ctx.getBean("speciesService");
     int counter  = 0;
@@ -1006,440 +1402,9 @@ def correctSynonyms() {
 
 //correctSynonyms()
 
-def addSynToAccName(sciName, synDetails) {
-    NamesParser namesParser = new NamesParser();
-    def parsedNames = namesParser.parse([synDetails.name]);
-
-    def synMer = null; 
-    synMer = SynonymsMerged.findByName(synDetails.name);
-    if(!synMer) {
-        synMer = new SynonymsMerged();
-        synMer.name = synDetails.name;
-        synMer.canonicalForm = synDetails.canonicalForm;
-        synMer.relationship = RelationShip.SYNONYM 
-        if(parsedNames[0]?.canonicalForm) {
-            synMer.normalizedForm = parsedNames[0].normalizedForm;
-            synMer.italicisedForm = parsedNames[0].italicisedForm;
-            synMer.binomialForm = parsedNames[0].binomialForm;
-        } 
-        /*else {
-          println "=====PUTTING CANONICAL AS BINOMIAL===="
-          synMer.normalizedForm = synMer.canonicalForm
-          synMer.italicisedForm = synMer.canonicalForm 
-          synMer.binomialForm = synMer.canonicalForm;
-          }*/
-
-        synMer.status = NamesMetadata.NameStatus.SYNONYM
-        synMer.viaDatasource = "CatalogueOfLife"
-        synMer.uploadTime = new Date()
-        def contributor = SUser.read(1L);
-        synMer.uploader = contributor
-        synMer.authorYear = synDetails.authorString;
-        synMer.ibpSource = null
-        synMer.matchId = synDetails.id
-        synMer.matchDatabaseName = "CatalogueOfLife"
-        synMer.position = NamesMetadata.NamePosition.WORKING
-        synMer.rank = synDetails.parsedRank;
-        synMer.colNameStatus = nSer.getCOLNameStatus(synDetails.colNameStatus);
-        synMer.addToContributors(contributor);
-
-        if(!synMer.save()) {
-            synMer.errors.each { println it }
-        }
-    }
-    sciName.addSynonym(synMer);
+def testSearchIBP() {
+    def res = nSer.searchIBP("Eriocaulon epedunculatum bis", "Potdar, Anil Kumar", NamesMetadata.NameStatus.ACCEPTED,10)
+    println res;
 }
 
-def addSynonymsFromCOL() {
-    def start = new Date();
-	int limit = 75000, offset = 0;
-    int counter = 0;
-    List curatingThese = [];
-    //File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition");
-
-	File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
-    while(true){
-        println "=====offset == "+ offset + " ===== limit == " + limit  
-        def taxDefList;
-        TaxonomyDefinition.withNewTransaction {
-            def c = TaxonomyDefinition.createCriteria()
-            //taxDefList = TaxonomyDefinition.get(4135L);
-            taxDefList = c.list (max: limit , offset:offset) {
-                and {
-                    gt('rank', 8)
-                    eq('status', NamesMetadata.NameStatus.ACCEPTED)
-                    eq('position', NamesMetadata.NamePosition.WORKING)
-                    //isNull('position')
-                }
-                order('rank','asc')
-                order('id','asc')                    
-            }
-        }
-        int count5 = 0;
-        int synCount = 0;
-        Date startDate = new Date();
-        for(taxDef in taxDefList) {
-            count5 ++;
-            println "###############################################################################################"
-            println "#"
-            println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
-            def colID = taxDef.matchId
-            counter++;
-            List colData = nSer.processColData(new File(domainSourceDir, taxDef.canonicalForm.replaceAll(' ', '_')+'.xml'));
-            def acceptedMatch = null;
-            if(colData && colData.size() > 0 ) {
-                for(colMatch in colData) {
-                    if(colMatch.externalId == colID){
-                        acceptedMatch = colMatch
-                        break
-                    }
-                }
-            } else {
-                acceptedMatch = nSer.searchCOL(colID, 'id')[0]
-            }
-            TaxonomyDefinition.withNewTransaction {
-                if(acceptedMatch){
-                    println "=======ACCEPTED MATCH FROM COL ======= " + acceptedMatch
-                    synCount += acceptedMatch.synList.size();
-                    acceptedMatch.synList.each { synDetails ->
-                        println "====ADDING THESE DETAILS AS SYNONYMS ====== " + synDetails
-                        NamesParser namesParser = new NamesParser();
-                        def parsedNames = namesParser.parse([synDetails.name]);
-                        boolean createSynonym;
-                        if(parsedNames[0]?.canonicalForm) {
-                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, parsedNames[0]?.normalizedForm)
-                        } else {
-                            createSynonym = createThisSynonym(taxDef, synDetails.canonicalForm, synDetails.authorYear, synDetails.name)
-                        }
-                        if(createSynonym) {
-                            addSynToAccName(taxDef, synDetails)    
-                        } else {
-                            println "======THIS SYNONYM FROM COL ALREADY EXISTS===="
-                        }
-                    }
-                } else {
-                    println "=========NO ACCEPTED MATCH======== "
-                }
-            }
-            if(count5 == 4){
-                utilsService.cleanUpGorm(true);
-                println "=========SYN COUNT PER 5 ACCEPTED NAME ========= " + synCount + "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
-                startDate = new Date();
-                synCount = 0;
-                count5 = 0;
-            }
-        }
-        offset = offset + limit; 
-        utilsService.cleanUpGorm(true);
-        if(!taxDefList) break;  
-    }
- println "=======START TIME ===== " + start
-println "========END TIME= ======= " + new Date()
-
-}
-
-//addSynonymsFromCOL()
-
-def addDetailsFromGNI() {
-    int limit = 71800, offset = 71799;
-    int counter = 0;
-
-    while(true){
-        println "=====offset == "+ offset + " ===== limit == " + limit  
-        def synMerList;
-        SynonymsMerged.withNewTransaction {
-            def c = SynonymsMerged.createCriteria()
-            //taxDefList = TaxonomyDefinition.get(4135L);
-            synMerList = c.list (max: limit , offset:offset) {
-                and {
-                    gt('id', 280621L)
-                }
-                order('rank','asc')
-                order('id','asc')                    
-            }
-        }
-        int count200 = 0;
-        Date startDate = new Date();
-        for(synMer in synMerList) {
-            count200 ++;
-            println "###############################################################################################"
-            println "#"
-            println "=====WORKING ON THIS SYN MER============== " + synMer + " =========COUNTER ====== " + counter;
-            counter++;
-            SynonymsMerged.withNewTransaction { 
-                NamesParser namesParser = new NamesParser();
-                def parsedNames = namesParser.parse([synMer.name]);
-                if(parsedNames[0]?.canonicalForm) {
-                    synMer.normalizedForm = parsedNames[0].normalizedForm;
-                    synMer.italicisedForm = parsedNames[0].italicisedForm;
-                    synMer.binomialForm = parsedNames[0].binomialForm;
-                    if(!synMer.save()) {
-                        synMer.errors.each { println it }
-                    }
-                }
-            }
-            if(count200 == 200){
-                println "==== total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
-                utilsService.cleanUpGorm(true);
-                startDate = new Date();
-                count200 = 0;
-            }
-        }
-        offset = offset + limit; 
-        utilsService.cleanUpGorm(true);
-        if(!synMerList) break;  
-    }
-}
-
-//addDetailsFromGNI()
-
-def testCheck(){
-	ScientificName sciName = TaxonomyDefinition.get(882L);
-        sciName.noOfCOLMatches = 0;
-        sciName.position = NamesMetadata.NamePosition.RAW;
-        sciName.dirtyListReason = "NO XML - NO COL DATA"
-        println "=======NO COL MATCHES==== " + sciName.noOfCOLMatches
-        if(!sciName.hasErrors() && sciName.save(flush:true)) {
-	println "saved====="
-        }
-}
-
-//testCheck()
-
-//IBPhierarchyDirtlistSpsWithInfo : contains names in the dirty list for at species or infra-species level for which the ccomplete hierarchy needs to be populated into the IBP TAXONOMIC HIERARCHY
-def IBPhierarchyDirtlistSpsWithInfo() {
-	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistSpsWithInfo.txt");
-    def lines = file.readLines();
-    int i=0;
-    SUser admin = SUser.read(1L);
-    def trr = new TaxonomyDefinition[11];
-    def classifi = Classification.findByName("Author Contributed Taxonomy Hierarchy");
-    lines.each { line ->
-            if(i++ == 0) return;
-            arr = line.split('\\t');
-            println arr;
-            def reg = TaxonomyRegistry.get(Long.parseLong(arr[5]));
-
-            def result = taxonService.deleteTaxonHierarchy(reg, true, false);
-            if(result.success) {
-                String speciesName= (arr.size() == 17) ? arr[6+TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]: arr[6+TaxonomyRank.SPECIES.ordinal()];
-                def taxonNames= [];
-                int j=0;
-                arr.each {
-                    if(j++<6) return;
-                    if(it != 'null')
-                        taxonNames << it
-                    else 
-                        taxonNames << null
-                }
-                println taxonNames
-                println  taxonService.addTaxonHierarchy(speciesName, taxonNames, classifi, admin, null, false, false, null);
-            } else {
-                println "ERROR : "+result;
-            }
-    } 
-}
-
-//IBPhierarchyDirtlistSpsToDrop: contains names in the dirty list for at species or infra-species level which need to be dropped and stubs deleted.
-def IBPhierarchyDirtlistSpsToDrop() {
-    println "IBPhierarchyDirtlistSpsToDrop"
-	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistSpsToDrop.txt");
-    def lines = file.readLines();
-    int i=0;
-    def sc = new SpeciesController();
-    SUser admin = SUser.read(1L);
-    int ns = 0, nt=0;
-    lines.each { line ->
-        if(i++ == 0) return;
-        def arr = line.split('\\t');
-        //println arr;
-        def speciesInstance = Species.get(Long.parseLong(arr[0]));
-        if(speciesInstance) {
-            //Species.withTransaction {
-                try {
-                    boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, admin);
-                    if(success) {
-                        ns++;
-                        def reg = TaxonomyRegistry.get(Long.parseLong(arr[4]));
-                        if(reg) {
-                            def result = taxonService.deleteTaxonHierarchy(reg, true, false);
-                        }
-                       
-                        def taxon = TaxonomyDefinition.get(Long.parseLong(arr[3]));
-                        if (taxon) {
-                            taxon.isDeleted = true;
-                            if(taxon.save(flush:true)) nt++;
-                        }
-                    }
-                } catch(e) {
-                    e.printStackTrace()
-                    println "ERRRRORRRR : "+e.getMessage();
-
-                }
-            //}
-        }
-    }
-    println "deleted "+ns+" species "+ nt + " taxon ";
-}
-
-
-//IBPhierarchyDirtlistABOVESpsToDrop: contains names in the dirty list for above species level, which needs to be dropped only if they have no reference in other places.
-def IBPhierarchyDirtlistABOVESpsToDrop() {
-    println "IBPhierarchyDirtlistABOVESpsToDrop"
-
-    def taxonService = ctx.getBean("taxonService");
-	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistABOVESpsToDrop.txt");
-    def lines = file.readLines();
-    int i=0;
-    int no=0;
-    TaxonomyDefinition.withNewSession {
-        lines.each { line ->
-            if(i++ == 0) return;
-            def arr = line.split('\\t');
-            println arr;
-            TaxonomyDefinition t = TaxonomyDefinition.get(Long.parseLong(arr[3]));
-            TaxonomyRegistry reg = TaxonomyRegistry.get(Long.parseLong(arr[4]));
-            def r = taxonService.deleteTaxonEntries(reg, true, false);
-            if(r.success && r.status != 401) {
-                t.isDeleted = true;
-                if(t.save(flush:true)) {
-                    no++;
-                } else {
-		        	t.errors.each { println it }
-                }
-            }
-        }
-    }
-    println "deleted "+no+" taxonNames";
-}
-
-def getTaxonMap(taxon, author, iucn, gbif) {
-    println "cheking author"
-    def classifi
-    def map = taxon.longestParentTaxonRegistry(author);
-    if(map.regId) {
-        classifi = author
-        hierarchyNodes = map.get(author);
-    } else {
-        println "checking IUCN"
-        classifi = iucn
-        map = taxon.longestParentTaxonRegistry(iucn);
-        if(map.regId) {
-        } else {
-            println "chking GBIF"
-            classifi = gbif
-            map = taxon.longestParentTaxonRegistry(gbif);
-        }
-    }
-    map.put('classification', classifi);
-    return map;
-}
-
-def createIBPHierarchyForDirtylist() {
-    //for all names in dirty list
-    Date startDate = new Date();
-    def taxons = TaxonomyDefinition.withCriteria {
-        eq('position', NamePosition.DIRTY)
-        eq('status', NamesMetadata.NameStatus.ACCEPTED)
-        order('rank', 'asc')
-    }
-    println "----------------------"
-    println taxons
-    int i = 0;
-    def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
-    def author = Classification.findByName("Author Contributed Taxonomy Hierarchy");
-    def iucn = Classification.findByName('IUCN Taxonomy Hierarchy (2010)');
-    def gbif = Classification.findByName("GBIF Taxonomy Hierarchy");
-    def admin = SUser.read(1L);
-    taxons.each { taxon ->
-        println taxon;
-        TaxonomyDefinition.withNewTransaction { 
-            def map = getTaxonMap(taxon, author, iucn, gbif);
-            def hierarchyNodes;
-            def reg;
-            if(map.regId) {
-                hierarchyNodes = map.get(map.get('classification'));
-            }
-            if(hierarchyNodes) {
-                def taxonNames = new ArrayList(10);
-                int j
-                for(j = hierarchyNodes.size()-2; j>=0; j--) {
-                    //check which node high up in the hierarchy is in WORKING status
-                    if(hierarchyNodes[j].position == NamePosition.WORKING) {
-                        //update path from the node with WORKING path.
-                        def map2 = hierarchyNodes[j].parentTaxonRegistry(ibp_classifi);
-                        def reg2 = map2.get(ibp_classifi);
-                        reg2.each{
-                            taxonNames[it.rank] = it.name;
-                        }
-                        break;
-                    } 
-                }
-                for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
-                    taxonNames[hierarchyNodes[k].rank] =  hierarchyNodes[k].name;
-                }
-                println  taxonService.addTaxonHierarchy(null, taxonNames, ibp_classifi, admin, null, false, false, null);
-            } else {
-                println "No hierarchy"
-            }
-        }
-    }
-    println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
-}
-
-//IBPhierarchyDirtlistSpsWithInfo() 
-//IBPhierarchyDirtlistSpsToDrop();
-//IBPhierarchyDirtlistABOVESpsToDrop();
-createIBPHierarchyForDirtylist();
-
-
-def copyIBPHierarchyToCOLClassification() {
-    def classifi = Classification.findByName("Catalogue of Life Taxonomy Hierarchy");
-    def ibpClass = Classification.findByName("IBP Taxonomy Hierarchy");
-    def start = new Date();
-	int limit = 50, offset = 0;
-    int counter = 0;
-    SUser admin = SUser.read(1L);
-    while(true){
-        println "=====offset == "+ offset + " ===== limit == " + limit  
-        def taxRegList = [];
-        TaxonomyRegistry.withNewTransaction {
-	        def taxReg = TaxonomyRegistry.createCriteria()
-            taxRegList = taxReg.list (max: limit , offset:offset) {
-                and {
-                    eq('classification', ibpClass)
-                }
-                order('id','asc')                    
-            }
-        }
-        for(reg in taxRegList) {
-            println "=====WORKING ON THIS REGISTRY============== " + reg + " =========COUNTER ====== " + counter;
-            counter++;
-            List taxonNames = [];
-            List taxIds = reg.path.tokenize('_');
-            def m = [:]
-            taxIds.each {
-                def tax = TaxonomyDefinition.read(it.toLong());
-                m[tax.rank] = tax.name;
-            }
-            for (index in 0..10) {
-                if(m[index]) {
-                    taxonNames.add(m[index]);
-                } else {
-                    taxonNames.add(null);
-                }
-            }
-            def otherParams = [:];
-            otherParams['nameStatus'] = 'accepted';
-            println "=====TAXON NAMES ====== " + taxonNames
-            println  taxonService.addTaxonHierarchy(taxonNames.last(), taxonNames, classifi, admin, null, false, true, otherParams);
-        }
-
-        offset = offset + limit; 
-        //utilsService.cleanUpGorm(true); 
-        if(!taxRegList) break;  
-    }
-    println "=====START === " + start + "====END === " + new Date()
-}
-
-//copyIBPHierarchyToCOLClassification()
+testSearchIBP()

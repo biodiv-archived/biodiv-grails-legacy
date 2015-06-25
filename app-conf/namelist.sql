@@ -159,3 +159,7 @@ update taxonomy_definition set lowercase_match_name = lower(canonical_form);
     buildTree() in checklistObvPost.groovy
 	
 13. Snapping of hierarchy by Sravanthi
+
+/**------ Post process
+Old Synonyms table and its related stuff can be dropped, as now new table is created SynonymsMerged inherited from Taxonomy Definition
+Just check references of synonyms table everywhere
