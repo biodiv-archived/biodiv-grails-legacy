@@ -288,11 +288,13 @@ function searchDatabase(addNewName) {
                 fillPopupTable(data , $("#externalDbResults"), "externalData", true);
             }else {
                 var oldText = $(".dialogMsgText").html();
-                if (oldText.indexOf("RESPONSE") >= 0) {
-                    var arr = oldText.split("<hr><br /> <b>RESPONSE</b>");
-                    oldText = arr[0];
+                if (oldText.indexOf("Sorry") >= 0) {
+                    oldText = "";//arr[0];
+                    $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                } else {
+                    $(".dialogMsgText").html(oldText + "<hr><br /> <b>RESPONSE</b> <br /> Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 }
-                $(".dialogMsgText").html(oldText + "<hr><br /> <b>RESPONSE</b> <br /> Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 $("#dialogMsg").modal('show');
                 if(addNewName) {

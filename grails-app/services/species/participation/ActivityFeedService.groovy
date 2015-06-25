@@ -9,6 +9,9 @@ import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
 import content.eml.Document
+
+import species.NamesMetadata;
+
  
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ActivityFeedService {
@@ -361,8 +364,12 @@ class ActivityFeedService {
 				break
             case TAXON_NAME_UPDATED :
                 activityTitle = getLocalizedMessage(activityType)
-				text = feedInstance.activityDescrption.replaceAll(' \\.', '.<br/>');
                 def instance = TaxonomyDefinition.read(feedInstance.rootHolderId.toLong());
+				if(instance.position == NamesMetadata.NamePosition.WORKING) {
+                    text = feedInstance.activityDescrption.replaceAll(' \\.', '.<br/>');
+                } else {
+                    text = "Raw list reason - " + feedInstance.activityDescrption + '<br/>';
+                }
                 text += "Number of COL Matches - " + instance.noOfCOLMatches + "<br/>"
                 if(instance.isFlagged) {
                     text += "IsFlagged - reason " + instance.flaggingReason.tokenize('###')[-1];
