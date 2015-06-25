@@ -103,9 +103,29 @@ delete from taxonomy_registry_suser where taxonomy_registry_contributors_id in (
 update taxonomy_registry set parent_taxon_id  = null where classification_id = 821;
 delete from taxonomy_registry where id in (select id from taxonomy_registry where classification_id = 821 limit 1000);
 
+
+/**
+ *  Adding optimized column for case insenstive match
+ */
+ALTER TABLE taxonomy_definition ADD COLUMN  lowercase_match_name varchar(255);
+ALTER TABLE recommendation  ADD COLUMN  lowercase_name varchar(255);
+ALTER TABLE common_names  ADD COLUMN  lowercase_name varchar(255);
+
+update recommendation set lowercase_name = lower(name); 
+update common_names set lowercase_name = lower(name); 
+update taxonomy_definition set lowercase_match_name = lower(canonical_form); 
+
+CREATE INDEX taxonomy_definition_lowercase_match_name ON taxonomy_definition(lowercase_match_name);
+CREATE INDEX recommendation_lowercase_name ON recommendation(lowercase_name);
+CREATE INDEX common_names_lowercase_name ON common_names(lowercase_name);
+
+
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
-2. Trinomials rank update using updateRanks() in namelist.groovy, sheet provided by Thomas (dirtynamesMatchedtoCoLpipesep.csv).
+//All files under /apps/git/biodiv/namelist
+//All logs under /apps/git/biodiv/namelist/logs
+
+2. Trinomials rank update using updateRanks() in namelist.groovy, sheet provided by Thomas (trinomialsFinal.csv).
 
 3. Add IBP hierarchy using addIBPTaxonHie() in namelist.groovy.
 
@@ -116,7 +136,7 @@ delete from taxonomy_registry where id in (select id from taxonomy_registry wher
 
 6. curateAllNames() in namelist.groovy, check what is the last id in tax_def and use that.
 
-7. curateWithManualIds() in namelist.groovy, sheet provided by thomas //sheet provided by Thomas (dirtynamesMatchedtoCoLpipesep.csv)
+7. curateWithManualIds() in namelist.groovy, sheet provided by Thomas (dirtynamesMatchedtoCoLpipesep.csv)
 
 8. addSynonymsFromCOL() in namelist.groovy
 
@@ -125,7 +145,17 @@ delete from taxonomy_registry where id in (select id from taxonomy_registry wher
 10. change back code in addIBPHierarchyFromCol() in NamelistService.groovy  before deployment //line number 1207 uncomment, 1213 comment
 
 11. Delete/Merge by Sandeep
+	mergeAcceptedName() in checklistObvPost.groovy
 
 12. Names Sync by Sandeep
 
+update recommendation set lowercase_name = lower(name); 
+update common_names set lowercase_name = lower(name); 
+update taxonomy_definition set lowercase_match_name = lower(canonical_form);
+
+	sync() in checklistObvPost.groovy
+	
+12.a Rebuilding auto suggestion tree on pamba
+    buildTree() in checklistObvPost.groovy
+	
 13. Snapping of hierarchy by Sravanthi
