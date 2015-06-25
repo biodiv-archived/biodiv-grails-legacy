@@ -1812,7 +1812,8 @@ class XMLConverter extends SourceConverter {
                                     //TODO: chk commenting curate here
                                     //namelistService.curateName(taxon)
                                     if(!taxon.id){
-                                        taxon.status = null;
+                                        //No name with null status
+                                        //taxon.status = null;
                                         //even no proper match from COL
                                         println "==============NEW NAME SAVED IN BETWEEN HIERARCHY======================="
                                         newNameSaved = true;
@@ -1852,7 +1853,7 @@ class XMLConverter extends SourceConverter {
                                 }*/
                                 taxon.position = NamePosition.WORKING
                                 taxon.matchDatabaseName = "CatalogueOfLife";
-                                if(otherParams.id_details && otherParams.id_detailstaxon.canonicalForm) {
+                                if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
                                 println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
                                     taxon.matchId = otherParams.id_details[taxon.canonicalForm];
                                 }

@@ -357,9 +357,9 @@
                                 <b>Name</b> 
                                 <input type="text" placeholder="Name" class="name span10" style="height:100%;width:70%;"/>
                             </div>
-                            <div class="span4" style="width:29%;">
+                            <div class="span4" style="width:25%;">
                                <b> AuthorString </b>
-                                <input type="text" placeholder="Author string" class="authorString span8" style="height:100%;width:60%;"/>
+                                <input type="text" placeholder="Author string" class="authorString span8" style="height:100%;width:55%;"/>
                             </div>
                             <div class="span4" style="width:25%;">
                                 <b>Status</b>  <select id="statusDropDown" class="statusDropDown span9" style="height:100%;width:70%;" >
@@ -553,7 +553,7 @@
                 expandAll:false,
                 showCheckBox:false
             });
-            modifySourceOnEdit();
+            //modifySourceOnEdit();
             //initializeLanguage();
             $(".listSelector").change(function () {
                 var selectedList = $(this).val();
