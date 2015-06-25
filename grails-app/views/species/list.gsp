@@ -50,35 +50,36 @@
 						</sUser:isAdmin>
                         */%>
 						<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
-                        <div class="span8 list right-shadow-box" style="top:0px; margin:0px;clear:both;">
+						<div class="list" style="top: 0px;">
 							<s:showSpeciesList/>
 						</div>
+				</div>
+                <div id="taxonBrowser" class="tab-pane" style="position:relative">
+                    <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
+                        <h5><g:message code="button.classifications" /></h5>	
+                <div class="section help-block"> 
+                    <ul>
+                        <li>
+                        <g:message code="text.reasearcher.procedure" /> <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> <g:message code="text.alloted.rights" />
+                        </li>
+                    </ul>
+                </div>
+                        <div id="taxaHierarchy" style="width:940px;padding:0px">
 
-                        <div class="span4" style="position:relative;top:20px">
-                        <%
-                        def classifications = [];
-                        Classification.list().each {
-                        classifications.add([it.id, it, null]);
-                        }
-                        classifications = classifications.sort {return it[1].name};
-                        %>
+                            <%
+                            def classifications = [];
+                            Classification.list().each {
+                            classifications.add([it.id, it, null]);
+                            }
+                            classifications = classifications.sort {return it[1].name}; 
+                            %>
 
-                        <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
-                            <h5><g:message code="button.classifications" /></h5>	
-                            <div class="section help-block"> 
-                                <ul>
-                                    <li>
-                                    <g:message code="text.reasearcher.procedure" /> <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> <g:message code="text.alloted.rights" />
-                                    </li>
-                                </ul>
-                            </div>
-                            <div id="taxaHierarchy" style="padding:0px">
-                                <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
-                            </div>
-                    </div>
-                    <g:render template="/species/inviteForContribution"/>
+                            <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
                         </div>
                     </div>
+                    <g:render template="/species/inviteForContribution"/>
+				</div>
+
 				<div id="contribute" class="tab-pane">
                                     <g:render template="contributeTemplate"/>
 				</div>
