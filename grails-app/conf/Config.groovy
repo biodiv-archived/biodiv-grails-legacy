@@ -540,10 +540,10 @@ environments {
             warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
                     'grails.app'
-            debug   'org.springframework.security'
-            debug   'org.springframework.security.web'
-            debug   'org.springframework.security.authentication'
-            debug   'speciespage',
+            warn   'org.springframework.security'
+            warn   'org.springframework.security.web'
+            warn   'org.springframework.security.authentication'
+            info   'speciespage',
                     'species'
             debug   'com.the6hours', 
                     'grails.app.taglib.com.the6hours'
