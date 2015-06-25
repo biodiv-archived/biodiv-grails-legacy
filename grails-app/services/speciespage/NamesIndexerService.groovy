@@ -167,7 +167,7 @@ class NamesIndexerService {
 			//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
 			//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
 			String highlightedName = getLabel(record.originalName, inputTerm);
-			String icon = getIconPath1(record)
+			String icon = record.icon
 			
 			def languageName = Language.read(record.languageId)?.name 
 			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, languageName:languageName, "category":"Names"]);
