@@ -55,7 +55,6 @@
 		border:1px solid #ccc;
 		height:288px;
         margin:0px !important;
-        resize: horizontal;
         overflow: auto;
 	}
 	.taxon_selector_wrapper{

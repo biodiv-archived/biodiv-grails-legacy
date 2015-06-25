@@ -345,7 +345,6 @@ class TaxonController {
            rs.each { r->
                 size ++;
                 String parentPath = "";
-                println "----------------------__"+r.path
                 if(r.path && r.path.lastIndexOf("_")!=-1) {
                     parentPath = r.path.substring(0, r.path.lastIndexOf("_"))
                 }
