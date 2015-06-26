@@ -163,3 +163,19 @@ update taxonomy_definition set lowercase_match_name = lower(canonical_form);
 /**------ Post process
 Old Synonyms table and its related stuff can be dropped, as now new table is created SynonymsMerged inherited from Taxonomy Definition
 Just check references of synonyms table everywhere
+
+////// STATS
+
+1. Tax def sheet generation
+select s.id as speciesID, s.percent_of_info,s.title as species_title, t.* from  taxonomy_definition t left join species s on s.taxon_concept_id = t.id;
+
+2. Hierarchy script
+In Namelist.groovy functions - 
+    a. incompleteHierarchy()
+    b. speciesDetails()
+
+3. Col Multiple Results sheet
+In colReport.groovy
+    a. Utils.generateColStats("/apps/git/biodiv/col_8May")
+
+

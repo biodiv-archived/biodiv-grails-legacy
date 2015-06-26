@@ -1558,6 +1558,7 @@ class XMLConverter extends SourceConverter {
      */
     //List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
+        //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
         log.debug "Getting classification hierarchy : "+classification.name;
         println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL 
 

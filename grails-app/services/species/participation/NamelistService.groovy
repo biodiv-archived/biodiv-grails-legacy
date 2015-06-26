@@ -1527,7 +1527,10 @@ class NamelistService {
                 println "========TNRS RESULT====== " + xmlText
                 return responseFromEOLAsMap(xmlText, searchBy);
             }
-            response.'404' = { println '404 - Not found' }
+            response.'404' = { 
+            println '404 - Not found' 
+            return null
+            }
         }
     }
 
