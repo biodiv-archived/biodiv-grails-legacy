@@ -238,7 +238,7 @@ function populateNameDetails(data){
             $("."+key).val(data[key]);
         }
     }
-    if($(".source").val() == 'COL') {
+    if($(".source").val() == 'COL' || $(".source").val() == 'CatalogueOfLife') {
         changeEditingMode(true);
     }
     $(".via").val(data["sourceDatabase"]);
@@ -288,7 +288,13 @@ function searchDatabase(addNewName) {
                 fillPopupTable(data , $("#externalDbResults"), "externalData", true);
             }else {
                 var oldText = $(".dialogMsgText").html();
-                $(".dialogMsgText").html(oldText + "<br /> <b>RESPONSE</b> <br /> Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                if (oldText.indexOf("Sorry") >= 0) {
+                    oldText = "";//arr[0];
+                    $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                } else {
+                    $(".dialogMsgText").html(oldText + "<hr><br /> <b>RESPONSE</b> <br /> Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                }
+                
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 $("#dialogMsg").modal('show');
                 if(addNewName) {
@@ -574,14 +580,14 @@ function changeEditingMode(mode) {
     $(".canBeDisabled select").prop("disabled", mode); 
 }
 
-function modifySourceOnEdit() {
+/*function modifySourceOnEdit() {
     $(".canBeDisabled").click(function() {
         if(!($(".canBeDisabled input").prop("disabled"))) {
             $(".source").val('user entered');
             $(".via").val('');
         }
     });
-}
+}*/
 
 
 //====================== SYNONYM/COMMON NAME RELATED ===============================

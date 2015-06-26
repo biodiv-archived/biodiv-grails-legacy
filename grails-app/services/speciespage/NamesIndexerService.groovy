@@ -50,7 +50,7 @@ class NamesIndexerService {
 		//TODO fetch in batches
 		def startTime = System.currentTimeMillis()
 		
-		int limit = 100, offset = 0, noOfRecosAdded = 0;
+		int limit = 200, offset = 0, noOfRecosAdded = 0;
         def recos;
 		while(true){
             Recommendation.withNewTransaction([readOnly:true]) { status ->
@@ -110,14 +110,9 @@ class NamesIndexerService {
 		//log.debug "Adding recommendation : "+reco.name + " with taxonConcept : "+reco.taxonConcept;
 
 		boolean success = false;
-
 		def species = getSpecies(reco.taxonConcept);
-		def icon;
-        if(species)
-            icon = getIconPath(species.mainImage())
-        else 
-            icon = getIconPath(reco.taxonConcept?.group?.icon());
-
+		def icon = getIconPath1(reco)
+		
 		//log.debug "Generating ngrams"
 		def tokenStream = analyzer.tokenStream("name", new StringReader(reco.name));
 		tokenStream.reset()
@@ -172,15 +167,32 @@ class NamesIndexerService {
 			//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
 			//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
 			String highlightedName = getLabel(record.originalName, inputTerm);
-			String icon = record.icon;
-			if(icon) {
-				icon = grailsApplication.config.speciesPortal.resources.serverURL + "/" + icon;
-				//icon = icon.replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.galleryThumbnail.suffix);
-			}
+			String icon = record.icon
+			
 			def languageName = Language.read(record.languageId)?.name 
 			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, languageName:languageName, "category":"Names"]);
 		}
 		return result;
+	}
+	
+	String getIconPath1(Recommendation reco){
+		String imagePath = null;
+		def speciesInstance = getSpecies(reco.taxonConcept);
+		if(speciesInstance){
+			def mainImage = speciesInstance.mainImage()
+			def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+			if(mainImage?.fileName == speciesGroupIcon.fileName) {
+				imagePath = mainImage.thumbnailUrl(null, '.png');
+			} else{
+				imagePath = mainImage?mainImage.thumbnailUrl():null;
+			}
+		}
+		else{
+			def mainImage = reco.taxonConcept?.group?.icon(ImageType.VERY_SMALL)
+			imagePath = mainImage?.thumbnailUrl(null, '.png');
+		}
+		//println "=============== image path " + imagePath
+		return imagePath
 	}
 	
     String getLabel(String originalName , String inputTerm) {
