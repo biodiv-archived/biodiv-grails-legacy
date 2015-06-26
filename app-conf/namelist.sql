@@ -166,7 +166,7 @@ Just check references of synonyms table everywhere
 
 ////// STATS
 
-1. Tax def sheet generation
+1. Tax def sheet generation and joint with species information
 select s.id as speciesID, s.percent_of_info,s.title as species_title, t.* from  taxonomy_definition t left join species s on s.taxon_concept_id = t.id;
 
 2. Hierarchy script
