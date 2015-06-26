@@ -55,7 +55,6 @@
 		border:1px solid #ccc;
 		height:288px;
         margin:0px !important;
-        resize: horizontal;
         overflow: auto;
 	}
 	.taxon_selector_wrapper{
@@ -82,7 +81,7 @@
         position: relative;
         overflow-y: scroll;        
         height: 196px;
-        width: 470px;
+        //width: 470px;
         margin: 0px;
 	}
     .listarea_content ul {
@@ -90,7 +89,7 @@
         cursor:pointer;
     }
     .taxonomyBrowser{    
-        width: 392px;    
+        //width: 392px;    
     }
 	.taxon_selector_list{
 
@@ -115,7 +114,7 @@
   		<div class="taxon_selector_span taxon_selector_wrapper_span">
             Taxon Selector
         </div>
-        <div class="taxonomyBrowser listarea_content" style="position: relative;height:255px;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+        <div class="taxonomyBrowser" data-name="classification" data-speciesid="${speciesInstance?.id}">
             <div id="taxaHierarchy">
                 <%
                 def classifications = [];

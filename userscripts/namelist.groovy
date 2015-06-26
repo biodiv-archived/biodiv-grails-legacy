@@ -784,7 +784,7 @@ def IBPhierarchyDirtlistABOVESpsToDrop() {
     println "IBPhierarchyDirtlistABOVESpsToDrop"
 
     def taxonService = ctx.getBean("taxonService");
-	File file = new File("/apps/git/biodiv/IBPhierarchyDirtlistABOVESpsToDrop.txt");
+	File file = new File("/home/sravanthi/git/biodiv/IBPhierarchyDirtlistABOVESpsToDrop.txt");
     def lines = file.readLines();
     int i=0;
     int no=0;
@@ -808,81 +808,6 @@ def IBPhierarchyDirtlistABOVESpsToDrop() {
     }
     println "deleted "+no+" taxonNames";
 }
-
-def getTaxonMap(taxon, author, iucn, gbif) {
-    println "cheking author"
-    def classifi
-    def map = taxon.longestParentTaxonRegistry(author);
-    if(map.regId) {
-        classifi = author
-        hierarchyNodes = map.get(author);
-    } else {
-        println "checking IUCN"
-        classifi = iucn
-        map = taxon.longestParentTaxonRegistry(iucn);
-        if(map.regId) {
-        } else {
-            println "chking GBIF"
-            classifi = gbif
-            map = taxon.longestParentTaxonRegistry(gbif);
-        }
-    }
-    map.put('classification', classifi);
-    return map;
-}
-
-def createIBPHierarchyForDirtylist() {
-    //for all names in dirty list
-    Date startDate = new Date();
-    def taxons = TaxonomyDefinition.withCriteria {
-        eq('position', NamePosition.DIRTY)
-        eq('status', NamesMetadata.NameStatus.ACCEPTED)
-        order('rank', 'asc')
-    }
-    println "----------------------"
-    println taxons
-    int i = 0;
-    def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
-    def author = Classification.findByName("Author Contributed Taxonomy Hierarchy");
-    def iucn = Classification.findByName('IUCN Taxonomy Hierarchy (2010)');
-    def gbif = Classification.findByName("GBIF Taxonomy Hierarchy");
-    def admin = SUser.read(1L);
-    taxons.each { taxon ->
-        println taxon;
-        TaxonomyDefinition.withNewTransaction { 
-            def map = getTaxonMap(taxon, author, iucn, gbif);
-            def hierarchyNodes;
-            def reg;
-            if(map.regId) {
-                hierarchyNodes = map.get(map.get('classification'));
-            }
-            if(hierarchyNodes) {
-                def taxonNames = new ArrayList(10);
-                int j
-                for(j = hierarchyNodes.size()-2; j>=0; j--) {
-                    //check which node high up in the hierarchy is in WORKING status
-                    if(hierarchyNodes[j].position == NamePosition.WORKING) {
-                        //update path from the node with WORKING path.
-                        def map2 = hierarchyNodes[j].parentTaxonRegistry(ibp_classifi);
-                        def reg2 = map2.get(ibp_classifi);
-                        reg2.each{
-                            taxonNames[it.rank] = it.name;
-                        }
-                        break;
-                    } 
-                }
-                for(int k=j+1; k<hierarchyNodes.size(); k++ ) {
-                    taxonNames[hierarchyNodes[k].rank] =  hierarchyNodes[k].name;
-                }
-                println  taxonService.addTaxonHierarchy(null, taxonNames, ibp_classifi, admin, null, false, false, null);
-            } else {
-                println "No hierarchy"
-            }
-        }
-    }
-    println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
-}
-
 //IBPhierarchyDirtlistSpsWithInfo() 
 //IBPhierarchyDirtlistSpsToDrop();
 //IBPhierarchyDirtlistABOVESpsToDrop();

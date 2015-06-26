@@ -1662,6 +1662,18 @@ class SpeciesService extends AbstractObjectService  {
             }
         }
 
+        if(params.taxon) {
+            def taxon = TaxonomyDefinition.read(Long.parseLong(params.taxon))
+            if(taxon){
+                queryParams['taxon'] = taxon
+                queryParams['classification'] = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                query += " join s.taxonConcept.hierarchies as reg "
+                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                countQuery += " join s.taxonConcept.hierarchies as reg "
+                countFilterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+            }
+        }
+
 //		XXX: to be corrected		
 //		if(params.user){
 //			def userInstance = params.user.toLong()

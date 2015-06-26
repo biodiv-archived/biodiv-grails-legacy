@@ -20,7 +20,6 @@ import species.auth.SUser;
 import species.ScientificName.RelationShip
 import species.NamesMetadata.NamePosition;
 
-
 class TaxonController {
 
     def dataSource
@@ -345,7 +344,6 @@ class TaxonController {
            rs.each { r->
                 size ++;
                 String parentPath = "";
-                println "----------------------__"+r.path
                 if(r.path && r.path.lastIndexOf("_")!=-1) {
                     parentPath = r.path.substring(0, r.path.lastIndexOf("_"))
                 }
@@ -742,8 +740,6 @@ class TaxonController {
 
         println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
     }
-
-
 
 }
 
