@@ -20,7 +20,6 @@ import species.auth.SUser;
 import species.ScientificName.RelationShip
 import species.NamesMetadata.NamePosition;
 
-
 class TaxonController {
 
     def dataSource
@@ -741,8 +740,6 @@ class TaxonController {
 
         println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
     }
-
-
 
 }
 

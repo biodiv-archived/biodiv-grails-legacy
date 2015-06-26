@@ -27,8 +27,8 @@ class TaxonomyDefinition extends ScientificName {
 	
 	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
-	
-	static hasMany = [author:String, year:String]
+
+	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
 
 	static constraints = {
 		name(blank:false)

@@ -114,7 +114,7 @@
   		<div class="taxon_selector_span taxon_selector_wrapper_span">
             Taxon Selector
         </div>
-        <div class="taxonomyBrowser listarea_content" data-name="classification" data-speciesid="${speciesInstance?.id}">
+        <div class="taxonomyBrowser" data-name="classification" data-speciesid="${speciesInstance?.id}">
             <div id="taxaHierarchy">
                 <%
                 def classifications = [];

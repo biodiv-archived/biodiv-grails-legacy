@@ -900,10 +900,10 @@ class TaxonService {
                             }
                         }
                     }
-                    if(c[0] > 0) {
+                    if(c[0] > 1) {
                         //there is another hierarchy sharing same nodes and with same contributor.
                         // so leaving this portion untouched
-                        toDelete = [];
+                        //toDelete = [];
                         r.success = true;
                         r.status = 401
                         r.msg = 'Successfully removed registry';
