@@ -120,9 +120,13 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-		def speciesInstance = new Species()
-		speciesInstance.properties = params
-		return [speciesInstance: speciesInstance]
+		flash.message = "Species page create is currently unavailable."
+		redirect(action: "list")
+		return
+//
+//		def speciesInstance = new Species()
+//		speciesInstance.properties = params
+//		return [speciesInstance: speciesInstance]
 	}
 
     @Secured(['ROLE_USER'])
@@ -214,6 +218,7 @@ class SpeciesController extends AbstractObjectController {
                     flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
 					def redirectInstance = getTargetInstance(Species.class, params.id)
 					if(redirectInstance){
+						flash.message = "${message(code: 'default.resource.redirect.message', args: [message(code: 'species.label', default: 'Species'), params.id, redirectInstance.id])}"
 						redirect(action: "show", id: redirectInstance.id)
 					}else{
 						redirect(action: "list")
@@ -752,9 +757,9 @@ class SpeciesController extends AbstractObjectController {
                 if(result.activityType) {
                     if(result.taxonConcept) {
                         result['dataId'] = result.dataId?:result.dataInstance?.id.toString()
-                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.dataInstance, springSecurityService.currentUser, result.activityType);
+                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.dataInstance, springSecurityService.currentUser, result.activityType, result.activityDesc);
                     } else {
-                        feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                        feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType, result.activityDesc);
                     }
                 }
                 if(result.mailType) {

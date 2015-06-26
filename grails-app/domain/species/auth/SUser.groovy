@@ -11,7 +11,6 @@ import species.groups.UserGroupMemberRole;
 import species.participation.Observation;
 import species.participation.Flag;
 import species.participation.RecommendationVote;
-import species.participation.curation.UnCuratedVotes;
 import species.groups.UserGroupMemberRole.UserGroupMemberRoleType;
 import species.utils.ImageType;
 import species.Habitat;
@@ -54,7 +53,7 @@ class SUser {
 	// Language
     Language language;
 
-	static hasMany = [openIds: OpenID, flags:Flag, unCuratedVotes:UnCuratedVotes, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document,oAuthIDs: OAuthID ]
+	static hasMany = [openIds: OpenID, flags:Flag, observations:Observation, recoVotes:RecommendationVote, groups:UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, documents:Document,oAuthIDs: OAuthID ]
 	static belongsTo = [UserGroup]
 	//static hasOne = [facebookUser:FacebookUser]
 

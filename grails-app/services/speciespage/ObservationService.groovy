@@ -6,6 +6,7 @@ import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.taggable.TagLink;
+import species.Classification;
 
 import java.util.Date;
 import java.util.List;
@@ -1038,7 +1039,7 @@ class ObservationService extends AbstractObjectService {
         query += " from Observation obv "
         //def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
-        def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '';
+        def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '';
         def filterQuery = " where obv.isDeleted = :isDeleted "
         
         if(params.featureBy == "true" || params.userGroup || params.webaddress){
@@ -1095,7 +1096,7 @@ class ObservationService extends AbstractObjectService {
             filterQuery += " and userGroup.id =:userGroupId "
             queryParams['userGroupId'] = params.userGroup.id
             queryParams['userGroup'] = params.userGroup
-        }
+        } 
 
         if(params.tag){
             tagQuery = ",  TagLink tagLink "
@@ -1124,14 +1125,14 @@ class ObservationService extends AbstractObjectService {
             filterQuery += " and (obv.isChecklist = false and obv.maxVotedReco is null) "
             //queryParams["speciesName"] = params.speciesName
             activeFilters["speciesName"] = params.speciesName
-        }
+        } 
 
-        if(params.isFlagged && params.isFlagged.toBoolean()){
+        if (params.isFlagged && params.isFlagged.toBoolean()){
             filterQuery += " and obv.flagCount > 0 "
             activeFilters["isFlagged"] = params.isFlagged.toBoolean()
         }
 
-        if(params.daterangepicker_start && params.daterangepicker_end){
+        if( params.daterangepicker_start && params.daterangepicker_end){
             def df = new SimpleDateFormat("dd/MM/yyyy")
             def startDate = df.parse(URLDecoder.decode(params.daterangepicker_start))
             def endDate = df.parse(URLDecoder.decode(params.daterangepicker_end))
@@ -1182,7 +1183,7 @@ class ObservationService extends AbstractObjectService {
             //filterQuery += " and 1=0 ";// and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
             queryParams['boundGeometry'] = boundGeometry
             activeFilters["bounds"] = params.bounds
-        } 
+        }  
 
         if(params.type == 'nearBy' && params.lat && params.long) {
             String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
@@ -1195,7 +1196,7 @@ class ObservationService extends AbstractObjectService {
             activeFilters["maxRadius"] = maxRadius
             
             orderByClause = " ST_Distance(${point}, obv.topology)" 
-        }
+        } 
         
         if(params.filterProperty == 'speciesName' && params.parentId) {
             //Check because ajax calls sending these parameters
@@ -1258,6 +1259,18 @@ class ObservationService extends AbstractObjectService {
             }
         }
 		
+        if(params.taxon) {
+            def taxon = TaxonomyDefinition.read(params.taxon.toLong());
+            if(taxon){
+                queryParams['taxon'] = taxon
+                queryParams['classification'] = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                taxonQuery = " join obv.maxVotedReco.taxonConcept.hierarchies as reg "
+                query += taxonQuery;
+                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+
+            }
+        }
+		
 		if(params.isMediaFilter.toBoolean()){
 			filterQuery += " and obv.isShowable = true ";
 		}
@@ -1274,14 +1287,14 @@ class ObservationService extends AbstractObjectService {
             checklistObvCond = " and obv.id != obv.sourceId "
         }
 
-        def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
-        def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ checklistObvCond + " and obv.maxVotedReco is not null ";
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+        def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
+        def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ checklistObvCond + " and obv.maxVotedReco is not null ";
+        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 		def checklistCountQuery =  null
 		
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
             filterQuery += " and obv.isChecklist = true "
-			checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
+			checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
 			checklistCountQuery += " and obv.isChecklist = true "
             activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
         }else{
@@ -1291,9 +1304,13 @@ class ObservationService extends AbstractObjectService {
 
 
         
-		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
+		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
 
         orderByClause = " order by " + orderByClause;
+        println "+========================================="
+        println query
+        println "+========================================="
+
         return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }

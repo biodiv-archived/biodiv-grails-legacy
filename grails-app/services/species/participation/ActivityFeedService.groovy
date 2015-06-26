@@ -64,7 +64,6 @@ class ActivityFeedService {
 
 	//static final String DOCUMENT_POSTED_ON_GROUP = "Posted document to group"
 	//static final String DOCUMENT_REMOVED_FROM_GROUP = "Removed document from group"
-	
 	//species related
 	//static final String SPECIES_POSTED_ON_GROUP = "Posted species to group"
 	//static final String SPECIES_REMOVED_FROM_GROUP = "Removed species from group"
@@ -363,6 +362,9 @@ class ActivityFeedService {
                 activityTitle = getLocalizedMessage(activityType)
 				text = feedInstance.activityDescrption
                 break
+			case[SPECIES_CREATED, SPECIES_FIELD_UPDATED, SPECIES_FIELD_CREATED, SPECIES_FIELD_DELETED, SPECIES_SYNONYM_CREATED,SPECIES_SYNONYM_UPDATED, SPECIES_SYNONYM_DELETED, SPECIES_COMMONNAME_CREATED, SPECIES_COMMONNAME_UPDATED, SPECIES_COMMONNAME_DELETED, SPECIES_HIERARCHY_CREATED,SPECIES_HIERARCHY_DELETED ] :
+				activityTitle = feedInstance.activityDescrption
+				break
 			default:
 				activityTitle = getLocalizedMessage(activityType)
 				break

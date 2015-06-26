@@ -34,8 +34,8 @@ class NamesLoaderService {
         try {
             dataSource.setUnreturnedConnectionTimeout(500);
 			noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate, addToTree);
-            noOfNames += syncSynonyms();
-            noOfNames += syncCommonNames();
+            noOfNames += syncSynonyms(addToTree);
+            noOfNames += syncCommonNames(addToTree);
         } catch(Exception e) {
             log.error e.printStackTrace();
         } finally {
@@ -65,6 +65,7 @@ class NamesLoaderService {
         def conn = new Sql(dataSource)
         def tmpTableName = "tmp_taxon_concept"
         try {
+			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
             conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null and  t.status = 'ACCEPTED' order by t.id ");
         } finally {
             conn.close();
@@ -139,6 +140,7 @@ class NamesLoaderService {
             def tmpTableName = "tmp_table_update_taxonconcept"
             try {
                 try {
+					conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
                     conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
                 } finally {
                     conn.close();
@@ -203,6 +205,8 @@ class NamesLoaderService {
 		def tmpTableName2 = "tmp_synonyms_2"
 		
         try {
+			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName2);
+			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName1);
             conn.executeUpdate("CREATE TABLE " + tmpTableName1 +  " as select  t.lowercase_match_name  as lowercase_match_name,  t.canonical_form as canonical_form, asyn.accepted_id as taxonconcept from accepted_synonym as asyn, taxonomy_definition as t where t.id = asyn.synonym_id and t.status = 'SYNONYM'");   
 			conn.executeUpdate("CREATE TABLE " + tmpTableName2 +  " as select n.canonical_form as canonical_form, n.taxonconcept as taxonconcept from " + tmpTableName1 + " as n left outer join recommendation r on n.lowercase_match_name = r.lowercase_name  and n.taxonconcept = r.taxon_concept_id  where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxonconcept order by n.taxonconcept");
  			conn.executeUpdate("ALTER TABLE " + tmpTableName2 +  " ADD COLUMN id SERIAL PRIMARY KEY");
@@ -265,6 +269,7 @@ class NamesLoaderService {
         group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.taxon_concept_id
         """
         try {
+			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
             conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + selectQuery );
             conn.executeUpdate("ALTER TABLE " + tmpTableName +  " ADD COLUMN id SERIAL PRIMARY KEY");
         } finally {

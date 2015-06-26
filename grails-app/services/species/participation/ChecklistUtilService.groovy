@@ -24,10 +24,8 @@ import species.Language;
 import species.License;
 import species.Reference;
 
-import species.participation.curation.UnCuratedVotes;
 import species.utils.Utils;
 import species.participation.RecommendationVote.ConfidenceType
-import species.participation.curation.UnCuratedCommonNames
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;

@@ -1204,13 +1204,13 @@ class NamelistService {
         println colAcceptedNameData.fromCOL;
         println colAcceptedNameData.spellCheck
         //From UI uncomment
-        //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL.toBoolean(), colAcceptedNameData);
+        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL.toBoolean(), colAcceptedNameData);
         
         //From migration script
         //Also add to catalogue of life hierarchy
         //def colClassification = Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
         //def result1 = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, colClassification, contributor, null, false, true, colAcceptedNameData);
-        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
+        //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         println result
         return result;
     }

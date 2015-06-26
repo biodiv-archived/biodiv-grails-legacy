@@ -342,10 +342,10 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
     $.each(data, function(index, value) {
         if(dataFrom == "externalData") {
             var nameStatus = value['nameStatus'];
-            var colLink = 'http://www.catalogueoflife.org/annual-checklist/2014/details/species/id/'+value['externalId']
+            var colLink = 'http://www.catalogueoflife.org/annual-checklist/2015/details/species/id/'+value['externalId']
             if(nameStatus == 'synonym') {
-                colLink = 'http://www.catalogueoflife.org/annual-checklist/2014/details/species/id/'+value['acceptedNamesList'][0]['id']
-                if(value['rank'] == 'species') {
+                colLink = 'http://www.catalogueoflife.org/annual-checklist/2015/details/species/id/'+value['acceptedNamesList'][0]['id']
+                if(value['rank'] == 'species' || value['rank'] == 'infraspecies') {
                     nameStatus = nameStatus + " for <a style = 'color:blue;' target='_blank' href='"+colLink+"'>" + value['acceptedNamesList'][0]['name']+"</a>";
                 }else {
                     nameStatus = nameStatus + " for " + value['acceptedNamesList'][0]['name'];
@@ -356,10 +356,11 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
                     }
                 });
             }
-            if(value['rank'] == 'species') {
+            if(value['rank'] == 'species' || value['rank'] == 'infraspecies') {
                 rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
             }else {
-                rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td>"+value['name'] +"</td>"
+                colLink = 'http://catalogueoflife.org/annual-checklist/2015/browse/tree/id/'+value['externalId']
+                rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
             }
             rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails(this,"+showNameDetails+")'>Select this</button></td></tr>"        
         }else {

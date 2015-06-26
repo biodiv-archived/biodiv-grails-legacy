@@ -320,7 +320,7 @@ class SpeciesService extends AbstractObjectService  {
                     List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                     sortAsPerRating(sameFieldSpeciesFieldInstances);
                     addMediaInSpField(params, speciesFieldInstance);
-                    return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
+                    return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED, activityDesc:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
                 } else {
                     return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
                 }
@@ -359,7 +359,7 @@ class SpeciesService extends AbstractObjectService  {
                 addMediaInSpField(params, speciesField);
             }
             log.debug "Successfully updated species field";
-            return [success:true, msg:messageSource.getMessage("info.success.update", null, LCH.getLocale()), errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:ActivityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_UPDATED]
+            return [success:true, msg:messageSource.getMessage("info.success.update", null, LCH.getLocale()), errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:ActivityFeedService.SPECIES_FIELD_UPDATED, activityDesc:ActivityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_UPDATED]
         } catch(Exception e) {
             e.printStackTrace();
             def messagesourcearg = new Object[1];
@@ -494,7 +494,7 @@ class SpeciesService extends AbstractObjectService  {
                 //sortAsPerRating(sameFieldSpeciesFieldInstances);
                 //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
                 def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                return [success:true, msg:messageSource.getMessage("info.speciefield.deleted", null, LCH.getLocale()), id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_DELETED]
+                return [success:true, msg:messageSource.getMessage("info.speciefield.deleted", null, LCH.getLocale()), id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_DELETED, activityDesc:ActivityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_DELETED]
             } catch(e) {
                 e.printStackTrace();
                 log.error e.getMessage();
@@ -994,19 +994,19 @@ class SpeciesService extends AbstractObjectService  {
                 msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
                 //content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
                 content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
-                String activityType, mailType;
+                String activityType, mailType, description;
                 if(oldSynonym) {
-                    activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
-                    mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
+                    description = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
                 } else {
-                    activityType = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
-                    mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
+                    description =  ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
                 }
                 if(otherParams) {
                     println "========SYNONYMS========== " + synonyms
-                    return [success:true,/* id:speciesId,*/ msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept,dataInstance:synonyms[0], activityType:activityType, mailType:mailType]  
+                    return [success:true,/* id:speciesId,*/ msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept,dataInstance:synonyms[0], activityType:activityType, mailType:mailType, activityDesc:description]  
                 }
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType, activityDesc:description]
             }
         }
     }
@@ -1076,20 +1076,20 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
                 content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
-                String activityType, mailType;
+                String activityType, mailType, description;
                 if(oldCommonname) {
-                    activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
-                    mailType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
+                    description = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
+                    mailType =  activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
                 } else {
-                    activityType = ActivityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
-                    mailType = ActivityFeedService.SPECIES_COMMONNAME_CREATED
+                    description = ActivityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+                    mailType = activityType =  ActivityFeedService.SPECIES_COMMONNAME_CREATED
                 }
                 if(otherParams) {
                     println "========COMMON NAME========== " + commonnames
-                    return [success:true,/* id:speciesId,*/ msg:msg, type:'commonname', content:content,taxonConcept:taxonConcept,dataInstance:commonnames[0], activityType:activityType, mailType:mailType]  
+                    return [success:true,/* id:speciesId,*/ msg:msg, type:'commonname', content:content,taxonConcept:taxonConcept,dataInstance:commonnames[0], activityType:activityType, mailType:mailType, activityDesc:description]  
                 }
 
-                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType :mailType]
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType :mailType, activityDesc:description]
             }
         }
     }
@@ -1283,7 +1283,7 @@ class SpeciesService extends AbstractObjectService  {
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
                 //content = taxonConcept ? Synonyms.findAllByTaxonConcept(taxonConcept) :  null;
                 content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
-                return [success:true, id:speciesInstance?.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+                return [success:true, id:speciesInstance?.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED, activityDesc:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1343,9 +1343,9 @@ class SpeciesService extends AbstractObjectService  {
                 msg = messageSource.getMessage("info.success.remove.commonname", null, LCH.getLocale());
                 content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
                 if(speciesInstance) {
-                    return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                    return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance,activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED, activityDesc:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
                 } else {
-                    return [success:true, msg:msg, type:'commonname', content:content, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                    return [success:true, msg:msg, type:'commonname', content:content, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED, activityDesc:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
                 }
             } 
             catch(e) {
@@ -2062,16 +2062,16 @@ def checking(){
                 def content;
                 msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType, mailType;
+                String activityType, mailType, description;
                 if(oldSynonym) {
-                    activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
-                    mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
+					description = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
                 } else {
-                    activityType = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
-                    mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
+				    description = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
                 }
 
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType, activityDesc:description]
             }
         }
     }
@@ -2119,7 +2119,7 @@ def checking(){
                 }
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
                 content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED, activityDesc:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();

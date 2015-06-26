@@ -55,7 +55,6 @@
 		border:1px solid #ccc;
 		height:288px;
         margin:0px !important;
-        resize: horizontal;
         overflow: auto;
 	}
 	.taxon_selector_wrapper{
@@ -67,22 +66,22 @@
         font-weight: bold;
 	}
 	.taxon_selector_span{
-		background-color:#3399FF;			
+		background-color:beige; //#3399FF;			
 	}
 	.dirty_list_span{
-		background-color:#C0504D;
+		background-color:lightgrey; //#C0504D;
 	}
 	.working_list_span{
-		background-color:#FF9900;
+		background-color:khaki; //#FF9900;
 	}
 	.clean_list_span{
-		background-color:#009933;
+		background-color:mediumaquamarine; //#009933;
 	}    
 	.listarea_content{
         position: relative;
         overflow-y: scroll;        
         height: 196px;
-        width: 470px;
+        //width: 470px;
         margin: 0px;
 	}
     .listarea_content ul {
@@ -90,7 +89,7 @@
         cursor:pointer;
     }
     .taxonomyBrowser{    
-        width: 392px;    
+        //width: 392px;    
     }
 	.taxon_selector_list{
 
@@ -115,7 +114,7 @@
   		<div class="taxon_selector_span taxon_selector_wrapper_span">
             Taxon Selector
         </div>
-        <div class="taxonomyBrowser listarea_content" style="position: relative;height:255px;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+        <div class="taxonomyBrowser" data-name="classification" data-speciesid="${speciesInstance?.id}">
             <div id="taxaHierarchy">
                 <%
                 def classifications = [];
@@ -223,7 +222,7 @@
     .connection_wrapper_row1{
         color:white;
         height:23px;
-		background-color:#009933;
+		background-color:darkcyan;
 	}
 	.connection_wrapper_row2{		
         background-color: beige;
@@ -293,7 +292,7 @@
 	
 	
         <div class="row-fluid">
-            <div class="span3 canBeDisabled column lt_family" style="width:30%;background:#C0504D">
+            <div class="span3 canBeDisabled column lt_family" style="width:30%;background:seagreen">
                         <table style="width:100% ;color:white">
                             <tr>
                                 <td class='rankStrings'>Kingdom</td>
@@ -344,7 +343,7 @@
                         </table>
 
                     </div>
-                    <div class="span9 canBeDisabled column" style="width:70%;background:#FF9900">
+                    <div class="span9 canBeDisabled column" style="width:70%;background:seagreen">
                         <input type="hidden" class="taxonRegId" value="">
                         <input type="hidden" class="taxonId" value="">
                         <input type="hidden" class="recoId" value="">
@@ -392,7 +391,7 @@
 									</div>			
 							</div>
 						    <div class="row-fluid">	
-                                <div class="span12 column rt_family" style="background:#3D6798">
+                                <div class="span12 column rt_family" style="background:slategrey">
 						
 
                         <ul class="nav nav-tabs" id="" style="margin:0px;">

@@ -22,17 +22,17 @@ def migrate(){
 
 def mergeAcceptedName(){
 	def ns = ctx.getBean("namelistService");
-	File file = new File("/home/sandeept/namesync/isFlaggedToDelete.csv");
-	//File file = new File("/apps/git/biodiv/isFlaggedToDelete.csv");
+	//File file = new File("/home/sandeept/namesync/tobedeleted_KK.txt");
+	File file = new File("/apps/git/biodiv/namelist/tobedeleted_KK.txt");
 	
 	def lines = file.readLines();
 	println "============ started =========="
 	int i=0;
 	lines.each { line ->
 		if(i++ == 0) return;
-		def arr = line.split(',');
-		def toDelete = Long.parseLong(arr[1].trim())
-        def toMove = Long.parseLong(arr[2].trim())
+		def arr = line.split('\\t');
+		def toDelete = Long.parseLong(arr[0].trim())
+        def toMove = Long.parseLong(arr[1].trim())
 		println "====================  " + toDelete + "   toMove " + toMove
 		try {
 				ns.mergeAcceptedName(toDelete, toMove)
@@ -42,7 +42,7 @@ def mergeAcceptedName(){
 	}
 }
 
-//mergeAcceptedName()
+mergeAcceptedName()
 
 def sync(){
 	def startDate = new Date()
@@ -61,6 +61,6 @@ def buildTree(){
 	s.rebuild()
 	println "========done=== start date " + startDate + "  " + new Date()
 }
-buildTree()
+//buildTree()
 
  

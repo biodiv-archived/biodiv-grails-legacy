@@ -453,3 +453,40 @@ ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
 update observation set location_scale = 'APPROXIMATE' where  location_scale is null;
 alter table observation  alter column location_scale set not null;
 
+
+# 22 june 2015
+////////////////////////////// redundant table drop //////////////
+drop table un_curated_scientific_names_un_curated_common_names;
+drop table un_curated_votes;
+drop table un_curated_common_names;
+drop table un_curated_scientific_names;
+
+
+#23 june 2015 activity feed correction for species page
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added hierarchy%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated hierarchy%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted hierarchy%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added common name%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated common name%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted common name%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added synonym%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated synonym%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted synonym%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated species field%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added species field%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted species field%';
+
+
+update activity_feed set activity_type = 'Added hierarchy' where activity_type like 'Added hierarchy%';
+update activity_feed set activity_type = 'Updated hierarchy' where activity_type like 'Updated hierarchy%';
+update activity_feed set activity_type = 'Deleted hierarchy' where activity_type like 'Deleted hierarchy%';
+update activity_feed set activity_type = 'Added common name' where activity_type like 'Added common name%';
+update activity_feed set activity_type = 'Updated common name'  where activity_type like 'Updated common name%';
+update activity_feed set activity_type = 'Deleted common name' where activity_type like 'Deleted common name%';
+update activity_feed set activity_type = 'Added synonym' where activity_type like 'Added synonym%';
+update activity_feed set activity_type =  'Updated synonym' where activity_type like 'Updated synonym%';
+update activity_feed set activity_type = 'Deleted synonym' where activity_type like 'Deleted synonym%';
+update activity_feed set activity_type = 'Updated species field' where activity_type like 'Updated species field%';
+update activity_feed set activity_type = 'Added species field' where activity_type like 'Added species field%';
+update activity_feed set activity_type = 'Deleted species field' where activity_type like 'Deleted species field%';
+

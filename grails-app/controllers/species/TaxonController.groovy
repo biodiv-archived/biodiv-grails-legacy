@@ -16,9 +16,9 @@ import groovy.xml.MarkupBuilder;
 import java.util.List;
 import java.util.Map;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import species.auth.SUser;
 import species.ScientificName.RelationShip
 import species.NamesMetadata.NamePosition;
-import species.auth.SUser;
 
 class TaxonController {
 
@@ -50,8 +50,6 @@ class TaxonController {
         def parentId = params.nodeid  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
         def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
-        println "+++++++++++++++++"
-        println params.classSystem
         Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
 
@@ -366,7 +364,7 @@ class TaxonController {
                     if(r.containsKey('parentId')) {
                     cell (r.parentId)
                     } else {
-                    cell (null)
+                    cell (parentPath)
                     }
                     cell (r.rank == TaxonomyRank.SPECIES.ordinal() ? true : false)
                     cell (r.expanded?:false) //for expanded
@@ -623,7 +621,7 @@ class TaxonController {
 	//////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////Navigator query related ///////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
-	
+
 
     private def getTaxonMap(taxon, author, iucn, gbif) {
         println "cheking author"
@@ -664,18 +662,34 @@ class TaxonController {
         def taxons;
         int limit=10;
         int offset = 0;
-        def sql = new Sql(dataSource)
-        String query = " select * from taxonomy_definition where id not in (select taxon_definition_id from taxonomy_registry  where classification_id=265799) and position='RAW' and status='ACCEPTED'";
+        def sql;
         def tmpTableName = "tmp_table_ibp_taxonconcept"
+
+        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
         try {
-            //    sql.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
-        } finally {
-            sql.close();
+            dataSource.setUnreturnedConnectionTimeout(500);
+
+            sql = new Sql(dataSource)
+            String query = " select * from taxonomy_definition where id not in (select taxon_definition_id from taxonomy_registry  where classification_id=265799) and position='RAW' and status='ACCEPTED'";
+
+            try {
+                sql.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + query);
+            } finally {
+                sql.close();
+            }
+        } catch(e) {
+        }finally {
+            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
         }
 
-        while(offset < limit) {
+        while(true) {
             sql = new Sql(dataSource)
-            println limit+"       "+offset;
+            println "***************************************"
+            println "***************************************"
+            println "*****************"+limit+"       "+offset;
+            println "***************************************"
+            println "***************************************"
             //        taxons = species.TaxonomyDefinition.executeQuery("from TaxonomyDefinition t where t.id not in (select taxonDefinition.id from TaxonomyRegistry r where r.classification.id=265799) and position='RAW' and status = 'ACCEPTED' order by rank", [max:limit, offset:offset]);
             String sqlStr = "select * from "+tmpTableName;
             taxons = sql.rows(sqlStr, offset, limit);
@@ -719,14 +733,13 @@ class TaxonController {
 
         sql = new Sql(dataSource)
         try {
-            //    sql.executeUpdate("DROP TABLE " + tmpTableName +  " as " + query);
+            sql.executeUpdate("DROP TABLE " + tmpTableName);
         } finally {
             sql.close();
         }
 
         println "      total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
     }
-
 
 }
 
