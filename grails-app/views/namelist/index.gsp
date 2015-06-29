@@ -550,6 +550,8 @@
             //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
                 expandAll:false,
+                controller:"${params.controller}",
+                action:"${params.action}",
                 showCheckBox:false
             });
             //modifySourceOnEdit();
