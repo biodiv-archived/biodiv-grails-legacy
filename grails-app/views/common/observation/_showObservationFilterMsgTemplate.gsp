@@ -101,6 +101,36 @@
 						${queryParam.value } <a href="#"
 						onclick="setDefaultHabitat(); return false;">[X]</a> </a> </span> <g:message code="default.habitats.label" />
                            </g:elseif>
+
+
+
+			<g:if
+				test="${queryParam.key == 'taxon' && queryParam.value instanceof Long }">
+				<g:if test="${queryParam.value && TaxonomyDefinition.read(queryParam.value)}">
+                                  <g:message code="text.in" />   <span class="highlight"><a
+						href="${uGroup.createLink(
+						controller:"observation", action:"list",
+						params:[taxon: queryParam.value])}">
+                        ${TaxonomyDefinition.read(queryParam.value).name} </a>
+                    
+                        <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                        </span>
+                            </g:if>
+			</g:if>
+			<g:elseif test="${queryParam.key == 'taxon' && queryParam.value}">
+                           		 <g:message code="text.in" /> <span class="highlight"><a
+					href="${uGroup.createLink(
+					controller:params.controller, action:params.action,
+					params:[taxon: queryParam.value.id])}">
+						${queryParam.value.name } </a>  
+                 <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                </span>
+                           </g:elseif>
+
+
+
+
+
 			<g:if test="${queryParam.key == 'tag' && queryParam.value}">
                                     <g:message code="text.tagged" />  <span class="highlight">
 					<a

@@ -914,6 +914,15 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['tag']
     }
 
+    var taxon = $("input#filterByTaxon").val();
+    if(taxon) {
+        params['taxon'] = taxon
+    } else {
+        delete params['taxon']
+    }
+
+
+
 
     return params;
 }	

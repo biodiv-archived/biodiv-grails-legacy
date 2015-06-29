@@ -48,12 +48,7 @@
                 var expandSpecies = postData['expand_species'];
 
                 //if("${speciesInstance}".length == 0){
-                if(me.options.showCheckBox == false){    
-                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Show names</button></span>"
-                } else {
-                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='checkbox'></input></span>"
-                
-                }
+                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect' data-controller='"+me.options.controller+"' data-action='"+me.options.action+"' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Filter "+me.options.controller+"</button></span>"
             //}
                 var isContributor= $(cells[11]).text();
                 if(isContributor == 'true') {
@@ -143,8 +138,18 @@
                         console.log("===LAST==============="+last)
                         $(e.target).parent("span").find(".taxDefIdVal").val(last);
                         console.log("======PARENT ID==== " + rowid);
-                        if($(e.target).hasClass("taxDefIdSelect")) {
-                            getNamesFromTaxon($(e.target), rowid);
+                        switch($(e.target).data('controller')) {
+                            case 'species' :
+                            case 'observation' :
+                                var taxonId = $(e.target).parent("span").find(".taxDefIdVal").val();
+                                var classificationId = $('#taxaHierarchy option:selected').val();
+
+                                $("input#filterByTaxon").val(taxonId);
+				                updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
+                                break;
+                            case 'namelist' :
+                                getNamesFromTaxon($(e.target), rowid);
+                                break;
                         }
                         //localData = $this.jqGrid("getLocalRow", rowid);
 
