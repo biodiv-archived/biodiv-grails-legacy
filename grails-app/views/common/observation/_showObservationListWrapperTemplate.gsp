@@ -182,13 +182,16 @@ $(document).ready(function() {
 </script>
 <r:script>
 $(document).ready(function() {
-  var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
-    expandAll:false,
-    controller:"${params.controller}",
-    action:"${params.action}",
-    expandTaxon:"${params.taxon?true:false}",
-    taxonId:${params.taxon?:''}
-  });	
-
+        var taxonBrowserOptions = {
+            expandAll:false,
+            controller:"${params.controller}",
+            action:"${params.action}",
+            expandTaxon:"${params.taxon?true:false}"
+        }
+        if(${params.taxon}){
+        taxonBrowserOptions['taxonId'] = "${params.taxon}";
+        }
+        var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+ 
 });
 </r:script>
