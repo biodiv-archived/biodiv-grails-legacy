@@ -163,8 +163,8 @@ modules = {
 	observations_list { 
 		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
 		
-		resource url:'/js/species/taxonhierarchy.js'
         resource url:'/js/species/observations/list.js'
+		resource url:'/js/species/taxonhierarchy.js'
 	}
 
 	susers_list { 
@@ -211,8 +211,6 @@ modules = {
 		dependsOn 'observations_list'
 
         resource url:'/js/species/speciesPermission.js'
-
-		resource url:'/js/species/taxonhierarchy.js'
 	}
 
 	search {

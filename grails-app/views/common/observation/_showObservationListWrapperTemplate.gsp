@@ -185,7 +185,9 @@ $(document).ready(function() {
   var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
     expandAll:false,
     controller:"${params.controller}",
-    action:"${params.action}"
+    action:"${params.action}",
+    expandTaxon:"${params.taxon?true:false}",
+    taxonId:${params.taxon?:''}
   });	
 
 });

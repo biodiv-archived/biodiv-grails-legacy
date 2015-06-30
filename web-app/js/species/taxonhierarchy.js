@@ -23,6 +23,7 @@
                 var speciesId = $.trim($(cells[4]).text());
                 var level = $(cells[6]).text();
                 var position = $(cells[12]).text();
+                var selectedTaxonId = $("input#filterByTaxon").val();
                 var levelTxt;
                 $.each(taxonRanks, function(i,v) {
                     if(level == v.value) {
@@ -30,13 +31,13 @@
                         return;
                     }
                 });
-
+console.log(taxonId+"   "+selectedTaxonId)
                 //el+= taxonId;
                 if(speciesId && speciesId != -1) {
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
+                } else if(taxonId.endsWith(selectedTaxonId)) {
+                    el = levelTxt+": "+"<span class='rank rank"+level+" "+position+" btn-info'>"+el+"";
                 } else {
-                    // el = "<a href='${createLink(action:"taxon")}/"+taxonId+"'
-                    // class='rank"+level+"'>"+levelTxt+": "+el+"</a>";
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'>"+el;
                 }
                 
@@ -46,6 +47,7 @@
             
                 var postData = $(this).getGridParam('postData');
                 var expandSpecies = postData['expand_species'];
+                var expandTaxon = postData['expand_taxon'];
 
                 //if("${speciesInstance}".length == 0){
                 el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect' data-controller='"+me.options.controller+"' data-action='"+me.options.action+"' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Show "+me.options.controller+"</button></span>"
@@ -60,7 +62,7 @@
                 return el;	   
             }
             
-            this.$element.find('#taxonHierarchy').jqGrid({
+            var jqGrid = this.$element.find('#taxonHierarchy').jqGrid({
                 url:window.params.taxon.classification.listUrl,
                 datatype: "xml",
                 colNames:['Id', '_Id_', '', '#Species', 'SpeciesId', 'Class System'],
@@ -81,12 +83,12 @@
                 ExpandColumn : 'name',
                 ExpandColClick  : false,
                 treeGridModel: 'adjacency',
-                postData:{n_level:-1, expand_species:me.options.expandSpecies, expand_all:me.options.expandAll, speciesid:me.options.speciesId, classSystem:$.trim($('#taxaHierarchy option:selected').val())},
+                postData:{n_level:-1, expand_species:me.options.expandSpecies, expand_taxon:me.options.expandTaxon, expand_all:me.options.expandAll, speciesid:me.options.speciesId,  taxonid:me.options.taxonId, classSystem:$.trim($('#taxaHierarchy option:selected').val())},
                 sortable:false,
                 loadComplete:function(data) {
-                    console.log(data);
                     var postData = $("#taxonHierarchy").getGridParam('postData');
                     postData["expand_species"] = false;
+                    postData["expand_taxon"] = false;
                     postData["expand_all"] = false;
                     if(me.options.editable) {
                         me.updateEditableForm(postData);
@@ -99,7 +101,6 @@
                     if(xhr.status == 401) {
                         show_login_dialog();
                     } else {	 
-                        console.log(error);   
                        // alert(error);
                     }
                 },
@@ -130,14 +131,13 @@
 
                     }
 */
-
+                    $("span.rank").removeClass('btn-info');
+                    $(e.target).parent('span').prev().addClass('btn-info');
                     if ((e.target.nodeName === "INPUT" && $(e.target).hasClass("taxDefIdCheck") )|| ($(e.target).hasClass("taxDefIdSelect"))) {
     
                         state = $(e.target).prop("checked");
                         var last = rowid.substring(rowid.lastIndexOf("_") + 1, rowid.length);
-                        console.log("===LAST==============="+last)
                         $(e.target).parent("span").find(".taxDefIdVal").val(last);
-                        console.log("======PARENT ID==== " + rowid);
                         switch($(e.target).data('controller')) {
                             case 'species' :
                             case 'observation' :
@@ -160,7 +160,7 @@
                 }
 
             });
-
+        //    jqGrid.setSelection(selectedTaxonId, function() {console.log('setting selection');} );
             $("#taxaHierarchy>select[name='taxaHierarchy']").change($.proxy(this.onChange, this));
             
             $('#cInfo').html($("#c-"+$('#taxaHierarchy option:selected').val()).html());
@@ -173,6 +173,7 @@
             var me = this;
             var postData = $("#taxonHierarchy").getGridParam('postData');
             postData["expand_species"] = me.options.expandSpecies;
+            postData["expand_taxon"] = me.options.expandTaxon;
             postData["expand_all"] = me.options.expandAll;
             var selectedClassification = $('#taxaHierarchy option:selected').val();
             postData["classSystem"] = $.trim(selectedClassification);
@@ -333,6 +334,10 @@
         this.each(function () {
             taxonHierarchies.push(new TaxonHierarchy(this, options));
         });
+
+        if(options.taxonId) {
+            $("input#filterByTaxon").val(options.taxonId);
+        }
         return {
             'taxonHierarchies' : taxonHierarchies
         }

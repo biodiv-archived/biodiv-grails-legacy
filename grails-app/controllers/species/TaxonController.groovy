@@ -52,6 +52,8 @@ class TaxonController {
         def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
         Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
+        def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
+        Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
 
         /*combinedHierarchy.merge();
         if(classSystem == combinedHierarchy.id) {
@@ -68,8 +70,12 @@ class TaxonController {
         } else {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            def taxonIds = [];
+            if(expandTaxon) {
+                taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
+            }
             def cl = Classification.read(classSystem.toLong());
-            getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
+            getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, taxonIds);
             println "========RES SIZE ========== " + rs.size() 
             if(cl == classification) {
                 def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
@@ -177,6 +183,8 @@ class TaxonController {
                     if(r.rank+1 <= tillLevel) {
                         r.put('expanded', true);
                         r.put('loaded', true);
+                        println "calling agn for level "+(r.rank+1)
+                        println resultSet
                         getHierarchyNodes(resultSet, r.rank+1, tillLevel, r.path, classSystem, expandAll, expandSpecies, taxonIds)
                     }
                 }
