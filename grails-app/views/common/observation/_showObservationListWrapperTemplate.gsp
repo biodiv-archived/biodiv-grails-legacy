@@ -184,14 +184,13 @@ $(document).ready(function() {
 $(document).ready(function() {
         var taxonBrowserOptions = {
             expandAll:false,
-            controller:"${params.controller}",
-            action:"${params.action}",
+            controller:"${params.controller?:'observation'}",
+            action:"${params.action?:'list'}",
             expandTaxon:"${params.taxon?true:false}"
         }
-        if(${params.taxon}){
+        if(${params.taxon?:false}){
         taxonBrowserOptions['taxonId'] = "${params.taxon}";
         }
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
- 
 });
 </r:script>
