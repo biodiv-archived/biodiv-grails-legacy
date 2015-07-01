@@ -47,6 +47,9 @@ class DocumentTokelUrlJob {
                     docSciNameInstance.canonicalForm = parsedNameSetValues[sciName]
                     docSciNameInstance.displayOrder = mapSize
                     mapSize--;
+                    if(docSciNameInstance.canonicalForm) {
+                        docSciNameInstance.taxonConcept = TaxonomyDefinition.findByCanonicalForm(docSciNameInstance.canonicalForm);
+                    }
                    // println "mapsize----in loop--- "+ mapSize
                 	if (!docSciNameInstance.save(flush: true)) {
    					    docSciNameInstance.errors.each {

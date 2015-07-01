@@ -490,3 +490,6 @@ update activity_feed set activity_type = 'Updated species field' where activity_
 update activity_feed set activity_type = 'Added species field' where activity_type like 'Added species field%';
 update activity_feed set activity_type = 'Deleted species field' where activity_type like 'Deleted species field%';
 
+
+# 30th Jun 2015
+alter table doc_sci_name add column taxon_concept_id bigint;

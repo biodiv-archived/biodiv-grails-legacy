@@ -137,7 +137,7 @@
 
 	<!-- main_content end -->
 </div>
-<script type="text/javascript">
+<r:script type="text/javascript">
 $(document).ready(function() {
     window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
 
@@ -172,7 +172,9 @@ $(document).ready(function() {
         //loadDistinctRecoList();
         updateDistinctRecoTable();
     });
-  });
+});
+</r:script>
+<script>
     var taxonRanks = [];
     <g:each in="${TaxonomyRank.list()}" var="t">
         taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});

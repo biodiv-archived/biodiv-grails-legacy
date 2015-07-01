@@ -10,6 +10,7 @@ import groovy.sql.Sql
 import content.eml.Document
 import species.groups.SpeciesGroup;
 import species.Habitat
+import species.TaxonomyDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
@@ -54,6 +55,7 @@ import java.net.URL;
 import java.lang.Boolean;
 import species.NamesParser;
 import species.Metadata
+import species.Classification;
 
 
 class DocumentService extends AbstractObjectService {
@@ -367,6 +369,7 @@ class DocumentService extends AbstractObjectService {
 	 * @return
 	 */
 	Map getFilteredDocuments(params, max, offset) {
+        print "1111"
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
 		if(Utils.isSearchAction(params)){
 			//returning docs from solr search
@@ -416,6 +419,7 @@ class DocumentService extends AbstractObjectService {
 	 * @return
 	 */
 	def getDocumentsFilterQuery(params) {
+        println params;
 		def query = "select document from Document document "
 		def queryParams = [:]
 		def activeFilters = [:]
@@ -465,8 +469,24 @@ class DocumentService extends AbstractObjectService {
 			//}
 		}
 		
+		if(params.taxon) {
+			def taxon = TaxonomyDefinition.read(params.taxon);
+            if(taxon){
+				queryParams['taxon'] = taxon
+				queryParams['canonicalForm'] = taxon.canonicalForm
+
+                def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+				queryParams['classification'] = ibp_classifi
+		
+				query += " join document.docSciNames ds join  ds.taxonConcept.hierarchies as reg "
+                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+			}
+		}
 		def sortBy = params.sort ? params.sort : "lastRevised "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
+        println "=========================+++++"
+        println query;
+        println "=========================+++++"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}
 

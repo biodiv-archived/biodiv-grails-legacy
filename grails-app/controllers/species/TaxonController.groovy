@@ -42,7 +42,6 @@ class TaxonController {
      * 
      */
     def listHierarchy = {
-        log.debug params;
         //cache "taxonomy_results"
         includeOriginHeader();
 
@@ -71,15 +70,18 @@ class TaxonController {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
             def taxonIds = [];
+            def tillLevel = level+3;
             if(expandTaxon) {
+                def taxon = TaxonomyDefinition.read(taxonId);
+                tillLevel = taxon.rank;
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
             }
             def cl = Classification.read(classSystem.toLong());
-            getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, taxonIds);
+            getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
             println "========RES SIZE ========== " + rs.size() 
             if(cl == classification) {
                 def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                getHierarchyNodes(rs, level, level+3, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
+                getHierarchyNodes(rs, level, tillLevel, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
             }
         }
         log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
@@ -183,8 +185,6 @@ class TaxonController {
                     if(r.rank+1 <= tillLevel) {
                         r.put('expanded', true);
                         r.put('loaded', true);
-                        println "calling agn for level "+(r.rank+1)
-                        println resultSet
                         getHierarchyNodes(resultSet, r.rank+1, tillLevel, r.path, classSystem, expandAll, expandSpecies, taxonIds)
                     }
                 }

@@ -139,16 +139,15 @@ console.log(taxonId+"   "+selectedTaxonId)
                         var last = rowid.substring(rowid.lastIndexOf("_") + 1, rowid.length);
                         $(e.target).parent("span").find(".taxDefIdVal").val(last);
                         switch($(e.target).data('controller')) {
-                            case 'species' :
-                            case 'observation' :
+                            case 'namelist' :
+                                getNamesFromTaxon($(e.target), rowid);
+                                break;
+                            default:
                                 var taxonId = $(e.target).parent("span").find(".taxDefIdVal").val();
                                 var classificationId = $('#taxaHierarchy option:selected').val();
 
                                 $("input#filterByTaxon").val(taxonId);
 				                updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
-                                break;
-                            case 'namelist' :
-                                getNamesFromTaxon($(e.target), rowid);
                                 break;
                         }
                         //localData = $this.jqGrid("getLocalRow", rowid);
