@@ -494,9 +494,9 @@ environments {
         ibp.domain='indiabiodiversity.localhost.org'
         wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
         //grails.resources.debug=true
-        grails.resources.mappers.hashandcache.excludes = ['**']
+//        grails.resources.mappers.hashandcache.excludes = ['**']
         //grails.resources.flatten = false
-        grails.resources.mappers.yuijsminify.disable=true
+//        grails.resources.mappers.yuijsminify.disable=true
 
         ckeditor {
             upload {
@@ -535,7 +535,7 @@ environments {
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
-            //debug "org.grails.plugin.resource"
+            debug "org.grails.plugin.resource"
  
             warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
@@ -637,7 +637,7 @@ environments {
 		//grails.resources.debug=true
 		grails.resources.mappers.hashandcache.excludes = ['**']
 		//grails.resources.flatten = false
-		grails.resources.mappers.yuijsminify.disable=true
+//		grails.resources.mappers.yuijsminify.disable=true
 	}
 
 	saturn {

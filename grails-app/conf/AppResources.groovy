@@ -115,6 +115,7 @@ modules = {
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
 		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
 
+        resource url:'/js/species/observations/list.js'
 	}
 
 	location_utils { 
@@ -163,7 +164,6 @@ modules = {
 	observations_list { 
 		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
 		
-        resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/taxonhierarchy.js'
 	}
 
@@ -173,7 +173,7 @@ modules = {
         resource url:'/css/location_picker.css'
         resource url:'/js/location/location-picker.js'
 	
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
 		//resource url:'/js/species/users/list.js'
 	}
 
@@ -183,9 +183,9 @@ modules = {
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
 		resource url:'/css/biodiv.css'
+		resource url:'/js/species/taxonhierarchy.js'
 		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/species.js'
-		resource url:'/js/species/taxonhierarchy.js'
 	}
 
 	species_show {
@@ -240,7 +240,7 @@ modules = {
 	userGroups_list {
 		dependsOn 'observations, location_utils, list_utils'
 		
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/userGroups/main.js'		
 	}
 
@@ -292,7 +292,7 @@ modules = {
     checklist_list {
 		dependsOn 'checklist'
 
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
     }
 
 	checklist_create {
@@ -385,5 +385,9 @@ modules = {
 
     curation {
         resource url:'/js/species/curation.js'
+    }
+
+    document_list {
+        dependsOn 'observations_list'
     }
 }

@@ -35,7 +35,7 @@ console.log(taxonId+"   "+selectedTaxonId)
                 //el+= taxonId;
                 if(speciesId && speciesId != -1) {
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
-                } else if(taxonId.endsWith(selectedTaxonId)) {
+                } else if(selectedTaxonId && taxonId.endsWith(selectedTaxonId)) {
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+" btn-info'>"+el+"";
                 } else {
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'>"+el;
