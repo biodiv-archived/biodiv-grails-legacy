@@ -53,7 +53,7 @@
 						</div>
                         <div id="taxonBrowser" class="span4" style="position:relative">
                             <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
-                                <h5><g:message code="button.classifications" /></h5>	
+                                <h5><g:message code="button.taxon.browser" /></h5>	
                                 <div id="taxaHierarchy">
 
                                     <%

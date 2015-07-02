@@ -4,9 +4,9 @@
 <div class="story-actions clearfix" style="width: 100%;">
     <div class="" style="margin-bottom:20px">
         <g:if test="${ibpClassification}">
-        <g:each in="${ibpClassification}" var="taxonDefinition">
+        <g:each in="${ibpClassification}" var="taxonDefinition" status="i">
         <a href="${uGroup.createLink('controller':params.controller, 'action':'list', params:['taxon':taxonDefinition.id])}"><span class='rank${taxonDefinition.rank} '> ${raw(taxonDefinition.italicisedForm)}</span></a>
-        <g:if test="${taxonDefinition.rank<ibpClassification.size()}">></g:if>
+        <g:if test="${i<ibpClassification.size()-1}">></g:if>
         </g:each> 
         </g:if>
     </div>
