@@ -31,11 +31,12 @@
                         return;
                     }
                 });
-console.log(taxonId+"   "+selectedTaxonId)
                 //el+= taxonId;
+                var btnAction = "Show"
                 if(speciesId && speciesId != -1) {
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
                 } else if(selectedTaxonId && taxonId.endsWith(selectedTaxonId)) {
+                    btnAction = "Hide"
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+" btn-info'>"+el+"";
                 } else {
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'>"+el;
@@ -44,13 +45,16 @@ console.log(taxonId+"   "+selectedTaxonId)
                 if(this.expandAllIcon) {
                     el += "&nbsp;<a class='taxonExpandAll' onClick='expandAll(\"taxonHierarchy\", \""+cellVal.rowId+"\", true)'>+</a>";
                 }
-            
+           
+                if(me.options.controller == 'namelist') {
+                    btnAction = 'Show';
+                }
                 var postData = $(this).getGridParam('postData');
                 var expandSpecies = postData['expand_species'];
                 var expandTaxon = postData['expand_taxon'];
 
                 //if("${speciesInstance}".length == 0){
-                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect' data-controller='"+me.options.controller+"' data-action='"+me.options.action+"' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Show "+me.options.controller+"</button></span>"
+                el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect "+ ((btnAction=='Show')?'':'active')+"' data-controller='"+me.options.controller+"' data-action='"+me.options.action+"' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Show "+me.options.controller+"</button></span>"
             //}
                 var isContributor= $(cells[11]).text();
                 if(isContributor == 'true') {
@@ -133,6 +137,11 @@ console.log(taxonId+"   "+selectedTaxonId)
 */
                     $("span.rank").removeClass('btn-info');
                     $(e.target).parent('span').prev().addClass('btn-info');
+
+                    var s = $(e.target).hasClass('active');
+                    $('#taxonHierarchy .taxDefIdSelect').removeClass('active');
+                    s ? $(e.target).removeClass('active'): $(e.target).addClass('active');
+
                     if ((e.target.nodeName === "INPUT" && $(e.target).hasClass("taxDefIdCheck") )|| ($(e.target).hasClass("taxDefIdSelect"))) {
     
                         state = $(e.target).prop("checked");
@@ -142,12 +151,17 @@ console.log(taxonId+"   "+selectedTaxonId)
                             case 'namelist' :
                                 getNamesFromTaxon($(e.target), rowid);
                                 break;
-                            default:
-                                var taxonId = $(e.target).parent("span").find(".taxDefIdVal").val();
-                                var classificationId = $('#taxaHierarchy option:selected').val();
+                            default :
+                                if($(e.target).hasClass('active')) {
+                                    var taxonId = $(e.target).parent("span").find(".taxDefIdVal").val();
+                                    var classificationId = $('#taxaHierarchy option:selected').val();
 
-                                $("input#filterByTaxon").val(taxonId);
-				                updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
+                                    $("input#filterByTaxon").val(taxonId);
+                                } else {
+                                    $("input#filterByTaxon").val('');
+                                    $("span.rank").removeClass('btn-info');
+                                }
+                                updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
                                 break;
                         }
                         //localData = $this.jqGrid("getLocalRow", rowid);

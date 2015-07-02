@@ -958,6 +958,8 @@ environments {
             debug   'grails.app.services.species'
 
        }
+
+        grails.resources.mappers.hashandcache.excludes = ['**']
 	}
 	kk {
 		servername = 'indiabiodiversity.org'
