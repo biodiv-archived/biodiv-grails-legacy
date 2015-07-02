@@ -10,7 +10,26 @@
     	<uGroup:objectPostToGroupsWrapper 
 			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
     </g:if>
-	<div class="sidebar_section">
+    <div id="taxonBrowser">
+        <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
+            <h5><g:message code="button.classifications" /></h5>	
+            <div id="taxaHierarchy">
+
+                <%
+                def classifications = [];
+                Classification.list().each {
+                classifications.add([it.id, it, null]);
+                }
+                classifications = classifications.sort {return it[1].name}; 
+                %>
+
+                <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+            </div>
+        </div>
+    </div>
+
+
+	<!--div class="sidebar_section">
             <h5><g:message code="documentsidebar.document.manager" /> <sup><g:message code="msg.beta" /></sup></h5>
 
                 <p class="tile" style="margin:0px; padding:5px;">
@@ -20,7 +39,7 @@
 		
                 </p>
                 
-	</div>
+	</div-->
 
 
 
@@ -45,24 +64,6 @@
 			<project:showTagsCloud model="[tagType:'document', showMoreTagPageLink:uGroup.createLink(controller:'document', action:'tagcloud', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)]"></project:showTagsCloud>
 		</div>
     </g:if>
-    <div id="taxonBrowser">
-        <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
-            <h5><g:message code="button.classifications" /></h5>	
-            <div id="taxaHierarchy">
-
-                <%
-                def classifications = [];
-                Classification.list().each {
-                classifications.add([it.id, it, null]);
-                }
-                classifications = classifications.sort {return it[1].name}; 
-                %>
-
-                <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
-            </div>
-        </div>
-    </div>
-
 
 </div>
         <script type="text/javascript">

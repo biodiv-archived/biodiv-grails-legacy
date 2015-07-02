@@ -125,6 +125,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                 changeEditingMode(false);
                 populateNameDetails(data);
                 populateTabDetails(data, false);
+                populateConnections(data,taxonId);
                 showProperTabs();
                 $(".countSp").text(data["countSp"]);
                 $(".countObv").text(data["countObv"]);
@@ -249,6 +250,13 @@ function populateNameDetails(data){
     }
     setOption(document.getElementById("rankDropDown"), data["rank"]);
     setOption(document.getElementById("statusDropDown"), data["nameStatus"]);
+}
+
+function populateConnections(data, taxonId){
+    $('#speciesInstanceTotal').html(data.speciesInstanceTotal).parent().attr('href', $('#speciesInstanceTotal').parent().data('href')+'?taxon='+taxonId);
+    $('#observationInstanceTotal').html(data.observationInstanceTotal).parent().attr('href', $('#observationInstanceTotal').parent().data('href')+'?taxon='+taxonId);
+    $('#checklistInstanceTotal').html(data.checklistInstanceTotal).parent().attr('href', $('#checklistInstanceTotal').parent().data('href')+'?taxon='+taxonId);
+    $('#documentInstanceTotal').html(data.documentInstanceTotal).parent().attr('href', $('#documentInstanceTotal').parent().data('href')+'?taxon='+taxonId);
 }
 
 //takes name for search
@@ -942,3 +950,63 @@ function saveAcceptedName(acceptedMatch) {
         } 
     });
 }
+
+
+$(document).ready(function() {
+
+    $(".loadConnection").click(function() { 
+        var $me = $(this);
+        var controller = $me.data('controller');
+        var url = '';
+        switch(controller) {
+            case 'species' : url = window.params.species.listUrl; break;
+            case 'observation' : url = window.params.observation.listUrl; break;
+            case 'document' : url = window.params.document.listUrl; break;
+            default : console.log("no url");
+        }
+        var taxon = 94899;//$("input#filterByTaxon").val();
+        var params = {};
+        params['taxon'] = taxon;
+        params['max'] = $(this).data('max');
+        params['offset'] = $(this).data('offset');
+        params['format'] = 'json';
+        var $connTable = $('#'+controller+'_connTable');
+        $.ajax({
+            url:url,
+            dataType: "json",
+            data:params,
+            success: function(data) {
+                var instanceList, instanceCount;
+                switch(controller) {
+                    case 'observation' : 
+                        instanceList = data.model.observationInstanceList;
+                        instanceCount = data.model.instanceTotal;
+                        break;
+                    case 'species' : 
+                        instanceList = data.model.speciesInstanceList;
+                        instanceCount = data.model.instanceTotal;
+                        break;
+                    case 'document' : 
+                        instanceList = data.model.documentInstanceList;
+                        instanceCount = data.model.instanceTotal;
+                        break;
+                    default : console.log("no url");
+                }
+
+                $('#'+controller+'_connList .'+controller+'InstanceTotal').html(' <a href="'+url+'">'+instanceCount+'</a>');
+                /*if(data.success == true) {
+                    $.each(instanceList, function(index, item) {
+                        $connTable.append('<tr><td><a href="/'+controller+'/show/'+item.id+'">'+item.title+'</a></td></tr>');
+                    });
+                    $me.data('offset', data.model.next);
+                    if(!data.model.next){
+                        $me.hide();
+                    }
+                } else {
+                    $me.hide();
+                }*/
+            }
+        });
+
+   });
+});

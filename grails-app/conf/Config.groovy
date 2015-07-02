@@ -535,7 +535,7 @@ environments {
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
-            debug "org.grails.plugin.resource"
+            warn "org.grails.plugin.resource"
  
             warn    'org.springframework.security',
                     'org.codehaus.groovy.grails.web.servlet',  //  controllers
@@ -1072,6 +1072,8 @@ environments {
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
 		}
+
+         grails.resources.mappers.hashandcache.excludes = ['**']
 	}
 }
 

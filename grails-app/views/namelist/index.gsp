@@ -214,7 +214,7 @@
 	    border: 1px solid #ccc;
 	    width: 17% !important;
 	    text-align:center;
-        height: 328px;
+        /*height: 328px;*/
 	}
 	.connection_wrapper{
 		background-color:#00FFCC;
@@ -226,9 +226,9 @@
 	}
 	.connection_wrapper_row2{		
         background-color: beige;
-        height: 19px;
         text-align: center;
         padding: 2.4px;
+        height:19px;
     }
     .taxonomyRanks {
 	    border: 1px solid #ccc;
@@ -505,25 +505,11 @@
         <div class="row-fluid"style=" background: #009933; ">
 		  <div class="connection_wrapper" style="background:grey; padding: 5px 0px;font-weight: bold;">Connections</div>
 		  
-		  <div class="connection_wrapper_row1">Species Page</div>
-		  
-		  <div class="connection_wrapper_row2 countSp"></div>
-
-		  <div class="connection_wrapper_row1">Observations</div>
-		  
-		  <div class="connection_wrapper_row2 countObv"></div>
-		  
-		  <div class="connection_wrapper_row1">Lists</div>
-		  
-		  <div class="connection_wrapper_row2 countCKL"></div>
-		  
-		  <div class="connection_wrapper_row1">Maps</div>
-		  
-		  <div class="connection_wrapper_row2 countMaps"></div>
-		  
-		  <div class="connection_wrapper_row1">Documents</div>
-		  
-		  <div class="connection_wrapper_row2 countDocs"></div>
+            <g:render template="/namelist/connectionsTemplate" model="[controller:'species', instanceTotal:speciesInstanceTotal]"/>
+            <g:render template="/namelist/connectionsTemplate" model="[controller:'observation', instanceTotal:observationInstanceTotal]"/>
+            <g:render template="/namelist/connectionsTemplate" model="[controller:'checklist', instanceTotal:checklistInstanceTotal]"/>
+            <g:render template="/namelist/connectionsTemplate" model="[controller:'map', instanceTotal:mapInstanceTotal]"/>
+            <g:render template="/namelist/connectionsTemplate" model="[controller:'document', instanceTotal:documentInstanceTotal]"/>
       </div>
 
   </div>
@@ -548,12 +534,17 @@
     <r:script>
     $(document).ready(function() {
             //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
-            var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
+            var taxonBrowserOptions = {
                 expandAll:false,
-                controller:"${params.controller}",
-                action:"${params.action}",
-                showCheckBox:false
-            });
+                controller:"${params.controller?:'namelist'}",
+                action:"${params.action?:'index'}",
+                expandTaxon:"${params.taxon?true:false}"
+            }
+            if(${params.taxon?:false}){
+            taxonBrowserOptions['taxonId'] = "${params.taxon}";
+            }
+            var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+
             //modifySourceOnEdit();
             //initializeLanguage();
             $(".listSelector").change(function () {

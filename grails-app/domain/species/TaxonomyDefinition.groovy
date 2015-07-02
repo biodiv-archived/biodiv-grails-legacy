@@ -28,6 +28,8 @@ class TaxonomyDefinition extends ScientificName {
 	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
 
+    def grailsApplication
+
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
 
 	static constraints = {
@@ -105,8 +107,8 @@ class TaxonomyDefinition extends ScientificName {
 		}
 		return result;
 	}
-	
-	/**
+
+    /**
 	* Returns parents as per classification
 	* @return
 	*/
@@ -120,9 +122,14 @@ class TaxonomyDefinition extends ScientificName {
 		   }
 		   result.put(reg.classification , l);
 	   }
-	   return result;
+ 	   return result;
    }
-   
+   	
+	List<TaxonomyDefinition> fetchDefaultHierarchy() {
+        def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+        return parentTaxonRegistry(classification).get(classification);
+    }
+
    Map longestParentTaxonRegistry(Classification classification) {
        def result = [:];
        def res = TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, classification);

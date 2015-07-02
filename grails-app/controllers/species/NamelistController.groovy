@@ -9,6 +9,9 @@ import grails.plugin.springsecurity.annotation.Secured;
 import species.NamesParser;
 import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
+import species.participation.Observation;
+import content.eml.Document;
+import species.Species;
 
 class NamelistController {
     
@@ -18,7 +21,9 @@ class NamelistController {
     def namelistService
     def utilsService
     def springSecurityService;
-	
+    def speciesService;
+    def observationService;
+    def documentService;
 	/**
 	 * input : taxon id ,classification id of ibp 
 	 * @return A map which contain keys as dirty, clean and working list. Values of this key is again a LIST of maps with key as name and id
@@ -62,6 +67,27 @@ class NamelistController {
             println "======TAXON REGISTRY NULL====="
         }*/
         res['feedCommentHtml'] = feedCommentHtml
+
+
+        Species.withNewTransaction {
+            //speciesModel will be  [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
+            def speciesModel = speciesService.getSpeciesList([taxon:instance.id+"", max:1], 'list');
+            res['speciesInstanceTotal'] = speciesModel.instanceTotal;
+        }
+
+        Observation.withNewTransaction {
+            //observationModel will be [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+            def observationModel = observationService.getFilteredObservations([taxon:instance.id+""], 1, 0, false);
+            res['observationInstanceTotal'] = observationModel.allObservationCount;
+            res['checklistInstanceTotal'] = observationModel.checklistCount;
+        }
+
+        Document.withNewTransaction {
+            //documentModel will be  [documentInstanceList:documentInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+            def documentModel = documentService.getFilteredDocuments([taxon:instance.id+""], 1, 0);
+            res['documentInstanceTotal'] = documentModel.instanceTotal;
+        }
+
         render res as JSON
 	}
 	

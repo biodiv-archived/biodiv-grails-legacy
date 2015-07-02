@@ -54,6 +54,7 @@ $(document).ready(function() {
                 'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}",
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
+                    'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
                     'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
                 },
@@ -77,7 +78,7 @@ $(document).ready(function() {
                     'url':"${uGroup.createLink('controller':'content')}"
                 },
                 'observation':{
-                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
                     occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
                     relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
                     uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
@@ -112,7 +113,11 @@ $(document).ready(function() {
                     'joinUsUrl' : "${uGroup.createLink(controller:'userGroup', action:'joinUs') }",
 		            'leaveUrl' : "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }",
                     'requestMembershipUrl' : "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }"
+                },
+                'document':{
+                    'listUrl':"${uGroup.createLink('controller':'document', action:'list', 'userGroup':userGroupInstance)}",
                 }
+ 
                 
 	}
 

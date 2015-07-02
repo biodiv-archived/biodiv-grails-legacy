@@ -890,6 +890,7 @@ $(document).ready(function() {
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
             speciesId:speciesId,
             //speciesLevel:${TaxonomyRank.SPECIES.ordinal()},
+            action:'show',
             expandAll:true,
             expandSpecies:true
         });	

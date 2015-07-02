@@ -369,13 +369,13 @@ class DocumentService extends AbstractObjectService {
 	 * @return
 	 */
 	Map getFilteredDocuments(params, max, offset) {
-        print "1111"
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
 		if(Utils.isSearchAction(params)){
 			//returning docs from solr search
 			res.putAll(search(params))
 		}else{
 			res.putAll(getDocsFromDB(params, max, offset))
+		    res['instanceTotal'] = getDocsFromDB(params, -1, -1).documentInstanceList.size()
 		}
 		return res
 	}

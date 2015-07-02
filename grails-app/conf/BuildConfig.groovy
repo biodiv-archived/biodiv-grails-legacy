@@ -150,7 +150,7 @@ grails.project.dependency.resolution = {
         compile ':hibernate:3.6.10.16'
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
-        runtime ":resources:1.2.14"
+        runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
         compile ":spring-security-acl:2.0-RC2"
