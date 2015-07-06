@@ -67,7 +67,7 @@ class NamelistService {
     private static long AFTER_CAN_MULTI_SINGLE = 0;
     private static long AFTER_CAN_MULTI_MULTI = 0;
     
-    public static Set namesInWKG = [];
+    public static Set namesInWKG = new HashSet();
 
     public static Map namesBeforeSave = [:];
     public static Map namesAfterSave = [:];
@@ -511,130 +511,84 @@ class NamelistService {
     }
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
-    public List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank, boolean searchInNull = false) {  
-        //utilsService.cleanUpGorm(true);
+    public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null) {  
         SEARCH_IBP_COUNTER ++;
-        println "========SEARCH IBP CALLED======="
+        println "========SEARCH IBP CALLED=======>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "=--- "+ rank;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
+		
         def clazz;
         if(status == NameStatus.ACCEPTED) {
             clazz = TaxonomyDefinition.class;
         } else {
             clazz = SynonymsMerged.class; 
         }
-        def res1 = [];
         println "====SEARCHING ON IBP IN CLASS ====== " + clazz
-        clazz.withNewSession{
-            //FINDING BY CANONICAL
-            res1 = clazz.findAllWhere(canonicalForm:canonicalForm, status: status, rank:rank);
-            if(searchInNull) {
-                res = res1;
-            } else {
-                res1.each{
-                    if(it.position != null) {
-                        res.add(it)
-                    }
-                }
+        clazz.withNewTransaction{
+			
+            println  "Searching canonical + rank + status"
+            res = clazz.withCriteria(){
+				and{
+					eq('canonicalForm', canonicalForm)
+					if(status) eq('status', status)
+					if(rank >= 0)
+						eq('rank', rank)
+					if(!searchInNull){
+						isNotNull('position')
+					}
+				}
             }
-            //CANONICAL ZERO MATCH OR SINGLE MATCH
+			//CANONICAL ZERO MATCH OR SINGLE MATCH
             if(res.size() < 2) { 
                 if(res.size() == 0 ) {
                     CAN_ZERO ++;
-                    println "====CANONICAL - ZERO MATCH ====== "
                 } else {
                     CAN_SINGLE ++;
-                    println "====CANONICAL - SINGLE MATCH ====== "
-                    if(res[0].rank != rank) {
-                        println "====CANONICAL - SINGLE MATCH BUT RANK DIFFERENT====== "
-                        res = [];
-                    }
                 }
-                return res;
             }
             //CANONICAL MULTIPLE MATCH
             else {
-                //COUNTER INCREASE FOR CANONICAL MULTIPLE
                 CAN_MULTIPLE ++;
-                //FINDING BY VERBATIM
-                if(!authorYear) authorYear = '';
-                res1 = clazz.findAllWhere(name: (canonicalForm + " " + authorYear), status: status, rank:rank);
-                if(searchInNull) {
-                    res = res1;
-                } else {
-                    res1.each{
-                        if(it.position != null) {
-                            res.add(it)
-                        }
-                    }
+                println " constructed normalized form + rank + status"
+				if(!authorYear) authorYear = '';
+                res = clazz.withCriteria(){
+					and{
+						eq('normalizedForm', canonicalForm + " " + authorYear)
+						if(status) eq('status', status)
+						if(rank >= 0)
+							eq('rank', rank)
+						if(!searchInNull){
+							isNotNull('position')
+						}
+					}
                 }
-                //VERBATIM SINGLE MATCH
                 if(res.size() == 1) {
-                    //COUNTER INCREASE FOR prune to 1 result
                     AFTER_CAN_MULTI_SINGLE ++;
-                    println "====VERBATIM - SINGLE MATCH ====== "
-                    return res;
-                }
-
-                //VERBATIM ZERO MATCH/MULTIPLE MATCH
-                else if(res.size() > 2 || res.size() == 0) {
-                    //FINDING BY VERBATIM + RANK
-                    res1 = clazz.findAllWhere(name:(canonicalForm + " " + authorYear),rank: rank, status: status);
-                    if(searchInNull) {
-                        res = res1;
-                    } else {
-                        res1.each{
-                            if(it.position != null) {
-                                res.add(it)
-                            }
-                        }
-                    }
-                    //VERBATIM + RANK ZERO MATCH
-                    if(res.size() == 0) {
-                        if(authorYear) {
-                            println "====TRYING VERBATIM + RANK - ZERO MATCH AND ALSO HAS AUTHOR YEAR"
-                            AFTER_CAN_MULTI_ZERO ++;
-                            return res;
-                        }
-                        else {
-                            //FINDING BY CANONICAL + RANK
-                            println "====TRYING VERBATIM + RANK - ZERO MATCH & NO AUTHOR YEAR - SO MATCHED ON CANONICAL + RANK"
-                            res1 = clazz.findAllWhere(canonicalForm:canonicalForm ,rank: rank, status: status);
-                            if(searchInNull) {
-                                res = res1;
-                            } else {
-                                res1.each{
-                                    if(it.position != null) {
-                                        res.add(it)
-                                    }
-                                }
-                            }
-                            if(res.size() == 0) {AFTER_CAN_MULTI_ZERO ++;}
-                            else if(res.size() == 1) {AFTER_CAN_MULTI_SINGLE ++;}
-                            else {AFTER_CAN_MULTI_MULTI ++;}
-                            
-                            return res;
-                        }
-                    }
-                    //VERBATIM + RANK SINGLE MATCH
-                    if(res.size() == 1) {
-                        //COUNTER INCREASE FOR prune to 1 result
-                        AFTER_CAN_MULTI_SINGLE ++;
-                        println "====TRYING VERBATIM + RANK - SINGLE MATCH"
-                        return res;
-                    }
-
-                    //VERBATIM + RANK MULTIPLE MATCH
-                    else {
-                        AFTER_CAN_MULTI_MULTI ++;
-                        println "====TRYING VERBATIM + RANK - MULTIPLE MATCH"
-                        return res;
-                    }
+                }else if(res.size() == 0) {
+                    AFTER_CAN_MULTI_ZERO ++;
+				}else {
+                	AFTER_CAN_MULTI_MULTI ++;
                 }
             }
-            return res;
+			
+			if(res.isEmpty() && normalizedForm){
+				println "Searching normalized form + rank + status"
+				res = clazz.withCriteria(){
+					and{
+						eq('normalizedForm', normalizedForm)
+						if(status) eq('status', status)
+						if(rank >= 0)
+							eq('rank', rank)
+						if(!searchInNull){
+							isNotNull('position')
+						}
+					}
+				}
+			}			
         }
+		println "=========== FINAL SEARCH RESULT " + res
+		return res;
     }
     
     List searchIBPResults(String canonicalForm, String authorYear, NameStatus status, rank) {
@@ -1915,31 +1869,35 @@ def sql= session.createSQLQuery(query)
 
 	
 	
-	def mergeAcceptedName(long oldId, long newId){
+	def mergeAcceptedName(long oldId, long newId, boolean fullDelete = false){
 		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
 		TaxonomyDefinition newName = TaxonomyDefinition.get(newId)
 		
-		if(!oldName &&  !newName){
+		
+		if(!oldName ||  !newName){
 			log.debug "One of name is not exist in the system " + oldId + "  " +  newId
 			return
 		}
+		
+		
 		
 		def oldTrList = TaxonomyRegistry.findAllByTaxonDefinition(oldName)
 		
 		
 		//update all paths for this taxon defintion
-		List trList = TaxonomyRegistry.findAllByPath('%_' + oldId + '_%')
-		trList.addAll(TaxonomyRegistry.findAllByPath(oldId + '_%'))
+		List trList = TaxonomyRegistry.findAllByPathLike('%_' + oldId + '_%')
+		trList.addAll(TaxonomyRegistry.findAllByPathLike(oldId + '_%'))
 		trList.addAll(TaxonomyRegistry.findAllByPath(oldId))
 		trList.addAll(oldTrList)
 		trList.unique()
 		
+		println " complete tr list ------------ " + trList
 		
 		List oldTrToBeDeleted = []
 		List updateTrList = []
 		
 		Map updateTrMap = [:]
-		
+		Map deleteToParentTaxonMap = [:]
 		Species.withTransaction {
 		println "================ starting things now "
 		trList.each { TaxonomyRegistry tr ->
@@ -1955,7 +1913,7 @@ def sql= session.createSQLQuery(query)
 			if(newPath.endsWith('_' + oldId))
 				newPath = newPath.substring(0, newPath.lastIndexOf('_') + 1) +  newId
 				
-			if(isDuplicateTr(tr, newPath, newName)){
+			if(isDuplicateTr(tr, newPath, newName, deleteToParentTaxonMap)){
 				oldTrToBeDeleted << tr
 			}else{
 				updateTrMap.put(tr, newPath)
@@ -1972,20 +1930,28 @@ def sql= session.createSQLQuery(query)
 		oldTrList.removeAll(oldTrToBeDeleted)
 		//trList.removeAll(oldTrToBeDeleted)
 		
-
+		println "------------ updateTrList " + updateTrList
 		updateTrList.each {TaxonomyRegistry tr ->
 			println "================ updating tr " + tr
 			if(!tr.save(flush:true)){
 				tr.errors.allErrors.each { log.error it }
 			}
 		}
-
-				
+		println "------------ oldTrToBeDeleted " + oldTrToBeDeleted
 		oldTrToBeDeleted.each {TaxonomyRegistry tr ->
 			println "================ deleting tr " + tr
+			def tmpTr = deleteToParentTaxonMap.get(tr)
+			TaxonomyRegistry.findAllByParentTaxon(tr).each{
+				it.parentTaxon = tmpTr
+				if(!tmpTr.save(flush:true)){
+					tmpTr.errors.allErrors.each { log.error it }
+				}
+			}
 			tr.delete(flush:true)
 		}
 		
+		
+		println "------------ oldTrList " + oldTrList
 		//updating taxon def so that new hirarchy should be shown
 		oldTrList.each {TaxonomyRegistry tr ->
 			println "================ taxon def for tr " + tr
@@ -2058,21 +2024,45 @@ def sql= session.createSQLQuery(query)
 		}
 		
 		//setting delete flag true on name
-		oldName.isDeleted = true
-		println "======= for delete " + oldName
-		if(!oldName.save(flush:true)){
-			oldName.errors.allErrors.each { log.error it }
+		if(fullDelete){
+			def newReco = Recommendation.findByTaxonConcept(newName)
+			def reco = Recommendation.findByTaxonConcept(oldName)
+			if(reco){
+			RecommendationVote.findAllByRecommendationOrCommonNameReco(reco, reco).each { r ->
+				println " saving reco vote  " + r
+				if(r.recommendation == reco){
+					r.recommendation = newReco
+				}
+				if(r.commonNameReco == reco){
+					r.commonNameReco = newReco
+				}
+				if(!r.save(flush:true)){
+					r.errors.allErrors.each { log.error it }
+				}
+			}
+			println "========= deleting reco " + reco
+			reco.delete(flush:true)
+			}
+			println "========= old name " + oldName
+			if(oldName)
+				oldName.delete(flush:true)
+		}else{
+			oldName.isDeleted = true
+			println "======= for delete " + oldName
+			if(!oldName.save(flush:true)){
+				oldName.errors.allErrors.each { log.error it }
+			}
 		}
 		}
 		
 	}
 	
 	
-	private boolean isDuplicateTr(tr, newPath, newName){
+	private boolean isDuplicateTr(tr, newPath, newName, deleteToParentTaxonMap ){
 		//update all paths for this taxon defintion
 		def id = newName.id
-		List trList = TaxonomyRegistry.findAllByPath('%_' + id + '_%')
-		trList.addAll(TaxonomyRegistry.findAllByPath(id + '_%'))
+		List trList = TaxonomyRegistry.findAllByPathLike('%_' + id + '_%')
+		trList.addAll(TaxonomyRegistry.findAllByPathLike(id + '_%'))
 		trList.addAll(TaxonomyRegistry.findAllByPath(id))
 		trList.addAll(TaxonomyRegistry.findAllByTaxonDefinition(newName))
 		trList.unique()
@@ -2083,6 +2073,8 @@ def sql= session.createSQLQuery(query)
 			
 				if((nTr.classification == tr.classification) && (nTr.path == newPath) ){
 					isDuplicate = true
+					println "----------- duplicate tr " + nTr
+					deleteToParentTaxonMap.put(tr, nTr)
 				}
 				
 		}
