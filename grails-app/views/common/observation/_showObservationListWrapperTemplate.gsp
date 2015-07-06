@@ -105,8 +105,8 @@
                         </div>
                     </div>
                 </div>
-
-
+                
+                <g:render template="/observation/summaryTemplate" model="['speciesCount':speciesCount, 'subSpeciesCount':subSpeciesCount]"/>
                 <div id="observations_list_map" class="observation sidebar_section"
                     style="clear:both;overflow:hidden;display:none;">
                     <h5><g:message code="default.species.distribution.label" /></h5>

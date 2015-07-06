@@ -77,10 +77,12 @@
 
                             <g:render template="/species/inviteForContribution"/>
                             -->
+
+                            <g:render template="/observation/summaryTemplate" model="['speciesCount':speciesCount, 'subSpeciesCount':subSpeciesCount]"/>
+                               
                         </div>
 
-
-                    </div>
+                   </div>
                     <div id="contribute" class="tab-pane">
                         <g:render template="contributeTemplate"/>
                     </div>

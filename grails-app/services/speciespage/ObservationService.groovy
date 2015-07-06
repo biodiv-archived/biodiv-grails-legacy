@@ -79,7 +79,9 @@ import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import static org.springframework.http.HttpStatus.*;
+import species.ScientificName.TaxonomyRank;
 
+import species.NamesMetadata.NameStatus;
 
 class ObservationService extends AbstractObjectService {
 
@@ -918,7 +920,7 @@ class ObservationService extends AbstractObjectService {
 
         def queryParts = getFilteredObservationsFilterQuery(params) 
         String query = queryParts.query;
-        long checklistCount = 0, allObservationCount = 0;
+        long checklistCount = 0, allObservationCount = 0, speciesCount = 0, subSpeciesCount = 0;
 
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
         /*        if(isMapView) {//To get id, topology of all markers
@@ -932,6 +934,8 @@ class ObservationService extends AbstractObjectService {
         log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
         //log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
         //log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
+        log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
+        log.debug "speciesStatusCountQuery : "+queryParts.speciesStatusCountQuery;
 
         log.debug query;
         log.debug queryParts.queryParams;
@@ -939,6 +943,8 @@ class ObservationService extends AbstractObjectService {
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
         //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
         //def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
+        def speciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
+        def speciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
@@ -946,6 +952,7 @@ class ObservationService extends AbstractObjectService {
 			if(checklistCountQuery)
             	checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
             //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
         } 
@@ -972,7 +979,17 @@ class ObservationService extends AbstractObjectService {
 		}
 
         allObservationCountQuery.setProperties(queryParts.queryParams)
+        speciesCountQuery.setProperties(queryParts.queryParams)
+        speciesStatusCountQuery.setProperties(queryParts.queryParams)
         allObservationCount = allObservationCountQuery.list()[0]
+        def speciesCounts = speciesCountQuery.list()
+        speciesCount = speciesCounts[0]
+        subSpeciesCount = speciesCounts[1]
+
+        def speciesStatusCounts = speciesStatusCountQuery.list()
+        def acceptedSpeciesCount = speciesStatusCounts[0]
+        def synonymSpeciesCount = speciesStatusCounts[1]
+
 
         if(!params.loadMore?.toBoolean()) {
             /*distinctRecoQuery.setProperties(queryParts.queryParams)
@@ -999,7 +1016,7 @@ class ObservationService extends AbstractObjectService {
         if(params.observedon_end){
             queryParts.queryParams["observedon_end"] =  params.observedon_end
         }
-        return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+        return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, speciesCount:speciesCount, subSpeciesCount:subSpeciesCount, acceptedSpeciesCount:acceptedSpeciesCount, synonymSpeciesCount:synonymSpeciesCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
     }
 
     /**
@@ -1305,13 +1322,15 @@ class ObservationService extends AbstractObjectService {
 
         
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
+		def speciesCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.rank having obv.maxVotedReco.taxonConcept.rank in :ranks"
+        queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
+
+		def speciesStatusCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.status having obv.maxVotedReco.taxonConcept.status in :status"
+        queryParams['status'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
 
         orderByClause = " order by " + orderByClause;
-        println "+========================================="
-        println query
-        println "+========================================="
 
-        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, speciesCountQuery:speciesCountQuery, speciesStatusCountQuery:speciesStatusCountQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 

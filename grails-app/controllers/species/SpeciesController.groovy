@@ -1437,10 +1437,16 @@ class SpeciesController extends AbstractObjectController {
             def hibSession = sessionFactory?.getCurrentSession();
             String taxonId=221859;
             //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
-            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
+//            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
+            try {
+            def hqlQuery = sessionFactory.currentSession.createQuery("select count(*) as count from Species s  join s.taxonConcept.hierarchies as reg  where s.id is not null  and reg.classification="+265799+" and (reg.path like '%!_123350!_%'  escape '!' or reg.path like '123350!_%'  escape '!' or reg.path like '%!_123350' escape '!') and reg.taxonDefinition.rank = 9");
             println "PppppppppppppppppppppppppppppppP"
         def speciesInstanceList = hqlQuery.list();
+
 render speciesInstanceList;
+            } catch(e) {
+                e.printStackTrace();
+            }
 
         });
         println "=====================++++"

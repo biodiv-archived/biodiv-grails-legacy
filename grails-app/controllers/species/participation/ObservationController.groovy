@@ -42,6 +42,7 @@ import species.ScientificName.TaxonomyRank;
 import species.participation.ActivityFeedService;
 import static org.springframework.http.HttpStatus.*;
 
+
 class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
@@ -116,7 +117,9 @@ class ObservationController extends AbstractObjectController {
         }
         
         model = utilsService.getSuccessModel('', null, OK.value(), model);
-
+println "=============================================+++++"
+println model.speciesCount;
+println "=============================================+++++"
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
@@ -222,7 +225,7 @@ class ObservationController extends AbstractObjectController {
             }
         }
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, speciesCount:filteredObservation.speciesCount,  subSpeciesCount:filteredObservation.subSpeciesCount, acceptedSpeciesCount:filteredObservation.acceptedSpeciesCount, synonymSpeciesCount:filteredObservation.synonymSpeciesCount, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
 	}
 	
 	def occurrences() {
