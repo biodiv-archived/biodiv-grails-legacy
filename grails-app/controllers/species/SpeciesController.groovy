@@ -278,6 +278,7 @@ class SpeciesController extends AbstractObjectController {
                     nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
                     md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
                     overview  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OVERVIEW,1,userLanguage),
+                    ss_v_r  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUBSPECIES_VARIETIES_RACES,2,userLanguage),
                     acth  : grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,
                     trn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage),
                     sn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage),
@@ -442,7 +443,7 @@ class SpeciesController extends AbstractObjectController {
 			for(category in concept.value.clone()) {
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) ) {
+				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) || category.key.equals(config.ss_v_r)) {
 					boolean show = false;
 					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
@@ -454,7 +455,12 @@ class SpeciesController extends AbstractObjectController {
 					} else if(category.key.equals(config.documents)) {
                         show = DocSciName.speciesHasDocuments(speciesInstance);
                         println "======SHOW ===== " + show
+                    } else if(category.key.equals(config.ss_v_r)) {
+                        if(speciesInstance.taxonConcept.rank == TaxonomyRank.SPECIES.ordinal()) {
+                            show = speciesInstance.fetchInfraSpecies().size()>0;
+                        }
                     }
+
                     else {
 						show = true;
 					}

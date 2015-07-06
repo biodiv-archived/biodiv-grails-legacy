@@ -321,6 +321,7 @@ speciesPortal {
 		NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"
 		TAXON_RECORD_NAME = 'Taxon Record Name'
 		OVERVIEW = 'Overview'
+        SUBSPECIES_VARIETIES_RACES = 'SubSpecies Varieties Races'
 		OCCURRENCE_RECORDS = 'Occurrence Records'
 		BRIEF = "Brief"
 		SUMMARY = "Summary"

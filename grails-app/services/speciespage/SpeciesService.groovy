@@ -1584,6 +1584,7 @@ class SpeciesService extends AbstractObjectService  {
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
+            queryParams['groupId']  = groupIds[0]
         } else {
             if(params.startsWith == "A-Z") {
                 query = "select s from Species s, TaxonomyDefinition t "
@@ -1599,6 +1600,7 @@ class SpeciesService extends AbstractObjectService  {
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
+            queryParams['groupId']  = groupIds[0]
         }
 
         if(params.featureBy == "true" ) {

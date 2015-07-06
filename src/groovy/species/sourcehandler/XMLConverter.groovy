@@ -1511,6 +1511,7 @@ class XMLConverter extends SourceConverter {
                         ent.taxonDefinition = taxon
                         ent.classification = classification;
                         ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+                        ent.parentTaxonDefinition = ent.parentTaxon.taxonDefinition;
                         log.debug("Parent Taxon : "+ent.parentTaxon)
                         ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
                         //same taxon at same parent and same path may exist from same classification.

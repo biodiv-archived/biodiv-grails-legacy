@@ -869,7 +869,6 @@ $(document).ready(function() {
     }, function(){
         $(this).children('.poor_species_content').slideUp(200);
     });
-    $(".grid_view").toggle();
 
 
     initGalleryTabs();

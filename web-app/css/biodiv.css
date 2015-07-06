@@ -1116,6 +1116,14 @@ input,button,select,textarea {
 	font-weight: bold;
 }
 
+tr.taxon-highlight {
+	font-weight: bold;
+    border: 1px solid #fad42e;
+      background: #fbec88;
+        color: #363636;
+}
+
+
 .info-message {
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -2930,3 +2938,33 @@ small {
 	height : 16px;
 	display:none;
 }
+
+.raw_position {
+    color:#777
+}
+.clean_position {
+    color:#3c763d
+}
+.working_position {
+    color:#8a6d3b
+}
+.status {
+    top: -5px;
+    position: relative;
+}
+
+#taxonHierarchy td {
+	height: 30px;
+	vertical-align: middle;
+}
+
+
+.taxaHierarchy {
+	background: url(../images/tree.png) 5px 50% no-repeat;
+	margin-left: 0;
+	margin-right: 5px;
+	padding-left: 5px;
+	padding-right: 20px;
+}
+
+

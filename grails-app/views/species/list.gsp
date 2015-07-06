@@ -67,7 +67,7 @@
                                     <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
                                 </div>
                             </div>
-                            <div class="section help-block"> 
+                            <!--div class="section help-block"> 
                                 <ul>
                                     <li>
                                     <g:message code="text.reasearcher.procedure" /> <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> <g:message code="text.alloted.rights" />
@@ -76,6 +76,7 @@
                             </div>
 
                             <g:render template="/species/inviteForContribution"/>
+                            -->
                         </div>
 
 
@@ -113,10 +114,6 @@
 	</script>
 
 	<r:script>
-    $('.list').on('updatedGallery', function(event) {
-        $(".grid_view").show();
-    });
-
     $(document).ready(function() {
         var taxonBrowserOptions = {
             expandAll:false,

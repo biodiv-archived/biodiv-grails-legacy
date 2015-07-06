@@ -31,6 +31,7 @@ class TaxonomyDefinition extends ScientificName {
     def grailsApplication
 
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
+    static mappedBy = [hierarchies:'taxonDefinition']
 
 	static constraints = {
 		name(blank:false)
@@ -54,8 +55,12 @@ class TaxonomyDefinition extends ScientificName {
 		tablePerHierarchy true
 	}
 
+    Species findSpecies() {
+        return Species.findByTaxonConcept(this);
+    }
+
 	Long findSpeciesId() {
-		return Species.findByTaxonConcept(this)?.id;
+		return findSpecies()?.id
 	}
 
 	void setName(String name) {

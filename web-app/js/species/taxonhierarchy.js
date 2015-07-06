@@ -23,7 +23,7 @@
                 var speciesId = $.trim($(cells[4]).text());
                 var level = $(cells[6]).text();
                 var position = $(cells[12]).text();
-                var selectedTaxonId = $("input#filterByTaxon").val();
+                var selectedTaxonId = $("input#taxon").val();
                 var levelTxt;
                 $.each(taxonRanks, function(i,v) {
                     if(level == v.value) {
@@ -37,7 +37,7 @@
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'><a href='/species/show/"+speciesId+"'>"+el+"</a>";
                 } else if(selectedTaxonId && taxonId.endsWith(selectedTaxonId)) {
                     btnAction = "Hide"
-                    el = levelTxt+": "+"<span class='rank rank"+level+" "+position+" btn-info'>"+el+"";
+                    el = levelTxt+": "+"<span class='rank rank"+level+" "+position+" btn-info-nocolor'>"+el+"";
                 } else {
                     el = levelTxt+": "+"<span class='rank rank"+level+" "+position+"'>"+el;
                 }
@@ -53,10 +53,13 @@
                 var expandSpecies = postData['expand_species'];
                 var expandTaxon = postData['expand_taxon'];
 
-                if(me.options.action == 'show'){
+                if(me.options.action == 'show' || me.options.action == 'taxonBrowser'){
                     el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input></span>"
                 } else {
-                    el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input><button class='btn taxDefIdSelect "+ ((btnAction=='Show')?'':'active')+"' data-controller='"+me.options.controller+"' data-action='"+me.options.action+"' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Show "+me.options.controller+"</button></span>"
+                    el+= "</span><span class='taxDefId'><input class='taxDefIdVal' type='text' style='display:none;'></input><input class='taxDefIdCheck checkbox "+(expandSpecies?'hide':'')+"' type='hidden'></input>";
+                    if(me.options.controller) {
+                        el += "<button class='btn taxDefIdSelect pull-right "+ ((btnAction=='Show')?'':'active')+"' data-controller='"+me.options.controller+"' data-action='"+me.options.action+"' title='Show all names for this taxon' style='margin-left:5px;height:20px;line-height:11px;'>Show "+me.options.controller+"</button></span>"
+                    }
                 } 
                 var isContributor= $(cells[11]).text();
                 if(isContributor == 'true') {
@@ -102,6 +105,7 @@
                         me.$element.find(me.addSelector).prevAll('.addFieldButton, .editFieldButton, .deleteFieldButton').remove();
                         me.initEditables(me.editSelector, me.addSelector);
                     }
+                    $("span.rank.btn-info-nocolor").parent().closest('tr').addClass('taxon-highlight');
                 },
                 loadError : function(xhr, status, error) {
                     if(xhr.status == 401) {
@@ -137,8 +141,8 @@
 
                     }
 */
-                    $("span.rank").removeClass('btn-info');
-                    $(e.target).parent('span').prev().addClass('btn-info');
+                    $("span.rank").removeClass('btn-info-nocolor').parent().closest('tr').removeClass('taxon-highlight');
+                    $(e.target).parent('span').prev().addClass('btn-info-nocolor').closest('tr').addClass('taxon-highlight');
 
                     var s = $(e.target).hasClass('active');
                     $('#taxonHierarchy .taxDefIdSelect').removeClass('active');
@@ -158,10 +162,10 @@
                                     var taxonId = $(e.target).parent("span").find(".taxDefIdVal").val();
                                     var classificationId = $('#taxaHierarchy option:selected').val();
 
-                                    $("input#filterByTaxon").val(taxonId);
+                                    $("input#taxon").val(taxonId);
                                 } else {
-                                    $("input#filterByTaxon").val('');
-                                    $("span.rank").removeClass('btn-info');
+                                    $("input#taxon").val('');
+                                    $("span.rank").removeClass('btn-info-nocolor').parent().closest('tr').removeClass('taxon-highlight');
                                 }
                                 updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
                                 break;
@@ -351,7 +355,7 @@
         });
 
         if(options.taxonId) {
-            $("input#filterByTaxon").val(options.taxonId);
+            $("input#taxon").val(options.taxonId);
         }
         return {
             'taxonHierarchies' : taxonHierarchies

@@ -32,6 +32,6 @@
 <g:else>
 <table id="taxonHierarchy" class="emptyField" style="width: 938px;"></table>
 </g:else>
-<input type="hidden" id="filterByTaxon"></input>
+<input type="hidden" id="taxon"></input>
 
 

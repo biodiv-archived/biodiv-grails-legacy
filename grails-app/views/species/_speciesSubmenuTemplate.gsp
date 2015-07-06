@@ -1,3 +1,7 @@
+<%@page import="species.NamesMetadata.NamePosition"%>
+<%@page import="species.NamesMetadata.NameStatus"%>
+<%@page import="species.Species"%>
+
 <g:if test="${speciesInstance}">
 <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
 </g:if>
@@ -10,14 +14,7 @@
     </g:if>
 
     <div class="pull-right">
-<%--        <g:if test="${isSpeciesContributor}">--%>
-<%--        <a id="editSpecies" class="btn btn-primary pull-right" style="margin-right: 5px;"--%>
-<%--            href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">--%>
-<%--            <i class="icon-edit"></i><g:message code="button.edit" /></a>--%>
-<%----%>
-<%--        </g:if>--%>
-
-        <sUser:isAdmin>
+       <sUser:isAdmin>
             <g:if test="${speciesInstance}">
             <a id="deleteSpecies" class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
                 href="${uGroup.createLink(controller:'species', action:'delete', id:speciesInstance.id)}"
@@ -27,7 +24,23 @@
 
     </div>
 
-    <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]"/>		
+    <g:if test="${speciesInstance}">
+    <% def status = speciesInstance.taxonConcept.status.label(); %>
+    <g:if test="${speciesInstance.taxonConcept.status == NameStatus.SYNONYM}">
+    <% status += ' of ';%>
+    <g:each in="${speciesInstance.taxonConcept.fetchAcceptedNames()}" var="acceptedName">
+    <% def s= acceptedName.findSpecies()%>
+    <g:if test="${s}">
+    <% status += "<a href='"+uGroup.createLink(controller:'species', action:'show', id:s.id)+"'>"+acceptedName.italicisedForm+"</a>"%> 
+    </g:if>
+    <g:else>
+    <% status += acceptedName.italicisedForm%> 
+    </g:else>
+    </g:each>
+    </g:if>
+
+    <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass, position:speciesInstance.taxonConcept.position, status:status]"/>		
+        </g:if>
     </div>
 </g:if>
 
