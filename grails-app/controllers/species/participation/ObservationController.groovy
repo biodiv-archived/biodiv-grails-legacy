@@ -1697,11 +1697,12 @@ class ObservationController extends AbstractObjectController {
         if(params.lockType == "Lock"){
             //current user & reco
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
+            ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
             def newRecVo;
             if(recVo){
                 if(reco != recVo.recommendation) {
-                    recVo.delete(flush: true, failOnError:true)
-                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                    recVo.delete(flush: true, failOnError:true)                    
+                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence:confidence)
                     if(!newRecVo.save(flush:true)){
                         newRecVo.errors.allErrors.each { log.error it } 
                     }
@@ -1709,10 +1710,9 @@ class ObservationController extends AbstractObjectController {
                     //user locking his own reco
                     newRecVo = recVo;
                 }
-                
             }
             if(!recVo){
-                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser )
+                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence:confidence )
                 if(!newRecVo.save(flush:true)){
                     newRecVo.errors.allErrors.each { log.error it } 
                 }
