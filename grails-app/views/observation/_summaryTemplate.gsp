@@ -1,6 +1,6 @@
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <%@ page import="species.NamesMetadata.NameStatus"%>
-<div class="sidebar_section">
+<div id="summary_section" class="sidebar_section">
     <h5><g:message code="project.show.Summary" /></h5>
     <table class="table table-bordered table-condensed table-striped">
         <tr>

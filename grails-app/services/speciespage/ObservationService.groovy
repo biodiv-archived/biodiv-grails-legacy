@@ -982,14 +982,14 @@ class ObservationService extends AbstractObjectService {
         speciesCountQuery.setProperties(queryParts.queryParams)
         speciesStatusCountQuery.setProperties(queryParts.queryParams)
         allObservationCount = allObservationCountQuery.list()[0]
-        def speciesCounts = speciesCountQuery.list()
+        /*def speciesCounts = speciesCountQuery.list()
         speciesCount = speciesCounts[0]
         subSpeciesCount = speciesCounts[1]
 
         def speciesStatusCounts = speciesStatusCountQuery.list()
         def acceptedSpeciesCount = speciesStatusCounts[0]
         def synonymSpeciesCount = speciesStatusCounts[1]
-
+        */
 
         if(!params.loadMore?.toBoolean()) {
             /*distinctRecoQuery.setProperties(queryParts.queryParams)
@@ -1016,7 +1016,7 @@ class ObservationService extends AbstractObjectService {
         if(params.observedon_end){
             queryParts.queryParams["observedon_end"] =  params.observedon_end
         }
-        return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, speciesCount:speciesCount, subSpeciesCount:subSpeciesCount, acceptedSpeciesCount:acceptedSpeciesCount, synonymSpeciesCount:synonymSpeciesCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+        return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
     }
 
     /**

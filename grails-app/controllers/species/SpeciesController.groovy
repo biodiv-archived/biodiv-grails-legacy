@@ -74,6 +74,7 @@ class SpeciesController extends AbstractObjectController {
             model.resultType = "species"
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
             model.remove('speciesInstanceList');
+            model['summaryHtml'] = g.render(template:"/observation/summaryTemplate", model:model);
         }
         model = utilsService.getSuccessModel('', null, OK.value(), model);
         withFormat {

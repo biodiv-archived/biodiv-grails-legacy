@@ -958,6 +958,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);
+        $('#summary_section').replaceWith(data.model.summaryHtml);
         //$('#filterPanel').replaceWith(data.model.filterPanel);
         //$('.observation_location').replaceWith(data.model.mapViewHtml);
         setActiveTag(activeTag);

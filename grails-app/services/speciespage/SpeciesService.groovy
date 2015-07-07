@@ -1538,9 +1538,9 @@ class SpeciesService extends AbstractObjectService  {
         String filterQuery = " where s.id is not null " //dummy statement
         String countFilterQuery = " where s.id is not null " //dummy statement
         String speciesCountQuery = "select count(*) as count from Species s "
-        String speciesCountFilterQuery;
+        String speciesCountFilterQuery = '';
         String speciesStatusCountQuery = "select count(*) as count from Species s "
-        String speciesStatusCountFilterQuery;
+        String speciesStatusCountFilterQuery = '';
 
 
         def queryParams = [:]
@@ -1696,13 +1696,8 @@ class SpeciesService extends AbstractObjectService  {
                 countFilterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
                 speciesCountQuery += " join s.taxonConcept.hierarchies as reg "
-                speciesCountFilterQuery = countFilterQuery +" group by reg.taxonDefinition.rank having reg.taxonDefinition.rank in :ranks ";
-                queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
-                
                 speciesStatusCountQuery += " join s.taxonConcept.hierarchies as reg "
-                speciesStatusCountFilterQuery = countFilterQuery +" group by reg.taxonDefinition.status having reg.taxonDefinition.status in :status ";
-                queryParams['status'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
-
+                
             }
         }
 
@@ -1719,6 +1714,13 @@ class SpeciesService extends AbstractObjectService  {
 //		}
 
         query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
+
+        speciesCountFilterQuery = countFilterQuery +" group by s.taxonConcept.rank having s.taxonConcept.rank in :ranks ";
+        queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
+
+        speciesStatusCountFilterQuery = countFilterQuery +" group by s.taxonConcept.status having s.taxonConcept.status in :status ";
+        queryParams['status'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
+
         speciesCountQuery = speciesCountQuery + speciesCountFilterQuery
         speciesStatusCountQuery = speciesStatusCountQuery + speciesStatusCountFilterQuery
 		
