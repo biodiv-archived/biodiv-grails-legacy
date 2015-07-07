@@ -79,10 +79,10 @@ class TaxonController {
             def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
             println "========RES SIZE ========== " + rs.size() 
-            if(cl == classification) {
+            /*if(cl == classification) {
                 def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
                 getHierarchyNodes(rs, level, tillLevel, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
-            }
+            }*/
         }
         log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
         render(contentType: "text/xml", text:buildHierarchyResult(rs, classSystem))

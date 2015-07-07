@@ -12,12 +12,7 @@
 
 <r:require modules="species_show"/>
 <style type="text/css">
-    .RAW {
-        background-color:red;
-    }
-    .WORKING {
-    }
-</style>
+    </style>
 
 </head>
 <body>
