@@ -23,7 +23,7 @@
 	<g:set var="sNameTitle" value="${observationInstance.fetchSpeciesCall()}" />
 
     <% def status = ''; def position='' %>
-    <g:if test="${observationInstance.maxVotedReco?.taxonConcept && isHeading}">
+    <g:if test="${observationInstance.maxVotedReco?.taxonConcept}">
     <% status = observationInstance.maxVotedReco.taxonConcept.status.label(); %>
     <% position = observationInstance.maxVotedReco.taxonConcept.position; %>
     <g:if test="${observationInstance.maxVotedReco.taxonConcept.status == NameStatus.SYNONYM}">

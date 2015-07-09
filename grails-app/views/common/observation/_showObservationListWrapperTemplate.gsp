@@ -168,11 +168,6 @@ $(document).ready(function() {
         refreshMapBounds(mapLocationPicker);
     });
 
-    $('.list').on('updatedGallery', function() {
-    	loadSpeciesGroupCount();
-        //loadDistinctRecoList();
-        updateDistinctRecoTable();
-    });
 });
 </r:script>
 <script>
@@ -181,6 +176,13 @@ $(document).ready(function() {
         taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
     </g:each>
 
+    $(document).ready (function() {
+    $('.list').on('updatedGallery', function() {
+    	loadSpeciesGroupCount();
+        //loadDistinctRecoList();
+        updateDistinctRecoTable();
+        });
+    });
 
 </script>
 <r:script>

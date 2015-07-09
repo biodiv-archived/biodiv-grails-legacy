@@ -68,15 +68,7 @@
 	.taxon_selector_span{
 		background-color:beige; //#3399FF;			
 	}
-	.dirty_list_span{
-		background-color:lightgrey; //#C0504D;
-	}
-	.working_list_span{
-		background-color:khaki; //#FF9900;
-	}
-	.clean_list_span{
-		background-color:mediumaquamarine; //#009933;
-	}    
+   
 	.listarea_content{
         position: relative;
         overflow-y: scroll;        
@@ -141,7 +133,7 @@
         </div-->
     </div>
     <div class="span3 listarea">
-        <span class="dirty_list_span taxon_selector_wrapper_span">
+        <span class="dirty_list taxon_selector_wrapper_span">
             Raw List
         </span>
         <select class="span12 listSelector">
@@ -159,7 +151,7 @@
 
     </div>
     <div class="span3 listarea">
-        <span class="working_list_span taxon_selector_wrapper_span">
+        <span class="working_list taxon_selector_wrapper_span">
             Working List
         </span>
         <select class="span12 listSelector">
@@ -176,7 +168,7 @@
         </div-->
     </div>
     <div class="span3 listarea">
-        <span class="clean_list_span taxon_selector_wrapper_span">
+        <span class="clean_list taxon_selector_wrapper_span">
             Clean List
         </span>
         <select class="span12 listSelector">

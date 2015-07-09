@@ -2,7 +2,7 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 <%@ page import="species.groups.UserGroup"%>
 <div class="story-actions clearfix" style="width: 100%;">
-    <div class="" style="margin-bottom:20px">
+    <div class="breadcrumb" style="margin-bottom:20px">
         <g:if test="${ibpClassification}">
         <g:each in="${ibpClassification}" var="taxonDefinition" status="i">
         <a href="${uGroup.createLink('controller':params.controller, 'action':'list', params:['taxon':taxonDefinition.id])}"><span class='rank${taxonDefinition.rank} '> ${raw(taxonDefinition.italicisedForm)}</span></a>

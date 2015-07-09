@@ -1792,8 +1792,8 @@ class SpeciesService extends AbstractObjectService  {
         def acceptedSpeciesCount;
         def synonymSpeciesCount;
         speciesStatusCounts.each { s ->
-            if(s[0] == NameStatus.ACCEPTED.value()) acceptedSpeciesCount = s[1]
-            else if(s[0] == NameStatus.SYNONYM.value()) synonymSpeciesCount = s[1]
+            if(s[0] == NameStatus.ACCEPTED) acceptedSpeciesCount = s[1]
+            else if(s[0] == NameStatus.SYNONYM) synonymSpeciesCount = s[1]
         }
 
 

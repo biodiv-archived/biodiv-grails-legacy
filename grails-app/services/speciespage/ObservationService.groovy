@@ -558,8 +558,18 @@ class ObservationService extends AbstractObjectService {
         return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset, userGroupInstance)
     }
 
-    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset , UserGroup userGroupInstance = null) {
-		
+    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null) {
+        String query = "from Observation o where o.isDeleted = :isDeleted and o.id != :obvId and "+(maxVotedReco.taxonConcept?"maxVotedReco.taxonConcept=:maxVotedRecoTaxonConcept":"maxVotedReco=:maxVotedReco")+(userGroupInstance?" userGroupInstance.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
+        println "===================================+"
+        println query;
+        println params
+        println "===================================+"
+        def params = ['isDeleted':false, 'obvId':obvId]
+        if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept;
+        else params['maxVotedReco'] = maxVotedReco;
+        if(userGroupInstance) params['userGroupId'] = userGroupInstance.id
+	    def observations = Observation.executeQuery(query, params, [max:limit, offset:offset]);
+        /*
         def observations = Observation.withCriteria () {
 //            projections {
 //                groupProperty('sourceId')
@@ -567,7 +577,15 @@ class ObservationService extends AbstractObjectService {
 //				groupProperty('lastRevised')
 //            }
             and {
-                eq("maxVotedReco", maxVotedReco)
+                if(maxVotedReco.taxonConcept) {
+                    maxVotedReco {
+                        taxonConcept {
+                            eq("id", maxVotedReco.taxonConcept.id)
+                        }
+                    }
+                } else {
+                    eq("maxVotedReco", maxVotedReco)
+                }
                 eq("isDeleted", false)
                 if(obvId) ne("id", obvId)
                 if(userGroupInstance){
@@ -581,6 +599,7 @@ class ObservationService extends AbstractObjectService {
             if(limit >= 0) maxResults(limit)
                 firstResult (offset?:0)
         }
+        */
         def result = [];
         observations.each {
             def obv = it
@@ -967,7 +986,7 @@ class ObservationService extends AbstractObjectService {
             //distinctRecoQuery.setFirstResult(0);
             queryParts.queryParams["offset"] = offset
         }
-
+        
         hqlQuery.setProperties(queryParts.queryParams);
         def observationInstanceList = hqlQuery.list();
 
@@ -1227,8 +1246,14 @@ class ObservationService extends AbstractObjectService {
             Observation parentObv = Observation.read(params.parentId);
             def parMaxVotedReco = parentObv.maxVotedReco;
             if(parMaxVotedReco) {
-                filterQuery += " and obv.maxVotedReco = :parMaxVotedReco " //removed check for not equal to parentId to include it in show page 
+                if(parMaxVotedReco.taxonConcept) {
+                    filterQuery += " and (obv.maxVotedReco = :parMaxVotedReco  or obv.maxVotedReco.taxonConcept = :parMaxVotedRecoTaxonConcept)" //removed check for not equal to parentId to include it in show page 
+                    queryParams['parMaxVotedRecoTaxonConcept'] = parMaxVotedReco.taxonConcept
+                } else {
+                    filterQuery += " and (obv.maxVotedReco = :parMaxVotedReco)" //removed check for not equal to parentId to include it in show page 
+                }
                 queryParams['parMaxVotedReco'] = parMaxVotedReco
+
                 queryParams['parentId'] = params.parentId;
                 
                 activeFilters["filterProperty"] = params.filterProperty
