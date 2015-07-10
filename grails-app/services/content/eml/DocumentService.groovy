@@ -419,7 +419,6 @@ class DocumentService extends AbstractObjectService {
 	 * @return
 	 */
 	def getDocumentsFilterQuery(params) {
-        println params;
 		def query = "select document from Document document "
 		def queryParams = [:]
 		def activeFilters = [:]
@@ -484,9 +483,6 @@ class DocumentService extends AbstractObjectService {
 		}
 		def sortBy = params.sort ? params.sort : "lastRevised "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
-        println "=========================+++++"
-        println query;
-        println "=========================+++++"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}
 

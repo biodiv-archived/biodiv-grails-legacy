@@ -397,7 +397,7 @@ class ObservationService extends AbstractObjectService {
         } else if(params.filterProperty == "latestUpdatedObservations") {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
         } else if(params.filterProperty == "latestUpdatedSpecies") {
-            relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
+            //relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
         } 
         else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
@@ -560,10 +560,6 @@ class ObservationService extends AbstractObjectService {
 
     private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null) {
         String query = "from Observation o where o.isDeleted = :isDeleted and o.id != :obvId and "+(maxVotedReco.taxonConcept?"maxVotedReco.taxonConcept=:maxVotedRecoTaxonConcept":"maxVotedReco=:maxVotedReco")+(userGroupInstance?" userGroupInstance.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
-        println "===================================+"
-        println query;
-        println params
-        println "===================================+"
         def params = ['isDeleted':false, 'obvId':obvId]
         if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept;
         else params['maxVotedReco'] = maxVotedReco;

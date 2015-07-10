@@ -60,6 +60,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 import species.NamesMetadata.NameStatus;
+import content.eml.DocSciName;
+import content.eml.Document;
+import species.AcceptedSynonym;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -2198,4 +2201,18 @@ def checking(){
         }
     }
 
+    List<Document> getRelatedDocuments(Species speciesInstance) {
+        List<SynonymsMerged> synonyms = AcceptedSynonym.fetchSynonyms(speciesInstance.taxonConcept);
+
+        List<String> canonicalForms = [];        
+
+        canonicalForms << speciesInstance.taxonConcept.canonicalForm;
+        synonyms.each { syn ->
+            canonicalForms << syn.canonicalForm;
+        }
+
+        def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms", ['canonicalForms':canonicalForms]);
+        return docSciNames.document.unique();
+
+    }
 }

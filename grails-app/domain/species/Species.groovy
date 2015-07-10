@@ -20,6 +20,8 @@ import species.participation.Flag;
 import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
 
+import content.eml.Document;
+
 class Species implements Rateable { 
  	String title;
 	String guid; 
@@ -473,5 +475,9 @@ class Species implements Rateable {
                 infraSpecies << s
         }
         return infraSpecies;
+    }
+
+    List<Document> findRelatedDocuments() {
+        return speciesService.getRelatedDocuments(this);
     }
 }

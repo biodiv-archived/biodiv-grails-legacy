@@ -1207,7 +1207,6 @@ println "=============================================+++++"
 	 */
 
 	def listRelated = {
-    	log.debug params;
         Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 
