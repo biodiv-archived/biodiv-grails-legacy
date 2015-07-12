@@ -117,9 +117,7 @@ class ObservationController extends AbstractObjectController {
         }
         
         model = utilsService.getSuccessModel('', null, OK.value(), model);
-println "=============================================+++++"
-println model.speciesCount;
-println "=============================================+++++"
+
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
@@ -208,7 +206,9 @@ println "=============================================+++++"
 //		def count = queryResult.observationInstanceList.size()
         def checklistCount =  filteredObservation.checklistCount
 		def allObservationCount =  filteredObservation.allObservationCount
-		
+	
+        queryParams.remove('ranks')
+        queryParams.remove('statuses')
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result

@@ -69,6 +69,8 @@ class SpeciesController extends AbstractObjectController {
 		params.action="list"
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
+        model.queryParams.remove('ranks');
+        model.queryParams.remove('statuses');
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model['obvListHtml'] =  g.render(template:"/species/showSpeciesListTemplate", model:model);
             model.resultType = "species"

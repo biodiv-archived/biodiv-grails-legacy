@@ -471,7 +471,8 @@ class DocumentService extends AbstractObjectService {
 		if(params.taxon) {
 			def taxon = TaxonomyDefinition.read(params.taxon);
             if(taxon){
-				queryParams['taxon'] = taxon
+				queryParams['taxon'] = taxon.id
+				activeFilters['taxon'] = taxon.id
 				queryParams['canonicalForm'] = taxon.canonicalForm
 
                 def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");

@@ -1691,7 +1691,8 @@ class SpeciesService extends AbstractObjectService  {
         if(params.taxon) {
             def taxon = TaxonomyDefinition.read(Long.parseLong(params.taxon))
             if(taxon){
-                queryParams['taxon'] = taxon
+                queryParams['taxon'] = taxon.id
+                activeFilters['taxon'] = taxon.id
                 queryParams['classification'] = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
                 query += " join s.taxonConcept.hierarchies as reg "
                 filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
@@ -1702,6 +1703,27 @@ class SpeciesService extends AbstractObjectService  {
                 speciesStatusCountQuery += " join s.taxonConcept.hierarchies as reg "
                 
             }
+        }
+
+        if(params.taxonRank) {
+            queryParams['taxonRank'] = Integer.parseInt(params.taxonRank)
+            activeFilters['taxonRank'] = queryParams['taxonRank']
+            filterQuery += " and s.taxonConcept.rank=:taxonRank";
+            countFilterQuery += " and s.taxonConcept.rank=:taxonRank";
+        }
+
+        if(params.status) {
+            def st;
+            NameStatus.list().each { s ->
+                if(s.value().equalsIgnoreCase(params.status)) {
+                    st = s;
+                    return
+                }
+            }
+            queryParams['status'] = st;
+            activeFilters['status'] = st;
+            filterQuery += " and s.taxonConcept.status=:status";
+            countFilterQuery += " and s.taxonConcept.status=:status";
         }
 
 //		XXX: to be corrected		
@@ -1721,8 +1743,8 @@ class SpeciesService extends AbstractObjectService  {
         speciesCountFilterQuery = countFilterQuery +" group by s.taxonConcept.rank having s.taxonConcept.rank in :ranks ";
         queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
 
-        speciesStatusCountFilterQuery = countFilterQuery +" group by s.taxonConcept.status having s.taxonConcept.status in :status ";
-        queryParams['status'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
+        speciesStatusCountFilterQuery = countFilterQuery +" group by s.taxonConcept.status having s.taxonConcept.status in :statuses ";
+        queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
 
         speciesCountQuery = speciesCountQuery + speciesCountFilterQuery
         speciesStatusCountQuery = speciesStatusCountQuery + speciesStatusCountFilterQuery

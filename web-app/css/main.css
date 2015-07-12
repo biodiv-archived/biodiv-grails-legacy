@@ -379,10 +379,6 @@ img {
 	text-align: right;
 	display : inline;
 }*/
-.breadcrumb,.commonName {
-	color: #666666;
-	font-weight: bold;
-}
 
 .searchButton {
 	background: #ffffff url(../images/search.png) no-repeat scroll center;

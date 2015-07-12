@@ -921,6 +921,20 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['taxon']
     }
 
+    var taxonRank = $("input#taxonRank").val();
+    if(taxonRank) {
+        params['taxonRank'] = taxonRank
+    } else {
+        delete params['taxonRank']
+    }
+
+    var status = $("input#status").val();
+    if(status) {
+        params['status'] = status
+    } else {
+        delete params['status']
+    }
+
 
 
 

@@ -3,6 +3,9 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
+<%@ page import="species.NamesMetadata"%>
+<%@ page import="species.TaxonomyDefinition"%>
 <script type="text/javascript">
 	function setDefaultGroup(){
 		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
@@ -108,7 +111,7 @@
 				<g:if test="${queryParam.value && TaxonomyDefinition.read(queryParam.value)}">
                                   <g:message code="text.in" />   <span class="highlight"><a
 						href="${uGroup.createLink(
-						controller:"observation", action:"list",
+						controller:params.controller, action:params.action,
 						params:[taxon: queryParam.value])}">
                         ${TaxonomyDefinition.read(queryParam.value).name} </a>
                     
@@ -127,6 +130,43 @@
                            </g:elseif>
 
 
+
+			<g:if
+				test="${queryParam.key == 'taxonRank' && queryParam.value instanceof Integer }">
+				<g:if test="${queryParam.value && TaxonomyRank.values()[queryParam.value]}">
+                                  <g:message code="text.in" />   <span class="highlight"><a
+						href="${uGroup.createLink(
+						controller:params.controller, action:"list",
+						params:[taxonRank: queryParam.value])}">
+                        ${TaxonomyRank.values()[queryParam.value].value()} </a>
+                    
+                        <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                        </span>
+                            </g:if>
+			</g:if>
+			<g:elseif test="${queryParam.key == 'taxonRank' && queryParam.value}">
+                           		 <g:message code="text.in" /> <span class="highlight"><a
+					href="${uGroup.createLink(
+					controller:params.controller, action:'list',
+					params:[taxonRank: queryParam.value])}">
+						${queryParam.value } </a>  
+                 <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                </span>
+                           </g:elseif>
+
+            <g:if
+                    test="${queryParam.key == 'status'}">
+                    <g:if test="${queryParam.value}">
+                    <g:message code="text.in" />   <span class="highlight"><a
+                            href="${uGroup.createLink(
+                            controller:params.controller, action:"list",
+                            params:[status: queryParam.value])}">
+                            ${queryParam.value} </a>
+
+                        <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                    </span>
+                    </g:if>
+            </g:if>
 
 
 

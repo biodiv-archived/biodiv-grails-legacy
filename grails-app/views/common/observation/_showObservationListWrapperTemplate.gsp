@@ -101,7 +101,7 @@
                             classifications = classifications.sort {return it[1].name}; 
                             %>
 
-                            <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+                            <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false, 'queryParams':queryParams]"/>
                         </div>
                     </div>
                 </div>
