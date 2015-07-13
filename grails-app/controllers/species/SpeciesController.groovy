@@ -126,11 +126,11 @@ class SpeciesController extends AbstractObjectController {
 		flash.message = "Species page create is currently unavailable."
 		redirect(action: "list")
 		return
-//
-//		def speciesInstance = new Species()
-//		speciesInstance.properties = params
-//		return [speciesInstance: speciesInstance]
-	}
+
+/*		def speciesInstance = new Species()
+		speciesInstance.properties = params
+		return [speciesInstance: speciesInstance]
+*/	}
 
     @Secured(['ROLE_USER'])
     def save() {
@@ -530,9 +530,9 @@ class SpeciesController extends AbstractObjectController {
         return false;
     }
 
-	/*@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER'])
 	def edit() {
-		if(params.id) {
+/*		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
 			if (!speciesInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
@@ -546,7 +546,7 @@ class SpeciesController extends AbstractObjectController {
 			params.max = Math.min(params.max ? params.int('max') : 10, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count()]
 		}
-	}*/
+*/	}
 
     @Secured(['ROLE_USER'])
     def update() {
