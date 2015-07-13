@@ -28,16 +28,17 @@
     </div>
 </div>
  <table id="taxonHierarchy" class="emptyField"></table>
-    <g:if test="${actionName == 'list'}">
-    <style type="text/css">
-            .ui-jqgrid-bdiv, .ui-jqgrid .ui-jqgrid-btable{
-                width:938px !important;
-            }
-    </style>
-    </g:if>
-</g:if>
+ </g:if>
 <g:else>
 <table id="taxonHierarchy" class="emptyField" style="width: 938px;"></table>
 </g:else>
-
+<g:if test="${queryParams && queryParams.taxon instanceof TaxonomyDefinition}">
+<input type="hidden" id="taxon" name="taxon" value="${queryParams.taxon.id}"></input>
+</g:if>
+<g:elseif test="${queryParams && queryParams.taxon instanceof Long}">
+<input type="hidden" id="taxon" name="taxon" value="${queryParams.taxon}"></input>
+</g:elseif>
+<g:else>
+<input type="hidden" id="taxon" name="taxon" value=""></input>
+</g:else>
 

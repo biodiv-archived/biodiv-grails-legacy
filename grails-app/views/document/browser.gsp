@@ -3,12 +3,13 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="org.grails.taggable.Tag"%>
 <%@ page import="species.participation.ActivityFeedService"%>
+
 <html>
     <head>
         <g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
         <g:set var="entityName" value="${g.message(code:'button.documents')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="add_file, content_view, activityfeed" />
+        <r:require modules="document_list,add_file, content_view, activityfeed" />
         <style type="text/css">
             .thumbnails>.thumbnail {
             margin: 0 0 10px 0px;
@@ -28,14 +29,18 @@
             <h4><g:message code="heading.browse.documents" /></h4>
 
             <div class="document-list span8 right-shadow-box" style="margin:0;">
-               
 
-                <obv:showObservationFilterMessage />
 
-                <g:render template="/document/documentListTemplate" model="${model}"/>
+                <div class="list span8 right-shadow-box" style="margin: 0px;">
+                    <obv:showObservationFilterMessage />
+
+                    <g:render template="/document/documentListTemplate" model="${model}"/>
+                </div>
+
+
             </div>
 
             <g:render template="/document/documentSidebar" model="[]"/>
         </div>
-	    </body>
-</html>
+        </body>
+    </html>

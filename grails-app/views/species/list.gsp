@@ -34,8 +34,6 @@
 			<ul class="nav nav-tabs species-list-tabs" style="margin-bottom: 0px">
 				<li class="active"><a href="#list" ><g:message code="button.gallery" /></a>
 				</li>
-				<li><a href="#taxonBrowser"><g:message code="button.taxon.browser" /></a>
-				</li>
 				<li><a href="#contribute"><g:message code="button.contribute" /></a>
 				</li>
 
@@ -50,41 +48,46 @@
 						</sUser:isAdmin>
                         */%>
 						<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
-						<div class="list" style="top: 0px;">
+						<div class="list span8 right-shadow-box" style="margin: 0px;">
 							<s:showSpeciesList/>
 						</div>
-				</div>
-                <div id="taxonBrowser" class="tab-pane" style="position:relative">
-                    <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
-                        <h5><g:message code="button.classifications" /></h5>	
-                <div class="section help-block"> 
-                    <ul>
-                        <li>
-                        <g:message code="text.reasearcher.procedure" /> <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> <g:message code="text.alloted.rights" />
-                        </li>
-                    </ul>
-                </div>
-                        <div id="taxaHierarchy" style="width:940px;padding:0px">
+                        <div id="taxonBrowser" class="span4" style="position:relative">
+                            <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
+                                <h5><g:message code="button.taxon.browser" /></h5>	
+                                <div id="taxaHierarchy">
 
-                            <%
-                            def classifications = [];
-                            Classification.list().each {
-                            classifications.add([it.id, it, null]);
-                            }
-                            classifications = classifications.sort {return it[1].name}; 
-                            %>
+                                    <%
+                                    def classifications = [];
+                                    Classification.list().each {
+                                    classifications.add([it.id, it, null]);
+                                    }
+                                    classifications = classifications.sort {return it[1].name}; 
+                                    %>
 
-                            <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+                                    <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+                                </div>
+                            </div>
+                            <!--div class="section help-block"> 
+                                <ul>
+                                    <li>
+                                    <g:message code="text.reasearcher.procedure" /> <span class="mailme">${grailsApplication.config.speciesPortal.ibp.supportEmail}</span> <g:message code="text.alloted.rights" />
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <g:render template="/species/inviteForContribution"/>
+                            -->
+
+                            <g:render template="/observation/summaryTemplate" model="['speciesCount':speciesCount, 'subSpeciesCount':subSpeciesCount, queryParams:queryParams]"/>
+                               
                         </div>
-                    </div>
-                    <g:render template="/species/inviteForContribution"/>
-				</div>
 
-				<div id="contribute" class="tab-pane">
-                                    <g:render template="contributeTemplate"/>
-				</div>
-			</div>
-		</div>
+                   </div>
+                    <div id="contribute" class="tab-pane">
+                        <g:render template="contributeTemplate"/>
+                    </div>
+                </div>
+            </div>
 	</div>
 	
 	<script type="text/javascript">
@@ -113,14 +116,17 @@
 	</script>
 
 	<r:script>
-    $('.list').on('updatedGallery', function(event) {
-        $(".grid_view").show();
-    });
-
     $(document).ready(function() {
-        var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
-            expandAll:false
-        });	
+        var taxonBrowserOptions = {
+            expandAll:false,
+            controller:"${params.controller?:'species'}",
+            action:"${params.action?:'list'}",
+            expandTaxon:"${params.taxon?true:false}"
+        }
+        if(${params.taxon?:false}){
+        taxonBrowserOptions['taxonId'] = "${params.taxon}";
+        }
+        var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
         $('.species-list-tabs a').click(function (e) {
           e.preventDefault();
           $('.nav-tabs li').removeClass('active');

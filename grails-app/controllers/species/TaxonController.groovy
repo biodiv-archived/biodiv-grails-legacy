@@ -42,7 +42,6 @@ class TaxonController {
      * 
      */
     def listHierarchy = {
-        log.debug params;
         //cache "taxonomy_results"
         includeOriginHeader();
 
@@ -52,6 +51,8 @@ class TaxonController {
         def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
         Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
+        def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
+        Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
 
         /*combinedHierarchy.merge();
         if(classSystem == combinedHierarchy.id) {
@@ -68,13 +69,20 @@ class TaxonController {
         } else {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-            def cl = Classification.read(classSystem.toLong());
-            getHierarchyNodes(rs, level, level+3, parentId, classSystem, expandAll, expandSpecies, null);
-            println "========RES SIZE ========== " + rs.size() 
-            if(cl == classification) {
-                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                getHierarchyNodes(rs, level, level+3, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
+            def taxonIds = [];
+            def tillLevel = level+3;
+            if(expandTaxon) {
+                def taxon = TaxonomyDefinition.read(taxonId);
+                tillLevel = taxon.rank;
+                taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
             }
+            def cl = Classification.read(classSystem.toLong());
+            getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
+            println "========RES SIZE ========== " + rs.size() 
+            /*if(cl == classification) {
+                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                getHierarchyNodes(rs, level, tillLevel, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
+            }*/
         }
         log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
         render(contentType: "text/xml", text:buildHierarchyResult(rs, classSystem))

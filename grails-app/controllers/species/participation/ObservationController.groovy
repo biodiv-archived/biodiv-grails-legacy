@@ -42,6 +42,7 @@ import species.ScientificName.TaxonomyRank;
 import species.participation.ActivityFeedService;
 import static org.springframework.http.HttpStatus.*;
 
+
 class ObservationController extends AbstractObjectController {
 	
 	public static final boolean COMMIT = true;
@@ -205,7 +206,9 @@ class ObservationController extends AbstractObjectController {
 //		def count = queryResult.observationInstanceList.size()
         def checklistCount =  filteredObservation.checklistCount
 		def allObservationCount =  filteredObservation.allObservationCount
-		
+	
+        queryParams.remove('ranks')
+        queryParams.remove('statuses')
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
@@ -222,7 +225,7 @@ class ObservationController extends AbstractObjectController {
             }
         }
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, speciesCount:filteredObservation.speciesCount,  subSpeciesCount:filteredObservation.subSpeciesCount, acceptedSpeciesCount:filteredObservation.acceptedSpeciesCount, synonymSpeciesCount:filteredObservation.synonymSpeciesCount, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
 	}
 	
 	def occurrences() {
@@ -1204,7 +1207,6 @@ class ObservationController extends AbstractObjectController {
 	 */
 
 	def listRelated = {
-    	log.debug params;
         Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 

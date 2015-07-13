@@ -69,11 +69,14 @@ class SpeciesController extends AbstractObjectController {
 		params.action="list"
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
+        model.queryParams.remove('ranks');
+        model.queryParams.remove('statuses');
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model['obvListHtml'] =  g.render(template:"/species/showSpeciesListTemplate", model:model);
             model.resultType = "species"
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
             model.remove('speciesInstanceList');
+            model['summaryHtml'] = g.render(template:"/observation/summaryTemplate", model:model);
         }
         model = utilsService.getSuccessModel('', null, OK.value(), model);
         withFormat {
@@ -123,11 +126,11 @@ class SpeciesController extends AbstractObjectController {
 		flash.message = "Species page create is currently unavailable."
 		redirect(action: "list")
 		return
-//
-//		def speciesInstance = new Species()
-//		speciesInstance.properties = params
-//		return [speciesInstance: speciesInstance]
-	}
+
+/*		def speciesInstance = new Species()
+		speciesInstance.properties = params
+		return [speciesInstance: speciesInstance]
+*/	}
 
     @Secured(['ROLE_USER'])
     def save() {
@@ -278,6 +281,7 @@ class SpeciesController extends AbstractObjectController {
                     nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
                     md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
                     overview  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OVERVIEW,1,userLanguage),
+                    ss_v_r  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUBSPECIES_VARIETIES_RACES,2,userLanguage),
                     acth  : grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,
                     trn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage),
                     sn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage),
@@ -442,7 +446,7 @@ class SpeciesController extends AbstractObjectController {
 			for(category in concept.value.clone()) {
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) ) {
+				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) || category.key.equals(config.ss_v_r)) {
 					boolean show = false;
 					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
@@ -454,7 +458,12 @@ class SpeciesController extends AbstractObjectController {
 					} else if(category.key.equals(config.documents)) {
                         show = DocSciName.speciesHasDocuments(speciesInstance);
                         println "======SHOW ===== " + show
+                    } else if(category.key.equals(config.ss_v_r)) {
+                        if(speciesInstance.taxonConcept.rank == TaxonomyRank.SPECIES.ordinal()) {
+                            show = speciesInstance.fetchInfraSpecies().size()>0;
+                        }
                     }
+
                     else {
 						show = true;
 					}
@@ -521,9 +530,9 @@ class SpeciesController extends AbstractObjectController {
         return false;
     }
 
-	/*@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER'])
 	def edit() {
-		if(params.id) {
+/*		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
 			if (!speciesInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
@@ -537,7 +546,7 @@ class SpeciesController extends AbstractObjectController {
 			params.max = Math.min(params.max ? params.int('max') : 10, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count()]
 		}
-	}*/
+*/	}
 
     @Secured(['ROLE_USER'])
     def update() {
@@ -1420,6 +1429,25 @@ class SpeciesController extends AbstractObjectController {
 
     }
 
+    def related () {
+        def relatedObv;
+        def result = [];
+        switch(params.filterProperty) {
+            case 'featureBy':
+                break;
+            case 'documents':
+                List documents = speciesService.getRelatedDocuments(params.id?Species.read(Long.parseLong(params.id)):null);
+                documents.each {
+                    def obv = it
+                    result.add(['observation':obv, 'title':it.title]);
+                }
+                relatedObv = ['observations':result];
+                break;
+        }
+
+        return formatRelatedResults(relatedObv, params);
+    }
+
     def testingCount() {
         def sp = Species.read(228424L);
         println "=========!ST COUNT ====== " + sp.fetchResourceCount();
@@ -1430,10 +1458,17 @@ class SpeciesController extends AbstractObjectController {
         utilsService.logSql({
             def hibSession = sessionFactory?.getCurrentSession();
             String taxonId=221859;
-            def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
+            //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
+//            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
+            try {
+            def hqlQuery = sessionFactory.currentSession.createQuery("select count(*) as count from Species s  join s.taxonConcept.hierarchies as reg  where s.id is not null  and reg.classification="+265799+" and (reg.path like '%!_123350!_%'  escape '!' or reg.path like '123350!_%'  escape '!' or reg.path like '%!_123350' escape '!') and reg.taxonDefinition.rank = 9");
             println "PppppppppppppppppppppppppppppppP"
         def speciesInstanceList = hqlQuery.list();
+
 render speciesInstanceList;
+            } catch(e) {
+                e.printStackTrace();
+            }
 
         });
         println "=====================++++"

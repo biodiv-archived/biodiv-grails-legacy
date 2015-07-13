@@ -47,7 +47,11 @@ abstract class AbstractObjectController {
 
     def related() {
         def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-        if(params.filterProperty != 'bulkUploadResources'){
+        return formatRelatedResults(relatedObv, params);
+    }
+
+    protected formatRelatedResults(relatedObv, params) {
+        if(params.filterProperty != 'bulkUploadResources') {
             if(relatedObv) {
                 if(relatedObv.observations)
                     relatedObv.observations = observationService.createUrlList2(relatedObv.observations, observationService.getIconBasePath(params.controller));

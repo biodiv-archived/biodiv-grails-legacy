@@ -209,7 +209,7 @@
         </s:isSpeciesContributor>
         
         <div class="span12">
-            <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor]"/>
+            <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor, speciesInstance:speciesInstance]"/>
 
                 <g:if test="${!speciesInstance.percentOfInfo}">
                 <div class="poor_species_content alert">
@@ -221,7 +221,7 @@
 
                 <div class="span12" style="margin-left:0px">
                     <g:render template="/common/observation/showObservationStoryActionsTemplate"
-                    model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true]" />
+                    model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, ibpClassification:speciesInstance.taxonConcept.fetchDefaultHierarchy()]" />
                 </div>
 
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>

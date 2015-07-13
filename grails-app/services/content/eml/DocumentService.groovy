@@ -10,6 +10,7 @@ import groovy.sql.Sql
 import content.eml.Document
 import species.groups.SpeciesGroup;
 import species.Habitat
+import species.TaxonomyDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
@@ -54,6 +55,7 @@ import java.net.URL;
 import java.lang.Boolean;
 import species.NamesParser;
 import species.Metadata
+import species.Classification;
 
 
 class DocumentService extends AbstractObjectService {
@@ -373,6 +375,7 @@ class DocumentService extends AbstractObjectService {
 			res.putAll(search(params))
 		}else{
 			res.putAll(getDocsFromDB(params, max, offset))
+		    res['instanceTotal'] = getDocsFromDB(params, -1, -1).documentInstanceList.size()
 		}
 		return res
 	}
@@ -465,6 +468,20 @@ class DocumentService extends AbstractObjectService {
 			//}
 		}
 		
+		if(params.taxon) {
+			def taxon = TaxonomyDefinition.read(params.taxon);
+            if(taxon){
+				queryParams['taxon'] = taxon.id
+				activeFilters['taxon'] = taxon.id
+				queryParams['canonicalForm'] = taxon.canonicalForm
+
+                def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+				queryParams['classification'] = ibp_classifi
+		
+				query += " join document.docSciNames ds join  ds.taxonConcept.hierarchies as reg "
+                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+			}
+		}
 		def sortBy = params.sort ? params.sort : "lastRevised "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]

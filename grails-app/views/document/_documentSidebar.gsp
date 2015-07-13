@@ -1,5 +1,8 @@
 <%@ page import="content.Project"%>
 <%@ page import="content.eml.Document"%>
+<%@ page import="species.Classification"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
+
 
 
 <div id="project-sidebar" class="span4">
@@ -7,7 +10,26 @@
     	<uGroup:objectPostToGroupsWrapper 
 			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
     </g:if>
-	<div class="sidebar_section">
+    <div id="taxonBrowser">
+        <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
+            <h5><g:message code="button.taxon.browser" /></h5>	
+            <div id="taxaHierarchy">
+
+                <%
+                def classifications = [];
+                Classification.list().each {
+                classifications.add([it.id, it, null]);
+                }
+                classifications = classifications.sort {return it[1].name}; 
+                %>
+
+                <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false]"/>
+            </div>
+        </div>
+    </div>
+
+
+	<!--div class="sidebar_section">
             <h5><g:message code="documentsidebar.document.manager" /> <sup><g:message code="msg.beta" /></sup></h5>
 
                 <p class="tile" style="margin:0px; padding:5px;">
@@ -17,7 +39,7 @@
 		
                 </p>
                 
-	</div>
+	</div-->
 
 
 
@@ -42,6 +64,30 @@
 			<project:showTagsCloud model="[tagType:'document', showMoreTagPageLink:uGroup.createLink(controller:'document', action:'tagcloud', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)]"></project:showTagsCloud>
 		</div>
     </g:if>
-        
+
 </div>
+        <script type="text/javascript">
+            var taxonRanks = [];
+            <g:each in="${TaxonomyRank.list()}" var="t">
+            taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
+            </g:each>
+            </script>
+
+            <r:script>
+
+            $(document).ready(function() {
+            var taxonBrowserOptions = {
+            expandAll:false,
+            controller:"${params.controller?:'document'}",
+            action:"${params.action?:'browser'}",
+            expandTaxon:"${params.taxon?true:false}"
+            }
+            if(${params.taxon?:false}){
+            taxonBrowserOptions['taxonId'] = "${params.taxon}";
+            }
+            var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+            });
+
+            </r:script>
+
 

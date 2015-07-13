@@ -33,7 +33,6 @@ modules = {
 		resource url:'/bootstrap/css/bootstrap.min.css'
 		resource url:'/css/bootstrap-combobox.css'
 		resource url:'/css/bootstrap-multiselect.css'
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/css/ui.jqgrid.css'
 		resource url:'/css/auth.css'
 //		resource url:[dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui']
 //		resource url:[dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui']
@@ -81,6 +80,7 @@ modules = {
         resource url:'/js/feature.js'
         resource url:'/js/flag.js'
 		resource url:'/js/species/abstracttype.js'
+		resource url:'/js/species/abstracteditabletype.js'
 		resource url:'/js/species/relatedStory.js'
 		resource url:'/js/species/search.js'
 	}
@@ -111,6 +111,11 @@ modules = {
 		resource url:'/js/jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js'
 		resource url:'/js/jquery/jquery.url.js'
 		resource url:'/js/jquery/jquery.autopager-1.0.0.js'
+		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
+		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
+		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
+
+        resource url:'/js/species/observations/list.js'
 	}
 
 	location_utils { 
@@ -159,7 +164,7 @@ modules = {
 	observations_list { 
 		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
 		
-        resource url:'/js/species/observations/list.js'
+		resource url:'/js/species/taxonhierarchy.js'
 	}
 
 	susers_list { 
@@ -168,7 +173,7 @@ modules = {
         resource url:'/css/location_picker.css'
         resource url:'/js/location/location-picker.js'
 	
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
 		//resource url:'/js/species/users/list.js'
 	}
 
@@ -178,9 +183,8 @@ modules = {
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
 		resource url:'/css/biodiv.css'
-		resource url:'/js/species/abstracteditabletype.js'
-		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/taxonhierarchy.js'
+		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/species.js'
 	}
 
@@ -188,12 +192,9 @@ modules = {
 		dependsOn 'species, maps, gallery, comment, activityfeed, observations_create'
 
 		resource url:'/css/augmented-maps.css'
-		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
 		resource url:'/css/bootstrap-wysihtml5-0.0.2.css'
 		resource url:'/css/jquery.tocify.css'
 		
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
 		resource url:'/js/jquery/jquery.tocify.min.js'
 		//resource url:'/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
@@ -209,11 +210,7 @@ modules = {
 	species_list {
 		dependsOn 'observations_list'
 
-		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
         resource url:'/js/species/speciesPermission.js'
-
 	}
 
 	search {
@@ -243,7 +240,7 @@ modules = {
 	userGroups_list {
 		dependsOn 'observations, location_utils, list_utils'
 		
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/userGroups/main.js'		
 	}
 
@@ -295,7 +292,7 @@ modules = {
     checklist_list {
 		dependsOn 'checklist'
 
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
     }
 
 	checklist_create {
@@ -388,5 +385,9 @@ modules = {
 
     curation {
         resource url:'/js/species/curation.js'
+    }
+
+    document_list {
+        dependsOn 'observations_list'
     }
 }
