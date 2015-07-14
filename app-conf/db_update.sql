@@ -499,3 +499,13 @@ alter table taxonomy_registry add column parent_taxon_definition_id bigint;
 alter table taxonomy_registry add constraint td_fk foreign key (parent_taxon_definition_id) references taxonomy_definition(id);
 update taxonomy_registry set parent_taxon_definition_id=t1.taxon_definition_id from taxonomy_registry t1 where taxonomy_registry.parent_taxon_id=t1.id;
 
+
+#14th july
+ALTER TABLE taxonomy_registry DROP CONSTRAINT fk9ded596b7e532be5,
+ADD CONSTRAINT fk9ded596b7e532be5 FOREIGN KEY (parent_taxon_id) REFERENCES taxonomy_registry(id) ON DELETE CASCADE;
+
+ALTER TABLE taxonomy_registry_suser DROP CONSTRAINT fk87a93aea76e99a2e,
+ADD CONSTRAINT fk87a93aea76e99a2e FOREIGN KEY (taxonomy_registry_contributors_id) REFERENCES taxonomy_registry(id) ON DELETE CASCADE;
+
+
+
