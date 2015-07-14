@@ -1590,15 +1590,15 @@ class SpeciesService extends AbstractObjectService  {
                 filterQuery += " and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
@@ -1610,8 +1610,8 @@ class SpeciesService extends AbstractObjectService  {
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
@@ -1619,8 +1619,8 @@ class SpeciesService extends AbstractObjectService  {
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
