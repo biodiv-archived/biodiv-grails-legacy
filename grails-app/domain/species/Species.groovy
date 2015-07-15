@@ -20,6 +20,8 @@ import species.participation.Flag;
 import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
 
+import content.eml.Document;
+
 class Species implements Rateable { 
  	String title;
 	String guid; 
@@ -462,5 +464,20 @@ class Species implements Rateable {
 	def boolean deleteSpecies(SUser user){
 		return speciesUploadService.deleteSpeciesWrapper(this, user)
 	}
- 
+
+    List<Species> fetchInfraSpecies() {
+        List infraSpecies = [];
+        def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+        def regs = TaxonomyRegistry.findAllByParentTaxonDefinitionAndClassification(this.taxonConcept, classification);
+        regs.each {reg ->
+            Species s = reg.taxonDefinition.findSpecies();
+            if(s)
+                infraSpecies << s
+        }
+        return infraSpecies;
+    }
+
+    List<Document> findRelatedDocuments() {
+        return speciesService.getRelatedDocuments(this);
+    }
 }

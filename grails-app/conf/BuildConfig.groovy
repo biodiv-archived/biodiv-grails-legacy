@@ -192,7 +192,7 @@ grails.project.dependency.resolution = {
         compile ":rest:0.8"
         compile ":tagcloud:0.3"
         compile ":taggable:1.0.1"
-        runtime ":yui-minify-resources:0.1.5"
+        //runtime ":yui-minify-resources:0.1.5"
         runtime ":zipped-resources:1.0"
     } 
 

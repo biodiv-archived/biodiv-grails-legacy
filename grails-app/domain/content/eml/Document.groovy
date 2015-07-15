@@ -131,7 +131,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		habitat nullable:true
 	}
 	
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup, docSciNames:DocSciName]
 	static belongsTo = [SUser, UserGroup]
 	
 	static mapping = {

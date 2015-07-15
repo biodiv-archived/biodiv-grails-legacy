@@ -479,6 +479,10 @@ $(document).ready(function(){
 
     //	last_actions();
     eatCookies();
+
+    $('#taxonHierarchy').on("reloadGrid", function() {
+        updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
+    }); 
 });
 
 /**
@@ -914,6 +918,32 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['tag']
     }
 
+    var taxon = $("input#taxon").val();
+    if(taxon) {
+        var classificationId = $('#taxaHierarchy option:selected').val();
+        params['classification'] = classificationId
+        params['taxon'] = taxon
+    } else {
+        delete params['taxon']
+        delete params['classification']
+    }
+
+    var taxonRank = $("input#taxonRank").val();
+    if(taxonRank) {
+        params['taxonRank'] = taxonRank
+    } else {
+        delete params['taxonRank']
+    }
+
+    var status = $("input#status").val();
+    if(status) {
+        params['status'] = status
+    } else {
+        delete params['status']
+    }
+
+
+
 
     return params;
 }	
@@ -949,6 +979,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);
+        $('#summary_section').replaceWith(data.model.summaryHtml);
         //$('#filterPanel').replaceWith(data.model.filterPanel);
         //$('.observation_location').replaceWith(data.model.mapViewHtml);
         setActiveTag(activeTag);

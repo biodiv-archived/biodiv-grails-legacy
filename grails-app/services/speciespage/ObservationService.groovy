@@ -79,7 +79,9 @@ import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import static org.springframework.http.HttpStatus.*;
+import species.ScientificName.TaxonomyRank;
 
+import species.NamesMetadata.NameStatus;
 
 class ObservationService extends AbstractObjectService {
 
@@ -395,7 +397,7 @@ class ObservationService extends AbstractObjectService {
         } else if(params.filterProperty == "latestUpdatedObservations") {
             relatedObv = getLatestUpdatedObservation(params.webaddress,params.sort, max, offset)
         } else if(params.filterProperty == "latestUpdatedSpecies") {
-            relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
+            //relatedObv = speciesService.getLatestUpdatedSpecies(params.webaddress,params.sort, max, offset)
         } 
         else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
@@ -556,8 +558,14 @@ class ObservationService extends AbstractObjectService {
         return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset, userGroupInstance)
     }
 
-    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit, int offset , UserGroup userGroupInstance = null) {
-		
+    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null) {
+        String query = "from Observation o where o.isDeleted = :isDeleted and o.id != :obvId and "+(maxVotedReco.taxonConcept?"maxVotedReco.taxonConcept=:maxVotedRecoTaxonConcept":"maxVotedReco=:maxVotedReco")+(userGroupInstance?" userGroupInstance.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
+        def params = ['isDeleted':false, 'obvId':obvId]
+        if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept;
+        else params['maxVotedReco'] = maxVotedReco;
+        if(userGroupInstance) params['userGroupId'] = userGroupInstance.id
+	    def observations = Observation.executeQuery(query, params, [max:limit, offset:offset]);
+        /*
         def observations = Observation.withCriteria () {
 //            projections {
 //                groupProperty('sourceId')
@@ -565,7 +573,15 @@ class ObservationService extends AbstractObjectService {
 //				groupProperty('lastRevised')
 //            }
             and {
-                eq("maxVotedReco", maxVotedReco)
+                if(maxVotedReco.taxonConcept) {
+                    maxVotedReco {
+                        taxonConcept {
+                            eq("id", maxVotedReco.taxonConcept.id)
+                        }
+                    }
+                } else {
+                    eq("maxVotedReco", maxVotedReco)
+                }
                 eq("isDeleted", false)
                 if(obvId) ne("id", obvId)
                 if(userGroupInstance){
@@ -579,6 +595,7 @@ class ObservationService extends AbstractObjectService {
             if(limit >= 0) maxResults(limit)
                 firstResult (offset?:0)
         }
+        */
         def result = [];
         observations.each {
             def obv = it
@@ -918,7 +935,7 @@ class ObservationService extends AbstractObjectService {
 
         def queryParts = getFilteredObservationsFilterQuery(params) 
         String query = queryParts.query;
-        long checklistCount = 0, allObservationCount = 0;
+        long checklistCount = 0, allObservationCount = 0, speciesCount = 0, subSpeciesCount = 0;
 
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
         /*        if(isMapView) {//To get id, topology of all markers
@@ -932,6 +949,8 @@ class ObservationService extends AbstractObjectService {
         log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
         //log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
         //log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
+        log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
+        log.debug "speciesStatusCountQuery : "+queryParts.speciesStatusCountQuery;
 
         log.debug query;
         log.debug queryParts.queryParams;
@@ -939,6 +958,8 @@ class ObservationService extends AbstractObjectService {
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
         //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
         //def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
+        def speciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
+        def speciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
@@ -946,6 +967,7 @@ class ObservationService extends AbstractObjectService {
 			if(checklistCountQuery)
             	checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
             //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
         } 
@@ -960,7 +982,7 @@ class ObservationService extends AbstractObjectService {
             //distinctRecoQuery.setFirstResult(0);
             queryParts.queryParams["offset"] = offset
         }
-
+        
         hqlQuery.setProperties(queryParts.queryParams);
         def observationInstanceList = hqlQuery.list();
 
@@ -972,7 +994,17 @@ class ObservationService extends AbstractObjectService {
 		}
 
         allObservationCountQuery.setProperties(queryParts.queryParams)
+        speciesCountQuery.setProperties(queryParts.queryParams)
+        speciesStatusCountQuery.setProperties(queryParts.queryParams)
         allObservationCount = allObservationCountQuery.list()[0]
+        /*def speciesCounts = speciesCountQuery.list()
+        speciesCount = speciesCounts[0]
+        subSpeciesCount = speciesCounts[1]
+
+        def speciesStatusCounts = speciesStatusCountQuery.list()
+        def acceptedSpeciesCount = speciesStatusCounts[0]
+        def synonymSpeciesCount = speciesStatusCounts[1]
+        */
 
         if(!params.loadMore?.toBoolean()) {
             /*distinctRecoQuery.setProperties(queryParts.queryParams)
@@ -1210,8 +1242,14 @@ class ObservationService extends AbstractObjectService {
             Observation parentObv = Observation.read(params.parentId);
             def parMaxVotedReco = parentObv.maxVotedReco;
             if(parMaxVotedReco) {
-                filterQuery += " and obv.maxVotedReco = :parMaxVotedReco " //removed check for not equal to parentId to include it in show page 
+                if(parMaxVotedReco.taxonConcept) {
+                    filterQuery += " and (obv.maxVotedReco = :parMaxVotedReco  or obv.maxVotedReco.taxonConcept = :parMaxVotedRecoTaxonConcept)" //removed check for not equal to parentId to include it in show page 
+                    queryParams['parMaxVotedRecoTaxonConcept'] = parMaxVotedReco.taxonConcept
+                } else {
+                    filterQuery += " and (obv.maxVotedReco = :parMaxVotedReco)" //removed check for not equal to parentId to include it in show page 
+                }
                 queryParams['parMaxVotedReco'] = parMaxVotedReco
+
                 queryParams['parentId'] = params.parentId;
                 
                 activeFilters["filterProperty"] = params.filterProperty
@@ -1262,11 +1300,21 @@ class ObservationService extends AbstractObjectService {
         if(params.taxon) {
             def taxon = TaxonomyDefinition.read(params.taxon.toLong());
             if(taxon){
-                queryParams['taxon'] = taxon
-                queryParams['classification'] = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                queryParams['taxon'] = taxon.id
+                activeFilters['taxon'] = taxon.id
                 taxonQuery = " join obv.maxVotedReco.taxonConcept.hierarchies as reg "
                 query += taxonQuery;
-                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
+ 
+                filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
             }
         }
@@ -1305,13 +1353,15 @@ class ObservationService extends AbstractObjectService {
 
         
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
+		def speciesCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.rank having obv.maxVotedReco.taxonConcept.rank in :ranks"
+        queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
+
+		def speciesStatusCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.status having obv.maxVotedReco.taxonConcept.status in :statuses"
+        queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
 
         orderByClause = " order by " + orderByClause;
-        println "+========================================="
-        println query
-        println "+========================================="
 
-        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, speciesCountQuery:speciesCountQuery, speciesStatusCountQuery:speciesStatusCountQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 

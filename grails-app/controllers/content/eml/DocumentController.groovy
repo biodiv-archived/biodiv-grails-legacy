@@ -335,8 +335,7 @@ class DocumentController extends AbstractObjectController {
 		def queryParams = filteredDocument.queryParams
 		def activeFilters = filteredDocument.activeFilters
 		def canPullResource = filteredDocument.canPullResource
-		
-		def count = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList.size()
+	    def count = filteredDocument.instanceTotal	
 		if(params.append?.toBoolean()) {
             session["doc_ids_list"].addAll(documentInstanceList.collect {it.id});
         } else {

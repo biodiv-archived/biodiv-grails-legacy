@@ -83,438 +83,13 @@ class NamelistService {
     def activityFeedService;
 	//def speciesUploadService;
 	
-    public List searchCOL(String input, String searchBy) {
-        //http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
-
-        def http = new HTTPBuilder()
-        http.request( COL_SITE, GET, TEXT ) { req ->
-            uri.path = COL_URI
-            if(searchBy == 'name') {
-                uri.query = [ name:input, response:'full', format:'xml']
-            } else if(searchBy == 'id') {
-                uri.query = [ id:input, response:'full', format:'xml']
-            }
-            //headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
-            headers.Accept = 'text/xml'
-
-            response.success = { resp, reader ->
-                assert resp.statusLine.statusCode == 200
-                println "Got response: ${resp.statusLine}"
-                println "Content-Type: ${resp.headers.'Content-Type'}"
-                def xmlText =  reader.text
-                //println xmlText
-                def result = responseAsMap(xmlText, searchBy);
-                return result;
-            }
-            response.'404' = { println 'Not found' }
-        }
-    }
-
-    public List searchGBIF(String input, String searchBy){
-        //http://api.gbif.org/v1/species/match?verbose=true&name=Mangifera
-
-        def http = new HTTPBuilder()
-        println "========GBIF SITE===== " + GBIF_SITE
-        http.request( GBIF_SITE, GET, TEXT ) { req ->
-            if(searchBy == 'name') {
-                uri.path = GBIF_URI + '/match';
-            } else {
-                uri.path = GBIF_URI + '/' + input;
-            }
-            if(searchBy == 'name') {
-                uri.query = [ name:input]
-            }
-            /*else if(searchBy == 'id') {
-                uri.query = [ id:input, format:'xml']
-            }*/
-            //headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
-            headers.Accept = '*/*'
-
-            response.success = { resp, reader ->
-                assert resp.statusLine.statusCode == 200
-                println "Got response: ${resp.statusLine}"
-                println "Content-Type: ${resp.headers.'Content-Type'}"
-                def xmlText =  reader.text
-                return responseFromGBIFAsMap(xmlText, searchBy);
-            }
-            response.'404' = { println 'Not found' }
-        }
-    }
-
-    List responseAsMap(String xmlText, String searchBy) {
-        def results = new XmlParser().parseText(xmlText)
-        return responseAsMap(results, searchBy)
-    }
-
-    String generateVerbatim (colResult) {
-        String verbatim = '';
-        int origRank = XMLConverter.getTaxonRank(colResult.rank?.text()?.toLowerCase()); 
-        if(origRank <= TaxonomyRank.SPECIES.ordinal()) {
-            verbatim = colResult?.name?.text() + " " +colResult?.author?.text().capitalize();
-        } else {
-            String genus = colResult?.genus?.text() + ' ';
-            String species = colResult?.species?.text() + ' '; 
-            String infraSpeciesMarker = '';
-            if(colResult?.infraspecies_marker) {
-                infraSpeciesMarker = colResult?.infraspecies_marker.text() + ' ';
-            }
-            String infraSpecies = '';
-            if(colResult?.infraspecies) {
-                infraSpecies = colResult?.infraspecies.text() + ' ';
-            }
-            String authorYear = '';
-            if(colResult?.author) {
-                authorYear = colResult?.author.text().capitalize();
-            }
-            verbatim = genus + species + infraSpeciesMarker + infraSpecies + authorYear;
-        }
-        return verbatim
-    }
-
-    List responseAsMap(results, String searchBy) {
-        List finalResult = []
-        //println results.'@total_number_of_results'
-        //println results.'@number_of_results_returned'
-        //println results.'@error_message'
-        //println results.'@version'
-
-        int i = 0
-        results.result.each { r ->
-            Map temp = new HashMap();
-            Map id_details = new HashMap();
-            temp['externalId'] = r?.id?.text()//+"'"
-            temp['matchDatabaseName'] = "CatalogueOfLife"
-            temp['canonicalForm'] = r?.name?.text();
-            temp['rank'] = r?.rank?.text()?.toLowerCase()
-            temp[r?.rank?.text()?.toLowerCase()] = generateVerbatim(r);     //r?.name?.text()
-            //GENERATING VERBATIM BASED ON RANK
-            temp['name'] = generateVerbatim(r);
-            
-            id_details[r?.name?.text()] = r?.id?.text();
-            def cs = r?.name_status?.text()?.tokenize(' ')[0]
-            if(cs == 'provisionally' || cs == 'accepted') {
-                temp['nameStatus'] = 'accepted'
-            } else if (cs == 'misapplied' || cs == 'ambiguous' || cs == 'synonym') {
-                temp['nameStatus'] = 'synonym'
-            } else {
-                temp['nameStatus'] = cs
-            }
-            temp['colNameStatus'] = r?.name_status?.text()?.tokenize(' ')[0]
-            temp['authorString'] = r?.author?.text().capitalize();
-            temp['sourceDatabase'] = r?.source_database?.text()
-
-            temp['group'] = (r?.classification?.taxon[0]?.name?.text())?r?.classification?.taxon[0]?.name?.text():''
-            //println "==========NAME STATUS========= " + temp['nameStatus']
-            if(temp['nameStatus'] == "synonym") {
-                def aList = []
-                r.accepted_name.each {
-                    def m = [:]
-                    m['id'] = it.id.text()
-                    m['name'] = generateVerbatim(it)        //it.name.text() + " " + it.author.text().capitalize();;
-                    m['canonicalForm'] = it.name.text();
-                    m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
-                    m['colNameStatus'] = it.name_status?.text()?.tokenize(' ')[0]
-                    m['rank'] = it.rank?.text()?.toLowerCase();
-                    m['authorString'] = it.author.text().capitalize();;
-                    m['source'] = "CatalogueOfLife"
-                    aList.add(m);
-                }
-                //println "======A LIST======== " + aList;
-                temp['acceptedNamesList'] = aList;
-            }
-            if(searchBy == 'id' || searchBy == 'name') {
-                //println "============= references  "
-                r.references.reference.each { ref ->
-                //println ref.author.text()
-                //println ref.source.text()
-                }
-
-                //println "============= higher taxon  "
-                int maxRank = -1;
-                r.classification.taxon.each { t ->
-                    //println t.rank.text() + " == " + t.name.text()
-                    temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
-                    id_details[t?.name?.text()] = t?.id?.text()
-                    int currRank = XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());
-                    if(currRank > maxRank) {
-                        temp['parentTaxon'] =  t?.name?.text()
-                        maxRank = currRank
-                    }
-                }
-
-                //println "============= child taxon  "
-                r.child_taxa.taxon.each { t ->
-                // println t.name.text()
-                // println t.author.text()
-                }
-
-                println "============= synonyms  "
-                if(temp['nameStatus'] == "accepted") {
-                    def synList = []
-                    r.synonyms.synonym.each {
-                        def m = [:]
-                        m['id'] = it.id.text()
-                        m['name'] = generateVerbatim(it);        //it.name.text() + " " + it.author.text().capitalize();;
-                        m['canonicalForm'] = it.name.text();
-                        m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
-                        m['colNameStatus'] = it.name_status?.text()?.tokenize(' ')[0]
-                        m['rank'] = it.rank?.text()?.toLowerCase();
-                        m['parsedRank'] = XMLConverter.getTaxonRank(m.rank);
-                        m['authorString'] = it.author.text().capitalize();;
-                        m['source'] = "CatalogueOfLife"
-                        synList.add(m);
-                    }
-                    //println "======A LIST======== " + aList;
-                    temp['synList'] = synList;
-                }
-                //r.synonyms.synonym.each { s ->
-                //println s.rank.text() + " == " + s.name.text()
-                //println "============= references  "
-                //s.references.reference.each { ref ->
-                //println ref.author.text()
-                //println ref.source.text()
-                //}
-                //}
-                /*
-                println "==========NAME STATUS========= " + temp['nameStatus']
-                if(temp['nameStatus'] == "synonym") {
-                    def aList = []
-                    r.accepted_name.each {
-                        def m = [:]
-                        m['id'] = it.id.text()
-                        m['name'] = it.name.text()
-                        m['source'] = "CatalogueOfLife"
-                        aList.add(m);
-                    }
-                    println "======A LIST======== " + aList;
-                    temp['acceptedNamesList'] = aList;
-                }
-                */
-            }
-            
-            temp['id_details'] = id_details
-            finalResult.add(temp);
-        }
-        return finalResult
-    }
-
-    List responseFromGBIFAsMap(String xmlText , String searchBy) {
-        def result = JSON.parse(xmlText)
-        println "=====RESULT ===== " + result
-        def finalResult = []
-        if(!result['usageKey']) {
-            return finalResult
-        }
-        Map temp = new HashMap()
-        temp['externalId'] = result['usageKey'];
-        temp['name'] = result['scientificName'];
-        temp['rank'] = result['rank']?.toLowerCase();
-        temp['nameStatus'] = '';
-        temp['sourceDatabase'] = '';
-        temp['group'] = result['kingdom'];
-        if(searchBy == 'id') {
-            temp['name'] = result['canonicalName'];
-            temp['externalId'] = result['key'];
-            temp['kingdom'] = result['kingdom']; 
-            temp['phylum'] = result['phylum']; 
-            temp['order'] = result['order']; 
-            temp['family'] = result['family']; 
-            temp['class'] = result['class']; 
-            temp['genus'] = result['genus']; 
-            temp['species'] = result['species']; 
-            temp['nameStatus'] = result['taxonomicStatus']?.toLowerCase();
-            temp['sourceDatabase'] = result['accordingTo'];
-            temp['authorString'] = result['authorship'];
-        }
-        finalResult.add(temp);
-        println "===========PARSED RESULT ======== " + finalResult
-        return finalResult;
-    }
-
-    public def getNamesFromTaxon(params){
-        log.debug params
-        def sql = new Sql(dataSource)
-        def sqlStr, rs
-        def classSystem = params.classificationId.toLong()
-        def parentId = params.parentId
-        def limit = params.limit ? params.limit.toInteger() : 1000
-        def offset = params.offset ? params.limit.toLong() : 0
-        def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
-        def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
-        println "===========NEXT PRIMARY RANK ====== " + nextPrimaryRank
-        println "============== " + parentId
-        if(!parentId) {
-            sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
-                from taxonomy_registry s, \
-                taxonomy_definition t \
-                where \
-                s.taxon_definition_id = t.id and "+
-                (classSystem?"s.classification_id = :classSystem and ":"")+
-                "t.rank = 0";
-
-            //ALways fetch from IBP Taxonomy Hierarchy
-            def fieldsConfig = grailsApplication.config.speciesPortal.fields
-            def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-
-            rs = sql.rows(sqlStr, [classSystem:IBPclassification.id])
-            /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-            def cl = Classification.read(classSystem.toLong());
-            if(cl == classification) {
-                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
-            }*/
-        } else {
-            sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
-                from taxonomy_registry s, \
-                taxonomy_definition t \
-                where \
-                s.taxon_definition_id = t.id and "+
-                (classSystem?"s.classification_id = :classSystem and ":"")+
-                "s.path like '"+parentId+"%' and " +
-                "t.rank <= " + nextPrimaryRank + 
-                " order by t.rank, t.name asc limit :limit offset :offset";
-            
-            //ALways fetch from IBP Taxonomy Hierarchy
-            def fieldsConfig = grailsApplication.config.speciesPortal.fields
-            def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-            rs = sql.rows(sqlStr, [classSystem:IBPclassification.id, limit:limit, offset:offset])
-            
-            /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-            def cl = Classification.read(classSystem.toLong());
-            if(cl == classification) {
-                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
-            }*/
-        }
-
-        println "total result size === " + rs.size()
-        
-        def dirtyList = [:]
-        def workingList = [:]
-        def cleanList = [:]
-        
-        def accDL = [], accWL = [], accCL = []
-        def synDL = [], synWL = [], synCL = []
-        def comDL = [], comWL = [], comCL = []
-
-
-        ///////////////////////////////
-        rs.each {
-            //NOT SENDING PATH
-            //SENDING IDS as taxonid for synonyms and common names
-            //def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
-                //from synonyms s where s.taxon_concept_id = :taxonId";
-            
-            def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position \
-                from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId";
-
-            def q1 = sql.rows(s1, [taxonId:it.taxonid])
-            q1.each {
-                println "==========TAXA IDS======= " + it.taxonid
-                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                    synDL << it
-                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                    synWL << it
-                }else{
-                    synCL << it
-                }
-            }
-            
-            def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position \
-                from common_names c where c.taxon_concept_id = :taxonId";
-
-            def q2 = sql.rows(s2, [taxonId:it.taxonid])
-            /*q2.each {
-                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                    comDL << it
-                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                    comWL << it
-                }else{
-                    comCL << it
-                }
-            }*/
-        }
-
-        println "==========SYN DL============= " + synDL
-        println "==========COM DL============= " + comDL
-        ///////////////////////////////
-        
-        rs.each {
-            if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                accDL << it
-            }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                accWL << it
-            }else{
-                accCL << it
-            }
-        }
-        dirtyList['accDL'] = accDL
-        dirtyList['synDL'] = synDL
-        dirtyList['comDL'] = comDL
-        workingList['accWL'] = accWL
-        workingList['synWL'] = synWL
-        workingList['comWL'] = comWL
-        cleanList['accCL'] = accCL
-        cleanList['synCL'] = synCL
-        cleanList['comCL'] = comCL
-        return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]	
-    }
-
-    public def getNameDetails(params){
-        log.debug params
-        if(params.nameType == '1') {
-            def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
-            def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
-            def result = taxonDef.fetchGeneralInfo()
-            result['taxonId'] = params.taxonId;
-
-            if(taxonReg) {
-                result['taxonRegId'] = taxonReg.id?.toString()
-                taxonReg.path.tokenize('_').each { taxonDefinitionId ->
-                    def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
-                }
-            }
-            result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
-            result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
-            /*def counts = getObvCKLCountsOfTaxon(taxonDef);
-            result['countObv'] = counts['countObv'];
-            result['countCKL'] = counts['countCKL'];
-            result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
-            println "=========COUNTS============= " + counts
-            */
-            println "----------- "  + result
-            return result
-        }else if(params.nameType == '2') {
-            if(params.choosenName && params.choosenName != '') {
-                //taxonId here is id of synonyms table
-                def syn = SynonymsMerged.read(params.taxonId.toLong());
-                def result = syn.fetchGeneralInfo();
-                result[result['rank']] = params.choosenName;
-                result['acceptedNamesList'] = getAcceptedNamesOfSynonym(syn);
-                println "========SYNONYMS NAME DETAILS ===== " + result
-                return result
-            }    
-        }else if(params.nameType == '3') {
-            if(params.choosenName && params.choosenName != '') {
-                //taxonId here is id of common names table
-                def com = CommonNames.read(params.taxonId.toLong());
-                def result = com.fetchGeneralInfo()
-                result[result['rank']] = params.choosenName;
-                result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
-                println "========SYNONYMS NAME DETAILS ===== " + result
-                return result
-            }    
-        }
-    }
+ 
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
-    public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null) {  
+    public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
         SEARCH_IBP_COUNTER ++;
         println "========SEARCH IBP CALLED=======>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-        println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "=--- "+ rank;
+        println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "--- "+ rank;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
 		
@@ -537,6 +112,14 @@ class NamelistService {
 					if(!searchInNull){
 						isNotNull('position')
 					}
+					//XXX in curation while taking col hir. we want author year column to be used forcefully 
+					// in other cases we will not use untill gets multiple matches 
+					if(useAuthorYear){
+						if(authorYear)
+							eq('authorYear', authorYear)
+						else
+							isNull('authorYear')	
+					}
 				}
             }
 			//CANONICAL ZERO MATCH OR SINGLE MATCH
@@ -545,6 +128,7 @@ class NamelistService {
                     CAN_ZERO ++;
                 } else {
                     CAN_SINGLE ++;
+					
                 }
             }
             //CANONICAL MULTIPLE MATCH
@@ -866,7 +450,7 @@ class NamelistService {
         }
     }
 
-    public def processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize) {
+    public processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize) {
         sciName.tempActivityDescription = "";
         /*def upAt = updateAttributes(sciName, acceptedMatch);
         println  "====UP AT == " + upAt 
@@ -1157,8 +741,9 @@ class NamelistService {
         println colAcceptedNameData.abortOnNewName;
         println colAcceptedNameData.fromCOL;
         println colAcceptedNameData.spellCheck
+		//boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
         //From UI uncomment
-        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, colAcceptedNameData.abortOnNewName, colAcceptedNameData.fromCOL.toBoolean(), colAcceptedNameData);
+        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
         
         //From migration script
         //Also add to catalogue of life hierarchy
@@ -1178,6 +763,7 @@ class NamelistService {
     }
 
     List processColData(File f) {
+		println "========= File --- " + f.absolutePath
         if(!f.exists()){
             log.debug "File not found skipping now..."
             return
@@ -1868,219 +1454,457 @@ def sql= session.createSQLQuery(query)
     }
 
 	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	def mergeAcceptedName(long oldId, long newId, boolean fullDelete = false){
-		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
-		TaxonomyDefinition newName = TaxonomyDefinition.get(newId)
-		
-		
-		if(!oldName ||  !newName){
-			log.debug "One of name is not exist in the system " + oldId + "  " +  newId
-			return
-		}
-		
-		
-		
-		def oldTrList = TaxonomyRegistry.findAllByTaxonDefinition(oldName)
-		
-		
-		//update all paths for this taxon defintion
-		List trList = TaxonomyRegistry.findAllByPathLike('%_' + oldId + '_%')
-		trList.addAll(TaxonomyRegistry.findAllByPathLike(oldId + '_%'))
-		trList.addAll(TaxonomyRegistry.findAllByPath(oldId))
-		trList.addAll(oldTrList)
-		trList.unique()
-		
-		println " complete tr list ------------ " + trList
-		
-		List oldTrToBeDeleted = []
-		List updateTrList = []
-		
-		Map updateTrMap = [:]
-		Map deleteToParentTaxonMap = [:]
-		Species.withTransaction {
-		println "================ starting things now "
-		trList.each { TaxonomyRegistry tr ->
-			String newPath = tr.path
-			newPath = newPath.replaceAll('_' + oldId + '_', '_' + newId + '_')
-			
-			if(newPath.startsWith(oldId + '_'))
-				newPath.replaceFirst(oldId + '_', newId + '_')
-			
-			if(newPath == ('' + oldId) )
-				newPath = '' + newId
-			
-			if(newPath.endsWith('_' + oldId))
-				newPath = newPath.substring(0, newPath.lastIndexOf('_') + 1) +  newId
-				
-			if(isDuplicateTr(tr, newPath, newName, deleteToParentTaxonMap)){
-				oldTrToBeDeleted << tr
-			}else{
-				updateTrMap.put(tr, newPath)
-			}	
-		}
-		
-		trList.clear()
-		updateTrMap.each { k, v ->
-			k.path = v
-			updateTrList << k
-		}
-		updateTrMap.clear()
-		
-		oldTrList.removeAll(oldTrToBeDeleted)
-		//trList.removeAll(oldTrToBeDeleted)
-		
-		println "------------ updateTrList " + updateTrList
-		updateTrList.each {TaxonomyRegistry tr ->
-			println "================ updating tr " + tr
-			if(!tr.save(flush:true)){
-				tr.errors.allErrors.each { log.error it }
+	public List searchCOL(String input, String searchBy) {
+		//http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
+
+		def http = new HTTPBuilder()
+		http.request( COL_SITE, GET, TEXT ) { req ->
+			uri.path = COL_URI
+			if(searchBy == 'name') {
+				uri.query = [ name:input, response:'full', format:'xml']
+			} else if(searchBy == 'id') {
+				uri.query = [ id:input, response:'full', format:'xml']
 			}
-		}
-		println "------------ oldTrToBeDeleted " + oldTrToBeDeleted
-		oldTrToBeDeleted.each {TaxonomyRegistry tr ->
-			println "================ deleting tr " + tr
-			def tmpTr = deleteToParentTaxonMap.get(tr)
-			TaxonomyRegistry.findAllByParentTaxon(tr).each{
-				it.parentTaxon = tmpTr
-				if(!tmpTr.save(flush:true)){
-					tmpTr.errors.allErrors.each { log.error it }
-				}
+			//headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
+			headers.Accept = 'text/xml'
+
+			response.success = { resp, reader ->
+				assert resp.statusLine.statusCode == 200
+				println "Got response: ${resp.statusLine}"
+				println "Content-Type: ${resp.headers.'Content-Type'}"
+				def xmlText =  reader.text
+				//println xmlText
+				def result = responseAsMap(xmlText, searchBy);
+				return result;
 			}
-			tr.delete(flush:true)
+			response.'404' = { println 'Not found' }
 		}
-		
-		
-		println "------------ oldTrList " + oldTrList
-		//updating taxon def so that new hirarchy should be shown
-		oldTrList.each {TaxonomyRegistry tr ->
-			println "================ taxon def for tr " + tr
-			tr.taxonDefinition = newName
-			
-		}
-		
-		
-		
-		//moving synonym
-		oldName.fetchSynonyms().each {
-			println "================ synonym move " + it
-			newName.addSynonym(it)
-			oldName.removeSynonym(it)
-		}
-		
-		//moving common names
-		List cns = CommonNames.findAllByTaxonConcept(oldName)
-		cns.each { cn ->
-			println "================ common name update " + cn
-			cn.taxonConcept = newName
-			if(!cn.save(flush:true)){
-				cn.errors.allErrors.each { log.error it }
-			}
-		}
-		
-		
-		
-		Species oldSpecies = Species.findByTaxonConcept(oldName)
-		Species newSpecies = Species.findByTaxonConcept(newName)
-		
-		//updating species for names
-		if(!newSpecies && oldSpecies){
-			oldSpecies.taxonConcept = newName
-			if(!oldSpecies.save(flush:true)){
-				oldSpecies.errors.allErrors.each { log.error it }
-			}
-			log.debug "  new speices not available"
-		}
-		
-		if(newSpecies && oldSpecies){
-			//move sfield
-			SpeciesField.findAllBySpecies(oldSpecies).each {sf ->
-				sf.species = newSpecies
-				if(!sf.save(flush:true)){
-					sf.errors.allErrors.each { log.error it }
-				}
-			}
-			
-			//move resources
-			def ress = oldSpecies.resources.collect { it}
-			ress.each { res ->
-				log.debug "Removing resource " + res
-				newSpecies.addToResources(res)
-				oldSpecies.removeFromResources(res)
-			}
-			
-			//add hyper link for redirect
-			log.debug "================= old species id " + oldSpecies + " ............ " + newSpecies
-			ResourceRedirect.addLink(oldSpecies, newSpecies)
-			
-			//saving new species
-			if(!newSpecies.save(flush:true)){
-				newSpecies.errors.allErrors.each { log.error it }
-			}
-			
-			//deleting speices
-			//oldSpecies.taxonConcept = null
-			oldSpecies.deleteSpecies(SUser.read(1))
-		}
-		
-		//setting delete flag true on name
-		if(fullDelete){
-			def newReco = Recommendation.findByTaxonConcept(newName)
-			def reco = Recommendation.findByTaxonConcept(oldName)
-			if(reco){
-			RecommendationVote.findAllByRecommendationOrCommonNameReco(reco, reco).each { r ->
-				println " saving reco vote  " + r
-				if(r.recommendation == reco){
-					r.recommendation = newReco
-				}
-				if(r.commonNameReco == reco){
-					r.commonNameReco = newReco
-				}
-				if(!r.save(flush:true)){
-					r.errors.allErrors.each { log.error it }
-				}
-			}
-			println "========= deleting reco " + reco
-			reco.delete(flush:true)
-			}
-			println "========= old name " + oldName
-			if(oldName)
-				oldName.delete(flush:true)
-		}else{
-			oldName.isDeleted = true
-			println "======= for delete " + oldName
-			if(!oldName.save(flush:true)){
-				oldName.errors.allErrors.each { log.error it }
-			}
-		}
-		}
-		
-	}
-	
-	
-	private boolean isDuplicateTr(tr, newPath, newName, deleteToParentTaxonMap ){
-		//update all paths for this taxon defintion
-		def id = newName.id
-		List trList = TaxonomyRegistry.findAllByPathLike('%_' + id + '_%')
-		trList.addAll(TaxonomyRegistry.findAllByPathLike(id + '_%'))
-		trList.addAll(TaxonomyRegistry.findAllByPath(id))
-		trList.addAll(TaxonomyRegistry.findAllByTaxonDefinition(newName))
-		trList.unique()
-		
-		boolean isDuplicate = false
-		
-		trList.each { nTr ->
-			
-				if((nTr.classification == tr.classification) && (nTr.path == newPath) ){
-					isDuplicate = true
-					println "----------- duplicate tr " + nTr
-					deleteToParentTaxonMap.put(tr, nTr)
-				}
-				
-		}
-		return isDuplicate
 	}
 
-    
+	public List searchGBIF(String input, String searchBy){
+		//http://api.gbif.org/v1/species/match?verbose=true&name=Mangifera
+
+		def http = new HTTPBuilder()
+		println "========GBIF SITE===== " + GBIF_SITE
+		http.request( GBIF_SITE, GET, TEXT ) { req ->
+			if(searchBy == 'name') {
+				uri.path = GBIF_URI + '/match';
+			} else {
+				uri.path = GBIF_URI + '/' + input;
+			}
+			if(searchBy == 'name') {
+				uri.query = [ name:input]
+			}
+			/*else if(searchBy == 'id') {
+				uri.query = [ id:input, format:'xml']
+			}*/
+			//headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
+			headers.Accept = '*/*'
+
+			response.success = { resp, reader ->
+				assert resp.statusLine.statusCode == 200
+				println "Got response: ${resp.statusLine}"
+				println "Content-Type: ${resp.headers.'Content-Type'}"
+				def xmlText =  reader.text
+				return responseFromGBIFAsMap(xmlText, searchBy);
+			}
+			response.'404' = { println 'Not found' }
+		}
+	}
+
+	List responseAsMap(String xmlText, String searchBy) {
+		def results = new XmlParser().parseText(xmlText)
+		return responseAsMap(results, searchBy)
+	}
+
+	String generateVerbatim (colResult) {
+		String verbatim = '';
+		int origRank = XMLConverter.getTaxonRank(colResult.rank?.text()?.toLowerCase());
+		if(origRank <= TaxonomyRank.SPECIES.ordinal()) {
+			verbatim = colResult?.name?.text() + " " +colResult?.author?.text().capitalize();
+		} else {
+			String genus = colResult?.genus?.text() + ' ';
+			String species = colResult?.species?.text() + ' ';
+			String infraSpeciesMarker = '';
+			if(colResult?.infraspecies_marker) {
+				infraSpeciesMarker = colResult?.infraspecies_marker.text() + ' ';
+			}
+			String infraSpecies = '';
+			if(colResult?.infraspecies) {
+				infraSpecies = colResult?.infraspecies.text() + ' ';
+			}
+			String authorYear = '';
+			if(colResult?.author) {
+				authorYear = colResult?.author.text().capitalize();
+			}
+			verbatim = genus + species + infraSpeciesMarker + infraSpecies + authorYear;
+		}
+		return verbatim
+	}
+
+	List responseAsMap(results, String searchBy) {
+		List finalResult = []
+		//println results.'@total_number_of_results'
+		//println results.'@number_of_results_returned'
+		//println results.'@error_message'
+		//println results.'@version'
+
+		int i = 0
+		results.result.each { r ->
+			Map temp = new HashMap();
+			Map id_details = new HashMap();
+			temp['externalId'] = r?.id?.text()//+"'"
+			temp['matchDatabaseName'] = "CatalogueOfLife"
+			temp['canonicalForm'] = r?.name?.text();
+			temp['rank'] = r?.rank?.text()?.toLowerCase()
+			temp[r?.rank?.text()?.toLowerCase()] = generateVerbatim(r);     //r?.name?.text()
+			//GENERATING VERBATIM BASED ON RANK
+			temp['name'] = generateVerbatim(r);
+			
+			id_details[r?.name?.text()] = r?.id?.text();
+			def cs = r?.name_status?.text()?.tokenize(' ')[0]
+			if(cs == 'provisionally' || cs == 'accepted') {
+				temp['nameStatus'] = 'accepted'
+			} else if (cs == 'misapplied' || cs == 'ambiguous' || cs == 'synonym') {
+				temp['nameStatus'] = 'synonym'
+			} else {
+				temp['nameStatus'] = cs
+			}
+			temp['colNameStatus'] = r?.name_status?.text()?.tokenize(' ')[0]
+			temp['authorString'] = r?.author?.text().capitalize();
+			temp['sourceDatabase'] = r?.source_database?.text()
+
+			temp['group'] = (r?.classification?.taxon[0]?.name?.text())?r?.classification?.taxon[0]?.name?.text():''
+			//println "==========NAME STATUS========= " + temp['nameStatus']
+			if(temp['nameStatus'] == "synonym") {
+				def aList = []
+				r.accepted_name.each {
+					def m = [:]
+					m['id'] = it.id.text()
+					m['name'] = generateVerbatim(it)        //it.name.text() + " " + it.author.text().capitalize();;
+					m['canonicalForm'] = it.name.text();
+					m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
+					m['colNameStatus'] = it.name_status?.text()?.tokenize(' ')[0]
+					m['rank'] = it.rank?.text()?.toLowerCase();
+					m['authorString'] = it.author.text().capitalize();;
+					m['source'] = "CatalogueOfLife"
+					aList.add(m);
+				}
+				//println "======A LIST======== " + aList;
+				temp['acceptedNamesList'] = aList;
+			}
+			if(searchBy == 'id' || searchBy == 'name') {
+				//println "============= references  "
+				r.references.reference.each { ref ->
+				//println ref.author.text()
+				//println ref.source.text()
+				}
+
+				//println "============= higher taxon  "
+				int maxRank = -1;
+				r.classification.taxon.each { t ->
+					//println t.rank.text() + " == " + t.name.text()
+					temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
+					id_details[t?.name?.text()] = t?.id?.text()
+					int currRank = XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());
+					if(currRank > maxRank) {
+						temp['parentTaxon'] =  t?.name?.text()
+						maxRank = currRank
+					}
+				}
+
+				//println "============= child taxon  "
+				r.child_taxa.taxon.each { t ->
+				// println t.name.text()
+				// println t.author.text()
+				}
+
+				println "============= synonyms  "
+				if(temp['nameStatus'] == "accepted") {
+					def synList = []
+					r.synonyms.synonym.each {
+						def m = [:]
+						m['id'] = it.id.text()
+						m['name'] = generateVerbatim(it);        //it.name.text() + " " + it.author.text().capitalize();;
+						m['canonicalForm'] = it.name.text();
+						m['nameStatus'] = it.name_status.text()?.tokenize(' ')[0];
+						m['colNameStatus'] = it.name_status?.text()?.tokenize(' ')[0]
+						m['rank'] = it.rank?.text()?.toLowerCase();
+						m['parsedRank'] = XMLConverter.getTaxonRank(m.rank);
+						m['authorString'] = it.author.text().capitalize();;
+						m['source'] = "CatalogueOfLife"
+						synList.add(m);
+					}
+					//println "======A LIST======== " + aList;
+					temp['synList'] = synList;
+				}
+				//r.synonyms.synonym.each { s ->
+				//println s.rank.text() + " == " + s.name.text()
+				//println "============= references  "
+				//s.references.reference.each { ref ->
+				//println ref.author.text()
+				//println ref.source.text()
+				//}
+				//}
+				/*
+				println "==========NAME STATUS========= " + temp['nameStatus']
+				if(temp['nameStatus'] == "synonym") {
+					def aList = []
+					r.accepted_name.each {
+						def m = [:]
+						m['id'] = it.id.text()
+						m['name'] = it.name.text()
+						m['source'] = "CatalogueOfLife"
+						aList.add(m);
+					}
+					println "======A LIST======== " + aList;
+					temp['acceptedNamesList'] = aList;
+				}
+				*/
+			}
+			
+			temp['id_details'] = id_details
+			finalResult.add(temp);
+		}
+		return finalResult
+	}
+
+	List responseFromGBIFAsMap(String xmlText , String searchBy) {
+		def result = JSON.parse(xmlText)
+		println "=====RESULT ===== " + result
+		def finalResult = []
+		if(!result['usageKey']) {
+			return finalResult
+		}
+		Map temp = new HashMap()
+		temp['externalId'] = result['usageKey'];
+		temp['name'] = result['scientificName'];
+		temp['rank'] = result['rank']?.toLowerCase();
+		temp['nameStatus'] = '';
+		temp['sourceDatabase'] = '';
+		temp['group'] = result['kingdom'];
+		if(searchBy == 'id') {
+			temp['name'] = result['canonicalName'];
+			temp['externalId'] = result['key'];
+			temp['kingdom'] = result['kingdom'];
+			temp['phylum'] = result['phylum'];
+			temp['order'] = result['order'];
+			temp['family'] = result['family'];
+			temp['class'] = result['class'];
+			temp['genus'] = result['genus'];
+			temp['species'] = result['species'];
+			temp['nameStatus'] = result['taxonomicStatus']?.toLowerCase();
+			temp['sourceDatabase'] = result['accordingTo'];
+			temp['authorString'] = result['authorship'];
+		}
+		finalResult.add(temp);
+		println "===========PARSED RESULT ======== " + finalResult
+		return finalResult;
+	}
+
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	public def getNamesFromTaxon(params){
+		log.debug params
+		def sql = new Sql(dataSource)
+		def sqlStr, rs
+		def classSystem = params.classificationId.toLong()
+		def parentId = params.parentId
+		def limit = params.limit ? params.limit.toInteger() : 1000
+		def offset = params.offset ? params.limit.toLong() : 0
+		def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
+		def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
+		println "===========NEXT PRIMARY RANK ====== " + nextPrimaryRank
+		println "============== " + parentId
+		if(!parentId) {
+			sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
+				from taxonomy_registry s, \
+				taxonomy_definition t \
+				where \
+				s.taxon_definition_id = t.id and "+
+				(classSystem?"s.classification_id = :classSystem and ":"")+
+				"t.rank = 0";
+
+			//ALways fetch from IBP Taxonomy Hierarchy
+			def fieldsConfig = grailsApplication.config.speciesPortal.fields
+			def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+
+			rs = sql.rows(sqlStr, [classSystem:IBPclassification.id])
+			/*def fieldsConfig = grailsApplication.config.speciesPortal.fields
+			def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+			def cl = Classification.read(classSystem.toLong());
+			if(cl == classification) {
+				def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+				rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
+			}*/
+		} else {
+			sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
+				from taxonomy_registry s, \
+				taxonomy_definition t \
+				where \
+				s.taxon_definition_id = t.id and "+
+				(classSystem?"s.classification_id = :classSystem and ":"")+
+				"s.path like '"+parentId+"%' and " +
+				"t.rank <= " + nextPrimaryRank +
+				" order by t.rank, t.name asc limit :limit offset :offset";
+			
+			//ALways fetch from IBP Taxonomy Hierarchy
+			def fieldsConfig = grailsApplication.config.speciesPortal.fields
+			def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+			rs = sql.rows(sqlStr, [classSystem:IBPclassification.id, limit:limit, offset:offset])
+			
+			/*def fieldsConfig = grailsApplication.config.speciesPortal.fields
+			def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+			def cl = Classification.read(classSystem.toLong());
+			if(cl == classification) {
+				def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+				rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
+			}*/
+		}
+
+		println "total result size === " + rs.size()
+		
+		def dirtyList = [:]
+		def workingList = [:]
+		def cleanList = [:]
+		
+		def accDL = [], accWL = [], accCL = []
+		def synDL = [], synWL = [], synCL = []
+		def comDL = [], comWL = [], comCL = []
+
+
+		///////////////////////////////
+		rs.each {
+			//NOT SENDING PATH
+			//SENDING IDS as taxonid for synonyms and common names
+			//def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
+				//from synonyms s where s.taxon_concept_id = :taxonId";
+			
+			def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position \
+				from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId";
+
+			def q1 = sql.rows(s1, [taxonId:it.taxonid])
+			q1.each {
+				println "==========TAXA IDS======= " + it.taxonid
+				if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+					synDL << it
+				}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+					synWL << it
+				}else{
+					synCL << it
+				}
+			}
+			
+			def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position \
+				from common_names c where c.taxon_concept_id = :taxonId";
+
+			def q2 = sql.rows(s2, [taxonId:it.taxonid])
+			/*q2.each {
+				if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+					comDL << it
+				}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+					comWL << it
+				}else{
+					comCL << it
+				}
+			}*/
+		}
+
+		println "==========SYN DL============= " + synDL
+		println "==========COM DL============= " + comDL
+		///////////////////////////////
+		
+		rs.each {
+			if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+				accDL << it
+			}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+				accWL << it
+			}else{
+				accCL << it
+			}
+		}
+		dirtyList['accDL'] = accDL
+		dirtyList['synDL'] = synDL
+		dirtyList['comDL'] = comDL
+		workingList['accWL'] = accWL
+		workingList['synWL'] = synWL
+		workingList['comWL'] = comWL
+		cleanList['accCL'] = accCL
+		cleanList['synCL'] = synCL
+		cleanList['comCL'] = comCL
+		return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]
+	}
+
+	public def getNameDetails(params){
+		log.debug params
+		if(params.nameType == '1') {
+			def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
+			def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
+			def result = taxonDef.fetchGeneralInfo()
+			result['taxonId'] = params.taxonId;
+
+			if(taxonReg) {
+				result['taxonRegId'] = taxonReg.id?.toString()
+				taxonReg.path.tokenize('_').each { taxonDefinitionId ->
+					def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
+					result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+				}
+			}
+			result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
+			result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
+			/*def counts = getObvCKLCountsOfTaxon(taxonDef);
+			result['countObv'] = counts['countObv'];
+			result['countCKL'] = counts['countCKL'];
+			result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
+			println "=========COUNTS============= " + counts
+			*/
+			println "----------- "  + result
+			return result
+		}else if(params.nameType == '2') {
+			if(params.choosenName && params.choosenName != '') {
+				//taxonId here is id of synonyms table
+				def syn = SynonymsMerged.read(params.taxonId.toLong());
+				def result = syn.fetchGeneralInfo();
+				result[result['rank']] = params.choosenName;
+				result['acceptedNamesList'] = getAcceptedNamesOfSynonym(syn);
+				println "========SYNONYMS NAME DETAILS ===== " + result
+				return result
+			}
+		}else if(params.nameType == '3') {
+			if(params.choosenName && params.choosenName != '') {
+				//taxonId here is id of common names table
+				def com = CommonNames.read(params.taxonId.toLong());
+				def result = com.fetchGeneralInfo()
+				result[result['rank']] = params.choosenName;
+				result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
+				println "========SYNONYMS NAME DETAILS ===== " + result
+				return result
+			}
+		}
+	}
+
+	
+	
+	
+	
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 
 }

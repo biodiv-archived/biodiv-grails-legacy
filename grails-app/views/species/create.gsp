@@ -132,6 +132,11 @@
         </g:else>
         </g:each>
 
+        var text1 = $('#page').data('rank');
+        $('#rank option').filter(function() {
+            return $(this).val() == text1; 
+        }).prop('selected', true);
+
         $('#rank').change(function() {
             $('#page').attr('data-rank', $('#rank').find(':selected').val());
         });

@@ -1510,6 +1510,7 @@ class XMLConverter extends SourceConverter {
                         ent.taxonDefinition = taxon
                         ent.classification = classification;
                         ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+                        ent.parentTaxonDefinition = ent.parentTaxon.taxonDefinition;
                         log.debug("Parent Taxon : "+ent.parentTaxon)
                         ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
                         //same taxon at same parent and same path may exist from same classification.
@@ -1623,7 +1624,8 @@ class XMLConverter extends SourceConverter {
 //                            def ctx = ApplicationHolder.getApplication().getMainContext();
 //                            namelistService = ctx.getBean("namelistService");
                             boolean searchInNull = true;
-                            def searchIBP = NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm)
+							boolean useAuthorYear = (otherParams?true:false)
+                            def searchIBP = NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
                             println "========SEARCH RESULT------>>> #################======== " + searchIBP
                             TaxonomyDefinition taxon = null;
                             
@@ -1633,6 +1635,7 @@ class XMLConverter extends SourceConverter {
                             //if its accepted pick that as taxon & flag it
                             //else if its synonym pick 1st result and flag that synonym
                             if(otherParams) {
+								//println "============= otherParams  " + otherParams
                                 //DOING THIS BECAUSE IT DIDNT FIND NEWLY MOVED NAME FROM SYNONYM TO ACCEPTED
                                 if(fieldNode == fieldNodes.last()) {
                                     if(otherParams.curatingTaxonId) {
@@ -1745,7 +1748,8 @@ class XMLConverter extends SourceConverter {
                                 flag = false;
                                 return;
                             }
-                            if(fromCOL && taxon && taxon.position != NamePosition.WORKING && (rank < TaxonomyRank.SPECIES.ordinal())) {
+                            if(fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
+								println " =========== got taxon but creating duplicate "
                                 taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
@@ -1892,6 +1896,7 @@ class XMLConverter extends SourceConverter {
                                  ent.classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
                             }*/
                             ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+							ent.parentTaxonDefinition = ent.parentTaxon?.taxonDefinition
                             log.debug("Parent Taxon : "+ent.parentTaxon)
                             ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
                             //same taxon at same parent and same path may exist from same classification.

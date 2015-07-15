@@ -273,6 +273,12 @@ class Utils {
 		}
 	}
 	
+	public static saveFiles(File sourceDir, taxonList, List errors){
+		taxonList.each {
+			saveFile(sourceDir, it, errors)
+		}
+	}
+	
 	private static saveFile(File sourceDir, taxon, List errors){
 		def name = taxon.canonicalForm
         def id = taxon.id

@@ -32,3 +32,11 @@
 </table>
 <button id="distinctRecoTableAction" class="btn btn-mini pull-right" data-offset='0'><g:message code="msg.load.more" /> </button>
 </div>
+<script>
+$(document).ready(function(){
+    console.log('click');
+    $("#distinctRecoTableAction").click(loadDistinctRecoList);
+});
+
+
+</script>

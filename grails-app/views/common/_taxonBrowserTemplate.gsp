@@ -6,7 +6,7 @@
 <g:if test="${classifications}">
 <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
     <g:each in="${classifications}" var="classification">
-    <option value="${classification[0]}" ${(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY).equalsIgnoreCase(classification[1].name)?'selected':''}>
+    <option value="${classification[0]}" ${(classification[1].id==selectedClassification || (!selectedClassification && (grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY).equalsIgnoreCase(classification[1].name)))?'selected':''}>
     ${classification[1].name} ${classification[2]?classification[2].toString():''}
     </option>
     </g:each>
@@ -28,16 +28,17 @@
     </div>
 </div>
  <table id="taxonHierarchy" class="emptyField"></table>
-    <g:if test="${actionName == 'list'}">
-    <style type="text/css">
-            .ui-jqgrid-bdiv, .ui-jqgrid .ui-jqgrid-btable{
-                width:938px !important;
-            }
-    </style>
-    </g:if>
-</g:if>
+ </g:if>
 <g:else>
 <table id="taxonHierarchy" class="emptyField" style="width: 938px;"></table>
 </g:else>
-
+<g:if test="${queryParams && queryParams.taxon instanceof TaxonomyDefinition}">
+<input type="hidden" id="taxon" name="taxon" value="${queryParams.taxon.id}"></input>
+</g:if>
+<g:elseif test="${queryParams && queryParams.taxon instanceof Long}">
+<input type="hidden" id="taxon" name="taxon" value="${queryParams.taxon}"></input>
+</g:elseif>
+<g:else>
+<input type="hidden" id="taxon" name="taxon" value=""></input>
+</g:else>
 

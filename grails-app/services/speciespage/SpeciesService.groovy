@@ -52,11 +52,17 @@ import species.participation.DownloadLog;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.TaxonomyRegistry;
+import species.ScientificName.TaxonomyRank;
 import org.hibernate.FetchMode;
 import grails.converters.JSON;
 import species.participation.ActivityFeedService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
+
+import species.NamesMetadata.NameStatus;
+import content.eml.DocSciName;
+import content.eml.Document;
+import species.AcceptedSynonym;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -1534,6 +1540,11 @@ class SpeciesService extends AbstractObjectService  {
         String query, countQuery;
         String filterQuery = " where s.id is not null " //dummy statement
         String countFilterQuery = " where s.id is not null " //dummy statement
+        String speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s "
+        String speciesCountFilterQuery = '';
+        String speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s "
+        String speciesStatusCountFilterQuery = '';
+
 
         def queryParams = [:]
         def activeFilters = [:]
@@ -1563,11 +1574,14 @@ class SpeciesService extends AbstractObjectService  {
             if(params.startsWith == "A-Z") {
                 query = "select s from Species s ";
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s "
+
             } else {
                 query = "select s from Species s "
                 filterQuery += " and s.title like '<i>${params.startsWith}%' ";
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
+
+
 				queryParams["startsWith"] = params.startsWith
             }
         } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
@@ -1576,14 +1590,19 @@ class SpeciesService extends AbstractObjectService  {
                 filterQuery += " and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
+            queryParams['groupId']  = groupIds[0]
         } else {
             if(params.startsWith == "A-Z") {
                 query = "select s from Species s, TaxonomyDefinition t "
@@ -1591,14 +1610,21 @@ class SpeciesService extends AbstractObjectService  {
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
+
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
+            queryParams['groupId']  = groupIds[0]
         }
 
         if(params.featureBy == "true" ) {
@@ -1650,7 +1676,6 @@ class SpeciesService extends AbstractObjectService  {
             queryParams["daterangepicker_end"] =  endDate
         }
 
-
         if(params.webaddress) {
             def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
             if(userGroupInstance){
@@ -1665,13 +1690,46 @@ class SpeciesService extends AbstractObjectService  {
         if(params.taxon) {
             def taxon = TaxonomyDefinition.read(Long.parseLong(params.taxon))
             if(taxon){
-                queryParams['taxon'] = taxon
-                queryParams['classification'] = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                queryParams['taxon'] = taxon.id
+                activeFilters['taxon'] = taxon.id
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
                 query += " join s.taxonConcept.hierarchies as reg "
-                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
                 countQuery += " join s.taxonConcept.hierarchies as reg "
-                countFilterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                countFilterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+
+                speciesCountQuery += " join s.taxonConcept.hierarchies as reg "
+                speciesStatusCountQuery += " join s.taxonConcept.hierarchies as reg "
+                
             }
+        }
+
+        if(params.taxonRank) {
+            queryParams['taxonRank'] = Integer.parseInt(params.taxonRank)
+            activeFilters['taxonRank'] = queryParams['taxonRank']
+            filterQuery += " and s.taxonConcept.rank=:taxonRank";
+            countFilterQuery += " and s.taxonConcept.rank=:taxonRank";
+        }
+
+        if(params.status) {
+            def st;
+            NameStatus.list().each { s ->
+                if(s.value().equalsIgnoreCase(params.status)) {
+                    st = s;
+                    return
+                }
+            }
+            queryParams['status'] = st;
+            activeFilters['status'] = st;
+            filterQuery += " and s.taxonConcept.status=:status";
+            countFilterQuery += " and s.taxonConcept.status=:status";
         }
 
 //		XXX: to be corrected		
@@ -1687,9 +1745,19 @@ class SpeciesService extends AbstractObjectService  {
 //		}
 
         query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
-        countQuery += countFilterQuery + " group by s.percentOfInfo"
+
+        speciesCountFilterQuery = countFilterQuery +" group by s.taxonConcept.rank having s.taxonConcept.rank in :ranks ";
+        queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
+
+        speciesStatusCountFilterQuery = countFilterQuery +" group by s.taxonConcept.status having s.taxonConcept.status in :statuses ";
+        queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
+
+        speciesCountQuery = speciesCountQuery + speciesCountFilterQuery
+        speciesStatusCountQuery = speciesStatusCountQuery + speciesStatusCountFilterQuery
 		
-        return [query:query, countQuery:countQuery, queryParams:queryParams]
+        countQuery += countFilterQuery + " group by s.percentOfInfo"
+
+        return [query:query, countQuery:countQuery, speciesCountQuery:speciesCountQuery,  speciesStatusCountQuery:speciesStatusCountQuery, queryParams:queryParams]
 
 
     }
@@ -1700,8 +1768,12 @@ class SpeciesService extends AbstractObjectService  {
     private _getSpeciesList(params) {
         //cache "taxonomy_results"
         def queryParts = _getSpeciesListQuery(params)
+        println queryParts
         def hqlQuery = sessionFactory.currentSession.createQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createQuery(queryParts.countQuery)
+        def hqlSpeciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
+        def hqlSpeciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
+
         def queryParams = queryParts.queryParams
         if(queryParams.max > -1){
             hqlQuery.setMaxResults(queryParams.max);
@@ -1711,6 +1783,8 @@ class SpeciesService extends AbstractObjectService  {
         } 
         hqlQuery.setProperties(queryParams);
         hqlCountQuery.setProperties(queryParams);
+        hqlSpeciesCountQuery.setProperties(queryParams);
+        hqlSpeciesStatusCountQuery.setProperties(queryParams);
         
         log.debug "Species list query :${queryParts.query} with params ${queryParams}"
         def speciesInstanceList = hqlQuery.list();
@@ -1731,7 +1805,31 @@ class SpeciesService extends AbstractObjectService  {
         if(params.daterangepicker_end){
             queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
         }
-        return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
+
+        log.debug "No of species count query :${queryParts.speciesCountQuery} with params ${queryParams}"
+        def speciesCounts = hqlSpeciesCountQuery.list();
+        def speciesCount;
+        def subSpeciesCount;
+        speciesCounts.each {s->
+            if(s[0]==TaxonomyRank.SPECIES.ordinal()) 
+                speciesCount = s[1];
+            else if(s[0]==TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()) 
+                subSpeciesCount = s[1];
+
+        }
+
+        log.debug "No of species status count query :${queryParts.speciesStatusCountQuery} with params ${queryParams}"
+        def speciesStatusCounts = hqlSpeciesStatusCountQuery.list();
+        def acceptedSpeciesCount;
+        def synonymSpeciesCount;
+        speciesStatusCounts.each { s ->
+            if(s[0] == NameStatus.ACCEPTED) acceptedSpeciesCount = s[1]
+            else if(s[0] == NameStatus.SYNONYM) synonymSpeciesCount = s[1]
+        }
+
+
+
+        return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, speciesCount:speciesCount, subSpeciesCount:subSpeciesCount, acceptedSpeciesCount:acceptedSpeciesCount, synonymSpeciesCount:synonymSpeciesCount, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
         //else {
         //Not being used for now
         //return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
@@ -2131,4 +2229,18 @@ def checking(){
         }
     }
 
+    List<Document> getRelatedDocuments(Species speciesInstance) {
+        List<SynonymsMerged> synonyms = AcceptedSynonym.fetchSynonyms(speciesInstance.taxonConcept);
+
+        List<String> canonicalForms = [];        
+
+        canonicalForms << speciesInstance.taxonConcept.canonicalForm;
+        synonyms.each { syn ->
+            canonicalForms << syn.canonicalForm;
+        }
+
+        def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms", ['canonicalForms':canonicalForms]);
+        return docSciNames.document.unique();
+
+    }
 }

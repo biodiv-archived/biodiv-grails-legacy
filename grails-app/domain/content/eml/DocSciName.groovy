@@ -1,5 +1,6 @@
 package content.eml
 import species.Species
+import species.TaxonomyDefinition;
 
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
@@ -11,10 +12,12 @@ class DocSciName {
 	String offsetValues;
 	String canonicalForm;
 	int displayOrder;
+    TaxonomyDefinition taxonConcept;
 
 	static constraints = {
 		offsetValues (size:0..2000)
 		canonicalForm nullable:true
+		taxonConcept nullable:true
 	}
 
     public static boolean speciesHasDocuments( Species speciesInstance) {

@@ -9,6 +9,8 @@ class ObservationMarshaller {
        JSON.registerObjectMarshaller( Observation) { Observation obv ->
             Map result = [
                 id : obv.id,
+                title: obv.fetchFormattedSpeciesCall(),
+
                 placeName : obv.placeName,
                 reverseGeocodedName : obv.reverseGeocodedName,
                 geoPrivacy : obv.geoPrivacy,

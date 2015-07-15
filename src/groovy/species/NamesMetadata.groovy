@@ -56,6 +56,12 @@ abstract class NamesMetadata extends NamesSorucedata {
             return this.value;
         }
 
+        String label() {
+            if(this == ACCEPTED) return "Accepted Name" 
+            if(this == SYNONYM) return "Synonym" 
+            if(this == PROV_ACCEPTED) return "Provisionally Accepted Name" 
+            if(this == COMMON) return "Common Name" 
+        }
         String toString() {
             return this.value();
         }
