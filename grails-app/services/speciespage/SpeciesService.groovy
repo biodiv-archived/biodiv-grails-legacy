@@ -1684,6 +1684,8 @@ class SpeciesService extends AbstractObjectService  {
                 filterQuery += " and userGroup=:userGroup "
                 countQuery += " join s.userGroups userGroup "
                 countFilterQuery += " and userGroup=:userGroup "
+                speciesCountQuery += " join s.userGroups userGroup "
+                speciesStatusCountQuery += " join s.userGroups userGroup "
             }
         }
 
