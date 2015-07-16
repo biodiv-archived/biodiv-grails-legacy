@@ -51,7 +51,7 @@ class NamelistUtilService {
 	
 	
 	public downloadColXml(List<ScientificName> taxons){
-		Utils.saveFiles(new File(grailsApplication.config..speciesPortal.namelist.rootDir), taxons, [])
+		Utils.saveFiles(new File(grailsApplication.config.speciesPortal.namelist.rootDir), taxons, [])
 	}
 	
 	public updateIBPNameWithCol(ScientificName sn, String colId){
@@ -85,7 +85,7 @@ class NamelistUtilService {
 	
 	private List getColDataFromXml(ScientificName sn){
 		String taxCan = sn.canonicalForm.replaceAll(' ', '_');
-		return namelistService.processColData(new File(new File(grailsApplication.config..speciesPortal.namelist.rootDir), taxCan +'.xml'));
+		return namelistService.processColData(new File(new File(grailsApplication.config.speciesPortal.namelist.rootDir), taxCan +'.xml'));
 	}
 
 	
