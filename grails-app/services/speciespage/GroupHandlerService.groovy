@@ -13,6 +13,8 @@ import species.groups.SpeciesGroup;
 import species.groups.SpeciesGroupMapping;
 import species.sourcehandler.XMLConverter;
 
+import groovy.sql.Sql;
+
 class GroupHandlerService {
 
 	static transactional = false
@@ -21,7 +23,9 @@ class GroupHandlerService {
 	def sessionFactory
 	def utilsService
 
-	static int BATCH_SIZE = 20;
+    def dataSource
+
+	static int BATCH_SIZE = 50;
 
 	def speciesGroupMappings;
 
@@ -98,40 +102,56 @@ class GroupHandlerService {
 	 * parent if at any level has a corresponding group mapping.
 	 * A species should not have multiple paths in the same classification 
 	 * @return
-	 */
-	int updateGroups() {
-		int noOfUpdations = 0;
-		int offset = 0;
-		int limit = 60000;
-		
-		def taxonConcepts;
-		
-		long startTime = System.currentTimeMillis();
-		int count = 0;
-		
-		while(true) {
-			taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as t where t.rank = :rank",
-					[rank: TaxonomyRank.SPECIES.ordinal()], [max:limit, offset:offset]);
-			if(!taxonConcepts){				
-				 break;
-			}
-			
-			taxonConcepts.each { taxonConcept ->
-				if(!taxonConcept.group && updateGroup(taxonConcept)) {
-					count ++;
-				}
-			}
-			
-			
-			if(count && count == BATCH_SIZE) {
-				cleanUpGorm();
-				noOfUpdations += count;
-				count = 0;
-				log.info "Updated group for taxonConcepts ${noOfUpdations}"
-			}
-			offset += limit;
-		}
-		
+     */
+    int updateGroups() {
+        int noOfUpdations = 0;
+        int offset = 0;
+        int limit = BATCH_SIZE;
+
+        def taxonConcepts;
+
+        long startTime = System.currentTimeMillis();
+        int count = 0;
+
+        //        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+        //        dataSource.setUnreturnedConnectionTimeout(500);
+
+        def conn;
+        while(true) {
+            try {
+
+                conn = new Sql(dataSource)
+
+                taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                println taxonConcepts
+                TaxonomyDefinition.withNewTransaction {
+                    taxonConcepts.each { taxonConceptRow ->
+                        def taxonConcept = TaxonomyDefinition.get(taxonConceptRow.id);
+                        if(!taxonConcept.group && updateGroup(taxonConcept)) {
+                            count ++;
+                        }
+                    }
+
+
+                    if(count && count == BATCH_SIZE) {
+                        cleanUpGorm();
+                        noOfUpdations += count;
+                        count = 0;
+                        log.info "Updated group for taxonConcepts ${noOfUpdations}"
+                    }
+                    offset += limit;
+                }
+
+            } catch(Exception e) {
+                log.error e.printStackTrace();
+            } finally {
+                //            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+                //            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+                conn.close()
+            }
+            if(!taxonConcepts) break;
+            taxonConcepts.clear();
+        }
 
 		if(count) {
 			cleanUpGorm();
@@ -173,7 +193,14 @@ class GroupHandlerService {
 	 */
 	boolean updateGroup(TaxonomyDefinition taxonConcept) {
 		//parentTaxon has hierarchies from all classifications
-		return updateGroup(taxonConcept, getGroupByHierarchy(taxonConcept, taxonConcept.parentTaxon()));
+        def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+        def ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
+        if(ibpParentTaxon)
+            return updateGroup(taxonConcept, getGroupByHierarchy(taxonConcept, ibpParentTaxon));
+        else {
+            log.error "No IBP parent taxon for  ${taxonConcept}"
+            return false;
+        }
 	}
 
 	/**
