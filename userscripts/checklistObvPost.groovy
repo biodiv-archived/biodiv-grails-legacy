@@ -128,7 +128,7 @@ def splitTree(){
 	String sqlStr = "select taxon_definition_id from tt0  where c > 1"
 	def taxons = sql.rows(sqlStr);
 	int i = 0
-	new File("/tmp/names_with_multiple_ibp_hierachy_raw_deleted.csv").withWriter { out ->
+	new File("/tmp/names_with_multiple_ibp_hierachy_raw_deleted_33_corrected.csv").withWriter { out ->
 		out.println "id|name|status|position|rank|colId|paths|nextChilds"
 		taxons.each { t ->
 			def tdf = TaxonomyDefinition.get(t.taxon_definition_id)
@@ -142,7 +142,7 @@ def splitTree(){
 					hNames << (tr.path + "#" + tr.path.split("_").collect{TaxonomyDefinition.read(Long.parseLong(it)).name}.join("->"))
 					def cTrs =  TaxonomyRegistry.findAllByParentTaxon(tr)
 					cTrs.each { ctr ->
-						nextChild << (ctr.path + "#" + ctr.path.split("_").collect{TaxonomyDefinition.read(Long.parseLong(it)).name}.join("->"))
+						nextChild << (ctr.path + "#" + ctr.path.split("_").collect{TaxonomyDefinition.read(Long.parseLong(it)).name}.join("->") + ":" + ctr.taxonDefinition.matchId)
 					}
 				}
 				out.println tdf.id + "|" + tdf.name + "|" + tdf.status + "|" + tdf.position + "|"+ tdf.rank  + "|" +  tdf.matchId + "|"+  hNames.join('#') + "|" + nextChild.join('#') 
@@ -221,5 +221,5 @@ def addColhir(){
 	}
 	println "============= done "
 }
-addColhir()
+//addColhir()
  
