@@ -213,9 +213,9 @@ class GroupHandlerService {
 		log.info "Updating group associations for taxon concept : "+taxonConcept + " to ${group}";
 		int noOfUpdations = 0;
 
-		if(taxonConcept && group) {
+		if(taxonConcept) {// && group) {
 
-			if(!group.equals(taxonConcept.group)) {
+//			if(!group.equals(taxonConcept.group)) {
 				taxonConcept.group = group;
 				if(taxonConcept.save(flush:true)) {
 					log.info "Setting group '${group.name}' for taxonConcept '${taxonConcept.name}'"
@@ -223,7 +223,7 @@ class GroupHandlerService {
 				} else {
 					taxonConcept.errors.allErrors.each { log.error it }
 				}
-			}
+//			}
 		}
 		return noOfUpdations ?: false;
 	}
@@ -239,7 +239,7 @@ class GroupHandlerService {
 		
 		speciesGroupMappings.each { mapping ->
 			if((taxonConcept.name.trim().equals(mapping.taxonName)) && taxonConcept.rank == mapping.rank) {
-				group = mapping.speciesGroup;
+				group = SpeciesGroup.read(mapping.speciesGroup.id);
 				if(!group.isAttached()) {
 					group.attach();
 				}
