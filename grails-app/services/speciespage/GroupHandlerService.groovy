@@ -127,7 +127,8 @@ class GroupHandlerService {
                 TaxonomyDefinition.withNewTransaction {
                     taxonConcepts.each { taxonConceptRow ->
                         def taxonConcept = TaxonomyDefinition.get(taxonConceptRow.id);
-                        if(!taxonConcept.group && updateGroup(taxonConcept)) {
+                        //if(!taxonConcept.group && 
+                        if(updateGroup(taxonConcept)) {
                             count ++;
                         }
                     }
@@ -195,9 +196,11 @@ class GroupHandlerService {
 		//parentTaxon has hierarchies from all classifications
         def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
         def ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
-        if(ibpParentTaxon)
+        println ibpParentTaxon;
+        if(ibpParentTaxon) {
+            println "Updating==================================="
             return updateGroup(taxonConcept, getGroupByHierarchy(taxonConcept, ibpParentTaxon));
-        else {
+        } else {
             log.error "No IBP parent taxon for  ${taxonConcept}"
             return false;
         }
