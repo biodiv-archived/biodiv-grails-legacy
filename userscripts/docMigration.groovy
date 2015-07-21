@@ -35,7 +35,7 @@ def runGNRDService() {
         docList << Document.read(s.id);
     } 
     println docList
-    println dS.runDocuments(docList);
+    println dS.runDocuments(docList, true);
 }
 
 

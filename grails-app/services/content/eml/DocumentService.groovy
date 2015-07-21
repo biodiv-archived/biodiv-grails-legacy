@@ -782,18 +782,10 @@ class DocumentService extends AbstractObjectService {
 
     def runAllDocuments() {
         List documentInstanceList = Document.list();
-        return runDocuments2222(documentInstanceList);
+        return runDocuments(documentInstanceList, false);
     }
 
-    def runDocuments(List documentInstanceList) {
-        println "-----------------_____"
-        println "-----------------_____"
-        println "-----------------_____"
-        println "-----------------_____"
-        println "-----------------_____"
-        println "-----------------_____"
-        println "-----------------_____"
-        println "-----------------_____"
+    def runDocuments(List documentInstanceList, boolean rerun=false) {
         def url = '';
         def tokenUrl = '';
         int i = 0;
@@ -807,7 +799,7 @@ class DocumentService extends AbstractObjectService {
                 log.debug instance
                 i++;
                 def p = DocumentTokenUrl.findByDoc(instance)
-                if(!p) {
+                if(!p || rerun) {
                     if(instance?.uFile != null){
                         url = grailsApplication.config.speciesPortal.content.serverURL
                         url = url+instance?.uFile?.path 
