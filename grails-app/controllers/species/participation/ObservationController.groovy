@@ -1830,4 +1830,25 @@ def filterChain() {
 			xml { render model as XML }
 		}
 	}
+
+ @Secured(['ROLE_USER'])
+    def updateOraddTags(){
+        log.debug params
+        def observationInstance =  Observation.read(params.observationId);
+        def result = observationService.updateTags(params,observationInstance)
+        def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
+        render model as JSON
+        return;
+
+    }
+@Secured(['ROLE_USER'])
+    def updateSpeciesGrp(){
+        log.debug params
+        def observationInstance =  Observation.read(params.observationId);        
+        def result = observationService.updateSpeciesGrp(params,observationInstance)
+        def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
+        render model as JSON
+        return;
+    }
+
 }

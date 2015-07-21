@@ -11,6 +11,7 @@ class TaxonomyRegistry extends NamesSorucedata {
 
 	static constraints = {
 		parentTaxon(nullable:true);
+		parentTaxonDefinition(nullable:true);
 		taxonDefinition(unique:['classification', 'path'])
 	}
 

@@ -168,9 +168,13 @@ class NamelistController {
             break
         }
         //def res = [name:'rahul', kingdom:'kk',phylum:'ph', authorString:'author', rank:'order', source:'COL', superfamily:'rerfef', nameStatus:'acceptedName']
-        println "========RES DETAILS====== " + res[0]  
+        //println "========RES DETAILS====== " + res[0]  
         //Sending 0th index as only one result as its queried on id
-        render res[0] as JSON
+        def finRes = [:];
+        if(res) {
+            finRes = res[0]
+        }
+        render finRes as JSON
     }
     
     def searchIBP() {

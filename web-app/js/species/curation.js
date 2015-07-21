@@ -413,6 +413,10 @@ function getExternalDbDetails(ele, showNameDetails) {
                 saveAcceptedName(createNewAcceptedNameData(data));
                 return;
             } else {
+                if(jQuery.isEmptyObject(data)) {
+                    alert("Sorry no details found");
+                    return;
+                }
                 populateNameDetails(data);
                 populateTabDetails(data, true);
                 showProperTabs();

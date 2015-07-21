@@ -616,6 +616,24 @@ class UtilsService {
 				templateMap["message"] = messageSource.getMessage("mail.customfieldedit.message", null, LCH.getLocale())
 				toUsers.add(getOwner(obv))
 				break
+
+                case ActivityFeedService.OBSERVATION_TAG_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.observation.tag.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.observationtagedit.message", null, LCH.getLocale())
+                toUsers.add(getOwner(obv))
+                break
+
+                case ActivityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.observation.species.group.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.observationspeciesgroupupdate.message", null, LCH.getLocale())
+                toUsers.add(getOwner(obv))
+                break
                 
                 default:
                 log.debug "invalid notification type"

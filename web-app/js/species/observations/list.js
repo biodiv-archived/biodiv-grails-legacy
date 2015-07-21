@@ -479,6 +479,10 @@ $(document).ready(function(){
 
     //	last_actions();
     eatCookies();
+
+    $('#taxonHierarchy').on("reloadGrid", function() {
+        updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
+    }); 
 });
 
 /**
@@ -916,9 +920,12 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 
     var taxon = $("input#taxon").val();
     if(taxon) {
+        var classificationId = $('#taxaHierarchy option:selected').val();
+        params['classification'] = classificationId
         params['taxon'] = taxon
     } else {
         delete params['taxon']
+        delete params['classification']
     }
 
     var taxonRank = $("input#taxonRank").val();

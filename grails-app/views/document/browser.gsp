@@ -40,7 +40,7 @@
 
             </div>
 
-            <g:render template="/document/documentSidebar" model="[]"/>
+            <g:render template="/document/documentSidebar" model="${model}"/>
         </div>
         </body>
     </html>
