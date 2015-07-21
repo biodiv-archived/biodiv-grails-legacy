@@ -475,11 +475,18 @@ class DocumentService extends AbstractObjectService {
 				activeFilters['taxon'] = taxon.id
 				queryParams['canonicalForm'] = taxon.canonicalForm
 
-                def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
-				queryParams['classification'] = ibp_classifi
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
+ 
 		
 				query += " join document.docSciNames ds join  ds.taxonConcept.hierarchies as reg "
-                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 			}
 		}
 		def sortBy = params.sort ? params.sort : "lastRevised "

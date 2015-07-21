@@ -890,7 +890,9 @@ def addFeedForRawNames(){
             println "=====WORKING ON THIS TAX DEF============== " + td + " =========COUNTER ====== " + counter;
             counter++;
             TaxonomyDefinition.withNewTransaction {
-                def feedInstance = activityFeedService.addActivityFeed(td, td, SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, td.dirtyListReason);
+                if(td.dirtyListReason && td.dirtyListReason != '') {
+                    def feedInstance = activityFeedService.addActivityFeed(td, td, SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, td.dirtyListReason);
+                }
             }
         }
 
@@ -1332,4 +1334,4 @@ def testSearchIBP() {
     println res;
 }
 
-testSearchIBP()
+//testSearchIBP()

@@ -256,6 +256,9 @@ speciesPortal {
 		serverURL = "http://localhost/${appName}/content"
 		MAX_DOC_SIZE = 50*1024*1024 //10 mb
 		MAX_IMG_SIZE = 2*1024*1024 // 2mb
+	}
+	namelist {
+		rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 	}	
 		
 	names.parser.serverURL = "127.0.0.1"

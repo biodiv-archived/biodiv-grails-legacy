@@ -197,6 +197,7 @@
             var selectedClassification = $('#taxaHierarchy option:selected').val();
             postData["classSystem"] = $.trim(selectedClassification);
             $('#cInfo').html($("#c-"+selectedClassification).html());
+            $("input#taxon").val('');
             $('#taxonHierarchy').trigger("reloadGrid");
         },
 

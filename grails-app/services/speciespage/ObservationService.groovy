@@ -1302,10 +1302,19 @@ class ObservationService extends AbstractObjectService {
             if(taxon){
                 queryParams['taxon'] = taxon.id
                 activeFilters['taxon'] = taxon.id
-                queryParams['classification'] = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
                 taxonQuery = " join obv.maxVotedReco.taxonConcept.hierarchies as reg "
                 query += taxonQuery;
-                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
+ 
+                filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
             }
         }
@@ -2426,5 +2435,33 @@ class ObservationService extends AbstractObjectService {
 	def Map updateInlineCf(params){
 		return customFieldService.updateInlineCf(params)
 	}
-	
+
+    def Map updateTags(params,observationInstance){
+        def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+        def  result = observationInstance.setTags(tags);
+        def tagsObj = getRelatedTagsFromObservation(observationInstance);
+        def model = [:];
+        def new_des = '';
+        for ( e in tagsObj ) {
+            model.put(e.key,e.value);
+            new_des +=(new_des != '')? ','+e.key:e.key;
+        }
+        def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.OBSERVATION_TAG_UPDATED,new_des);
+            utilsService.sendNotificationMail(activityFeedService.OBSERVATION_TAG_UPDATED, observationInstance, null, null, activityFeed);
+        return model;
+    }
+
+    def Map updateSpeciesGrp(params,observationInstance){
+        def prevgroupIcon = observationInstance.group.iconClass();
+       if(observationInstance.group.id != params.group_id){
+            def new_des = observationInstance.group.name+" to ";            
+            observationInstance.group  = params.group?:SpeciesGroup.get(params.group_id);
+            observationInstance.save();
+            def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED,new_des+""+observationInstance.group.name);
+            utilsService.sendNotificationMail(activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED, observationInstance, null, null, activityFeed);
+        }
+        return [ 'groupName' : observationInstance?.group?.name,'groupIcon' : observationInstance.group.iconClass(),'prevgroupIcon':prevgroupIcon]
+
+    }
+
 }

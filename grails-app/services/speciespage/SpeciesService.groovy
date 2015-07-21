@@ -1590,15 +1590,15 @@ class SpeciesService extends AbstractObjectService  {
                 filterQuery += " and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
@@ -1610,8 +1610,8 @@ class SpeciesService extends AbstractObjectService  {
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
@@ -1619,8 +1619,8 @@ class SpeciesService extends AbstractObjectService  {
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
-                speciesCountQuery = "select t.rank, count(*) as count from Species s, TaxonomyDefinition t "
-                speciesStatusCountQuery = "select t.status, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
@@ -1676,7 +1676,6 @@ class SpeciesService extends AbstractObjectService  {
             queryParams["daterangepicker_end"] =  endDate
         }
 
-
         if(params.webaddress) {
             def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
             if(userGroupInstance){
@@ -1693,11 +1692,18 @@ class SpeciesService extends AbstractObjectService  {
             if(taxon){
                 queryParams['taxon'] = taxon.id
                 activeFilters['taxon'] = taxon.id
-                queryParams['classification'] = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
                 query += " join s.taxonConcept.hierarchies as reg "
-                filterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
                 countQuery += " join s.taxonConcept.hierarchies as reg "
-                countFilterQuery += " and reg.classification=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                countFilterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
                 speciesCountQuery += " join s.taxonConcept.hierarchies as reg "
                 speciesStatusCountQuery += " join s.taxonConcept.hierarchies as reg "
