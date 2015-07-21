@@ -829,13 +829,18 @@ class DocumentService extends AbstractObjectService {
         }//each
     }
 
-     def documentDelete(Document docInstance){
-    	def  docTokenId =DocumentTokenUrl.findByDoc(docInstance)
-    		 docTokenId.delete();
-    	List docSciNameId = DocSciName.findAllByDocument(docInstance)
-    		 docSciNameId.each {
-    			it.delete();
-    			}
+    def documentDelete(Document documentInstance){
+        userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
+
+
+        def  docTokenId =DocumentTokenUrl.findByDoc(documentInstance)
+        docTokenId.delete();
+        List docSciNameId = DocSciName.findAllByDocument(documentInstance)
+        docSciNameId.each {
+        it.delete();
+        }
+
+        documentInstance.delete(flush: true, failOnError:true)
     }
 
 }

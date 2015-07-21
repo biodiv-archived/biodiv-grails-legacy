@@ -31,6 +31,9 @@ def runGNRDService() {
     def dS = ctx.getBean("documentService");
     def docList = [];
 
+    sql.eachRow(" select id from document where id not in (select doc_id from document_token_url)") { s->
+        docList << Document.read(s.id);
+    } 
     sql.eachRow(" select id from document where id in (select doc_id from document_token_url where status != 'Success')") { s->
         docList << Document.read(s.id);
     } 

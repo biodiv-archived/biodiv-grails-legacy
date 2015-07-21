@@ -963,7 +963,7 @@ environments {
 
        }
 
-        grails.resources.mappers.hashandcache.excludes = ['**']
+        //grails.resources.mappers.hashandcache.excludes = ['**']
 	}
 	kk {
 		servername = 'indiabiodiversity.org'
@@ -1077,7 +1077,7 @@ environments {
             debug   'grails.app.services.species'
 		}
 
-         grails.resources.mappers.hashandcache.excludes = ['**']
+         //grails.resources.mappers.hashandcache.excludes = ['**']
 	}
 }
 
