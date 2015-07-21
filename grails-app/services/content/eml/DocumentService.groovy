@@ -782,13 +782,29 @@ class DocumentService extends AbstractObjectService {
 
     def runAllDocuments() {
         List documentInstanceList = Document.list();
+        return runDocuments2222(documentInstanceList);
+    }
+
+    def runDocuments(List documentInstanceList) {
+        println "-----------------_____"
+        println "-----------------_____"
+        println "-----------------_____"
+        println "-----------------_____"
+        println "-----------------_____"
+        println "-----------------_____"
+        println "-----------------_____"
+        println "-----------------_____"
         def url = '';
         def tokenUrl = '';
         int i = 0;
         def numOfDocs = documentInstanceList.size()
+        println numOfDocs;
+        println "==============++++"
         while(i < numOfDocs) {
             DocumentTokenUrl.withNewTransaction { 
                 def instance = documentInstanceList.get(i)
+                println instance
+                log.debug instance
                 i++;
                 def p = DocumentTokenUrl.findByDoc(instance)
                 if(!p) {
@@ -806,17 +822,21 @@ class DocumentService extends AbstractObjectService {
                         uri.query = [ url:url ]     	
                         headers.Accept = '*/*'
                         response.success = { resp,  reader ->
-                            //println "========reader====="+reader;
-                            //println "========reader====="+reader.token_url;
+                            println "========reader====="+reader;
+                            println "========reader====="+reader.token_url;
                             tokenUrl = reader.token_url;
                         }
                         response.'404' = { status = ObvUtilService.FAILED }
                     }
                     DocumentTokenUrl.createLog(instance, tokenUrl);
                 }//IF
+                else {
+                    println "Already tried"
+                }
             }
         }//each
     }
+
      def documentDelete(Document docInstance){
     	def  docTokenId =DocumentTokenUrl.findByDoc(docInstance)
     		 docTokenId.delete();

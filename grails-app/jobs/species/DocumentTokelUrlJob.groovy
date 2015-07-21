@@ -69,6 +69,7 @@ class DocumentTokelUrlJob {
 
     private setStatus(task, status){
 		task.status = status
+        task.merge();
 		if(!task.save(flush:true)){
 			task.errors.allErrors.each { log.debug it }
 		}

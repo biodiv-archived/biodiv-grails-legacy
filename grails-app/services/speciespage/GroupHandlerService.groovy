@@ -140,11 +140,10 @@ class GroupHandlerService {
                         count = 0;
                         log.info "Updated group for taxonConcepts ${noOfUpdations}"
                     }
-                    offset += limit;
                 }
 
             } catch(Exception e) {
-                log.error e.printStackTrace();
+                println e.printStackTrace();
             } finally {
                 //            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
                 //            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
@@ -152,6 +151,7 @@ class GroupHandlerService {
             }
             if(!taxonConcepts) break;
             taxonConcepts.clear();
+            offset += limit;
         }
 
 		if(count) {
