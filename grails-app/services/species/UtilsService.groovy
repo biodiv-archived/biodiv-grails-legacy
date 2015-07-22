@@ -623,7 +623,7 @@ class UtilsService {
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["message"] = messageSource.getMessage("mail.observationtagedit.message", null, LCH.getLocale())
-                toUsers.add(getOwner(obv))
+                toUsers.addAll(getParticipants(obv))
                 break
 
                 case ActivityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED :
@@ -632,7 +632,7 @@ class UtilsService {
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["message"] = messageSource.getMessage("mail.observationspeciesgroupupdate.message", null, LCH.getLocale())
-                toUsers.add(getOwner(obv))
+                toUsers.addAll(getParticipants(obv))
                 break
                 
                 default:
