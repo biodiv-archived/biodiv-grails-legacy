@@ -1,6 +1,9 @@
-<div class="view_tags view_obv_tags">
-	<g:if test="${tags}">
-                <i class="icon-tags"></i> <g:message code="default.tags.label" />
+<div class="view_tags view_obv_tags" style="margin-bottom:25px;">
+	<div style="height: 26px;">
+		<i class="icon-tags"></i> <g:message code="default.tags.label" />
+		<div class="btn btn-small pull-right btn-primary add_obv_tags" style="  margin-right: 16px;">Add Tag</div>
+	</div>
+	<g:if test="${tags}">                
 		<ul class="tagit tagitAppend">
 			<g:each in="${tags.entrySet()}">
 				<li class="tagit-choice" style="padding:0 5px;">
@@ -12,7 +15,6 @@
 </div>
 
 
-<div class="btn btn-small pull-right btn-primary add_obv_tags" style=" margin-bottom: 40px;margin-right: 10px;">Add Tag</div>
 
 <div class="add_obv_tags_wrapper" style="background-color: #a6dfc8;padding: 10px;display:none;" >
 <div class="block sidebar-section">

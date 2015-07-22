@@ -521,14 +521,14 @@ $(document).ready(function(){
         /* Added for  Species Update*/
         var group_icon = $('.group_icon_show');
         var group_icon_show_wrap = $('.group_icon_show_wrap');
-        var habitat_icon = $('.habitat_icon_show');
+        //var habitat_icon = $('.habitat_icon_show');
         var label_group = $('label.group');
         var propagateGrpHab = $('.propagateGrpHab');
         $('.propagateGrpHab .control-group  label').hide();
 
         $('.edit_group_btn').click(function(){            
             group_icon_show_wrap.hide();
-            habitat_icon.hide();
+            //habitat_icon.hide();
             label_group.hide();
             propagateGrpHab.show();
 
@@ -552,7 +552,7 @@ $(document).ready(function(){
                             console.log(data);
                             group_icon.removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);                           
                             group_icon_show_wrap.show();
-                            habitat_icon.show();
+                            //habitat_icon.show();
                             propagateGrpHab.hide();
                             updateFeeds();
                     },
