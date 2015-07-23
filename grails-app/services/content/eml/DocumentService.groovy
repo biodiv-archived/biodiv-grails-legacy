@@ -826,5 +826,25 @@ class DocumentService extends AbstractObjectService {
     			}
     }
 
+    def Map updateTags(params,domainInstance){
+        def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+        def  result = domainInstance.setTags(tags);
+        def tagsObj = domainInstance.tags;
+        println tagsObj;
+        def model = [:];
+        def new_des = '';
+        def iden = 1;
+        for ( e in tagsObj ) {        	
+            model.put(e,iden);
+            iden++;
+            new_des +=(new_des != '')? ','+e:e;
+        }
+        println  new_des;
+        def activityFeed = activityFeedService.addActivityFeed(domainInstance, domainInstance,  springSecurityService.currentUser, activityFeedService.DOCUMENT_TAG_UPDATED,new_des);
+        	utilsService.sendNotificationMail(activityFeedService.DOCUMENT_TAG_UPDATED, domainInstance, null, null, activityFeed);
+         
+        return model;
+    }
+
 }
 

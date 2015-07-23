@@ -626,6 +626,24 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
+                case ActivityFeedService.DOCUMENT_TAG_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.document.tag.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.documenttagedit.message", null, LCH.getLocale())
+                toUsers.addAll(getParticipants(obv))
+                break
+
+                case ActivityFeedService.DISCUSSION_TAG_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.discussion.tag.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.discussiontagedit.message", null, LCH.getLocale())
+                toUsers.addAll(getParticipants(obv))
+                break
+
                 case ActivityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED :
                 log.debug "Mail sending ...................................."
                 mailSubject = messageSource.getMessage("mail.observation.species.group.updated.subject", null, LCH.getLocale())

@@ -74,15 +74,21 @@
                     datetime="${discussionInstance.lastRevised?.getTime()}"></time>
                 </div>
             </div>
-        <g:if test="${discussionInstance.tags}">
+       
         <div class="prop">
-            <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
+         <g:if test="${showDetails}">
+             <div style="height: 26px;">
+                <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
+                <div class="btn btn-small pull-right btn-primary add_obv_tags" style="  margin-right: 16px;">Add Tag</div>
+            </div>
+        </g:if>    
             <div class="value">
                 <g:render template="/project/showTagsList"
-                model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list']" />
-            </div>
+                model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list', 'showDetails' : showDetails]" />
+            </div>            
         </div>
-        </g:if>
+        
+       
         
         <div class="row observation_footer" style="margin-left:0px;">
              <g:render template="/discussion/showDiscussionStoryFooterTemplate"
