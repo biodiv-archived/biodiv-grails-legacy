@@ -384,8 +384,7 @@ class DiscussionController extends AbstractObjectController {
 	@Secured(['ROLE_USER'])
     def updateOraddTags(){
         log.debug params
-        def discussionInstance =  Discussion.read(params.instanceId);
-        println "============documentInstance=============="+discussionInstance;
+        def discussionInstance =  Discussion.read(params.instanceId);        
         def result = documentService.updateTags(params,discussionInstance)
         def model = utilsService.getSuccessModel('success', discussionInstance, OK.value(),result);
         render model as JSON
