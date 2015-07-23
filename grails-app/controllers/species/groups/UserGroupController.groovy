@@ -48,7 +48,7 @@ class UserGroupController {
     static defaultAction = "list"
 
 	def index = {
-		redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action: "list", params: params)
+		redirect(action: "list", params: params)
 	}
 
 	def activity = {

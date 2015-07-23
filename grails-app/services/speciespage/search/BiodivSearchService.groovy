@@ -312,7 +312,7 @@ class BiodivSearchService extends AbstractSearchService {
                     }
     */
                     if(instance) {
-                        if(params.resultType?.equalsIgnoreCase("json")) {
+                        if(params.format?.equalsIgnoreCase("json")) {
                             instanceList.add([id:instanceId, object_type:className, title:instance.title(), summary:instance.summary(params.userLanguage), containers:containerInstances]);
                         } else {
                             instanceList.add([id:instanceId, object_type:className, instance:instance, containers:containerInstances]);

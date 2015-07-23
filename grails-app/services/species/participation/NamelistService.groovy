@@ -89,7 +89,7 @@ class NamelistService {
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
         SEARCH_IBP_COUNTER ++;
         println "========SEARCH IBP CALLED=======>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-        println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "--- "+ rank;
+        println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "--- "+ rank + " :::: userauthoryear " + useAuthorYear ;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
 		

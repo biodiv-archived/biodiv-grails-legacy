@@ -26,7 +26,7 @@ class SpeciesTagLib {
 				out << "<a href=\"http://www.eol.org/pages/${extLink.eolId}\" title=\"View on Encyclopedia of Life\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'eol.png', absolute:true)}\"/></a>" ;
 				break;
 			case "gbifId" : 
-				out << "<a href=\"http://data.gbif.org/species/${extLink.gbifId}\" title=\"View on GBIF\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'gbif.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://www.gbif.org/species/${extLink.gbifId}\" title=\"View on GBIF\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'gbif.png', absolute:true)}\"/></a>";
 				 break; 
 			case "iucnId" : 
 				out << "<a href=\"http://www.iucnredlist.org/apps/redlist/details/${extLink.iucnId?.replace('IUCN-', '')}\" title=\"View on IUCN Red List\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${createLinkTo(dir: 'images/icons/externalLinks', file:'iucn.png', absolute:true)}\"/></a>";

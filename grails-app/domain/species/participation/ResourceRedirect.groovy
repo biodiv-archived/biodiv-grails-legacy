@@ -31,7 +31,10 @@ class ResourceRedirect {
 	
 	def fetchTargetInstance(String sourceType, sourceId){
 		def rr = ResourceRedirect.findBySourceTypeAndSourceId(sourceType, sourceId)
-		return utilsService.getDomainObject(rr.targetType, '' + rr.targetId)
+        if(rr)
+		    return utilsService.getDomainObject(rr.targetType, '' + rr.targetId)
+        else
+            return null;
 	}
 		
 }
