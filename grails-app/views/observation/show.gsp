@@ -470,29 +470,23 @@ $(document).ready(function(){
                             console.log(tagsData.hasOwnProperty("model"));
                             //console.log(Object.keys(data.model).length);
                             if(tagsData.hasOwnProperty("model")){
-
-                                if(!$('.view_tags').hasClass('tagit')){
-                                    $('.view_obv_tags').html('<i class="icon-tags"></i>Tags<ul class="tagit tagitAppend"></ul');
-                                }
                                 if(Object.keys(data.model).length > 0){
                                     $.each(data.model, function( index, value ) {
                                         outHtml+= '<li class="tagit-choice" style="padding:0 5px;">';
                                         outHtml+= index;
                                         outHtml+= '&nbsp;<span class="tag_stats">'+value +'</span>';
                                         outHtml+= '</li>';
-                                        
-                                    
                                     });
                                     $('.tagitAppend').html(outHtml);                        
                                     $('.view_obv_tags, .add_obv_tags').show();
-                                    $('.add_obv_tags_wrapper').hide(); 
-                                    updateFeeds();                         
+                                    $('.add_obv_tags_wrapper').hide();                                    
                                 }
                             }else{
+                                $('.tagitAppend').empty();
                                 $('.view_obv_tags, .add_obv_tags_wrapper').hide();
                                 $('.add_obv_tags').show();
-                                
-                            }   
+                            }
+                            updateFeeds();
                         }
                         return false;
                     },
@@ -521,14 +515,14 @@ $(document).ready(function(){
         /* Added for  Species Update*/
         var group_icon = $('.group_icon_show');
         var group_icon_show_wrap = $('.group_icon_show_wrap');
-        var habitat_icon = $('.habitat_icon_show');
+        //var habitat_icon = $('.habitat_icon_show');
         var label_group = $('label.group');
         var propagateGrpHab = $('.propagateGrpHab');
         $('.propagateGrpHab .control-group  label').hide();
 
         $('.edit_group_btn').click(function(){            
             group_icon_show_wrap.hide();
-            habitat_icon.hide();
+            //habitat_icon.hide();
             label_group.hide();
             propagateGrpHab.show();
 
@@ -552,7 +546,7 @@ $(document).ready(function(){
                             console.log(data);
                             group_icon.removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);                           
                             group_icon_show_wrap.show();
-                            habitat_icon.show();
+                            //habitat_icon.show();
                             propagateGrpHab.hide();
                             updateFeeds();
                     },

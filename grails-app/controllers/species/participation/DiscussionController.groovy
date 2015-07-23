@@ -332,7 +332,7 @@ class DiscussionController extends AbstractObjectController {
 	//// SEARCH //////
 	/**
 	 * 	
-//	 */
+	 */
 //	def search = {
 //		log.debug params;
 //		def model = discussionService.search(params)
@@ -380,4 +380,17 @@ class DiscussionController extends AbstractObjectController {
 		discussionService.migrate()
 		render "=============== done"
 	}
+
+	@Secured(['ROLE_USER'])
+    def updateOraddTags(){
+        log.debug params
+        def discussionInstance =  Discussion.read(params.instanceId);        
+        def result = documentService.updateTags(params,discussionInstance)
+        def model = utilsService.getSuccessModel('success', discussionInstance, OK.value(),result);
+        render model as JSON
+        return;
+
+    }
+
+
 }
