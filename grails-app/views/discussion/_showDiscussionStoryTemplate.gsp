@@ -1,5 +1,5 @@
 <div class="observation_story observation" style="border: 1px solid rgb(106, 201, 162);">
-    <div style="height:${params.action == 'show'?'inherit':'160px'};">
+    <div style="min-height:${params.action == 'show'?'inherit':'160px'};">
         <g:if test="${showFeatured}">
 
         <div class="featured_body">
@@ -75,13 +75,16 @@
                 </div>
             </div>
        
-        <div class="prop">
+        <div class="prop" style="margin-bottom: 35px;">
          <g:if test="${showDetails}">
              <div style="height: 26px;">
                 <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
                 <div class="btn btn-small pull-right btn-primary add_obv_tags" style="  margin-right: 16px;">Add Tag</div>
             </div>
-        </g:if>    
+        </g:if>
+        <g:else>
+                <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
+        </g:else>   
             <div class="value">
                 <g:render template="/project/showTagsList"
                 model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list', 'showDetails' : showDetails]" />

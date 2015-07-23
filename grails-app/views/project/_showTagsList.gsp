@@ -100,14 +100,15 @@ def action = action?action:'browser'
                                     });
                                     $('.tagitAppend').html(outHtml);                        
                                     $('.view_obv_tags, .add_obv_tags').show();
-                                    $('.add_obv_tags_wrapper').hide(); 
-                                    updateFeeds();                         
+                                    $('.add_obv_tags_wrapper').hide();                                  
                                 }
                             }else{
+                                $('.tagitAppend').empty();
                                 $('.view_obv_tags, .add_obv_tags_wrapper').hide();
                                 $('.add_obv_tags').show();
                                 
-                            }   
+                            }
+                            updateFeeds(); 
                         }
                         return false;
                     },
