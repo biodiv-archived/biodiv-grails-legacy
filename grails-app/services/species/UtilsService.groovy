@@ -70,11 +70,11 @@ class UtilsService {
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
 
-    private void cleanUpGorm() {
+    public void cleanUpGorm() {
         cleanUpGorm(true)
     }
 
-    private void cleanUpGorm(boolean clearSession) {
+    public void cleanUpGorm(boolean clearSession) {
 
         def hibSession = sessionFactory?.getCurrentSession();
 

@@ -26,18 +26,18 @@ def migrate(){
 //migrate()
 
 def mergeAcceptedName(){
-	def ns = ctx.getBean("namelistService");
-	File file = new File("/home/sandeept/namesync/toDelete.csv");
+	def ns = ctx.getBean("namelistUtilService");
+	File file = new File("/home/sandeept/namesync/thomas/toDelete.csv");
 	//File file = new File("/apps/git/biodiv/namelist/tobedeleted_KK.txt");
 	
 	def lines = file.readLines();
 	println "============ started =========="
 //	try {
-//		ns.mergeAcceptedName(276173, 264706, true)
+//		ns.mergeAcceptedName(161686, 279950, true)
 //	}catch(e){
 //		println e.printStackTrace()
 //	}
-	
+	def failCountList = []
 	int i=0;
 	lines.each { line ->
 		if(i++ == 0) return;
@@ -46,17 +46,23 @@ def mergeAcceptedName(){
 		if(arr.length > 1){
 		def toDelete = Long.parseLong(arr[0].trim())
 		def fullDelete = (arr[1].trim() == 'Yes') ? true : false
+		if(!fullDelete)
+			return
         def toMove = Long.parseLong(arr[2].trim())
 		println "====================  " + toDelete + "   toMove " + toMove + "    fullDelete " + fullDelete
 		try {
 				ns.mergeAcceptedName(toDelete, toMove, fullDelete)
 		}catch(e){
+			failCountList << arr
 			println e.printStackTrace()
 		}
 	}else{
 		println '  leaving arr ' + arr
 	}
 	}
+	println "=========== failed list " + failCountList
+	println "=========== tatal failed " + failCountList.size()
+
 }
 
 //mergeAcceptedName()
@@ -81,7 +87,8 @@ def buildTree(){
 //buildTree()
 
 def snap(){
-	def tt = new species.TaxonController()
+	//XXX to do
+ 	def tt = new species.TaxonController()
 	tt.createIBPHierarchyForDirtylist()
 }
 
@@ -120,7 +127,7 @@ def dmp(){
 //dmp()
 
 
-def splitTree(){
+def splitTreeExport(){
 	def dataSource = ctx.getBean("dataSource");
 	dataSource.setUnreturnedConnectionTimeout(500);
 	def sql = new Sql(dataSource)
@@ -128,8 +135,11 @@ def splitTree(){
 	String sqlStr = "select taxon_definition_id from tt0  where c > 1"
 	def taxons = sql.rows(sqlStr);
 	int i = 0
+	int totalSizeC = 0
+	int totalhier = 0
+	
 	new File("/tmp/names_with_multiple_ibp_hierachy_raw_deleted_33_corrected.csv").withWriter { out ->
-		out.println "id|name|status|position|rank|colId|paths|nextChilds"
+		//out.println "id|name|status|position|rank|colId|paths|nextChilds"
 		taxons.each { t ->
 			def tdf = TaxonomyDefinition.get(t.taxon_definition_id)
 			println i++	
@@ -138,22 +148,26 @@ def splitTree(){
 				def hNames = []
 				def nextChild = []
 				def trs = TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(tdf, Classification.read(265799))
+				totalhier += trs.size()
 				trs.each { tr ->
 					hNames << (tr.path + "#" + tr.path.split("_").collect{TaxonomyDefinition.read(Long.parseLong(it)).name}.join("->"))
 					def cTrs =  TaxonomyRegistry.findAllByParentTaxon(tr)
+					totalSizeC += cTrs.size()
 					cTrs.each { ctr ->
 						nextChild << (ctr.path + "#" + ctr.path.split("_").collect{TaxonomyDefinition.read(Long.parseLong(it)).name}.join("->") + ":" + ctr.taxonDefinition.matchId)
 					}
 				}
-				out.println tdf.id + "|" + tdf.name + "|" + tdf.status + "|" + tdf.position + "|"+ tdf.rank  + "|" +  tdf.matchId + "|"+  hNames.join('#') + "|" + nextChild.join('#') 
+				out.println tdf.id + "|" + tdf.name + "|" + tdf.status + "|" + tdf.position + "|"+ tdf.rank  + "|" +  tdf.matchId + "|"+  hNames.join('#') + "|" + nextChild.join('$') 
 			//}
 			//}
 			
 		}
 	}
 	
+	println "===========================  tatal child count " + totalSizeC + "  total hier " + totalhier + "  total names " + i
+	
 }
-//splitTree()
+//splitTreeExport()
 
 
 def dropRawHir(){
@@ -176,21 +190,12 @@ def dropRawHir(){
 //			String s = "select id from taxonomy_registry where classification_id = 265799 and (path like '%\\_" + t.id + "\\_%' or path like '" + t.id + "\\_%' or path like '%\\_" + t.id + "'  or path like '" + t.id + "')" 
 //			def ids = sql.rows(s).collect{it.id}
 //            println s
-//			println ids
+////			println ids
 //			trids.putAt(t.id, ids)	
-			
-			
-			
-			//	trids.addAll(sql.rows("select id from taxonomy_registry where classification_id = 265799 and (path like '%\\_" + t.id + "\\_%' or path like '" + t.id + "\\_%' or path like '%\\_" + t.id + "'  or path like '" + t.id + "')" ).collect{it.id})
-				//trids.addAll(sql.rows("select id from taxonomy_registry where classification_id = 265799 and path like '" + t.id + "\\_%'").collect{it.id})
-				//trids.addAll(sql.rows("select id from taxonomy_registry where classification_id = 265799 and path like '%\\_" + t.id + "'").collect{it.id})
-				//trids.addAll(sql.rows("select id from taxonomy_registry where classification_id = 265799 and path like '" + t.id + "'").collect{it.id})
-			//}
 			
 	}
 //	println trids.size()
-//	
-//	new File("/home/sandeept/namesync/d_map.txt").withWriter { out ->
+//	new File("/home/sandeept/name-mig/d_map.txt").withWriter { out ->
 //		  out.println trids as JSON
 //	  }
 //	println '-------------------------------'
@@ -222,4 +227,61 @@ def addColhir(){
 	println "============= done "
 }
 //addColhir()
- 
+
+
+def createDuplicateName(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	
+	def dataSource = ctx.getBean("dataSource");
+	dataSource.setUnreturnedConnectionTimeout(500);
+	
+	File file = new File("/home/sandeept/namesync/thomas/to_split.csv");
+	//File file = new File("/apps/git/biodiv/namelist/tobedeleted_KK.txt");
+	
+	def lines = file.readLines();
+	int i=0;
+	def ibpId = null
+	boolean hasId = false
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split(',');
+		println " arr ->>> " + arr
+		if(arr.length > 1){
+			if(arr[0] && (arr[0].trim() != '')){
+				ibpId = Long.parseLong(arr[0].trim())
+				hasId = true
+			}else{
+				hasId = false
+			}
+			
+			def colId = arr[1].trim()
+			def path = arr[2].trim()
+			
+			if(!hasId){
+				def td = TaxonomyDefinition.get(ibpId)
+				nlSer.createDuplicateNameWithNewColId(colId)
+				nlSer.addExistingHir(td, colId, path)
+			}
+			else{
+				println "updating only col id"
+				def otd = TaxonomyDefinition.get(ibpId)
+				otd.matchId = colId
+				if(!otd.save(flush:true)){
+					otd.errors.allErrors.each { println it }
+				}
+			}
+		}else{
+			println '  leaving arr ' + arr
+		}
+	}
+	println "============= done "
+}
+//createDuplicateName()
+
+def createInputFile(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	//nlSer.generateStatsInput(new File("/home/sandeept/name-mig/ac_names_2.csv"))
+	nlSer.verifyAcceptedNamesAndColPath(new File("/home/sandeept/name-mig/verify/res1.csv"), new File("/home/sandeept/name-mig/verify/in2.csv"))
+	
+}
+createInputFile()

@@ -30,6 +30,7 @@ import species.NamesParser;
 import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
 import speciespage.SpeciesUploadService;
+import species.namelist.Utils;
 
 class NamelistService {
    
@@ -450,7 +451,7 @@ class NamelistService {
         }
     }
 
-    public processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize) {
+    public processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize, boolean createOnlyNameFromCol = false) {
         sciName.tempActivityDescription = "";
         /*def upAt = updateAttributes(sciName, acceptedMatch);
         println  "====UP AT == " + upAt 
@@ -458,8 +459,12 @@ class NamelistService {
             log.debug "MARKED AS DELETED ${sciName}"
             return;
         }*/
-        sciName = updateAttributes(sciName, acceptedMatch);
-        sciName = updateStatus(sciName, acceptedMatch).sciName;
+        sciName = updateAttributes(sciName, acceptedMatch, createOnlyNameFromCol);
+		
+		//inside this we are adding hirarchy
+		if(!createOnlyNameFromCol)
+        	sciName = updateStatus(sciName, acceptedMatch).sciName;
+			
         println "========THE SCI NAME======== " + sciName
         println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
         if(!acceptedMatch['parsedRank']) {
@@ -762,15 +767,36 @@ class NamelistService {
         sciName.position = position;
     }
 
-    List processColData(File f) {
+    List processColData(File f, ScientificName sn = null) {
 		println "========= File --- " + f.absolutePath
         if(!f.exists()){
-            log.debug "File not found skipping now..."
-            return
+			println "File not found..."
+			if(sn){
+				println  "Downloading based on canonical name " + sn
+				Utils.saveFiles(new File(grailsApplication.config.speciesPortal.namelist.rootDir), [sn], [])
+			}
         }
+		return _processColData(new XmlParser().parse(f))
+    }
+	
+	List processColData(String colId) {
+		String text = Utils.getColDataAsText(colId)
+		if(!text) return 
+		def res = _processColData(new XmlParser().parseText(text))
+		if(res){
+			String taxCan = res[0].canonicalForm.replaceAll(' ', '_');
+			File f = new File(new File(grailsApplication.config.speciesPortal.namelist.rootDir), taxCan + ".xml")
+			if(taxCan && !f.exists()){
+				f.createNewFile()
+				println "-- Writing to file " + f.getAbsolutePath()
+				f.write(text)
+			}
+		}
+		return res
+	}
+		
+	private _processColData(results){
         try{
-            def results = new XmlParser().parse(f)
-
             String errMsg = results.'@error_message'
             int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
             if(errMsg != ""){
@@ -1195,35 +1221,37 @@ def sql= session.createSQLQuery(query)
         return sciName;
     }
 
-    private ScientificName updateAttributes(ScientificName sciName, Map colMatch) {
+    private ScientificName updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
         TaxonomyDefinition.withNewSession {
             println "=========UPDATING ATTRIBUTES ========"
             NamesParser namesParser = new NamesParser();
             def name = colMatch.canonicalForm + " " + colMatch.authorString
-            def res1 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
-            def res2 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
-            res2.addAll(res1);
-            if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
-                sciName.isFlagged = true;
-                String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
-                res2.each {
-                    flaggingReason = flaggingReason + it.id.toString() + ", ";
-                }
-                println "########### Flagging becoz of Udating attributes ============== " + sciName
-                res2.each {
-                    if(it != sciName && it.isFlagged) {
-                        it.flaggingReason = it.flaggingReason + " ### " + flaggingReason;
-                        it = it.merge();
-                        if(!it.save(flush:true)) {
-                            it.errors.allErrors.each { log.error it }
-                        }
-                    }
-                }
-                sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
-                if(!sciName.findSpeciesId()) {
-                    sciName.isDeleted = true;
-                }
-            }
+			if(!doNotSearch){
+				def res1 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
+				def res2 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
+				res2.addAll(res1);
+	            if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
+	                sciName.isFlagged = true;
+	                String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+	                res2.each {
+	                    flaggingReason = flaggingReason + it.id.toString() + ", ";
+	                }
+	                println "########### Flagging becoz of Udating attributes ============== " + sciName
+	                res2.each {
+	                    if(it != sciName && it.isFlagged) {
+	                        it.flaggingReason = it.flaggingReason + " ### " + flaggingReason;
+	                        it = it.merge();
+	                        if(!it.save(flush:true)) {
+	                            it.errors.allErrors.each { log.error it }
+	                        }
+	                    }
+	                }
+	                sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
+	                if(!sciName.findSpeciesId()) {
+	                    sciName.isDeleted = true;
+	                }
+	            }
+			}
             def parsedNames = namesParser.parse([name]);
             println "=============PARSING THIS ========== " + name
             def pn = parsedNames[0];
@@ -1557,6 +1585,8 @@ def sql= session.createSQLQuery(query)
 		results.result.each { r ->
 			Map temp = new HashMap();
 			Map id_details = new HashMap();
+			List colIdPath = []
+			List colNamePath = []
 			temp['externalId'] = r?.id?.text()//+"'"
 			temp['matchDatabaseName'] = "CatalogueOfLife"
 			temp['canonicalForm'] = r?.name?.text();
@@ -1610,6 +1640,8 @@ def sql= session.createSQLQuery(query)
 					//println t.rank.text() + " == " + t.name.text()
 					temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
 					id_details[t?.name?.text()] = t?.id?.text()
+					colIdPath << t?.id?.text()
+					colNamePath << t?.name?.text()
 					int currRank = XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());
 					if(currRank > maxRank) {
 						temp['parentTaxon'] =  t?.name?.text()
@@ -1623,7 +1655,6 @@ def sql= session.createSQLQuery(query)
 				// println t.author.text()
 				}
 
-				println "============= synonyms  "
 				if(temp['nameStatus'] == "accepted") {
 					def synList = []
 					r.synonyms.synonym.each {
@@ -1668,6 +1699,8 @@ def sql= session.createSQLQuery(query)
 			}
 			
 			temp['id_details'] = id_details
+			temp['colIdPath'] = colIdPath.join("_").trim()
+			temp['colNamePath'] = colNamePath.join("->").trim()
 			finalResult.add(temp);
 		}
 		return finalResult

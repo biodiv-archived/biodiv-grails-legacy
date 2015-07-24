@@ -177,5 +177,50 @@ In Namelist.groovy functions -
 3. Col Multiple Results sheet
 In colReport.groovy
     a. Utils.generateColStats("/apps/git/biodiv/col_8May")
+*/
 
+/*
+ * After Migration clean up steps
+ */
+1. Add constrain for deltetion in taxonomy_registry.
+ALTER TABLE taxonomy_registry DROP CONSTRAINT fk9ded596b7e532be5,
+ADD CONSTRAINT fk9ded596b7e532be5 FOREIGN KEY (parent_taxon_id) REFERENCES taxonomy_registry(id) ON DELETE CASCADE;
 
+ALTER TABLE taxonomy_registry_suser DROP CONSTRAINT fk87a93aea76e99a2e,
+ADD CONSTRAINT fk87a93aea76e99a2e FOREIGN KEY (taxonomy_registry_contributors_id) REFERENCES taxonomy_registry(id) ON DELETE CASCADE;
+
+2. Drop hir for all raw names. In checklistObvPost.groovy run dropRawHir()
+
+3. Delete names created because of snapping
+delete from taxonomy_registry where taxon_definition_id > 420871;
+delete from taxonomy_definition_suser where taxonomy_definition_contributors_id > 420871;
+delete from accepted_synonym where  synonym_id > 420871;
+delete from taxonomy_definition_year where taxonomy_definition_id > 420871;
+delete from taxonomy_definition_author where taxonomy_definition_id > 420871;
+
+4. Adding/updating hir for 33 accepted working name. 
+Copy '/home/sandeept/git/biodiv/app-conf/col-xmls/TaxonomyDefinition' to kk for latest XML
+In checklistObvPost.groovy run addColhir()
+
+5. Create new working name with different col id and split the children. In checklistObvPost.groovy run createDuplicateName()
+
+5c. Deleted unnecessary  hierarchies.
+select * from taxonomy_registry where parent_taxon_id in (select id from taxonomy_registry where path in ('872_20218_47444_52192_52194_280012','124658_125488_125504_125531_125540_278688','872_874_876_66985_69492_277801','2998_33364_107311_112729_30643_277376','94899_94901_95676_95692_95694_280083','872_874_876_66985_67041_277802','94899_94901_95736_95738_95833_280088','123350','2998_33364_33366_118713_3055_277291','872_78725_79245_79747_276733_79956_280738','2998_33364_33366_3554_30698_279037','872_76313_76340_76418_76538_279950','94899_97001_98845_99000_99324_280115','94899_94901_95120_95146_166380_280266','872_78725_79245_79747_276733_79956_280738'));
+delete from taxonomy_registry where path in ('872_20218_47444_52192_52194_280012','124658_125488_125504_125531_125540_278688','872_874_876_66985_69492_277801','2998_33364_107311_112729_30643_277376','94899_94901_95676_95692_95694_280083','872_874_876_66985_67041_277802','94899_94901_95736_95738_95833_280088','123350','2998_33364_33366_118713_3055_277291','872_78725_79245_79747_276733_79956_280738','2998_33364_33366_3554_30698_279037','872_76313_76340_76418_76538_279950','94899_97001_98845_99000_99324_280115','94899_94901_95120_95146_166380_280266','872_78725_79245_79747_276733_79956_280738');
+
+6. Delete duplicates.
+delete from common_names_suser where common_names_contributors_id in (select id from common_names where taxon_concept_id = 113098); 
+delete from common_names where taxon_concept_id = 113098;
+
+In checklistObvPost.groovy run mergeAcceptedName()
+
+7. updating col id for working names
+update taxonomy_definition set match_id = 'cbe288fbc700b394526d6aabf07f3fbe' where id = 278329; 
+update taxonomy_definition set match_id = '0db9547d1db256a759d1e3436d9e0c5a' where id = 278330; 
+update taxonomy_definition set match_id = 'd26f3a70c8ddb7ee45f38dbbfb307331' where id = 277470; 
+update taxonomy_definition set match_id = '6a24ded7009e1be4e8d0d63ae8c95b9e' where id = 278944; 
+update taxonomy_definition set match_id = '5dae19da1534c9b5104960f259772955' where id = 279018; 
+update taxonomy_definition set match_id = '8efabbc738df6fea09ce18141b4fae0c' where id = 280475; 
+update taxonomy_definition set match_id = 'ef9e5fbbfb2b09301c00a8cb6b44bcd0' where id = 281524;
+
+8. For verification :  In checklistObvPost.groovy run createInputFile()
