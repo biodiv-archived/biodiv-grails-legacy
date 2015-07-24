@@ -12,8 +12,9 @@ import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.SpeciesGroupMapping;
 import species.sourcehandler.XMLConverter;
-
+import species.SynonymsMerged;
 import groovy.sql.Sql;
+import species.NamesMetadata.NameStatus;
 
 class GroupHandlerService {
 
@@ -103,7 +104,7 @@ class GroupHandlerService {
 	 * A species should not have multiple paths in the same classification 
 	 * @return
      */
-    int updateGroups() {
+    int updateGroups(boolean runForSynonyms=false) {
         int noOfUpdations = 0;
         int offset = 0;
         int limit = BATCH_SIZE;
@@ -122,7 +123,11 @@ class GroupHandlerService {
 
                 conn = new Sql(dataSource)
 
-                taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                if(runForSynonyms) {
+                    taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.status = '"+NameStatus.SYNONYM.value().toUpperCase()+"' and t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                } else {
+                    taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                }
                 println taxonConcepts
                 TaxonomyDefinition.withNewTransaction {
                     taxonConcepts.each { taxonConceptRow ->
@@ -140,11 +145,10 @@ class GroupHandlerService {
                         count = 0;
                         log.info "Updated group for taxonConcepts ${noOfUpdations}"
                     }
-                    offset += limit;
                 }
 
             } catch(Exception e) {
-                log.error e.printStackTrace();
+                println e.printStackTrace();
             } finally {
                 //            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
                 //            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
@@ -152,6 +156,7 @@ class GroupHandlerService {
             }
             if(!taxonConcepts) break;
             taxonConcepts.clear();
+            offset += limit;
         }
 
 		if(count) {
@@ -195,8 +200,13 @@ class GroupHandlerService {
 	boolean updateGroup(TaxonomyDefinition taxonConcept) {
 		//parentTaxon has hierarchies from all classifications
         def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
-        def ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
-        println ibpParentTaxon;
+        def ibpParentTaxon;
+        if(taxonConcept instanceof SynonymsMerged) {
+            def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
+            ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+        } else {
+            ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
+        }
         if(ibpParentTaxon) {
             println "Updating==================================="
             return updateGroup(taxonConcept, getGroupByHierarchy(taxonConcept, ibpParentTaxon));

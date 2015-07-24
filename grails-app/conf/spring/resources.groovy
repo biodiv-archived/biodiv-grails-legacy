@@ -43,6 +43,7 @@ import grails.plugin.mail.MailMessageContentRenderer;
 import grails.rest.render.json.JsonRenderer;
 import org.codehaus.groovy.grails.web.mime.MimeType;
 import species.participation.Comment;
+import species.auth.RestTokenValidationFilter;
 
 // Place your Spring DSL code here
 beans = {
@@ -423,7 +424,22 @@ beans = {
     final v2_MIME_TYPE = new MimeType(API_MIME_TYPE, [v: '2.0']);
     commentV1Renderer(CommentRenderer, Comment, v1_MIME_TYPE) {
     }
-    */
+ */
+    
+
+    restTokenValidationFilter(RestTokenValidationFilter) {
+        grailsApplication = ref('grailsApplication') 
+        webInvocationPrivilegeEvaluator = ref('webInvocationPrivilegeEvaluator') 
+        headerName = conf.rest.token.validation.headerName
+        validationEndpointUrl = conf.rest.token.validation.endpointUrl
+        active = conf.rest.token.validation.active
+        tokenReader = ref('tokenReader')
+        enableAnonymousAccess = conf.rest.token.validation.enableAnonymousAccess
+        authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
+        authenticationFailureHandler = ref('restAuthenticationFailureHandler')
+        restAuthenticationProvider = ref('restAuthenticationProvider')
+    }
+
 }
 
 
