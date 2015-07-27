@@ -225,4 +225,6 @@ update taxonomy_definition set match_id = '5dae19da1534c9b5104960f259772955' whe
 update taxonomy_definition set match_id = '8efabbc738df6fea09ce18141b4fae0c' where id = 280475; 
 update taxonomy_definition set match_id = 'ef9e5fbbfb2b09301c00a8cb6b44bcd0' where id = 281524;
 
+7a. In checklistObvPost.groovy run updateColId()
+
 8. For verification :  In checklistObvPost.groovy run createInputFile()
