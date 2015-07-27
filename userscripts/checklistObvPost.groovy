@@ -23,12 +23,10 @@ def migrate(){
 	}
 }
 
-//migrate()
-
 def mergeAcceptedName(){
 	def ns = ctx.getBean("namelistUtilService");
-	File file = new File("/home/sandeept/namesync/thomas/toDelete.csv");
-	//File file = new File("/apps/git/biodiv/namelist/tobedeleted_KK.txt");
+	//File file = new File("/home/sandeept/namesync/thomas/toDelete.csv");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/toDelete.csv");
 	
 	def lines = file.readLines();
 	println "============ started =========="
@@ -65,8 +63,6 @@ def mergeAcceptedName(){
 
 }
 
-//mergeAcceptedName()
-
 def sync(){
 	def startDate = new Date()
 	println "============ strated "
@@ -75,7 +71,6 @@ def sync(){
 	println "========done=== start date " + startDate + "  " + new Date()
 }
 
-//sync()
 
 
 def buildTree(){
@@ -84,7 +79,6 @@ def buildTree(){
 	s.rebuild()
 	println "========done=== start date " + startDate + "  " + new Date()
 }
-//buildTree()
 
 def snap(){
 	//XXX to do
@@ -92,7 +86,6 @@ def snap(){
 	tt.createIBPHierarchyForDirtylist()
 }
 
-//snap()
 
 
 def dmp(){
@@ -124,15 +117,12 @@ def dmp(){
 	
 }
 
-//dmp()
-
-
 def splitTreeExport(){
 	def dataSource = ctx.getBean("dataSource");
 	dataSource.setUnreturnedConnectionTimeout(500);
 	def sql = new Sql(dataSource)
 	
-	String sqlStr = "select taxon_definition_id from tt0  where c > 1"
+	String sqlStr = "select taxon_definition_id from tmp_mul_ibp_hier  where c > 1"
 	def taxons = sql.rows(sqlStr);
 	int i = 0
 	int totalSizeC = 0
@@ -167,8 +157,6 @@ def splitTreeExport(){
 	println "===========================  tatal child count " + totalSizeC + "  total hier " + totalhier + "  total names " + i
 	
 }
-//splitTreeExport()
-
 
 def dropRawHir(){
 	def dataSource = ctx.getBean("dataSource");
@@ -204,7 +192,6 @@ def dropRawHir(){
 	
 	
 }
-//dropRawHir()
  
 def addColhir(){
 	def nlSer = ctx.getBean("namelistUtilService");
@@ -226,8 +213,6 @@ def addColhir(){
 	}
 	println "============= done "
 }
-//addColhir()
-
 
 def createDuplicateName(){
 	def nlSer = ctx.getBean("namelistUtilService");
@@ -235,8 +220,8 @@ def createDuplicateName(){
 	def dataSource = ctx.getBean("dataSource");
 	dataSource.setUnreturnedConnectionTimeout(500);
 	
-	File file = new File("/home/sandeept/namesync/thomas/to_split.csv");
-	//File file = new File("/apps/git/biodiv/namelist/tobedeleted_KK.txt");
+	//File file = new File("/home/sandeept/namesync/thomas/to_split.csv");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/to_split.csv");
 	
 	def lines = file.readLines();
 	int i=0;
@@ -276,7 +261,28 @@ def createDuplicateName(){
 	}
 	println "============= done "
 }
-//createDuplicateName()
+
+
+def updateColId(){
+	def dataSource = ctx.getBean("dataSource");
+	dataSource.setUnreturnedConnectionTimeout(500);
+	def sql = new Sql(dataSource)
+	
+	//File file = new File("/home/sandeept/namesync/thomas/validation_fixes.csv");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/validation_fixes.csv");
+	
+	def lines = file.readLines();
+	int i=0;
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split(',');
+		println " arr ->>> " + arr
+		def ibpId = arr[0]//Long.parseLong(arr[0].trim())
+		def colId = arr[1]
+		sql.executeUpdate(" update taxonomy_definition set match_id = '" + colId + "' where id = " + ibpId);
+	}
+}
+	
 
 def createInputFile(){
 	def nlSer = ctx.getBean("namelistUtilService");
@@ -284,4 +290,12 @@ def createInputFile(){
 	nlSer.verifyAcceptedNamesAndColPath(new File("/home/sandeept/name-mig/verify/res1.csv"), new File("/home/sandeept/name-mig/verify/in2.csv"))
 	
 }
-createInputFile()
+
+
+dropRawHir()
+//addColhir()
+//createDuplicateName()
+//mergeAcceptedName()
+//updateColId()
+
+//createInputFile()

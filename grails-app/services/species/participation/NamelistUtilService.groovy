@@ -18,6 +18,7 @@ import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.COLNameStatus;
 import species.NamesMetadata.NamePosition;
 import species.auth.SUser;
+import content.eml.DocSciName
 import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.ContentType.TEXT
@@ -417,7 +418,16 @@ class NamelistUtilService {
 			}
 		}
 		
-		
+		//moving docsciname
+		List dcs = DocSciName.findAllByTaxonConcept(oldName)
+		dcs.each {DocSciName  cn ->
+			cn.taxonConcept = newName
+			if(!cn.save(flush:true)){
+				cn.errors.allErrors.each { log.error it }
+			}else{
+				cn.delete(flush:true)
+			}
+		}
 		
 		Species oldSpecies = Species.findByTaxonConcept(oldName)
 		Species newSpecies = Species.findByTaxonConcept(newName)

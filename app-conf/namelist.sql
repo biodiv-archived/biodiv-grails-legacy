@@ -197,6 +197,8 @@ delete from taxonomy_definition_suser where taxonomy_definition_contributors_id 
 delete from accepted_synonym where  synonym_id > 420871;
 delete from taxonomy_definition_year where taxonomy_definition_id > 420871;
 delete from taxonomy_definition_author where taxonomy_definition_id > 420871;
+delete from doc_sci_name where taxon_concept_id > 420871;
+delete from taxonomy_definition where id > 420871;
 
 4. Adding/updating hir for 33 accepted working name. 
 Copy '/home/sandeept/git/biodiv/app-conf/col-xmls/TaxonomyDefinition' to kk for latest XML
