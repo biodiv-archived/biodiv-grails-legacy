@@ -873,6 +873,10 @@ environments {
                 rootDir = "${app.rootDir}/usersRes"
                 serverURL = "http://${servername}/${appName}/usersRes"   
             }
+			namelist {
+				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
+			}
+		
 
             search.serverURL="http://${servername}:8080/solr"
             grails {
@@ -1004,7 +1008,10 @@ environments {
                 rootDir = "${app.rootDir}/usersRes"
                 serverURL = "http://${servername}/${appName}/usersRes"   
             }
-
+			namelist {
+				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
+			}
+		
             search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {
