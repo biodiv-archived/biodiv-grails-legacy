@@ -843,5 +843,29 @@ class DocumentService extends AbstractObjectService {
         documentInstance.delete(flush: true, failOnError:true)
     }
 
+    def Map updateTags(params,domainInstance){
+        def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+        def tag_des = '';
+        if(params.controller == 'discussion'){
+        	tag_des = activityFeedService.DISCUSSION_TAG_UPDATED;
+        }else if(params.controller == 'document'){
+        	tag_des = activityFeedService.DOCUMENT_TAG_UPDATED;
+        }
+        def  result = domainInstance.setTags(tags);
+        def tagsObj = domainInstance.tags;
+        def model = [:];
+        def new_des = '';
+        def iden = 1;
+        for ( e in tagsObj ) {        	
+            model.put(e,iden);
+            iden++;
+            new_des +=(new_des != '')? ','+e:e;
+        }
+        def activityFeed = activityFeedService.addActivityFeed(domainInstance, domainInstance,  springSecurityService.currentUser,tag_des,new_des);
+        	utilsService.sendNotificationMail(tag_des, domainInstance, null, null, activityFeed);
+         
+        return model;
+    }
+
 }
 
