@@ -466,6 +466,18 @@ class DocumentController extends AbstractObjectController {
 		render " done "
 	}
 
+    @Secured(['ROLE_USER'])
+    def updateOraddTags(){
+        log.debug params
+        def documentInstance =  Document.read(params.instanceId);
+        println "============documentInstance=============="+documentInstance;
+        def result = documentService.updateTags(params,documentInstance)
+        def model = utilsService.getSuccessModel('success', documentInstance, OK.value(),result);
+        render model as JSON
+        return;
+
+    }
+
 	def runAllDocuments() {
 			
 			documentService.runAllDocuments();

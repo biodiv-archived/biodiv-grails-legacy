@@ -2435,5 +2435,33 @@ class ObservationService extends AbstractObjectService {
 	def Map updateInlineCf(params){
 		return customFieldService.updateInlineCf(params)
 	}
-	
+
+    def Map updateTags(params,observationInstance){
+        def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+        def  result = observationInstance.setTags(tags);
+        def tagsObj = getRelatedTagsFromObservation(observationInstance);
+        def model = [:];
+        def new_des = '';
+        for ( e in tagsObj ) {
+            model.put(e.key,e.value);
+            new_des +=(new_des != '')? ','+e.key:e.key;
+        }
+        def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.OBSERVATION_TAG_UPDATED,new_des);
+            utilsService.sendNotificationMail(activityFeedService.OBSERVATION_TAG_UPDATED, observationInstance, null, null, activityFeed);
+        return model;
+    }
+
+    def Map updateSpeciesGrp(params,observationInstance){
+        def prevgroupIcon = observationInstance.group.iconClass();
+       if(observationInstance.group.id != params.group_id){
+            def new_des = observationInstance.group.name+" to ";            
+            observationInstance.group  = params.group?:SpeciesGroup.get(params.group_id);
+            observationInstance.save();
+            def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED,new_des+""+observationInstance.group.name);
+            utilsService.sendNotificationMail(activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED, observationInstance, null, null, activityFeed);
+        }
+        return [ 'groupName' : observationInstance?.group?.name,'groupIcon' : observationInstance.group.iconClass(),'prevgroupIcon':prevgroupIcon]
+
+    }
+
 }

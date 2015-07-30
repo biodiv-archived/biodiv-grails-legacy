@@ -130,15 +130,19 @@
         </div>
         </g:if>
 
-        <g:if test="${showDetails && documentInstance?.tags}">
-        <div class="prop">
-            <span class="name"><g:message code="default.tags.label" /></span>
+        <g:if test="${showDetails}">
 
+        <div class="prop" style="margin-bottom: 35px;">
+            <div style="height: 26px;">
+                <span class="name"><g:message code="default.tags.label" /></span>
+                <div class="btn btn-small pull-right btn-primary add_obv_tags" style="  margin-right: 16px;">Add Tag</div>
+            </div>            
             <div class="value">
                 <g:render template="/project/showTagsList"
                 model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
-            </div>
+            </div>           
         </div>
+
         </g:if>
         </g:else>
     </div>
