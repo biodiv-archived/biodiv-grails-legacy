@@ -163,6 +163,54 @@ class TaxonomyDefinition extends ScientificName {
        return result;
    }
 
+   public boolean snapToIBPHir(List<Classification> hirList, Classification targetHir){
+	   if(TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, targetHir)){
+		   println  "Already has one IBP hierarchy. Returning " + this
+		   return true
+	   }
+	   
+	   List<TaxonomyRegistry> trs = []
+	   
+	   hirList.each { hir ->
+		  trs.addAll(TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, hir))
+	   }
+	   
+	   boolean isSnapped = false
+	   trs.each { TaxonomyRegistry tr ->
+		   if(!isSnapped){
+			   isSnapped = _sanpToImmediateParent(tr, targetHir)
+		   }
+	   }
+	   
+	   return isSnapped
+	   
+   }
+   
+   private boolean _sanpToImmediateParent(TaxonomyRegistry sourceTr,  Classification targetHir){
+	  
+	   TaxonomyRegistry targetTr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(sourceTr.parentTaxonDefinition, targetHir)
+	   if(!targetTr){
+		   	println  "Immediate parent does not have ibp hir or this is the raw name at kingdom level " + this
+	   		return false
+	   }
+	   
+	   
+	   TaxonomyRegistry ibpTr = new TaxonomyRegistry()
+	   ibpTr.properties = targetTr.properties
+	   ibpTr.parentTaxon = targetTr
+	   ibpTr.parentTaxonDefinition = targetTr.taxonDefinition
+	   ibpTr.taxonDefinition = sourceTr.taxonDefinition
+	   ibpTr.path = targetTr.path + "_" + sourceTr.taxonDefinition.id
+	   ibpTr.contributors = null
+	   
+	   if(!ibpTr.save(flush:true)){
+			ibpTr.errors.allErrors.each { log.error it }
+	   }else{
+	   		return true
+	   }		   
+			   
+   }
+   
    Map fetchGeneralInfo(){
 	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }

@@ -40,19 +40,14 @@ class AcceptedSynonym {
     }
 
     static removeEntry(TaxonomyDefinition accepted, SynonymsMerged synonym) {
-//        println "===========REMOVING ENTRY ====== "
-//        println "===========ACCEPTED ====== " + accepted
-//        println "===========SYNONYM  ====== " + synonym
         AcceptedSynonym.withNewSession {
             def ent = AcceptedSynonym.findWhere(accepted: accepted, synonym: synonym)
-//            println "=======ENTRY ========= " + ent
             if(ent) {
                 try {
                     println "deleting"
                     if(!ent.delete(flush:true,failOnError:true)){
                         ent.errors.allErrors.each { log.error it }
                     }
-//                    println "deleted"
                 }catch (Exception e) {
                     e.printStackTrace()
                 }

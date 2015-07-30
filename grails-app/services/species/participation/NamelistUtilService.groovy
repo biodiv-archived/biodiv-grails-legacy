@@ -2,6 +2,8 @@ package species.participation
 
 import org.apache.commons.logging.LogFactory;
 
+import species.SpeciesPermission
+import species.AcceptedSynonym
 import species.ScientificName
 import species.TaxonomyDefinition;
 import species.SynonymsMerged;
@@ -33,8 +35,6 @@ import species.participation.Recommendation;
 import speciespage.SpeciesUploadService;
 
 import species.namelist.Utils
-import species.SpeciesPermission
-
 
 class NamelistUtilService {
 	
@@ -299,9 +299,94 @@ class NamelistUtilService {
 		ret += p.split("_").collect{TaxonomyDefinition.findByMatchId(it).name}.join("->")
 	}
 	
+	
+	
+	
+	public copyIBPHirAsCOL(){
+		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
+		dataSource.setUnreturnedConnectionTimeout(50000);
+		def sql =  Sql.newInstance(dataSource);
+		def query  = ''' select tr.id as trId from taxonomy_registry as tr, taxonomy_definition as t where t.status = 'ACCEPTED' and t.position = 'WORKING' and t.is_deleted = false and t.id = tr.taxon_definition_id  and tr.classification_id = 265799 and rank > -1 order by t.rank, t.id '''
+		int i = 0
+		int offset = 0
+		int limit = 1000
+		def colHir = Classification.findByName('Catalogue of Life Taxonomy Hierarchy')
+		Map pMap = [:]
+		while(true){
+			String q = query + " limit " + limit + " offset " + offset
+			def resList = sql.rows(q)
+			if(resList.isEmpty())
+				break
+			
+			TaxonomyRegistry.withNewTransaction {
+				resList.each{
+					i++
+					if(i%100 == 0){
+						println " count " + i + " time " + new Date()
+					}
+					TaxonomyRegistry ibpTr = TaxonomyRegistry.get(it.getProperty("trId"))
+					TaxonomyRegistry colTr = new TaxonomyRegistry()
+					colTr.properties = ibpTr.properties
+					colTr.classification = colHir
+					
+					def pTdf = ibpTr.parentTaxonDefinition
+					
+					if(pTdf){
+						colTr.parentTaxon = pMap.get(pTdf)
+					}
+					colTr.contributors = null;
+					
+					if(!colTr.save(flush:true)){
+						colTr.errors.allErrors.each { log.error it }
+					}else{
+						pMap.put(colTr.taxonDefinition, colTr)
+					}
+				}
+			}
+			utilsService.cleanUpGorm()
+			pMap.clear()
+			offset += limit
+			println "map size " + pMap.size()  + " new offset " + offset
+		}
+			
+		dataSource.setUnreturnedConnectionTimeout(oldTimeOut); 
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////  MERGE ACCEPTED NAME  ////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public mergeSynonym(long oldId, long newId, boolean fullDelete = false){
+		SynonymsMerged oldName = SynonymsMerged.get(oldId)
+		SynonymsMerged newName = SynonymsMerged.get(newId)
+		
+		
+		if(!oldName ||  !newName){
+			log.debug "One of name is not exist in the system " + oldId + "  " +  newId
+			return
+		}
+		
+		//moving synonym
+		def oldEntries = AcceptedSynonym.findAllBySynonym(oldName);
+		oldEntries.each { e ->
+			TaxonomyDefinition acName = e.accepted
+			acName.removeSynonym(oldName)
+			acName.addSynonym(newName)
+		}
+		
+		if(fullDelete){
+			println "========= old name " + oldName
+			if(oldName)
+				oldName.delete(flush:true)
+		}else{
+			oldName.isDeleted = true
+			println "======= for delete " + oldName
+			if(!oldName.save(flush:true)){
+				oldName.errors.allErrors.each { log.error it }
+			}
+		}
+	}
+	
 	
 	public mergeAcceptedName(long oldId, long newId, boolean fullDelete = false){
 		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
@@ -544,5 +629,56 @@ class NamelistUtilService {
 		}
 		return isDuplicate
 	}	
+	
+	/////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////// SNAPPING RAW NAMES /////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////
+	
+	public addIBPHirToRawNames() {
+		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+		dataSource.setUnreturnedConnectionTimeout(5000);
+		
+		Date startDate = new Date();
+		List hirList = [Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
+		def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+		def admin = SUser.read(1L);
+		
+		def taxons;
+		def query  = ''' select id from taxonomy_definition where status = 'ACCEPTED' and position = 'RAW' and is_deleted = false order by rank, id '''
+		def sql =  Sql.newInstance(dataSource);
+		
+		int failCount = 0
+		int i = 0
+		int offset = 0
+		int limit = 100
+		while(true){
+			if(i%20 == 0){
+				println "-- Count  " + i + " failed Count " + failCount
+			}
+			
+			String q = query + " limit " + limit + " offset " + offset
+			taxons = sql.rows(q)
+			if(taxons.isEmpty())
+				break
+			
+			TaxonomyRegistry.withNewTransaction {	
+			taxons.each { t ->
+				i++
+				TaxonomyDefinition td = TaxonomyDefinition.get(t.id)
+				boolean isSnapped = td.snapToIBPHir(hirList, ibp_classifi)
+				if(!isSnapped){
+					failCount ++
+					println "failed for " +  td 
+				}
+			}
+			}
+			utilsService.cleanUpGorm()
+			offset = offset + limit;
+			
+		}
+		dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+		println "Failed count " + failCount   + "  Total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
+	}
+
 	
 }

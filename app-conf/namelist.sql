@@ -228,3 +228,17 @@ update taxonomy_definition set match_id = 'ef9e5fbbfb2b09301c00a8cb6b44bcd0' whe
 7a. In checklistObvPost.groovy run updateColId()
 
 8. For verification :  In checklistObvPost.groovy run createInputFile()
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// 29th july 2015 ////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+
+1. In checklistObvPost.groovy run mergeAcceptedName()
+2. In checklistObvPost.groovy run mergeSynonym()
+3. Remove col hier for all working names and copy IBP hir as col hir.
+	In checklistObvPost.groovy run copyIbpHir()
+4. In checklistObvPost.groovy run addIBPHirToRawNames()
+
+
