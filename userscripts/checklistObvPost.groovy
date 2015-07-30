@@ -23,15 +23,16 @@ def migrate(){
 	}
 }
 
-def mergeAcceptedName(){
+def mergeSynonym(){
 	def ns = ctx.getBean("namelistUtilService");
-	//File file = new File("/home/sandeept/namesync/thomas/toDelete.csv");
-	File file = new File("/apps/git/biodiv/namelist/after-migration/toDelete.csv");
+	//File file = new File("/home/sandeept/namesync/thomas/duplicatestodelete.csv")
+	File file = new File("/home/sandeept/namesync/thomas/duplicatecolidstomergeSynonyms.csv")
+	//File file = new File("/apps/git/biodiv/namelist/after-migration/toDelete.csv");
 	
 	def lines = file.readLines();
 	println "============ started =========="
 //	try {
-//		ns.mergeAcceptedName(161686, 279950, true)
+//		ns.mergeSynonym(385677,358206, true)
 //	}catch(e){
 //		println e.printStackTrace()
 //	}
@@ -40,23 +41,64 @@ def mergeAcceptedName(){
 	lines.each { line ->
 		if(i++ == 0) return;
 		def arr = line.split(',');
-		//println '--------------' + arr
+		println '--------------' + arr
 		if(arr.length > 1){
-		def toDelete = Long.parseLong(arr[0].trim())
-		def fullDelete = (arr[1].trim() == 'Yes') ? true : false
-		if(!fullDelete)
-			return
-        def toMove = Long.parseLong(arr[2].trim())
-		println "====================  " + toDelete + "   toMove " + toMove + "    fullDelete " + fullDelete
-		try {
-				ns.mergeAcceptedName(toDelete, toMove, fullDelete)
-		}catch(e){
-			failCountList << arr
-			println e.printStackTrace()
+			def toDelete = Long.parseLong(arr[0].trim())
+			def fullDelete = (arr[1].trim().toLowerCase() == 'yes') ? true : false
+			if(!fullDelete)
+				return
+	        def toMove = Long.parseLong(arr[2].trim())
+			println "====================  " + toDelete + "   toMove " + toMove + "    fullDelete " + fullDelete
+			try {
+				ns.mergeSynonym(toDelete, toMove, fullDelete)
+			}catch(e){
+				failCountList << arr
+				println e.printStackTrace()
+			}
+		}else{
+			println '  leaving arr ' + arr
 		}
-	}else{
-		println '  leaving arr ' + arr
 	}
+	println "=========== failed list " + failCountList
+	println "=========== tatal failed " + failCountList.size()
+
+}
+
+
+def mergeAcceptedName(){
+	def ns = ctx.getBean("namelistUtilService");
+	File file = new File("/home/sandeept/namesync/thomas/duplicatestodelete.csv")
+	//File file = new File("/apps/git/biodiv/namelist/after-migration/toDelete.csv");
+	
+	def lines = file.readLines();
+	println "============ started =========="
+//	try {
+//		ns.mergeAcceptedName(385677,358206, true)
+//	}catch(e){
+//		println e.printStackTrace()
+//	}
+	def failCountList = []
+	int i=0;
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split(',');
+		println '--------------' + arr
+		if(arr.length > 1){
+			def toDelete = Long.parseLong(arr[0].trim())
+			def fullDelete = (arr[1].trim().toLowerCase() == 'yes') ? true : false
+			if(!fullDelete)
+				return
+	        def toMove = Long.parseLong(arr[2].trim())
+			println "====================  " + toDelete + "   toMove " + toMove + "    fullDelete " + fullDelete
+			try {
+				ns.mergeAcceptedName(toDelete, toMove, fullDelete)
+			}catch(e){
+				failCountList << arr
+				println e.printStackTrace()
+			}
+		}else{
+			println '  leaving arr ' + arr
+		}
 	}
 	println "=========== failed list " + failCountList
 	println "=========== tatal failed " + failCountList.size()
@@ -96,7 +138,7 @@ def dmp(){
 	String sqlStr = "select * from tmp_duplicates  where c > 1 order by rank desc, name asc"
 	def taxons = sql.rows(sqlStr);
 	int i = 0
-	new File("/tmp/higher_rank_duplicates.csv").withWriter { out ->
+	new File("/tmp/accepted_duplicates.csv").withWriter { out ->
 		out.println "id|name|status|position|paths"
 		taxons.each { t ->
 			def tds = TaxonomyDefinition.findAllByNameAndRank(t.name, t.rank)
@@ -122,16 +164,18 @@ def splitTreeExport(){
 	dataSource.setUnreturnedConnectionTimeout(500);
 	def sql = new Sql(dataSource)
 	
-	String sqlStr = "select taxon_definition_id from tmp_mul_ibp_hier  where c > 1"
+	//String sqlStr = "select taxon_definition_id  as id from tmp_mul_ibp_hier  where c > 1"
+	String sqlStr = "select id from taxonomy_definition where id in (160240, 161749, 4414, 170120, 127543, 159416, 170257, 160983, 156734, 167433, 162764, 132778, 146902, 5693, 71886, 161011, 160201, 166095, 87087, 82121, 122152, 176805, 273654, 137733, 168253, 69648, 162621, 276697, 276974, 420941, 277742) "
+	
 	def taxons = sql.rows(sqlStr);
 	int i = 0
 	int totalSizeC = 0
 	int totalhier = 0
 	
-	new File("/tmp/names_with_multiple_ibp_hierachy_raw_deleted_33_corrected.csv").withWriter { out ->
+	new File("/tmp/names_with_childinfo.csv").withWriter { out ->
 		//out.println "id|name|status|position|rank|colId|paths|nextChilds"
 		taxons.each { t ->
-			def tdf = TaxonomyDefinition.get(t.taxon_definition_id)
+			def tdf = TaxonomyDefinition.get(t.id)
 			println i++	
 			//tds.each {  td ->
 			//if(!td.isDeleted){
@@ -286,16 +330,35 @@ def updateColId(){
 
 def createInputFile(){
 	def nlSer = ctx.getBean("namelistUtilService");
-	//nlSer.generateStatsInput(new File("/home/sandeept/name-mig/ac_names_2.csv"))
-	nlSer.verifyAcceptedNamesAndColPath(new File("/home/sandeept/name-mig/verify/res1.csv"), new File("/home/sandeept/name-mig/verify/in2.csv"))
+	//nlSer.generateStatsInput(new File("/home/sandeept/name-mig/kk_ac_names.csv"))
+	nlSer.verifyAcceptedNamesAndColPath(new File("/home/sandeept/name-mig/kk_ac_names.csv"), new File("/home/sandeept/name-mig/kk_ac_in.csv"))
 	
 }
 
 
-dropRawHir()
+def copyIbpHir(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	nlSer.copyIBPHirAsCOL()
+	
+}
+
+def addIBPHirToRawNames(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	nlSer.addIBPHirToRawNames()
+	
+}
+
+
+//dmp()
+//splitTreeExport()
+
+//dropRawHir()
 //addColhir()
 //createDuplicateName()
 //mergeAcceptedName()
+//mergeSynonym()
 //updateColId()
 
 //createInputFile()
+//copyIbpHir()
+addIBPHirToRawNames()
