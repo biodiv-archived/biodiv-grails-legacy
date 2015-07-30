@@ -95,7 +95,7 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(CommonNames) {
             def commonname = ['id':it.id, 'name':it.name, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor() ];
             if(it.language) {
-                commonname ['language'] =  ['id':it.language.id, 'name':it.language.name]
+                commonname ['language'] =  it.language
             }
             return commonname;
         }
@@ -159,7 +159,7 @@ class CustomObjectMarshallers {
 
             def imagePath = it.thumbnailUrl(basePath);
 
-            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating];
+            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'licenses':it.licenses];
         }
 	
 		JSON.registerObjectMarshaller(Comment) {
@@ -189,7 +189,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(Language) {
-            return ['id':it.id, 'name':it.name]
+            return ['id':it.id, 'name':it.name, 'threeLetterCode':it.threeLetterCode, 'twoLetterCode':it.twoLetterCode]
         }
  
         JSON.registerObjectMarshaller(UFile) {

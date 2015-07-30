@@ -1,5 +1,5 @@
 <div class="observation_story observation" style="border: 1px solid rgb(106, 201, 162);">
-    <div style="height:${params.action == 'show'?'inherit':'160px'};">
+    <div style="min-height:${params.action == 'show'?'inherit':'160px'};">
         <g:if test="${showFeatured}">
 
         <div class="featured_body">
@@ -74,15 +74,31 @@
                     datetime="${discussionInstance.lastRevised?.getTime()}"></time>
                 </div>
             </div>
-        <g:if test="${discussionInstance.tags}">
-        <div class="prop">
-            <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
+       
+        <div class="prop" style="margin-bottom: 35px;">
+         <g:if test="${showDetails}">
+             <div style="height: 26px;">
+                <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
+                <div class="btn btn-small pull-right btn-primary add_obv_tags" style="  margin-right: 16px;">Add Tag</div>
+            </div>
             <div class="value">
                 <g:render template="/project/showTagsList"
-                model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list']" />
-            </div>
-        </div>
+                model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list', 'showDetails' : showDetails]" />
+            </div> 
         </g:if>
+        <g:else>
+            <g:if test="${discussionInstance?.tags}"> 
+                <span class="name"><i class="icon-tags"></i><g:message code="default.tags.label" /></span>
+                <div class="value">
+                    <g:render template="/project/showTagsList"
+                model="['instance': discussionInstance, 'controller': 'discussion', 'action':'list', 'showDetails' : showDetails]" />
+                </div> 
+            </g:if>
+        </g:else>   
+                       
+        </div>
+        
+       
         
         <div class="row observation_footer" style="margin-left:0px;">
              <g:render template="/discussion/showDiscussionStoryFooterTemplate"

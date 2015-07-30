@@ -21,9 +21,21 @@ class SpeciesMarshaller {
                 taxonRegistryFormattedMap << ['clasification':classification, 'hierarchies':taxonRegistries]
             }
 
-            def synonyms =  Synonyms.findAllByTaxonConcept(species.taxonConcept);
-            def common_names = CommonNames.findAllByTaxonConcept(species.taxonConcept);
+            def synonyms = species.taxonConcept.fetchSynonyms()
+            def common_names =  CommonNames.findAllByTaxonConcept(species.taxonConcept);
 
+/*            def converter = new XMLConverter()
+            String rStr = converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.REFERENCES,2,userLanguage),
+            def references = [];
+            for(f in species.fields) {
+                if(f.references) {
+                    references << reference
+                }
+                if(f.category.equals(rStr)) {
+                    f.references
+                }
+            }
+*/
             Map result = [
                 id : species.id,
                 title: species.title,

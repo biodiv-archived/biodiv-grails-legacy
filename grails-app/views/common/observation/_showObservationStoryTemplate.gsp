@@ -7,8 +7,52 @@
     .observation .prop .value {
         margin-left:10px;
     }
-
+    .group_icon_show_wrap{
+        float:left;
+    }
     </g:if>
+    <g:if test="${!showFeatured}">
+    li.group_option{
+        height:30px;
+    }
+    li.group_option span{
+        padding: 0px;
+        float: left;
+    }
+    .groups_super_div{
+        margin-top: -15px;
+        margin-right: 10px;
+    }
+    .groups_div > .dropdown-toggle{
+          height: 25px;
+    }
+    .group_options, .group_option{
+          min-width: 110px;
+    }
+    .save_group_btn{
+        float: right;
+        margin-right: 11px;
+          margin-top: -9px;
+    }
+    .group_icon_show_wrap{
+        border: 1px solid #ccc;
+        float: right;
+        height: 33px;
+        margin-right: 4px;
+    }
+    .edit_group_btn{
+        top: -10px;
+        position: relative;
+        margin-right: 12px;
+    }
+    .propagateGrpHab{
+        display:none;
+        float: right;
+        margin-top: -5px;
+    }
+    
+    </g:if>
+
 </style>
 <div class="observation_story">
     	<%
@@ -18,24 +62,50 @@
         	<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
         </g:if>
             <div class="observation-icons">
-            	<g:if test="${observationInstance.habitat}">
-                <span style="float:right;"
-                    class="habitat_icon group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
-                    title="${observationInstance.habitat.name}"></span>
-                </g:if>
-                <span style="float:right;"
-                    class="group_icon species_groups_sprites active ${observationInstance.group.iconClass()}"
-                    title="${observationInstance.group?.name}"></span>
-                
+
                 <g:if test="${showDetails && speciesInstance && speciesInstance.taxonConcept?.threatenedStatus}">
-                <span>
+                <div style="float:left;">
                     <s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
-                    </span>
+                    </div>
                 </g:if>
+
+
+            	<g:if test="${observationInstance.habitat}">
+                <div style="float: left;">
+                <span
+                    class="habitat_icon_show group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
+                    title="${observationInstance.habitat.name}"></span>
+                </div>
+                </g:if>
+
+
+                <div class="group_icon_show_wrap">
+                    <span
+                        class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()}"
+                        title="${observationInstance.group?.name}"></span>
+                <g:if test="${showDetails && !showFeatured}">        
+                    <div class="btn btn-small btn-primary edit_group_btn">Edit
+                    </div>
+                </g:if>    
+                </div>
+              
 
                 <g:if test="${showFeatured}">
                     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
                 </g:if>
+                <g:if test="${!showFeatured}">
+                 <div class="column propagateGrpHab">
+                 <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
+                                method="GET">
+                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
+                    <input type="hidden" name="prev_group" value="${observationInstance?.group?.id}" />
+                    <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
+                    <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
+                </form>
+                </div>
+                </g:if>
+
+               
             </div>
             <g:if test="${showFeatured}">
             <div class="featured_body">
@@ -215,4 +285,3 @@
         </div>
         </g:else>
     </div>
-

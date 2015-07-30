@@ -86,6 +86,10 @@ class ActivityFeedService {
 	static final String SPECIES_HIERARCHY_UPDATED = "Updated hierarchy"
 	static final String SPECIES_HIERARCHY_DELETED = "Deleted hierarchy"
 	static final String CUSTOM_FIELD_EDITED = "Custom field edited"
+	static final String OBSERVATION_TAG_UPDATED = "Observation tag updated"
+	static final String DOCUMENT_TAG_UPDATED = "Document tag updated"
+	static final String DISCUSSION_TAG_UPDATED = "Discussion tag updated"	
+	static final String OBSERVATION_SPECIES_GROUP_UPDATED = "Observation species group updated"
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"
@@ -359,6 +363,22 @@ class ActivityFeedService {
                 activityTitle = getLocalizedMessage(SPECIES_UPDATED)
                 break
 			case CUSTOM_FIELD_EDITED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case OBSERVATION_TAG_UPDATED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case DOCUMENT_TAG_UPDATED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case DISCUSSION_TAG_UPDATED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case OBSERVATION_SPECIES_GROUP_UPDATED:
 				activityTitle = getLocalizedMessage(activityType)
 				text = feedInstance.activityDescrption
 				break

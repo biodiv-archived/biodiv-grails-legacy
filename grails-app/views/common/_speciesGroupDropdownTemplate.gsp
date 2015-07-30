@@ -24,13 +24,21 @@
     </g:if>
     </g:each>
     </select-->
+
+
+<%
+
+ def selected_group = (observationInstance?.group?.name) ? observationInstance?.group?.name : 'All';
+ def message_selected_group = (observationInstance?.group?.name) ? observationInstance?.group?.name : g.message(code:'default.select.group.label');
+%>
+
     <div class="groups_div dropdown" style="z-index:15;">
         <div class="dropdown-toggle btn selected_group selected_value " data-toggle="dropdown">
             <span style="float:left;"
-                        class="group_icon species_groups_sprites active ${SpeciesGroup.findByName('All').iconClass()}"
-                    title="${SpeciesGroup.findByName('All').name}"></span>
+                        class="group_icon species_groups_sprites active ${SpeciesGroup.findByName(selected_group).iconClass()}"
+                    title="${SpeciesGroup.findByName(selected_group).name}"></span>
             <!--img src="${createLinkTo(dir: 'images', file: SpeciesGroup.findByName('All').icon()?.fileName?.trim(), absolute:true)}" style="width:22px;"/-->
-            <span class="display_value"><g:message code="default.select.group.label" /> </span>
+            <span class="display_value">${message_selected_group}</span>
             <b class="caret"></b>
         </div>
             <ul class="group_options dropdown-menu">
@@ -63,6 +71,12 @@ $(document).ready(function(){
     });
 
     $(".group_option").unbind('click').click(function(){
+        var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
+           if(is_save_btn_exists.length == 1){
+                is_save_btn_exists.show();
+           }
+       
+
         $(this).closest(".groups_super_div").find(".group").val($(this).val());
         $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
         $(this).closest(".group_options").hide();
