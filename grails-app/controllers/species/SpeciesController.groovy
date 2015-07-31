@@ -1434,6 +1434,7 @@ class SpeciesController extends AbstractObjectController {
         def result = [];
         switch(params.filterProperty) {
             case 'featureBy':
+                return super.related();
                 break;
             case 'documents':
                 List documents = speciesService.getRelatedDocuments(params.id?Species.read(Long.parseLong(params.id)):null);
