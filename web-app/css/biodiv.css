@@ -2274,7 +2274,7 @@ line-height: 11px;
     position:absolute;
 }
 .jcarousel-skin-ie7 .jcarousel-prev-vertical {
-    top:5px;
+    top:-20px;
 }
 
 .feedParentContext {
