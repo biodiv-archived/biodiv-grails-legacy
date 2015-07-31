@@ -47,11 +47,17 @@
 							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
 						</sUser:isAdmin>
                         */%>
-						<uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
+	
+				<obv:download
+					model="['source':'Species', 'requestObject':request, 'downloadTypes':[DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'speciesList']" />
+
+
 						<div class="list span8 right-shadow-box" style="margin: 0px;">
 							<s:showSpeciesList/>
 						</div>
                         <div id="taxonBrowser" class="span4" style="position:relative">
+
+						    <uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
                             <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
                                 <h5><g:message code="button.taxon.browser" /></h5>	
                                 <div id="taxaHierarchy">

@@ -117,7 +117,7 @@ class ObvUtilService {
             def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress).getAllResult()
             log.debug " Obv total $observationInstanceList.size()" 
             return exportObservation(observationInstanceList, dl.type, dl.author, dl.id, params.filterUrl )
-            DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl.id, params.filterUrl );
+            //DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl.id, params.filterUrl );
 
         }
     }
@@ -184,9 +184,11 @@ class ObvUtilService {
 			return exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl)
 		}else if(exportType == DownloadLog.DownloadType.KML) {
 			return exportAsKML(downloadDir, obvList, reqUser)
-		} else {
+		} else  if(exportType == DownloadLog.DownloadType.DWCA) {
 			return exportAsDW(downloadDir, obvList, reqUser, dl_id, params_filterUrl)
-		}
+		} else {
+            log.warn "Not a valid export type"
+        }
 	}
 	
 	def exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl){
@@ -276,33 +278,33 @@ DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUs
 
 
 
-	def exportAsDW(downloadDir, obvList, reqUser, dl_id, params_filterUrl){
-		    List<String> list_final=[] ;
-		//File dwFile = new File(downloadDir, "obv_" + new Date().getTime() + ".dw")
-		//CSVWriter writer = getCSVWriter(dwFile.getParent(), dwFile.getName())
-		
-
-		obvList.each {
-
-		 
-		def it_observation =Observation.read(it)
-
-		println it_observation
-		 def next = it_observation as JSON ; 
+    def exportAsDW(downloadDir, obvList, reqUser, dl_id, params_filterUrl){
+        List<String> list_final=[] ;
+        //File dwFile = new File(downloadDir, "obv_" + new Date().getTime() + ".dw")
+        //CSVWriter writer = getCSVWriter(dwFile.getParent(), dwFile.getName())
 
 
-		def it_final=JSON.parse(""+next)
+        obvList.each {
 
 
- 	list_final.add(it_final)
+            def it_observation =Observation.read(it)
 
- }
+            println it_observation
+            def next = it_observation as JSON ; 
 
 
- //DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl_id, params_filterUrl );
-DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
-		
-	}
+            def it_final=JSON.parse(""+next)
+
+
+            list_final.add(it_final)
+
+        }
+
+
+        //DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl_id, params_filterUrl );
+        DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
+
+    }
 
 	
 	def CSVWriter getCSVWriter(def directory, def fileName) {

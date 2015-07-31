@@ -1498,11 +1498,10 @@ class SpeciesService extends AbstractObjectService  {
     }
 
     def export(params, dl){
-        log.debug(params)
         String action = new URL(dl.filterUrl).getPath().split("/")[2]
         def speciesInstanceList = getSpeciesList(params, action).speciesInstanceList
         log.debug " Species total $speciesInstanceList.size "
-        return exportSpeciesData(speciesInstanceList, null)
+        return exportSpeciesData(speciesInstanceList, null, dl)
     }
 
     def getSpeciesList(params, String action){
@@ -1516,15 +1515,27 @@ class SpeciesService extends AbstractObjectService  {
     /**
      * export species data
      */
-    def exportSpeciesData(String directory) {
+/*    private def exportSpeciesData(String directory) {
         return DwCAExporter.getInstance().exportSpeciesData(directory)
     } 
-
+*/
     /**
      * export species data
      */
-    def exportSpeciesData(List<Species> species, String directory) {
-        return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+    private def exportSpeciesData(List<Species> species, String directory, DownloadLog dl) {
+		if(!species || species.isEmpty())
+			return null
+		
+		File downloadDir = new File(directory?:grailsApplication.config.speciesPortal.species.speciesDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		}
+		log.debug "export type " + exportType 
+		if(exportType == DownloadLog.DownloadType.DWCA) {
+            return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+        } else {
+            log.warn "Not a valid export type"
+        }
     }
 
     /**

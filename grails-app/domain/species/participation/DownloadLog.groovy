@@ -16,7 +16,8 @@ class DownloadLog {
 		KML("KML"),
 		PDF("PDF"),
 		ZIP("ZIP"),
-		TAR("TAR")
+		TAR("TAR"),
+		DWCA("DWCA")
 		private String value;
 
 		DownloadType(String value) {
