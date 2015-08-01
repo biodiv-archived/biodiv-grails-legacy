@@ -1491,11 +1491,11 @@ class SpeciesService extends AbstractObjectService  {
     /////////////////////////////// Export ////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
-    def requestExport(params){
+    /*def requestExport(params){
         log.debug(params)
         log.debug "creating species download request"
         DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
-    }
+    }*/
 
     def export(params, dl){
         String action = new URL(dl.filterUrl).getPath().split("/")[2]

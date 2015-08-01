@@ -40,21 +40,18 @@
 			</ul>
 
 			<div class="tab-content">
-				<div id="list" class="tab-pane active">
-						<s:speciesFilter></s:speciesFilter>
-						<% /*
-                        <sUser:isAdmin>
-							<s:showDownloadAction model="['source':'Species', 'requestObject':request ]" />
-						</sUser:isAdmin>
-                        */%>
-	
-				<obv:download
-					model="['source':'Species', 'requestObject':request, 'downloadTypes':[DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'speciesList']" />
+                <div id="list" class="tab-pane active">
+                    <div class="observation">
+                        <s:speciesFilter></s:speciesFilter>
+                            <div class="btn-group pull-left" style="z-index: 10">	
+                                <obv:download
+                                model="['source':'Species', 'requestObject':request, 'downloadTypes':[DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'speciesList']" />
+                            </div>
+                        </div>
 
-
-						<div class="list span8 right-shadow-box" style="margin: 0px;">
-							<s:showSpeciesList/>
-						</div>
+                        <div class="list span8 right-shadow-box" style="margin: 0px;clear:both;">
+                            <s:showSpeciesList/>
+                            </div>
                         <div id="taxonBrowser" class="span4" style="position:relative">
 
 						    <uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
