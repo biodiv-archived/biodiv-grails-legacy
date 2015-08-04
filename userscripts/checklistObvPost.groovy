@@ -25,8 +25,8 @@ import grails.converters.JSON
 
 def mergeSynonym(){
 	def ns = ctx.getBean("namelistUtilService");
-	File file = new File("/home/sandeept/namesync/thomas/duplicatecolidstomergeSynonyms.csv")
-	//File file = new File("/apps/git/biodiv/namelist/after-migration/duplicatecolidstomergeSynonyms.csv");
+	//File file = new File("/home/sandeept/namesync/thomas/duplicatecolidstomergeSynonyms.csv")
+	File file = new File("/apps/git/biodiv/namelist/after-migration/duplicatecolidstomergeSynonyms.csv");
 	
 	def lines = file.readLines();
 	println "============ started =========="
@@ -66,9 +66,9 @@ def mergeSynonym(){
 
 def mergeAcceptedName(){
 	def ns = ctx.getBean("namelistUtilService");
-	File file = new File("/home/sandeept/namesync/thomas/duplicatestodelete.csv")
+	//File file = new File("/home/sandeept/namesync/thomas/duplicatestodelete.csv")
 	//File file = new File("/apps/git/biodiv/namelist/after-migration/toDelete.csv");
-	//File file = new File("/apps/git/biodiv/namelist/after-migration/duplicatestodelete.csv");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/duplicatestodelete.csv");
 	
 	def lines = file.readLines();
 	println "============ started =========="
@@ -263,9 +263,9 @@ def createDuplicateName(){
 	dataSource.setUnreturnedConnectionTimeout(500);
 	
 	//File file = new File("/home/sandeept/namesync/thomas/to_split.csv");
-	File file = new File("/home/sandeept/namesync/thomas/to-split_again.csv");
+	//File file = new File("/home/sandeept/namesync/thomas/to-split_again.csv");
 	//File file = new File("/apps/git/biodiv/namelist/after-migration/to_split.csv");
-	//File file = new File("/apps/git/biodiv/namelist/after-migration/to-split_again.csv");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/to-split_again.csv");
 	
 	def lines = file.readLines();
 	int i=0;
@@ -313,9 +313,9 @@ def updateColId(){
 	def sql = new Sql(dataSource)
 	
 	//File file = new File("/home/sandeept/namesync/thomas/validation_fixes.csv");
-	File file = new File("/home/sandeept/namesync/thomas/colIDreplacements.csv");
+	//File file = new File("/home/sandeept/namesync/thomas/colIDreplacements.csv");
 	//File file = new File("/apps/git/biodiv/namelist/after-migration/validation_fixes.csv");
-	//File file = new File("/apps/git/biodiv/namelist/after-migration/colIDreplacements.csv");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/colIDreplacements.csv");
 	
 	def lines = file.readLines();
 	int i=0;
@@ -452,9 +452,9 @@ def rawNamesWithNoIbpHir(){
 //mergeAcceptedName()
 //mergeSynonym()
 //createDuplicateName()
-copyIbpHir()
 //removeIsDeletedRawName()
-//addIBPHirToRawNames()
+addIBPHirToRawNames()
+//copyIbpHir()
 
 
 //rawNamesWithNoIbpHir()

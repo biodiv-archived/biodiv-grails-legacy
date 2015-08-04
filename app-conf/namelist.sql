@@ -258,10 +258,10 @@ delete from taxonomy_definition where id = 39867;;
 1. In checklistObvPost.groovy run mergeAcceptedName()
 2. In checklistObvPost.groovy run mergeSynonym()
 3. In checklistObvPost.groovy run createDuplicateName()
-4. Remove col hier for all working names and copy IBP hir as col hir.
-	In checklistObvPost.groovy run copyIbpHir()
-5. Remove accepted raw name marked as deleted 
+4. Remove accepted raw name marked as deleted 
 	In checklistObvPost.groovy run removeIsDeletedRawName()
-6. In checklistObvPost.groovy run addIBPHirToRawNames()
+5. In checklistObvPost.groovy run addIBPHirToRawNames()
+6. Remove col hier for all working names and copy IBP hir as col hir.
+	In checklistObvPost.groovy run copyIbpHir()
 
 
