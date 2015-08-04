@@ -175,10 +175,17 @@ class TaxonomyDefinition extends ScientificName {
 		  trs.addAll(TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, hir))
 	   }
 	   
+	   if(trs.isEmpty()){
+		   println "No hir found for name " + this
+		   return false
+	   }
+	   
 	   boolean isSnapped = false
 	   trs.each { TaxonomyRegistry tr ->
 		   if(!isSnapped){
 			   isSnapped = _sanpToImmediateParent(tr, targetHir)
+			   println "======== checking for path " + tr + "  path " + tr.path + "   result snap " + isSnapped
+			   
 		   }
 	   }
 	   
@@ -187,7 +194,14 @@ class TaxonomyDefinition extends ScientificName {
    }
    
    private boolean _sanpToImmediateParent(TaxonomyRegistry sourceTr,  Classification targetHir){
-	  
+	   if(!sourceTr.parentTaxonDefinition){
+		   println "No parent "
+		   return false
+	   }
+	   if(sourceTr.parentTaxonDefinition.status != NameStatus.ACCEPTED){
+		   println "Immediate parent has following status " + sourceTr.parentTaxonDefinition.status
+		   return false
+	   }
 	   TaxonomyRegistry targetTr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(sourceTr.parentTaxonDefinition, targetHir)
 	   if(!targetTr){
 		   	println  "Immediate parent does not have ibp hir or this is the raw name at kingdom level " + this

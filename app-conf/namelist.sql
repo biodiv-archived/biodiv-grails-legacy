@@ -235,10 +235,33 @@ update taxonomy_definition set match_id = 'ef9e5fbbfb2b09301c00a8cb6b44bcd0' whe
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 
+ALTER TABLE synonyms_suser DROP CONSTRAINT fkc2e9df97c09419c5,
+ADD CONSTRAINT fkc2e9df97c09419c5 FOREIGN KEY (synonyms_contributors_id) REFERENCES synonyms(id) ON DELETE CASCADE;
+
+ALTER TABLE common_names_suser DROP CONSTRAINT fka5241eb35d2d07c2,
+ADD CONSTRAINT fka5241eb35d2d07c2 FOREIGN KEY (common_names_contributors_id) REFERENCES common_names(id) ON DELETE CASCADE;
+
+update taxonomy_definition set is_deleted = false where id = 276110;
+
+delete from taxonomy_registry where taxon_definition_id = 39867;
+delete from taxonomy_definition_suser where taxonomy_definition_contributors_id = 39867;
+delete from accepted_synonym where  accepted_id = 39867;
+delete from taxonomy_definition_year where taxonomy_definition_id = 39867;
+delete from taxonomy_definition_author where taxonomy_definition_id = 39867;
+delete from doc_sci_name where taxon_concept_id = 39867;
+delete from common_names where taxon_concept_id = 39867;
+delete from synonyms where taxon_concept_id = 39867;
+delete from recommendation where taxon_concept_id = 39867;
+delete from taxonomy_definition where id = 39867;;
+
+0. In checklistObvPost.groovy run updateColId()
 1. In checklistObvPost.groovy run mergeAcceptedName()
 2. In checklistObvPost.groovy run mergeSynonym()
-3. Remove col hier for all working names and copy IBP hir as col hir.
+3. In checklistObvPost.groovy run createDuplicateName()
+4. Remove col hier for all working names and copy IBP hir as col hir.
 	In checklistObvPost.groovy run copyIbpHir()
-4. In checklistObvPost.groovy run addIBPHirToRawNames()
+5. Remove accepted raw name marked as deleted 
+	In checklistObvPost.groovy run removeIsDeletedRawName()
+6. In checklistObvPost.groovy run addIBPHirToRawNames()
 
 

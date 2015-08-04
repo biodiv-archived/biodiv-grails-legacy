@@ -644,37 +644,42 @@ class NamelistUtilService {
 		def admin = SUser.read(1L);
 		
 		def taxons;
-		def query  = ''' select id from taxonomy_definition where status = 'ACCEPTED' and position = 'RAW' and is_deleted = false order by rank, id '''
+		def query  = ''' select id from taxonomy_definition where status = 'ACCEPTED' and position = 'RAW' and is_deleted = false and rank = '''
+		//def query = ''' select id from taxonomy_definition where id not in (select distinct(taxon_definition_id) from taxonomy_registry where classification_id = 265799 and taxon_definition_id in (select id from taxonomy_definition where status = 'ACCEPTED' and position = 'RAW')) and status = 'ACCEPTED' and position = 'RAW'  order by rank, name '''
+	
 		def sql =  Sql.newInstance(dataSource);
 		
 		int failCount = 0
 		int i = 0
-		int offset = 0
-		int limit = 100
-		while(true){
-			if(i%20 == 0){
-				println "-- Count  " + i + " failed Count " + failCount
-			}
-			
-			String q = query + " limit " + limit + " offset " + offset
-			taxons = sql.rows(q)
-			if(taxons.isEmpty())
-				break
-			
-			TaxonomyRegistry.withNewTransaction {	
-			taxons.each { t ->
-				i++
-				TaxonomyDefinition td = TaxonomyDefinition.get(t.id)
-				boolean isSnapped = td.snapToIBPHir(hirList, ibp_classifi)
-				if(!isSnapped){
-					failCount ++
-					println "failed for " +  td 
+		for(int r = 0; r <= 10 ; r++){
+			int offset = 0
+			int limit = 100
+			while(true){
+				if(i%20 == 0){
+					println "-- Count  " + i + " failed Count " + failCount
 				}
+				
+				String q = query + r + " order by rank, id  limit " + limit + " offset " + offset
+				taxons = sql.rows(q)
+				if(taxons.isEmpty())
+					break
+				
+				TaxonomyRegistry.withNewTransaction {	
+				taxons.each { t ->
+					i++
+					TaxonomyDefinition td = TaxonomyDefinition.get(t.id)
+					println "--------------------------- starting " + td 
+					boolean isSnapped = td.snapToIBPHir(hirList, ibp_classifi)
+					if(!isSnapped){
+						failCount ++
+						println "failed for " +  td 
+					}
+				}
+				}
+				utilsService.cleanUpGorm()
+				offset = offset + limit;
+				
 			}
-			}
-			utilsService.cleanUpGorm()
-			offset = offset + limit;
-			
 		}
 		dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		println "Failed count " + failCount   + "  Total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
