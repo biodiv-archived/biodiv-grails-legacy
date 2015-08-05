@@ -63,6 +63,8 @@ import species.NamesMetadata.NameStatus;
 import content.eml.DocSciName;
 import content.eml.Document;
 import species.AcceptedSynonym;
+import species.sourcehandler.exporter.DwCSpeciesExporter
+import java.io.File ;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -1501,7 +1503,20 @@ class SpeciesService extends AbstractObjectService  {
         String action = new URL(dl.filterUrl).getPath().split("/")[2]
         def speciesInstanceList = getSpeciesList(params, action).speciesInstanceList
         log.debug " Species total $speciesInstanceList.size "
-        return exportSpeciesData(speciesInstanceList, null, dl)
+        List<String> list_final=[] ;
+
+
+        speciesInstanceList.each {
+            println it 
+            def it_next= it as JSON ; 
+            def it_final=JSON.parse(""+it_next)
+            list_final.add(it_final)
+
+        }
+
+         return DwCSpeciesExporter.getInstance().exportSpecieData( null, list_final, dl.author, dl.id, dl.filterUrl )
+        //return exportSpeciesData(speciesInstanceList, null, dl)
+
     }
 
     def getSpeciesList(params, String action){
