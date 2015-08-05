@@ -32,7 +32,7 @@ $(document).ready(function() {
             </g:else>
     </g:if>
 
-    <g:if test="${relatedInstanceList || observationId}">
+    <g:if test="${relatedInstanceList || filterProperty != 'featureBy'}">
 
 <div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;" data-url="${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}" data-contextFreeUrl=${uGroup.createLink(controller:resultController?:controller, action:'show')}>
 	<ul style="list-style:none; width:100%; margin-left:0px;">
