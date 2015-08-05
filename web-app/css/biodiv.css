@@ -1116,7 +1116,12 @@ input,button,select,textarea {
 	font-weight: bold;
 }
 
-tr.taxon-highlight {
+#taxonHierarchy {
+    overflow:auto;
+    max-height:300px;
+}
+
+.taxon-highlight {
 	font-weight: bold;
     border: 1px solid #fad42e;
       background: #fbec88;
@@ -2968,7 +2973,7 @@ small {
 }
 
 .RAW {
-    background-color:red;
+    background-color:red !important;
 }
 .WORKING {
 }

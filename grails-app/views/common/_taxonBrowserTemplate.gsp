@@ -27,10 +27,10 @@
 
     </div>
 </div>
- <table id="taxonHierarchy" class="emptyField"></table>
+ <div id="taxonHierarchy" class="emptyField"></div>
  </g:if>
 <g:else>
-<table id="taxonHierarchy" class="emptyField" style="width: 938px;"></table>
+<div id="taxonHierarchy" class="emptyField" style="width: 938px;"></div>
 </g:else>
 <g:if test="${queryParams && queryParams.taxon instanceof TaxonomyDefinition}">
 <input type="hidden" id="taxon" name="taxon" value="${queryParams.taxon.id}"></input>

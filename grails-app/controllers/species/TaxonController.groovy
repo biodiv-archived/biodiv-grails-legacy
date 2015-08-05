@@ -46,7 +46,7 @@ class TaxonController {
         includeOriginHeader();
 
         int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0
-        def parentId = params.nodeid  ?: null
+        def parentId = params.id  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
         def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
         Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
@@ -76,7 +76,7 @@ class TaxonController {
                 tillLevel = taxon.rank;
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
             }
-            def cl = Classification.read(classSystem.toLong());
+            //def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
             println "========RES SIZE ========== " + rs.size() 
             /*if(cl == classification) {
@@ -85,7 +85,7 @@ class TaxonController {
             }*/
         }
         log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
-        render(contentType: "text/xml", text:buildHierarchyResult(rs, classSystem))
+        render buildHierarchyResult(rs, classSystem) as JSON
     }
 
     /**
@@ -341,8 +341,51 @@ class TaxonController {
      * @param classSystem
      * @return
      */
-    private String buildHierarchyResult(rs, classSystem) {
-        def writer = new StringWriter ();
+    private List buildHierarchyResult(rs, classSystem) {
+        List result = [];
+        rs.each { r ->
+            Map map = [:]
+            String parentPath = "";
+            if(r.path && r.path.lastIndexOf("_")!=-1) {
+                parentPath = r.path.substring(0, r.path.lastIndexOf("_"))
+            }
+            def id;
+            if(r.containsKey(id)) {
+                id = r.id;
+            } else {
+                id = r.path;
+            }
+
+            map['id'] = id
+            map['parent'] = parentPath?:'#'
+            map['text'] = r.name.trim()
+            map['icon'] = false;
+            map['speciesid'] = r["speciesid"]
+            map['taxonid'] = r["taxonid"]
+            map['classsystem'] = r["classsystem"]
+            map['rank'] = r.rank
+            map['type'] = r.rank+''
+            map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false
+            if(r.containsKey('isContributor')) {
+                map['isContributor'] = r.isContributor?:false
+            } else {
+                map['isContributor'] = false
+            }
+            map['position'] = r["position"]
+
+            map['state'] = [
+            opened    : r.expanded?:false,  // is the node open
+            loaded : r.loaded ?:false,
+            disabled  : false  // is the node disabled
+            ]
+            
+            map['li_attr'] = []  // attributes for the generated LI node
+            map['a_attr'] = ['class':map['position']]  // attributes for the generated A node
+
+            result << map
+        }
+        return result;
+/*        def writer = new StringWriter ();
         def result = new MarkupBuilder(writer);
         int i=0;
         result.rows() {
@@ -388,7 +431,7 @@ class TaxonController {
             records (size)
         }
         return writer.toString();
-    }
+*/    }
 
     /**
      * 

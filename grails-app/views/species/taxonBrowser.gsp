@@ -103,7 +103,10 @@
         <r:script>
         $(document).ready(function() {
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
-                expandAll:false
+                expandAll:false,
+                controller:"${params.controller?:'namelist'}",
+                action:"${params.action?:'index'}"
+
             });	
             /*$("#searchPermission").autofillNames({
                 'appendTo' : '#nameSuggestions',

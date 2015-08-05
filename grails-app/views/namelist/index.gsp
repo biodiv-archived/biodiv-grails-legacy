@@ -59,7 +59,12 @@
 	}
 	.taxon_selector_wrapper{
 		//width:285px!important;
+        overflow:hidden;
 	}
+    #taxaHierarchy #taxonHierarchy {
+      overflow: auto;
+      height: 228px;
+    }
 
 	.taxon_selector_wrapper_span{
         padding: 3px 65px;

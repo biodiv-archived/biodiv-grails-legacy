@@ -333,7 +333,7 @@ $(document).ready(function(){
         return false;
     });
 
-    $(".removeQueryFilter").on('click', function(){
+    $(document).on('click', ".removeQueryFilter", function(){
         var removeParam = undefined;
         if($('input[name="'+$(this).attr('data-target')+'"]').length != 0)
             $('input[name="'+$(this).attr('data-target')+'"]').val('')
@@ -929,6 +929,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     } else {
         delete params['taxon']
         delete params['classification']
+        $(".jstree-anchor").removeClass('taxon-highlight');
     }
 
     var taxonRank = $("input#taxonRank").val();

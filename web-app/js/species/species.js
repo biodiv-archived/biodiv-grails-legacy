@@ -141,6 +141,7 @@ var updateEditorContent = function() {
     }
 }
 
+/*
 var setTaxonId = function(el, rowId){
     var last = rowId.substring(rowId.lastIndexOf("_") + 1, rowId.length);
     $(el).parent("span").find(".taxDefIdVal").val(last);
@@ -157,7 +158,7 @@ var expandAll = function(gridId, rowId, force) {
           rowData['expanded'] = 'false';
           rowData['loaded'] = 'false';
           */
-    }
+/*    }
     if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false') {
         var postData = grid.getGridParam('postData');
         if(grid.getNodeChildren(rowData).length == 0)
@@ -167,7 +168,7 @@ var expandAll = function(gridId, rowId, force) {
         //$("#" + rowId + " div.treeclick").trigger('click');
     } 
 }
-
+*/
 var initializeCKEditor = function() {
     /*
      * CKEDITOR.on('instanceReady', function(ev) { var editor = ev.editor; var

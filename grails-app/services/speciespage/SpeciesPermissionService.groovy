@@ -17,6 +17,7 @@ import species.participation.UserToken;
 import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
 import grails.util.Environment;
+import species.ScientificName.TaxonomyRank;
 
 class SpeciesPermissionService {
 
@@ -183,7 +184,7 @@ class SpeciesPermissionService {
         if(!selectedNodes) return "Please select a node";
         def rankLevel
         def rankArray = [];
-        TaxonomyDefinition.TaxonomyRank.each {
+        TaxonomyRank.each {
             rankArray << it.value()
         }
 
@@ -230,7 +231,7 @@ class SpeciesPermissionService {
         if(!selectedNodes) return "Please select a node";
         def rankLevel
         def rankArray = [];
-        TaxonomyDefinition.TaxonomyRank.each {
+        TaxonomyRank.each {
             rankArray << it.value()
         }
 
@@ -272,7 +273,7 @@ class SpeciesPermissionService {
         if(!selectedNodes) return "Please select a node";
         def rankLevel
         def rankArray = [];
-        TaxonomyDefinition.TaxonomyRank.each {
+        TaxonomyRank.each {
             rankArray << it.value()
         }
 

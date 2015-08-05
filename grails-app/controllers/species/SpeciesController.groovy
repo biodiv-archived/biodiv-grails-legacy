@@ -239,7 +239,7 @@ class SpeciesController extends AbstractObjectController {
                     def model = utilsService.getErrorModel(flash.message, null, OK.value())
                     withFormat {
                         html {
-                            url = uGroup.createLink(controller:"species", action:"contribute");
+                            def url = uGroup.createLink(controller:"species", action:"contribute");
                             redirect url: url
                         }
                         json { render model as JSON }
@@ -457,7 +457,6 @@ class SpeciesController extends AbstractObjectController {
 						}
 					} else if(category.key.equals(config.documents)) {
                         show = DocSciName.speciesHasDocuments(speciesInstance);
-                        println "======SHOW ===== " + show
                     } else if(category.key.equals(config.ss_v_r)) {
                         if(speciesInstance.taxonConcept.rank == TaxonomyRank.SPECIES.ordinal()) {
                             show = speciesInstance.fetchInfraSpecies().size()>0;
