@@ -245,9 +245,7 @@ class DocumentController extends AbstractObjectController {
             try {
                 def documentInstance = Document.get(params.long('id'))
                 if (documentInstance) {
-                    userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
 				    documentService.documentDelete(documentInstance)
-                    documentInstance.delete(flush: true, failOnError:true)
 
                     msg = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 

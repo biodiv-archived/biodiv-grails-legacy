@@ -47,12 +47,11 @@ public max_date
 		return _instance;
 	}
 	
-def exportObservationData(String directory, list_of_observationInstance, reqUser , dl_id , params_filterUrl) {
+	def exportObservationData(String directory, list_of_observationInstance, reqUser , dl_id , params_filterUrl) {
 		log.info "Darwin Core export started"
-		/* if(!directory) {
-			directory = config.speciesPortal.species.speciesDownloadDir
-		} */
-//extract_identified_by(list_of_observationInstance[0]); 
+			if(!directory) {
+				directory = config.speciesPortal.species.speciesDownloadDir
+			} 
 
 
 		String folderName = "dwc_"+ + new Date().getTime()
@@ -75,45 +74,54 @@ def exportObservationData(String directory, list_of_observationInstance, reqUser
 
 
 
-public File returnMetaData_EML( String folderPath, reqUser, dl_id, params_filterUrl) {
+	public File returnMetaData_EML( String folderPath, reqUser, dl_id, params_filterUrl) {
+
+		 File folder= new File(folderPath)
+			 if(!folder.exists()){
+					folder.mkdirs()
+			}
+
+		File eml = new File ( folder,  'metadata.eml.xml' )
+				if(!eml.exists()){
+					eml.createNewFile()
+
+				}
+				
+
+		eml << '<?xml version="1.0" encoding="utf-8"?>\n<eml:eml\n        xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" \n        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \n        xmlns:dc="http://purl.org/dc/terms/" \n        xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1" \n        xml:lang="en"\n        packageId="IndiaBiodiversityPortal.observations.eml.'
+	  eml << dl_id
+	  eml << '"\n        system="http://indiabiodiversity.org" \n        scope="system">\n\t<dataset>\n\t\t<alternateIdentifier>'
+	  eml << params_filterUrl
+	  eml << '</alternateIdentifier>\n\t\t<title xml:lang="en">'
+	  eml << dl_id +" "+ new Date()
+	  eml << '</title>\n\n\n\n\n\t\t<pubDate>'
+	  eml << new Date()
+	  eml << '</pubDate>\n\t\t\t<!-- This is the RESOURCE language and not the metadata language which is at the bottom -->\n\t\t<language>en_US</language>\n\t\t<abstract>\n\t\t\t<para>'
+	  eml << dl_id
+	  eml << '</para>\n\t\t</abstract>\n\t\t<intellectualRights>\n\t\t\t<para>\n\t\t\t\tIndia Biodiversity Portal, downloaded on '
+	  eml << new Date()
+	  eml << '.\n\t\t\t\tFree for use by all individuals provided that the\n\t\t\t\trights holder is acknowledged under terms of \n\t\t\t\tCreative Commons licences in any use or publication.\n\t\t\t</para>\n\t\t</intellectualRights>\n\t\t<!-- The distributionType URL is generally meant for informational purposes, and the "function" attribute should be set to "information". -->\n\t\t<distribution scope="document">\n\t\t\t<online>\n\t\t\t\t<url function="information">'
+	  eml << "url of dl_id"
+	  eml << '</url>\n\t\t\t</online>\n\t\t</distribution>\n\t\t<coverage>\n\t\t\t<geographicCoverage>\n\t\t\t\t<geographicDescription>Bounding Box</geographicDescription>\n\t\t\t\t<boundingCoordinates>\n\t\t\t\t\t<westBoundingCoordinate>'
+	  eml << min_lon
+	  eml << '</westBoundingCoordinate>\n\t\t\t\t\t<eastBoundingCoordinate>'
+	  eml << max_lon
+	  eml << '</eastBoundingCoordinate>\n\t\t\t\t\t<northBoundingCoordinate>'
+	  eml << max_lat
+	  eml << '</northBoundingCoordinate>\n\t\t\t\t\t<southBoundingCoordinate>'
+	  eml << min_lat
+	  eml << '</southBoundingCoordinate> \n\t\t\t\t</boundingCoordinates>\n\t\t\t</geographicCoverage>\n\t\t\t<temporalCoverage>\n\t\t\t\t<rangeOfDates>\n\t\t\t\t\t<beginDate>\n\t\t\t\t\t\t<calendarDate>'
+	  eml << min_date
+	  eml << '</calendarDate>\n\t\t\t\t\t</beginDate>\n\t\t\t\t\t<endDate>\n\t\t\t\t\t\t<calendarDate>'
+	  eml << max_date
+	  eml << '</calendarDate>\n\t\t\t\t\t</endDate>\n\t\t\t\t</rangeOfDates>\n\t\t\t</temporalCoverage>\n\t\t</coverage>\n\t</dataset>\n</eml:eml> '
 
 
 
-File eml= new File (folderPath + '/metadata.eml.xml')
-
-	eml << '<?xml version="1.0" encoding="utf-8"?>\n<eml:eml\n        xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" \n        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \n        xmlns:dc="http://purl.org/dc/terms/" \n        xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1" \n        xml:lang="en"\n        packageId="IndiaBiodiversityPortal.observations.eml.'
-  eml << dl_id
-  eml << '"\n        system="http://indiabiodiversity.org" \n        scope="system">\n\t<dataset>\n\t\t<alternateIdentifier>'
-  eml << params_filterUrl
-  eml << '</alternateIdentifier>\n\t\t<title xml:lang="en">'
-  eml << dl_id +" "+ new Date()
-  eml << '</title>\n\n\n\n\n\t\t<pubDate>'
-  eml << new Date()
-  eml << '</pubDate>\n\t\t\t<!-- This is the RESOURCE language and not the metadata language which is at the bottom -->\n\t\t<language>en_US</language>\n\t\t<abstract>\n\t\t\t<para>'
-  eml << dl_id
-  eml << '</para>\n\t\t</abstract>\n\t\t<intellectualRights>\n\t\t\t<para>\n\t\t\t\tIndia Biodiversity Portal, downloaded on '
-  eml << new Date()
-  eml << '.\n\t\t\t\tFree for use by all individuals provided that the\n\t\t\t\trights holder is acknowledged under terms of \n\t\t\t\tCreative Commons licences in any use or publication.\n\t\t\t</para>\n\t\t</intellectualRights>\n\t\t<!-- The distributionType URL is generally meant for informational purposes, and the "function" attribute should be set to "information". -->\n\t\t<distribution scope="document">\n\t\t\t<online>\n\t\t\t\t<url function="information">'
-  eml << "url of dl_id"
-  eml << '</url>\n\t\t\t</online>\n\t\t</distribution>\n\t\t<coverage>\n\t\t\t<geographicCoverage>\n\t\t\t\t<geographicDescription>Bounding Box</geographicDescription>\n\t\t\t\t<boundingCoordinates>\n\t\t\t\t\t<westBoundingCoordinate>'
-  eml << min_lon
-  eml << '</westBoundingCoordinate>\n\t\t\t\t\t<eastBoundingCoordinate>'
-  eml << max_lon
-  eml << '</eastBoundingCoordinate>\n\t\t\t\t\t<northBoundingCoordinate>'
-  eml << max_lat
-  eml << '</northBoundingCoordinate>\n\t\t\t\t\t<southBoundingCoordinate>'
-  eml << min_lat
-  eml << '</southBoundingCoordinate> \n\t\t\t\t</boundingCoordinates>\n\t\t\t</geographicCoverage>\n\t\t\t<temporalCoverage>\n\t\t\t\t<rangeOfDates>\n\t\t\t\t\t<beginDate>\n\t\t\t\t\t\t<calendarDate>'
-  eml << min_date
-  eml << '</calendarDate>\n\t\t\t\t\t</beginDate>\n\t\t\t\t\t<endDate>\n\t\t\t\t\t\t<calendarDate>'
-  eml << max_date
-  eml << '</calendarDate>\n\t\t\t\t\t</endDate>\n\t\t\t\t</rangeOfDates>\n\t\t\t</temporalCoverage>\n\t\t</coverage>\n\t</dataset>\n</eml:eml> '
+	return eml
 
 
-return eml
-
-
-}
+	}
 	protected void fillHeaders() {
 		String[] observationHeader = [	
 
@@ -191,69 +199,69 @@ return eml
 
 	public def exportOccurence( list_of_observationInstance, reqUser, dl_id , params_filterUrl) {
 
-	String[] observationRow
-	String  result2 = ""
-	boolean flag=true
-	def date =new Date()//.getTime()
+		String[] observationRow
+		String  result2 = ""
+		boolean flag=true
+		def date =new Date()//.getTime()
 
-list_of_observationInstance.each {
-	
-		observationRow = new String[23]
-		observationRow[0] = (!it?.id) ? "" : it?.id;
-		observationRow[1] = (!it?.lastRevised) ? "" : it?.lastRevised;  // should be last updated
-		observationRow[2] = (!it?.author?.name) ? "" : it?.author?.name; //IBP users ID for Darwin core archive generation  
-		observationRow[3] = "India Biodiversity Portal" //institution id
-		observationRow[4] = dl_id //datasetid
-		observationRow[5]=params_filterUrl +date
-		observationRow[6] = "humanObservation" //basis of record
-		observationRow[7] =  informationWithheld_extraction(it)
-		observationRow[8] = "http://indiabiodiversity.org/observation/show/"+it?.id 
-		observationRow[9] = it?.author?.name +"(http://indiabiodiversity.org/user/show/" + it?.author?.id +")"
-		observationRow[10] = notes_extraction(it)
-		observationRow[11] = (!it?.fromDate) ? "" : it?.fromDate;
-		observationRow[12] = (!it?.habitat?.name) ? "" : it?.habitat?.name;
-		observationRow[13] = (!it?.placeName) ? "" : it?.placeName;
-		observationRow[14] = (!it?.locationAccuracy) ? "" : it?.locationAccuracy;
-		observationRow[15] = extract_latitude(it)
+		list_of_observationInstance.each {
+		
+			observationRow = new String[23]
+			observationRow[0] = (!it?.id) ? "" : it?.id;
+			observationRow[1] = (!it?.lastRevised) ? "" : it?.lastRevised;  // should be last updated
+			observationRow[2] = (!it?.author?.name) ? "" : it?.author?.name; //IBP users ID for Darwin core archive generation  
+			observationRow[3] = "India Biodiversity Portal" //institution id
+			observationRow[4] = dl_id //datasetid		
+			observationRow[5]=   params_filterUrl + " " + date
+			observationRow[6] = "humanObservation" //basis of record
+			observationRow[7] =  informationWithheld_extraction(it)
+			observationRow[8] = "http://indiabiodiversity.org/observation/show/"+it?.id 
+			observationRow[9] = it?.author?.name +"(http://indiabiodiversity.org/user/show/" + it?.author?.id +")"
+			observationRow[10] = notes_extraction(it)
+			observationRow[11] = (!it?.fromDate) ? "" : it?.fromDate;
+			observationRow[12] = (!it?.habitat?.name) ? "" : it?.habitat?.name;
+			observationRow[13] = (!it?.placeName) ? "" : it?.placeName;
+			observationRow[14] = (!it?.locationAccuracy) ? "" : it?.locationAccuracy;
+			observationRow[15] = extract_latitude(it)
 
-			
-		def lat=extract_latitude(it)
-		observationRow[16] = extract_longitude(it)
-		def lon=extract_longitude(it)
-	
-		if(flag){
+				
+			def lat=extract_latitude(it)
+			observationRow[16] = extract_longitude(it)
+			def lon=extract_longitude(it)
+		
+			if(flag){
 
-			min_lat=lat
-			max_lat=lat
-			min_lon=lon
-			max_lon=lon
-			min_date=it?.fromDate
-			max_date=it?.fromDate
-			flag=false
-		}
-		else {
-			if(lat<min_lat)
 				min_lat=lat
-			if(lat>max_lat)
 				max_lat=lat
-			if(lon<min_lon)
 				min_lon=lon
-			if(lon>max_lon)
 				max_lon=lon
-			min_date=compareDate(it?.fromDate,min_date)
-			max_date=compareDateMax(it?.fromDate, max_date)
-		}
+				min_date=it?.fromDate
+				max_date=it?.fromDate
+				flag=false
+			}
+			else {
+				if(lat<min_lat)
+					min_lat=lat
+				if(lat>max_lat)
+					max_lat=lat
+				if(lon<min_lon)
+					min_lon=lon
+				if(lon>max_lon)
+					max_lon=lon
+				min_date=compareDate(it?.fromDate,min_date)
+				max_date=compareDateMax(it?.fromDate, max_date)
+			}
 
-	
-		observationRow[17] = extract_identified_by(it)  
-		observationRow[18] = extract_date_identified(it)
-		observationRow[19] = (!it?.maxVotedReco?.sciNameReco?.id) ? "" : it?.maxVotedReco?.sciNameReco?.id//specieNameid
-		observationRow[20] = (!it?.maxVotedReco?.sciNameReco?.name) ? "Unidentified" : it?.maxVotedReco?.sciNameReco?.name		
-		observationRow[21] = extract_vernacularName(it?.maxVotedReco?.commonNamesRecoList)
-		observationRow[22]= "Copyright " + it?.author?.name  +  " licensed under a Creative Commons license: http://creativecommons.org/licenses/by/3.0 " 
-		observationWriter.writeNext(observationRow)
+		
+			observationRow[17] = extract_identified_by(it)  
+			observationRow[18] = extract_date_identified(it)
+			observationRow[19] = (!it?.maxVotedReco?.sciNameReco?.id) ? "" : it?.maxVotedReco?.sciNameReco?.id//specieNameid
+			observationRow[20] = (!it?.maxVotedReco?.sciNameReco?.name) ? "Unidentified" : it?.maxVotedReco?.sciNameReco?.name		
+			observationRow[21] = extract_vernacularName(it?.maxVotedReco?.commonNamesRecoList)
+			observationRow[22]= "Copyright " + it?.author?.name  +  " licensed under a Creative Commons license: http://creativecommons.org/licenses/by/3.0 " 
+			observationWriter.writeNext(observationRow)
+		}
 	}
-}
 
 	public def exportMedia(list_of_observationInstance) {
 		String[] mediaRow
@@ -268,7 +276,7 @@ list_of_observationInstance.each {   second->
 			mediaRow[2] = (!it?.url) ? "" : it?.url;
 			mediaRow[3] =(!it?.uploadTime) ? "" : it?.uploadTime; 
 			mediaRow[4] =(!it?.uploader?.name) ? "" : it?.uploader?.name+ ' (http://indiabiodiversity.org/user/show/' + it?.uploader?.id+')'
-			mediaRow[5] = "Copyright " + it?.uploader?.name  +  " licensed under a Creative Commons "+license+" license: http://creativecommons.org/licenses/by/3.0/" //this is temporary the actual licence should be pulled from the server 	
+			mediaRow[5] = "Copyright " + it?.uploader?.name  +  " licensed under a Creative Commons "+it?.licenses+" license: http://creativecommons.org/licenses/by/3.0/" //this is temporary the actual licence should be pulled from the server 	
 
 
 			mediaWriter.writeNext(mediaRow)		
@@ -398,7 +406,7 @@ def extract_date_identified(observationInstance) {
 		
 
 
-		def extract_year(String date) {
+	def extract_year(String date) {
 
 		String year = date.substring(0, 4)	
 	
@@ -426,111 +434,111 @@ def extract_date_identified(observationInstance) {
 		String time=date.substring(11, 19)
 			
 			return time
-		}
+	}
 
 
 
-	  def compareDate(String date1, String date2) {     
-	  
-	
-String year1=extract_year(date1)
-String year2=extract_year(date2)
-String month1=extract_month(date1)
-String month2=extract_month(date2)
-String day1=extract_day(date1)
-String day2=extract_day(date2)
-String time1=extract_time(date1)
-String time2= extract_time(date2)
+	def compareDate(String date1, String date2) {     
+			  
+			
+		String year1=extract_year(date1)
+		String year2=extract_year(date2)
+		String month1=extract_month(date1)
+		String month2=extract_month(date2)
+		String day1=extract_day(date1)
+		String day2=extract_day(date2)
+		String time1=extract_time(date1)
+		String time2= extract_time(date2)
 
-	if(year1<year2 ){
-	
+			if(year1<year2 ){
+			
+				return date1
+			}
+			else if (year2<year1 ) {
+				
+				return date2
+				}
+			else if(month1<month2){
+				
+					return date1
+				}
+
+			else if(month2<month1){
+				
+					return date2
+				}
+			else if(day1<day2) {
+				
+				return date1
+			}
+			else if (day2<day1) {
+				
+				return date2
+			}
+			else if (time1<time2){
+				
+			return date1
+			}
+			else if (time2<time1){
+				
+			return date2
+			}
+			
 		return date1
 	}
-	else if (year2<year1 ) {
-		
-		return date2
-		}
-	else if(month1<month2){
-		
-			return date1
-		}
 
-	else if(month2<month1){
+	def compareDateMax(String date1, String date2) {     
+		  
+		
+	String year1=extract_year(date1)
+	String year2=extract_year(date2)
+	String month1=extract_month(date1)
+	String month2=extract_month(date2)
+	String day1=extract_day(date1)
+	String day2=extract_day(date2)
+	String time1=extract_time(date1)
+	String time2= extract_time(date2)
+
+		if(year1<year2 ){
 		
 			return date2
 		}
-	else if(day1<day2) {
-		
-		return date1
-	}
-	else if (day2<day1) {
-		
-		return date2
-	}
-	else if (time1<time2){
-		
-	return date1
-	}
-	else if (time2<time1){
-		
-	return date2
-	}
-	
-return date1
-}
+		else if (year2<year1 ) {
+			return date1
+			
+			}
+		else if(month1<month2){
+			
+				return date2
+			}
 
-def compareDateMax(String date1, String date2) {     
-	  
-	
-String year1=extract_year(date1)
-String year2=extract_year(date2)
-String month1=extract_month(date1)
-String month2=extract_month(date2)
-String day1=extract_day(date1)
-String day2=extract_day(date2)
-String time1=extract_time(date1)
-String time2= extract_time(date2)
+		else if(month2<month1){
+			
+				return date1
 
-	if(year1<year2 ){
-	
-		return date2
-	}
-	else if (year2<year1 ) {
-		return date1
-		
-		}
-	else if(month1<month2){
-		
+			}
+		else if(day1<day2) {
+			
 			return date2
-		}
 
-	else if(month2<month1){
-		
+		}
+		else if (day2<day1) {
+			
 			return date1
 
 		}
-	else if(day1<day2) {
-		
+		else if (time1<time2){
+			
 		return date2
 
-	}
-	else if (day2<day1) {
+		}
+		else if (time2<time1){
+			
+			return date1
+		}
 		
-		return date1
-
+		return date2
 	}
-	else if (time1<time2){
-		
-	return date2
-
-	}
-	else if (time2<time1){
-		
-		return date1
-	}
-	
-	return date2
-}
 
 	def extract_latitude(observationInstance) {
 		String topo= observationInstance?.topology
@@ -580,34 +588,31 @@ String time2= extract_time(date2)
 	}
 
 
-def extract_vernacularName(observationInstance){
-String result=""
+	def extract_vernacularName(observationInstance){
+		String result=""
 
-	observationInstance.each{
-		if (result=="") {
-			result= it?.language?.name + " : "+ it?.name	//language should be exchanged into 2 letters hashmap
-		}
-		else{
-			result=result +", "+ it?.language?.name + " : "+ it?.name	 
-		}
+			observationInstance.each{
+				if (result=="") {
+					result= it?.language?.name + " : "+ it?.name	//language should be exchanged into 2 letters hashmap
+				}
+				else{
+					result=result +", "+ it?.language?.name + " : "+ it?.name	 
+				}
+			}
+		return result
+
 	}
-return result
-
-}
 
 
-		def archive(directory, folderName) {
+	def archive(directory, folderName) {
 
-
-			def HOME = directory +File.separator + folderName
-			println HOME
-			def deploymentFiles = [ folderName+'/meta.xml', folderName+'/metadata.eml.xml', folderName+'/multimedia.txt', folderName+'/occurrence.txt' ]
-			def zipFile = new File(HOME + ".zip")
-			
-
-			new AntBuilder().zip( basedir: HOME,
+		def HOME = directory +File.separator + folderName
+		def deploymentFiles = [ folderName+'/meta.xml', folderName+'/metadata.eml.xml', folderName+'/multimedia.txt', folderName+'/occurrence.txt' ]
+		def zipFile = new File(HOME + ".zip")			
+		new AntBuilder().zip( basedir: HOME,
                       destFile: zipFile.absolutePath,
                       includes: deploymentFiles.join(' ') )
+			return zipFile
             
 	}
 

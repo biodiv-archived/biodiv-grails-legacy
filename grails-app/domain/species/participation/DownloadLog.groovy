@@ -16,7 +16,8 @@ class DownloadLog {
 		KML("KML"),
 		PDF("PDF"),
 		ZIP("ZIP"),
-		TAR("TAR")
+		TAR("TAR"),
+		DWCA("DWCA")
 		private String value;
 
 		DownloadType(String value) {
@@ -48,6 +49,7 @@ class DownloadLog {
 		paramsMapAsText nullable:true, blank: true
 		filePath nullable:true
     }
+
 	static mapping = {
 		version : false;
 		notes type:'text';
@@ -64,11 +66,9 @@ class DownloadLog {
 		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status, sourceType:sourceType, paramsMapAsText:paramsMapAsText)
 		if(!dl.save(flush:true)){
 			dl.errors.allErrors.each { println it }
-			return null
-		}else{
-			return dl
-		}
-	}
+	 	}
+		return dl
+	 }
 	
 	static DownloadType getType(String dType){
 		if(!dType) return null;

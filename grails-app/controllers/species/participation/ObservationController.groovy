@@ -1587,10 +1587,8 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def requestExport() {
-		obvUtilService.requestExport(params)
-		def r = [:]
-		r['msg']= "${message(code: 'observation.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
-		render r as JSON
+        def r = obvUtilService.requestExport(params)
+        render r as JSON
 	}
 	
 	@Secured(['ROLE_USER'])

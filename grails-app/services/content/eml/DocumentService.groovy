@@ -782,16 +782,24 @@ class DocumentService extends AbstractObjectService {
 
     def runAllDocuments() {
         List documentInstanceList = Document.list();
+        return runDocuments(documentInstanceList, false);
+    }
+
+    def runDocuments(List documentInstanceList, boolean rerun=false) {
         def url = '';
         def tokenUrl = '';
         int i = 0;
         def numOfDocs = documentInstanceList.size()
+        println numOfDocs;
+        println "==============++++"
         while(i < numOfDocs) {
             DocumentTokenUrl.withNewTransaction { 
                 def instance = documentInstanceList.get(i)
+                println instance
+                log.debug instance
                 i++;
                 def p = DocumentTokenUrl.findByDoc(instance)
-                if(!p) {
+                if(!p || rerun) {
                     if(instance?.uFile != null){
                         url = grailsApplication.config.speciesPortal.content.serverURL
                         url = url+instance?.uFile?.path 
@@ -806,24 +814,33 @@ class DocumentService extends AbstractObjectService {
                         uri.query = [ url:url ]     	
                         headers.Accept = '*/*'
                         response.success = { resp,  reader ->
-                            //println "========reader====="+reader;
-                            //println "========reader====="+reader.token_url;
+                            println "========reader====="+reader;
+                            println "========reader====="+reader.token_url;
                             tokenUrl = reader.token_url;
                         }
                         response.'404' = { status = ObvUtilService.FAILED }
                     }
                     DocumentTokenUrl.createLog(instance, tokenUrl);
                 }//IF
+                else {
+                    println "Already tried"
+                }
             }
         }//each
     }
-     def documentDelete(Document docInstance){
-    	def  docTokenId =DocumentTokenUrl.findByDoc(docInstance)
-    		 docTokenId.delete();
-    	List docSciNameId = DocSciName.findAllByDocument(docInstance)
-    		 docSciNameId.each {
-    			it.delete();
-    			}
+
+    def documentDelete(Document documentInstance){
+        userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
+
+
+        def  docTokenId =DocumentTokenUrl.findByDoc(documentInstance)
+        docTokenId.delete();
+        List docSciNameId = DocSciName.findAllByDocument(documentInstance)
+        docSciNameId.each {
+        it.delete();
+        }
+
+        documentInstance.delete(flush: true, failOnError:true)
     }
 
     def Map updateTags(params,domainInstance){

@@ -181,6 +181,8 @@ class AbstractObjectService {
         query += orderByClause
 
         log.debug "FeaturedQuery:"+ query + " params: "+queryParams
+        println "FeaturedQuery:"+ query + " params: "+queryParams
+        
         featured = Featured.executeQuery(query, queryParams);
         def observations = [:]
         featured.each {

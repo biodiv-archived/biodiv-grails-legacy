@@ -1748,7 +1748,7 @@ class XMLConverter extends SourceConverter {
                                 flag = false;
                                 return;
                             }
-                            if(fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
+                            if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
 								println " =========== got taxon but creating duplicate "
                                 taxon = null;
                             }
@@ -1836,25 +1836,19 @@ class XMLConverter extends SourceConverter {
                                     //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
                                     //taxon = namelistService.updateAttributes(taxon, res);
                                 }
-                            } else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
-                                def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
-                                spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
-                                //copy names of taxon to old taxon.
-                                //mark it flagged
-                                //save oldTaxon
-                                taxon = oldTaxon;
-                            } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
-                                println "=====TAXON WAS THERE================================== "
-                                /*
-                                def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
-                                if(synonym)
-                                    synonym.updateContributors(getUserContributors(fieldNode.data))
-                                */
                             } else if(taxon && fromCOL) {
+								println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> coming here"
+								if(fieldNode == fieldNodes.last()){
+									taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
+									taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
+									taxon.authorYear = otherParams?.metadata?otherParams.metadata.authorString:"";
+								}
+							
                                 NamelistService.namesInWKG.add(taxon.id)
                                 /*if(fieldNode == fieldNodes.last()){
                                     namelistService.namesBeforeSave[taxon.id] = "Working"
                                 }*/
+								
                                 taxon.position = NamePosition.WORKING
                                 taxon.matchDatabaseName = "CatalogueOfLife";
                                 if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
@@ -1871,6 +1865,20 @@ class XMLConverter extends SourceConverter {
                                 }*/
                                 //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
                                 //taxon = namelistService.updateAttributes(taxon, res);
+                            }else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
+                                def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
+                                spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
+                                //copy names of taxon to old taxon.
+                                //mark it flagged
+                                //save oldTaxon
+                                taxon = oldTaxon;
+                            } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
+                                println "=====TAXON WAS THERE================================== "
+                                /*
+                                def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+                                if(synonym)
+                                    synonym.updateContributors(getUserContributors(fieldNode.data))
+                                */
                             }
                             //Moving name to Working list, so all names should be in working list,
                             //even if a single name in hierarchy is in dirty list

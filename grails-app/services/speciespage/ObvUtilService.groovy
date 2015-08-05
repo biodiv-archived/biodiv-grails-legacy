@@ -5,6 +5,7 @@ import groovy.xml.MarkupBuilder;
 import groovy.xml.XmlUtil;
 
 import java.util.Map;
+import java.io.File ;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -116,8 +117,8 @@ class ObvUtilService {
         }else {
             def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress).getAllResult()
             log.debug " Obv total $observationInstanceList.size()" 
-            //return exportObservation(observationInstanceList, dl.type, dl.author, dl.id, params.filterUrl )
-            return DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl.id, params.filterUrl );
+            return exportObservation(observationInstanceList, dl.type, dl.author, dl.id, dl.filterUrl )
+            //return DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl.id, params.filterUrl );
 
         }
     }
@@ -160,7 +161,7 @@ class ObvUtilService {
         return csvFile
     }
 
-	private File exportObservation(List obvList, exportType, reqUser, dl_id, params_filterUrl ){
+	private def exportObservation(List obvList, exportType, reqUser, dl_id, params_filterUrl ){
 		if(! obvList)
 			return null
 		
@@ -183,44 +184,22 @@ class ObvUtilService {
 		if(exportType == DownloadLog.DownloadType.CSV){
 			return exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl)
 		}else if(exportType == DownloadLog.DownloadType.KML) {
-			return exportAsKML(downloadDir, obvList, reqUser)
+			return exportAsKML(downloadDir, obvList, reqUser, dl_id, params_filterUrl)
 		} else {
 			return exportAsDW(downloadDir, obvList, reqUser, dl_id, params_filterUrl)
 		}
 	}
+
 	
-	def exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl){
-
-		  List<String> list_final=[] ;
+	private def  File exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl){
 		String folderName = "obv_"+ + new Date().getTime()
-		String file_name="obv_" + new Date().getTime() + ".csv"
-		String parent_dir=downloadDir+File.separator+folderName+File.separator+ folderName
-
-		File dir =  new File(parent_dir)
-			if(!dir.exists()){
-				dir.mkdirs()
-
-			}
-		File csvFile = new File ( dir,  file_name )
-			if(!csvFile.exists()){
-				csvFile.createNewFile()
-
-			}
-
+		String parent_dir=downloadDir.getAbsolutePath() +File.separator+folderName+File.separator+ folderName
+		File csvFile = new File(parent_dir, "obv_" + new Date().getTime() + ".csv")
+	
+		
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
 		
-		obvList.each {
-		def it_observation =Observation.read(it)
-		def next = it_observation as JSON ; 
-		def it_final=JSON.parse(""+next)
-
- 		}
-
-
-	 //DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl_id, params_filterUrl );
-	DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
-
-		/*boolean headerAdded = false
+		boolean headerAdded = false
 		obvList.each { obv ->
 			log.debug "Writting " + obv
 			Map m = obv.fetchExportableValue(reqUser)
@@ -235,50 +214,60 @@ class ObvUtilService {
 			writer.writeNext(m.values().toArray(new String[0]))
 		}
 		writer.flush()
-		writer.close()*/
-		
+		writer.close()
 
-		File eml=DwCObservationExporter.getInstance().returnMetaData_EML(parent_dir,reqUser , dl_id , params_filterUrl)return archive(downloadDir, folderName, file_name )
-		//return csvFile+ eml
-}
+
+		File f=DwCObservationExporter.getInstance().returnMetaData_EML(parent_dir,reqUser , dl_id , params_filterUrl)
+		return archive(downloadDir.getAbsolutePath(), folderName, csvFile, f )
+
+		//return csvFile
+	}
 	
 
-		def archive(directory, folderName, file_name) {
+		def  archive(directory, folderName,  file_name1,  file_name2 ) {
 
+			String f = File.separator
 
-			def HOME = directory +File.separator + folderName
+			File folder= new File(folderName)
+ 			if(!folder.exists()){
+				folder.mkdirs()
+
+			}
+
+			def HOME = directory + f + folderName
 			println HOME
-			def deploymentFiles = [ folderName+File.separator+file_name, folderName+'/metadata.eml.xml' ]
-			def zipFile = new File(HOME + ".zip")
-			
 
+			println folderName+f+ file_name2.getName()
+
+			def zipFile = new File(HOME + ".zip")
+			def deploymentFiles = [ folderName + f + file_name1.getName(), folderName+f+file_name2.getName() ]
 			new AntBuilder().zip( basedir: HOME,
                       destFile: zipFile.absolutePath,
-                      includes: deploymentFiles.join( ' ' ) )
+                     includes: deploymentFiles.join( ' ' ))
+
+
+			return zipFile
             
 		}
 
-	
 
 
 
 	def exportAsDW(downloadDir, obvList, reqUser, dl_id, params_filterUrl){
-		    List<String> list_final=[] ;
-		//File dwFile = new File(downloadDir, "obv_" + new Date().getTime() + ".dw")
-		//CSVWriter writer = getCSVWriter(dwFile.getParent(), dwFile.getName())
-		
+		 List<String> list_final=[] ;
+
 
 		obvList.each {
-		def it_observation =Observation.read(it)
-		 def next = it_observation as JSON ; 
-		def it_final=JSON.parse(""+next)
-		list_final.add(it_final)
+			def it_observation =it
+			 def next = it_observation as JSON ; 
+			def it_final=JSON.parse(""+next)
+			list_final.add(it_final)
 
  		}
 
 
- 	//DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl_id, params_filterUrl );
-	DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
+ 	DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), list_final, reqUser, dl_id, params_filterUrl );
+	//DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
 		
 	}
 
@@ -291,6 +280,28 @@ class ObvUtilService {
 		}
 		return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
 	}
+
+
+		def exportAsDW__specie(downloadDir, obvList, reqUser, dl_id, params_filterUrl){
+		    List<String> list_final=[] ;
+		//File dwFile = new File(downloadDir, "obv_" + new Date().getTime() + ".dw")
+		//CSVWriter writer = getCSVWriter(dwFile.getParent(), dwFile.getName())
+		
+
+		obvList.each {
+		def it_observation =it
+		 def next = it_observation as JSON ; 
+		def it_final=JSON.parse(""+next)
+		list_final.add(it_final)
+
+ 		}
+
+
+ 	DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), list_final, reqUser, dl_id, params_filterUrl );
+	//DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
+		
+	}
+
 
 	
 	def exportAsKML(downloadDir, obvList, reqUser, dl_id , params_filterUrl){
@@ -436,7 +447,7 @@ class ObvUtilService {
 
 		String  file_name = "obv_" + new Date().getTime() + ".kml"
 		String folderName ="obv_kml" + new Date().getTime()
-		String parent_dir=downloadDir+File.separator+folderName+File.separator+ folderName
+		String parent_dir=downloadDir.getAbsolutePath() +File.separator+folderName+File.separator+ folderName
 
 		File dir =  new File(parent_dir)
 			if(!dir.exists()){
@@ -452,7 +463,7 @@ class ObvUtilService {
 		
 		File eml=DwCObservationExporter.getInstance().returnMetaData_EML(parent_dir,reqUser , dl_id , params_filterUrl)
 
-		return archive(downloadDir, folderName, file_name )
+		return archive(downloadDir.getAbsolutePath(), folderName, kmlFile, eml )
 	}
 
 	////////////////////////////////// End export//////////////////////////////

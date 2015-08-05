@@ -463,7 +463,10 @@ $(document).ready(function(){
 					//formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
 				}, 
 	            success: function(data, statusText, xhr, form) {
-	            	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+                    if(data.success)
+	                	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+                    else 
+	                	$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg+"   "+JSON.stringify(data.errors));
 	            	$('.download-box').find('.download-options').hide();
 	            	$("html, body").animate({ scrollTop: 0 });
 	            	return false;

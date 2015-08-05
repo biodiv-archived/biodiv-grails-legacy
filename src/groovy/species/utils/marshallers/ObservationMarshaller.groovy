@@ -37,6 +37,7 @@ class ObservationMarshaller {
                 recommendationVote : obv.recommendationVote,
                 userGroups : obv.userGroups,
                 annotations : obv.annotations,
+                language : obv.language,
 
                 isDeleted : obv.isDeleted,
                 isLocked : obv.isLocked,

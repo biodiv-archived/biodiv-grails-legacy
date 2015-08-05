@@ -30,30 +30,30 @@ grails.project.groupId = appName // change this to alter the default package nam
 grails.mime.file.extensions = false // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
 grails.mime.types = [ html: [
-		'text/html',
-		'application/xhtml+xml'
-	],
-	xml: [
-		'text/xml',
-		'application/xml'
-	],
-	text: 'text/plain',
-	js: 'text/javascript',
-	rss: 'application/rss+xml',
-	atom: 'application/atom+xml',
-	css: 'text/css',
-	csv: 'text/csv',
-	all: '*/*',
-	json: [
-        'application/json',
-		'application/json;v=1.0',
-		'text/json'
-	],
-	form: 'application/x-www-form-urlencoded',
-	multipartForm: 'multipart/form-data',
-    all:'*/*',
-    api:['application/vnd.biodiv.app.api+json;v=1.0', 'application/json'],
-    apiv2:['application/vnd.biodiv.app.api+json;v=2.0', 'application/json']
+'text/html',
+'application/xhtml+xml'
+],
+xml: [
+'text/xml',
+'application/xml'
+],
+text: 'text/plain',
+js: 'text/javascript',
+rss: 'application/rss+xml',
+atom: 'application/atom+xml',
+css: 'text/css',
+csv: 'text/csv',
+all: '*/*',
+json: [
+'application/json',
+'application/json;v=1.0',
+'text/json'
+],
+form: 'application/x-www-form-urlencoded',
+multipartForm: 'multipart/form-data',
+all:'*/*',
+api:['application/vnd.biodiv.app.api+json;v=1.0', 'application/json'],
+apiv2:['application/vnd.biodiv.app.api+json;v=2.0', 'application/json']
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
@@ -85,32 +85,32 @@ def log4jConsoleLogLevel = Priority.DEBUG
 
 
 grails.gorm.default.mapping = {
-	cache true
-	id generator:'increment'
-   /* Added by the Hibernate Spatial Plugin. */
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.GeometryCollection)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LineString)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Point)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygon)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiLineString)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPoint)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPolygon)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LinearRing)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Puntal)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Lineal)
-   'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygonal)
-	'user-type'( type:org.hibernate.type.YesNoType, class:Boolean )
+cache true
+id generator:'increment'
+/* Added by the Hibernate Spatial Plugin. */
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.GeometryCollection)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LineString)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Point)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygon)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiLineString)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPoint)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPolygon)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LinearRing)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Puntal)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Lineal)
+'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygonal)
+'user-type'( type:org.hibernate.type.YesNoType, class:Boolean )
 }
 
 grails.views.javascript.library="jquery"
 
 grails.project.dependency.resolution = {
-	inherits("global") {
-		if (Environment.current == Environment.PRODUCTION) {
-			exclude "servlet-api-2.3"
-		}
-	}
+    inherits("global") {
+        if (Environment.current == Environment.PRODUCTION) {
+            exclude "servlet-api-2.3"
+        }
+    }
 }
 
 
@@ -118,10 +118,10 @@ grails.project.dependency.resolution = {
 cache.headers.enabled = true
 
 cache.headers.presets = [
-	authed_page: false, // No caching for logged in user
-	content: [shared:true, validFor: 3600], // 1hr on content
-	search_results: [validFor: 60, shared: true],
-	taxonomy_results: [validFor: 60, shared: true]
+authed_page: false, // No caching for logged in user
+content: [shared:true, validFor: 3600], // 1hr on content
+search_results: [validFor: 60, shared: true],
+taxonomy_results: [validFor: 60, shared: true]
 ]
 
 /**
@@ -136,35 +136,35 @@ cache.headers.presets = [
 
 def ENV_NAME = "${appName}_config_location".toUpperCase()
 if (!grails.config.locations || !(grails.config.locations instanceof List)) {
-	grails.config.locations = []
+    grails.config.locations = []
 }
 if (System.getProperty(ENV_NAME) && new File(System.getProperty(ENV_NAME)).exists()) {
-	println "Using configuration file specified on command line: " + System.getProperty(ENV_NAME)
-	grails.config.locations = ["file:" + System.getProperty(ENV_NAME) ]
+    println "Using configuration file specified on command line: " + System.getProperty(ENV_NAME)
+        grails.config.locations = ["file:" + System.getProperty(ENV_NAME) ]
 }
 else if (new File("${userHome}/.grails/${appName}-config.groovy").exists()) {
-	println "*** User defined config: file:${userHome}/.grails/${appName}-config.groovy. ***"
-	grails.config.locations = [
-		"file:${userHome}/.grails/${appName}-config.groovy"
-	]
+    println "*** User defined config: file:${userHome}/.grails/${appName}-config.groovy. ***"
+    grails.config.locations = [
+    "file:${userHome}/.grails/${appName}-config.groovy"
+    ]
 }
 else if (System.getenv(ENV_NAME) && new File(System.getenv(ENV_NAME)).exists()) {
-	println("Using system environment configuration file: " + System.getenv(ENV_NAME))
-	grails.config.locations << "file:" + System.getenv(ENV_NAME)
+    println("Using system environment configuration file: " + System.getenv(ENV_NAME))
+    grails.config.locations << "file:" + System.getenv(ENV_NAME)
 }
 
 else if (new File("${userHome}/.grails/${appName}-config.properties").exists()) {
-	println "*** Using user defined config: file:${userHome}/.grails/${appName}-config.properties. ***"
-	grails.config.locations = [
-		"file:${userHome}/.grails/${appName}-config.properties"
-	]
+    println "*** Using user defined config: file:${userHome}/.grails/${appName}-config.properties. ***"
+    grails.config.locations = [
+    "file:${userHome}/.grails/${appName}-config.properties"
+    ]
 }
 else if (new File(System.getenv(ENV_NAME)).exists()) {
-	println "*** Additional config: file:${userHome}/.grails/additional-config.groovy. ***"
-	grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
+    println "*** Additional config: file:${userHome}/.grails/additional-config.groovy. ***"
+    grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
 }
 else {
-	//println "*** No external configuration file defined. ***"
+    //println "*** No external configuration file defined. ***"
 }
 
 
@@ -177,245 +177,245 @@ speciesPortal {
     app.twitterUrl = "https://twitter.com/inbiodiversity"
     app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
     app.feedbackFormUrl = "http://indiabiodiversity.org/feedback_form"
-	app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
+    app.googlePlusUrl = "https://plus.google.com/110731547233656611783"
 
-	app.rootDir = "${userHome}/git/biodiv/app-conf"
-	data.rootDir = "${app.rootDir}/data"
-	download.rootDir = "${data.rootDir}/datarep/downloads"
- 
+    app.rootDir = "${userHome}/git/biodiv/app-conf"
+    data.rootDir = "${app.rootDir}/data"
+    download.rootDir = "${data.rootDir}/datarep/downloads"
+
     app.logo = "logo/IBP.png"
     app.favicon = "logo/favicon.png"
-   
+
     app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]
 
-	species {
-		speciesDownloadDir = "${download.rootDir}/species"
-	}
-	domain = "localhost"
-	resources {
-		rootDir = "${app.rootDir}/img"
-		serverURL = "http://indiabiodiversity.localhost.org/${appName}/img"
-		images {
-			defaultType = "jpg"
-			thumbnail {
-				suffix = "_th1"+".${defaultType}"
-				width = 200
-				height = 200
-			}
+    species {
+        speciesDownloadDir = "${download.rootDir}/species"
+    }
+    domain = "localhost"
+    resources {
+        rootDir = "${app.rootDir}/img"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/img"
+        images {
+            defaultType = "jpg"
+            thumbnail {
+                suffix = "_th1"+".${defaultType}"
+                width = 200
+                height = 200
+            }
 
-			gallery {
-				suffix = "_gall"+".${defaultType}"
-				width = 500
-				height = 300
+            gallery {
+                suffix = "_gall"+".${defaultType}"
+                width = 500
+                height = 300
 
-			}
-			galleryThumbnail {
-				suffix = "_gall_th"+".${defaultType}"
-				width = 50
-				height = 50
-			}
-		}
-	}
-	observations {
-		rootDir = "${app.rootDir}/observations"
-		observationDownloadDir = "${download.rootDir}/observations"
-		serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
-		//serverURL = "http://localhost/${appName}/observations"
-		MAX_IMAGE_SIZE = 104857600
-	} 
-	 userGroups {
-		rootDir = "${app.rootDir}/userGroups"
-		serverURL = "http://indiabiodiversity.localhost.org/${appName}/userGroups"
-		//serverURL = "http://localhost/${appName}/userGroups"
-		logo {
-			MAX_IMAGE_SIZE = 51200
-		}
-	}
+            }
+            galleryThumbnail {
+                suffix = "_gall_th"+".${defaultType}"
+                width = 50
+                height = 50
+            }
+        }
+    }
+    observations {
+        rootDir = "${app.rootDir}/observations"
+        observationDownloadDir = "${download.rootDir}/observations"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
+        //serverURL = "http://localhost/${appName}/observations"
+        MAX_IMAGE_SIZE = 104857600
+    } 
+    userGroups {
+        rootDir = "${app.rootDir}/userGroups"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/userGroups"
+        //serverURL = "http://localhost/${appName}/userGroups"
+        logo {
+            MAX_IMAGE_SIZE = 51200
+        }
+    }
 
-	users {
-		rootDir = "${app.rootDir}/users"
-		serverURL = "http://localhost/${appName}/users"
-		logo {
-			MAX_IMAGE_SIZE = 2097000
-		}
-	}
-	
-	checklist{
-		rootDir = "${app.rootDir}/checklist"
-		serverURL = "http://localhost/${appName}/checklist"
-		checklistDownloadDir = "${download.rootDir}/checklist"
-	}
+    users {
+        rootDir = "${app.rootDir}/users"
+        serverURL = "http://localhost/${appName}/users"
+        logo {
+            MAX_IMAGE_SIZE = 2097000
+        }
+    }
+
+    checklist{
+        rootDir = "${app.rootDir}/checklist"
+        serverURL = "http://localhost/${appName}/checklist"
+        checklistDownloadDir = "${download.rootDir}/checklist"
+    }
 
     maps {
         SRID = 4326;
-		serverURL = "http://indiabiodiversity.localhost.org/${appName}/maps"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/maps"
     }
 
-	content{
-		rootDir = "${app.rootDir}/content"
-		serverURL = "http://localhost/${appName}/content"
-		MAX_DOC_SIZE = 50*1024*1024 //10 mb
-		MAX_IMG_SIZE = 2*1024*1024 // 2mb
-	}
-	namelist {
-		rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
-	}	
-		
-	names.parser.serverURL = "127.0.0.1"
-	names.parser.port = 4334
-	search {
-		serverURL = "http://localhost:8090/solr"
-		queueSize = 1000
-		threadCount = 3
-		soTimeout = 10000;
-		connectionTimeout = 100;
-		defaultMaxConnectionsPerHost = 100;
-		maxTotalConnections = 100;
-		followRedirects = false;
-		allowCompression = true;
-		maxRetries = 1;
-	}
-	nameSearch {
-		serverURL = "http://localhost:8090/solr/names"
-		indexStore = "${app.rootDir}/data/names"
-		queueSize = 1000
-		threadCount = 3
-		soTimeout = 1000;
-		connectionTimeout = 100;
-		defaultMaxConnectionsPerHost = 100;
-		maxTotalConnections = 100;
-		followRedirects = false;
-		allowCompression = true;
-		maxRetries = 1;
-	}
-	fields  {
-		COMBINED_TAXONOMIC_HIERARCHY = "Combined Taxonomy Hierarchy"
-		AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY = "Author Contributed Taxonomy Hierarchy"
-		IBP_TAXONOMIC_HIERARCHY = "IBP Taxonomy Hierarchy"
-		GBIF_TAXONOMIC_HIERARCHY = "GBIF Taxonomy Hierarchy"
-		CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY = 'Catalogue of Life Taxonomy Hierarchy'
-		EFLORA_TAXONOMIC_HIERARCHY = 'Eflora Taxonomy Hierarchy'
-		FISHBASE_TAXONOMIC_HIERARCHY = 'FishBase Taxonomy Hierarchy'
-		ITIS_TAXONOMIC_HIERARCHY = 'ITIS Taxonomy Hierarchy'
-		IUCN_TAXONOMIC_HIERARCHY = 'IUCN Taxonomy Hierarchy (2010)'
-		WIKIPEDIA_TAXONOMIC_HIERARCHY = 'Wikipedia Taxonomy Hierarchy'
-		SIBLEY_AND_MONROE_TAXONOMIC_HIERARCHY = 'Sibley and Monroe Taxonomy Hierarchy (1996)'
-		HOWARD_AND_MOORE_TAXONOMIC_HIERARCHY = 'Howard and Moore Taxonomy Hierarchy (3rd Edition)'
-		CLEMENTS_TAXONOMIC_HIERARCHY = 'Clements 6th edition Taxonomy Hierarchy (2009)'
-		IOC_TAXONOMIC_HIERARCHY = 'IOC Taxonomy Hierarchy (2009)'
-		EBIRD_TAXONOMIC_HIERARCHY = 'eBird Taxonomy Hierarchy (2010)'
-		OBC_TAXONOMIC_HIERARCHY = 'OBC Taxonomy Hierarchy (2001)'
-		FLOWERS_OF_INDIA_TAXONOMIC_HIERARCHY = 'Flowers of India Taxonomy Hierarchy'
+    content{
+        rootDir = "${app.rootDir}/content"
+        serverURL = "http://localhost/${appName}/content"
+        MAX_DOC_SIZE = 50*1024*1024 //10 mb
+        MAX_IMG_SIZE = 2*1024*1024 // 2mb
+    }
+    namelist {
+        rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
+    }	
 
-		COMMON_NAME = "Common Name"
-		SYNONYMS = "Synonyms"
-		INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Local Distribution Geographic Entity"
-		INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY = "Local Endemicity Geographic Entity"
-		GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Global Distribution Geographic Entity"
-		GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY = "Global Endemicity Geographic Entity"
-		META_DATA = "Meta data"
-		TAXONOMIC_HIERARCHY = "Taxonomy Hierarchy"
-		FAMILY = "Family"
-		GENUS = "Genus"
-		SUB_GENUS = "Sub-Genus"
-		SPECIES = "Species"
-		GENERIC_SPECIFIC_NAME = "Generic Specific Name"
-		SCIENTIFIC_NAME = "Scientific Name"
-		NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"
-		TAXON_RECORD_NAME = 'Taxon Record Name'
-		OVERVIEW = 'Overview'
+    names.parser.serverURL = "127.0.0.1"
+    names.parser.port = 4334
+    search {
+        serverURL = "http://localhost:8090/solr"
+        queueSize = 1000
+        threadCount = 3
+        soTimeout = 10000;
+        connectionTimeout = 100;
+        defaultMaxConnectionsPerHost = 100;
+        maxTotalConnections = 100;
+        followRedirects = false;
+        allowCompression = true;
+        maxRetries = 1;
+    }
+    nameSearch {
+        serverURL = "http://localhost:8090/solr/names"
+        indexStore = "${app.rootDir}/data/names"
+        queueSize = 1000
+        threadCount = 3
+        soTimeout = 1000;
+        connectionTimeout = 100;
+        defaultMaxConnectionsPerHost = 100;
+        maxTotalConnections = 100;
+        followRedirects = false;
+        allowCompression = true;
+        maxRetries = 1;
+    }
+    fields  {
+        COMBINED_TAXONOMIC_HIERARCHY = "Combined Taxonomy Hierarchy"
+        AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY = "Author Contributed Taxonomy Hierarchy"
+        IBP_TAXONOMIC_HIERARCHY = "IBP Taxonomy Hierarchy"
+        GBIF_TAXONOMIC_HIERARCHY = "GBIF Taxonomy Hierarchy"
+        CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY = 'Catalogue of Life Taxonomy Hierarchy'
+        EFLORA_TAXONOMIC_HIERARCHY = 'Eflora Taxonomy Hierarchy'
+        FISHBASE_TAXONOMIC_HIERARCHY = 'FishBase Taxonomy Hierarchy'
+        ITIS_TAXONOMIC_HIERARCHY = 'ITIS Taxonomy Hierarchy'
+        IUCN_TAXONOMIC_HIERARCHY = 'IUCN Taxonomy Hierarchy (2010)'
+        WIKIPEDIA_TAXONOMIC_HIERARCHY = 'Wikipedia Taxonomy Hierarchy'
+        SIBLEY_AND_MONROE_TAXONOMIC_HIERARCHY = 'Sibley and Monroe Taxonomy Hierarchy (1996)'
+        HOWARD_AND_MOORE_TAXONOMIC_HIERARCHY = 'Howard and Moore Taxonomy Hierarchy (3rd Edition)'
+        CLEMENTS_TAXONOMIC_HIERARCHY = 'Clements 6th edition Taxonomy Hierarchy (2009)'
+        IOC_TAXONOMIC_HIERARCHY = 'IOC Taxonomy Hierarchy (2009)'
+        EBIRD_TAXONOMIC_HIERARCHY = 'eBird Taxonomy Hierarchy (2010)'
+        OBC_TAXONOMIC_HIERARCHY = 'OBC Taxonomy Hierarchy (2001)'
+        FLOWERS_OF_INDIA_TAXONOMIC_HIERARCHY = 'Flowers of India Taxonomy Hierarchy'
+
+        COMMON_NAME = "Common Name"
+        SYNONYMS = "Synonyms"
+        INDIAN_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Local Distribution Geographic Entity"
+        INDIAN_ENDEMICITY_GEOGRAPHIC_ENTITY = "Local Endemicity Geographic Entity"
+        GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY = "Global Distribution Geographic Entity"
+        GLOBAL_ENDEMICITY_GEOGRAPHIC_ENTITY = "Global Endemicity Geographic Entity"
+        META_DATA = "Meta data"
+        TAXONOMIC_HIERARCHY = "Taxonomy Hierarchy"
+        FAMILY = "Family"
+        GENUS = "Genus"
+        SUB_GENUS = "Sub-Genus"
+        SPECIES = "Species"
+        GENERIC_SPECIFIC_NAME = "Generic Specific Name"
+        SCIENTIFIC_NAME = "Scientific Name"
+        NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"
+        TAXON_RECORD_NAME = 'Taxon Record Name'
+        OVERVIEW = 'Overview'
         SUBSPECIES_VARIETIES_RACES = 'SubSpecies Varieties Races'
-		OCCURRENCE_RECORDS = 'Occurrence Records'
-		BRIEF = "Brief"
-		SUMMARY = "Summary"
-		TAXONRECORDID = "TaxonRecordID"
-		GLOBALUNIQUEIDENTIFIER = "GlobalUniqueIdentifier"
-		NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"
-		TAXON_RECORD_NAME = "Taxon Record Name"
-		ATTRIBUTIONS = "attributions"
-		CONTRIBUTOR = "contributor"
-		LICENSE = 'license'
-		AUDIENCE = 'audience'
-		STATUS = 'status'
-		INFORMATION_LISTING = "Information Listing"
-		REFERENCES = "References"
-		
-		CONCEPT = "concept"
-		CATEGORY = "category"
-		SUBCATEGORY = "subcategory"
-		IMAGES = "images"
-		ICONS = "icons"
-		AUDIO = "audio"
-		VIDEO = "video"
-		DOCUMENTS = "Documents"
-	}
-	group {
-		ALL = "All"
-		OTHERS = "Others"
-	}
-	searchFields {
-		ID = "id"
-		GUID = "guid"
-		TITLE = "title"
-		CONTRIBUTOR = "contributor"
-		NAME = "name"
-		NAME_EXACT = "name_exact"
-		COMMON_NAME = "common_name"
-		COMMON_NAME_EXACT = "common_name_exact"
-		LOCATION = "location"
-		LOCATION_EXACT = "location_exact"
-		ATTRIBUTION = "attribution"
-		PERCENT_OF_INFO = "percent_of_info"
-		
-		REFERENCE = "reference"
-		TAXON = "taxon"
-		MESSAGE = "text"
-		CANONICAL_NAME = "canonical_name"
-		CANONICAL_NAME_EXACT = "canonical_name_exact"
-		UNINOMIAL = "uninomial"
-		UNINOMIAL_EXACT = "uninomial_exact"
-		AUTHOR = "author"
-		AUTHOR_ID = "author_id"
-		YEAR = "year"
-		GENUS = "genus"
-		SPECIES = "species"
-		INFRASPECIES = "infraspecies"
-		INFRAGENUS = "infragenus"
-		SYNONYM = "synonym"
-		SYNONYM_CANONICAL = "synonym_canonical"
-		SCIENTIFIC_NAME = "scientific_name"
-		OBSERVED_ON = "observedon"
-		UPLOADED_ON = "createdon"
-		UPDATED_ON = "updatedon"
-		FROM_DATE = "fromdate"
-		TO_DATE = "todate"
-		SGROUP = "sgroup"
-		HABITAT = "habitat"
-		LATITUDE = "latitude"
-		LONGITUDE = "longitude"
-		MAX_VOTED_SPECIES_NAME = "maxvotedspeciesname"
-		TAG = "tag"
-		ISFLAGGED = "isflagged"
-		IS_CHECKLIST = "ischecklist"
-		IS_SHOWABLE = "isshowable"
-		SOURCE_ID = "source_id"
-		SOURCE_TEXT = "source_text"
-		LATLONG = "latlong"
-		USER_GROUP = "group"
-		USER_GROUP_WEBADDRESS = "group_webaddress"
-		
-		GRANTEE_ORGANIZATION = "grantee_organization"
-		SITENAME = "sitename"
-		CORRIDOR = "corridor"
+        OCCURRENCE_RECORDS = 'Occurrence Records'
+        BRIEF = "Brief"
+        SUMMARY = "Summary"
+        TAXONRECORDID = "TaxonRecordID"
+        GLOBALUNIQUEIDENTIFIER = "GlobalUniqueIdentifier"
+        NOMENCLATURE_AND_CLASSIFICATION = "Nomenclature and Classification"
+        TAXON_RECORD_NAME = "Taxon Record Name"
+        ATTRIBUTIONS = "attributions"
+        CONTRIBUTOR = "contributor"
+        LICENSE = 'license'
+        AUDIENCE = 'audience'
+        STATUS = 'status'
+        INFORMATION_LISTING = "Information Listing"
+        REFERENCES = "References"
+
+        CONCEPT = "concept"
+        CATEGORY = "category"
+        SUBCATEGORY = "subcategory"
+        IMAGES = "images"
+        ICONS = "icons"
+        AUDIO = "audio"
+        VIDEO = "video"
+        DOCUMENTS = "Documents"
+    }
+    group {
+        ALL = "All"
+        OTHERS = "Others"
+    }
+    searchFields {
+        ID = "id"
+        GUID = "guid"
+        TITLE = "title"
+        CONTRIBUTOR = "contributor"
+        NAME = "name"
+        NAME_EXACT = "name_exact"
+        COMMON_NAME = "common_name"
+        COMMON_NAME_EXACT = "common_name_exact"
+        LOCATION = "location"
+        LOCATION_EXACT = "location_exact"
+        ATTRIBUTION = "attribution"
+        PERCENT_OF_INFO = "percent_of_info"
+
+        REFERENCE = "reference"
+        TAXON = "taxon"
+        MESSAGE = "text"
+        CANONICAL_NAME = "canonical_name"
+        CANONICAL_NAME_EXACT = "canonical_name_exact"
+        UNINOMIAL = "uninomial"
+        UNINOMIAL_EXACT = "uninomial_exact"
+        AUTHOR = "author"
+        AUTHOR_ID = "author_id"
+        YEAR = "year"
+        GENUS = "genus"
+        SPECIES = "species"
+        INFRASPECIES = "infraspecies"
+        INFRAGENUS = "infragenus"
+        SYNONYM = "synonym"
+        SYNONYM_CANONICAL = "synonym_canonical"
+        SCIENTIFIC_NAME = "scientific_name"
+        OBSERVED_ON = "observedon"
+        UPLOADED_ON = "createdon"
+        UPDATED_ON = "updatedon"
+        FROM_DATE = "fromdate"
+        TO_DATE = "todate"
+        SGROUP = "sgroup"
+        HABITAT = "habitat"
+        LATITUDE = "latitude"
+        LONGITUDE = "longitude"
+        MAX_VOTED_SPECIES_NAME = "maxvotedspeciesname"
+        TAG = "tag"
+        ISFLAGGED = "isflagged"
+        IS_CHECKLIST = "ischecklist"
+        IS_SHOWABLE = "isshowable"
+        SOURCE_ID = "source_id"
+        SOURCE_TEXT = "source_text"
+        LATLONG = "latlong"
+        USER_GROUP = "group"
+        USER_GROUP_WEBADDRESS = "group_webaddress"
+
+        GRANTEE_ORGANIZATION = "grantee_organization"
+        SITENAME = "sitename"
+        CORRIDOR = "corridor"
         DESCRIPTION = "description"
         TYPE = "type"
         TOPOLOGY = "topology"
         SCORE = "score"
 
-		EMAIL = "email"
-		USERNAME = "username"
-		ABOUT_ME = "about_me"
-		LAST_LOGIN = "lastlogindate"
+        EMAIL = "email"
+        USERNAME = "username"
+        ABOUT_ME = "about_me"
+        LAST_LOGIN = "lastlogindate"
         SP_OVERVIEW = "sp_overview"
         SP_NC = "sp_nc"
         SP_NH = "sp_nh"
@@ -427,39 +427,39 @@ speciesPortal {
         OBJECT_TYPE = "object_type"
         MEMBERS = "members"
         DOC_TYPE = "doc_type"
-		LICENSE = 'license'
+        LICENSE = 'license'
         CONTEXT = 'context'
         CONTAINER = 'container'
         RESOURCETYPE = 'resourcetype'
         USER = 'user'
-	}
+    }
 
-	nameSearchFields {
-		SCINAME_ID = "sciName_id"
-		PREFERRED_SCINAME = "preferred_sciName"
-		SCINAME = "sciName"
-		COMMONNAME = "commonName"
-		SYNONYM = "synonym"
-		ICON = "icon"
-		SPECIES_ID = "species_id"
-		AUTOCOMPLETE = "autocomplete"
-	}
-	
-	drupal {
-		getAuthentication = "/getAuthentication.php"
-	}
-	flushImmediately = true
+    nameSearchFields {
+        SCINAME_ID = "sciName_id"
+        PREFERRED_SCINAME = "preferred_sciName"
+        SCINAME = "sciName"
+        COMMONNAME = "commonName"
+        SYNONYM = "synonym"
+        ICON = "icon"
+        SPECIES_ID = "species_id"
+        AUTOCOMPLETE = "autocomplete"
+    }
+
+    drupal {
+        getAuthentication = "/getAuthentication.php"
+    }
+    flushImmediately = true
     usersResource {
         rootDir = "${app.rootDir}/usersRes"
-		serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
     }
-    
+
     ibpMapDatabase {
-		url = "jdbc:postgresql://localhost:5432/ibp"
-		username = "biodiv"
-		password = "prharasr"
-		driver   = "org.postgresql.Driver"
-	}
+        url = "jdbc:postgresql://localhost:5432/ibp"
+        username = "biodiv"
+        password = "prharasr"
+        driver   = "org.postgresql.Driver"
+    }
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
@@ -467,11 +467,11 @@ speciesPortal {
 }
 
 speciesPortal.validCrossDomainOrigins = [
-	"localhost",
-	"wgp.saturn.strandls.com",
-	"wgp.pamba.strandls.com",
-	"ibp.saturn.strandls.com",
-	"ibp.pamba.strandls.com"
+"localhost",
+"wgp.saturn.strandls.com",
+"wgp.pamba.strandls.com",
+"ibp.saturn.strandls.com",
+"ibp.pamba.strandls.com"
 ]
 
 //uiperformance.enabled = false
@@ -482,7 +482,7 @@ environments {
     development {
         grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
         speciesPortal {
-	        app.rootDir = "${userHome}/git/biodiv/app-conf"
+            app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
             names.parser.serverURL = "10.0.0.10"
         }
@@ -498,14 +498,14 @@ environments {
         ibp.domain='indiabiodiversity.localhost.org'
         wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
         //grails.resources.debug=true
-//        grails.resources.mappers.hashandcache.excludes = ['**']
+        //        grails.resources.mappers.hashandcache.excludes = ['**']
         //grails.resources.flatten = false
-//        grails.resources.mappers.yuijsminify.disable=true
+        //        grails.resources.mappers.yuijsminify.disable=true
 
         ckeditor {
             upload {
-				baseurl = "/newsletters"
-				basedir = "${speciesPortal.app.rootDir}/newsletters/"
+                baseurl = "/newsletters"
+                basedir = "${speciesPortal.app.rootDir}/newsletters/"
                 image.browser = true
                 image.upload = true    
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
@@ -518,9 +518,9 @@ environments {
 
             appenders {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
-                 //console name:'stacktrace'
-                 //'null' name:'stacktrace'//to disable stacktraces on stdout
-             }
+                //console name:'stacktrace'
+                //'null' name:'stacktrace'//to disable stacktraces on stdout
+            }
             root {
                 error 'stdout'
             }
@@ -530,32 +530,32 @@ environments {
             error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
             error    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
             error   'org.codehaus.groovy.grails.commons', // core / classloading
-                    'org.codehaus.groovy.grails.plugins', // plugins
-                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'grails.app.tagLib.org.grails.plugin.resource',
-                    'org.hibernate',
-                    'grails.util'
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'grails.app.tagLib.org.grails.plugin.resource',
+            'org.hibernate',
+            'grails.util'
             error "grails.plugin" 
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
             warn "org.grails.plugin.resource"
- 
+
             warn    'org.springframework.security',
-                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                    'grails.app'
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.app'
             warn   'org.springframework.security'
             warn   'org.springframework.security.web'
             warn   'org.springframework.security.authentication'
             info   'speciespage',
-                    'species'
+            'species'
             debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
+            'grails.app.taglib.com.the6hours'
             debug   'species.auth'
             debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
+            'grails.app.controllers.com.odobo',
+            'grails.app.services.com.odobo',
+            'org.pac4j'
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage'
@@ -569,8 +569,8 @@ environments {
             fatal   'jdbc.audit'
             fatal   'jdbc.resultset'
             fatal   'jdbc.resultsettable'
-//            debug 'org.hibernate.SQL'
-//            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+            //            debug 'org.hibernate.SQL'
+            //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
             /*debug 'org.springframework.security.acls'
             debug 'org.hibernate.jdbc'
             debug 'org.hibernate.persister.entity'
@@ -580,17 +580,17 @@ environments {
             debug 'org.hibernate.transaction'
             debug 'org.springframework.transaction'
             info    'org.hibernate.jdbc.ConnectionManager'
-            */
+             */
             trace   'com.grailsrocks.emailconfirmation'
             debug   'com.odobo.grails.plugin.springsecurity.rest'
             debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
             debug   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
-       }
+        }
     }
-	test {
+    test {
         log4jConsoleLogLevel = Priority.DEBUG
-	    log4j = {
+        log4j = {
             // By default, messages are logged at the warn level to the console and the app.log
             appenders {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
@@ -617,227 +617,227 @@ environments {
             'com.mchange.v2.resourcepool.BasicResourcePool'
             info    'com.linkedin.grails'
         }
-		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
-		google.analytics.enabled = false
-	}
-	production {
-		grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
-		speciesPortal {
-			search.serverURL = "http://localhost:8090/solr"
-			names.parser.serverURL = "127.0.0.1"
-		}
-		google.analytics.enabled = false
+        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+        google.analytics.enabled = false
+    }
+    production {
+        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+        speciesPortal {
+            search.serverURL = "http://localhost:8090/solr"
+            names.parser.serverURL = "127.0.0.1"
+        }
+        google.analytics.enabled = false
 
-		
-		grails {
-			mail {
-				 host = "127.0.0.1"
-				 port = 25
-			}
-		}
+
+        grails {
+            mail {
+                host = "127.0.0.1"
+                port = 25
+            }
+        }
 
         ibp.domain='indiabiodiversity.localhost.org'
         wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
-		//grails.resources.debug=true
-		grails.resources.mappers.hashandcache.excludes = ['**']
-		//grails.resources.flatten = false
-//		grails.resources.mappers.yuijsminify.disable=true
-	}
+        //grails.resources.debug=true
+        grails.resources.mappers.hashandcache.excludes = ['**']
+        //grails.resources.flatten = false
+        //		grails.resources.mappers.yuijsminify.disable=true
+    }
 
-	saturn {
-		grails.serverURL = "http://ibp.saturn.strandls.com/${appName}"
-		
-		speciesPortal {
-			app.rootDir = "/data/species"
-			data.rootDir = "${app.rootDir}/data"
+    saturn {
+        grails.serverURL = "http://ibp.saturn.strandls.com/${appName}"
 
-			resources {
-				rootDir = "${app.rootDir}/images"
-				serverURL = "http://saturn.strandls.com/${appName}/images"
-			}
+        speciesPortal {
+            app.rootDir = "/data/species"
+            data.rootDir = "${app.rootDir}/data"
 
-			nameSearch.indexStore = "${app.rootDir}/data/names"
-
-			observations {
-				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://ibp.saturn.strandls.com/${appName}/observations"
-				//serverURL = "http://localhost/${appName}/observations"
-			}
-			userGroups {
-				rootDir = "${app.rootDir}/userGroups"
-				serverURL = "http://ibp.saturn.strandls.com/${appName}/userGroups"
-				//serverURL = "http://localhost/${appName}/observations"
-			}
-			users {
-				rootDir = "${app.rootDir}/users"
-				serverURL = "http://ibp.saturn.strandls.com/${appName}/users"
-			}
-            maps {
-		        serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/maps"
+            resources {
+                rootDir = "${app.rootDir}/images"
+                serverURL = "http://saturn.strandls.com/${appName}/images"
             }
-			search.serverURL="http://saturn.strandls.com:8080/solr"
-			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
-			grails {
-				mail {
-					 host = "127.0.0.1"
-					 port = 25
-				}
-			}
+
+            nameSearch.indexStore = "${app.rootDir}/data/names"
+
+            observations {
+                rootDir = "${app.rootDir}/observations"
+                serverURL = "http://ibp.saturn.strandls.com/${appName}/observations"
+                //serverURL = "http://localhost/${appName}/observations"
+            }
+            userGroups {
+                rootDir = "${app.rootDir}/userGroups"
+                serverURL = "http://ibp.saturn.strandls.com/${appName}/userGroups"
+                //serverURL = "http://localhost/${appName}/observations"
+            }
+            users {
+                rootDir = "${app.rootDir}/users"
+                serverURL = "http://ibp.saturn.strandls.com/${appName}/users"
+            }
+            maps {
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/maps"
+            }
+            search.serverURL="http://saturn.strandls.com:8080/solr"
+            grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
+            grails {
+                mail {
+                    host = "127.0.0.1"
+                    port = 25
+                }
+            }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
                 serverURL = "http://ibp.saturn.strandls.com/${appName}/usersRes"   
             }
-		}
-		google.analytics.enabled = false
+        }
+        google.analytics.enabled = false
 
-	    ibp.domain='ibp.saturn.strandls.com'
+        ibp.domain='ibp.saturn.strandls.com'
         wgp.domain='wgp.saturn.strandls.com' 
-		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
-                ckeditor {
-                    upload {
-                    baseurl = "/newsletters"
-                    basedir = "${speciesPortal.app.rootDir}/newsletters/"
-                    image.browser = true
-                    image.upload = true    
-                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
-                    image.denied = []
-                }
+        grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+        grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
-		}
-		log4jConsoleLogLevel = Priority.DEBUG
-		log4j = {
-			appenders {
-				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
-			}
-			debug	'species',
-					'speciespage'
-			info 'com.mchange.v2.resourcepool.BasicResourcePool' 
-           // debug   'grails.app.filters.species.SecurityFilters'
-		}
-	}
-	pambaTest {
-		appName = "biodiv"
-		grails.serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}"
-		
-		speciesPortal {
-			app.rootDir = "/data/pambaTest/species"
-			data.rootDir = "${app.rootDir}/data"
-
-			resources {
-				rootDir = "${app.rootDir}/img"
-				serverURL = "http://saturn.strandls.com/${appName}/img"
-			}
-
-			nameSearch.indexStore = "${app.rootDir}/data/names"
-
-			observations {
-				rootDir = "${app.rootDir}/observations"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/observations"
-				//serverURL = "http://localhost/${appName}/observations"
-                
-			}
-			userGroups {
-				rootDir = "${app.rootDir}/userGroups"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/userGroups"
-				//serverURL = "http://localhost/${appName}/observations"
-			}
-			users {
-				rootDir = "${app.rootDir}/users"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/users"
-			}
-			content{
-				rootDir = "${app.rootDir}/content"
-				serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/content"
-			}
-            maps {
-		        serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/maps"
+        ckeditor {
+            upload {
+                baseurl = "/newsletters"
+                basedir = "${speciesPortal.app.rootDir}/newsletters/"
+                image.browser = true
+                image.upload = true    
+                image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                image.denied = []
             }
 
-			search.serverURL="http://saturn.strandls.com:8080/solrPamba"
-			grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
-			grails {
-				mail {
-					 host = "127.0.0.1"
-					 port = 25
-				}
-			}
+        }
+        log4jConsoleLogLevel = Priority.DEBUG
+        log4j = {
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+            }
+            debug	'species',
+            'speciespage'
+            info 'com.mchange.v2.resourcepool.BasicResourcePool' 
+            // debug   'grails.app.filters.species.SecurityFilters'
+        }
+    }
+    pambaTest {
+        appName = "biodiv"
+        grails.serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}"
+
+        speciesPortal {
+            app.rootDir = "/data/pambaTest/species"
+            data.rootDir = "${app.rootDir}/data"
+
+            resources {
+                rootDir = "${app.rootDir}/img"
+                serverURL = "http://saturn.strandls.com/${appName}/img"
+            }
+
+            nameSearch.indexStore = "${app.rootDir}/data/names"
+
+            observations {
+                rootDir = "${app.rootDir}/observations"
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/observations"
+                //serverURL = "http://localhost/${appName}/observations"
+
+            }
+            userGroups {
+                rootDir = "${app.rootDir}/userGroups"
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/userGroups"
+                //serverURL = "http://localhost/${appName}/observations"
+            }
+            users {
+                rootDir = "${app.rootDir}/users"
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/users"
+            }
+            content{
+                rootDir = "${app.rootDir}/content"
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/content"
+            }
+            maps {
+                serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/maps"
+            }
+
+            search.serverURL="http://saturn.strandls.com:8080/solrPamba"
+            grails.project.war.file = "/data/jetty-6.1.26/webapps/${appName}.war"
+            grails {
+                mail {
+                    host = "127.0.0.1"
+                    port = 25
+                }
+            }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
                 serverURL = "http://indiabiodiversity.saturn.strandls.com/${appName}/usersRes"   
             }
-		}
-		google.analytics.enabled = false
+        }
+        google.analytics.enabled = false
 
-	    ibp.domain='indiabiodiversity.saturn.strandls.com'
-            wgp.domain='thewesternghats.indiabiodiversity.saturn.strandls.com' 
-		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+        ibp.domain='indiabiodiversity.saturn.strandls.com'
+        wgp.domain='thewesternghats.indiabiodiversity.saturn.strandls.com' 
 
-                ckeditor {
-                    upload {
-                    baseurl = "/newsletters"
-                    basedir = "${speciesPortal.app.rootDir}/newsletters/"
+        grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+        grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
-                    image.browser = true
-                    image.upload = true    
-                    image.allowed = ['jpg', 'gif', 'jpeg', 'png']
-                    image.denied = []
-                }
+        ckeditor {
+            upload {
+                baseurl = "/newsletters"
+                basedir = "${speciesPortal.app.rootDir}/newsletters/"
 
-		}
-		log4j = {
-			appenders {
-				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
-			}
-/*			info	'species',
-					'speciespage',
-					'com.mchange.v2.resourcepool.BasicResourcePool' 
+                image.browser = true
+                image.upload = true    
+                image.allowed = ['jpg', 'gif', 'jpeg', 'png']
+                image.denied = []
+            }
+
+        }
+        log4j = {
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: log4jConsoleLogLevel
+            }
+            /*			info	'species',
+            'speciespage',
+            'com.mchange.v2.resourcepool.BasicResourcePool' 
             debug   'grails.app.filters.species.SecurityFilters'
-*/
+             */
             error stdout:"StackTrace"
 
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages', //  GSP
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                    'org.codehaus.groovy.grails.commons', // core / classloading
-                    'org.codehaus.groovy.grails.plugins', // plugins
-                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'grails.app.tagLib.org.grails.plugin.resource',
-                    'org.hibernate',
-                    'grails.util'
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'grails.app.tagLib.org.grails.plugin.resource',
+            'org.hibernate',
+            'grails.util'
 
             warn    'org.springframework.security',
-                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                    'grails.plugin',
-                    'grails.app'
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.plugin',
+            'grails.app'
             info   'org.springframework.security'
-           // debug   'org.springframework.security.web'
-           // debug   'org.springframework.security.authentication'
+            // debug   'org.springframework.security.web'
+            // debug   'org.springframework.security.authentication'
 
-           // debug   'speciespage',
-                   // 'species'
-          //  debug   'com.the6hours', 
-                  //  'grails.app.taglib.com.the6hours'
-           // debug   'species.auth'
-           // debug   'com.odobo',
-                 //   'grails.app.controllers.com.odobo',
-                   // 'grails.app.services.com.odobo',
-                  //  'org.pac4j'
- 
+            // debug   'speciespage',
+            // 'species'
+            //  debug   'com.the6hours', 
+            //  'grails.app.taglib.com.the6hours'
+            // debug   'species.auth'
+            // debug   'com.odobo',
+            //   'grails.app.controllers.com.odobo',
+            // 'grails.app.services.com.odobo',
+            //  'org.pac4j'
+
         }
 
-	}
+    }
 
 
-	pamba {
-		servername = 'pamba.strandls.com'
-		grails.serverURL = "http://${servername}/${appName}"
-		
+    pamba {
+        servername = 'pamba.strandls.com'
+        grails.serverURL = "http://${servername}/${appName}"
+
         speciesPortal {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
@@ -851,7 +851,7 @@ environments {
             observations {
                 rootDir = "${app.rootDir}/observations"
                 serverURL = "http://${servername}/${appName}/observations"
-				//filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
+                //filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
@@ -867,12 +867,16 @@ environments {
                 serverURL = "http://${servername}/${appName}/content"
             }	
             maps {
-		        serverURL = "http://${servername}/${appName}/maps"
+                serverURL = "http://${servername}/${appName}/maps"
             }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
                 serverURL = "http://${servername}/${appName}/usersRes"   
             }
+			namelist {
+				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
+			}
+		
 
             search.serverURL="http://${servername}:8080/solr"
             grails {
@@ -885,14 +889,14 @@ environments {
 
         ibp.domain=servername
         wgp.domain="thewesternghats.${servername}" 
-		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+
+        grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+        grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
-				baseurl = "/newsletters"
-				basedir = "${speciesPortal.app.rootDir}/newsletters/"
+                baseurl = "/newsletters"
+                basedir = "${speciesPortal.app.rootDir}/newsletters/"
 
                 image.browser = true
                 image.upload = true    
@@ -900,51 +904,51 @@ environments {
                 image.denied = []
             }
         }
-		log4jConsoleLogLevel = Priority.DEBUG
+        log4jConsoleLogLevel = Priority.DEBUG
 
         log4j = {
 
             appenders {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
-                 //console name:'stacktrace'
-                 //'null' name:'stacktrace'//to disable stacktraces on stdout
-             }
+                //console name:'stacktrace'
+                //'null' name:'stacktrace'//to disable stacktraces on stdout
+            }
             root {
                 error 'stdout'
             }
             error stdout:"StackTrace"
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages', //  GSP
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                    'org.codehaus.groovy.grails.commons', // core / classloading
-                    'org.codehaus.groovy.grails.plugins', // plugins
-                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'grails.app.tagLib.org.grails.plugin.resource',
-                    'org.hibernate',
-                    'grails.util'
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'grails.app.tagLib.org.grails.plugin.resource',
+            'org.hibernate',
+            'grails.util'
             error "grails.plugin" 
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
             //debug "org.grails.plugin.resource"
- 
+
             warn    'org.springframework.security',
-                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                    'grails.app'
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.app'
             info   'org.springframework.security'
             info   'org.springframework.security.web'
             info   'org.springframework.security.authentication'
 
-           debug   'speciespage',
-                    'species'
+            debug   'speciespage',
+            'species'
             debug   'com.the6hours', 
-                    'grails.app.taglib.com.the6hours'
+            'grails.app.taglib.com.the6hours'
             debug   'species.auth'
             debug   'com.odobo',
-                    'grails.app.controllers.com.odobo',
-                    'grails.app.services.com.odobo',
-                    'org.pac4j'
+            'grails.app.controllers.com.odobo',
+            'grails.app.services.com.odobo',
+            'org.pac4j'
             info    'jdbc.sqltiming'
             info    'jdbc.connection'
             off   'jdbc.sqlonly'
@@ -952,23 +956,23 @@ environments {
             off   'jdbc.resultset'
             off   'jdbc.resultsettable'
             info   'grails.app.filters.species.SecurityFilters'
-//            debug 'org.hibernate.SQL'
-//            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            
+            //            debug 'org.hibernate.SQL'
+            //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage.ObservationService'
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
 
-       }
+        }
 
-        grails.resources.mappers.hashandcache.excludes = ['**']
-	}
-	kk {
-		servername = 'indiabiodiversity.org'
-		grails.serverURL = "http://${servername}/${appName}"
-		
+        //grails.resources.mappers.hashandcache.excludes = ['**']
+    }
+    kk {
+        servername = 'indiabiodiversity.org'
+        grails.serverURL = "http://${servername}/${appName}"
+
         speciesPortal {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
@@ -982,7 +986,7 @@ environments {
             observations {
                 rootDir = "${app.rootDir}/observations"
                 serverURL = "http://${servername}/${appName}/observations"
-				//filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
+                //filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
@@ -998,13 +1002,16 @@ environments {
                 serverURL = "http://${servername}/${appName}/content"
             }	
             maps {
-		        serverURL = "http://${servername}/${appName}/maps"
+                serverURL = "http://${servername}/${appName}/maps"
             }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
                 serverURL = "http://${servername}/${appName}/usersRes"   
             }
-
+			namelist {
+				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
+			}
+		
             search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {
@@ -1016,14 +1023,14 @@ environments {
 
         ibp.domain=servername
         wgp.domain="thewesternghats.${servername}" 
-		
-		grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-		grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
+
+        grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+        grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
 
         ckeditor {
             upload {
-				baseurl = "/newsletters"
-				basedir = "${speciesPortal.app.rootDir}/newsletters/"
+                baseurl = "/newsletters"
+                basedir = "${speciesPortal.app.rootDir}/newsletters/"
 
                 image.browser = true
                 image.upload = true    
@@ -1031,38 +1038,38 @@ environments {
                 image.denied = []
             }
         }
-		log4jConsoleLogLevel = Priority.DEBUG
-		log4j = {
-			appenders {
-				console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
-			}
+        log4jConsoleLogLevel = Priority.DEBUG
+        log4j = {
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
+            }
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages', //  GSP
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping', // URL mapping
-                    'org.codehaus.groovy.grails.commons', // core / classloading
-                    'org.codehaus.groovy.grails.plugins', // plugins
-                    'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-                    'grails.app.tagLib.org.grails.plugin.resource',
-                    'org.hibernate',
-                    'grails.util'
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping', // URL mapping
+            'org.codehaus.groovy.grails.commons', // core / classloading
+            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+            'grails.app.tagLib.org.grails.plugin.resource',
+            'org.hibernate',
+            'grails.util'
             error "grails.plugin" 
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
             //debug "org.grails.plugin.resource"
- 
+
             warn    'org.springframework.security',
-                    'org.codehaus.groovy.grails.web.servlet',  //  controllers
-                    'grails.app'
+            'org.codehaus.groovy.grails.web.servlet',  //  controllers
+            'grails.app'
             warn   'org.springframework.security'
             warn   'org.springframework.security.web'
             warn   'org.springframework.security.authentication'
 
 
-			info	'species',
-					'speciespage',
-					'com.mchange.v2.resourcepool.BasicResourcePool' 
+            info	'species',
+            'speciespage',
+            'com.mchange.v2.resourcepool.BasicResourcePool' 
             off   'jdbc.sqltiming'
             off   'jdbc.connection'
             off   'jdbc.sqlonly'
@@ -1075,69 +1082,69 @@ environments {
             debug   'grails.app.services.speciespage.ObservationService'
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
-		}
+        }
 
-         grails.resources.mappers.hashandcache.excludes = ['**']
-	}
+        //grails.resources.mappers.hashandcache.excludes = ['**']
+    }
 }
 
 /*
 navigation.species_dashboard = [
-        [controller:'species', title:'Species Gallery', order:1, action:"list"],
-        [controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
-		[controller:'species', title:'Contribute', order:30, action:'contribute'],
+[controller:'species', title:'Species Gallery', order:1, action:"list"],
+[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
+[controller:'species', title:'Contribute', order:30, action:'contribute'],
 ]
 
 navigation.observation_dashboard = [
-        [controller:'observation', title:'Browse Observations', order:1, action:'list'],
-        [controller:'observation', title:'Add Observation', order:10, action:"create"],
+[controller:'observation', title:'Browse Observations', order:1, action:'list'],
+[controller:'observation', title:'Add Observation', order:10, action:"create"],
 ]
 
 navigation.users_dashboard = [
-	[controller:'species', title:'Species Gallery', order:1, action:"list"],
-	[controller:'observation', title:'Browse Observations', order:1, action:'list'],	
-	[controller:'userGroup', title:'Groups', order:20, action:'list'],
-	[controller:'SUser', title:'Users', order:20, action:'list']
+[controller:'species', title:'Species Gallery', order:1, action:"list"],
+[controller:'observation', title:'Browse Observations', order:1, action:'list'],	
+[controller:'userGroup', title:'Groups', order:20, action:'list'],
+[controller:'SUser', title:'Users', order:20, action:'list']
 ]
 
 navigation.user_group_dashboard = [
-	[controller:'userGroup', title:'Browse Groups', order:1, action:'list'],
-    [controller:'userGroup', title:'Create New Group', order:10, action:"create"],
+[controller:'userGroup', title:'Browse Groups', order:1, action:'list'],
+[controller:'userGroup', title:'Create New Group', order:10, action:"create"],
 ]
 
 navigation.userGroup_species_dashboard = [
-	[controller:'species', title:'Species Gallery', order:1, action:"list"],
-	[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
-	[controller:'species', title:'Contribute', order:30, action:'contribute'],
+[controller:'species', title:'Species Gallery', order:1, action:"list"],
+[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
+[controller:'species', title:'Contribute', order:30, action:'contribute'],
 ]
 
 navigation.userGroup_observation_dashboard = [
-	[controller:'userGroup', action:'observations', title:'Browse Observations', order:1, action:'list'],
-	[controller:'observation', title:'Add Observation', order:10, action:"create"],
+[controller:'userGroup', action:'observations', title:'Browse Observations', order:1, action:'list'],
+[controller:'observation', title:'Add Observation', order:10, action:"create"],
 ]
 
 navigation.dashboard = [
-	[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
-			[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
-			[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
-			[controller:'species', title:'Contribute', order:20, action:'contribute']
-		]],
-	[group:'observation', order:40, controller:'observation', title:'Observations', action:'list', subItems:[
-			[controller:'observation', title:'Browse', order:1, action:'list'],
-			[controller:'observation', title:'Add Observation', order:10, action:"create"],
-		]],
-	[group:'users', order:50, controller:'SUser', title:'Users', action:'list'],
-	[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
+[group:'species', controller:'species', order:10, title:'Species', action:'list', subItems:[
+[controller:'species', title:'Thumbnail Gallery', order:1, action:"list"],
+[controller:'species', title:'Taxonomy Browser', order:10, action:'taxonBrowser'],
+[controller:'species', title:'Contribute', order:20, action:'contribute']
+]],
+[group:'observation', order:40, controller:'observation', title:'Observations', action:'list', subItems:[
+[controller:'observation', title:'Browse', order:1, action:'list'],
+[controller:'observation', title:'Add Observation', order:10, action:"create"],
+]],
+[group:'users', order:50, controller:'SUser', title:'Users', action:'list'],
+[group:'search', order:60, controller:'search', title:'Advanced Search', action:'advSelect'],
 ]
-*/
+ */
 
 jquery {
-	sources = 'jquery'
-	coreSuffix = 'core'
-	cssFolder = 'theme'
-	cssDefault = 'base'
-	minFolder = 'minified'
-	minExtentsion = 'min'
+    sources = 'jquery'
+    coreSuffix = 'core'
+    cssFolder = 'theme'
+    cssDefault = 'base'
+    minFolder = 'minified'
+    minExtentsion = 'min'
 }
 
 
@@ -1178,11 +1185,11 @@ grails.plugin.springsecurity.openid.userLookup.openIdsPropertyName = "openIds"
 grails.plugin.springsecurity.rememberMe.persistent = true
 grails.plugin.springsecurity.rememberMe.persistentToken.domainClassName = 'species.auth.PersistentLogin'
 grails.plugin.springsecurity.roleHierarchy = '''
-	ROLE_ADMIN > ROLE_USER
+ROLE_ADMIN > ROLE_USER
 '''
 
 grails.plugin.springsecurity.facebook.domain.classname='species.auth.FacebookUser'
- 
+
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
@@ -1206,270 +1213,270 @@ grails.plugin.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>Y
 grails.plugin.springsecurity.ui.register.emailSubject = 'Activate your account with $domain'
 
 grails.plugin.springsecurity.ui.newuser.emailBody = '''\
-Hi $username,<br/>
-<br/>
-Thank you for registering with us at <b>$domain</b>.<br/>
-<br/> 
-We look forward to your contribution on the portal. The portal is a public participatory portal that thrives by participation from users like you. Will also appreciate any feedback you may have to offer.<br/>
-<br/>
-You will be notified by mail on any social activity on the observation.<br/>
-Please update your <a href="$userProfileUrl">user profile</a>.<br/>
-<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
--The portal team
-'''
-//grails.plugin.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
-
-grails.plugin.springsecurity.ui.userdeleted.emailBody = '''\
-Hi Admin,<br/>
-<br/>
-A user with email address $email is being deleted from <b>$domain</b>.<br/>
-<br/>
--The portal team
-'''
-//grails.plugin.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
-
-grails.plugin.springsecurity.ui.forgotPassword.emailBody = '''\
-Hi $username,<br/>
-<br/>
-You (or someone pretending to be you) requested that your password be reset.<br/>
-<br/>
-If you didn't make this request then ignore the email; no changes have been made.<br/>
-<br/>
-If you did make the request, then click <a href="$url">here</a> to reset your password.
-'''
-//grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
-
-grails.plugin.springsecurity.ui.addObservation.emailSubject = 'Observation added'
-grails.plugin.springsecurity.ui.addObservation.emailBody = '''\
     Hi $username,<br/>
     <br/>
-    You have uploaded an observation to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+    Thank you for registering with us at <b>$domain</b>.<br/>
+    <br/> 
+    We look forward to your contribution on the portal. The portal is a public participatory portal that thrives by participation from users like you. Will also appreciate any feedback you may have to offer.<br/>
     <br/>
     You will be notified by mail on any social activity on the observation.<br/>
-    If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+    Please update your <a href="$userProfileUrl">user profile</a>.<br/>
     <br/>
-    Thank you for your contribution to the portal.<br/>
+    If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
     <br/>
     -The portal team
     '''
+    //grails.plugin.springsecurity.ui.newuser.emailFrom = 'notification@indiabiodiversity.org'
+    grails.plugin.springsecurity.ui.newuser.emailSubject = 'Welcome to $domain'
 
-grails.plugin.springsecurity.ui.addChecklist.emailSubject = 'Checklist added'
-grails.plugin.springsecurity.ui.addChecklist.emailBody = '''\
-Hi $username,<br/>
-<br/>
-You have uploaded a checklist to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
-<br/>
-You will be notified by mail on any social activity on the checklist.<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
-Thank you for your contribution to the portal.<br/>
-<br/>
--The portal team'''
+    grails.plugin.springsecurity.ui.userdeleted.emailBody = '''\
+        Hi Admin,<br/>
+        <br/>
+        A user with email address $email is being deleted from <b>$domain</b>.<br/>
+        <br/>
+        -The portal team
+        '''
+        //grails.plugin.springsecurity.ui.userdeleted.emailFrom = 'notification@indiabiodiversity.org'
+        grails.plugin.springsecurity.ui.userdeleted.emailSubject = 'User is being deleted on $domain'
 
+        grails.plugin.springsecurity.ui.forgotPassword.emailBody = '''\
+            Hi $username,<br/>
+            <br/>
+            You (or someone pretending to be you) requested that your password be reset.<br/>
+            <br/>
+            If you didn't make this request then ignore the email; no changes have been made.<br/>
+            <br/>
+            If you did make the request, then click <a href="$url">here</a> to reset your password.
+            '''
+            //grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'notification@indiabiodiversity.org'
+            grails.plugin.springsecurity.ui.forgotPassword.emailSubject = "Password Reset"
 
-grails.plugin.springsecurity.ui.addRecommendationVote.emailSubject = 'Species name suggested'
-grails.plugin.springsecurity.ui.addRecommendationVote.emailBody = '''\
-Hi $username,<br/>
-<br/>
+            grails.plugin.springsecurity.ui.addObservation.emailSubject = 'Observation added'
+            grails.plugin.springsecurity.ui.addObservation.emailBody = '''\
+                Hi $username,<br/>
+                <br/>
+                You have uploaded an observation to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+                <br/>
+                You will be notified by mail on any social activity on the observation.<br/>
+                If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                <br/>
+                Thank you for your contribution to the portal.<br/>
+                <br/>
+                -The portal team
+                '''
 
-                       <a href="$actorProfileUrl">
-                               <img class="small_profile_pic"
-                                       src="$actorIconUrl"
-                                       title="$actorName" /> $actorName
-                       </a>
-               
-: $activity on the observation <a href="$obvUrl">here</a><br/>
-<br/>
-You will be notified by mail on any social activity on the observation.<br/>
-<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
--The portal team'''
-
-grails.plugin.springsecurity.ui.newComment.emailSubject = 'New comment'
-grails.plugin.springsecurity.ui.newComment.emailBody = '''
-Hi $username,<br/>
-<br/>
-A new comment got added to your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
-<br/>
-You will be notified by mail on any social activity on the observation.<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
-Thank you for your contribution to the portal.<br/>
-<br/>
--The portal team'''
-
-grails.plugin.springsecurity.ui.removeComment.emailSubject = 'Removed a comment'
-grails.plugin.springsecurity.ui.removeComment.emailBody = '''
-Hi $username,<br/>
-<br/>
-A comment got removed from your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
-<br/>
-You will be notified by mail on any social activity on the observation.<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
-Thank you for your contribution to the portal.<br/>
-<br/>
--The portal team'''
-
-grails.plugin.springsecurity.ui.observationFlagged.emailBody ='''
-Hi $username,<br/>
-<br/>
-Your <a href="$obvUrl">observation</a> has some social activity.<br/>
-$currentUser.username has flagged your Observation.<br/>
-<br/>
-You can see the posting on your observation <a href="$obvUrl">here</a><br/>
-<br/>
-You will be notified by mail on any social activity on the observation.<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
--The portal team'''
-
-grails.plugin.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
-grails.plugin.springsecurity.ui.askIdentification.staticMessage = '''
-The user $currentUser has shared this $activitySource from $domain with you.'''
-grails.plugin.springsecurity.ui.askIdentification.emailBody = '''
-Message from <a href="$currentUserProfileLink">$currentUser</a> on $domain <% print activitySource != null ? 'about <a href="'+activitySourceUrl+'">'+activitySource+'</a>':''%>.
-<br/>
-$userMessage
-<br/>
-If you do not want to receive such mails please click <a href="$unsubscribeUrl">here</a>.
-<br/>
-<br/>
--The portal team'''
-
-grails.plugin.springsecurity.ui.observationDeleted.emailSubject = 'Observation deleted'
-grails.plugin.springsecurity.ui.observationDeleted.emailBody = '''
-Hi $username,<br/>
-<br/>
-Your <a href="$obvUrl">observation</a> has been deleted on <b>$domain</b>.<br/>
-<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
--The portal team'''
-
-grails.plugin.springsecurity.ui.checklistDeleted.emailSubject = 'Checklist deleted'
-grails.plugin.springsecurity.ui.checklistDeleted.emailBody = '''
-Hi $username,<br/>
-<br/>
-Your <a href="$obvUrl">checklist</a> has been deleted on <b>$domain</b>.<br/>
-<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
--The portal team'''
+                grails.plugin.springsecurity.ui.addChecklist.emailSubject = 'Checklist added'
+                grails.plugin.springsecurity.ui.addChecklist.emailBody = '''\
+                    Hi $username,<br/>
+                    <br/>
+                    You have uploaded a checklist to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+                    <br/>
+                    You will be notified by mail on any social activity on the checklist.<br/>
+                    If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                    <br/>
+                    Thank you for your contribution to the portal.<br/>
+                    <br/>
+                    -The portal team'''
 
 
-grails.plugin.springsecurity.ui.userGroup.inviteMember.emailSubject = 'Request to join the group'
-grails.plugin.springsecurity.ui.userGroup.inviteMember.emailBody = '''
-Hi $username,<br/>
-<br/>
-$user has invited you to be member of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
-<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
--The portal team'''
+                    grails.plugin.springsecurity.ui.addRecommendationVote.emailSubject = 'Species name suggested'
+                    grails.plugin.springsecurity.ui.addRecommendationVote.emailBody = '''\
+                        Hi $username,<br/>
+                        <br/>
 
-grails.plugin.springsecurity.ui.userGroup.inviteFounder.emailSubject = 'Request to be founder of the group'
-grails.plugin.springsecurity.ui.userGroup.inviteFounder.emailBody = '''
-Hi $username,<br/>
-<br/>
-$user has invited you to be founder of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
-<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
--The portal team'''
-grails.plugin.springsecurity.ui.downloadRequest.emailSubject = 'Download request'
-grails.plugin.springsecurity.ui.downloadRequest.message = " data download request has been processed. The download link will be visible once you log in to your profile."
-grails.plugin.springsecurity.ui.downloadRequest.emailBody = '''\
-Hi $username,<br/>
-<br/>
-Your data download request on the <b>$domain</b> has been processed. 
-<br/>
-You can download your data from your <a href="$userProfileUrl">user profile</a>.
-<br/> 
-Please note that you will need to be logged in to see the download link.
-<br/><br/>
--The portal team
-'''
+                        <a href="$actorProfileUrl">
+                        <img class="small_profile_pic"
+                        src="$actorIconUrl"
+                        title="$actorName" /> $actorName
+                        </a>
 
-grails.plugin.springsecurity.ui.removeRecommendationVote.emailSubject = 'Species name deleted'
+                        : $activity on the observation <a href="$obvUrl">here</a><br/>
+                        <br/>
+                        You will be notified by mail on any social activity on the observation.<br/>
+                        <br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        -The portal team'''
 
-grails.plugin.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observation posted to group'
-grails.plugin.springsecurity.ui.observationPostedToGroup.emailBody = '''\
-Hi $username,<br/>
-<br/>
-<a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
-<br/><br/>
--The portal team
-'''
+                        grails.plugin.springsecurity.ui.newComment.emailSubject = 'New comment'
+                        grails.plugin.springsecurity.ui.newComment.emailBody = '''
+                        Hi $username,<br/>
+                        <br/>
+                        A new comment got added to your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
+                        <br/>
+                        You will be notified by mail on any social activity on the observation.<br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        Thank you for your contribution to the portal.<br/>
+                        <br/>
+                        -The portal team'''
 
-grails.plugin.springsecurity.ui.checklistPostedToGroup.emailSubject = 'Checklist posted to group'
-grails.plugin.springsecurity.ui.checklistPostedToGroup.emailBody = '''\
-Hi $username,<br/>
-<br/>
-<a href="$actorProfileUrl">$actorName</a> has posted a <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
-<br/><br/>
--The portal team
-'''
+                        grails.plugin.springsecurity.ui.removeComment.emailSubject = 'Removed a comment'
+                        grails.plugin.springsecurity.ui.removeComment.emailBody = '''
+                        Hi $username,<br/>
+                        <br/>
+                        A comment got removed from your observation on <b>$domain</b> which is available <a href="$obvUrl">here</a><br/>
+                        <br/>
+                        You will be notified by mail on any social activity on the observation.<br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        Thank you for your contribution to the portal.<br/>
+                        <br/>
+                        -The portal team'''
+
+                        grails.plugin.springsecurity.ui.observationFlagged.emailBody ='''
+                        Hi $username,<br/>
+                        <br/>
+                        Your <a href="$obvUrl">observation</a> has some social activity.<br/>
+                        $currentUser.username has flagged your Observation.<br/>
+                        <br/>
+                        You can see the posting on your observation <a href="$obvUrl">here</a><br/>
+                        <br/>
+                        You will be notified by mail on any social activity on the observation.<br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        -The portal team'''
+
+                        grails.plugin.springsecurity.ui.askIdentification.emailSubject = 'Please identify the species name'
+                        grails.plugin.springsecurity.ui.askIdentification.staticMessage = '''
+                        The user $currentUser has shared this $activitySource from $domain with you.'''
+                        grails.plugin.springsecurity.ui.askIdentification.emailBody = '''
+                        Message from <a href="$currentUserProfileLink">$currentUser</a> on $domain <% print activitySource != null ? 'about <a href="'+activitySourceUrl+'">'+activitySource+'</a>':''%>.
+                        <br/>
+                        $userMessage
+                        <br/>
+                        If you do not want to receive such mails please click <a href="$unsubscribeUrl">here</a>.
+                        <br/>
+                        <br/>
+                        -The portal team'''
+
+                        grails.plugin.springsecurity.ui.observationDeleted.emailSubject = 'Observation deleted'
+                        grails.plugin.springsecurity.ui.observationDeleted.emailBody = '''
+                        Hi $username,<br/>
+                        <br/>
+                        Your <a href="$obvUrl">observation</a> has been deleted on <b>$domain</b>.<br/>
+                        <br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        -The portal team'''
+
+                        grails.plugin.springsecurity.ui.checklistDeleted.emailSubject = 'Checklist deleted'
+                        grails.plugin.springsecurity.ui.checklistDeleted.emailBody = '''
+                        Hi $username,<br/>
+                        <br/>
+                        Your <a href="$obvUrl">checklist</a> has been deleted on <b>$domain</b>.<br/>
+                        <br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        -The portal team'''
 
 
-grails.plugin.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Observation removed from group'
-grails.plugin.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
-Hi $username,<br/>
-<br/>
-<a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
-<br/><br/>
--The portal team
-'''
+                        grails.plugin.springsecurity.ui.userGroup.inviteMember.emailSubject = 'Request to join the group'
+                        grails.plugin.springsecurity.ui.userGroup.inviteMember.emailBody = '''
+                        Hi $username,<br/>
+                        <br/>
+                        $user has invited you to be member of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
+                        <br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        -The portal team'''
 
-grails.plugin.springsecurity.ui.checklistRemovedFromGroup.emailSubject = 'Checklist removed from group'
-grails.plugin.springsecurity.ui.checklistRemovedFromGroup.emailBody = '''\
-Hi $username,<br/>
-<br/>
-<a href="$actorProfileUrl">$actorName</a> has removed a <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
-<br/><br/>
--The portal team
-'''
+                        grails.plugin.springsecurity.ui.userGroup.inviteFounder.emailSubject = 'Request to be founder of the group'
+                        grails.plugin.springsecurity.ui.userGroup.inviteFounder.emailBody = '''
+                        Hi $username,<br/>
+                        <br/>
+                        $user has invited you to be founder of the group <a href="$groupUrl">$group</a> on <b>$domain</b>.<br/>
+                        <br/>
+                        If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                        <br/>
+                        -The portal team'''
+                        grails.plugin.springsecurity.ui.downloadRequest.emailSubject = 'Download request'
+                        grails.plugin.springsecurity.ui.downloadRequest.message = " data download request has been processed. The download link will be visible once you log in to your profile."
+                        grails.plugin.springsecurity.ui.downloadRequest.emailBody = '''\
+                            Hi $username,<br/>
+                            <br/>
+                            Your data download request on the <b>$domain</b> has been processed. 
+                            <br/>
+                            You can download your data from your <a href="$userProfileUrl">user profile</a>.
+                            <br/> 
+                            Please note that you will need to be logged in to see the download link.
+                            <br/><br/>
+                            -The portal team
+                            '''
+
+                            grails.plugin.springsecurity.ui.removeRecommendationVote.emailSubject = 'Species name deleted'
+
+                            grails.plugin.springsecurity.ui.observationPostedToGroup.emailSubject = 'Observation posted to group'
+                            grails.plugin.springsecurity.ui.observationPostedToGroup.emailBody = '''\
+                                Hi $username,<br/>
+                                <br/>
+                                <a href="$actorProfileUrl">$actorName</a> has posted an <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
+                                <br/><br/>
+                                -The portal team
+                                '''
+
+                                grails.plugin.springsecurity.ui.checklistPostedToGroup.emailSubject = 'Checklist posted to group'
+                                grails.plugin.springsecurity.ui.checklistPostedToGroup.emailBody = '''\
+                                    Hi $username,<br/>
+                                    <br/>
+                                    <a href="$actorProfileUrl">$actorName</a> has posted a <a href="$obvUrl">$actionObject</a> to $groupNameWithlink.
+                                    <br/><br/>
+                                    -The portal team
+                                    '''
 
 
-grails.plugin.springsecurity.ui.addDocument.emailSubject = 'Document added'
-grails.plugin.springsecurity.ui.addDocument.emailBody = '''
-Hi $username,<br/>
-<br/>
-You have uploaded a document to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
-<br/>
-You will be notified by mail on any social activity on the document.<br/>
-If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
-<br/>
-Thank you for your contribution to the portal.<br/>
-<br/>
--The portal team'''
+                                    grails.plugin.springsecurity.ui.observationRemovedFromGroup.emailSubject = 'Observation removed from group'
+                                    grails.plugin.springsecurity.ui.observationRemovedFromGroup.emailBody = '''\
+                                        Hi $username,<br/>
+                                        <br/>
+                                        <a href="$actorProfileUrl">$actorName</a> has removed an <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
+                                        <br/><br/>
+                                        -The portal team
+                                        '''
+
+                                        grails.plugin.springsecurity.ui.checklistRemovedFromGroup.emailSubject = 'Checklist removed from group'
+                                        grails.plugin.springsecurity.ui.checklistRemovedFromGroup.emailBody = '''\
+                                            Hi $username,<br/>
+                                            <br/>
+                                            <a href="$actorProfileUrl">$actorName</a> has removed a <a href="$obvUrl">$actionObject</a> from $groupNameWithlink.
+                                            <br/><br/>
+                                            -The portal team
+                                            '''
+
+
+                                            grails.plugin.springsecurity.ui.addDocument.emailSubject = 'Document added'
+                                            grails.plugin.springsecurity.ui.addDocument.emailBody = '''
+                                            Hi $username,<br/>
+                                            <br/>
+                                            You have uploaded a document to <b>$domain</b> and it is available <a href="$obvUrl">here</a><br/>
+                                            <br/>
+                                            You will be notified by mail on any social activity on the document.<br/>
+                                            If you do not want to receive notifications please go to your <a href="$userProfileUrl">user profile</a> and switch it off.<br/>
+                                            <br/>
+                                            Thank you for your contribution to the portal.<br/>
+                                            <br/>
+                                            -The portal team'''
 
 
 
-grails.plugin.springsecurity.ui.encodePassword = false
+                                            grails.plugin.springsecurity.ui.encodePassword = false
 
-grails.plugin.springsecurity.useSecurityEventListener = true
-grails.plugin.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
-	Class<?> User = SUser.class
-	println "updating lastlogin date : "+appCtx.springSecurityService.principal.id
-	if (!User) {
-		println "Can't find domain: $domainClassName"
-		return null
-	}
-	def user = null
+                                            grails.plugin.springsecurity.useSecurityEventListener = true
+                                            grails.plugin.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
+                                                Class<?> User = SUser.class
+                                                println "updating lastlogin date : "+appCtx.springSecurityService.principal.id
+                                                if (!User) {
+                                                    println "Can't find domain: $domainClassName"
+                                                    return null
+                                                }
+                                                def user = null
 
-	User.withTransaction {
-		user = User.get(appCtx.springSecurityService.principal.id)
-		user.lastLoginDate = new Date()
-		user.save()
-	}
-}
+                                                User.withTransaction {
+                                                    user = User.get(appCtx.springSecurityService.principal.id)
+                                                    user.lastLoginDate = new Date()
+                                                    user.save()
+                                                }
+                                            }
 
 grails.plugin.springsecurity.openid.registration.requiredAttributes = [email: 'http://axschema.org/contact/email', location: 'http://axschema.org/contact/country/home',firstname:'http://axschema.org/namePerson/first', lastname: 'http://axschema.org/namePerson/last', profilePic:'http://axschema.org/media/image/default']
 
@@ -1485,85 +1492,85 @@ grails.plugin.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_
 grails.plugin.springsecurity.securityConfigType = SecurityConfigType.Annotation 
 //grails.plugin.springsecurity.rejectIfNoRule = false;
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-    '/*/create/**':                  ['ROLE_USER'],
-    '/*/edit/**':                  ['ROLE_USER'],
-	'/role/**': ['ROLE_ADMIN'],
-	'/persistentLogin/**': ['ROLE_ADMIN'],
-	'/abstractS2Ui/**': ['ROLE_ADMIN'],
-	'/aclClass/**': ['ROLE_ADMIN'],
-	'/aclEntry/**': ['ROLE_ADMIN'],
-	'/aclObjectIdentity/**': ['ROLE_ADMIN'],
-	'/aclSid/**': ['ROLE_ADMIN'],
-	'/registrationCode/**': ['ROLE_ADMIN'],
-	'/requestmap/**': ['ROLE_ADMIN'],
-	'/securityInfo/**': ['ROLE_ADMIN'],
-	'/securityInfo/**': ['ROLE_ADMIN'],
-    '/rateable/rate/**': ['ROLE_USER'],
-    '/adminmanage/**': ['ROLE_ADMIN'],
-    '/biodivAdmin/**':['ROLE_ADMIN'],
-    '/securityinfo':    ['ROLE_ADMIN'],
-    '/securityinfo.*':  ['ROLE_ADMIN'],
-    '/securityinfo/**': ['ROLE_ADMIN'],
-    '/**/js/**':       ['permitAll'],
-    '/**/css/**':      ['permitAll'],
-    '/**/images/**':   ['permitAll'],
-    '/js/**':       ['permitAll'],
-    '/css/**':      ['permitAll'],
-    '/images/**':   ['permitAll'],
-    '/plugins/ckeditor-3.6.3.0/**':   ['permitAll'],
-    '/bootstrap/img/*':['permitAll'],
-    '/plugins/jquery-ui-1.10.3/**':['permitAll'],
-    '/login/**':        ['permitAll'],
-    '/logout/**':       ['permitAll'],
-    '/oauth/**':        ['permitAll'],
-    '/**':['permitAll']
- ]
+'/*/create/**':                  ['ROLE_USER'],
+'/*/edit/**':                  ['ROLE_USER'],
+'/role/**': ['ROLE_ADMIN'],
+'/persistentLogin/**': ['ROLE_ADMIN'],
+'/abstractS2Ui/**': ['ROLE_ADMIN'],
+'/aclClass/**': ['ROLE_ADMIN'],
+'/aclEntry/**': ['ROLE_ADMIN'],
+'/aclObjectIdentity/**': ['ROLE_ADMIN'],
+'/aclSid/**': ['ROLE_ADMIN'],
+'/registrationCode/**': ['ROLE_ADMIN'],
+'/requestmap/**': ['ROLE_ADMIN'],
+'/securityInfo/**': ['ROLE_ADMIN'],
+'/securityInfo/**': ['ROLE_ADMIN'],
+'/rateable/rate/**': ['ROLE_USER'],
+'/adminmanage/**': ['ROLE_ADMIN'],
+'/biodivAdmin/**':['ROLE_ADMIN'],
+'/securityinfo':    ['ROLE_ADMIN'],
+'/securityinfo.*':  ['ROLE_ADMIN'],
+'/securityinfo/**': ['ROLE_ADMIN'],
+'/**/js/**':       ['permitAll'],
+'/**/css/**':      ['permitAll'],
+'/**/images/**':   ['permitAll'],
+'/js/**':       ['permitAll'],
+'/css/**':      ['permitAll'],
+'/images/**':   ['permitAll'],
+'/plugins/ckeditor-3.6.3.0/**':   ['permitAll'],
+'/bootstrap/img/*':['permitAll'],
+'/plugins/jquery-ui-1.10.3/**':['permitAll'],
+'/login/**':        ['permitAll'],
+'/logout/**':       ['permitAll'],
+'/oauth/**':        ['permitAll'],
+'/**':['permitAll']
+]
 
 
 
 jcaptchas {
-	imageCaptcha = new GenericManageableCaptchaService(
-		new GenericCaptchaEngine(
-			new GimpyFactory(
-				new RandomWordGenerator(
-					"abcdefghijklmnopqrstuvwxyz1234567890"
-				),
-				new ComposedWordToImage(
-					new RandomFontGenerator(
-						20, // min font size
-						30, // max font size
-						[new Font("Arial", 0, 10)] as Font[]
-					),
-					new GradientBackgroundGenerator(
-						140, // width
-						35, // height
-						new SingleColorGenerator(new Color(229, 229, 229)),
-						new SingleColorGenerator(new Color(229, 229, 229))
-					),
-					new NonLinearTextPaster(
-						6, // minimal length of text
-						6, // maximal length of text
-						new Color(0, 0, 0)
-					)
-				)
-			)
-		),
-		180, // minGuarantedStorageDelayInSeconds
-		180000, // maxCaptchaStoreSize
-        75000
-	)
+imageCaptcha = new GenericManageableCaptchaService(
+new GenericCaptchaEngine(
+new GimpyFactory(
+new RandomWordGenerator(
+"abcdefghijklmnopqrstuvwxyz1234567890"
+),
+new ComposedWordToImage(
+new RandomFontGenerator(
+20, // min font size
+30, // max font size
+[new Font("Arial", 0, 10)] as Font[]
+),
+new GradientBackgroundGenerator(
+140, // width
+35, // height
+new SingleColorGenerator(new Color(229, 229, 229)),
+new SingleColorGenerator(new Color(229, 229, 229))
+),
+new NonLinearTextPaster(
+6, // minimal length of text
+6, // maximal length of text
+new Color(0, 0, 0)
+)
+)
+)
+),
+180, // minGuarantedStorageDelayInSeconds
+180000, // maxCaptchaStoreSize
+75000
+)
 
-	/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
+/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
 }
 
 NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";
 ObservationController.COMMIT = false;
 
 grails.rateable.rater.evaluator = { 
-	Class<?> User = SUser.class
-	if (!User) {
-		println "Can't find domain: $domainClassName"
-		return null
+    Class<?> User = SUser.class
+    if (!User) {
+        println "Can't find domain: $domainClassName"
+        return null
     }
     def u = org.springframework.security.core.context.SecurityContextHolder.context.authentication.principal
     if(u && !(u instanceof String)) {
@@ -1577,22 +1584,22 @@ grails.rateable.rater.evaluator = {
 /* remove this line 
 // GSP settings
 grails {
-    views {
-        gsp {
-            encoding = 'UTF-8'
-            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
-            codecs {
-                expression = 'html' // escapes values inside null
-                scriptlet = 'none' // escapes output from scriptlets in GSPs
-                taglib = 'none' // escapes output from taglibs
-                staticparts = 'none' // escapes output from static template parts
-            }
-        }
-        // escapes all not-encoded output at final stage of outputting
-        filteringCodecForContentType {
-            //'text/html' = 'html'
-        }
-    }
+views {
+gsp {
+encoding = 'UTF-8'
+htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+codecs {
+expression = 'html' // escapes values inside null
+scriptlet = 'none' // escapes output from scriptlets in GSPs
+taglib = 'none' // escapes output from taglibs
+staticparts = 'none' // escapes output from static template parts
+}
+}
+// escapes all not-encoded output at final stage of outputting
+filteringCodecForContentType {
+//'text/html' = 'html'
+}
+}
 }
 remove this line */
 //grails.dependency.cache.dir = "${userHome}/.ivy2/cache"
@@ -1630,6 +1637,76 @@ grails.doc.copyright=''
 grails.doc.footer='Powered by the open source Biodiversity Informatics Platform'
 
 //REST
+
+grails {
+    plugin {
+    springsecurity {
+    rest {
+
+
+    active = true
+
+    login {
+    active = true
+    endpointUrl = '/api/login'
+    usernamePropertyName = 'username'
+    passwordPropertyName = 'password'
+    failureStatusCode = HttpServletResponse.SC_UNAUTHORIZED    //401
+    useJsonCredentials = true
+    useRequestParamsCredentials = false
+    }
+
+    logout {
+    endpointUrl = '/api/logout'
+    }
+
+    token {
+
+    generation {
+    useSecureRandom = true
+    useUUID = false
+    }
+
+    storage {
+    useGorm = false
+    useMemcached = false
+    useGrailsCache = false
+
+    gorm {
+    tokenDomainClassName = null
+    tokenValuePropertyName = 'tokenValue'
+    usernamePropertyName = 'username'
+    }
+
+    memcached {
+    hosts = 'localhost:11211'
+    username = ''
+    password = ''
+
+    expiration = 3600
+    }
+
+    }
+
+    validation {
+        active = true
+        headerName = 'X-Auth-Token'
+        endpointUrl = '/api/validate'
+        tokenHeaderMissingStatusCode = HttpServletResponse.SC_UNAUTHORIZED    //401
+        enableAnonymousAccess = false
+        useBearerToken = true
+    }
+
+    rendering {
+        usernamePropertyName = 'username'
+        tokenPropertyName = 'access_token'
+        authoritiesPropertyName = 'roles'
+    }
+    }
+    }
+    }
+    }
+}
 //grails.plugin.springsecurity.rest.login.useJsonCredentials = true
 grails.plugin.springsecurity.rest.token.storage.useGorm=true
 grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName='species.auth.AuthenticationToken'
@@ -1673,15 +1750,15 @@ grails.plugins.dynamicController.mixins = [
 
 
 grails.plugin.springsecurity.filterChain.chainMap = [
-    '/**/js/**':'exceptionTranslationFilter',
-    '/**/css/**':'exceptionTranslationFilter',
-    '/**/images/**':'exceptionTranslationFilter',
-    '/**/img/**':'exceptionTranslationFilter',
-    '/api/guest/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
-    '/api/oauth/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
-    '/api/register/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
-    '/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
-    '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
+'/**/js/**':'exceptionTranslationFilter',
+'/**/css/**':'exceptionTranslationFilter',
+'/**/images/**':'exceptionTranslationFilter',
+'/**/img/**':'exceptionTranslationFilter',
+'/api/guest/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+'/api/oauth/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+'/api/register/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
+'/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
+'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
 ]
 
 //http://mrhaki.blogspot.in/2014/07/grails-goodness-enable-accept-header.html

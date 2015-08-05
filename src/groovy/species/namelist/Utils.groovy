@@ -325,6 +325,33 @@ class Utils {
             errors.add(temp); 
         }
 	}
+	
+	//XXX: Get col data based on colid
+	public static String getColDataAsText(String colId){
+		String text = null
+		try {
+			def http = new HTTPBuilder()
+
+			http.request( COL_SITE, GET, TEXT ) { req ->
+				uri.path = COL_URI
+				uri.query = [ id:colId, response:'full', format:'xml']
+				//headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
+				headers.Accept = 'text/xml'
+
+				response.success = { resp, reader ->
+					assert resp.statusLine.statusCode == 200
+					println "Got response: ${resp.statusLine}"
+					//println "Content-Type: ${resp.headers.'Content-Type'}"
+					text =  reader.text
+				}
+				response.'404' = { println 'Not found' }
+			}
+		} catch(Exception e) {
+			println e.printStackTrace()
+		}
+		return text
+	}
+
 
 	static void searchCol(String name){
 		//http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa

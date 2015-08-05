@@ -81,7 +81,7 @@ class UrlMappings {
                 constraints { id matches: /\d+/ }
             }
             "/group/$action" {
-                controller = 'SUser'
+                controller = 'userGroup'
                 constraints {
                     action(matches:/(?!\d+$)\w+/)
                 }
