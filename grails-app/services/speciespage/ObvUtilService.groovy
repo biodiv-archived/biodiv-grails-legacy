@@ -33,7 +33,7 @@ import species.sourcehandler.exporter.DwCObservationExporter;
 import species.sourcehandler.exporter.DwCSpeciesExporter
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import grails.converters.JSON;
-
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class ObvUtilService {
 
@@ -84,16 +84,36 @@ class ObvUtilService {
 	def activityFeedService
 	def observationsSearchService
 	def commentService
-	
+    def messageSource;
+
 	///////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	
 	
 	def requestExport(params){
-		log.debug(params)
-		log.debug "creating download request"
-		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
+        log.debug "creating download request"
+        def dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
+        def r = [:];
+        if(!dl.hasErrors()) {
+            r['success'] = true;
+            r['msg']= messageSource.getMessage('observation.download.requsted',null,'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.', LCH.getLocale())
+        } else {
+            r['success'] = false;
+            r['msg'] = 'Error in creating download log.' 
+            def errors = [];
+            dl.errors.allErrors.each {
+                println it;
+                println "===============++++"
+                def formattedMessage = messageSource.getMessage(it, LCH.getLocale());
+                errors << ['field': it.field, 'message': formattedMessage]
+            }
+            r['errors'] = errors 
+
+            println dl.errors.allErrors
+        }
+
+        return r;
 	}
 	
 	def export(params, dl){
