@@ -68,9 +68,9 @@ if(r) {
 </head>
 <body>
 
-<link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.css">
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/galleria-1.3.5.js"></script>
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
+<link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.css">
+<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/galleria.1.4.2-youtubeV3.js"></script>
+<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.min.js"></script>
 
             <div class="observation  span12">
                             <obv:showSubmenuTemplate/>
