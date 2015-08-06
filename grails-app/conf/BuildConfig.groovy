@@ -133,6 +133,7 @@ grails.project.dependency.resolution = {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
 
+        compile ":grails-ant:0.1.3"
     }
 
     plugins { 
