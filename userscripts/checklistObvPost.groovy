@@ -4,7 +4,7 @@ import species.participation.Checklists
 import groovy.sql.Sql
 import species.*
 import grails.converters.JSON
-
+import species.NamesMetadata.NameStatus;
 
 //
 //
@@ -436,6 +436,122 @@ def rawNamesWithNoIbpHir(){
 }
 
 
+def deleteName(){
+	def dataSource = ctx.getBean("dataSource");
+	dataSource.setUnreturnedConnectionTimeout(500);
+	def sql = new Sql(dataSource)
+	
+	
+	String s1 = "delete from taxonomy_definition_suser where taxonomy_definition_contributors_id = "
+	String s2 = "delete from accepted_synonym where accepted_id = "
+	String s3 = "delete from taxonomy_definition_year where taxonomy_definition_id = "
+	String s4 = "delete from taxonomy_definition_author where taxonomy_definition_id = "
+	String s5 = "delete from doc_sci_name where taxon_concept_id = "
+	String s6 = "delete from recommendation where taxon_concept_id = ";
+	String s7 = "delete from common_names where taxon_concept_id = "
+	String s8 = "delete from synonyms where taxon_concept_id = "
+	String s9 = "delete from taxonomy_definition where id = "
+	
+	List delTableList = [s1, s2, s3, s4, s5, s6, s7, s8, s9]
+	String ss = "update recommendation set taxon_concept_id = NULL where taxon_concept_id = "
+	
+	File file = new File("/apps/git/biodiv/namelist/after-migration/raw_names_without_ibpHir_todelete.csv");
+	//File file = new File("/home/sandeept/namesync/thomas/raw_names_without_ibpHir_todelete.csv")
+	def lines = file.readLines();
+	int i=0;
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split(',');
+		println " arr ->>> " + arr
+		def tId = arr[0]//Long.parseLong(arr[0].trim())
+		sql.executeUpdate(ss + tId)
+		delTableList.each { String s ->
+			sql.executeUpdate(s + " " + tId)
+		}
+	}
+}
+
+
+def updateNameAndCreateIbpHir(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	def ibpHir = Classification.findByName("IBP Taxonomy Hierarchy");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/raw_names_without_ibpHir_tocorrectandsnap.csv");
+	//File file = new File("/home/sandeept/namesync/thomas/raw_names_without_ibpHir_tocorrectandsnap.csv")
+	def lines = file.readLines();
+	int i=0;
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split(',');
+		println " arr ->>> " + arr
+		def tId = Long.parseLong(arr[0].trim())
+		String correctName = arr[1].trim()
+		def pId = Long.parseLong(arr[3].trim())
+		TaxonomyDefinition td = TaxonomyDefinition.get(tId)
+		
+		NamesParser namesParser = new NamesParser();
+		def parsedNames = namesParser.parse([correctName]);
+		if(parsedNames[0]?.canonicalForm) {
+			td.normalizedForm = parsedNames[0].normalizedForm;
+			td.italicisedForm = parsedNames[0].italicisedForm;
+			td.binomialForm = parsedNames[0].binomialForm;
+			td.canonicalForm = parsedNames[0].canonicalForm
+			td.name = correctName
+			if(!td.save(flush:true)) {
+				td.errors.each { println it }
+			}
+		}
+	
+		nlSer.saveIBPHir(td, pId)
+	}
+}
+
+
+def createNameAndAddIBPHir(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/raw_names_without_ibpHir_tocreateandsnap.csv");
+	//File file = new File("/home/sandeept/namesync/thomas/raw_names_without_ibpHir_tocreateandsnap.csv")
+	def lines = file.readLines();
+	int i=0;
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split(',');
+		println " arr ->>> " + arr
+		def tId = Long.parseLong(arr[0].trim())
+		String correctName = arr[1].trim()
+		String parentName = arr[2].trim()
+		def pTd = nlSer.createName(parentName, arr[5].trim(), arr[6].trim(), arr[4].trim())
+		if(!pTd){
+			println "Not able to create parent " + parentName
+			return
+		}
+		def tr = nlSer.saveIBPHir(pTd, Long.parseLong(arr[8].trim()))
+		if(!tr){
+			println "Not able to create tr for " + pTd
+			return 
+		}
+		
+		NamesParser namesParser = new NamesParser();
+		def parsedNames = namesParser.parse([correctName]);
+		if(parsedNames[0]?.canonicalForm) {
+			TaxonomyDefinition td = TaxonomyDefinition.get(tId)
+			td.normalizedForm = parsedNames[0].normalizedForm;
+			td.italicisedForm = parsedNames[0].italicisedForm;
+			td.binomialForm = parsedNames[0].binomialForm;
+			td.canonicalForm = parsedNames[0].canonicalForm
+			td.name = correctName
+			if(!td.save(flush:true)) {
+				td.errors.each { println it }
+			}
+			nlSer.saveIBPHir(td, pTd.id)
+		}
+	}	
+}
+
+def migSyn(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	nlSer.migrateSynonymForRawNames()
+}
+
 //dmp()
 //splitTreeExport()
 
@@ -453,8 +569,12 @@ def rawNamesWithNoIbpHir(){
 //mergeSynonym()
 //createDuplicateName()
 //removeIsDeletedRawName()
-addIBPHirToRawNames()
+//addIBPHirToRawNames()
 //copyIbpHir()
 
-
 //rawNamesWithNoIbpHir()
+
+deleteName()
+//updateNameAndCreateIbpHir()
+//createNameAndAddIBPHir()
+//migSyn()

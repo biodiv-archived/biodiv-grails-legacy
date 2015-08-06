@@ -33,6 +33,8 @@ import species.NamesParser;
 import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
 import speciespage.SpeciesUploadService;
+import species.Synonyms
+
 
 import species.namelist.Utils
 
@@ -685,5 +687,144 @@ class NamelistUtilService {
 		println "Failed count " + failCount   + "  Total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////
+	////////////////// Create name from Spreadsheet and add IBP hir /////////////////
+	/////////////////////////////////////////////////////////////////////////////////
 	
+
+	public TaxonomyDefinition createName(String name, String rank, String status, String position){
+		return createName(name, rank.trim().toInteger(), NameStatus.getEnum(status), NamePosition.getEnum(position))
+	}
+	
+	public TaxonomyDefinition createName(String name, int rank, NameStatus status, NamePosition position){
+		def parsedNames =  new NamesParser().parse([name]);
+		if(!parsedNames[0]?.canonicalForm) {
+			println "Not able to parse " + name
+			return
+		}
+		
+		TaxonomyDefinition td = new TaxonomyDefinition()
+		
+		td.normalizedForm = parsedNames[0].normalizedForm;
+		td.italicisedForm = parsedNames[0].italicisedForm;
+		td.binomialForm = parsedNames[0].binomialForm;
+		td.canonicalForm = parsedNames[0].canonicalForm
+		td.name = name
+		
+		List<TaxonomyDefinition> tds = NamelistService.searchIBP(td.canonicalForm, null, status, rank)
+		if(!tds.isEmpty()){
+			println "Name alreay exist in system " + tds
+			return tds[0]
+		}
+		
+		td.status = status
+		td.position = position
+		td.rank = rank
+		
+		if(!td.save(flush:true)) {
+			td.errors.each { log.debug it }
+		}
+		
+		return td
+	}
+		
+	public TaxonomyRegistry saveIBPHir(TaxonomyDefinition td, Long parentId){
+		Classification ibpHir = Classification.findByName("IBP Taxonomy Hierarchy");
+		TaxonomyDefinition  pTd = TaxonomyDefinition.read(parentId)
+		
+		if(!td || !pTd)
+			return 
+		
+		TaxonomyRegistry ibpTr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(td, ibpHir)
+		if(ibpTr){
+			println "Already have on ibp hir " + ibpTr
+			return ibpTr
+		}
+		
+		ibpTr =	new TaxonomyRegistry()
+		if(pTd.status == NameStatus.SYNONYM){
+			pTd = AcceptedSynonym.fetchAcceptedNames(pTd)[0]
+		}
+		
+		TaxonomyRegistry pIbpTr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(pTd, ibpHir)
+		if(!pIbpTr){
+			println "Parent do not have ibp hir " + pTd + "  for name " +  td
+			return
+		}
+		
+		ibpTr.properties = pIbpTr.properties
+		ibpTr.parentTaxonDefinition = pIbpTr.taxonDefinition
+		ibpTr.taxonDefinition = td
+		ibpTr.parentTaxon = pIbpTr
+		ibpTr.contributors = null;
+		ibpTr.path = pIbpTr.path + "_" + td.id
+		
+		if(!ibpTr.save(flush:true)){
+			ibpTr.errors.allErrors.each { println  it }
+		}
+		
+		return ibpTr
+	}
+	
+	//migrate synonyms for accepted raw names
+	public migrateSynonymForRawNames(){
+		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+		dataSource.setUnreturnedConnectionTimeout(5000);
+		
+		def query  = '''select id from taxonomy_definition where status = 'ACCEPTED' and position = 'RAW' order by rank, id '''
+		def sql =  Sql.newInstance(dataSource);
+		
+		int failCount = 0
+		int i = 0
+		def createList = []
+		boolean doAgain = true
+		
+		sql.rows(query).each { r ->
+			i++
+			println "============= count " + i
+			if(!doAgain) return
+			
+			TaxonomyDefinition  pTd = TaxonomyDefinition.read(r.id)
+			
+			
+			Synonyms.findAllByTaxonConcept(pTd).each {Synonyms syn ->
+				SynonymsMerged td 
+				def tds = NamelistService.searchIBP(syn.name, null, NamesMetadata.NameStatus.ACCEPTED)
+				if(!tds.isEmpty()){
+					println "Name is accpeted in new sytem leaving out " + tds
+					return 
+				}
+				tds = NamelistService.searchIBP(syn.name, null, NamesMetadata.NameStatus.SYNONYM)
+				if(!tds.isEmpty()){
+					println "Name is synonym in new sytem so retusing " + tds
+					td = tds[0]
+					AcceptedSynonym.createEntry(pTd, td)
+				}
+				else{
+					createList << syn.id
+				
+					
+					td = new SynonymsMerged()
+					td.properties = syn.properties
+					td.status = NamesMetadata.NameStatus.SYNONYM
+					td.position = NamesMetadata.NamePosition.RAW
+					td.rank = pTd.rank
+					td.contributors = null
+					td.curators = null
+	
+					
+					if(!td.save(flush:true)){
+						td.errors.allErrors.each { println  it }
+					}
+					
+					AcceptedSynonym.createEntry(pTd, td)
+				}
+			}
+			
+		}
+		
+		println "-----------------------id list==============" + createList.size()
+		println createList.join(", ")
+		println "-------------------------------"
+	}
 }

@@ -35,7 +35,6 @@ class AcceptedSynonym {
         res.each {
             acceptedNames.add(it.accepted);
         }
-        println "Accepted names for " + synonym +" =========== " + acceptedNames;
         return acceptedNames;
     }
 
