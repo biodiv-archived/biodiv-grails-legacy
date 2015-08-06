@@ -2218,7 +2218,7 @@ def checking(){
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = synonymId;
             return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
-        } 
+        }
 
         /*if(!oldSynonym.isContributor()) {
             return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]

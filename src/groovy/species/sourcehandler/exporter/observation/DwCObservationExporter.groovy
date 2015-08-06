@@ -49,9 +49,9 @@ public max_date
 	
 	def exportObservationData(String directory, list_of_observationInstance, reqUser , dl_id , params_filterUrl) {
 		log.info "Darwin Core export started"
-			if(!directory) {
+		/*	if(!directory) {
 				directory = config.speciesPortal.species.speciesDownloadDir
-			} 
+			} */
 
 
 		String folderName = "dwc_"+ + new Date().getTime()
