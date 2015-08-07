@@ -115,6 +115,9 @@ var doc    = window.document,
     // video providers
     _video = {
         youtube: {
+            //          String re = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>|<\/a>))[?=&+%\w-]*/;
+            reg: /https?:\/\/(?:[0-9A-Z-]+\.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])(([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w]*(?:['"][^<>]*>|<\/a>))[?=&+%\w-]*)/i,
+            //reg: /https?:\/\/(?:[0-9a-zA_Z]{2,3}.)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i,
             reg: /https?:\/\/(?:[a-zA_Z]{2,3}.)?(?:youtube\.com\/watch\?)((?:[\w\d\-\_\=]+&amp;(?:amp;)?)*v(?:&lt;[A-Z]+&gt;)?=([0-9a-zA-Z\-\_]+))/i,
             embed: function() {
                 return 'http://www.youtube.com/embed/' + this.id;
