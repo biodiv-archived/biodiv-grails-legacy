@@ -134,6 +134,7 @@
                     'keep_selected_style': false,
                     'three_state': false,
                     'whole_node': false,
+                    'cascade':'down',
                     'visible': false
                 },
                 "plugins": [

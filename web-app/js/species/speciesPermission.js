@@ -98,6 +98,7 @@ $(document).ready(function() {
     $(".inviteButton").click(function(){
         var $dialog = $(this).parent().parent();
         var selectedNodes = $.map($('#taxonHierarchy').jstree(true).get_checked(true), function(val) { return val.original.taxonid; }).join()
+        console.log(selectedNodes);
         //$(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
         var invitetype = $dialog.find('input[name="invitetype"]').val();
 

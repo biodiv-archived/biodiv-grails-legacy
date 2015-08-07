@@ -172,9 +172,11 @@ class SpeciesPermissionService {
     }
     
     List<TaxonomyDefinition> contributorFor(SUser user){
+        println user;
         def result = SpeciesPermission.findAllByAuthorAndPermissionType(user, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
+        println result;
         def res = []
-        result.each{
+        result.each {
             res << it.taxonConcept
         }
         return res
@@ -239,33 +241,71 @@ class SpeciesPermissionService {
         String msg = ""
         String usernameFieldName = 'name'
         def selNodes = selectedNodes.split(",")
+
+        def selNodeTDs = [];
+
+        selNodes.each { snid ->
+            def sn = TaxonomyDefinition.get(snid.toLong())
+            if(sn)
+                selNodeTDs << sn;
+        }
+
+        //order selectedNodes by their rank;
+        selNodeTDs = selNodeTDs.sort { a,b -> a.rank <=> b.rank }
+
+        boolean alReq = false;
+
         members.each { mem ->
             def hadPermissionFor;
             if(invitetype == 'curator')
-                hadPermissionFor = curatorFor(mem)
+                hadPermissionFor = curatorFor(mem);
             else
-                hadPermissionFor = contributorFor(mem)
-
-            selNodes.each { snid ->
-                def sn = TaxonomyDefinition.get(snid.toLong())
+                hadPermissionFor = contributorFor(mem);
+           
+            selNodeTDs.each { sn ->
                 def allParents = sn.parentTaxon()
-                if(hadPermissionFor) {
-                    if(hadPermissionFor.intersect(allParents)) {
-                        //he is already has permission for a parent node, no need to add for child node
-                        rankLevel = rankArray[sn.rank]
-                        msg += " ${mem.name} is already a ${invitetype} of " + rankLevel + " : ${sn.name} ";
-                        return msg
+                
+                allParents = allParents - sn;
+
+                boolean hasPermission = false, alreadyRequested = false;
+                allParents.each { parent ->
+                    if(hadPermissionFor && hadPermissionFor.contains(parent)) {
+                        hasPermission = true;
+                        return;
+                    } else if(selNodeTDs.contains(parent)) {
+                        alreadyRequested = true;
+                        alReq = true;
+                        return;
                     }
                 }
+
+                if(hasPermission) {
+                    //he is already has permission for a parent node, no need to add for child node
+                    rankLevel = rankArray[sn.rank]
+                    msg += " ${mem.name} is already a ${invitetype} of " + rankLevel + " : ${sn.name}. ";
+                    return msg
+                }
+                if(alreadyRequested) {
+                    //invitation was already sent for parent node, no need to add for child node
+                    rankLevel = rankArray[sn.rank]
+//                    msg += " ${mem.name} has already requested ${invitetype} permission for its parent of " + rankLevel + " : ${sn.name}. ";
+                    return msg
+                }
+
                 rankLevel = rankArray[sn.rank]
                 def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionInviteRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
                 userToken.save(flush: true)
                 def userLanguage = utilsService.getCurrentLanguage();
                 emailConfirmationService.sendConfirmation(mem.email,mailSubject,  [curator: mem, invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/invitePermission', message:message], userToken.token);
 
-                msg += " Successfully sent invitation to ${mem.name} for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
+                msg += " Successfully sent invitation to ${mem.name} for ${invitetype}ship of " + rankLevel + " : ${sn.name}. "           
             }
+
         }
+        if(alReq) {
+            msg += " As an invitation was sent for the parent other selected taxon names are ignored. ";
+        }
+
         return msg
     }
 
@@ -282,6 +322,19 @@ class SpeciesPermissionService {
         String usernameFieldName = 'name'
         def selNodes = selectedNodes.split(",")
 
+        def selNodeTDs = [];
+
+        selNodes.each { snid ->
+            def sn = TaxonomyDefinition.get(snid.toLong())
+            if(sn)
+                selNodeTDs << sn;
+        }
+
+        //order selectedNodes by their rank;
+        selNodeTDs = selNodeTDs.sort { a,b -> a.rank <=> b.rank }
+
+        boolean alReq = false;
+
         members.each { mem ->
             def hadPermissionFor;
             if(invitetype == 'curator')
@@ -289,35 +342,58 @@ class SpeciesPermissionService {
             else
                 hadPermissionFor = contributorFor(mem)
 
-            selNodes.each { snid ->
-                def sn = TaxonomyDefinition.get(snid.toLong())
-                def allParents = sn.parentTaxon()
-                if(hadPermissionFor) {
-                    if(hadPermissionFor.intersect(allParents)) {
+                selNodeTDs.each { sn ->
+                    def allParents = sn.parentTaxon()
+
+                    allParents = allParents - sn;
+
+                    boolean hasPermission = false, alreadyRequested = false;
+                    allParents.each { parent ->
+                        if(hadPermissionFor && hadPermissionFor.contains(parent)) {
+                            hasPermission = true;
+                            return;
+                        } else if(selNodeTDs.contains(parent)) {
+                            alreadyRequested = true;
+                            alReq = true;
+                            return;
+                        }
+                    }
+
+                    if(hasPermission) {
                         //he is already has permission for a parent node, no need to add for child node
                         rankLevel = rankArray[sn.rank]
                         msg += " ${mem.name} is already a ${invitetype} of " + rankLevel + " : ${sn.name} ";
                         return msg
                     }
-                }
-                rankLevel = rankArray[sn.rank]
-                def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
-                userToken.save(flush: true)
+                    if(alreadyRequested) {
+                        rankLevel = rankArray[sn.rank]
+                        return msg
+                    }
 
-                List<SUser> speciesAdmins;
-                if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
-                    speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
-                } else {
-                    speciesAdmins = [springSecurityService.currentUser];
-                }
-                speciesAdmins.each {
-                    def userLanguage = utilsService.getCurrentLanguage();
-                    emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:utilsService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/requestPermission', 'message':message], userToken.token);
-                }
 
-                msg += " Successfully sent request for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
-            }
+                    rankLevel = rankArray[sn.rank]
+                    def userToken = new UserToken(username: mem."$usernameFieldName", controller:'species', action:'confirmPermissionRequest', params:['userId':mem.id.toString(), 'taxonConcept':sn.id.toString(), 'invitetype':invitetype]);
+                    userToken.save(flush: true)
+
+                    List<SUser> speciesAdmins;
+                    if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
+                        speciesAdmins = SUserRole.findAllByRole(Role.findByAuthority("ROLE_SPECIES_ADMIN")).sUser
+                    } else {
+                        speciesAdmins = [springSecurityService.currentUser];
+                    }
+                    speciesAdmins.each {
+                        def userLanguage = utilsService.getCurrentLanguage();
+                        emailConfirmationService.sendConfirmation(it.email, mailSubject,  [admin: it, requester:mem, requesterUrl:utilsService.generateLink("SUser", "show", ["id": mem.id], null), invitetype:invitetype, taxon:sn, domain:domain, rankLevel:rankLevel, view:'/emailtemplates/'+userLanguage.threeLetterCode+'/requestPermission', 'message':message], userToken.token);
+                    }
+
+                    msg += " Successfully sent request for ${invitetype}ship of " + rankLevel + " : ${sn.name} "                        
+                }
         }
+
+        if(alReq) {
+            msg += " As a request was sent for the parent, other selected taxon names are ignored. ";
+        }
+
         return msg
     }
 
