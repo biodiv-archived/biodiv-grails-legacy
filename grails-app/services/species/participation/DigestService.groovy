@@ -21,12 +21,17 @@ class DigestService {
 
     public static final MAX_DIGEST_OBJECTS = 5
     static transactional = false
+	
+	
 
-    def sendDigestAction() {
+    public sendDigestAction() {
         log.debug "Send digest action called"
-        def digestList = Digest.list()
+        def digestList = Digest.list(true)
         def setTime = true
         digestList.each{ dig ->
+			if(!dig.userGroup.sendDigestMail){
+				return
+			}
             log.debug "Sending digest for ${dig}"
 			try{
 				sendDigestWrapper(dig, setTime)
@@ -38,7 +43,7 @@ class DigestService {
 
     }
 
-    def sendDigestWrapper(Digest digest, setTime=true){
+    public sendDigestWrapper(Digest digest, setTime=true){
         int max = 50
         long offset = 0
         Date lastSent;
@@ -83,7 +88,7 @@ class DigestService {
 
     }
 
-    def sendDigest(Digest digest, usersEmailList, setTime, digestContent){
+    private sendDigest(Digest digest, usersEmailList, setTime, digestContent){
         //def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
@@ -109,7 +114,7 @@ class DigestService {
         }
     }
 
-    def fetchDigestContent(Digest digest){
+    public fetchDigestContent(Digest digest){
         log.debug "fetchDigestContent"
         def params = [:]
         params.rootHolderId = digest.userGroup.id
@@ -268,7 +273,7 @@ class DigestService {
             def recentTopContributors = [];
             def topIDProviders = [];
             def newDate = new Date()
-            int days = (newDate - digest.startDateStats); 
+            int days = (newDate - digest.userGroup.statStartDate); 
             int max = 5
             UserGroup userGroupInstance = digest.userGroup
 
@@ -317,7 +322,7 @@ log.debug resultSet
         return res
     }
 
-    def sendDigestPrizeEmail(){
+    public sendDigestPrizeEmail(){
         def max = 50
         def offset = 0
         def emailFlag = true
@@ -342,7 +347,7 @@ log.debug resultSet
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
-    def sendSampleDigestPrizeEmail(usersEmailList){
+    public sendSampleDigestPrizeEmail(usersEmailList){
         def max = 50
         def offset = 0
         def emailFlag = true
@@ -367,7 +372,7 @@ log.debug resultSet
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
-    def List getParticipantsForDigest(userGroup, max, offset) {
+    private List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
@@ -383,7 +388,7 @@ log.debug resultSet
         return participants;
     }
 
-    def latestContentsByGroup(Digest digest) {
+    private latestContentsByGroup(Digest digest) {
         log.debug "latestContentsByGroup ${digest}"
 		def res = [:]
         int max = 5

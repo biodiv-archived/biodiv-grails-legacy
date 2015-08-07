@@ -501,3 +501,14 @@ update taxonomy_registry set parent_taxon_definition_id=t1.taxon_definition_id f
 
 
 
+///////////////////////////// 7th aug 2015 ////////////////////////
+alter table user_group add column send_digest_mail boolean;
+update user_group set send_digest_mail = false; 
+update user_group set send_digest_mail = true where id in (select user_group_id from digest);
+alter table user_group alter column send_digest_mail set not NULL;
+
+alter table user_group  add column stat_start_date timestamp without time zone;
+update user_group set stat_start_date = founded_on;
+alter table user_group alter column stat_start_date set not NULL;
+
+alter table digest drop column start_date_stats;
