@@ -348,7 +348,8 @@ function loadYoutube(youtube_container) {
 	
 	var youtube_video_id = $(preview).find('span.videoId').text();
 	if(youtube_video_id) {
-		var api_url = "https://gdata.youtube.com/feeds/api/videos/" + youtube_video_id + "?v=2&alt=json-in-script&callback=?";
+
+        var api_url = 'https://www.googleapis.com/youtube/v3/videos?id=' + youtube_video_id + '?part=contentDetails&key=AIzaSyAyhfqwsO200BkWr3nH8Zbn8NteoxNhe0o&alt=json-in-script&callback=?';
 		 this;
 		$.getJSON(api_url, function(data) {
 		    $(info).html("<b><a href='http://youtube.com/watch?v=" + youtube_video_id + "' target='_blank'>" + data.entry.title.$t + "</a></b>");
