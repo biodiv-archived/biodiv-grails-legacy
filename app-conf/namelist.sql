@@ -264,4 +264,11 @@ delete from taxonomy_definition where id = 39867;;
 6. Remove col hier for all working names and copy IBP hir as col hir.
 	In checklistObvPost.groovy run copyIbpHir()
 
+	
+	
+////////////////////// 6th Aug 2015 ///////////////
 
+1. In checklistObvPost.groovy run deleteName()
+2. In checklistObvPost.groovy run updateNameAndCreateIbpHir()
+3. In checklistObvPost.groovy run createNameAndAddIBPHir()
+4. In checklistObvPost.groovy run migSyn() 

@@ -30,6 +30,20 @@ abstract class NamesMetadata extends NamesSorucedata {
         String toString() {
             return this.value();
         }
+		
+		static NamePosition getEnum(String str){
+			if(!str) return null
+			
+			NamePosition retVal = null
+			list().each{
+				if(!retVal){
+					if(str.trim().equalsIgnoreCase(it.value())){
+						retVal = it
+					}
+				}
+			}
+			return retVal
+		}
     }
 
     public enum NameStatus {
@@ -65,6 +79,20 @@ abstract class NamesMetadata extends NamesSorucedata {
         String toString() {
             return this.value();
         }
+		
+		static NameStatus getEnum(String str){
+			if(!str) return null
+			
+			NameStatus retVal = null
+			list().each{
+				if(!retVal){
+					if(str.trim().equalsIgnoreCase(it.value())){
+						retVal = it
+					}
+				}
+			}
+			return retVal
+		}
     }
 
     public enum COLNameStatus {
