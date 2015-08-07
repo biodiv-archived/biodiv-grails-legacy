@@ -548,8 +548,21 @@ def createNameAndAddIBPHir(){
 }
 
 def migSyn(){
+	def m = [:]
+	//File file = new File("/home/sandeept/namesync/thomas/synonyms_to_reuse.csv");
+	File file = new File("/apps/git/biodiv/namelist/after-migration/synonyms_to_reuse.csv");
+	
+	def lines = file.readLines();
+	int i=0;
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split(',');
+		println " arr ->>> " + arr
+		m.put(Long.parseLong(arr[0].trim()), Long.parseLong(arr[1].trim()))
+	}
+	println " m ------------- " + m
 	def nlSer = ctx.getBean("namelistUtilService");
-	nlSer.migrateSynonymForRawNames()
+	nlSer.migrateSynonymForRawNames(m)
 }
 
 //dmp()

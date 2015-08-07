@@ -767,7 +767,8 @@ class NamelistUtilService {
 	}
 	
 	//migrate synonyms for accepted raw names
-	public migrateSynonymForRawNames(){
+	public migrateSynonymForRawNames(Map replaceMap=[:] ){
+		NamesParser nameParser = new NamesParser()
 		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
 		dataSource.setUnreturnedConnectionTimeout(5000);
 		
@@ -777,53 +778,88 @@ class NamelistUtilService {
 		int failCount = 0
 		int i = 0
 		def createList = []
-		boolean doAgain = true
-		
-		sql.rows(query).each { r ->
-			i++
-			println "============= count " + i
-			if(!doAgain) return
+		int offset = 0
+		int limit = 100
+		while(true){
+			String q = query + " limit " + limit + " offset " + offset
+			def res = sql.rows(q)
+			if(res.isEmpty()){
+				break
+			}
 			
-			TaxonomyDefinition  pTd = TaxonomyDefinition.read(r.id)
-			
-			
-			Synonyms.findAllByTaxonConcept(pTd).each {Synonyms syn ->
-				SynonymsMerged td 
-				def tds = NamelistService.searchIBP(syn.name, null, NamesMetadata.NameStatus.ACCEPTED)
-				if(!tds.isEmpty()){
-					println "Name is accpeted in new sytem leaving out " + tds
-					return 
+			res.each { r ->
+				i++
+				if(i%50 == 0){
+					println "============= count " + i
 				}
-				tds = NamelistService.searchIBP(syn.name, null, NamesMetadata.NameStatus.SYNONYM)
-				if(!tds.isEmpty()){
-					println "Name is synonym in new sytem so retusing " + tds
-					td = tds[0]
-					AcceptedSynonym.createEntry(pTd, td)
-				}
-				else{
-					createList << syn.id
 				
-					
-					td = new SynonymsMerged()
-					td.properties = syn.properties
-					td.status = NamesMetadata.NameStatus.SYNONYM
-					td.position = NamesMetadata.NamePosition.RAW
-					td.rank = pTd.rank
-					td.contributors = null
-					td.curators = null
-	
-					
-					if(!td.save(flush:true)){
-						td.errors.allErrors.each { println  it }
+				TaxonomyDefinition  pTd = TaxonomyDefinition.read(r.id)
+				Synonyms.findAllByTaxonConcept(pTd).each { Synonyms syn ->
+					SynonymsMerged td 
+					def replaceId = replaceMap.get(syn.id)
+					if(replaceId){
+						println "============= reusing id give by map " + replaceId
+						td = SynonymsMerged.get(replaceId)
+						AcceptedSynonym.createEntry(pTd, td)
+						return
 					}
 					
-					AcceptedSynonym.createEntry(pTd, td)
+					def tds = NamelistService.searchIBP(syn.name, null, NamesMetadata.NameStatus.ACCEPTED)
+					if(!tds.isEmpty()){
+						println "Name is accpeted in new system leaving out " + tds
+						return 
+					}
+					tds = NamelistService.searchIBP(syn.name, null, NamesMetadata.NameStatus.SYNONYM)
+					if(!tds.isEmpty()){
+						println "Name is synonym in new system so reusing " + tds
+						td = tds[0]
+						AcceptedSynonym.createEntry(pTd, td)
+					}
+					else{
+						if(!syn.name){
+							createList << syn.id
+							println "name is null failed for synonym " + syn
+							return
+						}
+						def parsedNames =  nameParser.parse([syn.name]);
+						if(!parsedNames[0]?.canonicalForm) {
+							println "Not able to parse " + syn.name
+							createList << syn.id
+							return
+						}
+						
+						
+						td = new SynonymsMerged()
+						td.properties = syn.properties
+						
+						td.normalizedForm = parsedNames[0].normalizedForm;
+						td.italicisedForm = parsedNames[0].italicisedForm;
+						td.binomialForm = parsedNames[0].binomialForm;
+						td.canonicalForm = parsedNames[0].canonicalForm
+						td.name = syn.name
+						
+						td.status = NamesMetadata.NameStatus.SYNONYM
+						td.position = NamesMetadata.NamePosition.RAW
+						td.rank = pTd.rank
+						td.contributors = null
+						td.curators = null
+		
+						
+						if(!td.save(flush:true)){
+							td.errors.allErrors.each { println  it }
+						}
+						
+						AcceptedSynonym.createEntry(pTd, td)
+					}
 				}
+			
 			}
+			utilsService.cleanUpGorm()
+			offset = offset + limit;
 			
 		}
 		
-		println "-----------------------id list==============" + createList.size()
+		println "-----------------------failed id list==============" + createList.size()
 		println createList.join(", ")
 		println "-------------------------------"
 	}
