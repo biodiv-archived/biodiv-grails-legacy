@@ -25,7 +25,7 @@
 				<input type="hidden" name="downloadFrom" value="${downloadFrom}">
 				<input type="hidden" name="source" value="${source}">
 				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}">
-				<textarea class="comment-textbox" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
+				<textarea class="comment-textbox noComment" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
 <%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
 				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}"></input>
 				<div class = "download-close popup-form-close" value="${g.message(code:'button.close')}">
