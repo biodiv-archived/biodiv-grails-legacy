@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.auth.SUser;
 import species.ScientificName.RelationShip
 import species.NamesMetadata.NamePosition;
+import grails.converters.XML;
 
 class TaxonController {
 
@@ -71,14 +72,13 @@ class TaxonController {
             def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
             def taxonIds = [];
             def tillLevel = level+3;
-            if(expandTaxon) {
+             if(expandTaxon) {
                 def taxon = TaxonomyDefinition.read(taxonId);
                 tillLevel = taxon.rank;
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
             }
             //def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
-            println "========RES SIZE ========== " + rs.size() 
             /*if(cl == classification) {
                 def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
                 getHierarchyNodes(rs, level, tillLevel, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
@@ -459,7 +459,6 @@ class TaxonController {
 
 	@Secured(['ROLE_USER'])
     def create() {
-        println "=======PARAMS IN CREATE======== " + params
         def msg;
 
         def errors = [], result=[success:false];
@@ -695,5 +694,67 @@ class TaxonController {
         return map;
     }
  
+
+    def search(params) {
+        //setIfMissing 'max', 12, 100
+        //setIfMissing 'offset', 0
+        int totalCount = 0;
+        def result = [];
+
+        if(!params.str) 
+            render result as JSON;
+
+        def fieldsConfig = grailsApplication.config.speciesPortal.fields
+        def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+        def queryParams = [query:'%'+params.str+'%', classSystem:classification.id];
+
+        def sql = new Sql(dataSource)
+
+        String sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name, s.id as regid, s.path as path, s.classification_id as classification, t.position as position \
+        from taxonomy_registry s, \
+        taxonomy_definition t \
+        where \
+        s.taxon_definition_id = t.id and \
+        s.classification_id = :classSystem and \
+        lower(t.name) like lower(:query)";
+
+
+        log.debug sqlStr + "   " + queryParams;
+        def rs = sql.rows(sqlStr, queryParams)
+
+        rs.each { r ->
+            TaxonomyRegistry reg = TaxonomyRegistry.read(r.regid);
+            def p = reg.parentTaxon
+            while(p) {
+                result.add(p.path);
+                p = p.parentTaxon;
+            }
+        }
+
+        withFormat {
+            json { render result as JSON }
+            xml { render result as XML }
+        }
+    }
+
+    def nodes() {
+        def ids = params.id;
+
+        def fieldsConfig = grailsApplication.config.speciesPortal.fields
+        def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+
+        def result = [:];
+        ids.split(',').each { id ->
+            def rs = new ArrayList<GroovyRowResult>();
+            getHierarchyNodes(rs, 0, 1, id, classification.id, false, false, null);
+
+            result[id] =  buildHierarchyResult(rs, classification.id)
+        }
+
+        withFormat {
+            json { render result as JSON }
+            xml { render result as XML }
+        }
+    }
 }
 

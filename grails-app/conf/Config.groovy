@@ -560,6 +560,9 @@ environments {
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
+            debug   'grails.app.controllers.species'
+            debug   'grails.app.controllers.content'
+            debug   'grails.app.controllers.utils'
 
             debug   'grails.plugin.springsecurity.openid'
             debug    'grails.app.filters.species'

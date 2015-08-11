@@ -28,9 +28,17 @@
     </div>
 </div>
  <div id="taxonHierarchy" class="emptyField"></div>
+ <div class="input-append" class="input-block-level" style="width:94%">
+    <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="Search for taxon" />
+    <span id="searchTaxonButton" class="add-on btn">Search</span>
+ </div>
  </g:if>
 <g:else>
 <div id="taxonHierarchy" class="emptyField" style="width: 938px;"></div>
+ <div class="input-append" class="input-block-level" style="width:94%">
+    <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="Search for taxon" />
+    <span id="searchTaxonButton" class="add-on btn">Search</span>
+ </div>
 </g:else>
 <g:if test="${queryParams && queryParams.taxon instanceof TaxonomyDefinition}">
 <input type="hidden" id="taxon" name="taxon" value="${queryParams.taxon.id}"></input>

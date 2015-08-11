@@ -112,8 +112,9 @@
                 };
             };
 
-            this.$element.find('#taxonHierarchy').jstree({
+            me.$element.find('#taxonHierarchy').jstree({
                 'core': {
+                    worker : false,
                     "themes": {
                         'dots': true,
                         'stripes': true
@@ -137,8 +138,25 @@
                     'cascade':'down',
                     'visible': false
                 },
+                "search": {
+                    'ajax' : {
+                        'url' : window.params.taxon.searchUrl
+                    }
+                },
+                'massload' : function(ids, callback) {
+                    $.ajax({
+                        'url' : window.params.taxon.nodesUrl,
+                    'data' : { 'id' : ids.join(',') },
+                    dataType:'json',
+                    method:'get'
+                    }).done(function (data) {
+                        console.log(data);
+                        callback(data);
+                        $('#searchTaxonButton').html('Search').removeClass('disabled');
+                    });
+                },
                 "plugins": [
-                    "search", "sort", "themes", "questionmark", "checkbox"
+                    "massload", "search", "sort", "themes", "questionmark", "checkbox"
                 ]
             }).on('ready.jstree', function() {
                 var postData = me.options.postData;
@@ -190,12 +208,29 @@
                     }
                 });
 
+                $('#searchTaxonButton').click(function () {
+                    $(this).html('Searching...').addClass('disabled');
+                    var v = $('#searchTaxon').val();
+                    me.$element.find('#taxonHierarchy').jstree(true).search(v);
+                });
+/*
+                var to = false;
+                $('#searchTaxon').keyup(function () {
+                    if(to) { clearTimeout(to); }
+                    to = setTimeout(function () {
+                        var v = $('#searchTaxon').val();
+                        me.$element.find('#taxonHierarchy').jstree(true).search(v);
+                    }, 250);
+                });
+*/
+
             }).on('load_node.jstree', function(event, obj) {
                 var l = obj.node.children.length;
                 for (var i = 0; i < l; i++) {
                 }
             }).on('model.jstree', function(nodes, parent) {
             });
+
 
             /*            var heirarchyLevelFormatter = function(el, cellVal, opts) {
                           var cells = $(opts).find('cell');
