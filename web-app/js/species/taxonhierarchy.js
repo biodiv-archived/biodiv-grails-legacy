@@ -148,11 +148,11 @@
                         'url' : window.params.taxon.nodesUrl,
                     'data' : { 'id' : ids.join(',') },
                     dataType:'json',
-                    method:'get'
+                    method:'post'
                     }).done(function (data) {
-                        console.log(data);
                         callback(data);
                         $('#searchTaxonButton').html('Search').removeClass('disabled');
+                        //$('body').addClass('busy');
                     });
                 },
                 "plugins": [
@@ -210,6 +210,7 @@
 
                 $('#searchTaxonButton').click(function () {
                     $(this).html('Searching...').addClass('disabled');
+                    //$('body').addClass('busy');
                     var v = $('#searchTaxon').val();
                     me.$element.find('#taxonHierarchy').jstree(true).search(v);
                 });
