@@ -16,7 +16,7 @@
     a.not_in_use {
         cursor:not-allowed;
     }
-    input[type=text], select {
+    .metadataDetails input[type=text], select {
         min-height:22px !important;
     }
     .languageDropDown {
@@ -58,7 +58,7 @@
 	}
     #taxaHierarchy #taxonHierarchy {
       overflow: auto;
-      height: 228px;
+      height: 200px;
     }
 
 	.taxon_selector_wrapper_span{

@@ -2994,3 +2994,13 @@ small {
     top: -10px;
     position: relative;
 }
+
+.input-append.input-block-level {
+      display: table; 
+  }
+  .input-append.input-block-level .add-on {
+        display: table-cell;
+    }
+    .input-append.input-block-level > input {
+          width: 100%;
+      }
