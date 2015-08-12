@@ -11,12 +11,12 @@
 				<div><span class="label label-info" style="padding:5px;margin-bottom: 10px;"><g:message code="msg.link.available" /></span></div>
 				<g:each in="${downloadTypes}" var="downloadType" status="i">
 					<g:if test="${i > 0}">
-						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
+                    <input type="radio" class="${instanceTotal>5000?'disabled':''}" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
 						<br />
 					</g:if>
 					<g:else>
-						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED>
+						<input type="radio"  class="${instanceTotal>5000?'disabled':''}" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED>
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
 						<br />
 					</g:else>

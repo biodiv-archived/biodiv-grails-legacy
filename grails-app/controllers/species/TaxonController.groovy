@@ -706,7 +706,7 @@ class TaxonController {
 
         def fieldsConfig = grailsApplication.config.speciesPortal.fields
         def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-        def queryParams = [query:'%'+params.str+'%', classSystem:classification.id];
+        def queryParams = [query:params.str+'%', classSystem:classification.id];
 
         def sql = new Sql(dataSource)
 

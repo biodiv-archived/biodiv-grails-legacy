@@ -1124,7 +1124,7 @@ input,button,select,textarea {
 .taxon-highlight {
 	font-weight: bold;
     border: 1px solid #fad42e;
-      background: #fbec88;
+      background: #fbec88 !important;
         color: #363636;
 }
 
