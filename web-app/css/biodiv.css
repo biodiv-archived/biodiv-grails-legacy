@@ -1121,6 +1121,10 @@ input,button,select,textarea {
     max-height:300px;
 }
 
+.jstree-default .jstree-search.search-highlight {
+    background-color:#88EAFB !important
+}
+
 .taxon-highlight {
 	font-weight: bold;
     border: 1px solid #fad42e;
