@@ -114,7 +114,6 @@
                 };
             };
             var filterResults = function(e) {
-                console.log($(e.target));
                 var selectedTaxonId = $(e.target).data('taxonid');
 
                 //                    $("#"+selectedTaxonId).removeClass('btn-info-nocolor').parent().closest('tr').removeClass('taxon-highlight');
@@ -129,7 +128,7 @@
                 switch (me.options.controller) {
                     case 'namelist':
                         $("input#taxon").val(selectedTaxonId);
-                        getNamesFromTaxon($(e.target), selectedTaxonId);
+                        getNamesFromTaxon($(e.target), $(e.target).attr('id').replace('_anchor',''));
                         break;
                     default:
                         if ($(e.target).hasClass('taxon-highlight')) {
