@@ -140,7 +140,10 @@
                             //$("span.rank").removeClass('btn-info-nocolor').parent().closest('tr').removeClass('taxon-highlight');
                             $(".jstree-anchor").removeClass('taxon-highlight');
                         }
-                        updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
+
+                        if (me.options.action != 'show' && me.options.action != 'taxonBrowser') {
+                            updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
+                        }
                         break;
                 }
             };
@@ -186,6 +189,7 @@
                         method: 'post'
                     }).done(function(data) {
                         callback(data);
+                        //$('#searchTaxonResultCount').html($('.jstree-search').length+" taxons found").show();
                         $('#searchTaxonButton').html('Search').removeClass('disabled');
                         //$('body').addClass('busy');
                     });
@@ -218,6 +222,13 @@
                     var v = $('#searchTaxon').val();
                     me.$element.find('#taxonHierarchy').jstree(true).search(v);
                 });
+                $('#searchTaxon').keypress(function (e) {
+                    var key = e.which;
+                    if(key == 13) { // the enter key code
+                        $('#searchTaxonButton').click();
+                        return false;  
+                    }
+                });   
                 /*
                                 var to = false;
                                 $('#searchTaxon').keyup(function () {
@@ -234,9 +245,7 @@
                 for (var i = 0; i < l; i++) {}
             }).on('model.jstree', function(nodes, parent) {
             }).bind("select_node.jstree", function(e, data) {
-                if (me.options.action != 'show' && me.options.action != 'taxonBrowser') {
                     filterResults(data.event);
-                }
             }).on('search.jstree', function(e, data) {
                 $(this).find('.jstree-search:eq(0)')[0].scrollIntoView();
             });

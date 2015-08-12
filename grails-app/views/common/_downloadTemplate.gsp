@@ -7,19 +7,19 @@
 		</a>
 
 		<div class="download-options popup-form" style="display: none; ${(downloadFrom=='uniqueSpecies')?'left:-399px;font-weight:normal':''} ">
-			<form class="download-form">
-				<div><span class="label label-info" style="padding:5px;margin-bottom: 10px;"><g:message code="msg.link.available" /></span></div>
+			<form class="download-form form-horizontal">
+				<div><div class="alert alert-info"><g:message code="msg.link.available" /></div></div>
 				<g:each in="${downloadTypes}" var="downloadType" status="i">
+                    <label>
 					<g:if test="${i > 0}">
-                    <input type="radio" class="${instanceTotal>5000?'disabled':''}" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
+                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" <%=instanceTotal>5000?'disabled':''%> >
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
-						<br />
 					</g:if>
 					<g:else>
-						<input type="radio"  class="${instanceTotal>5000?'disabled':''}" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED>
+                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED  <%=instanceTotal>5000?'disabled':''%>>
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
-						<br />
-					</g:else>
+                        </g:else>
+                    </label>
 				</g:each>
                 <br />
 				<input type="hidden" name="downloadFrom" value="${downloadFrom}">

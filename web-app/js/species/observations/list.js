@@ -1175,6 +1175,11 @@ function intializesSpeciesHabitatInterest(multiSelect){
 function updateDownloadBox(instanceTotal){
     if(instanceTotal > 0){
         $('.download-box').show();
+        if(instanceTotal > 5000) {
+            jQuery(".download-box input:radio").attr('disabled',true);
+        } else {
+            jQuery(".download-box input:radio").removeAttr('disabled')
+        }
     }else{
         $('.download-box').hide();
     }

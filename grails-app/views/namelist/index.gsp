@@ -13,11 +13,6 @@
 
 <title>NameList - Curation Interface</title>
 <style type="text/css">
-    .RAW {
-        background-color:red;
-    }
-    .WORKING {
-    }
     a.not_in_use {
         cursor:not-allowed;
     }
