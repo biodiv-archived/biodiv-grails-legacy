@@ -1177,8 +1177,10 @@ function updateDownloadBox(instanceTotal){
         $('.download-box').show();
         if(instanceTotal > 5000) {
             jQuery(".download-box input:radio").attr('disabled',true);
+            jQuery(".download-box input[type='submit']").attr('disabled',true);
         } else {
             jQuery(".download-box input:radio").removeAttr('disabled')
+            jQuery(".download-box input[type='submit']").removeAttr('disabled');
         }
     }else{
         $('.download-box').hide();

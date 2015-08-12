@@ -27,7 +27,7 @@
 				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}">
 				<textarea class="comment-textbox noComment" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
 <%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
-				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}"></input>
+				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}" <%=instanceTotal>5000?'disabled':''%>></input>
 				<div class = "download-close popup-form-close" value="${g.message(code:'button.close')}">
 					<i class="icon-remove"></i>
 				</div>
