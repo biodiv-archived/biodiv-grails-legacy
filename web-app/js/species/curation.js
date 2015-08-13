@@ -41,7 +41,7 @@ function getNamesFromTaxon(ele , parentId) {
     $(ele).parents("tr").addClass("clickedEle");
     $("#taxonHierarchy tr").css('background', 'white');
     $(ele).parents("tr").css('background', '#3399FF');
-    var taxonId = $("input#taxon").val();//$(ele).parent("span").find(".taxDefIdVal").val();
+    //var taxonId = $("input#taxon").val();//$(ele).parent("span").find(".taxDefIdVal").val();
     var classificationId = $('#taxaHierarchy option:selected').val();
     var url = window.params.curation.getNamesFromTaxonUrl;
     $.ajax({
