@@ -12,11 +12,11 @@
 				<g:each in="${downloadTypes}" var="downloadType" status="i">
                     <label>
 					<g:if test="${i > 0}">
-                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" <%=instanceTotal>5000?'disabled':''%> >
+                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" >
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
 					</g:if>
 					<g:else>
-                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED  <%=instanceTotal>5000?'disabled':''%>>
+                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED >
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
                         </g:else>
                     </label>
@@ -25,9 +25,10 @@
 				<input type="hidden" name="downloadFrom" value="${downloadFrom}">
 				<input type="hidden" name="source" value="${source}">
 				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}">
+				<input type="hidden" name="instanceTotal" value="${instanceTotal}">
 				<textarea class="comment-textbox noComment" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
 <%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
-				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}" <%=instanceTotal>5000?'disabled':''%>></input>
+				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}" ></input>
 				<div class = "download-close popup-form-close" value="${g.message(code:'button.close')}">
 					<i class="icon-remove"></i>
 				</div>

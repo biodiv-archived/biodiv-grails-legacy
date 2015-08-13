@@ -18,6 +18,11 @@ import java.text.SimpleDateFormat ;
 import java.util.Date;
 import java.lang.*;
 import java.io.File;
+import species.participation.Observation;
+import species.participation.DownloadLog;
+import species.auth.SUser;
+import grails.converters.JSON;
+
 
 /**
  * Exports data into Darwin core format
@@ -47,7 +52,7 @@ public max_date
 		return _instance;
 	}
 	
-	def exportObservationData(String directory, list_of_observationInstance, reqUser , dl_id , params_filterUrl) {
+	def exportObservationData(String directory, DownloadLog dl) {
 		log.info "Darwin Core export started"
 		/*	if(!directory) {
 				directory = config.speciesPortal.species.speciesDownloadDir
@@ -61,18 +66,27 @@ public max_date
 		String folderPath = directory + File.separator+ folderName + File.separator+ folderName
 		initWriters(folderPath)
 		fillHeaders() 
-		exportObservation(list_of_observationInstance, reqUser , dl_id, params_filterUrl)
-		exportMedia(list_of_observationInstance)
+
+        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
+        while(rf.hasNext()) {
+            def list_of_observationInstance = rf.next();
+            def obvList = [];
+            list_of_observationInstance.each { 
+                def json = it as JSON;
+                def obv = JSON.parse(""+json);
+                obvList << obv;
+            }
+
+            exportObservation(obvList, dl.author, dl.id, dl.filterUrl)
+            exportMedia(obvList)
+        }
 		closeWriters()
 
 		def meta=new File (folderPath + '/meta.xml')
 		meta<< '<archive xmlns="http://rs.tdwg.org/dwc/text/" metadata="metadata.eml.xml">\n\t<core encoding="UTF-8" fieldsTerminatedBy="\\t" linesTerminatedBy="\\n"  ignoreHeaderLines="1" rowType="http://rs.tdwg.org/dwc/terms/Occurrence">\n\t\t<files>\n\t\t\t<location>occurrence.txt</location>\n\t\t</files>\n\t\t<id index="0" />\n\t\t\t\t<field index="1" term="http://purl.org/dc/terms/modified"/>\n\t\t\t\t<field index="2"  term="http://purl.org/dc/terms/rightsHolder"/>\n\t\t\t\t<field index="3" default="India Biodiversity Portal" term="http://rs.tdwg.org/dwc/terms/institutionID"/>\n\t\t\t\t<field index="4" term="http://rs.tdwg.org/dwc/terms/datasetID"/>\n\t\t\t\t<field index="5" term="http://rs.tdwg.org/dwc/terms/datasetName"/>\n\t\t\t\t<field index="6" default="HumanObservation" term="http://rs.tdwg.org/dwc/terms/basisOfRecord"/>\n\t\t\t\t<field index="7" term="http://rs.tdwg.org/dwc/terms/informationWithheld"/>\n\t\t\t\t<field index="8" term="http://rs.tdwg.org/dwc/terms/occurrenceID"/>\n\t\t\t\t<field index="9" term="http://rs.tdwg.org/dwc/terms/recordedBy"/>\n\t\t\t\t<field index="10" term="http://rs.tdwg.org/dwc/terms/occurrenceRemarks"/>\n\t\t\t\t<field index="11" term="http://rs.tdwg.org/dwc/terms/verbatimEventDate"/>\n\t\t\t\t<field index="12" term="http://rs.tdwg.org/dwc/terms/habitat"/>\n\t\t\t\t<field index="13" term="http://rs.tdwg.org/dwc/terms/verbatimLocality"/>\n\t\t\t\t<field index="14" term="http://rs.tdwg.org/dwc/terms/locationRemarks"/>\n\t\t\t\t<field index="15" term="http://rs.tdwg.org/dwc/terms/decimalLatitude"/>\n\t\t\t\t<field index="16" term="http://rs.tdwg.org/dwc/terms/decimalLongitude"/>\n\t\t\t\t<field index="17" term="http://rs.tdwg.org/dwc/terms/identifiedBy"/>\n\t\t\t\t<field index="18" term="http://rs.tdwg.org/dwc/terms/dateIdentified"/>\n\t\t\t\t<field index="19" term="http://rs.tdwg.org/dwc/terms/taxonID"/>\n\t\t\t\t<field index="20" term="http://rs.tdwg.org/dwc/terms/scientificName"/>\n\t\t\t\t<field index="21" term="http://rs.tdwg.org/dwc/terms/vernacularName"/>\n\t\t\t\t<field index="22" term="http://purl.org/dc/terms/rights"/>\n\t</core>\n\n\t<extension encoding="UTF-8" fieldsTerminatedBy="\\t" linesTerminatedBy="\\n" ignoreHeaderLines="1" rowType="http://rs.gbif.org/terms/1.0/Multimedia">\n\t\t<files>\n\t\t\t<location>multimedia.txt</location>\n\t\t</files>\n\t\t<coreid index="0" />\n\t\t<field index="1" term="http://purl.org/dc/terms/type"/>\n\t\t<field index="2" term="http://purl.org/dc/terms/identifier"/>\n\t\t<field index="3" term="http://purl.org/dc/terms/created"/>\n\t\t<field index="4" term="http://purl.org/dc/terms/creator"/>\n\t\t<field index="5" term="http://purl.org/dc/terms/license"/>\n\t</extension>\n</archive>'
-		File eml = returnMetaData_EML(folderPath, reqUser , dl_id , params_filterUrl)
+		File eml = returnMetaData_EML(folderPath, dl.author, dl.id, dl.filterUrl)
 		return archive(directory, folderName)
 	}
-
-
-
 
 	public File returnMetaData_EML( String folderPath, reqUser, dl_id, params_filterUrl) {
 
@@ -122,6 +136,7 @@ public max_date
 
 
 	}
+
 	protected void fillHeaders() {
 		String[] observationHeader = [	
 
@@ -192,12 +207,11 @@ public max_date
 		return writer
 	}
 
-	public def exportObservation(list_of_observationInstance, reqUser, dl_id , params_filterUrl) {
-		exportOccurence(list_of_observationInstance, reqUser, dl_id , params_filterUrl);
-
+	public def exportObservation(List list_of_observationInstance, SUser reqUser, Long dl_id , String params_filterUrl) {
+		return exportOccurence(list_of_observationInstance, reqUser, dl_id , params_filterUrl);
 	} 
 
-	public def exportOccurence( list_of_observationInstance, reqUser, dl_id , params_filterUrl) {
+	public def exportOccurence(List list_of_observationInstance, SUser reqUser, Long dl_id, String params_filterUrl) {
 
 		String[] observationRow
 		String  result2 = ""
@@ -205,7 +219,7 @@ public max_date
 		def date =new Date()//.getTime()
 
 		list_of_observationInstance.each {
-		
+
 			observationRow = new String[23]
 			observationRow[0] = (!it?.id) ? "" : it?.id;
 			observationRow[1] = (!it?.lastRevised) ? "" : it?.lastRevised;  // should be last updated
@@ -263,26 +277,25 @@ public max_date
 		}
 	}
 
-	public def exportMedia(list_of_observationInstance) {
-		String[] mediaRow
-		mediaRow = new String[6]
+    public def exportMedia(List list_of_observationInstance) {
+        String[] mediaRow = new String[6]
 
-list_of_observationInstance.each {   second->
-	
-	second?.resource?.each { 
+        list_of_observationInstance.each {   second->
 
-			mediaRow[0] = (!second?.id) ? "" : second?.id;
-			mediaRow[1] = (!it?.type) ? "" : it?.type;
-			mediaRow[2] = (!it?.url) ? "" : it?.url;
-			mediaRow[3] =(!it?.uploadTime) ? "" : it?.uploadTime; 
-			mediaRow[4] =(!it?.uploader?.name) ? "" : it?.uploader?.name+ ' (http://indiabiodiversity.org/user/show/' + it?.uploader?.id+')'
-			mediaRow[5] = "Copyright " + it?.uploader?.name  +  " licensed under a Creative Commons "+it?.licenses+" license: http://creativecommons.org/licenses/by/3.0/" //this is temporary the actual licence should be pulled from the server 	
+            second?.resource?.each { 
+
+                mediaRow[0] = (!second?.id) ? "" : second?.id;
+                mediaRow[1] = (!it?.type) ? "" : it?.type;
+                mediaRow[2] = (!it?.url) ? "" : it?.url;
+                mediaRow[3] =(!it?.uploadTime) ? "" : it?.uploadTime; 
+                mediaRow[4] =(!it?.uploader?.name) ? "" : it?.uploader?.name+ ' (http://indiabiodiversity.org/user/show/' + it?.uploader?.id+')'
+                mediaRow[5] = "Copyright " + it?.uploader?.name  +  " licensed under a Creative Commons "+it?.licenses+" license: http://creativecommons.org/licenses/by/3.0/" //this is temporary the actual licence should be pulled from the server 	
 
 
-			mediaWriter.writeNext(mediaRow)		
-		}
-	}
-}
+                mediaWriter.writeNext(mediaRow)		
+            }
+        }
+    }
 
 	public def occurrence_extraction(observationInstance) {
 		String  result ="";
@@ -335,8 +348,6 @@ list_of_observationInstance.each {   second->
 		return final_result
 	}
 
-
-
 	def extract_identified_by(observationInstance) {
 	
 	if(observationInstance?.maxVotedReco?.sciNameReco?.name){
@@ -367,7 +378,6 @@ list_of_observationInstance.each {   second->
 
 		}
 	}
-
 
 def extract_date_identified(observationInstance) {
 
@@ -403,8 +413,6 @@ def extract_date_identified(observationInstance) {
 		return ""
 	}
 }
-		
-
 
 	def extract_year(String date) {
 
@@ -421,7 +429,6 @@ def extract_date_identified(observationInstance) {
 			return month
 		}
 
-
 		def extract_day(String date) {
 
 		String day=date.substring(8, 10)
@@ -435,8 +442,6 @@ def extract_date_identified(observationInstance) {
 			
 			return time
 	}
-
-
 
 	def compareDate(String date1, String date2) {     
 			  
@@ -587,7 +592,6 @@ def extract_date_identified(observationInstance) {
 		return ""
 	}
 
-
 	def extract_vernacularName(observationInstance){
 		String result=""
 
@@ -602,7 +606,6 @@ def extract_date_identified(observationInstance) {
 		return result
 
 	}
-
 
 	def archive(directory, folderName) {
 

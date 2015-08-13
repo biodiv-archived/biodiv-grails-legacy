@@ -159,7 +159,7 @@ class CustomObjectMarshallers {
 
             def imagePath = it.thumbnailUrl(basePath);
 
-            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'licenses':it.licenses, 'contributors':it.contributors, 'attributors':attributors];
+            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'licenses':it.licenses, 'contributors':it.contributors, 'attributors': it.attributors];
         }
 	
 		JSON.registerObjectMarshaller(Comment) {

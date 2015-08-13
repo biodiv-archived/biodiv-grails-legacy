@@ -463,10 +463,14 @@ $(document).ready(function(){
 					//formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
 				}, 
 	            success: function(data, statusText, xhr, form) {
-                    if(data.success)
-	                	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+                    console.log(data);
+                    var msg = '';
+                    for(var i=0; i<data.length; i++) {
+                    if(data[0].success)
+	                	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html("Scheduled "+data.length+" job(s) for every 5000 records. "+data[0].msg);
                     else 
-	                	$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg+"   "+JSON.stringify(data.errors));
+	                	$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data[0].msg+"   "+JSON.stringify(data[0].errors));
+                    }
 	            	$('.download-box').find('.download-options').hide();
 	            	$("html, body").animate({ scrollTop: 0 });
 	            	return false;
@@ -1175,14 +1179,14 @@ function intializesSpeciesHabitatInterest(multiSelect){
 function updateDownloadBox(instanceTotal){
     if(instanceTotal > 0){
         $('.download-box').show();
-        if(instanceTotal > 5000) {
+/*        if(instanceTotal > 5000) {
             jQuery(".download-box input:radio").attr('disabled',true);
             jQuery(".download-box input[type='submit']").attr('disabled',true);
         } else {
             jQuery(".download-box input:radio").removeAttr('disabled')
             jQuery(".download-box input[type='submit']").removeAttr('disabled');
         }
-    }else{
+*/    }else{
         $('.download-box').hide();
     }
 }
