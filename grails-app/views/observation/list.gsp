@@ -57,7 +57,7 @@
 </style>
 <style type="text/css">
 .commonName{
-    width: 69% !important;
+    width: 79% !important;
 }
 .group_icon_show_wrap {
   border: 1px solid #ccc;
@@ -115,6 +115,11 @@
           color: white;
           font-weight: bold;
           padding: 0px 33px;
+          text-decoration: none;
+    }
+    .view_bootstrap_gallery:hover{
+        color: white;
+        text-decoration: none;
     }
 </style>
 </head>
@@ -171,7 +176,7 @@
         thumbUrl;
         $.each(images, function (index, photo) {
             console.log("photo ="+photo);
-            baseUrl = "http://indiabiodiversity.org/biodiv/observations/"+photo;
+            baseUrl = "${grailsApplication.config.speciesPortal.observations.serverURL}"+photo;
             //thumbUrl = "http://indiabiodiversity.org/biodiv/observations/"+folderpath+"/"+photo+"_th1.jpg";
             //console.log(thumbUrl);
             $('<a/>')
@@ -208,9 +213,9 @@ $(document).ready(function(){
 
 	<script type="text/javascript">
 		$(document).ready(function() {
+            window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', userGroupWebaddress:params.webaddress) }";
 			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
                         initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
-                        
                 });
 	</script>
 </body>

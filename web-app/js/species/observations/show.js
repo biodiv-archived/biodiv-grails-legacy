@@ -152,12 +152,11 @@ function preLoadRecos(max, offset, seeAllClicked,observationId) {
        seeMoreMessage = $("#seeMoreMessage");
        seeMore = $("#seeMore");
    }else{
-        getRecommendationVotesURL = "http://indiabiodiversity.localhost.org/observation/getRecommendationVotes/"+observationId;
+        getRecommendationVotesURL = window.params.observation.getRecommendationVotesURL+'/'+observationId;
         seeMoreMessage = $("#seeMoreMessage_"+observationId);
         seeMore = $("#seeMore_"+observationId);
    }
     
-    console.log(observationId);
     if(seeMoreMessage.hasClass('isLocked') && observationId != 'undefined'){
         showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success',seeMoreMessage);
     }else{
