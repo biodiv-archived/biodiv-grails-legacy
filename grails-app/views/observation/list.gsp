@@ -176,7 +176,7 @@
         thumbUrl;
         $.each(images, function (index, photo) {
             console.log("photo ="+photo);
-            baseUrl = "http://indiabiodiversity.org/biodiv/observations/"+photo;
+            baseUrl = "${grailsApplication.config.speciesPortal.observations.serverURL}"+photo;
             //thumbUrl = "http://indiabiodiversity.org/biodiv/observations/"+folderpath+"/"+photo+"_th1.jpg";
             //console.log(thumbUrl);
             $('<a/>')
