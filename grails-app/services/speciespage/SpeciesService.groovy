@@ -1500,7 +1500,7 @@ class SpeciesService extends AbstractObjectService  {
     }*/
 
     def export(params, dl){
-        String action = new URL(dl.filterUrl).getPath().split("/")[2]
+/*        String action = new URL(dl.filterUrl).getPath().split("/")[2]
         def speciesInstanceList = getSpeciesList(params, action).speciesInstanceList
         log.debug " Species total $speciesInstanceList.size "
         List<String> list_final=[] ;
@@ -1513,8 +1513,8 @@ class SpeciesService extends AbstractObjectService  {
             list_final.add(it_final)
 
         }
-
-         return DwCSpeciesExporter.getInstance().exportSpecieData( null, list_final, dl.author, dl.id, dl.filterUrl )
+*/
+          return DwCSpeciesExporter.getInstance().exportSpecieData( null, dl)
         //return exportSpeciesData(speciesInstanceList, null, dl)
 
     }

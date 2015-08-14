@@ -500,4 +500,7 @@ alter table taxonomy_registry add constraint td_fk foreign key (parent_taxon_def
 update taxonomy_registry set parent_taxon_definition_id=t1.taxon_definition_id from taxonomy_registry t1 where taxonomy_registry.parent_taxon_id=t1.id;
 
 
-
+#13th Aug 2015
+alter table download_log add column offset_param bigint;
+update download_log set offset_param=0;
+alter table download_log alter column offset_param set not null;

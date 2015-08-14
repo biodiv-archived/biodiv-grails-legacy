@@ -15,6 +15,10 @@ import org.apache.commons.logging.LogFactory
 import species.utils.Utils;
 import java.math.BigDecimal
 import java.io.File ;
+import species.participation.DownloadLog;
+import species.auth.SUser;
+import grails.converters.JSON;
+
 
 
 /**
@@ -39,7 +43,7 @@ class DwCSpeciesExporter{
 		return _instance;
 	}
 	
-def exportSpecieData(directory, list_of_species, reqUser , dl_id , params_filterUrl) {
+def exportSpecieData(directory, DownloadLog dl) {
 		log.info "Darwin Core specie export started"
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String f = File.separator
@@ -51,7 +55,7 @@ def exportSpecieData(directory, list_of_species, reqUser , dl_id , params_filter
 				fileDir.mkdirs()
 
 			}
-			
+	 		
 		} 
 
 		String folderName = "dwc_specie"+ new Date().getTime()
@@ -61,22 +65,33 @@ def exportSpecieData(directory, list_of_species, reqUser , dl_id , params_filter
 
 		initWriters(folderPath)
 		fillHeaders() 
-		exportSpecie(list_of_species, reqUser , dl_id, params_filterUrl)
+
+        ResourceFetcher rf = new ResourceFetcher(Species.class.canonicalName, dl.filterUrl, null, 0);
+        while(rf.hasNext()) {
+            def list_of_species = rf.next();
+            def sList = [];
+            list_of_species.each { 
+                def json = it as JSON;
+                def s = JSON.parse(""+json);
+                sList << s;
+            }
+            exportSpecie(sList, dl.author, dl.id, dl.filterUrl)
+        }
 		closeWriters()
 
 		meta<< '<?xml version="1.0"?>\n<archive xmlns="http://rs.tdwg.org/dwc/text/"  metadata="metadata.eml.xml">\n\t<core encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="\\t" fieldsEnclosedBy="" ignoreHeaderLines="1" rowType="http://rs.tdwg.org/dwc/terms/Taxon">\n\t\t<files>\n\t\t\t<location>taxon.txt</location>\n\t\t</files>\n\t\t<id index="0"/>\n\t\t<field index="1" term="http://rs.tdwg.org/dwc/terms/scientificNameID"/>\n\t\t<field index="2" term="http://rs.tdwg.org/dwc/terms/scientificName"/>\n\t\t<field index="3" term="http://rs.tdwg.org/dwc/terms/kingdom"/>\n\t\t<field index="4" term="http://rs.tdwg.org/dwc/terms/phylum"/>\n\t\t<field index="5" term="http://rs.tdwg.org/dwc/terms/class"/>\n\t\t<field index="6" term="http://rs.tdwg.org/dwc/terms/order"/>\n\t\t<field index="7" term="http://rs.tdwg.org/dwc/terms/family"/>\n\t\t<field index="8" term="http://rs.tdwg.org/dwc/terms/genus"/>\n\t\t<field index="9" term="http://purl.org/dc/terms/modified"/>\n\t</core>\n\t<extension encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="\\t" fieldsEnclosedBy="" ignoreHeaderLines="1" rowType="http://rs.gbif.org/terms/1.0/Description">\n\t\t<files>\n\t\t\t<location>description.txt</location>\n\t\t</files>\n\t\t<coreid index="0"/>\n\t\t<field index="1" term="http://purl.org/dc/terms/type"/>\n\t\t<field index="2" term="http://purl.org/dc/terms/description"/>\n\t\t<field index="3" term="http://purl.org/dc/terms/source"/>\n\t\t<field index="4" term="http://purl.org/dc/terms/created"/>\n\t\t<field index="5" term="http://purl.org/dc/terms/contributor"/>\n\t\t<field index="6" term="http://purl.org/dc/terms/audience"/>\n\t\t<field index="7" term="http://purl.org/dc/terms/license"/>\n\t</extension>\n\t<extension encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="\\t" fieldsEnclosedBy="" ignoreHeaderLines="1" rowType="http://rs.gbif.org/terms/1.0/VernacularName">\n\t\t<files>\n\t\t\t<location>commonName.txt</location>\n\t\t</files>\n\t\t<coreid index="0"/>\n\t\t<field index="1" term="http://rs.tdwg.org/dwc/terms/vernacularName"/>\n\t\t<field index="2" term="http://purl.org/dc/terms/language"/>\n\t</extension>\n\t<extension encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="\\t" fieldsEnclosedBy="" ignoreHeaderLines="1" rowType="http://rs.gbif.org/terms/1.0/Multimedia">\n\t\t<files>\n\t\t\t<location>multimedia.txt</location>\n\t\t</files>\n\t\t<coreid index="0"/>\n\t\t<field index="1" term="http://purl.org/dc/terms/description"/>\n\t\t<field index="2" term="http://purl.org/dc/terms/type"/>\n\t\t<field index="3" term="http://purl.org/dc/terms/identifier"/>\n\t\t<field index="4" term="http://purl.org/dc/terms/created"/>\n\t\t<field index="5" term="http://purl.org/dc/terms/creator"/>\n\t\t<field index="6" term="http://purl.org/dc/terms/license"/>\n\t\t<field index="7" term="http://purl.org/dc/terms/rightsHolder"/>\n\t</extension>\n</archive>'
 
 		
 	eml << '<?xml version="1.0" encoding="utf-8"?>\n<eml:eml\n        xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" \n        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \n        xmlns:dc="http://purl.org/dc/terms/" \n        xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1" \n        xml:lang="en"\n        packageId="IndiaBiodiversityPortal.observations.eml.'
-  eml << dl_id
+  eml << dl.id
   eml << '"\n        system="http://indiabiodiversity.org" \n        scope="system">\n\t<dataset>\n\t\t<alternateIdentifier>'
-  eml << params_filterUrl
+  eml << dl.filterUrl
   eml << '</alternateIdentifier>\n\t\t<title xml:lang="en">'
-  eml << dl_id +" "+ new Date()
+  eml << dl.id +" "+ new Date()
   eml << '</title>\n\n\n\n\n\t\t<pubDate>'
   eml << new Date()
   eml << '</pubDate>\n\t\t\t<!-- This is the RESOURCE language and not the metadata language which is at the bottom -->\n\t\t<language>en_US</language>\n\t\t<abstract>\n\t\t\t<para>'
-  eml << dl_id
+  eml << dl.id
   eml << '</para>\n\t\t</abstract>\n\t\t<intellectualRights>\n\t\t\t<para>\n\t\t\t\tIndia Biodiversity Portal, downloaded on '
   eml << new Date()
   eml << '.\n\t\t\t\tFree for use by all individuals provided that the\n\t\t\t\trights holder is acknowledged under terms of \n\t\t\t\tCreative Commons licences in any use or publication.\n\t\t\t</para>\n\t\t</intellectualRights>\n\t\t<!-- The distributionType URL is generally meant for informational purposes, and the "function" attribute should be set to "information". -->\n\t\t<distribution scope="document">\n\t\t\t<online>\n\t\t\t\t<url function="information">'
