@@ -81,7 +81,7 @@ class NamelistUtilService {
 		if(match){
 			log.debug LOG_PREFIX + " Found match for  col Id " + colId
 			//log.debug match
-			namelistService.processDataForMigration(new TaxonomyDefinition(), match, 1, true)
+			namelistService.processDataForMigration(new TaxonomyDefinition(), match, 1, true, false)
 		}else{
 			log.debug LOG_PREFIX + " Either match not found or name is already in working list for col Id " + colId
 		}

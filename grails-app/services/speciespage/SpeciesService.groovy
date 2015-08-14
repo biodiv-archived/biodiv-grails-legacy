@@ -26,6 +26,7 @@ import species.SpeciesField.Status;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup;
+import species.ScientificName
 import species.Synonyms;
 import species.SynonymsMerged;
 import species.CommonNames;
@@ -63,6 +64,7 @@ import species.NamesMetadata.NameStatus;
 import content.eml.DocSciName;
 import content.eml.Document;
 import species.AcceptedSynonym;
+import species.participation.NamelistService
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -1376,8 +1378,8 @@ class SpeciesService extends AbstractObjectService  {
 
         XMLConverter converter = new XMLConverter();
         speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
-         if(speciesInstance.taxonConcept) {
-            speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
+		 if(speciesInstance.taxonConcept) {
+			speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
             //taxonconcept is being used as guid
             speciesInstance.guid = converter.constructGUID(speciesInstance);
 
@@ -1419,8 +1421,10 @@ class SpeciesService extends AbstractObjectService  {
             Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;
-            result.taxonRegistry = taxonRegistry;
+			speciesInstance.taxonConcept.postProcess()
+			result.taxonRegistry = taxonRegistry;
             result.errors.addAll(errors);
+			
         }
        return result;
     }
@@ -2245,4 +2249,22 @@ def checking(){
         return docSciNames.document.unique();
 
     }
+	
+	/////////////////////////// Online edit and bulk upload //////////////////////////
+	ScientificName searchIBP(def parsedName, int rank, NameStatus status =  NameStatus.ACCEPTED ){
+		if(parsedName instanceof String){
+			parsedName = new TaxonomyDefinition(canonicalForm:parsedName.trim())
+		}
+		List taxonList = NamelistService.searchIBP( parsedName.canonicalForm, null, status, rank, false, parsedName.normalizedForm)
+		if(taxonList.isEmpty())
+			return null
+		
+		if(taxonList.size() > 1){
+			log.error '############  ' + "IBP serch returning mulitiple result: should not happen " + taxonList
+		}
+		
+		return taxonList[0]
+	}
+	
+	
 }

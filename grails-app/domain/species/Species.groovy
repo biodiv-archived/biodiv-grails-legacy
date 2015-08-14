@@ -295,7 +295,9 @@ class Species implements Rateable {
 	
 	        //TODO:looks like this is gonna be heavy on every save ... gotta change
 			this.fields?.each { contributors.addAll(it.contributors)}
-            contributors.addAll(this.taxonConcept.contributors)
+			def sContributors =  this.taxonConcept.contributors
+			if(sContributors)
+            	contributors.addAll(sContributors)
 	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        
@@ -443,7 +445,10 @@ class Species implements Rateable {
 
     def fetchSpeciesFieldResourceCount() {
         def sql =  Sql.newInstance(dataSource);
-        def fieldIds = this.fields.id;
+        def fieldIds = this.fields?.id;
+		if(!fieldIds)
+			return 0
+		
         def ss = "(" + fieldIds[0] 
         fieldIds.each{
             ss +=  "," +it

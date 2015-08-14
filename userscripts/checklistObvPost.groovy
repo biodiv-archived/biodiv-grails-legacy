@@ -565,6 +565,13 @@ def migSyn(){
 	nlSer.migrateSynonymForRawNames(m)
 }
 
+
+def test(){
+	List hirList = [ Classification.findByName('Catalogue of Life Taxonomy Hierarchy'), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
+	def trHir = Classification.findByName("IBP Taxonomy Hierarchy");
+	TaxonomyDefinition.get(421973).snapToIBPHir(hirList, trHir)
+}
+
 //dmp()
 //splitTreeExport()
 
@@ -587,7 +594,9 @@ def migSyn(){
 
 //rawNamesWithNoIbpHir()
 
-deleteName()
+//deleteName()
 //updateNameAndCreateIbpHir()
 //createNameAndAddIBPHir()
 //migSyn()
+
+test()
