@@ -150,7 +150,7 @@ def obvId = observationInstance?.id
 </div>
 <g:if test="${!observationInstance.isLocked}">
 <a href="javascript:void(0);" class="clickSuggest pull-right">Click to suggest</a>
-<div class="input-append" style="width:98%; display:none;">
+<div class="input-append" style="width:98%; display:none; height: 130px;">
     <g:hasErrors bean="${recommendationInstance}">
         <div class="errors">
             <g:renderErrors bean="${recommendationInstance}" as="list" />

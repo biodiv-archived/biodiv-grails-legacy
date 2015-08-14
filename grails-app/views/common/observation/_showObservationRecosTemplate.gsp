@@ -53,9 +53,15 @@
     </a>
     </g:if>
 
-    <span class="voteCount"><span id="votes_${r.recoId}">
-            ${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"><g:message code="text.user.thinks" /> </g:if>
-        <g:else> <g:message code="text.user.thinks" /></g:else> <g:message code="text.it.is" />:</span><span class="highlight">
+<!--    <span class="voteCount">
+        <span id="votes_${r.recoId}">
+            ${r.noOfVotes} 
+        </span> 
+    <g:if test="${r.noOfVotes <= 1}"><g:message code="text.user.thinks" /> </g:if>
+    <g:else> <g:message code="text.user.thinks" /></g:else> 
+    <g:message code="text.it.is" />:</span>
+-->
+    <span class="highlight">
         <g:if test="${r.speciesId}">
         <a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
             <i> ${r.name} </i>
