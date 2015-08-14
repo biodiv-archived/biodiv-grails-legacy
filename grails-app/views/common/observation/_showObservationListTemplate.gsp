@@ -100,7 +100,7 @@ function addListLayout(){
 }
 
 function addGridLayout(){
-	$('.thumbnails>li').css({'width':'inherit','margin':'5px 0px'});
+	$('.thumbnails>li').css({'width':'inherit','margin':'0px 5px'});
 	$('.prop').css('clear','both');
 	$('.species_title_wrapper').show();
 	$('.showObvDetails, .view_bootstrap_gallery').hide();
