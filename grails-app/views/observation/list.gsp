@@ -53,62 +53,10 @@
         float: right;
         margin-top: -5px;
     }
+    .commonName{
+        width: 79% !important;
+    }    
 
-</style>
-<style type="text/css">
-.commonName{
-    width: 79% !important;
-}
-.group_icon_show_wrap {
-  border: 1px solid #ccc;
-  float: right;
-  height: 33px;
-  margin-right: 4px;
-}
-.edit_group_btn {
-  top: -10px;
-  position: relative;
-  margin-right: 12px;
-}
-
-    li.group_option{
-        height:30px;
-    }
-    li.group_option span{
-        padding: 0px;
-        float: left;
-    }
-    .groups_super_div{
-        margin-top: -15px;
-        margin-right: 10px;
-    }
-    .groups_div > .dropdown-toggle{
-          height: 25px;
-    }
-    .group_options, .group_option{
-          min-width: 110px;
-    }
-    .save_group_btn{
-        float: right;
-        margin-right: 11px;
-          margin-top: -9px;
-    }
-    .group_icon_show_wrap{
-        border: 1px solid #ccc;
-        float: right;
-        height: 33px;
-        margin-right: 4px;
-    }
-    .edit_group_btn{
-        top: -10px;
-        position: relative;
-        margin-right: 12px;
-    }
-    .propagateGrpHab{
-        display:none !important;
-        float: right;
-        margin-top: -5px;
-    }
     .view_bootstrap_gallery{
           margin-top: -20px;
           position: absolute;
