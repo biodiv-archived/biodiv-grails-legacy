@@ -10,6 +10,17 @@
 			<i class="icon-th-large"></i>
 		</button>
 	</div-->
+
+	<div class="btn-group pull-right button-bar">
+        <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small">
+        	<i class="icon-th-list"></i>List
+        </a>
+       <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small active">
+       		<i class="icon-th"></i>Grid
+       </a>
+    </div>
+
+
         <div class="btn-group button-bar pull-right" style="z-index: 10; margin-right:3px;">
                     <div class="controls">
                         <g:select name="limit" class="input-mini"
@@ -28,7 +39,7 @@
 			<%
 				def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
 			%>
-			<ul class="grid_view thumbnails">
+			<ul class="grid_view thumbnails obvListwrapper">
 			
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
@@ -44,8 +55,7 @@
 					</li>
 
 				</g:each>
-			</ul>
-					
+			</ul>			
 		</div>
 	</div>
         
@@ -70,3 +80,88 @@
 	
 
 </div>
+
+<script type="text/javascript">
+function loadSpeciesnameReco(){
+	$('.showObvDetails').each(function(){
+		var observationId = $(this).attr('rel');
+		$(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="/biodiv/images/spinner.gif" /></li>')
+		preLoadRecos(3, 0, false,observationId);
+	});
+}
+function addListLayout(){
+	//alert("hhh");
+	$('.thumbnails>li').css('width','100%');
+	$('.prop').css('clear','inherit');
+	$('.showObvDetails, .view_bootstrap_gallery').show();
+	$('.species_title_wrapper').hide();
+	loadSpeciesnameReco();
+	initializeLanguage();
+
+}
+
+function addGridLayout(){
+	//alert("hhh");
+	$('.thumbnails>li').css('width','inherit');
+	$('.prop').css('clear','both');
+	$('.species_title_wrapper').show();
+	$('.showObvDetails, .view_bootstrap_gallery').hide();
+}
+
+$(document).ready(function(){
+
+	$('#obvList').click(function(){
+			$(this).addClass('active');
+			$('#obvGrid').removeClass('active');
+			addListLayout();
+	});
+
+	$('#obvGrid').click(function(){
+			$(this).addClass('active');
+			$('#obvList').removeClass('active');
+			addGridLayout();
+	});
+
+ 	$(document).on('click','.clickSuggest',function(){	
+		$(this).next().toggle('slow');
+	});
+
+	   $('.addRecommendation').bind('submit', function(event) {
+	   		var that = $(this);
+            $(this).ajaxSubmit({ 
+                url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
+                dataType: 'json', 
+                type: 'GET',
+                beforeSubmit: function(formData, jqForm, options) {
+                	console.log(formData);
+                    updateCommonNameLanguage();
+                    return true;
+                }, 
+                success: function(data, statusText, xhr, form) {
+                    if(data.status == 'success' || data.success == true) {
+                    	console.log(data);
+                        if(data.canMakeSpeciesCall === 'false'){
+                            $('#selectedGroupList').modal('show');
+                        } else{
+                            preLoadRecos(3, 0, false,data.instance.observation);
+                            setFollowButton();
+                            showUpdateStatus(data.msg, data.success?'success':'error');
+                        }
+                    } else {
+                        showUpdateStatus(data.msg, data.success?'success':'error');
+                    }
+                    $(".addRecommendation_"+data.instance.observation)[0].reset();
+                    $("#canName").val("");
+                    return false;
+                },
+                error:function (xhr, ajaxOptions, thrownError){
+                    //successHandler is used when ajax login succedes
+                    var successHandler = this.success, errorHandler = showUpdateStatus;
+                    handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+                } 
+            });
+            event.preventDefault();
+        });
+
+});
+</script>

@@ -396,6 +396,9 @@ $(document).ready(function(){
             // a function to be executed when next page was loaded. 
             // "this" points to the element of loaded content.
             load : function(current, next) {
+                if($('#obvList').hasClass('active')){
+                    $('#obvList').trigger('click');
+                }
                 $(".mainContent:last").hide().fadeIn(3000);
 
                 $("div.paginateButtons a.nextLink").attr('href', next.url);
@@ -490,6 +493,52 @@ $(document).ready(function(){
     $('#taxonHierarchy').on("reloadGrid", function() {
         updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
     }); 
+
+     /* Added for  Species Update*/
+        var group_icon = $('.group_icon_show');
+        var label_group = $('label.group');
+        var propagateGrpHab = $('.propagateGrpHab');
+        $('.propagateGrpHab .control-group  label').hide();
+
+        $('.edit_group_btn').click(function(){ 
+            var obvId = $(this).attr('id');           
+            $('#group_icon_show_wrap_'+obvId).hide();
+            //habitat_icon.hide();
+            label_group.hide();
+            $('#propagateGrpHab_'+obvId).show();
+
+        }); 
+
+        $('#updateSpeciesGrp').bind('submit', function(event) {
+
+         $(this).ajaxSubmit({ 
+                    url: "/observation/updateSpeciesGrp",
+                    dataType: 'json', 
+                    type: 'GET',  
+                    beforeSubmit: function(formData, jqForm, options) {
+                        /*console.log(formData);
+                        if(formData.group_id == formData.prev_group){
+                            alert("Nothing Changes!");
+                            return false;
+                        }*/
+                    },               
+                    success: function(data, statusText, xhr, form) {
+                            console.log(data);
+                            $('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
+                            $('#group_icon_show_wrap_'+data.instance.id).show();
+                            //habitat_icon.show();
+                            $('#propagateGrpHab_'+data.instance.id).hide();                           
+                    },
+                    error:function (xhr, ajaxOptions, thrownError){
+                        //successHandler is used when ajax login succedes
+                        var successHandler = this.success, errorHandler = showUpdateStatus;
+                        handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+                    } 
+
+                 });    
+               
+            event.preventDefault(); 
+        }); 
 });
 
 /**
