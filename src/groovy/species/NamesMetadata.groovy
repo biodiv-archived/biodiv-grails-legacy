@@ -191,6 +191,7 @@ abstract class NamesMetadata extends NamesSorucedata {
     }
 
 	def beforeInsert(){
+		super.beforeInsert()
 	}
 	
 	def beforeUpdate(){

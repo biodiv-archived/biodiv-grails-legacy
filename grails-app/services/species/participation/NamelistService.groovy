@@ -245,7 +245,13 @@ class NamelistService {
         curateName(sciName, res);
     }
 
-    void curateName (ScientificName sciName, List colData) {
+	void curateName (ScientificName sciName, List colData) {
+		def acceptedMatch = validateColMatch(sciName, colData)
+		if(acceptedMatch)
+			processDataForMigration(sciName, acceptedMatch, colData.size());
+	}
+    
+	def validateColMatch(ScientificName sciName, List colData) {
         //println "================LIST OF COL DATA=========================== " + colData
         log.debug "=========== Curating name ${sciName} with col data ${colData}"
         def acceptedMatch;
@@ -437,7 +443,7 @@ class NamelistService {
                 return;
             }
             log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
-            processDataForMigration(sciName, acceptedMatch, colDataSize);            
+			return acceptedMatch                  
         } else {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
             sciName.noOfCOLMatches = colDataSize;
@@ -451,7 +457,7 @@ class NamelistService {
         }
     }
 
-    public processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize, boolean createOnlyNameFromCol = false) {
+    public processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize, boolean createOnlyNameFromCol = false, boolean addHir= true) {
         sciName.tempActivityDescription = "";
         /*def upAt = updateAttributes(sciName, acceptedMatch);
         println  "====UP AT == " + upAt 
@@ -462,7 +468,7 @@ class NamelistService {
         sciName = updateAttributes(sciName, acceptedMatch, createOnlyNameFromCol);
 		
 		//inside this we are adding hirarchy
-		if(!createOnlyNameFromCol)
+		if(addHir)
         	sciName = updateStatus(sciName, acceptedMatch).sciName;
 			
         println "========THE SCI NAME======== " + sciName

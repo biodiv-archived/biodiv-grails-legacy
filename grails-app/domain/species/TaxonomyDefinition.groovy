@@ -29,6 +29,8 @@ class TaxonomyDefinition extends ScientificName {
 	String lowercaseMatchName
 
     def grailsApplication
+	def namelistService
+	def namelistUtilService
 
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
     static mappedBy = [hierarchies:'taxonDefinition']
@@ -181,17 +183,23 @@ class TaxonomyDefinition extends ScientificName {
 	   }
 	   
 	   boolean isSnapped = false
-	   trs.each { TaxonomyRegistry tr ->
-		   if(!isSnapped){
-			   isSnapped = _sanpToImmediateParent(tr, targetHir)
-			   println "======== checking for path " + tr + "  path " + tr.path + "   result snap " + isSnapped
-			   
-		   }
+	   for(int i = 0; i < trs.size(); i++){
+		   TaxonomyRegistry tr = trs[i]
+		   if(isSnapped)
+		   		break
+				   
+		    TaxonomyDefinition pTd = tr.parentTaxonDefinition 
+			if(pTd){
+				pTd.snapToIBPHir(hirList, targetHir)   
+			 }
+			 isSnapped = _sanpToImmediateParent(tr, targetHir)
+			 println "======== checking for path " + tr + "  path " + tr.path + "   result snap " + isSnapped
 	   }
 	   
 	   return isSnapped
 	   
    }
+   
    
    private boolean _sanpToImmediateParent(TaxonomyRegistry sourceTr,  Classification targetHir){
 	   if(!sourceTr.parentTaxonDefinition){
@@ -261,5 +269,102 @@ class TaxonomyDefinition extends ScientificName {
 		super.beforeUpdate()
 		if(lowercaseMatchName != canonicalForm.toLowerCase())
 			lowercaseMatchName = canonicalForm.toLowerCase()
+	}
+	
+	def afterInsert(){
+//		TaxonomyDefinition.withNewSession{
+//			println "================================ calling post preocess"
+//			postProcess()
+//		}
+		
+	}
+	
+	public postProcess(){
+		curateNameByCol()
+		println "----------------------------------- adding col hir"
+		addColHir()
+		println "---------------------- adding IBP hir"
+		
+		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
+		def trHir = Classification.findByName("IBP Taxonomy Hierarchy");
+		snapToIBPHir(hirList, trHir)
+	}
+	
+	private addColHir(){
+		Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
+		def hir = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, classification)
+		if(hir || !matchId){
+			log.debug "Hir already present or No match found on COL"
+			return
+		}
+		
+		Map colData = namelistUtilService.getColDataFromColId(matchId)
+		if(!colData){
+			return
+		}
+		
+		List taxonList = []
+		boolean abort = false
+		println "colIdPath ---- " + colData.colIdPath
+		List colIdList = colData.colIdPath.tokenize("_")
+		colIdList.each {
+			if(abort) return
+			def td = TaxonomyDefinition.findByMatchId(it)
+			if(!td){
+				abort = true
+				return
+			}
+			taxonList << td
+		}
+		if(abort){
+			log.error "Some name is missing while adding col hir aborting please check db " + colIdList
+			return
+		}
+		
+		taxonList << this
+		List pathList = []
+		String path = ""
+		TaxonomyDefinition prevTaxon = null
+		TaxonomyRegistry prevReg = null
+		taxonList.each { TaxonomyDefinition td ->
+			pathList << td.id 
+			TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(td, classification)
+			if(!tr){
+				tr = new TaxonomyRegistry()
+				tr.path = pathList.join("_")
+				tr.parentTaxonDefinition = prevTaxon
+				tr.taxonDefinition = td
+				tr.parentTaxon = prevReg
+				tr.classification =  classification
+				println "------ saving col registry " + tr
+				if(!tr.save(flush:true)){
+					tr.errors.allErrors.each { log.error it }
+				}
+			}
+			prevTaxon = td
+			prevReg = tr
+		}
+	}
+	
+	private curateNameByCol(){
+		if((status != NameStatus.ACCEPTED) || matchId)
+			return
+		
+			
+		def colData = namelistService.searchCOL(canonicalForm, 'name')
+		println "--------------------------- " + colData
+		def acceptedMatch = namelistService.validateColMatch(this, colData)
+		println "------------------ came here " + acceptedMatch
+		if(!acceptedMatch){
+			log.debug "No match found on col so returning without adding col hir"
+			return
+		}
+		if(!status.value().equalsIgnoreCase(acceptedMatch.nameStatus)) {
+			log.debug "Status from col is different so not adding col hir/info " + status + " col status " + acceptedMatch.nameStatus
+			return
+		}
+		
+		namelistService.processDataForMigration(this, acceptedMatch, colData.size(), true)
+		
 	}
 }

@@ -36,6 +36,9 @@ import species.participation.UserToken;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import static org.springframework.http.HttpStatus.*;
 
+import species.participation.NamelistService
+import species.NamesMetadata
+
 class SpeciesController extends AbstractObjectController {
 
 	def dataSource
@@ -126,11 +129,10 @@ class SpeciesController extends AbstractObjectController {
 		flash.message = "Species page create is currently unavailable."
 		redirect(action: "list")
 		return
-
-/*		def speciesInstance = new Species()
-		speciesInstance.properties = params
-		return [speciesInstance: speciesInstance]
-*/	}
+//		def speciesInstance = new Species()
+//		speciesInstance.properties = params
+//		return [speciesInstance: speciesInstance]
+	}
 
     @Secured(['ROLE_USER'])
     def save() {
@@ -168,7 +170,7 @@ class SpeciesController extends AbstractObjectController {
                         redirect url: url
                         return;
                     } else {
-                    flash.message = result.msg ? result.msg+result.errors:${message(code: 'default.species.error.Create',null)}+result.errors
+                    flash.message = result.msg ? result.msg+result.errors:"${message(code: 'default.species.error.Create',null)}"+result.errors
 			        render(view: "create", model: result)
                     return;
                     }
@@ -212,7 +214,7 @@ class SpeciesController extends AbstractObjectController {
 	def show() {
 		//cache "content"
         params.id = params.long('id');
-
+		def url
 		def speciesInstance = params.id ? Species.get(params.id):null;
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
@@ -531,7 +533,7 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def edit() {
-/*		if(params.id) {
+		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
 			if (!speciesInstance) {
 				flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
@@ -545,7 +547,7 @@ class SpeciesController extends AbstractObjectController {
 			params.max = Math.min(params.max ? params.int('max') : 10, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count()]
 		}
-*/	}
+	}
 
     @Secured(['ROLE_USER'])
     def update() {
@@ -1268,34 +1270,53 @@ class SpeciesController extends AbstractObjectController {
             hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
         }
 */
+		XMLConverter.myPrint("========== " + params)
 		def msg;
         def result = [requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
         if(params.page && params.rank) {
             try {
                 int rank = params.rank?params.int('rank'):null;
+				def taxonRegistry
                 Map r = getTaxon(params.page, rank);
+				XMLConverter.myPrint("========== " + r)
+				
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
                     if(!taxon) {
+						if(r.genusTaxon){
+							def fieldsConfig = grailsApplication.config.speciesPortal.fields
+							def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+							taxonRegistry = r.genusTaxon.parentTaxonRegistry(classification)?.get(classification);
+							if(taxonRegistry){
+								List tmp = []
+								taxonRegistry.each { td ->
+									tmp.putAt(td.rank, td.name)
+								}
+								taxonRegistry = tmp
+							}
+							println "================== " + taxonRegistry
+							
+						}
                     	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
-                        result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
+                        result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry]]
                     } else {
                         //CHK if a species page exists for this concept
                         Species species = Species.findByTaxonConcept(taxon);
-                        def taxonRegistry = taxon.parentTaxonRegistry();
+                        taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
                             result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         } else {
-                        	msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
+							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
                             result = ['success':true, 'msg':msg, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         }
-                        result['taxonRegistry'] = [:];
-                        taxonRegistry.each {classification, h ->
-                            if(!result['taxonRegistry'][classification.name])
-                                result['taxonRegistry'][classification.name] = [];
-                            result['taxonRegistry'][classification.name] << h
-                        }
+	                    result['taxonRegistry'] = [:];
+						
+						taxonRegistry.each {classification, h ->
+							if(!result['taxonRegistry'][classification.name])
+								result['taxonRegistry'][classification.name] = [];
+							result['taxonRegistry'][classification.name] << h
+						}
                     }
                 } else {
                     result.putAll(r);
@@ -1310,27 +1331,32 @@ class SpeciesController extends AbstractObjectController {
         	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], RCU.getLocale(request))
             result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
+		XMLConverter.myPrint("========== " + result)
         render result as JSON
     }
     
     private Map getTaxon(String name, int rank) {
         def result = [:];
         if(!name || rank == null) return result;
-
+		def msg
         NamesParser namesParser = new NamesParser();
         List<TaxonomyDefinition> names = namesParser.parse([name]);
         TaxonomyDefinition page = names[0];
         if(page && page.canonicalForm) {
-            def taxonCriteria = TaxonomyDefinition.createCriteria();
-            TaxonomyDefinition taxon = taxonCriteria.get {
-                eq("rank", rank);
-                ilike("canonicalForm", page.canonicalForm);
-            }
-            if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
+			if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
             	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
                 result = ['success':false, 'msg':msg]
             } else {
-                result = ['success':true, 'taxon':taxon];        
+				def taxon = speciesService.searchIBP(page, rank)
+                result = ['success':true, 'taxon':taxon];
+				
+				//checking if given species name have genus in ibp system
+				if(!taxon && page.binomialForm){
+					def genusTaxon = speciesService.searchIBP(page.binomialForm.tokenize(" ")[0], TaxonomyRank.GENUS.ordinal())
+					if(genusTaxon){
+						result.genusTaxon = genusTaxon
+					}
+				}     
             }
         } else {
         	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
