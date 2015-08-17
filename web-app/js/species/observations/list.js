@@ -525,7 +525,8 @@ $(document).ready(function(){
                             $('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
                             $('#group_icon_show_wrap_'+data.instance.id).show();
                             //habitat_icon.show();
-                            $('#propagateGrpHab_'+data.instance.id).hide();                           
+                            $('#propagateGrpHab_'+data.instance.id).hide();
+                            $('.prev_group_'+data.instance.id).val(data.model.prev_group);
                     },
                     error:function (xhr, ajaxOptions, thrownError){
                         //successHandler is used when ajax login succedes
