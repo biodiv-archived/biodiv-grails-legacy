@@ -22,10 +22,10 @@
                     </label>
 				</g:each>
                 <br />
-				<input type="hidden" name="downloadFrom" value="${downloadFrom}">
-				<input type="hidden" name="source" value="${source}">
-				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}">
-				<input type="hidden" name="instanceTotal" value="${instanceTotal}">
+				<input type="hidden" name="downloadFrom" value="${downloadFrom}"/>
+				<input type="hidden" name="source" value="${source}"/>
+				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}"/>
+				<input id="instanceTotal" type="hidden" name="instanceTotal" value="${instanceTotal}"/>
 				<textarea class="comment-textbox noComment" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
 <%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
 				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}" ></input>

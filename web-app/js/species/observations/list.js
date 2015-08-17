@@ -466,7 +466,6 @@ $(document).ready(function(){
 					//formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
 				}, 
 	            success: function(data, statusText, xhr, form) {
-                    console.log(data);
                     var msg = '';
                     for(var i=0; i<data.length; i++) {
                     if(data[0].success)
@@ -523,7 +522,6 @@ $(document).ready(function(){
                         }*/
                     },               
                     success: function(data, statusText, xhr, form) {
-                            console.log(data);
                             $('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
                             $('#group_icon_show_wrap_'+data.instance.id).show();
                             //habitat_icon.show();
@@ -1046,7 +1044,6 @@ function updateListPage(activeTag) {
         last_actions();
         eatCookies();			
         $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
-        console.log('triggering updatedGallery');
         $('.list').trigger('updatedGallery');
     }
 }
@@ -1226,6 +1223,7 @@ function intializesSpeciesHabitatInterest(multiSelect){
 }
 
 function updateDownloadBox(instanceTotal){
+    $('#instanceTotal').val(instanceTotal);
     if(instanceTotal > 0){
         $('.download-box').show();
 /*        if(instanceTotal > 5000) {

@@ -241,7 +241,7 @@ class SpeciesController extends AbstractObjectController {
                     def model = utilsService.getErrorModel(flash.message, null, OK.value())
                     withFormat {
                         html {
-                            def url = uGroup.createLink(controller:"species", action:"contribute");
+                            url = uGroup.createLink(controller:"species", action:"contribute");
                             redirect url: url
                         }
                         json { render model as JSON }
