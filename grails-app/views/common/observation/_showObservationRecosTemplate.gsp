@@ -26,21 +26,24 @@
             title="${author.name}" />
         </a>
         </g:each>
-    </div>
-    <sUser:hasObvLockPerm model="['obvId': r.obvId]">
-    <%
-        def lockButton
-        if(r.showLock){
-            lockButton = g.message(code:"button.lock")
-        }
-        else{
-            lockButton = g.message(code:"button.unlock")
-        }
-    %>
-    <a class="lockObvId pull-right btn btn-primary btn-small ${(lockButton == 'Lock' && r.isLocked)?' disabled ': ''}" style="margin-left: 1px; background: orangered;"
+
+        <sUser:hasObvLockPerm model="['obvId': r.obvId]">
+        <%
+            def lockButton
+            if(r.showLock){
+                lockButton = g.message(code:"button.lock")
+            }
+            else{
+                lockButton = g.message(code:"button.unlock")
+            }
+        %>
+        <a class="lockObvId pull-right btn btn-primary btn-small ${(lockButton == 'Lock' && r.isLocked)?' disabled ': ''}" style="margin-left: 1px; background: orangered;"
         onclick="lockObv('${uGroup.createLink(controller:'observation', action:'lock', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', '${lockButton}', ${r.recoId}, ${r.obvId}, this )">
         <i class="icon-lock"></i>${lockButton}</a>
     </sUser:hasObvLockPerm>
+
+
+    </div>    
 
     <g:if test="${r.observationImage}">
     <a href="${uGroup.createLink([action:"show", controller:"observation", id:r.obvId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
@@ -50,9 +53,15 @@
     </a>
     </g:if>
 
-    <span class="voteCount"><span id="votes_${r.recoId}">
-            ${r.noOfVotes} </span> <g:if test="${r.noOfVotes <= 1}"><g:message code="text.user.thinks" /> </g:if>
-        <g:else> <g:message code="text.user.thinks" /></g:else> <g:message code="text.it.is" />:</span><span class="highlight">
+<!--    <span class="voteCount">
+        <span id="votes_${r.recoId}">
+            ${r.noOfVotes} 
+        </span> 
+    <g:if test="${r.noOfVotes <= 1}"><g:message code="text.user.thinks" /> </g:if>
+    <g:else> <g:message code="text.user.thinks" /></g:else> 
+    <g:message code="text.it.is" />:</span>
+-->
+    <span class="highlight">
         <g:if test="${r.speciesId}">
         <a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
             <i> ${r.name} </i>

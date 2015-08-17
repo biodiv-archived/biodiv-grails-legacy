@@ -572,7 +572,7 @@ class SourceConverter {
 		return summary.toString()
 	}
 
-	def myPrint(str){
+	def static myPrint(str){
 		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
 			println str
 		}

@@ -61,7 +61,7 @@ class XMLConverter extends SourceConverter {
     private Species s;
 
     def groupHandlerService;
-    //def namelistService;
+	//def namelistService;
     //def markupSanitizerService;
 
     public enum SaveAction {
@@ -1560,7 +1560,7 @@ class XMLConverter extends SourceConverter {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
         log.debug "Getting classification hierarchy : "+classification.name;
-        println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL 
+        println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL + "other params " + otherParams
 		println "============OTHER PARAMS ========= " + otherParams
         //to be used only in case of namelist
         boolean newNameSaved = false;
@@ -1623,7 +1623,7 @@ class XMLConverter extends SourceConverter {
                             println "@@@@@@@@@@@@@@@@@@@@@@@ " + parsedName.authorYear
 //                            def ctx = ApplicationHolder.getApplication().getMainContext();
 //                            namelistService = ctx.getBean("namelistService");
-                            boolean searchInNull = true;
+                            boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
                             def searchIBP = NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
                             println "========SEARCH RESULT------>>> #################======== " + searchIBP
@@ -1749,8 +1749,8 @@ class XMLConverter extends SourceConverter {
                                 return;
                             }
                             if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
-								println " =========== got taxon but creating duplicate "
-                                taxon = null;
+								println " =========== got raw taxon and reusing it  "
+                                //taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
                                 println "=====SAVING NEW TAXON================================== "
@@ -2027,19 +2027,21 @@ class XMLConverter extends SourceConverter {
      * @param s
      * @return
      */
-    TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank) {
+    TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank, boolean createNew = true) {
         def cleanSciName = Utils.cleanSciName(sciName);
 
         if(cleanSciName) {
             List name = namesParser.parse([cleanSciName])
             if(name[0].normalizedForm) {
-                def taxonCriteria = TaxonomyDefinition.createCriteria();
-                TaxonomyDefinition taxon = taxonCriteria.get {
-                    eq("rank", rank);
-                    ilike("canonicalForm", name[0].canonicalForm);
-                }
-
-                if(!taxon) {
+				TaxonomyDefinition taxon
+				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, null, NameStatus.ACCEPTED, rank, false, name[0].normalizedForm)
+				if(taxonList.size() > 1){
+					log.error '############  ' + "IBP search returning mulitiple result: should not happen " + taxonList
+				}
+				if(taxonList){
+					taxon =  taxonList[0]
+				}
+				if(!taxon && createNew) {
                     taxon = name[0];
                     taxon.rank = rank;
                     if(!taxon.save(flush:true)) {

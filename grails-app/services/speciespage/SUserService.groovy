@@ -87,6 +87,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
 			return null
 		}
+		SUserSearchService.publishSearchIndex(user, true);
 		return user
 	}
 

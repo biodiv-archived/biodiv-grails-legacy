@@ -66,6 +66,7 @@ import content.Project
 import species.participation.Checklists
 import species.participation.Featured
 import species.formatReader.SpreadsheetReader
+import species.participation.Digest
 
 class UserGroupService {
 
@@ -81,7 +82,7 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-
+	
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -121,6 +122,8 @@ class UserGroupService {
 		if(params.ne_longitude)
 			userGroup.ne_longitude = Float.parseFloat(params.ne_longitude)
 
+		userGroup.statStartDate = utilsService.parseDate(params.campStatStartDate)
+			
 		if(!userGroup.hasErrors() && userGroup.save()) {
 			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 			userGroup.setTags(tags);
@@ -131,7 +134,10 @@ class UserGroupService {
 			List experts = Utils.getUsersList(params.expertUserIds);
 			setUserGroupExperts(userGroup, experts, params.expertMsg, params.domain);
 			params.founders = founders;
-		}
+			
+			//updating digest 
+			Digest.updateDigest(userGroup)
+		}  
 	}
 
 	//@PreAuthorize("hasPermission(#id, 'species.groups.UserGroup', read) or hasPermission(#id, 'species.groups.UserGroup', admin)")

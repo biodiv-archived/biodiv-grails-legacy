@@ -310,7 +310,27 @@ max-width: 100%;
 				<div class="super-section"  style="clear: both">
 				 	<g:render template="/observation/createCustomFieldTemplate" model="['userGroupInstance':userGroupInstance]"/>
 				</div>
-    
+
+				<div class="super-section" style="clear: both;">
+					<div class="section"
+						style="position: relative; overflow: visible;">
+						<h3><g:message code="usergroup.send.digest" default="Digest Mail Settings" /></h3>
+						<div class="row control-group left-indent">
+								<label class="checkbox" style="text-align: left;"> 
+								 <g:checkBox style="margin-left:0px;"
+												name="sendDigestMail" checked="${userGroupInstance.sendDigestMail}"/>
+								 <g:message code="userGroup.enableDigestMail.msg" default="" /> </label>
+						</div>
+						<div class="row control-group left-indent">
+<%--							<label for="campStatStartDate" class="control-label"><g:message--%>
+<%--									code="userGroup.statdate" default="Start Date" /> </label>--%>
+<%--							--%>
+        					<input name="campStatStartDate" type="text" class="date" class="input-block-level"
+        						value="${userGroupInstance?.statStartDate?.format('dd/MM/yyyy')}" title="Start date for stats"
+        						placeholder="${g.message(code:'placeholder.dateinput.select.fromdate')}" />
+						</div>
+   					</div>
+   				</div>	 
 				
 				<div class="super-section" style="clear: both;">
 					<div class="section"

@@ -56,7 +56,7 @@
  
                             <div class="input-prepend">
                                 <select id="rank" name="rank" class="add-on">
-                                <g:each in="${TaxonomyRank.list().reverse()}" var="rank">
+                                <g:each in="${TaxonomyRank.list().reverse()[0..1]}" var="rank">
                                     <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}><g:message error="${rank}"/></option>
                                 </g:each>
                             </select>
@@ -193,8 +193,8 @@
                         $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
                         var $hier = $('#taxonHierachyInput');
                         $hier.empty()
+                        var taxonRegistry = data.requestParams? data.requestParams.taxonRegistry:undefined;
                         for (var i=0; i<data.rank; i++) {
-                            var taxonRegistry = data.requestParams? data.requestParams.taxonRegistry:undefined;
                             var taxonValue = (taxonRegistry && taxonRegistry[i]) ?taxonRegistry[i]:taxonRanks[i].taxonValue;
                             $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
                         }

@@ -94,7 +94,17 @@ modules = {
 		//resource url:'/js/galleria/1.3.5/galleria-1.3.5.js'
 		//resource url:'/js/galleria/1.3.5/themes/classic/galleria.classic.min.js'
 	}
-
+	bootstrap_gallery{
+		resource url:[dir:'js/bootstrap_gallery/css/',file:'blueimp-gallery.css']
+		resource url:'/js/bootstrap_gallery/js/blueimp-helper.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery.js'		
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-fullscreen.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-indicator.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-video.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-vimeo.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-youtube.js'
+		resource url:'/js/bootstrap_gallery/js/jquery.blueimp-gallery.js'
+	}
 	carousel {
 		resource url:[dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css']
 		resource url:'/js/jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js'
@@ -163,9 +173,11 @@ modules = {
     }
 
 	observations_list { 
-		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
+		dependsOn 'observations, bootstrap_gallery, list_utils, comment, activityfeed, distinct_reco'
 		
 		resource url:'/js/species/taxonhierarchy.js'
+		resource url:'/js/species/observations/show.js'
+		resource url:'/js/species/chooseLanguage.js'
 	}
 
 	susers_list { 
