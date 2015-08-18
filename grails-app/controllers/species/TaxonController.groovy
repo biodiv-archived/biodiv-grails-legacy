@@ -54,7 +54,6 @@ class TaxonController {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-
         /*combinedHierarchy.merge();
         if(classSystem == combinedHierarchy.id) {
             classSystem = null;
@@ -69,7 +68,7 @@ class TaxonController {
             getSpeciesHierarchy(speciesid, rs, regId);
         } else {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
-            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            def classification = classSystem ? Classification.read(classSystem) : Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
             def taxonIds = [];
             def tillLevel = level+3;
              if(expandTaxon) {
@@ -229,8 +228,7 @@ class TaxonController {
         where 
         s.taxon_definition_id = t.id and 
         ${(classSystem?"s.classification_id = :classSystem and ":"")}
-        s.path like '%!_"""+taxonId+"' escape '!'";
-
+        (s.path like '%!_"""+taxonId+"!_%' or s.path like '"+taxonId+"!_%' or s.path like '%!_"+taxonId+"'  escape '!')";
         def rs
         if(classSystem) {
             rs = sql.rows(s, [classSystem:classSystem])
@@ -238,7 +236,6 @@ class TaxonController {
             rs = sql.rows(s)
         }
         def paths = rs.collect {it.path};
-
 
         def result = [];
         paths.each {
@@ -380,7 +377,7 @@ class TaxonController {
             ]
             
             map['li_attr'] = []  // attributes for the generated LI node
-            map['a_attr'] = ['class':map['position']]  // attributes for the generated A node
+            map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
 
             result << map
         }
@@ -674,18 +671,15 @@ class TaxonController {
 
 
     private def getTaxonMap(taxon, author, iucn, gbif) {
-        println "cheking author"
         def classifi
         def map = taxon.longestParentTaxonRegistry(author);
         if(map.regId) {
             classifi = author
         } else {
-            println "checking IUCN"
             classifi = iucn
             map = taxon.longestParentTaxonRegistry(iucn);
             if(map.regId) {
             } else {
-                println "chking GBIF"
                 classifi = gbif
                 map = taxon.longestParentTaxonRegistry(gbif);
             }

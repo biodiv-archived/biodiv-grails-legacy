@@ -72,9 +72,14 @@ public max_date
             def list_of_observationInstance = rf.next();
             def obvList = [];
             list_of_observationInstance.each { 
+                try {
                 def json = it as JSON;
                 def obv = JSON.parse(""+json);
                 obvList << obv;
+                } catch(e) {
+                    log.debug "Error while exporting observation ${it}"
+                    e.printStackTrace()
+                }
             }
 
             exportObservation(obvList, dl.author, dl.id, dl.filterUrl)

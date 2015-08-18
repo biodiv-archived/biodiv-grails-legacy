@@ -2960,6 +2960,11 @@ small {
 .status {
     top: -5px;
     position: relative;
+    color:#000;
+}
+
+.status_a {
+    text-decoration:underline;
 }
 
 #taxonHierarchy td {
@@ -2981,17 +2986,15 @@ small {
 }
 .WORKING {
 }
+
 .dirty_list{
     background-color:lightgrey; //#C0504D;
-    color:#000;
 }
 .working_list{
     background-color:khaki; //#FF9900;
-    color:#000;
 }
 .clean_list{
     background-color:mediumaquamarine; //#009933;
-    color:#000;
 }
 .breadcrumb {
     margin-bottom: 20px;

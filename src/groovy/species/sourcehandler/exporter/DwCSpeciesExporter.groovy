@@ -71,9 +71,14 @@ def exportSpecieData(directory, DownloadLog dl) {
             def list_of_species = rf.next();
             def sList = [];
             list_of_species.each { 
+                try {
                 def json = it as JSON;
                 def s = JSON.parse(""+json);
                 sList << s;
+                } catch(e) {
+                    log.debug "Error while exporting species ${it}"
+                    e.printStackTrace();
+                }
             }
             exportSpecie(sList, dl.author, dl.id, dl.filterUrl)
         }
