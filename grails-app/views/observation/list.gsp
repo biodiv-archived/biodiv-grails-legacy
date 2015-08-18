@@ -69,6 +69,15 @@
         color: white;
         text-decoration: none;
     }
+    .addmargin{
+        margin:10px 0px !important;
+    }
+    .showObvDetails{
+        padding: 10px 0px;
+    }
+    .snippettablet{
+        padding: 5px;
+    }
 </style>
 </head>
 <body>

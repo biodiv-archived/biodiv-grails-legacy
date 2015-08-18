@@ -7,8 +7,6 @@ function showRecos(data, textStatus,observationId) {
     }else{
         recoSummaryWrap = $('.recoSummary_'+observationId);
         seeMoreMessage = $("#seeMoreMessage_"+observationId);
-        console.log(observationId);
-        console.log(data.model.recoHtml);
     }
     if(textStatus && textStatus == 'append')
         recoSummaryWrap.append(data.model.recoHtml);
@@ -224,7 +222,6 @@ function customFieldInlineEdit(comp, url, cfId, obvId){
             url: url,
             data:data,
             success: function(data){
-                console.log(data);
                 valComp.text(data.model.fieldName);
                 finalComp.hide();
                 valComp.show();

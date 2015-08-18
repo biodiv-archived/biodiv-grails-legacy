@@ -126,7 +126,7 @@ def obvId = observationInstance?.id
                  <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                                 method="GET">
                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
-                    <input type="hidden" name="prev_group" value="${observationInstance?.group?.id}" />
+                    <input type="hidden" name="prev_group" class="prev_group_${observationInstance.id}" value="${observationInstance?.group?.id}" />
                     <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
                     <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
                 </form>
