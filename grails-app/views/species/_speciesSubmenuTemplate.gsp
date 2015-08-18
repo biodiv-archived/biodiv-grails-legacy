@@ -44,7 +44,7 @@
     </g:each>
     </g:if>
 
-    <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass, position:speciesInstance.taxonConcept.position, status:status]"/>		
+    <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass, position:speciesInstance.taxonConcept.position, status:status, taxon:speciesInstance.taxonConcept]"/>		
         </g:if>
     </div>
 </g:if>

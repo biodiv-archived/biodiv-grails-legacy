@@ -54,7 +54,6 @@ class TaxonController {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-
         /*combinedHierarchy.merge();
         if(classSystem == combinedHierarchy.id) {
             classSystem = null;
@@ -69,7 +68,7 @@ class TaxonController {
             getSpeciesHierarchy(speciesid, rs, regId);
         } else {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
-            def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            def classification = classSystem ? Classification.read(classSystem) : Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
             def taxonIds = [];
             def tillLevel = level+3;
              if(expandTaxon) {
@@ -222,6 +221,8 @@ class TaxonController {
      * @return
      */
     private List getSpeciesHierarchyTaxonIds(Long taxonId, Long classSystem) {
+        println taxonId
+        println classSystem
         def sql = new Sql(dataSource)
         String s = """select s.path as path 
         from taxonomy_registry s, 
@@ -229,8 +230,8 @@ class TaxonController {
         where 
         s.taxon_definition_id = t.id and 
         ${(classSystem?"s.classification_id = :classSystem and ":"")}
-        s.path like '%!_"""+taxonId+"' escape '!'";
-
+        (s.path like '%!_"""+taxonId+"!_%' or s.path like '"+taxonId+"!_%' or s.path like '%!_"+taxonId+"'  escape '!')";
+println s;
         def rs
         if(classSystem) {
             rs = sql.rows(s, [classSystem:classSystem])
@@ -238,14 +239,14 @@ class TaxonController {
             rs = sql.rows(s)
         }
         def paths = rs.collect {it.path};
-
+println paths;
 
         def result = [];
         paths.each {
             it.tokenize("_").each {
                 result.add(Long.parseLong(it));
             }
-        }
+        }println result;
         return result;
         //		return [Species.get(speciesId).id]
     }

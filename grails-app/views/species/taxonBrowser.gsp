@@ -24,7 +24,7 @@
         %>
         <s:showSubmenuTemplate model="['entityName':taxonomy_browser]"/>
 
-            <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+            <div class="taxonomyBrowser sidebar_section" style="position: relative;">
                 <h5><g:message code="button.classifications" /></h5>	
                 <div class="section help-block"> 
                     <ul>

@@ -16,7 +16,8 @@
         constructor: TaxonHierarchy,
         show: function() {
             var me = this;
-
+            console.log('show');
+console.log($('#taxaHierarchy option:selected').val());
             me.options.postData = {
                 n_level: -1,
                 expand_species: me.options.expandSpecies,
@@ -211,6 +212,14 @@
 
                 if (me.options.action == 'taxonBrowser') {
                     $(this).jstree(true).show_checkboxes();
+                }
+                
+                if (me.options.controller == 'namelist') {
+                    console.log(postData);
+                    var anchor = $('a.jstree-anchor.taxon-highlight');
+                    var parentId = anchor.parent().attr('id');
+                    $(this).jstree(true).open_node('#'+parentId);
+                    getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''));
                 }
 
                 $('#taxonHierarchy').on('click', ".taxDefIdSelect", filterResults);
@@ -606,14 +615,21 @@
        @params {Object} options
        */
     $.fn.taxonhierarchy = function(options) {
+        if (options.taxonId) {
+            $("input#taxon").val(options.taxonId);
+        }
+        if (options.classSystem) {
+            var t = '"'+options.classSystem+'"'
+            $("#taxaHierarchy select").find("option[value="+t+"]").attr('selected',true);
+        }
+        console.log('sdfsdf');
+console.log($('#taxaHierarchy option:selected').val());
+
         var taxonHierarchies = new Array();
         this.each(function() {
             taxonHierarchies.push(new TaxonHierarchy(this, options));
         });
 
-        if (options.taxonId) {
-            $("input#taxon").val(options.taxonId);
-        }
         return {
             'taxonHierarchies': taxonHierarchies
         }

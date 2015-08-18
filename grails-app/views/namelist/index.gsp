@@ -535,6 +535,10 @@
             if(${params.taxon?:false}){
             taxonBrowserOptions['taxonId'] = "${params.taxon}";
             }
+            if(${params.classSystem?:false}){
+            taxonBrowserOptions['classSystem'] = "${params.classSystem}";
+            }
+ 
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
 
             //modifySourceOnEdit();

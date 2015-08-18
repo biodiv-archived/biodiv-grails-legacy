@@ -11,7 +11,7 @@
 			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
     </g:if>
     <div id="taxonBrowser">
-        <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
+        <div class="taxonomyBrowser sidebar_section" style="position:relative">
             <h5><g:message code="button.taxon.browser" /></h5>	
             <div id="taxaHierarchy">
 
