@@ -9,7 +9,7 @@
 
     <div id="taxaHierarchy">
         <g:set var="classifications" value="${speciesInstance.classifications()}" />
-        <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications,'speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor, queryParams:queryParams]]"/>
+        <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications,'speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor, queryParams:queryParams]"/>
     </div>
     <form id="taxonHierarchyForm" class="form-horizontal editableform hide">
         <div class="control-group">

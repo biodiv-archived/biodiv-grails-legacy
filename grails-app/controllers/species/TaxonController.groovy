@@ -221,8 +221,6 @@ class TaxonController {
      * @return
      */
     private List getSpeciesHierarchyTaxonIds(Long taxonId, Long classSystem) {
-        println taxonId
-        println classSystem
         def sql = new Sql(dataSource)
         String s = """select s.path as path 
         from taxonomy_registry s, 
@@ -231,7 +229,6 @@ class TaxonController {
         s.taxon_definition_id = t.id and 
         ${(classSystem?"s.classification_id = :classSystem and ":"")}
         (s.path like '%!_"""+taxonId+"!_%' or s.path like '"+taxonId+"!_%' or s.path like '%!_"+taxonId+"'  escape '!')";
-println s;
         def rs
         if(classSystem) {
             rs = sql.rows(s, [classSystem:classSystem])
@@ -239,14 +236,13 @@ println s;
             rs = sql.rows(s)
         }
         def paths = rs.collect {it.path};
-println paths;
 
         def result = [];
         paths.each {
             it.tokenize("_").each {
                 result.add(Long.parseLong(it));
             }
-        }println result;
+        }
         return result;
         //		return [Species.get(speciesId).id]
     }
@@ -381,7 +377,7 @@ println paths;
             ]
             
             map['li_attr'] = []  // attributes for the generated LI node
-            map['a_attr'] = ['class':map['position']]  // attributes for the generated A node
+            map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
 
             result << map
         }
@@ -675,18 +671,15 @@ println paths;
 
 
     private def getTaxonMap(taxon, author, iucn, gbif) {
-        println "cheking author"
         def classifi
         def map = taxon.longestParentTaxonRegistry(author);
         if(map.regId) {
             classifi = author
         } else {
-            println "checking IUCN"
             classifi = iucn
             map = taxon.longestParentTaxonRegistry(iucn);
             if(map.regId) {
             } else {
-                println "chking GBIF"
                 classifi = gbif
                 map = taxon.longestParentTaxonRegistry(gbif);
             }

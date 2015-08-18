@@ -16,8 +16,6 @@
         constructor: TaxonHierarchy,
         show: function() {
             var me = this;
-            console.log('show');
-console.log($('#taxaHierarchy option:selected').val());
             me.options.postData = {
                 n_level: -1,
                 expand_species: me.options.expandSpecies,
@@ -79,7 +77,9 @@ console.log($('#taxaHierarchy option:selected').val());
                             var selectedTaxonId = $("input#taxon").val();
                             if (nodeData.original.isSpecies && nodeData.original.speciesId != -1) {
                                 //elm = "<span class='rank rank" + level + "'><a href='/species/show/" + speciesId + "'>" + el + "</a>";
-                            } else if (selectedTaxonId && nodeData.original.taxonid == selectedTaxonId) {
+                            } 
+                            
+                            if (selectedTaxonId && nodeData.original.taxonid == selectedTaxonId) {
                                 btnAction = "Hide";
                                 elm = "<span class='rank rank" + level + " btn-info-nocolor'>";
                                 $(obj).children('.jstree-anchor').addClass('taxon-highlight');
@@ -208,21 +208,29 @@ console.log($('#taxaHierarchy option:selected').val());
                     me.initEditables(me.editSelector, me.addSelector);
                 }
                 //$("span.rank.btn-info-nocolor").parent().closest('tr').addClass('taxon-highlight');
-                $("#" + postData.taxonid + ">.jstree-anchor").addClass('taxon-highlight');
+                console.log(postData);
+                $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
 
                 if (me.options.action == 'taxonBrowser') {
                     $(this).jstree(true).show_checkboxes();
                 }
                 
                 if (me.options.controller == 'namelist') {
-                    console.log(postData);
                     var anchor = $('a.jstree-anchor.taxon-highlight');
                     var parentId = anchor.parent().attr('id');
                     $(this).jstree(true).open_node('#'+parentId);
                     getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''));
                 }
 
+                $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
                 $('#taxonHierarchy').on('click', ".taxDefIdSelect", filterResults);
+
+                function scrollIntoView(ele) {
+                //    ele.scrollIntoView();
+                    var topPos = ele.offsetTop;
+                    document.getElementById('#taxonHierarchy').scrollTop = topPos;
+                }
+
                 var searchResultAnchors;
                 $('#searchTaxonButton').click(function() {
                     $(this).html('Searching...').addClass('disabled');
@@ -251,7 +259,7 @@ console.log($('#taxaHierarchy option:selected').val());
                     }
                     if(i+1 < searchResultAnchors.length) {
                         $(searchResultAnchors[i]).removeClass('search-highlight');
-                      $(searchResultAnchors[i+1]).addClass('search-highlight')[0].scrollIntoView();
+                      scrollIntoView($(searchResultAnchors[i+1]).addClass('search-highlight')[0]);
                     } else {
                         $(this).addClass('disabled')
                     }
@@ -270,7 +278,7 @@ console.log($('#taxaHierarchy option:selected').val());
 
                     if(i > 0) {
                         $(searchResultAnchors[i]).removeClass('search-highlight');
-                        $(searchResultAnchors[i-1]).addClass('search-highlight')[0].scrollIntoView();
+                        scrollIntoView($(searchResultAnchors[i-1]).addClass('search-highlight')[0]);
                     } else {
                         $(this).addClass('disabled')
                     }
@@ -295,7 +303,7 @@ console.log($('#taxaHierarchy option:selected').val());
                     filterResults(data.event);
             }).on('search.jstree', function(e, data) {
                 $(this).find('.jstree-search:eq(0)').addClass('search-highlight');
-                $(this).find('.jstree-search:eq(0)')[0].scrollIntoView();
+                scrollIntoView($(this).find('.jstree-search:eq(0)')[0]);
             });
 
 
@@ -527,7 +535,6 @@ console.log($('#taxaHierarchy option:selected').val());
         updateEditableForm: function(postData) {
             var hierarchy = this.$element.find('#taxonHierarchy').jstree().getJSON();
             $.each(hierarchy, function(i, v) {
-                console.log(v);
                 var temp = $(v.name.split(':')[1]);
                 $('.taxonRank[name="taxonRegistry.' + v.level + '"]').val(temp.text());
             });
@@ -618,12 +625,11 @@ console.log($('#taxaHierarchy option:selected').val());
         if (options.taxonId) {
             $("input#taxon").val(options.taxonId);
         }
+
         if (options.classSystem) {
             var t = '"'+options.classSystem+'"'
             $("#taxaHierarchy select").find("option[value="+t+"]").attr('selected',true);
         }
-        console.log('sdfsdf');
-console.log($('#taxaHierarchy option:selected').val());
 
         var taxonHierarchies = new Array();
         this.each(function() {
