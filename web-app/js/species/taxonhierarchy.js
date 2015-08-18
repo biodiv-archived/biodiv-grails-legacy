@@ -148,6 +148,17 @@
                 }
             };
 
+            function scrollIntoView(ele) {
+                //    ele.scrollIntoView();
+                var scrollTo = $(ele);
+                var myContainer = $('#taxonHierarchy');
+                myContainer.animate({
+                    scrollTop: scrollTo.offset().top - myContainer.offset().top + myContainer.scrollTop()
+                });
+                //var topPos = ele.offsetTop;
+                //document.getElementById('taxonHierarchy').scrollTop = topPos;
+            }
+
 
             me.$element.find('#taxonHierarchy').jstree({
                 'core': {
@@ -189,7 +200,8 @@
                         method: 'post'
                     }).done(function(data) {
                         callback(data);
-                        $('#searchTaxonButton').html('Search').removeClass('disabled');
+                        $('#searchTaxonButton').html('Search')
+                        $('.searchTaxonPaginate').removeClass('disabled');
                         //$('body').addClass('busy');
                     });
                 },
@@ -208,7 +220,6 @@
                     me.initEditables(me.editSelector, me.addSelector);
                 }
                 //$("span.rank.btn-info-nocolor").parent().closest('tr').addClass('taxon-highlight');
-                console.log(postData);
                 $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
 
                 if (me.options.action == 'taxonBrowser') {
@@ -217,21 +228,16 @@
                 
                 if (me.options.controller == 'namelist') {
                     var anchor = $('a.jstree-anchor.taxon-highlight');
-                    if(anchor) {
+                    if(anchor.length > 0) {
                         var parentId = anchor.parent().attr('id');
                         $(this).jstree(true).open_node('#'+parentId);
                         getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''));
+                        scrollIntoView(anchor);
                     }
                 }
 
                 $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
                 $('#taxonHierarchy').on('click', ".taxDefIdSelect", filterResults);
-
-                function scrollIntoView(ele) {
-                //    ele.scrollIntoView();
-                    var topPos = ele.offsetTop;
-                    document.getElementById('#taxonHierarchy').scrollTop = topPos;
-                }
 
                 var searchResultAnchors;
                 $('#searchTaxonButton').click(function() {
