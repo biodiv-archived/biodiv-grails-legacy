@@ -217,9 +217,11 @@
                 
                 if (me.options.controller == 'namelist') {
                     var anchor = $('a.jstree-anchor.taxon-highlight');
-                    var parentId = anchor.parent().attr('id');
-                    $(this).jstree(true).open_node('#'+parentId);
-                    getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''));
+                    if(anchor) {
+                        var parentId = anchor.parent().attr('id');
+                        $(this).jstree(true).open_node('#'+parentId);
+                        getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''));
+                    }
                 }
 
                 $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
