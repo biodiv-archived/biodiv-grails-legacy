@@ -65,12 +65,13 @@
           padding: 0px 33px;
           text-decoration: none;
     }
-    .view_bootstrap_gallery:hover{
+    .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited{
         color: white;
         text-decoration: none;
     }
     .addmargin{
         margin:10px 0px !important;
+        border: 2px solid #a6dfc8 !important;
     }
     .showObvDetails{
         padding: 10px 0px;

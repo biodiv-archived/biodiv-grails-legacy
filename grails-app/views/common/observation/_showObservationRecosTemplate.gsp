@@ -8,7 +8,7 @@
 <div class="">
     <div class="users">
         <g:if test="${!hideAgree}">
-        <div class="iAgree ">
+        <div class="iAgree iAgree_${r.obvId}">
             <g:if test="${!r.disAgree}">
             <button class="btn btn-primary btn-small nameAgree ${r.isLocked?' disabled ': ''}" style="margin-left: 1px;" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}', this); return true;"><g:message code="button.agree" /></button>
             </g:if>
@@ -37,7 +37,7 @@
                 lockButton = g.message(code:"button.unlock")
             }
         %>
-        <a class="lockObvId pull-right btn btn-primary btn-small ${(lockButton == 'Lock' && r.isLocked)?' disabled ': ''}" style="margin-left: 1px; background: orangered;"
+        <a class="lockObvId lockObvId_${r.obvId} pull-right btn btn-primary btn-small ${(lockButton == 'Lock' && r.isLocked)?' disabled ': ''}" style="margin-left: 1px; background: orangered;"
         onclick="lockObv('${uGroup.createLink(controller:'observation', action:'lock', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', '${lockButton}', ${r.recoId}, ${r.obvId}, this )">
         <i class="icon-lock"></i>${lockButton}</a>
     </sUser:hasObvLockPerm>

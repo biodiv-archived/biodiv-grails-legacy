@@ -107,10 +107,7 @@ def obvId = observationInstance?.id
                         <img src="${grailsApplication.config.speciesPortal.users.serverURL+'/'+observationInstance.author.icon}"
                         class="small_profile_pic pull-left" title="${observationInstance.author.name}" /></a>
                     </div>
-                    <a title="${observationInstance.author.name}"
-                        href="${userLink}">
-                        <span> ${observationInstance.author.name}</span>
-                    </a>
+                    
                 </div>
                 <div style="float:right">
                     <div style="float: left;">
@@ -137,9 +134,9 @@ def obvId = observationInstance?.id
                 </div>
               
             </div>
-<div class="recommendations sidebar_section" style="  width: 97%;float: right;top: -35px;  margin-bottom: -35px;position: relative;">
+<div class="recommendations sidebar_section" style="width: 97%;float: right;top: -44px;margin-bottom: -44px;position: relative;">
 <div>
-    <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
+    <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -4px;">
 
     </ul>
     <div id="seeMoreMessage_${observationInstance.id}" 
@@ -172,7 +169,7 @@ def obvId = observationInstance?.id
                         value="${observationInstance.id}" />
                 
                  <input type="submit"
-                        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px" />
+                        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
             </div>
             
         </form>
