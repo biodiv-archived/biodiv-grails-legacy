@@ -96,21 +96,16 @@ def obvId = observationInstance?.id
                     <b>-</b>&nbsp; <time class="timeago" datetime="${observationInstance.toDate.getTime()}"></time>
                     </g:if>
                 </div>
-            </div>
-
-
+            </div>            
             <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);%>
-            <div class="prop">
+            <div class="prop" style="margin-top: 46px;">
                 <div style="float:left;">
                     <div class="figure user-icon pull-left" style="display:table;height:32px;">
                         <a href="${userLink}"> 
                         <img src="${grailsApplication.config.speciesPortal.users.serverURL+'/'+observationInstance.author.icon}"
                         class="small_profile_pic pull-left" title="${observationInstance.author.name}" /></a>
                     </div>
-                    <a title="${observationInstance.author.name}"
-                        href="${userLink}">
-                        <span> ${observationInstance.author.name}</span>
-                    </a>
+                    
                 </div>
                 <div style="float:right">
                     <div style="float: left;">
@@ -118,7 +113,7 @@ def obvId = observationInstance?.id
                     </div>
                     <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
                         <span class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()}" title="Plants"></span>
-                        <div class="btn btn-small btn-primary edit_group_btn" id="${observationInstance.id}">Edit
+                        <div class="btn btn-small btn-primary edit_group_btn" style="right: -6px;" id="${observationInstance.id}">Edit
                         </div>
                     </div>
 
@@ -128,7 +123,7 @@ def obvId = observationInstance?.id
                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
                     <input type="hidden" name="prev_group" class="prev_group_${observationInstance.id}" value="${observationInstance?.group?.id}" />
                     <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
-                    <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
+                    <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;   margin-top: -73px;" value="Save" />
                 </form>
                 </div>
 
@@ -137,9 +132,9 @@ def obvId = observationInstance?.id
                 </div>
               
             </div>
-<div class="recommendations sidebar_section" style="  width: 97%;float: right;top: -35px;  margin-bottom: -35px;position: relative;">
+<div class="recommendations sidebar_section" style="width: 97%;float: right;top: -44px;margin-bottom: -44px;position: relative;">
 <div>
-    <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
+    <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -10px;margin-right: -11px;">
 
     </ul>
     <div id="seeMoreMessage_${observationInstance.id}" 
@@ -172,7 +167,7 @@ def obvId = observationInstance?.id
                         value="${observationInstance.id}" />
                 
                  <input type="submit"
-                        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px" />
+                        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
             </div>
             
         </form>
