@@ -150,7 +150,7 @@
 
             function scrollIntoView(ele) {
                 var scrollTo = $(ele);
-                if(scrollTo) {
+                if(scrollTo && scrollTo.offset()) {
                     var myContainer = $('#taxonHierarchy');
                     myContainer.animate({
                         scrollTop: scrollTo.offset().top - myContainer.offset().top + myContainer.scrollTop()
@@ -199,7 +199,8 @@
                         method: 'post'
                     }).done(function(data) {
                         callback(data);
-                        $('#searchTaxonButton').html('Search')
+                        console.log(data);
+                        $('#searchTaxonButton').html('Search').removeClass('disabled')
                         $('.searchTaxonPaginate').removeClass('disabled');
                         //$('body').addClass('busy');
                     });
@@ -241,10 +242,10 @@
                 var searchResultAnchors;
                 $('#searchTaxonButton').click(function() {
                     $(this).html('Searching...').addClass('disabled');
-                    //$('body').addClass('busy');
                      $('.searchTaxonPaginate').addClass('disabled')
                     var v = $('#searchTaxon').val();
                     me.$element.find('#taxonHierarchy').jstree(true).search(v);
+                    $('#searchTaxon').parent().parent().find('.ui-autocomplete').addClass('hide');
                 });
 
                 $('#searchTaxon').keypress(function (e) {

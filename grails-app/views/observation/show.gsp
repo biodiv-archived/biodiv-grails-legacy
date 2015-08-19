@@ -41,7 +41,7 @@ if(r) {
 
 .textbox input{
     text-align: left;
-    width: 290px;
+    width: 380px;
     padding:5px;
 }
 
@@ -52,17 +52,17 @@ if(r) {
     margin-top: 3px;
 }
 .nameContainer.textbox #commonName {
-    width: 200px;
+    width: 282px;
 }
 .nameContainer .combobox-container {
-    left: 322px;
+    left: 282px;
 }
  
 .observation_story .observation_footer {
     margin-top:50px;
 }
 .commonName {
-    width:322px !important;
+    width:282px !important;
 }
 </style>
 </head>
@@ -221,6 +221,7 @@ if(r) {
                                     
                                      <input type="submit"
                                             value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px" />
+                                            <div style="clear:both"></div>
                                 </div>
                                 
                             </form>
