@@ -65,7 +65,7 @@
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
                         <input type="text" name="recoName" class="recoName input-block-level" value="${species_sn_name}" rel="${g.message(code:'placeholder.suggest.species.name')}"
                             placeholder='${g.message(code:"editrecomendation.placeholder.scientific")}'
-                            class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
+                            class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" style="width: 419px;"/>
                         <div class='nameSuggestions' style='display: block;'></div>
                         <input type="hidden" name="canName" class="canName" value="${species_canonical_name }"/>
                         
@@ -83,7 +83,7 @@
                     <div class="nameContainer textbox">
                         <input type="text" name="recoComment" id="recoComment" value="${species_call_comment}"
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"
-                        placeholder="${g.message(code:'editrecomendation.placeholder.comment')}"/>
+                        placeholder="${g.message(code:'editrecomendation.placeholder.comment')}" style="width: 419px;"/>
                     </div>
                 </div>
             </div>

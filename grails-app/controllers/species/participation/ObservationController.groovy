@@ -1698,7 +1698,7 @@ class ObservationController extends AbstractObjectController {
         def currentUser = springSecurityService.currentUser;
         def mailType = '';
         def activityFeed;
-        if(params.lockType == "Lock"){
+        if(params.lockType == "Validate"){
             //current user & reco
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
             def newRecVo;

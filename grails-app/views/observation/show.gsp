@@ -55,14 +55,14 @@ if(r) {
     width: 200px;
 }
 .nameContainer .combobox-container {
-    left:198px;
+    left: 322px;
 }
  
 .observation_story .observation_footer {
     margin-top:50px;
 }
 .commonName {
-    width:200px !important;
+    width:322px !important;
 }
 </style>
 </head>
@@ -196,8 +196,8 @@ if(r) {
                             <ul id="recoSummary" class="pollBars">
 
                             </ul>
-                            <div id="seeMoreMessage" class="message"></div>
-                            <div id="seeMore" class="btn btn-mini"><g:message code="button.show.all" /></div>
+                            <div id="seeMoreMessage_${observationInstance.id}" class="message"></div>
+                            <div id="seeMore_${observationInstance.id}" class="btn btn-mini"><g:message code="button.show.all" /></div>
                         </div>
                         <div style="width:100%;">
                             <g:hasErrors bean="${recommendationInstance}">
@@ -220,7 +220,7 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px" />
                                 </div>
                                 
                             </form>
@@ -432,7 +432,7 @@ $(document).ready(function(){
         //loadObjectInGroups();
         var obvLock = ${obvLock};
         if(obvLock){
-            showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
+            showUpdateStatus('This species ID has been validated by a species curator and is locked!', 'success');
             $('.nameContainer input').attr("disabled", "disabled");
             $('.iAgree button').addClass("disabled");
         }

@@ -33,19 +33,20 @@ function lockObv(url, lockType, recoId, obvId, ele) {
         dataType: "json",
         data:{"lockType" : lockType, "recoId" : recoId},
         success: function(data){
-            if(lockType == "Lock"){
+            seeMoreMessage = $("#seeMoreMessage_"+obvId);            
+            if(lockType == "Validate"){
                 //$("#addRecommendation").hide();
-                $('.nameContainer input').attr('disabled', 'disabled');
-                $('.iAgree button').addClass('disabled');
-                $(".lockObvId").hide();
-                showUpdateStatus(data.msg, 'success');
+                $('.nameContainer_'+obvId+' input').attr('disabled', 'disabled');
+                $('.iAgree_'+obvId+' button').addClass('disabled');
+                $(".lockObvId_"+obvId).hide();
+                showUpdateStatus(data.msg, 'success',seeMoreMessage);
             }
             else{
                 //$("#addRecommendation").show();
-                $('.nameContainer input').removeAttr('disabled');
-                $('.iAgree button').removeClass('disabled');
-                $(".lockObvId").hide();
-                showUpdateStatus(data.msg, 'success');
+                $('.nameContainer_'+obvId+' input').removeAttr('disabled');
+                $('.iAgree_'+obvId+' button').removeClass('disabled');
+                $(".lockObvId_"+obvId).hide();
+                showUpdateStatus(data.msg, 'success',seeMoreMessage);
             }
             updateFeeds();
         }
@@ -156,7 +157,7 @@ function preLoadRecos(max, offset, seeAllClicked,observationId) {
    }
     
     if(seeMoreMessage.hasClass('isLocked') && observationId != 'undefined'){
-        showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success',seeMoreMessage);
+        showUpdateStatus('This species ID has been validated by a species curator and is locked!', 'success',seeMoreMessage);
     }else{
         seeMoreMessage.hide();
     }
