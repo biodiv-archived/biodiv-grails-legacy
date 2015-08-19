@@ -6,7 +6,7 @@
 <g:each in="${result}" var="r">
 <li class="reco_block ${r.maxVotedSpeciesName?'max_voted_species_name':''}">
 <div class="">
-    <div class="users">
+    <div class="users" style="  margin-right: 10px;">
         <g:if test="${!hideAgree}">
         <div class="iAgree iAgree_${r.obvId}">
             <g:if test="${!r.disAgree}">
