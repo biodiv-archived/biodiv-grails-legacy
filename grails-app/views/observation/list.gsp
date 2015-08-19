@@ -71,7 +71,7 @@
     }
     .addmargin{
         margin:10px 0px !important;
-        border: 2px solid #a6dfc8 !important;
+        border: 3px solid #a6dfc8 !important;
     }
     .showObvDetails{
         padding: 10px 0px;

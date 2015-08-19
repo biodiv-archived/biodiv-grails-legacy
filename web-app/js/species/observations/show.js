@@ -157,7 +157,7 @@ function preLoadRecos(max, offset, seeAllClicked,observationId) {
    }
     
     if(seeMoreMessage.hasClass('isLocked') && observationId != 'undefined'){
-        showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success',seeMoreMessage);
+        showUpdateStatus('This species ID has been validated by a species curator and is locked!', 'success',seeMoreMessage);
     }else{
         seeMoreMessage.hide();
     }

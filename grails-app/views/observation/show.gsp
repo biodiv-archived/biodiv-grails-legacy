@@ -432,7 +432,7 @@ $(document).ready(function(){
         //loadObjectInGroups();
         var obvLock = ${obvLock};
         if(obvLock){
-            showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
+            showUpdateStatus('This species ID has been validated by a species curator and is locked!', 'success');
             $('.nameContainer input').attr("disabled", "disabled");
             $('.iAgree button').addClass("disabled");
         }
