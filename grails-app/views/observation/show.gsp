@@ -199,7 +199,7 @@ if(r) {
                             <div id="seeMoreMessage" class="message"></div>
                             <div id="seeMore" class="btn btn-mini"><g:message code="button.show.all" /></div>
                         </div>
-                        <div class="input-append" style="width:100%;">
+                        <div style="width:100%;">
                             <g:hasErrors bean="${recommendationInstance}">
                                 <div class="errors">
                                     <g:renderErrors bean="${recommendationInstance}" as="list" />

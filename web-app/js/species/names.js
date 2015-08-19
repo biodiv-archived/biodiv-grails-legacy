@@ -15,12 +15,14 @@
         this.options = _options;
         //cache[this.options.nameFilter] = {}
         var appendTo = this.parent().find('.nameSuggestions');
-        console.log(appendTo);
+        
         if(_options.appendTo == undefined && appendTo.length > 0) {
             _options.appendTo = appendTo;
         }
+
+        console.log(_options.appendTo);
         var result = $(this).catcomplete({
-//               appendTo:_options.appendTo,
+               appendTo:_options.appendTo,
                source:function( request, response ) {
                    var term = request.term;
                    
@@ -79,7 +81,7 @@
                 };
 
                 $(this).data( "customCatcomplete" )._resizeMenu = function() {
-                    this.menu.element.outerWidth( 300 );
+                    //this.menu.element.outerWidth( 300 );
                 }
             });
 

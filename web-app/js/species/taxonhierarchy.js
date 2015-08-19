@@ -149,14 +149,13 @@
             };
 
             function scrollIntoView(ele) {
-                //    ele.scrollIntoView();
                 var scrollTo = $(ele);
-                var myContainer = $('#taxonHierarchy');
-                myContainer.animate({
-                    scrollTop: scrollTo.offset().top - myContainer.offset().top + myContainer.scrollTop()
-                });
-                //var topPos = ele.offsetTop;
-                //document.getElementById('taxonHierarchy').scrollTop = topPos;
+                if(scrollTo) {
+                    var myContainer = $('#taxonHierarchy');
+                    myContainer.animate({
+                        scrollTop: scrollTo.offset().top - myContainer.offset().top + myContainer.scrollTop()
+                    });
+                }
             }
 
 
@@ -247,6 +246,7 @@
                     var v = $('#searchTaxon').val();
                     me.$element.find('#taxonHierarchy').jstree(true).search(v);
                 });
+
                 $('#searchTaxon').keypress(function (e) {
                     var key = e.which;
                     if(key == 13) { // the enter key code
@@ -291,7 +291,23 @@
                         $(this).addClass('disabled')
                     }
                 });
- 
+                
+                $("#searchTaxon").autofillNames({
+                    'appendTo' : $("#searchTaxon").parent().parent().find('.nameSuggestions'),
+                    'nameFilter':'scientificNames',
+                    focus: function( event, ui ) {
+                        $("#searchTaxon").val( ui.item.label.replace(/<.*?>/g,"") );
+                        $("#nameSuggestions_searchTaxon li a").css('border', 0);
+                        return false;
+                    },
+                    select: function( event, ui ) {
+                        $("#searchTaxon").val( ui.item.label.replace(/<.*?>/g,"") );
+                        return false;
+                    },open: function(event, ui) {
+                    }
+                });
+
+
                 /*
                                 var to = false;
                                 $('#searchTaxon').keyup(function () {
