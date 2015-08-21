@@ -27,13 +27,16 @@
 
     </div>
 </div>
- <div id="taxonHierarchy" class="emptyField"></div>
- <div id="searchTaxonBox" class="input-append input-block-level">
-    <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="Search for taxon" />
-    <span id="searchTaxonPrev" class="add-on btn searchTaxonPaginate">&lt;</span>
-    <span id="searchTaxonNext" class="add-on btn searchTaxonPaginate">&gt;</span>
-    <span id="searchTaxonButton" class="add-on btn">Search</span>
- </div>
+<div id="taxonHierarchy" class="emptyField"></div>
+<div class="nameContainer">
+    <div id="searchTaxonBox" class="input-append input-block-level">
+        <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="Search for taxon" />
+        <span id="searchTaxonPrev" class="add-on btn searchTaxonPaginate">&lt;</span>
+        <span id="searchTaxonNext" class="add-on btn searchTaxonPaginate">&gt;</span>
+        <span id="searchTaxonButton" class="add-on btn">Search</span>
+    </div>
+    <div class="nameSuggestions" style="display: block;"></div>
+</div>
     <div id="searchTaxonResultCount" class="hide"></div>
  </g:if>
 <g:else>
