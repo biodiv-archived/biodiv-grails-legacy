@@ -132,7 +132,7 @@ def obvId = observationInstance?.id
                 </div>
               
             </div>
-<div class="recommendations sidebar_section" style="width: 97%;float: right;top: -44px;margin-bottom: -44px;position: relative;">
+<div class="recommendations sidebar_section" style="width: 97%;float: right;top: -44px;padding-bottom: 3px;margin-bottom: -48px;position: relative;">
 <div>
     <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
 

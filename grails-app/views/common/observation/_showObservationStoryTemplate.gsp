@@ -5,7 +5,7 @@
     <g:if test="${!showDetails}">
 
     .observation .prop .value {
-        margin-left:250px;
+        margin-left:260px;
     }
     .group_icon_show_wrap{
         float:left;

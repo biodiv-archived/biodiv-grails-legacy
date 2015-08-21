@@ -107,16 +107,16 @@ function addGridLayout(){
 	$('.species_title_wrapper').show();
 	$('.showObvDetails, .view_bootstrap_gallery').hide();
 }
-
 $(document).ready(function(){
-
 	$('#obvList').click(function(){
+			checkView = true;
 			$(this).addClass('active');
 			$('#obvGrid').removeClass('active');
 			addListLayout();
 	});
 
 	$('#obvGrid').click(function(){
+			checkView = false;
 			$(this).addClass('active');
 			$('#obvList').removeClass('active');
 			addGridLayout();
