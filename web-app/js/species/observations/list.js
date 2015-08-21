@@ -1,3 +1,4 @@
+var checkView = false;
     var handlePaginateButtons = function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');
@@ -396,9 +397,7 @@ $(document).ready(function(){
             // a function to be executed when next page was loaded. 
             // "this" points to the element of loaded content.
             load : function(current, next) {
-                if($('#obvList').hasClass('active')){
-                    $('#obvList').trigger('click');
-                }
+                checkList();
                 $(".mainContent:last").hide().fadeIn(3000);
 
                 $("div.paginateButtons a.nextLink").attr('href', next.url);
@@ -1035,7 +1034,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);
-        $('#summary_section').replaceWith(data.model.summaryHtml);
+        $('#summary_section').replaceWith(data.model.summaryHtml);        
         //$('#filterPanel').replaceWith(data.model.filterPanel);
         //$('.observation_location').replaceWith(data.model.mapViewHtml);
         setActiveTag(activeTag);
@@ -1046,6 +1045,7 @@ function updateListPage(activeTag) {
         eatCookies();			
         $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
         $('.list').trigger('updatedGallery');
+        checkList();
     }
 }
 
@@ -1296,4 +1296,8 @@ function loadSpeciesGroupCount() {
         }
     });
 }
-    
+function checkList(){   
+    if(checkView){
+        $('#obvList').trigger('click');
+    }
+}
