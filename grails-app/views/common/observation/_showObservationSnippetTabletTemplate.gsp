@@ -138,7 +138,7 @@ def obvId = observationInstance?.id
 
     </ul>
     <div id="seeMoreMessage_${observationInstance.id}" 
-        class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}"></div>
+        class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="margin-bottom: 0px;"></div>
     <div id="seeMore_${observationInstance.id}" class="btn btn-mini">
         <g:message code="button.show.all" />
     </div>
