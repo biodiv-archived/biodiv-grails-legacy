@@ -398,6 +398,7 @@ modules = {
 
     curation {
         resource url:'/js/species/curation.js'
+        resource url:'/css/namelist.css'
     }
 
     document_list {

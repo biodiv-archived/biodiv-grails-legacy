@@ -2987,15 +2987,6 @@ small {
 .WORKING {
 }
 
-.dirty_list{
-    background-color:lightgrey; //#C0504D;
-}
-.working_list{
-    background-color:khaki; //#FF9900;
-}
-.clean_list{
-    background-color:mediumaquamarine; //#009933;
-}
 .breadcrumb {
     margin-bottom: 20px;
     top: -10px;

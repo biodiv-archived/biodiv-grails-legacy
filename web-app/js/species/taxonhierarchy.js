@@ -200,8 +200,8 @@
                     }).done(function(data) {
                         callback(data);
                         console.log(data);
-                        $('#searchTaxonButton').html('Search').removeClass('disabled')
-                        $('.searchTaxonPaginate').removeClass('disabled');
+                        //$('#searchTaxonButton').html('Search').removeClass('disabled')
+                        //$('.searchTaxonPaginate').removeClass('disabled');
                         //$('body').addClass('busy');
                     });
                 },
@@ -245,7 +245,7 @@
                      $('.searchTaxonPaginate').addClass('disabled')
                     var v = $('#searchTaxon').val();
                     me.$element.find('#taxonHierarchy').jstree(true).search(v);
-                    $('#searchTaxon').parent().parent().find('.ui-autocomplete').addClass('hide');
+                    $('#searchTaxon').parent().parent().find('.ui-autocomplete').hide();
                 });
 
                 $('#searchTaxon').keypress(function (e) {
@@ -329,6 +329,9 @@
             }).on('search.jstree', function(e, data) {
                 $(this).find('.jstree-search:eq(0)').addClass('search-highlight');
                 scrollIntoView($(this).find('.jstree-search:eq(0)')[0]);
+            }).on('search.jstree', function(nodes, search_string, result_objects) {
+                $('#searchTaxonButton').html('Search').removeClass('disabled')
+                $('.searchTaxonPaginate').removeClass('disabled');
             });
 
 
