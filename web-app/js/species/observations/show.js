@@ -145,13 +145,13 @@ function removeRecoVote(obvId, recoId, url, obj){
 }
 
 function preLoadRecos(max, offset, seeAllClicked,observationId) {
-   var getRecommendationVotesURL,seeMoreMessage,seeMore;
+       var getRecommendationVotesURL,seeMoreMessage,seeMore;
    if(typeof observationId === 'undefined'){
        getRecommendationVotesURL = window.params.observation.getRecommendationVotesURL;
        seeMoreMessage = $("#seeMoreMessage");
        seeMore = $("#seeMore");
    }else{
-        getRecommendationVotesURL = window.params.observation.getRecommendationVotesURL+'/'+observationId;
+        getRecommendationVotesURL = window.params.observation.getRecommendationVotesURL;
         seeMoreMessage = $("#seeMoreMessage_"+observationId);
         seeMore = $("#seeMore_"+observationId);
    }
@@ -162,7 +162,7 @@ function preLoadRecos(max, offset, seeAllClicked,observationId) {
         seeMoreMessage.hide();
     }
     seeMore.hide();
-    $.ajax({
+     $.ajax({
         /*url: window.params.observation.getRecommendationVotesURL,*/
         url:getRecommendationVotesURL,
         method: "POST",

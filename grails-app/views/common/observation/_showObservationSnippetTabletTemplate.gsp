@@ -137,9 +137,9 @@ def obvId = observationInstance?.id
     <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
 
     </ul>
-    <div id="seeMoreMessage_${observationInstance.id}" 
+    <div id="seeMoreMessage seeMoreMessage_${observationInstance.id}" 
         class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="margin-bottom: 0px;"></div>
-    <div id="seeMore_${observationInstance.id}" class="btn btn-mini">
+    <div id="seeMore  seeMore_${observationInstance.id}" class="btn btn-mini">
         <g:message code="button.show.all" />
     </div>
 </div>

@@ -193,7 +193,7 @@ if(r) {
                         
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
                         <div>
-                            <ul id="recoSummary" class="pollBars">
+                            <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
 
                             </ul>
                             <div id="seeMoreMessage_${observationInstance.id}" class="message"></div>
@@ -294,13 +294,13 @@ $(document).ready(function(){
     <r:script>
     
    
-    
+    var observationId = ${observationInstance.id};
     $(document).ready(function(){
 <%--        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");--%>
 <%--        dcorateCommentBody($('.yj-message-body')); --%>
 
         $("#seeMoreMessage").hide();
-            $(".readmore").readmore({
+        $(".readmore").readmore({
             substr_len : 400,
             more_link : '<a class="more readmore">&nbsp;More</a>'
         });
@@ -384,7 +384,7 @@ $(document).ready(function(){
             window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
          });
          
-               
+             
         $('#addRecommendation').bind('submit', function(event) {
             $(this).ajaxSubmit({ 
                 url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
@@ -398,8 +398,8 @@ $(document).ready(function(){
                     if(data.status == 'success' || data.success == true) {
                         if(data.canMakeSpeciesCall === 'false'){
                             $('#selectedGroupList').modal('show');
-                        } else{
-                            preLoadRecos(3, 0, false);
+                        } else{                             
+                            preLoadRecos(3, 0, false,observationId);
                             updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
                             updateFeeds();
                             setFollowButton();
@@ -426,10 +426,10 @@ $(document).ready(function(){
         })
 
         $("#seeMore").click(function(){
-            preLoadRecos(-1, 3, true);
+            preLoadRecos(-1, 3, true,observationId);
         });
 
-        preLoadRecos(3, 0, false);
+        preLoadRecos(3, 0, false,observationId);
         //loadObjectInGroups();
         var obvLock = ${obvLock};
         if(obvLock){
