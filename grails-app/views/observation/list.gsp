@@ -65,7 +65,7 @@
           padding: 0px 33px;
           text-decoration: none;
     }
-    .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited{
+    .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited, .view_bootstrap_gallery:focus{
         color: white;
         text-decoration: none;
     }
