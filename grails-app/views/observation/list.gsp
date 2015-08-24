@@ -65,7 +65,7 @@
           padding: 0px 33px;
           text-decoration: none;
     }
-    .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited{
+    .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited, .view_bootstrap_gallery:focus{
         color: white;
         text-decoration: none;
     }
@@ -158,7 +158,7 @@
 
 $(document).ready(function(){   
 
-    $('.view_bootstrap_gallery').click(function(){
+    $(document).on('click','.view_bootstrap_gallery',function(){
             // Load demo images from flickr:    
     var ovbId       = $(this).attr('rel');
     var images  = $(this).attr('data-img').split(",");
@@ -265,5 +265,6 @@ $(document).ready(function(){
 
 });
 </script>
+
 </body>
 </html>
