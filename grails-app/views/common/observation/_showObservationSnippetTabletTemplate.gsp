@@ -120,7 +120,7 @@ def obvId = observationInstance?.id
                 <div class="column propagateGrpHab" id="propagateGrpHab_${observationInstance.id}" style="display:none;">
                  <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                                 method="GET">
-                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
+                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance,'action':'show']"/>
                     <input type="hidden" name="prev_group" class="prev_group_${observationInstance.id}" value="${observationInstance?.group?.id}" />
                     <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
                     <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;   margin-top: -73px;" value="Save" />
@@ -137,9 +137,9 @@ def obvId = observationInstance?.id
     <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
 
     </ul>
-    <div id="seeMoreMessage seeMoreMessage_${observationInstance.id}" 
+    <div id="seeMoreMessage_${observationInstance.id}" 
         class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="margin-bottom: 0px;"></div>
-    <div id="seeMore  seeMore_${observationInstance.id}" class="btn btn-mini">
+    <div id="seeMore_${observationInstance.id}" class="btn btn-mini">
         <g:message code="button.show.all" />
     </div>
 </div>

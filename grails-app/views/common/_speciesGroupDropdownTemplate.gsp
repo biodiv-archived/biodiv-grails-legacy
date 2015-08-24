@@ -3,10 +3,12 @@
 <%@page import="species.groups.SpeciesGroup"%>
 <%@page import="species.Habitat"%>
 <div class ="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}" style="clear:both;">
+   <g:if
+    test="${action != 'show'}">
     <label for="group"><g:message
         code="observation.group.label" default="${g.message(code:'default.group.label')}" />
     </label> 
-
+    </g:if>
     <div class="help-inline control-label">
         <g:hasErrors bean="${observationInstance}" field="group">
         <g:message code="observation.group.not_selected" />

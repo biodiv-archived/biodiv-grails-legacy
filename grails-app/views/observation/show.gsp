@@ -220,7 +220,7 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;right: 4px;" />
                                             <div style="clear:both"></div>
                                 </div>
                                 
@@ -286,7 +286,7 @@ if(r) {
                             </div>
 <script type="text/javascript">
 $(document).ready(function(){
-    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes',userGroupWebaddress:params.webaddress) }";
 });
 </script>
 

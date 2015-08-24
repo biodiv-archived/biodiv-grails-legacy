@@ -79,6 +79,9 @@
     .snippettablet{
         padding: 5px;
     }
+    .recoName, #recoComment{
+        width:419px !important;
+    }
 </style>
 </head>
 <body>
@@ -173,8 +176,94 @@ $(document).ready(function(){
 		$(document).ready(function() {
             window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', userGroupWebaddress:params.webaddress) }";
 			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
-                        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+            initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
                 });
 	</script>
+
+
+<script type="text/javascript">
+function loadSpeciesnameReco(){
+    $('.showObvDetails').each(function(){
+        var observationId = $(this).attr('rel');
+        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="/biodiv/images/spinner.gif" /></li>')
+        preLoadRecos(3, 0, false,observationId);
+    });
+}
+function addListLayout(){
+    $('.thumbnails>li').css({'width':'100%'}).addClass('addmargin');
+    $('.snippet.tablet').addClass('snippettablet');
+    $('.prop').css('clear','inherit');
+    $('.showObvDetails, .view_bootstrap_gallery').show();
+    $('.species_title_wrapper').hide();
+    loadSpeciesnameReco();
+    initializeLanguage();
+
+}
+
+function addGridLayout(){
+    $('.thumbnails>li').css({'width':'inherit'}).removeClass('addmargin');
+    $('.snippet.tablet').removeClass('snippettablet');
+    $('.prop').css('clear','both');
+    $('.species_title_wrapper').show();
+    $('.showObvDetails, .view_bootstrap_gallery').hide();
+}
+$(document).ready(function(){
+    $(document).on('click','#obvList',function(){
+            checkView = true;
+            $(this).addClass('active');
+            $('#obvGrid').removeClass('active');
+            addListLayout();
+    });
+
+    $(document).on('click','#obvGrid',function(){
+            checkView = false;
+            $(this).addClass('active');
+            $('#obvList').removeClass('active');
+            addGridLayout();
+    });
+
+    $(document).on('click','.clickSuggest',function(){  
+        $(this).next().toggle('slow');
+    });
+
+       $('.addRecommendation').bind('submit', function(event) {
+            var that = $(this);
+            $(this).ajaxSubmit({ 
+                url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
+                dataType: 'json', 
+                type: 'GET',
+                beforeSubmit: function(formData, jqForm, options) {
+                    console.log(formData);
+                    updateCommonNameLanguage();
+                    return true;
+                }, 
+                success: function(data, statusText, xhr, form) {
+                    if(data.status == 'success' || data.success == true) {
+                        console.log(data);
+                        if(data.canMakeSpeciesCall === 'false'){
+                            $('#selectedGroupList').modal('show');
+                        } else{
+                            preLoadRecos(3, 0, false,data.instance.observation);
+                            setFollowButton();
+                            showUpdateStatus(data.msg, data.success?'success':'error');
+                        }
+                    } else {
+                        showUpdateStatus(data.msg, data.success?'success':'error');
+                    }
+                    $(".addRecommendation_"+data.instance.observation)[0].reset();
+                    $("#canName").val("");
+                    return false;
+                },
+                error:function (xhr, ajaxOptions, thrownError){
+                    //successHandler is used when ajax login succedes
+                    var successHandler = this.success, errorHandler = showUpdateStatus;
+                    handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+                } 
+            });
+            event.preventDefault();
+        });
+
+});
+</script>
 </body>
 </html>

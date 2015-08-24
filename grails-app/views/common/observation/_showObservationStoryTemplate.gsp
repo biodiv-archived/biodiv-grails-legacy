@@ -97,7 +97,7 @@
                  <div class="column propagateGrpHab">
                  <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                                 method="GET">
-                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
+                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance,'action':'show']"/>
                     <input type="hidden" name="prev_group" value="${observationInstance?.group?.id}" />
                     <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
                     <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
