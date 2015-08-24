@@ -11,6 +11,7 @@
 		</button>
 	</div-->
 
+<g:if test="${!activeFilters.isChecklistOnly}">
 	<div class="btn-group pull-right button-bar">
         <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small">
         	<i class="icon-th-list"></i>List
@@ -19,7 +20,7 @@
        		<i class="icon-th"></i>Grid
        </a>
     </div>
-
+</g:if>
 
         <div class="btn-group button-bar pull-right" style="z-index: 10; margin-right:3px;">
                     <div class="controls">
