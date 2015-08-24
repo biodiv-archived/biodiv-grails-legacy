@@ -498,7 +498,7 @@ $(document).ready(function(){
         var propagateGrpHab = $('.propagateGrpHab');
         $('.propagateGrpHab .control-group  label').hide();
 
-        $('.edit_group_btn').click(function(){ 
+        $(document).on('click','.edit_group_btn',function(){
             var obvId = $(this).attr('id');           
             $('#group_icon_show_wrap_'+obvId).hide();
             //habitat_icon.hide();

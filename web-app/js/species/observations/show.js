@@ -161,7 +161,7 @@ function preLoadRecos(max, offset, seeAllClicked,observationId) {
     }else{
         seeMoreMessage.hide();
     }
-    seeMore.hide();
+    seeMore.hide();    
     $.ajax({
         /*url: window.params.observation.getRecommendationVotesURL,*/
         url:getRecommendationVotesURL,
