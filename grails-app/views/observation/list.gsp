@@ -158,7 +158,7 @@
 
 $(document).ready(function(){   
 
-    $('.view_bootstrap_gallery').click(function(){
+    $(document).on('click','.view_bootstrap_gallery',function(){
             // Load demo images from flickr:    
     var ovbId       = $(this).attr('rel');
     var images  = $(this).attr('data-img').split(",");
@@ -265,5 +265,6 @@ $(document).ready(function(){
 
 });
 </script>
+
 </body>
 </html>
