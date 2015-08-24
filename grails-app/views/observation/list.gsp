@@ -180,7 +180,7 @@ $(document).ready(function(){
                 });
 	</script>
 
-
+<g:if test="${!activeFilters.isChecklistOnly}">
 <script type="text/javascript">
 function loadSpeciesnameReco(){
     $('.showObvDetails').each(function(){
@@ -265,6 +265,6 @@ $(document).ready(function(){
 
 });
 </script>
-
+</g:if>
 </body>
 </html>
