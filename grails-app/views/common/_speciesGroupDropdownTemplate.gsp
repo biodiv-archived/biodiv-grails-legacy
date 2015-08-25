@@ -68,12 +68,12 @@
 <g:if test="${action != 'show'}">
 <r:script>
 $(document).ready(function(){
-    $(".selected_group").unbind('click').click(function(){
+    $(".selected_group").off('click').on('click',function(){
         $(this).closest(".groups_super_div").find(".group_options").toggle();
         //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
     });
 
-    $(".group_option").unbind('click').click(function(){
+    $(".group_option").off('click').on('click',function(){
         var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
            if(is_save_btn_exists.length == 1){
                 is_save_btn_exists.show();
