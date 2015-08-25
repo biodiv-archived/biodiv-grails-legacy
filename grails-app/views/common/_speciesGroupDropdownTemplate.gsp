@@ -64,8 +64,9 @@
     <input class="group" type="hidden" name="group_id"></input>
 </div>
 
-<r:script>
 
+<g:if test="${action != 'show'}">
+<r:script>
 $(document).ready(function(){
     $(".selected_group").unbind('click').click(function(){
         $(this).closest(".groups_super_div").find(".group_options").toggle();
@@ -91,4 +92,5 @@ $(document).ready(function(){
 });
 
 </r:script>
+</g:if>
 </div>

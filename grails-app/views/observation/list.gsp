@@ -226,7 +226,7 @@ $(document).ready(function(){
         $(this).next().toggle('slow');
     });
 
-       $('.addRecommendation').bind('submit', function(event) {
+       $(document).on('submit','.addRecommendation', function(event) {
             var that = $(this);
             $(this).ajaxSubmit({ 
                 url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
@@ -247,11 +247,11 @@ $(document).ready(function(){
                             setFollowButton();
                             showUpdateStatus(data.msg, data.success?'success':'error');
                         }
+                        $(".addRecommendation_"+data.instance.observation)[0].reset();
+                        $("#canName").val("");   
                     } else {
                         showUpdateStatus(data.msg, data.success?'success':'error');
-                    }
-                    $(".addRecommendation_"+data.instance.observation)[0].reset();
-                    $("#canName").val("");
+                    }                    
                     return false;
                 },
                 error:function (xhr, ajaxOptions, thrownError){
@@ -265,6 +265,38 @@ $(document).ready(function(){
 
 });
 </script>
+
+
+<r:script>
+$(document).ready(function(){
+    $(".selected_group").off('click').on('click',function(){
+        console.log("selected_group");
+        $(this).closest(".groups_super_div").find(".group_options").toggle();
+        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
+    });
+
+    $(".group_option").off('click').on('click',function(){
+        console.log("group_option");
+        var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
+           if(is_save_btn_exists.length == 1){
+                is_save_btn_exists.show();
+           }
+       
+
+        $(this).closest(".groups_super_div").find(".group").val($(this).val());
+        $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
+        $(this).closest(".group_options").hide();
+        //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
+        if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
+            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
+        }
+    });
+
+});
+
+</r:script>
+
+
 </g:if>
 </body>
 </html>
