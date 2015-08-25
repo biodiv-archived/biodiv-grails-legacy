@@ -43,3 +43,81 @@
         </div>
     </div>
 </div>
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+// For Open Tag
+
+        $('.add_obv_tags').click(function(){
+            $('.view_obv_tags, .add_obv_tags').hide();
+            $('.add_obv_tags').parent().hide();
+            $('.add_obv_tags_wrapper').show();
+        });
+
+        $('.cancel_open_tags').click(function(){
+            $('.view_obv_tags, .add_obv_tags').show();
+            $('.add_obv_tags').parent().show();
+            $('.add_obv_tags_wrapper').hide();
+        });
+
+         $('#addOpenTags').bind('submit', function(event) {
+
+                 $(this).ajaxSubmit({ 
+                    url: "${uGroup.createLink(controller:'observation', action:'updateOraddTags')}",
+                    dataType: 'json', 
+                    type: 'GET',                
+                    success: function(data, statusText, xhr, form) {
+                        console.log("data "+data +" statusText = "+statusText+" xhr = "+xhr+" form = "+form);
+                        console.log(data);
+                        var tagsData = data;
+                        if(tagsData.success){
+                            var outHtml = '';
+                            console.log(tagsData.hasOwnProperty("model"));
+                            //console.log(Object.keys(data.model).length);
+                            if(tagsData.hasOwnProperty("model")){
+                                if(Object.keys(data.model).length > 0){
+                                    $.each(data.model, function( index, value ) {
+                                        outHtml+= '<li class="tagit-choice" style="padding:0 5px;">';
+                                        outHtml+= index;
+                                        outHtml+= '&nbsp;<span class="tag_stats">'+value +'</span>';
+                                        outHtml+= '</li>';
+                                    });
+                                    $('.tagitAppend').html(outHtml);                        
+                                    $('.view_obv_tags, .add_obv_tags').show();
+                                    $('.add_obv_tags_wrapper').hide();                                    
+                                }
+                            }else{
+                                $('.tagitAppend').empty();
+                                $('.view_obv_tags, .add_obv_tags_wrapper').hide();
+                                $('.add_obv_tags').show();
+                            }
+                            updateFeeds();
+                        }
+                        return false;
+                    },
+                    error:function (xhr, ajaxOptions, thrownError){
+                        //successHandler is used when ajax login succedes
+                        var successHandler = this.success, errorHandler = showUpdateStatus;
+                        handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+                    } 
+
+                 });    
+               
+            event.preventDefault(); 
+        });
+        $(".obvCreateTags").tagit({
+            select:true, 
+            allowSpaces:true, 
+            placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
+            fieldName: 'tags', 
+            autocomplete:{
+                source: '/observation/tags'
+            }, 
+            triggerKeys:['enter', 'comma', 'tab'], 
+            maxLength:30
+        });
+});
+
+</script>
