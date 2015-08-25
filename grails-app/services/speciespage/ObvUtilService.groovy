@@ -98,10 +98,7 @@ class ObvUtilService {
         def res = [];
         int instanceTotal = params.instanceTotal?params.int('instanceTotal'):0
         for( int i=0; i<instanceTotal/EXPORT_BATCH_SIZE; i++) {
-            println "=========================================="
-            println i
             int offset = (i * EXPORT_BATCH_SIZE);
-            println offset
             dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params, offset);
 
             def r = [:];
@@ -243,11 +240,12 @@ class ObvUtilService {
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
 		
 		boolean headerAdded = false
-        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
-        while(rf.hasNext()) {
+        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, dl.offsetParam.intValue());
+        int total = 0;
+        while (total < EXPORT_BATCH_SIZE && rf.hasNext()) {
             def obvList = rf.next();
+            total += obvList.size();
             obvList.each { obv ->
-
 			    if(obv.isChecklist) return;
 
                 log.debug "Writting " + obv
@@ -403,9 +401,11 @@ class ObvUtilService {
                         }
                     }
 
-                    ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
-                    while(rf.hasNext()) {
+                    ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, dl.offsetParam.intValue());
+                    int total = 0;
+                    while(rf.hasNext() && total < EXPORT_BATCH_SIZE) {
                         def obvList = rf.next();
+                        total += obvList.size();
                         for ( obv in obvList) {
                             log.debug "writing $obv"
                             def mainImage = obv.mainImage()

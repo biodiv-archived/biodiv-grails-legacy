@@ -10,6 +10,7 @@ import species.participation.Stats
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 import  org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
+import static org.springframework.http.HttpStatus.*;
 
 
 class ActivityFeedController {

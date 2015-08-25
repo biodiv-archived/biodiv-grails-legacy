@@ -20,6 +20,7 @@ import java.lang.*;
 import java.io.File;
 import species.participation.Observation;
 import species.participation.DownloadLog;
+import speciespage.ObvUtilService;
 import species.auth.SUser;
 import grails.converters.JSON;
 
@@ -67,9 +68,11 @@ public max_date
 		initWriters(folderPath)
 		fillHeaders() 
 
-        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
-        while(rf.hasNext()) {
+        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, dl.offsetParam);
+        int total = 0;
+        while(rf.hasNext() && total < ObvUtilService.EXPORT_BATCH_SIZE) {
             def list_of_observationInstance = rf.next();
+            total += list_of_observationInstance.size();
             def obvList = [];
             list_of_observationInstance.each { 
                 try {
