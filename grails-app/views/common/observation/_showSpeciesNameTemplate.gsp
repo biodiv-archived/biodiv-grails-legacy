@@ -18,7 +18,7 @@
 			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>"+see_checklists+"</a>"
 		}
 	%>
-	<g:set var="speciesLinkHtml" value="${speciesLink.replaceAll('"','\\\\"').encodeAsRaw()}" />
+	<g:set var="speciesLinkHtml" value="${speciesLink.encodeAsRaw()}" />
 	<g:set var="sName" value="${raw(observationInstance.fetchFormattedSpeciesCall())}" />
 	<g:set var="sNameTitle" value="${observationInstance.fetchSpeciesCall()}" />
 
