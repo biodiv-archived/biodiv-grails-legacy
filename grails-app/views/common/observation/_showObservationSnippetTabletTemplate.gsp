@@ -1,4 +1,5 @@
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="species.utils.ImageType"%>
 <g:set var="mainImage" value="${observationInstance?.mainImage()}" />
 <%
 def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
@@ -102,7 +103,7 @@ def obvId = observationInstance?.id
                 <div style="float:left;">
                     <div class="figure user-icon pull-left" style="display:table;height:32px;">
                         <a href="${userLink}"> 
-                        <img src="${grailsApplication.config.speciesPortal.users.serverURL+'/'+observationInstance.author.icon}"
+                        <img src="${observationInstance.author.profilePicture(ImageType.SMALL)}"
                         class="small_profile_pic pull-left" title="${observationInstance.author.name}" /></a>
                     </div>
                     

@@ -507,7 +507,7 @@ $(document).ready(function(){
 
         }); 
 
-        $('#updateSpeciesGrp').bind('submit', function(event) {
+        $(document).on('submit','#updateSpeciesGrp', function(event) {
 
          $(this).ajaxSubmit({ 
                     url: "/observation/updateSpeciesGrp",
