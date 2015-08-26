@@ -559,7 +559,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null) {
-        String query = "from Observation o where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and maxVotedReco.taxonConcept=:maxVotedRecoTaxonConcept":"and maxVotedReco=:maxVotedReco")+(userGroupInstance?" and userGroupInstance.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
+        String query = "from Observation o "+(userGroupInstance?" join o.userGroups u":"")+" where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and o.maxVotedReco.taxonConcept=:maxVotedRecoTaxonConcept":"and o.maxVotedReco=:maxVotedReco")+(userGroupInstance?" and u.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
         def params = ['isDeleted':false, 'obvId':obvId]
         if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept;
         else params['maxVotedReco'] = maxVotedReco;
