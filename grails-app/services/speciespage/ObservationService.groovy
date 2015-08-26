@@ -596,9 +596,10 @@ class ObservationService extends AbstractObjectService {
                 firstResult (offset?:0)
         }
         */
+
         def result = [];
         observations.each {
-            def obv = it
+            def obv = it[0];
             result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
         }
 
