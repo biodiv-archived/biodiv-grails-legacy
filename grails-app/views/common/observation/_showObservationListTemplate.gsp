@@ -40,7 +40,7 @@
 			<%
 				def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
 			%>
-			<ul class="grid_view thumbnails obvListwrapper">
+			<ul class="grid_view thumbnails obvListwrapper" style="${(params?.view=='list') ? 'display:none;' : ''; }">
 			
 				<g:each in="${observationInstanceList}" status="i"
 					var="observationInstance">
@@ -77,7 +77,5 @@
 		<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'observation'}"
 			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
 			 max="${queryParams.max}" params="${activeFilters}" />
-	</div>
-	
-
+	</div>	
 </div>

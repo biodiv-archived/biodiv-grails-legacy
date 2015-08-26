@@ -1,4 +1,3 @@
-var checkView = false;
     var handlePaginateButtons = function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');
@@ -1063,8 +1062,7 @@ function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpda
     return params;
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
-    
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {    
     var params = getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam);
 
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
@@ -1072,6 +1070,11 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     	params["isGalleryUpdate"] = isGalleryUpdate;
     var href = params.href;
     var base = params.base;
+    if(checkView){
+        params["view"] = "list";
+    }else{
+        params["view"] = "grid";
+    }
     delete params["href"]
     delete params["base"]
     var recursiveDecoded = decodeURIComponent($.param(params));
@@ -1298,6 +1301,7 @@ function loadSpeciesGroupCount() {
 }
 function checkList(){   
     if(checkView){
-        $('#obvList').trigger('click');
+        $('#obvList').trigger('click');        
     }
+    $('.obvListwrapper').show();
 }

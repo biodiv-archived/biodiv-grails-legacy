@@ -122,12 +122,8 @@
     <a class="play-pause"></a>
     <ol class="indicator"></ol>
 </div>
- 
-
-
-
- <script type="text/javascript">
-
+<script type="text/javascript">
+var checkView = false;
  function appendGallery(ovbId,images){
         $("#links").removeClass();
         $("#links").addClass('links'+ovbId);
@@ -207,15 +203,60 @@ function addGridLayout(){
     $('.species_title_wrapper').show();
     $('.showObvDetails, .view_bootstrap_gallery').hide();
 }
+
+function checkUrl(viewText,changeText){
+    var ls = window.location.search;
+    ls = ls.slice(1);
+    if((!params['view'] || params['view'] == viewText) && !ls){
+        var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?view='+changeText;
+        window.history.pushState({path:newurl},'',newurl);               
+    }else{
+        if(ls.split("&").length == 1){
+            var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?view='+changeText;
+            window.history.pushState({path:newurl},'',newurl);   
+        }else{
+        var lang_key = "view=";
+        var ps = ls.split("&");
+        var flag, i;
+        if(ps) {
+            for(i=0; i<ps.length; i++){
+                if(ps[i].indexOf(lang_key) == 0){
+                    flag = true;
+                    break;
+                }
+                else{
+                    flag = false;
+                }
+            }
+
+            if(flag){
+                ps[i] = lang_key + changeText;
+                s = ps.join("&");
+            }
+            else{
+                s += "&" + lang_key + changeText;
+            }
+        }
+
+        newurl = window.location.href.replace(window.location.search, "?"+s);
+        window.history.pushState({path:newurl},'',newurl);
+
+        }
+    }
+}
 $(document).ready(function(){
-    $(document).on('click','#obvList',function(){
-            checkView = true;
+    $(document).on('click','#obvList',function(){           
+            checkUrl("grid","list");
+            params['view'] = "list"; 
+            checkView = true;           
             $(this).addClass('active');
             $('#obvGrid').removeClass('active');
             addListLayout();
     });
 
-    $(document).on('click','#obvGrid',function(){
+    $(document).on('click','#obvGrid',function(){              
+            checkUrl("list","grid");
+            params['view'] = "grid"; 
             checkView = false;
             $(this).addClass('active');
             $('#obvList').removeClass('active');
@@ -293,6 +334,15 @@ $(document).ready(function(){
 });
 
 </r:script>
+<g:if test="${params?.view == 'list'}">
+  <script type="text/javascript">
+  $(document).ready(function(){     
+        checkView = true;   
+        $('#obvList').trigger('click');
+        $('.obvListwrapper').show();
+    });
+  </script>
+</g:if>
 </g:if>
 </body>
 </html>
