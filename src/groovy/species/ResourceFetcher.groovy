@@ -100,7 +100,7 @@ class ResourceFetcher {
 	}
 	
 	public List getAllResult(){
-		resetFrom()
+		resetFrom(0)
 		List res = []
 		while(hasNext()){
 			res.addAll(next())
