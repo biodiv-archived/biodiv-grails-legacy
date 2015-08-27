@@ -231,14 +231,14 @@ function checkUrl(viewText,changeText){
 
             if(flag){
                 ps[i] = lang_key + changeText;
-                s = ps.join("&");
+                ls = ps.join("&");
             }
             else{
-                s += "&" + lang_key + changeText;
+                ls += "&" + lang_key + changeText;
             }
         }
 
-        newurl = window.location.href.replace(window.location.search, "?"+s);
+        newurl = window.location.href.replace(window.location.search, "?"+ls);
         window.history.pushState({path:newurl},'',newurl);
 
         }
