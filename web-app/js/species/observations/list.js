@@ -417,6 +417,11 @@ $(document).ready(function(){
                 var a = $('<a href="'+current.url+'"></a>');
                 var url = a.url();
                 var params = url.param();
+                if(checkView){
+                    params["view"] = "list";
+                }else{
+                    params["view"] = "grid";
+                }
                 delete params["append"]
                 delete params["loadMore"]
                 params['max'] = parseInt(params['offset'])+parseInt(params['max']);
