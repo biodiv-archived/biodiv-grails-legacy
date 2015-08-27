@@ -599,7 +599,9 @@ class ObservationService extends AbstractObjectService {
 
         def result = [];
         observations.each {
-            def obv = it[0];
+            def obv;
+            if(userGroupInstance) obv = it[0];
+            else obv = it;
             result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
         }
 
