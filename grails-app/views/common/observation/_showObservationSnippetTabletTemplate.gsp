@@ -10,7 +10,7 @@ def obvId = observationInstance?.id
 <g:if test="${observationInstance}">
     <g:set var="featureCount" value="${observationInstance.featureCount}"/>
 </g:if>
-<div class="snippet tablet">
+<div class="snippet tablet ${styleviewcheck?'snippettablet': '';}">
     <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
                 </span>
 
@@ -52,24 +52,24 @@ def obvId = observationInstance?.id
         %>
    </g:if>
 </g:each>
-     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="display:none;" rel="${observationInstance.id}" data-img="${photonames}">View gallery</a>
-	<div class="caption species_title_wrapper" >
+     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery</a>
+	<div class="caption species_title_wrapper" style="${styleviewcheck?'display:none;': ''}" >
 		<obv:showStoryTablet
 			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
 		<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
 	</div>
 </div>
 
-<div class="showObvDetails" rel="${observationInstance.id}" style="display:none;">
+<div class="showObvDetails" rel="${observationInstance.id}" style="${styleviewcheck?'display:block;': 'display:none;'}">
 
-			<div class="prop">
+			<div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">
 			    <span class="name"><i class="icon-share-alt"></i><g:message code="default.name.label" /></span>
 			    <div class="value">
 			        <obv:showSpeciesName
 			        model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'isListView':!showDetails]" />
 			    </div>
 			</div>
-            <div class="prop">
+            <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">
                 <span class="name"><i class="icon-map-marker"></i><g:message code="default.place.label" /></span>
                 <div class="value ellipsis">
                     <g:if test="${observationInstance.placeName == ''}">
@@ -88,7 +88,7 @@ def obvId = observationInstance?.id
                 </div>
             </div>
 
-            <div class="prop">                
+            <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">                
                 <span class="name"><i class="icon-time"></i><g:message code="default.observed.on.label" /></span>
                 <div class="value">
                     <time class="timeago"
@@ -99,7 +99,7 @@ def obvId = observationInstance?.id
                 </div>
             </div>            
             <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);%>
-            <div class="prop" style="margin-top: 46px;">
+            <div class="prop" style="margin-top: 46px; ${styleviewcheck?'clear:inherit;': 'clear:both;'}">
                 <div style="float:left;">
                     <div class="figure user-icon pull-left" style="display:table;height:32px;">
                         <a href="${userLink}"> 
@@ -136,11 +136,15 @@ def obvId = observationInstance?.id
 <div class="recommendations sidebar_section" style="width: 97%;float: right;top: -44px;padding-bottom: 3px;margin-bottom: -48px;position: relative;">
 <div>
     <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
-
+        <g:if test="${styleviewcheck}">    
+            <li style="text-align: center;">
+                <img src="/biodiv/images/spinner.gif" />
+            </li>
+        </g:if>
     </ul>
     <div id="seeMoreMessage_${observationInstance.id}" 
-        class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="margin-bottom: 0px;"></div>
-    <div id="seeMore_${observationInstance.id}" class="btn btn-mini">
+        class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="margin-bottom: 0px;display:none;"></div>
+    <div id="seeMore_${observationInstance.id}" class="btn btn-mini" style="display:none;">
         <g:message code="button.show.all" />
     </div>
 </div>
