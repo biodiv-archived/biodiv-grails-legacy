@@ -505,6 +505,8 @@ class NamelistService {
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
+		
+		sciName.addSynonymFromCol(acceptedMatch.synList)
 		return sciName
     }
    

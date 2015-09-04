@@ -12,20 +12,23 @@
         def sourcechecklists=g.message(code:"showspeciesnametemp.title.source")
         def see_species=g.message(code:"button.see.species")
 		if(speciesId && !isHeading){
-			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>"+see_species+"</a>"
+            def l = uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true)
+			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + l + '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_species+'</a>'
 		} 
-		if(observationInstance.id != observationInstance.sourceId && !isHeading){
-			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) + '">' + "<i class='icon-info-sign' style='margin-right: 1px; margin-left: 10px;'></i>"+see_checklists+"</a>"
+        if(observationInstance.id != observationInstance.sourceId && !isHeading) {
+            def l = uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) 
+			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l + '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_checklists+'</a>'
 		}
 	%>
-	<g:set var="speciesLinkHtml" value="${speciesLink.replaceAll('"','\\\\"').encodeAsRaw()}" />
+	<g:set var="speciesLinkHtml" value="${raw(speciesLink.replaceAll('"',"'"))}" />
 	<g:set var="sName" value="${raw(observationInstance.fetchFormattedSpeciesCall())}" />
 	<g:set var="sNameTitle" value="${observationInstance.fetchSpeciesCall()}" />
 
-    <% def status = ''; def position='' %>
+    <% def status = ''; def position=''; def taxon; %>
     <g:if test="${observationInstance.maxVotedReco?.taxonConcept}">
     <% status = observationInstance.maxVotedReco.taxonConcept.status.label(); %>
     <% position = observationInstance.maxVotedReco.taxonConcept.position; %>
+    <% taxon = observationInstance.maxVotedReco.taxonConcept; %>
     <g:if test="${observationInstance.maxVotedReco.taxonConcept.status == NameStatus.SYNONYM}">
     <% status += ' of ';%>
     <g:each in="${observationInstance.maxVotedReco.taxonConcept.fetchAcceptedNames()}" var="acceptedName">
@@ -62,30 +65,30 @@
 		<g:elseif test="${observationInstance.maxVotedReco.isScientificName}">
 			<div class="sci_name ellipsis" title="${sNameTitle}">
 				 ${sName}
-                <g:render template="/namelist/statusTemplate" model="[position:position, status:status]"/>
+                <g:render template="/namelist/statusTemplate" model="[position:position, status:status, taxon:taxon]"/>
 			</div>
 		</g:elseif>
 		<g:else>
                         <div class="ellipsis" title="${sNameTitle}">
                             ${sName}
-                            <g:render template="/namelist/statusTemplate" model="[position:position, status:status]"/>
+                            <g:render template="/namelist/statusTemplate" model="[position:position, status:status, taxon:taxon]"/>
                         </div>
 		</g:else>
 	</g:elseif>
 	<g:else>
 		<g:if test="${observationInstance.maxVotedReco.isScientificName}">
-			<div class="sci_name ellipsis" title="${sNameTitle }">
+			<div class="sci_name ellipsis" title="${sNameTitle}">
                 ${sName} ${speciesLinkHtml}
-                <g:render template="/namelist/statusTemplate" model="[position:position, status:status]"/>
+                <g:render template="/namelist/statusTemplate" model="[position:position, status:status, taxon:taxon]"/>
 			</div>
-			<div class="common_name ellipsis" title="${commonName }">
+			<div class="common_name ellipsis" title="${commonName}">
 				${commonName}
 			</div>
 		</g:if>
 		<g:else>
 			<div class="ellipsis" title="${sNameTitle}">
                 ${sName} ${speciesLinkHtml}
-                <g:render template="/namelist/statusTemplate" model="[position:position, status:status]"/>
+                <g:render template="/namelist/statusTemplate" model="[position:position, status:status, taxon:taxon]"/>
 			</div>
 		</g:else>
 	</g:else>

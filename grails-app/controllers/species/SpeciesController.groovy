@@ -82,33 +82,25 @@ class SpeciesController extends AbstractObjectController {
             model['summaryHtml'] = g.render(template:"/observation/summaryTemplate", model:model);
         }
         model = utilsService.getSuccessModel('', null, OK.value(), model);
+
+        boolean hack = false;
         withFormat {
             html{
                 if(params.loadMore?.toBoolean()){
                     render(template:"/species/showSpeciesListTemplate", model:model.model);
                     return;
-                    } else if(!params.isGalleryUpdate?.toBoolean()){
-                        render (view:"list", model:model.model);
-                        return;
-                        } else{
-                            /* 
-                            if(params.webaddress)
-                            model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
-                            def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
-                            model.resultType = "species"
-                            def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-                            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-
-                            render (result as JSON)
-                             */   
-                            
-                            return;
-                        }
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    render (view:"list", model:model.model);
+                    return;
+                } else{
+                    hack = true;
+                    return;
+                }
             }
             json { render model as JSON; }
             xml { render model as XML }
         }
+        if(hack) render model.model as JSON
 	}
 
 	def listXML() {
@@ -454,7 +446,6 @@ class SpeciesController extends AbstractObjectController {
 						}
 					} else if(category.key.equals(config.documents)) {
                         show = DocSciName.speciesHasDocuments(speciesInstance);
-                        println "======SHOW ===== " + show
                     } else if(category.key.equals(config.ss_v_r)) {
                         if(speciesInstance.taxonConcept.rank == TaxonomyRank.SPECIES.ordinal()) {
                             show = speciesInstance.fetchInfraSpecies().size()>0;

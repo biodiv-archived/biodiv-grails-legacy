@@ -132,7 +132,6 @@ grails.project.dependency.resolution = {
         runtime ('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
-
     }
 
     plugins { 
@@ -194,6 +193,7 @@ grails.project.dependency.resolution = {
         compile ":taggable:1.0.1"
         //runtime ":yui-minify-resources:0.1.5"
         runtime ":zipped-resources:1.0"
+        compile ":grails-ant:0.1.3"
     } 
 
     grails.war.resources = { stagingDir ->

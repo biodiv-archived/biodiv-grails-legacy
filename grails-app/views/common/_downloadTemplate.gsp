@@ -7,27 +7,28 @@
 		</a>
 
 		<div class="download-options popup-form" style="display: none; ${(downloadFrom=='uniqueSpecies')?'left:-399px;font-weight:normal':''} ">
-			<form class="download-form">
-				<div><span class="label label-info" style="padding:5px;margin-bottom: 10px;"><g:message code="msg.link.available" /></span></div>
+			<form class="download-form form-horizontal">
+				<div><div class="alert alert-info"><g:message code="msg.link.available" /></div></div>
 				<g:each in="${downloadTypes}" var="downloadType" status="i">
+                    <label>
 					<g:if test="${i > 0}">
-						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}">
+                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" >
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
-						<br />
 					</g:if>
 					<g:else>
-						<input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED>
+                    <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED >
 						${g.message(code:'download.export')} ${downloadType.value()}</input>
-						<br />
-					</g:else>
+                        </g:else>
+                    </label>
 				</g:each>
                 <br />
-				<input type="hidden" name="downloadFrom" value="${downloadFrom}">
-				<input type="hidden" name="source" value="${source}">
-				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}">
-				<textarea class="comment-textbox" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
+				<input type="hidden" name="downloadFrom" value="${downloadFrom}"/>
+				<input type="hidden" name="source" value="${source}"/>
+				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}"/>
+				<input id="instanceTotal" type="hidden" name="instanceTotal" value="${instanceTotal}"/>
+				<textarea class="comment-textbox noComment" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
 <%--				<input style="width:385px" type="text" name="notes"></input><br />--%>
-				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}"></input>
+				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}" ></input>
 				<div class = "download-close popup-form-close" value="${g.message(code:'button.close')}">
 					<i class="icon-remove"></i>
 				</div>

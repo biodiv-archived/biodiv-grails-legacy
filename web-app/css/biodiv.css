@@ -1116,10 +1116,19 @@ input,button,select,textarea {
 	font-weight: bold;
 }
 
-tr.taxon-highlight {
+#taxonHierarchy {
+    overflow:auto;
+    max-height:300px;
+}
+
+.jstree-default .jstree-search.search-highlight {
+    background-color:#88EAFB !important
+}
+
+.taxon-highlight {
 	font-weight: bold;
     border: 1px solid #fad42e;
-      background: #fbec88;
+      background: #fbec88 !important;
         color: #363636;
 }
 
@@ -2951,6 +2960,11 @@ small {
 .status {
     top: -5px;
     position: relative;
+    color:#000;
+}
+
+.status_a {
+    text-decoration:underline;
 }
 
 #taxonHierarchy td {
@@ -2968,24 +2982,23 @@ small {
 }
 
 .RAW {
-    background-color:red;
+    color:red !important;
 }
 .WORKING {
 }
-.dirty_list{
-    background-color:lightgrey; //#C0504D;
-    color:#000;
-}
-.working_list{
-    background-color:khaki; //#FF9900;
-    color:#000;
-}
-.clean_list{
-    background-color:mediumaquamarine; //#009933;
-    color:#000;
-}
+
 .breadcrumb {
     margin-bottom: 20px;
     top: -10px;
     position: relative;
 }
+
+.input-append.input-block-level {
+      display: table; 
+  }
+  .input-append.input-block-level .add-on {
+        display: table-cell;
+    }
+    .input-append.input-block-level > input {
+          width: 100%;
+      }

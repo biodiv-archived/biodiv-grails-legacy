@@ -7,6 +7,7 @@ import species.groups.SpeciesGroup;
 import species.utils.Utils;
 import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.COLNameStatus;
+import species.participation.NamelistService
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -374,5 +375,51 @@ class TaxonomyDefinition extends ScientificName {
 		
 		namelistService.processDataForMigration(this, acceptedMatch, colData.size(), true)
 		return true
+	}
+	
+	def addSynonymFromCol(List synList){
+		if(!synList || (status != NameStatus.ACCEPTED))
+			return
+			
+		synList.each {syn ->
+			def s = SynonymsMerged.findByMatchId(syn.id)
+			if(s){
+				addSynonym(s)
+			}else{
+				NamesParser nameParser = new NamesParser()
+				def parsedNames =  nameParser.parse([syn.name]);
+				if(!parsedNames[0]?.canonicalForm) {
+					log.error "Not able to parse " + syn.name
+				}else{
+					SynonymsMerged synToAdd
+					def name = parsedNames[0]
+					def tds = NamelistService.searchIBP(parsedNames[0].canonicalForm, syn.authorString,  NamesMetadata.NameStatus.SYNONYM, syn.parsedRank, false, parsedNames[0].normalizedForm, true)
+					if(!tds.isEmpty()){
+						log.debug "Name is synonym in new system so reusing " + tds
+						synToAdd = tds[0]
+					}else{
+						synToAdd = new SynonymsMerged()
+						synToAdd.normalizedForm = parsedNames[0].normalizedForm;
+						synToAdd.italicisedForm = parsedNames[0].italicisedForm;
+						synToAdd.binomialForm = parsedNames[0].binomialForm;
+						synToAdd.canonicalForm = parsedNames[0].canonicalForm
+						synToAdd.status = NamesMetadata.NameStatus.SYNONYM
+					}
+					
+					synToAdd.name = syn.name
+					synToAdd.matchId = syn.id
+					synToAdd.position = NamesMetadata.NamePosition.WORKING
+					synToAdd.rank = syn.parsedRank
+					synToAdd.authorYear = syn.authorString
+					
+					if(!synToAdd.save(flush:true)){
+						synToAdd.errors.allErrors.each { println  it }
+					}
+					addSynonym(synToAdd)
+				}
+			}
+			
+		}	
+		
 	}
 }

@@ -1,43 +1,52 @@
-function showRecos(data, textStatus) {
+function showRecos(data, textStatus,observationId) {
     if(!data) return;
+    var recoSummaryWrap,seeMoreMessage;
+    if(typeof observationId === 'undefined'){
+        recoSummaryWrap = $('#recoSummary');
+        seeMoreMessage = $("#seeMoreMessage");
+    }else{
+        recoSummaryWrap = $('.recoSummary_'+observationId);
+        seeMoreMessage = $("#seeMoreMessage_"+observationId);
+    }
     if(textStatus && textStatus == 'append')
-        $('#recoSummary').append(data.model.recoHtml);
+        recoSummaryWrap.append(data.model.recoHtml);
     else
-        $('#recoSummary').html(data.model.recoHtml);
+        recoSummaryWrap.html(data.model.recoHtml);
     var speciesName =  data.model.speciesName;
-    $('.species_title').replaceWith(data.model.speciesNameTemplate);
-    $('.page-header .species-page-link').hide();
-    $('.species-external-link').replaceWith(data.model.speciesExternalLinkHtml);
+   // $('.species_title').replaceWith(data.model.speciesNameTemplate);
+    //$('.page-header .species-page-link').hide();
+    //$('.species-external-link').replaceWith(data.model.speciesExternalLinkHtml);
     if($('#carousel_a').length > 0) {
         reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
     }
-    showUpdateStatus(data.msg, data.success?'success':'error');
+    showUpdateStatus(data.msg, data.success?'success':'error',seeMoreMessage);
 }
 
 function lockObv(url, lockType, recoId, obvId, ele) {
     if($(ele).hasClass('disabled')) {
         alert(window.i8ln.observation.show.lock);
         event.preventDefault();
-        return false; 		 		
+        return false;               
     }
     $.ajax({
         url:url,
         dataType: "json",
         data:{"lockType" : lockType, "recoId" : recoId},
         success: function(data){
-            if(lockType == "Lock"){
+            seeMoreMessage = $("#seeMoreMessage_"+obvId);            
+            if(lockType == "Validate"){
                 //$("#addRecommendation").hide();
-                $('.nameContainer input').attr('disabled', 'disabled');
-                $('.iAgree button').addClass('disabled');
-                $(".lockObvId").hide();
-                showUpdateStatus(data.msg, 'success');
+                $('.nameContainer_'+obvId+' input').attr('disabled', 'disabled');
+                $('.iAgree_'+obvId+' button').addClass('disabled');
+                $(".lockObvId_"+obvId).hide();
+                showUpdateStatus(data.msg, 'success',seeMoreMessage);
             }
             else{
                 //$("#addRecommendation").show();
-                $('.nameContainer input').removeAttr('disabled');
-                $('.iAgree button').removeClass('disabled');
-                $(".lockObvId").hide();
-                showUpdateStatus(data.msg, 'success');
+                $('.nameContainer_'+obvId+' input').removeAttr('disabled');
+                $('.iAgree_'+obvId+' button').removeClass('disabled');
+                $(".lockObvId_"+obvId).hide();
+                showUpdateStatus(data.msg, 'success',seeMoreMessage);
             }
             updateFeeds();
         }
@@ -62,7 +71,7 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
     statusCode: {
         401: function() {
             show_login_dialog();
-        }	    				    			
+        }                                       
     },
     error: function(xhr, status, error) {
         // $(".deleteCommentIcon").tooltip('hide');
@@ -75,7 +84,7 @@ function removeRecoComment(recoVoteId, commentDivId, url, commentComp){
 function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url, obj){
     if($(obj).hasClass('disabled')) {
         event.preventDefault();
-        return false; 		 		
+        return false;               
     }
     $.ajax({
         url: url,
@@ -108,7 +117,7 @@ function addAgreeRecoVote(obvId, recoId, currentVotes, liComponent, url, obj){
 function removeRecoVote(obvId, recoId, url, obj){
     if($(obj).hasClass('disabled')) {
         event.preventDefault();
-        return false; 		 		
+        return false;               
     }
     $.ajax({
         url: url,
@@ -135,28 +144,43 @@ function removeRecoVote(obvId, recoId, url, obj){
 
 }
 
-function preLoadRecos(max, offset, seeAllClicked) {
-    $("#seeMoreMessage").hide();
-    $("#seeMore").hide();
-
+function preLoadRecos(max, offset, seeAllClicked,observationId) {
+   var getRecommendationVotesURL,seeMoreMessage,seeMore;
+   if(typeof observationId === 'undefined'){
+       getRecommendationVotesURL = window.params.observation.getRecommendationVotesURL;
+       seeMoreMessage = $("#seeMoreMessage");
+       seeMore = $("#seeMore");
+   }else{
+        getRecommendationVotesURL = window.params.observation.getRecommendationVotesURL+'/'+observationId;
+        seeMoreMessage = $("#seeMoreMessage_"+observationId);
+        seeMore = $("#seeMore_"+observationId);
+   }
+    
+    if(seeMoreMessage.hasClass('isLocked') && observationId != 'undefined'){
+        showUpdateStatus('This species ID has been validated by a species curator and is locked!', 'success',seeMoreMessage);
+    }else{
+        seeMoreMessage.hide();
+    }
+    seeMore.hide();    
     $.ajax({
-        url: window.params.observation.getRecommendationVotesURL,
+        /*url: window.params.observation.getRecommendationVotesURL,*/
+        url:getRecommendationVotesURL,
         method: "POST",
         dataType: "json",
-        data: {max:max , offset:offset},	
+        data: {max:max , offset:offset},    
         success: function(data) {
             if(data.status == 'success' || data.success == true) {
                 if(offset>0) {
-                    showRecos(data, 'append');
+                    showRecos(data, 'append',observationId);
                 } else {
-                    showRecos(data, null);
+                    showRecos(data, null,observationId);
                 }
                 //$("#recoSummary").html(data.recoHtml);
                 var uniqueVotes = parseInt(data.model.uniqueVotes);
                 if(uniqueVotes > offset+max){
-                    $("#seeMore").show();
+                    seeMore.show();
                 } else {
-                    $("#seeMore").hide();
+                    seeMore.hide();
                 }
                 showUpdateStatus(data.msg, data.success?'success':'error');
             } else {
@@ -172,50 +196,49 @@ function preLoadRecos(max, offset, seeAllClicked) {
 }
 
 function customFieldInlineEdit(comp, url, cfId, obvId){
-	var finalComp = $(comp).parent().prev().children(".cfInlineEdit");
-	var valComp = $(comp).parent().prev().children(".cfStaticVal");
-	if($(comp).text() == 'Edit'){
-		valComp.hide();
-		finalComp.show();
-		$(comp).text('Submit');
-	}else{
-		if(!cfValidation(finalComp)){
-			return false;
-		}
-		var inputComp = $(finalComp).find("input");
-		if(inputComp.attr("name") == undefined){
-			inputComp = $(finalComp).find("select");
-		}
-		if(inputComp.attr("name") == undefined){
-			inputComp = $(finalComp).find("textarea");
-		}
-		var value = inputComp.val();
-		var data = new Object();
-		data['fieldValue'] = value;
-		data['cfId'] = cfId;
-		data['obvId'] = obvId;
-		
-		$.ajax({
-			url: url,
-			data:data,
-			success: function(data){
-				console.log(data);
-				valComp.text(data.model.fieldName);
-				finalComp.hide();
-				valComp.show();
-				$(comp).text('Edit');
-				 updateFeeds();
-				return true;
-			},
-			error:function (xhr, ajaxOptions, thrownError){
-				//successHandler is used when ajax login succedes
-				var successHandler = this.success, errorHandler = undefined;
-				handleError(xhr, ajaxOptions, thrownError, successHandler, function(){
-				});
-			}
-		});
-	}	
-	return false;
+    var finalComp = $(comp).parent().prev().children(".cfInlineEdit");
+    var valComp = $(comp).parent().prev().children(".cfStaticVal");
+    if($(comp).text() == 'Edit'){
+        valComp.hide();
+        finalComp.show();
+        $(comp).text('Submit');
+    }else{
+        if(!cfValidation(finalComp)){
+            return false;
+        }
+        var inputComp = $(finalComp).find("input");
+        if(inputComp.attr("name") == undefined){
+            inputComp = $(finalComp).find("select");
+        }
+        if(inputComp.attr("name") == undefined){
+            inputComp = $(finalComp).find("textarea");
+        }
+        var value = inputComp.val();
+        var data = new Object();
+        data['fieldValue'] = value;
+        data['cfId'] = cfId;
+        data['obvId'] = obvId;
+        
+        $.ajax({
+            url: url,
+            data:data,
+            success: function(data){
+                valComp.text(data.model.fieldName);
+                finalComp.hide();
+                valComp.show();
+                $(comp).text('Edit');
+                 updateFeeds();
+                return true;
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                //successHandler is used when ajax login succedes
+                var successHandler = this.success, errorHandler = undefined;
+                handleError(xhr, ajaxOptions, thrownError, successHandler, function(){
+                });
+            }
+        });
+    }   
+    return false;
 }
 
 function showObservationMapView(obvId, observedOn, mapLocationPicker) {
@@ -304,7 +327,7 @@ function drawVisualization(rows) {
     
     //setting month name explicitly
     for (var i=0;i<12;i++){
-    	grouped_dt.setValue(i, 2, months[grouped_dt.getValue(i, 0)]);
+        grouped_dt.setValue(i, 2, months[grouped_dt.getValue(i, 0)]);
     }
     
     grouped_dt.sort([{column:0}]);

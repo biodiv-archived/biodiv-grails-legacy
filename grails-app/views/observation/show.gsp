@@ -41,7 +41,7 @@ if(r) {
 
 .textbox input{
     text-align: left;
-    width: 290px;
+    width: 380px;
     padding:5px;
 }
 
@@ -52,17 +52,17 @@ if(r) {
     margin-top: 3px;
 }
 .nameContainer.textbox #commonName {
-    width: 200px;
+    width: 282px;
 }
 .nameContainer .combobox-container {
-    left:198px;
+    left: 282px;
 }
  
 .observation_story .observation_footer {
     margin-top:50px;
 }
 .commonName {
-    width:200px !important;
+    width:282px !important;
 }
 </style>
 </head>
@@ -193,13 +193,13 @@ if(r) {
                         
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
                         <div>
-                            <ul id="recoSummary" class="pollBars">
+                            <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
 
                             </ul>
-                            <div id="seeMoreMessage" class="message"></div>
-                            <div id="seeMore" class="btn btn-mini"><g:message code="button.show.all" /></div>
+                            <div id="seeMoreMessage_${observationInstance.id}" class="message"></div>
+                            <div id="seeMore_${observationInstance.id}" class="btn btn-mini"><g:message code="button.show.all" /></div>
                         </div>
-                        <div class="input-append" style="width:100%;">
+                        <div style="width:100%;">
                             <g:hasErrors bean="${recommendationInstance}">
                                 <div class="errors">
                                     <g:renderErrors bean="${recommendationInstance}" as="list" />
@@ -220,7 +220,8 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;right: 4px;" />
+                                            <div style="clear:both"></div>
                                 </div>
                                 
                             </form>
@@ -285,7 +286,7 @@ if(r) {
                             </div>
 <script type="text/javascript">
 $(document).ready(function(){
-    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes',userGroupWebaddress:params.webaddress) }";
 });
 </script>
 
@@ -293,13 +294,13 @@ $(document).ready(function(){
     <r:script>
     
    
-    
+    var observationId = ${observationInstance.id};
     $(document).ready(function(){
 <%--        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");--%>
 <%--        dcorateCommentBody($('.yj-message-body')); --%>
 
         $("#seeMoreMessage").hide();
-            $(".readmore").readmore({
+        $(".readmore").readmore({
             substr_len : 400,
             more_link : '<a class="more readmore">&nbsp;More</a>'
         });
@@ -383,7 +384,7 @@ $(document).ready(function(){
             window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
          });
          
-               
+             
         $('#addRecommendation').bind('submit', function(event) {
             $(this).ajaxSubmit({ 
                 url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
@@ -397,8 +398,8 @@ $(document).ready(function(){
                     if(data.status == 'success' || data.success == true) {
                         if(data.canMakeSpeciesCall === 'false'){
                             $('#selectedGroupList').modal('show');
-                        } else{
-                            preLoadRecos(3, 0, false);
+                        } else{                             
+                            preLoadRecos(3, 0, false,observationId);
                             updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
                             updateFeeds();
                             setFollowButton();
@@ -425,14 +426,14 @@ $(document).ready(function(){
         })
 
         $("#seeMore").click(function(){
-            preLoadRecos(-1, 3, true);
+            preLoadRecos(-1, 3, true,observationId);
         });
 
-        preLoadRecos(3, 0, false);
+        preLoadRecos(3, 0, false,observationId);
         //loadObjectInGroups();
         var obvLock = ${obvLock};
         if(obvLock){
-            showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
+            showUpdateStatus('This species ID has been validated by a species curator and is locked!', 'success');
             $('.nameContainer input').attr("disabled", "disabled");
             $('.iAgree button').addClass("disabled");
         }
@@ -443,124 +444,7 @@ $(document).ready(function(){
         initializeLanguage(); 
          $(".CustomField_multiselectcombo").multiselect();
 
-         // For Open Tag
-
-        $('.add_obv_tags').click(function(){
-            $('.view_obv_tags, .add_obv_tags').hide();
-            $('.add_obv_tags_wrapper').show();
-        });
-
-        $('.cancel_open_tags').click(function(){
-            $('.view_obv_tags, .add_obv_tags').show();
-            $('.add_obv_tags_wrapper').hide();
-        });
-
-         $('#addOpenTags').bind('submit', function(event) {
-
-                 $(this).ajaxSubmit({ 
-                    url: "${uGroup.createLink(controller:'observation', action:'updateOraddTags')}",
-                    dataType: 'json', 
-                    type: 'GET',                
-                    success: function(data, statusText, xhr, form) {
-                        console.log("data "+data +" statusText = "+statusText+" xhr = "+xhr+" form = "+form);
-                        console.log(data);
-                        var tagsData = data;
-                        if(tagsData.success){
-                            var outHtml = '';
-                            console.log(tagsData.hasOwnProperty("model"));
-                            //console.log(Object.keys(data.model).length);
-                            if(tagsData.hasOwnProperty("model")){
-                                if(Object.keys(data.model).length > 0){
-                                    $.each(data.model, function( index, value ) {
-                                        outHtml+= '<li class="tagit-choice" style="padding:0 5px;">';
-                                        outHtml+= index;
-                                        outHtml+= '&nbsp;<span class="tag_stats">'+value +'</span>';
-                                        outHtml+= '</li>';
-                                    });
-                                    $('.tagitAppend').html(outHtml);                        
-                                    $('.view_obv_tags, .add_obv_tags').show();
-                                    $('.add_obv_tags_wrapper').hide();                                    
-                                }
-                            }else{
-                                $('.tagitAppend').empty();
-                                $('.view_obv_tags, .add_obv_tags_wrapper').hide();
-                                $('.add_obv_tags').show();
-                            }
-                            updateFeeds();
-                        }
-                        return false;
-                    },
-                    error:function (xhr, ajaxOptions, thrownError){
-                        //successHandler is used when ajax login succedes
-                        var successHandler = this.success, errorHandler = showUpdateStatus;
-                        handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-                    } 
-
-                 });    
-               
-            event.preventDefault(); 
-        });
-        $(".obvCreateTags").tagit({
-            select:true, 
-            allowSpaces:true, 
-            placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
-            fieldName: 'tags', 
-            autocomplete:{
-                source: '/observation/tags'
-            }, 
-            triggerKeys:['enter', 'comma', 'tab'], 
-            maxLength:30
-        });
-
-        /* Added for  Species Update*/
-        var group_icon = $('.group_icon_show');
-        var group_icon_show_wrap = $('.group_icon_show_wrap');
-        //var habitat_icon = $('.habitat_icon_show');
-        var label_group = $('label.group');
-        var propagateGrpHab = $('.propagateGrpHab');
-        $('.propagateGrpHab .control-group  label').hide();
-
-        $('.edit_group_btn').click(function(){            
-            group_icon_show_wrap.hide();
-            //habitat_icon.hide();
-            label_group.hide();
-            propagateGrpHab.show();
-
-        });        
-   
-
-    $('#updateSpeciesGrp').bind('submit', function(event) {
-
-         $(this).ajaxSubmit({ 
-                    url: "${uGroup.createLink(controller:'observation', action:'updateSpeciesGrp')}",
-                    dataType: 'json', 
-                    type: 'GET',  
-                    beforeSubmit: function(formData, jqForm, options) {
-                        /*console.log(formData);
-                        if(formData.group_id == formData.prev_group){
-                            alert("Nothing Changes!");
-                            return false;
-                        }*/
-                    },               
-                    success: function(data, statusText, xhr, form) {
-                            console.log(data);
-                            group_icon.removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);                           
-                            group_icon_show_wrap.show();
-                            //habitat_icon.show();
-                            propagateGrpHab.hide();
-                            updateFeeds();
-                    },
-                    error:function (xhr, ajaxOptions, thrownError){
-                        //successHandler is used when ajax login succedes
-                        var successHandler = this.success, errorHandler = showUpdateStatus;
-                        handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-                    } 
-
-                 });    
-               
-            event.preventDefault(); 
-        });
-
+       
 
 
     });

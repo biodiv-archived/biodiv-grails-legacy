@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import static org.springframework.http.HttpStatus.*;
-
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 /**
  * This filter starts the token validation flow. It extracts the token from the configured header name, and pass it to
@@ -116,7 +116,7 @@ class RestTokenValidationFilter extends GenericFilterBean {
             println authentication
             println isAllowed
             println "******************************************************************"
-            if (authentication && authentication instanceof GrailsAnonymousAuthenticationToken && isAllowed) {
+            if (authentication && authentication instanceof AbstractAuthenticationToken && isAllowed) {
                 log.debug "Request is already authenticated as anonymous request. Continuing the filter chain"
                 chain.doFilter(request, response)
             } else {

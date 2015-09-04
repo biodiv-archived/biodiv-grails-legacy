@@ -16,7 +16,8 @@ class DownloadLog {
 		KML("KML"),
 		PDF("PDF"),
 		ZIP("ZIP"),
-		TAR("TAR")
+		TAR("TAR"),
+		DWCA("DWCA")
 		private String value;
 
 		DownloadType(String value) {
@@ -39,7 +40,8 @@ class DownloadLog {
 	String notes;
 	String status;
 	String paramsMapAsText
-	String sourceType
+	String sourceType;
+    int offsetParam;
 	
 	static belongsTo = [author:SUser];
 	
@@ -48,27 +50,26 @@ class DownloadLog {
 		paramsMapAsText nullable:true, blank: true
 		filePath nullable:true
     }
+
 	static mapping = {
 		version : false;
 		notes type:'text';
 		paramsMapAsText type:'text';
     }
 	
-	static createLog(SUser author, String filterUrl, String downloadTypeString, String notes, String sourceType, params){
-		return createLog(author, null, filterUrl, downloadTypeString, notes, sourceType, new Date(),  ObvUtilService.SCHEDULED, params)
+	static createLog(SUser author, String filterUrl, String downloadTypeString, String notes, String sourceType, params, int offsetParam=0){
+		return createLog(author, null, filterUrl, downloadTypeString, notes, sourceType, new Date(),  ObvUtilService.SCHEDULED, params, offsetParam)
 	}
 	
-	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes,  String sourceType, Date createdOn, String status, params){
+	static createLog(SUser author, String filePath, String filterUrl, String downloadTypeString, String notes,  String sourceType, Date createdOn, String status, params, int offsetParam=0){
 		def paramsMapAsText = getTextFromMap(params)
 		log.debug "params in download log "+ paramsMapAsText
-		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status, sourceType:sourceType, paramsMapAsText:paramsMapAsText)
+		DownloadLog dl = new DownloadLog (author:author, filePath:filePath, filterUrl:filterUrl, type:getType(downloadTypeString), notes:notes, createdOn:createdOn, status:status, sourceType:sourceType, paramsMapAsText:paramsMapAsText, offsetParam:offsetParam?:0)
 		if(!dl.save(flush:true)){
 			dl.errors.allErrors.each { println it }
-			return null
-		}else{
-			return dl
-		}
-	}
+	 	}
+		return dl
+	 }
 	
 	static DownloadType getType(String dType){
 		if(!dType) return null;

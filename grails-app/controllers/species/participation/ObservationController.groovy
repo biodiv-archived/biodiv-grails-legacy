@@ -41,6 +41,9 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.ScientificName.TaxonomyRank;
 import species.participation.ActivityFeedService;
 import static org.springframework.http.HttpStatus.*;
+import species.sourcehandler.exporter.DwCObservationExporter; 
+import species.sourcehandler.exporter.DwCSpeciesExporter; 
+import java.math.BigDecimal
 
 
 class ObservationController extends AbstractObjectController {
@@ -1584,10 +1587,8 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def requestExport() {
-		obvUtilService.requestExport(params)
-		def r = [:]
-		r['msg']= "${message(code: 'observation.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
-		render r as JSON
+        def r = obvUtilService.requestExport(params)
+        render r as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1697,7 +1698,7 @@ class ObservationController extends AbstractObjectController {
         def currentUser = springSecurityService.currentUser;
         def mailType = '';
         def activityFeed;
-        if(params.lockType == "Lock"){
+        if(params.lockType == "Validate"){
             //current user & reco
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
             def newRecVo;
@@ -1850,5 +1851,6 @@ def filterChain() {
         render model as JSON
         return;
     }
+
 
 }

@@ -41,7 +41,7 @@ function getNamesFromTaxon(ele , parentId) {
     $(ele).parents("tr").addClass("clickedEle");
     $("#taxonHierarchy tr").css('background', 'white');
     $(ele).parents("tr").css('background', '#3399FF');
-    var taxonId = $(ele).parent("span").find(".taxDefIdVal").val();
+    //var taxonId = $("input#taxon").val();//$(ele).parent("span").find(".taxDefIdVal").val();
     var classificationId = $('#taxaHierarchy option:selected').val();
     var url = window.params.curation.getNamesFromTaxonUrl;
     $.ajax({
@@ -425,7 +425,8 @@ function validateSpeciesSuccessHandler(data, search){
 			$("#externalDbResults h6").html(name);
 			fillPopupTable(tList, $("#externalDbResults"), "IBPData", true, "onlinSpeciesCreation");
 		} else {
-			alert("Sorry no results found from IBP Database. Fill in details manually");
+			$("#dialogMsg").modal('show');
+			$(".dialogMsgText").html("Sorry no results found from IBP Database. Fill in details manually");
 		}
 
 		if ($("#externalDbResults").hasClass('IBPResult')) {

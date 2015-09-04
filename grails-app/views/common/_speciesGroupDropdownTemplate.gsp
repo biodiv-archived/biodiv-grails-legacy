@@ -3,10 +3,12 @@
 <%@page import="species.groups.SpeciesGroup"%>
 <%@page import="species.Habitat"%>
 <div class ="control-group ${hasErrors(bean: observationInstance, field: 'group', 'error')}" style="clear:both;">
+   <g:if
+    test="${action != 'show'}">
     <label for="group"><g:message
         code="observation.group.label" default="${g.message(code:'default.group.label')}" />
     </label> 
-
+    </g:if>
     <div class="help-inline control-label">
         <g:hasErrors bean="${observationInstance}" field="group">
         <g:message code="observation.group.not_selected" />
@@ -62,15 +64,16 @@
     <input class="group" type="hidden" name="group_id"></input>
 </div>
 
-<r:script>
 
+<g:if test="${action != 'show'}">
+<r:script>
 $(document).ready(function(){
-    $(".selected_group").unbind('click').click(function(){
+    $(".selected_group").off('click').on('click',function(){
         $(this).closest(".groups_super_div").find(".group_options").toggle();
         //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
     });
 
-    $(".group_option").unbind('click').click(function(){
+    $(".group_option").off('click').on('click',function(){
         var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
            if(is_save_btn_exists.length == 1){
                 is_save_btn_exists.show();
@@ -89,4 +92,5 @@ $(document).ready(function(){
 });
 
 </r:script>
+</g:if>
 </div>

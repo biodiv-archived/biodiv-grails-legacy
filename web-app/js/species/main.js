@@ -146,9 +146,9 @@ jQuery(document).ready(function($) {
     // IE caching the request in ajax so setting it false globally for all browser
     $.ajaxSetup({cache:false});
     $(document).bind("ajaxStart", function(){
-        $(this).addClass('busy');
+        $('body').addClass('busy');
     }).bind("ajaxStop", function(){
-        $(this).removeClass('busy');
+        $('body').removeClass('busy');
     });
 
 

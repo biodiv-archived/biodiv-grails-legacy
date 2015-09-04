@@ -78,7 +78,7 @@
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:g.message(code:'button.share')]" />
 				
 				<obv:download
-					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML], 'onlyIcon': 'false', 'downloadFrom' : 'obvList']" />
+					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML, DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'obvList']" />
 
 			</div>
             <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
@@ -89,7 +89,7 @@
                 <uGroup:objectPostToGroupsWrapper 
                 model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName, 'userGroup':userGroup]" />
                 <div id="taxonBrowser">
-                    <div class="taxonomyBrowser sidebar_section" data-name="classification" data-speciesid="${speciesInstance?.id}" style="position:relative">
+                    <div class="taxonomyBrowser sidebar_section" style="position:relative">
                         <h5><g:message code="button.taxon.browser" /></h5>	
                         <div id="taxaHierarchy">
 

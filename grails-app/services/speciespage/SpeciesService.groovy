@@ -64,6 +64,8 @@ import species.NamesMetadata.NameStatus;
 import content.eml.DocSciName;
 import content.eml.Document;
 import species.AcceptedSynonym;
+import species.sourcehandler.exporter.DwCSpeciesExporter
+import java.io.File ;
 import species.participation.NamelistService
 
 class SpeciesService extends AbstractObjectService  {
@@ -1386,7 +1388,7 @@ class SpeciesService extends AbstractObjectService  {
 			td = namelistService.processDataForMigration(td, namelistService.searchCOL(colId, 'id')[0], 1, true)
 			println "------------ name created from col data ---------  " +  td
 		}else{
-			td = converter.getTaxonConceptFromName(speciesName, rank, colId);
+			td = converter.getTaxonConceptFromName(speciesName, rank);
 		}
 		speciesInstance.taxonConcept = td
 		if(speciesInstance.taxonConcept) {
@@ -1514,18 +1516,30 @@ class SpeciesService extends AbstractObjectService  {
     /////////////////////////////// Export ////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
-    def requestExport(params){
+    /*def requestExport(params){
         log.debug(params)
         log.debug "creating species download request"
         DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
-    }
+    }*/
 
     def export(params, dl){
-        log.debug(params)
-        String action = new URL(dl.filterUrl).getPath().split("/")[2]
+/*        String action = new URL(dl.filterUrl).getPath().split("/")[2]
         def speciesInstanceList = getSpeciesList(params, action).speciesInstanceList
         log.debug " Species total $speciesInstanceList.size "
-        return exportSpeciesData(speciesInstanceList, null)
+        List<String> list_final=[] ;
+
+
+        speciesInstanceList.each {
+            println it 
+            def it_next= it as JSON ; 
+            def it_final=JSON.parse(""+it_next)
+            list_final.add(it_final)
+
+        }
+*/
+          return DwCSpeciesExporter.getInstance().exportSpecieData( null, dl)
+        //return exportSpeciesData(speciesInstanceList, null, dl)
+
     }
 
     def getSpeciesList(params, String action){
@@ -1539,15 +1553,27 @@ class SpeciesService extends AbstractObjectService  {
     /**
      * export species data
      */
-    def exportSpeciesData(String directory) {
+/*    private def exportSpeciesData(String directory) {
         return DwCAExporter.getInstance().exportSpeciesData(directory)
     } 
-
+*/
     /**
      * export species data
      */
-    def exportSpeciesData(List<Species> species, String directory) {
-        return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+    private def exportSpeciesData(List<Species> species, String directory, DownloadLog dl) {
+		if(!species || species.isEmpty())
+			return null
+		
+		File downloadDir = new File(directory?:grailsApplication.config.speciesPortal.species.speciesDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		}
+		log.debug "export type " + exportType 
+		if(exportType == DownloadLog.DownloadType.DWCA) {
+            return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+        } else {
+            log.warn "Not a valid export type"
+        }
     }
 
     /**
@@ -2215,7 +2241,7 @@ def checking(){
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = synonymId;
             return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
-        } 
+        }
 
         /*if(!oldSynonym.isContributor()) {
             return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]

@@ -109,7 +109,10 @@ $(document).ready(function() {
                         'createUrl':"${uGroup.createLink(controller:'taxon', action:'create', userGroupWebaddress:params.webaddress)}",
                         'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
                         'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
-                    }
+
+                    },
+                    'searchUrl':"${uGroup.createLink(controller:'taxon', action:'search', userGroupWebaddress:params.webaddress)}",
+                    'nodesUrl':"${uGroup.createLink(controller:'taxon', action:'nodes', userGroupWebaddress:params.webaddress)}"
                 },
                 'userGroup': {
                     'joinUsUrl' : "${uGroup.createLink(controller:'userGroup', action:'joinUs') }",

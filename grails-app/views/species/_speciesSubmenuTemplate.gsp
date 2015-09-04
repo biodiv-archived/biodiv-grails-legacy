@@ -18,9 +18,7 @@
 	        <a id="editSpecies" class="btn btn-primary pull-right" style="margin-right: 5px;"
 	            href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
 	            <i class="icon-edit"></i><g:message code="button.edit" /></a>
-	
 	   </g:if>
-       
        <sUser:isAdmin>
             <g:if test="${speciesInstance}">
             <a id="deleteSpecies" class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
@@ -46,7 +44,7 @@
     </g:each>
     </g:if>
 
-    <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass, position:speciesInstance.taxonConcept.position, status:status]"/>		
+    <s:showHeadingAndSubHeading model="['heading':entityName, 'subHeading':subHeading, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass, position:speciesInstance.taxonConcept.position, status:status, taxon:speciesInstance.taxonConcept]"/>		
         </g:if>
     </div>
 </g:if>
