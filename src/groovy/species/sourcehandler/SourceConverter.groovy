@@ -574,7 +574,7 @@ class SourceConverter {
 
 	def static myPrint(str){
 		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
-			println str
+			println '$$$$$$$$$$$$$--- ' +  str
 		}
 	}
 

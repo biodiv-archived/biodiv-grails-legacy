@@ -505,7 +505,7 @@ class NamelistService {
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
-
+		return sciName
     }
    
     public def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
@@ -1511,7 +1511,6 @@ def sql= session.createSQLQuery(query)
 				println "Got response: ${resp.statusLine}"
 				println "Content-Type: ${resp.headers.'Content-Type'}"
 				def xmlText =  reader.text
-				//println xmlText
 				def result = responseAsMap(xmlText, searchBy);
 				return result;
 			}

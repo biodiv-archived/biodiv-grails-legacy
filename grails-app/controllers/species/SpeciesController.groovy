@@ -126,17 +126,14 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-		flash.message = "Species page create is currently unavailable."
-		redirect(action: "list")
-		return
-//		def speciesInstance = new Species()
-//		speciesInstance.properties = params
-//		return [speciesInstance: speciesInstance]
+		def speciesInstance = new Species()
+		speciesInstance.properties = params
+		return [speciesInstance: speciesInstance]
 	}
 
     @Secured(['ROLE_USER'])
     def save() {
-        List errors = [];
+		List errors = [];
         Language languageInstance = utilsService.getCurrentLanguage(request);
         Map result = [userLanguage:languageInstance, errors:errors];
 
@@ -155,10 +152,8 @@ class SpeciesController extends AbstractObjectController {
             rank = params.int('rank');
             t.putAt(rank, speciesName);
 
-            //t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
-
             try {
-                result = speciesService.createSpecies(speciesName, rank, t, languageInstance);
+                result = speciesService.createSpecies(speciesName, rank, t, params.colId, languageInstance);
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
@@ -1264,43 +1259,105 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 */
+	
+	@Secured(['ROLE_USER'])
+	def editSpeciesPage(){
+		Long taxonId = params.taxonId ? params.taxonId.toLong() : TaxonomyDefinition.findByMatchId(params.colId)?.id
+		def result = [taxonRanks:getTaxonRankForUI(), 'success':true]
+		if(taxonId){
+			def taxon = TaxonomyDefinition.read(taxonId)
+			Species species = Species.findByTaxonConcept(taxon);
+			if(!species){
+				species = speciesUploadService.createSpeciesStub(taxon)
+			}
+			result.id = species?.id
+			render result as JSON
+			return
+		}
+		
+		//given name is in col not present in ibp system
+		def colRes, msg 
+		if(params.colId){
+			colRes = namelistService.searchCOL(params.colId, 'id');
+		}
+		
+		if(!colRes){
+			msg = "No result from COL"
+			result.msg = msg
+			render result as JSON
+			return
+		}
+		//got col result now populating things
+		colRes = colRes[0]
+		List taxonRegistry = []
+		result.authorYear = colRes.authorString
+		result.canonicalForm = colRes.canonicalForm
+		TaxonomyRank.list().each { TaxonomyRank r ->
+			String rStr = r.value().toLowerCase()
+			taxonRegistry.putAt(XMLConverter.getTaxonRank(rStr) , colRes.get(rStr))
+		}
+		result.requestParams = [taxonRegistry:taxonRegistry, speciesName:colRes.name, rank:XMLConverter.getTaxonRank(colRes.rank), colId: params.colId]
+		result.msg = "Data populated from COL"
+		result.rank = XMLConverter.getTaxonRank(colRes.rank)
+		render result as JSON
+	}
+	
+	private List getTaxonRankForUI(){
+		List taxonRanks = []
+		TaxonomyRank.list().each { t ->
+			boolean mandatory = true
+			if((t == TaxonomyRank.SUB_GENUS) || (t == TaxonomyRank.SUB_FAMILY)){
+				mandatory = false
+			}
+			taxonRanks << [value:t.ordinal(), text:g.message(error:t), mandatory:mandatory, taxonValue:'']
+		}
+		return taxonRanks
+	}
+	
     @Secured(['ROLE_USER'])
     def validate() {
-/*        List hierarchy = [];
-        if(params.taxonRegistry) {
-            hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
-        }
-*/
-		XMLConverter.myPrint("========== " + params)
 		def msg;
-        def result = [requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
+        def result = [taxonRanks:getTaxonRankForUI(), requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
         if(params.page && params.rank) {
             try {
                 int rank = params.rank?params.int('rank'):null;
 				def taxonRegistry
                 Map r = getTaxon(params.page, rank);
-				XMLConverter.myPrint("========== " + r)
 				
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
+					List taxonList = r.taxonList
                     if(!taxon) {
+						List tmp = []
 						if(r.genusTaxon){
 							def fieldsConfig = grailsApplication.config.speciesPortal.fields
 							def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
 							taxonRegistry = r.genusTaxon.parentTaxonRegistry(classification)?.get(classification);
 							if(taxonRegistry){
-								List tmp = []
 								taxonRegistry.each { td ->
 									tmp.putAt(td.rank, td.name)
 								}
-								taxonRegistry = tmp
 							}
-							println "================== " + taxonRegistry
-							
 						}
-                    	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
-                        result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry]]
-                    } else {
+						tmp.putAt(TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal(), r.infraSpeicesName)
+						tmp.putAt(TaxonomyRank.SPECIES.ordinal(), r.speciesName)
+						tmp.putAt(TaxonomyRank.GENUS.ordinal(), r.genusName)
+						taxonRegistry = tmp
+						
+						result = [taxonRanks:getTaxonRankForUI(), 'success':true, rank:rank, taxonList:taxonList, canonicalForm:r.canonicalForm, authorYear:r.authorYear, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry, page:params.page]]
+						
+						// no result in ibp so going ahead to create new name
+						if(!taxonList){
+							msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
+	                    }
+						//multiple result from ibp so showing popup to select one of the result
+						else{
+							msg = "Multiple results from IBP search"
+						}
+						result.msg = msg
+                    }
+					// one result in ibp system so redirecting to species page
+					else {
                         //CHK if a species page exists for this concept
                         Species species = Species.findByTaxonConcept(taxon);
                         taxonRegistry = taxon.parentTaxonRegistry();
@@ -1332,7 +1389,7 @@ class SpeciesController extends AbstractObjectController {
         	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], RCU.getLocale(request))
             result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
-		XMLConverter.myPrint("========== " + result)
+		XMLConverter.myPrint(" validate result " + result)
         render result as JSON
     }
     
@@ -1344,19 +1401,31 @@ class SpeciesController extends AbstractObjectController {
         List<TaxonomyDefinition> names = namesParser.parse([name]);
         TaxonomyDefinition page = names[0];
         if(page && page.canonicalForm) {
-			if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
+			if((rank == TaxonomyRank.SPECIES.ordinal() || rank == TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()) && !page.binomialForm) { //TODO:check its not uninomial
             	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
                 result = ['success':false, 'msg':msg]
             } else {
-				def taxon = speciesService.searchIBP(page, rank)
-                result = ['success':true, 'taxon':taxon];
+				def taxonList = speciesService.searchIBP(page, rank)
+				def taxon = (taxonList && taxonList.size() == 1)?taxonList[0]:null
+                result = ['success':true, 'taxon':taxon, 'taxonList':taxonList ];
 				
-				//checking if given species name have genus in ibp system
-				if(!taxon && page.binomialForm){
-					def genusTaxon = speciesService.searchIBP(page.binomialForm.tokenize(" ")[0], TaxonomyRank.GENUS.ordinal())
-					if(genusTaxon){
-						result.genusTaxon = genusTaxon
+				//no resutl in ibp search. checking if given species name have genus in ibp system
+				if(page.binomialForm){
+					def genusTaxonList = speciesService.searchIBP(page.binomialForm.tokenize(" ")[0], TaxonomyRank.GENUS.ordinal())
+					if(genusTaxonList){
+						result.genusTaxon = genusTaxonList[0]
 					}
+					def tokList = page.canonicalForm.tokenize(" ")
+					result.genusName = tokList[0]
+					if(tokList.size() == 2){
+						result.speciesName = page.canonicalForm
+					}else{
+						result.speciesName = result.genusName + " " + tokList[1]
+						result.infraSpeicesName = page.canonicalForm
+					}
+					
+					result.authorYear = page.authorYear
+					result.canonicalForm = page.canonicalForm
 				}     
             }
         } else {

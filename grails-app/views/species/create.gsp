@@ -5,19 +5,19 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="observations_create"/>
+        <r:require modules="observations_create, curation"/>
         <style>
-            #addSpecies .add-on {
+            #addSpeciesPage .add-on {
             height:20px;
             width:98px;
             }
-            #addSpecies select.add-on {
+            #addSpeciesPage select.add-on {
             height:30px;
             width:110px;
             }
 
 
-            #addSpecies .taxonRank {
+            #addSpeciesPage .taxonRank {
             min-height:20px;
             width:575px;   
             }
@@ -34,7 +34,7 @@
             <%--<g:renderErrors bean="${speciesInstance}" as="list" />--%>
             </g:hasErrors>
 
-            <form id="addSpecies" action="${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+            <form id="addSpeciesPage" action="${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
 
                 <div class="span12 super-section" style="clear:both;">
 
@@ -68,14 +68,20 @@
                             <input type="hidden" name="canName" id="canName" value=""/>
                             <div id="nameSuggestions" style="display: block;position:relative;"></div>
                             <input type="hidden" name="lang" value="${lang?:params.lang}"/>
+                            <input type="hidden" name="colId" value="${params.colId}"/>
 
                         </div>
-                            <div id="errorMsg" class="alert hide"></div>
+                        <div id="parserInfo" style="margin-top:10px; display:none;">
+                        	<label style="float:left;">Canonical Name :</label> <div  class="canonicalName"> </div>
+                        	<label style="clear:both; float:left;">Author Year:</label> <div class="authorYear"> </div>
+                        </div>
+                        <div id="errorMsg" class="alert hide" style="clear:both;"></div>
                         </div>
                     </div>  
                     <g:render template="/common/createTaxonRegistryTemplate" model='[requestParams:requestParams, errors:errors]'/>
                     </div>
-
+					<g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
+					 <g:render template="/namelist/dialogMsgTemplate" model="[]"/>
                 </div>   
                 <div class="span12 submitButtons">
 
@@ -91,7 +97,7 @@
                         style="float: right; margin-right: 5px;"> <g:message code="button.validate" /></a>
 
 
-                    <a id="addSpeciesSubmit" class="btn btn-primary"
+                    <a id="addSpeciesPageSubmit" class="btn btn-primary"
                         style="float: right; margin-right: 5px;display:none;"> <g:message code="default.add.page.label" /></a>
 
                 </div>
@@ -120,18 +126,8 @@
                 //$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
             }
         });
-
-        var taxonRanks = [];
-
-        <g:each in="${TaxonomyRank.list()}" var="t">
-        <g:if test="${t == TaxonomyRank.SUB_GENUS || t == TaxonomyRank.SUB_FAMILY}">
-        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}", mandatory:false, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
-        </g:if>
-        <g:else>
-        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}", mandatory:true, taxonValue:"${requestParams?requestParams.taxonRegistryNames[t.ordinal()]:''}"});
-        </g:else>
-        </g:each>
-
+        
+ 
         var text1 = $('#page').data('rank');
         $('#rank option').filter(function() {
             return $(this).val() == text1; 
@@ -149,15 +145,14 @@
                 $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonRanks[i].taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
             }
             if(rank > 0) $('#taxonHierarchyInputForm').show();
-            $('#addSpeciesSubmit').show();
         </g:if>
 
         if($(".taxonRank:not(#page)").length > 0)
             $(".taxonRank:not(#page)").autofillNames();
 
-        $('#validateSpeciesSubmit').click(function() {
-            var params = {};
-            $("#addSpecies input").each(function(index, ele) {
+        $('#validateSpeciesSubmit').click(function() {	
+        	var params = {};
+            $("#addSpeciesPage input").each(function(index, ele) {
                 if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
             });
             params['rank'] = $('#rank').find(":selected").val(); 
@@ -168,49 +163,7 @@
                 method:'POST',
                 dataType:'json',
                 success:function(data) {
-                    if(data.success == true) {
-                        if(data.id) {
-                            window.location.href = '/species/show/'+data.id+'?editMode=true'
-                            return;
-                            //data.msg += "Did you mean <a href='/species/show/"+data.id+"'>"+data.name+"</a>?"
-                        }
-                        $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
-                        //$('#validateSpeciesSubmit').hide()
-                        var $ul = $('<ul></ul>');
-                        $('#existingHierarchies').empty().append($ul);
-                        if(data.taxonRegistry) {
-                            $.each(data.taxonRegistry, function(index, value) {
-                                var $c = $('<li></li>');
-                                $ul.append($c);
-                                var $u = $('<ul><b>'+index+'</b></ul>');
-                                $c.append($u);
-                                $.each(value[0], function(i, v) {
-                                    $u.append('<li>'+v.rank+' : '+v.name+'</li>');
-                                });
-                            });
-                        }
-                        
-                        $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
-                        var $hier = $('#taxonHierachyInput');
-                        $hier.empty()
-                        var taxonRegistry = data.requestParams? data.requestParams.taxonRegistry:undefined;
-                        for (var i=0; i<data.rank; i++) {
-                            var taxonValue = (taxonRegistry && taxonRegistry[i]) ?taxonRegistry[i]:taxonRanks[i].taxonValue;
-                            $('<div class="input-prepend"><span class="add-on">'+taxonRanks[i].text+(taxonRanks[i].mandatory?'*':'')+'</span><input data-provide="typeahead" data-rank ="'+taxonRanks[i].value+'" type="text" class="taxonRank" name="taxonRegistry.'+taxonRanks[i].value+'" value="'+taxonValue+'" placeholder="Add '+taxonRanks[i].text+'" /></div>').appendTo($hier);
-                        }
-                        if(data.rank > 0) $('#taxonHierarchyInputForm').show();
-
-                        if($(".taxonRank:not(#page)").length > 0)
-                            $(".taxonRank:not(#page)").autofillNames();
-
-
-                        $('#addSpeciesSubmit').show();
-                    } else {
-                        if(data.status == 'requirePermission') 
-                            window.location.href = '/species/contribute'
-                        else 
-                            $('#errorMsg').removeClass('alert-info hide').addClass('alert-error').text(data.msg);
-                    }
+                	validateSpeciesSuccessHandler(data, true);
                 }, error: function(xhr, status, error) {
                     handleError(xhr, status, error, this.success, function() {
                         var msg = $.parseJSON(xhr.responseText);
@@ -222,8 +175,8 @@
             // get and autofill author contrib hierarchy
         });
 
-        $('#addSpeciesSubmit').click(function() {
-            $('#addSpecies').submit();
+        $('#addSpeciesPageSubmit').click(function() {
+        	$('#addSpeciesPage').submit();
         });
     });
     </r:script>

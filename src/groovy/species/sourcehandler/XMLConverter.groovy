@@ -1560,8 +1560,9 @@ class XMLConverter extends SourceConverter {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
         log.debug "Getting classification hierarchy : "+classification.name;
-        println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL + "other params " + otherParams
-		println "============OTHER PARAMS ========= " + otherParams
+        //println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL + "other params " + otherParams
+		//println "============OTHER PARAMS ========= " + otherParams
+		println "============ SNAME------------- " + scientificName
         //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1922,7 +1923,7 @@ class XMLConverter extends SourceConverter {
                                     taxonEntities.add(registry);
                             } else if(saveTaxonHierarchy) {
                                 log.debug "Saving taxon registry entity : "+ent;
-                                println "=====SAVING NEW TAXON REGISTRY================================== "
+                                println "????????????????????=====SAVING NEW TAXON REGISTRY================================== "
                                 if(!ent.save(flush:true)) {
                                     ent.errors.each { log.error it }
                                 } else {
@@ -2028,13 +2029,13 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank, boolean createNew = true) {
-        def cleanSciName = Utils.cleanSciName(sciName);
+		def cleanSciName = Utils.cleanSciName(sciName);
 
         if(cleanSciName) {
             List name = namesParser.parse([cleanSciName])
             if(name[0].normalizedForm) {
 				TaxonomyDefinition taxon
-				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, null, NameStatus.ACCEPTED, rank, false, name[0].normalizedForm)
+				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, name[0].authorYear, NameStatus.ACCEPTED, rank, false, name[0].normalizedForm)
 				if(taxonList.size() > 1){
 					log.error '############  ' + "IBP search returning mulitiple result: should not happen " + taxonList
 				}

@@ -279,8 +279,11 @@ class TaxonomyDefinition extends ScientificName {
 		
 	}
 	
-	public postProcess(){
-		curateNameByCol()
+	public boolean postProcess(){
+		boolean isSuccess = false
+		isSuccess = curateNameByCol()
+		if(!isSuccess)
+			return isSuccess
 		println "----------------------------------- adding col hir"
 		addColHir()
 		println "---------------------- adding IBP hir"
@@ -288,6 +291,7 @@ class TaxonomyDefinition extends ScientificName {
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
 		def trHir = Classification.findByName("IBP Taxonomy Hierarchy");
 		snapToIBPHir(hirList, trHir)
+		return isSuccess
 	}
 	
 	private addColHir(){
@@ -346,25 +350,29 @@ class TaxonomyDefinition extends ScientificName {
 		}
 	}
 	
-	private curateNameByCol(){
-		if((status != NameStatus.ACCEPTED) || matchId)
-			return
+	private boolean curateNameByCol(){
+		println "-------------matchId------------------ " + matchId
+		if((status != NameStatus.ACCEPTED) || matchId )
+			return true
 		
-			
 		def colData = namelistService.searchCOL(canonicalForm, 'name')
 		println "--------------------------- " + colData
 		def acceptedMatch = namelistService.validateColMatch(this, colData)
+		if(colData && !acceptedMatch){
+			log.debug "No match found on col so returning without adding col hir"
+			return false
+		}
 		println "------------------ came here " + acceptedMatch
 		if(!acceptedMatch){
 			log.debug "No match found on col so returning without adding col hir"
-			return
+			return false
 		}
 		if(!status.value().equalsIgnoreCase(acceptedMatch.nameStatus)) {
 			log.debug "Status from col is different so not adding col hir/info " + status + " col status " + acceptedMatch.nameStatus
-			return
+			return false
 		}
 		
 		namelistService.processDataForMigration(this, acceptedMatch, colData.size(), true)
-		
+		return true
 	}
 }

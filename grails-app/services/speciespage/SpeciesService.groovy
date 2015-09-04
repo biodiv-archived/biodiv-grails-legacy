@@ -81,6 +81,8 @@ class SpeciesService extends AbstractObjectService  {
     def taxonService;
     def activityFeedService;
     def messageSource;
+	def namelistService;
+	
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
     def request;
@@ -1369,16 +1371,32 @@ class SpeciesService extends AbstractObjectService  {
     /**
     * Create Species given species name and atleast one taxon hierarchy
     */
-    def createSpecies(String speciesName, int rank, List taxonRegistryNames, Language language) {
+    def createSpecies(String speciesName, int rank, List taxonRegistryNames, String colId, Language language) {
         
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
         Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames], errors:errors];
 
-        XMLConverter converter = new XMLConverter();
-        speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
-		 if(speciesInstance.taxonConcept) {
+		XMLConverter converter = new XMLConverter();
+		def td
+		//if colId is given then creating name from col info
+		if(colId){
+			td = new TaxonomyDefinition()
+			td = namelistService.processDataForMigration(td, namelistService.searchCOL(colId, 'id')[0], 1, true)
+			println "------------ name created from col data ---------  " +  td
+		}else{
+			td = converter.getTaxonConceptFromName(speciesName, rank, colId);
+		}
+		speciesInstance.taxonConcept = td
+		if(speciesInstance.taxonConcept) {
+			speciesInstance.taxonConcept.postProcess()
+//			boolean shouldProceed = speciesInstance.taxonConcept.postProcess()
+//			if(!shouldProceed){
+//				result['success'] = false;
+//				result['msg'] = "Multiple11 matches from col. Please select one to proceed."// messageSource.getMessage("info.message.missing", null, LCH.getLocale())
+//				return result
+//			}
 			speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
             //taxonconcept is being used as guid
             speciesInstance.guid = converter.constructGUID(speciesInstance);
@@ -1404,10 +1422,11 @@ class SpeciesService extends AbstractObjectService  {
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
-
-                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
-                def tD = tR.taxonDefinition
+				
+//				def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
+//              List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
+//              def tD = tR.taxonDefinition
+				def tD = speciesInstance.taxonConcept
                 if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;
                     result['status'] = 'requirePermission';
@@ -1421,7 +1440,7 @@ class SpeciesService extends AbstractObjectService  {
             Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;
-			speciesInstance.taxonConcept.postProcess()
+			//speciesInstance.taxonConcept.postProcess()
 			result.taxonRegistry = taxonRegistry;
             result.errors.addAll(errors);
 			
@@ -2251,7 +2270,7 @@ def checking(){
     }
 	
 	/////////////////////////// Online edit and bulk upload //////////////////////////
-	ScientificName searchIBP(def parsedName, int rank, NameStatus status =  NameStatus.ACCEPTED ){
+	List<ScientificName> searchIBP(def parsedName, int rank=-1, NameStatus status =  NameStatus.ACCEPTED ){
 		if(parsedName instanceof String){
 			parsedName = new TaxonomyDefinition(canonicalForm:parsedName.trim())
 		}
@@ -2259,11 +2278,7 @@ def checking(){
 		if(taxonList.isEmpty())
 			return null
 		
-		if(taxonList.size() > 1){
-			log.error '############  ' + "IBP serch returning mulitiple result: should not happen " + taxonList
-		}
-		
-		return taxonList[0]
+		return taxonList
 	}
 	
 	

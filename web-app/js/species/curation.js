@@ -279,6 +279,10 @@ function searchDatabase(addNewName) {
         alert("Please select a database to query from!!");
         return;
     }
+    searchAndPopupResult(name, dbName, addNewName);
+}
+
+function searchAndPopupResult(name, dbName, addNewName, source){
     var url = window.params.curation.searchExternalDbUrl;
     $.ajax({
         url: url,
@@ -293,7 +297,7 @@ function searchDatabase(addNewName) {
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
-                fillPopupTable(data , $("#externalDbResults"), "externalData", true);
+                fillPopupTable(data , $("#externalDbResults"), "externalData", true, source);
             }else {
                 var oldText = $(".dialogMsgText").html();
                 if (oldText.indexOf("Sorry") >= 0) {
@@ -345,7 +349,7 @@ function searchIBP(name) {
 
 }
 
-function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
+function fillPopupTable(data, $ele, dataFrom, showNameDetails, source ) {
     if(data.length == 0) {
         alert("Sorry No results found!!");
     }
@@ -354,7 +358,8 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
     $ele.find("table tr td").remove();
     var rows = "";
     $.each(data, function(index, value) {
-        if(dataFrom == "externalData") {
+    	if(dataFrom == "externalData") {
+    		var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value['id'] + ',"' + value['externalId'] + '")' : 'getExternalDbDetails(this, ' +showNameDetails+')'
             var nameStatus = value['nameStatus'];
             var colLink = 'http://www.catalogueoflife.org/annual-checklist/2015/details/species/id/'+value['externalId']
             if(nameStatus == 'synonym') {
@@ -376,16 +381,155 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails) {
                 colLink = 'http://catalogueoflife.org/annual-checklist/2015/browse/tree/id/'+value['externalId']
                 rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
             }
-            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getExternalDbDetails(this,"+showNameDetails+")'>Select this</button></td></tr>"        
-        }else {
-            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><button class='btn' onclick='getNameDetails("+value['taxonId'] +","+ classificationId+",1, undefined)'>Select this</button></td></tr>"
+            
+            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"        
+        }
+        else {
+        	var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value['id'] + ',' + value['externalId'] + ')' : 'getNameDetails(' +value['taxonId'] + ',' + classificationId + ',1, undefined)' 
+            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"
         }
     });
     $ele.find("table").append(rows);
     return
 }
 
-//takes COL id
+function openSpeciesPage(taxonId, colId){
+	var url = window.params.curation.editSpeciesPageURL;
+	$("#externalDbResults").modal('hide');
+	$.ajax({
+	        url: url,
+	        dataType: "json",
+	        type: "POST",
+	        data: {taxonId:taxonId, colId:colId},	
+	        success: function(data) {
+	            processingStop();
+	            validateSpeciesSuccessHandler(data, false);
+	        }, error: function(xhr, status, error) {
+	            processingStop();
+	            alert(xhr.responseText);
+	        } 
+	    });
+	
+	return false;
+}
+
+function validateSpeciesSuccessHandler(data, search){
+	
+	function showSearchPopup(data){
+		// show the popup
+		var tList = data.taxonList
+		if (tList && tList.length != 0) {
+			$("#dialogMsg").modal('hide');
+			$("#externalDbResults").addClass('IBPResult');
+			$("#externalDbResults").modal('show');
+			$("#externalDbResults h6").html(name);
+			fillPopupTable(tList, $("#externalDbResults"), "IBPData", true, "onlinSpeciesCreation");
+		} else {
+			alert("Sorry no results found from IBP Database. Fill in details manually");
+		}
+
+		if ($("#externalDbResults").hasClass('IBPResult')) {
+			$('#externalDbResults .modal-dialog').on('hidden', function(event) {
+				$(this).unbind();
+				$("#dialogMsg").modal('show');
+				$(".dialogMsgText").html("Searching in COL...");
+				searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
+			});
+		} else {
+			$("#dialogMsg").modal('show');
+			$(".dialogMsgText").html("Searching in COL...");
+			searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation")
+		}
+		$("#externalDbResults").removeClass('IBPResult');
+
+	}
+	
+	function updateHirInput(data){
+		var $ul = $('<ul></ul>');
+		$('#existingHierarchies').empty().append($ul);
+		if (data.taxonRegistry) {
+			$.each(data.taxonRegistry, function(index, value) {
+				var $c = $('<li></li>');
+				$ul.append($c);
+				var $u = $('<ul><b>' + index + '</b></ul>');
+				$c.append($u);
+				$.each(value[0], function(i, v) {
+					$u.append('<li>' + v.rank + ' : ' + v.name + '</li>');
+				});
+			});
+		}
+
+		$('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
+		var $hier = $('#taxonHierachyInput');
+		$hier.empty()
+		var taxonRegistry = data.requestParams ? data.requestParams.taxonRegistry: undefined;
+		var taxonRanks = data.taxonRanks;
+		for (var i = 0; i < data.rank; i++) {
+			var taxonValue = (taxonRegistry && taxonRegistry[i]) ? taxonRegistry[i]
+					: taxonRanks[i].taxonValue;
+			$(
+					'<div class="input-prepend"><span class="add-on">'
+							+ taxonRanks[i].text
+							+ (taxonRanks[i].mandatory ? '*' : '')
+							+ '</span><input data-provide="typeahead" data-rank ="'
+							+ taxonRanks[i].value
+							+ '" type="text" class="taxonRank" name="taxonRegistry.'
+							+ taxonRanks[i].value + '" value="' + taxonValue
+							+ '" placeholder="Add ' + taxonRanks[i].text
+							+ '" /></div>').appendTo($hier);
+		}
+		if (data.rank > 0)
+			$('#taxonHierarchyInputForm').show();
+
+		if ($(".taxonRank:not(#page)").length > 0)
+			$(".taxonRank:not(#page)").autofillNames();
+		
+	}
+	
+	if (data.success == true) {
+		//if species page id returned then open in edit mode
+		if (data.id) {
+			window.location.href = '/species/show/' + data.id + '?editMode=true'
+			return;
+		}
+		
+		$('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+		
+		updateHirInput(data);
+		
+		//showing parser info
+		$('#parserInfo').children('.canonicalName').html(data.canonicalForm);
+		$('#parserInfo').children('.authorYear').html(data.authorYear);
+		$('#parserInfo').show();
+		
+		if(search)
+			showSearchPopup(data);
+		else{
+			//updating new rank
+			 var text1 = data.rank;
+		     $('#rank option').filter(function() {
+		            return $(this).val() == text1; 
+		     }).prop('selected', true);
+
+		    //updating name and colId
+ 		    $("#page").val(data.requestParams.speciesName);
+ 		    $( "input[name='colId']" ).val(data.requestParams.colId);
+ 		}
+
+		$('#addSpeciesPageSubmit').show();
+
+	} else {
+		if (data.status == 'requirePermission')
+			window.location.href = '/species/contribute'
+		else
+			$('#errorMsg').removeClass('alert-info hide').addClass(
+					'alert-error').text(data.msg);
+	}
+}
+
+
+
+// takes COL id
 function getExternalDbDetails(ele, showNameDetails) {
     var externalId = $(ele).parents('tr').find('input').val();
     var url = window.params.curation.getExternalDbDetailsUrl;
@@ -394,7 +538,7 @@ function getExternalDbDetails(ele, showNameDetails) {
         alert("Could not find details as no ID present");
         return;
     }
-    //IN case of TNRS no id comes
+    // IN case of TNRS no id comes
     //so search by name
     if(externalId == undefined || externalId == "") {
         externalId = $(".name").val();

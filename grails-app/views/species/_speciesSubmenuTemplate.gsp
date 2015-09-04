@@ -14,13 +14,13 @@
     </g:if>
 
     <div class="pull-right">
-<%--     	<g:if test="${isSpeciesContributor}">--%>
-<%--	        <a id="editSpecies" class="btn btn-primary pull-right" style="margin-right: 5px;"--%>
-<%--	            href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">--%>
-<%--	            <i class="icon-edit"></i><g:message code="button.edit" /></a>--%>
-<%--	--%>
-<%--	   </g:if>--%>
-<%--       --%>
+     	<g:if test="${isSpeciesContributor}">
+	        <a id="editSpecies" class="btn btn-primary pull-right" style="margin-right: 5px;"
+	            href="${uGroup.createLink(controller:'species', action:'edit', id:speciesInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+	            <i class="icon-edit"></i><g:message code="button.edit" /></a>
+	
+	   </g:if>
+       
        <sUser:isAdmin>
             <g:if test="${speciesInstance}">
             <a id="deleteSpecies" class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"

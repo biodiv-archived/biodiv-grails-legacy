@@ -46,7 +46,7 @@ class CustomObjectMarshallers {
     
     def grailsApplication;
     def userGroupService;
-
+	
     List marshallers = []
 
     def register() {
@@ -101,7 +101,7 @@ class CustomObjectMarshallers {
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value()]
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'']
         }
 
         JSON.registerObjectMarshaller(Classification) {
