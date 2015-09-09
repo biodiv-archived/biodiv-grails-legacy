@@ -36,13 +36,8 @@ import species.participation.UserToken;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import static org.springframework.http.HttpStatus.*;
 
-<<<<<<< HEAD
-import org.apache.commons.lang.StringEscapeUtils;
-
-=======
 import species.participation.NamelistService
 import species.NamesMetadata
->>>>>>> master
 
 class SpeciesController extends AbstractObjectController {
 
@@ -1450,8 +1445,26 @@ class SpeciesController extends AbstractObjectController {
         }    
 
     }
-<<<<<<< HEAD
-=======
+
+    def related () {
+        def relatedObv;
+        def result = [];
+        switch(params.filterProperty) {
+            case 'featureBy':
+                return super.related();
+                break;
+            case 'documents':
+                List documents = speciesService.getRelatedDocuments(params.id?Species.read(Long.parseLong(params.id)):null);
+                documents.each {
+                    def obv = it
+                    result.add(['observation':obv, 'title':it.title]);
+                }
+                relatedObv = ['observations':result];
+                break;
+        }
+
+        return formatRelatedResults(relatedObv, params);
+    }
 
     def related () {
         def relatedObv;
@@ -1498,5 +1511,4 @@ render speciesInstanceList;
         });
         println "=====================++++"
     }
->>>>>>> master
 }

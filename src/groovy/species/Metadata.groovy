@@ -98,23 +98,18 @@ abstract class Metadata {
 		reverseGeocodedName(nullable:true)
 		latitude(nullable: true)
 		longitude(nullable:true)
-		locationAccuracy(nullable: true)
-<<<<<<< HEAD
 		topology (nullable:true)
-//		, validator : { val, obj ->
 //			if(!val){
 //				return true
 //			}
 //			return ObservationService.validateLocation(val, obj)
 //		}
-=======
-		topology nullable:true, validator : { val, obj ->
-			if(!val){
-				return true
-			}
-			return ObservationService.validateLocation(val, obj)
-		}
->>>>>>> master
+		//topology nullable:true, validator : { val, obj ->
+		//	if(!val){
+		//		return true
+		//	}
+		//	return ObservationService.validateLocation(val, obj)
+	//	}
         fromDate nullable:true, validator : {val, obj ->
 			if(!val){
 				return true

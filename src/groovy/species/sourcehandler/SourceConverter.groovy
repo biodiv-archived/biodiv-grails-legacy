@@ -572,13 +572,8 @@ class SourceConverter {
 		return summary.toString()
 	}
 
-<<<<<<< HEAD
-	def myPrint(str){
-		//if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
-=======
 	def static myPrint(str){
 		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
->>>>>>> master
 			println str
 		//}
 	}
