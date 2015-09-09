@@ -84,7 +84,7 @@
             <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
                 <obv:showObservationsList />
             </div>
-            <div class="span4" style="position:relative;top:20px">
+            <!--div class="span4" style="position:relative;top:20px">
 
                 <uGroup:objectPostToGroupsWrapper 
                 model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName, 'userGroup':userGroup]" />
@@ -104,11 +104,11 @@
                             <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false, 'queryParams':queryParams, selectedClassification:queryParams.classification]"/>
                         </div>
                     </div>
-                </div>
+                </div-->
                <!-- 
                <g:render template="/observation/summaryTemplate" model="['speciesCount':speciesCount, 'subSpeciesCount':subSpeciesCount]"/>
                -->
-                <div id="observations_list_map" class="observation sidebar_section"
+                <!--div id="observations_list_map" class="observation sidebar_section"
                     style="clear:both;overflow:hidden;display:none;">
                     <h5><g:message code="default.species.distribution.label" /></h5>
                     <obv:showObservationsLocation
@@ -131,7 +131,7 @@
                     <div id="speciesGroupCountList"></div>
                 </div>
                 <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
-
+                -->
             </div>
         </div>
     </div>
