@@ -13,21 +13,28 @@ class CustomFieldService {
 	def utilsService
 	def dataSource
 	def springSecurityService
+	def activityFeedService
 	
-	def List fetchAllCustomFields(Observation obv){
-		List result = []
+	def Map fetchAllCustomFields(Observation obv){
+		Map result = [:]
 		obv.userGroups.collect{it}.each { ug ->
 			CustomField.fetchCustomFields(ug).each { cf ->
-				def val = fetchValue(cf, obv.id)
-				if(val && (cf.dataType == CustomField.DataType.DATE)){
-					val = val.format('MMMM d, y')
-				}
-				result << [key:cf.name, value : val]
+				def val = fetchForDisplay(cf, obv.id)
+				result[cf] = [key:cf.name, value : val, ugId:ug.id]
 			}
 		}
 		return result
 	}
 	
+	private fetchForDisplay(CustomField cf,  observationId){
+		def val = fetchValue(cf, observationId)
+		if(val && (cf.dataType == CustomField.DataType.DATE)){
+			val = val.format('MMMM d, y')
+		}else if (val && cf.allowedMultiple){
+			val = val.split(",").join(", ")
+		}
+		return val
+	}
 	
 	def fetchValue(CustomField cf,  observationId){
 		if(!observationId)
@@ -78,7 +85,7 @@ class CustomFieldService {
 				def dataType = CustomField.DataType.getDataType(m.dataType) 
 				boolean allowedMultiple = (dataType == CustomField.DataType.TEXT)?m.allowedMultiple:false
 				def options = m.options? m.options.split(",").collect{it.trim()}.join(","):""
-				CustomField cf =  new CustomField(userGroup:ug, name:m.name, dataType:dataType, isMandatory:m.isMandatory, allowedMultiple:m.allowedMultiple, defaultValue:m.defaultValue, options:options, notes:m.description, author:author)
+				CustomField cf =  new CustomField(userGroup:ug, name:m.name, dataType:dataType, isMandatory:m.isMandatory, allowedParticipation:m.allowedParticipation, allowedMultiple:m.allowedMultiple, defaultValue:m.defaultValue, options:options, notes:m.description, author:author)
 				if(!cf.save(flush:true)){
 					cf.errors.allErrors.each { log.error it }
 				}else{
@@ -156,9 +163,12 @@ class CustomFieldService {
 		return sql.rows(query, [tableName:tableName, dbName:'biodiv']).isEmpty()		
 	}
 	
+	private boolean isRowExist(String tableName , obvId){
+		def query = ''' SELECT * FROM  ''' + tableName + ''' where  observation_id = :obvId '''
+		Sql sql = Sql.newInstance(dataSource)
+		return !sql.rows(query, [obvId:obvId]).isEmpty()
+	}
 
-
-	
 	private boolean deleteRow(ug, obvId){
 		String query = "delete from "+ utilsService.getTableNameForGroup(ug) + " where observation_id =:observationId "
 		return executeQuery(query, [observationId:obvId] )
@@ -171,6 +181,40 @@ class CustomFieldService {
 		return executeQuery(query, m)
 	}
 		
+	private boolean updateRow(cf, Map m){
+		String query
+		if(isRowExist(utilsService.getTableNameForGroup(cf.userGroup), m.obvId)){
+			query = "update "+ utilsService.getTableNameForGroup(cf.userGroup) +  " set " + m.remove('columnName') + " = :columnValue where observation_id = :obvId "
+		}else{
+			query = "insert into "+ utilsService.getTableNameForGroup(cf.userGroup) +  " ( observation_id, " +  m.remove('columnName') + " ) "   +  " values (:obvId,  :columnValue ) "
+			m = [obvId: m.obvId, columnValue:m.columnValue]
+		}
+		return executeQuery(query, m)
+	}
+	
+	def Map updateInlineCf(params){
+		CustomField cf = CustomField.get(params.cfId?.toLong())
+		if(!cf){
+			return
+		}
+		def v = params.fieldValue ?  params.fieldValue :  params.get('fieldValue[]')
+		if(v && !(v instanceof String)){
+			v = v.join(",")
+		}
+		
+		def m = ['columnName': cf.fetchSqlColName(), 'columnValue' :cf.fetchTypeCastValue(v), 'obvId':params.obvId?.toLong()]
+		def oldValue = fetchValue(cf, params.obvId?.toLong())
+		updateRow(cf, m)
+		def newValue = fetchValue(cf, params.obvId?.toLong())
+		
+		if(oldValue != newValue){
+			def observationInstance = Observation.read(params.obvId?.toLong())
+			log.debug "Adding feed and sending mail for custom field update ${cf.name} ::: ${oldValue}  =>  ${newValue}"
+			def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.CUSTOM_FIELD_EDITED, "${cf.name} : " + fetchForDisplay(cf, params.obvId?.toLong()));
+			utilsService.sendNotificationMail(activityFeedService.CUSTOM_FIELD_EDITED, observationInstance, null, params.webaddress, activityFeed);
+		}
+		return [ 'fieldName' : fetchForDisplay(cf, params.obvId?.toLong())]
+	}
 	
 	def test1(){
 		def m = [webaddress : 'bangalore_birdrace_2013', 'CustomField_Name' : 'sandeep', 'CustomField_Age': '100', 'CustomField_Status' : 'false']

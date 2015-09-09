@@ -2,9 +2,8 @@ package species
 
 import java.sql.ResultSet;
 
+import species.ScientificName.TaxonomyRank;
 import grails.web.Action;
-
-import species.TaxonomyDefinition.TaxonomyRank;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
@@ -37,8 +36,13 @@ import species.participation.UserToken;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import static org.springframework.http.HttpStatus.*;
 
+<<<<<<< HEAD
 import org.apache.commons.lang.StringEscapeUtils;
 
+=======
+import species.participation.NamelistService
+import species.NamesMetadata
+>>>>>>> master
 
 class SpeciesController extends AbstractObjectController {
 
@@ -54,6 +58,8 @@ class SpeciesController extends AbstractObjectController {
     def activityFeedService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource;
+    def namelistService;
+    def sessionFactory;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -71,40 +77,35 @@ class SpeciesController extends AbstractObjectController {
 		params.action="list"
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
+        model.queryParams.remove('ranks');
+        model.queryParams.remove('statuses');
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model['obvListHtml'] =  g.render(template:"/species/showSpeciesListTemplate", model:model);
             model.resultType = "species"
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
             model.remove('speciesInstanceList');
+            model['summaryHtml'] = g.render(template:"/observation/summaryTemplate", model:model);
         }
         model = utilsService.getSuccessModel('', null, OK.value(), model);
+
+        boolean hack = false;
         withFormat {
             html{
                 if(params.loadMore?.toBoolean()){
                     render(template:"/species/showSpeciesListTemplate", model:model.model);
                     return;
-                    } else if(!params.isGalleryUpdate?.toBoolean()){
-                        render (view:"list", model:model.model);
-                        return;
-                        } else{
-                            /* 
-                            if(params.webaddress)
-                            model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
-                            def obvListHtml =  g.render(template:"/species/showSpeciesListTemplate", model:model);
-                            model.resultType = "species"
-                            def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-                            def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-
-                            render (result as JSON)
-                             */   
-                            
-                            return;
-                        }
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    render (view:"list", model:model.model);
+                    return;
+                } else{
+                    hack = true;
+                    return;
+                }
             }
             json { render model as JSON; }
             xml { render model as XML }
         }
+        if(hack) render model.model as JSON
 	}
 
 	def listXML() {
@@ -122,9 +123,12 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-		def speciesInstance = new Species()
-		speciesInstance.properties = params
-		return [speciesInstance: speciesInstance]
+		flash.message = "Species page create is currently unavailable."
+		redirect(action: "list")
+		return
+//		def speciesInstance = new Species()
+//		speciesInstance.properties = params
+//		return [speciesInstance: speciesInstance]
 	}
 
     @Secured(['ROLE_USER'])
@@ -163,7 +167,7 @@ class SpeciesController extends AbstractObjectController {
                         redirect url: url
                         return;
                     } else {
-                    flash.message = result.msg ? result.msg+result.errors:${message(code: 'default.species.error.Create',null)}+result.errors
+                    flash.message = result.msg ? result.msg+result.errors:"${message(code: 'default.species.error.Create',null)}"+result.errors
 			        render(view: "create", model: result)
                     return;
                     }
@@ -207,14 +211,20 @@ class SpeciesController extends AbstractObjectController {
 	def show() {
 		//cache "content"
         params.id = params.long('id');
-
+		def url
 		def speciesInstance = params.id ? Species.get(params.id):null;
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
             withFormat {
                 html {
                     flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-                    redirect(action: "list")
+					def redirectInstance = getTargetInstance(Species.class, params.id)
+					if(redirectInstance){
+						flash.message = "${message(code: 'default.resource.redirect.message', args: [message(code: 'species.label', default: 'Species'), params.id, redirectInstance.id])}"
+						redirect(action: "show", id: redirectInstance.id)
+					}else{
+						redirect(action: "list")
+					}	
 
                 } json { render model as JSON }
                 xml { render model as XML }
@@ -270,6 +280,7 @@ class SpeciesController extends AbstractObjectController {
                     nc  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.NOMENCLATURE_AND_CLASSIFICATION,1,userLanguage),
                     md  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.META_DATA,1,userLanguage),
                     overview  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.OVERVIEW,1,userLanguage),
+                    ss_v_r  : converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SUBSPECIES_VARIETIES_RACES,2,userLanguage),
                     acth  : grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY,
                     trn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.TAXON_RECORD_NAME,1,userLanguage),
                     sn: converter.getFieldFromName(grailsApplication.config.speciesPortal.fields.SCIENTIFIC_NAME,1,userLanguage),
@@ -434,7 +445,7 @@ class SpeciesController extends AbstractObjectController {
 			for(category in concept.value.clone()) {
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) ) {
+				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) || category.key.equals(config.ss_v_r)) {
 					boolean show = false;
 					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
@@ -445,8 +456,12 @@ class SpeciesController extends AbstractObjectController {
 						}
 					} else if(category.key.equals(config.documents)) {
                         show = DocSciName.speciesHasDocuments(speciesInstance);
-                        println "======SHOW ===== " + show
+                    } else if(category.key.equals(config.ss_v_r)) {
+                        if(speciesInstance.taxonConcept.rank == TaxonomyRank.SPECIES.ordinal()) {
+                            show = speciesInstance.fetchInfraSpecies().size()>0;
+                        }
                     }
+
                     else {
 						show = true;
 					}
@@ -513,7 +528,7 @@ class SpeciesController extends AbstractObjectController {
         return false;
     }
 
-	/*@Secured(['ROLE_USER'])
+	@Secured(['ROLE_USER'])
 	def edit() {
 		if(params.id) {
 			def speciesInstance = Species.get(params.long('id'))
@@ -529,28 +544,35 @@ class SpeciesController extends AbstractObjectController {
 			params.max = Math.min(params.max ? params.int('max') : 10, 100)
 			return [speciesInstanceList: Species.list(params), instanceTotal: Species.count()]
 		}
-	}*/
+	}
 
-	@Secured(['ROLE_USER'])
+    @Secured(['ROLE_USER'])
     def update() {
+        println "========PARAMS======== " + params 
+        if(params.dataFromCuration) {
+            params << JSON.parse(params.dataFromCuration)
+            params.remove('dataFromCuration');
+        }
+        println "========PARAMS======== " + params 
         def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
         def paramsForUploadSpField =  params.paramsForUploadSpField?JSON.parse(params.paramsForUploadSpField):null
         
-        if(!(params.name && params.pk)) {
+        if(!(params.name && params.pk) && !params.otherParams) {
         	msg=messageSource.getMessage("default.species.error.fieldOrname", null, RCU.getLocale(request))
             render ([success:false, msg:msg] as JSON)
+            println "=======HERE========= "
             return;
         }
-        
+         
         try {
             def result;
             Long speciesFieldId = params.pk ? params.long('pk'):null;
             def value = params.value;
             userLanguage = utilsService.getCurrentLanguage(request);
             params.locale_language = userLanguage;
-
+            println "near switch case=================="
             switch(params.name) {
                 case "contributor":
                 long cid = params.cid?params.long('cid'):null;
@@ -610,13 +632,24 @@ class SpeciesController extends AbstractObjectController {
                 }
                 break;
                 case 'synonym':
+                println "=====HELLO HERE========"
                 Long sid = params.sid?params.long('sid'):null;
                 String relationship = params.relationship?:null;
 
                 if(params.act == 'delete') {
-                    result = speciesService.deleteSynonym(sid, speciesFieldId);
+                    if(params.otherParams) {
+                        result = speciesService.deleteSynonym(sid, null, params.otherParams.taxonId);
+                    } else {
+                        result = speciesService.deleteSynonym(sid, speciesFieldId);
+                    }
                 } else {
-                    result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value);
+                    def otherParams = null
+                    if(params.otherParams) {
+                        otherParams = params.otherParams
+                        otherParams['source'] = params.source;
+                        otherParams['contributor'] = params.contributor;
+                    }
+                    result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value, otherParams);
                 }
                 break;
                 case 'commonname':
@@ -624,9 +657,15 @@ class SpeciesController extends AbstractObjectController {
                 String language = params.language?:null;
 
                 if(params.act == 'delete') {
-                    result = speciesService.deleteCommonname(cid, speciesFieldId);
+                    result = speciesService.deleteCommonname(cid, speciesFieldId, params.otherParams?.taxonId );
                 } else {
-                    result = speciesService.updateCommonname(cid, speciesFieldId, language, value);
+                    def otherParams = null
+                    if(params.otherParams) {
+                        otherParams = params.otherParams
+                        otherParams['source'] = params.source;
+                        otherParams['contributor'] = params.contributor;
+                    }
+                    result = speciesService.updateCommonname(cid, speciesFieldId, language, value, otherParams);
                 }
 
                 break;
@@ -655,6 +694,66 @@ class SpeciesController extends AbstractObjectController {
                 result.content = html.join();
                 
                 break;
+
+                //only possible thru curation interface
+                //adding an accpted name to synonym
+                //if accepted name exists use it
+                //else create and match to COL
+                case 'accepted':
+                def resMsg = '';
+                println "=====HELLO HERE========"
+                if(params.modifyingFor == 'synonym') {
+                    //get aid if not present
+                    //and put in params aid
+                    //create new if aid not present
+                    if(!params.aid){
+                        NamesParser namesParser = new NamesParser();
+                        List<TaxonomyDefinition> taxDefs = namesParser.parse([value]);
+                        TaxonomyDefinition taxDef = taxDefs[0];
+                        namelistService.curateName(taxDef);
+                        if(taxDef.id){
+                            params.aid = taxDef.id
+                            println "========NEW ID CREATED ====== " + taxDef.id
+                            resMsg = "Successfully created " + value + " as new accepted name using COL attributes and added " + params.synComName + " as a synonym to it."
+                        }else {
+                            println "========NO ACCPTED NAME ====== "
+                            def result1 = ['success': false, 'msg':'Could not create an accepted name of ' + value]
+                            render result1 as JSON
+                            return;
+                        }
+                    }
+                    Long sid = params.otherParams?params.otherParams.taxonId.toLong():null;
+                    String relationship = "synonym"; //params.relationship?:null;
+
+                    if(params.act == 'delete') {
+                        if(params.otherParams) {
+                            result = speciesService.deleteSynonym(sid, null, params.aid);
+                        } else {
+                            //NOT POSSIBLE
+                            //result = speciesService.deleteSynonym(sid, speciesFieldId);
+                        }
+                    } else {
+                        def otherParams = null
+                        if(params.otherParams) {
+                            otherParams = params.otherParams
+                            otherParams.taxonId = params.aid;
+                            otherParams['source'] = params.synComSource; //'DUMMY';    //params.source;
+                            otherParams['contributor'] = params.contributor;
+                        }
+                        value = params.synComName;
+                        result = speciesService.updateSynonym(sid, speciesFieldId, relationship, value, otherParams);
+                        result.newSynComId = result.dataInstance?.id.toString();
+                        result.dataId = params.aid;
+                        if(result.success) {
+                            result.msg = resMsg;
+                        }
+
+                    }
+                }else if(params.modifyingFor == 'common'){
+                
+                }
+                break;
+
                 default :
                 msg=messageSource.getMessage("default.species.incorrect.datatype", null, RCU.getLocale(request))
                 result=['success':false, msg:msg];
@@ -662,28 +761,40 @@ class SpeciesController extends AbstractObjectController {
  
             if(result.success) {
                 def feedInstance;
-                if(result.activityType)
-                    feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType);
+                if(result.activityType) {
+                    if(result.taxonConcept) {
+                        result['dataId'] = result.dataId?:result.dataInstance?.id.toString()
+                        feedInstance = activityFeedService.addActivityFeed(result.taxonConcept, result.dataInstance, springSecurityService.currentUser, result.activityType, result.activityDesc);
+                    } else {
+                        feedInstance = activityFeedService.addActivityFeed(result.speciesInstance, result.speciesFieldInstance, springSecurityService.currentUser, result.activityType, result.activityDesc);
+                    }
+                }
                 if(result.mailType) {
-                    def otherParams = ['info':result.activityType]
+                    def otherParamsForMail = ['info':result.activityType]
                     def spIns = result.speciesFieldInstance
                     if(spIns) {
                         def des = spIns.description
                         des = des.replaceAll("<(.|\n)*?>", '');
                         des = des.replaceAll("&nbsp;", '');
                         if(des.length() > 150) {
-                            otherParams['spFDes'] = des[0..147] + "...";
+                            otherParamsForMail['spFDes'] = des[0..147] + "...";
                         } else {
-                            otherParams['spFDes'] = des
+                            otherParamsForMail['spFDes'] = des
                         }
                     }
-                    utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParams);
+                    //TODO: send mail for adding synonym on any taxon
+                    //create dummy speciesInstance and check the mail template
+                    if(result.speciesInstance) {
+                        utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParamsForMail);
+                    }
                 }
+                println "---------RESULT---- " + result
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
+                result.remove('synonymInstance');
+                result.remove('taxonConcept');
             }
-
             render result as JSON
             return;
         } catch(Exception e) {
@@ -692,7 +803,6 @@ class SpeciesController extends AbstractObjectController {
             render ([success:false, msg:e.getMessage()] as JSON)
             return;
         }
-
     }
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
@@ -756,14 +866,12 @@ class SpeciesController extends AbstractObjectController {
 	} 
 
 	@Secured(['ROLE_ADMIN'])
-	def delete() {
+	def deleteSpecies() {
 		def speciesInstance = Species.get(params.long('id'))
 		if (speciesInstance) {
 			try {
-                boolean success = speciesUploadService.unpostFromUserGroup(speciesInstance, [], springSecurityService.currentUser, null);
-                if(success) {
-				    speciesInstance.delete(flush: true)
-				    speciesSearchService.delete(speciesInstance.id);
+				boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, springSecurityService.currentUser);
+				if(success) {
 				    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                     def model = utilsService.getSuccessModel(msg, null, OK.value());
                     withFormat {
@@ -1159,34 +1267,53 @@ class SpeciesController extends AbstractObjectController {
             hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
         }
 */
+		XMLConverter.myPrint("========== " + params)
 		def msg;
         def result = [requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
         if(params.page && params.rank) {
             try {
                 int rank = params.rank?params.int('rank'):null;
+				def taxonRegistry
                 Map r = getTaxon(params.page, rank);
+				XMLConverter.myPrint("========== " + r)
+				
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
                     if(!taxon) {
+						if(r.genusTaxon){
+							def fieldsConfig = grailsApplication.config.speciesPortal.fields
+							def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+							taxonRegistry = r.genusTaxon.parentTaxonRegistry(classification)?.get(classification);
+							if(taxonRegistry){
+								List tmp = []
+								taxonRegistry.each { td ->
+									tmp.putAt(td.rank, td.name)
+								}
+								taxonRegistry = tmp
+							}
+							println "================== " + taxonRegistry
+							
+						}
                     	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
-                        result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry]]
+                        result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry]]
                     } else {
                         //CHK if a species page exists for this concept
                         Species species = Species.findByTaxonConcept(taxon);
-                        def taxonRegistry = taxon.parentTaxonRegistry();
+                        taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
                             result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         } else {
-                        	msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
+							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
                             result = ['success':true, 'msg':msg, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         }
-                        result['taxonRegistry'] = [:];
-                        taxonRegistry.each {classification, h ->
-                            if(!result['taxonRegistry'][classification.name])
-                                result['taxonRegistry'][classification.name] = [];
-                            result['taxonRegistry'][classification.name] << h
-                        }
+	                    result['taxonRegistry'] = [:];
+						
+						taxonRegistry.each {classification, h ->
+							if(!result['taxonRegistry'][classification.name])
+								result['taxonRegistry'][classification.name] = [];
+							result['taxonRegistry'][classification.name] << h
+						}
                     }
                 } else {
                     result.putAll(r);
@@ -1201,27 +1328,32 @@ class SpeciesController extends AbstractObjectController {
         	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], RCU.getLocale(request))
             result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
+		XMLConverter.myPrint("========== " + result)
         render result as JSON
     }
     
     private Map getTaxon(String name, int rank) {
         def result = [:];
         if(!name || rank == null) return result;
-
+		def msg
         NamesParser namesParser = new NamesParser();
         List<TaxonomyDefinition> names = namesParser.parse([name]);
         TaxonomyDefinition page = names[0];
         if(page && page.canonicalForm) {
-            def taxonCriteria = TaxonomyDefinition.createCriteria();
-            TaxonomyDefinition taxon = taxonCriteria.get {
-                eq("rank", rank);
-                ilike("canonicalForm", page.canonicalForm);
-            }
-            if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
+			if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
             	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
                 result = ['success':false, 'msg':msg]
             } else {
-                result = ['success':true, 'taxon':taxon];        
+				def taxon = speciesService.searchIBP(page, rank)
+                result = ['success':true, 'taxon':taxon];
+				
+				//checking if given species name have genus in ibp system
+				if(!taxon && page.binomialForm){
+					def genusTaxon = speciesService.searchIBP(page.binomialForm.tokenize(" ")[0], TaxonomyRank.GENUS.ordinal())
+					if(genusTaxon){
+						result.genusTaxon = genusTaxon
+					}
+				}     
             }
         } else {
         	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
@@ -1259,6 +1391,14 @@ class SpeciesController extends AbstractObjectController {
         */
     }
     
+    def downloadNamesMapper () {
+        File file = speciesUploadService.downloadNamesMapper(params);
+        if(!file) {    
+            return render(text: [success:false, downloadFile: ""] as JSON, contentType:'text/html')
+        }
+        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
+    }
+
     @Secured(['ROLE_USER'])
     def getSpeciesFieldMedia() {
         def resList = []
@@ -1310,4 +1450,53 @@ class SpeciesController extends AbstractObjectController {
         }    
 
     }
+<<<<<<< HEAD
+=======
+
+    def related () {
+        def relatedObv;
+        def result = [];
+        switch(params.filterProperty) {
+            case 'featureBy':
+                return super.related();
+                break;
+            case 'documents':
+                List documents = speciesService.getRelatedDocuments(params.id?Species.read(Long.parseLong(params.id)):null);
+                documents.each {
+                    def obv = it
+                    result.add(['observation':obv, 'title':it.title]);
+                }
+                relatedObv = ['observations':result];
+                break;
+        }
+
+        return formatRelatedResults(relatedObv, params);
+    }
+
+    def testingCount() {
+        def sp = Species.read(228424L);
+        println "=========!ST COUNT ====== " + sp.fetchResourceCount();
+        println "===NEXT COUNT ==== " + sp.fetchSpeciesFieldResourceCount();
+    }
+
+    def test() {
+        utilsService.logSql({
+            def hibSession = sessionFactory?.getCurrentSession();
+            String taxonId=221859;
+            //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
+//            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
+            try {
+            def hqlQuery = sessionFactory.currentSession.createQuery("select count(*) as count from Species s  join s.taxonConcept.hierarchies as reg  where s.id is not null  and reg.classification="+265799+" and (reg.path like '%!_123350!_%'  escape '!' or reg.path like '123350!_%'  escape '!' or reg.path like '%!_123350' escape '!') and reg.taxonDefinition.rank = 9");
+            println "PppppppppppppppppppppppppppppppP"
+        def speciesInstanceList = hqlQuery.list();
+
+render speciesInstanceList;
+            } catch(e) {
+                e.printStackTrace();
+            }
+
+        });
+        println "=====================++++"
+    }
+>>>>>>> master
 }

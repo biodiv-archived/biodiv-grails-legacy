@@ -5,24 +5,29 @@ import java.util.List;
 import java.util.Map;
 
 import content.eml.Document
+
 import grails.plugin.springsecurity.annotation.Secured;
 import groovy.sql.Sql;
 import groovy.util.Eval;
 
 import org.apache.solr.common.SolrException;
+
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.plugin.springsecurity.acl.AclEntry
 import grails.plugin.springsecurity.acl.AclSid
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission;
+
 import org.springframework.security.acls.domain.GrantedAuthoritySid
 import org.springframework.security.acls.domain.PrincipalSid
 import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid
 import org.springframework.security.core.Authentication
+
 import grails.plugin.springsecurity.acl.AclSid;
+
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission;
@@ -33,7 +38,9 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.Assert
+
 import grails.plugin.springsecurity.acl.AclObjectIdentity
+
 import org.apache.commons.logging.LogFactory;
 
 import species.Habitat;
@@ -43,6 +50,7 @@ import species.Resource.ResourceType;
 import species.Species;
 import species.auth.Role;
 import species.auth.SUser;
+import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup;
 import species.groups.UserGroupMemberRole;
@@ -58,6 +66,7 @@ import content.Project
 import species.participation.Checklists
 import species.participation.Featured
 import species.formatReader.SpreadsheetReader
+import species.participation.Digest
 
 class UserGroupService {
 
@@ -73,7 +82,7 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-
+	
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -113,6 +122,8 @@ class UserGroupService {
 		if(params.ne_longitude)
 			userGroup.ne_longitude = Float.parseFloat(params.ne_longitude)
 
+		userGroup.statStartDate = utilsService.parseDate(params.campStatStartDate)
+			
 		if(!userGroup.hasErrors() && userGroup.save()) {
 			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 			userGroup.setTags(tags);
@@ -123,7 +134,10 @@ class UserGroupService {
 			List experts = Utils.getUsersList(params.expertUserIds);
 			setUserGroupExperts(userGroup, experts, params.expertMsg, params.domain);
 			params.founders = founders;
-		}
+			
+			//updating digest 
+			Digest.updateDigest(userGroup)
+		}  
 	}
 
 	//@PreAuthorize("hasPermission(#id, 'species.groups.UserGroup', read) or hasPermission(#id, 'species.groups.UserGroup', admin)")
@@ -442,9 +456,19 @@ class UserGroupService {
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postObservationToUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
-		userGroup.addToObservations(observation);
+		List obvs = [observation]
+		if(observation.instanceOf(Checklists)){
+			obvs.addAll(observation.observations)
+		}
+		obvs.collate(ResourceUpdate.POST_BATCH_SIZE).each  { subList ->
+			Observation.withNewTransaction{
+				subList.each {
+					userGroup.addToObservations(it);
+				}
+			}
+		}
 		if(!userGroup.save()) {
-			log.error "Could not add ${observation} to ${userGroup}"
+			log.error "Could not add ${obvs} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, true, sendMail);
@@ -468,9 +492,19 @@ class UserGroupService {
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeObservationFromUserGroup(Observation observation, UserGroup userGroup, boolean sendMail = true) {
-		userGroup.observations.remove(observation);
+		List obvs = [observation]
+		if(observation.instanceOf(Checklists)){
+			obvs.addAll(observation.observations)
+		}
+		obvs.collate(ResourceUpdate.POST_BATCH_SIZE).each  { subList ->
+			Observation.withNewTransaction{
+				subList.each {
+					userGroup.observations.remove(it);
+				}
+			}
+		}
 		if(!userGroup.save()) {
-			log.error "Could not remove ${observation} from ${usergroup}"
+			log.error "Could not remove ${obvs} from ${usergroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(observation, userGroup, observation.author, false, sendMail);
@@ -503,11 +537,11 @@ class UserGroupService {
             case Observation.simpleName:
             queryParams['isDeleted'] = false;
             queryParams['isChecklist'] = false;
-            queryParams['isShowable'] = true;
+            //queryParams['isShowable'] = true;
             query = "select count(*) from Observation obv "
             if(userGroupInstance)
                 query += "join obv.userGroups userGroup where userGroup=:userGroup and "
-            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist and obv.isShowable = :isShowable"
+            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist "// and obv.isShowable = :isShowable"
             count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
             break;
             case Checklists.simpleName:
@@ -1276,7 +1310,13 @@ class UserGroupService {
 			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
 			List obvs = []
 			if(objectIds && objectIds != ""){
-				obvs = objectIds.split(",").collect { domainClass.read(Long.parseLong(it)) }
+				objectIds.split(",").each { 
+					def obj = domainClass.read(Long.parseLong(it))
+					obvs << obj
+					if(obj.instanceOf(Checklists)){
+						obvs.addAll(obj.observations)
+					}
+				}
 			}
 			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
 			
@@ -1346,7 +1386,7 @@ class UserGroupService {
 	}
 	
 	private class ResourceUpdate {
-		private static final int POST_BATCH_SIZE = 50
+		public static final int POST_BATCH_SIZE = 100
 		private static final log = LogFactory.getLog(this);
 		
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
@@ -1440,36 +1480,30 @@ class UserGroupService {
 			return newObvs
 		}
 	}
+	
+	///////////////////////////////// Remove user in bulk ////////////////////////////////
+	def removeMemberInBulk(params){
+		try{
+			List userIds = []
+			List<Map> content = SpreadsheetReader.readSpreadSheet(params.file, 0, 0);
+			for (Map row : content) {
+				userIds << row.get("userid").toLong();
+			}
+			
+			UserGroup ug = UserGroup.get(params.groupId.toLong())
+			println "user gropu name " + ug.name + " and userIds " + userIds 
 
-       ///////////////////////////////// Remove user in bulk ////////////////////////////////
-       def removeMemberInBulk(params){
-               try{
-                       List userIds = []
-                       List<Map> content = SpreadsheetReader.readSpreadSheet(params.file, 0, 0);
-                       for (Map row : content) {
-                               userIds << row.get("userid").toLong();
-                       }
-                       
-                       UserGroup ug = UserGroup.get(params.groupId.toLong())
-                       println "user group name " + ug.name + " and userIds " + userIds 
-
-                       
-                       UserGroup.withTransaction { 
-                               userIds.each { uid ->
-                               		SUser u = SUser.get(uid)
-                               		if(ug.isMember(u)){
-										println  "Deleting user " + uid + " from group " + ug
-                                       ug.deleteMember(u)
-                               		}else{
-                               			println " >>>>>>>>>>>>> Not a member ==== " + uid
-                               		}
-                                       
-                                       
-                               }
-                       }
-               }catch(Exception e){
-                       log.error e.printStackTrace()
-               }
-       }
+			
+			UserGroup.withTransaction { 
+				userIds.each { uid ->
+					SUser u = SUser.get(uid)
+					println  "Deleting user " + uid + " from group " + ug
+					ug.deleteMember(u)
+				}
+			}
+		}catch(Exception e){
+			log.error e.printStackTrace()
+		}
+	}
 
 }

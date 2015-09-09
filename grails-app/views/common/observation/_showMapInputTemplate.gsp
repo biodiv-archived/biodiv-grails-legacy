@@ -1,4 +1,47 @@
 <%@ page import="species.utils.Utils"%>
+
+<div class="control-group locationScale ${hasErrors(bean: observationInstance, field: 'locationScale', 'error')}" >
+	<label for="locationScale" class="control-label"> <g:message
+    	code="observation.locationScale.label" default="Location Scale" /><span class="req">*</span>
+    </label>
+	<div class="controls"  style="margin-top:5px;">
+		<%
+        	def defaultAccuracy = (obvInfoFeeder?.locationScale) ? obvInfoFeeder.locationScale.value().toLowerCase() : "approximate"
+            def isAccurateChecked = (defaultAccuracy == "accurate")? "checked" : ""
+            def isApproxChecked = (defaultAccuracy == "approximate")? "checked" : ""
+			def isLocalChecked = (defaultAccuracy == "local")? "checked" : ""
+			def isRegionChecked = (defaultAccuracy == "region")? "checked" : ""
+			def isCountryChecked = (defaultAccuracy == "country")? "checked" : ""
+			
+			def isGeoPrivacyChecked = (observationInstance?.geoPrivacy) ? "checked" : ""
+						
+         %>
+		<g:if test="${sourceType == 'observation'  || ((params.action == 'edit') && (sourceType == 'checklist-obv'))}">
+        	<input type="radio" style="margin-bottom: 6px;" name="locationScale" value="Accurate" ${isAccurateChecked} /><g:message code="default.accurate.label" /> 
+            <input type="radio" style="margin-bottom: 6px;"  name="locationScale" value="Approximate" ${isApproxChecked} /><g:message code="default.approximate.label" />
+        </g:if>
+        <g:if test="${(sourceType == 'checklist') || ((params.action == 'edit') && (sourceType == 'checklist-obv'))}">
+        	<input type="radio" style="margin-bottom: 6px;" name="locationScale" value="Local" ${isLocalChecked} /><g:message code="default.local.label" /> 
+            <input type="radio" style="margin-bottom: 6px;" name="locationScale" value="Region" ${isRegionChecked} /><g:message code="default.regional.label" /> 
+			<input type="radio" style="margin-bottom: 6px;"  name="locationScale" value="Country" ${isCountryChecked} /><g:message code="default.country.label" /> 
+		</g:if>	
+		
+
+	    <div class="help-inline">
+        	<g:hasErrors bean="${observationInstance}" field="locationScale">
+        		<g:message code="observation.locationScale.not_selected" />
+        	</g:hasErrors>
+	    </div>
+		
+		 
+	</div>
+	
+	
+</div>
+
+
+
+
 <div class="control-group map_class">
 
     <label for="topology" class="control-label">
@@ -57,7 +100,10 @@
 		                            <label class="pull-left" style="text-align:center; font-weight:normal;"> <g:checkBox class="use_dms pull-left"
 		                                name="use_dms" value="${use_dms}" />
 		                                <g:message code="default.use.deg-min-sec.label" /> </label>
-		                        </div>
+		                            <g:if test="${sourceType != 'checklist'}">    
+										<label class="pull-left" style="text-align:center; font-weight:normal;margin-left: 20px;"><input type="checkbox" class="pull-left" name="geoPrivacy" value="${observationInstance?.geoPrivacy}" onclick="$(this).val('' + $(this).prop('checked'))" ${isGeoPrivacyChecked} /><g:message code="default.hide.location.label" /></label>
+									</g:if>	  
+							    </div>
 		                 	</g:if>
 	                        <div class="help-inline" style="white-space: normal;">
 	                               <g:hasErrors bean="${sourceInstance}" field="${topologyNameField}">
@@ -68,26 +114,8 @@
 	                    	</div>
 	                    </div>
                         
-                        <div class="control-group">
-                                <%
-                                def defaultAccuracy = (obvInfoFeeder?.locationAccuracy) ? obvInfoFeeder.locationAccuracy : "Approximate"
-                                def isAccurateChecked = (defaultAccuracy == "Accurate")? "checked" : ""
-                                def isApproxChecked = (defaultAccuracy == "Approximate")? "checked" : ""
-								def isGeoPrivacyChecked = (observationInstance?.geoPrivacy) ? "checked" : ""
-                                %>
-                                <!--label for="location_accuracy" class="control-label" style="padding:0px"><g:message
-                                code="observation.accuracy.label"
-                                default="Accuracy" /> </label-->
-
-                                <input type="radio" name="location_accuracy" value="Accurate" ${isAccurateChecked} /><g:message code="default.accurate.label" /> 
-                                <input type="radio" name="location_accuracy" value="Approximate" ${isApproxChecked} /><g:message code="default.approximate.label" /> 
-                                <input type="checkbox" class="" name="geoPrivacy" value="${observationInstance?.geoPrivacy}" onclick="$(this).val('' + $(this).prop('checked'))" ${isGeoPrivacyChecked} />
-                               <g:message code="default.hide.location.label" /> 
-
-
-                        </div>
-                        <div class="row control-group" style="display:none;" >
-                            <label for="location_accuracy" class="control-label" style="padding:0px"><g:message
+                         <div class="row control-group" style="display:none;" >
+                            <label for="locationScale" class="control-label" style="padding:0px"><g:message
                                 code="observation.geocode.label"
                                 default="Geocode name" /> </label>
                             <div class="controls">                

@@ -38,9 +38,13 @@ import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.AbstractObjectController;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.participation.ActivityFeedService;
 import static org.springframework.http.HttpStatus.*;
+import species.sourcehandler.exporter.DwCObservationExporter; 
+import species.sourcehandler.exporter.DwCSpeciesExporter; 
+import java.math.BigDecimal
+
 
 class ObservationController extends AbstractObjectController {
 	
@@ -177,25 +181,25 @@ class ObservationController extends AbstractObjectController {
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
 		def observationInstanceList = filteredObservation.observationInstanceList
         
-        //Because returning source Ids instead of actual obv ins
-        if(params.filterProperty == 'speciesName') {
-            //def fetchedCklCount = filteredObservation.checklistCount;
-            def results = []
-            //def cklCount = 0;
-            observationInstanceList.each {
-                def obv = Observation.read(it);
-                //if(fetchedCklCount != 0 && obv.isChecklist) {
-                  //  cklCount += 1;
-                //}
-                results.add(obv)
-            }
-            filteredObservation.observationInstanceList = results;
-            observationInstanceList = results;
-            //if(fetchedCklCount != 0 ) {
-              //  filteredObservation.checklistCount = cklCount;
-            //}
-            //println "=============CKL COUNT========= " + cklCount
-        }
+//        //Because returning source Ids instead of actual obv ins
+//        if(params.filterProperty == 'speciesName') {
+//            //def fetchedCklCount = filteredObservation.checklistCount;
+//            def results = []
+//            //def cklCount = 0;
+//            observationInstanceList.each {
+//                def obv = Observation.read(it);
+//                //if(fetchedCklCount != 0 && obv.isChecklist) {
+//                  //  cklCount += 1;
+//                //}
+//                results.add(obv)
+//            }
+//            filteredObservation.observationInstanceList = results;
+//            observationInstanceList = results;
+//            //if(fetchedCklCount != 0 ) {
+//              //  filteredObservation.checklistCount = cklCount;
+//            //}
+//            //println "=============CKL COUNT========= " + cklCount
+//        }
 
 		def queryParams = filteredObservation.queryParams
 		def activeFilters = filteredObservation.activeFilters
@@ -205,7 +209,9 @@ class ObservationController extends AbstractObjectController {
 //		def count = queryResult.observationInstanceList.size()
         def checklistCount =  filteredObservation.checklistCount
 		def allObservationCount =  filteredObservation.allObservationCount
-		
+	
+        queryParams.remove('ranks')
+        queryParams.remove('statuses')
 		//storing this filtered obvs ids list in session for next and prev links
 		//http://grepcode.com/file/repo1.maven.org/maven2/org.codehaus.groovy/groovy-all/1.8.2/org/codehaus/groovy/runtime/DefaultGroovyMethods.java
 		//returns an arraylist and invalidates prev listing result
@@ -222,7 +228,7 @@ class ObservationController extends AbstractObjectController {
             }
         }
 		log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
-		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
+		return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, speciesCount:filteredObservation.speciesCount,  subSpeciesCount:filteredObservation.subSpeciesCount, acceptedSpeciesCount:filteredObservation.acceptedSpeciesCount, synonymSpeciesCount:filteredObservation.synonymSpeciesCount, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
 	}
 	
 	def occurrences() {
@@ -238,8 +244,9 @@ class ObservationController extends AbstractObjectController {
 	def create() {
 		def observationInstance = new Observation()
 		observationInstance.properties = params;
+		observationInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
 		def author = springSecurityService.currentUser;
-		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
+		def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted and obv.id = obv.sourceId and obv.isChecklist = false order by obv.createdOn desc ",[author:author, isDeleted:false]);
 		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
         return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}
@@ -1203,7 +1210,6 @@ class ObservationController extends AbstractObjectController {
 	 */
 
 	def listRelated = {
-    	log.debug params;
         Long parentId = params.id?params.long('id'):null;
         def result = observationService.getRelatedObservations(params);
 
@@ -1581,10 +1587,8 @@ class ObservationController extends AbstractObjectController {
 	
 	@Secured(['ROLE_USER'])
 	def requestExport() {
-		obvUtilService.requestExport(params)
-		def r = [:]
-		r['msg']= "${message(code: 'observation.download.requsted', default: 'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.')}"
-		render r as JSON
+        def r = obvUtilService.requestExport(params)
+        render r as JSON
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1694,7 +1698,7 @@ class ObservationController extends AbstractObjectController {
         def currentUser = springSecurityService.currentUser;
         def mailType = '';
         def activityFeed;
-        if(params.lockType == "Lock"){
+        if(params.lockType == "Validate"){
             //current user & reco
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
             ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
@@ -1807,10 +1811,46 @@ class ObservationController extends AbstractObjectController {
 	    //setupService.uploadFields("/tmp/FrenchDefinitions.xlsx");
 	    println speciesService.checking();
     	//return false;
-        //render springSecurityFilterChain
     }
+
+def filterChain() {
+    render springSecurityFilterChain
+}
 
     def filePickerSecurityCodes() {
         utilsService.filePickerSecurityCodes();
     }
+	
+	@Secured(['ROLE_USER'])
+	def updateCustomField(){
+		log.debug params
+		def result = observationService.updateInlineCf(params)
+		def model = utilsService.getSuccessModel('success', null, OK.value(), result);
+		withFormat {
+			json { render model as JSON }
+			xml { render model as XML }
+		}
+	}
+
+ @Secured(['ROLE_USER'])
+    def updateOraddTags(){
+        log.debug params
+        def observationInstance =  Observation.read(params.observationId);
+        def result = observationService.updateTags(params,observationInstance)
+        def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
+        render model as JSON
+        return;
+
+    }
+@Secured(['ROLE_USER'])
+    def updateSpeciesGrp(){
+        log.debug params
+        def observationInstance =  Observation.read(params.observationId);        
+        def result = observationService.updateSpeciesGrp(params,observationInstance)
+        def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
+        render model as JSON
+        return;
+    }
+
+
 }

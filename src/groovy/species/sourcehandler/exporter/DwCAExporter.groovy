@@ -6,7 +6,7 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import species.*
 import species.Contributor
-import species.TaxonomyDefinition.TaxonomyRank
+import species.ScientificName.TaxonomyRank
 import java.util.HashSet
 
 import java.util.zip.ZipOutputStream

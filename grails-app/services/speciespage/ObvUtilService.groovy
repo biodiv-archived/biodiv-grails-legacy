@@ -5,12 +5,13 @@ import groovy.xml.MarkupBuilder;
 import groovy.xml.XmlUtil;
 
 import java.util.Map;
+import java.io.File ;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
 import species.auth.SUser
 import species.groups.SpeciesGroup;
-import species.groups.UserGroup
+import species.groups.UserGroup 
 import species.participation.*
 import species.participation.RecommendationVote.ConfidenceType
 import species.Habitat
@@ -28,7 +29,11 @@ import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
-
+import species.sourcehandler.exporter.DwCObservationExporter; 
+import species.sourcehandler.exporter.DwCSpeciesExporter
+import org.codehaus.groovy.grails.web.json.JSONObject;
+import grails.converters.JSON;
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class ObvUtilService {
 
@@ -40,9 +45,11 @@ class ObvUtilService {
 	static final String HABITAT = "habitat"
 	static final String OBSERVED_ON   = "observed on"
 	static final String CN    = "common name"
+	static final String LANGUAGE    = "language"
 	static final String SN    = "scientific name"
 	static final String GEO_PRIVACY   = "Geoprivacy enabled"
 	static final String LOCATION   = "location title"
+	static final String LOCATION_SCALE   = "location scale"
 	static final String LONGITUDE    = "longitude"
 	static final String LATITUDE   = "latitude"
 	static final String LICENSE   = "license"
@@ -77,20 +84,45 @@ class ObvUtilService {
 	def activityFeedService
 	def observationsSearchService
 	def commentService
-	
+    def messageSource;
+
 	///////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	
-	
+	private final static int EXPORT_BATCH_SIZE = 5000;
+
 	def requestExport(params){
-		log.debug(params)
-		log.debug "creating download request"
-		DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
+        log.debug "creating download request"
+        DownloadLog dl;
+        def res = [];
+        int instanceTotal = params.instanceTotal?params.int('instanceTotal'):0
+        for( int i=0; i<instanceTotal/EXPORT_BATCH_SIZE; i++) {
+            int offset = (i * EXPORT_BATCH_SIZE);
+            dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params, offset);
+
+            def r = [:];
+            r['offset'] = offset;
+            if(!dl.hasErrors()) {
+                r['success'] = true;
+                r['msg']= messageSource.getMessage('observation.download.requsted',null,'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.', LCH.getLocale())
+            } else {
+                r['success'] = false;
+                r['msg'] = 'Error in creating download log.' 
+                def errors = [];
+                dl.errors.allErrors.each {
+                    def formattedMessage = messageSource.getMessage(it, LCH.getLocale());
+                    errors << ['field': it.field, 'message': formattedMessage]
+                }
+                r['errors'] = errors 
+                println dl.errors.allErrors
+            }
+            res << r;
+        }
+        return res;
 	}
 	
 	def export(params, dl){
-		log.debug(params)
         if(params.downloadFrom && params.downloadFrom == 'uniqueSpecies') {
             def max = Math.min(params.max ? params.int('max') : 10, 100)
             def offset = params.offset ? params.int('offset') : 0
@@ -108,12 +140,13 @@ class ObvUtilService {
             distinctRecoListResult.distinctRecoListResult = completeResult;
             return exportUniqueSpeciesList(distinctRecoListResult); 
         }else {
-            def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress).getAllResult()
-            log.debug " Obv total $observationInstanceList.size()" 
-            return exportObservation(observationInstanceList, dl.type, dl.author)
+//            def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress, dl.offset).getAllResult()
+            return exportObservation(dl);
+//            return exportObservation(observationInstanceList, dl.type, dl.author, dl.id, dl.filterUrl )
+            //return DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl.id, params.filterUrl );
+
         }
     }
-	
 	
     private File exportUniqueSpeciesList(Map distinctRecoListResult) {
         if(!distinctRecoListResult) {
@@ -151,8 +184,26 @@ class ObvUtilService {
 
         return csvFile
     }
+	
+    private def exportObservation(DownloadLog dl){
+    	if(!dl)
+			return null
+		
+		File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		}
+		log.debug "export type " + dl.type 
+		if(dl.type == DownloadLog.DownloadType.CSV) {
+			return exportAsCSV(downloadDir, dl)
+		} else if(dl.type == DownloadLog.DownloadType.KML) {
+			return exportAsKML(downloadDir, dl)
+		} else {
+			return exportAsDW(downloadDir, dl)
+		}
+    }
 
-	private File exportObservation(List obvList, exportType, reqUser){
+/*    private def exportObservation(List obvList, exportType, reqUser, dl_id, params_filterUrl ){
 		if(! obvList)
 			return null
 		
@@ -173,14 +224,56 @@ class ObvUtilService {
 		}
 		log.debug "export type " + exportType 
 		if(exportType == DownloadLog.DownloadType.CSV){
-			return exportAsCSV(downloadDir, obvList, reqUser)
-		}else{
-			return exportAsKML(downloadDir, obvList, reqUser)
+			return exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl)
+		}else if(exportType == DownloadLog.DownloadType.KML) {
+			return exportAsKML(downloadDir, obvList, reqUser, dl_id, params_filterUrl)
+		} else {
+			return exportAsDW(downloadDir, obvList, reqUser, dl_id, params_filterUrl)
 		}
 	}
-	
-	private File exportAsCSV(downloadDir, obvList, reqUser){
-		File csvFile = new File(downloadDir, "obv_" + new Date().getTime() + ".csv")
+*/
+	private File exportAsCSV(File downloadDir, DownloadLog dl){
+		String folderName = "obv_"+ + new Date().getTime()
+		String parent_dir = downloadDir.getAbsolutePath() + File.separator + folderName+File.separator + folderName
+		File csvFile = new File(parent_dir, "obv_" + new Date().getTime() + ".csv")
+		
+		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
+		
+		boolean headerAdded = false
+        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, dl.offsetParam.intValue());
+        int total = 0;
+        while (total < EXPORT_BATCH_SIZE && rf.hasNext()) {
+            def obvList = rf.next();
+            total += obvList.size();
+            obvList.each { obv ->
+			    if(obv.isChecklist) return;
+
+                log.debug "Writting " + obv
+                Map m = obv.fetchExportableValue(dl.author)
+                if(!headerAdded){
+                    def header = []
+                    for(entry in m){
+                        header.add(entry.getKey())
+                    }
+                    writer.writeNext(header.toArray(new String[0]))
+                    headerAdded = true
+                }
+                writer.writeNext(m.values().toArray(new String[0]))
+            }
+        }
+		writer.flush()
+		writer.close()
+
+		File f = DwCObservationExporter.getInstance().returnMetaData_EML(parent_dir, dl.author, dl.id, dl.filterUrl)
+		return archive(downloadDir.getAbsolutePath(), folderName, csvFile, f )
+		//return csvFile
+	}
+/*	
+	private File exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl){
+		String folderName = "obv_"+ + new Date().getTime()
+		String parent_dir=downloadDir.getAbsolutePath() +File.separator+folderName+File.separator+ folderName
+		File csvFile = new File(parent_dir, "obv_" + new Date().getTime() + ".csv")
+		
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
 		
 		boolean headerAdded = false
@@ -199,162 +292,242 @@ class ObvUtilService {
 		}
 		writer.flush()
 		writer.close()
-		
-		return csvFile
+
+		File f=DwCObservationExporter.getInstance().returnMetaData_EML(parent_dir,reqUser , dl_id , params_filterUrl)
+		return archive(downloadDir.getAbsolutePath(), folderName, csvFile, f )
+		//return csvFile
 	}
-	
-	def CSVWriter getCSVWriter(def directory, def fileName) {
-		//char separator = '\t'
-		File dir =  new File(directory)
-		if(!dir.exists()){
-			dir.mkdirs()
-		}
-		return new CSVWriter(new FileWriter("$directory/$fileName"))//, separator);
-	}
-	
-	def exportAsKML(downloadDir, obvList, reqUser){
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		String iconBasePath = config.speciesPortal.observations.serverURL
-		
-		def builder = new StreamingMarkupBuilder()
-		builder.encoding = 'UTF-8'
-		def books = builder.bind {
-			mkp.xmlDeclaration()
-			namespaces << ['':'http://www.opengis.net/kml/2.2']
-			kml() {
-				Document(){
-					Style(id:"displayName-value") {
-						BalloonStyle() {
-							text() {
-								mkp.yield '''
-<a href='$[Observation]' style="height:150px" ><img src='$[Image]' title='$[Species Name]'/></a>
-<table>
-<tr><td><b>Species Name</b></td><td>$[Species Name]</td></tr>
-<tr><td><b>Common Name</b></td><td>$[Common Name]</td></tr>
-<tr><td><b><b>Place</b></td><td>$[Place]</td></tr>
-<tr><td><b>Observed On</b></td><td>$[Observed on]</td></tr>
-<tr><td><b>Species Group</b></b></td><td>$[Species Group]</td></tr>
-<tr><td><b>Habitat</td><td>$[Habitat]</td></tr>
-<tr><td><b>By</b></td><td><a href='$[AuthorProfile]'>$[Author]</a></td></tr>
-<tr><td><b>Posted to User Groups</b></td><td>$[UserGroups]</td></tr>
-<tr><td><b>Notes</b></td><td>$[Notes]</td></tr>
-</table>
-											'''
-							}
-						}
-					
-					IconStyle() {
-					   color('ff00ff00')
-					   colorMode('random')
-					   scale('1.1')
-					   Icon() {
-						  href('http://maps.google.com/mapfiles/kml/pal3/icon21.png')
-					   }
-					}
-					}
-					for ( obv in obvList) {
-						log.debug "writing $obv"
-						def mainImage = obv.mainImage()
-						def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
-						def commonName = obv.fetchSuggestedCommonNames()
-						def base = grailsApplication.config.speciesPortal.observations.serverURL
-						def geoPrivacyAdjust = obv.fetchGeoPrivacyAdjustment(reqUser)
-						def obvLongitude = obv.longitude + geoPrivacyAdjust
-						def obvLatitude = obv.latitude + geoPrivacyAdjust
-						PhotoOverlay() {
-							name(obv.fetchSpeciesCall())
-							styleUrl('#displayName-value')
-//							def snippet = g.render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:obv, 'userGroupWebaddress':params.webaddress])
-//							description () {
-//								 mkp.yield "$snippet"
-//							}
-							ExtendedData() {
-								Data(name:'Observation') {
-									value("${utilsService.createHardLink('observation', 'show', obv.id)}")
-									//value("${userGroupService.userGroupBasedLink(controller:'observation', action:'show', id:obv.id, 'userGroupWebaddress':params.webaddress, absolute:true) }")
-								}
-								Data(name:'Image') {
-									if(imagePath) {
-										value("${'' + base + imagePath}")
-										//value("${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath, absolute:true)}")
-									} else {
-										value()
-									}
-								}
-								Data(name:'Species Name') {
-									value(obv.fetchSpeciesCall());
-								}
-								
-								Data(name:'Common Name') {
-										
-										value(commonName)
-									
-								}
-								Data(name:'Place') {
-									value(obv.reverseGeocodedName)
-								}
-								Data(name:'Observed on') {
-									value(String.format('%tA %<te %<tB %<ty', obv.fromDate))
-								}
-								Data(name:'Notes') {
-									value() {
-										 mkp.yield obv.notes
-									}
-								}
-								Data(name:'Species Group') {
-									value(obv.group?.name)
-								}
-								Data(name:'Habitat') {
-									value(obv.habitat?.name)
-								}
-								Data(name:'Author') {
-									value(obv.author.name)
-								}
-								Data(name:'AuthorProfile') {
-									value("${utilsService.createHardLink('user', 'show', obv.author.id)}")
-									//value("${userGroupService.userGroupBasedLink('controller':'SUser', action:'show', id:obv.author.id,  'userGroupWebaddress':params.webaddress, absolute:true)}")
-								}
-								Data(name:'UserGroups') {
-									value(obv.userGroups*.name.join(','))
-								}
-								Data(name:'Geoprivacy enabled') {
-									value("" + obv.geoPrivacy)
-								}
-							}
-							Camera() {
-								longitude(obvLongitude)
-								latitude(obvLatitude)
-								altitude(5)
-								roll(0)
-								altitudeMode('relativeToGround')
-							}
-							ImagePyramid() {
-								maxWidth(512)
-								maxHeight(512)
-							}
-							Icon() {
-								href('' + base + imagePath)
-								//href(createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath, absolute:true))
-							}
-							Point() {
-								coordinates(obvLongitude+","+obvLatitude)
-							}
-							Style() {
-								IconStyle() {
-									Icon() {
-										href('http://maps.google.com/mapfiles/ms/micons/green-dot.png')
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		File kmlFile = new File(downloadDir, "obv_" + new Date().getTime() + ".kml")
-		kmlFile <<  XmlUtil.serialize(books)
-		return kmlFile
-	}
+*/
+    def  archive(directory, folderName,  file_name1,  file_name2 ) {
+        String f = File.separator
+
+        File folder= new File(folderName)
+        if(!folder.exists()){
+            folder.mkdirs()
+        }
+
+        def HOME = directory + f + folderName
+
+        def zipFile = new File(HOME + ".zip")
+        def deploymentFiles = [ folderName + f + file_name1.getName(), folderName+f+file_name2.getName() ]
+        new AntBuilder().zip( basedir: HOME,
+        destFile: zipFile.absolutePath,
+        includes: deploymentFiles.join( ' ' ))
+
+        return zipFile
+    }
+
+    def exportAsDW(File downloadDir, DownloadLog dl){
+        List<String> list_final=[] ;
+
+/*        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
+        while(rf.hasNext()) {
+            def obvList = rf.next(); 
+            obvList.each {
+                def it_observation = it
+                def next = it_observation as JSON ; 
+                def it_final = JSON.parse(""+next)
+                list_final.add(it_final)
+            }
+        }
+*/
+        DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), dl);
+        //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
+    }
+
+    def CSVWriter getCSVWriter(def directory, def fileName) {
+        //char separator = '\t'
+        File dir =  new File(directory)
+        if(!dir.exists()){
+            dir.mkdirs()
+        }
+        return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
+    }
+
+/*    def exportAsDW__specie(downloadDir, obvList, reqUser, dl_id, params_filterUrl){
+        List<String> list_final=[] ;
+        //File dwFile = new File(downloadDir, "obv_" + new Date().getTime() + ".dw")
+        //CSVWriter writer = getCSVWriter(dwFile.getParent(), dwFile.getName())
+
+        obvList.each {
+            def it_observation =it
+            def next = it_observation as JSON ; 
+            def it_final=JSON.parse(""+next)
+            list_final.add(it_final)
+        }
+
+        DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), list_final, reqUser, dl_id, params_filterUrl );
+        //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
+    }
+*/	
+    def exportAsKML(File downloadDir, DownloadLog dl){
+        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        String iconBasePath = config.speciesPortal.observations.serverURL
+
+        def builder = new StreamingMarkupBuilder()
+        builder.encoding = 'UTF-8'
+        def books = builder.bind {
+            mkp.xmlDeclaration()
+            namespaces << ['':'http://www.opengis.net/kml/2.2']
+            kml() {
+                Document(){
+                    Style(id:"displayName-value") {
+                        BalloonStyle() {
+                            text() {
+                                mkp.yield '''
+                                <a href='$[Observation]' style="height:150px" ><img src='$[Image]' title='$[Species Name]'/></a>
+                                <table>
+                                <tr><td><b>Species Name</b></td><td>$[Species Name]</td></tr>
+                                <tr><td><b>Common Name</b></td><td>$[Common Name]</td></tr>
+                                <tr><td><b><b>Place</b></td><td>$[Place]</td></tr>
+                                <tr><td><b>Observed On</b></td><td>$[Observed on]</td></tr>
+                                <tr><td><b>Species Group</b></b></td><td>$[Species Group]</td></tr>
+                                <tr><td><b>Habitat</td><td>$[Habitat]</td></tr>
+                                <tr><td><b>By</b></td><td><a href='$[AuthorProfile]'>$[Author]</a></td></tr>
+                                <tr><td><b>Posted to User Groups</b></td><td>$[UserGroups]</td></tr>
+                                <tr><td><b>Notes</b></td><td>$[Notes]</td></tr>
+                                </table>
+                                '''
+                            }
+                        }
+
+                        IconStyle() {
+                            color('ff00ff00')
+                            colorMode('random')
+                            scale('1.1')
+                            Icon() {
+                                href('http://maps.google.com/mapfiles/kml/pal3/icon21.png')
+                            }
+                        }
+                    }
+
+                    ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, dl.offsetParam.intValue());
+                    int total = 0;
+                    while(rf.hasNext() && total < EXPORT_BATCH_SIZE) {
+                        def obvList = rf.next();
+                        total += obvList.size();
+                        for ( obv in obvList) {
+                            log.debug "writing $obv"
+                            def mainImage = obv.mainImage()
+                            def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
+                            def commonName = obv.fetchSuggestedCommonNames()
+                            def base = grailsApplication.config.speciesPortal.observations.serverURL
+                            def geoPrivacyAdjust = obv.fetchGeoPrivacyAdjustment(dl.author)
+                            def obvLongitude = obv.longitude + geoPrivacyAdjust
+                            def obvLatitude = obv.latitude + geoPrivacyAdjust
+                            PhotoOverlay() {
+                                name(obv.fetchSpeciesCall())
+                                styleUrl('#displayName-value')
+                                //							def snippet = g.render (template:"/common/observation/showObservationSnippetTabletTemplate", model:[observationInstance:obv, 'userGroupWebaddress':params.webaddress])
+                                //							description () {
+                                //								 mkp.yield "$snippet"
+                                //							}
+                                ExtendedData() {
+                                    Data(name:'Observation') {
+                                        value("${utilsService.createHardLink('observation', 'show', obv.id)}")
+                                        //value("${userGroupService.userGroupBasedLink(controller:'observation', action:'show', id:obv.id, 'userGroupWebaddress':params.webaddress, absolute:true) }")
+                                    }
+                                    Data(name:'Image') {
+                                        if(imagePath) {
+                                            value("${'' + base + imagePath}")
+                                            //value("${createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath, absolute:true)}")
+                                        } else {
+                                            value()
+                                        }
+                                    }
+                                    Data(name:'Species Name') {
+                                        value(obv.fetchSpeciesCall());
+                                    }
+
+                                    Data(name:'Common Name') {
+
+                                        value(commonName)
+
+                                    }
+                                    Data(name:'Place') {
+                                        value(obv.reverseGeocodedName)
+                                    }
+                                    Data(name:'Observed on') {
+                                        value(String.format('%tA %<te %<tB %<ty', obv.fromDate))
+                                    }
+                                    Data(name:'Notes') {
+                                        value() {
+                                            mkp.yield obv.notes
+                                        }
+                                    }
+                                    Data(name:'Species Group') {
+                                        value(obv.group?.name)
+                                    }
+                                    Data(name:'Habitat') {
+                                        value(obv.habitat?.name)
+                                    }
+                                    Data(name:'Author') {
+                                        value(obv.author.name)
+                                    }
+                                    Data(name:'AuthorProfile') {
+                                        value("${utilsService.createHardLink('user', 'show', obv.author.id)}")
+                                        //value("${userGroupService.userGroupBasedLink('controller':'SUser', action:'show', id:obv.author.id,  'userGroupWebaddress':params.webaddress, absolute:true)}")
+                                    }
+                                    Data(name:'UserGroups') {
+                                        value(obv.userGroups*.name.join(','))
+                                    }
+                                    Data(name:'Geoprivacy enabled') {
+                                        value("" + obv.geoPrivacy)
+                                    }
+                                }
+                                Camera() {
+                                    longitude(obvLongitude)
+                                    latitude(obvLatitude)
+                                    altitude(5)
+                                    roll(0)
+                                    altitudeMode('relativeToGround')
+                                }
+                                ImagePyramid() {
+                                    maxWidth(512)
+                                    maxHeight(512)
+                                }
+                                Icon() {
+                                    href('' + base + imagePath)
+                                    //href(createLinkTo(base:grailsApplication.config.speciesPortal.observations.serverURL,	file: imagePath, absolute:true))
+                                }
+                                Point() {
+                                    coordinates(obvLongitude+","+obvLatitude)
+                                }
+                                Style() {
+                                    IconStyle() {
+                                        Icon() {
+                                            href('http://maps.google.com/mapfiles/ms/micons/green-dot.png')
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        String  file_name = "obv_" + new Date().getTime() + ".kml"
+        String folderName = "obv_kml" + new Date().getTime()
+        String parent_dir = downloadDir.getAbsolutePath() + File.separator+folderName + File.separator + folderName
+
+        File dir =  new File(parent_dir)
+        if(!dir.exists()){
+            dir.mkdirs()
+        }
+
+        File kmlFile = new File ( dir,  file_name )
+        if(!kmlFile.exists()){
+            kmlFile.createNewFile()
+        }
+
+        kmlFile <<  XmlUtil.serialize(books)
+
+        File eml = DwCObservationExporter.getInstance().returnMetaData_EML(parent_dir, dl.author, dl.id, dl.filterUrl)
+
+        return archive(downloadDir.getAbsolutePath(), folderName, kmlFile, eml)
+    }
 
 	////////////////////////////////// End export//////////////////////////////
 	
@@ -435,12 +608,14 @@ class ObvUtilService {
 		obvParams['longitude'] = (m[LONGITUDE] ?:"76.658279")
 		obvParams['latitude'] = (m[LATITUDE] ?: "12.32112")
 		obvParams['location_accuracy'] = 'Approximate'
+		obvParams['locationScale'] = m[LOCATION_SCALE]
 		obvParams['placeName'] = m[LOCATION]
 		obvParams['reverse_geocoded_name'] = (m[LOCATION] ?: "National Highway 6, Maharashtra, India")
 		
 		//reco related
 		obvParams['recoName'] = m[SN]
 		obvParams['commonName'] = m[CN] 
+		obvParams['languageName'] = m[LANGUAGE]
 		obvParams['recoComment'] = m[COMMENT]
 		
 		//tags, grouplist, notes
@@ -541,7 +716,7 @@ class ObvUtilService {
 		
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
-			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, params.author);
 			observationInstance.lastRevised = new Date();
 			//saving max voted species name for observation instance
 			observationInstance.calculateMaxVotedSpeciesName();

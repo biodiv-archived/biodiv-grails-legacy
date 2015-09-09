@@ -1,6 +1,6 @@
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="species.Reference"%>
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@page import="species.ScientificName.TaxonomyRank"%>
 
 <div class="sidebar_section  <%=sparse?'':'menubutton'%>  <%=concept.key.equalsIgnoreCase(fieldFromName.overview)?'defaultSpeciesConcept':''%>   ${concept.value.hasContent?'':'emptyField'}" <%=concept.value.hasContent?'':'style=\"display:none\"'%>  ">
     <g:set var="fieldCounter" value="${1}" />
@@ -36,7 +36,7 @@
                     <a class="category-header-heading speciesFieldHeader" href="#speciesField${conceptCounter}_${fieldCounter}"> ${category.key}</a>
                 </h6>
                 <div>
-                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) && !category.key.equalsIgnoreCase(fieldFromName.references) && !category.key.equalsIgnoreCase(fieldFromName.documents) && isSpeciesContributor && category.value.isContributor!=2}">
+                <g:if test="${category.value.containsKey('field') && !category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) && !category.key.equalsIgnoreCase(fieldFromName.references) && !category.key.equalsIgnoreCase(fieldFromName.ss_v_r) && !category.key.equalsIgnoreCase(fieldFromName.documents) && isSpeciesContributor && category.value.isContributor!=2}">
                 <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:category.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
                 </g:if>
 
@@ -45,7 +45,7 @@
                 <div 
                     class="<%=category.key.equals(brief)?'defaultSpeciesField':''%> speciesField">
                     <div>   
-                    <g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) || category.key.equalsIgnoreCase(fieldFromName.references)|| category.key.equalsIgnoreCase(fieldFromName.documents)}">
+                    <g:if test="${category.value.containsKey('speciesFieldInstance') || category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords) || category.key.equalsIgnoreCase(fieldFromName.references)|| category.key.equalsIgnoreCase(fieldFromName.documents) || category.key.equalsIgnoreCase(fieldFromName.ss_v_r) }">
                     <g:if
                     test="${category.key.equalsIgnoreCase(fieldFromName.occurrenceRecords)}">
                     <g:render template="/species/showSpeciesOccurences" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance, 'category':category]"/> 
@@ -59,6 +59,13 @@
                         <g:render template="/species/speciesFieldDocumentListWrapperTemplate" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance]"/> 
                     </g:elseif>
 
+                    <g:elseif test="${category.key.equalsIgnoreCase(fieldFromName.ss_v_r)}">
+                        <g:each in="${category.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
+                        <g:showSpeciesField
+                        model="['speciesInstance' : speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':category.value.get('field'), 'isSpeciesContributor':isSpeciesContributor]" />
+                        </g:each>
+                        <g:render template="/species/speciesFieldSubSpeciesVarietiesAndRacesTemplate" model="['speciesInstance':speciesInstance, 'userGroupInstance':userGroupInstance]"/> 
+                    </g:elseif>
                     <g:else>
                     <g:each in="${category.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
                     <g:showSpeciesField

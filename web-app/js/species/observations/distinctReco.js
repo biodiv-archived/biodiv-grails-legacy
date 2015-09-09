@@ -1,7 +1,3 @@
-$(document).ready(function(){
-    $("#distinctRecoTableAction").click(loadDistinctRecoList);
-});
-
 function updateDistinctRecoTable(){
 	$('#distinctRecoTable tbody').empty();
 	var me = $('#distinctRecoTableAction');

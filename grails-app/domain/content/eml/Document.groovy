@@ -121,6 +121,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		license nullable:false
     	featureCount nullable:false
 		agreeTerms nullable:true
+		locationScale(nullable: true)
 		
 		//coverage related extended from metadata
 		placeName(nullable:true)
@@ -131,7 +132,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		locationScale nullable:true
 	}
 	
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup, docSciNames:DocSciName]
 	static belongsTo = [SUser, UserGroup]
 	
 	static mapping = {

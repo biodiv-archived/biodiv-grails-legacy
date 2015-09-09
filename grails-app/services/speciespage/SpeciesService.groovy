@@ -26,7 +26,9 @@ import species.SpeciesField.Status;
 import species.TaxonomyDefinition;
 import species.formatReader.SpreadsheetReader
 import species.groups.SpeciesGroup;
+import species.ScientificName
 import species.Synonyms;
+import species.SynonymsMerged;
 import species.CommonNames;
 import species.Language;
 import species.Classification;
@@ -51,11 +53,20 @@ import species.participation.DownloadLog;
 import species.groups.UserGroup;
 import species.AbstractObjectService;
 import species.TaxonomyRegistry;
+import species.ScientificName.TaxonomyRank;
 import org.hibernate.FetchMode;
 import grails.converters.JSON;
 import species.participation.ActivityFeedService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
+
+import species.NamesMetadata.NameStatus;
+import content.eml.DocSciName;
+import content.eml.Document;
+import species.AcceptedSynonym;
+import species.sourcehandler.exporter.DwCSpeciesExporter
+import java.io.File ;
+import species.participation.NamelistService
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -319,7 +330,7 @@ class SpeciesService extends AbstractObjectService  {
                     List sameFieldSpeciesFieldInstances =  speciesInstance.fields.findAll { it.field.id == field.id} as List
                     sortAsPerRating(sameFieldSpeciesFieldInstances);
                     addMediaInSpField(params, speciesFieldInstance);
-                    return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
+                    return [success:true, msg:messageSource.getMessage("info.success.added", null, LCH.getLocale()), id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id, errors:errors, speciesFieldInstance:speciesFieldInstance, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_CREATED, activityDesc:ActivityFeedService.SPECIES_FIELD_CREATED+" : "+field, mailType:ActivityFeedService.SPECIES_FIELD_CREATED]
                 } else {
                     return [success:false, msg:messageSource.getMessage("info.error.adding", null, LCH.getLocale()), errors:errors]
                 }
@@ -358,7 +369,7 @@ class SpeciesService extends AbstractObjectService  {
                 addMediaInSpField(params, speciesField);
             }
             log.debug "Successfully updated species field";
-            return [success:true, msg:messageSource.getMessage("info.success.update", null, LCH.getLocale()), errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:ActivityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_UPDATED]
+            return [success:true, msg:messageSource.getMessage("info.success.update", null, LCH.getLocale()), errors:result.errors, content:speciesField, speciesFieldInstance:speciesField, speciesInstance:speciesField.species, activityType:ActivityFeedService.SPECIES_FIELD_UPDATED, activityDesc:ActivityFeedService.SPECIES_FIELD_UPDATED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_UPDATED]
         } catch(Exception e) {
             e.printStackTrace();
             def messagesourcearg = new Object[1];
@@ -493,7 +504,7 @@ class SpeciesService extends AbstractObjectService  {
                 //sortAsPerRating(sameFieldSpeciesFieldInstances);
                 //return [success:true, msg:"Successfully deleted species field", id:field.id, content:sameFieldSpeciesFieldInstances, speciesId:speciesInstance.id]
                 def newSpeciesFieldInstance = createNewSpeciesField(speciesInstance, field, '');
-                return [success:true, msg:messageSource.getMessage("info.speciefield.deleted", null, LCH.getLocale()), id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_DELETED]
+                return [success:true, msg:messageSource.getMessage("info.speciefield.deleted", null, LCH.getLocale()), id:field.id, content:newSpeciesFieldInstance, speciesFieldInstance:speciesField, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_FIELD_DELETED, activityDesc:ActivityFeedService.SPECIES_FIELD_DELETED+" : "+speciesField.field, mailType:ActivityFeedService.SPECIES_FIELD_DELETED]
             } catch(e) {
                 e.printStackTrace();
                 log.error e.getMessage();
@@ -911,28 +922,33 @@ class SpeciesService extends AbstractObjectService  {
 		}
     }
 
-    def updateSynonym(def synonymId, def speciesId, String relationship, String value) {
-        
+    def updateSynonym(def synonymId, def speciesId, String relationship, String value, otherParams = null) {
+        println "=====parameters========== " + synonymId +"========== "+ speciesId+ "======== "+relationship +"========= " + value+"============ " + otherParams
+        //if(request == null) request = RequestContextHolder.currentRequestAttributes().request
         if(!value || !relationship) {
             return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
         }
-        Species speciesInstance = Species.get(speciesId);
-   
-        if(!speciesInstance) {
-            def messagesourcearg = new Object[1];
+        Species speciesInstance = null; 
+        if(!otherParams) {
+            speciesInstance = Species.get(speciesId);
+
+            if(!speciesInstance) {
+                def messagesourcearg = new Object[1];
                 messagesourcearg[0] = speciesFieldId;
-            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+            	return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+            }
         }
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+        if(speciesInstance && !speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
             return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
-
-        Synonyms oldSynonym;
+        println "=====2========"
+        SynonymsMerged oldSynonym;
         if(synonymId) {
-            oldSynonym = Synonyms.read(synonymId);
+            oldSynonym = SynonymsMerged.read(synonymId);
 
             if(!oldSynonym) {
+        println "=====a========"
                 //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
@@ -941,60 +957,87 @@ class SpeciesService extends AbstractObjectService  {
             }
         }
 
+        println "=====3========"
         Species.withTransaction { status ->
+            TaxonomyDefinition taxonConcept;
+            if(otherParams) {
+                taxonConcept = TaxonomyDefinition.get(otherParams['taxonId'].toLong()); 
+            } else {
+                taxonConcept = speciesInstance.taxonConcept;
+            }
             if(oldSynonym) {
-                def result = deleteSynonym(oldSynonym, speciesInstance);
+                def result
+                if(otherParams) {
+                    println "===========HERE HERE ======= " + oldSynonym +"===== "+ taxonConcept
+                    result = deleteSynonym(oldSynonym, null, taxonConcept);
+                } else {
+                    result = deleteSynonym(oldSynonym, speciesInstance);
+                }
                 if(!result.success) {
                     def messagesourcearg = new Object[1];
-                messagesourcearg[0] = result.msg;
+                    messagesourcearg[0] = result.msg;
                     return [success:false, msg:messageSource.getMessage("info.error.updating.synonym", messagesourcearg, LCH.getLocale())]
                 }
             } 
+            println "====4========="
             XMLConverter converter = new XMLConverter();
 
             NodeBuilder builder = NodeBuilder.newInstance();
             def synonym = builder.createNode("synonym");
             Node data = new Node(synonym, 'data', value)
             new Node(data, "relationship", relationship);
-            new Node(data, "contributor", springSecurityService.currentUser.email);
- 
-            List<Synonyms> synonyms = converter.createSynonyms(synonym, speciesInstance.taxonConcept);
+            def email = (springSecurityService.currentUser)?springSecurityService.currentUser.email:"admin@strandls.com";
+            new Node(data, "contributor", email);
+            if(otherParams) {
+                new Node(data, "viaDatasource", otherParams['source']);
+            }
+            List<SynonymsMerged> synonyms = converter.createSynonyms(synonym, taxonConcept);
             
             if(!synonyms) {
                 return [success:false, msg:messageSource.getMessage("info.error.update.synonym", null, LCH.getLocale())]
             } else {
+                synonyms.each {
+                    taxonConcept.addSynonym(it);
+                }
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
-                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType, mailType;
+                //content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
+                content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
+                String activityType, mailType, description;
                 if(oldSynonym) {
-                    activityType = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
-                    mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
+                    description = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
                 } else {
-                    activityType = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
-                    mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
+                    description =  ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
                 }
-
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType]
+                if(otherParams) {
+                    println "========SYNONYMS========== " + synonyms
+                    return [success:true,/* id:speciesId,*/ msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept,dataInstance:synonyms[0], activityType:activityType, mailType:mailType, activityDesc:description]  
+                }
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType, activityDesc:description]
             }
         }
     }
 
-    def updateCommonname(def cnId, def speciesId, String language, String value) {
+    def updateCommonname(def cnId, def speciesId, String language, String value, otherParams = null) {
         
         if(!value || !language) {
             return [success:false, msg:messageSource.getMessage("info.name.language.no.empty", null, LCH.getLocale())]
         }
-        Species speciesInstance = Species.get(speciesId);
-   
-        if(!speciesInstance) {
-            def messagesourcearg = new Object[1];
-                messagesourcearg[0] = speciesFieldId;
-            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
-        }
+        Species speciesInstance = null;
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+        if(!otherParams) {
+            speciesInstance = Species.get(speciesId);
+
+            if(!speciesInstance) {
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = speciesId;
+                return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+            }
+        }
+        if(speciesInstance && !speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
             return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
 
@@ -1013,6 +1056,13 @@ class SpeciesService extends AbstractObjectService  {
         }
 
         Species.withTransaction { status ->
+            TaxonomyDefinition taxonConcept;
+            if(otherParams) {
+                taxonConcept = TaxonomyDefinition.get(otherParams['taxonId'].toLong()); 
+            } else {
+                taxonConcept = speciesInstance.taxonConcept;
+            }
+
             if(oldCommonname) {
                 oldCommonname.delete();
             } 
@@ -1024,8 +1074,10 @@ class SpeciesService extends AbstractObjectService  {
             Node l = new Node(data, "language");
             new Node(l, 'name', language);
             new Node(data, "contributor", springSecurityService.currentUser.email);
- 
-            List<CommonNames> commonnames = converter.createCommonNames(cn, speciesInstance.taxonConcept);
+            if(otherParams) {
+                new Node(data, "viaDatasource", otherParams['source']);
+            }
+            List<CommonNames> commonnames = converter.createCommonNames(cn, taxonConcept);
             
             if(!commonnames) {
                 return [success:false, msg:messageSource.getMessage("info.error.updating.commonname", null, LCH.getLocale())]
@@ -1033,18 +1085,21 @@ class SpeciesService extends AbstractObjectService  {
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                String activityType, mailType;
+                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
+                String activityType, mailType, description;
                 if(oldCommonname) {
-                    activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
-                    mailType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
+                    description = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
+                    mailType =  activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
                 } else {
-                    activityType = ActivityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
-                    mailType = ActivityFeedService.SPECIES_COMMONNAME_CREATED
+                    description = ActivityFeedService.SPECIES_COMMONNAME_CREATED+" : "+commonnames[0].name
+                    mailType = activityType =  ActivityFeedService.SPECIES_COMMONNAME_CREATED
+                }
+                if(otherParams) {
+                    println "========COMMON NAME========== " + commonnames
+                    return [success:true,/* id:speciesId,*/ msg:msg, type:'commonname', content:content,taxonConcept:taxonConcept,dataInstance:commonnames[0], activityType:activityType, mailType:mailType, activityDesc:description]  
                 }
 
-
-                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType :mailType]
+                return [success:true, id:speciesId, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType :mailType, activityDesc:description]
             }
         }
     }
@@ -1186,40 +1241,49 @@ class SpeciesService extends AbstractObjectService  {
         return deleteSpeciesField(id);
     }
 
-    def deleteSynonym(long synonymId, long speciesId) {
-        Synonyms oldSynonym;
+    def deleteSynonym(long synonymId, def speciesId = null, def taxonId = null) {
+        SynonymsMerged oldSynonym;
         if(synonymId) {
-            oldSynonym = Synonyms.read(synonymId);
+            oldSynonym = SynonymsMerged.read(synonymId);
         }
-        Species speciesInstance = Species.get(speciesId);
+        Species speciesInstance = null;
+        if(speciesId)
+            speciesInstance = Species.get(speciesId);
 
-        return deleteSynonym(oldSynonym, speciesInstance);
+        TaxonomyDefinition taxonConcept = null;
+        if(taxonId)
+            taxonConcept = TaxonomyDefinition.get(taxonId);
+
+        return deleteSynonym(oldSynonym, speciesInstance, taxonConcept);
     }
     
-    def deleteSynonym(Synonyms oldSynonym, Species speciesInstance) {
-        
+    def deleteSynonym(SynonymsMerged oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
+       println oldSynonym; 
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
-                messagesourcearg[0] = synonymId;
+            messagesourcearg[0] = oldSynonym.id;
             return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
 
-        if(!oldSynonym.isContributor()) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+        if(speciesInstance) {
+            if(!oldSynonym.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+            }
+
+            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
+            }
         }
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
-        }
-
-        Synonyms.withTransaction { status ->
+        SynonymsMerged.withTransaction { status ->
             String msg = '';
             def content;
             try{
                 oldSynonym.removeFromContributors(springSecurityService.currentUser);
-                
+                taxonConcept = speciesInstance ? speciesInstance.taxonConcept : oldSynonym.taxonConcept;
+                taxonConcept.removeSynonym(oldSynonym);
                 if(oldSynonym.contributors.size() == 0) {
-                    oldSynonym.delete(failOnError:true)
+                    oldSynonym.delete(failOnError:true) //should not delete synonym entry
                 } else {
                     if(!oldSynonym.save()) {
                         oldSynonym.errors.each { log.error it }
@@ -1227,8 +1291,9 @@ class SpeciesService extends AbstractObjectService  {
                     }
                 }
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
-                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+                //content = taxonConcept ? Synonyms.findAllByTaxonConcept(taxonConcept) :  null;
+                content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
+                return [success:true, id:speciesInstance?.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED, activityDesc:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1239,33 +1304,37 @@ class SpeciesService extends AbstractObjectService  {
             }
         }
     }
-
-    def deleteCommonname(def cnId, def speciesId) {
+  
+    //taxonId comes from curation interface only 
+    def deleteCommonname(def cnId, def speciesId = null, def taxonId = null) {
         CommonNames oldCommonname;
         if(cnId) {
             oldCommonname = CommonNames.read(cnId);
         }
 
-        Species speciesInstance = Species.get(speciesId);
-        return deleteCommonname(oldCommonname, speciesInstance);
-    } 
-    
-    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance) {
-        
+        Species speciesInstance = (speciesId) ? Species.get(speciesId):null;
+        TaxonomyDefinition taxonConcept = (taxonId)?TaxonomyDefinition.get(taxonId.toLong()):null;
+        return deleteCommonname(oldCommonname, speciesInstance, taxonConcept);
+    }
+
+    //taxonConcept comes from curation interface only 
+    def deleteCommonname(CommonNames oldCommonname, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
+        if(!taxonConcept) taxonConcept = speciesInstance?.taxonConcept
         if(!oldCommonname) {
             def messagesourcearg = new Object[1];
                 messagesourcearg[0] = cnId;
             return [success:false, msg:messageSource.getMessage("info.common.name.id.not.found", messagesourcearg, LCH.getLocale())]
-        } 
-
-        if(!oldCommonname.isContributor()) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
         }
+        //Permission check only if its from species show page
+        if(speciesInstance) {
+            if(!oldCommonname.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+            }
 
-        if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.commonname", null, LCH.getLocale())]
+            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.delete.commonname", null, LCH.getLocale())]
+            }
         }
-
         CommonNames.withTransaction { status ->
             String msg = '';
             def content;
@@ -1282,8 +1351,12 @@ class SpeciesService extends AbstractObjectService  {
                 }
 
                 msg = messageSource.getMessage("info.success.remove.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
-                return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
+                if(speciesInstance) {
+                    return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance,activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED, activityDesc:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                } else {
+                    return [success:true, msg:msg, type:'commonname', content:content, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED, activityDesc:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
+                }
             } 
             catch(e) {
                 e.printStackTrace();
@@ -1307,8 +1380,8 @@ class SpeciesService extends AbstractObjectService  {
 
         XMLConverter converter = new XMLConverter();
         speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
-         if(speciesInstance.taxonConcept) {
-            speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
+		 if(speciesInstance.taxonConcept) {
+			speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
             //taxonconcept is being used as guid
             speciesInstance.guid = converter.constructGUID(speciesInstance);
 
@@ -1335,7 +1408,7 @@ class SpeciesService extends AbstractObjectService  {
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
                 def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
 
-                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false);
+                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
                 def tD = tR.taxonDefinition
                 if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;
@@ -1350,8 +1423,10 @@ class SpeciesService extends AbstractObjectService  {
             Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;
-            result.taxonRegistry = taxonRegistry;
+			speciesInstance.taxonConcept.postProcess()
+			result.taxonRegistry = taxonRegistry;
             result.errors.addAll(errors);
+			
         }
        return result;
     }
@@ -1422,18 +1497,30 @@ class SpeciesService extends AbstractObjectService  {
     /////////////////////////////// Export ////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
-    def requestExport(params){
+    /*def requestExport(params){
         log.debug(params)
         log.debug "creating species download request"
         DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params)
-    }
+    }*/
 
     def export(params, dl){
-        log.debug(params)
-        String action = new URL(dl.filterUrl).getPath().split("/")[2]
+/*        String action = new URL(dl.filterUrl).getPath().split("/")[2]
         def speciesInstanceList = getSpeciesList(params, action).speciesInstanceList
         log.debug " Species total $speciesInstanceList.size "
-        return exportSpeciesData(speciesInstanceList, null)
+        List<String> list_final=[] ;
+
+
+        speciesInstanceList.each {
+            println it 
+            def it_next= it as JSON ; 
+            def it_final=JSON.parse(""+it_next)
+            list_final.add(it_final)
+
+        }
+*/
+          return DwCSpeciesExporter.getInstance().exportSpecieData( null, dl)
+        //return exportSpeciesData(speciesInstanceList, null, dl)
+
     }
 
     def getSpeciesList(params, String action){
@@ -1447,15 +1534,27 @@ class SpeciesService extends AbstractObjectService  {
     /**
      * export species data
      */
-    def exportSpeciesData(String directory) {
+/*    private def exportSpeciesData(String directory) {
         return DwCAExporter.getInstance().exportSpeciesData(directory)
     } 
-
+*/
     /**
      * export species data
      */
-    def exportSpeciesData(List<Species> species, String directory) {
-        return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+    private def exportSpeciesData(List<Species> species, String directory, DownloadLog dl) {
+		if(!species || species.isEmpty())
+			return null
+		
+		File downloadDir = new File(directory?:grailsApplication.config.speciesPortal.species.speciesDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		}
+		log.debug "export type " + exportType 
+		if(exportType == DownloadLog.DownloadType.DWCA) {
+            return DwCAExporter.getInstance().exportSpeciesData(species, directory)
+        } else {
+            log.warn "Not a valid export type"
+        }
     }
 
     /**
@@ -1471,6 +1570,11 @@ class SpeciesService extends AbstractObjectService  {
         String query, countQuery;
         String filterQuery = " where s.id is not null " //dummy statement
         String countFilterQuery = " where s.id is not null " //dummy statement
+        String speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s "
+        String speciesCountFilterQuery = '';
+        String speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s "
+        String speciesStatusCountFilterQuery = '';
+
 
         def queryParams = [:]
         def activeFilters = [:]
@@ -1500,11 +1604,14 @@ class SpeciesService extends AbstractObjectService  {
             if(params.startsWith == "A-Z") {
                 query = "select s from Species s ";
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s "
+
             } else {
                 query = "select s from Species s "
                 filterQuery += " and s.title like '<i>${params.startsWith}%' ";
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' "
+
+
 				queryParams["startsWith"] = params.startsWith
             }
         } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
@@ -1513,14 +1620,19 @@ class SpeciesService extends AbstractObjectService  {
                 filterQuery += " and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  is null ";
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  is null ";
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
+            queryParams['groupId']  = groupIds[0]
         } else {
             if(params.startsWith == "A-Z") {
                 query = "select s from Species s, TaxonomyDefinition t "
@@ -1528,14 +1640,21 @@ class SpeciesService extends AbstractObjectService  {
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
 
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
+
             } else {
                 query = "select s from Species s, TaxonomyDefinition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup) "
                 countQuery = "select s.percentOfInfo, count(*) as count from Species s, TaxonomyDefinition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxonConcept = t and t.group.id  in (:sGroup)  ";
+
+                speciesCountQuery = "select s.taxonConcept.rank, count(*) as count from Species s, TaxonomyDefinition t "
+                speciesStatusCountQuery = "select s.taxonConcept.status, count(*) as count from Species s, TaxonomyDefinition t "
 				queryParams["startsWith"] = params.startsWith
             }
             queryParams['sGroup']  = groupIds
+            queryParams['groupId']  = groupIds[0]
         }
 
         if(params.featureBy == "true" ) {
@@ -1587,7 +1706,6 @@ class SpeciesService extends AbstractObjectService  {
             queryParams["daterangepicker_end"] =  endDate
         }
 
-
         if(params.webaddress) {
             def userGroupInstance = UserGroup.findByWebaddress(params.webaddress)
             if(userGroupInstance){
@@ -1596,7 +1714,54 @@ class SpeciesService extends AbstractObjectService  {
                 filterQuery += " and userGroup=:userGroup "
                 countQuery += " join s.userGroups userGroup "
                 countFilterQuery += " and userGroup=:userGroup "
+                speciesCountQuery += " join s.userGroups userGroup "
+                speciesStatusCountQuery += " join s.userGroups userGroup "
             }
+        }
+
+        if(params.taxon) {
+            def taxon = TaxonomyDefinition.read(Long.parseLong(params.taxon))
+            if(taxon){
+                queryParams['taxon'] = taxon.id
+                activeFilters['taxon'] = taxon.id
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
+                query += " join s.taxonConcept.hierarchies as reg "
+                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                countQuery += " join s.taxonConcept.hierarchies as reg "
+                countFilterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+
+                speciesCountQuery += " join s.taxonConcept.hierarchies as reg "
+                speciesStatusCountQuery += " join s.taxonConcept.hierarchies as reg "
+                
+            }
+        }
+
+        if(params.taxonRank) {
+            queryParams['taxonRank'] = Integer.parseInt(params.taxonRank)
+            activeFilters['taxonRank'] = queryParams['taxonRank']
+            filterQuery += " and s.taxonConcept.rank=:taxonRank";
+            countFilterQuery += " and s.taxonConcept.rank=:taxonRank";
+        }
+
+        if(params.status) {
+            def st;
+            NameStatus.list().each { s ->
+                if(s.value().equalsIgnoreCase(params.status)) {
+                    st = s;
+                    return
+                }
+            }
+            queryParams['status'] = st;
+            activeFilters['status'] = st;
+            filterQuery += " and s.taxonConcept.status=:status";
+            countFilterQuery += " and s.taxonConcept.status=:status";
         }
 
 //		XXX: to be corrected		
@@ -1612,9 +1777,19 @@ class SpeciesService extends AbstractObjectService  {
 //		}
 
         query += filterQuery + " order by s.${queryParams.sort} ${queryParams.order}"
-        countQuery += countFilterQuery + " group by s.percentOfInfo"
+
+        speciesCountFilterQuery = countFilterQuery +" group by s.taxonConcept.rank having s.taxonConcept.rank in :ranks ";
+        queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
+
+        speciesStatusCountFilterQuery = countFilterQuery +" group by s.taxonConcept.status having s.taxonConcept.status in :statuses ";
+        queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
+
+        speciesCountQuery = speciesCountQuery + speciesCountFilterQuery
+        speciesStatusCountQuery = speciesStatusCountQuery + speciesStatusCountFilterQuery
 		
-        return [query:query, countQuery:countQuery, queryParams:queryParams]
+        countQuery += countFilterQuery + " group by s.percentOfInfo"
+
+        return [query:query, countQuery:countQuery, speciesCountQuery:speciesCountQuery,  speciesStatusCountQuery:speciesStatusCountQuery, queryParams:queryParams]
 
 
     }
@@ -1625,8 +1800,12 @@ class SpeciesService extends AbstractObjectService  {
     private _getSpeciesList(params) {
         //cache "taxonomy_results"
         def queryParts = _getSpeciesListQuery(params)
+        println queryParts
         def hqlQuery = sessionFactory.currentSession.createQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createQuery(queryParts.countQuery)
+        def hqlSpeciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
+        def hqlSpeciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
+
         def queryParams = queryParts.queryParams
         if(queryParams.max > -1){
             hqlQuery.setMaxResults(queryParams.max);
@@ -1636,6 +1815,8 @@ class SpeciesService extends AbstractObjectService  {
         } 
         hqlQuery.setProperties(queryParams);
         hqlCountQuery.setProperties(queryParams);
+        hqlSpeciesCountQuery.setProperties(queryParams);
+        hqlSpeciesStatusCountQuery.setProperties(queryParams);
         
         log.debug "Species list query :${queryParts.query} with params ${queryParams}"
         def speciesInstanceList = hqlQuery.list();
@@ -1656,7 +1837,31 @@ class SpeciesService extends AbstractObjectService  {
         if(params.daterangepicker_end){
             queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
         }
-        return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
+
+        log.debug "No of species count query :${queryParts.speciesCountQuery} with params ${queryParams}"
+        def speciesCounts = hqlSpeciesCountQuery.list();
+        def speciesCount;
+        def subSpeciesCount;
+        speciesCounts.each {s->
+            if(s[0]==TaxonomyRank.SPECIES.ordinal()) 
+                speciesCount = s[1];
+            else if(s[0]==TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()) 
+                subSpeciesCount = s[1];
+
+        }
+
+        log.debug "No of species status count query :${queryParts.speciesStatusCountQuery} with params ${queryParams}"
+        def speciesStatusCounts = hqlSpeciesStatusCountQuery.list();
+        def acceptedSpeciesCount;
+        def synonymSpeciesCount;
+        speciesStatusCounts.each { s ->
+            if(s[0] == NameStatus.ACCEPTED) acceptedSpeciesCount = s[1]
+            else if(s[0] == NameStatus.SYNONYM) synonymSpeciesCount = s[1]
+        }
+
+
+
+        return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, speciesCount:speciesCount, subSpeciesCount:subSpeciesCount, acceptedSpeciesCount:acceptedSpeciesCount, synonymSpeciesCount:synonymSpeciesCount, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
         //else {
         //Not being used for now
         //return [speciesInstanceList: Species.list(params), instanceTotal: Species.count(),  'userGroupWebaddress':params.webaddress]
@@ -1923,5 +2128,169 @@ def checking(){
    return "Passed!" 
 }
 
+    def updateSynonymOld(def synonymId, def speciesId, String relationship, String value) {
+        if(!value || !relationship) {
+            return [success:false, msg:messageSource.getMessage("info.synonym.non.empty", null, LCH.getLocale())]
+        }
+        Species speciesInstance = Species.get(speciesId);
+
+        if(!speciesInstance) {
+            def messagesourcearg = new Object[1];
+            messagesourcearg[0] = speciesFieldId;
+            return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
+        }
+
+        /*if(!speciesPermissionService.isSpeciesContributor(speciesInstance, SUser.read(1L))) {
+            return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
+        }*/
+        def currentUser
+        Synonyms oldSynonym;
+        if(synonymId) {
+            println "=====SYN ID HAI== " + synonymId
+            oldSynonym = Synonyms.read(synonymId);
+            println "=====OLD SYN == " + oldSynonym
+            if(oldSynonym) {
+                println "====CONTRIBUTOR=== " +  oldSynonym.contributors[0]
+                currentUser = oldSynonym.contributors[0]
+            }
+            if(!oldSynonym) {
+                //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
+            } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
+                return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
+            } /*else if(!oldSynonym.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+            }*/
+        } else {
+            println "====CONTRIBUTOR=== " + SUser.read(1L)
+            currentUser = SUser.read(1L)
+        }
+
+        Species.withTransaction { status ->
+            if(oldSynonym) {
+                def result = deleteSynonymOld(oldSynonym, speciesInstance);
+                if(!result.success) {
+                    def messagesourcearg = new Object[1];
+                    println "====FAILED DELETE IN UPDATE===="
+                    messagesourcearg[0] = result.msg;
+                    return [success:false, msg:messageSource.getMessage("info.error.updating.synonym", messagesourcearg, LCH.getLocale())]
+                }
+            } 
+            XMLConverter converter = new XMLConverter();
+            
+            NodeBuilder builder = NodeBuilder.newInstance();
+            def synonym = builder.createNode("synonym");
+            Node data = new Node(synonym, 'data', value)
+            new Node(data, "relationship", relationship);
+            new Node(data, "contributor", currentUser.email);
+
+            List<Synonyms> synonyms = converter.createSynonymsOld(synonym, speciesInstance.taxonConcept);
+
+            if(!synonyms) {
+                return [success:false, msg:messageSource.getMessage("info.error.update.synonym", null, LCH.getLocale())]
+            } else {
+                String msg = '';
+                def content;
+                msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                String activityType, mailType, description;
+                if(oldSynonym) {
+					description = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_UPDATED
+                } else {
+				    description = ActivityFeedService.SPECIES_SYNONYM_CREATED+" : "+synonyms[0].name
+                    activityType = mailType = ActivityFeedService.SPECIES_SYNONYM_CREATED
+                }
+
+                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType, activityDesc:description]
+            }
+        }
+    }
+
+    def deleteSynonymOld(long synonymId, long speciesId) {
+        Synonyms oldSynonym;
+        if(synonymId) {
+            oldSynonym = Synonyms.read(synonymId);
+        }
+        Species speciesInstance = Species.get(speciesId);
+
+        return deleteSynonymOld(oldSynonym, speciesInstance);
+    }
     
+    def deleteSynonymOld(Synonyms oldSynonym, Species speciesInstance) {
+        def currentUser
+        if(!oldSynonym) {
+            def messagesourcearg = new Object[1];
+                messagesourcearg[0] = synonymId;
+            return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
+        }
+
+        /*if(!oldSynonym.isContributor()) {
+            return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
+        }*/
+
+        currentUser = oldSynonym.contributors[0];
+        /*if(!speciesPermissionService.isSpeciesContributor(speciesInstance, currentUser)) {
+            return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
+        }*/
+
+        Synonyms.withTransaction { status ->
+            String msg = '';
+            def content;
+            try{
+                oldSynonym.removeFromContributors(currentUser);
+                
+                if(oldSynonym.contributors.size() == 0) {
+                    oldSynonym.delete(failOnError:true)
+                } else {
+                    if(!oldSynonym.save()) {
+                        oldSynonym.errors.each { log.error it }
+                        return [success:false, msg:messageSource.getMessage("info.error.deleting.synonym", null, LCH.getLocale())]
+                    }
+                }
+                msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
+                content = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) ;
+                return [success:true, id:speciesInstance.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED, activityDesc:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+            } 
+            catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+                def messagesourcearg = new Object[1];
+                messagesourcearg[0] = e.getMessage();
+                return [success:false, msg:messageSource.getMessage("info.error.synonym.deletion", messagesourcearg, LCH.getLocale())]
+            }
+        }
+    }
+
+    List<Document> getRelatedDocuments(Species speciesInstance) {
+        List<SynonymsMerged> synonyms = AcceptedSynonym.fetchSynonyms(speciesInstance.taxonConcept);
+
+        List<String> canonicalForms = [];        
+
+        canonicalForms << speciesInstance.taxonConcept.canonicalForm;
+        synonyms.each { syn ->
+            canonicalForms << syn.canonicalForm;
+        }
+
+        def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms", ['canonicalForms':canonicalForms]);
+        return docSciNames.document.unique();
+
+    }
+	
+	/////////////////////////// Online edit and bulk upload //////////////////////////
+	ScientificName searchIBP(def parsedName, int rank, NameStatus status =  NameStatus.ACCEPTED ){
+		if(parsedName instanceof String){
+			parsedName = new TaxonomyDefinition(canonicalForm:parsedName.trim())
+		}
+		List taxonList = NamelistService.searchIBP( parsedName.canonicalForm, null, status, rank, false, parsedName.normalizedForm)
+		if(taxonList.isEmpty())
+			return null
+		
+		if(taxonList.size() > 1){
+			log.error '############  ' + "IBP serch returning mulitiple result: should not happen " + taxonList
+		}
+		
+		return taxonList[0]
+	}
+	
+	
 }

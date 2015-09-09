@@ -152,6 +152,7 @@ class Checklists extends Observation {
 		metaDataList.add([keyPrefix + "state" + SEPARATOR,  cl.states.join(", ")])
 		metaDataList.add([keyPrefix + "district" + SEPARATOR,  cl.districts.join(", ")])
 		metaDataList.add([keyPrefix + "taluka" + SEPARATOR,  cl.talukas.join(", ")])
+		metaDataList.add([keyPrefix + "locationScale" + SEPARATOR, ""  + cl.locationScale?.value()])
 		
 		
 		metaDataList.add([keyPrefix + "fromDate" + SEPARATOR,  "" + cl.fromDate])
@@ -206,7 +207,7 @@ class Checklists extends Observation {
 	* List of dirty fields that should update observation.
 	*/
    static List fetchDirtyFields(){
-	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationAccuracy", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
+	   return ["fromDate", "geoPrivacy", "group", "habitat", "latitude", "locationScale", "longitude", "placeName", "reverseGeocodedName", "toDate", "topology", "sciNameColumn", "commonNameColumn"]
    }
 
     private List fetchObservationsLatLongs() {
@@ -240,8 +241,10 @@ class Checklists extends Observation {
         return
     }
 	
+	//XXX super class observation has this method to nullify its effect overwriting here.
 	private updateLocationScale(){
-		locationScale = locationScale?:LocationScale.LOCAL
+		
 	}
+	
 
 }

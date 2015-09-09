@@ -2,7 +2,7 @@ package species
 
 import org.apache.commons.logging.LogFactory;
 
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.utils.Utils;
 
 import grails.converters.JSON;
@@ -125,6 +125,9 @@ class NamesParser {
 
 						//TODO make this descendant selector & there shd be a better way to write this
 						if(part.species instanceof Map){
+                            //Adding authorship as authorYear
+                            parsedName.authorYear = part.species?.authorship?.toString();
+
 							if(part.species?.combinationAuthorTeam?.author) {
 								for( author in (part.species.combinationAuthorTeam.author[0][0]) ) {
 									parsedName.addToAuthor(author);
@@ -160,6 +163,8 @@ class NamesParser {
 	
 							//ignoring rank;
 							//ignoring cultivar name type
+
+                            
 						}
 
 						if(sciName.hybrid) {

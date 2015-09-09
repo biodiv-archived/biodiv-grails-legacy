@@ -13,7 +13,7 @@
     RewriteCond  %{REQUEST_URI} ^/(geoserver|biodiv/maps/thumbnails)
     RewriteRule  /(.*)$ http://indiabiodiversity.saturn.strandls.com/$1 [P,L]
 
-    RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|.*/upload_resource|emailConfirmation|ck).*
+    RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|.*/upload_resource|emailConfirmation|ck|authAjax).*
     RewriteRule ^/biodiv(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://indiabiodiversity.localhost.org:8080/biodiv
 
@@ -64,7 +64,7 @@
     RewriteCond %{QUERY_STRING} destination
     RewriteRule ^(.*)$ $1 [QSA,L]
 
-    RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|comment|newsletter|edit|emailConfirmation|jcaptcha|ck|biodivofm|resource).*
+    RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|comment|newsletter|edit|emailConfirmation|jcaptcha|ck|biodivofm|resource|authAjax).*
 #domainanme here need to be wgp instead of localhost as google uses this address in its return to url
     RewriteRule ^/biodiv(.*)$ http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://thewesternghats.indiabiodiversity.localhost.org:8080/biodiv

@@ -81,7 +81,7 @@
 	<p> <a target="_blank" href="${grailsApplication.config.speciesPortal.app.facebookUrl}"><img src="${resource(dir:'images',file:'facebook.png', absolute:true)}"></a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}"><img src="${resource(dir:'images',file:'twitter.png', absolute:true)}"></a>| <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}"><img src="${resource(dir:'images',file:'google_plus.png', absolute:true)}"></a><br />
 <g:message code="text.supported.on" /><br />
 <g:message code="text.powered.by" /> <a href="https://github.com/strandls/biodiv" target="_blank"><g:message code="link.informatics.platform" /></a>
-<g:message code="text.technology.partner" /> <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank"><g:message code="technology.partner.strandlifesciences" /></a>
+<g:message code="text.technology.partner" /> <a href="http://www.strandlifefoundation.org/" target="_blank"><g:message code="technology.partner.strandlifesciences" /></a>
 </p>
 	</div>
 </div>
@@ -130,7 +130,7 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
                 $('.fbJustConnect').click(function() {
                         var clickedObject = this;
                         var scope = { scope: "" };
-                        scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website,publish_stream";
+                        scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website";
                         
                         window.fbEnsure(function() {
                                 FB.login(function(response) {
@@ -138,14 +138,14 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
                                                 $.cookie("fb_login", "true", { path: '/', domain:".${Utils.getIBPServerCookieDomain()}"});
                                                 if($(clickedObject).hasClass('ajaxForm')) {
                                                         $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
-                                                        var p = new Array();
+                                                        var p = {};
                                                         p['uid'] = response.authResponse.userID;
                                                         <g:if test="${targetUrl}">
                                                             p['spring-security-redirect'] = '${targetUrl}'
                                                         </g:if>
                                                         $.ajax({
                                                             url: "${uGroup.createLink(controller:'login', action:'authSuccess')}",
-                                                            method:"GET",
+                                                            method:'GET',
                                                             data:p,
                                                             success: function(data, statusText, xhr) {
                                                                 ajaxLoginSuccessHandler(data, statusText, xhr);
@@ -215,6 +215,18 @@ window.fbEnsure = function(callback) {
 }(document, 'script', 'facebook-jssdk'));
 ////////////////////////FB RELATED CALLS END HERE ///////////////////////
 
+////////////////////////GOOGLE RELATED CALLS START HERE ///////////////////////
+var apiKey = 'AIzaSyBo2gN8F-lhjj4y2Jpd7GNCBNeOFF68_mw';
+var clientId = '986256795102-e7mcrh4k0flornhrgjbfvq2pp5cnp5qt.apps.googleusercontent.com'
+//var scopes = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+var scopes = 'https://www.googleapis.com/auth/plus.me';
+gapi.load('auth', gapiInit);
+function gapiInit() {
+    gapi.client.setApiKey(apiKey);
+}
+
+////////////////////////GOOGLE RELATED CALLS END HERE ///////////////////////
+
 
         
         function closeHandler() {
@@ -255,7 +267,7 @@ window.fbEnsure = function(callback) {
                 'openid.oauth.scope' : 'http://www.google.com/m8/feeds/',
                 'openid.ui.icon' : 'true'
         };
-
+/*
         var googleOpener = popupManager.createPopupOpener({
                 'realm' : 'http://*.'+"${Utils.getIBPServerCookieDomain()}",
                 'opEndpoint' : 'https://www.google.com/accounts/o8/ud',
@@ -264,7 +276,7 @@ window.fbEnsure = function(callback) {
                 'shouldEncodeUrls' : true,
                 'extensions' : extensions
         });
-        
+       */ 
         var yahooOpener = popupManager.createPopupOpener({
                 'realm' : 'http://*.'+"${Utils.getIBPServerCookieDomain()}",
                 'opEndpoint' : 'https://open.login.yahooapis.com/openid/op/auth',

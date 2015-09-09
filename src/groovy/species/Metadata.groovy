@@ -36,6 +36,29 @@ abstract class Metadata {
 		String value() {
 			return this.value;
 		}
+		
+		static LocationScale getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof LocationScale)
+				return value
+			
+			value = value.toUpperCase().trim()
+			switch(value){
+				case 'APPROXIMATE':
+					return LocationScale.APPROXIMATE
+				case 'ACCURATE':
+					return LocationScale.ACCURATE
+				case 'LOCAL':
+					return LocationScale.LOCAL
+				case 'REGION':
+					return LocationScale.REGION
+				case 'COUNTRY':
+					return LocationScale.COUNTRY
+				default:
+					return null	
+			}
+		}
 	}
 
 	
@@ -76,6 +99,7 @@ abstract class Metadata {
 		latitude(nullable: true)
 		longitude(nullable:true)
 		locationAccuracy(nullable: true)
+<<<<<<< HEAD
 		topology (nullable:true)
 //		, validator : { val, obj ->
 //			if(!val){
@@ -83,6 +107,14 @@ abstract class Metadata {
 //			}
 //			return ObservationService.validateLocation(val, obj)
 //		}
+=======
+		topology nullable:true, validator : { val, obj ->
+			if(!val){
+				return true
+			}
+			return ObservationService.validateLocation(val, obj)
+		}
+>>>>>>> master
         fromDate nullable:true, validator : {val, obj ->
 			if(!val){
 				return true

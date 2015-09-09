@@ -4,7 +4,7 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import species.ExternalLinks;
 import species.Species;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import grails.converters.JSON;
 import grails.util.Environment;
 import groovyx.net.http.HTTPBuilder;
@@ -60,20 +60,26 @@ class ExternalLinksService {
 	boolean updateExternalLinks(TaxonomyDefinition taxonConcept) {
 		def http = new HTTPBuilder();
 
-		//if(!Environment.getCurrent().getName().startsWith("development")) {
-			updateEOLId(http, taxonConcept);
-			if(taxonConcept.externalLinks?.eolId) {
-				updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
-			}
-
-			//taxonConcept = session.merge(taxonConcept);
-            if(!taxonConcept.isAttached()) taxonConcept.attach();
-			if(!taxonConcept.save()) {
+		updateEOLId(http, taxonConcept);
+		if(taxonConcept.externalLinks?.eolId) {
+			updateOtherIdsFromEOL(http, taxonConcept.externalLinks?.eolId, taxonConcept);
+		}
+		
+		return saveInNewDBConnection(taxonConcept)
+	}
+	
+	//to avoid jdbc connection time out.
+	private boolean saveInNewDBConnection(TaxonomyDefinition taxonConcept){
+		TaxonomyDefinition.withNewTransaction{
+			taxonConcept = taxonConcept.merge()
+			
+			if(!taxonConcept.save(flush:true)) {
 				taxonConcept.errors.each { log.error it};
 				return false;
 			}
-		//}
-		return true;
+			
+			return true
+		}
 	}
 
 	/**
@@ -134,10 +140,7 @@ class ExternalLinksService {
 		}
 
 		if(persist) {
-
-            if(!taxonConcept.isAttached()) taxonConcept.attach();
-            if(!taxonConcept.save()) 
-			    taxonConcept.errors.each { log.error it};
+			saveInNewDBConnection(taxonConcept)
 		}
 	}
 

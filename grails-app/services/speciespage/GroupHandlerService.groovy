@@ -6,12 +6,15 @@ import org.hibernate.exception.ConstraintViolationException;
 import species.Classification;
 import species.Species;
 import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.TaxonomyRegistry;
 import species.formatReader.SpreadsheetReader;
 import species.groups.SpeciesGroup;
 import species.groups.SpeciesGroupMapping;
 import species.sourcehandler.XMLConverter;
+import species.SynonymsMerged;
+import groovy.sql.Sql;
+import species.NamesMetadata.NameStatus;
 
 class GroupHandlerService {
 
@@ -21,7 +24,9 @@ class GroupHandlerService {
 	def sessionFactory
 	def utilsService
 
-	static int BATCH_SIZE = 20;
+    def dataSource
+
+	static int BATCH_SIZE = 50;
 
 	def speciesGroupMappings;
 
@@ -98,40 +103,61 @@ class GroupHandlerService {
 	 * parent if at any level has a corresponding group mapping.
 	 * A species should not have multiple paths in the same classification 
 	 * @return
-	 */
-	int updateGroups() {
-		int noOfUpdations = 0;
-		int offset = 0;
-		int limit = 60000;
-		
-		def taxonConcepts;
-		
-		long startTime = System.currentTimeMillis();
-		int count = 0;
-		
-		while(true) {
-			taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as t where t.rank = :rank",
-					[rank: TaxonomyRank.SPECIES.ordinal()], [max:limit, offset:offset]);
-			if(!taxonConcepts){				
-				 break;
-			}
-			
-			taxonConcepts.each { taxonConcept ->
-				if(!taxonConcept.group && updateGroup(taxonConcept)) {
-					count ++;
-				}
-			}
-			
-			
-			if(count && count == BATCH_SIZE) {
-				cleanUpGorm();
-				noOfUpdations += count;
-				count = 0;
-				log.info "Updated group for taxonConcepts ${noOfUpdations}"
-			}
-			offset += limit;
-		}
-		
+     */
+    int updateGroups(boolean runForSynonyms=false) {
+        int noOfUpdations = 0;
+        int offset = 0;
+        int limit = BATCH_SIZE;
+
+        def taxonConcepts;
+
+        long startTime = System.currentTimeMillis();
+        int count = 0;
+
+        //        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+        //        dataSource.setUnreturnedConnectionTimeout(500);
+
+        def conn;
+        while(true) {
+            try {
+
+                conn = new Sql(dataSource)
+
+                if(runForSynonyms) {
+                    taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.status = '"+NameStatus.SYNONYM.value().toUpperCase()+"' and t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                } else {
+                    taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                }
+                println taxonConcepts
+                TaxonomyDefinition.withNewTransaction {
+                    taxonConcepts.each { taxonConceptRow ->
+                        def taxonConcept = TaxonomyDefinition.get(taxonConceptRow.id);
+                        //if(!taxonConcept.group && 
+                        if(updateGroup(taxonConcept)) {
+                            count ++;
+                        }
+                    }
+
+
+                    if(count && count == BATCH_SIZE) {
+                        cleanUpGorm();
+                        noOfUpdations += count;
+                        count = 0;
+                        log.info "Updated group for taxonConcepts ${noOfUpdations}"
+                    }
+                }
+
+            } catch(Exception e) {
+                println e.printStackTrace();
+            } finally {
+                //            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+                //            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+                conn.close()
+            }
+            if(!taxonConcepts) break;
+            taxonConcepts.clear();
+            offset += limit;
+        }
 
 		if(count) {
 			cleanUpGorm();
@@ -173,7 +199,21 @@ class GroupHandlerService {
 	 */
 	boolean updateGroup(TaxonomyDefinition taxonConcept) {
 		//parentTaxon has hierarchies from all classifications
-		return updateGroup(taxonConcept, getGroupByHierarchy(taxonConcept, taxonConcept.parentTaxon()));
+        def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+        def ibpParentTaxon;
+        if(taxonConcept instanceof SynonymsMerged) {
+            def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
+            ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+        } else {
+            ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
+        }
+        if(ibpParentTaxon) {
+            println "Updating==================================="
+            return updateGroup(taxonConcept, getGroupByHierarchy(taxonConcept, ibpParentTaxon));
+        } else {
+            log.error "No IBP parent taxon for  ${taxonConcept}"
+            return false;
+        }
 	}
 
 	/**
@@ -186,17 +226,17 @@ class GroupHandlerService {
 		log.info "Updating group associations for taxon concept : "+taxonConcept + " to ${group}";
 		int noOfUpdations = 0;
 
-		if(taxonConcept && group) {
+		if(taxonConcept) {// && group) {
 
-			if(!group.equals(taxonConcept.group)) {
+//			if(!group.equals(taxonConcept.group)) {
 				taxonConcept.group = group;
-				if(taxonConcept.save()) {
-					log.info "Setting group '${group.name}' for taxonConcept '${taxonConcept.name}'"
+				if(taxonConcept.save(flush:true)) {
+					log.info "Setting group '${group?.name}' for taxonConcept '${taxonConcept?.name}'"
 					noOfUpdations++;
 				} else {
 					taxonConcept.errors.allErrors.each { log.error it }
 				}
-			}
+//			}
 		}
 		return noOfUpdations ?: false;
 	}
@@ -212,7 +252,7 @@ class GroupHandlerService {
 		
 		speciesGroupMappings.each { mapping ->
 			if((taxonConcept.name.trim().equals(mapping.taxonName)) && taxonConcept.rank == mapping.rank) {
-				group = mapping.speciesGroup;
+				group = SpeciesGroup.read(mapping.speciesGroup.id);
 				if(!group.isAttached()) {
 					group.attach();
 				}
@@ -225,7 +265,7 @@ class GroupHandlerService {
 	 * returns the group for the closest ancestor.
 	 * 
 	 */
-	private SpeciesGroup getGroupByHierarchy(TaxonomyDefinition taxonConcept, List<TaxonomyDefinition> parentTaxon) {
+	public SpeciesGroup getGroupByHierarchy(TaxonomyDefinition taxonConcept, List<TaxonomyDefinition> parentTaxon) {
 		int rank = TaxonomyRank.KINGDOM.ordinal();
 
 		SpeciesGroup group;

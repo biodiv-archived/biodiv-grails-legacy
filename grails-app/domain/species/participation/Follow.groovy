@@ -12,7 +12,7 @@ class Follow extends AbstractAction {
 	}
 		
     static boolean fetchIsFollowing(object, SUser author) {
-		if(!author){
+		if(!author || !object){
 			return false
 		}
 		

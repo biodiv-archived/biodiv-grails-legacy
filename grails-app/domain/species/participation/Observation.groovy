@@ -330,10 +330,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return visitCount;
 	}
 	
-	private updateLocationScale(){
-		locationScale = locationScale?:LocationScale.APPROXIMATE
-	}
-
 	public static int getCountForGroup(groupId){
 		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
 	}
@@ -368,6 +364,10 @@ class Observation extends Metadata implements Taggable, Rateable {
 		}
 		
 		checklistAnnotations = m as JSON
+	}
+	
+	private updateLocationScale(){
+		locationScale = locationScale?:Metadata.LocationScale.APPROXIMATE
 	}
 	
 	String fetchFormattedSpeciesCall() {
@@ -446,6 +446,8 @@ class Observation extends Metadata implements Taggable, Rateable {
 		
 				
 		res[ObvUtilService.LOCATION] = placeName
+		res[ObvUtilService.LOCATION_SCALE] = locationScale?.value()
+		
 		def geoPrivacyAdjust = fetchGeoPrivacyAdjustment(reqUser)
 		res[ObvUtilService.LONGITUDE] = "" + (this.longitude + geoPrivacyAdjust)
 		res[ObvUtilService.LATITUDE] = "" + (this.latitude + geoPrivacyAdjust)
@@ -581,7 +583,7 @@ class Observation extends Metadata implements Taggable, Rateable {
         def c = Observation.createCriteria();
         def observationCount = c.count {
             eq ('isDeleted', false);
-            eq ('isShowable', true);
+            //eq ('isShowable', true);
             eq ('isChecklist', false);
         }
         return observationCount;
@@ -616,7 +618,7 @@ class Observation extends Metadata implements Taggable, Rateable {
     }
 
     private deleteFromChecklist() {
-        if(id != sourceId) {
+        if(isObvFromChecklist()) {
             def ckl = Checklists.get(sourceId)
             ckl.deleteObservation(this)
         }
@@ -624,5 +626,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 
     SpeciesGroup fetchSpeciesGroup() {
         return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+	}
+	
+	def boolean isObvFromChecklist(){
+		return (id != sourceId)
 	}
 }

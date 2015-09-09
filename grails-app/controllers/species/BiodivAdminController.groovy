@@ -199,7 +199,7 @@ class BiodivAdminController {
     def updateGroups = {
         int noOfUpdations = 0;
         try {
-            noOfUpdations = groupHandlerService.updateGroups();
+            noOfUpdations = groupHandlerService.updateGroups(params.runForSynonyms?params.runForSynonyms.toBoolean():false);
             flash.message = messageSource.getMessage("default.admin.success.updated.group", ['associations',noOfUpdations] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();

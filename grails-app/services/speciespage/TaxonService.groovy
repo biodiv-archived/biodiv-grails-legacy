@@ -7,7 +7,7 @@ import org.hibernate.exception.ConstraintViolationException
 import species.Classification
 import species.Species;
 import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.TaxonomyRegistry
 import species.formatReader.SpreadsheetReader
 import species.sourcehandler.XMLConverter
@@ -16,6 +16,7 @@ import grails.converters.JSON;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 import species.Language;
+import species.NamesMetadata.NamePosition
 
 class TaxonService {
 
@@ -577,7 +578,7 @@ class TaxonService {
 			new Node(taxon1, "subcategory", "species")
 			new Node(taxon1, "data", name)
 			taxonEntries.add(taxon1);
-			List<TaxonomyRegistry> registry = converter.getClassifications(taxonEntries, name);
+			List<TaxonomyRegistry> registry = converter.getClassifications(taxonEntries, name).taxonRegistry;
 
 			def taxonConcept = converter.getTaxonConcept(registry,  Classification.findByName(grailsApplication.config.speciesPortal.fields.IUCN_TAXONOMIC_HIERARCHY));
 			if(!taxonConcept.isAttached()) {
@@ -780,18 +781,24 @@ class TaxonService {
     *
     */
 
-    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language) {
-    	 
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
+        return addTaxonHierarchy(speciesName, taxonRegistryNames, classification, [contributor], language, abortOnNewName, fromCOL, otherParams);
+    }
+
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, List<SUser> contributors, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
         List errors = [];
         if(!classification) {
         	def messagesourcearg = new Object[1];
-                 messagesourcearg[0] =classification?.name;
+            messagesourcearg[0] =classification?.name;
             return [success:false, msg:messageSource.getMessage("info.not.valid", messagesourcearg, LCH.getLocale())]
         }
         
         XMLConverter converter = new XMLConverter();
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributor, language);
-        List<TaxonomyRegistry> taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);
+        println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributors, language);
+        
+        def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
+        List<TaxonomyRegistry> taxonRegistry = getClassifictaionsRes.taxonRegistry;
 /*        //check if user has permission to contribute to the taxon hierarchy
         if(speciesPermissionService.isTaxonContributor(taxonRegistry, contributor)) {
             taxonRegistry = converter.getClassifications(taxonRegistryNodes, speciesName, true);            
@@ -804,24 +811,39 @@ class TaxonService {
             TaxonomyRegistry reg;
             String hier = ""
             taxonRegistry.each { 
-                if(it.errors.getErrorCount() > 0)
+                if(it.errors && it.errors.getErrorCount() > 0)
                     errors.addAll(it.errors.collect {it.toString()})
-                if(it.taxonDefinition.rank > maxRank) {
+                if(it.taxonDefinition && it.taxonDefinition.rank > maxRank) {
                     reg = it;
                     maxRank = it.taxonDefinition.rank;
                 }
                 hier += it.taxonDefinition.name +" > "
             }
-            return ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, LCH.getLocale()), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors]
+            def res = ['success':true, msg:messageSource.getMessage("info.success.added.hierarchy", null, LCH.getLocale()), activityType:activityFeedService.SPECIES_HIERARCHY_CREATED+" : "+hier, 'reg' : reg, errors:errors, taxonRegistry: taxonRegistry, 'spellCheckMsg':getClassifictaionsRes.spellCheckMsg]
+            def taxonRegistryForIBPHierarchy = null;
+            def fieldsConfig = grailsApplication.config.speciesPortal.fields
+            def IBPClassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            taxonRegistry.each {
+                if(it.classification == IBPClassification) {
+                    taxonRegistryForIBPHierarchy = it 
+                }
+            }
+            if(taxonRegistryForIBPHierarchy && !(taxonRegistryForIBPHierarchy.taxonDefinition.status)) {
+                res['newlyCreated'] = true
+                res['newlyCreatedName'] = taxonRegistry[-1].taxonDefinition.name
+            }
+            def lastTaxonInIBPHierarchy = (taxonRegistryForIBPHierarchy)?taxonRegistryForIBPHierarchy.taxonDefinition:null;
+            res['lastTaxonInIBPHierarchy'] = lastTaxonInIBPHierarchy;
+            return res   
         }
         return ['success':false, msg:messageSource.getMessage("info.error.adding.hierarchy", null, LCH.getLocale()), errors:errors]
     }
 
-    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false) {
-        return deleteTaxonEntries(reg, force);
+    def deleteTaxonHierarchy(TaxonomyRegistry reg, boolean force = false, boolean checkContributor = true) {
+        return deleteTaxonEntries(reg, force, checkContributor);
     } 
 
-    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false) {
+    private def deleteTaxonEntries(TaxonomyRegistry reg, boolean force = false, boolean checkContributor = true) {
     	 
         String msg = '';
         def content;
@@ -833,11 +855,11 @@ class TaxonService {
         if(!reg) {
             return [success:false, msg:"Taxonomy registry is null", errors:errors]
          } 
-
-         if(!reg.isContributor()) {
-            return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, LCH.getLocale()), errors:errors]
+        if(checkContributor) {
+            if(!reg.isContributor()) {
+                return [success:false, msg:messageSource.getMessage("info.no.delete.permission", null, LCH.getLocale()), errors:errors]
+            }
         }
-
         def otherHierarchiesCount = TaxonomyRegistry.withCriteria {
             projections {
                 count('id')
@@ -855,24 +877,37 @@ class TaxonService {
 
         try {
             if(reg) {
+                println "====REG HERE=== ----------------------" + reg
                 String hier = "";
+                println "=========================================="
+                println "=========================================="
                 def contributor = springSecurityService.currentUser;
                 while(reg != null) {
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+                    println contributor
                     def c = TaxonomyRegistry.withCriteria () {
                         projections {
                             count('id')
                         }
                         eq('parentTaxon', reg)
-                        contributors {
-                            eq('id', contributor.id)
+                        if(checkContributor && contributor) { 
+                            contributors {
+                                eq('id', contributor.id)
+                            }
                         }
                     }
                     if(c[0] > 1) {
                         //there is another hierarchy sharing same nodes and with same contributor.
                         // so leaving this portion untouched
+                        //toDelete = [];
                         r.success = true;
+                        r.status = 401
                         r.msg = 'Successfully removed registry';
                         r.errors << errors
+                        println "=====ITS BREAKING HERE====== " + c[0]
                         break;
                     }
                     //reg.removeFromContributors(contributor);
@@ -883,17 +918,23 @@ class TaxonService {
                     reg = reg.parentTaxon;
 
                 } 
-                
+                println "========to delete LIST=========== " + toDelete 
                 int maxRank = 0, regId;
                 TaxonomyRegistry.withTransaction { status ->
                     toDelete.each { r2 ->
-
+                        println "====ITS RANK====== " + r2.taxonDefinition.rank + "======MAX RANK===== "+ maxRank
                         if(r2.taxonDefinition.rank > maxRank) {
                             regId = r2.id;
+                            println "====HERE REG ID== " + regId
                             maxRank = r2.taxonDefinition.rank;
                         }
 
-                        r2.removeFromContributors(contributor);
+                        if(contributor) {
+                            println "00000000000000000000000000000000000000000"
+                            r2.removeFromContributors(contributor);
+                        } else if(force) {
+                            r2.contributors.clear();
+                        }
 
                         if(r2.contributors.size() == 0) {
                             r2.delete(failOnError:true)
@@ -944,7 +985,7 @@ class TaxonService {
 	 * 
 	 */
 	private List<TaxonomyRegistry> saveTaxonEntries(converter, List taxonEntries, Classification c, String name) {
-		List<TaxonomyRegistry> registry = converter.getTaxonHierarchy(new NodeList(taxonEntries), c, name);
+		List<TaxonomyRegistry> registry = converter.getTaxonHierarchy(new NodeList(taxonEntries), c, name).taxonRegistry;
 		//cleanUpGorm();
 		//registry.each { e ->
 		//	e.save(flush:true);
@@ -1008,7 +1049,7 @@ class TaxonService {
 
     boolean validateHierarchy(List<String> taxonEntries) {
         for (int i=0; i< taxonEntries.size(); i++) {
-            if(TaxonomyRank.list()[i] != TaxonomyRank.SUB_FAMILY && TaxonomyRank.list()[i] != TaxonomyRank.SUB_GENUS) {
+            if(TaxonomyRank.list()[i] != TaxonomyRank.SUB_FAMILY && TaxonomyRank.list()[i] != TaxonomyRank.SUB_GENUS && TaxonomyRank.list()[i] != TaxonomyRank.SUPER_FAMILY) {
                 if(!taxonEntries[TaxonomyRank.list()[i].ordinal()]) {
                     log.debug "${TaxonomyRank.list()[i]} is missing" 
                     return false;
@@ -1016,5 +1057,109 @@ class TaxonService {
             }
         }
         return true;
+    }
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////Navigator query related ///////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////
+	
+	List getNodeChildren(params){
+		
+		int level = params.level?.toInteger()
+		int limit = params.limit?(params.limit.toInteger()):10
+		long offset = params.offset?(params.offset.toLong):0
+		
+		TaxonomyRegistry tr = getTaxonReg(params)
+		if(!tr){
+			log.error "No taxon registry found for params " + params
+			return
+		}
+		
+		String searchablePrefix = tr.path + "_" +"%" 
+		
+		return TaxonomyRegistry.createCriteria().list(max:limit, offset:offset){
+			projections {
+				property("taxonDefinition")
+			}
+			and{
+				like('path', searchablePrefix)
+				if(level){
+					eq('level', level)
+				}
+			}
+			order 'id', 'asc'
+		}
+	}
+	
+	TaxonomyRegistry getTaxonRegParent(params){
+		return getTaxonReg(params)?.parentTaxon.taxonDefinition
+	}
+	
+	private TaxonomyRegistry getTaxonReg(params){
+		long taxonId = params.taxonId.toLong()
+		long classificationId = params.classificationId.toLong()
+		return TaxonomyRegistry.findByTaxonDefinitionAndClassification(TaxonomyDefinition.read(taxonId), Classification.read(classificationId))
+	}
+	
+	def addLevelToTaxonReg(){
+		int i = 0
+		TaxonomyRegistry.withTransaction { status ->
+			TaxonomyRegistry.list().each { tr ->
+				tr.level = tr.path.split("_").size()
+				tr.save()
+				i++
+				if(i%100 == 0)
+					println i
+			}
+		}
+	}
+
+    def moveToWKG(taxonRegistry) {
+        println "======TAXON REGISTRY====== " + taxonRegistry
+        def lastTaxonReg = taxonRegistry[-1]
+        def taxonDef = lastTaxonReg.taxonDefinition
+        if(!taxonDef.status) {
+            return false
+        }
+        def classification = lastTaxonReg.classification
+        def taxonsMap = taxonDef.parentTaxonRegistry(classification)
+        println "=======TAXONS MAP====== " + taxonsMap.get(classification)
+        def taxons = taxonsMap.get(classification);
+        taxons.add(taxonDef);
+        taxons.each {
+            if(it.position == NamePosition.RAW) {
+                println "=====CHANGING POSITION to WORKING ====="
+                it.position = NamePosition.WORKING
+            }
+            if(!it.save()) {
+                it.errors.each { log.error it}
+            } 
+        }
+        return true;
+    }
+
+    def updateTaxonName(params, reg) {
+        def c = TaxonomyRegistry.withCriteria () {
+            projections {
+                count('id')
+            }
+            eq('parentTaxon', reg)
+        }
+        println "=========THE COUNT======== " + c[0]
+        if(c[0] > 1) {
+            //there is another hierarchy sharing same nodes and with same contributor.
+            // so leaving this portion untouched
+            //just updating its name
+            //TODO update contributor also
+            def taxDef = reg.taxonDefinition
+            def rank = taxDef.rank + ""
+            println "=======RANK==== " + rank
+            println "======UPDATE THE NAME with=== " + params.taxonRegistry[rank]
+            return true
+        } else {
+            //not in many paths
+            return false
+        }
     }
 }

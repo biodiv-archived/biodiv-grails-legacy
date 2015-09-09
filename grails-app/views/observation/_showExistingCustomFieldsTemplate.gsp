@@ -12,6 +12,8 @@
 					<th><g:message code="customField.allowedMultiple.label" default="MultiSelect"/></th>
 					<th><g:message  code="customField.defalutValue.label" default="Default Value" /></th>
 					<th><g:message code="customField.isMandatory.label" default="Mandatory"/></th>
+					<th><g:message code="customField.allowedParticipation.label" default="Participation"/></th>
+					
 				</tr>
 			</thead>
 		
@@ -39,6 +41,9 @@
 						</td>
 						<td>
 							${cf.isMandatory}
+						</td>
+						<td>
+							${cf.allowedParticipation}
 						</td>
 					</tr>
 				</g:each>

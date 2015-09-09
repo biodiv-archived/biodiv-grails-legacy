@@ -4,8 +4,6 @@ $(document).ready(function() {
 });
 </r:script>
 
-<div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;" data-url="${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}" data-contextFreeUrl=${uGroup.createLink(controller:resultController?:controller, action:'show')}>
-
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
     <g:if test="${controller.toLowerCase().equals('featured')}">
         <h4><g.message code="heading.feature.content" /></h4>
@@ -33,6 +31,10 @@ $(document).ready(function() {
     <h4><g:message code="heading.featured" args="${ [controller_name] }" /> </h4>
             </g:else>
     </g:if>
+
+    <g:if test="${relatedInstanceList || filterProperty != 'featureBy'}">
+
+<div id="carousel_${id}" class="jcarousel-skin-ie7" style="clear:both;" data-url="${uGroup.createLink(controller:controller, action:action, id:observationId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress)}" data-contextFreeUrl=${uGroup.createLink(controller:resultController?:controller, action:'show')}>
 	<ul style="list-style:none; width:100%; margin-left:0px;">
             <!-- The content will be dynamically loaded in here along with static content present here in featuredInstanceList-->
             <g:each in="${relatedInstanceList}" var="relatedInstanceDetails">
@@ -44,7 +46,6 @@ $(document).ready(function() {
                 </li>
             </g:each>
         </ul>
-
 	<g:if test="${!hideShowAll && (relatedInstanceList||filterProperty != 'featureBy')}">
 		<div class="observation_links">
 			<g:if test="${observationId}">
@@ -63,9 +64,10 @@ $(document).ready(function() {
 					</a>
 			</g:else>
 		</div>
-	</g:if>
 <%--	<div id="carouselItemDesc"></div>--%>
+	</g:if>
 </div>
+        </g:if>
 <div id="relatedObservationAddButton_${id}" class="alert alert-info" style="display:none;">
 	<g:message code="msg.no.observations" />
     </div>

@@ -1,4 +1,4 @@
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@page import="species.ScientificName.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <html>
@@ -11,6 +11,8 @@
 <title><g:message code="taxonbrowser.taxonomy.browser" /></title>
 
 <r:require modules="species_show"/>
+<style type="text/css">
+    </style>
 
 </head>
 <body>
@@ -22,7 +24,7 @@
         %>
         <s:showSubmenuTemplate model="['entityName':taxonomy_browser]"/>
 
-            <div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+            <div class="taxonomyBrowser sidebar_section" style="position: relative;">
                 <h5><g:message code="button.classifications" /></h5>	
                 <div class="section help-block"> 
                     <ul>
@@ -101,7 +103,10 @@
         <r:script>
         $(document).ready(function() {
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
-                expandAll:false
+                expandAll:false,
+                controller:"${params.controller?:'namelist'}",
+                action:"${params.action?:'index'}"
+
             });	
             /*$("#searchPermission").autofillNames({
                 'appendTo' : '#nameSuggestions',

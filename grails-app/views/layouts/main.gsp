@@ -20,8 +20,8 @@
 <g:set var="domain" value="${Utils.getDomain(request)}"/>
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>
 <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
-
-
+<script src="http://apis.google.com/js/auth.js" type="text/javascript">
+</script>
 <g:set var="userGroupInstance" value="${userGroupInstance}"/>
 <g:if test="${userGroupInstance && userGroupInstance.theme}">
 	<link rel="stylesheet" type="text/css"
@@ -43,8 +43,12 @@
     </div>
 	<div id="species_main_wrapper" style="clear: both;">
 		<domain:showSiteHeader model="['userGroupInstance':userGroupInstance]" />
-
-            <div class="container outer-wrapper">
+            <g:if test ="${params.controller == 'namelist'}">
+                <div class="container-fluid outer-wrapper">
+            </g:if>
+            <g:else>
+                <div class="container outer-wrapper">
+            </g:else>
 			<div>
 				<div style="padding: 10px 0px; margin-left: -20px">
 					<g:layoutBody />

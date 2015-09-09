@@ -29,6 +29,16 @@ $(document).ready(function() {
                 'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
                 "queryParamsMax":"${queryParams?.max}",
                 'getProcessedImageUrl' : "${createLink(controller:'observation',  action:'getProcessedImageStatus')}",
+                'curation':{
+                    'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",
+                    'getNameDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getNameDetails')}",
+                    'searchExternalDbUrl' : "${uGroup.createLink('controller':'namelist', action:'searchExternalDb')}",
+                    'getExternalDbDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getExternalDbDetails')}",
+                    'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
+                    'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
+                    'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
+                    'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}"
+                },
 		'speciesName':"${params.speciesName }",
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
 		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
@@ -44,15 +54,21 @@ $(document).ready(function() {
                 'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}",
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
+                    'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
                     'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
                 'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
+                'login' : {
+                    googleOAuthSuccessUrl : "/oauth/google/success",
+
+                },
                 'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
                 'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
                 'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
                 'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
+                'downloadNamesMapperURL' : "${uGroup.createLink(controller:'species', action:'downloadNamesMapper','userGroup':userGroupInstance) }",
                 'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
                 'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
                 'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",
@@ -62,7 +78,7 @@ $(document).ready(function() {
                     'url':"${uGroup.createLink('controller':'content')}"
                 },
                 'observation':{
-                    listUrl:"${uGroup.createLink(controller:'observation', action: 'listJSON', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+                    listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
                     occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
                     relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
                     uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
@@ -91,13 +107,20 @@ $(document).ready(function() {
                         'createUrl':"${uGroup.createLink(controller:'taxon', action:'create', userGroupWebaddress:params.webaddress)}",
                         'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
                         'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
-                    }
+
+                    },
+                    'searchUrl':"${uGroup.createLink(controller:'taxon', action:'search', userGroupWebaddress:params.webaddress)}",
+                    'nodesUrl':"${uGroup.createLink(controller:'taxon', action:'nodes', userGroupWebaddress:params.webaddress)}"
                 },
                 'userGroup': {
                     'joinUsUrl' : "${uGroup.createLink(controller:'userGroup', action:'joinUs') }",
 		            'leaveUrl' : "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }",
                     'requestMembershipUrl' : "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }"
+                },
+                'document':{
+                    'listUrl':"${uGroup.createLink('controller':'document', action:'list', 'userGroup':userGroupInstance)}",
                 }
+ 
                 
 	}
 

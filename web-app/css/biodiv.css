@@ -1116,6 +1116,23 @@ input,button,select,textarea {
 	font-weight: bold;
 }
 
+#taxonHierarchy {
+    overflow:auto;
+    max-height:300px;
+}
+
+.jstree-default .jstree-search.search-highlight {
+    background-color:#88EAFB !important
+}
+
+.taxon-highlight {
+	font-weight: bold;
+    border: 1px solid #fad42e;
+      background: #fbec88 !important;
+        color: #363636;
+}
+
+
 .info-message {
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -2266,7 +2283,7 @@ line-height: 11px;
     position:absolute;
 }
 .jcarousel-skin-ie7 .jcarousel-prev-vertical {
-    top:5px;
+    top:-20px;
 }
 
 .feedParentContext {
@@ -2911,3 +2928,58 @@ small {
 	height : 16px;
 	display:none;
 }
+
+.raw_position {
+    color:#777
+}
+.clean_position {
+    color:#3c763d
+}
+.working_position {
+    color:#8a6d3b
+}
+.status {
+    top: -5px;
+    position: relative;
+    color:#000;
+}
+
+.status_a {
+    text-decoration:underline;
+}
+
+#taxonHierarchy td {
+	height: 30px;
+	vertical-align: middle;
+}
+
+
+.taxaHierarchy {
+	background: url(../images/tree.png) 5px 50% no-repeat;
+	margin-left: 0;
+	margin-right: 5px;
+	padding-left: 5px;
+	padding-right: 20px;
+}
+
+.RAW {
+    color:red !important;
+}
+.WORKING {
+}
+
+.breadcrumb {
+    margin-bottom: 20px;
+    top: -10px;
+    position: relative;
+}
+
+.input-append.input-block-level {
+      display: table; 
+  }
+  .input-append.input-block-level .add-on {
+        display: table-cell;
+    }
+    .input-append.input-block-level > input {
+          width: 100%;
+      }

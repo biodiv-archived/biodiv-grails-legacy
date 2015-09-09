@@ -423,6 +423,8 @@ h4. getRecommendationVotes
 
 * *Path* : /api/observation/id/getRecommendationVotes
 * *Parameters* :
+** max : number of recovotes to fetch. Default ordering is on number of votes for each name.
+** offset : offset of votes
 * *REST Method* : GET
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* :

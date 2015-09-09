@@ -1,6 +1,7 @@
 var grid;
 var dirtyRows;
 var prevNameColumn = {};
+var columnUpdated = false;
 
 function isEmptyRow(rowEntry){
     var emptyRow = true;
@@ -28,7 +29,7 @@ function isEmptyRow(rowEntry){
 
 //only returning modified data
 function getDataFromGrid(){
-    if(!dirtyRows){
+    if(!dirtyRows || columnUpdated){
         return grid.getData();
     }
     var selectedRows = grid.getSelectedRows();
@@ -136,6 +137,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
 
                 grid.setColumns(columns);
                 grid.render();
+                columnUpdated = true;
                 return newColumn;
             }
         };
@@ -189,6 +191,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             selectNameColumn($('#latitude'), null);
             selectNameColumn($('#longitude'), null);
             selectNameColumn($('#obvDate'), null);
+            columnUpdated = true;
 
         });
         grid.registerPlugin(headerMenuPlugin);
@@ -321,18 +324,18 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             $('#sciNameColumn').val(sciNameColumn);
             selectNameColumn($('#sciNameColumn'), sciNameFormatter);
         }
-        else {
-            $('#sciNameColumn').val(sciNameColumn);
-            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
-        }
+//        else {
+//            $('#sciNameColumn').val(sciNameColumn);
+//            selectNameColumn($('#sciNameColumn'), sciNameFormatter);
+//        }
         if(commonNameColumn) {
             $('#commonNameColumn').val(commonNameColumn);
             selectNameColumn($('#commonNameColumn'), commonNameFormatter);
         }
-        else{
-            $('#commonNameColumn').val(commonNameColumn);
-            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
-        }
+//        else{
+//            $('#commonNameColumn').val(commonNameColumn);
+//            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
+//        }
     });
 } 
 
@@ -746,40 +749,7 @@ $(document).ready(function(){
     }
 
     
-    function customFieldNumericValidation(){
-    	var result = true;
-    	$("input.CustomField_number").each(function( index ) {
-    		var comp = $(this).closest('.control-group');
-    		comp.removeClass('error');
-    		var val = $(this).val();
-    		if(val && !$.isNumeric(val)){
-    			comp.addClass('error');
-    			result = false;
-    		}
-    	});
-    	return result;
-    }
-    
-    function customFieldMandatoryValidation(){
-    	var result = true;
-    	$(".customField .mandatoryField").each(function( index ) {
-    		var comp = $(this).closest('.control-group');
-    		comp.removeClass('error');
-    		var val = $(this).val();
-    		if(!val){
-    			comp.addClass('error');
-    			result = false;
-    		}
-    	});
-    	
-    	return result;
-    }
-    
-    function scrollToCustomForm(){
-    	$('html, body').animate({
-            scrollTop: $(".customFieldForm").offset().top
-        }, 800);
-    }
+
     /**
      *
      */
@@ -789,21 +759,10 @@ $(document).ready(function(){
             event.preventDefault();
             return false; 		 		
         }
+        if(!cfValidation()){
+			return false;
+		}
  
-        if(!customFieldMandatoryValidation()) {
-            alert(window.i8ln.observation.bulkObvCreate.failedMandatoryFieldValidation);
-            event.preventDefault();
-            scrollToCustomForm();
-            return false; 		 		
-        }
-        
-        if(!customFieldNumericValidation()) {
-            alert(window.i8ln.observation.bulkObvCreate.failedNumericFieldValidation);
-            event.preventDefault();
-            scrollToCustomForm();
-            return false; 		 		
-        }
-        
         if (document.getElementById('agreeTerms').checked) {
             $(this).addClass("disabled");
 
