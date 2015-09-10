@@ -61,6 +61,8 @@
                                     <option value="${rank.ordinal()}" ${(requestParams?requestParams.rank:-1) == rank?'selected':''}><g:message error="${rank}"/></option>
                                 </g:each>
                             </select>
+							<a id="validateSpeciesSubmit" class="btn btn-primary"
+                        		style="float: right; margin-left: 5px;"> <g:message code="button.validate" /></a>
 
                             <input id="page" 
                             data-provide="typeahead" type="text" class="taxonRank" style=""
@@ -85,19 +87,16 @@
 					 <g:render template="/namelist/dialogMsgTemplate" model="[]"/>
                 </div>   
                 <div class="span12 submitButtons">
-
-                    <g:if test="${speciesInstance?.id}">
-                    <a href="${uGroup.createLink(controller:params.controller, action:'show', id:speciesInstance.id)}" class="btn"
-                        style="float: right; margin-right: 30px;"> <g:message code="button.cancel" /> </a>
-                    </g:if>
-                    <g:else>
-                    <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"
-                        style="float: right; margin-right: 30px;"> <g:message code="button.cancel" /> </a>
-                    </g:else>
-                    <a id="validateSpeciesSubmit" class="btn btn-primary"
-                        style="float: right; margin-right: 5px;"> <g:message code="button.validate" /></a>
-
-
+<%----%>
+<%--                    <g:if test="${speciesInstance?.id}">--%>
+<%--                    <a href="${uGroup.createLink(controller:params.controller, action:'show', id:speciesInstance.id)}" class="btn"--%>
+<%--                        style="float: right; margin-right: 30px;"> <g:message code="button.cancel" /> </a>--%>
+<%--                    </g:if>--%>
+<%--                    <g:else>--%>
+<%--                    <a href="${uGroup.createLink(controller:params.controller, action:'list')}" class="btn"--%>
+<%--                        style="float: right; margin-right: 30px;"> <g:message code="button.cancel" /> </a>--%>
+<%--                    </g:else>--%>
+                    
                     <a id="addSpeciesPageSubmit" class="btn btn-primary"
                         style="float: right; margin-right: 5px;display:none;"> <g:message code="default.add.page.label" /></a>
 
@@ -179,8 +178,7 @@
         $('#addSpeciesPageSubmit').click(function() {
             var allValidated = true;
         	$("#taxonHierachyInput .input-prepend").each(function(index, ele) {
-        		if(!$(ele).children('div').hasClass('disabled'));
-        			allValidated = false;
+        		allValidated = (allValidated && ($(ele).children('div').hasClass('disabled')));
     		});
     		
     		if(!allValidated){

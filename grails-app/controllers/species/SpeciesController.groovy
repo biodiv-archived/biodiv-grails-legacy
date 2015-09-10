@@ -1335,7 +1335,7 @@ class SpeciesController extends AbstractObjectController {
 						tmp.putAt(TaxonomyRank.GENUS.ordinal(), r.genusName)
 						taxonRegistry = tmp
 						
-						result = [taxonRanks:getTaxonRankForUI(), 'success':true, rank:rank, taxonList:taxonList, canonicalForm:r.canonicalForm, authorYear:r.authorYear, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry, page:params.page]]
+						result = [taxonRanks:getTaxonRankForUI(), 'success':true, rank:rank, taxonList:taxonList, canonicalForm:r.canonicalForm, authorYear:r.authorYear, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry, genusTaxonMsg : r.genusTaxonMsg, page:params.page]]
 						
 						// no result in ibp so going ahead to create new name
 						if(!taxonList){
@@ -1405,6 +1405,7 @@ class SpeciesController extends AbstractObjectController {
 					def genusTaxonList = speciesService.searchIBP(page.binomialForm.tokenize(" ")[0], TaxonomyRank.GENUS.ordinal())
 					if(genusTaxonList){
 						result.genusTaxon = genusTaxonList[0]
+						result.genusTaxonMsg = (genusTaxonList.size() > 1) ? "Multiple matches for Genus detected. Fields are pre-populated with default match. Please select another match below to change.":""
 					}
 					def tokList = page.canonicalForm.tokenize(" ")
 					result.genusName = tokList[0]

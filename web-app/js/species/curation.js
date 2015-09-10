@@ -284,6 +284,8 @@ function searchDatabase(addNewName) {
 
 function searchAndPopupResult(name, dbName, addNewName, source){
     var url = window.params.curation.searchExternalDbUrl;
+    var ibpStatus = $("#statusDropDown").val() ?$("#statusDropDown").val():""
+    var diplayDBName =  $("#queryDatabase option:selected").text() ? $("#queryDatabase option:selected").text() : "Catalogue of Life"
     $.ajax({
         url: url,
         dataType: "json",
@@ -296,15 +298,15 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 $("#dialogMsg").modal('hide');
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
-                $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
+                $("#externalDbResults h6").html(name +"(IBP status : "+ ibpStatus +")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData", true, source);
             }else {
                 var oldText = $(".dialogMsgText").html();
                 if (oldText.indexOf("Sorry") >= 0) {
                     oldText = "";//arr[0];
-                    $(".dialogMsgText").html("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                    $(".dialogMsgText").html("Sorry no results found from "+ diplayDBName + ". Please query an alternative database or input name-attributes manually.");
                 } else {
-                    $(".dialogMsgText").html(oldText + "<hr><br /> <b>RESPONSE</b> <br /> Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
+                    $(".dialogMsgText").html(oldText + "<hr><br /> <b>RESPONSE</b> <br /> Sorry no results found from "+ diplayDBName + ". Please query an alternative database or input name-attributes manually.");
                 }
                 
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
@@ -424,6 +426,7 @@ function openSpeciesPage(taxonId, colId){
 
 function showSearchPopup(data){
 	// show the popup
+	var colMsg = "";
 	var tList = data.taxonList
 	if (tList && tList.length != 0) {
 		$("#dialogMsg").modal('hide');
@@ -434,18 +437,20 @@ function showSearchPopup(data){
 	} else {
 		$("#dialogMsg").modal('show');
 		$(".dialogMsgText").html("Sorry no results found from IBP Database. Fill in details manually");
+		colMsg = "No results found for taxon name on IBP. "
 	}
-
+	
+	colMsg = colMsg + "Querying the Catalogue of Life for matches..."
 	if ($("#externalDbResults").hasClass('IBPResult')) {
 		$('#externalDbResults .modal-dialog').on('hidden', function(event) {
 			$(this).unbind();
 			$("#dialogMsg").modal('show');
-			$(".dialogMsgText").html("Searching in COL...");
+			$(".dialogMsgText").html(colMsg);
 			searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
 		});
 	} else {
 		$("#dialogMsg").modal('show');
-		$(".dialogMsgText").html("Searching in COL...");
+		$(".dialogMsgText").html(colMsg);
 		searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
 	}
 	$("#externalDbResults").removeClass('IBPResult');
@@ -463,7 +468,16 @@ function validateHirName(comp){
 	
 	comp.addClass("currentTargetName");
 	var inputCom = $(comp).children('input');
-	var params = {'rank':inputCom.attr('data-rank'), 'page':inputCom.attr('value').trim()};
+	var rank = inputCom.attr('data-rank');
+	var page = inputCom.attr('value').trim();
+	//if not a mandatory field and name is empty text then leaving  
+	if( (rank == "4"  || rank == "6" ||rank == "8") && (page == "") ){
+		vButton.removeClass('btn-primary').addClass('btn-success disabled');
+		vButton.html('Validated');
+		return;
+	}
+	
+	var params = {'rank':rank, 'page':page};
 	
 	$.ajax({
         url:'/species/validate',
@@ -547,6 +561,10 @@ function validateSpeciesSuccessHandler(data, search){
 		if ($(".taxonRank:not(#page)").length > 0)
 			$(".taxonRank:not(#page)").autofillNames();
 		
+		if(data.requestParams.genusTaxonMsg){
+			alert(data.requestParams.genusTaxonMsg);
+		}
+		
 	}
 	
 	if (data.success == true) {
@@ -558,12 +576,16 @@ function validateSpeciesSuccessHandler(data, search){
 		
 		$('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
 		
-		updateHirInput(data);
-		
 		//showing parser info
 		$('#parserInfo').children('.canonicalName').html(data.canonicalForm);
 		$('#parserInfo').children('.authorYear').html(data.authorYear);
 		$('#parserInfo').show();
+		
+		if(!data.authorYear){
+			alert("Author and Year information is essential to distinguish taxon name from synonyms. Please input these details in the recommended nomenclatural format for the phylum and re-validate; eg: Cuon alpinus (Pallas,1811).");
+		}
+		
+		updateHirInput(data);
 		
 		if(search)
 			showSearchPopup(data);

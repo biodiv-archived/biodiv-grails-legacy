@@ -2300,7 +2300,7 @@ def checking(){
 		if(parsedName instanceof String){
 			parsedName = new TaxonomyDefinition(canonicalForm:parsedName.trim())
 		}
-		List taxonList = NamelistService.searchIBP( parsedName.canonicalForm, null, status, rank, false, parsedName.normalizedForm)
+		List taxonList = NamelistService.searchIBP( parsedName.canonicalForm, null, status, rank, false, parsedName.canonicalForm)
 		if(taxonList.isEmpty())
 			return null
 		

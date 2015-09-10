@@ -123,6 +123,7 @@ class NamelistService {
 					}
 				}
             }
+			
 			//CANONICAL ZERO MATCH OR SINGLE MATCH
             if(res.size() < 2) { 
                 if(res.size() == 0 ) {
