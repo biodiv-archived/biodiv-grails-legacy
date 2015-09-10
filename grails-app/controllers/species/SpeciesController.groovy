@@ -1297,8 +1297,8 @@ class SpeciesController extends AbstractObjectController {
 		List taxonRanks = []
 		TaxonomyRank.list().each { t ->
 			boolean mandatory = true
-			if((t == TaxonomyRank.SUB_GENUS) || (t == TaxonomyRank.SUB_FAMILY)){
-				mandatory = false
+			if((t == TaxonomyRank.SUB_GENUS) || (t == TaxonomyRank.SUB_FAMILY) || (t == TaxonomyRank.SUPER_FAMILY)){
+				mandatory = false 
 			}
 			taxonRanks << [value:t.ordinal(), text:g.message(error:t), mandatory:mandatory, taxonValue:'']
 		}
@@ -1354,10 +1354,10 @@ class SpeciesController extends AbstractObjectController {
                         taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
-                            result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
+                            result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
                         } else {
 							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
-                            result = ['success':true, 'msg':msg, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
+                            result = ['success':true, 'msg':msg, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
                         }
 	                    result['taxonRegistry'] = [:];
 						

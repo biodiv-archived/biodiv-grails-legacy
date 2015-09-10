@@ -8,6 +8,7 @@ import species.utils.Utils;
 import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.COLNameStatus;
 import species.participation.NamelistService
+import species.sourcehandler.XMLConverter;
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -411,6 +412,7 @@ class TaxonomyDefinition extends ScientificName {
 					synToAdd.position = NamesMetadata.NamePosition.WORKING
 					synToAdd.rank = syn.parsedRank
 					synToAdd.authorYear = syn.authorString
+					synToAdd.relationship = XMLConverter.getRelationship(null)
 					
 					if(!synToAdd.save(flush:true)){
 						synToAdd.errors.allErrors.each { println  it }

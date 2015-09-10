@@ -1345,10 +1345,10 @@ class XMLConverter extends SourceConverter {
      * @param rel
      * @return
      */
-    private RelationShip getRelationship(String rel) {
+    public static RelationShip getRelationship(String rel) {
         if(rel) {
             for(RelationShip type : RelationShip) {
-                if(type.value().equals(rel)) {
+                if(type.value().equalsIgnoreCase(rel)) {
                     return type;
                 }
             }

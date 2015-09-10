@@ -19,7 +19,8 @@
 
             #addSpeciesPage .taxonRank {
             min-height:20px;
-            width:575px;   
+            width:400px;  
+            padding-bottom: 0px;
             }
         </style>
     </head>
@@ -176,6 +177,17 @@
         });
 
         $('#addSpeciesPageSubmit').click(function() {
+            var allValidated = true;
+        	$("#taxonHierachyInput .input-prepend").each(function(index, ele) {
+        		if(!$(ele).children('div').hasClass('disabled'));
+        			allValidated = false;
+    		});
+    		
+    		if(!allValidated){
+    			alert("Some names are not validated in the Taxon Hierarchy. Please validated them before submit.")
+    			return; 
+    		}
+    		
         	$('#addSpeciesPage').submit();
         });
     });
