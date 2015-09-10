@@ -1537,7 +1537,7 @@ class SpeciesService extends AbstractObjectService  {
 
         }
 */
-          return DwCSpeciesExporter.getInstance().exportSpecieData( null, dl)
+          return DwCSpeciesExporter.getInstance().exportSpecieData( null, dl, params.webaddress)
         //return exportSpeciesData(speciesInstanceList, null, dl)
 
     }
