@@ -35,7 +35,7 @@
             <%--<g:renderErrors bean="${speciesInstance}" as="list" />--%>
             </g:hasErrors>
 
-            <form id="addSpeciesPage" action="${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" method="POST" class="form-horizontal">
+            <form id="addSpeciesPage" class="form-horizontal">
 
                 <div class="span12 super-section" style="clear:both;">
 
@@ -80,7 +80,13 @@
                         </div>
                         <div id="errorMsg" class="alert hide" style="clear:both;"></div>
                         </div>
-                    </div>  
+                    </div>
+                    <div class="genusSelector control-group hide" style="clear:both;margin-bottom:10px;">
+                     	<label class="control-label span3">Genus Selector</label>
+                     	 <div class="genusItemList span8">
+                     	 </div>
+                    </div>
+                      
                     <g:render template="/common/createTaxonRegistryTemplate" model='[requestParams:requestParams, errors:errors]'/>
                     </div>
 					<g:render template="/namelist/externalDbResultsTemplate" model="[]"/>
@@ -176,17 +182,7 @@
         });
 
         $('#addSpeciesPageSubmit').click(function() {
-            var allValidated = true;
-        	$("#taxonHierachyInput .input-prepend").each(function(index, ele) {
-        		allValidated = (allValidated && ($(ele).children('div').hasClass('disabled')));
-    		});
-    		
-    		if(!allValidated){
-    			alert("Some names are not validated in the Taxon Hierarchy. Please validated them before submit.")
-    			return; 
-    		}
-    		
-        	$('#addSpeciesPage').submit();
+        	addSpeciesPage("${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}");
         });
     });
     </r:script>

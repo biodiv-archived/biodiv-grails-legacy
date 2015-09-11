@@ -1373,12 +1373,12 @@ class SpeciesService extends AbstractObjectService  {
     /**
     * Create Species given species name and atleast one taxon hierarchy
     */
-    def createSpecies(String speciesName, int rank, List taxonRegistryNames, String colId, Language language) {
+    def createSpecies(String speciesName, int rank, List taxonRegistryNames, String colId, Language language, Map taxonHirMatch = null) {
         
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
-        Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames], errors:errors];
+        Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames, taxonHirMatch:taxonHirMatch], errors:errors];
 
 		XMLConverter converter = new XMLConverter();
 		def td
@@ -1439,7 +1439,7 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             //save taxonomy hierarchy
-            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language); 
+            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language, false, false, null, taxonHirMatch); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;
 			//speciesInstance.taxonConcept.postProcess()

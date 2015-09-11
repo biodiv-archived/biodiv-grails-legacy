@@ -131,21 +131,23 @@ class SpeciesController extends AbstractObjectController {
 
         if(params.page && params.rank) {
             Map list = params.taxonRegistry?:[:];
-            List t = [];
+            List hirNameList = [];
             String speciesName;
             int rank;
             list.each { key, value -> 
                 if(value) {
-                    t.putAt(Integer.parseInt(key).intValue(), value);
+                    hirNameList.putAt(Integer.parseInt(key).intValue(), value);
                  }
             } 
 
             speciesName = params.page
             rank = params.int('rank');
-            t.putAt(rank, speciesName);
+            hirNameList.putAt(rank, speciesName);
+			
+			println "--------------------- taxonHirMatch  " + params.taxonHirMatch
 
             try {
-                result = speciesService.createSpecies(speciesName, rank, t, params.colId, languageInstance);
+                result = speciesService.createSpecies(speciesName, rank, hirNameList, params.colId, languageInstance, params.taxonHirMatch);
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
@@ -181,7 +183,7 @@ class SpeciesController extends AbstractObjectController {
 
 
                         redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
-                        return;
+						return;
                     } else {
                         flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
                     }
@@ -1281,15 +1283,20 @@ class SpeciesController extends AbstractObjectController {
 		//got col result now populating things
 		colRes = colRes[0]
 		List taxonRegistry = []
+		List taxonColHirMatch = []
 		result.authorYear = colRes.authorString
 		result.canonicalForm = colRes.canonicalForm
 		TaxonomyRank.list().each { TaxonomyRank r ->
 			String rStr = r.value().toLowerCase()
-			taxonRegistry.putAt(XMLConverter.getTaxonRank(rStr) , colRes.get(rStr))
+			int tRank = XMLConverter.getTaxonRank(rStr)
+			String tName = colRes.get(rStr)
+			taxonRegistry.putAt(tRank , tName)
+			taxonColHirMatch.putAt(tRank , colRes.get('id_details').getAt(tName))
 		}
-		result.requestParams = [taxonRegistry:taxonRegistry, speciesName:colRes.name, rank:XMLConverter.getTaxonRank(colRes.rank), colId: params.colId]
+		result.requestParams = [taxonRegistry:taxonRegistry, taxonCOLHirMatch:taxonColHirMatch, speciesName:colRes.name, rank:XMLConverter.getTaxonRank(colRes.rank), colId: params.colId]
 		result.msg = "Data populated from COL"
 		result.rank = XMLConverter.getTaxonRank(colRes.rank)
+		println "-------------------------- result   " + result
 		render result as JSON
 	}
 	
@@ -1305,6 +1312,42 @@ class SpeciesController extends AbstractObjectController {
 		return taxonRanks
 	}
 	
+	
+	private Map getMatchResult(Map r){
+		List gTaxonList = r.genusTaxonList
+		
+		if(!gTaxonList){
+			return null
+		}
+		
+		def fieldsConfig = grailsApplication.config.speciesPortal.fields
+		def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+		
+		def defMatch = [:]
+		
+		def tmpResult = []
+		gTaxonList.each { TaxonomyDefinition t ->
+			def tdList = t.parentTaxonRegistry(classification)?.get(classification);
+			if(tdList){
+				List taxonRegistry = []
+				List taxonIBPHirMatch = []
+				tdList.each { TaxonomyDefinition td ->
+					println "======================= " +  td.rank + "   " + td.name + "  " + td.id
+					taxonRegistry.putAt(td.rank, td.name)
+					taxonIBPHirMatch.putAt(td.rank, td.id)
+				}
+				taxonRegistry.putAt(TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal(), r.infraSpeicesName)
+				taxonRegistry.putAt(TaxonomyRank.SPECIES.ordinal(), r.speciesName)
+				String namePath = tdList.collect { it.name }.join('->')
+				tmpResult << [taxonRegistry:taxonRegistry, taxonIBPHirMatch:taxonIBPHirMatch, namePath:namePath]
+			}	
+			if(!defMatch){
+				defMatch = tmpResult[0]
+			}
+		}
+		return ["defMatch": defMatch, genusMatchResult : tmpResult]
+	}
+	
     @Secured(['ROLE_USER'])
     def validate() {
 		def msg;
@@ -1315,28 +1358,22 @@ class SpeciesController extends AbstractObjectController {
 				def taxonRegistry
                 Map r = getTaxon(params.page, rank);
 				
+				println "-----------------------------------ddd   " + r
+				
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
 					List taxonList = r.taxonList
                     if(!taxon) {
-						List tmp = []
-						if(r.genusTaxon){
-							def fieldsConfig = grailsApplication.config.speciesPortal.fields
-							def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-							taxonRegistry = r.genusTaxon.parentTaxonRegistry(classification)?.get(classification);
-							if(taxonRegistry){
-								taxonRegistry.each { td ->
-									tmp.putAt(td.rank, td.name)
-								}
-							}
+						Map matchResult = getMatchResult(r)
+						
+						println "----------------------------------- match result " + matchResult
+						
+						Map requestParams = [genusTaxonMsg : r.genusTaxonMsg, page:params.page]
+						if(matchResult){
+							requestParams.putAll(matchResult.remove("defMatch"))
+							requestParams.put('genusMatchResult', matchResult.genusMatchResult)
 						}
-						tmp.putAt(TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal(), r.infraSpeicesName)
-						tmp.putAt(TaxonomyRank.SPECIES.ordinal(), r.speciesName)
-						tmp.putAt(TaxonomyRank.GENUS.ordinal(), r.genusName)
-						taxonRegistry = tmp
-						
-						result = [taxonRanks:getTaxonRankForUI(), 'success':true, rank:rank, taxonList:taxonList, canonicalForm:r.canonicalForm, authorYear:r.authorYear, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry, genusTaxonMsg : r.genusTaxonMsg, page:params.page]]
-						
+						result = [taxonRanks:getTaxonRankForUI(), 'success':true, rank:rank, taxonList:taxonList, canonicalForm:r.canonicalForm, authorYear:r.authorYear, requestParams:requestParams]
 						// no result in ibp so going ahead to create new name
 						if(!taxonList){
 							msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
@@ -1380,7 +1417,7 @@ class SpeciesController extends AbstractObjectController {
         	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], RCU.getLocale(request))
             result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
-		XMLConverter.myPrint(" validate result " + result)
+		XMLConverter.myPrint(" ----------------- validate result " + result)
         render result as JSON
     }
     
@@ -1406,9 +1443,11 @@ class SpeciesController extends AbstractObjectController {
 					if(genusTaxonList){
 						result.genusTaxon = genusTaxonList[0]
 						result.genusTaxonMsg = (genusTaxonList.size() > 1) ? "Multiple matches for Genus detected. Fields are pre-populated with default match. Please select another match below to change.":""
+						result.genusTaxonList = genusTaxonList
 					}
 					def tokList = page.canonicalForm.tokenize(" ")
 					result.genusName = tokList[0]
+					
 					if(tokList.size() == 2){
 						result.speciesName = page.canonicalForm
 					}else{

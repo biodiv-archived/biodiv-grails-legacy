@@ -138,6 +138,12 @@ class TaxonomyDefinition extends ScientificName {
         def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
         return parentTaxonRegistry(classification).get(classification);
     }
+	
+	String fetchRootName(){
+		def hir = fetchDefaultHierarchy()
+		if(hir)
+			return hir[0].canonicalForm
+	}
 
    Map longestParentTaxonRegistry(Classification classification) {
        def result = [:];

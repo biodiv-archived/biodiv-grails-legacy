@@ -61,7 +61,7 @@ class XMLConverter extends SourceConverter {
     private Species s;
 
     def groupHandlerService;
-	//def namelistService;
+	def namelistService;
     //def markupSanitizerService;
 
     public enum SaveAction {
@@ -1626,8 +1626,9 @@ class XMLConverter extends SourceConverter {
 //                            namelistService = ctx.getBean("namelistService");
                             boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
-                            def searchIBP = NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
-                            println "========SEARCH RESULT------>>> #################======== " + searchIBP
+							
+							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode)
+                            println "========SEARCH RESULT------>>> #################======== " + searchIBPResult
                             TaxonomyDefinition taxon = null;
                             
                             //if from curation
@@ -1644,21 +1645,21 @@ class XMLConverter extends SourceConverter {
                                         if(sciName.status == NameStatus.ACCEPTED) {
                                             //couldnot use contains()
                                             boolean isPresent = false;
-                                            searchIBP.each {
+                                            searchIBPResult.each {
                                                 if(it.id == sciName.id){
                                                     isPresent = true;
                                                 }
                                             }
                                             if(!isPresent) {
-                                                searchIBP.add(sciName);
+                                                searchIBPResult.add(sciName);
                                             }
                                         }
                                     }
                                 }
-                                if(searchIBP.size() == 1) {
-                                    taxon = searchIBP[0];
+                                if(searchIBPResult.size() == 1) {
+                                    taxon = searchIBPResult[0];
                                 }
-                                if(searchIBP.size() > 1 ){
+                                if(searchIBPResult.size() > 1 ){
                                     if(fieldNode == fieldNodes.last()) {
                                         if(otherParams.curatingTaxonId) {
                                             TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
@@ -1667,7 +1668,7 @@ class XMLConverter extends SourceConverter {
                                                 taxon = sciName;
                                                 taxon.isFlagged = true;
                                                 String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
-                                                searchIBP.each {
+                                                searchIBPResult.each {
                                                     flaggingReason = flaggingReason + it.id.toString() + ", ";
                                                 }
                                                 println "########### Flagging becoz of XML CONVERTER ==============" + taxon
@@ -1681,7 +1682,7 @@ class XMLConverter extends SourceConverter {
                                                 //Pick any working list name if available
                                                 def workingTaxon = null
                                                 def dirtyTaxon = null
-                                                searchIBP.each {
+                                                searchIBPResult.each {
                                                     if(it.position == NamePosition.WORKING && !workingTaxon) {
                                                         workingTaxon = it;
                                                     }
@@ -1694,11 +1695,11 @@ class XMLConverter extends SourceConverter {
                                                 } else if(dirtyTaxon) {
                                                     taxon = dirtyTaxon;
                                                 } else {
-                                                    taxon = searchIBP[0];
+                                                    taxon = searchIBPResult[0];
                                                 }
                                                 sciName.isFlagged = true;
                                                 String flaggingReason = "The accepted name for this is a system default.Multiple potential matches exist.IDs- ";
-                                                searchIBP.each {
+                                                searchIBPResult.each {
                                                     flaggingReason = flaggingReason + it.id.toString() + ", ";
                                                 }
                                                 sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
@@ -1713,7 +1714,7 @@ class XMLConverter extends SourceConverter {
                                         //then null
                                         def workingTaxon = null
                                         def dirtyTaxon = null
-                                        searchIBP.each {
+                                        searchIBPResult.each {
                                             if(it.position == NamePosition.WORKING && !workingTaxon) {
                                                 workingTaxon = it;
                                             }
@@ -1726,13 +1727,13 @@ class XMLConverter extends SourceConverter {
                                         } else if(dirtyTaxon) {
                                             taxon = dirtyTaxon;
                                         } else {
-                                            taxon = searchIBP[0];
+                                            taxon = searchIBPResult[0];
                                         }
                                     }    
                                 }
                             } else {
-                                if(searchIBP.size() > 0) {
-                                    taxon = searchIBP[0];
+                                if(searchIBPResult.size() > 0) {
+                                    taxon = searchIBPResult[0];
                                 }
                             }
                             /*
@@ -1948,6 +1949,41 @@ class XMLConverter extends SourceConverter {
         return ['taxonRegistry' : taxonEntities, 'spellCheckMsg' : spellCheckMsg];
     }
 
+	
+	/**
+	 * This method first look at the name node and if any ibpid or colid is given then return(if not present then create first)
+	 * if namenode is null then doing normal ibp search
+	 * @param parsedName
+	 * @param rank
+	 * @param searchInNull
+	 * @param useAuthorYear
+	 * @param nameNode
+	 * @return
+	 */
+	private List searchIBP(TaxonomyDefinition parsedName, rank, searchInNull, useAuthorYear, nameNode){
+		def ibpId = nameNode?.ibpId?.text();
+		def colId = nameNode?.colId?.text();
+		
+		println "----------------- ibp id  and col id "  + ibpId + "   " + colId
+		
+		if(ibpId){
+			ibpId = Long.parseLong(ibpId.trim());
+			return [TaxonomyDefinition.get(ibpId)]
+		}
+		
+		if(colId){
+			def taxon = TaxonomyDefinition.findByMatchId(colId)
+			if(!taxon){
+				//have to create new name based on col info
+				taxon  = new TaxonomyDefinition()
+				taxon = namelistService.processDataForMigration(taxon, namelistService.searchCOL(colId, 'id')[0], 1, true)
+				taxon.postProcess()
+			}
+			return [taxon]
+		}
+		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
+	}
+	
     /**
      * 
      * @param rankStr

@@ -87,12 +87,12 @@ class SourceConverter {
         return data;
     }
 
-    public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor, Language language) {
+    public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor, Language language , Map taxonHirMap = null) {
         return createTaxonRegistryNodes(names, classification, [contributor], language);
     }
 
-    public List<Node> createTaxonRegistryNodes(List names, String classification, List<SUser> contributors, Language language) {
-        println "======CREATE TAXON REG NODES ========= " +names;
+    public List<Node> createTaxonRegistryNodes(List names, String classification, List<SUser> contributors, Language language, Map taxonHirMap = null) {
+        //println "======CREATE TAXON REG NODES ========= " +names;
         NodeBuilder builder = NodeBuilder.newInstance();
         List nodes = [];
         names.eachWithIndex { name, index ->
@@ -107,6 +107,12 @@ class SourceConverter {
                     new Node(data, "contributor", contributor.email);
                 }
                 
+				Map matchMap = taxonHirMap ? taxonHirMap.get("" + index) : null
+				if(matchMap){
+					new Node(field, "ibpId", matchMap.ibpId);
+					new Node(field, "colId", matchMap.colId);
+				}
+				//println "---------------------- node at level " + index + "   " + field
                 nodes << field;
             }
         }
