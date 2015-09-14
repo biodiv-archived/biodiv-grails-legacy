@@ -2,7 +2,7 @@ var accDLContent, accWLContent, accCLContent;
 var synDLContent, synWLContent, synCLContent;
 var comDLContent, comWLContent, comCLContent;
 var oldName = '', oldRank = '' , oldStatus = '';
-var genusMatchResult, taxonRanks, nameRank
+var genusMatchResult, taxonRanks, nameRank, genusTaxonMsg
 
 function createListHTML(list, nameType, isOrphanList) {
     var listContent = "<ul>";
@@ -317,6 +317,7 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                     searchIBP(name);
                 }
             }
+          
         }, error: function(xhr, status, error) {
             processingStop()
             alert(xhr.responseText);
@@ -510,6 +511,13 @@ function showSearchPopup(data){
 		$("#dialogMsg").modal('show');
 		$(".dialogMsgText").html(colMsg);
 		searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
+		$('#externalDbResults .modal-dialog').on('hidden', function(event) {
+			$(this).unbind();
+			if(genusTaxonMsg){
+				alert(genusTaxonMsg);
+				genusTaxonMsg = undefined;
+	 		}
+		});
 	}
 	$("#externalDbResults").removeClass('IBPResult');
 
@@ -615,15 +623,13 @@ function updateHirInput(data){
 						+ '" onchange="enableValidButton($(this).parent());"' 
 						+ '" /><div class="btn btn-mini ' + bClass + '" onclick=validateHirName($(this).parent());> ' + bText + ' </div></div>').appendTo($hier);
 	}
-	if (nameRank > 0)
+	if (nameRank > 0){
 		$('#taxonHierarchyInputForm').show();
-
+		$('html, body').animate({scrollTop:400}, 1000);
+	}
+	
 	if ($(".taxonRank:not(#page)").length > 0)
 		$(".taxonRank:not(#page)").autofillNames();
-	
-	if(data.requestParams.genusTaxonMsg){
-		alert(data.requestParams.genusTaxonMsg);
-	}
 	
 }
 
@@ -681,8 +687,11 @@ function validateSpeciesSuccessHandler(data, search){
 		
 		updateHirInput(data);
 		
-		if(search)
+		genusTaxonMsg = data.requestParams.genusTaxonMsg
+		
+		if(search){
 			showSearchPopup(data);
+		}
 		else{
 			//updating new rank
 			 var text1 = data.rank;
@@ -692,9 +701,12 @@ function validateSpeciesSuccessHandler(data, search){
 
 		    //updating name and colId
  		    $("#page").val(data.requestParams.speciesName);
- 		    $( "input[name='colId']" ).val(data.requestParams.colId);
+ 		    $( "input[name='colId']" ).val(data.requestParams.colId); 		    
+ 		   
  		}
-
+		
+		
+		
 		$('#addSpeciesPageSubmit').show();
 
 	} else {
