@@ -301,6 +301,13 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+ ibpStatus +")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData", true, source);
+            	$('#externalDbResults .modal-dialog').on('hidden', function(event) {
+            		$(this).unbind();
+            		if(genusTaxonMsg){
+            			alert(genusTaxonMsg);
+            			genusTaxonMsg = undefined;
+             		}
+            	});
             }else {
                 var oldText = $(".dialogMsgText").html();
                 if (oldText.indexOf("Sorry") >= 0) {
@@ -316,6 +323,14 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                     alert("Searching name in IBP Database");
                     searchIBP(name);
                 }
+                
+                $('#dialogMsg').on('hidden', function(event) {
+            		//$(this).unbind();
+            		if(genusTaxonMsg){
+            			alert(genusTaxonMsg);
+            			genusTaxonMsg = undefined;
+             		}
+            	});
             }
           
         }, error: function(xhr, status, error) {
@@ -489,37 +504,23 @@ function showSearchPopup(data){
 	var tList = data.taxonList
 	if (tList && tList.length != 0) {
 		$("#dialogMsg").modal('hide');
-		$("#externalDbResults").addClass('IBPResult');
 		$("#externalDbResults").modal('show');
 		$("#externalDbResults h6").html(name);
 		fillPopupTable(tList, $("#externalDbResults"), "IBPData", true, "onlinSpeciesCreation");
-	} else {
-		$("#dialogMsg").modal('show');
-		$(".dialogMsgText").html("Sorry no results found from IBP Database. Fill in details manually");
-		colMsg = "No results found for taxon name on IBP. "
-	}
-	
-	colMsg = colMsg + "Querying the Catalogue of Life for matches..."
-	if ($("#externalDbResults").hasClass('IBPResult')) {
 		$('#externalDbResults .modal-dialog').on('hidden', function(event) {
 			$(this).unbind();
 			$("#dialogMsg").modal('show');
+			colMsg = colMsg + "Querying the Catalogue of Life for matches..."
 			$(".dialogMsgText").html(colMsg);
 			searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
 		});
 	} else {
 		$("#dialogMsg").modal('show');
+		colMsg = "No results found for taxon name on IBP. Querying the Catalogue of Life for matches..."
 		$(".dialogMsgText").html(colMsg);
-		searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
-		$('#externalDbResults .modal-dialog').on('hidden', function(event) {
-			$(this).unbind();
-			if(genusTaxonMsg){
-				alert(genusTaxonMsg);
-				genusTaxonMsg = undefined;
-	 		}
-		});
+		searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");	
 	}
-	$("#externalDbResults").removeClass('IBPResult');
+	
 
 }
 
