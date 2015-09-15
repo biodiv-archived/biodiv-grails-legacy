@@ -1305,7 +1305,7 @@ class SpeciesController extends AbstractObjectController {
 			render result as JSON
 		}else{
 			//this name is synonym taken from col so creating stub for synonym 
-			def syn = namelistService.createNameFromColId(colRes.id)
+			def syn = namelistService.createNameFromColId(colRes.externalId)
 			def species = speciesUploadService.createSpeciesStub(syn)
 			result.msg = "Creating species page from selected COL Synonym"
 			result.id = species.id

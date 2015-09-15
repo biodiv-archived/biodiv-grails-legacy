@@ -214,7 +214,7 @@ class NamelistService {
 		if(status.equalsIgnoreCase('accepted')){
 			return createAcceptedNameFromColId(colId, runPostProcess)
 		}else{
-			return createSynonymFromColId(colId)
+			return createSynonymFromColId(colId, runPostProcess)
 		}
 	}
 	
@@ -230,15 +230,17 @@ class NamelistService {
 			td.postProcess()
 		}
 		
-		log.debug "Created accepted name from col Id " + colId
+		println  "---------- Created accepted name from col Id " + colId
 		return td
 	}
 	
 	private ScientificName createSynonymFromColId(String colId, runPostProcess){
 		def colRes = searchCOL(colId, 'id')[0]
-		String accepteNameColId = colRes.acceptedNamesList[0]
+		String accepteNameColId = colRes.acceptedNamesList[0].id
 		TaxonomyDefinition td = createAcceptedNameFromColId(accepteNameColId, runPostProcess)
-		return SynonymsMerged.findByMatchId(colId)
+		def syn =  SynonymsMerged.findByMatchId(colId)
+		println "---------------created synonym " + syn
+		return syn
 	}
 	
 	
