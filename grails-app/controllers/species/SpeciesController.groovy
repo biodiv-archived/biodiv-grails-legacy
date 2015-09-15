@@ -1306,9 +1306,9 @@ class SpeciesController extends AbstractObjectController {
 		}else{
 			//this name is synonym taken from col so creating stub for synonym 
 			def syn = namelistService.createNameFromColId(colRes.externalId)
-			def species = speciesUploadService.createSpeciesStub(syn)
+			def species = syn?.createSpeciesStub()
 			result.msg = "Creating species page from selected COL Synonym"
-			result.id = species.id
+			result.id = species?.id
 			render result as JSON
 		}
 	}
@@ -1378,7 +1378,7 @@ class SpeciesController extends AbstractObjectController {
                     if(!taxon) {
 						Map matchResult = getMatchResult(r)
 						
-						println "----------------------------------- match result " + matchResult
+						//println "----------------------------------- match result " + matchResult
 						
 						Map requestParams = [genusTaxonMsg : r.genusTaxonMsg, page:params.page]
 						if(matchResult){

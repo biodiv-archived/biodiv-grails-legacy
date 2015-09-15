@@ -287,6 +287,27 @@ class TaxonomyDefinition extends ScientificName {
 		
 	}
 	
+	def createSpeciesStub() {
+		if(!id) return;
+
+		Species s = Species.findByTaxonConcept(this);
+		if(s){
+			return s
+		}
+		
+		XMLConverter converter = new XMLConverter();
+		
+        s = new Species();
+		s.taxonConcept = this
+		s.title = s.taxonConcept.italicisedForm;
+		s.guid = converter.constructGUID(s);
+		
+		if(!s.save(flush:true)){
+			s.errors.allErrors.each {log.error it}
+		}
+		return s;
+	}
+	
 	public boolean postProcess(){
 		boolean isSuccess = false
 		isSuccess = curateNameByCol()
