@@ -666,6 +666,9 @@ function validateSpeciesSuccessHandler(data, search){
 	if (data.success == true) {
 		//if species page id returned then open in edit mode
 		if (data.id) {
+			if(data.msg){
+				 console.log(data.msg);
+			}
 			window.location.href = '/species/show/' + data.id + '?editMode=true'
 			return;
 		}
