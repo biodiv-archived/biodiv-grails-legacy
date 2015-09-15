@@ -325,7 +325,7 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 }
                 
                 $('#dialogMsg').on('hidden', function(event) {
-            		//$(this).unbind();
+            		$(this).unbind();
             		if(genusTaxonMsg){
             			alert(genusTaxonMsg);
             			genusTaxonMsg = undefined;
@@ -666,6 +666,9 @@ function validateSpeciesSuccessHandler(data, search){
 	if (data.success == true) {
 		//if species page id returned then open in edit mode
 		if (data.id) {
+			if(data.msg){
+				alert(data.msg);
+			}
 			window.location.href = '/species/show/' + data.id + '?editMode=true'
 			return;
 		}

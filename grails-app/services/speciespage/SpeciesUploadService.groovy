@@ -468,7 +468,7 @@ class SpeciesUploadService {
 	/**
 	 *
 	 */
-	def createSpeciesStub(TaxonomyDefinition taxonConcept) {
+	def Species createSpeciesStub(TaxonomyDefinition taxonConcept) {
 		if(!taxonConcept) return;
 
 		XMLConverter converter = new XMLConverter();
@@ -477,7 +477,10 @@ class SpeciesUploadService {
 		s.taxonConcept = taxonConcept
 		s.title = s.taxonConcept.italicisedForm;
 		s.guid = converter.constructGUID(s);
-
+		
+		if(!s.save(flush:true)){
+			s.errors.allErrors.each {log.error it}
+		}
 		return s;
 	}
 

@@ -1257,6 +1257,8 @@ class SpeciesController extends AbstractObjectController {
 	def editSpeciesPage(){
 		Long taxonId = params.taxonId ? params.taxonId.toLong() : TaxonomyDefinition.findByMatchId(params.colId)?.id
 		def result = [taxonRanks:getTaxonRankForUI(), 'success':true]
+		println "======================== parasm " + params + "  taxon id " + taxonId
+		
 		if(taxonId){
 			def taxon = TaxonomyDefinition.read(taxonId)
 			Species species = Species.findByTaxonConcept(taxon);
@@ -1264,6 +1266,7 @@ class SpeciesController extends AbstractObjectController {
 				species = speciesUploadService.createSpeciesStub(taxon)
 			}
 			result.id = species?.id
+			println "result after create stub " + result
 			render result as JSON
 			return
 		}
@@ -1280,24 +1283,34 @@ class SpeciesController extends AbstractObjectController {
 			render result as JSON
 			return
 		}
+		
 		//got col result now populating things
 		colRes = colRes[0]
-		List taxonRegistry = []
-		List taxonColHirMatch = []
-		result.authorYear = colRes.authorString
-		result.canonicalForm = colRes.canonicalForm
-		TaxonomyRank.list().each { TaxonomyRank r ->
-			String rStr = r.value().toLowerCase()
-			int tRank = XMLConverter.getTaxonRank(rStr)
-			String tName = colRes.get(rStr)
-			taxonRegistry.putAt(tRank , tName)
-			taxonColHirMatch.putAt(tRank , colRes.get('id_details').getAt(tName))
+		String status = colRes.nameStatus
+		if(status.equalsIgnoreCase('accepted')){
+			List taxonRegistry = []
+			List taxonColHirMatch = []
+			result.authorYear = colRes.authorString
+			result.canonicalForm = colRes.canonicalForm
+			TaxonomyRank.list().each { TaxonomyRank r ->
+				String rStr = r.value().toLowerCase()
+				int tRank = XMLConverter.getTaxonRank(rStr)
+				String tName = colRes.get(rStr)
+				taxonRegistry.putAt(tRank , tName)
+				taxonColHirMatch.putAt(tRank , colRes.get('id_details').getAt(tName))
+			}
+			result.requestParams = [taxonRegistry:taxonRegistry, taxonCOLHirMatch:taxonColHirMatch, speciesName:colRes.name, rank:XMLConverter.getTaxonRank(colRes.rank), colId: params.colId]
+			result.msg = "Data populated from COL"
+			result.rank = XMLConverter.getTaxonRank(colRes.rank)
+			render result as JSON
+		}else{
+			//this name is synonym taken from col so creating stub for synonym 
+			def syn = namelistService.createNameFromColId(colRes.id)
+			def species = speciesUploadService.createSpeciesStub(syn)
+			result.msg = "Creating species page from selected COL Synonym"
+			result.id = species.id
+			render result as JSON
 		}
-		result.requestParams = [taxonRegistry:taxonRegistry, taxonCOLHirMatch:taxonColHirMatch, speciesName:colRes.name, rank:XMLConverter.getTaxonRank(colRes.rank), colId: params.colId]
-		result.msg = "Data populated from COL"
-		result.rank = XMLConverter.getTaxonRank(colRes.rank)
-		println "-------------------------- result   " + result
-		render result as JSON
 	}
 	
 	private List getTaxonRankForUI(){
@@ -1332,7 +1345,6 @@ class SpeciesController extends AbstractObjectController {
 				List taxonRegistry = []
 				List taxonIBPHirMatch = []
 				tdList.each { TaxonomyDefinition td ->
-					println "======================= " +  td.rank + "   " + td.name + "  " + td.id
 					taxonRegistry.putAt(td.rank, td.name)
 					taxonIBPHirMatch.putAt(td.rank, td.id)
 				}
@@ -1391,11 +1403,13 @@ class SpeciesController extends AbstractObjectController {
                         taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
-                            result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
                         } else {
+							species = speciesUploadService.createSpeciesStub(taxon)
+							println "============================= creating species stub now for taxon " + taxon
 							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
-                            result = ['success':true, 'msg':msg, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
                         }
+						result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
+						
 	                    result['taxonRegistry'] = [:];
 						
 						taxonRegistry.each {classification, h ->

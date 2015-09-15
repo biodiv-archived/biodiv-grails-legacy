@@ -94,8 +94,8 @@ class NamelistService {
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
 		
-        def clazz;
-        if(status == NameStatus.ACCEPTED) {
+        def clazz
+        if(status == NameStatus.ACCEPTED || !status) {
             clazz = TaxonomyDefinition.class;
         } else {
             clazz = SynonymsMerged.class; 
@@ -192,11 +192,56 @@ class NamelistService {
             temp['sourceDatabase'] = it.viaDatasource?it.viaDatasource:''
             finalResult.add(temp);
         }
-        println "====RESULT FROM IBP==== " + finalResult
         return finalResult 
     }
 
 
+	public ScientificName createNameFromColId(String colId, boolean runPostProcess = true){
+		if(!colId)
+			return
+		
+		def td = TaxonomyDefinition.findByMatchId(colId)
+		if(td){
+			return td
+		}
+		
+		def colRes = searchCOL(colId, 'id')
+		if(!colRes)
+			return
+		
+		colRes = colRes[0]
+		String status = colRes.nameStatus
+		if(status.equalsIgnoreCase('accepted')){
+			return createAcceptedNameFromColId(colId, runPostProcess)
+		}else{
+			return createSynonymFromColId(colId)
+		}
+	}
+	
+	private ScientificName createAcceptedNameFromColId(String colId, boolean runPostProcess){
+		TaxonomyDefinition td = TaxonomyDefinition.findByMatchId(colId)
+		if(td){
+			return td
+		}
+		
+		td = processDataForMigration(new TaxonomyDefinition(), searchCOL(colId, 'id')[0], 1, true)
+		
+		if(runPostProcess){
+			td.postProcess()
+		}
+		
+		log.debug "Created accepted name from col Id " + colId
+		return td
+	}
+	
+	private ScientificName createSynonymFromColId(String colId, runPostProcess){
+		def colRes = searchCOL(colId, 'id')[0]
+		String accepteNameColId = colRes.acceptedNamesList[0]
+		TaxonomyDefinition td = createAcceptedNameFromColId(accepteNameColId, runPostProcess)
+		return SynonymsMerged.findByMatchId(colId)
+	}
+	
+	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////

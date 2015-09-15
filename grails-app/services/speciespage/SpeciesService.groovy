@@ -1384,9 +1384,7 @@ class SpeciesService extends AbstractObjectService  {
 		def td
 		//if colId is given then creating name from col info
 		if(colId){
-			td = new TaxonomyDefinition()
-			td = namelistService.processDataForMigration(td, namelistService.searchCOL(colId, 'id')[0], 1, true)
-			println "------------ name created from col data ---------  " +  td
+			td = namelistService.createNameFromColId(colId, false)
 		}else{
 			td = converter.getTaxonConceptFromName(speciesName, rank);
 		}
@@ -2296,7 +2294,7 @@ def checking(){
     }
 	
 	/////////////////////////// Online edit and bulk upload //////////////////////////
-	List<ScientificName> searchIBP(def parsedName, int rank=-1, NameStatus status =  NameStatus.ACCEPTED ){
+	List<ScientificName> searchIBP(def parsedName, int rank=-1, NameStatus status = null){
 		if(parsedName instanceof String){
 			parsedName = new TaxonomyDefinition(canonicalForm:parsedName.trim())
 		}
