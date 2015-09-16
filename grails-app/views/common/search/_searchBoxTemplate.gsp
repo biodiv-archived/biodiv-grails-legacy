@@ -56,7 +56,7 @@ $(document).ready(function() {
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
                     'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
-                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
+                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'deleteSpecies')}"
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
                 'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",

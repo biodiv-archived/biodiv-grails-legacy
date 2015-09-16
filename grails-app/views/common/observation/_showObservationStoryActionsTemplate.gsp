@@ -2,15 +2,16 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 <%@ page import="species.groups.UserGroup"%>
 <div class="story-actions clearfix" style="width: 100%;">
+ <g:if test="${ibpClassification}">
     <div class="breadcrumb" style="margin-bottom:20px">
-        <g:if test="${ibpClassification}">
+       
         <g:each in="${ibpClassification}" var="taxonDefinition" status="i">
         <a href="${uGroup.createLink('controller':params.controller, 'action':'list', params:['taxon':taxonDefinition.id])}"><span class='rank${taxonDefinition.rank} '> ${raw(taxonDefinition.italicisedForm)}</span></a>
         <g:if test="${i<ibpClassification.size()-1}">></g:if>
         </g:each> 
-        </g:if>
+        
     </div>
-
+</g:if>
     <div class="span8" style="margin-left:0px;position:relative">
         <div class="footer-item pull-left">
             <obv:like model="['resource':instance]"/>

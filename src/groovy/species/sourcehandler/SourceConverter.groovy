@@ -150,7 +150,7 @@ class SourceConverter {
 				addToSummary("No reference key for image : "+imageData)
             }
         }
-    }//
+    }
 
     protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
 
@@ -575,7 +575,7 @@ class SourceConverter {
 	def static myPrint(str){
 		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
 			println str
-		//}
+		}
 	}
 
     private static class FieldsMapHolder {

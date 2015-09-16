@@ -83,6 +83,7 @@ modules = {
 		resource url:'/js/species/abstracteditabletype.js'
 		resource url:'/js/species/relatedStory.js'
 		resource url:'/js/species/search.js'
+		resource url:'/js/jquery.cookie.js'
 	}
 
 	auth {
@@ -234,7 +235,11 @@ modules = {
 	admin { dependsOn	'core' }
 
 	pages {
+		resource url: '/css/jquery.cycle/style.css'
 		resource url:'/js/species/pages.js'
+		resource url: '/js/jquery.cycle2/jquery.cycle2.min.js'
+		resource url: '/js/jquery.cycle2/jquery.cycle2.video.min.js'
+		resource url: '/js/jquery.cycle2/jquery.cycle2.center.min.js'
 	}
 	
 	userGroups_show {

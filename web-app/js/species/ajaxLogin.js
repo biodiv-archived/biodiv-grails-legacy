@@ -100,4 +100,40 @@
         return false;
     }
 
+
+    var remember = $.cookie('remember');
+	//alert(remember);
+    if (remember == 'true') 
+    {        	
+        var email = $.cookie('email');
+        var password = $.cookie('password');
+        // autofill the fields
+        $('.username').val(email);
+        //alert(email);
+        //alert($('.username').html());
+        $('.password').val(password);
+        $('.remember_me').attr('checked',true);
+    }
+    $(document).on('click','#login',function(event) {    	  	
+        if ($(this).parent().find('#remember_me').is(':checked')) {        	
+            var email = $(this).parent().parent().parent().find('#username').val();
+            var password = $(this).parent().parent().parent().find('#password').val();
+            // set cookies to expire in 14 days
+            $.cookie('email', email, { expires: 14 });
+            $.cookie('password', password, { expires: 14});
+            $.cookie('remember', true, { expires: 14});  
+            $(this).submit();            
+        }
+        else
+        {
+            // reset cookies
+            $.cookie('email', null);
+            $.cookie('password', null);
+            $.cookie('remember', null);
+         	$(this).submit();
+        }
+
+        
+  	});
+
 })(jQuery);

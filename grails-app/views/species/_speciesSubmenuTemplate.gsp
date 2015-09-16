@@ -22,7 +22,7 @@
        <sUser:isAdmin>
             <g:if test="${speciesInstance}">
             <a id="deleteSpecies" class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                href="${uGroup.createLink(controller:'species', action:'delete', id:speciesInstance.id)}"
+                href="${uGroup.createLink(controller:'species', action:'deleteSpecies', id:speciesInstance.id)}"
                 ><i class="icon-trash"></i><g:message code="button.delete" /></a>
             </g:if>
         </sUser:isAdmin>

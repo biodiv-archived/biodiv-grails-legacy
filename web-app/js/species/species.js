@@ -931,11 +931,12 @@ $(document).ready(function() {
         if($('#deleteSpecies').length > 0) {
             $('#deleteSpecies').click (function() {
                 if(confirm(window.i8ln.species.specie.sdel)) {
+                    var urlDel = $(this).attr('href');
                     $.ajax({
-                        url:window.params.species.deleteUrl,
+                        url:urlDel,
                         type:'POST',
                         success : function( data, textStatus, jqXHR) {
-                           //alert(data); 
+                           location.reload();
                         },error: function(xhr, status, error) {
                             //alert(msg);
                             return false;

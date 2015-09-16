@@ -18,7 +18,7 @@ $(document).ready(function(){
 });
 
 </script>
-<div id="speciesGroupFilter" data-toggle="buttons-radio">
+<div id="speciesGroupFilter" data-toggle="buttons-radio" style="display:none;">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
 		<g:if test="${sGroup != othersGroup }">
@@ -35,7 +35,7 @@ $(document).ready(function(){
 
 
 <g:if test="${(params.controller != 'species') && !hideHabitatFilter}">
-	<div id="habitatFilter" data-toggle="buttons-radio">
+	<div id="habitatFilter" data-toggle="buttons-radio" style="display:none;">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 			<g:if test="${habitat.id != othersHabitat.id }">
@@ -56,7 +56,7 @@ $(document).ready(function(){
 
 <g:if test="${forObservations}">
 <%--	<div id="observationAllChecklistFilter" class="btn-group"--%>
-<%--		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">--%>
+<%--		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 250px;">--%>
 <%--		<input type="text" id="observationAllChecklistFilter"--%>
 <%--			value="${params.isChecklistOnly}" style="display: none" />--%>
 <%--		<button id="observationAllButton" class="btn"--%>
@@ -67,7 +67,7 @@ $(document).ready(function(){
 
 	<g:if test="${!params.isChecklistOnly}">
 		<div id="observationMediaFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">
+			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 262px;">
 			<input type="text" id="observationMediaFilter"
 				value="${params.isMediaFilter}" style="display: none" />
 			<button id="observationMediaAllFilterButton" class="btn"
@@ -77,7 +77,7 @@ $(document).ready(function(){
 		</div>
 
 		<div id="speciesNameFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
+			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 0;">
 			<input type="text" id="speciesNameFilter"
 				value="${params.speciesName}" style="display: none" />
 			<button id="speciesNameAllButton" class="btn" rel="tooltip"
@@ -87,7 +87,7 @@ $(document).ready(function(){
 		</div>
 		
 		<div id="observationFlagFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -30px; right: 0;">
+			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 142px;">
 			<input type="text" id="observationFlagFilter"
 				value="${params.isFlagged}" style="display: none" />
 			<button id="observationWithNoFlagFilterButton" class="btn"
@@ -98,7 +98,7 @@ $(document).ready(function(){
 	</g:if>
 	<g:else>
 		<div id="areaFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
+			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 0;">
 			<input type="text" id="areaFilter"
 				value="${params.areaFilter}" style="display: none" />
 			<button id="allAreaButton" class="btn" rel="tooltip"
