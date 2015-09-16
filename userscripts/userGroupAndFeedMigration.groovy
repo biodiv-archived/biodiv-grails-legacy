@@ -307,7 +307,17 @@ def postSpeices(){
 	userGroupService.updateResourceOnGroup(m)
 }
 
-postSpeices()
+
+def updateSpeciesGroup(){
+	def groupHandlerService = ctx.getBean("groupHandlerService");
+	Species.findAllByIdGreaterThanEquals(276023).each { Species s ->
+		groupHandlerService.updateGroup(s.taxonConcept);
+	}
+}
+
+updateSpeciesGroup()
+
+//postSpeices()
 
 //pullTreeSpecies()
 //pullTreeObservations()
