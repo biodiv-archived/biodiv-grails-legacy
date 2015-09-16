@@ -535,6 +535,8 @@ function validateHirName(comp){
 	
 	comp.addClass("currentTargetName");
 	var inputCom = $(comp).children('input');
+	inputCom.attr('data-ibpid', "");
+	inputCom.attr('data-colid', "");
 	var rank = inputCom.attr('data-rank');
 	var page = inputCom.attr('value').trim();
 	//if not a mandatory field and name is empty text then leaving  

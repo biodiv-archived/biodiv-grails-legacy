@@ -1962,7 +1962,7 @@ class XMLConverter extends SourceConverter {
 		def ibpId = nameNode?.ibpId?.text();
 		def colId = nameNode?.colId?.text();
 		
-		println "----------------- ibp id  and col id "  + ibpId + "   " + colId
+		println "----------------- ibp id  " +  ibpId + "  and col id " + colId
 		
 		if(ibpId){
 			ibpId = Long.parseLong(ibpId.trim());
