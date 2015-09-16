@@ -61,9 +61,7 @@ class XMLConverter extends SourceConverter {
     private Species s;
 
     def groupHandlerService;
-	def namelistService;
-    //def markupSanitizerService;
-
+ 	
     public enum SaveAction {
         MERGE("merge"),
         OVERWRITE("overwrite"),
@@ -1973,12 +1971,9 @@ class XMLConverter extends SourceConverter {
 		
 		if(colId){
 			def taxon = TaxonomyDefinition.findByMatchId(colId)
-			if(!taxon){
-				//have to create new name based on col info
-				taxon  = new TaxonomyDefinition()
-				taxon = namelistService.processDataForMigration(taxon, namelistService.searchCOL(colId, 'id')[0], 1, true)
-				taxon.postProcess()
-			}
+			if(!taxon)
+				taxon =  ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
+				
 			return [taxon]
 		}
 		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
