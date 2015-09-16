@@ -32,6 +32,7 @@
                         <th>Rank</th>
                         <th>Name status</th>
                         <th>Group</th>
+                        <th>Parent</th>
                         <th>Source Database</th>
                         <th>Action</th>
                     </tr>

@@ -315,19 +315,17 @@ class TaxonomyDefinition extends ScientificName {
 		return s;
 	}
 	
-	public boolean postProcess(){
-		boolean isSuccess = false
-		isSuccess = curateNameByCol()
-		if(!isSuccess)
-			return isSuccess
+	public postProcess(){
+		curateNameByCol()
+		
 		println "----------------------------------- adding col hir"
 		addColHir()
-		println "---------------------- adding IBP hir"
 		
+		println "---------------------- adding IBP hir"
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
 		def trHir = Classification.findByName("IBP Taxonomy Hierarchy");
 		snapToIBPHir(hirList, trHir)
-		return isSuccess
+		
 	}
 	
 	private addColHir(){

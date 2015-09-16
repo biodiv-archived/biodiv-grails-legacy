@@ -203,12 +203,14 @@ class GroupHandlerService {
         def ibpParentTaxon;
         if(taxonConcept instanceof SynonymsMerged) {
             def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
+			acceptedTaxonConcept.postProcess()
             ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
         } else {
+			taxonConcept.postProcess()
             ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
         }
-        if(ibpParentTaxon) {
-            println "Updating==================================="
+		
+		if(ibpParentTaxon) {
             return updateGroup(taxonConcept, getGroupByHierarchy(taxonConcept, ibpParentTaxon));
         } else {
             log.error "No IBP parent taxon for  ${taxonConcept}"
