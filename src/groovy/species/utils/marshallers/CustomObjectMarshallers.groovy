@@ -102,7 +102,7 @@ class CustomObjectMarshallers {
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'group':it.fetchRootName(), 'position':it.position.value()]
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'group':it.fetchRootName(), parentName:it.fetchParentName(), 'position':it.position.value()]
         }
 
         JSON.registerObjectMarshaller(Classification) {

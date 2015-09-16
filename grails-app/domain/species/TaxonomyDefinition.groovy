@@ -144,6 +144,13 @@ class TaxonomyDefinition extends ScientificName {
 		if(hir)
 			return hir[0].canonicalForm
 	}
+	
+	String fetchParentName(){
+		def hir = fetchDefaultHierarchy()
+		if(hir && (hir.size() > 1))
+			return hir[-2].canonicalForm
+			
+	}
 
    Map longestParentTaxonRegistry(Classification classification) {
        def result = [:];

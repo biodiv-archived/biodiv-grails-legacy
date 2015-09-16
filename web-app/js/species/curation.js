@@ -325,7 +325,7 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 }
                 
                 $('#dialogMsg').on('hidden', function(event) {
-            		$(this).unbind();
+            		//$(this).unbind();
             		if(genusTaxonMsg){
             			alert(genusTaxonMsg);
             			genusTaxonMsg = undefined;
@@ -405,7 +405,7 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
         }
         else {
         	var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value['id'] + ',"' + value['externalId'] + '", "' + value['name'] + '")' : 'getNameDetails(' +value['taxonId'] + ',' + classificationId + ',1, undefined)' 
-            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus']+ "/" + value['position'] +"</td><td>"+value['group']+"</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"
+            rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus'] + "/" + value['position'] +"</td><td>"+value['group']+"-" + value['parentName'] + "</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"
         }
     });
     $ele.find("table").append(rows);
@@ -668,9 +668,6 @@ function validateSpeciesSuccessHandler(data, search){
 	if (data.success == true) {
 		//if species page id returned then open in edit mode
 		if (data.id) {
-			if(data.msg){
-				 console.log(data.msg);
-			}
 			window.location.href = '/species/show/' + data.id + '?editMode=true'
 			return;
 		}

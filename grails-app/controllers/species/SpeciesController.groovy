@@ -787,6 +787,7 @@ class SpeciesController extends AbstractObjectController {
                 result.remove('synonymInstance');
                 result.remove('taxonConcept');
             }
+			println "--------------final result at synonym update " +  result
             render result as JSON
             return;
         } catch(Exception e) {

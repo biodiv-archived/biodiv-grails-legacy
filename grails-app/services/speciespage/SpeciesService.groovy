@@ -936,7 +936,7 @@ class SpeciesService extends AbstractObjectService  {
 
             if(!speciesInstance) {
                 def messagesourcearg = new Object[1];
-                messagesourcearg[0] = speciesFieldId;
+                messagesourcearg[0] = speciesId;
             	return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
             }
         }
@@ -950,7 +950,7 @@ class SpeciesService extends AbstractObjectService  {
             oldSynonym = SynonymsMerged.read(synonymId);
 
             if(!oldSynonym) {
-        println "=====a========"
+				println "=====a========"
                 //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
