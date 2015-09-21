@@ -22,13 +22,14 @@
 </script>
 <div class="info-message" id="info-message">
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
-                class="icon-search"></i></span> ${speciesCountWithContent} <g:message code="common.observation.species.pages" /> <g:if test="${speciesCountWithContent>1}"></g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}"><g:message code="text.and" /> ${instanceTotal- speciesCountWithContent} <g:message code="common.observation.species.stubs" /> </g:if> <g:message code="text.found" /><g:if test="${params.hasMedia == 'true'}"> <g:message code="with.media" /></g:if><g:if test="${params.hasMedia == 'false'}"> <g:message code="without.media" /></g:if></g:if>
+                class="icon-search"></i></span> ${speciesCountWithContent} <g:message code="common.observation.species.pages" /> <g:if test="${speciesCountWithContent>1}"></g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}"><g:message code="text.and" /> ${instanceTotal- speciesCountWithContent} <g:message code="common.observation.species.stubs" /> </g:if> <g:message code="text.found1" /><g:if test="${params.hasMedia == 'true'}"> <g:message code="with.media" /></g:if><g:if test="${params.hasMedia == 'false'}"> <g:message code="without.media" /></g:if></g:if>
 		<g:else>
 			<span class="name" style="color: #b1b1b1;"><i
 				class="icon-search"></i></span>
 				<g:if test="${instanceTotal==0}"><g:message code="text.no.result" /> </g:if>
 				<g:elseif test="${resultType != 'observation' }">
-					${instanceTotal} ${resultType}<g:if test="${instanceTotal>1 && resultType != 'species'}"><g:message code="text.s" /></g:if>
+					${instanceTotal} 
+					<g:if test="${resultType != 'user'}">${resultType}</g:if><g:else><g:message code="title.user" /></g:else><g:if test="${instanceTotal>1 && resultType != 'species'}"><g:message code="text.s" /></g:if>
 				</g:elseif>
 				<g:else>
 					<g:if test="${observationCount}">

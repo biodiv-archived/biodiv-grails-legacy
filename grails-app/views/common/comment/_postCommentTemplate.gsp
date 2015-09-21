@@ -6,12 +6,12 @@
     <form class="form-horizontal" onSubmit="return postComment(this, '${postCommentUrl}')">
 		<%
 			boolean isGroupDisccusionThread = params.webaddress && (params.controller == 'activityFeed' || params.action == 'activity')
-			def commentPlaceHolder = "Write comment"
+			def commentPlaceHolder = g.message(code:'placeholder.write.comment')
 			def commentHolderClass = ActivityFeedService.getType(commentHolder)
 			if(commentHolderClass == Observation.class.getName())
-				commentPlaceHolder += " on observation"
+				commentPlaceHolder += " "+g.message(code:'placeholder.write.on.observation')
 			if(commentHolderClass == Recommendation.class.getName())
-				commentPlaceHolder += " on species call"
+				commentPlaceHolder += " "+g.message(code:'placeholder.write.on.species')
 			if(isGroupDisccusionThread)
 				commentPlaceHolder = "Message"
 		%>

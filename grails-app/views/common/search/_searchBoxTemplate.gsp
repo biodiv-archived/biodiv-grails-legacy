@@ -263,7 +263,9 @@ $(document).ready(function() {
                 "mrecord" :"${g.message(code:'maps.all.records')}",
                 "moccur"  :"${g.message(code:'maps.occurence.records')}",
                 "msearch" :"${g.message(code:'default.search')}",
-                "noselect":"${g.message(code:'maps.no.selected')}"
+                "noselect":"${g.message(code:'maps.no.selected')}",
+                "nofeatureselect":"${g.message(code:'maps.no.featured.select')}",
+                "reset":"${g.message(code:'maps.reset')}"
             }      
 
 
