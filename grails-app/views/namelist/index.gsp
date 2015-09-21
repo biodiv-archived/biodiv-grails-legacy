@@ -9,7 +9,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <meta name="layout" content="main" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <r:require modules="species_show,curation"/>
+        <r:require modules="curation"/>
 
         <title>NameList - Curation Interface</title>
 
@@ -57,6 +57,7 @@
                 <select class="span12 listSelector">
                     <option value='accDLContent'>Accepted Names</option>
                     <option value='synDLContent'>Synonyms</option>
+                    <option value='leafDLContent'>Species and Subspecies</option>
                     <!--option value='comDLContent'>Common Names</option-->
                 </select>
                 <div class="dl_content taxon_selector_list listarea_content">
@@ -76,6 +77,7 @@
                 <select class="span12 listSelector">
                     <option value='accWLContent'>Accepted Names</option>
                     <option value='synWLContent'>Synonyms</option>
+                    <option value='leafWLContent'>Species and Subspecies</option>
                     <!--option value='comWLContent'>Common Names</option-->
                 </select>
 
@@ -94,6 +96,7 @@
                 <select class="span12 listSelector">
                     <option value='accCLContent'>Accepted Names</option>
                     <option value='synCLContent'>Synonyms</option>
+                    <option value='leafCLContent'>Species and Subspecies</option>
                     <!--option value='comCLContent'>Common Names</option-->
                 </select>
 
@@ -120,53 +123,13 @@
                 </div>
 
                 <table style="width:100%;">
+                    <g:each in="${TaxonomyRank.list()}" var="taxon">
                     <tr>
-                        <td class='rankStrings'>Kingdom</td>
-                        <td class='rankValues'><input type="text" class="kingdom span12"></td> 
+                        <td class='rankStrings'>${taxon.value()}</td>
+                        <td class='rankValues'><input type="text" class="taxon taxon${taxon.ordinal()} span12"></td> 
                     </tr>
-                    <tr>
-                        <td class='rankStrings'>Phylum</td>
-                        <td class='rankValues'><input type="text" class="phylum span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Class</td>
-                        <td class='rankValues'><input type="text" class="class span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Order</td>
-                        <td class='rankValues'><input type="text" class="order span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class="super_family rankStrings">Super-Family</td>
-                        <td class='rankValues'><input type="text" class="superfamily span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Family</td>
-                        <td class='rankValues'><input type="text" class="family span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class="sub_family rankStrings">Sub-Family</td>
-                        <td class='rankValues'><input type="text" class="subfamily span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Genus</td>
-                        <td class='rankValues'><input type="text" class="genus span12 "></td> 
-                    </tr>
-
-                    <tr>
-                        <td class="sub_genus rankStrings">Sub-Genus</td>
-                        <td class='rankValues'><input type="text" class="subgenus span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Species</td>
-                        <td class='rankValues'><input type="text" class="species span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class="infra_species rankStrings">Infra-Species</td>
-                        <td class='rankValues'><input type="text" class="infraspecies span12"></td> 
-                    </tr>
-
-                </table>
+                    </g:each>
+               </table>
 
             </div>
             <div class="span7 canBeDisabled listarea" style="background:seagreen">
@@ -189,24 +152,24 @@
                         
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.name.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="Name" class="span5" style="width:65%;"/>
+                        <input type="text" placeholder="Name" class="span5 name" style="width:65%;"/>
                     </div>
                     <div class="span4">
                         <label> Author String
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.authorstring.info')}"></i>
                         </label>
-                        <input type="text" placeholder="Author string" class="span3" style="width:45%;"/>
+                        <input type="text" placeholder="Author string" class="span3 authorString" style="width:45%;"/>
                     </div>
                     <div class="span4">
                         <label>Status
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.status.info')}"></i>
                         </label>
-                        <select id="statusDropDown" class="span4" style="width:65%;" >
+                        <select id="statusDropDown" class="span4 status" style="width:65%;" >
                             <option value="chooseNameStatus">Choose Name Status</option>
                             <g:each in="${NameStatus.list()}" var="ns">
-                            <option value="${ns.toString().toLowerCase()}">${ns}</option>
+                            <option value="${ns.toString().toLowerCase()}">${ns.value()}</option>
                             </g:each>
                         </select>
                     </div>
@@ -216,7 +179,7 @@
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.rank.info')}"></i>
                         </label>
-                        <select id="rankDropDown" class="span7">
+                        <select id="rankDropDown" class="span7 rank">
                             <option value="chooseRank">Choose Rank</option>
                             <% def rankCount = 0 %>
                             <g:each in="${TaxonomyRank.list()}" var="t">
@@ -229,21 +192,21 @@
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.source.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="" class="span7" style=""/>
+                        <input type="text" placeholder="" class="span6 source" style=""/>
                     </div>															
                     <div class="span3">
                         <label>via
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.via.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8" style=""/>
+                        <input type="text" placeholder="" class="span8 sourceDatabase via" style=""/>
                     </div>
                     <div class="span3">
                         <label>ID
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.id.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8" style=""/>
+                        <input type="text" placeholder="" class="span8 id" style=""/>
                     </div>			
                 </div>
 
@@ -334,14 +297,25 @@
 
 
 
-                        <!--button type="button" class="save_button" style="background-color:#C0504D;" onClick='saveHierarchy(false)'>Save & Retain</button--!> 
-                        <button type="button" class="save_button" style="background-color:#FF9900;" onClick='saveHierarchy(true)'>Save & Move to Working List</button> 
-                        <!--button type="button" class="save_button" style="background-color:#009933;">Save & Move to Clean List</button--!> 
-                    </div>
+                  </div>
 
 
                 </div>
-
+                        <!--button type="button" class="save_button btn" onClick='saveHierarchy(false, false)'>Save & Retain</button--!> 
+                        <button id="saveNameDetails" type="button" class="canBeDisabled btn" onClick='saveNameDetails(false, false, false)'>Save </button> 
+                        <div class="btn-group">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                Move Name to List
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a id="moveToWKG" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Move to Working List</a> </li>
+                                <li><a id="removeFromWKG" class="remove_button btn btn-link disabled" onClick='saveNameDetails(true, false, false)'>Remove from Working List</a> </li>
+                                <li><a id="moveToClean" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, false, true)'>Move to Clean List</a> </li>
+                                <li><a id="removeFromClean" class="remove_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Remove from Clean List</a></li>
+                            </ul>
+                        </div>
+ 
 
 
 

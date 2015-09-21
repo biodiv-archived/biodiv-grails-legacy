@@ -869,36 +869,36 @@ class SpeciesController extends AbstractObjectController {
 	} 
 
 	@Secured(['ROLE_ADMIN'])
-	def deleteSpecies() {
-		def speciesInstance = Species.get(params.long('id'))
-		if (speciesInstance) {
-			try {
-				boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, springSecurityService.currentUser);
-				if(success) {
-				    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+    def delete() {
+        def speciesInstance = Species.get(params.long('id'))
+        if (speciesInstance) {
+            try {
+                boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, springSecurityService.currentUser);
+                if(success) {
+                    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                     def model = utilsService.getSuccessModel(msg, null, OK.value());
                     withFormat {
                         html {
                             flash.message = msg;
-				            redirect(action: "list")
+                            redirect(action: "list")
                         }
                         json { render model as JSON }
                         xml { render model as XML }
                     }
                 } else {
-				    String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                     def model = utilsService.getErrorModel(msg, null, OK.value());
                     withFormat {
                         html {
                             flash.message = msg;
-				            redirect(action: "show", id: params.id)
+                            redirect(action: "show", id: params.id)
                         }
                         json { render model as JSON }
                         xml { render model as XML }
                     }
                 }
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
                 String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
                 withFormat {
@@ -909,21 +909,21 @@ class SpeciesController extends AbstractObjectController {
                     json { render model as JSON }
                     xml { render model as XML }
                 }
-			}
-		}
-		else {
-			String msg = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
-                withFormat {
-                    html {
-                        flash.message = msg;
-                        redirect(action: "list")
-                    }
-                    json { render model as JSON }
-                    xml { render model as XML }
+            }
+        }
+        else {
+            String msg = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.message = msg;
+                    redirect(action: "list")
                 }
-		}
-	}
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
 
 	def count() {
 		//cache "search_results"
@@ -1144,6 +1144,15 @@ class SpeciesController extends AbstractObjectController {
                 case 'contributor':
                 success = speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
                 break;
+
+                case 'taxon_curator':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR);
+                break;
+
+                case 'taxon_editor':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR);
+                break;
+
                 default: log.error "No invite type"
             }
 

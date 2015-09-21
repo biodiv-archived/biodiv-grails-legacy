@@ -1406,7 +1406,7 @@ class XMLConverter extends SourceConverter {
         String spellCheckMsg = ''
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
-            println "==CREATING FIELD NODES ------------------------=== " + taxonNodes
+            println "==CREATING FIELD NODES for classification ${it}------------------------=== " + taxonNodes
 			def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
             //println "USING OLD TAXON HIERARCHY CREATION"
             //def getTaxonHierarchyRes = getTaxonHierarchyOld(taxonNodes, it, scientificName, saveHierarchy)
@@ -1640,7 +1640,8 @@ class XMLConverter extends SourceConverter {
                                 if(fieldNode == fieldNodes.last()) {
                                     if(otherParams.curatingTaxonId) {
                                         TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
-                                        if(sciName.status == NameStatus.ACCEPTED) {
+                                        println "=============++++++ 1111 ${sciName.status} ............${otherParams.curatingTaxonStatus}"
+                                        //if(otherParams.curatingTaxonStatus == NameStatus.ACCEPTED) {
                                             //couldnot use contains()
                                             boolean isPresent = false;
                                             searchIBP.each {
@@ -1651,17 +1652,22 @@ class XMLConverter extends SourceConverter {
                                             if(!isPresent) {
                                                 searchIBP.add(sciName);
                                             }
-                                        }
+                                        //}
                                     }
                                 }
                                 if(searchIBP.size() == 1) {
+                                    println "SEARCH RESULT == 1 choosing first result as taxon"
                                     taxon = searchIBP[0];
                                 }
                                 if(searchIBP.size() > 1 ){
+                                    println "SEARCH RESULT > 1"
                                     if(fieldNode == fieldNodes.last()) {
+                                        println "Field node is last node"
                                         if(otherParams.curatingTaxonId) {
                                             TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
+                                            println "1=============++++++ 1111 ${sciName.status} ............${otherParams.curatingTaxonStatus}"
                                             if(sciName.status == NameStatus.ACCEPTED) {
+                                                println "==========sci name status  ${sciName.status} ............${otherParams.curatingTaxonStatus}"
                                                 println "############==== Flagging accepted name " + sciName;
                                                 taxon = sciName;
                                                 taxon.isFlagged = true;
@@ -1669,7 +1675,7 @@ class XMLConverter extends SourceConverter {
                                                 searchIBP.each {
                                                     flaggingReason = flaggingReason + it.id.toString() + ", ";
                                                 }
-                                                println "########### Flagging becoz of XML CONVERTER ==============" + taxon
+                                                println "########### Flagging in XML CONVERTER becoz : ${flaggingReason}==============" + taxon
                                                 taxon.flaggingReason = taxon.flaggingReason + " ### " + flaggingReason;
                                                 taxon = taxon.merge();
                                                 if(!taxon.save()) {
@@ -1705,8 +1711,11 @@ class XMLConverter extends SourceConverter {
                                                     sciName.errors.each { log.error it }
                                                 }
                                             }
+                                        } else {
+                                            println "==========No curation taxon id"
                                         }
                                     } else {
+                                        println "Field node is not last node"
                                         //Pick any working list name if available
                                         //then dirty
                                         //then null
@@ -1728,10 +1737,16 @@ class XMLConverter extends SourceConverter {
                                             taxon = searchIBP[0];
                                         }
                                     }    
+                                } else {
+                                    println ".....${searchIBP.size()}";
                                 }
                             } else {
+                                println "NO OTHER PARAMS"
                                 if(searchIBP.size() > 0) {
+                                    println "FIRST search result as taxon"
                                     taxon = searchIBP[0];
+                                } else {
+                                    println searchIBP;
                                 }
                             }
                             /*
@@ -1857,7 +1872,7 @@ class XMLConverter extends SourceConverter {
                                 }
                                 taxon = taxon.merge();
                                 if(!taxon.save(flush:true)) {
-                                    taxon.errors.each { log.error it }
+                                    taxon.errors.each { println it; log.error it }
                                 }
 
                                 /*if(fieldNode == fieldNodes.last()){
@@ -1888,14 +1903,30 @@ class XMLConverter extends SourceConverter {
                                     newNameSaved = true;
                                 }
                             }
-                            def ent = new TaxonomyRegistry();
-                            ent.taxonDefinition = taxon
+
                             //newNameSaved true becoz now this taxon cant be used in hierarchy 
                             //of a lower level as its status is not accepted 
                             newNameSaved = newNameSaved || taxon.status != NameStatus.ACCEPTED
                             if(taxon.status != NameStatus.ACCEPTED) {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
+ 
+                            def ibpHierarchy = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+
+                            def criteria = TaxonomyRegistry.createCriteria()
+                            TaxonomyRegistry registry = criteria.get {
+                                eq("taxonDefinition", ent.taxonDefinition);
+                                if(ent.classification != ibpHierarchy) eq("path", ent.path);
+                                eq("classification", ent.classification);
+                            }
+
+                            println "===========REGISTRY=========== " + registry
+
+                            def ent;
+                            if(ent.classification != ibpHierarchy) ent = registry;
+                            else ent = new TaxonomyRegistry();
+
+                            ent.taxonDefinition = taxon
                             ent.classification = classification;
                             //all hierarchy from curation interface
                             //to go under IBP tax hie
@@ -1908,18 +1939,21 @@ class XMLConverter extends SourceConverter {
                             log.debug("Parent Taxon : "+ent.parentTaxon)
                             ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
                             //same taxon at same parent and same path may exist from same classification.
-                            def criteria = TaxonomyRegistry.createCriteria()
-                            TaxonomyRegistry registry = criteria.get {
-                                eq("taxonDefinition", ent.taxonDefinition);
-                                eq("path", ent.path);
-                                eq("classification", ent.classification);
-                            }
-                            println "===========REGISTRY=========== " + registry
                             if(registry) {
                                 log.debug "Taxon registry already exists : "+registry;
-                                if(saveTaxonHierarchy)
+                                if(saveTaxonHierarchy) {
                                     registry.updateContributors(getUserContributors(fieldNode.data))
-                                    taxonEntities.add(registry);
+                                    if(ent.classification == ibpHierarchy) {
+                                        log.debug "Saving taxon registry entity : "+ent;
+                                        println "=====SAVING NEW TAXON REGISTRY================================== "
+                                        if(!ent.save(flush:true)) {
+                                            ent.errors.each { log.error it }
+                                        } else {
+                                            log.debug "Saved taxon registry entity : "+ent;
+                                        }
+                                    }
+                                }
+                                taxonEntities.add(registry);
                             } else if(saveTaxonHierarchy) {
                                 log.debug "Saving taxon registry entity : "+ent;
                                 println "=====SAVING NEW TAXON REGISTRY================================== "

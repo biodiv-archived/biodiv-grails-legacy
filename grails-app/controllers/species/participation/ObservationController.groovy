@@ -103,7 +103,9 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def list() {
+        println "+++++++++++++++++++"
 		def model = runLastListQuery(params);
+        println "+++++++++++++++++++"
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
@@ -129,6 +131,9 @@ class ObservationController extends AbstractObjectController {
                 } else if(!params.isGalleryUpdate?.toBoolean()){
                     model.model['width'] = 300;
                     model.model['height'] = 200;
+println "=================================================="
+                    println "=================================================="
+
                     render (view:"list", model:model.model)
                     return;
                 } else {
@@ -144,7 +149,14 @@ class ObservationController extends AbstractObjectController {
                     def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal,userLanguage:userLanguage]
 
                     render result as JSON
-*/                  return;
+*/
+                    println "=================================================="
+                    println "=================================================="
+                    println "=================================================="
+                    println "=================================================="
+                    println "=================================================="
+                    
+                    return;
                 }
             }
             json { render model as JSON }

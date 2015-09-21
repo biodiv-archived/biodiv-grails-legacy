@@ -97,9 +97,13 @@ class ObvUtilService {
         DownloadLog dl;
         def res = [];
         int instanceTotal = params.instanceTotal?params.int('instanceTotal'):0
-        for( int i=0; i<instanceTotal/EXPORT_BATCH_SIZE; i++) {
-            println "=========================================="
-            println i
+        int x = instanceTotal/EXPORT_BATCH_SIZE;
+
+        if(x==0 || params.downloadFrom && params.downloadFrom == 'uniqueSpecies') {
+            x = 1;
+        }
+
+        for( int i=0; i<x; i++) {
             int offset = (i * EXPORT_BATCH_SIZE);
             println offset
             dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params, offset);

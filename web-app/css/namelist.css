@@ -43,7 +43,7 @@ input[type=text], select {
     border-bottom-color: transparent !important;
 }
 .tab-content{
-    overflow-y: scroll;
+/*    overflow-y: scroll;*/
     height: 197px;
     overflow-x: hidden !important;
 }   
@@ -58,6 +58,7 @@ input[type=text], select {
 
 .metadataDetails .listarea { 
     height : 375px;
+    overflow:visible;
 }
 
 .taxon_selector_wrapper{
@@ -95,7 +96,7 @@ input[type=text], select {
 .listarea_content{
     position: relative;
     overflow-y: scroll;        
-    height: 196px;
+    height: 230px;
     //width: 470px;
     margin: 0px;
 }
@@ -174,11 +175,8 @@ input[type=text], select {
     display: none;
     position: absolute;
 }
-.save_button{       
-    border-radius: 3px;
-    font-size: 12px;
-    line-height: 24px;
-    font-weight: bold;
+.save_button, .remove_button{ 
+    text-align:left;
 }
 .tab-content>.span*{
     margin-left:2px;

@@ -557,12 +557,16 @@ environments {
             'grails.app.services.com.odobo',
             'org.pac4j'
             debug   'grails.app.services.species.participation.DigestService'
+            debug   'grails.app.services.species.participation.NamesIndexerService'
+            debug   'grails.app.services.species.participation.NameslistService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
             debug   'grails.app.controllers.species'
             debug   'grails.app.controllers.content'
             debug   'grails.app.controllers.utils'
+
+            debug   'species.sourcehandler.XMLConverter'
 
             debug   'grails.plugin.springsecurity.openid'
             debug    'grails.app.filters.species'

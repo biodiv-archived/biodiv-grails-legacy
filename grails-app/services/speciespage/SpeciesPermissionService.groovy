@@ -78,7 +78,7 @@ class SpeciesPermissionService {
         return addTaxonUser(author, taxonConcept, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR);
     }
 
-    private int addUsers(SUser author, List<Species> species, SpeciesPermission.PermissionType permissionType) {
+    int addUsers(SUser author, List<Species> species, SpeciesPermission.PermissionType permissionType) {
         int n = 0
         species.each { spec -> 
             addUser(author, spec, permissionType)? n++ :''
@@ -86,15 +86,15 @@ class SpeciesPermissionService {
         return n
     }
 
-    private boolean addUser(SUser author, Species species, SpeciesPermission.PermissionType permissionType) {
+    boolean addUser(SUser author, Species species, SpeciesPermission.PermissionType permissionType) {
         return addTaxonUser(author, species.taxonConcept, permissionType);
     }
 
-    private boolean addTaxonUser(SUser user, TaxonomyDefinition taxonConcept, SpeciesPermission.PermissionType permissionType){
+    boolean addTaxonUser(SUser user, TaxonomyDefinition taxonConcept, SpeciesPermission.PermissionType permissionType){
         if(!isTaxonContributor(taxonConcept, user, [permissionType])) {
             log.debug "adding taxon user ${user} to ${taxonConcept} with permission ${permissionType}"
             try{
-                def newCon = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
+                def newCon = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: permissionType.toString())
                 if(!newCon.save(flush:true)){
                     newCon.errors.allErrors.each { log.error it }
                     return false
@@ -133,7 +133,7 @@ class SpeciesPermissionService {
             inList('permissionType', permissions)
             inList('taxonConcept',  parentTaxons)
         }
-        if(res && res.size() > 0) {
+        if((res && res.size() > 0) || (utilsService.isAdmin(user))) {
             return true
         } else {
             return false
@@ -163,18 +163,15 @@ class SpeciesPermissionService {
     } 
 
     List<TaxonomyDefinition> curatorFor(SUser user){
-        def result = SpeciesPermission.findAllWhere(author: user, permissionType: SpeciesPermission.PermissionType.ROLE_CURATOR.toString())
-        def res = []
-        result.each{
-            res << it.taxonConcept
-        }
-        return res
+        return hasRoleFor(user, SpeciesPermission.PermissionType.ROLE_CURATOR);
     }
     
     List<TaxonomyDefinition> contributorFor(SUser user){
-        println user;
-        def result = SpeciesPermission.findAllByAuthorAndPermissionType(user, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR.toString())
-        println result;
+        return hasRoleFor(user, SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR);
+    }
+
+    List<TaxonomyDefinition> hasRoleFor(SUser user, SpeciesPermission.PermissionType permissionType){
+        def result = SpeciesPermission.findAllByAuthorAndPermissionType(user, permissionType.toString())
         def res = []
         result.each {
             res << it.taxonConcept
@@ -259,9 +256,15 @@ class SpeciesPermissionService {
             def hadPermissionFor;
             if(invitetype == 'curator')
                 hadPermissionFor = curatorFor(mem);
-            else
+            else if(invitetype == 'contributor')
                 hadPermissionFor = contributorFor(mem);
-           
+            else if(invitetype == 'taxon_curator')
+                hadPermissionFor = hasRoleFor(mem, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR);
+            else if(invitetype == 'taxon_editor')
+                hadPermissionFor = hasRoleFor(mem, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR);
+
+            hadPermissionFor = hadPermissionFor.id;
+
             selNodeTDs.each { sn ->
                 def allParents = sn.parentTaxon()
                 
@@ -269,7 +272,7 @@ class SpeciesPermissionService {
 
                 boolean hasPermission = false, alreadyRequested = false;
                 allParents.each { parent ->
-                    if(hadPermissionFor && hadPermissionFor.contains(parent)) {
+                    if(hadPermissionFor && hadPermissionFor.contains(parent.id)) {
                         hasPermission = true;
                         return;
                     } else if(selNodeTDs.contains(parent)) {
@@ -338,26 +341,30 @@ class SpeciesPermissionService {
         members.each { mem ->
             def hadPermissionFor;
             if(invitetype == 'curator')
-                hadPermissionFor = curatorFor(mem)
-            else
-                hadPermissionFor = contributorFor(mem)
+                hadPermissionFor = curatorFor(mem);
+            else if(invitetype == 'contributor')
+                hadPermissionFor = contributorFor(mem);
+            else if(invitetype == 'taxon_curator')
+                hadPermissionFor = hasRoleFor(mem, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR);
+            else if(invitetype == 'taxon_editor')
+                hadPermissionFor = hasRoleFor(mem, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR);
 
-                selNodeTDs.each { sn ->
-                    def allParents = sn.parentTaxon()
+            selNodeTDs.each { sn ->
+                def allParents = sn.parentTaxon()
 
-                    allParents = allParents - sn;
+                allParents = allParents - sn;
 
-                    boolean hasPermission = false, alreadyRequested = false;
-                    allParents.each { parent ->
-                        if(hadPermissionFor && hadPermissionFor.contains(parent)) {
-                            hasPermission = true;
-                            return;
-                        } else if(selNodeTDs.contains(parent)) {
-                            alreadyRequested = true;
-                            alReq = true;
-                            return;
-                        }
+                boolean hasPermission = false, alreadyRequested = false;
+                allParents.each { parent ->
+                    if(hadPermissionFor && hadPermissionFor.contains(parent)) {
+                        hasPermission = true;
+                        return;
+                    } else if(selNodeTDs.contains(parent)) {
+                        alreadyRequested = true;
+                        alReq = true;
+                        return;
                     }
+                }
 
                     if(hasPermission) {
                         //he is already has permission for a parent node, no need to add for child node

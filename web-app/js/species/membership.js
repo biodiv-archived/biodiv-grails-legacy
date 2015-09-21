@@ -301,6 +301,17 @@ console.log('init_group_header');
 		usersUrl : window.params.userTermsUrl
 	});
 
+    taxon_curators_autofillUsersComp = $("#userAndEmailList_taxon_curator").autofillUsers({
+        //appendTo:"#userNameSuggestions",
+		usersUrl : window.params.userTermsUrl
+	});
+
+    taxon_editors_autofillUsersComp = $("#userAndEmailList_taxon_editor").autofillUsers({
+        //appendTo:"#userNameSuggestions",
+		usersUrl : window.params.userTermsUrl
+	});
+
+
 }
 
 /*

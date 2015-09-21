@@ -1,5 +1,7 @@
 var curators_autofillUsersComp;
 var contributors_autofillUsersComp;
+var taxon_curators_autofillUsersComp;
+var taxon_editors_autofillUsersComp;
 
 function onSpeciesImageUploadSuccess(type){
     $("body").css("cursor", "progress");
@@ -49,7 +51,7 @@ function getNextRelatedObvImages(speciesId, url, resourceListType, context){
 
 
 $(document).ready(function() {
-    $('#inviteCurators, #inviteContributors, #requestPermission').click(function(e){
+    $('#inviteCurators, #inviteContributors, #inviteTaxonCurators, #requestPermission').click(function(e){
         var invitetype = $(this).data('invitetype');
         var $dialog, $autofillUsers;
         if(invitetype === 'curator') {
@@ -58,6 +60,12 @@ $(document).ready(function() {
         } else if(invitetype === 'contributor') {
             $dialog = $('#inviteContributorsDialog');
             $autofillUsers = contributors_autofillUsersComp;
+        } else if(invitetype === 'taxon_curator') {
+            $dialog = $('#inviteTaxonCuratorsDialog');
+            $autofillUsers = taxon_curators_autofillUsersComp;
+        } else if(invitetype === 'taxon_editor') {
+            $dialog = $('#inviteTaxonEditorsDialog');
+            $autofillUsers = taxon_editors_autofillUsersComp;
         } else if(invitetype === 'requestPermission') {
             $dialog = $('#requestPermissionDialog');
         }
@@ -105,7 +113,13 @@ $(document).ready(function() {
         var $autofillUsers;
         if(invitetype === 'curator') {
             $autofillUsers = curators_autofillUsersComp[0]
-        } else {
+        } else if(invitetype === 'contributor') {
+            $autofillUsers = contributors_autofillUsersComp[0]
+        } else if(invitetype === 'taxon_curator') {
+            $autofillUsers = taxon_curators_autofillUsersComp[0]
+        } else if(invitetype === 'taxon_editor') {
+            $autofillUsers = taxon_editors_autofillUsersComp[0]
+        }else {
             $autofillUsers = contributors_autofillUsersComp[0]
         }
         $dialog.find('input[name="userIds"]').val($autofillUsers.getEmailAndIdsList().join(","));

@@ -397,6 +397,10 @@ modules = {
     }
 
     curation {
+		dependsOn 'comment, activityfeed'
+
+		resource url:'/js/species/taxonhierarchy.js'
+        resource url:'/js/species/speciesPermission.js'
         resource url:'/js/species/curation.js'
         resource url:'/css/namelist.css'
     }

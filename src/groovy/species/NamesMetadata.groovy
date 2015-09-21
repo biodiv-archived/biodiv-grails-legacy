@@ -76,9 +76,10 @@ abstract class NamesMetadata extends NamesSorucedata {
             if(this == PROV_ACCEPTED) return "Provisionally Accepted Name" 
             if(this == COMMON) return "Common Name" 
         }
-        String toString() {
+
+        /*String toString() {
             return this.value();
-        }
+        }*/
 		
 		static NameStatus getEnum(String str){
 			if(!str) return null

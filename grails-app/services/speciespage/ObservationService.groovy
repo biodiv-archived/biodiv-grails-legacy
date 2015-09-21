@@ -1121,7 +1121,12 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        if(params.userGroup || params.webaddress) {
+        if(params.webaddress) {
+            def userGroupInstance =	utilsService.getUserGroup(params)
+            params.userGroup = userGroupInstance;
+        }
+
+        if(params.userGroup) {
             log.debug "Filtering from usergourp : ${params.userGroup}"
             userGroupQuery = " join obv.userGroups userGroup "
             query += userGroupQuery
@@ -2390,6 +2395,11 @@ class ObservationService extends AbstractObjectService {
      * used for download and post in bulk
      */
     def getObservationList(params, max, offset, action){
+        println "===========================================+++++"
+        println "===========================================+++++"
+        println "===========================================+++++"
+        println "===========================================+++++"
+        println params;
 		if(Utils.isSearchAction(params, action)){
             //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
@@ -2398,7 +2408,7 @@ class ObservationService extends AbstractObjectService {
                 res.add(Observation.read(obvId))
             }
             return res
-        }else if(params.webaddress){
+        } else if(params.webaddress){
             def userGroupInstance =	userGroupService.get(params.webaddress)
             if (!userGroupInstance){
                 log.error "user group not found for id  $params.id  and webaddress $params.webaddress"

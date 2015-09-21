@@ -11,6 +11,8 @@ class SpeciesPermission {
     public enum PermissionType {
         ROLE_CURATOR("ROLE_CURATOR"),
         ROLE_CONTRIBUTOR("ROLE_CONTRIBUTOR"),
+        ROLE_TAXON_CURATOR("ROLE_TAXON_CURATOR"),
+        ROLE_TAXON_EDITOR("ROLE_TAXON_EDITOR")
 
         private String value;
 

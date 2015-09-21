@@ -1578,11 +1578,11 @@ class SpeciesService extends AbstractObjectService  {
 
         def queryParams = [:]
         def activeFilters = [:]
-        queryParams.max = Math.min(params.max ? params.max.toInteger() : 42, 100);
+        queryParams.max = Math.min(params.max ? params.max.toInteger() : 40, 100);
         queryParams.offset = params.offset ? params.offset.toInteger() : 0
 
         if(queryParams.max < 0 ) {
-            queryParams.max = 42 
+            queryParams.max = 40 
         }
 
         if(queryParams.offset < 0) {
