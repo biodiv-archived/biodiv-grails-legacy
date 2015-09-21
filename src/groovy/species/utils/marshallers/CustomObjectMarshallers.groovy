@@ -31,6 +31,7 @@ import species.TaxonomyRegistry;
 import species.Classification;
 import species.Resource;
 import species.participation.Comment;
+import species.participation.ActivityFeed;
 import species.utils.ImageType;
 import species.Language;
 import content.eml.UFile;
@@ -164,7 +165,7 @@ class CustomObjectMarshallers {
 	
 		JSON.registerObjectMarshaller(Comment) {
             println "comment marshaller"
-			return ['id':it.id, 'text':it.body, 'authorId':it.author.id, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
+			return ['id':it.id, 'text':it.body, 'author':it.author, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
 		}
 
         JSON.registerObjectMarshaller(SpeciesField) {
@@ -195,6 +196,22 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(UFile) {
             return ['path': grailsApplication.config.speciesPortal.content.serverURL + it.path, 'size':it.size, 'mimetype':it.mimetype]
         }
+        
+        JSON.registerObjectMarshaller(ActivityFeed) {
+            def map = [:];
+            if(it.activityRootType) map['activityRootType'] = it.activityRootType;
+            if(it.rootHolderId) { map['rootHolderId'] = it.rootHolderId; map['rootHolderType'] = it.rootHolderType; }
+            map['activityType'] = it.activityType;
+            if(it.activityDescrption) map['activityDescription'] = it.activityDescrption;
+        
+            if(it.activityHolderId) { map['activityHolderId'] = it.activityHolderId; map['activityHolderType'] = it.activityHolderType; }
+            if(it.subRootHolderId) { map['subRootHolderId'] = it.subRootHolderId; map['subRootHolderType'] = it.subRootHolderType; }
+            map['author'] = it.author;
+            
+            map['dateCreated'] = it.dateCreated;
+            map['lastUpdated'] = it.lastUpdated;
+            return map;
+        }
 
         XML.registerObjectMarshaller(new MapMarshaller() {
             public String getElementName(Object o) {
@@ -209,6 +226,7 @@ class CustomObjectMarshallers {
                 }
             }
         })
+
     }
     }
 }

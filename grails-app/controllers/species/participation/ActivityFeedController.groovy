@@ -10,6 +10,7 @@ import species.participation.Stats
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 import  org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
+import static org.springframework.http.HttpStatus.*;
 
 
 class ActivityFeedController {
@@ -29,13 +30,14 @@ class ActivityFeedController {
 
 		def feeds = activityFeedService.getActivityFeeds(params);
 		def userLanguage = utilsService.getCurrentLanguage(request);
-		if(!feeds.isEmpty()){
+		if(!feeds.isEmpty()) {
 			if(params.checkFeed){
 				def m = [feedAvailable:true]
 				render m as JSON;
 			}
-			else{
-				def showFeedListHtml = g.render(template:"/common/activityfeed/showActivityFeedListTemplate", model:[feeds:feeds, feedType:params.feedType, feedPermission:params.feedPermission, feedHomeObject:activityFeedService.getDomainObject(params.feedHomeObjectType, params.feedHomeObjectId), userLanguage:userLanguage]);
+			else {
+                def model = [feeds:feeds, feedType:params.feedType, feedPermission:params.feedPermission, feedHomeObject:activityFeedService.getDomainObject(params.feedHomeObjectType, params.feedHomeObjectId), userLanguage:userLanguage]
+				def showFeedListHtml = g.render(template:"/common/activityfeed/showActivityFeedListTemplate", model:model);
                 showFeedListHtml = showFeedListHtml.replaceAll('\\n|\\t','');
 				def newerTimeRef = (params.feedOrder == activityFeedService.LATEST_FIRST) ? feeds.first().lastUpdated.time.toString() : feeds.last().lastUpdated.time.toString()
 				def olderTimeRef = (params.feedOrder == activityFeedService.LATEST_FIRST) ? feeds.last().lastUpdated.time.toString() : feeds.first().lastUpdated.time.toString()
@@ -44,9 +46,12 @@ class ActivityFeedController {
 					params.refTime = olderTimeRef
 					result["remainingFeedCount"] = activityFeedService.getCount(params);
 				}
-				render result as JSON
-				}
-		}else{
+                
+                model = utilsService.getSuccessModel('', null, OK.value(), model);
+                model.putAll(result);
+				render model as JSON
+			}
+		} else {
 			render [:] as JSON
 		}
 	}
@@ -61,7 +66,6 @@ class ActivityFeedController {
 	}
 	
 	def list() {
-		log.debug params
 		['feedType':params.feedType, 'feedCategory':params.feedCategory]
 	}
 	

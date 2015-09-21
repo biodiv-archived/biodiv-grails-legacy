@@ -97,15 +97,15 @@ class ObvUtilService {
         DownloadLog dl;
         def res = [];
         int instanceTotal = params.instanceTotal?params.int('instanceTotal'):0
+
         int x = instanceTotal/EXPORT_BATCH_SIZE;
 
-        if(x==0 || params.downloadFrom && params.downloadFrom == 'uniqueSpecies') {
+        if(x == 0 || (params.downloadFrom && params.downloadFrom == 'uniqueSpecies')) {
             x = 1;
         }
 
         for( int i=0; i<x; i++) {
             int offset = (i * EXPORT_BATCH_SIZE);
-            println offset
             dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params, offset);
 
             def r = [:];
@@ -148,7 +148,7 @@ class ObvUtilService {
             return exportUniqueSpeciesList(distinctRecoListResult); 
         }else {
 //            def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress, dl.offset).getAllResult()
-            return exportObservation(dl);
+            return exportObservation(dl, params.webaddress);
 //            return exportObservation(observationInstanceList, dl.type, dl.author, dl.id, dl.filterUrl )
             //return DwCObservationExporter.getInstance().exportObservationData(downloadDir, list_final, reqUser, dl.id, params.filterUrl );
 
@@ -192,7 +192,7 @@ class ObvUtilService {
         return csvFile
     }
 	
-    private def exportObservation(DownloadLog dl){
+    private def exportObservation(DownloadLog dl, String userGroupWebaddress){
     	if(!dl)
 			return null
 		
@@ -202,11 +202,11 @@ class ObvUtilService {
 		}
 		log.debug "export type " + dl.type 
 		if(dl.type == DownloadLog.DownloadType.CSV) {
-			return exportAsCSV(downloadDir, dl)
+			return exportAsCSV(downloadDir, dl, userGroupWebaddress)
 		} else if(dl.type == DownloadLog.DownloadType.KML) {
-			return exportAsKML(downloadDir, dl)
+			return exportAsKML(downloadDir, dl, userGroupWebaddress)
 		} else {
-			return exportAsDW(downloadDir, dl)
+			return exportAsDW(downloadDir, dl, userGroupWebaddress)
 		}
     }
 
@@ -239,7 +239,7 @@ class ObvUtilService {
 		}
 	}
 */
-	private File exportAsCSV(File downloadDir, DownloadLog dl){
+	private File exportAsCSV(File downloadDir, DownloadLog dl, String userGroupWebaddress){
 		String folderName = "obv_"+ + new Date().getTime()
 		String parent_dir = downloadDir.getAbsolutePath() + File.separator + folderName+File.separator + folderName
 		File csvFile = new File(parent_dir, "obv_" + new Date().getTime() + ".csv")
@@ -247,11 +247,12 @@ class ObvUtilService {
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
 		
 		boolean headerAdded = false
-        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
-        while(rf.hasNext()) {
+        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, userGroupWebaddress, dl.offsetParam.intValue());
+        int total = 0;
+        while (total < EXPORT_BATCH_SIZE && rf.hasNext()) {
             def obvList = rf.next();
+            total += obvList.size();
             obvList.each { obv ->
-
 			    if(obv.isChecklist) return;
 
                 log.debug "Writting " + obv
@@ -323,7 +324,7 @@ class ObvUtilService {
         return zipFile
     }
 
-    def exportAsDW(File downloadDir, DownloadLog dl){
+    def exportAsDW(File downloadDir, DownloadLog dl, String userGroupWebaddress){
         List<String> list_final=[] ;
 
 /*        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
@@ -337,7 +338,7 @@ class ObvUtilService {
             }
         }
 */
-        DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), dl);
+        DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), dl, userGroupWebaddress);
         //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
     }
 
@@ -366,7 +367,7 @@ class ObvUtilService {
         //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
     }
 */	
-    def exportAsKML(File downloadDir, DownloadLog dl){
+    def exportAsKML(File downloadDir, DownloadLog dl, String userGroupWebaddress){
         def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
         String iconBasePath = config.speciesPortal.observations.serverURL
 
@@ -407,9 +408,11 @@ class ObvUtilService {
                         }
                     }
 
-                    ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
-                    while(rf.hasNext()) {
+                    ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, userGroupWebaddress, dl.offsetParam.intValue());
+                    int total = 0;
+                    while(rf.hasNext() && total < EXPORT_BATCH_SIZE) {
                         def obvList = rf.next();
+                        total += obvList.size();
                         for ( obv in obvList) {
                             log.debug "writing $obv"
                             def mainImage = obv.mainImage()
