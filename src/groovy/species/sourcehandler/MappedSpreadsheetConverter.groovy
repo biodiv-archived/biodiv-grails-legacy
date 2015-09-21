@@ -75,7 +75,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
 				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
 				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
-					myPrint("================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase()))
+					//myPrint("================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase()))
 					fieldName = fieldName.toLowerCase();
 					//String delimiter = delimiterMap.get(fieldName)
 					//Map customFormat = customFormatMap.get(fieldName)
@@ -84,10 +84,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					Node category = new Node(field, "category", mappedField.get("category"));
 					Node subcategory = new Node(field, "subcategory", mappedField.get("subcategory"));
                     Language language = Language.read(Long.parseLong(mappedField.get("language")+""));
+					//language = language?:Language.getLanguage("")
 					Node languageNode = new Node(field, "language", language);
 
                     //TODO: remove hardcodings for field names
 					if (mappedField.get("category")?.equalsIgnoreCase("images")) {
+						println "================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase())
 						Node images = getImages(imagesMetaData, fieldName, 'images', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir, language);
 					} else if (category.text().equalsIgnoreCase("icons")) {
 						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir,  language);
@@ -323,9 +325,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 				
                 	if(delimiter) {
-                    	txt.split(delimiter).each { loc ->
-							createImages(images, loc, imagesMetaData, imagesDir, language);
-                    	}
+                    	def tmpImageIds =  txt.split(delimiter).collect{it.trim()}
+						createImages(images, tmpImageIds, imagesMetaData, imagesDir, language);
                 	} else {
 						createImages(images, txt, imagesMetaData, imagesDir, language);
                 	}

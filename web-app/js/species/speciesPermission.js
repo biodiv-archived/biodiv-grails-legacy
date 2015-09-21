@@ -97,7 +97,9 @@ $(document).ready(function() {
 
     $(".inviteButton").click(function(){
         var $dialog = $(this).parent().parent();
-        var selectedNodes = $(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
+        var selectedNodes = $.map($('#taxonHierarchy').jstree(true).get_checked(true), function(val) { return val.original.taxonid; }).join()
+        console.log(selectedNodes);
+        //$(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
         var invitetype = $dialog.find('input[name="invitetype"]').val();
 
         var $autofillUsers;
@@ -117,7 +119,6 @@ $(document).ready(function() {
             type: 'POST',
             data:data,
             success: function(data, statusText, xhr) {
-                console.log(data);
                 if(data.statusComplete) {
                     $dialog.modal('hide');
                     $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
@@ -139,7 +140,8 @@ $(document).ready(function() {
 
     $(".requestButton").click(function(){
         var $dialog = $(this).parent().parent();
-        var selectedNodes = $(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
+//        var selectedNodes = $(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
+        var selectedNodes = $.map($('#taxonHierarchy').jstree(true).get_checked(true), function(val) { return val.original.taxonid; }).join()
         var invitetype = $dialog.find('input[name="invitetype"]').val();
 
         var data = {message:$dialog.find('.inviteMsg').val(), selectedNodes : selectedNodes}

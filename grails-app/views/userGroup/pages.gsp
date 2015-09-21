@@ -32,7 +32,6 @@
 </style>
 </head>
 <body>
-
 	<div class="observation span12">
 		<!-- uGroup:showSubmenuTemplate model="['entityName':'Pages']" /-->
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
@@ -100,10 +99,11 @@
   				var contentID = me.attr('href');//e.target.hash; //get anchor
   				if(contentID && contentID != '/project/list') {
 	  				e.preventDefault();
-	  				var History = window.History; 
+	  				var History = window.History;
 		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
 				    	History.pushState({state:1}, document.title, pageURL+'/'+contentID.replace('#',''));
 		            	me.tab('show');
+		            	$( '.cycle-slideshow' ).cycle();
 		           	});
 	           	} 
 			});

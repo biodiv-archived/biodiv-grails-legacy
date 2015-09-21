@@ -1,6 +1,6 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.ImageUtils"%>
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@page import="species.utils.Utils"%>

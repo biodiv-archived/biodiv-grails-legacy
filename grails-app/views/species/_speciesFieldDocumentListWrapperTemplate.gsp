@@ -8,17 +8,17 @@
 <%
             def link = ""
             
-            List result = DocSciName.findAllByScientificName(speciesInstance.taxonConcept.canonicalForm)
+            List result = speciesInstance.findRelatedDocuments()
             if(result){
                 result.each { 
-                        def documentId = it.document.id
-                        String docTitle = it.document.title
-                        String description = it.document.notes
+                        def documentId = it.id
+                        String docTitle = it.title
+                        String description = it.notes
                         %>
                        <li style="float: left; list-style: none; width:876px; border: 1px solid #CECECE; background-color: #FFF; border-radius:7px;">
                       <g:render template="/species/showSpeciesDocumentTemplate" model="[
         controller:'document', 
-        documentInstance:it.document,
+        documentInstance:it,
         docId:documentId,
         showFeatured:true, 
         showDetails:false, docTitle:docTitle, desc:description]"/></li>

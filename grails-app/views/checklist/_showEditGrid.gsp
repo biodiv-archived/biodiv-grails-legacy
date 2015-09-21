@@ -12,7 +12,7 @@ $(document).ready(function(){
         }
         loadDataToGrid(data, columns, 'checklist', '${sciNameColumn?:""}', '${commonNameColumn?:""}');
     } else {
-    	loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance.id}");
+    	loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance?.id}");
     }
 });
 </r:script>

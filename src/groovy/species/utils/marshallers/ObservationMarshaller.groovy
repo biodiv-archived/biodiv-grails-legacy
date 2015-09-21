@@ -9,6 +9,8 @@ class ObservationMarshaller {
        JSON.registerObjectMarshaller( Observation) { Observation obv ->
             Map result = [
                 id : obv.id,
+                title: obv.fetchFormattedSpeciesCall(),
+
                 placeName : obv.placeName,
                 reverseGeocodedName : obv.reverseGeocodedName,
                 geoPrivacy : obv.geoPrivacy,
@@ -35,6 +37,7 @@ class ObservationMarshaller {
                 recommendationVote : obv.recommendationVote,
                 userGroups : obv.userGroups,
                 annotations : obv.annotations,
+                language : obv.language,
 
                 isDeleted : obv.isDeleted,
                 isLocked : obv.isLocked,

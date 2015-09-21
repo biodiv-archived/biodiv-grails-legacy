@@ -1,5 +1,7 @@
 package species.participation
 
+import org.junit.Before;
+
 import species.Language;
 import species.TaxonomyDefinition;
 import species.auth.Role;
@@ -15,11 +17,19 @@ class Recommendation {
 	boolean isScientificName = true;
 	//if its common name then can have language
 	Long languageId = null;
+	boolean isFlagged = false;
+	String flaggingReason;
+
+	// added this column for optimizing case insensitive sql query 
+	String lowercaseName;
 	
 	static constraints = {
 		name(blank:false, unique:['taxonConcept', 'languageId']);
 		taxonConcept nullable:true;
 		languageId(nullable:true);
+        isFlagged nullable:true;
+		lowercaseName nullable:true;
+		flaggingReason nullable:true;
 	}
 
 	static mapping = { 
@@ -76,5 +86,14 @@ class Recommendation {
 	   }
 	   map.put("recoComments", recoComments);
 	   return map;
+   }
+   
+   def beforeInsert(){
+	   lowercaseName = name.toLowerCase()
+   }
+   
+   def beforeUpdate(){
+	   if(lowercaseName != name.toLowerCase())
+		   lowercaseName = name.toLowerCase()
    }
 }

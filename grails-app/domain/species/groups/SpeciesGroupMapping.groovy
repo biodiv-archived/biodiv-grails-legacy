@@ -1,7 +1,6 @@
 package species.groups
 
-import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.TaxonomyDefinition
 
 class SpeciesGroupMapping {
 

@@ -21,19 +21,29 @@ class DigestService {
 
     public static final MAX_DIGEST_OBJECTS = 5
     static transactional = false
+	
+	
 
-    def sendDigestAction() {
+    public sendDigestAction() {
         log.debug "Send digest action called"
         def digestList = Digest.list()
         def setTime = true
         digestList.each{ dig ->
+			if(!dig.userGroup.sendDigestMail){
+				return
+			}
             log.debug "Sending digest for ${dig}"
-            sendDigestWrapper(dig, setTime)
+			try{
+				sendDigestWrapper(dig, setTime)
+			}catch(Exception e){
+				log.error "Digets failed for ${dig}"
+				log.error e.printStackTrace()
+			}
         }
 
     }
 
-    def sendDigestWrapper(Digest digest, setTime=true){
+    public sendDigestWrapper(Digest digest, setTime=true){
         int max = 50
         long offset = 0
         Date lastSent;
@@ -50,22 +60,24 @@ class DigestService {
 
         def emailFlag = true
 
-        while(emailFlag){
-            List<SUser> usersEmailList = [];
-            Digest.withTransaction { status ->
-                usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
-
+        if(digestContent) {
+            while(emailFlag){
+                List<SUser> usersEmailList = [];
+                Digest.withTransaction { status ->
+                    usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
+                }
                 if(usersEmailList.size() != 0){
                     sendDigest(digest, usersEmailList, false, digestContent)
                     offset = offset + max
-                }
-                else{
+                }else{
                     emailFlag = false
                 }
+
+                if(emailFlag) 
+                    Thread.sleep(600000L);
             }
-            if(emailFlag) 
-                Thread.sleep(600000L);
         }
+		
         if(setTime) {
             digest.lastSent = lastSent;
             log.debug "Saving digest lastSent ${digest}"
@@ -76,7 +88,7 @@ class DigestService {
 
     }
 
-    def sendDigest(Digest digest, usersEmailList, setTime, digestContent){
+    private sendDigest(Digest digest, usersEmailList, setTime, digestContent){
         //def digestContent = fetchDigestContent(digest)
         if(digestContent){
             log.debug "SENDING A DIGEST MAIL FOR GROUP : " + digest.userGroup
@@ -102,7 +114,7 @@ class DigestService {
         }
     }
 
-    def fetchDigestContent(Digest digest){
+    public fetchDigestContent(Digest digest){
         log.debug "fetchDigestContent"
         def params = [:]
         params.rootHolderId = digest.userGroup.id
@@ -261,7 +273,7 @@ class DigestService {
             def recentTopContributors = [];
             def topIDProviders = [];
             def newDate = new Date()
-            int days = (newDate - digest.startDateStats); 
+            int days = (newDate - digest.userGroup.statStartDate); 
             int max = 5
             UserGroup userGroupInstance = digest.userGroup
 
@@ -310,7 +322,7 @@ log.debug resultSet
         return res
     }
 
-    def sendDigestPrizeEmail(){
+    public sendDigestPrizeEmail(){
         def max = 50
         def offset = 0
         def emailFlag = true
@@ -335,7 +347,7 @@ log.debug resultSet
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
-    def sendSampleDigestPrizeEmail(usersEmailList){
+    public sendSampleDigestPrizeEmail(usersEmailList){
         def max = 50
         def offset = 0
         def emailFlag = true
@@ -360,7 +372,7 @@ log.debug resultSet
         log.debug " DIGEST PRIZE EMAIL SENT "
     }
 
-    def List getParticipantsForDigest(userGroup, max, offset) {
+    private List getParticipantsForDigest(userGroup, max, offset) {
         List participants = [];
         if (Environment.getCurrent().getName().equalsIgnoreCase("kk")) {
             def result = UserGroupMemberRole.findAllByUserGroup(userGroup, [max: max, sort: "sUser", order: "asc", offset: offset]).collect {it.sUser};
@@ -376,7 +388,7 @@ log.debug resultSet
         return participants;
     }
 
-    def latestContentsByGroup(Digest digest) {
+    private latestContentsByGroup(Digest digest) {
         log.debug "latestContentsByGroup ${digest}"
 		def res = [:]
         int max = 5

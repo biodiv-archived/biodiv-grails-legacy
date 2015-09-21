@@ -422,6 +422,39 @@ $('#downloadModifiedSpecies').click(function() {
 
 });
 
+$('#downloadNamesMapper').click(function() {
+    if($(this).hasClass('disabled')) {
+        alert(window.i8ln.observation.upload.again);
+        event.preventDefault();
+        return false; 		 		
+    }
+    $(this).addClass('disabled');
+    $("#uploadSpecies").addClass('disabled');
+    var xlsxFileUrl = $('#xlsxFileUrl').val();
+    $.ajax({
+        url : window.params.downloadNamesMapperURL,
+        type : 'post', 
+        dataType: 'json',
+        data : {'xlsxFileUrl' : xlsxFileUrl},
+        success : function(data) {
+            $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
+            $("#downloadSpeciesFile").submit();
+            $("#downloadNamesMapper").removeClass('disabled');
+            $("#uploadSpecies").removeClass('disabled');
+
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            alert('Error downloading file!!');
+            $("#downloadModifiedSpecies").removeClass('disabled');
+            $("#uploadSpecies").removeClass('disabled');
+            console.log(xhr);
+        }
+    });
+
+});
+
+
+
 function uploadSpecies(){
     $("#speciesLoader").show();
     getTagsForHeaders();

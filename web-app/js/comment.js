@@ -317,7 +317,9 @@ function placeCaretAtEnd(el) {
 }
 
 $(document).on('focus','.comment-textbox',function(){
-	appendCommentWrapper($(this));
+	if(!$(this).hasClass('noComment')){	
+		appendCommentWrapper($(this));
+	}
 });
 
 $(document).ready(function()

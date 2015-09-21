@@ -2,14 +2,14 @@
 <%@ page import="species.Classification"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.TaxonomyDefinition"%>
-<%@ page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 
-<div class="taxonomyBrowser sidebar_section" style="position: relative;" data-name="classification" data-speciesid="${speciesInstance?.id}">
+<div class="taxonomyBrowser sidebar_section" style="position: relative;" data-speciesid="${speciesInstance?.id}">
     <h5><g:message code="button.classifications" /></h5>	
 
     <div id="taxaHierarchy">
         <g:set var="classifications" value="${speciesInstance.classifications()}" />
-        <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications,'speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor]"/>
+        <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications,'speciesInstance':speciesInstance, 'expandSpecies':true, 'expandAll':false, 'speciesId':speciesInstance.taxonConcept?.id, expandAllIcon:false, isSpeciesContributor:isSpeciesContributor, queryParams:queryParams]"/>
     </div>
     <form id="taxonHierarchyForm" class="form-horizontal editableform hide">
         <div class="control-group">

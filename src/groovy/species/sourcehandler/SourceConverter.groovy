@@ -9,7 +9,7 @@ import species.License.LicenseType;
 import species.formatReader.SpreadsheetWriter;
 import species.auth.SUser;
 import species.TaxonomyDefinition;
-import species.TaxonomyDefinition.TaxonomyRank;
+import species.ScientificName.TaxonomyRank;
 import species.Language;
 
 class SourceConverter {
@@ -88,6 +88,11 @@ class SourceConverter {
     }
 
     public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor, Language language) {
+        return createTaxonRegistryNodes(names, classification, [contributor], language);
+    }
+
+    public List<Node> createTaxonRegistryNodes(List names, String classification, List<SUser> contributors, Language language) {
+        println "======CREATE TAXON REG NODES ========= " +names;
         NodeBuilder builder = NodeBuilder.newInstance();
         List nodes = [];
         names.eachWithIndex { name, index ->
@@ -98,7 +103,9 @@ class SourceConverter {
                 new Node(field, "language", language);
 
                 Node data = new Node(field, "data", name);
-                new Node(data, "contributor", contributor.email);
+                contributors.each {contributor ->
+                    new Node(data, "contributor", contributor.email);
+                }
                 
                 nodes << field;
             }
@@ -143,7 +150,7 @@ class SourceConverter {
 				addToSummary("No reference key for image : "+imageData)
             }
         }
-    }//
+    }
 
     protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
 
@@ -266,8 +273,7 @@ class SourceConverter {
 			return;
 		}
 		
-		
-		Node images = new Node(speciesElement, "images");
+		Node images = speciesElement
 		imageMetaData.each { imageData ->
 			String refKey = imageData.get("id");
 			if(imageIds.contains(refKey)) {
@@ -300,29 +306,8 @@ class SourceConverter {
 		log.debug images
 	}
 
-	protected void createImages(Node images, String imageId, List<Map> imageMetaData, String imagesDir="") {
-		log.debug "Creating images ${imageId}"
-		if(!imageId){
-			addToSummary("In ImageMetadata sheet either 'id' header missing or values are blank within the column ")
-			return
-		}
-		imageMetaData.each { imageData ->
-			String refKey = imageData.get("id");
-			if(refKey && refKey.trim().equals(imageId.trim())) {
-				Node image = new Node(images, "image");
-				String loc = imageData.get("imageno.")?:imageData.get("image")?:imageData.get("id");
-				File file = new File(imagesDir, cleanLoc(loc));
-				new Node(image, "refKey", refKey);
-				myPrint(" image location " + loc)
-				myPrint("Absolute file path for image " + file.getAbsolutePath())
-				new Node(image, "fileName", file.getAbsolutePath());
-				new Node(image, "source", imageData.get("source")?:imageData.get("url"));
-				new Node(image, "caption", imageData.get("possiblecaption")?:imageData.get("caption"));
-				new Node(image, "attribution", imageData.get("attribution"));
-				new Node(image, "contributor", imageData.get("contributor"));
-				new Node(image, "license", imageData.get("license"));
-			}
-		}
+	protected void createImages(Node images, String imageId, List<Map> imageMetaData, String imagesDir="", Language language="") {
+		createImages(images, [imageId], imageMetaData, imagesDir, language)
 	}
 
 	protected String cleanLoc(String loc) {
@@ -587,10 +572,10 @@ class SourceConverter {
 		return summary.toString()
 	}
 
-	def myPrint(str){
-		//if(!Environment.getCurrent().getName().equalsIgnoreCase("pamba")){
+	def static myPrint(str){
+		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
 			println str
-		//}
+		}
 	}
 
     private static class FieldsMapHolder {

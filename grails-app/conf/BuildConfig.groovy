@@ -135,7 +135,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins { 
-        build   ":tomcat:7.0.52.1"
+         build   ":tomcat:7.0.54"
         //build ":tomcat8:8.0.5"
         //build ':jetty:2.0.3'
 
@@ -146,7 +146,7 @@ grails.project.dependency.resolution = {
         }
 //        runtime ":database-migration:1.4.0"
 
-        compile ':hibernate:3.6.10.15'
+        compile ':hibernate:3.6.10.16'
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
         runtime ":resources:1.2.8"
@@ -162,9 +162,11 @@ grails.project.dependency.resolution = {
             excludes 'spring-web' 
         } 
 
+
         compile ":spring-security-openid:2.0-RC2"
         compile ":spring-security-ui:1.0-RC2"
 
+        compile ':spring-security-oauth-google:0.3.1'
 
         compile ":webxml:1.4.1" 
         compile ':plugin-config:0.1.8'
@@ -178,7 +180,7 @@ grails.project.dependency.resolution = {
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
-        compile ":grails-melody:1.47.2"
+        //compile ":grails-melody:1.47.2"
         compile ":jcaptcha:1.5.0"
         runtime ":jquery:1.11.1"
         compile ":jquery-ui:1.10.3"
@@ -189,9 +191,9 @@ grails.project.dependency.resolution = {
         compile ":rest:0.8"
         compile ":tagcloud:0.3"
         compile ":taggable:1.0.1"
-        runtime ":yui-minify-resources:0.1.5"
+        //runtime ":yui-minify-resources:0.1.5"
         runtime ":zipped-resources:1.0"
-    
+        compile ":grails-ant:0.1.3"
     } 
 
     grails.war.resources = { stagingDir ->

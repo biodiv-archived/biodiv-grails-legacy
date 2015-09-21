@@ -47,6 +47,9 @@ class DocumentTokelUrlJob {
                     docSciNameInstance.canonicalForm = parsedNameSetValues[sciName]
                     docSciNameInstance.displayOrder = mapSize
                     mapSize--;
+                    if(docSciNameInstance.canonicalForm) {
+                        docSciNameInstance.taxonConcept = TaxonomyDefinition.findByCanonicalForm(docSciNameInstance.canonicalForm);
+                    }
                    // println "mapsize----in loop--- "+ mapSize
                 	if (!docSciNameInstance.save(flush: true)) {
    					    docSciNameInstance.errors.each {
@@ -66,6 +69,7 @@ class DocumentTokelUrlJob {
 
     private setStatus(task, status){
 		task.status = status
+        task.merge();
 		if(!task.save(flush:true)){
 			task.errors.allErrors.each { log.debug it }
 		}

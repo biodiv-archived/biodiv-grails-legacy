@@ -8,9 +8,9 @@ class UrlMappings {
 
         "/jcaptcha/$action/$id"(controller:'Jcaptcha')
 		//"500"(controller:'BiodivException', action:'error')
-		"500"(view:'/error')
-		"403"(view:'/error')
-		"404"(view:'/notfound')
+		'500'(view:'/error')
+		'403'(view:'/error')
+		'404'(view:'/notfound')
 /*		"403"(controller: "errors", action: "error403")
 		"500"(controller: "errors", action: "error500")
 		"500"(controller: "errors", action: "error403", exception: AccessDeniedException)
@@ -81,7 +81,7 @@ class UrlMappings {
                 constraints { id matches: /\d+/ }
             }
             "/group/$action" {
-                controller = 'SUser'
+                controller = 'userGroup'
                 constraints {
                     action(matches:/(?!\d+$)\w+/)
                 }

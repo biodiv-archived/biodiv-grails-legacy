@@ -10,6 +10,7 @@ import groovy.sql.Sql
 import content.eml.Document
 import species.groups.SpeciesGroup;
 import species.Habitat
+import species.TaxonomyDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
@@ -53,6 +54,8 @@ import speciespage.ObvUtilService;
 import java.net.URL;
 import java.lang.Boolean;
 import species.NamesParser;
+import species.Metadata
+import species.Classification;
 
 
 class DocumentService extends AbstractObjectService {
@@ -76,9 +79,10 @@ class DocumentService extends AbstractObjectService {
 	}
 
 
-	def updateDocument(document, params) {
+	def updateDocument(Document document, params) {
 		params.remove('latitude')
 		params.remove('longitude')
+		def locationScale = params.remove('locationScale')
 		document.properties = params
 		document.group = null
 		document.habitat = null
@@ -87,6 +91,7 @@ class DocumentService extends AbstractObjectService {
 		document.placeName = params.placeName
 		document.reverseGeocodedName = params.reverse_geocoded_name
 		document.locationAccuracy = params.location_accuracy
+		document.locationScale = Metadata.LocationScale.getEnum(locationScale)
 		document.language = params.locale_language 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 		if(params.areas) {
@@ -370,6 +375,7 @@ class DocumentService extends AbstractObjectService {
 			res.putAll(search(params))
 		}else{
 			res.putAll(getDocsFromDB(params, max, offset))
+		    res['instanceTotal'] = getDocsFromDB(params, -1, -1).documentInstanceList.size()
 		}
 		return res
 	}
@@ -462,6 +468,27 @@ class DocumentService extends AbstractObjectService {
 			//}
 		}
 		
+		if(params.taxon) {
+			def taxon = TaxonomyDefinition.read(params.taxon);
+            if(taxon){
+				queryParams['taxon'] = taxon.id
+				activeFilters['taxon'] = taxon.id
+				queryParams['canonicalForm'] = taxon.canonicalForm
+
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
+ 
+		
+				query += " join document.docSciNames ds join  ds.taxonConcept.hierarchies as reg "
+                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+			}
+		}
 		def sortBy = params.sort ? params.sort : "lastRevised "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
 		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
@@ -755,16 +782,24 @@ class DocumentService extends AbstractObjectService {
 
     def runAllDocuments() {
         List documentInstanceList = Document.list();
+        return runDocuments(documentInstanceList, false);
+    }
+
+    def runDocuments(List documentInstanceList, boolean rerun=false) {
         def url = '';
         def tokenUrl = '';
         int i = 0;
         def numOfDocs = documentInstanceList.size()
+        println numOfDocs;
+        println "==============++++"
         while(i < numOfDocs) {
             DocumentTokenUrl.withNewTransaction { 
                 def instance = documentInstanceList.get(i)
+                println instance
+                log.debug instance
                 i++;
                 def p = DocumentTokenUrl.findByDoc(instance)
-                if(!p) {
+                if(!p || rerun) {
                     if(instance?.uFile != null){
                         url = grailsApplication.config.speciesPortal.content.serverURL
                         url = url+instance?.uFile?.path 
@@ -779,24 +814,57 @@ class DocumentService extends AbstractObjectService {
                         uri.query = [ url:url ]     	
                         headers.Accept = '*/*'
                         response.success = { resp,  reader ->
-                            //println "========reader====="+reader;
-                            //println "========reader====="+reader.token_url;
+                            println "========reader====="+reader;
+                            println "========reader====="+reader.token_url;
                             tokenUrl = reader.token_url;
                         }
                         response.'404' = { status = ObvUtilService.FAILED }
                     }
                     DocumentTokenUrl.createLog(instance, tokenUrl);
                 }//IF
+                else {
+                    println "Already tried"
+                }
             }
         }//each
     }
-     def documentDelete(Document docInstance){
-    	def  docTokenId =DocumentTokenUrl.findByDoc(docInstance)
-    		 docTokenId.delete();
-    	List docSciNameId = DocSciName.findAllByDocument(docInstance)
-    		 docSciNameId.each {
-    			it.delete();
-    			}
+
+    def documentDelete(Document documentInstance){
+        userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
+
+
+        def  docTokenId =DocumentTokenUrl.findByDoc(documentInstance)
+        docTokenId.delete();
+        List docSciNameId = DocSciName.findAllByDocument(documentInstance)
+        docSciNameId.each {
+        it.delete();
+        }
+
+        documentInstance.delete(flush: true, failOnError:true)
+    }
+
+    def Map updateTags(params,domainInstance){
+        def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+        def tag_des = '';
+        if(params.controller == 'discussion'){
+        	tag_des = activityFeedService.DISCUSSION_TAG_UPDATED;
+        }else if(params.controller == 'document'){
+        	tag_des = activityFeedService.DOCUMENT_TAG_UPDATED;
+        }
+        def  result = domainInstance.setTags(tags);
+        def tagsObj = domainInstance.tags;
+        def model = [:];
+        def new_des = '';
+        def iden = 1;
+        for ( e in tagsObj ) {        	
+            model.put(e,iden);
+            iden++;
+            new_des +=(new_des != '')? ','+e:e;
+        }
+        def activityFeed = activityFeedService.addActivityFeed(domainInstance, domainInstance,  springSecurityService.currentUser,tag_des,new_des);
+        	utilsService.sendNotificationMail(tag_des, domainInstance, null, null, activityFeed);
+         
+        return model;
     }
 
 }

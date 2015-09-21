@@ -41,7 +41,7 @@ if(r) {
 
 .textbox input{
     text-align: left;
-    width: 290px;
+    width: 380px;
     padding:5px;
 }
 
@@ -52,25 +52,25 @@ if(r) {
     margin-top: 3px;
 }
 .nameContainer.textbox #commonName {
-    width: 200px;
+    width: 282px;
 }
 .nameContainer .combobox-container {
-    left:198px;
+    left: 282px;
 }
  
 .observation_story .observation_footer {
     margin-top:50px;
 }
 .commonName {
-    width:200px !important;
+    width:282px !important;
 }
 </style>
 </head>
 <body>
 
-<link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.css">
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/galleria-1.3.5.js"></script>
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
+<link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.css">
+<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/galleria.1.4.2-youtubeV3.js"></script>
+<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.min.js"></script>
 
             <div class="observation  span12">
                             <obv:showSubmenuTemplate/>
@@ -114,7 +114,7 @@ if(r) {
                                
                                <div class="span12" style="margin-left:0px">
                                    <g:render template="/common/observation/showObservationStoryActionsTemplate"
-                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress, 'userGroup':userGroupInstance]" />
+                                   model="['instance':observationInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'showDetails':true,'hideDownload':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress, 'userGroup':userGroupInstance, ibpClassification:observationInstance.maxVotedReco?.taxonConcept?.fetchDefaultHierarchy()]" />
                                </div>
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
@@ -193,13 +193,13 @@ if(r) {
                         
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
                         <div>
-                            <ul id="recoSummary" class="pollBars">
+                            <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
 
                             </ul>
-                            <div id="seeMoreMessage" class="message"></div>
-                            <div id="seeMore" class="btn btn-mini"><g:message code="button.show.all" /></div>
+                            <div id="seeMoreMessage_${observationInstance.id}" class="message"></div>
+                            <div id="seeMore_${observationInstance.id}" class="btn btn-mini"><g:message code="button.show.all" /></div>
                         </div>
-                        <div class="input-append" style="width:100%;">
+                        <div style="width:100%;">
                             <g:hasErrors bean="${recommendationInstance}">
                                 <div class="errors">
                                     <g:renderErrors bean="${recommendationInstance}" as="list" />
@@ -220,7 +220,8 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative;top: -30px; border-radius:4px" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;right: 4px;" />
+                                            <div style="clear:both"></div>
                                 </div>
                                 
                             </form>
@@ -285,7 +286,7 @@ if(r) {
                             </div>
 <script type="text/javascript">
 $(document).ready(function(){
-    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', id:observationInstance.id, userGroupWebaddress:params.webaddress) }";
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes',userGroupWebaddress:params.webaddress) }";
 });
 </script>
 
@@ -293,13 +294,13 @@ $(document).ready(function(){
     <r:script>
     
    
-    
+    var observationId = ${observationInstance.id};
     $(document).ready(function(){
 <%--        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");--%>
 <%--        dcorateCommentBody($('.yj-message-body')); --%>
 
         $("#seeMoreMessage").hide();
-            $(".readmore").readmore({
+        $(".readmore").readmore({
             substr_len : 400,
             more_link : '<a class="more readmore">&nbsp;More</a>'
         });
@@ -378,12 +379,12 @@ $(document).ready(function(){
                         
         $("ul[name='tags']").tagit({select:true,  tagSource: "${uGroup.createLink(controller:params.controller, action: 'tags')}"});
          
-        $("li.tagit-choice").click(function(){
+        $(".view_obv_tags li.tagit-choice").click(function(){
             var tg = $(this).contents().first().text();
             window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
          });
          
-               
+             
         $('#addRecommendation').bind('submit', function(event) {
             $(this).ajaxSubmit({ 
                 url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
@@ -397,8 +398,8 @@ $(document).ready(function(){
                     if(data.status == 'success' || data.success == true) {
                         if(data.canMakeSpeciesCall === 'false'){
                             $('#selectedGroupList').modal('show');
-                        } else{
-                            preLoadRecos(3, 0, false);
+                        } else{                             
+                            preLoadRecos(3, 0, false,observationId);
                             updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
                             updateFeeds();
                             setFollowButton();
@@ -425,14 +426,14 @@ $(document).ready(function(){
         })
 
         $("#seeMore").click(function(){
-            preLoadRecos(-1, 3, true);
+            preLoadRecos(-1, 3, true,observationId);
         });
 
-        preLoadRecos(3, 0, false);
+        preLoadRecos(3, 0, false,observationId);
         //loadObjectInGroups();
         var obvLock = ${obvLock};
         if(obvLock){
-            showUpdateStatus('This species ID has been confirmed by the species curator and hence is locked!', 'success');
+            showUpdateStatus('This species ID has been validated by a species curator and is locked!', 'success');
             $('.nameContainer input').attr("disabled", "disabled");
             $('.iAgree button').addClass("disabled");
         }
@@ -441,6 +442,11 @@ $(document).ready(function(){
             $('.iAgree button').removeClass("disabled");
         } 
         initializeLanguage(); 
+         $(".CustomField_multiselectcombo").multiselect();
+
+       
+
+
     });
     function deleteObservation(){
         var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";

@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <%@page import="species.utils.ImageType"%>
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
-<%@ page import="species.Synonyms"%>
+<%@ page import="species.ScientificName"%>
 <%@ page import="species.CommonNames"%>
 <%@ page import="species.Language"%>
 <%@page import="species.utils.Utils"%>
@@ -16,7 +16,8 @@
 <%@page import="species.Language"%>
 <%@page import="species.License"%>
 <%@page import="species.SpeciesField"%>
-
+<%@page import="species.sourcehandler.XMLConverter"%>
+<%@page import="species.participation.ActivityFeedService"%>
 
 <html>
     <head>
@@ -195,11 +196,12 @@
 
     <body>
 
-    
-    <link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.css">
-    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/galleria-1.3.5.js"></script>
-    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/themes/classic/galleria.classic.min.js"></script>
-    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js"></script>
+    <link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.css">
+<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/galleria.1.4.2-youtubeV3.js"></script>
+<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.min.js"></script>
+
+
+    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/plugins/flickr/galleria.flickr.min.js"></script>
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
@@ -208,7 +210,7 @@
         </s:isSpeciesContributor>
         
         <div class="span12">
-            <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor]"/>
+            <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor, speciesInstance:speciesInstance]"/>
 
                 <g:if test="${!speciesInstance.percentOfInfo}">
                 <div class="poor_species_content alert">
@@ -220,7 +222,7 @@
 
                 <div class="span12" style="margin-left:0px">
                     <g:render template="/common/observation/showObservationStoryActionsTemplate"
-                    model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true]" />
+                    model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, ibpClassification:speciesInstance.taxonConcept.fetchDefaultHierarchy()]" />
                 </div>
 
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
@@ -316,7 +318,7 @@
             </g:each>
 
             var synRelSelectorOptions = [], langSelectorOptions = [];
-            <g:each in="${Synonyms.RelationShip.toList()}" var="rel">
+            <g:each in="${ScientificName.RelationShip.toList()}" var="rel">
             synRelSelectorOptions.push({value:"${rel.value()}", text:"${rel.value()}"});
             </g:each>
             var langSelectorOptions = [];

@@ -1133,7 +1133,7 @@ function AugmentedMap(map_div, options) {
     }
     function clearFeatureInfoPanel() {
         if (feature_info_panel_div !== undefined) {
-            var msg = '<p style="padding:10px"><span class="info_msg">No features selected</span></p>';
+            var msg = '<p style="padding:10px"><span class="info_msg">'+window.i8ln.observation.maps.nofeatureselect+'</span></p>';
             addFeatureInfoPanel(feature_info_panel_div, msg);
         }
     }
@@ -1863,8 +1863,8 @@ function createLayerExplorerLinks(layers) {
     html = html + '<ul class="layer_explorer_sidebar_items">';
 
     //html = html + '<li><a href="#" onClick="updateLayersList(\'new\')" style="font-weight:normal; text-decoration:underline; font-style: italic; ">New layers</a></li>';
-    html = html + '<li><a href="#" onClick="updateLayersList(\'all\')">All layers</a></li>';
-    html = html + '<li><div class="collapsible_box"><a class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_theme\', \'fade\'); hideDiv(\'layers_by_geography\', \'fade\', 1);">By theme</a>';
+    html = html + '<li><a href="#" onClick="updateLayersList(\'all\')">'+window.i8ln.observation.maps.allayer+'</a></li>';
+    html = html + '<li><div class="collapsible_box"><a class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_theme\', \'fade\'); hideDiv(\'layers_by_geography\', \'fade\', 1);">'+window.i8ln.observation.maps.bytheme+'</a>';
     html = html + '<div id="layers_by_theme">';
     html = html + '<ul class="layer_explorer_sidebar_subitems">';
     var themes = getThemeNames(1);
@@ -1902,8 +1902,8 @@ function createAllKeywordsLinks(layers) {
     html = html + '<div id="layer_explorer_sidebar">';
     html = html + '<ul class="layer_explorer_sidebar_items">';
 
-    html = html + '<li><a href="#" onClick="updateLayersList(\'all\')">All layers</a></li>';
-    html = html + '<li><a href="#" onClick="toggleDiv(\'layer_themes\')">By theme</a>';
+    html = html + '<li><a href="#" onClick="updateLayersList(\'all\')">'+window.i8ln.observation.maps.allayer+'</a></li>';
+    html = html + '<li><a href="#" onClick="toggleDiv(\'layer_themes\')">'+window.i8ln.observation.maps.bytheme+'</a>';
     html = html + '<div id="layer_themes">';
     html = html + '<ul class="layer_explorer_sidebar_subitems">';
     var i;
@@ -2353,7 +2353,7 @@ function createMapStatusBox(map_div) {
 }
 
 function createResetBox() {
-    var html = '<div id="controls-bar"><ul><li title="Remove all added layers" class="controls_label" onclick="resetMap();">Reset</li></ul></div>';
+    var html = '<div id="controls-bar"><ul><li title="Remove all added layers" class="controls_label" onclick="resetMap();">'+window.i8ln.observation.maps.reset+'</li></ul></div>';
     return html;
 }
 

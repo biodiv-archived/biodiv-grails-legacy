@@ -21,7 +21,7 @@
     <div class="observation_create">
         <div class="span12">
 
-            <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Observation':'Add Observation']"/>
+            <g:render template="/observation/addObservationMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?g.message(code:'edit.observation'):g.message(code:'add.observation')]"/>
 
             <%
             def form_class = "addObservation"
@@ -63,7 +63,7 @@
                             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                             %>
                             <div>
-                            	<obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                            	<obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
                             </div>
                         </div>
                     </div>

@@ -70,11 +70,11 @@ class UtilsService {
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
 
-    private void cleanUpGorm() {
+    public void cleanUpGorm() {
         cleanUpGorm(true)
     }
 
-    private void cleanUpGorm(boolean clearSession) {
+    public void cleanUpGorm(boolean clearSession) {
 
         def hibSession = sessionFactory?.getCurrentSession();
 
@@ -285,7 +285,7 @@ class UtilsService {
 
             def templateMap = [obvUrl:obvUrl, domain:domain, baseUrl:baseUrl]
             //println "testing obs====================="+userLanguage;
-            templateMap["currentUser"] = springSecurityService.currentUser
+            templateMap["currentUser"] = feedInstance ? feedInstance.author : springSecurityService.currentUser
             templateMap["action"] = notificationType;
             templateMap["siteName"] = grailsApplication.config.speciesPortal.app.siteName;
             def mailSubject = ""
@@ -500,13 +500,7 @@ class UtilsService {
 
 			
                 case [ActivityFeedService.FEATURED, ActivityFeedService.UNFEATURED]:
-                boolean a
-                if(notificationType == ActivityFeedService.FEATURED) {
-                    a = true
-                }
-                else { 
-                    a = false
-                }               
+                boolean a = (notificationType == ActivityFeedService.FEATURED)               
                 mailSubject = getDescriptionForFeature(obv, null , a)
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -613,6 +607,50 @@ class UtilsService {
                 def user = otherParams['user'];
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
+                break
+				
+				case ActivityFeedService.CUSTOM_FIELD_EDITED :
+				mailSubject = messageSource.getMessage("custom.field.edited", null, LCH.getLocale())
+				bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+				populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+				templateMap["message"] = messageSource.getMessage("mail.customfieldedit.message", null, LCH.getLocale())
+				toUsers.add(getOwner(obv))
+				break
+
+                case ActivityFeedService.OBSERVATION_TAG_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.observation.tag.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.observationtagedit.message", null, LCH.getLocale())
+                toUsers.addAll(getParticipants(obv))
+                break
+
+                case ActivityFeedService.DOCUMENT_TAG_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.document.tag.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.documenttagedit.message", null, LCH.getLocale())
+                toUsers.addAll(getParticipants(obv))
+                break
+
+                case ActivityFeedService.DISCUSSION_TAG_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.discussion.tag.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.discussiontagedit.message", null, LCH.getLocale())
+                toUsers.addAll(getParticipants(obv))
+                break
+
+                case ActivityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED :
+                log.debug "Mail sending ...................................."
+                mailSubject = messageSource.getMessage("mail.observation.species.group.updated.subject", null, LCH.getLocale())
+                bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
+                populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                templateMap["message"] = messageSource.getMessage("mail.observationspeciesgroupupdate.message", null, LCH.getLocale())
+                toUsers.addAll(getParticipants(obv))
                 break
                 
                 default:

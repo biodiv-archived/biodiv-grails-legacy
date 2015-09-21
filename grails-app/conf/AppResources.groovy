@@ -33,7 +33,6 @@ modules = {
 		resource url:'/bootstrap/css/bootstrap.min.css'
 		resource url:'/css/bootstrap-combobox.css'
 		resource url:'/css/bootstrap-multiselect.css'
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/css/ui.jqgrid.css'
 		resource url:'/css/auth.css'
 //		resource url:[dir:'css',file:'spring-security-ui.css',plugin:'spring-security-ui']
 //		resource url:[dir:'css',file:'jquery.safari-checkbox.css',plugin:'spring-security-ui']
@@ -81,8 +80,10 @@ modules = {
         resource url:'/js/feature.js'
         resource url:'/js/flag.js'
 		resource url:'/js/species/abstracttype.js'
+		resource url:'/js/species/abstracteditabletype.js'
 		resource url:'/js/species/relatedStory.js'
 		resource url:'/js/species/search.js'
+		resource url:'/js/jquery.cookie.js'
 	}
 
 	auth {
@@ -94,7 +95,17 @@ modules = {
 		//resource url:'/js/galleria/1.3.5/galleria-1.3.5.js'
 		//resource url:'/js/galleria/1.3.5/themes/classic/galleria.classic.min.js'
 	}
-
+	bootstrap_gallery{
+		resource url:[dir:'js/bootstrap_gallery/css/',file:'blueimp-gallery.css']
+		resource url:'/js/bootstrap_gallery/js/blueimp-helper.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery.js'		
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-fullscreen.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-indicator.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-video.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-vimeo.js'
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-youtube.js'
+		resource url:'/js/bootstrap_gallery/js/jquery.blueimp-gallery.js'
+	}
 	carousel {
 		resource url:[dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css']
 		resource url:'/js/jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js'
@@ -111,6 +122,12 @@ modules = {
 		resource url:'/js/jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js'
 		resource url:'/js/jquery/jquery.url.js'
 		resource url:'/js/jquery/jquery.autopager-1.0.0.js'
+//		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
+//		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
+//		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
+		resource url:'/js/jstree-3.1.1/dist/themes/default/style.css'
+		resource url:'/js/jstree-3.1.1/dist/jstree.min.js'
+        resource url:'/js/species/observations/list.js'
 	}
 
 	location_utils { 
@@ -157,9 +174,11 @@ modules = {
     }
 
 	observations_list { 
-		dependsOn 'observations, list_utils, comment, activityfeed, distinct_reco'
+		dependsOn 'observations, bootstrap_gallery, list_utils, comment, activityfeed, distinct_reco'
 		
-        resource url:'/js/species/observations/list.js'
+		resource url:'/js/species/taxonhierarchy.js'
+		resource url:'/js/species/observations/show.js'
+		resource url:'/js/species/chooseLanguage.js'
 	}
 
 	susers_list { 
@@ -168,7 +187,7 @@ modules = {
         resource url:'/css/location_picker.css'
         resource url:'/js/location/location-picker.js'
 	
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
 		//resource url:'/js/species/users/list.js'
 	}
 
@@ -178,9 +197,8 @@ modules = {
 		resource url:'/css/960.css'
 		resource url:'/css/main.css'
 		resource url:'/css/biodiv.css'
-		resource url:'/js/species/abstracteditabletype.js'
-		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/taxonhierarchy.js'
+		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/species.js'
 	}
 
@@ -188,12 +206,9 @@ modules = {
 		dependsOn 'species, maps, gallery, comment, activityfeed, observations_create'
 
 		resource url:'/css/augmented-maps.css'
-		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
 		resource url:'/css/bootstrap-wysihtml5-0.0.2.css'
 		resource url:'/css/jquery.tocify.css'
 		
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
 		resource url:'/js/jquery/jquery.tocify.min.js'
 		//resource url:'/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
@@ -209,11 +224,7 @@ modules = {
 	species_list {
 		dependsOn 'observations_list'
 
-		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
-		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
         resource url:'/js/species/speciesPermission.js'
-
 	}
 
 	search {
@@ -224,7 +235,11 @@ modules = {
 	admin { dependsOn	'core' }
 
 	pages {
+		resource url: '/css/jquery.cycle/style.css'
 		resource url:'/js/species/pages.js'
+		resource url: '/js/jquery.cycle2/jquery.cycle2.min.js'
+		resource url: '/js/jquery.cycle2/jquery.cycle2.video.min.js'
+		resource url: '/js/jquery.cycle2/jquery.cycle2.center.min.js'
 	}
 	
 	userGroups_show {
@@ -243,7 +258,7 @@ modules = {
 	userGroups_list {
 		dependsOn 'observations, location_utils, list_utils'
 		
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/userGroups/main.js'		
 	}
 
@@ -295,7 +310,7 @@ modules = {
     checklist_list {
 		dependsOn 'checklist'
 
-		resource url:'/js/species/observations/list.js'
+		//resource url:'/js/species/observations/list.js'
     }
 
 	checklist_create {
@@ -384,5 +399,14 @@ modules = {
 		resource url:'/js/species/maps/map-search.js'
 		resource url:'/js/species/maps/mapapp.js'
 		resource url:'/js/species/maps/cookie-chef.js'
+    }
+
+    curation {
+        resource url:'/js/species/curation.js'
+        resource url:'/css/namelist.css'
+    }
+
+    document_list {
+        dependsOn 'observations_list'
     }
 }

@@ -39,9 +39,9 @@ input.dms_field {
     def form_button_val = "Add Document"
     if(params.action == 'edit' || params.action == 'update'){
     form_action = uGroup.createLink(action:'update', controller:'document', id:documentInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-    form_button_name = "${g.message(code:'link.update.document')}"
+    form_button_name = "${g.message(code:'button.update.document')}"
     form_button_val = "Update Document"
-    form_title = "Update Document"
+    form_title = "${g.message(code:'link.update.document')}"
 
     }
 

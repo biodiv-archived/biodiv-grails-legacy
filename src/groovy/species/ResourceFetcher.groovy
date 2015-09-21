@@ -6,6 +6,8 @@ import species.participation.Discussion;
 import species.utils.Utils;
 import content.eml.Document;
 
+import grails.converters.JSON;
+
 class ResourceFetcher {
 	private static final log = LogFactory.getLog(this);
 	
@@ -28,11 +30,15 @@ class ResourceFetcher {
 		this(rType, filterUrl, null)
 	}
 	
-	public  ResourceFetcher(String rType, String filterUrl, String userGroupWebAddress){
+	public ResourceFetcher(String rType, String filterUrl, String userGroupWebAddress){
+        this(rType, filterUrl, userGroupWebAddress, 0);    
+    }
+
+	public ResourceFetcher(String rType, String filterUrl, String userGroupWebAddress, int offset){
 		this.rType = rType
 		this.filterUrl = new URL(filterUrl)
 		this.userGroupWebAddress = userGroupWebAddress
-		init()
+		init(offset)
 	}
 	
 	public hasNext(){
@@ -47,11 +53,15 @@ class ResourceFetcher {
 	}
 	
 	public reset(){
-		init()
+		init(0)
 	}
-	
-	private init(){
-		offset = 0
+
+    public resetFrom(int offset){
+		init(offset)
+	}
+
+	private init(int offset){
+		this.offset = offset
 		computeNext()
 	}
 	
@@ -90,7 +100,7 @@ class ResourceFetcher {
 	}
 	
 	public List getAllResult(){
-		reset()
+		resetFrom(0)
 		List res = []
 		while(hasNext()){
 			res.addAll(next())

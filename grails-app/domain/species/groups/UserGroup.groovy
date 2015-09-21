@@ -19,7 +19,7 @@ import content.Project;
 import species.Species
 import species.Language;
 import species.participation.Discussion;
-
+import species.participation.Digest;
 import utils.Newsletter;
 
 class UserGroup implements Taggable {
@@ -55,6 +55,11 @@ class UserGroup implements Taggable {
 	def userGroupService;
 	// Language
     Language language;
+
+	
+	boolean sendDigestMail=false;
+	//when sending digest mail to count no. of days for calulating top contributors
+	Date statStartDate = new Date();
 
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species, discussions:Discussion]
 
@@ -428,4 +433,5 @@ class UserGroup implements Taggable {
     		return UserGroup.findWhere(webaddress: webaddress)
     	}
     }
+	
 }

@@ -20,6 +20,8 @@ import species.participation.Flag;
 import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
 
+import content.eml.Document;
+
 class Species implements Rateable { 
  	String title;
 	String guid; 
@@ -293,7 +295,9 @@ class Species implements Rateable {
 	
 	        //TODO:looks like this is gonna be heavy on every save ... gotta change
 			this.fields?.each { contributors.addAll(it.contributors)}
-            contributors.addAll(this.taxonConcept.contributors)
+			def sContributors =  this.taxonConcept.contributors
+			if(sContributors)
+            	contributors.addAll(sContributors)
 	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 	        
@@ -441,7 +445,10 @@ class Species implements Rateable {
 
     def fetchSpeciesFieldResourceCount() {
         def sql =  Sql.newInstance(dataSource);
-        def fieldIds = this.fields.id;
+        def fieldIds = this.fields?.id;
+		if(!fieldIds)
+			return 0
+		
         def ss = "(" + fieldIds[0] 
         fieldIds.each{
             ss +=  "," +it
@@ -458,5 +465,24 @@ class Species implements Rateable {
             this.errors.each { log.error it }
         }
     }
- 
+	
+	def boolean deleteSpecies(SUser user){
+		return speciesUploadService.deleteSpeciesWrapper(this, user)
+	}
+
+    List<Species> fetchInfraSpecies() {
+        List infraSpecies = [];
+        def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+        def regs = TaxonomyRegistry.findAllByParentTaxonDefinitionAndClassification(this.taxonConcept, classification);
+        regs.each {reg ->
+            Species s = reg.taxonDefinition.findSpecies();
+            if(s)
+                infraSpecies << s
+        }
+        return infraSpecies;
+    }
+
+    List<Document> findRelatedDocuments() {
+        return speciesService.getRelatedDocuments(this);
+    }
 }

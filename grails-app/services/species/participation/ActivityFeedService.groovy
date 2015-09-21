@@ -3,11 +3,15 @@ package species.participation
 import java.text.SimpleDateFormat
 import org.hibernate.Hibernate;
 
+import species.TaxonomyDefinition
 import species.auth.SUser;
 import species.groups.UserGroup;
 import species.Species;
 import species.SpeciesField
 import content.eml.Document
+
+import species.NamesMetadata;
+
  
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 class ActivityFeedService {
@@ -64,7 +68,6 @@ class ActivityFeedService {
 
 	//static final String DOCUMENT_POSTED_ON_GROUP = "Posted document to group"
 	//static final String DOCUMENT_REMOVED_FROM_GROUP = "Removed document from group"
-	
 	//species related
 	//static final String SPECIES_POSTED_ON_GROUP = "Posted species to group"
 	//static final String SPECIES_REMOVED_FROM_GROUP = "Removed species from group"
@@ -82,6 +85,11 @@ class ActivityFeedService {
 	static final String SPECIES_HIERARCHY_CREATED = "Added hierarchy"
 	static final String SPECIES_HIERARCHY_UPDATED = "Updated hierarchy"
 	static final String SPECIES_HIERARCHY_DELETED = "Deleted hierarchy"
+	static final String CUSTOM_FIELD_EDITED = "Custom field edited"
+	static final String OBSERVATION_TAG_UPDATED = "Observation tag updated"
+	static final String DOCUMENT_TAG_UPDATED = "Document tag updated"
+	static final String DISCUSSION_TAG_UPDATED = "Discussion tag updated"	
+	static final String OBSERVATION_SPECIES_GROUP_UPDATED = "Observation species group updated"
 	
 	static final String OLDER = "older"
 	static final String NEWER = "newer"
@@ -112,6 +120,7 @@ class ActivityFeedService {
 	static final String SPECIES_COMMON_NAMES = "species_Common Names"
 	static final String SPECIES_MAPS = "species_Occurrence Records"
 	static final String SPECIES_TAXON_RECORD_NAME = "species_Taxon Record Name"
+	static final String TAXON_NAME_UPDATED = "Taxon name updated"
 	
 	
 	private static DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
@@ -353,7 +362,42 @@ class ActivityFeedService {
             case SPECIES_UPDATED:
                 activityTitle = getLocalizedMessage(SPECIES_UPDATED)
                 break
-
+			case CUSTOM_FIELD_EDITED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case OBSERVATION_TAG_UPDATED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case DOCUMENT_TAG_UPDATED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case DISCUSSION_TAG_UPDATED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+			case OBSERVATION_SPECIES_GROUP_UPDATED:
+				activityTitle = getLocalizedMessage(activityType)
+				text = feedInstance.activityDescrption
+				break
+            case TAXON_NAME_UPDATED :
+                activityTitle = getLocalizedMessage(activityType)
+                def instance = TaxonomyDefinition.read(feedInstance.rootHolderId.toLong());
+				if(instance.position == NamesMetadata.NamePosition.WORKING) {
+                    text = feedInstance.activityDescrption.replaceAll(' \\.', '.<br/>');
+                } else {
+                    text = "Raw list reason - " + feedInstance.activityDescrption + '<br/>';
+                }
+                text += "Number of COL Matches - " + instance.noOfCOLMatches + "<br/>"
+                if(instance.isFlagged) {
+                    text += "IsFlagged - reason " + instance.flaggingReason.tokenize('###')[-1];
+                }
+                break
+			case[SPECIES_CREATED, SPECIES_FIELD_UPDATED, SPECIES_FIELD_CREATED, SPECIES_FIELD_DELETED, SPECIES_SYNONYM_CREATED,SPECIES_SYNONYM_UPDATED, SPECIES_SYNONYM_DELETED, SPECIES_COMMONNAME_CREATED, SPECIES_COMMONNAME_UPDATED, SPECIES_COMMONNAME_DELETED, SPECIES_HIERARCHY_CREATED,SPECIES_HIERARCHY_DELETED ] :
+				activityTitle = feedInstance.activityDescrption
+				break
 			default:
 				activityTitle = getLocalizedMessage(activityType)
 				break
@@ -451,7 +495,7 @@ class ActivityFeedService {
 					af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
 					int oldCount = resCountMap.get(r.class.canonicalName)?:0
 					resCountMap.put(r.class.canonicalName, ++oldCount)
-					if(!isBulkPull && sendMail){
+					if(!isBulkPull && !isChecklistObservation(r) && sendMail){
 						utilsService.sendNotificationMail(activityType, r, null, null, af)
 					}
 				}
@@ -466,6 +510,14 @@ class ActivityFeedService {
 			}
 		} 
 		return af
+	}
+	
+	private boolean  isChecklistObservation(r){
+		if(!r.instanceOf(Observation)){
+			return false
+		}
+		//returning true only when its obv from checklist
+		return r.isObvFromChecklist()
 	}
 	
 	private String getDescriptionForBulkResourcePull(isPost, countMap){

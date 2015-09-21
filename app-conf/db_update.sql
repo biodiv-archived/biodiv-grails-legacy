@@ -254,6 +254,123 @@ update solr schema.xml biodiv/conf/schema.xml
 //Dropping license from checklists table
 ALTER TABLE checklists DROP COLUMN license_id;
 
+
+/* sql for namelist changes added on 19th nov */
+
+ALTER TABLE taxonomy_definition ALTER COLUMN canonical_form SET NOT NULL;
+
+//adding place for super-family rank
+update taxonomy_definition set rank = 9 where rank = 8 ;
+update taxonomy_definition set rank = 8 where rank = 7 ;
+update taxonomy_definition set rank = 7 where rank = 6 ;
+update taxonomy_definition set rank = 6 where rank = 5 ;
+update taxonomy_definition set rank = 5 where rank = 4 ;
+
+//add columns to common name, synonyms and taxon def
+ALTER TABLE common_names ADD COLUMN  transliteration varchar(255);
+ALTER TABLE common_names ADD COLUMN  status varchar(255);
+ALTER TABLE common_names ADD COLUMN  position varchar(255);
+ALTER TABLE common_names ADD COLUMN  author_year varchar(255);
+ALTER TABLE common_names ADD COLUMN  match_database_name varchar(255);
+ALTER TABLE common_names ADD COLUMN  match_id varchar(255);
+ALTER TABLE common_names ADD COLUMN  ibp_source varchar(255);
+ALTER TABLE common_names ADD COLUMN  via_datasource varchar(255);
+
+update common_names set status = 'COMMON';
+update  common_names set position = 'RAW';
+
+
+ALTER TABLE taxonomy_definition ADD COLUMN  status varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  position varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  author_year varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  match_database_name varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  match_id varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  ibp_source varchar(255);
+ALTER TABLE taxonomy_definition ADD COLUMN  via_datasource varchar(255);
+
+update  taxonomy_definition set status = 'ACCEPTED';
+update  taxonomy_definition set position = 'RAW';
+
+
+ALTER TABLE synonyms ADD COLUMN  status varchar(255);
+ALTER TABLE synonyms ADD COLUMN  position varchar(255);
+ALTER TABLE synonyms ADD COLUMN  author_year varchar(255);
+ALTER TABLE synonyms ADD COLUMN  match_database_name varchar(255);
+ALTER TABLE synonyms ADD COLUMN  match_id varchar(255);
+ALTER TABLE synonyms ADD COLUMN  ibp_source varchar(255);
+ALTER TABLE synonyms ADD COLUMN  via_datasource varchar(255);
+
+update  synonyms set status = 'SYNONYM';
+update  synonyms set position = 'RAW';
+
+//added on 25th Feb 2015
+ALTER TABLE taxonomy_definition add column is_flagged boolean;
+update taxonomy_definition set is_flagged = false;
+
+////////////////**SYNONYM Migration**//////////////
+
+RUN-APP to create SynonymsMerged table;
+then run these sqls
+
+//12th March 2015
+//Synonyms migration to new table
+ALTER TABLE taxonomy_definition ADD COLUMN class varchar(255);
+update taxonomy_definition set class = 'species.TaxonomyDefinition';
+alter table taxonomy_definition alter column class set not null;
+
+/**if tax_def table does not have relationship column**/
+ALTER TABLE taxonomy_definition ADD COLUMN relationship varchar(255);
+
+/**Drop unique constraint**/
+ALTER TABLE taxonomy_definition DROP CONSTRAINT taxonomy_definition_rank_key;
+
+////////////////**SYNONYM Migration**//////////////
+
+/**Adding flagging reason column**/
+ALTER TABLE taxonomy_definition DROP COLUMN flagging_reason;
+ALTER TABLE taxonomy_definition ADD COLUMN flagging_reason varchar(1500);
+
+//////////////////**OBSERVATION RECOMMENDATION**///////////////////
+//added on 8th april 2015
+ALTER TABLE recommendation add column is_flagged boolean;
+update recommendation set is_flagged = false;
+ALTER TABLE recommendation ALTER COLUMN flagging_reason type varchar(1500);
+alter table activity_feed alter column activity_descrption type varchar(2000);
+
+ALTER TABLE taxonomy_definition ADD COLUMN no_ofcolmatches int;
+update taxonomy_definition set no_ofcolmatches = 0;
+
+ALTER TABLE taxonomy_definition add column is_deleted boolean;
+update taxonomy_definition set is_deleted = false;
+
+alter table taxonomy_definition add column dirty_list_reason  varchar(1000);
+
+/**
+6 rows of synonym manually value corrected
+**/
+update synonyms set name = 'Turraea obtusifolia' where id = 209954;
+update synonyms set name = 'Synadenium compactum' where id = 208733;
+update synonyms set name = 'Rungia parviflora var. pectinata' where id = 45174;
+update synonyms set name = 'Rungia parviflora var. muralis' where id = 45175;
+update synonyms set name = 'Fagopyrum dibotrys D. Don' where id = 198586;
+update synonyms set name = 'Linnaea spaethiana Graebn.' where id = 189883;
+
+alter table synonyms add column drop_reason  varchar(500);
+
+update taxonomy_definition set no_ofcolmatches = -99;
+update taxonomy_definition set position = NULL;
+
+/**
+    Delete col hierarchies
+ **/
+
+ delete from taxonomy_registry_suser where taxonomy_registry_contributors_id in (select id from taxonomy_registry where classification_id = 821);
+update taxonomy_registry set parent_taxon_id  = null where classification_id = 821;
+delete from taxonomy_registry where id in (select id from taxonomy_registry where classification_id = 821 limit 1000);
+
+////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
+
+
 //5th Dec 2014
 //create index taxonomy_definition_canonical_form_idx on taxonomy_definition ((lower(canonical_form)));
 //create index recommendation_name_idx on recommendation ((lower(name)));
@@ -327,5 +444,76 @@ update species_field SET description = 'dummy' where field_id = 81 and descripti
 
 # 2nd march 2015
 # Observation enhancement
-#update location scale colum  in checklist and observation (write actual sql)
 ALTER TABLE observation ADD COLUMN location_scale character varying(255);
+ALTER TABLE custom_field ADD COLUMN allowed_participation boolean;
+
+
+# 6th may 2015
+# Observation enhancement
+update observation set location_scale = 'APPROXIMATE' where  location_scale is null;
+alter table observation  alter column location_scale set not null;
+
+
+# 22 june 2015
+////////////////////////////// redundant table drop //////////////
+drop table un_curated_scientific_names_un_curated_common_names;
+drop table un_curated_votes;
+drop table un_curated_common_names;
+drop table un_curated_scientific_names;
+
+
+#23 june 2015 activity feed correction for species page
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added hierarchy%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated hierarchy%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted hierarchy%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added common name%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated common name%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted common name%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added synonym%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated synonym%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted synonym%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Updated species field%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Added species field%';
+update activity_feed set activity_descrption = activity_type where activity_type like 'Deleted species field%';
+
+
+update activity_feed set activity_type = 'Added hierarchy' where activity_type like 'Added hierarchy%';
+update activity_feed set activity_type = 'Updated hierarchy' where activity_type like 'Updated hierarchy%';
+update activity_feed set activity_type = 'Deleted hierarchy' where activity_type like 'Deleted hierarchy%';
+update activity_feed set activity_type = 'Added common name' where activity_type like 'Added common name%';
+update activity_feed set activity_type = 'Updated common name'  where activity_type like 'Updated common name%';
+update activity_feed set activity_type = 'Deleted common name' where activity_type like 'Deleted common name%';
+update activity_feed set activity_type = 'Added synonym' where activity_type like 'Added synonym%';
+update activity_feed set activity_type =  'Updated synonym' where activity_type like 'Updated synonym%';
+update activity_feed set activity_type = 'Deleted synonym' where activity_type like 'Deleted synonym%';
+update activity_feed set activity_type = 'Updated species field' where activity_type like 'Updated species field%';
+update activity_feed set activity_type = 'Added species field' where activity_type like 'Added species field%';
+update activity_feed set activity_type = 'Deleted species field' where activity_type like 'Deleted species field%';
+
+
+# 30th Jun 2015
+alter table doc_sci_name add column taxon_concept_id bigint;
+
+#7th July 2015
+alter table taxonomy_registry add column parent_taxon_definition_id bigint;
+alter table taxonomy_registry add constraint td_fk foreign key (parent_taxon_definition_id) references taxonomy_definition(id);
+update taxonomy_registry set parent_taxon_definition_id=t1.taxon_definition_id from taxonomy_registry t1 where taxonomy_registry.parent_taxon_id=t1.id;
+
+///////////////////////////// 7th aug 2015 ////////////////////////
+alter table user_group add column send_digest_mail boolean;
+update user_group set send_digest_mail = false; 
+update user_group set send_digest_mail = true where id in (select user_group_id from digest);
+alter table user_group alter column send_digest_mail set not NULL;
+
+alter table user_group  add column stat_start_date timestamp without time zone;
+update user_group set stat_start_date = founded_on;
+alter table user_group alter column stat_start_date set not NULL;
+
+alter table digest drop column start_date_stats;
+
+#13th Aug 2015
+alter table download_log add column offset_param bigint;
+update download_log set offset_param=0;
+alter table download_log alter column offset_param set not null;
+
+

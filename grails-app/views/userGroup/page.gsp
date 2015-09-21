@@ -12,7 +12,6 @@
 <r:require modules="userGroups_show" />
 </head>
 <body>
-
 	<div class="observation span12 bodymarker">
 		<uGroup:showSubmenuTemplate model="['entityName':'Pages']" />
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
@@ -62,5 +61,7 @@
 		</div>
 
 	</div>
+	<script>$.fn.cycle.defaults.autoSelector = '.cycle-slideshow';</script>
+
 </body>
 </html>

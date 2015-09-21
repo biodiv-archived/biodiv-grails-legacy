@@ -72,6 +72,9 @@ class CustomField {
 	SUser author
 	String notes
 	
+	//if true then any logged in user can change
+	boolean allowedParticipation = false
+	
 	static belongsTo = [userGroup: UserGroup]
 	
 	static constraints = {

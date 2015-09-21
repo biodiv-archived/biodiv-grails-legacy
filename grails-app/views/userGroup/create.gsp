@@ -310,7 +310,27 @@ max-width: 100%;
 				<div class="super-section"  style="clear: both">
 				 	<g:render template="/observation/createCustomFieldTemplate" model="['userGroupInstance':userGroupInstance]"/>
 				</div>
-    
+
+				<div class="super-section" style="clear: both;">
+					<div class="section"
+						style="position: relative; overflow: visible;">
+						<h3><g:message code="usergroup.send.digest" default="Digest Mail Settings" /></h3>
+						<div class="row control-group left-indent">
+								<label class="checkbox" style="text-align: left;"> 
+								 <g:checkBox style="margin-left:0px;"
+												name="sendDigestMail" checked="${userGroupInstance.sendDigestMail}"/>
+								 <g:message code="userGroup.enableDigestMail.msg" default="" /> </label>
+						</div>
+						<div class="row control-group left-indent">
+<%--							<label for="campStatStartDate" class="control-label"><g:message--%>
+<%--									code="userGroup.statdate" default="Start Date" /> </label>--%>
+<%--							--%>
+        					<input name="campStatStartDate" type="text" class="date" class="input-block-level"
+        						value="${userGroupInstance?.statStartDate?.format('dd/MM/yyyy')}" title="Start date for stats"
+        						placeholder="${g.message(code:'placeholder.dateinput.select.fromdate')}" />
+						</div>
+   					</div>
+   				</div>	 
 				
 				<div class="super-section" style="clear: both;">
 					<div class="section"
@@ -508,14 +528,14 @@ $(document).ready(function() {
 	function getCustomFields(){
 		var result = [];
 		var cPrefixClass = '.CustomField_';
-		var fieldList = ['name', 'description','dataType', 'isMandatory', 'allowedMultiple' , 'options', 'defaultValue'];
+		var fieldList = ['name', 'description','dataType', 'isMandatory', 'allowedMultiple' , 'options', 'defaultValue', 'allowedParticipation'];
 		$("ul.customFieldList li").each( function (index){
 			var thisli = $(this);
 			var cfMap = {};
 			$.each(fieldList, function(index, value){
 				var key = cPrefixClass + value;
 				var val = $(thisli).find(key).val();
-				if(key == '.CustomField_isMandatory' || key == '.CustomField_allowedMultiple' ){
+				if(key == '.CustomField_isMandatory' || key == '.CustomField_allowedMultiple' ||  key == '.CustomField_allowedParticipation' ){
 					var val = $(thisli).find(key).prop('checked');
 				}
 				cfMap[value] = val;

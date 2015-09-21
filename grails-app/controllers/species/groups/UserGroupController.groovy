@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.grails.taggable.*
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 
-import species.DigestJob;
+//import species.DigestJob;
 import species.auth.Role;
 import species.participation.Digest;
 import species.auth.SUser;
@@ -48,7 +48,7 @@ class UserGroupController {
     static defaultAction = "list"
 
 	def index = {
-		redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action: "list", params: params)
+		redirect(action: "list", params: params)
 	}
 
 	def activity = {
@@ -61,29 +61,34 @@ class UserGroupController {
 	def list() {
 		Map model = getUserGroupList(params);
 
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.resultType = 'group'
+            model['obvListHtml'] =  g.render(template:"/common/userGroup/showUserGroupListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+       /*     model['filteredTags'] = userGroupService.getTagsFromUserGroup(model.totalUserGroupInstanceList.collect{it.id})
+            model['tagsHtml'] = g.render(template:"/common/observation/showAllTagsTemplate", model:[tags:model.filteredTags, isAjaxLoad:true]);
+            model['mapViewHtml'] = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[userGroupInstanceList:model.totalUserGroupInstanceList]);
+            */
+        }
+ 
+        model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model);
+
         withFormat {
             html { 
                 if(!params.isGalleryUpdate?.toBoolean()){
-                    render (view:"list", model:model)
+                    render (view:"list", model:model.model)
                 } else{
-                    def userGroupListHtml =  g.render(template:"/common/userGroup/showUserGroupListTemplate", model:model);
-                    def userGroupFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-                    def filteredTags = userGroupService.getTagsFromUserGroup(model.totalUserGroupInstanceList.collect{it.id})
-                    def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[tags:filteredTags, isAjaxLoad:true]);
-                    def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[userGroupInstanceList:model.totalUserGroupInstanceList]);
-
-                    def result = [obvListHtml:userGroupListHtml, obvFilterMsgHtml:userGroupFilterMsgHtml, tagsHtml:tagsHtml, mapViewHtml:mapViewHtml]
-                    render result as JSON
+                    return
                 }
             }
             json {
-                model.remove('totalUserGroupInstanceList');
-                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as JSON)
+                model.model.remove('totalUserGroupInstanceList');
+                render model as JSON
             }
             xml {
-                model.remove('totalUserGroupInstanceList');
-                render (utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) as XML)
+                model.model.remove('totalUserGroupInstanceList');
+                render model as XML
             }
         }
 	}
@@ -385,6 +390,8 @@ println "2222222222222222222"
         def instanceTotal = userGroupInstance.getAllMembersCount();
         def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':allMembers, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':instanceTotal, 'expertsTotalCount': userGroupInstance.getExpertsCount()]
 
+        model = prepareRenderUserModel(params, model);
+
         withFormat {
             html {
                 renderUsersModel(params, model);
@@ -395,26 +402,32 @@ println "2222222222222222222"
         }
 	}
 
+    private prepareRenderUserModel(params, model) {
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model['resultType'] = 'user'
+            model['obvListHtml'] =  g.render(template:"/common/suser/showUserListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+
+            //			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
+            //			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
+            //			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
+        }
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+        return model;
+    }
+
 	private renderUsersModel (params,  model) {
-		if(params.loadMore?.toBoolean()){
+
+        if(params.loadMore?.toBoolean()){
 			params.remove('isGalleryUpdate');
-			render(template:"/common/suser/showUserListTemplate", model:model);
+			render(template:"/common/suser/showUserListTemplate", model:model.model);
 			return;
 		} else if(!params.isGalleryUpdate?.toBoolean()){
 			params.remove('isGalleryUpdate');
-			render( view:'user', model: model);
+			render( view:'user', model: model.model);
+            return;
 		} else {
 			params.remove('isGalleryUpdate');
-			model['resultType'] = 'user'
-			def obvListHtml =  g.render(template:"/common/suser/showUserListTemplate", model:model);
-			def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-
-//			def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-//			def tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-//			def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-
-			def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml]
-			render result as JSON
 			return;
 		}
 	}
@@ -430,11 +443,17 @@ println "2222222222222222222"
 
 		def instanceTotal = userGroupInstance.getFoundersCount();
 		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':founders, 'instanceTotal':instanceTotal, 'foundersTotalCount':instanceTotal, 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':userGroupInstance.getExpertsCount()]
+        
+        model = prepareRenderUserModel(params, model);
+        
 		withFormat {
             html{
                 renderUsersModel(params, model);
+                return;
             }
-            json { render model as JSON }
+            json { 
+                render model as JSON 
+            }
             xml { render model as XML }
         }
 	}
@@ -450,9 +469,14 @@ println "2222222222222222222"
 
 		def instanceTotal = userGroupInstance.getExpertsCount();
 		def model = ['userGroupInstance':userGroupInstance, 'userInstanceList':experts, 'instanceTotal':instanceTotal, 'foundersTotalCount':userGroupInstance.getFoundersCount(), 'membersTotalCount':userGroupInstance.getAllMembersCount(), 'expertsTotalCount':instanceTotal]
+
+        model = prepareRenderUserModel(params, model);
+
+
     	withFormat {
             html{
                 renderUsersModel(params, model);
+                return;
             }
             json { render model as JSON }
             xml { render model as XML }
@@ -500,16 +524,8 @@ println "2222222222222222222"
 		params.offset = params.offset ? params.int('offset') : 0
 		
 		def model = observationService.getUserGroupObservations(userGroupInstance, params, params.max, params.offset);
+		
         def observationInstanceList = model.observationInstanceList
-        if(params.filterProperty == 'speciesName') {
-            def results = []
-            observationInstanceList.each {
-                def obv = Observation.read(it);
-                results.add(obv)
-            }
-            model.observationInstanceList = results;
-            observationInstanceList = results;
-        }
         def checklistCount =  model.checklistCount
 		def allObservationCount =  model.allObservationCount
 		model['checklistCount'] = checklistCount
@@ -1620,11 +1636,11 @@ println "2222222222222222222"
         digestService.sendDigestPrizeEmail()
         println "==========ALL DIGEST EMAILS SENT============"
     }
-
-    @Secured(['ROLE_USER'])
+	
+	@Secured(['ROLE_USER'])
     def removeMemberInBulk(){
-       userGroupService.removeMemberInBulk(params)
-       render "== done"
+    	userGroupService.removeMemberInBulk(params)
+    	render "== done"
     }
 
     @Secured(['ROLE_ADMIN'])

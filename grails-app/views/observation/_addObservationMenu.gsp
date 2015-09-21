@@ -30,7 +30,6 @@
             </h1>
         </div>
     </div>
-    </g:if>
     <g:hasErrors bean="${observationInstance}">
     <i class="icon-warning-sign"></i>
     <span class="label label-important"> <g:message
@@ -38,5 +37,6 @@
     <%--<g:renderErrors bean="${observationInstance}" as="list" />--%>
     </g:hasErrors>
 </div>
+</g:if>
 
 

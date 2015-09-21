@@ -245,9 +245,7 @@ class DocumentController extends AbstractObjectController {
             try {
                 def documentInstance = Document.get(params.long('id'))
                 if (documentInstance) {
-                    userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
 				    documentService.documentDelete(documentInstance)
-                    documentInstance.delete(flush: true, failOnError:true)
 
                     msg = "${message(code: 'default.deleted.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
 
@@ -335,8 +333,7 @@ class DocumentController extends AbstractObjectController {
 		def queryParams = filteredDocument.queryParams
 		def activeFilters = filteredDocument.activeFilters
 		def canPullResource = filteredDocument.canPullResource
-		
-		def count = documentService.getFilteredDocuments(params, -1, -1).documentInstanceList.size()
+	    def count = filteredDocument.instanceTotal	
 		if(params.append?.toBoolean()) {
             session["doc_ids_list"].addAll(documentInstanceList.collect {it.id});
         } else {
@@ -468,6 +465,18 @@ class DocumentController extends AbstractObjectController {
 		documentService.processBatch(params)
 		render " done "
 	}
+
+    @Secured(['ROLE_USER'])
+    def updateOraddTags(){
+        log.debug params
+        def documentInstance =  Document.read(params.instanceId);
+        println "============documentInstance=============="+documentInstance;
+        def result = documentService.updateTags(params,documentInstance)
+        def model = utilsService.getSuccessModel('success', documentInstance, OK.value(),result);
+        render model as JSON
+        return;
+
+    }
 
 	def runAllDocuments() {
 			

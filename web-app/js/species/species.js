@@ -127,6 +127,7 @@ var updateEditorContent = function() {
     }
 }
 
+/*
 var setTaxonId = function(el, rowId){
     var last = rowId.substring(rowId.lastIndexOf("_") + 1, rowId.length);
     $(el).parent("span").find(".taxDefIdVal").val(last);
@@ -143,7 +144,7 @@ var expandAll = function(gridId, rowId, force) {
           rowData['expanded'] = 'false';
           rowData['loaded'] = 'false';
           */
-    }
+/*    }
     if (!grid.isNodeLoaded(rowData) || grid.isNodeLoaded(rowData) == 'false') {
         var postData = grid.getGridParam('postData');
         if(grid.getNodeChildren(rowData).length == 0)
@@ -153,7 +154,7 @@ var expandAll = function(gridId, rowId, force) {
         //$("#" + rowId + " div.treeclick").trigger('click');
     } 
 }
-
+*/
 var initializeCKEditor = function() {
     /*
      * CKEDITOR.on('instanceReady', function(ev) { var editor = ev.editor; var
@@ -855,7 +856,6 @@ $(document).ready(function() {
     }, function(){
         $(this).children('.poor_species_content').slideUp(200);
     });
-    $(".grid_view").toggle();
 
 
     initGalleryTabs();
@@ -876,6 +876,7 @@ $(document).ready(function() {
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
             speciesId:speciesId,
             //speciesLevel:${TaxonomyRank.SPECIES.ordinal()},
+            action:'show',
             expandAll:true,
             expandSpecies:true
         });	
@@ -930,11 +931,12 @@ $(document).ready(function() {
         if($('#deleteSpecies').length > 0) {
             $('#deleteSpecies').click (function() {
                 if(confirm(window.i8ln.species.specie.sdel)) {
+                    var urlDel = $(this).attr('href');
                     $.ajax({
-                        url:window.params.species.deleteUrl,
+                        url:urlDel,
                         type:'POST',
                         success : function( data, textStatus, jqXHR) {
-                           //alert(data); 
+                           location.reload();
                         },error: function(xhr, status, error) {
                             //alert(msg);
                             return false;

@@ -1,3 +1,4 @@
+    var checkView = false;
     var handlePaginateButtons = function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');
@@ -50,7 +51,7 @@ $(document).ready(function(){
         $("#observationChecklistOnlyButton").addClass('active')
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
-    return false;
+        return false;
     });
 
     $("#observationAllButton").click(function() {
@@ -146,6 +147,85 @@ $(document).ready(function(){
         $("#speciesNameFilter").val('Unknown');
         $("#speciesNameFilterButton").addClass('active');
         $("#speciesNameAllButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+    
+    $('#areaFilter').button();
+    if(window.params.areaFilter ==  undefined || window.params.areaFilter == 'all' ){
+    	$("#allAreaButton").addClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+    }else if(window.params.areaFilter == 'local'){
+    	$("#allAreaButton").removeClass('active');
+        $("#localAreaButton").addClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+    }else if(window.params.areaFilter == 'region'){
+    	$("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").addClass('active');
+        $("#countryAreaButton").removeClass('active');
+    }else{
+    	$("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").addClass('active');
+    }
+    
+    $("#allAreaButton").click(function() {
+        if($("#allAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('all');
+        $("#allAreaButton").addClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+    
+    $("#localAreaButton").click(function() {
+        if($("#localAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('local');
+        $("#allAreaButton").removeClass('active');
+        $("#localAreaButton").addClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#regionAreaButton").click(function() {
+        if($("#regionAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('region');
+        $("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").addClass('active');
+        $("#countryAreaButton").removeClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+
+    $("#countryAreaButton").click(function() {
+        if($("#countryAreaButton").hasClass('active')){
+            return false;
+        }
+        $("#areaFilter").val('country');
+        $("#allAreaButton").removeClass('active');
+        $("#localAreaButton").removeClass('active');
+        $("#regionAreaButton").removeClass('active');
+        $("#countryAreaButton").addClass('active');
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
@@ -254,7 +334,7 @@ $(document).ready(function(){
         return false;
     });
 
-    $(".removeQueryFilter").on('click', function(){
+    $(document).on('click', ".removeQueryFilter", function(){
         var removeParam = undefined;
         if($('input[name="'+$(this).attr('data-target')+'"]').length != 0)
             $('input[name="'+$(this).attr('data-target')+'"]').val('')
@@ -317,6 +397,7 @@ $(document).ready(function(){
             // a function to be executed when next page was loaded. 
             // "this" points to the element of loaded content.
             load : function(current, next) {
+                checkList();
                 $(".mainContent:last").hide().fadeIn(3000);
 
                 $("div.paginateButtons a.nextLink").attr('href', next.url);
@@ -337,6 +418,11 @@ $(document).ready(function(){
                 var a = $('<a href="'+current.url+'"></a>');
                 var url = a.url();
                 var params = url.param();
+                if(checkView){
+                    params["view"] = "list";
+                }else{
+                    params["view"] = "grid";
+                }
                 delete params["append"]
                 delete params["loadMore"]
                 params['max'] = parseInt(params['offset'])+parseInt(params['max']);
@@ -384,7 +470,13 @@ $(document).ready(function(){
 					//formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
 				}, 
 	            success: function(data, statusText, xhr, form) {
-	            	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+                    var msg = '';
+                    for(var i=0; i<data.length; i++) {
+                    if(data[0].success)
+	                	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html("Scheduled "+data.length+" job(s) for every 5000 records. "+data[0].msg);
+                    else 
+	                	$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data[0].msg+"   "+JSON.stringify(data[0].errors));
+                    }
 	            	$('.download-box').find('.download-options').hide();
 	            	$("html, body").animate({ scrollTop: 0 });
 	            	return false;
@@ -400,6 +492,56 @@ $(document).ready(function(){
 
     //	last_actions();
     eatCookies();
+
+    $('#taxonHierarchy').on("reloadGrid", function() {
+        updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
+    }); 
+
+     /* Added for  Species Update*/
+        var group_icon = $('.group_icon_show');
+        var label_group = $('label.group');
+        var propagateGrpHab = $('.propagateGrpHab');
+        $('.propagateGrpHab .control-group  label').hide();
+
+        $(document).on('click','.edit_group_btn',function(){
+            var obvId = $(this).attr('id');           
+            $('#group_icon_show_wrap_'+obvId).hide();
+            //habitat_icon.hide();
+            label_group.hide();
+            $('#propagateGrpHab_'+obvId).show();
+
+        }); 
+
+        $(document).on('submit','#updateSpeciesGrp', function(event) {
+
+         $(this).ajaxSubmit({ 
+                    url: "/observation/updateSpeciesGrp",
+                    dataType: 'json', 
+                    type: 'GET',  
+                    beforeSubmit: function(formData, jqForm, options) {
+                        /*console.log(formData);
+                        if(formData.group_id == formData.prev_group){
+                            alert("Nothing Changes!");
+                            return false;
+                        }*/
+                    },               
+                    success: function(data, statusText, xhr, form) {
+                            $('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
+                            $('#group_icon_show_wrap_'+data.instance.id).show();
+                            //habitat_icon.show();
+                            $('#propagateGrpHab_'+data.instance.id).hide();
+                            $('.prev_group_'+data.instance.id).val(data.model.prev_group);
+                    },
+                    error:function (xhr, ajaxOptions, thrownError){
+                        //successHandler is used when ajax login succedes
+                        var successHandler = this.success, errorHandler = showUpdateStatus;
+                        handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+                    } 
+
+                 });    
+               
+            event.preventDefault(); 
+        }); 
 });
 
 /**
@@ -562,6 +704,15 @@ function getSelectedMedia() {
     }	
 }
 
+function getSelectedAreaFilter() {
+    var area = ''; 
+    area = $("#areaFilter").attr('value');
+    if(area) {
+        area = area.replace(/\s*\,\s*$/,'');
+        return area;
+    }	
+}
+
 function getSelectedSpeciesName() {
     var sName = ''; 
     sName = $("#speciesNameFilter").attr('value');
@@ -642,10 +793,15 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['isChecklistOnly'] = allChecklistFlag;
     }
 
-    //    var mediaFilter = getSelectedMedia();
-    //    if(mediaFilter) {
-    //            params['isMediaFilter'] = mediaFilter;
-    //    }
+    var mediaFilter = getSelectedMedia();
+    if(mediaFilter) {
+    	params['isMediaFilter'] = mediaFilter;
+    }
+
+    var areaFilter = getSelectedAreaFilter();
+    if(areaFilter) {
+    	params['areaFilter'] = areaFilter;
+    }
 
     var grp = getSelectedGroup();
     if(grp) {
@@ -821,6 +977,33 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['tag']
     }
 
+    var taxon = $("input#taxon").val();
+    if(taxon) {
+        var classificationId = $('#taxaHierarchy option:selected').val();
+        params['classification'] = classificationId
+        params['taxon'] = taxon
+    } else {
+        delete params['taxon']
+        delete params['classification']
+        $(".jstree-anchor").removeClass('taxon-highlight');
+    }
+
+    var taxonRank = $("input#taxonRank").val();
+    if(taxonRank) {
+        params['taxonRank'] = taxonRank
+    } else {
+        delete params['taxonRank']
+    }
+
+    var status = $("input#status").val();
+    if(status) {
+        params['status'] = status
+    } else {
+        delete params['status']
+    }
+
+
+
 
     return params;
 }	
@@ -856,6 +1039,7 @@ function updateListPage(activeTag) {
         $('.observations_list').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);
+        $('#summary_section').replaceWith(data.model.summaryHtml);        
         //$('#filterPanel').replaceWith(data.model.filterPanel);
         //$('.observation_location').replaceWith(data.model.mapViewHtml);
         setActiveTag(activeTag);
@@ -865,8 +1049,8 @@ function updateListPage(activeTag) {
         last_actions();
         eatCookies();			
         $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
-        console.log('triggering updatedGallery');
         $('.list').trigger('updatedGallery');
+        checkList();
     }
 }
 
@@ -884,8 +1068,7 @@ function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpda
     return params;
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {
-    
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {    
     var params = getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam);
 
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
@@ -893,6 +1076,11 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     	params["isGalleryUpdate"] = isGalleryUpdate;
     var href = params.href;
     var base = params.base;
+    if(checkView){
+        params["view"] = "list";
+    }else{
+        params["view"] = "grid";
+    }
     delete params["href"]
     delete params["base"]
     var recursiveDecoded = decodeURIComponent($.param(params));
@@ -1047,9 +1235,17 @@ function intializesSpeciesHabitatInterest(multiSelect){
 }
 
 function updateDownloadBox(instanceTotal){
+    $('#instanceTotal').val(instanceTotal);
     if(instanceTotal > 0){
         $('.download-box').show();
-    }else{
+/*        if(instanceTotal > 5000) {
+            jQuery(".download-box input:radio").attr('disabled',true);
+            jQuery(".download-box input[type='submit']").attr('disabled',true);
+        } else {
+            jQuery(".download-box input:radio").removeAttr('disabled')
+            jQuery(".download-box input[type='submit']").removeAttr('disabled');
+        }
+*/    }else{
         $('.download-box').hide();
     }
 }
@@ -1111,4 +1307,9 @@ function loadSpeciesGroupCount() {
         }
     });
 }
-    
+function checkList(){   
+    if(checkView){
+        $('#obvList').trigger('click');        
+    }
+    $('.obvListwrapper').show();
+}

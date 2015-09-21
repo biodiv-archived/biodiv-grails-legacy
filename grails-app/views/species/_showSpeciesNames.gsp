@@ -44,7 +44,10 @@
 </g:if>
 
 <!-- Synonyms -->
-<%def synonyms = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) %>
+<%
+//def synonyms = Synonyms.findAllByTaxonConcept(speciesInstance.taxonConcept) 
+def synonyms = speciesInstance.taxonConcept.fetchSynonyms(); 
+%>
 <g:if test="${synonyms}">
 <div class="sidebar_section">
     <a class="speciesFieldHeader"  data-toggle="collapse" href="#synonyms"> 
@@ -58,7 +61,14 @@
                     ${synonym?.relationship?.value()}</span> 
             </div>
             <div class="span8">
+                <% def s = synonym.findSpecies(); %>
+                <g:if test="${s}">
+                    <a href="${uGroup.createLink(controller:'species', action:'show', id:s.id)}"> 
+                </g:if>
                 <span class="sci_name ${isSpeciesContributor && synonym.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-sid="${synonym.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="synonym" data-original-title="Edit synonym name" title="${g.message(code:'title.click.edit')}">  ${(synonym?.italicisedForm)?raw(synonym.italicisedForm):raw('<i>'+(synonym?.name)+'</i>')} </span>
+                <g:if test="${s}">
+                    </a>
+                </g:if>
             </div>    
             </li>
             </g:each>
@@ -133,7 +143,7 @@ list.sort();
         <div class="span8" style="display:table;">
             <g:each in="${it.value}"  status="i" var ="n">
                 <div class="entry pull-left" style="display:table-row;"> 
-                <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="${g.message(code:'title.click.edit')}">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
+                    <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="${g.message(code:'title.click.edit')}">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
                 </div>
             </g:each>
         </div>

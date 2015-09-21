@@ -5,6 +5,7 @@ import species.License;
 import species.groups.SpeciesGroup;
 import grails.plugin.springsecurity.annotation.Secured;
 import species.Resource.ResourceType;
+import species.Habitat;
 
 class ChecklistController {
 	
@@ -100,6 +101,7 @@ class ChecklistController {
 	def create() {
 		def checklistInstance = new Checklists(license:License.findByName(License.LicenseType.CC_BY))
 		checklistInstance.properties = params;
+		checklistInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
 		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
 		return [observationInstance: checklistInstance, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 	}
@@ -112,7 +114,7 @@ class ChecklistController {
                 redirect (url:uGroup.createLink(action:'show', controller:"checklist", id:result.checklistInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
             }else{
                 //flash.error = result.msg;//"${message(code: 'error')}";
-                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns.encodeAsJSON(), sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn, latitude:params.latitude, longitude:params.longitude])
+                render(view: "create", model: [observationInstance: result.checklistInstance, msg:result.msg, checklistData:params.checklistData.encodeAsJSON(), checklistColumns:params.checklistColumns.encodeAsJSON(), sciNameColumn:params.sciNameColumn, commonNameColumn:params.commonNameColumn, latitude:params.latitude, longitude:params.longitude, obvDate:params.obvDate])
             }
 		} else {
 			redirect (url:uGroup.createLink(action:'create', controller:"checklist", 'userGroupWebaddress':params.webaddress))

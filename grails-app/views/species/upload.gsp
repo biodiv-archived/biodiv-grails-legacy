@@ -1,6 +1,6 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.utils.ImageUtils"%>
-<%@page import="species.TaxonomyDefinition.TaxonomyRank"%>
+<%@ page import="species.ScientificName.TaxonomyRank"%>
 <%@page import="species.Species"%>
 <%@page import="species.groups.SpeciesGroup"%>
 <%@page import="species.utils.Utils"%>
@@ -67,6 +67,7 @@
                     <!--span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span-->
 
                     <div id="myGrid" class="" style="width:100%;height:350px;clear:both;"></div>
+                    <button class="btn btn-primary" id="downloadNamesMapper" style="margin-top: 8px"><g:message code="button.generate" /></button>
                     <div id="nameSuggestions" style="display: block;"></div>
                     <div id="legend" class="hide">
                         <span class="incorrectName badge"><g:message code="error.incorrect.names" /> </span>
