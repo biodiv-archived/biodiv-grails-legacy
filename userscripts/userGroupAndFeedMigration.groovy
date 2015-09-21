@@ -13,6 +13,7 @@ import species.auth.SUser
 import species.groups.UserGroup
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 import content.eml.*;
+import species.Species
 /*
 def feedService = ctx.getBean("activityFeedService");
 def userGroupService = ctx.getBean("userGroupService");
@@ -298,8 +299,28 @@ def pullTreeObservations(){
 	}
 }
 
+
+def postSpeices(){
+	def userGroupService = ctx.getBean("userGroupService");
+	def m = [author:"1", userGroups:"45", objectType:Species.class.getCanonicalName(), submitType:'post', objectIds: new File('/home/biodiv/NEspecies.csv').text]
+	println m
+	userGroupService.updateResourceOnGroup(m)
+}
+
+
+def updateSpeciesGroup(){
+	def groupHandlerService = ctx.getBean("groupHandlerService");
+	Species.findAllByIdGreaterThanEquals(276023).each { Species s ->
+		groupHandlerService.updateGroup(s.taxonConcept);
+	}
+}
+
+updateSpeciesGroup()
+
+//postSpeices()
+
 //pullTreeSpecies()
-pullTreeObservations()
+//pullTreeObservations()
 
 //migrateCoverageToDoc()
 //addDocumentPostFeed()

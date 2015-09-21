@@ -37,7 +37,9 @@ $(document).ready(function() {
                     'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
                     'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
                     'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
-                    'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}"
+                    'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}",
+                    'editSpeciesPageURL' : "${uGroup.createLink(controller:'species', action:'editSpeciesPage')}"
+                                
                 },
 		'speciesName':"${params.speciesName }",
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",

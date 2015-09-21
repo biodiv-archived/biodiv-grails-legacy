@@ -184,4 +184,9 @@ abstract class ScientificName extends NamesMetadata {
 		binomialForm nullable:true;
 		status nullable:true;
 	}
+	
+	def beforeInsert(){
+		super.beforeInsert()
+	}
+	
 }

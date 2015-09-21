@@ -43,4 +43,8 @@ class SynonymsMerged extends TaxonomyDefinition {
             this.removeAcceptedName(acc);
         }
     }
+	
+	def beforeInsert(){
+		super.beforeInsert()
+	}
 }

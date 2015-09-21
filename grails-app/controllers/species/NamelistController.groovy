@@ -144,8 +144,6 @@ class NamelistController {
         }
         
         //def res = [[name:'aa', nameStatus:'st', externalId:34, rank:'genus', group:'plant', sourceDatabase:'sb'], [name:'bb', nameStatus:'st', externalId:34, rank:'family', group:'animal', sourceDatabase:'sb']]
-
-        println "========RES ======= " + res
         render res as JSON
     }
     /**
@@ -194,7 +192,7 @@ class NamelistController {
         println "===========PARSED NAMES========= " + parsedNames[0].canonicalForm
         params.name = parsedNames[0].canonicalForm
         List res = []
-        res = namelistService.searchIBP(params.name); 
+        res = speciesService.searchIBP(params.name); 
         println "========RES ======= " + res
         render res as JSON
     }

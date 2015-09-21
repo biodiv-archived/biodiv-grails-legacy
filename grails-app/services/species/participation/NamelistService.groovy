@@ -95,8 +95,8 @@ class NamelistService {
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
 		
-        def clazz;
-        if(status == NameStatus.ACCEPTED) {
+        def clazz
+        if(status == NameStatus.ACCEPTED || !status) {
             clazz = TaxonomyDefinition.class;
         } else {
             clazz = SynonymsMerged.class; 
@@ -124,6 +124,7 @@ class NamelistService {
 					}
 				}
             }
+			
 			//CANONICAL ZERO MATCH OR SINGLE MATCH
             if(res.size() < 2) { 
                 if(res.size() == 0 ) {
@@ -192,11 +193,59 @@ class NamelistService {
             temp['sourceDatabase'] = it.viaDatasource?it.viaDatasource:''
             finalResult.add(temp);
         }
-        println "====RESULT FROM IBP==== " + finalResult
         return finalResult 
     }
 
 
+	public ScientificName createNameFromColId(String colId, boolean runPostProcess = true){
+		if(!colId)
+			return
+		
+		def td = TaxonomyDefinition.findByMatchId(colId)
+		if(td){
+			return td
+		}
+		
+		def colRes = searchCOL(colId, 'id')
+		if(!colRes)
+			return
+		
+		colRes = colRes[0]
+		String status = colRes.nameStatus
+		if(status.equalsIgnoreCase('accepted')){
+			return createAcceptedNameFromColId(colId, runPostProcess)
+		}else{
+			return createSynonymFromColId(colId, runPostProcess)
+		}
+	}
+	
+	private ScientificName createAcceptedNameFromColId(String colId, boolean runPostProcess){
+		TaxonomyDefinition td = TaxonomyDefinition.findByMatchId(colId)
+		if(td){
+			return td
+		}
+		
+		td = processDataForMigration(new TaxonomyDefinition(), searchCOL(colId, 'id')[0], 1, true)
+		
+		if(runPostProcess){
+			td.postProcess()
+		}
+		
+		println  "---------- Created accepted name from col Id " + colId
+		return td
+	}
+	
+	private ScientificName createSynonymFromColId(String colId, runPostProcess){
+		def colRes = searchCOL(colId, 'id')[0]
+		String accepteNameColId = colRes.acceptedNamesList[0].id
+		TaxonomyDefinition td = createAcceptedNameFromColId(accepteNameColId, runPostProcess)
+		td.createSpeciesStub()
+		def syn =  SynonymsMerged.findByMatchId(colId)
+		println "---------------created synonym " + syn
+		return syn
+	}
+	
+	
 	///////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -506,7 +555,9 @@ class NamelistService {
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
-
+		
+		sciName.addSynonymFromCol(acceptedMatch.synList)
+		return sciName
     }
    
     public def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
@@ -1706,7 +1757,6 @@ class NamelistService {
 				println "Got response: ${resp.statusLine}"
 				println "Content-Type: ${resp.headers.'Content-Type'}"
 				def xmlText =  reader.text
-				//println xmlText
 				def result = responseAsMap(xmlText, searchBy);
 				return result;
 			}

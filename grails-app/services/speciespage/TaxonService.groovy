@@ -781,11 +781,11 @@ class TaxonService {
     *
     */
 
-    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
-        return addTaxonHierarchy(speciesName, taxonRegistryNames, classification, [contributor], language, abortOnNewName, fromCOL, otherParams);
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, SUser contributor, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null, taxonHirMatch = null) {
+        return addTaxonHierarchy(speciesName, taxonRegistryNames, classification, [contributor], language, abortOnNewName, fromCOL, otherParams, taxonHirMatch );
     }
 
-    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, List<SUser> contributors, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null) {
+    def addTaxonHierarchy(String speciesName, List taxonRegistryNames, Classification classification, List<SUser> contributors, Language language, boolean abortOnNewName = false ,boolean fromCOL = false , otherParams = null, taxonHirMatch = null) {
         List errors = [];
         if(!classification) {
         	def messagesourcearg = new Object[1];
@@ -794,8 +794,8 @@ class TaxonService {
         }
         
         XMLConverter converter = new XMLConverter();
-        println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
-        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributors, language);
+        //println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
+        def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributors, language, taxonHirMatch);
         
         def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
         List<TaxonomyRegistry> taxonRegistry = getClassifictaionsRes.taxonRegistry;

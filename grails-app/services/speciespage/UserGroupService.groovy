@@ -1311,7 +1311,7 @@ class UserGroupService {
 			List obvs = []
 			if(objectIds && objectIds != ""){
 				objectIds.split(",").each { 
-					def obj = domainClass.read(Long.parseLong(it))
+					def obj = domainClass.read(Long.parseLong(it.trim()))
 					obvs << obj
 					if(obj.instanceOf(Checklists)){
 						obvs.addAll(obj.observations)

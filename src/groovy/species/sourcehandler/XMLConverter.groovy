@@ -61,9 +61,7 @@ class XMLConverter extends SourceConverter {
     private Species s;
 
     def groupHandlerService;
-	//def namelistService;
-    //def markupSanitizerService;
-
+ 	
     public enum SaveAction {
         MERGE("merge"),
         OVERWRITE("overwrite"),
@@ -1345,10 +1343,10 @@ class XMLConverter extends SourceConverter {
      * @param rel
      * @return
      */
-    private RelationShip getRelationship(String rel) {
+    public static RelationShip getRelationship(String rel) {
         if(rel) {
             for(RelationShip type : RelationShip) {
-                if(type.value().equals(rel)) {
+                if(type.value().equalsIgnoreCase(rel)) {
                     return type;
                 }
             }
@@ -1560,8 +1558,9 @@ class XMLConverter extends SourceConverter {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
         log.debug "Getting classification hierarchy : "+classification.name;
-        println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL + "other params " + otherParams
-		println "============OTHER PARAMS ========= " + otherParams
+        //println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL + "other params " + otherParams
+		//println "============OTHER PARAMS ========= " + otherParams
+		println "============ SNAME------------- " + scientificName
         //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1625,8 +1624,9 @@ class XMLConverter extends SourceConverter {
 //                            namelistService = ctx.getBean("namelistService");
                             boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
-                            def searchIBP = NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
-                            println "========SEARCH RESULT------>>> #################======== " + searchIBP
+							
+							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode)
+                            println "========SEARCH RESULT------>>> #################======== " + searchIBPResult
                             TaxonomyDefinition taxon = null;
                             
                             //if from curation
@@ -1644,23 +1644,21 @@ class XMLConverter extends SourceConverter {
                                         //if(otherParams.curatingTaxonStatus == NameStatus.ACCEPTED) {
                                             //couldnot use contains()
                                             boolean isPresent = false;
-                                            searchIBP.each {
+                                            searchIBPResult.each {
                                                 if(it.id == sciName.id){
                                                     isPresent = true;
                                                 }
                                             }
                                             if(!isPresent) {
-                                                searchIBP.add(sciName);
+                                                searchIBPResult.add(sciName);
                                             }
                                         //}
                                     }
                                 }
-                                if(searchIBP.size() == 1) {
-                                    println "SEARCH RESULT == 1 choosing first result as taxon"
-                                    taxon = searchIBP[0];
+                                if(searchIBPResult.size() == 1) {
+                                    taxon = searchIBPResult[0];
                                 }
-                                if(searchIBP.size() > 1 ){
-                                    println "SEARCH RESULT > 1"
+                                if(searchIBPResult.size() > 1 ){
                                     if(fieldNode == fieldNodes.last()) {
                                         println "Field node is last node"
                                         if(otherParams.curatingTaxonId) {
@@ -1672,7 +1670,7 @@ class XMLConverter extends SourceConverter {
                                                 taxon = sciName;
                                                 taxon.isFlagged = true;
                                                 String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
-                                                searchIBP.each {
+                                                searchIBPResult.each {
                                                     flaggingReason = flaggingReason + it.id.toString() + ", ";
                                                 }
                                                 println "########### Flagging in XML CONVERTER becoz : ${flaggingReason}==============" + taxon
@@ -1686,7 +1684,7 @@ class XMLConverter extends SourceConverter {
                                                 //Pick any working list name if available
                                                 def workingTaxon = null
                                                 def dirtyTaxon = null
-                                                searchIBP.each {
+                                                searchIBPResult.each {
                                                     if(it.position == NamePosition.WORKING && !workingTaxon) {
                                                         workingTaxon = it;
                                                     }
@@ -1699,11 +1697,11 @@ class XMLConverter extends SourceConverter {
                                                 } else if(dirtyTaxon) {
                                                     taxon = dirtyTaxon;
                                                 } else {
-                                                    taxon = searchIBP[0];
+                                                    taxon = searchIBPResult[0];
                                                 }
                                                 sciName.isFlagged = true;
                                                 String flaggingReason = "The accepted name for this is a system default.Multiple potential matches exist.IDs- ";
-                                                searchIBP.each {
+                                                searchIBPResult.each {
                                                     flaggingReason = flaggingReason + it.id.toString() + ", ";
                                                 }
                                                 sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
@@ -1721,7 +1719,7 @@ class XMLConverter extends SourceConverter {
                                         //then null
                                         def workingTaxon = null
                                         def dirtyTaxon = null
-                                        searchIBP.each {
+                                        searchIBPResult.each {
                                             if(it.position == NamePosition.WORKING && !workingTaxon) {
                                                 workingTaxon = it;
                                             }
@@ -1734,19 +1732,15 @@ class XMLConverter extends SourceConverter {
                                         } else if(dirtyTaxon) {
                                             taxon = dirtyTaxon;
                                         } else {
-                                            taxon = searchIBP[0];
+                                            taxon = searchIBPResult[0];
                                         }
                                     }    
                                 } else {
                                     println ".....${searchIBP.size()}";
                                 }
                             } else {
-                                println "NO OTHER PARAMS"
-                                if(searchIBP.size() > 0) {
-                                    println "FIRST search result as taxon"
-                                    taxon = searchIBP[0];
-                                } else {
-                                    println searchIBP;
+                                if(searchIBPResult.size() > 0) {
+                                    taxon = searchIBPResult[0];
                                 }
                             }
                             /*
@@ -1956,7 +1950,7 @@ class XMLConverter extends SourceConverter {
                                 taxonEntities.add(registry);
                             } else if(saveTaxonHierarchy) {
                                 log.debug "Saving taxon registry entity : "+ent;
-                                println "=====SAVING NEW TAXON REGISTRY================================== "
+                                println "????????????????????=====SAVING NEW TAXON REGISTRY================================== "
                                 if(!ent.save(flush:true)) {
                                     ent.errors.each { log.error it }
                                 } else {
@@ -1981,6 +1975,38 @@ class XMLConverter extends SourceConverter {
         return ['taxonRegistry' : taxonEntities, 'spellCheckMsg' : spellCheckMsg];
     }
 
+	
+	/**
+	 * This method first look at the name node and if any ibpid or colid is given then return(if not present then create first)
+	 * if namenode is null then doing normal ibp search
+	 * @param parsedName
+	 * @param rank
+	 * @param searchInNull
+	 * @param useAuthorYear
+	 * @param nameNode
+	 * @return
+	 */
+	private List searchIBP(TaxonomyDefinition parsedName, rank, searchInNull, useAuthorYear, nameNode){
+		def ibpId = nameNode?.ibpId?.text();
+		def colId = nameNode?.colId?.text();
+		
+		println "----------------- ibp id  " +  ibpId + "  and col id " + colId
+		
+		if(ibpId){
+			ibpId = Long.parseLong(ibpId.trim());
+			return [TaxonomyDefinition.get(ibpId)]
+		}
+		
+		if(colId){
+			def taxon = TaxonomyDefinition.findByMatchId(colId)
+			if(!taxon)
+				taxon =  ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
+				
+			return [taxon]
+		}
+		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
+	}
+	
     /**
      * 
      * @param rankStr
@@ -2062,13 +2088,13 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank, boolean createNew = true) {
-        def cleanSciName = Utils.cleanSciName(sciName);
+		def cleanSciName = Utils.cleanSciName(sciName);
 
         if(cleanSciName) {
             List name = namesParser.parse([cleanSciName])
             if(name[0].normalizedForm) {
 				TaxonomyDefinition taxon
-				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, null, NameStatus.ACCEPTED, rank, false, name[0].normalizedForm)
+				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, name[0].authorYear, NameStatus.ACCEPTED, rank, false, name[0].normalizedForm)
 				if(taxonList.size() > 1){
 					log.error '############  ' + "IBP search returning mulitiple result: should not happen " + taxonList
 				}
