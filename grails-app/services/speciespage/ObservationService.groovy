@@ -240,71 +240,74 @@ class ObservationService extends AbstractObjectService {
                 log.debug "==================UUID GENERATED======== " + uuidRand
                 observationInstance.resource.each { resource ->
                     log.debug "=============FOR RESOURCE=========== " + resource + " =======ITS CONTEXT ======== " + resource.context?.value() + " =====ITS FILE NAME===== " +  resource.fileName
-                    if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
+                    if((resource.context?.value() == Resource.ResourceContext.USER.toString())){
                         log.debug "========CONTEXT IS USER========= " 
-                        def usersResFolder = resource.fileName.tokenize('/')[0]
-                        log.debug "======USERS RES FOLDER========== " + usersResFolder
-                        def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
-                        log.debug "======OBV DIR FROM CONFIG======= " + obvDir
-                        if(!obvDir.exists()) {
-                            obvDir.mkdir();
-                        }
-                        /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
-                        obvDir = new File(obvDir, uuidRand);
-                        log.debug "=====NEW OBV DIR CREATED======== " + obvDir
-                        obvDir.mkdir();                
-                        /////change filename of resource to this uuid and inside that check for clash of filename
-                        File newUniq = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
-                        def a = newUniq.getAbsolutePath().tokenize('/')[-1]
-                        def newFileName = a.tokenize('.')[0]
-                        log.debug "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
-                        //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
-                        String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
-                        def usersResDir = new File(userRootDir, usersResFolder)
-                        def finalSuffix = ""
-                        log.debug "=========ITERATING IN THIS USER RES FOLDER ========= " + usersResDir
-                        usersResDir.eachFileRecurse (FileType.FILES) { file ->
-                            log.debug "=========PICKED UP THIS FILE==================== " + file
-                            def fName = file.getName();
-                            def tokens = fName.tokenize("_");
-                            def nameSuffix = ""
-                            if(tokens.size() == 1){
-                                nameSuffix = "."+fName.tokenize(".")[-1] 
-                                finalSuffix = nameSuffix
-                            }
-                            else {
-                                tokens.each{ t->
-                                    if(!t.isNumber()){
-                                        nameSuffix = nameSuffix + "_" + t
-                                    }
-                                }
-                            }
-                            log.debug "========NAME SUFFIX======== " + nameSuffix
-                            Path source = Paths.get(file.getAbsolutePath());
-                            Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
-                            log.debug "=======SOURCE============= " + source 
-                            log.debug "====DESTINATION=========== " + destination
-                            try {
-                                //Files moved but empty folder there
-                                log.debug "===================MOVING FILE================================"
-                                Files.move(source, destination);
-                            } catch (IOException e) {
-                                log.debug "======EXCEPTION IN MOVING FILE==============="
-                                e.printStackTrace();
-                            }
-                        }
-                        try{
-                            log.debug "=========DELETING DIRECTORY=========="
-                            FileUtils.deleteDirectory(usersResDir);
-
-                        }catch(IOException e){
-                            log.debug "========ERROR IN DELETION=========="
-                            e.printStackTrace();
-                        }                        
-                        //// UPDATING FILE NAME OF RES IN DB
-                        ////check format of filename---- slash kaise hai
-                        log.debug "=======UPDATING RESOURCE FILE NAME WITH======== : " + "/"+ uuidRand +"/"+ newFileName + finalSuffix
-                        resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+						if( resource.type != Resource.ResourceType.VIDEO){
+	                        def usersResFolder = resource.fileName.tokenize('/')[0]
+	                        log.debug "======USERS RES FOLDER========== " + usersResFolder
+	                        def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
+	                        log.debug "======OBV DIR FROM CONFIG======= " + obvDir
+	                        if(!obvDir.exists()) {
+	                            obvDir.mkdir();
+	                        }
+	                        /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
+	                        obvDir = new File(obvDir, uuidRand);
+	                        log.debug "=====NEW OBV DIR CREATED======== " + obvDir
+	                        obvDir.mkdir();                
+	                        /////change filename of resource to this uuid and inside that check for clash of filename
+	                        File newUniq = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
+	                        def a = newUniq.getAbsolutePath().tokenize('/')[-1]
+	                        def newFileName = a.tokenize('.')[0]
+	                        log.debug "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
+	                        //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
+	                        String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
+	                        def usersResDir = new File(userRootDir, usersResFolder)
+	                        def finalSuffix = ""
+	                        log.debug "=========ITERATING IN THIS USER RES FOLDER ========= " + usersResDir
+	                        usersResDir.eachFileRecurse (FileType.FILES) { file ->
+	                            log.debug "=========PICKED UP THIS FILE==================== " + file
+	                            def fName = file.getName();
+	                            def tokens = fName.tokenize("_");
+	                            def nameSuffix = ""
+	                            if(tokens.size() == 1){
+	                                nameSuffix = "."+fName.tokenize(".")[-1] 
+	                                finalSuffix = nameSuffix
+	                            }
+	                            else {
+	                                tokens.each{ t->
+	                                    if(!t.isNumber()){
+	                                        nameSuffix = nameSuffix + "_" + t
+	                                    }
+	                                }
+	                            }
+	                            log.debug "========NAME SUFFIX======== " + nameSuffix
+	                            Path source = Paths.get(file.getAbsolutePath());
+	                            Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
+	                            log.debug "=======SOURCE============= " + source 
+	                            log.debug "====DESTINATION=========== " + destination
+	                            try {
+	                                //Files moved but empty folder there
+	                                log.debug "===================MOVING FILE================================"
+	                                Files.move(source, destination);
+	                            } catch (IOException e) {
+	                                log.debug "======EXCEPTION IN MOVING FILE==============="
+	                                e.printStackTrace();
+	                            }
+	                        }
+	                        try{
+	                            log.debug "=========DELETING DIRECTORY=========="
+	                            FileUtils.deleteDirectory(usersResDir);
+	
+	                        }catch(IOException e){
+	                            log.debug "========ERROR IN DELETION=========="
+	                            e.printStackTrace();
+	                        }                        
+	                        //// UPDATING FILE NAME OF RES IN DB
+	                        ////check format of filename---- slash kaise hai
+	                        log.debug "=======UPDATING RESOURCE FILE NAME WITH======== : " + "/"+ uuidRand +"/"+ newFileName + finalSuffix
+	                        resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+						}		
+						
                         log.debug "=======UPDATING RESOURCE CONTEXT======"
                         resource.saveResourceContext(observationInstance)
 
@@ -312,11 +315,13 @@ class ObservationService extends AbstractObjectService {
                         ////////////////////
                         ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
                         log.debug "============UPDATING STATUS OF THIS USER RESOURCE========== " + usersRes
+						if(usersRes){
                         usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
                         if(!usersRes.save(flush:true)){
                             usersRes.errors.allErrors.each { log.error it }
                             return false
                         }
+						}
 
                     }
                 }
