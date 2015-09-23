@@ -1736,7 +1736,7 @@ class XMLConverter extends SourceConverter {
                                         }
                                     }    
                                 } else {
-                                    println ".....${searchIBP.size()}";
+                                    println "searchIBPResult.....${searchIBPResult.size()}";
                                 }
                             } else {
                                 if(searchIBPResult.size() > 0) {
@@ -1906,19 +1906,25 @@ class XMLConverter extends SourceConverter {
                             }
  
                             def ibpHierarchy = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-
+                            def parentTaxon = getParentTaxon(taxonEntities, rank);
+                            def path = (parentTaxon ? parentTaxon.path+"_":"") + taxon.id;
+ 
                             def criteria = TaxonomyRegistry.createCriteria()
                             TaxonomyRegistry registry = criteria.get {
-                                eq("taxonDefinition", ent.taxonDefinition);
-                                if(ent.classification != ibpHierarchy) eq("path", ent.path);
-                                eq("classification", ent.classification);
+                                eq("taxonDefinition", taxon);
+                                if(classification != ibpHierarchy) eq("path", path);
+                                eq("classification", classification);
                             }
 
                             println "===========REGISTRY=========== " + registry
 
                             def ent;
-                            if(ent.classification != ibpHierarchy) ent = registry;
-                            else ent = new TaxonomyRegistry();
+                            if(classification == ibpHierarchy) {
+                                println "STORING ONLY ONE HIERARCHY FOR IBP TAXON HIERARCHY"
+                                ent = registry;
+                            } else {
+                                ent = new TaxonomyRegistry();
+                            }
 
                             ent.taxonDefinition = taxon
                             ent.classification = classification;
@@ -1928,24 +1934,24 @@ class XMLConverter extends SourceConverter {
                             /*if(otherParams) {
                                  ent.classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
                             }*/
-                            ent.parentTaxon = getParentTaxon(taxonEntities, rank);
+                            ent.parentTaxon = parentTaxon;
 							ent.parentTaxonDefinition = ent.parentTaxon?.taxonDefinition
                             log.debug("Parent Taxon : "+ent.parentTaxon)
-                            ent.path = (ent.parentTaxon ? ent.parentTaxon.path+"_":"") + taxon.id;
+                            ent.path = path;
                             //same taxon at same parent and same path may exist from same classification.
                             if(registry) {
                                 log.debug "Taxon registry already exists : "+registry;
                                 if(saveTaxonHierarchy) {
-                                    registry.updateContributors(getUserContributors(fieldNode.data))
                                     if(ent.classification == ibpHierarchy) {
                                         log.debug "Saving taxon registry entity : "+ent;
-                                        println "=====SAVING NEW TAXON REGISTRY================================== "
+                                        println "=====UPDATING existing IBP TAXON REGISTRY================================== "
                                         if(!ent.save(flush:true)) {
                                             ent.errors.each { log.error it }
                                         } else {
                                             log.debug "Saved taxon registry entity : "+ent;
                                         }
                                     }
+                                    ent.updateContributors(getUserContributors(fieldNode.data))
                                 }
                                 taxonEntities.add(registry);
                             } else if(saveTaxonHierarchy) {

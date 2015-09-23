@@ -57,7 +57,7 @@
                 <select class="span12 listSelector">
                     <option value='accDLContent'>Accepted Names</option>
                     <option value='synDLContent'>Synonyms</option>
-                    <option value='leafDLContent'>Species and Subspecies</option>
+                    <option value='speciesDLContent'>Species and Subspecies</option>
                     <!--option value='comDLContent'>Common Names</option-->
                 </select>
                 <div class="dl_content taxon_selector_list listarea_content">
@@ -77,7 +77,7 @@
                 <select class="span12 listSelector">
                     <option value='accWLContent'>Accepted Names</option>
                     <option value='synWLContent'>Synonyms</option>
-                    <option value='leafWLContent'>Species and Subspecies</option>
+                    <option value='speciesWLContent'>Species and Subspecies</option>
                     <!--option value='comWLContent'>Common Names</option-->
                 </select>
 
@@ -96,7 +96,7 @@
                 <select class="span12 listSelector">
                     <option value='accCLContent'>Accepted Names</option>
                     <option value='synCLContent'>Synonyms</option>
-                    <option value='leafCLContent'>Species and Subspecies</option>
+                    <option value='speciesCLContent'>Species and Subspecies</option>
                     <!--option value='comCLContent'>Common Names</option-->
                 </select>
 
@@ -192,24 +192,25 @@
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.source.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="" class="span6 source" style=""/>
+                        <input type="text" placeholder="" class="span6 source"/>
                     </div>															
                     <div class="span3">
                         <label>via
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.via.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8 sourceDatabase via" style=""/>
+                        <input type="text" placeholder="" class="span8 sourceDatabase via"/>
                     </div>
                     <div class="span3">
                         <label>ID
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.id.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8 id" style=""/>
+                        <input type="text" placeholder="" class="span8 id"/>
                     </div>			
                 </div>
 
+                <input type="hidden" placeholder="" class="span8 position"/>
                 <div class="row-fluid">	
                     <div class="span12 column rt_family" style="background:slategrey">
 
@@ -377,7 +378,6 @@
             <g:each in="${TaxonomyRank.list()}" var="t">
             taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
             </g:each>
-            <r:script>
             $(document).ready(function() {
                     //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
                     var taxonBrowserOptions = {
@@ -397,45 +397,7 @@ var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);
 
 $('.icon-question-sign').tooltip();
 
-//modifySourceOnEdit();
-//initializeLanguage();
-$(".listSelector").change(function () {
-    var selectedList = $(this).val();
-    var list_content = $(this).parents(".listarea").find(".listarea_content");
-    $(list_content).find("ul").remove();
-    switch (selectedList) {
-    case 'accDLContent':
-    $(list_content).append(accDLContent);
-    break;
-    case 'synDLContent':
-    $(list_content).append(synDLContent);
-    break;
-    case 'comDLContent':
-    //$(list_content).append(comDLContent);
-    break;
-    case 'accWLContent':
-    $(list_content).append(accWLContent);
-    break;
-    case 'synWLContent':
-    $(list_content).append(synWLContent);
-    break;
-    case 'comWLContent':
-    //$(list_content).append(comWLContent);
-    break;
-    case 'accCLContent':
-    $(list_content).append(accCLContent);
-    break;
-    case 'synCLContent':
-    $(list_content).append(synCLContent);
-    break;
-    case 'comCLContent':
-    //$(list_content).append(comCLContent);
-    break;
-    default: alert('Wrong option selected!!')
-    }
 });
-});
-</r:script>
 </script>
 
 </body>

@@ -115,10 +115,12 @@
             };
             var filterResults = function(e) {
                 var $me;
+                if(e) {
                 if(!$(e.target).hasClass('.jstree-anchor')) {
                     $me = $(e.target).parent();
                 } else {
                     $me = $(e.target);
+                }
                 }
                 var selectedTaxonId = $me.data('taxonid');
 

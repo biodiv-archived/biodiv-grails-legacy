@@ -10,6 +10,7 @@ import species.NamesParser;
 import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
 import species.participation.Observation;
+import species.NamesMetadata.NameStatus;
 import content.eml.Document;
 import species.Species;
 
@@ -33,12 +34,15 @@ class NamelistController {
 	 */
 	def getNamesFromTaxon(){
         //input in params.taxonId
-		println "=====PARAMS========= " + params
         def res = namelistService.getNamesFromTaxon(params)
-        println "====CALL HERE ====== " +  res  //namelistService.getNamesFromTaxon(params)
-		println "=================================="
 		//def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
-        render res as JSON
+        def result;
+        if(res) result = [success:true, model:res]
+        else result = [success:false, msg:'Error while fetching names']
+        withFormat {
+            json { render result as JSON }
+            xml { render result as XML } 
+        }
 	}
 	
 	/**
@@ -50,52 +54,61 @@ class NamelistController {
 		//[name:'aa', kingdom:'kk', .....]
 		def userLanguage = utilsService.getCurrentLanguage(request);   
         def instance;
-        if(params.nameType == '1') {
-            instance = TaxonomyDefinition.read(params.taxonId.toLong())
-        } else if (params.nameType == '2') {
-            instance = SynonymsMerged.read(params.taxonId.toLong())
-        }
-        
+
         def res = [:];
+        try {
+            if(params.nameType?.equalsIgnoreCase(NameStatus.ACCEPTED.value())) {
+                instance = TaxonomyDefinition.read(params.taxonId.toLong())
+            } else if(params.nameType?.equalsIgnoreCase(NameStatus.SYNONYM.value())) {
+                instance = SynonymsMerged.read(params.taxonId.toLong())
+            } else if(params.nameType?.equalsIgnoreCase(NameStatus.COMMON.value())) {
+                //TODO
+            }
 
-        if(instance) {
-            def feedCommentHtml = g.render(template:"/common/feedCommentTemplate", model:[instance: instance, userLanguage:userLanguage]);
-            res = namelistService.getNameDetails(params);
-            res['success'] = true;
-            println "====CALL HERE NAME DETAILS====== " + res
-            println "========================================="
-            //fetch registry using taxon id and classification id
-            /*def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()),TaxonomyDefinition.read(params.taxonId.toLong())); 
-            println "=========TAXON REG========= " + taxonReg
-            def res
-            if(taxonReg) {
-                res = [name:'rahul', kingdom:'Plantae',phylum:'Magnoliophyta', authorString:'author', rank:'super-family', source:'COL', superfamily:'Ydfvsdv',family:'Menispermaceae', 'class':'Equisetopsida', order:'Ranunculales',genus:'Albertisia',species:'Albertisia mecistophylla','sub-genus':'Subsdfsdf','sub-family':'SubFfsad', nameStatus:'accepted', via:'xx', id:'123', taxonReg:taxonReg.id?.toString()]
+
+            if(instance) {
+                def feedCommentHtml = g.render(template:"/common/feedCommentTemplate", model:[instance: instance, userLanguage:userLanguage]);
+                res = namelistService.getNameDetails(params);
+                res['success'] = true;
+                println "====CALL HERE NAME DETAILS====== " + res
+                println "========================================="
+                //fetch registry using taxon id and classification id
+                /*def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()),TaxonomyDefinition.read(params.taxonId.toLong())); 
+                  println "=========TAXON REG========= " + taxonReg
+                  def res
+                  if(taxonReg) {
+                  res = [name:'rahul', kingdom:'Plantae',phylum:'Magnoliophyta', authorString:'author', rank:'super-family', source:'COL', superfamily:'Ydfvsdv',family:'Menispermaceae', 'class':'Equisetopsida', order:'Ranunculales',genus:'Albertisia',species:'Albertisia mecistophylla','sub-genus':'Subsdfsdf','sub-family':'SubFfsad', nameStatus:'accepted', via:'xx', id:'123', taxonReg:taxonReg.id?.toString()]
+                  } else {
+                  println "======TAXON REGISTRY NULL====="
+                  }*/
+                res['feedCommentHtml'] = feedCommentHtml
+
+
+                Species.withNewTransaction {
+                    //speciesModel will be  [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
+                    def speciesModel = speciesService.getSpeciesList([taxon:instance.id+"", max:1], 'list');
+                    res['speciesInstanceTotal'] = speciesModel.instanceTotal;
+                }
+
+                Observation.withNewTransaction {
+                    //observationModel will be [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+                    def observationModel = observationService.getFilteredObservations([taxon:instance.id+""], 1, 0, false);
+                    res['observationInstanceTotal'] = observationModel.allObservationCount;
+                    res['checklistInstanceTotal'] = observationModel.checklistCount;
+                }
+
+                Document.withNewTransaction {
+                    //documentModel will be  [documentInstanceList:documentInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+                    def documentModel = documentService.getFilteredDocuments([taxon:instance.id+""], 1, 0);
+                    res['documentInstanceTotal'] = documentModel.instanceTotal;
+                }
             } else {
-                println "======TAXON REGISTRY NULL====="
-            }*/
-            res['feedCommentHtml'] = feedCommentHtml
-
-
-            Species.withNewTransaction {
-                //speciesModel will be  [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
-                def speciesModel = speciesService.getSpeciesList([taxon:instance.id+"", max:1], 'list');
-                res['speciesInstanceTotal'] = speciesModel.instanceTotal;
+                res['success'] = false;
             }
-
-            Observation.withNewTransaction {
-                //observationModel will be [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
-                def observationModel = observationService.getFilteredObservations([taxon:instance.id+""], 1, 0, false);
-                res['observationInstanceTotal'] = observationModel.allObservationCount;
-                res['checklistInstanceTotal'] = observationModel.checklistCount;
-            }
-
-            Document.withNewTransaction {
-                //documentModel will be  [documentInstanceList:documentInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
-                def documentModel = documentService.getFilteredDocuments([taxon:instance.id+""], 1, 0);
-                res['documentInstanceTotal'] = documentModel.instanceTotal;
-            }
-        } else {
+        } catch (Exception e) {
+            e.printStackTrace();
             res['success'] = false;
+            res['msg'] = e.getMessage();
         }
         render res as JSON
         return;
@@ -200,67 +213,72 @@ class NamelistController {
     @Secured(['ROLE_USER'])
     def curateName() {
         def res = [:]
-        if(!utilsService.isAdmin(springSecurityService.currentUser?.id)) {
-            res['msg'] = "This action is temporarily disabled while feedback on the curation interface is being collected . Please leave comment below with details of correction required so that admins can implement it."
-            render res as JSON
-            return;
-        }
+        try{
+            if(!utilsService.isAdmin(springSecurityService.currentUser?.id)) {
+                res['msg'] = "This action is temporarily disabled while feedback on the curation interface is being collected . Please leave comment below with details of correction required so that admins can implement it."
+                render res as JSON
+                return;
+            }
 
-        if(!params.acceptedMatch) {
-            res['msg'] = "No acceptedMatch"
-            render res as JSON
-            return;
-        }
+            if(!params.acceptedMatch) {
+                res['msg'] = "No acceptedMatch"
+                render res as JSON
+                return;
+            }
 
-        def acceptedMatch = JSON.parse(params.acceptedMatch);
-        acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
-        def name;
-        if(acceptedMatch.isOrphanName == "true"){
-            name = Recommendation.get(acceptedMatch.recoId?.toLong());
-        } else {
-            name = TaxonomyDefinition.get(acceptedMatch.taxonId.toLong());
-        }
+            def acceptedMatch = JSON.parse(params.acceptedMatch);
+            acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
+            def name;
+            if(acceptedMatch.isOrphanName == "true"){
+                name = Recommendation.get(acceptedMatch.recoId?.toLong());
+            } else {
+                name = TaxonomyDefinition.get(acceptedMatch.taxonId.toLong());
+            }
 
-        if(!name) {
-            res['msg'] = "Not a valid name."
-            render res as JSON
-            return;
-        }
+            if(!name) {
+                res['msg'] = "Not a valid name."
+                render res as JSON
+                return;
+            }
 
-        boolean moveToRaw = acceptedMatch.moveToRaw?.toBoolean()
-        boolean moveToWKG = acceptedMatch.moveToWKG?.toBoolean()
-        boolean moveToClean = acceptedMatch.moveToClean?.toBoolean()
+            boolean moveToRaw = acceptedMatch.moveToRaw?.toBoolean()
+            boolean moveToWKG = acceptedMatch.moveToWKG?.toBoolean()
+            boolean moveToClean = acceptedMatch.moveToClean?.toBoolean()
 
-        if((moveToWKG || moveToRaw) && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
-) {
-            def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
-            res['msg'] = "Only user with Taxon Curator/Editor permission can edit raw names and move to working list. Please request for permission ${link}"
-            render res as JSON
-            return;
-        }
+            if((moveToWKG || moveToRaw) && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
+            ) {
+                def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
+                res['msg'] = "Only user with Taxon Curator/Editor permission can edit raw names and move to working list. Please request for permission ${link}"
+                render res as JSON
+                return;
+            }
 
-        //TODO:remove from clean shd be one by user with editor rights only
-        if(moveToClean && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
-        ) {
-            def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
-            res['msg'] = "Only user with Taxon Editor permission can edit raw/working names and move to clean list. Please request for permission ${link}"
-            render res as JSON
-            return;
-        }
+            //TODO:remove from clean shd be one by user with editor rights only
+            if(moveToClean && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
+            ) {
+                def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
+                res['msg'] = "Only user with Taxon Editor permission can edit raw/working names and move to clean list. Please request for permission ${link}"
+                render res as JSON
+                return;
+            }
 
-        if(moveToClean && name.position != NamesMetadata.NamePosition.WORKING) {
-            res['msg'] = "Only names in working list can be moved to clean list."
-            render res as JSON
-            return;
+            if(moveToClean && name.position != NamesMetadata.NamePosition.WORKING) {
+                res['msg'] = "Only names in working list can be moved to clean list."
+                render res as JSON
+                return;
 
-        }
+            }
 
-        if(acceptedMatch.isOrphanName == "true"){
-            Recommendation reco = name;
-            res = namelistService.processRecoName(reco, acceptedMatch);
-        } else {
-            ScientificName sciName = name;
-            res = namelistService.processDataFromUI(sciName, acceptedMatch)
+            if(acceptedMatch.isOrphanName == "true"){
+                Recommendation reco = name;
+                res = namelistService.processRecoName(reco, acceptedMatch);
+            } else {
+                ScientificName sciName = name;
+                res = namelistService.processDataFromUI(sciName, acceptedMatch)
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            res = [success:false, msg:e.getMessage()] 
         }
         render res as JSON
     }
