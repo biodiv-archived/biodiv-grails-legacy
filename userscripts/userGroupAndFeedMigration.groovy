@@ -315,7 +315,37 @@ def updateSpeciesGroup(){
 	}
 }
 
-updateSpeciesGroup()
+
+
+def obsQuery(){
+	File file = new File("/tmp/obv.txt")
+	if(!file.exists()){
+		file.createNewFile()
+	}
+	file.write "obv_id | contributor_id | suggestors \n"
+	
+	def ds = ctx.getBean('dataSource')
+	Sql sql = Sql.newInstance(ds)
+	String query = ''' select o.id as id, o.author_id as user_id from observation o, user_group_observations ug  where ug.user_group_id = 33 and o.id = ug.observation_id and o.created_on > '2015-08-01 00:00:00' and  o.created_on <  '2015-09-01 00:00:00' ''';
+	String q = "select string_agg(CAST(author_id as varchar), ', ') as cc from recommendation_vote where observation_id = " 
+	sql.eachRow(query){ row ->
+		String str = row.id + "|" + row.user_id + "|" 
+		def r = sql.rows(q + row.id)
+		def tt = ""
+		if(r){
+			tt = r[0].cc
+		}
+ 		str += tt + "\n"
+		println str
+		file << str
+	}
+}
+
+
+obsQuery()
+
+
+//updateSpeciesGroup()
 
 //postSpeices()
 
