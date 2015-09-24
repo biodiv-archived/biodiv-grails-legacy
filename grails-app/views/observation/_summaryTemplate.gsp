@@ -4,7 +4,7 @@
     <h5><g:message code="taxonomic.summary" /></h5>
     <table class="table table-bordered table-condensed table-striped">
         <tr>
-            <td>${TaxonomyRank.SPECIES.value()}</td>
+            <td>${g.message(error:TaxonomyRank.SPECIES)}</td>
             <td>
                 <a class="taxonRank" href="${uGroup.createLink(
 				    controller:params.controller, action:params.action?:'list',
@@ -13,7 +13,7 @@
             </td>
         </tr>
         <tr>
-            <td>${TaxonomyRank.INFRA_SPECIFIC_TAXA.value()}</td>
+            <td>${g.message(error:TaxonomyRank.INFRA_SPECIFIC_TAXA)}</td>
             <td>
                 <a class="taxonRank" href="${uGroup.createLink(
 				    controller:params.controller, action:params.action?:'list',
@@ -23,7 +23,7 @@
             </td>
         </tr>
         <tr>
-            <td>${NameStatus.ACCEPTED.label()}</td>
+            <td>${g.message(code:'NameStatus.ACCEPTED')}</td>
             <td>
                 <a class="status" href="${uGroup.createLink(
 				    controller:params.controller, action:params.action?:'list',
@@ -33,7 +33,7 @@
             </td>
         </tr>
         <tr>
-            <td>${NameStatus.SYNONYM.label()}</td>
+            <td>${g.message(code:'NameStatus.SYNONYM')}</td>
             <td>
                 <a class="status" href="${uGroup.createLink(
 				    controller:params.controller, action:params.action?:'list',

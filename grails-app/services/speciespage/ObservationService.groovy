@@ -1312,7 +1312,7 @@ class ObservationService extends AbstractObjectService {
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification))
                 if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
 
                 queryParams['classification'] = classification.id 
                 activeFilters['classification'] = classification.id

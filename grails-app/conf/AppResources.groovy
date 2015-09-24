@@ -217,7 +217,7 @@ modules = {
 		resource url:'/js/wysihtml5-0.3.0_rc2.min.js'
 		resource url:'/js/bootstrap-wysihtml5-0.0.2.min.js'		
 		resource url:'/js/wysihtml5.js'
-        resource url:'/js/species/speciesPermission.js'
+       // resource url:'/js/species/speciesPermission.js'
         //resource url:'http://malsup.github.com/jquery.form.js'
 	}
 	
