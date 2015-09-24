@@ -1,6 +1,10 @@
 package species
 
 import species.auth.SUser
+import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.context.MessageSource
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 abstract class NamesMetadata extends NamesSorucedata {
 
@@ -71,10 +75,12 @@ abstract class NamesMetadata extends NamesSorucedata {
         }
 
         String label() {
-            if(this == ACCEPTED) return "Accepted Name" 
-            if(this == SYNONYM) return "Synonym" 
-            if(this == PROV_ACCEPTED) return "Provisionally Accepted Name" 
-            if(this == COMMON) return "Common Name" 
+            MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
+            def request = RequestContextHolder.currentRequestAttributes().request
+            if(this == ACCEPTED) return messageSource.getMessage('label.accepted', null, RCU.getLocale(request))
+            if(this == SYNONYM) return messageSource.getMessage('label.synonyms', null, RCU.getLocale(request))
+            if(this == PROV_ACCEPTED) return messageSource.getMessage('label.provisionally.accepted', null, RCU.getLocale(request))
+            if(this == COMMON) messageSource.getMessage('label.common', null, RCU.getLocale(request)) 
         }
         String toString() {
             return this.value();
