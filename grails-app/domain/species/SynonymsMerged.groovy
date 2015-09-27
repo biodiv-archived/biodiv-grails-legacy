@@ -40,7 +40,8 @@ class SynonymsMerged extends TaxonomyDefinition {
     def removeAsSynonym() {
         def acceptedNames = this.fetchAcceptedNames();
         acceptedNames.each { acc ->
-            this.removeAcceptedName(acc);
+            //this.removeAcceptedName(acc);
+            acc.removeSynonym(this);
         }
     }
 	

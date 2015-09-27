@@ -2046,13 +2046,15 @@ class NamelistService {
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
-                    "s.parent_taxon_definition_id ="+parentId+" and " +
+                    "s.path like '"+parentId+"%' and " +
                     "t.rank <= " + nextPrimaryRank +
                     " order by t.rank, t.name asc limit :limit offset :offset";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields
                 //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+                println "======================+++++++"
+                println sqlStr;
                 rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
 
                 /*def fieldsConfig = grailsApplication.config.speciesPortal.fields

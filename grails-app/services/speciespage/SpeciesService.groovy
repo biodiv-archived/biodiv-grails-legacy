@@ -1282,7 +1282,7 @@ class SpeciesService extends AbstractObjectService  {
             def content;
             try{
                 oldSynonym.removeFromContributors(springSecurityService.currentUser);
-                taxonConcept = speciesInstance ? speciesInstance.taxonConcept : oldSynonym.taxonConcept;
+                taxonConcept = taxonConcept?:(speciesInstance ? speciesInstance.taxonConcept : oldSynonym);
                 taxonConcept.removeSynonym(oldSynonym);
                 if(oldSynonym.contributors.size() == 0) {
                     oldSynonym.delete(failOnError:true) //should not delete synonym entry

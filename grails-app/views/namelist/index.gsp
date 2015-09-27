@@ -209,8 +209,25 @@
                         <input type="text" placeholder="" class="span8 id"/>
                     </div>			
                 </div>
+                
+                <div class="row-fluid">
+                    <input type="hidden" placeholder="" class="span8 position"/>
+                    <!--button type="button" class="save_button btn" onClick='saveHierarchy(false, false)'>Save & Retain</button--!> 
+                    <button id="saveNameDetails" type="button" class="canBeDisabled btn" onClick='saveNameDetails(false, false, false)'>Save </button> 
+                    <div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            Move Name to List
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a id="moveToWKG" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Move to Working List</a> </li>
+                            <li><a id="removeFromWKG" class="remove_button btn btn-link disabled" onClick='saveNameDetails(true, false, false)'>Remove from Working List</a> </li>
+                            <li><a id="moveToClean" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, false, true)'>Move to Clean List</a> </li>
+                            <li><a id="removeFromClean" class="remove_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Remove from Clean List</a></li>
+                        </ul>
+                    </div>
+                </div>
 
-                <input type="hidden" placeholder="" class="span8 position"/>
                 <div class="row-fluid">	
                     <div class="span12 column rt_family" style="background:slategrey">
 
@@ -302,22 +319,7 @@
 
 
                 </div>
-                        <!--button type="button" class="save_button btn" onClick='saveHierarchy(false, false)'>Save & Retain</button--!> 
-                        <button id="saveNameDetails" type="button" class="canBeDisabled btn" onClick='saveNameDetails(false, false, false)'>Save </button> 
-                        <div class="btn-group">
-                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                                Move Name to List
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a id="moveToWKG" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Move to Working List</a> </li>
-                                <li><a id="removeFromWKG" class="remove_button btn btn-link disabled" onClick='saveNameDetails(true, false, false)'>Remove from Working List</a> </li>
-                                <li><a id="moveToClean" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, false, true)'>Move to Clean List</a> </li>
-                                <li><a id="removeFromClean" class="remove_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Remove from Clean List</a></li>
-                            </ul>
-                        </div>
- 
-
+                      
 
 
             </div>
