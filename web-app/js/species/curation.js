@@ -148,7 +148,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
         $('.isOrphanName').val(false);
         var url = window.params.curation.getNameDetailsUrl;
         var choosenName = ''
-            if(nameType == 'synonym' || nameType == 'common') {
+            if(nameType.toLowerCase() == 'synonym' || nameType.toLowerCase() == 'common') {
                 choosenName = $(ele).text();
             }
         $.ajax({
