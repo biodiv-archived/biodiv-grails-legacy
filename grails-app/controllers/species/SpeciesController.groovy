@@ -1081,6 +1081,15 @@ class SpeciesController extends AbstractObjectController {
                 case 'contributor':
                 success = speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
                 break;
+
+                case 'taxon_curator':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR);
+                break;
+
+                case 'taxon_editor':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR);
+                break;
+
                 default: log.error "No invite type"
             }
 

@@ -214,11 +214,11 @@ class NamelistController {
     def curateName() {
         def res = [:]
         try{
-            if(!utilsService.isAdmin(springSecurityService.currentUser?.id)) {
+            /*if(!utilsService.isAdmin(springSecurityService.currentUser?.id)) {
                 res['msg'] = "This action is temporarily disabled while feedback on the curation interface is being collected . Please leave comment below with details of correction required so that admins can implement it."
                 render res as JSON
                 return;
-            }
+            }*/
 
             if(!params.acceptedMatch) {
                 res['msg'] = "No acceptedMatch"
@@ -248,7 +248,7 @@ class NamelistController {
             if((moveToWKG || moveToRaw) && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
             ) {
                 def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
-                res['msg'] = "Only user with Taxon Curator/Editor permission can edit raw names and move to working list. Please request for permission ${link}"
+                res['msg'] = "Only user with Taxon curator/editor permission can edit raw names and move to working list. Please request for permission ${link}"
                 render res as JSON
                 return;
             }
@@ -257,7 +257,7 @@ class NamelistController {
             if(moveToClean && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
             ) {
                 def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
-                res['msg'] = "Only user with Taxon Editor permission can edit raw/working names and move to clean list. Please request for permission ${link}"
+                res['msg'] = "Only user with Taxon editor permission can edit working names and move to clean list. Please request for permission ${link}"
                 render res as JSON
                 return;
             }

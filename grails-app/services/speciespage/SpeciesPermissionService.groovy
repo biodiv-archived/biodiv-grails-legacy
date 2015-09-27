@@ -104,11 +104,11 @@ class SpeciesPermissionService {
             } catch (Exception e) {
                 e.printStackTrace();
 
-                log.error "error adding new contributor ${e.getMessage()}"
+                log.error "error adding ${permissionType} to the user. ${e.getMessage()}"
                 return false;
             }
         } else { 
-            log.debug "${user} is already a contributor"
+            log.debug "${user} already has ${permissionType} for the taxon"
             return true;
         }
     }
