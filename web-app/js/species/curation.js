@@ -933,7 +933,9 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
                 if(data["newlyCreated"]) {
                     alert(data["newlyCreatedName"] +" is a new uncurated name on the portal. Hierarchy saved is -- " + data['activityType'] +" .Please explicitly curate "+ data["newlyCreatedName"] +" from dirty list to continue.");
                 } else {
-                    var resMsg = "Successfull operation. " + data['activityType'];
+                    var resMsg = "Successfull operation. ";
+                    if(data['activityType'])
+                        resMsg += data['activityType'];
                     if(data['spellCheckMsg']) {
                         resMsg = resMsg + " . " + data['spellCheckMsg'];
                     }
