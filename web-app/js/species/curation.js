@@ -1007,7 +1007,7 @@ function changeEditingMode(mode) {
 
 //====================== SYNONYM/COMMON NAME RELATED ===============================
 function modifyContent(ele, type) {
-    return;
+    //return;
     processingStart();
     var typeName = '';
     var relationship = '';
