@@ -227,6 +227,14 @@ class NamelistController {
             }
 
             def acceptedMatch = JSON.parse(params.acceptedMatch);
+
+            if(!acceptedMatch.taxonId) {
+                res['msg'] = "No name selected"
+                render res as JSON
+                return;
+            }
+
+
             acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
             def name;
             if(acceptedMatch.isOrphanName == "true"){

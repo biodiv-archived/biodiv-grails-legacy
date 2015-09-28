@@ -18,7 +18,7 @@ function createListHTML(list, nameType, isOrphanList) {
         if(selectedName && value.name.toLowerCase() == selectedName) {
             klass = 'taxon-highlight';
         }
-        listContent += "<li class='nameDetails "+klass+"' onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",&quot;"+value.status+"&quot;, this,"+isOrphanList+")'><a>" +value.name +"</a>";
+        listContent += "<li class='nameDetails taxon"+value.rank+" "+klass+"' onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",&quot;"+value.status+"&quot;, this,"+isOrphanList+")'><a>" +value.name +"</a>";
         if(value.id)
             listContent += "<input type='hidden' value='"+value.id+"'>"+x+"</li>"
     });
@@ -44,6 +44,7 @@ function processingStop() {
 
 function getNamesFromTaxon(ele , parentId) {
     processingStart();
+    changeEditingMode(true);
     populateNameDetails();
     //var taxonId = $("input#taxon").val();//$(ele).parent("span").find(".taxDefIdVal").val();
     var classificationId = $('#taxaHierarchy option:selected').val();
@@ -231,7 +232,7 @@ function populateTabDetails(data, appendData) {
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
-            setOption($(ele).find(".languageDropDown")[0], value["language"]);
+            setOption($(ele).find(".languageDropDown")[0], value["language"], false);
         })
     }
     
@@ -255,10 +256,13 @@ function populateTabDetails(data, appendData) {
     }
 }
 
-function setOption(selectElement, value) {
+function setOption(selectElement, value, ignoreCase) {
     if(typeof value == 'undefined') return;
 
-    value = value.toLowerCase();
+    ignoreCase = typeof ignoreCase !== 'undefined' ? ignoreCase : true;
+
+    if(ignoreCase)
+        value = value.toLowerCase();
     $(selectElement).val(value);
    /*var options = selectElement.options;
     for (var i = 0, optionsLength = options.length; i < optionsLength; i++) {
@@ -859,6 +863,10 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
         console.log('returning')
         return false;
     }
+    if(!$('.taxonId').val()) {
+        alert("Please select a name")
+            return false;
+    }
     
     processingStart();
     /*if($("#statusDropDown").val() == 'accepted') {
@@ -918,9 +926,9 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
     }
     */
 
-    if(oldStatus == 'accepted') {
+    /*if(oldStatus == 'accepted') {
         postProcessOnAcceptedName();
-    }
+    }*/
     var url = window.params.curation.curateNameURL;
     var acceptedMatch = JSON.stringify(dataToProcess(moveToRaw, moveToWKG, moveToClean));
     $.ajax({

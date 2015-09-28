@@ -616,12 +616,12 @@ class NamelistService {
             }
 
             tempResult = updateRank(sciName, acceptedMatch.parsedRank);
+            println "======= RESULT FROM UpdateRank ${tempResult}";
             if(tempResult.success && tempResult.activityDescription)
                 tempActivityDescription += tempResult.activityDescription;
             result.errors << tempResult.errors;
             println "ActivityDescription : ${tempActivityDescription}";
 
-            println "======= RESULT FROM UpdateRank ${tempResult}";
 
             //WHY required here??
             //addIBPHierarchyFromCol(sciName, acceptedMatch);
@@ -633,13 +633,13 @@ class NamelistService {
             if(moveToRaw) position = NamesMetadata.NamePosition.RAW;
 
             tempResult = updatePosition(sciName, position); 
+            println "======= RESULT FROM UpdatePosition ${tempResult}";
             if(tempResult.success && tempResult.activityDescription)
                 tempActivityDescription += tempResult.activityDescription;
             result.errors << tempResult.errors;
             println "ActivityDescription : ${tempActivityDescription}";
             //taxonService.moveToWKG([taxonReg]);
 
-            println "======= RESULT FROM UpdatePosition ${tempResult}";
 
             println "=====SCI NAME ==== " + sciName
             println "=====SCI NAME CLASS ==== " + sciName.class
@@ -877,7 +877,7 @@ class NamelistService {
                 success = true;
             }            
         } else {
-            success = true;
+            success = false;
         }
         println "======= UPDATING RANK DONE to ${sciName.rank}============+"
         return [success:success, activityDescription:tempActivityDescription, errors:errors];
