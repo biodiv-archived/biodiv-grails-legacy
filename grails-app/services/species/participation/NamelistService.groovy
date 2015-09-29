@@ -181,20 +181,62 @@ class NamelistService {
         def res = searchIBP(canonicalForm, authorYear, status, rank) //TaxonomyDefinition.findAllByCanonicalForm(canonicalForm);
         def finalResult = []
         res.each { 
-            def taxonConcept = TaxonomyDefinition.get(it.id.toLong());
             def temp = [:]
             temp['taxonId'] = it.id
             temp['externalId'] = it.id
             temp['name'] = it.canonicalForm
             temp['rank'] = TaxonomyRank.getTRFromInt(it.rank).value().toLowerCase()
             temp['nameStatus'] = it.status.value().toLowerCase()
-            temp['group'] = groupHandlerService.getGroupByHierarchy(taxonConcept, taxonConcept.parentTaxon()).name
+            temp['group'] = groupHandlerService.getGroupByHierarchy(it, it.parentTaxon()).name
             temp['sourceDatabase'] = it.viaDatasource?it.viaDatasource:''
             finalResult.add(temp);
         }
         return finalResult 
     }
 
+	
+	/**
+	 * Searches given name with rank in ibp and col and return all the matched result
+	 * @param name
+	 * @param rank
+	 * @return
+	 */
+	public Map nameMapper(List<String> names) {
+		Map finalResult = [:]
+		NamesParser namesParser = new NamesParser();
+		List<TaxonomyDefinition> parsedNames = namesParser.parse(names);
+		
+		int i = -1
+        List nameSubLists = parsedNames.collate(5)
+        nameSubLists.each { nl ->
+        TaxonomyDefinition.withNewTransaction {
+        nl.each { TaxonomyDefinition name ->
+			i++
+			List tmpRes = []
+			if(!name || !name.canonicalForm) {
+				log.debug "Name is not parsed by Names Parser " + name
+				tmpRes << ['match':'None', 'name':'', 'rank':'', 'status': '', 'group' : '', 'position':'','id':'']
+				finalResult[names[i]] = tmpRes
+				// return works here as continue
+				return
+			}
+			
+			List ibpResult = searchIBP(name.canonicalForm, null, null)
+			ibpResult.each { TaxonomyDefinition t ->
+                t = TaxonomyDefinition.get(t.id)
+				tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
+			}
+			
+			List colResult = searchCOL(name.canonicalForm, 'name');
+			colResult.each { t ->
+				tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
+			}
+			finalResult[names[i]] = tmpRes
+        }
+        }
+		}
+		return finalResult;
+	}
 
 	public ScientificName createNameFromColId(String colId, boolean runPostProcess = true){
 		if(!colId)
@@ -244,7 +286,7 @@ class NamelistService {
 		return syn
 	}
 	
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -1506,39 +1548,7 @@ def sql= session.createSQLQuery(query)
         return desc;
     }
 
-    //suggest names from IBP and COL
-    public Map nameMapper(List<String> names) {
-        Map finalResult = [:]
-        NamesParser namesParser = new NamesParser();
-        def parsedNames = namesParser.parse(names);
-        int speciesRank = TaxonomyRank.SPECIES.ordinal();
-        int i = 0
-        parsedNames.each { pn ->
-            def res = searchIBP(pn.canonicalForm, pn.authorYear, NameStatus.ACCEPTED, speciesRank);
-            def res1 = searchIBP(pn.canonicalForm, pn.authorYear, NameStatus.SYNONYM, speciesRank);
-            res.addAll(res1);
-            if(res.size() == 0){
-                //COL results
-                def r = searchCOL(pn.canonicalForm, "name");
-                List temp = []
-                r.each {
-                    temp.add(['name':it.name, 'id':it.externalId, 'status':it.nameStatus])
-                }
-                if(r.size() == 0) temp = null;
-                finalResult[names[i]] = ['COL' : temp, 'IBP': null]; 
-            } else {
-                List temp = []
-                res.each {
-                    temp.add(['name':it.name, 'id':it.id, 'status': it.status.value()])
-                }
-                finalResult[names[i]] = ['IBP' : temp, 'COL' : null]; 
-            }
-            i++;
-        }
-        return finalResult;
-    }
-
-	
+ 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////

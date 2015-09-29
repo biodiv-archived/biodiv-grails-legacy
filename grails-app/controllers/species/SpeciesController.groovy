@@ -1018,6 +1018,15 @@ class SpeciesController extends AbstractObjectController {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Secured(['ROLE_SPECIES_ADMIN'])
+	def searchAndValidateName() {
+		log.debug params.xlsxFileUrl
+		Language languageInstance = utilsService.getCurrentLanguage(request);
+		params.locale_language = languageInstance;
+		def res = speciesUploadService.searchAndValidateName(params)
+		render(text:res as JSON, contentType:'text/html')
+	}
+	
+	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){

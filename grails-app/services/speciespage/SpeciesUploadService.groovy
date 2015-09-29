@@ -106,6 +106,22 @@ class SpeciesUploadService {
 	}
 	
 	
+	Map searchAndValidateName(params){
+		if(!params.xlsxFileUrl){
+			return ['msg': 'File not found !!!' ]
+		}
+		
+		File speciesDataFile = saveModifiedSpeciesFile(params)
+		log.debug "THE FILE BEING UPLOADED " + speciesDataFile
+		
+		if(!speciesDataFile.exists()){
+			return ['msg': 'File not found !!!' ]
+		}
+		
+		return ['msg': 'Names searched in IBP and COL. Please downlaod the file and validate']
+	}
+
+	
 	Map basicUploadValidation(params){
 		if(!params.xlsxFileUrl){
 			return ['msg': 'File not found !!!' ]
@@ -681,15 +697,14 @@ class SpeciesUploadService {
             def ext = params.xlsxFileUrl.split("\\.")[-1];
             List<Map> names = SpreadsheetReader.readSpreadSheet(params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir), 0 , 0);
 
-            println "======CONTENT ======= " + names
-            def namesList = [];
-
-            for (Map<String, String> map : names) {
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    namesList.add(entry.getValue());
-                }
-            }
-
+			println "============ names " + names
+			List namesList = []
+			names.each { Map m ->
+				 namesList.addAll(m.values())
+			}
+			
+			println "======CONTENT ======= " + namesList
+			
             def content = namelistService.nameMapper(namesList);
             println "=====NAMES MAPPED ===== " + content
             log.debug "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
@@ -712,13 +727,18 @@ class SpeciesUploadService {
     void writeNamesMapperSheet(File f, InputStream inp, Map content) {
         try {
             Workbook wb = WorkbookFactory.create(inp);
-            int sheetNo = 0;
-            Sheet sheet = wb.getSheetAt(sheetNo);
-            Iterator<Row> rowIterator = sheet.iterator();
-            int rowNum = 0;
-            Row row = rowIterator.next();
-            rowNum++;
-            def arr = ['Names','No. of Results' ,'IBP name', 'IBP ID', 'IBP status', 'COL name', 'COL ID', 'COL status']
+			//leaving first sheet as it is and creating new match sheet at index 1
+			
+			int sheetIndex = 0;
+            Sheet sheet = wb.getSheetAt(sheetIndex);
+			if(sheet != null) {
+				wb.removeSheetAt(sheetIndex);
+			}
+			sheet = wb.createSheet("Match Result");
+			
+			//writing header
+            Row row =  sheet.createRow(0);
+            List arr = ['Index', 'Source Name', 'Match Found', 'Name' ,'Rank', 'Status', 'Group', 'Position', 'Id']
             Cell cell;
             int k = 0;
             arr.each {
@@ -726,62 +746,34 @@ class SpeciesUploadService {
                 cell.setCellValue(it);
                 k++;
             }
-            content.each { key,value ->
-                String name = key;
-                def ibpValues = value['IBP'];
-                if(ibpValues) {
-                    ibpValues.each { iVal ->
-                        if(rowIterator.hasNext()) {
-                            row = rowIterator.next();
-                        } else {
-                            row = sheet.createRow(rowNum);
-                        }
-                        rowNum++;
-                        cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
-                        cell.setCellValue(name);
-                        cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
-                        if(ibpValues.size() == 0) {
-                            cell.setCellValue("ZERO");
-                        } else if(ibpValues.size() == 1) {
-                            cell.setCellValue("SINGLE");
-                        } else {
-                            cell.setCellValue("MULTIPLE");
-                        }
-                        println "======ADDED NAME ibp ===== " + name;
-                        int i = 2;
-                        iVal.each { k1,v1 ->
-                            cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-                            cell.setCellValue(v1);
-                            i++;
-                        }
-                    }
-                }
-                def colValues = value['COL'];
-                if(colValues) {
-                    colValues.each { cVal ->
-                        if(rowIterator.hasNext()) {
-                            row = rowIterator.next();
-                        } else {
-                            row = sheet.createRow(rowNum);
-                        }
-                        rowNum++;
-                        cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
-                        cell.setCellValue(name);
-                        println "======ADDED NAME col ===== " + name;
-                        cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
-                        if(colValues.size() == 0) {
-                            cell.setCellValue("ZERO");
-                        } else if(colValues.size() == 1) {
-                            cell.setCellValue("SINGLE");
-                        } else {
-                            cell.setCellValue("MULTIPLE");
-                        }
-                        int i = 5;
-                        cVal.each { k1,v1 ->
-                            cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-                            cell.setCellValue(v1);
-                            i++;
-                        }
+			
+			//writing result 
+			int nameIndex = 0
+			int rowNum = 1;
+			content.each { String name, List result ->
+				nameIndex++ 
+				println "-------------------------- name " + name + "  result " + result
+				if(!result){
+					println "--------------- inside"
+					row = sheet.createRow(rowNum++);
+					cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue(nameIndex);
+                    cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
+					cell.setCellValue(name);
+				}else{
+					result.each { Map r ->
+                    	row = sheet.createRow(rowNum++);
+						cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
+                    	cell.setCellValue(nameIndex);
+                    	cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
+						cell.setCellValue(name);
+						println "--------------------- row created " 
+						int i = 2 
+						r.each { k1,v1 ->
+                        	cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
+                        	cell.setCellValue(v1);
+                        	i++;
+                    	}
                     }
                 }
             }
