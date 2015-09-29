@@ -123,7 +123,6 @@
     <ol class="indicator"></ol>
 </div>
 <script type="text/javascript">
-var checkView = false;
  function appendGallery(ovbId,images){
         $("#links").removeClass();
         $("#links").addClass('links'+ovbId);
