@@ -275,6 +275,7 @@ function setOption(selectElement, value, ignoreCase) {
 }
 
 function populateNameDetails(data){
+    console.log(data);
     if(data == undefined || data.length == 0) return;
 
     $(".canBeDisabled input[type='text']").val('');
@@ -304,25 +305,33 @@ function populateNameDetails(data){
         }
     }
 
-    if($(".source").val() == 'COL' || $(".source").val() == 'CatalogueOfLife') {
-        changeEditingMode(true);
+    if(data["externalId"]) { //FROM EXTERNAL DB
+        //data['source'] = $("#queryDatabase option:selected ").text();
+        data['matchId'] = data['externalId'];
     }
 
+    //if($(".source").val() == 'COL' || $(".source").val() == 'CatalogueOfLife') {
+    var source = data['source']?data['source'].toLowerCase():undefined;
+    if(source == 'col' || source == 'catalogueoflife' || source == 'catalogue of life') {
+        changeEditingMode(true);
+        if(!data['position'])
+            $(".position").val("working");
+    } else {
+        $(".position").val(data["position"]);
+    }
+
+    $('.source').val(data['source']);
     $(".via").val(data["sourceDatabase"]);
     $(".id").val(data["matchId"]);
-    $(".position").val(data["position"]);
 
-    if(data["externalId"]) {
-        $(".source").val($("#queryDatabase option:selected ").text());
-        $(".id").val(data["externalId"]);
-    }
     setOption(document.getElementById("rankDropDown"), data["rank"]);
     setOption(document.getElementById("statusDropDown"), data["nameStatus"]);
+    setOption(document.getElementById("positionDropDown"), data["position"]);
 
-    var position = data['position']?data['position'].name.toLowerCase():undefined;
+    var position = data['position']?data['position'].toLowerCase():undefined;
     $('.save_button').addClass('disabled');
     $('.remove_button').addClass('disabled');
-    if(position == 'clean') {
+    /*if(position == 'clean') {
         $('#removeFromClean').removeClass('disabled');
     } else if(position == 'working') {
         $('#moveToClean').removeClass('disabled');
@@ -330,7 +339,7 @@ function populateNameDetails(data){
         $('#removeFromWKG').removeClass('disabled');
     } else {
         $('#moveToWKG').removeClass('disabled');
-    } 
+    } */
 }
 
 function populateConnections(data, taxonId){
@@ -825,6 +834,7 @@ function getExternalDbDetails(ele, showNameDetails) {
         success: function(data) {
             //show the popup
             $("#externalDbResults").modal('hide');
+            data['source'] = dbName;
             if(!showNameDetails) {
                 //create accepted match and saveAcceptedName
                 $(".fromCOL").val(true);
@@ -949,6 +959,11 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
                     }
                     alert(resMsg);
                 }
+
+                //if(oldStatus == 'accepted' && acceptedMatch.nameStatus != oldStatus) {
+                //    postProcessOnAcceptedName();
+                //}
+
                 //if(moveToRaw == true || moveToWKG == true || moveToClean == true) {
                     var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
                     getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id'));
@@ -1003,6 +1018,9 @@ function changeEditingMode(mode) {
     $(".canBeDisabled input").prop("disabled", mode); 
     $(".canBeDisabled select").prop("disabled", mode); 
     $(".canBeDisabled button").prop("disabled", mode); 
+    
+    $('#saveNameDetails').prop('disabled', false);
+    $(".canBeDisabled select.position").prop("disabled", false);
 }
 
 /*function modifySourceOnEdit() {
@@ -1223,9 +1241,11 @@ function dataToProcess(moveToRaw, moveToWKG, moveToClean) {
     }
     result['taxonId'] = $('.taxonId').val();
     result['recoId'] = $('.recoId').val();
-    result['moveToRaw'] = moveToRaw;
+    result['position'] = $('#positionDropDown').val();
+    /*result['moveToRaw'] = moveToRaw;
     result['moveToWKG'] = moveToWKG;
     result['moveToClean'] = moveToClean;
+    */
     //check for spell check
     if(oldName == $("."+$("#rankDropDown").val()).val()) {
         result['spellCheck'] = false;
@@ -1265,7 +1285,6 @@ function getOrphanRecoNames(){
 }
 
 function validateName(ele, showNameDetails) {
-    return;
     processingStart();
     $(ele).parents(".singleRow").find("input[name='aid']").addClass('validating');
     $('.queryDatabase option[value="col"]').attr("selected", "selected");
@@ -1371,6 +1390,7 @@ function saveAcceptedName(acceptedMatch) {
 
 $(document).ready(function() {
 
+    $('#statusDropDown').change(showProperTabs);
     $(".loadConnection").click(function() { 
         var $me = $(this);
         var controller = $me.data('controller');

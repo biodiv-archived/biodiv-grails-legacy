@@ -5,9 +5,9 @@ import species.auth.SUser
 abstract class NamesMetadata extends NamesSorucedata {
 
     public enum NamePosition {
-        CLEAN("Clean"),
+        RAW("Raw"),
         WORKING("Working"),
-        RAW("Raw");
+        CLEAN("Clean");
 
         private String value;
 

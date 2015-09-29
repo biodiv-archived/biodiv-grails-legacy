@@ -11,6 +11,7 @@ import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
 import species.participation.Observation;
 import species.NamesMetadata.NameStatus;
+import species.NamesMetadata.NamePosition;
 import content.eml.Document;
 import species.Species;
 
@@ -249,9 +250,17 @@ class NamelistController {
                 return;
             }
 
-            boolean moveToRaw = acceptedMatch.moveToRaw?.toBoolean()
-            boolean moveToWKG = acceptedMatch.moveToWKG?.toBoolean()
-            boolean moveToClean = acceptedMatch.moveToClean?.toBoolean()
+            println "==========================="
+            println acceptedMatch.position
+            println acceptedMatch.position.equalsIgnoreCase(NamePosition.WORKING.toString());
+
+            boolean moveToRaw = acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.RAW.toString()):false;
+            boolean moveToWKG =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.WORKING.toString()):false;
+            boolean moveToClean =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.CLEAN.toString()):false;
+
+            println moveToRaw
+            println moveToWKG
+            println moveToClean
 
             if((moveToWKG || moveToRaw) && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
             ) {

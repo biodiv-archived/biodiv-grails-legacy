@@ -1,6 +1,7 @@
 <%@page import="species.ScientificName.TaxonomyRank"%>
 <%@page import="species.Language"%>
 <%@page import="species.NamesMetadata.NameStatus"%>
+<%@page import="species.NamesMetadata.NamePosition"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <html>
@@ -152,21 +153,21 @@
                         
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.name.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="Name" class="span5 name" style="width:65%;"/>
+                        <input type="text" placeholder="Name" class="span5 name" style="width:70%;"/>
                     </div>
                     <div class="span4">
-                        <label> Author String
+                        <label> Author
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.authorstring.info')}"></i>
                         </label>
-                        <input type="text" placeholder="Author string" class="span3 authorString" style="width:45%;"/>
+                        <input type="text" placeholder="Author" class="span3 authorString" style="width:68%;"/>
                     </div>
                     <div class="span4">
                         <label>Status
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.status.info')}"></i>
                         </label>
-                        <select id="statusDropDown" class="span4 status" style="width:65%;" >
+                        <select id="statusDropDown" class="span4 status" style="width:67%;" >
                             <option value="chooseNameStatus">Choose Name Status</option>
                             <g:each in="${NameStatus.list()}" var="ns">
                             <option value="${ns.toString().toLowerCase()}">${ns.value()}</option>
@@ -174,12 +175,12 @@
                         </select>
                     </div>
                     
-                    <div class="span3" style="margin-left:0px;">
+                    <div class="span4" style="margin-left:0px;">
                         <label>Rank
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.rank.info')}"></i>
                         </label>
-                        <select id="rankDropDown" class="span7 rank">
+                        <select id="rankDropDown" class="span5 rank" style="width:70%; margin:left:3px;">
                             <option value="chooseRank">Choose Rank</option>
                             <% def rankCount = 0 %>
                             <g:each in="${TaxonomyRank.list()}" var="t">
@@ -187,34 +188,51 @@
                             </g:each>
                         </select>
                     </div>
-                    <div class="span3">
+                    <div class="span4">
                         <label>Source 
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.source.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="" class="span6 source"/>
+                        <input type="text" placeholder="Source" class="span5 source" style="width:67%;"/>
                     </div>															
-                    <div class="span3">
+                    <div class="span4">
                         <label>via
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.via.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8 sourceDatabase via"/>
+                        <input type="text" placeholder="Via" class="span5 sourceDatabase via" style="width:67%;margin-left:22px"/>
                     </div>
-                    <div class="span3">
+
+                    <div class="span4" style="margin-left:0px;">
                         <label>ID
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.id.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8 id"/>
+                        <input type="text" placeholder="Id" class="span5 id" style="width:70%;margin-left:23px;"/>
                     </div>			
+
+                    <div class="span4">
+                        <label>Position
+                        
+                    <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.position.info')}"></i>
+                        </label>
+                        <select id="positionDropDown" class="span5 position" style="width:64%;">
+                            <option value="choosePosition">Choose Position</option>
+                            <g:each in="${NamePosition.list()}" var="t">
+                            <option value="${t.toString().toLowerCase()}">${t}</option>
+                            </g:each>
+                        </select>
+                    </div>
+ 
+                    <div class="span4">
+                    <button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:8px;width:67%;">Save </button> 
+                </div>
                 </div>
                 
                 <div class="row-fluid">
-                    <input type="hidden" placeholder="" class="span8 position"/>
+                    <!--input type="hidden" placeholder="" class="span8 position"/-->
                     <!--button type="button" class="save_button btn" onClick='saveHierarchy(false, false)'>Save & Retain</button--!> 
-                    <button id="saveNameDetails" type="button" class="canBeDisabled btn" onClick='saveNameDetails(false, false, false)'>Save </button> 
-                    <div class="btn-group">
+                    <!--div class="btn-group">
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                             Move Name to List
                             <span class="caret"></span>
@@ -225,7 +243,7 @@
                             <li><a id="moveToClean" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, false, true)'>Move to Clean List</a> </li>
                             <li><a id="removeFromClean" class="remove_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Remove from Clean List</a></li>
                         </ul>
-                    </div>
+                    </div-->
                 </div>
 
                 <div class="row-fluid">	

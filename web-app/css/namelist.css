@@ -104,6 +104,7 @@ input[type=text], select {
     list-style-type:none;
     cursor:pointer;
 }
+
 .taxonomyBrowser{    
     //width: 392px;    
 }

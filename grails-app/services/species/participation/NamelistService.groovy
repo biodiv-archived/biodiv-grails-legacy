@@ -569,10 +569,9 @@ class NamelistService {
         result.errors = [];
         Map tempResult;
         try {
-
-            boolean moveToRaw = acceptedMatch.moveToRaw?.toBoolean()
-            boolean moveToWKG = acceptedMatch.moveToWKG?.toBoolean()
-            boolean moveToClean = acceptedMatch.moveToClean?.toBoolean()
+            boolean moveToRaw = acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.RAW.toString()):false;
+            boolean moveToWKG =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.WORKING.toString()):false;
+            boolean moveToClean =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.CLEAN.toString()):false;
 
             boolean justMoveToAnotherList = false;
             if(moveToRaw || moveToWKG || moveToClean) {
@@ -897,6 +896,7 @@ class NamelistService {
             def temp = colAcceptedNameData.curatingTaxonId
             println "SEARCHING COL for this accepted id"
             colAcceptedNameData = searchCOL(colAcceptedNameData.id, 'id')[0];
+            colAcceptedNameData['source'] = colAcceptedNameData.matchDatabaseName;
             println colAcceptedNameData;
             colAcceptedNameData.curatingTaxonId = temp;
         }
