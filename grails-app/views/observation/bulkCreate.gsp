@@ -383,6 +383,16 @@
             $(".habitat_options").click(function(e){
                 e.stopPropagation();
             });
+            
+            //initialize group toggle
+		    $(".toggleGrpsDiv").unbind("click").click(function(){
+		        var me = this;
+		        $(me).next().toggle();
+		    });
+		    $(".close_user_group").unbind("click").click(function(){
+		        $(this).closest(".postToGrpsToggle").hide();      
+		    });
+            
         });
 
         </r:script>

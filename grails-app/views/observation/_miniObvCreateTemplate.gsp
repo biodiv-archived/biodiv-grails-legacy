@@ -69,13 +69,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
 <r:script>
 
 $(document).ready(function(){
-    $(".toggleGrpsDiv").unbind("click").click(function(){
-        var me = this;
-        $(me).next().toggle();
-    });
-    $(".close_user_group").unbind("click").click(function(){
-        $(this).closest(".postToGrpsToggle").toggle();      
-    });
+
 });
 
 </r:script>
