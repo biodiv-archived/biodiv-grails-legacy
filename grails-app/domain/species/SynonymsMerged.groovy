@@ -19,7 +19,7 @@ class SynonymsMerged extends TaxonomyDefinition {
     }
 
     Map fetchGeneralInfo() {
-        return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+         return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
     }
 
     def addAcceptedName(TaxonomyDefinition accepted) {
@@ -40,7 +40,8 @@ class SynonymsMerged extends TaxonomyDefinition {
     def removeAsSynonym() {
         def acceptedNames = this.fetchAcceptedNames();
         acceptedNames.each { acc ->
-            this.removeAcceptedName(acc);
+            //this.removeAcceptedName(acc);
+            acc.removeSynonym(this);
         }
     }
 	

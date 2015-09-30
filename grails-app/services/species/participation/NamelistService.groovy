@@ -31,6 +31,7 @@ import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
 import speciespage.SpeciesUploadService;
 import species.namelist.Utils;
+import species.utils.Utils as UtilsUtils;
 
 class NamelistService {
    
@@ -556,7 +557,7 @@ class NamelistService {
             log.debug "MARKED AS DELETED ${sciName}"
             return;
         }*/
-        sciName = updateAttributes(sciName, acceptedMatch, createOnlyNameFromCol);
+        updateAttributes(sciName, acceptedMatch, createOnlyNameFromCol);
 		
 		//inside this we are adding hirarchy
 		if(addHir)
@@ -602,32 +603,114 @@ class NamelistService {
     }
    
     public def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
-        sciName.tempActivityDescription = "";
-        /*def upAt = updateAttributes(sciName, acceptedMatch);
-        println  "====UP AT == " + upAt 
-        if(upAt.isDeleted) {
+        println "+++++++++++++++++++++++++++++++++++"
+        println sciName.class
+        println "+++++++++++++++++++++++++++++++++++"
+
+        Map result = [:];
+        result.errors = [];
+        Map tempResult;
+        try {
+            boolean moveToRaw = acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.RAW.toString()):false;
+            boolean moveToWKG =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.WORKING.toString()):false;
+            boolean moveToClean =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.CLEAN.toString()):false;
+
+            boolean justMoveToAnotherList = false;
+            if(moveToRaw || moveToWKG || moveToClean) {
+                justMoveToAnotherList = true;
+            }
+
+            sciName.tempActivityDescription = "";
+            String tempActivityDescription = "";
+            if(!justMoveToAnotherList) {
+            /*def upAt = updateAttributes(sciName, acceptedMatch);
+            println  "====UP AT == " + upAt 
+            if(upAt.isDeleted) {
             log.debug "MARKED AS DELETED ${sciName}"
             return;
-        }*/
-        sciName = updateAttributes(sciName, acceptedMatch);
-        def result =  updateStatus(sciName, acceptedMatch);
-        sciName = result.sciName;
-        println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
-        updateRank(sciName, acceptedMatch.parsedRank);            
-        //WHY required here??
-        //addIBPHierarchyFromCol(sciName, acceptedMatch);            
-        updatePosition(sciName, NamesMetadata.NamePosition.WORKING);    
-        //taxonService.moveToWKG([taxonReg]);
-        println "=======SCI NAME POSITION ========== " + sciName.position
-        println "=====SCI NAME ==== " + sciName
-        sciName = sciName.merge();
-        if(!sciName.hasErrors() && sciName.save(flush:true)) {
-            log.debug "Saved sciname ${sciName}"        
-            def feedInstance = activityFeedService.addActivityFeed(sciName, sciName, springSecurityService.currentUser?:SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, sciName.tempActivityDescription);
-            sciName.tempActivityDescription = "";
-            //utilsService.cleanUpGorm(true);
-        } else {
-            sciName.errors.allErrors.each { log.error it }
+            }*/
+           
+
+            tempResult = updateAttributes(sciName, acceptedMatch);
+            if(tempResult.success && tempResult.activityDescription)
+                tempActivityDescription += tempResult.activityDescription;
+            result.errors << tempResult.errors;
+            println "ActivityDescription : ${tempActivityDescription}";
+            
+            println "======= RESULT FROM UpdateAttributes ${tempResult}";
+
+            //adds IBP Hierarchy as well
+            tempResult = updateStatus(sciName, acceptedMatch);
+            if(tempResult.success && tempResult.activityDescription)
+                tempActivityDescription += tempResult.activityDescription;
+            result.errors << tempResult.errors;
+            println "ActivityDescription : ${tempActivityDescription}";
+
+            println "======= RESULT FROM UpdateStatus ${tempResult}";
+            /*if(r)
+                sciName = r.sciName;
+            println "=======AFTER STATUS======== " + sciName.status;
+*/
+
+            if(!acceptedMatch['parsedRank']) {
+                acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
+            }
+
+            tempResult = updateRank(sciName, acceptedMatch.parsedRank);
+            println "======= RESULT FROM UpdateRank ${tempResult}";
+            if(tempResult.success && tempResult.activityDescription)
+                tempActivityDescription += tempResult.activityDescription;
+            result.errors << tempResult.errors;
+            println "ActivityDescription : ${tempActivityDescription}";
+
+
+            //WHY required here??
+            //addIBPHierarchyFromCol(sciName, acceptedMatch);
+            }
+
+            def position;
+            if(moveToClean) position = NamesMetadata.NamePosition.CLEAN;
+            if(moveToWKG) position = NamesMetadata.NamePosition.WORKING;
+            if(moveToRaw) position = NamesMetadata.NamePosition.RAW;
+
+            tempResult = updatePosition(sciName, position); 
+            println "======= RESULT FROM UpdatePosition ${tempResult}";
+            if(tempResult.success && tempResult.activityDescription)
+                tempActivityDescription += tempResult.activityDescription;
+            result.errors << tempResult.errors;
+            println "ActivityDescription : ${tempActivityDescription}";
+            //taxonService.moveToWKG([taxonReg]);
+
+
+            println "=====SCI NAME ==== " + sciName
+            println "=====SCI NAME CLASS ==== " + sciName.class
+            
+            println "ActivityDescription : ${tempActivityDescription}";
+            log.debug "Saving sciname ${sciName}"        
+            if(!sciName.hasErrors() && sciName.save(flush:true)) {
+                log.debug "Saved sciname ${sciName}" 
+                println "Saved sciname ${sciName} with changes: ${tempActivityDescription}" 
+                if(tempActivityDescription) {
+                    result.activityType = tempActivityDescription;
+                    //TODO: add activityFeed by current logged in user .... not admin
+                    def feedInstance = activityFeedService.addActivityFeed(sciName, sciName, springSecurityService.currentUser?:SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, tempActivityDescription);
+                }
+                //sciName.tempActivityDescription = "";
+                utilsService.cleanUpGorm(true);
+                result.success = true;
+            } else {
+                result.success = false;
+                result.msg = "Error while saving sciName";
+                result.errors << sciName.errors.allErrors;
+                sciName.errors.allErrors.each { 
+                    log.error it 
+                    println it;
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            result.success = false;
+            result.msg = e.getMessage();
         }
         return result;
     }
@@ -657,9 +740,18 @@ class NamelistService {
     //Handles name moving from accepted to synonym & vice versa
     //also updates IBP Hierarchy if no status change and its accepted name
     private def updateStatus(ScientificName sciName, Map colMatch) {
-        println "===========SCIENTIFIC NAME === " + sciName
-        println "===========COL STATUS === " + colMatch.nameStatus
+        println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
+        
+        boolean success = false;
+        def errors = [];
+
+        if(!colMatch.nameStatus) {
+            errors << "Not updating name status as there is no new value"
+            return [success:success, errors:errors];
+        }
+
         def result = [:];
+
         if(!sciName.status.value().equalsIgnoreCase(colMatch.nameStatus)) {
             log.debug "Changing status from ${sciName.status} to ${colMatch.nameStatus}"
             //NOW WILL BE FLAGGING IT
@@ -667,40 +759,41 @@ class NamelistService {
             /*
             boolean duplicateExists = checkForDuplicateSciNameOnStatusAndRank(sciName, getNewNameStatus(colMatch.nameStatus), colMatch.parsedRank);
             if(duplicateExists) {
-                log.debug "Changing status is resulting in a duplicate name with same status and rank... so leaving name for curation"
-                return sciName;
+            log.debug "Changing status is resulting in a duplicate name with same status and rank... so leaving name for curation"
+            return sciName;
             }
-            */
+             */
             //changing status
             sciName.tempActivityDescription += createNameActivityDescription("IBP status", sciName.status.value(), colMatch.nameStatus);
             def newStatus = getNewNameStatus(colMatch.nameStatus);
             println "===========NEW STATUS  === " + newStatus
             switch(newStatus) {
                 case NameStatus.ACCEPTED :
-                    result = changeSynonymToAccepted(sciName, colMatch);
-                    sciName = result.lastTaxonInIBPHierarchy;        //changeSynonymToAccepted(sciName, colMatch);
-                    result.sciName = sciName
-                    /*    
-                    def result = speciesService.deleteSynonym(sciName.id);
-                    if(!result.success) {
-                        log.debug "Error in deleting synonym ${sciName}. Not updating status."
-                    }
-                    sciName = saveAcceptedName(colMatch);
-                    */
-                    break;
+                result = changeSynonymToAccepted(sciName, colMatch);
+                //sciName = result.lastTaxonInIBPHierarchy;        //changeSynonymToAccepted(sciName, colMatch);
+                result.sciName = result.lastTaxonInIBPHierarchy
+                /*    
+                def result = speciesService.deleteSynonym(sciName.id);
+                if(!result.success) {
+                log.debug "Error in deleting synonym ${sciName}. Not updating status."
+                }
+                sciName = saveAcceptedName(colMatch);
+                 */
+                break;
                 case NameStatus.SYNONYM :                     
-                    sciName = changeAcceptedToSynonym(sciName, colMatch);
-                    result.sciName = sciName
-                    /*//delete the name from taxonDefinition table and add it to synonyms table
-                    taxonService.deleteTaxon(sciName);
-                    def synonym;
-                    //if the changed status is Synonym and its accepted name doesn't exist create it
-                    colMatch.acceptedNamesList.each { colAcceptedNameData ->
-                        ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
-                       //update acceptedName property for this synonym  
-                        synonym = saveSynonym(sciName, acceptedName);
+                sciName = changeAcceptedToSynonym(sciName, colMatch);
+                //changeAcceptedToSynonym(sciName, colMatch);
+                result.sciName = sciName
+                /*//delete the name from taxonDefinition table and add it to synonyms table
+                taxonService.deleteTaxon(sciName);
+                def synonym;
+                //if the changed status is Synonym and its accepted name doesn't exist create it
+                colMatch.acceptedNamesList.each { colAcceptedNameData ->
+                ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
+                    //update acceptedName property for this synonym  
+                    synonym = saveSynonym(sciName, acceptedName);
                     }*/
-                    break;
+                break;
             }
             //handling inside the cases only
             //sciName.status = newStatus;
@@ -710,9 +803,9 @@ class NamelistService {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
                 result = addIBPHierarchyFromCol(colMatch);
-                sciName = result.lastTaxonInIBPHierarchy; 
+                //sciName = result.lastTaxonInIBPHierarchy; 
                 println "======STATUS MEIN SCINAME==== " + sciName
-                result.sciName = sciName
+                result.sciName = result.lastTaxonInIBPHierarchy;
 
             } else {
                 //sciName = updateAttributes(sciName, colMatch)
@@ -729,7 +822,9 @@ class NamelistService {
                 result.sciName = sciName
             }
         }
-		result.remove("taxonRegistry");
+        result.remove("taxonRegistry");
+        result.success = true;
+        result.activityDescription = sciName.tempActivityDescription;
         return result;
     }
 
@@ -805,22 +900,46 @@ class NamelistService {
         }
     }
 
-    private void updateRank(ScientificName sciName, int rank) {
+    private Map updateRank(ScientificName sciName, int rank) {
+        println "======= UPDATING RANK ============+"
+        boolean success = false;
+        List errors = [];
+        String tempActivityDescription = '';
         if(sciName.rank != rank) {
             log.debug "Updating rank from ${sciName.rank} to ${rank}"
-            sciName.tempActivityDescription += createNameActivityDescription("Rank ", TaxonomyRank.getTRFromInt(sciName.rank).value(), TaxonomyRank.getTRFromInt(rank).value());
+            tempActivityDescription = createNameActivityDescription("Rank ", TaxonomyRank.getTRFromInt(sciName.rank).value(), TaxonomyRank.getTRFromInt(rank).value());
             sciName.rank = rank;
+            //TODO: might require to add IBP hierarchy here
+            if(!sciName.save(flush:true)) {
+                success = false;
+                errors << sciName.errors.allErrors;
+                sciName.errors.allErrors.each { log.error it }
+            } else {
+                success = true;
+            }            
+        } else {
+            success = false;
         }
+        println "======= UPDATING RANK DONE to ${sciName.rank}============+"
+        return [success:success, activityDescription:tempActivityDescription, errors:errors];
     }
         
     //A scientific name was also passed to this function but not used - so removed
     private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
+        log.debug "------------------------------------------------------------------"
+        log.debug "------------------------------------------------------------------"
+        println "Adding IBP hierarchy from ${colAcceptedNameData}"
+        log.debug "------------------------------------------------------------------"
+        log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
         //  but its id is present - so searching COL based on ID
         //  Might happen when name changes from accepeted to synonym
         if(!colAcceptedNameData.kingdom && colAcceptedNameData.id) {
             def temp = colAcceptedNameData.curatingTaxonId
+            println "SEARCHING COL for this accepted id"
             colAcceptedNameData = searchCOL(colAcceptedNameData.id, 'id')[0];
+            colAcceptedNameData['source'] = colAcceptedNameData.matchDatabaseName;
+            println colAcceptedNameData;
             colAcceptedNameData.curatingTaxonId = temp;
         }
         def fieldsConfig = grailsApplication.config.speciesPortal.fields
@@ -842,13 +961,20 @@ class NamelistService {
 		metadata1['via'] = colAcceptedNameData['sourceDatabase']
         colAcceptedNameData['metadata'] = metadata1
         println "=====T R N======= " + taxonRegistryNames
-        println colAcceptedNameData.abortOnNewName;
-        println colAcceptedNameData.fromCOL;
-        println colAcceptedNameData.spellCheck
+        println colAcceptedNameData;
 		//boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
         //From UI uncomment
-        def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
-        
+        def result;
+        //TaxonomyRegistry.withNewSession {
+            boolean fromCOL = false;
+            println metadata1
+            if(metadata1['source'].equalsIgnoreCase('COL') || metadata1['source'].equalsIgnoreCase('CatalogueOfLife') ||  metadata1['source'].equalsIgnoreCase('Catalogue Of Life')) {
+                fromCOL = true; 
+            }
+            result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, fromCOL, colAcceptedNameData);
+        //}
+        result.lastTaxonInIBPHierarchy.tempActivityDescription += result.activityType;
+
         //From migration script
         //Also add to catalogue of life hierarchy
         //def colClassification = Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
@@ -858,12 +984,31 @@ class NamelistService {
         return result;
     }
 
-    boolean updatePosition(ScientificName sciName, NamePosition position) {
+    private Map updatePosition(ScientificName sciName, NamePosition position) {
+        println "\n============== UPDATING POSITION ========"
+        boolean success = false;
+        List errors = [];
+        if(!position) {
+            return [success:success, errors:['Position is empty']];
+        }
+
         namesInWKG.add(sciName.id)
-        namesBeforeSave[sciName.id] = "Working"
+        namesBeforeSave[sciName.id] = position.value();
         log.debug "Updating position from ${sciName.position} to ${position}"
-        sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position?.value(), position.value());
+        println "Updating position from ${sciName.position} to ${position}"
+        println sciName.tempActivityDescription;
+        String tempActivityDescription = createNameActivityDescription("Position", sciName.position?.value()?:NamePosition.RAW.value(), position.value());
         sciName.position = position;
+        if(!sciName.save(flush:true)) {
+            success = false;
+            errors = sciName.errors.allErrors;
+            sciName.errors.allErrors.each { log.error it }
+        } else {
+            success = true;
+        }
+
+        println "\n============== UPDATING POSITION DONE FROM TO ${sciName.position}========"
+        return [success:success, activityDescription:tempActivityDescription, errors:errors];
     }
 
     List processColData(File f, ScientificName sn = null) {
@@ -944,9 +1089,13 @@ class NamelistService {
             result['taxonRegistry.9'] = res['9'] = m['species'];    
         }
         if(m['rank'] == 'infraspecies'){
-            def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
-            result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
-            m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
+            if(m['species']) {
+                if(m['id_details']) {
+                def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
+                m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
+                }
+                result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
+            }
             result['taxonRegistry.10'] = res['10'] = m['infraspecies']      //TODO:check author year coming or not + " " + m['authorString'];
         } else {
             result['taxonRegistry.10'] = res['10'] = m['infraspecies'];     
@@ -1250,7 +1399,8 @@ class NamelistService {
         colMatch.curatingTaxonId = sciName.id;
         colMatch.curatingTaxonStatus = sciName.status;
         //Change status and class for this row entry in database
-        sciName = updateStatusAndClass(sciName, NameStatus.ACCEPTED)
+        updateStatusAndClass(sciName, NameStatus.ACCEPTED)
+        sciName = sciName.merge();
         //Add IBP Hierarchy to this name
         //TODO Pass on id information of last node
         def result = addIBPHierarchyFromCol(colMatch)
@@ -1269,7 +1419,8 @@ class NamelistService {
         
         //sciName = updateAttributes(sciName, colMatch)
         //Change status and class for this row entry in database
-        sciName = updateStatusAndClass(sciName, NameStatus.SYNONYM)
+        updateStatusAndClass(sciName, NameStatus.SYNONYM)
+        sciName = sciName.merge()
         println "======CHANGED STATUS AND CLASS ==== " + sciName.status +" ===== " + sciName.class
         oldSynonyms.add(sciName);
         //Save all the new accepted names or update its hierarchy
@@ -1291,66 +1442,93 @@ class NamelistService {
     }
 
     private ScientificName updateStatusAndClass(ScientificName sciName, NameStatus status) {
-       	sciName = sciName.merge();
-	//def sql =  Sql.newInstance(dataSource);
+        sciName = sciName.merge();
         String query = "";
         println "=======RUNNING SQL TO UPDATE CLASS=========="
         if(status == NameStatus.ACCEPTED) {
-        	println "=======MAKING IT ACCEPTED=========="
+            println "=======MAKING IT ACCEPTED=========="
             sciName.relationship = null;
-            query = "update taxonomy_definition set class = 'species.TaxonomyDefinition' where id = " + sciName.id.toString();
-		def session = sessionFactory.getCurrentSession()
-def sql= session.createSQLQuery(query)
-            sql.executeUpdate();
-            println " ========executed query =="
-            utilsService.cleanUpGorm(true);
-            sciName = TaxonomyDefinition.get(sciName.id.toLong())
-        } else {
-        	println "=======MAKING IT SYNONYM=========="
-query = "update taxonomy_definition set class = 'species.SynonymsMerged' where id = " + sciName.id.toString();
+            /*TaxonomyDefinition.executeUpdate(
+                    "update TaxonomyDefinition t set t.class = :klass where t.id = :id ", 
+                        [klass:'species.TaxonomyDefinition', id:sciName.id]);
+            */
+            //def sql =  Sql.newInstance(dataSource);
+            query = "update taxonomy_definition set (class, status) = (:class, :status) where id = :id";
             def session = sessionFactory.getCurrentSession()
-def sql= session.createSQLQuery(query)
-            sql.executeUpdate();
+            def sql= session.createSQLQuery(query)
+            sql.setProperties([id:sciName.id, class:'species.TaxonomyDefinition', status:status.toString()]).executeUpdate();
             println " ========executed query =="
-            utilsService.cleanUpGorm(true);
-            sciName = SynonymsMerged.get(sciName.id.toLong())
-            sciName.relationship = ScientificName.RelationShip.SYNONYM;
+            utilsService.cleanUpGorm(false);
+            
+            //sciName.class = 'species.TaxonomyDefinition';
+            //TODO: CHK: sciName = TaxonomyDefinition.get(sciName.id.toLong())
+            //println "CASTING SYNONYM TO TAXONDEFINITION"
+            //sciName = (TaxonomyDefinition) sciName;
+            //println sciName.class
+        } else {
+            println "=======MAKING IT SYNONYM=========="
+            
+		    //def sql = new Sql(dataSource)
+            query = "update taxonomy_definition set (class, status, relationship) = (:class, :status, :relationship) where id = :id";
+            def session = sessionFactory.getCurrentSession()
+            def sql = session.createSQLQuery(query)
+            sql.setProperties([id:sciName.id, class:'species.SynonymsMerged', relationship:ScientificName.RelationShip.SYNONYM.toString(), status:status.toString()]).executeUpdate();
+            println " ========executed query =="
+            utilsService.cleanUpGorm(false);
+            
+            /*TaxonomyDefinition.executeUpdate(
+                    "update TaxonomyDefinition t set t.class = :klass where t.id = :id ", 
+                        [klass:'species.SynonymsMerged', id:sciName.id]);
+            */
+            //sciName.class = 'species.SynonymsMerged';
+            //sciName = new SynonymsMerged(sciName.properties);
+            println "=============COPYING PROPERTIES TO SynonymsMerged";
+            //UtilsUtils.copyProperties(sciName, persistentSciName, false);
+            //println sciName
+            //sciName = sciName.merge();
+            //println sciName
+            //println persistentSciName
+            //sciName = persistentSciName;
+            //sciName.relationship = ScientificName.RelationShip.SYNONYM;
         }
-        sciName.status = status;
-        return sciName;
+        //sciName.status = status;
+        //return sciName;
     }
 
-    private ScientificName updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
-        TaxonomyDefinition.withNewSession {
-            println "=========UPDATING ATTRIBUTES ========"
+    private Map updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
+        println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
+        boolean success = false;
+        def errors = [];
+        try {
             NamesParser namesParser = new NamesParser();
+            if(!colMatch.canonicalForm) colMatch.canonicalForm = colMatch.name;
             def name = colMatch.canonicalForm + " " + colMatch.authorString
-			if(!doNotSearch){
-				def res1 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
-				def res2 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
-				res2.addAll(res1);
-	            if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
-	                sciName.isFlagged = true;
-	                String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
-	                res2.each {
-	                    flaggingReason = flaggingReason + it.id.toString() + ", ";
-	                }
-	                println "########### Flagging becoz of Udating attributes ============== " + sciName
-	                res2.each {
-	                    if(it != sciName && it.isFlagged) {
-	                        it.flaggingReason = it.flaggingReason + " ### " + flaggingReason;
-	                        it = it.merge();
-	                        if(!it.save(flush:true)) {
-	                            it.errors.allErrors.each { log.error it }
-	                        }
-	                    }
-	                }
-	                sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
-	                if(!sciName.findSpeciesId()) {
-	                    sciName.isDeleted = true;
-	                }
-	            }
-			}
+            if(!doNotSearch){
+                def res1 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
+                def res2 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
+                res2.addAll(res1);
+                if((res2.size() > 1) || (res2.size() == 1 && res2[0].id != sciName.id)) {
+                    sciName.isFlagged = true;
+                    String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+                    res2.each {
+                        flaggingReason = flaggingReason + it.id.toString() + ", ";
+                    }
+                    println "########### Flagging becoz of Udating attributes ============== " + sciName
+                    res2.each {
+                        if(it != sciName && it.isFlagged) {
+                            it.flaggingReason = it.flaggingReason + " ### " + flaggingReason;
+                            it = it.merge();
+                            if(!it.save(/*flush:true*/)) {
+                                it.errors.allErrors.each { log.error it }
+                            }
+                        }
+                    }
+                    sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
+                    if(!sciName.findSpeciesId()) {
+                        sciName.isDeleted = true;
+                    }
+                }
+            }
             def parsedNames = namesParser.parse([name]);
             println "=============PARSING THIS ========== " + name
             def pn = parsedNames[0];
@@ -1369,24 +1547,40 @@ def sql= session.createSQLQuery(query)
             }
             sciName.tempActivityDescription += createNameActivityDescription("Author Year", sciName.authorYear, colMatch.authorString);
             sciName.authorYear = colMatch.authorString;
-            sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus?.value(), colMatch.colNameStatus);
-            sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
+            if(sciName.colNameStatus) {
+                sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus.value(), colMatch.colNameStatus);
+                sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
+            }
+
             sciName.tempActivityDescription += createNameActivityDescription("Match Id", sciName.matchId, colMatch.externalId);
             sciName.matchId = colMatch.externalId;
             sciName.tempActivityDescription += createNameActivityDescription("Match Database Name", sciName.matchDatabaseName, colMatch.matchDatabaseName);
             sciName.matchDatabaseName = colMatch.matchDatabaseName;
             sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
             sciName.viaDatasource = colMatch.sourceDatabase;
-            sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position?.value(), NamePosition.WORKING.value());
+            /*            sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position?.value(), NamePosition.WORKING.value());
             sciName.position = NamePosition.WORKING;
             sciName = sciName.merge();
             println "==========SCI NAME AFTER MERGE ======== " + sciName
+             */
             if(!sciName.save(flush:true)) {
+                success = false;
+                errors = sciName.errors.allErrors;
                 sciName.errors.allErrors.each { log.error it }
+            } else {
+                success = true;
             }
-            println "=========DONE UPDATING ATTRIBUTES ========"
-            return sciName //:sciName,isDeleted:false];
+            
+            println "=========DONE UPDATING ATTRIBUTES ========\n"
+
+        } catch (Exception e) {
+            success = false;
+            errors << e.getMessage();
+            e.printStackTrace();
+            println "=========ERROR WHILE UPDATING ATTRIBUTES ========\n"
         }
+        return [success:success, errors:errors, sciName:sciName, 'activityDescription':sciName.tempActivityDescription]; 
+        //:sciName,isDeleted:false];
     }
 
 ///////////////////OBV RECO NAMES/////////////////////////
@@ -1419,7 +1613,6 @@ def sql= session.createSQLQuery(query)
         if(acceptedMatch) {
             println "================ACCEPTED MATCH=========================== " + acceptedMatch
             log.debug "There is an acceptedMatch ${acceptedMatch} for recommendation ${reco.name}. Updating link"
-            //processRecoName(reco, acceptedMatch);
             ScientificName sciName;
             //Search on IBP that name with status
             NameStatus nameStatus = getNewNameStatus(acceptedMatch.nameStatus);
@@ -1542,7 +1735,8 @@ def sql= session.createSQLQuery(query)
         if(oldValue == "" || oldValue == null) oldValue = "-";
         if(newValue == "" || newValue == null) newValue = "-";
         String desc = "";
-        if(oldValue?.toLowerCase() != newValue?.toLowerCase()) {
+        println oldValue + "===================================" + newValue;
+        if(!oldValue.equalsIgnoreCase(newValue)) {
             desc = fieldName + " changed from " + oldValue + " to " + newValue +" .";
         }
         return desc;
@@ -1811,140 +2005,171 @@ def sql= session.createSQLQuery(query)
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
-	public def getNamesFromTaxon(params){
-		log.debug params
-		def sql = new Sql(dataSource)
-		def sqlStr, rs
-		def classSystem = params.classificationId.toLong()
-		def parentId = params.parentId
-		def limit = params.limit ? params.limit.toInteger() : 1000
-		def offset = params.offset ? params.limit.toLong() : 0
-		def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
-		def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
-		println "===========NEXT PRIMARY RANK ====== " + nextPrimaryRank
-		println "============== " + parentId
-		if(!parentId) {
-			sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
-				from taxonomy_registry s, \
-				taxonomy_definition t \
-				where \
-				s.taxon_definition_id = t.id and "+
-				(classSystem?"s.classification_id = :classSystem and ":"")+
-				"t.rank = 0";
-
-			//ALways fetch from IBP Taxonomy Hierarchy
-			def fieldsConfig = grailsApplication.config.speciesPortal.fields
-			def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-
-			rs = sql.rows(sqlStr, [classSystem:IBPclassification.id])
-			/*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-			def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-			def cl = Classification.read(classSystem.toLong());
-			if(cl == classification) {
-				def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-				rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
-			}*/
-		} else {
-			sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position \
-				from taxonomy_registry s, \
-				taxonomy_definition t \
-				where \
-				s.taxon_definition_id = t.id and "+
-				(classSystem?"s.classification_id = :classSystem and ":"")+
-				"s.path like '"+parentId+"%' and " +
-				"t.rank <= " + nextPrimaryRank +
-				" order by t.rank, t.name asc limit :limit offset :offset";
-			
-			//ALways fetch from IBP Taxonomy Hierarchy
-			def fieldsConfig = grailsApplication.config.speciesPortal.fields
-			def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-			rs = sql.rows(sqlStr, [classSystem:IBPclassification.id, limit:limit, offset:offset])
-			
-			/*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-			def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-			def cl = Classification.read(classSystem.toLong());
-			if(cl == classification) {
-				def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-				rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
-			}*/
-		}
-
-		println "total result size === " + rs.size()
-		
-		def dirtyList = [:]
-		def workingList = [:]
-		def cleanList = [:]
-		
-		def accDL = [], accWL = [], accCL = []
-		def synDL = [], synWL = [], synCL = []
-		def comDL = [], comWL = [], comCL = []
+    public def getNamesFromTaxon(params){
+        def sql = new Sql(dataSource)
+        def sqlStr, rs
+        def classSystem = params.classificationId.toLong()
+        def parentId = params.parentId
+        def limit = params.limit ? params.limit.toInteger() : 100
+        def offset = params.offset ? params.limit.toLong() : 0
+        def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
+        def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
 
 
-		///////////////////////////////
-		rs.each {
-			//NOT SENDING PATH
-			//SENDING IDS as taxonid for synonyms and common names
-			//def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
-				//from synonyms s where s.taxon_concept_id = :taxonId";
-			
-			def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position \
-				from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId";
 
-			def q1 = sql.rows(s1, [taxonId:it.taxonid])
-			q1.each {
-				println "==========TAXA IDS======= " + it.taxonid
-				if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-					synDL << it
-				}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-					synWL << it
-				}else{
-					synCL << it
-				}
-			}
-			
-			def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position \
-				from common_names c where c.taxon_concept_id = :taxonId";
+        def dirtyList = [:]
+        def workingList = [:]
+        def cleanList = [:]
 
-			def q2 = sql.rows(s2, [taxonId:it.taxonid])
-			/*q2.each {
-				if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-					comDL << it
-				}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-					comWL << it
-				}else{
-					comCL << it
-				}
-			}*/
-		}
+        def accDL = [], accWL = [], accCL = []
+        def synDL = [], synWL = [], synCL = []
+        def comDL = [], comWL = [], comCL = []
+        def speciesDL = [], speciesWL = [], speciesCL = []
 
-		println "==========SYN DL============= " + synDL
-		println "==========COM DL============= " + comDL
-		///////////////////////////////
-		
-		rs.each {
-			if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-				accDL << it
-			}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-				accWL << it
-			}else{
-				accCL << it
-			}
-		}
-		dirtyList['accDL'] = accDL
-		dirtyList['synDL'] = synDL
-		dirtyList['comDL'] = comDL
-		workingList['accWL'] = accWL
-		workingList['synWL'] = synWL
-		workingList['comWL'] = comWL
-		cleanList['accCL'] = accCL
-		cleanList['synCL'] = synCL
-		cleanList['comCL'] = comCL
-		return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]
-	}
+        try {
+
+            if(!parentId) {
+                sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status \
+                    from taxonomy_registry s, \
+                    taxonomy_definition t \
+                    where \
+                    s.taxon_definition_id = t.id and "+
+                    (classSystem?"s.classification_id = :classSystem and ":"")+
+                    "t.rank = 0 order by t.name";
+
+                //ALways fetch from IBP Taxonomy Hierarchy
+                //def fieldsConfig = grailsApplication.config.speciesPortal.fields
+                //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+
+                rs = sql.rows(sqlStr, [classSystem:classSystem])
+                /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
+                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+                def cl = Classification.read(classSystem.toLong());
+                if(cl == classification) {
+                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
+                }*/
+            } else {
+                sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status\
+                    from taxonomy_registry s, \
+                    taxonomy_definition t \
+                    where \
+                    s.taxon_definition_id = t.id and "+
+                    (classSystem?"s.classification_id = :classSystem and ":"")+
+                    "s.path like '"+parentId+"%' and " +
+                    "t.rank <= " + nextPrimaryRank +
+                    " order by t.rank, t.name asc limit :limit offset :offset";
+
+                //ALways fetch from IBP Taxonomy Hierarchy
+                //def fieldsConfig = grailsApplication.config.speciesPortal.fields
+                //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+                println "======================+++++++"
+                println sqlStr;
+                rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
+
+                /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
+                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+                def cl = Classification.read(classSystem.toLong());
+                if(cl == classification) {
+                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
+                }*/
+
+                def s3 = "select s.id as taxonid, s.rank as rank, s.name as name, s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, s.status as status from taxonomy_definition s left outer join  taxonomy_registry reg on s.id = reg.taxon_definition_id and reg.classification_id = :classSystem where s.rank >= :speciesRank and (reg.path like '%!_"+parentId+"!_%' escape '!'  or reg.path like '"+parentId+"!_%'  escape '!' or reg.path like '%!_"+parentId+"'  escape '!') order by s.name";
+
+
+                def sql1 = new Sql(dataSource)
+
+                def queryParams = ['speciesRank':TaxonomyRank.SPECIES.ordinal(), 'classSystem':classSystem]
+                def q3 = sql1.rows(s3, queryParams)
+                q3.each {
+                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                        speciesDL << it
+                    } else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                        speciesWL << it
+                    } else{
+                        speciesCL << it
+                    }
+                }
+            }
+
+            println "total result size === " + rs.size()
+
+            ///////////////////////////////
+            rs.each {
+                //NOT SENDING PATH
+                //SENDING IDS as taxonid for synonyms and common names
+                //def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
+                //from synonyms s where s.taxon_concept_id = :taxonId";
+
+                sql = new Sql(dataSource)
+                def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status\
+                from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId order by s.name";
+
+                def q1 = sql.rows(s1, [taxonId:it.taxonid])
+                q1.each {
+                    println "==========TAXA IDS======= " + it.taxonid
+                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                        synDL << it
+                    }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                        synWL << it
+                    }else{
+                        synCL << it
+                    }
+                }
+
+                sql = new Sql(dataSource)
+                def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
+                from common_names c where c.taxon_concept_id = :taxonId order by c.name";
+
+                def q2 = sql.rows(s2, [taxonId:it.taxonid])
+                /*q2.each {
+                  if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                  comDL << it
+                  }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                  comWL << it
+                  }else{
+                  comCL << it
+                  }
+                  }*/
+
+
+            }
+
+            println "==========SYN DL============= " + synDL
+            println "==========COM DL============= " + comDL
+            ///////////////////////////////
+
+            rs.each {
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                    accDL << it
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    accWL << it
+                }else{
+                    accCL << it
+                }
+            }
+            dirtyList['accDL'] = accDL
+            dirtyList['synDL'] = synDL
+            dirtyList['comDL'] = comDL
+            dirtyList['speciesDL'] = speciesDL
+            workingList['accWL'] = accWL
+            workingList['synWL'] = synWL
+            workingList['comWL'] = comWL
+            workingList['speciesWL'] = speciesWL
+            cleanList['accCL'] = accCL
+            cleanList['synCL'] = synCL
+            cleanList['comCL'] = comCL
+            cleanList['speciesCL'] = speciesCL
+        
+            return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 	public def getNameDetails(params){
-		log.debug params
-		if(params.nameType == '1') {
+		if(params.nameType?.equalsIgnoreCase(NameStatus.ACCEPTED.value())) {
 			def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
 			def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
 			def result = taxonDef.fetchGeneralInfo()
@@ -1967,7 +2192,7 @@ def sql= session.createSQLQuery(query)
 			*/
 			println "----------- "  + result
 			return result
-		}else if(params.nameType == '2') {
+		}else if(params.nameType?.equalsIgnoreCase(NameStatus.SYNONYM.value())) {
 			if(params.choosenName && params.choosenName != '') {
 				//taxonId here is id of synonyms table
 				def syn = SynonymsMerged.read(params.taxonId.toLong());
@@ -1977,7 +2202,7 @@ def sql= session.createSQLQuery(query)
 				println "========SYNONYMS NAME DETAILS ===== " + result
 				return result
 			}
-		}else if(params.nameType == '3') {
+		}else if(params.nameType?.equalsIgnoreCase(NameStatus.COMMON.value())) {
 			if(params.choosenName && params.choosenName != '') {
 				//taxonId here is id of common names table
 				def com = CommonNames.read(params.taxonId.toLong());

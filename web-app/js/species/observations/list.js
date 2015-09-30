@@ -1,3 +1,4 @@
+    var checkView = false;
     var handlePaginateButtons = function() {
     	$('.paginateButtons a.active').removeClass('active');
     	$(this).addClass('active');

@@ -5,9 +5,9 @@ import species.auth.SUser
 abstract class NamesMetadata extends NamesSorucedata {
 
     public enum NamePosition {
-        CLEAN("Clean"),
+        RAW("Raw"),
         WORKING("Working"),
-        RAW("Raw");
+        CLEAN("Clean");
 
         private String value;
 
@@ -76,9 +76,10 @@ abstract class NamesMetadata extends NamesSorucedata {
             if(this == PROV_ACCEPTED) return "Provisionally Accepted Name" 
             if(this == COMMON) return "Common Name" 
         }
-        String toString() {
+
+        /*String toString() {
             return this.value();
-        }
+        }*/
 		
 		static NameStatus getEnum(String str){
 			if(!str) return null

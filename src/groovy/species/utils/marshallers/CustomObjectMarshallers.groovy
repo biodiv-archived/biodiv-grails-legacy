@@ -34,6 +34,7 @@ import species.participation.Comment;
 import species.participation.ActivityFeed;
 import species.utils.ImageType;
 import species.Language;
+import species.NamesMetadata.NamePosition;
 import content.eml.UFile;
 
 import grails.converters.JSON
@@ -227,6 +228,9 @@ class CustomObjectMarshallers {
             }
         })
 
+        JSON.registerObjectMarshaller(NamePosition) {
+            return it.value();
+        }
     }
     }
 }
