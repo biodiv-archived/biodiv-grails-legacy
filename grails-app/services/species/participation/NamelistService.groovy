@@ -829,6 +829,9 @@ class NamelistService {
     }
     
     ScientificName saveAcceptedName(Map colAcceptedNameData) {
+        
+        if(colAcceptedNameData.taxonConcept) return colAcceptedNameData.taxonConcept;
+
         //List<ScientificName> acceptedNameList = checkIfSciNameExists(colAcceptedNameData);
         ScientificName acceptedName = null;
         //if(acceptedNameList.size() == 0) {
@@ -1378,7 +1381,9 @@ class NamelistService {
         //sciName = updateAttributes(sciName, colMatch)
         //Change status and class for this row entry in database
         updateStatusAndClass(sciName, NameStatus.SYNONYM)
-        sciName = sciName.merge()
+        sciName = sciName.refresh();
+        println sciName
+        println "==============+++++"
         println "======CHANGED STATUS AND CLASS ==== " + sciName.status +" ===== " + sciName.class
         oldSynonyms.add(sciName);
         //Save all the new accepted names or update its hierarchy
@@ -1440,7 +1445,7 @@ class NamelistService {
             */
             //sciName.class = 'species.SynonymsMerged';
             //sciName = new SynonymsMerged(sciName.properties);
-            println "=============COPYING PROPERTIES TO SynonymsMerged";
+            //println "=============COPYING PROPERTIES TO SynonymsMerged";
             //UtilsUtils.copyProperties(sciName, persistentSciName, false);
             //println sciName
             //sciName = sciName.merge();
@@ -2097,7 +2102,7 @@ class NamelistService {
                 from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId order by s.name";
 
                 def q1 = sql.rows(s1, [taxonId:it.taxonid])
-                q1.each {
+                /*q1.each {
                     println "==========TAXA IDS======= " + it.taxonid
                     if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                         synDL << it
@@ -2106,7 +2111,7 @@ class NamelistService {
                     }else{
                         synCL << it
                     }
-                }
+                }*/
 
                 sql = new Sql(dataSource)
                 def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\

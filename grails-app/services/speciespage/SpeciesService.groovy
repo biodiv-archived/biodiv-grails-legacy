@@ -957,6 +957,9 @@ class SpeciesService extends AbstractObjectService  {
             } else if(!oldSynonym.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
+        } else {
+            //search for existing synonym
+
         }
 
         println "=====3========"
