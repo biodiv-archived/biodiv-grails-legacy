@@ -90,7 +90,7 @@ class DocumentService extends AbstractObjectService {
 		//document.longitude = document.longitude ?:0.0
 		document.placeName = params.placeName
 		document.reverseGeocodedName = params.reverse_geocoded_name
-		document.locationAccuracy = params.location_accuracy
+		document.locationAccuracy = (params.location_accuracy)?params.location_accuracy:'Approximate'
 		document.locationScale = Metadata.LocationScale.getEnum(locationScale)
 		document.language = params.locale_language 
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);

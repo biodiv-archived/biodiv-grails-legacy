@@ -1,7 +1,7 @@
 <div class="span12 super-section" style="clear: both; margin-left:0px;">
 
 	<div class="section"
-		style="position: relative; overflow: visible; clear: both;">
+		style="position: relative; overflow: visible; clear: both;display:none;">
 
 		<h3><g:message code="document.cov.taxonomic.coverage" /> </h3>
 
@@ -14,7 +14,7 @@
 				model="['observationInstance':observationInstance, 'hideAdvSearchBar':true]" />
 		</div>
 	</div>
-	<hr>
+	
 	<obv:showMapInput model="[observationInstance:coverageInstance, obvInfoFeeder:coverageInstance, locationHeading:'Geographical Coverage', 'sourceInstance':sourceInstance]"></obv:showMapInput>
 </div>
 
