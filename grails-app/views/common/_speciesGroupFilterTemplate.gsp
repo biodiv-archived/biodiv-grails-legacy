@@ -18,7 +18,7 @@ $(document).ready(function(){
 });
 
 </script>
-<div id="speciesGroupFilter" data-toggle="buttons-radio" style="display:none;">
+<div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
 		<g:if test="${sGroup != othersGroup }">
@@ -35,7 +35,7 @@ $(document).ready(function(){
 
 
 <g:if test="${(params.controller != 'species') && !hideHabitatFilter}">
-	<div id="habitatFilter" data-toggle="buttons-radio" style="display:none;">
+	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
 			<g:if test="${habitat.id != othersHabitat.id }">
@@ -67,7 +67,7 @@ $(document).ready(function(){
 
 	<g:if test="${!params.isChecklistOnly}">
 		<div id="observationMediaFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 262px;">
+			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">
 			<input type="text" id="observationMediaFilter"
 				value="${params.isMediaFilter}" style="display: none" />
 			<button id="observationMediaAllFilterButton" class="btn"
@@ -77,7 +77,7 @@ $(document).ready(function(){
 		</div>
 
 		<div id="speciesNameFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 0;">
+			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
 			<input type="text" id="speciesNameFilter"
 				value="${params.speciesName}" style="display: none" />
 			<button id="speciesNameAllButton" class="btn" rel="tooltip"
@@ -87,7 +87,7 @@ $(document).ready(function(){
 		</div>
 		
 		<div id="observationFlagFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 142px;">
+			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -30px; right: 0;">
 			<input type="text" id="observationFlagFilter"
 				value="${params.isFlagged}" style="display: none" />
 			<button id="observationWithNoFlagFilterButton" class="btn"

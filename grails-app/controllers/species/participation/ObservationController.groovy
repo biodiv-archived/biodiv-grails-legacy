@@ -306,9 +306,7 @@ class ObservationController extends AbstractObjectController {
 		}
 	}
 	
-	private saveAndRender(params, sendMail=true){
-        params.group_id = (params.group_id)?params.group_id:1;
-        println "-==========params.group_id=[========"+params.group_id
+	private saveAndRender(params, sendMail=true){       
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = observationService.saveObservation(params, sendMail)
 		if(result.success){

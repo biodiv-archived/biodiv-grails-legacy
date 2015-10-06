@@ -1,7 +1,7 @@
 <div class="span12 super-section" style="clear: both; margin-left:0px;">
 
 	<div class="section"
-		style="position: relative; overflow: visible; clear: both;display:none;">
+		style="position: relative; overflow: visible; clear: both;">
 
 		<h3><g:message code="document.cov.taxonomic.coverage" /> </h3>
 
