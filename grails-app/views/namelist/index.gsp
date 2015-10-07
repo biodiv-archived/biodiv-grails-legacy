@@ -57,7 +57,7 @@
                 </div>
                 <select class="span12 listSelector">
                     <option value='accDLContent'>Child Taxa</option>
-                    <!--option value='synDLContent'>Synonyms</option-->
+                    <option value='synDLContent'>Synonyms</option>
                     <option value='speciesDLContent'>Species and Subspecies</option>
                     <!--option value='comDLContent'>Common Names</option-->
                 </select>
@@ -77,7 +77,7 @@
                 </div>
                 <select class="span12 listSelector">
                     <option value='accWLContent'>Child Taxa</option>
-                    <!--option value='synWLContent'>Synonyms</option-->
+                    <option value='synWLContent'>Synonyms</option>
                     <option value='speciesWLContent'>Species and Subspecies</option>
                     <!--option value='comWLContent'>Common Names</option-->
                 </select>
@@ -96,7 +96,7 @@
                 </div>
                 <select class="span12 listSelector">
                     <option value='accCLContent'>Child Taxa</option>
-                    <!--option value='synCLContent'>Synonyms</option-->
+                    <option value='synCLContent'>Synonyms</option>
                     <option value='speciesCLContent'>Species and Subspecies</option>
                     <!--option value='comCLContent'>Common Names</option-->
                 </select>
@@ -170,7 +170,9 @@
                         <select id="statusDropDown" class="span4 status" style="width:67%;" >
                             <option value="chooseNameStatus">Choose Name Status</option>
                             <g:each in="${NameStatus.list()}" var="ns">
+                            <g:if test="${ns != NameStatus.PROV_ACCEPTED && ns != NameStatus.COMMON}">
                             <option value="${ns.toString().toLowerCase()}">${ns.value()}</option>
+                            </g:if>
                             </g:each>
                         </select>
                     </div>

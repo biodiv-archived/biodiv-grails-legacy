@@ -573,14 +573,14 @@ class NamelistService {
             boolean moveToWKG =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.WORKING.toString()):false;
             boolean moveToClean =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.CLEAN.toString()):false;
 
-            boolean justMoveToAnotherList = false;
-            if(moveToRaw || moveToWKG || moveToClean) {
-                justMoveToAnotherList = true;
-            }
+            //boolean justMoveToAnotherList = false;
+            //if(moveToRaw || moveToWKG || moveToClean) {
+            //    justMoveToAnotherList = true;
+            //}
 
             sciName.tempActivityDescription = "";
             String tempActivityDescription = "";
-            if(!justMoveToAnotherList) {
+            //if(!justMoveToAnotherList) {
             /*def upAt = updateAttributes(sciName, acceptedMatch);
             println  "====UP AT == " + upAt 
             if(upAt.isDeleted) {
@@ -589,6 +589,10 @@ class NamelistService {
             }*/
            
 
+                println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
             tempResult = updateAttributes(sciName, acceptedMatch);
             if(tempResult.success && tempResult.activityDescription)
                 tempActivityDescription += tempResult.activityDescription;
@@ -599,6 +603,7 @@ class NamelistService {
 
             //adds IBP Hierarchy as well
             tempResult = updateStatus(sciName, acceptedMatch);
+            sciName = TaxonomyDefinition.get(sciName.id);
             if(tempResult.success && tempResult.activityDescription)
                 tempActivityDescription += tempResult.activityDescription;
             result.errors << tempResult.errors;
@@ -608,7 +613,7 @@ class NamelistService {
             /*if(r)
                 sciName = r.sciName;
             println "=======AFTER STATUS======== " + sciName.status;
-*/
+            */
 
             if(!acceptedMatch['parsedRank']) {
                 acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
@@ -624,7 +629,7 @@ class NamelistService {
 
             //WHY required here??
             //addIBPHierarchyFromCol(sciName, acceptedMatch);
-            }
+            //}
 
             def position;
             if(moveToClean) position = NamesMetadata.NamePosition.CLEAN;
@@ -1361,7 +1366,7 @@ class NamelistService {
         colMatch.curatingTaxonStatus = sciName.status;
         //Change status and class for this row entry in database
         updateStatusAndClass(sciName, NameStatus.ACCEPTED)
-        sciName = sciName.merge();
+        sciName = TaxonomyDefinition.get(sciName.id);
         //Add IBP Hierarchy to this name
         //TODO Pass on id information of last node
         def result = addIBPHierarchyFromCol(colMatch)
@@ -1370,6 +1375,10 @@ class NamelistService {
     }
     
     private ScientificName changeAcceptedToSynonym(ScientificName sciName,  Map colMatch) {
+        if(colMatch.acceptedNamesList && colMatch.acceptedNamesList.size() == 0) {
+            log.error "No acceptedMatch for the synonym. Ignoring status change"
+            return sciName
+        }
         println "======PROCESS START ACCEPTED TO SYNONYM===="
         //Attach its synonyms to the new accepted suggested by COL
         def oldSynonyms = sciName.fetchSynonyms();
@@ -1381,7 +1390,7 @@ class NamelistService {
         //sciName = updateAttributes(sciName, colMatch)
         //Change status and class for this row entry in database
         updateStatusAndClass(sciName, NameStatus.SYNONYM)
-        sciName = sciName.refresh();
+        sciName = SynonymsMerged.get(sciName.id);
         println sciName
         println "==============+++++"
         println "======CHANGED STATUS AND CLASS ==== " + sciName.status +" ===== " + sciName.class
@@ -1421,7 +1430,7 @@ class NamelistService {
             def sql= session.createSQLQuery(query)
             sql.setProperties([id:sciName.id, class:'species.TaxonomyDefinition', status:status.toString()]).executeUpdate();
             println " ========executed query =="
-            utilsService.cleanUpGorm(false);
+            utilsService.cleanUpGorm(true);
             
             //sciName.class = 'species.TaxonomyDefinition';
             //TODO: CHK: sciName = TaxonomyDefinition.get(sciName.id.toLong())
@@ -1437,7 +1446,7 @@ class NamelistService {
             def sql = session.createSQLQuery(query)
             sql.setProperties([id:sciName.id, class:'species.SynonymsMerged', relationship:ScientificName.RelationShip.SYNONYM.toString(), status:status.toString()]).executeUpdate();
             println " ========executed query =="
-            utilsService.cleanUpGorm(false);
+            utilsService.cleanUpGorm(true);
             
             /*TaxonomyDefinition.executeUpdate(
                     "update TaxonomyDefinition t set t.class = :klass where t.id = :id ", 
@@ -2070,12 +2079,12 @@ class NamelistService {
                 rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
                 }*/
 
-                def s3 = "select s.id as taxonid, s.rank as rank, s.name as name, s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, s.status as status from taxonomy_definition s left outer join  taxonomy_registry reg on s.id = reg.taxon_definition_id and reg.classification_id = :classSystem where s.rank >= :speciesRank and (reg.path like '%!_"+parentId+"!_%' escape '!'  or reg.path like '"+parentId+"!_%'  escape '!' or reg.path like '%!_"+parentId+"'  escape '!') order by s.name";
+                def s3 = "select s.id as taxonid, s.rank as rank, s.name as name, s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, s.status as status from taxonomy_definition s left outer join  taxonomy_registry reg on s.id = reg.taxon_definition_id and reg.classification_id = :classSystem where s.rank >= :speciesRank and s.status = :acceptedStatus and (reg.path like '%!_"+parentId+"!_%' escape '!'  or reg.path like '"+parentId+"!_%'  escape '!' or reg.path like '%!_"+parentId+"'  escape '!') order by s.name";
 
 
                 def sql1 = new Sql(dataSource)
 
-                def queryParams = ['speciesRank':TaxonomyRank.SPECIES.ordinal(), 'classSystem':classSystem]
+                def queryParams = ['speciesRank':TaxonomyRank.SPECIES.ordinal(), 'acceptedStatus':NameStatus.ACCEPTED.toString(), 'classSystem':classSystem]
                 def q3 = sql1.rows(s3, queryParams)
                 q3.each {
                     if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
@@ -2102,7 +2111,7 @@ class NamelistService {
                 from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId order by s.name";
 
                 def q1 = sql.rows(s1, [taxonId:it.taxonid])
-                /*q1.each {
+                q1.each {
                     println "==========TAXA IDS======= " + it.taxonid
                     if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                         synDL << it
@@ -2111,7 +2120,7 @@ class NamelistService {
                     }else{
                         synCL << it
                     }
-                }*/
+                }
 
                 sql = new Sql(dataSource)
                 def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
@@ -2164,50 +2173,65 @@ class NamelistService {
     }
 
 	public def getNameDetails(params){
-		if(params.nameType?.equalsIgnoreCase(NameStatus.ACCEPTED.value())) {
-			def taxonDef = TaxonomyDefinition.read(params.taxonId.toLong())
-			def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
-			def result = taxonDef.fetchGeneralInfo()
-			result['taxonId'] = params.taxonId;
+        def taxon = TaxonomyDefinition.read(params.taxonId.toLong());
+        NameStatus nameType = taxon.status;
 
-			if(taxonReg) {
-				result['taxonRegId'] = taxonReg.id?.toString()
-				taxonReg.path.tokenize('_').each { taxonDefinitionId ->
-					def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-					result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
-				}
-			}
-			result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
-			result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
-			/*def counts = getObvCKLCountsOfTaxon(taxonDef);
-			result['countObv'] = counts['countObv'];
-			result['countCKL'] = counts['countCKL'];
-			result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
-			println "=========COUNTS============= " + counts
-			*/
-			println "----------- "  + result
-			return result
-		}else if(params.nameType?.equalsIgnoreCase(NameStatus.SYNONYM.value())) {
-			if(params.choosenName && params.choosenName != '') {
-				//taxonId here is id of synonyms table
-				def syn = SynonymsMerged.read(params.taxonId.toLong());
-				def result = syn.fetchGeneralInfo();
-				result[result['rank']] = params.choosenName;
-				result['acceptedNamesList'] = getAcceptedNamesOfSynonym(syn);
-				println "========SYNONYMS NAME DETAILS ===== " + result
-				return result
-			}
-		}else if(params.nameType?.equalsIgnoreCase(NameStatus.COMMON.value())) {
-			if(params.choosenName && params.choosenName != '') {
-				//taxonId here is id of common names table
-				def com = CommonNames.read(params.taxonId.toLong());
-				def result = com.fetchGeneralInfo()
-				result[result['rank']] = params.choosenName;
-				result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
-				println "========SYNONYMS NAME DETAILS ===== " + result
-				return result
-			}
-		}
+        switch(nameType) {
+            case NameStatus.ACCEPTED:
+            def taxonDef = taxon;
+            def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
+            def result = taxonDef.fetchGeneralInfo()
+            result['taxonId'] = params.taxonId;
+
+            if(taxonReg) {
+                result['taxonRegId'] = taxonReg.id?.toString()
+                taxonReg.path.tokenize('_').each { taxonDefinitionId ->
+                    def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
+                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                }
+            }
+            result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
+            result['commonNamesList'] = getCommonNamesOfTaxon(taxonDef);
+            /*def counts = getObvCKLCountsOfTaxon(taxonDef);
+            result['countObv'] = counts['countObv'];
+            result['countCKL'] = counts['countCKL'];
+            result['countSp'] = getSpeciesCountOfTaxon(taxonDef);
+            println "=========COUNTS============= " + counts
+             */
+            println "----------- "  + result
+            return result;
+            case NameStatus.SYNONYM:
+            println "----------------------____"
+            if(params.choosenName && params.choosenName != '') {
+                //taxonId here is id of synonyms table
+                def syn = SynonymsMerged.read(params.taxonId.toLong());
+                def result = syn.fetchGeneralInfo();
+                result[result['rank']] = params.choosenName;
+                result['acceptedNamesList'] = getAcceptedNamesOfSynonym(syn);
+                println "========SYNONYMS NAME DETAILS ===== " + result
+
+                def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), syn);
+                if(taxonReg) {
+                    result['taxonRegId'] = taxonReg.id?.toString()
+                    taxonReg.path.tokenize('_').each { taxonDefinitionId ->
+                        def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
+                        result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                    }
+                }
+
+                return result
+            }
+            case NameStatus.COMMON :
+            if(params.choosenName && params.choosenName != '') {
+                //taxonId here is id of common names table
+                def com = CommonNames.read(params.taxonId.toLong());
+                def result = com.fetchGeneralInfo()
+                result[result['rank']] = params.choosenName;
+                result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
+                println "========SYNONYMS NAME DETAILS ===== " + result
+                return result
+            }
+        }
 	}
 
 	

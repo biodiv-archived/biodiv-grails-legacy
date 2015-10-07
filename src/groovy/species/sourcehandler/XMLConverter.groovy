@@ -1933,7 +1933,7 @@ class XMLConverter extends SourceConverter {
                             println "===========REGISTRY=========== " + registry
 
                             def ent;
-                            if(classification == ibpHierarchy) {
+                            if(registry && classification == ibpHierarchy) {
                                 println "STORING ONLY ONE HIERARCHY FOR IBP TAXON HIERARCHY"
                                 ent = registry;
                             } else {

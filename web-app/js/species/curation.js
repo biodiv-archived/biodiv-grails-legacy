@@ -64,7 +64,7 @@ function getNamesFromTaxon(ele , parentId) {
                     $(accDLContent).appendTo('.dl_content').show();
                 }
                 if(data.dirtyList.synDL){
-                    //synDLContent = createListHTML(data.dirtyList.synDL, "synDLContent", false); 
+                    synDLContent = createListHTML(data.dirtyList.synDL, "synDLContent", false); 
                     $(synDLContent).appendTo('.dl_content').hide();
                 }
                 if(data.dirtyList.comDL){
@@ -149,15 +149,20 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
         $('.isOrphanName').val(false);
         var url = window.params.curation.getNameDetailsUrl;
         var choosenName = ''
-            if(nameType.toLowerCase() == 'synonym' || nameType.toLowerCase() == 'common') {
+            //if(nameType.toLowerCase() == 'synonym' || nameType.toLowerCase() == 'common') {
                 choosenName = $(ele).text();
-            }
+            //}
         $.ajax({
             url: url,
             dataType: "json",
             type: "POST",
             data: {taxonId:taxonId, nameType:nameType, classificationId:classificationId, choosenName: choosenName},	
             success: function(data) {
+                if(!data.success) {
+                    processingStop();
+                    alert(data.msg);
+                    return;
+                }
                 $('.feedComment').html(data.feedCommentHtml);
                 changeEditingMode(false);
                 populateNameDetails(data);
@@ -187,7 +192,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                 oldRank = $("#rankDropDown").val();
             }, error: function(xhr, status, error) {
                 processingStop()
-                    alert(xhr.responseText);
+                alert(xhr.responseText);
             } 
         });
     }
@@ -839,6 +844,7 @@ function getExternalDbDetails(ele, showNameDetails) {
                 //create accepted match and saveAcceptedName
                 $(".fromCOL").val(true);
                 saveAcceptedName(createNewAcceptedNameData(data));
+                processingStop();
                 return;
             } else {
                 if(jQuery.isEmptyObject(data)) {
@@ -870,7 +876,6 @@ function getExternalDbDetails(ele, showNameDetails) {
 
 function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
     if($(event.target).hasClass('disabled')) {
-        console.log('returning')
         return false;
     }
     if(!$('.taxonId').val()) {
@@ -940,7 +945,24 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
         postProcessOnAcceptedName();
     }*/
     var url = window.params.curation.curateNameURL;
-    var acceptedMatch = JSON.stringify(dataToProcess(moveToRaw, moveToWKG, moveToClean));
+    var dataToProcessData = dataToProcess(moveToRaw, moveToWKG, moveToClean);
+    var acceptedNamePresent = false;
+    if(dataToProcessData['nameStatus'] == 'synonym' || dataToProcessData['name'] == 'common') {
+        //there shd be atleast one accepted name
+        var accNameRows = $("#names-tab0 input[name='aid']");
+        $.each(accNameRows, function(index, value){
+            if($(value).val() == '') {
+                acceptedNamePresent = false;
+                //TODO chk if there is atleast on valid accepted name
+                //break;
+            }
+        }) 
+        if(!acceptedNamePresent) {
+            alert("Please validate all accepted names. If any name is invalid please remove it from the collection.")
+            return false;
+        }
+    }
+    var acceptedMatch = JSON.stringify(dataToProcessData);
     $.ajax({
         url: url,
         type: "POST",
@@ -966,7 +988,7 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
 
                 //if(moveToRaw == true || moveToWKG == true || moveToClean == true) {
                     var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
-                    getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id'));
+                    getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''));
                     //$(".clickedEle").trigger("click");
                 //}
                 processingStop();
@@ -1253,6 +1275,7 @@ function dataToProcess(moveToRaw, moveToWKG, moveToClean) {
         result['spellCheck'] = true;
         result['oldTaxonId'] = $('.taxonId').val();
     }
+
     return result;
 }
 
@@ -1378,8 +1401,9 @@ function saveAcceptedName(acceptedMatch) {
             } else {
                 alert("Failed validating name");
             }
-            $(".validating").val(data.acceptedNameId);
+            $(".validating").val(data.acceptedNameId).parent().parent().find('.addEdit').html('Validated');
             $(".validating").removeClass('validating');
+            processingStop();
         }, error: function(xhr, status, error) {
             processingStop();
             alert(xhr.responseText);
