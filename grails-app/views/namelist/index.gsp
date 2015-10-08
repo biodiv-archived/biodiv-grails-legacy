@@ -56,9 +56,9 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.rawlist.info')}"></i>
                 </div>
                 <select class="span12 listSelector">
-                    <option value='accDLContent'>Child Taxa</option>
-                    <option value='synDLContent'>Synonyms</option>
                     <option value='speciesDLContent'>Species and Subspecies</option>
+                    <option value='accDLContent'>Child Taxa</option>
+                    <!--option value='synDLContent'>Synonyms</option-->
                     <!--option value='comDLContent'>Common Names</option-->
                 </select>
                 <div class="dl_content taxon_selector_list listarea_content">
@@ -76,9 +76,9 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.workinglist.info')}"></i>
                 </div>
                 <select class="span12 listSelector">
-                    <option value='accWLContent'>Child Taxa</option>
-                    <option value='synWLContent'>Synonyms</option>
                     <option value='speciesWLContent'>Species and Subspecies</option>
+                    <option value='accWLContent'>Child Taxa</option>
+                    <!--option value='synWLContent'>Synonyms</option-->
                     <!--option value='comWLContent'>Common Names</option-->
                 </select>
 
@@ -95,9 +95,9 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.cleanlist.info')}"></i>
                 </div>
                 <select class="span12 listSelector">
-                    <option value='accCLContent'>Child Taxa</option>
-                    <option value='synCLContent'>Synonyms</option>
                     <option value='speciesCLContent'>Species and Subspecies</option>
+                    <option value='accCLContent'>Child Taxa</option>
+                    <!--option value='synCLContent'>Synonyms</option-->
                     <!--option value='comCLContent'>Common Names</option-->
                 </select>
 

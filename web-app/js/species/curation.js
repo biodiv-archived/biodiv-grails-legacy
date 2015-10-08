@@ -64,7 +64,7 @@ function getNamesFromTaxon(ele , parentId) {
                     $(accDLContent).appendTo('.dl_content').show();
                 }
                 if(data.dirtyList.synDL){
-                    synDLContent = createListHTML(data.dirtyList.synDL, "synDLContent", false); 
+                    //synDLContent = createListHTML(data.dirtyList.synDL, "synDLContent", false); 
                     $(synDLContent).appendTo('.dl_content').hide();
                 }
                 if(data.dirtyList.comDL){
