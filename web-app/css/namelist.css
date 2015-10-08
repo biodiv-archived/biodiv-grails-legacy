@@ -44,7 +44,7 @@ input[type=text], select {
 }
 .tab-content{
 /*    overflow-y: scroll;*/
-    height: 197px;
+    height: 157px;
     overflow-x: hidden !important;
 }   
 .listarea{

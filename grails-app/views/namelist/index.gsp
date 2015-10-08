@@ -148,12 +148,12 @@
                 <input type="hidden" class="id_details" value="">
 
                 <div class="row-fluid form-inline">
-                    <div class="span4">
+                    <div class="span8">
                         <label>Name
                         
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.name.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="Name" class="span5 name" style="width:70%;"/>
+                        <input type="text" placeholder="Name" class="span5 name" style="width:85%;"/>
                     </div>
                     <div class="span4">
                         <label> Author
@@ -162,7 +162,7 @@
                         </label>
                         <input type="text" placeholder="Author" class="span3 authorString" style="width:68%;"/>
                     </div>
-                    <div class="span4">
+                    <div class="span4" style="margin-left:0px;">
                         <label>Status
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.status.info')}"></i>
@@ -177,7 +177,7 @@
                         </select>
                     </div>
                     
-                    <div class="span4" style="margin-left:0px;">
+                    <div class="span4">
                         <label>Rank
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.rank.info')}"></i>
@@ -197,7 +197,7 @@
                         </label> 
                         <input type="text" placeholder="Source" class="span5 source" style="width:67%;"/>
                     </div>															
-                    <div class="span4">
+                    <div class="span4" style="margin-left:0px">
                         <label>via
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.via.info')}"></i>
@@ -205,7 +205,7 @@
                         <input type="text" placeholder="Via" class="span5 sourceDatabase via" style="width:67%;margin-left:22px"/>
                     </div>
 
-                    <div class="span4" style="margin-left:0px;">
+                    <div class="span4">
                         <label>ID
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.id.info')}"></i>
@@ -226,8 +226,8 @@
                         </select>
                     </div>
  
-                    <div class="span4">
-                    <button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:8px;width:67%;">Save </button> 
+                    <div class="pull-right">
+                    <button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:2px;">Save </button> 
                 </div>
                 </div>
                 

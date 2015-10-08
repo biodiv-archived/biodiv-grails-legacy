@@ -61,7 +61,7 @@ function getNamesFromTaxon(ele , parentId) {
                 $('.dl_content ul').remove();
                 if(data.dirtyList.accDL){
                     accDLContent = createListHTML(data.dirtyList.accDL, "accDLContent", false); 
-                    $(accDLContent).appendTo('.dl_content').show();
+                    $(accDLContent).appendTo('.dl_content').hide();
                 }
                 if(data.dirtyList.synDL){
                     //synDLContent = createListHTML(data.dirtyList.synDL, "synDLContent", false); 
@@ -73,14 +73,14 @@ function getNamesFromTaxon(ele , parentId) {
                 }
                 if(data.dirtyList.speciesDL){
                     speciesDLContent = createListHTML(data.dirtyList.speciesDL, "speciesDLContent", false); 
-                    $(speciesDLContent).appendTo('.dl_content').hide();
+                    $(speciesDLContent).appendTo('.dl_content').show();
                 }
 
                 //WORKING LIST
                 $('.wl_content ul').remove();
                 if(data.workingList.accWL){
                     accWLContent = createListHTML(data.workingList.accWL, 'accWLContent', false);
-                    $(accWLContent).appendTo('.wl_content').show();
+                    $(accWLContent).appendTo('.wl_content').hide();
                 }
                 if(data.workingList.synWL){
                     synWLContent = createListHTML(data.workingList.synWL, 'synWLContent', false); 
@@ -92,14 +92,14 @@ function getNamesFromTaxon(ele , parentId) {
                 }
                 if(data.workingList.speciesWL){
                     speciesWLContent = createListHTML(data.workingList.speciesWL, 'speciesWLContent', false); 
-                    $(speciesWLContent).appendTo('.wl_content').hide();
+                    $(speciesWLContent).appendTo('.wl_content').show();
                 }
 
                 //CLEAN LIST
                 $('.cl_content ul').remove();
                 if(data.cleanList.accCL){
                     accCLContent = createListHTML(data.cleanList.accCL, 'accCLContent', false);
-                    $(accCLContent).appendTo('.cl_content').show();
+                    $(accCLContent).appendTo('.cl_content').hide();
                 }
                 if(data.cleanList.synCL){
                     synCLContent = createListHTML(data.cleanList.synCL, 'synCLContent', false);
@@ -111,7 +111,7 @@ function getNamesFromTaxon(ele , parentId) {
                 }
                 if(data.cleanList.speciesCL){
                     speciesCLContent = createListHTML(data.cleanList.speciesCL, 'speciesCLContent', false);
-                    $(speciesCLContent).appendTo('.cl_content').hide();
+                    $(speciesCLContent).appendTo('.cl_content').show();
                 }
 
                 $('.listSelector').find('option:eq(0)').prop('selected', true);
