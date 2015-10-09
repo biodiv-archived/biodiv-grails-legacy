@@ -1393,7 +1393,6 @@ class SpeciesService extends AbstractObjectService  {
 		}
 		speciesInstance.taxonConcept = td
 		if(speciesInstance.taxonConcept) {
-			speciesInstance.taxonConcept.postProcess()
 //			boolean shouldProceed = speciesInstance.taxonConcept.postProcess()
 //			if(!shouldProceed){
 //				result['success'] = false;
@@ -1447,6 +1446,7 @@ class SpeciesService extends AbstractObjectService  {
 			result.taxonRegistry = taxonRegistry;
             result.errors.addAll(errors);
 			
+			speciesInstance.taxonConcept.postProcess()
         }
        return result;
     }
