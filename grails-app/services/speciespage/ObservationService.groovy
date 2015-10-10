@@ -686,9 +686,11 @@ class ObservationService extends AbstractObjectService {
                 }
                 order("lastRevised", "desc")
             }*/
-            println query
-            println resIdList
-            def count = resIdList.size()//observations.totalCount;
+            String countQuery = "select count(*) from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') ";
+            def countRes = Observation.executeQuery (countQuery, ['classification':classification, 'isDeleted': false]);
+
+
+            def count = countRes[0]//observations.totalCount;
             def result = [];
             def iter = resIdList.iterator();
             while(iter.hasNext()){
