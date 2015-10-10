@@ -204,9 +204,12 @@
                         console.log(data);
                         if(data.success) {
                             console.log(node);
-                            var t = $('#taxonHierarchy').jstree(true).get_node(node, true)
+                            window.location.href = '/species/show/'+data.instance.id+ '?editMode=true';
+                            /*
+                             var t = $('#taxonHierarchy').jstree(true).get_node(node, true)
                             t.children('.jstree-anchor').attr('href', '/species/show/'+data.instance.id).css({'color':'#08c', 'cursor':'pointer'}).attr('target', '_blank');
                             t.remove('.createPage');
+                            */
                         } else {
                             alert(data.msg+" "+data.errors);
                         }

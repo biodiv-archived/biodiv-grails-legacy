@@ -980,7 +980,8 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     var taxon = $("input#taxon").val();
     if(taxon) {
         var classificationId = $('#taxaHierarchy option:selected').val();
-        params['classification'] = classificationId
+        if(classificationId) 
+            params['classification'] = classificationId
         params['taxon'] = taxon
     } else {
         delete params['taxon']
