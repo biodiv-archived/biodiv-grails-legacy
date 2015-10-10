@@ -213,8 +213,11 @@
                         } else {
                             alert(data.msg+" "+data.errors);
                         }
-                    }, error: function(xhr, status, error) {
-                        alert(xhr.responseText);
+                    }, error:function (xhr, ajaxOptions, thrownError){
+                        console.log(xhr.responseText);
+                        var successHandler = this.success, errorHandler = null;
+	            	    handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+
                     } 
                 });
             }
