@@ -289,7 +289,7 @@
 
                     <div class="sidebar_section">
                         <h5> <g:message code="button.pagesUnderTaxa" /> </h5>
-                        <input type="hidden" name="taxon" value="${speciesInstance.taxonConcept.id}"/> 
+                        <input type="hidden" id="taxon" name="taxon" value="${speciesInstance.taxonConcept.id}"/> 
                         <s:showSpeciesList model="['instanceTotal':0]"/>
                     </div>
                     <uGroup:objectPostToGroupsWrapper 
@@ -344,7 +344,7 @@
                 var uploadResource; 
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
-                updateGallery('/species/list', ${params.limit?:40}, 0, undefined, true);
+                updateGallery('/species/list', 30, 0, undefined, true);
             });
 
 

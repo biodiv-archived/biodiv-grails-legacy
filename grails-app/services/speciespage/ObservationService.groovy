@@ -641,9 +641,7 @@ class ObservationService extends AbstractObjectService {
         if(taxon) {
             def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
-            def resIdList = Observation.executeQuery ('''
-                select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc
-                ''', ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
+            def resIdList = Observation.executeQuery ("select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc", ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
 
              /*
             def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
@@ -675,10 +673,8 @@ class ObservationService extends AbstractObjectService {
         //if(scientificNameRecos) {
         if(taxon) {
             def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
-
-            def resIdList = Observation.executeQuery ('''
-                select obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc
-                ''', ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
+            String query = "select obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc";
+            def resIdList = Observation.executeQuery (query, ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
 
 
             /*def criteria = Observation.createCriteria();
@@ -690,6 +686,8 @@ class ObservationService extends AbstractObjectService {
                 }
                 order("lastRevised", "desc")
             }*/
+            println query
+            println resIdList
             def count = resIdList.size()//observations.totalCount;
             def result = [];
             def iter = resIdList.iterator();
