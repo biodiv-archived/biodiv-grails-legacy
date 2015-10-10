@@ -923,7 +923,7 @@ class NamelistService {
         //getTaxonHierarchy() XMLConverter
         def metadata1 = [:]
 		metadata1['authorString'] = colAcceptedNameData['authorString']
-		metadata1['source'] = colAcceptedNameData['source'] //col
+		metadata1['source'] = colAcceptedNameData['source']?:colAcceptedNameData['matchDatabaseName']
 		metadata1['via'] = colAcceptedNameData['sourceDatabase']
         colAcceptedNameData['metadata'] = metadata1
         println "=====T R N======= " + taxonRegistryNames
