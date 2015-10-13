@@ -245,7 +245,7 @@ class XMLConverter extends SourceConverter {
 
                 // if the author contributed taxonomy hierarchy is not specified
                 // then the taxonConept is null and sciName of species is saved as concept and is used to create the page
-				int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.TAXON_RANK));
+				int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
 				s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
 				
                 if(s.taxonConcept) {
@@ -453,8 +453,7 @@ class XMLConverter extends SourceConverter {
         }
       
         List sFields = [];
-        
-         if(s.isAttached() && field) {
+		if(s.isAttached() && field) {
              sFields = SpeciesField.withCriteria() {
                 eq("field", field)
                 eq('species', s)
@@ -1418,19 +1417,17 @@ class XMLConverter extends SourceConverter {
 
     private SynonymsMerged saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept, viaDatasource = null) {
 
+        SynonymsMerged sfield = null;
         if(parsedName && parsedName.canonicalForm) {
             //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
             //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
-            /*
-            def criteria = Synonyms.createCriteria();
-            Synonyms sfield = criteria.get {
+            
+            def criteria = TaxonomyDefinition.createCriteria();
+            TaxonomyDefinition taxon = criteria.get {
                 ilike("canonicalForm", parsedName.canonicalForm);
-                eq("relationship", rel);
-                eq("taxonConcept", taxonConcept);
             }
-            */
-            SynonymsMerged sfield = null;
-            if(!sfield) {
+           
+            if(!taxon) {
                 log.debug "Saving synonym : "+parsedName.name;
                 sfield = new SynonymsMerged();
                 sfield.name = parsedName.name;
@@ -1448,6 +1445,22 @@ class XMLConverter extends SourceConverter {
                 sfield.uploadTime = new Date();
                 if(!sfield.save(flush:true)) {
                     sfield.errors.each { log.error it }
+                }
+            } else {
+                println "Looking at existing name : ${taxon}"
+                if(taxon.status == NameStatus.ACCEPTED) {
+                    sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
+                } else {
+                    sfield = taxon as SynonymsMerged;
+                    /*sfield.rank = taxonConcept.rank;
+                    sfield.status = NameStatus.SYNONYM
+                    if(viaDatasource){
+                        sfield.viaDatasource = viaDatasource
+                    }
+                    if(!sfield.save(flush:true)) {
+                        sfield.errors.each { log.error it }
+                    }*/
+
                 }
             }
             println "========S FIELD============= " + sfield
@@ -2038,7 +2051,6 @@ class XMLConverter extends SourceConverter {
 								}
                             }
 
-                            
                             def ent = registry?registry:new TaxonomyRegistry();
 							println "===========REGISTRY=========== " + ent
 							

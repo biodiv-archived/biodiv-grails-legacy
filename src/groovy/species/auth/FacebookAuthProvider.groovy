@@ -80,6 +80,10 @@ public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.fa
 		}*/
 
         super.authenticate(authentication);
+
+        if(token.authenticated != false) {
+            token.authenticated = true;
+        }
         token.details = token.principal
 
         if(token.details) {

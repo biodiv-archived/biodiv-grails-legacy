@@ -13,6 +13,7 @@ class FacebookAuthToken extends com.the6hours.grails.springsecurity.facebook.Fac
             this.redirectUri = token.redirectUri
             this.principal = token.principal
             this.authorities = token.authorities
+            this.authenticated = token.authenticated
         }
 
 		@Override

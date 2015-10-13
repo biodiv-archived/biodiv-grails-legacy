@@ -221,6 +221,7 @@
                 </g:if>
 
                 <div class="span12" style="margin-left:0px">
+
                     <g:render template="/common/observation/showObservationStoryActionsTemplate"
                     model="['instance':speciesInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, ibpClassification:speciesInstance.taxonConcept.fetchDefaultHierarchy()]" />
                 </div>
@@ -285,6 +286,11 @@
                     <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />	
 
                     </div-->
+
+                    <div class="sidebar_section">
+                        <h5> <g:message code="button.pagesUnderTaxa" /> </h5>
+                        <s:showSpeciesList model="['instanceTotal':0]"/>
+                    </div>
                     <uGroup:objectPostToGroupsWrapper 
                     model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                     <div class="sidebar_section">
@@ -337,8 +343,11 @@
                 var uploadResource; 
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
+                $('input#taxon').val("${speciesInstance.taxonConcept.id}");
+                updateGallery('/species/list', 30, 0, undefined, true);
             });
- 
+
+
             </r:script>
 
         </body>

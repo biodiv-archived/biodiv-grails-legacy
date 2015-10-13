@@ -267,7 +267,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                                 <g:if test="${!namesReportList.isEmpty()}">
                                 <div id="namesValidationReports" class="section" style="clear: both;overflow:auto;">
                                     <h6>
-                                        <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.species.bulk.uploads" />
+                                        <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.names.validation.report" />
                                     </h6>
                                     <s:namesReportTable model="[uploadList:namesReportList]" />
                                 </div>

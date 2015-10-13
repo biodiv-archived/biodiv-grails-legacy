@@ -957,6 +957,9 @@ class SpeciesService extends AbstractObjectService  {
             } else if(!oldSynonym.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
+        } else {
+            //search for existing synonym
+
         }
 
         println "=====3========"
@@ -1390,7 +1393,6 @@ class SpeciesService extends AbstractObjectService  {
 		}
 		speciesInstance.taxonConcept = td
 		if(speciesInstance.taxonConcept) {
-			speciesInstance.taxonConcept.postProcess()
 //			boolean shouldProceed = speciesInstance.taxonConcept.postProcess()
 //			if(!shouldProceed){
 //				result['success'] = false;
@@ -1444,6 +1446,7 @@ class SpeciesService extends AbstractObjectService  {
 			result.taxonRegistry = taxonRegistry;
             result.errors.addAll(errors);
 			
+			speciesInstance.taxonConcept.postProcess()
         }
        return result;
     }

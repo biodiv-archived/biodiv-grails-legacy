@@ -57,6 +57,7 @@ $(document).ready(function() {
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
                     'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
+                    'saveUrl':"${uGroup.createLink(controller:'species', action:'save')}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
                     'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
                 },

@@ -155,19 +155,33 @@ class SpeciesController extends AbstractObjectController {
                         flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                         //flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
 
-                        def url = uGroup.createLink(controller:"species", action:"contribute");
-                        redirect url: url
+                        def model = utilsService.getErrorModel(flash.message, null, OK.value(), result.errors);
+                        withFormat {
+                            html {
+                                def url = uGroup.createLink(controller:"species", action:"contribute");
+                                redirect url: url
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
                         return;
                     } else {
-                    flash.message = result.msg ? result.msg+result.errors:"${message(code: 'default.species.error.Create',null)}"+result.errors
-			        render(view: "create", model: result)
-                    return;
+                        flash.message = result.msg ? result.msg+result.errors:"${message(code: 'default.species.error.Create',null)}"+result.errors
+                        def model = utilsService.getErrorModel(flash.message, null, OK.value(), result);
+                        withFormat {
+                            html {
+                                render(view: "create", model: result)
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
+                        return;
                     }
                 }
 
                 Species speciesInstance = result.speciesInstance;
                 if(speciesInstance.taxonConcept) {
-
+                    log.debug "Saving species instance ${speciesInstance}"
                     if (!speciesInstance.hasErrors() && speciesInstance.save(flush:true)) {
                         //Saving current user as contributor for the species
                         //if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
@@ -182,7 +196,14 @@ class SpeciesController extends AbstractObjectController {
                         utilsService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
 
 
-                        redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
+                        def model = utilsService.getSuccessModel(flash.message, speciesInstance, OK.value(), [:]);
+                        withFormat {
+                            html {
+                                redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
 						return;
                     } else {
                         flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
@@ -196,8 +217,16 @@ class SpeciesController extends AbstractObjectController {
                 result.errors << e.getMessage();
                 flash.message = result.msg ? result.msg+result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
             }
+
         }
-        render(view: "create", model:result)
+        def model = utilsService.getErrorModel(flash.message, null, OK.value(), result.errors);
+        withFormat {
+            html {
+                render(view: "create", model: result)
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
     }
 
 	def show() {
@@ -299,6 +328,7 @@ class SpeciesController extends AbstractObjectController {
                 json { render utilsService.getSuccessModel('', speciesInstance, OK.value()) as JSON }
                 xml { render utilsService.getSuccessModel('', speciesInstance, OK.value()) as XML }
             }
+            println "returning"
             if(result) return result
         }
     }
@@ -427,17 +457,25 @@ class SpeciesController extends AbstractObjectController {
 		}
         }
 
-
+        def changes = [:];
         utilsService.benchmark('remove empty info hierarchy') {
         //remove empty information hierarchy
-		for(concept in map.clone()) {
+//		for(concept in map.clone()) {
+        def conceptIter = map.entrySet().iterator();
+        while (conceptIter.hasNext()) {
+            def concept = conceptIter.next();
             if(concept.value.get('speciesFieldInstance')) {
                 speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
-			for(category in concept.value.clone()) {
+            
+//			for(category in concept.value.clone()) {
+            def categoryIter = concept.value.entrySet().iterator();
+            while (categoryIter.hasNext()) {
+                def category = categoryIter.next();
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) || category.key.equals(config.ss_v_r)) {
+				} 
+                else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) || category.key.equals(config.ss_v_r)) {
 					boolean show = false;
 					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
@@ -458,25 +496,38 @@ class SpeciesController extends AbstractObjectController {
 						show = true;
 					}
 					if(show) {
-                            map.get(concept.key).get(category.key).put('hasContent', true);
-                            map.get(concept.key).put('hasContent', true);
-					}
-				} else if(category.value.get('speciesFieldInstance')) {
-					    speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get('speciesFieldInstance'));
+                        //map.get(concept.key).get(category.key).put('hasContent', true);
+                        //category.value.put('hasContent', true);
+                        changes[concept.key+"_"+category.key+"_hasContent"] = true;
+                        //map.get(concept.key).put('hasContent', true);
+                        //concept.value.put('hasContent', true);
+                        changes[concept.key+"_hasContent"] = true
+                    }
+				} else if(category.value.containsKey('speciesFieldInstance')) {
+					//speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get('speciesFieldInstance'));
 				}
 
-                if(category.value.get('hasContent')) {
-                    map.get(concept.key).get(category.key).put('hasContent', true);
-                    map.get(concept.key).put('hasContent', true);
-                }
-                if(category.value.get('isContributor')) {
-                    int val = category.value.get('isContributor')
-                    if(!map.get(concept.key).containsKey('isContributor'))
-                        map.get(concept.key).put('isContributor', 1);
+                if(category.value['hasContent']) {
+                    //map.get(concept.key).get(category.key).put('hasContent', true);
+                    //category.value.put('hasContent', true);
+                    changes[concept.key+"_"+category.key+"_hasContent"] = true;
+                    //map.get(concept.key).put('hasContent', true);
+                    //concept.value.put('hasContent', true);
+                    changes[concept.key+"_hasContent"] = true
                 }
 
+ 
+                if(concept.value[category.key]['isContributor']) {
+                    //int val = category.value.get('isContributor')
+                    if(!map[concept.key].containsKey('isContributor')) {
+                        changes[concept.key+"_isContributor"] = 1;
+                    }
+                }
 
-				for(subCategory in category.value.clone()) {
+				//for(subCategory in category.value.clone()) {
+                def subCategoryIter = category.value.entrySet().iterator();
+                while (subCategoryIter.hasNext()) {
+                    def subCategory = subCategoryIter.next();
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor") || subCategory.key.equals("lang") ) continue;
 
 					if((subCategory.key.equals(config.gdge) && speciesInstance.globalDistributionEntities.size()>0)  ||
@@ -484,27 +535,54 @@ class SpeciesController extends AbstractObjectController {
 					(subCategory.key.equals(config.idge) && speciesInstance.indianDistributionEntities.size()>0) ||
 					(subCategory.key.equals(config.iege) && speciesInstance.indianEndemicityEntities.size()>0)) {
 
-                        if(subCategory.value.get('speciesFieldInstance')) {
+                        if(subCategory.value.containsKey('speciesFieldInstance')) {
                             speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get(subCategory.key).get('speciesFieldInstance'));
                         }
 					}
 
-                    if(subCategory.value.get('hasContent')) { 
-                        map.get(concept.key).get(category.key).put('hasContent', true);
-                        map.get(concept.key).put('hasContent', true);
+                    if(subCategory.value['hasContent']) { 
+                        //map.get(concept.key).get(category.key).put('hasContent', true);
+                        //category.value.put('hasContent', true);
+                        changes[concept.key+"_"+category.key+"_hasContent"] = true;
+                        //map.get(concept.key).put('hasContent', true);
+                        //concept.value.put('hasContent', true);
+                        changes[concept.key+"_hasContent"] = true;
                     }
 
-                    if(subCategory.value.get('isContributor')) { 
-                        int val = subCategory.value.get('isContributor')
+/*                    if(subCategory.value['isContributor']) { 
+                        //int val = subCategory.value.get('isContributor')
 
-                        if(!map.get(concept.key).get(category.key).containsKey('isContributor'))
-                            map.get(concept.key).get(category.key).put('isContributor', 1);
-                        if(!map.get(concept.key).containsKey('isContributor'))
-                            map.get(concept.key).put('isContributor', 1);
+                        if(!category.value.get('isContributor')) {
+                            //map.get(concept.key).get(category.key).put('isContributor', 1);
+                            //category.value.put('isContributor', 1);
+                            changes[concept.key+"_"+category.key+"_isContributor"] = true;
+                        }
+                        if(!concept.value.get('isContributor')) {
+                            //map.get(concept.key).put('isContributor', 1);
+                            //concept.value.put('isContributor', 1);
+                            changes[concept.key+"_isContributor"] = 1;
+                        }
                     }
-				}
+*/				}
+
 			}
 		}
+        }
+
+        utilsService.benchmark('applying changes if hasContent and isContributor to map') {
+            for(change in changes) {
+                def keys = change.key.split('_');
+                def newMap = map;
+                for(int i=0; i< keys.size()-1; i++) {
+                    newMap = newMap[keys[i]];
+                }
+                println "000000000000000"
+                println keys
+                println newMap
+                println keys[keys.size()-1]
+                //println newMap
+                newMap[keys[keys.size()-1]] = change.value;
+            }
         }
 		return map;
 	}
@@ -1027,9 +1105,6 @@ class SpeciesController extends AbstractObjectController {
             log.debug  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
-			if(res.sBulkUploadEntry)
-				res = speciesUploadService.upload(res.sBulkUploadEntry)
-				
 			render(text:res as JSON, contentType:'text/html')
 		}
 	}
