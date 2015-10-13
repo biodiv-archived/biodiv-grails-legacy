@@ -339,7 +339,7 @@ speciesPortal {
         STATUS = 'status'
         INFORMATION_LISTING = "Information Listing"
         REFERENCES = "References"
-
+		RANK = "Rank"
         CONCEPT = "concept"
         CATEGORY = "category"
         SUBCATEGORY = "subcategory"
@@ -348,6 +348,7 @@ speciesPortal {
         AUDIO = "audio"
         VIDEO = "video"
         DOCUMENTS = "Documents"
+		
     }
     group {
         ALL = "All"
@@ -593,6 +594,7 @@ environments {
             debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
             debug   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
+			debug   'grails.app.services.speciespage.SpeciesUploadService'
         }
     }
     test {
