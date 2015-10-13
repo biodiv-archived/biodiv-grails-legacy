@@ -35,7 +35,11 @@ public class SpreadsheetWriter {
             int sheetNo = 0;
             writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
             writeHeadersInFormat(wb, headerMarkers, orderedArray);
-            writeMatchResult(wb, headerMarkers, orderedArray);
+            Sheet sheet = wb.getSheet("headerMetadata");
+            if(sheet != null) {
+                wb.setSheetOrder("headerMetadata", 2);
+            }
+            
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
             out.close();
@@ -50,33 +54,37 @@ public class SpreadsheetWriter {
 
     }
 
-    private static void writeMatchResult(Workbook wb, JSONElement headerMarkers, JSONArray orderedArray){
-    	
-    	
-    }
-    
     public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail, JSONArray orderedArray) {
+        //System.out.println("================================" + writeContributor +"===" + contEmail );
+        /*if(writeContributor.equals("true")){
+            JSONObject r =  gridData.getJSONObject(0);
+            if(!r.has("contributor")){
+                for(int k = 0; k < gridData.length();k++){
+                    JSONObject r1 =  gridData.getJSONObject(k);
+                    r1.put("contributor", contEmail);
+                }
+            }
+        }*/
         Sheet sheet = wb.getSheetAt(sheetNo);
         Iterator<Row> rowIterator = sheet.iterator();
         int index = 0;
         int i = 0;
-        
+        boolean headerRow = true;
+        //System.out.println("===JSON ARRAY LENGTH==============");
+        //System.out.println(gridData.length());
         int gDataSize = gridData.length();
         JSONObject rowData = gridData.getJSONObject(index);
-        
-        //getting number of keys
         Iterator<String> keys = rowData.keys();
         int numKeys = 0;
         while(keys.hasNext()){
+            String kk = keys.next();
             numKeys++;
         }
-        
-        //populating keys array in order
         String[] keysArray = new String[numKeys];
+        //String[] keysArray = orderedArray;
         for (int k = 0; k< numKeys; k++){
             keysArray[k] = orderedArray.getString(k); 
         }
-        
         Row row = rowIterator.next();
         for(int a = 0; a < numKeys; a++){
             Cell cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
@@ -119,6 +127,7 @@ public class SpreadsheetWriter {
                 i++;
             }  
             index++;
+            headerRow = false;
             // rest cells in that row overwritten with empty string
             int lastCellNum = row.getLastCellNum();
             for(int j = i; j <= lastCellNum; j++) {

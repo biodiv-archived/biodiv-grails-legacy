@@ -51,6 +51,7 @@ import org.apache.log4j.FileAppender;
 import species.auth.SUser
 import species.formatReader.SpreadsheetReader;
 import species.formatReader.SpreadsheetWriter;
+import species.namelist.NameInfo
 import species.participation.Featured
 import species.participation.Recommendation
 import species.participation.SpeciesBulkUpload
@@ -68,6 +69,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+import species.participation.NamesReportGenerator
 
 class SpeciesUploadService {
 
@@ -118,7 +121,9 @@ class SpeciesUploadService {
 			return ['msg': 'File not found !!!' ]
 		}
 		
-		return ['msg': 'Names searched in IBP and COL. Please downlaod the file and validate']
+		def namesReportGenEntry = NamesReportGenerator.create(springSecurityService.currentUser, new Date(), null, speciesDataFile.getAbsolutePath())
+		
+		return ['msg': 'Names search in progress. Please visit your profile page to view status.' ,namesReportGenEntry:namesReportGenEntry]
 	}
 
 	
@@ -134,10 +139,18 @@ class SpeciesUploadService {
 			return ['msg': 'File not found !!!' ]
 		}
 		
+		if(!validateUserSheetForName(speciesDataFile)){
+			return  ['msg': 'Name validation failed !!!' ]
+		}
+		
 		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir)
 		
 		return ['msg': 'Bulk upload in progress. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
 		
+	}
+	
+	boolean validateUserSheetForName(File sFile){
+		return MappedSpreadsheetConverter.validateUserSheetForName(sFile)
 	}
 	
 	Map upload(SpeciesBulkUpload sBulkUploadEntry){
@@ -200,6 +213,28 @@ class SpeciesUploadService {
 		return [success:res.success, downloadFile:speciesDataFile, filterLink: link, msg:msg]
 	}
 	
+	
+	Map runNamesMapper( NamesReportGenerator nr) {
+		println "---------------- running ---- "
+		
+		def speciesDataFile = nr.filePath
+		
+		nr.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		List nameInfoList = MappedSpreadsheetConverter.getNames(speciesDataFile, speciesDataFile)
+		
+		println "------------------ name info list " + nameInfoList
+		File f = NameInfo.writeNamesMapperSheet(nameInfoList, new File(speciesDataFile))  
+		
+		nr.updateStatus(SpeciesBulkUpload.Status.SUCCESS)
+		
+		if(!nr.save(flush:true)){
+			nr.errors.allErrors.each { log.error it }
+		}
+		
+		def msg = "Please visit your profile page to view summary."
+		return [success:true, downloadFile:f, msg:msg] 
+	}
+	
 	/**
 	 * 
 	 * @param file
@@ -222,6 +257,8 @@ class SpeciesUploadService {
 	
 			converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
 			List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
+			converter.initCurationInfo(file)
+			
 			List<Map> imagesMetaData;
 			if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 				converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
@@ -671,15 +708,15 @@ class SpeciesUploadService {
         String fileName = "speciesSpreadsheet"
         String uploadDir = "species"
         def ext = params.xlsxFileUrl.split("\\.")[-1];
-        log.debug "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
-        log.debug "=========THE SPLITED LIST ================ " + ext
+        println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+        println "=========THE SPLITED LIST ================ " + ext
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();
-        log.debug "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
+        println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
         fileName = fileName + "."+ext;
-        log.debug "===FILE NAME CREATED ================ " + fileName
+        println "===FILE NAME CREATED ================ " + fileName
         File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
-        log.debug "=== NEW MODIFIED SPECIES FILE === " + file
+		println "=== NEW MODIFIED SPECIES FILE === " + file
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new FileInputStream(xlsxFileUrl);
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
@@ -690,104 +727,6 @@ class SpeciesUploadService {
         }
     }
 
-    File downloadNamesMapper(params) {
-        try{
-            String fileName = "NamesMapper"
-            String uploadDir = "species"
-            def ext = params.xlsxFileUrl.split("\\.")[-1];
-            List<Map> names = SpreadsheetReader.readSpreadSheet(params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir), 0 , 0);
-
-			println "============ names " + names
-			List namesList = []
-			names.each { Map m ->
-				 namesList.addAll(m.values())
-			}
-			
-			println "======CONTENT ======= " + namesList
-			
-            def content = namelistService.nameMapper(namesList);
-            println "=====NAMES MAPPED ===== " + content
-            log.debug "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
-            log.debug "=========THE SPLITED LIST ================ " + ext
-            String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
-            log.debug "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
-            fileName = fileName + "."+ext;
-            log.debug "===FILE NAME CREATED ================ " + fileName
-            File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
-            log.debug "=== NEW MODIFIED SPECIES FILE === " + file
-            InputStream input = new FileInputStream(xlsxFileUrl);
-            writeNamesMapperSheet(file, input, content);
-            return file
-        } catch(Exception e) {
-            e.printStackTrace();
-            log.error e.getMessage();
-        }
-    }
-    
-    void writeNamesMapperSheet(File f, InputStream inp, Map content) {
-        try {
-            Workbook wb = WorkbookFactory.create(inp);
-			//leaving first sheet as it is and creating new match sheet at index 1
-			
-			int sheetIndex = 0;
-            Sheet sheet = wb.getSheetAt(sheetIndex);
-			if(sheet != null) {
-				wb.removeSheetAt(sheetIndex);
-			}
-			sheet = wb.createSheet("Match Result");
-			
-			//writing header
-            Row row =  sheet.createRow(0);
-            List arr = ['Index', 'Source Name', 'Match Found', 'Name' ,'Rank', 'Status', 'Group', 'Position', 'Id']
-            Cell cell;
-            int k = 0;
-            arr.each {
-                cell = row.getCell(k, Row.CREATE_NULL_AS_BLANK);
-                cell.setCellValue(it);
-                k++;
-            }
-			
-			//writing result 
-			int nameIndex = 0
-			int rowNum = 1;
-			content.each { String name, List result ->
-				nameIndex++ 
-				println "-------------------------- name " + name + "  result " + result
-				if(!result){
-					println "--------------- inside"
-					row = sheet.createRow(rowNum++);
-					cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
-                    cell.setCellValue(nameIndex);
-                    cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
-					cell.setCellValue(name);
-				}else{
-					result.each { Map r ->
-                    	row = sheet.createRow(rowNum++);
-						cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
-                    	cell.setCellValue(nameIndex);
-                    	cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
-						cell.setCellValue(name);
-						println "--------------------- row created " 
-						int i = 2 
-						r.each { k1,v1 ->
-                        	cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-                        	cell.setCellValue(v1);
-                        	i++;
-                    	}
-                    }
-                }
-            }
-            FileOutputStream out = new FileOutputStream(f);
-            wb.write(out);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 	//////////////////////////////////////// ROLL BACK //////////////////////////////

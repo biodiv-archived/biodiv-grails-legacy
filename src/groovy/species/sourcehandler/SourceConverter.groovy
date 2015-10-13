@@ -13,6 +13,8 @@ import species.ScientificName.TaxonomyRank;
 import species.Language;
 
 class SourceConverter {
+	protected static final String KEY_SEP = "##"
+	
     protected Map licenseUrlMap;
     protected static final log = LogFactory.getLog(this);
 	
@@ -579,9 +581,9 @@ class SourceConverter {
 	}
 
 	def static myPrint(str){
-		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
-			println '$$$$$$$$$$$$$--- ' +  str
-		}
+//		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
+//			println '$$$$$$$$$$$$$--- ' +  str
+//		}
 	}
 
     private static class FieldsMapHolder {

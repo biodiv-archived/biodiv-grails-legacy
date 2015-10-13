@@ -18,8 +18,8 @@ class SpeciesBulkUpload {
 		ABORTED("ABORTED"),
 		FAILED("FAILED"),
 		UPLOADED("UPLOADED"),
-		ROLLBACK("ROLLBACK")
-		
+		ROLLBACK("ROLLBACK"),
+		SUCCESS("SUCCESS")
 		
 		private String value;
 

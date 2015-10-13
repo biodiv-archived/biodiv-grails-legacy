@@ -430,32 +430,13 @@ $('#downloadNamesMapper').click(function() {
     }
     $(this).addClass('disabled');
     $("#uploadSpecies").addClass('disabled');
-    var xlsxFileUrl = $('#xlsxFileUrl').val();
-    $.ajax({
-        url : window.params.downloadNamesMapperURL,
-        type : 'post', 
-        dataType: 'json',
-        data : {'xlsxFileUrl' : xlsxFileUrl},
-        success : function(data) {
-            $("#downloadSpeciesFile input[name='downloadFile']").val(data.downloadFile);
-            $("#downloadSpeciesFile").submit();
-            $("#downloadNamesMapper").removeClass('disabled');
-            $("#uploadSpecies").removeClass('disabled');
-
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            alert('Error downloading file!!');
-            $("#downloadModifiedSpecies").removeClass('disabled');
-            $("#uploadSpecies").removeClass('disabled');
-            console.log(xhr);
-        }
-    });
-
+    uploadSpecies(window.params.generateNamesReportURL);
+    $(this).removeClass('disabled');
 });
 
 
 
-function uploadSpecies(){
+function uploadSpecies(url){
     $("#speciesLoader").show();
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
@@ -465,8 +446,10 @@ function uploadSpecies(){
     var orderedArray = $('#columnOrder').val();
     orderedArray = JSON.stringify(orderedArray);
     var headerMarkers = JSON.stringify(hm);
+    if(url == undefined)
+    	url = window.params.uploadSpecies;
     $.ajax({
-        url : window.params.uploadSpecies,
+        url : url,
         type : 'post', 
         dataType: 'json',
         data : {'headerMarkers': headerMarkers , 'xlsxFileUrl' : xlsxFileUrl, 'gridData' : gData, 'imagesDir': $("#imagesDir").val(), 'writeContributor': 'true','orderedArray' : orderedArray },

@@ -30,6 +30,7 @@ import species.NamesParser;
 import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
 import speciespage.SpeciesUploadService;
+import species.namelist.NameInfo
 import species.namelist.Utils;
 import species.utils.Utils as UtilsUtils;
 
@@ -202,10 +203,10 @@ class NamelistService {
 	 * @param rank
 	 * @return
 	 */
-	public Map nameMapper(List<String> names) {
+	public Map nameMapper(List<NameInfo> names) {
 		Map finalResult = [:]
 		NamesParser namesParser = new NamesParser();
-		List<TaxonomyDefinition> parsedNames = namesParser.parse(names);
+		List<TaxonomyDefinition> parsedNames = namesParser.parse(names.collect {it.name});
 		
 		int i = -1
         List nameSubLists = parsedNames.collate(5)
@@ -230,7 +231,15 @@ class NamelistService {
 			
 			List colResult = searchCOL(name.canonicalForm, 'name');
 			colResult.each { t ->
-				tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
+				boolean addToList = true
+				if((names[i].rank <= 8) && (names[i].rank > 0)){
+					int rr = XMLConverter.getTaxonRank(t.rank)
+					if(rr != names[i].rank){
+						addToList = false
+					}
+				}
+				if(addToList)
+					tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
 			}
 			finalResult[names[i]] = tmpRes
         }

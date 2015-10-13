@@ -14,6 +14,7 @@ import species.groups.UserGroup
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 import content.eml.*;
 import species.Species
+import species.*;
 /*
 def feedService = ctx.getBean("activityFeedService");
 def userGroupService = ctx.getBean("userGroupService");
@@ -342,8 +343,17 @@ def obsQuery(){
 }
 
 
-obsQuery()
+//obsQuery()
 
+def addNewField1(){
+	def f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Taxon Record Name', subCategory:'Rank',description:'Place holder for TaxonRank', displayOrder:85, connection:85)
+	f.save(flush:true)
+	
+	def f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Author Contributed Taxonomy Hierarchy', subCategory:'Infra Species',description:'Place holder for Infra Species', displayOrder:86, connection:86)
+	f.save(flush:true)
+}
+
+addNewField1()
 
 //updateSpeciesGroup()
 
@@ -354,7 +364,7 @@ obsQuery()
 
 //migrateCoverageToDoc()
 //addDocumentPostFeed()
-
+author contributed taxonomy hierarchy
 
 //addUserRegistrationFeed()
 

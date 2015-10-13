@@ -6,6 +6,8 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.participation.SpeciesBulkUpload"%>
+<%@page import="species.participation.NamesReportGenerator"%>
+
 <html>
 <head>
 
@@ -94,6 +96,7 @@
 			<%
 				def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
 				def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'asc'])
+				def namesReportList = NamesReportGenerator.findAllByAuthor(user, [sort: 'startDate', order: 'asc'])
 			%>
 
                         <div id="userprofilenavbar" class="navbar">
@@ -258,6 +261,15 @@ def contact_me_text=g.message(code:'button.contact.me')
                                         <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.Downloads" />
                                     </h6>
                                     <obv:downloadTable model="[downloadLogList:downloadLogList]" />
+                                </div>
+                                </g:if>
+                                
+                                <g:if test="${!namesReportList.isEmpty()}">
+                                <div id="namesValidationReports" class="section" style="clear: both;overflow:auto;">
+                                    <h6>
+                                        <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.species.bulk.uploads" />
+                                    </h6>
+                                    <s:namesReportTable model="[uploadList:namesReportList]" />
                                 </div>
                                 </g:if>
                                 

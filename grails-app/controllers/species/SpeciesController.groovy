@@ -1017,14 +1017,6 @@ class SpeciesController extends AbstractObjectController {
 	//////////////////////////////////////Online upload //////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Secured(['ROLE_SPECIES_ADMIN'])
-	def searchAndValidateName() {
-		log.debug params.xlsxFileUrl
-		Language languageInstance = utilsService.getCurrentLanguage(request);
-		params.locale_language = languageInstance;
-		def res = speciesUploadService.searchAndValidateName(params)
-		render(text:res as JSON, contentType:'text/html')
-	}
 	
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload() {
@@ -1035,10 +1027,26 @@ class SpeciesController extends AbstractObjectController {
             log.debug  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
-			res = speciesUploadService.upload(res.sBulkUploadEntry)
+			if(res.sBulkUploadEntry)
+				res = speciesUploadService.upload(res.sBulkUploadEntry)
+				
 			render(text:res as JSON, contentType:'text/html')
 		}
 	}
+	
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def generateNamesReport() {
+		log.debug params.xlsxFileUrl
+		if(params.xlsxFileUrl){
+			Language languageInstance = utilsService.getCurrentLanguage(request);
+			params.locale_language = languageInstance;
+			def res = speciesUploadService.searchAndValidateName(params);
+			log.debug "Starting name searching and report generation "
+			println "============== res " + res
+			render(text:res as JSON, contentType:'text/html')
+		}
+	}
+
 	
 	def getDataColumns() {
         Language languageInstance = utilsService.getCurrentLanguage(request);
@@ -1537,14 +1545,7 @@ class SpeciesController extends AbstractObjectController {
         */
     }
     
-    def downloadNamesMapper () {
-        File file = speciesUploadService.downloadNamesMapper(params);
-        if(!file) {    
-            return render(text: [success:false, downloadFile: ""] as JSON, contentType:'text/html')
-        }
-        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
-    }
-
+ 
     @Secured(['ROLE_USER'])
     def getSpeciesFieldMedia() {
         def resList = []
