@@ -168,8 +168,9 @@ class XMLConverter extends SourceConverter {
 		//getting hir
 		
 		List taxonNodes = getNodesFromCategory(species.children(), "author contributed taxonomy hierarchy");
-		//println "====== taxon ============ " + taxonNodes
+		//println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
 		taxonNodes.each { tn ->
+			rank = getTaxonRank(tn.subcategory.text())
 			def tmp = new NameInfo(getData((tn && tn.data)?tn.data[0]:null), rank, index)
 			tmp.sourceName = speciesName
 			//println "--- hir " + tmp

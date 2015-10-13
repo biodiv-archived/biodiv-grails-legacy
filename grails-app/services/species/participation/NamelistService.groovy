@@ -204,6 +204,10 @@ class NamelistService {
 	 * @return
 	 */
 	public Map nameMapper(List<NameInfo> names) {
+		
+		println "---------------------- name ifons --------- "
+		println names
+		
 		Map finalResult = [:]
 		NamesParser namesParser = new NamesParser();
 		List<TaxonomyDefinition> parsedNames = namesParser.parse(names.collect {it.name});
@@ -229,21 +233,22 @@ class NamelistService {
 					tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
 				}
 				
-				//if(!ibpResult){
+				if(!ibpResult){
 					List colResult = searchCOL(name.canonicalForm, 'name');
 					colResult.each { t ->
 						boolean addToList = true
+						int rr = XMLConverter.getTaxonRank(t.rank)
 						if((names[i].rank <= 8) && (names[i].rank > 0)){
-							int rr = XMLConverter.getTaxonRank(t.rank)
 							if(rr != names[i].rank){
 								addToList = false
 							}
+							
 						}
 						if(addToList){
 							tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
 						}
 					}
-				//}
+				}
 				finalResult[names[i]] = tmpRes
 	        }
 	        }
