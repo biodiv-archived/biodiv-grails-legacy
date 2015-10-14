@@ -101,7 +101,7 @@ class XMLConverter extends SourceConverter {
 	
 	
 	protected populateIBPCOLMatch(Node species, Map speciesMap, Map hirMap, Map synMap){
-		if(!speciesMap || !hirMap || !synMap)
+		if(!speciesMap || !hirMap )
 			return 
 		
 		removeInvalidNode(species);
@@ -124,10 +124,12 @@ class XMLConverter extends SourceConverter {
 		}
 		
 		//updating synonyms here for ibp and col match
-		taxonNodes = getNodesFromCategory(species.children(), "synonyms");
-		taxonNodes.each { tn ->
-			k = index + KEY_SEP + sName + KEY_SEP + getData((tn && tn.data)?tn.data[0]:null)
-			updateNode(tn, synMap, k)
+		if(synMap){
+			taxonNodes = getNodesFromCategory(species.children(), "synonyms");
+			taxonNodes.each { tn ->
+				k = index + KEY_SEP + sName + KEY_SEP + getData((tn && tn.data)?tn.data[0]:null)
+				updateNode(tn, synMap, k)
+			}
 		}
 	
 	}
@@ -143,6 +145,12 @@ class XMLConverter extends SourceConverter {
 //		println "----------------- map " + completeMap
 //		println "--------ii--------- map " + m
 		
+		
+		String targetPosition = m['target position']
+		if(targetPosition){
+			new Node(node, "position", targetPosition);
+		}
+		
 		String id = m?.id
 		if(!id)
 			return
@@ -152,11 +160,7 @@ class XMLConverter extends SourceConverter {
 			new Node(node, "ibpId", id);
 		else if("col".equalsIgnoreCase(matchSource))	
 			new Node(node, "colId", id);
-			
-		String targetPosition = m['target position']
-		if(targetPosition){
-			new Node(node, "position", targetPosition);
-		}
+		
 	}
 	
 	

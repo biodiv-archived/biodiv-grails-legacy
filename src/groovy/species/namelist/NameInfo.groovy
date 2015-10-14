@@ -136,7 +136,7 @@ class NameInfo {
 			
 			//writing header
 			Row row =  sheet.createRow(0);
-			List arr = ['Name', 'Index', 'Source Name', 'Match Found', 'Rank', 'Status', 'Group', 'Position', 'Id']
+			List arr = ['Name', 'Index', 'Source Name', 'Match Found', 'Rank', 'Status', 'Group', 'Position', 'Id', 'Target Position']
 			Cell cell;
 			int k = 0;
 			arr.each {
