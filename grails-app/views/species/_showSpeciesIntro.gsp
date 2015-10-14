@@ -12,7 +12,7 @@
 
 <!-- media gallery -->
 <div class="span8 right-shadow-box" style="margin:0px;">
-
+    <g:if test="${speciesInstance.taxonConcept.rank >= TaxonomyRank.SPECIES.ordinal()}">
     <div style="padding-bottom:10px">
                 <center>
             <div id="gallerySpinner" class="spinner">
@@ -69,7 +69,15 @@
                 </div> 
             </div>
         </div>
+        </g:if>
+        <g:else>
+            <div class="sidebar_section">
+                <a class="hide hasMedia_filter_label active" value="true"></a>
+                <h5> <g:message code="button.childTaxa" /> <a href="${uGroup.createLink(controller:'species', action:'list', params:['taxon':speciesInstance.taxonConcept.id])}" class="pull-right"> Show All </a></h5>
+                <s:showSpeciesList model="['instanceTotal':0]"/>
+            </div>
 
+        </g:else>
 
         <g:render template="/species/speciesaudio" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor , 'resourcesInstanceList' : resourcesInstanceList]"/>
 

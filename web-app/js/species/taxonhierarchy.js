@@ -99,13 +99,13 @@
 
                             if(me.options.controller == 'species' && (me.options.action == 'list' || me.options.action == 'taxonBrowser')) {
                                 console.log(nodeData);
-                                if(!nodeData.original.speciesid || nodeData.original.speciesid == -1) {
+                                /*if(!nodeData.original.speciesid || nodeData.original.speciesid == -1) {
                                     var btn = "<button style='line-height:14px;' class='createPage" + ((btnAction == 'Show') ? '' : 'active') + "' data-controller='species' data-action='create' data-taxonid='"+nodeData.original.taxonid+"' title='Create page for this taxon'>Create page</button>";
                                     el.innerHTML = btn;
                                     $(el.childNodes[0]).insertAfter(tmp);
                                 } else {
                                     //TODO: show page
-                                }
+                                }*/
                             }
 
                             if (me.options.action != 'show' && me.options.action != 'taxonBrowser') {
@@ -165,6 +165,27 @@
                         }
                         break;
                 }
+
+                $('.createPage').hide();
+                if (me.options.controller == 'species' && me.options.action == 'list') {
+                    $.ajax({ 
+                        url:window.params.species.hasPermissionToCreateSpeciesPageUrl,
+                        data:{taxonId:selectedTaxonId},
+                        success: function(data, statusText, xhr, form) {
+                            if(data.success == true) {
+                                $('.createPage').show();
+                            } else {
+                                $('.createPage').hide();
+                            }
+                        },
+                        error:function (xhr, ajaxOptions, thrownError){
+                            console.log('error');
+	            	        return false;
+                        }
+                    });
+                }
+
+
             };
 
             function scrollIntoView(ele) {
@@ -177,50 +198,6 @@
                 }
             }
 
-
-            var createPage = function(e) {
-                console.log(e.currentTarget);
-                var jstree = $('#taxonHierarchy').jstree(true);
-                var node = jstree.get_node($(e.target));
-                var nodeData = node.original;
-                console.log(node);
-                console.log(nodeData);
-                var rParams = {};
-                rParams['page'] = nodeData.text;
-                rParams['rank'] = nodeData.rank;
-                rParams['taxonHirMatch'] = {'ibpId' : nodeData.taxonid};
-                var parent = node;
-                while(parent && parent.original) {
-                    rParams['taxonRegistry.'+parent.original.rank] = parent.original.text; 
-                    parent = jstree.get_node(parent.parent);
-                }
-
-                $.ajax({
-                    url:window.params.species.saveUrl,
-                    type:'POST',
-                    data:rParams,
-                    dataType:'json',
-                    success:function(data) {
-                        console.log(data);
-                        if(data.success) {
-                            console.log(node);
-                            window.location.href = '/species/show/'+data.instance.id+ '?editMode=true';
-                            /*
-                             var t = $('#taxonHierarchy').jstree(true).get_node(node, true)
-                            t.children('.jstree-anchor').attr('href', '/species/show/'+data.instance.id).css({'color':'#08c', 'cursor':'pointer'}).attr('target', '_blank');
-                            t.remove('.createPage');
-                            */
-                        } else {
-                            alert(data.msg+" "+data.errors);
-                        }
-                    }, error:function (xhr, ajaxOptions, thrownError){
-                        console.log(xhr.responseText);
-                        var successHandler = this.success, errorHandler = null;
-	            	    handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-
-                    } 
-                });
-            }
 
             me.$element.find('#taxonHierarchy').jstree({
                 'core': {
@@ -370,7 +347,6 @@
                     }
                 });
 
-                $("#taxaHierarchy").on('click', '.createPage', createPage);
             }).on('load_node.jstree', function(event, obj) {
                 var l = obj.node.children.length;
                 for (var i = 0; i < l; i++) {}

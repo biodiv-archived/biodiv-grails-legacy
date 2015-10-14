@@ -59,7 +59,8 @@ $(document).ready(function() {
                     'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
                     'saveUrl':"${uGroup.createLink(controller:'species', action:'save')}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
-                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}"
+                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}",
+                    'hasPermissionToCreateSpeciesPageUrl':"${uGroup.createLink(controller:'species', action:'hasPermissionToCreateSpeciesPage')}"
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
                 'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
