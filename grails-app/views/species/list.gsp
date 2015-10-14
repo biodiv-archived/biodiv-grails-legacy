@@ -118,6 +118,25 @@
         <g:each in="${TaxonomyRank.list()}" var="t">
         taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
         </g:each>
+        function hasPermissionToCreateSpeciesPage(selectedTaxonId) {
+            $.ajax({ 
+                        url:window.params.species.hasPermissionToCreateSpeciesPageUrl,
+                        data:{taxonId:selectedTaxonId},
+                        success: function(data, statusText, xhr, form) {
+                            if(data.success == true) {
+                                $('.createPage').show();
+                            } else {
+                                $('.createPage').hide();
+                            }
+                        },
+                        error:function (xhr, ajaxOptions, thrownError){
+                            console.log('error');
+	            	        return false;
+                        }
+                        });
+        }
+
+
 	</script>
 
 	<r:script>
@@ -146,27 +165,29 @@
 			
 
         var createPage = function(e) {
+            var selectedNode = $('.jstree-anchor.taxon-highlight');
+            if(!selectedNode) {
+            alert('Please select a node in the taxon browser first');
+            return;
+            }
+            var jstree = $('#taxonHierarchy').jstree(true);
+            var node = jstree.get_node(selectedNode);
+            var nodeData = node.original;
+            console.log(node);
+            console.log(nodeData);
+            if(nodeData.speciesid && nodeData.speciesid != -1) {
+            window.location.href = '/species/show/'+nodeData.speciesid;
+            return;
+            }
+
 			$.ajax({ 
 	         	url:window.params.species.hasPermissionToCreateSpeciesPageUrl,
+                data:{taxonId:nodeData.taxonid},
 				success: function(data, statusText, xhr, form) {
 					if(data.success == true) {
 
                         console.log(e.currentTarget);
-                        var selectedNode = $('.jstree-anchor.taxon-highlight');
-                        if(!selectedNode) {
-                        alert('Please select a node in the taxon browser first');
-                        return;
-                        }
-                        var jstree = $('#taxonHierarchy').jstree(true);
-                        var node = jstree.get_node(selectedNode);
-                        var nodeData = node.original;
-                        console.log(node);
-                        console.log(nodeData);
-                        if(nodeData.speciesid && nodeData.speciesid != -1) {
-                        window.location.href = '/species/show/'+nodeData.speciesid+ '?editMode=true';
-                        return;
-                        }
-                        var rParams = {};
+                                       var rParams = {};
                         rParams['page'] = nodeData.text;
                         rParams['rank'] = nodeData.rank;
                         rParams['taxonHirMatch'] = {'ibpId' : nodeData.taxonid};
@@ -209,8 +230,10 @@
                             } 
             });
         }
-
         $('.createPage').click(createPage);
+        if(${params.taxon?:false}){
+        hasPermissionToCreateSpeciesPage(${params.taxon});
+        }
 
 
     });

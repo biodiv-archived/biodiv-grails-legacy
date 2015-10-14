@@ -125,6 +125,7 @@
                     };
                 };
             };
+            
             var filterResults = function(e) {
                 var $me;
                 if(e) {
@@ -168,21 +169,7 @@
 
                 $('.createPage').hide();
                 if (me.options.controller == 'species' && me.options.action == 'list') {
-                    $.ajax({ 
-                        url:window.params.species.hasPermissionToCreateSpeciesPageUrl,
-                        data:{taxonId:selectedTaxonId},
-                        success: function(data, statusText, xhr, form) {
-                            if(data.success == true) {
-                                $('.createPage').show();
-                            } else {
-                                $('.createPage').hide();
-                            }
-                        },
-                        error:function (xhr, ajaxOptions, thrownError){
-                            console.log('error');
-	            	        return false;
-                        }
-                    });
+                    hasPermissionToCreateSpeciesPage(selectedTaxonId);
                 }
 
 
