@@ -152,6 +152,11 @@ class XMLConverter extends SourceConverter {
 			new Node(node, "ibpId", id);
 		else if("col".equalsIgnoreCase(matchSource))	
 			new Node(node, "colId", id);
+			
+		String targetPosition = m['target position']
+		if(targetPosition){
+			new Node(node, "position", targetPosition);
+		}
 	}
 	
 	
@@ -212,6 +217,38 @@ class XMLConverter extends SourceConverter {
 		return node
 	}
 	
+	private void addScNameNode(Node species, Node nameNode){
+		String rank = getNodeDataFromSubCategory(species, fieldsConfig.RANK);
+		
+		Node taxonLastNode = getNodeFromSubCategory(species, rank);
+		
+		if(taxonLastNode){
+			Node parentNode = taxonLastNode.parent()
+			parentNode.remove(taxonLastNode)
+		}
+		
+		//creating new node having all info as scientific name
+		Node field = new Node(species, "field");
+		Node concept = new Node(field, "concept", fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION);
+		Node category = new Node(field, "category", "Author Contributed Taxonomy Hierarchy");
+		Node subcategory = new Node(field, "subcategory", rank);
+		
+		field.append(nameNode.language)
+		field.append(nameNode.data)
+		
+		if(nameNode.ibpId){
+			field.append(nameNode.ibpId)
+		}
+		
+		if(nameNode.colId){
+			field.append(nameNode.colId)
+		}
+		
+		if(nameNode.position){
+			field.append(nameNode.position)
+		}
+	}
+	
     public Species convertSpecies(Node species) {
         //TODO default action to be merge
         convertSpecies(species, SaveAction.MERGE);
@@ -238,6 +275,9 @@ class XMLConverter extends SourceConverter {
             def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
             addToSummary("<<< NAME OF SPECIES >>> "  + speciesName)
             if(speciesName) {
+				//adding scientific name as last node in author contribute hir so that author year and other info picked from scientific name column
+				addScNameNode(species, speciesNameNode)
+				
                 //getting classification hierarchies and saving these taxon definitions
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true).taxonRegistry;
 
@@ -250,6 +290,7 @@ class XMLConverter extends SourceConverter {
 				s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
 				
                 if(s.taxonConcept) {
+					s.taxonConcept.updatePosition(speciesNameNode?.position?.text())
 
                     s.title = s.taxonConcept.italicisedForm;
 
@@ -1689,7 +1730,6 @@ class XMLConverter extends SourceConverter {
      * @param scientificName
      * @return
      */
-    //List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
         log.debug "Getting classification hierarchy : "+classification.name;
@@ -1753,7 +1793,8 @@ class XMLConverter extends SourceConverter {
                             //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
                             
                             //TODO: how to get status in each case?
-                            println "authoryear" + parsedName.authorYear
+							String parsedAuthorYear = parsedName.authorYear
+                            println "authoryear >>>>>>>>>>>>>>>>>> " + parsedAuthorYear
 //                            def ctx = ApplicationHolder.getApplication().getMainContext();
 //                            namelistService = ctx.getBean("namelistService");
                             boolean searchInNull = false;
@@ -2038,7 +2079,18 @@ class XMLConverter extends SourceConverter {
                             if(taxon.status != NameStatus.ACCEPTED) {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
- 
+							
+							//saving taxon new position
+							taxon.updatePosition(fieldNode?.position?.text())
+							//updating author year if not from COL
+							if(!fromCOL && parsedAuthorYear){
+								taxon.authorYear = parsedAuthorYear
+								if(!taxon.save(flush:true)) {
+									taxon.errors.each { println it; log.error it }
+								}
+							}
+							
+							
                             def ibpHierarchy = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
                             def parentTaxon = getParentTaxon(taxonEntities, rank);
                             def path = (parentTaxon ? parentTaxon.path+"_":"") + taxon.id;

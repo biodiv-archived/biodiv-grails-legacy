@@ -1009,7 +1009,7 @@ class NamelistService {
         return result;
     }
 
-    private Map updatePosition(ScientificName sciName, NamePosition position) {
+    public Map updatePosition(ScientificName sciName, NamePosition position) {
         println "\n============== UPDATING POSITION ========"
         boolean success = false;
         List errors = [];

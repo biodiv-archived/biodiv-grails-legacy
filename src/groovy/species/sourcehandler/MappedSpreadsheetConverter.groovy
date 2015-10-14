@@ -63,6 +63,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	private updateMap(List<Map> content, Map targetMap){
 		if(content){
 			content.each { Map m ->
+				if(!m['name'])
+					return
+					
 				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name']
 				if(targetMap.containsKey(key)){
 					multipleMatchingRow = true

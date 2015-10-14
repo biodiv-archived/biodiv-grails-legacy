@@ -456,4 +456,9 @@ class TaxonomyDefinition extends ScientificName {
 		}	
 		
 	}
+	
+	
+	def updatePosition(String pos){
+		return namelistService.updatePosition(this, NamesMetadata.NamePosition.getEnum(pos))
+	}
 }
