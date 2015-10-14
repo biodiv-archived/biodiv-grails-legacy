@@ -160,19 +160,31 @@
                             //$("span.rank").removeClass('btn-info-nocolor').parent().closest('tr').removeClass('taxon-highlight');
                             $(".jstree-anchor").removeClass('taxon-highlight');
                         }
+                        
+                        $('.createPage').hide();
+
+                        if (me.options.controller == 'species' && me.options.action == 'list') {
+                            var selectedNode = $('.jstree-anchor.taxon-highlight');
+                            var jstree = $('#taxonHierarchy').jstree(true);
+                            var node = jstree.get_node(selectedNode);
+                            var nodeData = node.original;
+                            console.log(node);
+                            console.log(nodeData);
+                            if(nodeData.speciesid && nodeData.speciesid != -1) {
+                                window.location.href = '/species/show/'+nodeData.speciesid;
+                                return;
+                            }
+                            hasPermissionToCreateSpeciesPage(selectedTaxonId);
+                        }
 
                         if (me.options.action != 'show' && me.options.action != 'taxonBrowser') {
                             updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
                         }
+
                         break;
                 }
 
-                $('.createPage').hide();
-                if (me.options.controller == 'species' && me.options.action == 'list') {
-                    hasPermissionToCreateSpeciesPage(selectedTaxonId);
-                }
-
-
+                
             };
 
             function scrollIntoView(ele) {

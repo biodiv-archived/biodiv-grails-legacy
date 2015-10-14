@@ -340,6 +340,7 @@
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
+                window.params.queryParamsMax = 8;
                 updateGallery('/species/list', 8, 0, undefined, true);
             });
 

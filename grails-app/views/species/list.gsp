@@ -46,6 +46,8 @@
                             <div class="btn-group pull-left" style="z-index: 10">	
                                 <obv:download
                                 model="['source':'Species', 'requestObject':request, 'downloadTypes':[DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'speciesList']" />
+
+                                <button class='createPage btn btn-primary pull-right' style="display:none;" title='Create page for the selected taxon'><i class="icon-plus"></i>Create page</button>
                             </div>
                         </div>
 
@@ -54,7 +56,6 @@
                             </div>
                         <div id="taxonBrowser" class="span4" style="position:relative">
 
-                            <button class='createPage btn pull-right' style="display:none;" title='Create page for the selected taxon'><i class="icon-plus"></i>Create page</button>
 						    <uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
 
                             <div class="taxonomyBrowser sidebar_section" style="position:relative">
@@ -187,14 +188,14 @@
 					if(data.success == true) {
 
                         console.log(e.currentTarget);
-                                       var rParams = {};
+                        var rParams = {};
                         rParams['page'] = nodeData.text;
                         rParams['rank'] = nodeData.rank;
                         rParams['taxonHirMatch'] = {'ibpId' : nodeData.taxonid};
                         var parent = node;
                         while(parent && parent.original) {
-                        rParams['taxonRegistry.'+parent.original.rank] = parent.original.text; 
-                        parent = jstree.get_node(parent.parent);
+                            rParams['taxonRegistry.'+parent.original.rank] = parent.original.text; 
+                            parent = jstree.get_node(parent.parent);
                         }
 
                         $.ajax({
