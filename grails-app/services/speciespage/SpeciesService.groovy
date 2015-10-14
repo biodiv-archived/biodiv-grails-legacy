@@ -1753,9 +1753,9 @@ class SpeciesService extends AbstractObjectService  {
                 queryParams['classification'] = classification.id 
                 activeFilters['classification'] = classification.id
                 query += " join s.taxonConcept.hierarchies as reg "
-                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!')";
                 countQuery += " join s.taxonConcept.hierarchies as reg "
-                countFilterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                countFilterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!')";
 
                 speciesCountQuery += " join s.taxonConcept.hierarchies as reg "
                 speciesStatusCountQuery += " join s.taxonConcept.hierarchies as reg "
