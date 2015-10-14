@@ -287,10 +287,6 @@
 
                     </div-->
 
-                    <div class="sidebar_section">
-                        <h5> <g:message code="button.pagesUnderTaxa" /> </h5>
-                        <s:showSpeciesList model="['instanceTotal':0]"/>
-                    </div>
                     <uGroup:objectPostToGroupsWrapper 
                     model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                     <div class="sidebar_section">
@@ -344,7 +340,7 @@
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
-                updateGallery('/species/list', 30, 0, undefined, true);
+                updateGallery('/species/list', 8, 0, undefined, true);
             });
 
 

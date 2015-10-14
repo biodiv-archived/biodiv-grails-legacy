@@ -1693,6 +1693,31 @@ class SpeciesController extends AbstractObjectController {
         return formatRelatedResults(relatedObv, params);
     }
 
+    def hasPermissionToCreateSpeciesPage() {
+        def result = [success:true]
+        if (!springSecurityService.isLoggedIn()) {
+            result = [success:false, msg:'Please login'];
+            render result as JSON;
+            return;
+        }
+println "is logged in "
+        if (!params.taxonId) {
+            result = [success:false, msg:'Please select a taxon'];
+            render result as JSON;
+            return;
+        }
+
+        def tD = TaxonomyDefinition.read(Long.parseLong(params.taxonId));
+        if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
+            result = [success:false, msg:'Please request for permission to contribute to this taxon'];
+            render result as JSON
+            return
+
+        } 
+        render result as JSON
+        return
+    }	
+
     def testingCount() {
         def sp = Species.read(228424L);
         println "=========!ST COUNT ====== " + sp.fetchResourceCount();

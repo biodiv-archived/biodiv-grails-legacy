@@ -54,7 +54,9 @@
                             </div>
                         <div id="taxonBrowser" class="span4" style="position:relative">
 
+                            <button class='createPage btn pull-right' style="display:none;" title='Create page for the selected taxon'><i class="icon-plus"></i>Create page</button>
 						    <uGroup:objectPostToGroupsWrapper model="['objectType':Species.class.canonicalName, canPullResource:canPullResource]"/>
+
                             <div class="taxonomyBrowser sidebar_section" style="position:relative">
                                 <h5><g:message code="button.taxon.browser" /></h5>	
                                 <div id="taxaHierarchy">
@@ -116,6 +118,25 @@
         <g:each in="${TaxonomyRank.list()}" var="t">
         taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
         </g:each>
+        function hasPermissionToCreateSpeciesPage(selectedTaxonId) {
+            $.ajax({ 
+                        url:window.params.species.hasPermissionToCreateSpeciesPageUrl,
+                        data:{taxonId:selectedTaxonId},
+                        success: function(data, statusText, xhr, form) {
+                            if(data.success == true) {
+                                $('.createPage').show();
+                            } else {
+                                $('.createPage').hide();
+                            }
+                        },
+                        error:function (xhr, ajaxOptions, thrownError){
+                            console.log('error');
+	            	        return false;
+                        }
+                        });
+        }
+
+
 	</script>
 
 	<r:script>
@@ -140,6 +161,81 @@
           //$(this).tab('show');
           return false;
         })
+
+			
+
+        var createPage = function(e) {
+            var selectedNode = $('.jstree-anchor.taxon-highlight');
+            if(!selectedNode) {
+            alert('Please select a node in the taxon browser first');
+            return;
+            }
+            var jstree = $('#taxonHierarchy').jstree(true);
+            var node = jstree.get_node(selectedNode);
+            var nodeData = node.original;
+            console.log(node);
+            console.log(nodeData);
+            if(nodeData.speciesid && nodeData.speciesid != -1) {
+            window.location.href = '/species/show/'+nodeData.speciesid;
+            return;
+            }
+
+			$.ajax({ 
+	         	url:window.params.species.hasPermissionToCreateSpeciesPageUrl,
+                data:{taxonId:nodeData.taxonid},
+				success: function(data, statusText, xhr, form) {
+					if(data.success == true) {
+
+                        console.log(e.currentTarget);
+                                       var rParams = {};
+                        rParams['page'] = nodeData.text;
+                        rParams['rank'] = nodeData.rank;
+                        rParams['taxonHirMatch'] = {'ibpId' : nodeData.taxonid};
+                        var parent = node;
+                        while(parent && parent.original) {
+                        rParams['taxonRegistry.'+parent.original.rank] = parent.original.text; 
+                        parent = jstree.get_node(parent.parent);
+                        }
+
+                        $.ajax({
+                            url:window.params.species.saveUrl,
+                            type:'POST',
+                            data:rParams,
+                            dataType:'json',
+                            success:function(data) {
+                            console.log(data);
+                            if(data.success) {
+                            console.log(node);
+                            window.location.href = '/species/show/'+data.instance.id+ '?editMode=true';
+                            } else {
+                            console.log(data.msg+" "+data.errors);
+                            alert(data.msg+" "+data.errors);
+                            }
+                            }, error:function (xhr, ajaxOptions, thrownError){
+                            console.log(xhr.responseText);
+                            var successHandler = this.success, errorHandler = null;
+                            handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+
+                            } 
+                        });
+                        } else {
+                            console.log(data.msg);
+                            alert(data.msg);
+                        }
+                }, error:function (xhr, ajaxOptions, thrownError){
+                            console.log(xhr.responseText);
+                            var successHandler = this.success, errorHandler = null;
+                            handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+
+                            } 
+            });
+        }
+        $('.createPage').click(createPage);
+        if(${params.taxon?:false}){
+        hasPermissionToCreateSpeciesPage(${params.taxon});
+        }
+
+
     });
 
 	</r:script>
