@@ -91,7 +91,6 @@ class NamelistService {
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
         SEARCH_IBP_COUNTER ++;
-        println "========SEARCH IBP CALLED=======>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "--- "+ rank + " :::: userauthoryear " + useAuthorYear ;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
@@ -102,7 +101,7 @@ class NamelistService {
         } else {
             clazz = SynonymsMerged.class; 
         }
-        println "====SEARCHING ON IBP IN CLASS ====== " + clazz
+        //println "====SEARCHING ON IBP IN CLASS ====== " + clazz
         clazz.withNewTransaction{
 			
             println  "Searching canonical + rank + status"
@@ -204,9 +203,6 @@ class NamelistService {
 	 * @return
 	 */
 	public Map nameMapper(List<NameInfo> names) {
-		
-		println "---------------------- name ifons --------- "
-		println names
 		
 		Map finalResult = [:]
 		NamesParser namesParser = new NamesParser();

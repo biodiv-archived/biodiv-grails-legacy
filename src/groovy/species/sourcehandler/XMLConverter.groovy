@@ -118,20 +118,30 @@ class XMLConverter extends SourceConverter {
 		//updating taxon hir here for ibp and col match
 		List taxonNodes = getNodesFromCategory(species.children(), "author contributed taxonomy hierarchy");
 		taxonNodes.each { tn ->
-			
-			k = index + KEY_SEP + sName + KEY_SEP + getData((tn && tn.data)?tn.data[0]:null)
-			updateNode(tn, hirMap, k)
+			if(tn && tn.data){
+				def tmpHirName = getData(tn.data[0])
+				if(tmpHirName){
+					k = index + KEY_SEP + sName + KEY_SEP + getData((tn && tn.data)?tn.data[0]:null)
+					updateNode(tn, hirMap, k)
+				}
+			}
 		}
 		
 		//updating synonyms here for ibp and col match
 		if(synMap){
 			taxonNodes = getNodesFromCategory(species.children(), "synonyms");
 			taxonNodes.each { tn ->
-				k = index + KEY_SEP + sName + KEY_SEP + getData((tn && tn.data)?tn.data[0]:null)
-				updateNode(tn, synMap, k)
+				if(tn && tn.data){
+					tn.data.each { s ->
+						def synName = getData(s)
+						if(synName){
+							k = index + KEY_SEP + sName + KEY_SEP + synName
+							updateNode(s, synMap, k)
+						}
+					}
+				}
 			}
 		}
-	
 	}
 	
 	
@@ -140,10 +150,9 @@ class XMLConverter extends SourceConverter {
 		
 //		println '--------- key ' + k
 //		println "-----------key set ------ " + completeMap.keySet()
-//		
-//		println "----------------- ndoe " + node 
-//		println "----------------- map " + completeMap
 //		println "--------ii--------- map " + m
+//		
+//		println "----------------- ndoe " + node
 		
 		
 		String targetPosition = m['target position']
@@ -1450,7 +1459,7 @@ class XMLConverter extends SourceConverter {
                     println "=======SOURCE HAI == == " + n.viaDatasource.text();
                     viaDatasource = n.viaDatasource.text();
                 }
-                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource);
+                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource, n);
                 if(sfield) {
                     //adding contributors
                     sfield.updateContributors(getUserContributors(n))
@@ -1464,54 +1473,48 @@ class XMLConverter extends SourceConverter {
         return synonyms;
     }
 
-    private SynonymsMerged saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept, viaDatasource = null) {
+    private SynonymsMerged saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept, viaDatasource, Node dataNode ) {
 
         SynonymsMerged sfield = null;
-        if(parsedName && parsedName.canonicalForm) {
-            //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
-            //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
-            
-            def criteria = TaxonomyDefinition.createCriteria();
-            TaxonomyDefinition taxon = criteria.get {
-                ilike("canonicalForm", parsedName.canonicalForm);
-            }
-           
-            if(!taxon) {
-                log.debug "Saving synonym : "+parsedName.name;
-                sfield = new SynonymsMerged();
-                sfield.name = parsedName.name;
-                sfield.relationship = rel;
-                //sfield.taxonConcept = taxonConcept;
-                sfield.rank = taxonConcept.rank;
-                sfield.canonicalForm = parsedName.canonicalForm;
-                sfield.normalizedForm = parsedName.normalizedForm;;
-                sfield.italicisedForm = parsedName.italicisedForm;;
-                sfield.binomialForm = parsedName.binomialForm;;
-                sfield.status = NameStatus.SYNONYM
-                if(viaDatasource){
-                    sfield.viaDatasource = viaDatasource
-                }
-                sfield.uploadTime = new Date();
-                if(!sfield.save(flush:true)) {
-                    sfield.errors.each { log.error it }
-                }
-            } else {
-                println "Looking at existing name : ${taxon}"
-                if(taxon.status == NameStatus.ACCEPTED) {
-                    sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
-                } else {
-                    sfield = taxon as SynonymsMerged;
-                    /*sfield.rank = taxonConcept.rank;
-                    sfield.status = NameStatus.SYNONYM
-                    if(viaDatasource){
-                        sfield.viaDatasource = viaDatasource
-                    }
-                    if(!sfield.save(flush:true)) {
-                        sfield.errors.each { log.error it }
-                    }*/
-
-                }
-            }
+		if(parsedName && parsedName.canonicalForm) {
+			List res = searchIBP(parsedName, -1, false, true, dataNode, NameStatus.SYNONYM)
+	        def taxon = res ? res[0] : null   
+	        if(!taxon) {
+	            log.debug "Saving synonym : "+parsedName.name;
+	            sfield = new SynonymsMerged();
+	            sfield.name = parsedName.name;
+	            sfield.relationship = rel;
+	            //sfield.taxonConcept = taxonConcept;
+	            sfield.rank = taxonConcept.rank;
+	            sfield.canonicalForm = parsedName.canonicalForm;
+	            sfield.normalizedForm = parsedName.normalizedForm;;
+	            sfield.italicisedForm = parsedName.italicisedForm;;
+	            sfield.binomialForm = parsedName.binomialForm;;
+	            sfield.status = NameStatus.SYNONYM
+	            if(viaDatasource){
+	                sfield.viaDatasource = viaDatasource
+	            }
+	            sfield.uploadTime = new Date();
+	            if(!sfield.save(flush:true)) {
+	                sfield.errors.each { log.error it }
+	            }
+	        } else {
+	            println "Looking at existing name : ${taxon}"
+	            if(taxon.status == NameStatus.ACCEPTED) {
+	                sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
+	            } else {
+	                sfield = taxon as SynonymsMerged;
+	                /*sfield.rank = taxonConcept.rank;
+	                sfield.status = NameStatus.SYNONYM
+	                if(viaDatasource){
+	                    sfield.viaDatasource = viaDatasource
+	                }
+	                if(!sfield.save(flush:true)) {
+	                    sfield.errors.each { log.error it }
+	                }*/
+	
+	            }
+	        }
             println "========S FIELD============= " + sfield
             return sfield;
         } else {
@@ -1807,7 +1810,7 @@ class XMLConverter extends SourceConverter {
                             boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
 							
-							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode)
+							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode, NameStatus.ACCEPTED)
                             println "========SEARCH RESULT------>>> #################======== " + searchIBPResult
                             TaxonomyDefinition taxon = null;
                             
@@ -2181,12 +2184,11 @@ class XMLConverter extends SourceConverter {
 	 * @param nameNode
 	 * @return
 	 */
-	private List searchIBP(TaxonomyDefinition parsedName, rank, searchInNull, useAuthorYear, nameNode){
+	private List searchIBP(TaxonomyDefinition parsedName, rank, searchInNull, useAuthorYear, nameNode, status = null){
 		def ibpId = nameNode?.ibpId?.text();
 		def colId = nameNode?.colId?.text();
 		
 		println "----------------- ibp id  " +  ibpId + "  and col id " + colId
-		
 		if(ibpId){
 			ibpId = Long.parseLong(ibpId.trim());
 			return [TaxonomyDefinition.get(ibpId)]
@@ -2199,7 +2201,7 @@ class XMLConverter extends SourceConverter {
 				
 			return [taxon]
 		}
-		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
+		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, status, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
 	}
 	
     /**
@@ -2290,7 +2292,7 @@ class XMLConverter extends SourceConverter {
 			List name = namesParser.parse([cleanSciName])
 			//If ibp or colid is given inside the node then using this method
 			if(nameNode){
-				List res = searchIBP(name, rank, false, true, nameNode)
+				List res = searchIBP(name, rank, false, true, nameNode, NameStatus.ACCEPTED)
 				if(res){
 					return res[0]
 				}
