@@ -349,7 +349,7 @@ def addNewField1(){
 	def f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Taxon Record Name', subCategory:'Rank',description:'Place holder for TaxonRank', displayOrder:85, connection:85)
 	f.save(flush:true)
 	
-	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Author Contributed Taxonomy Hierarchy', subCategory:'Infra Species',description:'Place holder for Infra Species', displayOrder:86, connection:86)
+	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Author Contributed Taxonomy Hierarchy', subCategory:'Infraspecies',description:'Place holder for Infra Species', displayOrder:86, connection:86)
 	f.save(flush:true)
 }
 

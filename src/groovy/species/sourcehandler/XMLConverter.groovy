@@ -420,7 +420,10 @@ class XMLConverter extends SourceConverter {
                     }
 
                     //adding taxonomy classifications
-                    taxonHierarchy.each {it.save();}
+                    taxonHierarchy.each { th ->
+						th = th.merge()
+						th.save();
+					}
 
                     //                  if(defaultSaveAction == SaveAction.MERGE){
                     //                      log.info "Merging with already existing species information : "+existingSpecies.id;
