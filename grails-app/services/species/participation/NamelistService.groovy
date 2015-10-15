@@ -216,41 +216,41 @@ class NamelistService {
         List nameSubLists = parsedNames.collate(5)
         nameSubLists.each { nl ->
 	        TaxonomyDefinition.withNewTransaction {
-	        nl.each { TaxonomyDefinition name ->
-				i++
-				List tmpRes = []
-				if(!name || !name.canonicalForm) {
-					log.debug "Name is not parsed by Names Parser " + name
-					tmpRes << ['match':'None', 'name':'', 'rank':'', 'status': '', 'group' : '', 'position':'','id':'']
-					finalResult[names[i]] = tmpRes
-					// return works here as continue
-					return
-				}
-				
-				List ibpResult = searchIBP(name.canonicalForm, null, null)
-				ibpResult.each { TaxonomyDefinition t ->
-	                t = TaxonomyDefinition.get(t.id)
-					tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
-				}
-				
-				if(!ibpResult){
-					List colResult = searchCOL(name.canonicalForm, 'name');
-					colResult.each { t ->
-						boolean addToList = true
-						int rr = XMLConverter.getTaxonRank(t.rank)
-						if((names[i].rank <= 8) && (names[i].rank > 0)){
-							if(rr != names[i].rank){
-								addToList = false
+		        nl.each { TaxonomyDefinition name ->
+					i++
+					List tmpRes = []
+					if(!name || !name.canonicalForm) {
+						log.debug "Name is not parsed by Names Parser " + name
+						tmpRes << ['match':'None', 'name':'', 'rank':'', 'status': '', 'group' : '', 'position':'','id':'']
+						finalResult[names[i]] = tmpRes
+						// return works here as continue
+						return
+					}
+					
+					List ibpResult = searchIBP(name.canonicalForm, null, null, names[i].rank)
+					ibpResult.each { TaxonomyDefinition t ->
+		                t = TaxonomyDefinition.get(t.id)
+						tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
+					}
+					
+					if(!ibpResult){
+						List colResult = searchCOL(name.canonicalForm, 'name');
+						colResult.each { t ->
+							boolean addToList = true
+							int rr = XMLConverter.getTaxonRank(t.rank)
+							if((names[i].rank <= 8) && (names[i].rank > 0)){
+								if(rr != names[i].rank){
+									addToList = false
+								}
+								
 							}
-							
-						}
-						if(addToList){
-							tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
+							if(addToList){
+								tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
+							}
 						}
 					}
-				}
-				finalResult[names[i]] = tmpRes
-	        }
+					finalResult[names[i]] = tmpRes
+		        }
 	        }
 		}
 		return finalResult;
