@@ -1020,6 +1020,9 @@ class NamelistService {
         println sciName.tempActivityDescription;
         String tempActivityDescription = createNameActivityDescription("Position", sciName.position?.value()?:NamePosition.RAW.value(), position.value());
         sciName.position = position;
+		sciName.attach();
+		sciName = sciName.merge()
+		
         if(!sciName.save(flush:true)) {
             success = false;
             errors = sciName.errors.allErrors;

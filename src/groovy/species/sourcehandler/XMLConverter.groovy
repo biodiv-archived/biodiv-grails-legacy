@@ -1813,7 +1813,7 @@ class XMLConverter extends SourceConverter {
                             boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
 							
-							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode, NameStatus.ACCEPTED)
+							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode)
                             println "========SEARCH RESULT------>>> #################======== " + searchIBPResult
                             TaxonomyDefinition taxon = null;
                             
@@ -2295,14 +2295,14 @@ class XMLConverter extends SourceConverter {
 			List name = namesParser.parse([cleanSciName])
 			//If ibp or colid is given inside the node then using this method
 			if(nameNode){
-				List res = searchIBP(name, rank, false, true, nameNode, NameStatus.ACCEPTED)
+				List res = searchIBP(name, rank, false, true, nameNode)
 				if(res){
 					return res[0]
 				}
 			}
 			
             if(name[0].normalizedForm) {
-				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, name[0].authorYear, NameStatus.ACCEPTED, rank, false, name[0].normalizedForm)
+				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, name[0].authorYear, null, rank, false, name[0].normalizedForm)
 				if(taxonList.size() > 1){
 					log.error '############  ' + "IBP search returning mulitiple result: should not happen " + taxonList
 				}
