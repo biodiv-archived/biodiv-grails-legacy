@@ -1518,6 +1518,10 @@ class XMLConverter extends SourceConverter {
 	
 	            }
 	        }
+			
+			if(dataNode){
+				sfield.updatePosition(dataNode?.position?.text())
+			}
             println "========S FIELD============= " + sfield
             return sfield;
         } else {
