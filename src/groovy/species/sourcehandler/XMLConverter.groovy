@@ -371,7 +371,7 @@ class XMLConverter extends SourceConverter {
                                 //commNames.each { s.addToCommonNames(it); }
                             } else if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.SYNONYMS, 2, language))) {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
-                                //synonyms.each { s.addToSynonyms(it); }
+                                synonyms.each { s.taxonConcept.addSynonym(it); }
                             }
                              else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY, 3, language))) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);

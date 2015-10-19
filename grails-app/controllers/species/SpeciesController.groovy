@@ -702,7 +702,6 @@ class SpeciesController extends AbstractObjectController {
                 }
                 break;
                 case 'synonym':
-                println "=====HELLO HERE========"
                 Long sid = params.sid?params.long('sid'):null;
                 String relationship = params.relationship?:null;
 
