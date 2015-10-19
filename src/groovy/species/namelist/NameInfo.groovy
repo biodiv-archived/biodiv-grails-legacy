@@ -11,6 +11,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+import species.ScientificName
 import species.participation.NamelistService
 
 
@@ -161,6 +163,10 @@ class NameInfo {
 					cell.setCellValue(name.sourceName);
 					cell = row.getCell(3, Row.CREATE_NULL_AS_BLANK);
 					cell.setCellValue("");
+					if(name.rank > -1 ){
+						cell = row.getCell(4, Row.CREATE_NULL_AS_BLANK);
+						cell.setCellValue(ScientificName.TaxonomyRank.getTRFromInt(name.rank)?.value());
+					}
 				}else{
 					result.each { Map r ->
 						row = sheet.createRow(rowNum++);
