@@ -1109,6 +1109,20 @@ class SpeciesController extends AbstractObjectController {
 	}
 	
 	@Secured(['ROLE_SPECIES_ADMIN'])
+	def uploadNames() {
+		log.debug params.xlsxFileUrl
+		if(params.xlsxFileUrl){
+			Language languageInstance = utilsService.getCurrentLanguage(request);
+			params.locale_language = languageInstance;
+			log.debug  "Choosen languauge is ${languageInstance}"
+			params.uploadType = "namesUpload"
+			def res = speciesUploadService.basicUploadValidation(params)
+			log.debug "Starting names upload"
+			render(text:res as JSON, contentType:'text/html')
+		}
+	}
+	
+	@Secured(['ROLE_SPECIES_ADMIN'])
 	def generateNamesReport() {
 		log.debug params.xlsxFileUrl
 		if(params.xlsxFileUrl){

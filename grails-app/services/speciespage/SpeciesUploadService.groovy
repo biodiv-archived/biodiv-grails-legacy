@@ -143,7 +143,7 @@ class SpeciesUploadService {
 			return  ['msg': 'Name validation failed !!!' ]
 		}
 		
-		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir)
+		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
 		
 		return ['msg': 'Bulk upload in progress. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
 		
@@ -358,7 +358,7 @@ class SpeciesUploadService {
 						speciesElements.add(speciesElement);
 					}
 				}
-				def res = saveSpeciesElementsWrapper(speciesElements)
+				def res = saveSpeciesElementsWrapper(speciesElements, sBulkUploadEntry)
 				speciesElements.clear()
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.summary);
@@ -388,8 +388,8 @@ class SpeciesUploadService {
 		return (sbu.status == SpeciesBulkUpload.Status.ABORTED)
 	}
 	
-	private Map saveSpeciesElementsWrapper(List speciesElements) {
-		def res = saveSpeciesElements(speciesElements)
+	private Map saveSpeciesElementsWrapper(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
+		def res = saveSpeciesElements(speciesElements, sBulkUploadEntry)
 		if(res.noOfInsertions == speciesElements.size()){
 			return res
 		}
@@ -398,7 +398,7 @@ class SpeciesUploadService {
 		List<Species> species = new ArrayList<Species>();
 		int noOfInsertions = 0;
 		speciesElements.each { sEle ->
-			def tmpRes = saveSpeciesElements([sEle])
+			def tmpRes = saveSpeciesElements([sEle], sBulkUploadEntry)
 			noOfInsertions += tmpRes.noOfInsertions
 			species.addAll(tmpRes.species)
 		}
@@ -406,22 +406,35 @@ class SpeciesUploadService {
 		return ['noOfInsertions':noOfInsertions, 'species':species];
 	}
 	
-	private Map saveSpeciesElements(List speciesElements) {
+	private Map saveSpeciesElements(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
 		XMLConverter converter = new XMLConverter();
         converter.setLogAppender(fa);
 		
-		List<Species> species = new ArrayList<Species>();
+		List species = []
 
 		int noOfInsertions = 0;
 		try {
-			for(Node speciesElement : speciesElements) {
-				Species.withNewTransaction { status ->
-					Species s = converter.convertSpecies(speciesElement)
-					if(s)
-						species.add(s);
+			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
+				for(Node speciesElement : speciesElements) {
+					Species.withNewTransaction { status ->
+						def s = converter.convertName(speciesElement)
+						if(s){
+							s.postProcess()
+							species.add(s)
+							noOfInsertions++;
+						}
+					}
 				}
+			}else{
+				for(Node speciesElement : speciesElements) {
+					Species.withNewTransaction { status ->
+						Species s = converter.convertSpecies(speciesElement)
+						if(s)
+							species.add(s);
+					}
+				}
+				noOfInsertions += saveSpecies(species);
 			}
-			noOfInsertions += saveSpecies(species);
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
@@ -730,8 +743,8 @@ class SpeciesUploadService {
 
 
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
-	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null){
-		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes)
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null){
+		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType)
 		
 	}
 	

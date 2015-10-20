@@ -1112,11 +1112,12 @@ class NamelistService {
         }
         if(m['rank'] == 'infraspecies'){
             if(m['species']) {
+				def authStr = ""
                 if(m['id_details']) {
-                def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
-                m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
+					authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
+					m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
                 }
-                result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
+                result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr?:"";    
             }
             result['taxonRegistry.10'] = res['10'] = m['infraspecies']      //TODO:check author year coming or not + " " + m['authorString'];
         } else {

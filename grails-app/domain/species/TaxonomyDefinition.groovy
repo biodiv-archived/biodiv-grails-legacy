@@ -467,4 +467,9 @@ class TaxonomyDefinition extends ScientificName {
 			}
 		}
 	}
+	
+	public String fetchLogSummary(){
+		return name + "\n" 
+	}
+	
 }

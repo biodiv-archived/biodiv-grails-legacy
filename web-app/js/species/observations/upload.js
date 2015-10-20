@@ -434,6 +434,17 @@ $('#downloadNamesMapper').click(function() {
     $(this).removeClass('disabled');
 });
 
+$('#uploadNames').click(function() {
+    if($(this).hasClass('disabled')) {
+        alert(window.i8ln.observation.upload.again);
+        event.preventDefault();
+        return false; 		 		
+    }
+    $(this).addClass('disabled');
+    $("#uploadSpecies").addClass('disabled');
+    uploadSpecies(window.params.uploadNamesURL);
+    $(this).removeClass('disabled');
+});
 
 
 function uploadSpecies(url){

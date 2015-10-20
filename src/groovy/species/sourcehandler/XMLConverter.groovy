@@ -449,6 +449,92 @@ class XMLConverter extends SourceConverter {
         }
     }
 
+	
+	public TaxonomyDefinition convertName(Node species) {
+		
+		if(!species) return null;
+
+		try {
+			log.info "Creating/Updating names"
+			log.info species
+			removeInvalidNode(species);
+
+			Language language;
+			//sciName is must for the species to be populated
+			Node speciesNameNode = species.field.find {
+				language = it.language[0].value();
+				it.subcategory.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.SCIENTIFIC_NAME, 3, language));
+			}
+
+			//XXX: sending just the first element need to decide on this if list has multiple elements
+			def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
+			addToSummary("<<< NAME >>> "  + speciesName)
+			if(speciesName) {
+				//adding scientific name as last node in author contribute hir so that author year and other info picked from scientific name column
+				addScNameNode(species, speciesNameNode)
+				
+				//getting classification hierarchies and saving these taxon definitions
+				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true).taxonRegistry;
+
+				//taxonConcept is being taken from only author contributed taxonomy hierarchy
+				TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy);
+
+				// if the author contributed taxonomy hierarchy is not specified
+				// then the taxonConept is null and sciName of species is saved as concept and is used to create the page
+				int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
+				taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
+				
+				if(taxonConcept) {
+					taxonConcept.updatePosition(speciesNameNode?.position?.text())
+
+					List<SynonymsMerged> synonyms;
+
+					for(Node fieldNode : species.children()) {
+						if(fieldNode.name().equals("field")) {
+							if(!isValidField(fieldNode)) {
+								log.warn "NOT A VALID FIELD : "+fieldNode;
+								addToSummary("NOT A VALID FIELD : "+fieldNode)
+								continue;
+							}
+
+							String concept = fieldNode.concept?.text()?.trim();
+							String category = fieldNode.category?.text()?.trim();
+							String subcategory = fieldNode.subcategory?.text()?.trim();
+
+							language = fieldNode.language[0].value();
+
+							if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.COMMON_NAME, 2, language))) {
+								List<CommonNames> commNames = createCommonNames(fieldNode, taxonConcept);
+							} else if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.SYNONYMS, 2, language))) {
+								synonyms = createSynonyms(fieldNode, taxonConcept);
+								synonyms.each {taxonConcept.addSynonym(it); }
+							}
+						}
+					}
+
+					//adding taxonomy classifications
+					taxonHierarchy.each { th ->
+						th = th.merge()
+						th.save();
+					}
+					return taxonConcept;
+				} else {
+					log.error "TaxonConcept is not found"
+					addToSummary("TaxonConcept is not found")
+				}
+			} else {
+				log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
+				addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
+			}
+		} catch(Exception e) {
+			log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
+			e.printStackTrace();
+			addToSummary(e);
+		}
+	}
+	
+	
+	
     /**
      * Removing nodes whose field concept is null
      * @param speciesNodes

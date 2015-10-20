@@ -127,6 +127,11 @@
                     <a id="uploadSpecies"
                         class="btn btn-primary" style="float: right; margin-right: 5px;">
                         <g:message code="button.upload.species" /></a>
+                    
+                    <a id="uploadNames"
+                        class="btn btn-primary" style="float: right; margin-right: 5px;">
+                        <g:message code="button.upload.names" /></a>
+                        
                     <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img class="uploadingSpecies" src="../images/rotate.gif"></div>
                     <span class="policy-text"> <g:message code="upload.submit.upload" /> <a href="/terms"><g:message code="link.terms.conditions" />          </a> <g:message code="button.propogate" /><g:message code="register.index.use.of.site" /></span>
                 </div>
