@@ -63,7 +63,7 @@
                 </div>
                 </div>
                 <div id="resourceTabs-3">						
-                    <div id="gallery3"></div>
+                    <div id="gallery3" style="margin-top: 60px;"></div>
                     <div id="flickrBranding"></div><br/>
                     <div class="message ui-corner-all"><g:message code="showspeciesintro.irrelevant.images" /></div>
                 </div> 
