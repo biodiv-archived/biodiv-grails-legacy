@@ -3,7 +3,7 @@
 <%@page import="species.Species"%>
 
 
-<div class="species_title">
+<div class="species_title species_title_${observationInstance.id}">
 	<%
 		def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()
 		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();

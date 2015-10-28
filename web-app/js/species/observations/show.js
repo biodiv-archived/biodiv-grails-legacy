@@ -13,9 +13,9 @@ function showRecos(data, textStatus,observationId) {
     else
         recoSummaryWrap.html(data.model.recoHtml);
     var speciesName =  data.model.speciesName;
-   // $('.species_title').replaceWith(data.model.speciesNameTemplate);
-    //$('.page-header .species-page-link').hide();
-    //$('.species-external-link').replaceWith(data.model.speciesExternalLinkHtml);
+     $('.species_title_'+observationId).replaceWith(data.model.speciesNameTemplate);
+     $('.page-header .species-page-link').hide();
+     $('.species-external-link').replaceWith(data.model.speciesExternalLinkHtml);
     if($('#carousel_a').length > 0) {
         reloadCarousel($('#carousel_a').data('jcarousel'), 'speciesName', speciesName);
     }
