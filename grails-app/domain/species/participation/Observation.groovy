@@ -143,7 +143,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 	}
 
 	private Recommendation findMaxRepeatedReco(){
-        def recoVotes = RecommendationVote.findAllByObservation(this);
+        /*def recoVotes = RecommendationVote.findAllByObservation(this);
         def votesCounts = [:];
         //aggregating votes across all recommendation accepted names
         recoVotes.each { recoVote ->
@@ -162,7 +162,8 @@ class Observation extends Metadata implements Taggable, Rateable {
             }
         }
         return Recommendation.findByName(maxVoteName);
-/*
+        */
+
 
 		//getting list of max repeated recoIds
 		def sql =  Sql.newInstance(dataSource);
@@ -190,7 +191,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		def recoVote = RecommendationVote.find(query, [observation:this, recoIds:recoIds])
 		updateChecklistAnnotation(recoVote)
 		return recoVote.recommendation
-        */
+        
 	}
 
 	void calculateMaxVotedSpeciesName(){

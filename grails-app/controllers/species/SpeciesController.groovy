@@ -144,8 +144,6 @@ class SpeciesController extends AbstractObjectController {
             rank = params.int('rank');
             hirNameList.putAt(rank, speciesName);
 			
-			println "--------------------- taxonHirMatch  " + params.taxonHirMatch
-
             try {
                 result = speciesService.createSpecies(speciesName, rank, hirNameList, params.colId, languageInstance, params.taxonHirMatch);
                 result.errors = result.errors ? ' : '+result.errors : '';
@@ -328,7 +326,6 @@ class SpeciesController extends AbstractObjectController {
                 json { render utilsService.getSuccessModel('', speciesInstance, OK.value()) as JSON }
                 xml { render utilsService.getSuccessModel('', speciesInstance, OK.value()) as XML }
             }
-            println "returning"
             if(result) return result
         }
     }
@@ -576,10 +573,6 @@ class SpeciesController extends AbstractObjectController {
                 for(int i=0; i< keys.size()-1; i++) {
                     newMap = newMap[keys[i]];
                 }
-                println "000000000000000"
-                println keys
-                println newMap
-                println keys[keys.size()-1]
                 //println newMap
                 newMap[keys[keys.size()-1]] = change.value;
             }
@@ -618,12 +611,10 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def update() {
-        println "========PARAMS======== " + params 
         if(params.dataFromCuration) {
             params << JSON.parse(params.dataFromCuration)
             params.remove('dataFromCuration');
         }
-        println "========PARAMS======== " + params 
         def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
