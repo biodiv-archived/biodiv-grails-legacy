@@ -255,7 +255,7 @@
     }
     var onloadCallback = function() {
     //    grecaptcha.render('html_element', <recaptcha:renderParameters successCallback='onRecaptchaSuccess' tabindex="2"/>);
-    grecaptcha.render('html_element', { 'sitekey': '6LcTrw8TAAAAAIV23l0NE207OzQBsXcZXTT1t25T', 'callback': onRecaptchaSuccess, 'tabindex': '2'});
+        grecaptcha.render('html_element', { 'sitekey': '${grailsApplication.config.recaptcha.publicKey}', 'callback': onRecaptchaSuccess, 'tabindex': '2'});
     $('#g_recaptcha_response').val('');
     };
     </script>
