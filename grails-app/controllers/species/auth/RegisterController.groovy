@@ -612,7 +612,7 @@ class CustomRegisterCommand {
 				if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), ['g-recaptcha-response':command.g_recaptcha_response])) {
 					return 'reCaptcha.invalid.message'
 				}
-			}catch (com.octo.captcha.service.CaptchaServiceException e) {
+			}catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace()
 				return 'reCaptcha.invalid.message'

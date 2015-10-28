@@ -940,11 +940,11 @@ class SpeciesUploadService {
 		}
 		
 		s.resources.each { res ->
-			if(resources.contains(res)){
+//			if(resources.contains(res)){
 				log.debug "Removing resource " + res
 				s.removeFromResources(res)
-				resources.remove(res)
-			}
+//				resources.remove(res)
+//			}
 		}
 		
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;

@@ -250,7 +250,6 @@
     <script type="text/javascript">
 
     var onRecaptchaSuccess = function(g_recaptcha_response) {
-    console.log(g_recaptcha_response);
     $('#g_recaptcha_response').val(g_recaptcha_response);
     }
     var onloadCallback = function() {
