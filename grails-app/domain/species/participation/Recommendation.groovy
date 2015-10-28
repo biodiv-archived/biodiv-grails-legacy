@@ -57,8 +57,11 @@ class Recommendation {
 	   map.put("isScientificName", isScientificName);
 	   
 	   if(this?.taxonConcept) {
-		   map.put("speciesId", this?.taxonConcept?.findSpeciesId());
-		   map.put("canonicalForm", this?.taxonConcept?.canonicalForm)
+		   map.put("speciesId", this.taxonConcept.findSpeciesId());
+		   map.put("canonicalForm", this.taxonConcept.canonicalForm)
+           if(!this.name.equalsIgnoreCase(this.taxonConcept.canonicalForm) && this.isScientificName) {
+    		   map.put("synonymOf", this?.taxonConcept?.canonicalForm)
+           }
 	   } else {
 	   }
 	   

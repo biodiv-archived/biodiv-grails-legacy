@@ -210,7 +210,8 @@
                             window.location.href = '/species/show/'+data.instance.id+ '?editMode=true';
                             } else {
                             console.log(data.msg+" "+data.errors);
-                            alert(data.msg+" "+data.errors);
+                            if(data.msg)
+                                alert(data.msg+" "+data.errors);
                             }
                             }, error:function (xhr, ajaxOptions, thrownError){
                             console.log(xhr.responseText);
@@ -221,7 +222,8 @@
                         });
                         } else {
                             console.log(data.msg);
-                            alert(data.msg);
+                            if(data.msg)
+                                alert(data.msg);
                         }
                 }, error:function (xhr, ajaxOptions, thrownError){
                             console.log(xhr.responseText);

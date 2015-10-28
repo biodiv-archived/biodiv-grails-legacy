@@ -38,7 +38,8 @@
                            dataType: "json",
                            data: {
                                 term : request.term,
-                                rank : $(this)[0].element.data('rank')
+                                rank : $(this)[0].element.data('rank'),
+                                nameFilter : request.nameFilter
                            },
                            success: function(data, status, xhr) {
                                //cache[_options.nameFilter][ term ] = data;
@@ -136,6 +137,7 @@ function initializeNameSuggestion() {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
             $(this).closest(".sciNameDiv").find(".canName").val( ui.item.value );
             $(this).closest(".sciNameDiv").find(".mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
+            $(this).closest(".sciNameDiv").find(".speciesId").val( ui.item.speciesId );
             return false;
         },open: function(event, ui) {
             //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 

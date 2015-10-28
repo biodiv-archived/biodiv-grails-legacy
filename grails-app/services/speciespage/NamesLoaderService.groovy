@@ -66,7 +66,7 @@ class NamesLoaderService {
         def tmpTableName = "tmp_taxon_concept"
         try {
 			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
-            conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id where r.name is null and  t.status = 'ACCEPTED' order by t.id ");
+            conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id and t.canonical_form = r.name where r.name is null and  t.status = 'ACCEPTED' order by t.id ");
         } finally {
             conn.close();
         }

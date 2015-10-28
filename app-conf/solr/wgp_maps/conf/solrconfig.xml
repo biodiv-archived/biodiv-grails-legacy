@@ -33,14 +33,11 @@
 
 <!-- Make sure the solr-dataimporthandlers are visible to solr -->
 
-  <lib dir="../lib/" regex="postgres*" />
+  <lib dir="/data/solr/wgp_maps/lib/" regex="postgresql-8.4-703.jdbc4.jar" />
 
   <indexConfig>
    <!-- Values here affect all index writers and act as a default unless overridden. -->
-
-    <maxMergeDocs>2147483647</maxMergeDocs>
-    <maxFieldLength>10000</maxFieldLength>
-    <writeLockTimeout>1000</writeLockTimeout>
+      <writeLockTimeout>1000</writeLockTimeout>
     <commitLockTimeout>10000</commitLockTimeout>
 
     <!--

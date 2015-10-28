@@ -1693,7 +1693,7 @@ class SpeciesController extends AbstractObjectController {
             render result as JSON;
             return;
         }
-println "is logged in "
+
         if (!params.taxonId) {
             result = [success:false, msg:'Please select a taxon'];
             render result as JSON;
@@ -1707,6 +1707,15 @@ println "is logged in "
             return
 
         } 
+
+        def s = Species.findByTaxonConcept(td);
+        if(s) {
+            result = [success:false];
+            render result as JSON
+            return
+
+        } 
+
         render result as JSON
         return
     }	

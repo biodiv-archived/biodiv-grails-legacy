@@ -38,5 +38,5 @@ cadb () {
 
 
 export BIODIV_CONFIG_LOCATION=~/.grails/additional-config.groovy
-export GRAILS_OPTS="-XX:MaxPermSize=256m -Xmx1024M -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
+export GRAILS_OPTS="-Xms1024M -Xmx3G -XX:MaxPermSize=512m -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
 export JAVA_OPTS="$JAVA_OPTS -Dsolr.solr.home=/home/sandeept/git/biodiv/app-conf/solr -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator "

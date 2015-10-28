@@ -72,7 +72,12 @@
         </g:elseif>
         <g:else>
         ${r.name}
-        </g:else>${r.commonNames}</span>
+        </g:else>
+        <g:if test="${r.synonymOf}">
+        (Synonym of <i>${r.synonymOf}</i>)
+        </g:if>
+        
+        ${r.commonNames}</span>
         <comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':r.observationInstance?:observationInstance]" />
         <%--				<obv:showRecoComment--%>
         <%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>

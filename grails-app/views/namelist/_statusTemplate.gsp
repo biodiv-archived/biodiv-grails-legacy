@@ -1,10 +1,8 @@
 
 <%@page import="species.NamesMetadata.NamePosition"%>
-<sUser:isAdmin>
 <g:if test="${taxon}">
 <a class="status_a" href="${uGroup.createLink(controller:'namelist', 'taxon':taxon.id, absolute:true)}">
 </g:if>
-</sUser:isAdmin>
 <g:if test="${position == NamePosition.RAW}">
 <span class="label label-success status dirty_list" title="This name appears in the IBP Raw list">${raw(status)}</span>
 </g:if>
@@ -14,8 +12,6 @@
 <g:else>
 <span class="label label-warning status clean_list" title="This name appears in the IBP Clean list">${raw(status)}</span>
 </g:else>
-<sUser:isAdmin>
 <g:if test="${taxon}">
 </a>
 </g:if>
-</sUser:isAdmin>

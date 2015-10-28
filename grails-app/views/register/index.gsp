@@ -148,8 +148,26 @@
 
 							</div>
 						</div>
+                        <recaptcha:ifEnabled>
 
-						<div
+                        <div class="control-group ${hasErrors(bean: command, field: 'g_recaptcha_response', 'error')}">
+                            <label class="control-label" for="g_recaptcha_response">
+                            </label>
+
+                            <div class="controls">
+                                <recaptcha:recaptchaExplicit loadCallback="onloadCallback" successCallback="onRecaptchaSuccess"/>
+                                <div id="html_element"></div>
+                                <textarea id="g_recaptcha_response" name="g_recaptcha_response" class="g_recaptcha_response" style="width: 250px; height: 40px; border: 1px solid #c1c1c1; margin: 10px 25px; padding: 0px; resize: none;  display: none; "></textarea>
+								<g:hasErrors bean="${command}" field="g_recaptcha_response">
+									<div class="help-inline">
+										<g:renderErrors bean="${command}" field="g_recaptcha_response" />
+									</div>
+								</g:hasErrors>
+                                <recaptcha:ifFailed/>
+                            </div>
+                            </recaptcha:ifEnabled>
+                        </div>
+                            <!--div
 							class="control-group ${hasErrors(bean: command, field: 'captcha_response', 'error')}">
 							<label class="control-label" for="captcha_response"><jcaptcha:jpeg
 									name="imageCaptcha" height="100px" width="100px" />
@@ -168,7 +186,7 @@
 								</g:hasErrors>
 
 							</div>
-						</div>
+						</div-->
 
 						<div class="control-group">
 							<span class="policy-text"> <g:message code="register.index.policy" />
@@ -229,6 +247,18 @@
 			</fieldset>
 		</div>
 	</div>
+    <script type="text/javascript">
+
+    var onRecaptchaSuccess = function(g_recaptcha_response) {
+    console.log(g_recaptcha_response);
+    $('#g_recaptcha_response').val(g_recaptcha_response);
+    }
+    var onloadCallback = function() {
+    //    grecaptcha.render('html_element', <recaptcha:renderParameters successCallback='onRecaptchaSuccess' tabindex="2"/>);
+    grecaptcha.render('html_element', { 'sitekey': '6LcTrw8TAAAAAIV23l0NE207OzQBsXcZXTT1t25T', 'callback': onRecaptchaSuccess, 'tabindex': '2'});
+    $('#g_recaptcha_response').val('');
+    };
+    </script>
 
 </body>
 </html>

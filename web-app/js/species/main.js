@@ -101,6 +101,8 @@ function showUpdateStatus(msg, type, $ele) {
             $ele.hide();
         }
 }
+
+
 jQuery(document).ready(function($) {
 
 
