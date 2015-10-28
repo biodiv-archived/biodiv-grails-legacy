@@ -716,7 +716,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getRecommendation(params){
-        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
+        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName, params.speciesId)
     }
 
     /**
@@ -726,14 +726,14 @@ class ObservationService extends AbstractObjectService {
     * languageName
     * 
     **/
-    Map getRecommendations(String recoName, String canName, String commonName, String languageName) {
+    Map getRecommendations(String recoName, String canName, String commonName, String languageName, Long speciesId=null) {
         def languageId = Language.getLanguage(languageName).id;
         //		def refObject = params.observation?:Observation.get(params.obvId);
 
         //if source of recommendation is other that observation (i.e Checklist)
         //		refObject = refObject ?: params.refObject
         Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
-        Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco);
+        Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId);
 
         //		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
 

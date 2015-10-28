@@ -103,9 +103,7 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def list() {
-        println "+++++++++++++++++++"
 		def model = runLastListQuery(params);
-        println "+++++++++++++++++++"
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
@@ -131,9 +129,6 @@ class ObservationController extends AbstractObjectController {
                 } else if(!params.isGalleryUpdate?.toBoolean()){
                     model.model['width'] = 300;
                     model.model['height'] = 200;
-println "=================================================="
-                    println "=================================================="
-
                     render (view:"list", model:model.model)
                     return;
                 } else {
@@ -150,12 +145,6 @@ println "=================================================="
 
                     render result as JSON
 */
-                    println "=================================================="
-                    println "=================================================="
-                    println "=================================================="
-                    println "=================================================="
-                    println "=================================================="
-                    
                     return;
                 }
             }
@@ -768,7 +757,7 @@ println "=================================================="
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName, params.long('speciesId'));
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -993,7 +982,7 @@ println "=================================================="
 			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName, params.long('speciesId'));
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -1318,7 +1307,7 @@ println "=================================================="
     * languageName
 	 * @return
 	 */
-	private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String canName, String commonName, String languageName) {
+	private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String canName, String commonName, String languageName, Long speciesId) {
 		def observation = params.observation?:Observation.get(obvId);
 		
 		ConfidenceType confidence = observationService.getConfidenceType(conf?:ConfidenceType.CERTAIN.name());
@@ -1331,7 +1320,7 @@ println "=================================================="
 			isAgreeRecommendation = true
 		} else {
 			//add recommendation used so taking both reco and common name reco if available
-			def recoResultMap = observationService.getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
+			def recoResultMap = observationService.getRecommendations(recoName, canName, commonName, languageName, speciesId)
 			reco = recoResultMap.mainReco;
 			commonNameReco =  recoResultMap.commonNameReco;
 		}

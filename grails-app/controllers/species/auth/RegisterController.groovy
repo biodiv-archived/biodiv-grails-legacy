@@ -32,10 +32,10 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	def facebookAuthService;
 	def springSecurityService;
 	def openIDAuthenticationFilter;
-	def jcaptchaService;
+	//def jcaptchaService;
 	def activityFeedService;
 	def messageSource;
-	//def recaptchaService;	
+	def recaptchaService;	
     //def grailsApplication
     def utilsService;
 
@@ -137,7 +137,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			return
 		}
 
-        //recaptchaService.cleanUp(session)
+        recaptchaService.cleanUp(session)
         if(params.webaddress) {
             //trigger joinUs 
             def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
@@ -582,13 +582,14 @@ class CustomRegisterCommand {
 	String profilePic;
 	String openId;
 	boolean facebookUser;
+    String g_recaptcha_response;
 	//String recaptcha_response_field;
 	//String recaptcha_challenge_field;
-	String captcha_response;
+	//String captcha_response;
 	
 	def grailsApplication
-	def jcaptchaService;
-	//def recaptchaService;
+	//def jcaptchaService;
+	def recaptchaService;
 	
 		
 	static constraints = {
@@ -603,12 +604,12 @@ class CustomRegisterCommand {
  		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
-		captcha_response blank:false, nullable:false, validator: { value, command ->
+		g_recaptcha_response blank:false, nullable:false, validator: { value, command ->
 			def session = RCH.requestAttributes.session
 			def request = RCH.requestAttributes.request
 			try{
-				if (!command.jcaptchaService.validateResponse("imageCaptcha", session.id, command.captcha_response)) {
-					//if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), command)) {
+				//if (!command.jcaptchaService.validateResponse("imageCaptcha", session.id, command.captcha_response)) {
+				if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), ['g-recaptcha-response':command.g_recaptcha_response])) {
 					return 'reCaptcha.invalid.message'
 				}
 			}catch (com.octo.captcha.service.CaptchaServiceException e) {
