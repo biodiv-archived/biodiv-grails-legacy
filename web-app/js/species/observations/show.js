@@ -28,6 +28,14 @@ function lockObv(url, lockType, recoId, obvId, ele) {
         event.preventDefault();
         return false;               
     }
+   
+    if($(ele).hasClass('LockedNow')) {
+        $(ele).removeClass('LockedNow');
+        lockType = $(ele).attr('rel');
+    }else{
+        $(ele).addClass('LockedNow');
+    }
+
     $.ajax({
         url:url,
         dataType: "json",
@@ -38,14 +46,18 @@ function lockObv(url, lockType, recoId, obvId, ele) {
                 //$("#addRecommendation").hide();
                 $('.nameContainer_'+obvId+' input').attr('disabled', 'disabled');
                 $('.iAgree_'+obvId+' button').addClass('disabled');
-                $(".lockObvId_"+obvId).hide();
+                $(".lockObvId_"+obvId).addClass('disabled');              
+                $(ele).attr('rel','Unlock');
+                $(ele).html('<i class="icon-lock"></i>Unlock').removeClass('disabled');
                 showUpdateStatus(data.msg, 'success',seeMoreMessage);
             }
             else{
                 //$("#addRecommendation").show();
                 $('.nameContainer_'+obvId+' input').removeAttr('disabled');
                 $('.iAgree_'+obvId+' button').removeClass('disabled');
-                $(".lockObvId_"+obvId).hide();
+                $(".lockObvId_"+obvId).removeClass('disabled');              
+                $(ele).attr('rel','Validate');
+                $(ele).html('<i class="icon-lock"></i>Validate').removeClass('disabled');
                 showUpdateStatus(data.msg, 'success',seeMoreMessage);
             }
             updateFeeds();
