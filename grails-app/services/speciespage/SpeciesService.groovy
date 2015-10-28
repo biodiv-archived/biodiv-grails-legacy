@@ -1079,6 +1079,13 @@ class SpeciesService extends AbstractObjectService  {
             Node l = new Node(data, "language");
             new Node(l, 'name', language);
             new Node(data, "contributor", springSecurityService.currentUser.email);
+
+            if(oldCommonname) {
+                oldCommonname.contributors.each { c ->                        
+                    new Node(data, "contributor", c.email);
+                }
+            }      
+
             if(otherParams) {
                 new Node(data, "viaDatasource", otherParams['source']);
             }
@@ -1092,7 +1099,7 @@ class SpeciesService extends AbstractObjectService  {
                 msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
                 content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
                 String activityType, mailType, description;
-                if(oldCommonname) {
+                if(oldCommonname) {                    
                     description = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
                     mailType =  activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
                 } else {
@@ -1284,7 +1291,13 @@ class SpeciesService extends AbstractObjectService  {
             String msg = '';
             def content;
             try{
-                oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                if(utilsService.isAdmin(springSecurityService.currentUser)){
+                    if(oldSynonym.contributors.size() > 0) {
+                        oldSynonym.contributors.clear();
+                    }
+                }else{ 
+                    oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                }
                 taxonConcept = taxonConcept?:(speciesInstance ? speciesInstance.taxonConcept : oldSynonym);
                 taxonConcept.removeSynonym(oldSynonym);
                 if(oldSynonym.contributors.size() == 0) {
@@ -1344,8 +1357,13 @@ class SpeciesService extends AbstractObjectService  {
             String msg = '';
             def content;
             try{
-                oldCommonname.removeFromContributors(springSecurityService.currentUser);
-                
+                if(utilsService.isAdmin(springSecurityService.currentUser)){
+                    if(oldCommonname.contributors.size() > 0) {
+                        oldCommonname.contributors.clear();
+                       }
+                }else{ 
+                    oldCommonname.removeFromContributors(springSecurityService.currentUser);
+                }
                 if(oldCommonname.contributors.size() == 0) {
                     oldCommonname.delete(failOnError:true)
                 } else {
