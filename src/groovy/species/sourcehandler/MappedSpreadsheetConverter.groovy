@@ -14,9 +14,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.FileAppender;
 import species.utils.Utils;
 import species.Language;
+import species.namelist.NameInfo;
+
 
 class MappedSpreadsheetConverter extends SourceConverter {
-
+	
 	//protected static SourceConverter _instance;
 	private static def log = LogFactory.getLog(this);
 	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
@@ -26,11 +28,99 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	public List<Map> mappingConfig;
 	public String imagesDir;
 	
+	private XMLConverter xmlConverter 
+	private Map speciesNameMap
+	private Map taxonHirMap
+	private Map synonymMap 
+	protected boolean multipleMatchingRow = false
+	
 	public MappedSpreadsheetConverter() {
 		imagesMetaData = [];
 		this.imagesDir = "";
+		xmlConverter = new XMLConverter()
+		speciesNameMap = [:]
+		taxonHirMap = [:]
+		synonymMap = [:]
 	}
-
+	
+	public initCurationInfo(String file){
+		List<Map> content = SpreadsheetReader.readSpreadSheet(file, NameInfo.TAXON_NAMES_SHEET, 0);
+		updateMap(content, speciesNameMap)
+		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.HIR_SHEET, 0);
+		updateMap(content, taxonHirMap)
+		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.SYNONYMS_SHEET, 0);
+		updateMap(content, synonymMap)
+		
+//		println '---------------------------------------------------'
+//		
+//		println speciesNameMap
+//		println taxonHirMap
+//		println synonymMap
+//		
+//		println '---------------------------------------------------'
+	}
+	
+	private updateMap(List<Map> content, Map targetMap){
+		if(content){
+			content.each { Map m ->
+				if(!m['name'])
+					return
+					
+				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name']
+				if(targetMap.containsKey(key)){
+					multipleMatchingRow = true
+				}
+				m.id = m.id ? m.id.split('\\.')[0]:""
+				targetMap.put(key, m)
+			}
+		}
+	}
+	
+	protected boolean validate(List<NameInfo> nList){
+		
+		boolean isValid = true
+		
+		
+		
+		nList.each { NameInfo sc -> 
+			if(!isValid)
+				return
+			
+			String key = sc.sourceIndex +  KEY_SEP + sc.sourceName +  KEY_SEP + sc.name
+			if(!speciesNameMap.containsKey(key)){
+				println "--- sm --- ??????????? key not present    key " +  key + "  ndoe "  + sc
+				println " map " + speciesNameMap
+				isValid = false
+				return
+			}
+			
+			sc.taxonHir.each { NameInfo ti ->
+				key = ti.sourceIndex +  KEY_SEP + ti.sourceName +  KEY_SEP + ti.name
+				if(!taxonHirMap.containsKey(key)){
+					println "------- tm---- ??????????? key not presen  key " +  key + "  ndoe " + ti
+					println " map " + taxonHirMap
+					
+					isValid = false
+					return
+				}
+			}
+			
+			sc.synonyms.each { NameInfo ti ->
+				key = ti.sourceIndex +  KEY_SEP + ti.sourceName +  KEY_SEP + ti.name
+				if(!synonymMap.containsKey(key)){
+					println "----- syn ---- ??????????? key not present  key " +  key + "  ndoe " + ti
+					println " map " + synonymMap
+					
+					isValid = false
+					return
+				}
+			}
+					 
+		}
+		return isValid
+		
+	}
+	
 	public List<Species> convertSpecies(String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo, String imagesDir="") {
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
 		mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);				
@@ -69,7 +159,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 			//log.debug speciesContent;
 			addToSummary("Creating XML for species row " + currentRowIndex++)
-			Node speciesElement = builder.createNode("species", ['rowIndex':currentRowIndex]);
+			Node speciesElement = new Node(null, "species", ['rowIndex':currentRowIndex]);
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
@@ -89,7 +179,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 
                     //TODO: remove hardcodings for field names
 					if (mappedField.get("category")?.equalsIgnoreCase("images")) {
-						println "================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase())
+						//println "================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase())
 						Node images = getImages(imagesMetaData, fieldName, 'images', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir, language);
 					} else if (category.text().equalsIgnoreCase("icons")) {
 						Node icons = getImages(imagesMetaData, fieldName, 'icons', customFormatMap, delimiterMap, speciesContent, speciesElement, imagesDir,  language);
@@ -157,9 +247,15 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					}
 				}
 			}
+			
+			populateIBPCOLMatch(speciesElement)
 			return speciesElement
 	}
 
+	private populateIBPCOLMatch(Node s){
+		xmlConverter.populateIBPCOLMatch(s, speciesNameMap, taxonHirMap, synonymMap)
+	}
+	
 	private createCommonNameNode(String part, Node field, Map speciesContent, Map mappedField) {
 		myPrint("=========== creating common names " + part)
 		String[] commonNames = part.split(":");
@@ -490,5 +586,56 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 	
 	
+
+	
+	
+	
+	/////////////////////////////////////////// Name validation related //////////////////////////
+	
+	
+	public static boolean validateUserSheetForName(File f){
+		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
+		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(f.getAbsolutePath(), 2, 0);
+		List<Map> content = SpreadsheetReader.readSpreadSheet(f.getAbsolutePath(), 0, 0);
+		
+		List sNodeList = []
+		content.each { m ->
+			sNodeList << converter.createSpeciesXML(m)
+		}
+		
+		List nameInfoList = []
+		int index = 1
+		XMLConverter xc = new XMLConverter()
+		sNodeList.each {
+			nameInfoList << xc.populateNameDetail(it, index++)
+		}
+		
+		converter.initCurationInfo(f.getAbsolutePath())
+		if(converter.multipleMatchingRow){
+			return false
+		}
+		
+		return converter.validate(nameInfoList);
+	}
+	
+	public static List getNames(String contentFile, String mappingFile){
+		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
+		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, 2, 0);
+		List<Map> content = SpreadsheetReader.readSpreadSheet(contentFile, 0, 0);
+		
+		List sNodeList = []
+		content.each { m ->
+			sNodeList << converter.createSpeciesXML(m)
+		} 
+		
+		List nameInfoList = []
+		int index = 1
+		XMLConverter xc = new XMLConverter()
+		sNodeList.each {
+			nameInfoList << xc.populateNameDetail(it, index++)
+		}
+		
+		return nameInfoList
+	}
 	
 }

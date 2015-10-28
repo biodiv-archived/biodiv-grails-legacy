@@ -49,6 +49,29 @@ public class SpreadsheetReader {
 		return sheetContent;
 	}
 
+	
+	public static List<Map> readSpreadSheet(String file, String sheetName,
+			int headerRowNo) {
+		InputStream inp;
+		try {
+			inp = new FileInputStream(file);
+			Workbook wb = WorkbookFactory.create(inp);
+			Sheet sheet = wb.getSheet(sheetName);
+			if(sheet !=null )
+				return readSpreadSheet(wb, wb.getSheetIndex(sheet), headerRowNo);
+			else
+				return null;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
 	public static List<Map> readSpreadSheet(String file, int sheetNo,
 			int headerRowNo) {
 		InputStream inp;

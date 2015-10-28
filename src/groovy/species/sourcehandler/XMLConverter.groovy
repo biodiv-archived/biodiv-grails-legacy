@@ -1,6 +1,9 @@
 package species.sourcehandler
 
+import groovy.util.Node;
+
 import java.util.List
+
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder;
 import org.hibernate.SessionFactory;
@@ -38,6 +41,7 @@ import species.auth.SUser
 import species.NamesMetadata;
 import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.NamePosition;
+import species.namelist.NameInfo
 import species.participation.NamelistService;
 
 import org.apache.log4j.Logger; 
@@ -77,6 +81,8 @@ class XMLConverter extends SourceConverter {
             return this.value;
         }
     }
+	
+
 
     public XMLConverter() {
         namesParser = new NamesParser();
@@ -91,7 +97,174 @@ class XMLConverter extends SourceConverter {
         }
         return instance;
     }*/
+	
+	
+	
+	protected populateIBPCOLMatch(Node species, Map speciesMap, Map hirMap, Map synMap){
+		if(!speciesMap || !hirMap )
+			return 
+		
+		removeInvalidNode(species);
+		
+		Node node = getNodeFromSubCategory(species, fieldsConfig.SCIENTIFIC_NAME);
+		String sName = getData((node && node.data)?node.data[0]:null);
+		
+		def index = species.attribute('rowIndex')
+		
+		//updating species node here for ibp and col match
+		String k = index + KEY_SEP + sName + KEY_SEP + sName
+		updateNode(node, speciesMap, k)
+		
+		//updating taxon hir here for ibp and col match
+		List taxonNodes = getNodesFromCategory(species.children(), "author contributed taxonomy hierarchy");
+		taxonNodes.each { tn ->
+			if(tn && tn.data){
+				def tmpHirName = getData(tn.data[0])
+				if(tmpHirName){
+					k = index + KEY_SEP + sName + KEY_SEP + getData((tn && tn.data)?tn.data[0]:null)
+					updateNode(tn, hirMap, k)
+				}
+			}
+		}
+		
+		//updating synonyms here for ibp and col match
+		if(synMap){
+			taxonNodes = getNodesFromCategory(species.children(), "synonyms");
+			taxonNodes.each { tn ->
+				if(tn && tn.data){
+					tn.data.each { s ->
+						def synName = getData(s)
+						if(synName){
+							k = index + KEY_SEP + sName + KEY_SEP + synName
+							updateNode(s, synMap, k)
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
+	private updateNode(Node node, Map completeMap, String k){
+		def m = completeMap.get(k)
+		
+//		println '--------- key ' + k
+//		println "-----------key set ------ " + completeMap.keySet()
+//		println "--------ii--------- map " + m
+//		
+//		println "----------------- ndoe " + node
+		
+		
+		String targetPosition = m['target position']
+		if(targetPosition){
+			new Node(node, "position", targetPosition);
+		}
+		
+		String id = m?.id
+		if(!id)
+			return
+		
+		String matchSource = m['match found']	
+		if("ibp".equalsIgnoreCase(matchSource))
+			new Node(node, "ibpId", id);
+		else if("col".equalsIgnoreCase(matchSource))	
+			new Node(node, "colId", id);
+		
+	}
+	
+	
+	public NameInfo populateNameDetail(Node species, int index){
+		removeInvalidNode(species);
+		//println "---------------------- node --- " + species
+		
+		String speciesName = getNodeDataFromSubCategory(species, fieldsConfig.SCIENTIFIC_NAME);
+		int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
+		
+		NameInfo n = new NameInfo(speciesName, rank, index)
+		
+		
+		//getting hir
+		
+		List taxonNodes = getNodesFromCategory(species.children(), "author contributed taxonomy hierarchy");
+		//println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
+		taxonNodes.each { tn ->
+			rank = getTaxonRank(tn.subcategory.text())
+			def hirNodeData = getData((tn && tn.data)?tn.data[0]:null)
+			if(hirNodeData){
+				def tmp = new NameInfo(hirNodeData, rank, index)
+				tmp.sourceName = speciesName
+				//println "--- hir " + tmp
+				n.addToHir(tmp)
+			}
+		}
+		
+		taxonNodes = getNodesFromCategory(species.children(), "synonyms");
+		//println "=======synonyms=========== " + taxonNodes
+		taxonNodes.each { tn ->
+			if(tn && tn.data){
+				tn.data.each { s ->
+					def synName = getData(s)
+					if(synName){
+						def tmp = new NameInfo(synName,index)
+						tmp.sourceName = speciesName
+						//println "--- syn " + tmp
+						n.addToSyn(tmp)
+					}
+				}
+			}
+		}
+		
+		//println "  final node  " + n
+		
+		return n
+	}
+	
+	private String getNodeDataFromSubCategory(species, subCat){
+		Node node =  getNodeFromSubCategory(species, subCat)
+		return getData((node && node.data)?node.data[0]:null);
+	}
 
+	private Node getNodeFromSubCategory(species, subCat){
+		Language language
+		Node node = species.field.find {
+			language = it.language[0].value();
+			it.subcategory.text().equalsIgnoreCase(getFieldFromName(subCat, 3, language));
+		}
+		return node
+	}
+	
+	private void addScNameNode(Node species, Node nameNode){
+		String rank = getNodeDataFromSubCategory(species, fieldsConfig.RANK);
+		
+		Node taxonLastNode = getNodeFromSubCategory(species, rank);
+		
+		if(taxonLastNode){
+			Node parentNode = taxonLastNode.parent()
+			parentNode.remove(taxonLastNode)
+		}
+		
+		//creating new node having all info as scientific name
+		Node field = new Node(species, "field");
+		Node concept = new Node(field, "concept", fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION);
+		Node category = new Node(field, "category", "Author Contributed Taxonomy Hierarchy");
+		Node subcategory = new Node(field, "subcategory", rank);
+		
+		field.append(nameNode.language)
+		field.append(nameNode.data)
+		
+		if(nameNode.ibpId){
+			field.append(nameNode.ibpId)
+		}
+		
+		if(nameNode.colId){
+			field.append(nameNode.colId)
+		}
+		
+		if(nameNode.position){
+			field.append(nameNode.position)
+		}
+	}
+	
     public Species convertSpecies(Node species) {
         //TODO default action to be merge
         convertSpecies(species, SaveAction.MERGE);
@@ -118,6 +291,9 @@ class XMLConverter extends SourceConverter {
             def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
             addToSummary("<<< NAME OF SPECIES >>> "  + speciesName)
             if(speciesName) {
+				//adding scientific name as last node in author contribute hir so that author year and other info picked from scientific name column
+				addScNameNode(species, speciesNameNode)
+				
                 //getting classification hierarchies and saving these taxon definitions
                 List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true).taxonRegistry;
 
@@ -126,8 +302,11 @@ class XMLConverter extends SourceConverter {
 
                 // if the author contributed taxonomy hierarchy is not specified
                 // then the taxonConept is null and sciName of species is saved as concept and is used to create the page
-                s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, TaxonomyRank.SPECIES.ordinal());
+				int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
+				s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
+				
                 if(s.taxonConcept) {
+					s.taxonConcept.updatePosition(speciesNameNode?.position?.text())
 
                     s.title = s.taxonConcept.italicisedForm;
 
@@ -192,7 +371,7 @@ class XMLConverter extends SourceConverter {
                                 //commNames.each { s.addToCommonNames(it); }
                             } else if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.SYNONYMS, 2, language))) {
                                 synonyms = createSynonyms(fieldNode, s.taxonConcept);
-                                //synonyms.each { s.addToSynonyms(it); }
+                                synonyms.each { s.taxonConcept.addSynonym(it); }
                             }
                              else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY, 3, language))) {
                                 List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
@@ -241,7 +420,10 @@ class XMLConverter extends SourceConverter {
                     }
 
                     //adding taxonomy classifications
-                    taxonHierarchy.each {it.save();}
+                    taxonHierarchy.each { th ->
+						th = th.merge()
+						th.save();
+					}
 
                     //                  if(defaultSaveAction == SaveAction.MERGE){
                     //                      log.info "Merging with already existing species information : "+existingSpecies.id;
@@ -267,6 +449,92 @@ class XMLConverter extends SourceConverter {
         }
     }
 
+	
+	public TaxonomyDefinition convertName(Node species) {
+		
+		if(!species) return null;
+
+		try {
+			log.info "Creating/Updating names"
+			log.info species
+			removeInvalidNode(species);
+
+			Language language;
+			//sciName is must for the species to be populated
+			Node speciesNameNode = species.field.find {
+				language = it.language[0].value();
+				it.subcategory.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.SCIENTIFIC_NAME, 3, language));
+			}
+
+			//XXX: sending just the first element need to decide on this if list has multiple elements
+			def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
+			addToSummary("<<< NAME >>> "  + speciesName)
+			if(speciesName) {
+				//adding scientific name as last node in author contribute hir so that author year and other info picked from scientific name column
+				addScNameNode(species, speciesNameNode)
+				
+				//getting classification hierarchies and saving these taxon definitions
+				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true).taxonRegistry;
+
+				//taxonConcept is being taken from only author contributed taxonomy hierarchy
+				TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy);
+
+				// if the author contributed taxonomy hierarchy is not specified
+				// then the taxonConept is null and sciName of species is saved as concept and is used to create the page
+				int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
+				taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
+				
+				if(taxonConcept) {
+					taxonConcept.updatePosition(speciesNameNode?.position?.text())
+
+					List<SynonymsMerged> synonyms;
+
+					for(Node fieldNode : species.children()) {
+						if(fieldNode.name().equals("field")) {
+							if(!isValidField(fieldNode)) {
+								log.warn "NOT A VALID FIELD : "+fieldNode;
+								addToSummary("NOT A VALID FIELD : "+fieldNode)
+								continue;
+							}
+
+							String concept = fieldNode.concept?.text()?.trim();
+							String category = fieldNode.category?.text()?.trim();
+							String subcategory = fieldNode.subcategory?.text()?.trim();
+
+							language = fieldNode.language[0].value();
+
+							if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.COMMON_NAME, 2, language))) {
+								List<CommonNames> commNames = createCommonNames(fieldNode, taxonConcept);
+							} else if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.SYNONYMS, 2, language))) {
+								synonyms = createSynonyms(fieldNode, taxonConcept);
+								synonyms.each {taxonConcept.addSynonym(it); }
+							}
+						}
+					}
+
+					//adding taxonomy classifications
+					taxonHierarchy.each { th ->
+						th = th.merge()
+						th.save();
+					}
+					return taxonConcept;
+				} else {
+					log.error "TaxonConcept is not found"
+					addToSummary("TaxonConcept is not found")
+				}
+			} else {
+				log.error "IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName;
+				addToSummary("IGNORING SPECIES AS SCIENTIFIC NAME WAS NOT FOUND : "+speciesName)
+			}
+		} catch(Exception e) {
+			log.error "ERROR CONVERTING SPECIES : "+e.getMessage();
+			e.printStackTrace();
+			addToSummary(e);
+		}
+	}
+	
+	
+	
     /**
      * Removing nodes whose field concept is null
      * @param speciesNodes
@@ -332,8 +600,7 @@ class XMLConverter extends SourceConverter {
         }
       
         List sFields = [];
-        
-         if(s.isAttached() && field) {
+		if(s.isAttached() && field) {
              sFields = SpeciesField.withCriteria() {
                 eq("field", field)
                 eq('species', s)
@@ -1281,7 +1548,7 @@ class XMLConverter extends SourceConverter {
                     println "=======SOURCE HAI == == " + n.viaDatasource.text();
                     viaDatasource = n.viaDatasource.text();
                 }
-                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource);
+                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource, n);
                 if(sfield) {
                     //adding contributors
                     sfield.updateContributors(getUserContributors(n))
@@ -1295,54 +1562,52 @@ class XMLConverter extends SourceConverter {
         return synonyms;
     }
 
-    private SynonymsMerged saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept, viaDatasource = null) {
+    private SynonymsMerged saveSynonym(TaxonomyDefinition parsedName, RelationShip rel, TaxonomyDefinition taxonConcept, viaDatasource, Node dataNode ) {
 
         SynonymsMerged sfield = null;
-        if(parsedName && parsedName.canonicalForm) {
-            //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
-            //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
-            
-            def criteria = TaxonomyDefinition.createCriteria();
-            TaxonomyDefinition taxon = criteria.get {
-                ilike("canonicalForm", parsedName.canonicalForm);
-            }
-           
-            if(!taxon) {
-                log.debug "Saving synonym : "+parsedName.name;
-                sfield = new SynonymsMerged();
-                sfield.name = parsedName.name;
-                sfield.relationship = rel;
-                //sfield.taxonConcept = taxonConcept;
-                sfield.rank = taxonConcept.rank;
-                sfield.canonicalForm = parsedName.canonicalForm;
-                sfield.normalizedForm = parsedName.normalizedForm;;
-                sfield.italicisedForm = parsedName.italicisedForm;;
-                sfield.binomialForm = parsedName.binomialForm;;
-                sfield.status = NameStatus.SYNONYM
-                if(viaDatasource){
-                    sfield.viaDatasource = viaDatasource
-                }
-                sfield.uploadTime = new Date();
-                if(!sfield.save(flush:true)) {
-                    sfield.errors.each { log.error it }
-                }
-            } else {
-                println "Looking at existing name : ${taxon}"
-                if(taxon.status == NameStatus.ACCEPTED) {
-                    sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
-                } else {
-                    sfield = taxon as SynonymsMerged;
-                    /*sfield.rank = taxonConcept.rank;
-                    sfield.status = NameStatus.SYNONYM
-                    if(viaDatasource){
-                        sfield.viaDatasource = viaDatasource
-                    }
-                    if(!sfield.save(flush:true)) {
-                        sfield.errors.each { log.error it }
-                    }*/
-
-                }
-            }
+		if(parsedName && parsedName.canonicalForm) {
+			List res = searchIBP(parsedName, -1, false, true, dataNode, NameStatus.SYNONYM)
+	        def taxon = res ? res[0] : null   
+	        if(!taxon) {
+	            log.debug "Saving synonym : "+parsedName.name;
+	            sfield = new SynonymsMerged();
+	            sfield.name = parsedName.name;
+	            sfield.relationship = rel;
+	            //sfield.taxonConcept = taxonConcept;
+	            sfield.rank = taxonConcept.rank;
+	            sfield.canonicalForm = parsedName.canonicalForm;
+	            sfield.normalizedForm = parsedName.normalizedForm;;
+	            sfield.italicisedForm = parsedName.italicisedForm;;
+	            sfield.binomialForm = parsedName.binomialForm;;
+	            sfield.status = NameStatus.SYNONYM
+	            if(viaDatasource){
+	                sfield.viaDatasource = viaDatasource
+	            }
+	            sfield.uploadTime = new Date();
+	            if(!sfield.save(flush:true)) {
+	                sfield.errors.each { log.error it }
+	            }
+	        } else {
+	            println "Looking at existing name : ${taxon}"
+	            if(taxon.status == NameStatus.ACCEPTED) {
+	                sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
+	            } else {
+	                sfield = taxon as SynonymsMerged;
+	                /*sfield.rank = taxonConcept.rank;
+	                sfield.status = NameStatus.SYNONYM
+	                if(viaDatasource){
+	                    sfield.viaDatasource = viaDatasource
+	                }
+	                if(!sfield.save(flush:true)) {
+	                    sfield.errors.each { log.error it }
+	                }*/
+	
+	            }
+	        }
+			
+			if(dataNode){
+				sfield.updatePosition(dataNode?.position?.text())
+			}
             println "========S FIELD============= " + sfield
             return sfield;
         } else {
@@ -1568,7 +1833,6 @@ class XMLConverter extends SourceConverter {
      * @param scientificName
      * @return
      */
-    //List<TaxonomyRegistry> getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
         log.debug "Getting classification hierarchy : "+classification.name;
@@ -1611,7 +1875,6 @@ class XMLConverter extends SourceConverter {
         boolean flag = true;
         fieldNodes.each { fieldNode ->
             if(flag) {
-                println "========NODES========"
                 if(fieldNode) {
                     log.debug "Adding taxonomy registry from node: "+fieldNode;
                     int rank = getTaxonRank(fieldNode?.subcategory?.text());
@@ -1633,7 +1896,8 @@ class XMLConverter extends SourceConverter {
                             //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
                             
                             //TODO: how to get status in each case?
-                            println "@@@@@@@@@@@@@@@@@@@@@@@ " + parsedName.authorYear
+							String parsedAuthorYear = parsedName.authorYear
+                            println "authoryear >>>>>>>>>>>>>>>>>> " + parsedAuthorYear
 //                            def ctx = ApplicationHolder.getApplication().getMainContext();
 //                            namelistService = ctx.getBean("namelistService");
                             boolean searchInNull = false;
@@ -1918,28 +2182,34 @@ class XMLConverter extends SourceConverter {
                             if(taxon.status != NameStatus.ACCEPTED) {
                                 println "TAXON SAVED WITH NULL STATUS==========================="
                             }
- 
+							
+							//saving taxon new position
+							taxon.updatePosition(fieldNode?.position?.text())
+							//updating author year if not from COL
+							if(!fromCOL && parsedAuthorYear){
+								taxon.authorYear = parsedAuthorYear
+								if(!taxon.save(flush:true)) {
+									taxon.errors.each { println it; log.error it }
+								}
+							}
+							
+							
                             def ibpHierarchy = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
                             def parentTaxon = getParentTaxon(taxonEntities, rank);
                             def path = (parentTaxon ? parentTaxon.path+"_":"") + taxon.id;
  
                             def criteria = TaxonomyRegistry.createCriteria()
                             TaxonomyRegistry registry = criteria.get {
-                                eq("taxonDefinition", taxon);
-                                if(classification != ibpHierarchy) eq("path", path);
-                                eq("classification", classification);
+								and{
+									eq("taxonDefinition", taxon);
+									eq("path", path);
+									eq("classification", classification);
+								}
                             }
 
-                            println "===========REGISTRY=========== " + registry
-
-                            def ent;
-                            if(registry && classification == ibpHierarchy) {
-                                println "STORING ONLY ONE HIERARCHY FOR IBP TAXON HIERARCHY"
-                                ent = registry;
-                            } else {
-                                ent = new TaxonomyRegistry();
-                            }
-
+                            def ent = registry?registry:new TaxonomyRegistry();
+							println "===========REGISTRY=========== " + ent
+							
                             ent.taxonDefinition = taxon
                             ent.classification = classification;
                             //all hierarchy from curation interface
@@ -1972,6 +2242,7 @@ class XMLConverter extends SourceConverter {
                                 log.debug "Saving taxon registry entity : "+ent;
                                 println "????????????????????=====SAVING NEW TAXON REGISTRY================================== "
                                 if(!ent.save(flush:true)) {
+									println "---TAXON SAVE ################## Error"
                                     ent.errors.each { log.error it }
                                 } else {
                                     log.debug "Saved taxon registry entity : "+ent;
@@ -2006,12 +2277,11 @@ class XMLConverter extends SourceConverter {
 	 * @param nameNode
 	 * @return
 	 */
-	private List searchIBP(TaxonomyDefinition parsedName, rank, searchInNull, useAuthorYear, nameNode){
+	private List searchIBP(TaxonomyDefinition parsedName, rank, searchInNull, useAuthorYear, nameNode, status = null){
 		def ibpId = nameNode?.ibpId?.text();
 		def colId = nameNode?.colId?.text();
 		
 		println "----------------- ibp id  " +  ibpId + "  and col id " + colId
-		
 		if(ibpId){
 			ibpId = Long.parseLong(ibpId.trim());
 			return [TaxonomyDefinition.get(ibpId)]
@@ -2024,7 +2294,7 @@ class XMLConverter extends SourceConverter {
 				
 			return [taxon]
 		}
-		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, NameStatus.ACCEPTED, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
+		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, status, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)
 	}
 	
     /**
@@ -2038,7 +2308,7 @@ class XMLConverter extends SourceConverter {
         try {
             request = RequestContextHolder.currentRequestAttributes().request
         } catch (e) {
-            log.debug "No thread bound request"
+            //log.debug "No thread bound request"
         }
 
         for(TaxonomyRank type : TaxonomyRank) {
@@ -2107,14 +2377,22 @@ class XMLConverter extends SourceConverter {
      * @param s
      * @return
      */
-    TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank, boolean createNew = true) {
+    TaxonomyDefinition getTaxonConceptFromName(String sciName, int rank, boolean createNew = true, Node nameNode = null) {
 		def cleanSciName = Utils.cleanSciName(sciName);
 
         if(cleanSciName) {
-            List name = namesParser.parse([cleanSciName])
+			TaxonomyDefinition taxon
+			List name = namesParser.parse([cleanSciName])
+			//If ibp or colid is given inside the node then using this method
+			if(nameNode){
+				List res = searchIBP(name, rank, false, true, nameNode)
+				if(res){
+					return res[0]
+				}
+			}
+			
             if(name[0].normalizedForm) {
-				TaxonomyDefinition taxon
-				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, name[0].authorYear, NameStatus.ACCEPTED, rank, false, name[0].normalizedForm)
+				List taxonList = NamelistService.searchIBP(name[0].canonicalForm, name[0].authorYear, null, rank, false, name[0].normalizedForm)
 				if(taxonList.size() > 1){
 					log.error '############  ' + "IBP search returning mulitiple result: should not happen " + taxonList
 				}

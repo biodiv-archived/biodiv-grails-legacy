@@ -217,8 +217,10 @@ class SpeciesSearchService extends AbstractSearchService {
             String memberInfo = ""
             List allMembers = utilsServiceBean.getParticipants(s)
             allMembers.each { mem ->
-                memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
-                doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+				if(mem){
+					memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
+					doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+				}
             }
             
             s.userGroups.each { userGroup ->

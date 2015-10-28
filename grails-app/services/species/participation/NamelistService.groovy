@@ -30,6 +30,7 @@ import species.NamesParser;
 import species.sourcehandler.XMLConverter;
 import species.participation.Recommendation;
 import speciespage.SpeciesUploadService;
+import species.namelist.NameInfo
 import species.namelist.Utils;
 import species.utils.Utils as UtilsUtils;
 
@@ -90,7 +91,6 @@ class NamelistService {
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
         SEARCH_IBP_COUNTER ++;
-        println "========SEARCH IBP CALLED=======>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "--- "+ rank + " :::: userauthoryear " + useAuthorYear ;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
@@ -101,7 +101,7 @@ class NamelistService {
         } else {
             clazz = SynonymsMerged.class; 
         }
-        println "====SEARCHING ON IBP IN CLASS ====== " + clazz
+        //println "====SEARCHING ON IBP IN CLASS ====== " + clazz
         clazz.withNewTransaction{
 			
             println  "Searching canonical + rank + status"
@@ -182,20 +182,75 @@ class NamelistService {
         def res = searchIBP(canonicalForm, authorYear, status, rank) //TaxonomyDefinition.findAllByCanonicalForm(canonicalForm);
         def finalResult = []
         res.each { 
-            def taxonConcept = TaxonomyDefinition.get(it.id.toLong());
             def temp = [:]
             temp['taxonId'] = it.id
             temp['externalId'] = it.id
             temp['name'] = it.canonicalForm
             temp['rank'] = TaxonomyRank.getTRFromInt(it.rank).value().toLowerCase()
             temp['nameStatus'] = it.status.value().toLowerCase()
-            temp['group'] = groupHandlerService.getGroupByHierarchy(taxonConcept, taxonConcept.parentTaxon()).name
+            temp['group'] = groupHandlerService.getGroupByHierarchy(it, it.parentTaxon()).name
             temp['sourceDatabase'] = it.viaDatasource?it.viaDatasource:''
             finalResult.add(temp);
         }
         return finalResult 
     }
 
+	
+	/**
+	 * Searches given name with rank in ibp and col and return all the matched result
+	 * @param name
+	 * @param rank
+	 * @return
+	 */
+	public Map nameMapper(List<NameInfo> names) {
+		
+		Map finalResult = [:]
+		NamesParser namesParser = new NamesParser();
+		List<TaxonomyDefinition> parsedNames = namesParser.parse(names.collect {it.name});
+		
+		int i = -1
+        List nameSubLists = parsedNames.collate(5)
+        nameSubLists.each { nl ->
+	        TaxonomyDefinition.withNewTransaction {
+		        nl.each { TaxonomyDefinition name ->
+					i++
+					List tmpRes = []
+					if(!name || !name.canonicalForm) {
+						log.debug "Name is not parsed by Names Parser " + name
+						tmpRes << ['match':'None', 'name':'', 'rank':'', 'status': '', 'group' : '', 'position':'','id':'']
+						finalResult[names[i]] = tmpRes
+						// return works here as continue
+						return
+					}
+					
+					List ibpResult = searchIBP(name.canonicalForm, null, null, names[i].rank)
+					ibpResult.each { TaxonomyDefinition t ->
+		                t = TaxonomyDefinition.get(t.id)
+						tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
+					}
+					
+					if(!ibpResult){
+						List colResult = searchCOL(name.canonicalForm, 'name');
+						colResult.each { t ->
+							boolean addToList = true
+							int rr = XMLConverter.getTaxonRank(t.rank)
+							if((names[i].rank <= 8) && (names[i].rank > 0)){
+								if(rr != names[i].rank){
+									addToList = false
+								}
+								
+							}
+							if(addToList){
+								tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
+							}
+						}
+					}
+					finalResult[names[i]] = tmpRes
+		        }
+	        }
+		}
+		return finalResult;
+	}
 
 	public ScientificName createNameFromColId(String colId, boolean runPostProcess = true){
 		if(!colId)
@@ -245,7 +300,7 @@ class NamelistService {
 		return syn
 	}
 	
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -950,8 +1005,8 @@ class NamelistService {
         return result;
     }
 
-    private Map updatePosition(ScientificName sciName, NamePosition position) {
-        println "\n============== UPDATING POSITION ========"
+    public Map updatePosition(ScientificName sciName, NamePosition position) {
+        println "\n============== UPDATING POSITION ========" + position
         boolean success = false;
         List errors = [];
         if(!position) {
@@ -965,6 +1020,7 @@ class NamelistService {
         println sciName.tempActivityDescription;
         String tempActivityDescription = createNameActivityDescription("Position", sciName.position?.value()?:NamePosition.RAW.value(), position.value());
         sciName.position = position;
+		
         if(!sciName.save(flush:true)) {
             success = false;
             errors = sciName.errors.allErrors;
@@ -1056,11 +1112,12 @@ class NamelistService {
         }
         if(m['rank'] == 'infraspecies'){
             if(m['species']) {
+				def authStr = ""
                 if(m['id_details']) {
-                def authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
-                m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
+					authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
+					m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
                 }
-                result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr;    
+                result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr?:"";    
             }
             result['taxonRegistry.10'] = res['10'] = m['infraspecies']      //TODO:check author year coming or not + " " + m['authorString'];
         } else {
@@ -1714,39 +1771,7 @@ class NamelistService {
         return desc;
     }
 
-    //suggest names from IBP and COL
-    public Map nameMapper(List<String> names) {
-        Map finalResult = [:]
-        NamesParser namesParser = new NamesParser();
-        def parsedNames = namesParser.parse(names);
-        int speciesRank = TaxonomyRank.SPECIES.ordinal();
-        int i = 0
-        parsedNames.each { pn ->
-            def res = searchIBP(pn.canonicalForm, pn.authorYear, NameStatus.ACCEPTED, speciesRank);
-            def res1 = searchIBP(pn.canonicalForm, pn.authorYear, NameStatus.SYNONYM, speciesRank);
-            res.addAll(res1);
-            if(res.size() == 0){
-                //COL results
-                def r = searchCOL(pn.canonicalForm, "name");
-                List temp = []
-                r.each {
-                    temp.add(['name':it.name, 'id':it.externalId, 'status':it.nameStatus])
-                }
-                if(r.size() == 0) temp = null;
-                finalResult[names[i]] = ['COL' : temp, 'IBP': null]; 
-            } else {
-                List temp = []
-                res.each {
-                    temp.add(['name':it.name, 'id':it.id, 'status': it.status.value()])
-                }
-                finalResult[names[i]] = ['IBP' : temp, 'COL' : null]; 
-            }
-            i++;
-        }
-        return finalResult;
-    }
-
-	
+ 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////

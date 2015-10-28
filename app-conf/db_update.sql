@@ -517,3 +517,7 @@ update download_log set offset_param=0;
 alter table download_log alter column offset_param set not null;
 
 
+#21 Oct 2015
+ALTER TABLE species_bulk_upload ADD COLUMN  upload_type varchar(255);
+
+

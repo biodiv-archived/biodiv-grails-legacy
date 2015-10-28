@@ -456,4 +456,20 @@ class TaxonomyDefinition extends ScientificName {
 		}	
 		
 	}
+	
+	
+	def updatePosition(String pos){
+		def newPosition = NamesMetadata.NamePosition.getEnum(pos)
+		if(newPosition && (newPosition != position)){
+			this.position = newPosition
+			if(!save()) {
+				this.errors.allErrors.each { log.error it }
+			}
+		}
+	}
+	
+	public String fetchLogSummary(){
+		return name + "\n" 
+	}
+	
 }
