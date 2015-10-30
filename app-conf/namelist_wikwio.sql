@@ -120,7 +120,7 @@ CREATE INDEX common_names_lowercase_name ON common_names(lowercase_name);
 
 2. Download COL XML if required using Utils.downloadColXml("file directory path") in colReport.groovy, can mention from what id to do or all. 
 
-3. ---- TODO curateAllNames() in namelist_wikwio.groovy, check what is the last id in tax_def and use that.
+3. curateAllNames() in namelist_wikwio.groovy
 
 4. addSynonymsFromCOL() in namelist_wikwio.groovy
 

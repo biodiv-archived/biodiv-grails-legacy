@@ -55,7 +55,7 @@ def curateName(taxonId, domainSourceDir) {
         nSer.curateName(sciName, colData);
     } else {
         ScientificName sciName = TaxonomyDefinition.get(taxonId.toLong())
-	sciName.noOfCOLMatches = 0;
+		sciName.noOfCOLMatches = 0;
         sciName.position = NamesMetadata.NamePosition.RAW;
         sciName.dirtyListReason = "NO XML - NO COL DATA"
         println "=======NO COL MATCHES==== " + sciName.noOfCOLMatches
@@ -339,51 +339,28 @@ def migrateSynonyms() {
 //First function to run curation for all accepted names
 def curateAllNames() {
     def start = new Date();
-	int limit = 70000, offset = 0;
     int counter = 0;
     List curatingThese = [];
     File domainSourceDir = new File("/apps/git/biodiv/col_8May/TaxonomyDefinition_cononical_name/TaxonomyDefinition");
-    while(offset < 68000){
-        println "=====offset == "+ offset + " ===== limit == " + limit  
-        def taxDefList = [];
-        TaxonomyDefinition.withNewTransaction {
-            def dataSoruce = ctx.getBean("dataSource");
-            def sql =  Sql.newInstance(dataSoruce);
-            def query  = "select id from taxonomy_definition where id <= 276064 order by rank,id asc limit 70000";
-            sql.rows(query).each{
-                taxDefList.add(TaxonomyDefinition.get(it.getProperty("id")));
-            }   
-            /*def c = TaxonomyDefinition.createCriteria()
-            taxDefList = c.list (max: limit , offset:offset) {
-            and {
-            //lt('id', 275703L)
-            lt('id', 276015L)
-            //eq('position', NamesMetadata.NamePosition.WORKING)
-            //isNull('position')
-            }
-            order('rank','asc')
-            order('id','asc')                    
-            }*/
-            //taxDefList = TaxonomyDefinition.list(max: limit, offset: offset, sort: "rank", order: "asc")
-        }
-        for(taxDef in taxDefList) {
-            TaxonomyDefinition.withNewSession {
-                println "###############################################################################################"
-                println "#"
-                println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
-                counter++;
-                //File domainSourceDir = new File("/apps/git/biodiv/col_27mar/TaxonomyDefinition");
-                //File domainSourceDir = new File("/apps/git/biodiv/col_21April_2015checklist/TaxonomyDefinition");
-                //File domainSourceDir = new File("/home/rahulk/col_8May/TaxonomyDefinition");
-                //curatingThese.add(taxDef.id);
-                curateName(taxDef.id, domainSourceDir);
-            }
-        }
-
-        offset = offset + limit; 
-        utilsService.cleanUpGorm(true); 
-        if(!taxDefList) break;  
+    def taxDefList = [];
+    TaxonomyDefinition.withNewTransaction {
+        def dataSoruce = ctx.getBean("dataSource");
+        def sql =  Sql.newInstance(dataSoruce);
+        def query  = "select id from taxonomy_definition rank,id asc";
+        sql.rows(query).each{
+            taxDefList.add(TaxonomyDefinition.get(it.getProperty("id")));
+        }   
     }
+    for(taxDef in taxDefList) {
+        TaxonomyDefinition.withNewSession {
+            println "###############################################################################################"
+            println "#"
+            println "=====WORKING ON THIS TAX DEF============== " + taxDef + " =========COUNTER ====== " + counter;
+            counter++;
+            curateName(taxDef.id, domainSourceDir);
+        }
+    }
+	utilsService.cleanUpGorm(true); 
     println "======NUM OF TIMES SEARCH IBP CALLED==== " + nSer.SEARCH_IBP_COUNTER;
     println "======CAN_ZERO==== " + nSer.CAN_ZERO;
     println "======CAN_SINGLE==== " + nSer.CAN_SINGLE;
@@ -409,7 +386,7 @@ def curateAllNames() {
     println "=======FI RES ===== " + fiRes
     println "=======FI RES size ===== " + fiRes.size()
 	println "=======START TIME ===== " + start
-println "========END TIME= ======= " + new Date()
+	println "========END TIME= ======= " + new Date()
 }
 
 //curateAllNames()
