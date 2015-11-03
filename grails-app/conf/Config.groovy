@@ -348,6 +348,9 @@ speciesPortal {
         AUDIO = "audio"
         VIDEO = "video"
         DOCUMENTS = "Documents"
+		NAME_SOURCE = "Name Source"
+		VIA_SOURCE = "Via Source"
+		NAME_SOURCE_ID = "Name Source Id"
 		
     }
     group {
