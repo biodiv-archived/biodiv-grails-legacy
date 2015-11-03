@@ -458,10 +458,21 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	
-	def updatePosition(String pos){
+	def updatePosition(String pos, Map nameSourceInfo = [:] ){
 		def newPosition = NamesMetadata.NamePosition.getEnum(pos)
-		if(newPosition && (newPosition != position)){
+		if(newPosition){
 			this.position = newPosition
+			if(this.position == NamesMetadata.NamePosition.CLEAN){
+				def fieldsConfig = grailsApplication.config.speciesPortal.fields
+				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
+				def tmpMatchId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
+				def tmpViaDatasource = nameSourceInfo.get("" + fieldsConfig.VIA_SOURCE)
+				if(tmpMatchDatabaseName || tmpMatchId || tmpViaDatasource){
+					matchDatabaseName = tmpMatchDatabaseName
+					matchId = tmpMatchId
+					viaDatasource = tmpViaDatasource
+				}
+			}
 			if(!save()) {
 				this.errors.allErrors.each { log.error it }
 			}

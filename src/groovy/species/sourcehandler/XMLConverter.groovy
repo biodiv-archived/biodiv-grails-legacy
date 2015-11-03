@@ -306,7 +306,7 @@ class XMLConverter extends SourceConverter {
 				s.taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
 				
                 if(s.taxonConcept) {
-					s.taxonConcept.updatePosition(speciesNameNode?.position?.text())
+					s.taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species))
 
                     s.title = s.taxonConcept.italicisedForm;
 
@@ -485,7 +485,7 @@ class XMLConverter extends SourceConverter {
 				taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
 				
 				if(taxonConcept) {
-					taxonConcept.updatePosition(speciesNameNode?.position?.text())
+					taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species))
 
 					List<SynonymsMerged> synonyms;
 
@@ -533,6 +533,13 @@ class XMLConverter extends SourceConverter {
 		}
 	}
 	
+	private Map getNameSourceInfo(Node species){
+		Map res = [:]
+		res.put(fieldsConfig.NAME_SOURCE, getNodeDataFromSubCategory(species, fieldsConfig.NAME_SOURCE))
+		res.put(fieldsConfig.VIA_SOURCE, getNodeDataFromSubCategory(species, fieldsConfig.VIA_SOURCE))
+		res.put(fieldsConfig.NAME_SOURCE_ID, getNodeDataFromSubCategory(species,fieldsConfig.NAME_SOURCE_ID))
+		return  res 
+	}
 	
 	
     /**

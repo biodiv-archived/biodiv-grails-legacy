@@ -345,15 +345,31 @@ def obsQuery(){
 
 //obsQuery()
 
-def addNewField1(){
+
+def addRankInfraSpeField(){
 	def f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Taxon Record Name', subCategory:'Rank',description:'Place holder for TaxonRank', displayOrder:85, connection:85)
 	f.save(flush:true)
-	
+			
 	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Author Contributed Taxonomy Hierarchy', subCategory:'Infraspecies',description:'Place holder for Infra Species', displayOrder:86, connection:86)
 	f.save(flush:true)
 }
+	
 
-addNewField1()
+def addNameSourceInfoField(){
+	def f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Name Source Information', subCategory:'Name Source',description:'Place holder for Name Source', displayOrder:87, connection:87)
+	f.save(flush:true)
+	
+	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Name Source Information', subCategory:'Via Source',description:'Place holder for Via Source', displayOrder:88, connection:88)
+	f.save(flush:true)
+	
+	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Name Source Information', subCategory:'Name Source Id',description:'Place holder for Name Source Id', displayOrder:89, connection:89)
+	f.save(flush:true)
+}
+
+
+
+//addRankInfraSpeField()
+addNameSourceInfoField()
 
 //updateSpeciesGroup()
 
