@@ -396,7 +396,7 @@ class Observation extends Metadata implements Taggable, Rateable {
         if(!maxVotedReco) return "Unknown"
 
         if(maxVotedReco.taxonConcept) //sciname from clean list
-            return maxVotedReco.taxonConcept.italicisedForm
+            return maxVotedReco.name; //maxVotedReco.taxonConcept.italicisedForm
         else if(maxVotedReco.isScientificName) //sciname from dirty list
             return '<i>'+maxVotedReco.name+'</i>'
         else //common name
