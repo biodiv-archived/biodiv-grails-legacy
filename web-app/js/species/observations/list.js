@@ -979,7 +979,8 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
 
     var taxon = $("input#taxon").val();
     if(taxon) {
-        var classificationId = $('#taxaHierarchy option:selected').val();
+        var ibpClassification = $('.ibpClassification').val();
+        var classificationId = ibpClassification?ibpClassification:$('#taxaHierarchy option:selected').val();
         if(classificationId) 
             params['classification'] = classificationId
         params['taxon'] = taxon

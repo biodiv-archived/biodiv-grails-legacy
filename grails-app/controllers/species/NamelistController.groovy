@@ -17,7 +17,6 @@ import species.Species;
 
 class NamelistController {
     
-	@Secured(['ROLE_USER'])
     def index() { }
 
     def namelistService
