@@ -395,11 +395,15 @@ class Observation extends Metadata implements Taggable, Rateable {
 	String fetchFormattedSpeciesCall() {
         if(!maxVotedReco) return "Unknown"
 
-        if(maxVotedReco.taxonConcept) //sciname from clean list
-            return maxVotedReco.name; //maxVotedReco.taxonConcept.italicisedForm
-        else if(maxVotedReco.isScientificName) //sciname from dirty list
+        //if(maxVotedReco.taxonConcept) //sciname from clean list
+        //    return maxVotedReco.name; //maxVotedReco.taxonConcept.italicisedForm
+        if(maxVotedReco.taxonConcept && maxVotedReco.isScientificName) { //sciname from dirty list
+
+           if(!maxVotedReco.name.equalsIgnoreCase(maxVotedReco.taxonConcept.canonicalForm) && maxVotedReco.isScientificName) {
+                return '<i>'+maxVotedReco.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.canonicalForm+'</i>';
+           }
             return '<i>'+maxVotedReco.name+'</i>'
-        else //common name
+        } else //common name
 		    return maxVotedReco.name
 	}
 	
