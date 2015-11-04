@@ -563,13 +563,6 @@ class NamelistService {
     }
 
     public processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize, boolean createOnlyNameFromCol = false, boolean addHir= true) {
-        sciName.tempActivityDescription = "";
-        /*def upAt = updateAttributes(sciName, acceptedMatch);
-        println  "====UP AT == " + upAt 
-        if(upAt.isDeleted) {
-            log.debug "MARKED AS DELETED ${sciName}"
-            return;
-        }*/
         updateAttributes(sciName, acceptedMatch, createOnlyNameFromCol);
 		
 		//inside this we are adding hirarchy
@@ -601,10 +594,7 @@ class NamelistService {
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"
-            if(sciName.tempActivityDescription != "") {
-                def feedInstance = activityFeedService.addActivityFeed(sciName, sciName, springSecurityService.currentUser?:SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, sciName.tempActivityDescription);
-                sciName.tempActivityDescription = "";
-            }
+			sciName.updateNameSignature()
             namesAfterSave[sciName.id] = sciName.position.value();
             utilsService.cleanUpGorm(true);
         } else {
@@ -633,8 +623,6 @@ class NamelistService {
             //    justMoveToAnotherList = true;
             //}
 
-            sciName.tempActivityDescription = "";
-            String tempActivityDescription = "";
             //if(!justMoveToAnotherList) {
             /*def upAt = updateAttributes(sciName, acceptedMatch);
             println  "====UP AT == " + upAt 
@@ -649,21 +637,14 @@ class NamelistService {
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
             tempResult = updateAttributes(sciName, acceptedMatch);
-            if(tempResult.success && tempResult.activityDescription)
-                tempActivityDescription += tempResult.activityDescription;
             result.errors << tempResult.errors;
-            println "ActivityDescription : ${tempActivityDescription}";
             
             println "======= RESULT FROM UpdateAttributes ${tempResult}";
 
             //adds IBP Hierarchy as well
             tempResult = updateStatus(sciName, acceptedMatch);
             sciName = TaxonomyDefinition.get(sciName.id);
-            if(tempResult.success && tempResult.activityDescription)
-                tempActivityDescription += tempResult.activityDescription;
             result.errors << tempResult.errors;
-            println "ActivityDescription : ${tempActivityDescription}";
-
             println "======= RESULT FROM UpdateStatus ${tempResult}";
             /*if(r)
                 sciName = r.sciName;
@@ -676,11 +657,8 @@ class NamelistService {
 
             tempResult = updateRank(sciName, acceptedMatch.parsedRank);
             println "======= RESULT FROM UpdateRank ${tempResult}";
-            if(tempResult.success && tempResult.activityDescription)
-                tempActivityDescription += tempResult.activityDescription;
             result.errors << tempResult.errors;
-            println "ActivityDescription : ${tempActivityDescription}";
-
+            
 
             //WHY required here??
             //addIBPHierarchyFromCol(sciName, acceptedMatch);
@@ -693,28 +671,18 @@ class NamelistService {
 
             tempResult = updatePosition(sciName, position); 
             println "======= RESULT FROM UpdatePosition ${tempResult}";
-            if(tempResult.success && tempResult.activityDescription)
-                tempActivityDescription += tempResult.activityDescription;
             result.errors << tempResult.errors;
-            println "ActivityDescription : ${tempActivityDescription}";
             //taxonService.moveToWKG([taxonReg]);
 
 
             println "=====SCI NAME ==== " + sciName
             println "=====SCI NAME CLASS ==== " + sciName.class
             
-            println "ActivityDescription : ${tempActivityDescription}";
             log.debug "Saving sciname ${sciName}"        
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 log.debug "Saved sciname ${sciName}" 
-                println "Saved sciname ${sciName} with changes: ${tempActivityDescription}" 
-                if(tempActivityDescription) {
-                    result.activityType = tempActivityDescription;
-                    //TODO: add activityFeed by current logged in user .... not admin
-                    def feedInstance = activityFeedService.addActivityFeed(sciName, sciName, springSecurityService.currentUser?:SUser.read(1L), ActivityFeedService.TAXON_NAME_UPDATED, tempActivityDescription);
-                }
-                //sciName.tempActivityDescription = "";
-                utilsService.cleanUpGorm(true);
+                sciName.updateNameSignature()
+				utilsService.cleanUpGorm(true);
                 result.success = true;
             } else {
                 result.success = false;
@@ -782,7 +750,6 @@ class NamelistService {
             }
              */
             //changing status
-            sciName.tempActivityDescription += createNameActivityDescription("IBP status", sciName.status.value(), colMatch.nameStatus);
             def newStatus = getNewNameStatus(colMatch.nameStatus);
             println "===========NEW STATUS  === " + newStatus
             switch(newStatus) {
@@ -842,7 +809,6 @@ class NamelistService {
         }
         result.remove("taxonRegistry");
         result.success = true;
-        result.activityDescription = sciName.tempActivityDescription;
         return result;
     }
 
@@ -925,10 +891,8 @@ class NamelistService {
         println "======= UPDATING RANK ============+"
         boolean success = false;
         List errors = [];
-        String tempActivityDescription = '';
         if(sciName.rank != rank) {
             log.debug "Updating rank from ${sciName.rank} to ${rank}"
-            tempActivityDescription = createNameActivityDescription("Rank ", TaxonomyRank.getTRFromInt(sciName.rank).value(), TaxonomyRank.getTRFromInt(rank).value());
             sciName.rank = rank;
             //TODO: might require to add IBP hierarchy here
             if(!sciName.save(flush:true)) {
@@ -942,7 +906,7 @@ class NamelistService {
             success = false;
         }
         println "======= UPDATING RANK DONE to ${sciName.rank}============+"
-        return [success:success, activityDescription:tempActivityDescription, errors:errors];
+        return [success:success, errors:errors];
     }
         
     //A scientific name was also passed to this function but not used - so removed
@@ -994,7 +958,6 @@ class NamelistService {
             }
             result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, fromCOL, colAcceptedNameData);
         //}
-        result.lastTaxonInIBPHierarchy.tempActivityDescription += result.activityType;
 
         //From migration script
         //Also add to catalogue of life hierarchy
@@ -1017,8 +980,6 @@ class NamelistService {
         namesBeforeSave[sciName.id] = position.value();
         log.debug "Updating position from ${sciName.position} to ${position}"
         println "Updating position from ${sciName.position} to ${position}"
-        println sciName.tempActivityDescription;
-        String tempActivityDescription = createNameActivityDescription("Position", sciName.position?.value()?:NamePosition.RAW.value(), position.value());
         sciName.position = position;
 		
         if(!sciName.save(flush:true)) {
@@ -1030,7 +991,7 @@ class NamelistService {
         }
 
         println "\n============== UPDATING POSITION DONE FROM TO ${sciName.position}========"
-        return [success:success, activityDescription:tempActivityDescription, errors:errors];
+        return [success:success, errors:errors];
     }
 
     List processColData(File f, ScientificName sn = null) {
@@ -1563,31 +1524,21 @@ class NamelistService {
             def pn = parsedNames[0];
             if(pn.canonicalForm) {
                 println "============= " + pn.canonicalForm +"============= "+ pn.name
-                sciName.tempActivityDescription += createNameActivityDescription("Canonical Name", sciName.canonicalForm, pn.canonicalForm);
                 sciName.canonicalForm = pn.canonicalForm
-                sciName.tempActivityDescription += createNameActivityDescription("Binomial Name", sciName.binomialForm, pn.binomialForm);
                 sciName.binomialForm = pn.binomialForm
-                sciName.tempActivityDescription += createNameActivityDescription("Normalized Name", sciName.normalizedForm, pn.normalizedForm);
                 sciName.normalizedForm = pn.normalizedForm
-                sciName.tempActivityDescription += createNameActivityDescription("Italicised Name", sciName.italicisedForm, pn.italicisedForm);
                 sciName.italicisedForm = pn.italicisedForm
-                sciName.tempActivityDescription += createNameActivityDescription("Verbatim Name", sciName.name, pn.name);
                 sciName.name = pn.name
             }
-            sciName.tempActivityDescription += createNameActivityDescription("Author Year", sciName.authorYear, colMatch.authorString);
             sciName.authorYear = colMatch.authorString;
             if(sciName.colNameStatus) {
-                sciName.tempActivityDescription += createNameActivityDescription("COL Name Status", sciName.colNameStatus.value(), colMatch.colNameStatus);
                 sciName.colNameStatus = getCOLNameStatus(colMatch.colNameStatus);
             }
 
-            sciName.tempActivityDescription += createNameActivityDescription("Match Id", sciName.matchId, colMatch.externalId);
             sciName.matchId = colMatch.externalId;
-            sciName.tempActivityDescription += createNameActivityDescription("Match Database Name", sciName.matchDatabaseName, colMatch.matchDatabaseName);
             sciName.matchDatabaseName = colMatch.matchDatabaseName;
-            sciName.tempActivityDescription += createNameActivityDescription("Source Database", sciName.viaDatasource, colMatch.sourceDatabase);
             sciName.viaDatasource = colMatch.sourceDatabase;
-            /*            sciName.tempActivityDescription += createNameActivityDescription("Position", sciName.position?.value(), NamePosition.WORKING.value());
+            /*
             sciName.position = NamePosition.WORKING;
             sciName = sciName.merge();
             println "==========SCI NAME AFTER MERGE ======== " + sciName
@@ -1608,7 +1559,7 @@ class NamelistService {
             e.printStackTrace();
             println "=========ERROR WHILE UPDATING ATTRIBUTES ========\n"
         }
-        return [success:success, errors:errors, sciName:sciName, 'activityDescription':sciName.tempActivityDescription]; 
+        return [success:success, errors:errors, sciName:sciName]; 
         //:sciName,isDeleted:false];
     }
 
