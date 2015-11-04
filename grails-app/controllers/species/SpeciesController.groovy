@@ -1719,7 +1719,7 @@ class SpeciesController extends AbstractObjectController {
 
         } 
 
-        def s = Species.findByTaxonConcept(td);
+        def s = Species.findByTaxonConcept(tD);
         if(s) {
             result = [success:false];
             render result as JSON
