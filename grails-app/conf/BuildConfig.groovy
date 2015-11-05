@@ -196,7 +196,7 @@ grails.project.dependency.resolution = {
         //runtime ":yui-minify-resources:0.1.5"
         runtime ":zipped-resources:1.0"
         compile ":grails-ant:0.1.3"
-        compile ":profiler:0.5"
+        //compile ":profiler:0.5"
     } 
 
     grails.war.resources = { stagingDir ->
