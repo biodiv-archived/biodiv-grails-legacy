@@ -9,6 +9,8 @@ import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.COLNameStatus;
 import species.participation.NamelistService
 import species.sourcehandler.XMLConverter;
+import species.participation.ActivityFeedService
+import species.auth.SUser
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -33,7 +35,8 @@ class TaxonomyDefinition extends ScientificName {
     def grailsApplication
 	def namelistService
 	def namelistUtilService
-
+	def activityFeedService
+	
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
     static mappedBy = [hierarchies:'taxonDefinition']
 
@@ -481,6 +484,37 @@ class TaxonomyDefinition extends ScientificName {
 	
 	public String fetchLogSummary(){
 		return name + "\n" 
+	}
+	
+	def updateNameSignature(List userList = [springSecurityService.currentUser]){
+		def ns = createNameSignature()
+		if(ns != activityDescription){
+			if(!save()) {
+				this.errors.allErrors.each { log.error it }
+			}else{
+				userList.each {
+					activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
+				}
+			}
+			
+		}
+	}
+	
+	private String createNameSignature(){
+		String s = ""
+		s += "Name : " + name  + "\n"
+		s += "Rank : " + TaxonomyRank.getTRFromInt(rank).value().toLowerCase()  + "\n"
+		s += "Position : " + position  + "\n"
+		s += "Name Status : " + status.toString().toLowerCase()  + "\n"
+		s += "Author : " + authorYear  + "\n"
+		s += "Source : " + matchDatabaseName  + "\n"
+		s += "Via Datasource : " + viaDatasource  + "\n"
+		s += "Match Id : " + matchId + "\n"
+
+		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")
+		//s += "Contributors : " + contributors.collect{it.email}.join(", ")
+		println "---- name sign s " + s
+		return s
 	}
 	
 }

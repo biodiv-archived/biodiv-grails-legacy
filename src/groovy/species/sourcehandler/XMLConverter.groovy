@@ -423,6 +423,7 @@ class XMLConverter extends SourceConverter {
                     taxonHierarchy.each { th ->
 						th = th.merge()
 						th.save();
+						th.taxonDefinition.updateNameSignature(getUserContributors(speciesNameNode.data));
 					}
 
                     //                  if(defaultSaveAction == SaveAction.MERGE){
@@ -516,6 +517,7 @@ class XMLConverter extends SourceConverter {
 					taxonHierarchy.each { th ->
 						th = th.merge()
 						th.save();
+						th.taxonDefinition.updateNameSignature(getUserContributors(speciesNameNode.data))
 					}
 					return taxonConcept;
 				} else {
