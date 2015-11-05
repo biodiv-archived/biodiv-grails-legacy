@@ -486,13 +486,15 @@ class TaxonomyDefinition extends ScientificName {
 		return name + "\n" 
 	}
 	
-	def updateNameSignature(){
+	def updateNameSignature(List userList = [springSecurityService.currentUser]){
 		def ns = createNameSignature()
 		if(ns != activityDescription){
 			if(!save()) {
 				this.errors.allErrors.each { log.error it }
 			}else{
-				activityFeedService.addActivityFeed(this, this, contributors[-1], ActivityFeedService.TAXON_NAME_UPDATED, ns);
+				userList.each {
+					activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
+				}
 			}
 			
 		}
@@ -510,6 +512,7 @@ class TaxonomyDefinition extends ScientificName {
 		s += "Match Id : " + matchId + "\n"
 
 		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")
+		//s += "Contributors : " + contributors.collect{it.email}.join(", ")
 		println "---- name sign s " + s
 		return s
 	}

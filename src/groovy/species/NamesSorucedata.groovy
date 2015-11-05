@@ -30,7 +30,7 @@ abstract class NamesSorucedata extends Sourcedata {
 	def updateContributors(List<SUser> users){
 		if(!users) return
 		
-		def toBeAddedUser = (!contributors)? users : users.minus(contributors)
+		def toBeAddedUser = (!contributors)? users : []
 
 		toBeAddedUser.each { u ->
 			this.addToContributors(u)
