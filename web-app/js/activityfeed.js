@@ -305,6 +305,13 @@ function updateFeeds(){
 
 function updateSpecificTargetComp(rootHolderType, rootHolderId){
 	var targetComp = getTargetComp();
+	var oldVal1 = $(targetComp).children('input[name="rootHolderType"]').val();
+	var oldVal2 = $(targetComp).children('input[name="rootHolderId"]').val();
+	
+	if((oldVal1 == rootHolderType) && (oldVal2 == rootHolderId)){
+		return;
+	}
+	
 	$(targetComp).children('input[name="rootHolderType"]').val(rootHolderType);
 	$(targetComp).children('input[name="rootHolderId"]').val(rootHolderId);
 	setUpTimeRef(targetComp);

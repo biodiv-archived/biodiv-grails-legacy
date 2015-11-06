@@ -992,7 +992,7 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
                     getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''));
                     //$(".clickedEle").trigger("click");
                 //}
-                //updateFeeds();    
+                updateFeeds();    
                 processingStop();
                 //postProcessOnAcceptedName();
             } else {
