@@ -147,7 +147,8 @@
 								</g:hasErrors>
 
 							</div>
-						</div>
+                        </div>
+                        <!--
                         <recaptcha:ifEnabled>
 
                         <div class="control-group ${hasErrors(bean: command, field: 'g_recaptcha_response', 'error')}">
@@ -165,9 +166,10 @@
 								</g:hasErrors>
                                 <recaptcha:ifFailed/>
                             </div>
+                            </div>
                             </recaptcha:ifEnabled>
-                        </div>
-                            <!--div
+                            -->
+                        <div
 							class="control-group ${hasErrors(bean: command, field: 'captcha_response', 'error')}">
 							<label class="control-label" for="captcha_response"><jcaptcha:jpeg
 									name="imageCaptcha" height="100px" width="100px" />
@@ -186,7 +188,7 @@
 								</g:hasErrors>
 
 							</div>
-						</div-->
+						</div>
 
 						<div class="control-group">
 							<span class="policy-text"> <g:message code="register.index.policy" />
@@ -248,7 +250,7 @@
 		</div>
 	</div>
     <script type="text/javascript">
-
+/*
     var onRecaptchaSuccess = function(g_recaptcha_response) {
     $('#g_recaptcha_response').val(g_recaptcha_response);
     }
@@ -257,6 +259,7 @@
         grecaptcha.render('html_element', { 'sitekey': '${grailsApplication.config.recaptcha.publicKey}', 'callback': onRecaptchaSuccess, 'tabindex': '2'});
     $('#g_recaptcha_response').val('');
     };
+    */
     </script>
 
 </body>

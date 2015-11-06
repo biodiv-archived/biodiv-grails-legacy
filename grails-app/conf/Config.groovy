@@ -1,7 +1,7 @@
 import species.auth.SUser;
 import java.awt.Font
 import java.awt.Color
-/*import com.octo.captcha.service.multitype.GenericManageableCaptchaService
+import com.octo.captcha.service.multitype.GenericManageableCaptchaService
 import com.octo.captcha.engine.GenericCaptchaEngine
 import com.octo.captcha.image.gimpy.GimpyFactory
 import com.octo.captcha.component.word.wordgenerator.RandomWordGenerator
@@ -11,7 +11,7 @@ import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGe
 import com.octo.captcha.component.image.color.SingleColorGenerator
 import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
 import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
-*/import grails.plugin.springsecurity.SecurityConfigType;
+import grails.plugin.springsecurity.SecurityConfigType;
 import org.apache.log4j.Priority
 
 // locations to search for config files that get merged into the main config
@@ -1539,7 +1539,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 ]
 
 
-/*
+
 jcaptchas {
 imageCaptcha = new GenericManageableCaptchaService(
 new GenericCaptchaEngine(
@@ -1571,7 +1571,7 @@ new Color(0, 0, 0)
 180000, // maxCaptchaStoreSize
 75000
 )
-}*/
+}
 
 NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";
 ObservationController.COMMIT = false;
