@@ -33,6 +33,7 @@ function loadOlderFeedsInAjax(targetComp){
     			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
     			if(data.remainingFeedCount && data.remainingFeedCount > 0){
 					$(targetComp).children('.activiyfeedoldermsg').text("Show " + ((feedType !== "GroupSpecific") ? data.remainingFeedCount: "") + " older feeds >>");
+					$(targetComp).children('.activiyfeedoldermsg').show();
 				}else{
 					$(targetComp).children('.activiyfeedoldermsg').hide();
 				}

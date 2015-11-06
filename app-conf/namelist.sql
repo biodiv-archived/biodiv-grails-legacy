@@ -282,5 +282,6 @@ delete from synonyms where id in ( 3882, 5359, 5559, 6355, 37845, 192238, 201742
 2. In userGroupAndFeedMigration.groovy run addNameSourceInfoField() // wikiwio and bhutan need to set lang and text properly here
 
 ALTER TABLE taxonomy_definition ADD COLUMN  activity_description varchar(2000);
-
+delete from activity_feed where activity_type = 'Taxon name updated' and activity_descrption = 'test';
+update activity_feed SET activity_descrption = replace(activity_descrption, ' .', '<br/>') where activity_type = 'Taxon name updated' and activity_descrption is not null;
 
