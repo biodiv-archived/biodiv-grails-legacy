@@ -163,7 +163,8 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                     alert(data.msg);
                     return;
                 }
-                $('.feedComment').html(data.feedCommentHtml);
+                updateSpecificTargetComp(data.rootHolderType, data.rootHolderId);
+                //$('.feedComment').html(data.feedCommentHtml);
                 changeEditingMode(false);
                 populateNameDetails(data);
                 populateTabDetails(data, false);

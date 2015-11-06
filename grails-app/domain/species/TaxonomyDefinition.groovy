@@ -503,9 +503,9 @@ class TaxonomyDefinition extends ScientificName {
 	private String createNameSignature(){
 		String s = ""
 		s += "Name : " + name  + "\n"
-		s += "Rank : " + TaxonomyRank.getTRFromInt(rank).value().toLowerCase()  + "\n"
+		s += "Rank : " + TaxonomyRank.getTRFromInt(rank).value()  + "\n"
 		s += "Position : " + position  + "\n"
-		s += "Name Status : " + status.toString().toLowerCase()  + "\n"
+		s += "Name Status : " + status.toString() + "\n"
 		s += "Author : " + authorYear  + "\n"
 		s += "Source : " + matchDatabaseName  + "\n"
 		s += "Via Datasource : " + viaDatasource  + "\n"
@@ -513,7 +513,6 @@ class TaxonomyDefinition extends ScientificName {
 
 		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")
 		//s += "Contributors : " + contributors.collect{it.email}.join(", ")
-		println "---- name sign s " + s
 		return s
 	}
 	

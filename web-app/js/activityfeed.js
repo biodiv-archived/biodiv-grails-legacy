@@ -302,6 +302,22 @@ function updateFeeds(){
 	}
 }
 
+function updateSpecificTargetComp(rootHolderType, rootHolderId){
+	var targetComp = getTargetComp();
+	$(targetComp).children('input[name="rootHolderType"]').val(rootHolderType);
+	$(targetComp).children('input[name="rootHolderId"]').val(rootHolderId);
+	setUpTimeRef(targetComp);
+	$(targetComp).children('.activiyfeedNoMoreFeedmsg').hide();
+	$(targetComp).children('ul').empty();
+	loadOlderFeedsInAjax(targetComp, false);
+	targetComp = $('.post-comment-form');
+	$(targetComp).children('input[name="rootHolderType"]').val(rootHolderType);
+	$(targetComp).children('input[name="rootHolderId"]').val(rootHolderId);
+	$(targetComp).children('input[name="commentHolderType"]').val(rootHolderType);
+	$(targetComp).children('input[name="commentHolderId"]').val(rootHolderId);
+	
+}
+
 function updateFeedComponent(targetComp, feedCategory){
 	 $(targetComp).children('input[name="feedCategory"]').val(feedCategory);
 	 setUpTimeRef(targetComp);

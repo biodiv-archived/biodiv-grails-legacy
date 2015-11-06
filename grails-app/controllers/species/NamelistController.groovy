@@ -67,9 +67,11 @@ class NamelistController {
 
 
             if(instance) {
-                def feedCommentHtml = g.render(template:"/common/feedCommentTemplate", model:[instance: instance, userLanguage:userLanguage]);
+                //def feedCommentHtml = g.render(template:"/common/feedCommentTemplate", model:[instance: instance, userLanguage:userLanguage]);
                 res = namelistService.getNameDetails(params);
                 res['success'] = true;
+				res['rootHolderType'] = instance.class.canonicalName
+				res['rootHolderId'] = instance.id
                 println "====CALL HERE NAME DETAILS====== " + res
                 println "========================================="
                 //fetch registry using taxon id and classification id
@@ -81,7 +83,7 @@ class NamelistController {
                   } else {
                   println "======TAXON REGISTRY NULL====="
                   }*/
-                res['feedCommentHtml'] = feedCommentHtml
+                //res['feedCommentHtml'] = raw(feedCommentHtml.replaceAll('"',"'"))
 
 
                 Species.withNewTransaction {
