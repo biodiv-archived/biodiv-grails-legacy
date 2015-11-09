@@ -953,7 +953,7 @@ class NamelistService {
         //TaxonomyRegistry.withNewSession {
             boolean fromCOL = false;
             println metadata1
-            if(metadata1['source'].equalsIgnoreCase('COL') || metadata1['source'].equalsIgnoreCase('CatalogueOfLife') ||  metadata1['source'].equalsIgnoreCase('Catalogue Of Life')) {
+            if('COL'.equalsIgnoreCase(metadata1['source']) || 'CatalogueOfLife'.equalsIgnoreCase(metadata1['source']) ||  'Catalogue Of Life'.equalsIgnoreCase(metadata1['source'])) {
                 fromCOL = true; 
             }
             result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, fromCOL, colAcceptedNameData);

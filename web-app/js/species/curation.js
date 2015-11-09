@@ -163,7 +163,8 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                     alert(data.msg);
                     return;
                 }
-                $('.feedComment').html(data.feedCommentHtml);
+                updateSpecificTargetComp(data.rootHolderType, data.rootHolderId);
+                //$('.feedComment').html(data.feedCommentHtml);
                 changeEditingMode(false);
                 populateNameDetails(data);
                 populateTabDetails(data, false);
@@ -991,6 +992,7 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
                     getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''));
                     //$(".clickedEle").trigger("click");
                 //}
+                updateFeeds();    
                 processingStop();
                 //postProcessOnAcceptedName();
             } else {

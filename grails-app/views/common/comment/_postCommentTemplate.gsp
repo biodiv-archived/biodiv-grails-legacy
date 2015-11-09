@@ -3,7 +3,7 @@
 <%@page import="species.participation.ActivityFeedService"%>
 <div class="post-comment">
     <g:set var="postCommentUrl" value="${uGroup.createLink(controller:'comment', action:'addComment')}"/>
-    <form class="form-horizontal" onSubmit="return postComment(this, '${postCommentUrl}')">
+    <form class="form-horizontal post-comment-form" onSubmit="return postComment(this, '${postCommentUrl}')">
 		<%
 			boolean isGroupDisccusionThread = params.webaddress && (params.controller == 'activityFeed' || params.action == 'activity')
 			def commentPlaceHolder = "Write comment"
@@ -20,10 +20,10 @@
 		</g:if>
 		<textarea name="commentBody" class="comment-textbox" placeholder="${commentPlaceHolder}" ></textarea>
 		<span  style="color:#B84A48; display:none;"><g:message code="postcommenttemplate.write.comment" /></span>
-		<input type="hidden" name='commentHolderId' value="${commentHolder.id}" />
+		<input type="hidden" name='commentHolderId' value="${commentHolder?.id}" />
 		<input type="hidden" name='commentHolderType' value="${commentHolderClass}" />
-		<input type="hidden" name='rootHolderId' value="${rootHolder.id}" />
-		<input type="hidden" name='rootHolderType' value="${rootHolder.class.getCanonicalName()}" />
+		<input type="hidden" name='rootHolderId' value="${rootHolder?.id}" />
+		<input type="hidden" name='rootHolderType' value="${rootHolder?.class?.getCanonicalName()}" />
 		<input type="hidden" name='commentType' value="${commentType}" />
 		<input type="hidden" name='newerTimeRef' value="${newerTimeRef}"/>
 		<input type="hidden" name='commentPostUrl' value="${uGroup.createLink(controller:'comment', action:'addComment')}"/>

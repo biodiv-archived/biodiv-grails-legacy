@@ -2197,6 +2197,7 @@ class XMLConverter extends SourceConverter {
 							//updating author year if not from COL
 							if(!fromCOL && parsedAuthorYear){
 								taxon.authorYear = parsedAuthorYear
+								taxon = taxon.merge();
 								if(!taxon.save(flush:true)) {
 									taxon.errors.each { println it; log.error it }
 								}

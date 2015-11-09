@@ -301,12 +301,13 @@ def messageSource;
 		int days = params.days ? params.days.toInteger() : 7
 		int max = params.max ? params.max.toInteger() : 10
 
+		def startDate = new Date().minus(days)
 		UserGroup userGroupInstance
 		if(params.webaddress) {
 			userGroupInstance = userGroupService.get(params.webaddress);
+			startDate = userGroupInstance.foundedOn
 		}
 
-		def startDate = new Date().minus(days)
 		DateGroovyMethods.clearTime(startDate)
 		
 		def result = activeUserStatsAuthorAndCount(max, userGroupInstance, startDate);		

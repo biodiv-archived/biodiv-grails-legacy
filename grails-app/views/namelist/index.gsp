@@ -393,7 +393,11 @@
             <p id="dialogMsg"></p>
         </div>
 
-        <div class='row-fluid feedComment' style="margin-top:10px">
+        <div class='row-fluid' style="margin-top:10px">
+        	<div class="union-comment">
+             	<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+                <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
+            </div>
         </div>
         <script type="text/javascript">
             var taxonRanks = [];

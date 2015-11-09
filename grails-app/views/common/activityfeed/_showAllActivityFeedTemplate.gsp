@@ -27,8 +27,8 @@
     <g:if test="${!hideList}">
 		<a class="activiyfeednewermsg yj-thread-replies-container yj-show-older-replies" style="display:none;" href="#" title="${g.message(code:'showallactivityfeed.load.new.feeds')}" onclick='loadNewerFeedsInAjax($(this).closest(".activityfeed${feedType}"), false);return false;'><g:message code="showallactivityfeed.new.feeds" /></a>
 		<g:if test="${feedOrder == 'oldestFirst'}">	
-			<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
-				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="${g.message(code:'showallactivityfeed.show.feeds')}" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'><g:message code="link.show" /> ${(feedType != 'GroupSpecific')?remainingFeedCount:''} <g:message code="showallactivityfeed.older.feeds" /> </a>
+			<g:if test="${refreshType == 'manual'}" >
+				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" style="${(remainingFeedCount == 0)? 'display:none;':''}" href="#" title="${g.message(code:'showallactivityfeed.show.feeds')}" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'><g:message code="link.show" /> ${(feedType != 'GroupSpecific')?remainingFeedCount:''} <g:message code="showallactivityfeed.older.feeds" /> </a>
 			</g:if>
 			<ul>
 				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder, 'userGroup':userGroup]" />
@@ -38,8 +38,8 @@
 			<ul>
 				<feed:showActivityFeedList model="['feeds':feeds, 'feedType':feedType, 'feedPermission':feedPermission, feedHomeObject:rootHolder , 'userGroup':userGroup]" />
 			</ul>
-			<g:if test="${refreshType == 'manual' && remainingFeedCount > 0}" >
-				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" href="#" title="${g.message(code:'showallactivityfeed.show.feeds')}" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'><g:message code="link.show" /> ${(feedType != 'GroupSpecific')?remainingFeedCount:''} <g:message code="showallactivityfeed.older.feeds" /> </a>
+			<g:if test="${refreshType == 'manual'}" >
+				<a class="activiyfeedoldermsg yj-thread-replies-container yj-show-older-replies" style="${(remainingFeedCount == 0)? 'display:none;':''}" href="#" title="${g.message(code:'showallactivityfeed.show.feeds')}" onclick='loadOlderFeedsInAjax($(this).closest(".activityfeed${feedType}"));return false;'><g:message code="link.show" /> ${(feedType != 'GroupSpecific')?remainingFeedCount:''} <g:message code="showallactivityfeed.older.feeds" /> </a>
 			</g:if>
 	    </g:else>
 	    <g:if test="${refreshType == 'auto'}">

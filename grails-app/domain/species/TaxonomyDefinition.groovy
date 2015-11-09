@@ -501,19 +501,23 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	private String createNameSignature(){
+		String lineBreak = "<br/>"
 		String s = ""
-		s += "Name : " + name  + "\n"
-		s += "Rank : " + TaxonomyRank.getTRFromInt(rank).value().toLowerCase()  + "\n"
-		s += "Position : " + position  + "\n"
-		s += "Name Status : " + status.toString().toLowerCase()  + "\n"
-		s += "Author : " + authorYear  + "\n"
-		s += "Source : " + matchDatabaseName  + "\n"
-		s += "Via Datasource : " + viaDatasource  + "\n"
-		s += "Match Id : " + matchId + "\n"
+		s += "Name : " + name  + lineBreak
+		s += "Rank : " + TaxonomyRank.getTRFromInt(rank).value()  + lineBreak
+		s += "Position : " + position  + lineBreak
+		s += "Name Status : " + status.toString() + lineBreak
+		s += "Author : " + authorYear  + lineBreak
+		s += "Source : " + matchDatabaseName  + lineBreak
+		s += "Via Datasource : " + viaDatasource  + lineBreak
+		s += "Match Id : " + matchId + lineBreak
 
-		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")
-		//s += "Contributors : " + contributors.collect{it.email}.join(", ")
-		println "---- name sign s " + s
+		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
+		s += "Number of COL Matches : " + noOfCOLMatches + lineBreak
+		if(isFlagged) {
+			s += "IsFlagged reason : " + flaggingReason.tokenize('###')[-1];
+		}
+		
 		return s
 	}
 	
