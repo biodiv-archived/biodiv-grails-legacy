@@ -1702,7 +1702,6 @@ class ObservationController extends AbstractObjectController {
         if(params.lockType == "Validate"){
             //current user & reco
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
-            ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
             def newRecVo;
             ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
 
