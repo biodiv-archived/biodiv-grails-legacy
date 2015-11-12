@@ -44,7 +44,7 @@ class DwCSpeciesExporter{
 		return _instance;
 	}
 	
-def exportSpecieData(directory, DownloadLog dl) {
+def exportSpecieData(directory, DownloadLog dl, String userGroupWebaddress) {
 		log.info "Darwin Core specie export started"
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 		String f = File.separator
@@ -67,7 +67,7 @@ def exportSpecieData(directory, DownloadLog dl) {
 		initWriters(folderPath)
 		fillHeaders() 
 
-        ResourceFetcher rf = new ResourceFetcher(Species.class.canonicalName, dl.filterUrl, null, dl.offsetParam);
+        ResourceFetcher rf = new ResourceFetcher(Species.class.canonicalName, dl.filterUrl, userGroupWebaddress, dl.offsetParam);
         int total = 0;
         while(rf.hasNext() && total < ObvUtilService.EXPORT_BATCH_SIZE) {
             def list_of_species = rf.next();

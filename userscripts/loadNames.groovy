@@ -2,8 +2,8 @@ import species.NamesParser;
 import species.Synonyms;
 import speciespage.TaxonService;
 
-def namesLoaderService = ctx.getBean("namesLoaderService");
-namesLoaderService.syncNamesAndRecos(false);
+//def namesLoaderService = ctx.getBean("namesLoaderService");
+//namesLoaderService.syncNamesAndRecos(false);
 //def namesLoaderService = ctx.getBean("namesIndexerService");
 //namesLoaderService.rebuild();
 
@@ -28,3 +28,5 @@ Synonyms.withTransaction {
 //def taxonService = ctx.getBean("taxonService");
 //taxonService.loadTaxon(true);
 
+def nS = ctx.getBean("namesIndexerService");
+nS.storeKryo('/home/sravanthi/git/biodiv/app-conf/data/names');

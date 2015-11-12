@@ -53,7 +53,7 @@ public max_date
 		return _instance;
 	}
 	
-	def exportObservationData(String directory, DownloadLog dl) {
+	def exportObservationData(String directory, DownloadLog dl, String userGroupWebaddress) {
 		log.info "Darwin Core export started"
 		/*	if(!directory) {
 				directory = config.speciesPortal.species.speciesDownloadDir
@@ -68,7 +68,7 @@ public max_date
 		initWriters(folderPath)
 		fillHeaders() 
 
-        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, dl.offsetParam);
+        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, userGroupWebaddress, dl.offsetParam);
         int total = 0;
         while(rf.hasNext() && total < ObvUtilService.EXPORT_BATCH_SIZE) {
             def list_of_observationInstance = rf.next();

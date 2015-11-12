@@ -144,7 +144,8 @@ class ObservationController extends AbstractObjectController {
                     def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal,userLanguage:userLanguage]
 
                     render result as JSON
-*/                  return;
+*/
+                    return;
                 }
             }
             json { render model as JSON }
@@ -756,7 +757,7 @@ class ObservationController extends AbstractObjectController {
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName, params.long('speciesId'));
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -981,7 +982,7 @@ class ObservationController extends AbstractObjectController {
 			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName);
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName, params.long('speciesId'));
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -1306,7 +1307,7 @@ class ObservationController extends AbstractObjectController {
     * languageName
 	 * @return
 	 */
-	private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String canName, String commonName, String languageName) {
+	private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String canName, String commonName, String languageName, Long speciesId) {
 		def observation = params.observation?:Observation.get(obvId);
 		
 		ConfidenceType confidence = observationService.getConfidenceType(conf?:ConfidenceType.CERTAIN.name());
@@ -1319,7 +1320,7 @@ class ObservationController extends AbstractObjectController {
 			isAgreeRecommendation = true
 		} else {
 			//add recommendation used so taking both reco and common name reco if available
-			def recoResultMap = observationService.getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
+			def recoResultMap = observationService.getRecommendations(recoName, canName, commonName, languageName, speciesId)
 			reco = recoResultMap.mainReco;
 			commonNameReco =  recoResultMap.commonNameReco;
 		}
@@ -1703,6 +1704,8 @@ class ObservationController extends AbstractObjectController {
             def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
             ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
             def newRecVo;
+            ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
+
             if(recVo){
                 if(reco != recVo.recommendation) {
                     recVo.delete(flush: true, failOnError:true)                    
@@ -1716,7 +1719,7 @@ class ObservationController extends AbstractObjectController {
                 }
             }
             if(!recVo){
-                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence:confidence )
+                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence )
                 if(!newRecVo.save(flush:true)){
                     newRecVo.errors.allErrors.each { log.error it } 
                 }

@@ -1,6 +1,7 @@
 <%@page import="species.ScientificName.TaxonomyRank"%>
 <%@page import="species.Language"%>
 <%@page import="species.NamesMetadata.NameStatus"%>
+<%@page import="species.NamesMetadata.NamePosition"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <html>
@@ -9,7 +10,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <meta name="layout" content="main" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <r:require modules="species_show,curation"/>
+        <r:require modules="curation"/>
 
         <title>NameList - Curation Interface</title>
 
@@ -55,8 +56,9 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.rawlist.info')}"></i>
                 </div>
                 <select class="span12 listSelector">
-                    <option value='accDLContent'>Accepted Names</option>
-                    <option value='synDLContent'>Synonyms</option>
+                    <option value='speciesDLContent'>Species and Subspecies</option>
+                    <option value='accDLContent'>Child Taxa</option>
+                    <!--option value='synDLContent'>Synonyms</option-->
                     <!--option value='comDLContent'>Common Names</option-->
                 </select>
                 <div class="dl_content taxon_selector_list listarea_content">
@@ -74,8 +76,9 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.workinglist.info')}"></i>
                 </div>
                 <select class="span12 listSelector">
-                    <option value='accWLContent'>Accepted Names</option>
-                    <option value='synWLContent'>Synonyms</option>
+                    <option value='speciesWLContent'>Species and Subspecies</option>
+                    <option value='accWLContent'>Child Taxa</option>
+                    <!--option value='synWLContent'>Synonyms</option-->
                     <!--option value='comWLContent'>Common Names</option-->
                 </select>
 
@@ -92,8 +95,9 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.cleanlist.info')}"></i>
                 </div>
                 <select class="span12 listSelector">
-                    <option value='accCLContent'>Accepted Names</option>
-                    <option value='synCLContent'>Synonyms</option>
+                    <option value='speciesCLContent'>Species and Subspecies</option>
+                    <option value='accCLContent'>Child Taxa</option>
+                    <!--option value='synCLContent'>Synonyms</option-->
                     <!--option value='comCLContent'>Common Names</option-->
                 </select>
 
@@ -120,53 +124,13 @@
                 </div>
 
                 <table style="width:100%;">
+                    <g:each in="${TaxonomyRank.list()}" var="taxon">
                     <tr>
-                        <td class='rankStrings'>Kingdom</td>
-                        <td class='rankValues'><input type="text" class="kingdom span12"></td> 
+                        <td class='rankStrings'>${taxon.value()}</td>
+                        <td class='rankValues'><input type="text" class="taxon taxon${taxon.ordinal()} span12"></td> 
                     </tr>
-                    <tr>
-                        <td class='rankStrings'>Phylum</td>
-                        <td class='rankValues'><input type="text" class="phylum span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Class</td>
-                        <td class='rankValues'><input type="text" class="class span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Order</td>
-                        <td class='rankValues'><input type="text" class="order span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class="super_family rankStrings">Super-Family</td>
-                        <td class='rankValues'><input type="text" class="superfamily span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Family</td>
-                        <td class='rankValues'><input type="text" class="family span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class="sub_family rankStrings">Sub-Family</td>
-                        <td class='rankValues'><input type="text" class="subfamily span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Genus</td>
-                        <td class='rankValues'><input type="text" class="genus span12 "></td> 
-                    </tr>
-
-                    <tr>
-                        <td class="sub_genus rankStrings">Sub-Genus</td>
-                        <td class='rankValues'><input type="text" class="subgenus span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class='rankStrings'>Species</td>
-                        <td class='rankValues'><input type="text" class="species span12 "></td> 
-                    </tr>
-                    <tr>
-                        <td class="infra_species rankStrings">Infra-Species</td>
-                        <td class='rankValues'><input type="text" class="infraspecies span12"></td> 
-                    </tr>
-
-                </table>
+                    </g:each>
+               </table>
 
             </div>
             <div class="span7 canBeDisabled listarea" style="background:seagreen">
@@ -184,39 +148,41 @@
                 <input type="hidden" class="id_details" value="">
 
                 <div class="row-fluid form-inline">
-                    <div class="span4">
+                    <div class="span8">
                         <label>Name
                         
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.name.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="Name" class="span5" style="width:65%;"/>
+                        <input type="text" placeholder="Name" class="span5 name" style="width:85%;"/>
                     </div>
                     <div class="span4">
-                        <label> Author String
+                        <label> Author
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.authorstring.info')}"></i>
                         </label>
-                        <input type="text" placeholder="Author string" class="span3" style="width:45%;"/>
+                        <input type="text" placeholder="Author" class="span3 authorString" style="width:68%;"/>
                     </div>
-                    <div class="span4">
+                    <div class="span4" style="margin-left:0px;">
                         <label>Status
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.status.info')}"></i>
                         </label>
-                        <select id="statusDropDown" class="span4" style="width:65%;" >
+                        <select id="statusDropDown" class="span4 status" style="width:67%;" >
                             <option value="chooseNameStatus">Choose Name Status</option>
                             <g:each in="${NameStatus.list()}" var="ns">
-                            <option value="${ns.toString().toLowerCase()}">${ns}</option>
+                            <g:if test="${ns != NameStatus.PROV_ACCEPTED && ns != NameStatus.COMMON}">
+                            <option value="${ns.toString().toLowerCase()}">${ns.value()}</option>
+                            </g:if>
                             </g:each>
                         </select>
                     </div>
                     
-                    <div class="span3" style="margin-left:0px;">
+                    <div class="span4">
                         <label>Rank
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.rank.info')}"></i>
                         </label>
-                        <select id="rankDropDown" class="span7">
+                        <select id="rankDropDown" class="span5 rank" style="width:70%; margin:left:3px;">
                             <option value="chooseRank">Choose Rank</option>
                             <% def rankCount = 0 %>
                             <g:each in="${TaxonomyRank.list()}" var="t">
@@ -224,27 +190,62 @@
                             </g:each>
                         </select>
                     </div>
-                    <div class="span3">
+                    <div class="span4">
                         <label>Source 
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.source.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="" class="span7" style=""/>
+                        <input type="text" placeholder="Source" class="span5 source" style="width:67%;"/>
                     </div>															
-                    <div class="span3">
+                    <div class="span4" style="margin-left:0px">
                         <label>via
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.via.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8" style=""/>
+                        <input type="text" placeholder="Via" class="span5 sourceDatabase via" style="width:67%;margin-left:22px"/>
                     </div>
-                    <div class="span3">
+
+                    <div class="span4">
                         <label>ID
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.id.info')}"></i>
                         </label>  
-                        <input type="text" placeholder="" class="span8" style=""/>
+                        <input type="text" placeholder="Id" class="span5 id" style="width:70%;margin-left:23px;"/>
                     </div>			
+
+                    <div class="span4">
+                        <label>Position
+                        
+                    <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.position.info')}"></i>
+                        </label>
+                        <select id="positionDropDown" class="span5 position" style="width:64%;">
+                            <option value="choosePosition">Choose Position</option>
+                            <g:each in="${NamePosition.list()}" var="t">
+                            <option value="${t.toString().toLowerCase()}">${t}</option>
+                            </g:each>
+                        </select>
+                    </div>
+ 
+                    <div class="pull-right">
+                    <button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:2px;">Save </button> 
+                </div>
+                </div>
+                
+                <div class="row-fluid">
+                    <!--input type="hidden" placeholder="" class="span8 position"/-->
+                    <!--button type="button" class="save_button btn" onClick='saveHierarchy(false, false)'>Save & Retain</button--!> 
+                    <!--div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            Move Name to List
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a id="moveToWKG" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Move to Working List</a> </li>
+                            <li><a id="removeFromWKG" class="remove_button btn btn-link disabled" onClick='saveNameDetails(true, false, false)'>Remove from Working List</a> </li>
+                            <li><a id="moveToClean" class="save_button btn btn-link disabled" onClick='saveNameDetails(false, false, true)'>Move to Clean List</a> </li>
+                            <li><a id="removeFromClean" class="remove_button btn btn-link disabled" onClick='saveNameDetails(false, true, false)'>Remove from Clean List</a></li>
+                        </ul>
+                    </div-->
                 </div>
 
                 <div class="row-fluid">	
@@ -334,15 +335,11 @@
 
 
 
-                        <!--button type="button" class="save_button" style="background-color:#C0504D;" onClick='saveHierarchy(false)'>Save & Retain</button--!> 
-                        <button type="button" class="save_button" style="background-color:#FF9900;" onClick='saveHierarchy(true)'>Save & Move to Working List</button> 
-                        <!--button type="button" class="save_button" style="background-color:#009933;">Save & Move to Clean List</button--!> 
-                    </div>
+                  </div>
 
 
                 </div>
-
-
+                      
 
 
             </div>
@@ -396,14 +393,17 @@
             <p id="dialogMsg"></p>
         </div>
 
-        <div class='row-fluid feedComment' style="margin-top:10px">
+        <div class='row-fluid' style="margin-top:10px">
+        	<div class="union-comment">
+             	<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+                <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
+            </div>
         </div>
         <script type="text/javascript">
             var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">
             taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
             </g:each>
-            <r:script>
             $(document).ready(function() {
                     //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
                     var taxonBrowserOptions = {
@@ -423,45 +423,7 @@ var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);
 
 $('.icon-question-sign').tooltip();
 
-//modifySourceOnEdit();
-//initializeLanguage();
-$(".listSelector").change(function () {
-    var selectedList = $(this).val();
-    var list_content = $(this).parents(".listarea").find(".listarea_content");
-    $(list_content).find("ul").remove();
-    switch (selectedList) {
-    case 'accDLContent':
-    $(list_content).append(accDLContent);
-    break;
-    case 'synDLContent':
-    $(list_content).append(synDLContent);
-    break;
-    case 'comDLContent':
-    //$(list_content).append(comDLContent);
-    break;
-    case 'accWLContent':
-    $(list_content).append(accWLContent);
-    break;
-    case 'synWLContent':
-    $(list_content).append(synWLContent);
-    break;
-    case 'comWLContent':
-    //$(list_content).append(comWLContent);
-    break;
-    case 'accCLContent':
-    $(list_content).append(accCLContent);
-    break;
-    case 'synCLContent':
-    $(list_content).append(synCLContent);
-    break;
-    case 'comCLContent':
-    //$(list_content).append(comCLContent);
-    break;
-    default: alert('Wrong option selected!!')
-    }
 });
-});
-</r:script>
 </script>
 
 </body>

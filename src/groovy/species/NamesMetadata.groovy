@@ -9,9 +9,9 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 abstract class NamesMetadata extends NamesSorucedata {
 
     public enum NamePosition {
-        CLEAN("Clean"),
+        RAW("Raw"),
         WORKING("Working"),
-        RAW("Raw");
+        CLEAN("Clean");
 
         private String value;
 
@@ -82,9 +82,10 @@ abstract class NamesMetadata extends NamesSorucedata {
             if(this == PROV_ACCEPTED) return messageSource.getMessage('label.provisionally.accepted', null, RCU.getLocale(request))
             if(this == COMMON) messageSource.getMessage('label.common', null, RCU.getLocale(request)) 
         }
-        String toString() {
+
+        /*String toString() {
             return this.value();
-        }
+        }*/
 		
 		static NameStatus getEnum(String str){
 			if(!str) return null

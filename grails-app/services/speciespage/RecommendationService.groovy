@@ -14,6 +14,7 @@ import species.participation.Recommendation;
 import species.utils.Utils;
 import species.NamesParser;
 import species.Language;
+import species.Species;
 
 class RecommendationService {
 
@@ -146,8 +147,12 @@ class RecommendationService {
 	}
 	
 	
-	public Recommendation getRecoForScientificName(String recoName,  String canonicalName, Recommendation commonNameReco){
+	public Recommendation getRecoForScientificName(String recoName,  String canonicalName, Recommendation commonNameReco, Long speciesId = null){
 		def reco, taxonConcept;
+        if(speciesId) {
+            //HACK as record in names indexer is not storing taxonId
+            taxonConcept = Species.read(speciesId)?.taxonConcept;
+        }
 		//
 		//first searching by canonical name. this name is present if user select from auto suggest
 		if(canonicalName && (canonicalName.trim() != "")){

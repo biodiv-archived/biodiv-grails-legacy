@@ -582,6 +582,7 @@ class CustomRegisterCommand {
 	String profilePic;
 	String openId;
 	boolean facebookUser;
+    //String g_recaptcha_response;
 	//String recaptcha_response_field;
 	//String recaptcha_challenge_field;
 	String captcha_response;
@@ -608,10 +609,10 @@ class CustomRegisterCommand {
 			def request = RCH.requestAttributes.request
 			try{
 				if (!command.jcaptchaService.validateResponse("imageCaptcha", session.id, command.captcha_response)) {
-					//if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), command)) {
+				//if(!command.recaptchaService.verifyAnswer(session, request.getRemoteAddr(), ['g-recaptcha-response':command.g_recaptcha_response])) {
 					return 'reCaptcha.invalid.message'
 				}
-			}catch (com.octo.captcha.service.CaptchaServiceException e) {
+			}catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace()
 				return 'reCaptcha.invalid.message'

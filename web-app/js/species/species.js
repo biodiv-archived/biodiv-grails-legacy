@@ -837,6 +837,13 @@ var initNameEditables = function ($e) {
     $('#commonNames .entry').removeClass('pull-left');
 }
 
+function deleteSpecies(){
+
+    if(confirm(window.i8ln.species.specie.sdel)){
+        document.forms.deleteForm.submit();
+    }
+}
+
 
 $(document).ready(function() {
 

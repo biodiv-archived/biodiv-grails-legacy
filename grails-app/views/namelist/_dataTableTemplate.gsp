@@ -27,7 +27,7 @@
   <div class="span2 tab_accept_inner"><label>Action</label></div>
 </div>
 <g:set var="typeClass" value="${type}id"/>
-<g:each in="${1..4}">
+<g:each in="${1..3}">
 <div class="row-fluid tab_div singleRow">
  <span class="tab_form">
   <div class="span4" style ="padding-left:4px;padding-right:4px;"> 

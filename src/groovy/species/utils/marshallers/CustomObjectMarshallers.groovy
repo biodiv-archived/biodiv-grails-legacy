@@ -34,6 +34,7 @@ import species.participation.Comment;
 import species.participation.ActivityFeed;
 import species.utils.ImageType;
 import species.Language;
+import species.NamesMetadata.NamePosition;
 import content.eml.UFile;
 
 import grails.converters.JSON
@@ -47,7 +48,7 @@ class CustomObjectMarshallers {
     
     def grailsApplication;
     def userGroupService;
-
+	
     List marshallers = []
 
     def register() {
@@ -102,7 +103,7 @@ class CustomObjectMarshallers {
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value()]
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'group':it.fetchRootName(), parentName:it.fetchParentName(), 'position':it.position.value()]
         }
 
         JSON.registerObjectMarshaller(Classification) {
@@ -134,7 +135,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
-            def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence.value(), votedOn: it.votedOn];
+            def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence?.value(), votedOn: it.votedOn];
             if(it.commonNameReco) {
                 r['commonNameReco'] = it.commonNameReco
             };
@@ -227,6 +228,9 @@ class CustomObjectMarshallers {
             }
         })
 
+        JSON.registerObjectMarshaller(NamePosition) {
+            return it.value();
+        }
     }
     }
 }

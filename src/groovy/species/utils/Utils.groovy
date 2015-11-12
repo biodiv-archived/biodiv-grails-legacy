@@ -88,6 +88,8 @@ class Utils {
 
         if(cleanSciName.indexOf(' ') == -1) {
             cleanSciName = cleanSciName.toLowerCase().capitalize();
+        } else {
+            cleanSciName = cleanSciName.capitalize();
         }
         return cleanSciName;
     }
@@ -153,7 +155,7 @@ class Utils {
 		} catch (Exception e) {
 			log.error e.printStackTrace();
 		}
-		return cleanName(name)
+		return cleanSciName(name)
 	}
 
 	static void populateHttpServletRequestParams(ServletRequest request, Map params) {
@@ -457,6 +459,12 @@ class Utils {
 		return ("search".equalsIgnoreCase(action) || "search".equalsIgnoreCase(params.action) ||  params.aq || params.query ) 
 	}
 
+    public static def copyProperties(source, target, boolean checkHasProperty = true) {
+        source.properties.each { key, value ->
+            if ((checkHasProperty && target.hasProperty(key)) && !(key in ['class', 'metaClass'])) 
+                target[key] = value
+        }
+    }
 }
 
 

@@ -7,6 +7,10 @@ import species.groups.SpeciesGroup;
 import species.utils.Utils;
 import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.COLNameStatus;
+import species.participation.NamelistService
+import species.sourcehandler.XMLConverter;
+import species.participation.ActivityFeedService
+import species.auth.SUser
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -31,7 +35,8 @@ class TaxonomyDefinition extends ScientificName {
     def grailsApplication
 	def namelistService
 	def namelistUtilService
-
+	def activityFeedService
+	
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
     static mappedBy = [hierarchies:'taxonDefinition']
 
@@ -136,6 +141,19 @@ class TaxonomyDefinition extends ScientificName {
         def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
         return parentTaxonRegistry(classification).get(classification);
     }
+	
+	String fetchRootName(){
+		def hir = fetchDefaultHierarchy()
+		if(hir)
+			return hir[0].canonicalForm
+	}
+	
+	String fetchParentName(){
+		def hir = fetchDefaultHierarchy()
+		if(hir && (hir.size() > 1))
+			return hir[-2].canonicalForm
+			
+	}
 
    Map longestParentTaxonRegistry(Classification classification) {
        def result = [:];
@@ -279,15 +297,38 @@ class TaxonomyDefinition extends ScientificName {
 		
 	}
 	
+	def createSpeciesStub() {
+		if(!id) return;
+
+		Species s = Species.findByTaxonConcept(this);
+		if(s){
+			return s
+		}
+		
+		XMLConverter converter = new XMLConverter();
+		
+        s = new Species();
+		s.taxonConcept = this
+		s.title = s.taxonConcept.italicisedForm;
+		s.guid = converter.constructGUID(s);
+		
+		if(!s.save(flush:true)){
+			s.errors.allErrors.each {log.error it}
+		}
+		return s;
+	}
+	
 	public postProcess(){
 		curateNameByCol()
+		
 		println "----------------------------------- adding col hir"
 		addColHir()
-		println "---------------------- adding IBP hir"
 		
+		println "---------------------- adding IBP hir"
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
 		def trHir = Classification.findByName("IBP Taxonomy Hierarchy");
 		snapToIBPHir(hirList, trHir)
+		
 	}
 	
 	private addColHir(){
@@ -346,25 +387,138 @@ class TaxonomyDefinition extends ScientificName {
 		}
 	}
 	
-	private curateNameByCol(){
-		if((status != NameStatus.ACCEPTED) || matchId)
-			return
+	private boolean curateNameByCol(){
+		println "-------------matchId------------------ " + matchId
+		if((status != NameStatus.ACCEPTED) || matchId )
+			return true
 		
-			
 		def colData = namelistService.searchCOL(canonicalForm, 'name')
 		println "--------------------------- " + colData
 		def acceptedMatch = namelistService.validateColMatch(this, colData)
+		if(colData && !acceptedMatch){
+			log.debug "No match found on col so returning without adding col hir"
+			return false
+		}
 		println "------------------ came here " + acceptedMatch
 		if(!acceptedMatch){
 			log.debug "No match found on col so returning without adding col hir"
-			return
+			return false
 		}
 		if(!status.value().equalsIgnoreCase(acceptedMatch.nameStatus)) {
 			log.debug "Status from col is different so not adding col hir/info " + status + " col status " + acceptedMatch.nameStatus
-			return
+			return false
 		}
 		
 		namelistService.processDataForMigration(this, acceptedMatch, colData.size(), true)
+		return true
+	}
+	
+	def addSynonymFromCol(List synList){
+		if(!synList || (status != NameStatus.ACCEPTED))
+			return
+			
+		synList.each {syn ->
+			def s = SynonymsMerged.findByMatchId(syn.id)
+			if(s){
+				addSynonym(s)
+			}else{
+				NamesParser nameParser = new NamesParser()
+				def parsedNames =  nameParser.parse([syn.name]);
+				if(!parsedNames[0]?.canonicalForm) {
+					log.error "Not able to parse " + syn.name
+				}else{
+					SynonymsMerged synToAdd
+					def name = parsedNames[0]
+					def tds = NamelistService.searchIBP(parsedNames[0].canonicalForm, syn.authorString,  NamesMetadata.NameStatus.SYNONYM, syn.parsedRank, false, parsedNames[0].normalizedForm, true)
+					if(!tds.isEmpty()){
+						log.debug "Name is synonym in new system so reusing " + tds
+						synToAdd = tds[0]
+					}else{
+						synToAdd = new SynonymsMerged()
+						synToAdd.normalizedForm = parsedNames[0].normalizedForm;
+						synToAdd.italicisedForm = parsedNames[0].italicisedForm;
+						synToAdd.binomialForm = parsedNames[0].binomialForm;
+						synToAdd.canonicalForm = parsedNames[0].canonicalForm
+						synToAdd.status = NamesMetadata.NameStatus.SYNONYM
+					}
+					
+					synToAdd.name = syn.name
+					synToAdd.matchId = syn.id
+					synToAdd.position = NamesMetadata.NamePosition.WORKING
+					synToAdd.rank = syn.parsedRank
+					synToAdd.authorYear = syn.authorString
+					synToAdd.relationship = XMLConverter.getRelationship(null)
+					
+					if(!synToAdd.save(flush:true)){
+						synToAdd.errors.allErrors.each { println  it }
+					}
+					addSynonym(synToAdd)
+				}
+			}
+			
+		}	
 		
 	}
+	
+	
+	def updatePosition(String pos, Map nameSourceInfo = [:] ){
+		def newPosition = NamesMetadata.NamePosition.getEnum(pos)
+		if(newPosition){
+			this.position = newPosition
+			if(this.position == NamesMetadata.NamePosition.CLEAN){
+				def fieldsConfig = grailsApplication.config.speciesPortal.fields
+				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
+				def tmpMatchId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
+				def tmpViaDatasource = nameSourceInfo.get("" + fieldsConfig.VIA_SOURCE)
+				if(tmpMatchDatabaseName || tmpMatchId || tmpViaDatasource){
+					matchDatabaseName = tmpMatchDatabaseName
+					matchId = tmpMatchId
+					viaDatasource = tmpViaDatasource
+				}
+			}
+			if(!save()) {
+				this.errors.allErrors.each { log.error it }
+			}
+		}
+	}
+	
+	public String fetchLogSummary(){
+		return name + "\n" 
+	}
+	
+	def updateNameSignature(List userList = [springSecurityService.currentUser]){
+		def ns = createNameSignature()
+		if(ns != activityDescription){
+			if(!save()) {
+				this.errors.allErrors.each { log.error it }
+			}else{
+				userList.each {
+					activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
+				}
+			}
+			
+		}
+	}
+	
+	private String createNameSignature(){
+		String lineBreak = "<br/>"
+		String s = ""
+		s += "Name : " + name  + lineBreak
+		s += "Rank : " + TaxonomyRank.getTRFromInt(rank).value()  + lineBreak
+		s += "Position : " + position  + lineBreak
+		s += "Name Status : " + status.toString() + lineBreak
+		s += "Author : " + authorYear  + lineBreak
+		s += "Source : " + matchDatabaseName  + lineBreak
+		s += "Via Datasource : " + viaDatasource  + lineBreak
+		s += "Match Id : " + matchId + lineBreak
+
+		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
+		s += "Number of COL Matches : " + noOfCOLMatches + lineBreak
+		if(isFlagged) {
+			s += "IsFlagged reason : " + flaggingReason.tokenize('###')[-1];
+		}
+		
+		return s
+	}
+	
 }

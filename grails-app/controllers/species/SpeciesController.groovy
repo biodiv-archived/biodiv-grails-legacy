@@ -118,9 +118,6 @@ class SpeciesController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-		// flash.message = "Species page create is currently unavailable."
-		// redirect(action: "list")
-		// return
 		def speciesInstance = new Species()
 		speciesInstance.properties = params
 		return [speciesInstance: speciesInstance]
@@ -128,29 +125,27 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def save() {
-        List errors = [];
+		List errors = [];
         Language languageInstance = utilsService.getCurrentLanguage(request);
         Map result = [userLanguage:languageInstance, errors:errors];
 
         if(params.page && params.rank) {
             Map list = params.taxonRegistry?:[:];
-            List t = [];
+            List hirNameList = [];
             String speciesName;
             int rank;
             list.each { key, value -> 
                 if(value) {
-                    t.putAt(Integer.parseInt(key).intValue(), value);
+                    hirNameList.putAt(Integer.parseInt(key).intValue(), value);
                  }
             } 
 
             speciesName = params.page
             rank = params.int('rank');
-            t.putAt(rank, speciesName);
-
-            //t.putAt(TaxonomyRank.SPECIES.ordinal(), params.species);
-
+            hirNameList.putAt(rank, speciesName);
+			
             try {
-                result = speciesService.createSpecies(speciesName, rank, t, languageInstance);
+                result = speciesService.createSpecies(speciesName, rank, hirNameList, params.colId, languageInstance, params.taxonHirMatch);
                 result.errors = result.errors ? ' : '+result.errors : '';
                 if(!result.success) {
                     if(result.status == 'requirePermission') {
@@ -158,19 +153,33 @@ class SpeciesController extends AbstractObjectController {
                         flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                         //flash.message = "Sorry, you don't have permission to contribute to this species ${params.id?speciesName+(params.id):''}. Please request for permission below."
 
-                        def url = uGroup.createLink(controller:"species", action:"contribute");
-                        redirect url: url
+                        def model = utilsService.getErrorModel(flash.message, null, OK.value(), result.errors);
+                        withFormat {
+                            html {
+                                def url = uGroup.createLink(controller:"species", action:"contribute");
+                                redirect url: url
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
                         return;
                     } else {
-                    flash.message = result.msg ? result.msg+result.errors:"${message(code: 'default.species.error.Create',null)}"+result.errors
-			        render(view: "create", model: result)
-                    return;
+                        flash.message = result.msg ? result.msg+result.errors:"${message(code: 'default.species.error.Create',null)}"+result.errors
+                        def model = utilsService.getErrorModel(flash.message, null, OK.value(), result);
+                        withFormat {
+                            html {
+                                render(view: "create", model: result)
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
+                        return;
                     }
                 }
 
                 Species speciesInstance = result.speciesInstance;
                 if(speciesInstance.taxonConcept) {
-
+                    log.debug "Saving species instance ${speciesInstance}"
                     if (!speciesInstance.hasErrors() && speciesInstance.save(flush:true)) {
                         //Saving current user as contributor for the species
                         //if(!speciesPermissionService.addContributorToSpecies(springSecurityService.currentUser, speciesInstance)){
@@ -185,8 +194,15 @@ class SpeciesController extends AbstractObjectController {
                         utilsService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
 
 
-                        redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
-                        return;
+                        def model = utilsService.getSuccessModel(flash.message, speciesInstance, OK.value(), [:]);
+                        withFormat {
+                            html {
+                                redirect(action: "show", id: speciesInstance.id, params:['editMode':true])
+                            }
+                            json { render model as JSON }
+                            xml { render model as XML }
+                        }
+						return;
                     } else {
                         flash.message = result.msg ? result.msg + result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
                     }
@@ -199,8 +215,16 @@ class SpeciesController extends AbstractObjectController {
                 result.errors << e.getMessage();
                 flash.message = result.msg ? result.msg+result.errors : messageSource.getMessage("default.species.error.species", null, RCU.getLocale(request)) +" "+ result.errors
             }
+
         }
-        render(view: "create", model:result)
+        def model = utilsService.getErrorModel(flash.message, null, OK.value(), result.errors);
+        withFormat {
+            html {
+                render(view: "create", model: result)
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
     }
 
 	def show() {
@@ -292,7 +316,7 @@ class SpeciesController extends AbstractObjectController {
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
 
                     def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:1, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
+                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
 
                     if(springSecurityService.currentUser) {
                         SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
@@ -430,17 +454,25 @@ class SpeciesController extends AbstractObjectController {
 		}
         }
 
-
+        def changes = [:];
         utilsService.benchmark('remove empty info hierarchy') {
         //remove empty information hierarchy
-		for(concept in map.clone()) {
+//		for(concept in map.clone()) {
+        def conceptIter = map.entrySet().iterator();
+        while (conceptIter.hasNext()) {
+            def concept = conceptIter.next();
             if(concept.value.get('speciesFieldInstance')) {
                 speciesService.sortAsPerRating(map.get(concept.key).get('speciesFieldInstance'));
 			}
-			for(category in concept.value.clone()) {
+            
+//			for(category in concept.value.clone()) {
+            def categoryIter = concept.value.entrySet().iterator();
+            while (categoryIter.hasNext()) {
+                def category = categoryIter.next();
 				if(category.key.equals("field") || category.key.equals("speciesFieldInstance") ||category.key.equals("hasContent") ||category.key.equals("isContributor") || category.key.equals("lang") || category.key.equalsIgnoreCase('Species Resources'))  {
 					continue;
-				} else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) || category.key.equals(config.ss_v_r)) {
+				} 
+                else if(category.key.equals(config.occurrenceRecords) || category.key.equals(config.references) || category.key.equals(config.documents) || category.key.equals(config.ss_v_r)) {
 					boolean show = false;
 					if(category.key.equals(config.references)) {
 						for(f in speciesInstance.fields) {
@@ -461,25 +493,38 @@ class SpeciesController extends AbstractObjectController {
 						show = true;
 					}
 					if(show) {
-                            map.get(concept.key).get(category.key).put('hasContent', true);
-                            map.get(concept.key).put('hasContent', true);
-					}
-				} else if(category.value.get('speciesFieldInstance')) {
-					    speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get('speciesFieldInstance'));
+                        //map.get(concept.key).get(category.key).put('hasContent', true);
+                        //category.value.put('hasContent', true);
+                        changes[concept.key+"_"+category.key+"_hasContent"] = true;
+                        //map.get(concept.key).put('hasContent', true);
+                        //concept.value.put('hasContent', true);
+                        changes[concept.key+"_hasContent"] = true
+                    }
+				} else if(category.value.containsKey('speciesFieldInstance')) {
+					//speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get('speciesFieldInstance'));
 				}
 
-                if(category.value.get('hasContent')) {
-                    map.get(concept.key).get(category.key).put('hasContent', true);
-                    map.get(concept.key).put('hasContent', true);
-                }
-                if(category.value.get('isContributor')) {
-                    int val = category.value.get('isContributor')
-                    if(!map.get(concept.key).containsKey('isContributor'))
-                        map.get(concept.key).put('isContributor', 1);
+                if(category.value['hasContent']) {
+                    //map.get(concept.key).get(category.key).put('hasContent', true);
+                    //category.value.put('hasContent', true);
+                    changes[concept.key+"_"+category.key+"_hasContent"] = true;
+                    //map.get(concept.key).put('hasContent', true);
+                    //concept.value.put('hasContent', true);
+                    changes[concept.key+"_hasContent"] = true
                 }
 
+ 
+                if(concept.value[category.key]['isContributor']) {
+                    //int val = category.value.get('isContributor')
+                    if(!map[concept.key].containsKey('isContributor')) {
+                        changes[concept.key+"_isContributor"] = 1;
+                    }
+                }
 
-				for(subCategory in category.value.clone()) {
+				//for(subCategory in category.value.clone()) {
+                def subCategoryIter = category.value.entrySet().iterator();
+                while (subCategoryIter.hasNext()) {
+                    def subCategory = subCategoryIter.next();
 					if(subCategory.key.equals("field") || subCategory.key.equals("speciesFieldInstance") || subCategory.key.equals('hasContent') ||subCategory.key.equals("isContributor") || subCategory.key.equals("lang") ) continue;
 
 					if((subCategory.key.equals(config.gdge) && speciesInstance.globalDistributionEntities.size()>0)  ||
@@ -487,27 +532,50 @@ class SpeciesController extends AbstractObjectController {
 					(subCategory.key.equals(config.idge) && speciesInstance.indianDistributionEntities.size()>0) ||
 					(subCategory.key.equals(config.iege) && speciesInstance.indianEndemicityEntities.size()>0)) {
 
-                        if(subCategory.value.get('speciesFieldInstance')) {
+                        if(subCategory.value.containsKey('speciesFieldInstance')) {
                             speciesService.sortAsPerRating(map.get(concept.key).get(category.key).get(subCategory.key).get('speciesFieldInstance'));
                         }
 					}
 
-                    if(subCategory.value.get('hasContent')) { 
-                        map.get(concept.key).get(category.key).put('hasContent', true);
-                        map.get(concept.key).put('hasContent', true);
+                    if(subCategory.value['hasContent']) { 
+                        //map.get(concept.key).get(category.key).put('hasContent', true);
+                        //category.value.put('hasContent', true);
+                        changes[concept.key+"_"+category.key+"_hasContent"] = true;
+                        //map.get(concept.key).put('hasContent', true);
+                        //concept.value.put('hasContent', true);
+                        changes[concept.key+"_hasContent"] = true;
                     }
 
-                    if(subCategory.value.get('isContributor')) { 
-                        int val = subCategory.value.get('isContributor')
+/*                    if(subCategory.value['isContributor']) { 
+                        //int val = subCategory.value.get('isContributor')
 
-                        if(!map.get(concept.key).get(category.key).containsKey('isContributor'))
-                            map.get(concept.key).get(category.key).put('isContributor', 1);
-                        if(!map.get(concept.key).containsKey('isContributor'))
-                            map.get(concept.key).put('isContributor', 1);
+                        if(!category.value.get('isContributor')) {
+                            //map.get(concept.key).get(category.key).put('isContributor', 1);
+                            //category.value.put('isContributor', 1);
+                            changes[concept.key+"_"+category.key+"_isContributor"] = true;
+                        }
+                        if(!concept.value.get('isContributor')) {
+                            //map.get(concept.key).put('isContributor', 1);
+                            //concept.value.put('isContributor', 1);
+                            changes[concept.key+"_isContributor"] = 1;
+                        }
                     }
-				}
+*/				}
+
 			}
 		}
+        }
+
+        utilsService.benchmark('applying changes if hasContent and isContributor to map') {
+            for(change in changes) {
+                def keys = change.key.split('_');
+                def newMap = map;
+                for(int i=0; i< keys.size()-1; i++) {
+                    newMap = newMap[keys[i]];
+                }
+                //println newMap
+                newMap[keys[keys.size()-1]] = change.value;
+            }
         }
 		return map;
 	}
@@ -543,12 +611,10 @@ class SpeciesController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def update() {
-        println "========PARAMS======== " + params 
         if(params.dataFromCuration) {
             params << JSON.parse(params.dataFromCuration)
             params.remove('dataFromCuration');
         }
-        println "========PARAMS======== " + params 
         def msg;
         def userLanguage;
         def paramsForObvSpField = params.paramsForObvSpField?JSON.parse(params.paramsForObvSpField):null
@@ -627,7 +693,6 @@ class SpeciesController extends AbstractObjectController {
                 }
                 break;
                 case 'synonym':
-                println "=====HELLO HERE========"
                 Long sid = params.sid?params.long('sid'):null;
                 String relationship = params.relationship?:null;
 
@@ -790,6 +855,7 @@ class SpeciesController extends AbstractObjectController {
                 result.remove('synonymInstance');
                 result.remove('taxonConcept');
             }
+			println "--------------final result at synonym update " +  result
             render result as JSON
             return;
         } catch(Exception e) {
@@ -861,36 +927,36 @@ class SpeciesController extends AbstractObjectController {
 	} 
 
 	@Secured(['ROLE_ADMIN'])
-	def deleteSpecies() {
-		def speciesInstance = Species.get(params.long('id'))
-		if (speciesInstance) {
-			try {
-				boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, springSecurityService.currentUser);
-				if(success) {
-				    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+    def delete() {
+        def speciesInstance = Species.get(params.long('id'))
+        if (speciesInstance) {
+            try {
+                boolean success = speciesUploadService.deleteSpeciesWrapper(speciesInstance, springSecurityService.currentUser);
+                if(success) {
+                    String msg = "${message(code: 'default.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                     def model = utilsService.getSuccessModel(msg, null, OK.value());
                     withFormat {
                         html {
                             flash.message = msg;
-				            redirect(action: "list")
+                            redirect(action: "list")
                         }
                         json { render model as JSON }
                         xml { render model as XML }
                     }
                 } else {
-				    String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+                    String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                     def model = utilsService.getErrorModel(msg, null, OK.value());
                     withFormat {
                         html {
                             flash.message = msg;
-				            redirect(action: "show", id: params.id)
+                            redirect(action: "show", id: params.id)
                         }
                         json { render model as JSON }
                         xml { render model as XML }
                     }
                 }
-			}
-			catch (org.springframework.dao.DataIntegrityViolationException e) {
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
                 String msg = "${message(code: 'default.not.deleted.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
                 withFormat {
@@ -901,21 +967,21 @@ class SpeciesController extends AbstractObjectController {
                     json { render model as JSON }
                     xml { render model as XML }
                 }
-			}
-		}
-		else {
-			String msg = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
-            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
-                withFormat {
-                    html {
-                        flash.message = msg;
-                        redirect(action: "list")
-                    }
-                    json { render model as JSON }
-                    xml { render model as XML }
+            }
+        }
+        else {
+            String msg = "${message(code: 'default.not.found.message', args: [message(code: 'species.label', default: 'Species'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.message = msg;
+                    redirect(action: "list")
                 }
-		}
-	}
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
 
 	def count() {
 		//cache "search_results"
@@ -1019,6 +1085,7 @@ class SpeciesController extends AbstractObjectController {
 	//////////////////////////////////////Online upload //////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
+	
 	@Secured(['ROLE_SPECIES_ADMIN'])
 	def upload() {
 		log.debug params.xlsxFileUrl
@@ -1028,10 +1095,37 @@ class SpeciesController extends AbstractObjectController {
             log.debug  "Choosen languauge is ${languageInstance}"
 			def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
-			res = speciesUploadService.upload(res.sBulkUploadEntry)
 			render(text:res as JSON, contentType:'text/html')
 		}
 	}
+	
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def uploadNames() {
+		log.debug params.xlsxFileUrl
+		if(params.xlsxFileUrl){
+			Language languageInstance = utilsService.getCurrentLanguage(request);
+			params.locale_language = languageInstance;
+			log.debug  "Choosen languauge is ${languageInstance}"
+			params.uploadType = "namesUpload"
+			def res = speciesUploadService.basicUploadValidation(params)
+			log.debug "Starting names upload"
+			render(text:res as JSON, contentType:'text/html')
+		}
+	}
+	
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def generateNamesReport() {
+		log.debug params.xlsxFileUrl
+		if(params.xlsxFileUrl){
+			Language languageInstance = utilsService.getCurrentLanguage(request);
+			params.locale_language = languageInstance;
+			def res = speciesUploadService.searchAndValidateName(params);
+			log.debug "Starting name searching and report generation "
+			println "============== res " + res
+			render(text:res as JSON, contentType:'text/html')
+		}
+	}
+
 	
 	def getDataColumns() {
         Language languageInstance = utilsService.getCurrentLanguage(request);
@@ -1083,6 +1177,15 @@ class SpeciesController extends AbstractObjectController {
                 case 'contributor':
                 success = speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
                 break;
+
+                case 'taxon_curator':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR);
+                break;
+
+                case 'taxon_editor':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR);
+                break;
+
                 default: log.error "No invite type"
             }
 
@@ -1136,6 +1239,15 @@ class SpeciesController extends AbstractObjectController {
                 case 'contributor':
                 success = speciesPermissionService.addContributorToTaxonConcept(user, taxonConcept)
                 break;
+
+                case 'taxon_curator':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR);
+                break;
+
+                case 'taxon_editor':
+                success = speciesPermissionService.addTaxonUser(user, taxonConcept, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR);
+                break;
+
                 default: log.error "No invite type"
             }
 
@@ -1255,53 +1367,164 @@ class SpeciesController extends AbstractObjectController {
         render result as JSON
     }
 */
+	
+	@Secured(['ROLE_USER'])
+	def editSpeciesPage(){
+		Long taxonId = params.taxonId ? params.taxonId.toLong() : TaxonomyDefinition.findByMatchId(params.colId)?.id
+		def result = [taxonRanks:getTaxonRankForUI(), 'success':true]
+		println "======================== parasm " + params + "  taxon id " + taxonId
+		
+		if(taxonId){
+			def taxon = TaxonomyDefinition.read(taxonId)
+			Species species = Species.findByTaxonConcept(taxon);
+			if(!species){
+				species = speciesUploadService.createSpeciesStub(taxon)
+			}
+			result.id = species?.id
+			println "result after create stub " + result
+			render result as JSON
+			return
+		}
+		
+		//given name is in col not present in ibp system
+		def colRes, msg 
+		if(params.colId){
+			colRes = namelistService.searchCOL(params.colId, 'id');
+		}
+		
+		if(!colRes){
+			msg = "No result from COL"
+			result.msg = msg
+			render result as JSON
+			return
+		}
+		
+		//got col result now populating things
+		colRes = colRes[0]
+		String status = colRes.nameStatus
+		if(status.equalsIgnoreCase('accepted')){
+			List taxonRegistry = []
+			List taxonColHirMatch = []
+			result.authorYear = colRes.authorString
+			result.canonicalForm = colRes.canonicalForm
+			TaxonomyRank.list().each { TaxonomyRank r ->
+				String rStr = r.value().toLowerCase()
+				int tRank = XMLConverter.getTaxonRank(rStr)
+				String tName = colRes.get(rStr)
+				taxonRegistry.putAt(tRank , tName)
+				taxonColHirMatch.putAt(tRank , colRes.get('id_details').getAt(tName))
+			}
+			result.requestParams = [taxonRegistry:taxonRegistry, taxonCOLHirMatch:taxonColHirMatch, speciesName:colRes.name, rank:XMLConverter.getTaxonRank(colRes.rank), colId: params.colId]
+			result.msg = "Data populated from COL"
+			result.rank = XMLConverter.getTaxonRank(colRes.rank)
+			render result as JSON
+		}else{
+			//this name is synonym taken from col so creating stub for synonym 
+			def syn = namelistService.createNameFromColId(colRes.externalId)
+			def species = syn?.createSpeciesStub()
+			result.msg = "Creating species page from selected COL Synonym"
+			result.id = species?.id
+			render result as JSON
+		}
+	}
+	
+	private List getTaxonRankForUI(){
+		List taxonRanks = []
+		TaxonomyRank.list().each { t ->
+			boolean mandatory = true
+			if((t == TaxonomyRank.SUB_GENUS) || (t == TaxonomyRank.SUB_FAMILY) || (t == TaxonomyRank.SUPER_FAMILY)){
+				mandatory = false 
+			}
+			taxonRanks << [value:t.ordinal(), text:g.message(error:t), mandatory:mandatory, taxonValue:'']
+		}
+		return taxonRanks
+	}
+	
+	
+	private Map getMatchResult(Map r){
+		List gTaxonList = r.genusTaxonList
+		
+		if(!gTaxonList){
+			return null
+		}
+		
+		def fieldsConfig = grailsApplication.config.speciesPortal.fields
+		def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+		
+		def defMatch = [:]
+		
+		def tmpResult = []
+		gTaxonList.each { TaxonomyDefinition t ->
+			def tdList = t.parentTaxonRegistry(classification)?.get(classification);
+			if(tdList){
+				List taxonRegistry = []
+				List taxonIBPHirMatch = []
+				tdList.each { TaxonomyDefinition td ->
+					taxonRegistry.putAt(td.rank, td.name)
+					taxonIBPHirMatch.putAt(td.rank, td.id)
+				}
+				taxonRegistry.putAt(TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal(), r.infraSpeicesName)
+				taxonRegistry.putAt(TaxonomyRank.SPECIES.ordinal(), r.speciesName)
+				String namePath = tdList.collect { it.name }.join('->')
+				tmpResult << [taxonRegistry:taxonRegistry, taxonIBPHirMatch:taxonIBPHirMatch, namePath:namePath]
+			}	
+			if(!defMatch){
+				defMatch = tmpResult[0]
+			}
+		}
+		return ["defMatch": defMatch, genusMatchResult : tmpResult]
+	}
+	
     @Secured(['ROLE_USER'])
     def validate() {
-/*        List hierarchy = [];
-        if(params.taxonRegistry) {
-            hierarchy = taxonService.getTaxonHierarchyList(params.taxonRegistry);
-        }
-*/
-		XMLConverter.myPrint("========== " + params)
 		def msg;
-        def result = [requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
+        def result = [taxonRanks:getTaxonRankForUI(), requestParams:[taxonRegistry:params.taxonRegistry?:[:]]];
         if(params.page && params.rank) {
             try {
                 int rank = params.rank?params.int('rank'):null;
 				def taxonRegistry
                 Map r = getTaxon(params.page, rank);
-				XMLConverter.myPrint("========== " + r)
+				
+				println "-----------------------------------ddd   " + r
 				
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
+					List taxonList = r.taxonList
                     if(!taxon) {
-						if(r.genusTaxon){
-							def fieldsConfig = grailsApplication.config.speciesPortal.fields
-							def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-							taxonRegistry = r.genusTaxon.parentTaxonRegistry(classification)?.get(classification);
-							if(taxonRegistry){
-								List tmp = []
-								taxonRegistry.each { td ->
-									tmp.putAt(td.rank, td.name)
-								}
-								taxonRegistry = tmp
-							}
-							println "================== " + taxonRegistry
-							
+						Map matchResult = getMatchResult(r)
+						
+						//println "----------------------------------- match result " + matchResult
+						
+						Map requestParams = [genusTaxonMsg : r.genusTaxonMsg, page:params.page]
+						if(matchResult){
+							requestParams.putAll(matchResult.remove("defMatch"))
+							requestParams.put('genusMatchResult', matchResult.genusMatchResult)
 						}
-                    	msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
-                        result = ['success':true, 'msg':msg, rank:rank, requestParams:[taxonRegistry:params.taxonRegistry?params.taxonRegistry:taxonRegistry]]
-                    } else {
+						result = [taxonRanks:getTaxonRankForUI(), 'success':true, rank:rank, taxonList:taxonList, canonicalForm:r.canonicalForm, authorYear:r.authorYear, requestParams:requestParams]
+						// no result in ibp so going ahead to create new name
+						if(!taxonList){
+							msg = messageSource.getMessage("default.species.error.NameValidate.message", null, RCU.getLocale(request))
+	                    }
+						//multiple result from ibp so showing popup to select one of the result
+						else{
+							msg = "Multiple results from IBP search"
+						}
+						result.msg = msg
+                    }
+					// one result in ibp system so redirecting to species page
+					else {
                         //CHK if a species page exists for this concept
                         Species species = Species.findByTaxonConcept(taxon);
                         taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
-                            result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         } else {
+							species = speciesUploadService.createSpeciesStub(taxon)
+							println "============================= creating species stub now for taxon " + taxon
 							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
-                            result = ['success':true, 'msg':msg, rank:taxon.rank, requestParams:[taxonRegistry:params.taxonRegistry]];
                         }
+						result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
+						
 	                    result['taxonRegistry'] = [:];
 						
 						taxonRegistry.each {classification, h ->
@@ -1323,7 +1546,7 @@ class SpeciesController extends AbstractObjectController {
         	msg = messageSource.getMessage("default.species.not.validName",  [' '] as Object[], RCU.getLocale(request))
             result = ['success':false, 'msg':msg, requestParams:[taxonRegistry:params.taxonRegistry]]
         }
-		XMLConverter.myPrint("========== " + result)
+		XMLConverter.myPrint(" ----------------- validate result " + result)
         render result as JSON
     }
     
@@ -1335,19 +1558,34 @@ class SpeciesController extends AbstractObjectController {
         List<TaxonomyDefinition> names = namesParser.parse([name]);
         TaxonomyDefinition page = names[0];
         if(page && page.canonicalForm) {
-			if(rank == TaxonomyRank.SPECIES.ordinal() && !page.binomialForm) { //TODO:check its not uninomial
+			if((rank == TaxonomyRank.SPECIES.ordinal() || rank == TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()) && !page.binomialForm) { //TODO:check its not uninomial
             	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
                 result = ['success':false, 'msg':msg]
             } else {
-				def taxon = speciesService.searchIBP(page, rank)
-                result = ['success':true, 'taxon':taxon];
+				def taxonList = speciesService.searchIBP(page, rank)
+				def taxon = (taxonList && taxonList.size() == 1)?taxonList[0]:null
+                result = ['success':true, 'taxon':taxon, 'taxonList':taxonList ];
 				
-				//checking if given species name have genus in ibp system
-				if(!taxon && page.binomialForm){
-					def genusTaxon = speciesService.searchIBP(page.binomialForm.tokenize(" ")[0], TaxonomyRank.GENUS.ordinal())
-					if(genusTaxon){
-						result.genusTaxon = genusTaxon
+				//no resutl in ibp search. checking if given species name have genus in ibp system
+				if(page.binomialForm){
+					def genusTaxonList = speciesService.searchIBP(page.binomialForm.tokenize(" ")[0], TaxonomyRank.GENUS.ordinal())
+					if(genusTaxonList){
+						result.genusTaxon = genusTaxonList[0]
+						result.genusTaxonMsg = (genusTaxonList.size() > 1) ? "Multiple matches for Genus detected. Fields are pre-populated with default match. Please select another match below to change.":""
+						result.genusTaxonList = genusTaxonList
 					}
+					def tokList = page.canonicalForm.tokenize(" ")
+					result.genusName = tokList[0]
+					
+					if(tokList.size() == 2){
+						result.speciesName = page.canonicalForm
+					}else{
+						result.speciesName = result.genusName + " " + tokList[1]
+						result.infraSpeicesName = page.canonicalForm
+					}
+					
+					result.authorYear = page.authorYear
+					result.canonicalForm = page.canonicalForm
 				}     
             }
         } else {
@@ -1386,14 +1624,7 @@ class SpeciesController extends AbstractObjectController {
         */
     }
     
-    def downloadNamesMapper () {
-        File file = speciesUploadService.downloadNamesMapper(params);
-        if(!file) {    
-            return render(text: [success:false, downloadFile: ""] as JSON, contentType:'text/html')
-        }
-        return render(text: [success:true, downloadFile: file.getAbsolutePath()] as JSON, contentType:'text/html')
-    }
-
+ 
     @Secured(['ROLE_USER'])
     def getSpeciesFieldMedia() {
         def resList = []
@@ -1465,6 +1696,40 @@ class SpeciesController extends AbstractObjectController {
 
         return formatRelatedResults(relatedObv, params);
     }
+
+    def hasPermissionToCreateSpeciesPage() {
+        def result = [success:true]
+        if (!springSecurityService.isLoggedIn()) {
+            result = [success:false, msg:'Please login'];
+            render result as JSON;
+            return;
+        }
+
+        if (!params.taxonId) {
+            result = [success:false, msg:'Please select a taxon'];
+            render result as JSON;
+            return;
+        }
+
+        def tD = TaxonomyDefinition.read(Long.parseLong(params.taxonId));
+        if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
+            result = [success:false, msg:'Please request for permission to contribute to this taxon'];
+            render result as JSON
+            return
+
+        } 
+
+        def s = Species.findByTaxonConcept(tD);
+        if(s) {
+            result = [success:false];
+            render result as JSON
+            return
+
+        } 
+
+        render result as JSON
+        return
+    }	
 
     def testingCount() {
         def sp = Species.read(228424L);

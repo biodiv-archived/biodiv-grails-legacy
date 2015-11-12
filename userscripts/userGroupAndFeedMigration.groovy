@@ -13,6 +13,8 @@ import species.auth.SUser
 import species.groups.UserGroup
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 import content.eml.*;
+import species.Species
+import species.*;
 /*
 def feedService = ctx.getBean("activityFeedService");
 def userGroupService = ctx.getBean("userGroupService");
@@ -298,12 +300,87 @@ def pullTreeObservations(){
 	}
 }
 
+
+def postSpeices(){
+	def userGroupService = ctx.getBean("userGroupService");
+	def m = [author:"1", userGroups:"45", objectType:Species.class.getCanonicalName(), submitType:'post', objectIds: new File('/home/biodiv/NEspecies.csv').text]
+	println m
+	userGroupService.updateResourceOnGroup(m)
+}
+
+
+def updateSpeciesGroup(){
+	def groupHandlerService = ctx.getBean("groupHandlerService");
+	Species.findAllByIdGreaterThanEquals(276023).each { Species s ->
+		groupHandlerService.updateGroup(s.taxonConcept);
+	}
+}
+
+
+
+def obsQuery(){
+	File file = new File("/tmp/obv.txt")
+	if(!file.exists()){
+		file.createNewFile()
+	}
+	file.write "obv_id | contributor_id | suggestors \n"
+	
+	def ds = ctx.getBean('dataSource')
+	Sql sql = Sql.newInstance(ds)
+	String query = ''' select o.id as id, o.author_id as user_id from observation o, user_group_observations ug  where ug.user_group_id = 33 and o.id = ug.observation_id and o.created_on > '2015-08-01 00:00:00' and  o.created_on <  '2015-09-01 00:00:00' ''';
+	String q = "select string_agg(CAST(author_id as varchar), ', ') as cc from recommendation_vote where observation_id = " 
+	sql.eachRow(query){ row ->
+		String str = row.id + "|" + row.user_id + "|" 
+		def r = sql.rows(q + row.id)
+		def tt = ""
+		if(r){
+			tt = r[0].cc
+		}
+ 		str += tt + "\n"
+		println str
+		file << str
+	}
+}
+
+
+//obsQuery()
+
+
+def addRankInfraSpeField(){
+	def f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Taxon Record Name', subCategory:'Rank',description:'Place holder for TaxonRank', displayOrder:85, connection:85)
+	f.save(flush:true)
+			
+	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Author Contributed Taxonomy Hierarchy', subCategory:'Infraspecies',description:'Place holder for Infra Species', displayOrder:86, connection:86)
+	f.save(flush:true)
+}
+	
+
+def addNameSourceInfoField(){
+	def f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Name Source Information', subCategory:'Name Source',description:'Place holder for Name Source', displayOrder:87, connection:87)
+	f.save(flush:true)
+	
+	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Name Source Information', subCategory:'Via Source',description:'Place holder for Via Source', displayOrder:88, connection:88)
+	f.save(flush:true)
+	
+	f = new Field(language: Language.findByNameIlike(Language.DEFAULT_LANGUAGE), concept:'Nomenclature and Classification',category:'Name Source Information', subCategory:'Name Source Id',description:'Place holder for Name Source Id', displayOrder:89, connection:89)
+	f.save(flush:true)
+}
+
+
+
+//addRankInfraSpeField()
+addNameSourceInfoField()
+
+//updateSpeciesGroup()
+
+//postSpeices()
+
 //pullTreeSpecies()
-pullTreeObservations()
+//pullTreeObservations()
 
 //migrateCoverageToDoc()
 //addDocumentPostFeed()
-
+//author contributed taxonomy hierarchy
 
 //addUserRegistrationFeed()
 

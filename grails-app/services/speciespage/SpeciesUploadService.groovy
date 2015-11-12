@@ -51,6 +51,7 @@ import org.apache.log4j.FileAppender;
 import species.auth.SUser
 import species.formatReader.SpreadsheetReader;
 import species.formatReader.SpreadsheetWriter;
+import species.namelist.NameInfo
 import species.participation.Featured
 import species.participation.Recommendation
 import species.participation.SpeciesBulkUpload
@@ -68,6 +69,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+import species.participation.NamesReportGenerator
 
 class SpeciesUploadService {
 
@@ -92,7 +95,7 @@ class SpeciesUploadService {
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
-	static int BATCH_SIZE = 5;
+	static int BATCH_SIZE = 1;
 	//int noOfFields = Field.count();
     String contentRootDir = config.speciesPortal.content.rootDir
 
@@ -106,6 +109,24 @@ class SpeciesUploadService {
 	}
 	
 	
+	Map searchAndValidateName(params){
+		if(!params.xlsxFileUrl){
+			return ['msg': 'File not found !!!' ]
+		}
+		
+		File speciesDataFile = saveModifiedSpeciesFile(params)
+		log.debug "THE FILE BEING UPLOADED " + speciesDataFile
+		
+		if(!speciesDataFile.exists()){
+			return ['msg': 'File not found !!!' ]
+		}
+		
+		def namesReportGenEntry = NamesReportGenerator.create(springSecurityService.currentUser, new Date(), null, speciesDataFile.getAbsolutePath())
+		
+		return ['msg': 'Names search in progress. Please visit your profile page to view status.' ,namesReportGenEntry:namesReportGenEntry]
+	}
+
+	
 	Map basicUploadValidation(params){
 		if(!params.xlsxFileUrl){
 			return ['msg': 'File not found !!!' ]
@@ -118,10 +139,18 @@ class SpeciesUploadService {
 			return ['msg': 'File not found !!!' ]
 		}
 		
-		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir)
+		if(!validateUserSheetForName(speciesDataFile)){
+			return  ['msg': 'Name validation failed !!!' ]
+		}
+		
+		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
 		
 		return ['msg': 'Bulk upload in progress. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
 		
+	}
+	
+	boolean validateUserSheetForName(File sFile){
+		return MappedSpreadsheetConverter.validateUserSheetForName(sFile)
 	}
 	
 	Map upload(SpeciesBulkUpload sBulkUploadEntry){
@@ -184,6 +213,28 @@ class SpeciesUploadService {
 		return [success:res.success, downloadFile:speciesDataFile, filterLink: link, msg:msg]
 	}
 	
+	
+	Map runNamesMapper( NamesReportGenerator nr) {
+		println "---------------- running ---- "
+		
+		def speciesDataFile = nr.filePath
+		
+		nr.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		List nameInfoList = MappedSpreadsheetConverter.getNames(speciesDataFile, speciesDataFile)
+		
+		println "------------------ name info list " + nameInfoList
+		File f = NameInfo.writeNamesMapperSheet(nameInfoList, new File(speciesDataFile))  
+		
+		nr.updateStatus(SpeciesBulkUpload.Status.SUCCESS)
+		
+		if(!nr.save(flush:true)){
+			nr.errors.allErrors.each { log.error it }
+		}
+		
+		def msg = "Please visit your profile page to view summary."
+		return [success:true, downloadFile:f, msg:msg] 
+	}
+	
 	/**
 	 * 
 	 * @param file
@@ -206,6 +257,8 @@ class SpeciesUploadService {
 	
 			converter.mappingConfig = SpreadsheetReader.readSpreadSheet(mappingFile, mappingSheetNo, mappingHeaderRowNo);
 			List<Map> content = SpreadsheetReader.readSpreadSheet(file, contentSheetNo, contentHeaderRowNo);
+			converter.initCurationInfo(file)
+			
 			List<Map> imagesMetaData;
 			if(imageMetaDataSheetNo && imageMetaDataSheetNo  >= 0) {
 				converter.imagesMetaData = SpreadsheetReader.readSpreadSheet(file, imageMetaDataSheetNo, 0);
@@ -305,7 +358,7 @@ class SpeciesUploadService {
 						speciesElements.add(speciesElement);
 					}
 				}
-				def res = saveSpeciesElementsWrapper(speciesElements)
+				def res = saveSpeciesElementsWrapper(speciesElements, sBulkUploadEntry)
 				speciesElements.clear()
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.summary);
@@ -335,8 +388,8 @@ class SpeciesUploadService {
 		return (sbu.status == SpeciesBulkUpload.Status.ABORTED)
 	}
 	
-	private Map saveSpeciesElementsWrapper(List speciesElements) {
-		def res = saveSpeciesElements(speciesElements)
+	private Map saveSpeciesElementsWrapper(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
+		def res = saveSpeciesElements(speciesElements, sBulkUploadEntry)
 		if(res.noOfInsertions == speciesElements.size()){
 			return res
 		}
@@ -345,7 +398,7 @@ class SpeciesUploadService {
 		List<Species> species = new ArrayList<Species>();
 		int noOfInsertions = 0;
 		speciesElements.each { sEle ->
-			def tmpRes = saveSpeciesElements([sEle])
+			def tmpRes = saveSpeciesElements([sEle], sBulkUploadEntry)
 			noOfInsertions += tmpRes.noOfInsertions
 			species.addAll(tmpRes.species)
 		}
@@ -353,22 +406,35 @@ class SpeciesUploadService {
 		return ['noOfInsertions':noOfInsertions, 'species':species];
 	}
 	
-	private Map saveSpeciesElements(List speciesElements) {
+	private Map saveSpeciesElements(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
 		XMLConverter converter = new XMLConverter();
         converter.setLogAppender(fa);
 		
-		List<Species> species = new ArrayList<Species>();
+		List species = []
 
 		int noOfInsertions = 0;
 		try {
-			for(Node speciesElement : speciesElements) {
-				Species.withNewTransaction { status ->
-					Species s = converter.convertSpecies(speciesElement)
-					if(s)
-						species.add(s);
+			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
+				for(Node speciesElement : speciesElements) {
+					Species.withNewTransaction { status ->
+						def s = converter.convertName(speciesElement)
+						if(s){
+							s.postProcess()
+							species.add(s)
+							noOfInsertions++;
+						}
+					}
 				}
+			}else{
+				for(Node speciesElement : speciesElements) {
+					Species.withNewTransaction { status ->
+						Species s = converter.convertSpecies(speciesElement)
+						if(s)
+							species.add(s);
+					}
+				}
+				noOfInsertions += saveSpecies(species);
 			}
-			noOfInsertions += saveSpecies(species);
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			log.error "OptimisticLockingFailureException : $e.message"
 			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
@@ -468,17 +534,9 @@ class SpeciesUploadService {
 	/**
 	 *
 	 */
-	def createSpeciesStub(TaxonomyDefinition taxonConcept) {
+	def Species createSpeciesStub(TaxonomyDefinition taxonConcept) {
 		if(!taxonConcept) return;
-
-		XMLConverter converter = new XMLConverter();
-		
-        Species s = new Species();
-		s.taxonConcept = taxonConcept
-		s.title = s.taxonConcept.italicisedForm;
-		s.guid = converter.constructGUID(s);
-
-		return s;
+		return taxonConcept.createSpeciesStub()
 	}
 
 
@@ -663,15 +721,15 @@ class SpeciesUploadService {
         String fileName = "speciesSpreadsheet"
         String uploadDir = "species"
         def ext = params.xlsxFileUrl.split("\\.")[-1];
-        log.debug "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
-        log.debug "=========THE SPLITED LIST ================ " + ext
+        println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+        println "=========THE SPLITED LIST ================ " + ext
         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
         String writeContributor = params.writeContributor.replace("\"","").trim();
-        log.debug "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
+        println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
         fileName = fileName + "."+ext;
-        log.debug "===FILE NAME CREATED ================ " + fileName
+        println "===FILE NAME CREATED ================ " + fileName
         File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
-        log.debug "=== NEW MODIFIED SPECIES FILE === " + file
+		println "=== NEW MODIFIED SPECIES FILE === " + file
         String contEmail = springSecurityService.currentUser.email;
         InputStream input = new FileInputStream(xlsxFileUrl);
         SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
@@ -682,133 +740,11 @@ class SpeciesUploadService {
         }
     }
 
-    File downloadNamesMapper(params) {
-        try{
-            String fileName = "NamesMapper"
-            String uploadDir = "species"
-            def ext = params.xlsxFileUrl.split("\\.")[-1];
-            List<Map> names = SpreadsheetReader.readSpreadSheet(params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir), 0 , 0);
-
-            println "======CONTENT ======= " + names
-            def namesList = [];
-
-            for (Map<String, String> map : names) {
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    namesList.add(entry.getValue());
-                }
-            }
-
-            def content = namelistService.nameMapper(namesList);
-            println "=====NAMES MAPPED ===== " + content
-            log.debug "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
-            log.debug "=========THE SPLITED LIST ================ " + ext
-            String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
-            log.debug "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
-            fileName = fileName + "."+ext;
-            log.debug "===FILE NAME CREATED ================ " + fileName
-            File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
-            log.debug "=== NEW MODIFIED SPECIES FILE === " + file
-            InputStream input = new FileInputStream(xlsxFileUrl);
-            writeNamesMapperSheet(file, input, content);
-            return file
-        } catch(Exception e) {
-            e.printStackTrace();
-            log.error e.getMessage();
-        }
-    }
-    
-    void writeNamesMapperSheet(File f, InputStream inp, Map content) {
-        try {
-            Workbook wb = WorkbookFactory.create(inp);
-            int sheetNo = 0;
-            Sheet sheet = wb.getSheetAt(sheetNo);
-            Iterator<Row> rowIterator = sheet.iterator();
-            int rowNum = 0;
-            Row row = rowIterator.next();
-            rowNum++;
-            def arr = ['Names','No. of Results' ,'IBP name', 'IBP ID', 'IBP status', 'COL name', 'COL ID', 'COL status']
-            Cell cell;
-            int k = 0;
-            arr.each {
-                cell = row.getCell(k, Row.CREATE_NULL_AS_BLANK);
-                cell.setCellValue(it);
-                k++;
-            }
-            content.each { key,value ->
-                String name = key;
-                def ibpValues = value['IBP'];
-                if(ibpValues) {
-                    ibpValues.each { iVal ->
-                        if(rowIterator.hasNext()) {
-                            row = rowIterator.next();
-                        } else {
-                            row = sheet.createRow(rowNum);
-                        }
-                        rowNum++;
-                        cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
-                        cell.setCellValue(name);
-                        cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
-                        if(ibpValues.size() == 0) {
-                            cell.setCellValue("ZERO");
-                        } else if(ibpValues.size() == 1) {
-                            cell.setCellValue("SINGLE");
-                        } else {
-                            cell.setCellValue("MULTIPLE");
-                        }
-                        println "======ADDED NAME ibp ===== " + name;
-                        int i = 2;
-                        iVal.each { k1,v1 ->
-                            cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-                            cell.setCellValue(v1);
-                            i++;
-                        }
-                    }
-                }
-                def colValues = value['COL'];
-                if(colValues) {
-                    colValues.each { cVal ->
-                        if(rowIterator.hasNext()) {
-                            row = rowIterator.next();
-                        } else {
-                            row = sheet.createRow(rowNum);
-                        }
-                        rowNum++;
-                        cell = row.getCell(0, Row.CREATE_NULL_AS_BLANK);
-                        cell.setCellValue(name);
-                        println "======ADDED NAME col ===== " + name;
-                        cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK);
-                        if(colValues.size() == 0) {
-                            cell.setCellValue("ZERO");
-                        } else if(colValues.size() == 1) {
-                            cell.setCellValue("SINGLE");
-                        } else {
-                            cell.setCellValue("MULTIPLE");
-                        }
-                        int i = 5;
-                        cVal.each { k1,v1 ->
-                            cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-                            cell.setCellValue(v1);
-                            i++;
-                        }
-                    }
-                }
-            }
-            FileOutputStream out = new FileOutputStream(f);
-            wb.write(out);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
-	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null){
-		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes)
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null){
+		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType)
 		
 	}
 	
@@ -1002,14 +938,12 @@ class SpeciesUploadService {
 			log.debug "Deleting  $tr"
 			tr.delete(flush:true)
 		}
-		
-		s.resources.each { res ->
-			if(resources.contains(res)){
-				log.debug "Removing resource " + res
-				s.removeFromResources(res)
-				resources.remove(res)
-			}
-		}
+	
+        def tempRes = s.resources.intersect(resources);
+        tempRes.each { res ->
+            log.debug "Removing resource " + res
+            s.removeFromResources(res)
+        }
 		
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){

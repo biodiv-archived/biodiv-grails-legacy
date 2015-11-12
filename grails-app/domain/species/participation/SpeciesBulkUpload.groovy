@@ -18,8 +18,8 @@ class SpeciesBulkUpload {
 		ABORTED("ABORTED"),
 		FAILED("FAILED"),
 		UPLOADED("UPLOADED"),
-		ROLLBACK("ROLLBACK")
-		
+		ROLLBACK("ROLLBACK"),
+		SUCCESS("SUCCESS")
 		
 		private String value;
 
@@ -39,6 +39,7 @@ class SpeciesBulkUpload {
 	String filePath;
 	String errorFilePath;
 	String imagesDir;
+	String uploadType;
 	
 	int speciesCreated = 0;
 	int speciesUpdated = 0
@@ -52,6 +53,7 @@ class SpeciesBulkUpload {
 		errorFilePath nullable:true
 		imagesDir nullable:true
 		endDate nullable:true
+		uploadType nullable:true
 		notes nullable:true, blank: true, size:0..400
     }
 	static mapping = {
@@ -59,8 +61,8 @@ class SpeciesBulkUpload {
 		notes type:'text';
     }
 	
-	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, Status status = Status.SCHEDULED){
-		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes)
+	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, String uploadType=null, Status status = Status.SCHEDULED){
+		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes, uploadType:uploadType)
 		if(!sbu.save(flush:true)){
 			sbu.errors.allErrors.each { println it }
 			return null

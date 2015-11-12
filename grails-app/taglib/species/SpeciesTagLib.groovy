@@ -135,6 +135,11 @@ class SpeciesTagLib {
 		out << render(template:"/species/speciesBulkUploadTableTemplate", model:attrs.model);
 	}
 
+	def namesReportTable = {attrs, body->
+		out << render(template:"/species/namesReportTableTemplate", model:attrs.model);
+	}
+
+	
     def hasPermission = {attrs, body ->
         SpeciesField speciesFieldInstance = attrs.model.speciesFieldInstance;
         Field fieldInstance = attrs.model.fieldInstance;

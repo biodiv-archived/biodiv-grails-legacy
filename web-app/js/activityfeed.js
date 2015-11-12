@@ -33,6 +33,7 @@ function loadOlderFeedsInAjax(targetComp){
     			$(targetComp).children('input[name="olderTimeRef"]').val(data.olderTimeRef);
     			if(data.remainingFeedCount && data.remainingFeedCount > 0){
 					$(targetComp).children('.activiyfeedoldermsg').text("Show " + ((feedType !== "GroupSpecific") ? data.remainingFeedCount: "") + " older feeds >>");
+					$(targetComp).children('.activiyfeedoldermsg').show();
 				}else{
 					$(targetComp).children('.activiyfeedoldermsg').hide();
 				}
@@ -300,6 +301,29 @@ function updateFeeds(){
 			}
 		}
 	}
+}
+
+function updateSpecificTargetComp(rootHolderType, rootHolderId){
+	var targetComp = getTargetComp();
+	var oldVal1 = $(targetComp).children('input[name="rootHolderType"]').val();
+	var oldVal2 = $(targetComp).children('input[name="rootHolderId"]').val();
+	
+	if((oldVal1 == rootHolderType) && (oldVal2 == rootHolderId)){
+		return;
+	}
+	
+	$(targetComp).children('input[name="rootHolderType"]').val(rootHolderType);
+	$(targetComp).children('input[name="rootHolderId"]').val(rootHolderId);
+	setUpTimeRef(targetComp);
+	$(targetComp).children('.activiyfeedNoMoreFeedmsg').hide();
+	$(targetComp).children('ul').empty();
+	loadOlderFeedsInAjax(targetComp, false);
+	targetComp = $('.post-comment-form');
+	$(targetComp).children('input[name="rootHolderType"]').val(rootHolderType);
+	$(targetComp).children('input[name="rootHolderId"]').val(rootHolderId);
+	$(targetComp).children('input[name="commentHolderType"]').val(rootHolderType);
+	$(targetComp).children('input[name="commentHolderId"]').val(rootHolderId);
+	
 }
 
 function updateFeedComponent(targetComp, feedCategory){

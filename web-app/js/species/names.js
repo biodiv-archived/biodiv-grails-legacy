@@ -38,7 +38,8 @@
                            dataType: "json",
                            data: {
                                 term : request.term,
-                                rank : $(this)[0].element.data('rank')
+                                rank : $(this)[0].element.data('rank'),
+                                nameFilter : request.nameFilter
                            },
                            success: function(data, status, xhr) {
                                //cache[_options.nameFilter][ term ] = data;
@@ -110,8 +111,8 @@ function initializeNameSuggestion() {
             return false;
         }, select: function( event, ui ) {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
-            $(this).closest(".commonNameDiv").next().find(".canName").val( ui.item.value );
-            $(this).closest(".commonNameDiv").next().find(".recoName").val( ui.item.value );
+            $(this).closest(".commonNameDiv").next().find(".canName").val( ui.item.desc );
+            $(this).closest(".commonNameDiv").next().find(".recoName").val( ui.item.desc );
             if(ui.item.languageName !== null){
                 $(this).closest(".commonNameDiv").find(".languageComboBox").val(ui.item.languageName).attr("selected",true);
                 $(this).closest(".commonNameDiv").find(".languageComboBox").data('combobox').refresh();
@@ -136,6 +137,7 @@ function initializeNameSuggestion() {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
             $(this).closest(".sciNameDiv").find(".canName").val( ui.item.value );
             $(this).closest(".sciNameDiv").find(".mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
+            $(this).closest(".sciNameDiv").find(".speciesId").val( ui.item.speciesId );
             return false;
         },open: function(event, ui) {
             //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 

@@ -83,6 +83,8 @@ class SpeciesService extends AbstractObjectService  {
     def taxonService;
     def activityFeedService;
     def messageSource;
+	def namelistService;
+	
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
     def request;
@@ -934,7 +936,7 @@ class SpeciesService extends AbstractObjectService  {
 
             if(!speciesInstance) {
                 def messagesourcearg = new Object[1];
-                messagesourcearg[0] = speciesFieldId;
+                messagesourcearg[0] = speciesId;
             	return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
             }
         }
@@ -948,13 +950,16 @@ class SpeciesService extends AbstractObjectService  {
             oldSynonym = SynonymsMerged.read(synonymId);
 
             if(!oldSynonym) {
-        println "=====a========"
+				println "=====a========"
                 //return [success:false, msg:"Synonym with id ${synonymId} is not found"]
             } else if(oldSynonym.name == value && oldSynonym.relationship.value().equals(relationship)) {
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
             } else if(!oldSynonym.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
+        } else {
+            //search for existing synonym
+
         }
 
         println "=====3========"
@@ -1074,6 +1079,13 @@ class SpeciesService extends AbstractObjectService  {
             Node l = new Node(data, "language");
             new Node(l, 'name', language);
             new Node(data, "contributor", springSecurityService.currentUser.email);
+
+            if(oldCommonname) {
+                oldCommonname.contributors.each { c ->                        
+                    new Node(data, "contributor", c.email);
+                }
+            }      
+
             if(otherParams) {
                 new Node(data, "viaDatasource", otherParams['source']);
             }
@@ -1087,7 +1099,7 @@ class SpeciesService extends AbstractObjectService  {
                 msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
                 content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
                 String activityType, mailType, description;
-                if(oldCommonname) {
+                if(oldCommonname) {                    
                     description = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
                     mailType =  activityType = ActivityFeedService.SPECIES_COMMONNAME_UPDATED
                 } else {
@@ -1279,8 +1291,14 @@ class SpeciesService extends AbstractObjectService  {
             String msg = '';
             def content;
             try{
-                oldSynonym.removeFromContributors(springSecurityService.currentUser);
-                taxonConcept = speciesInstance ? speciesInstance.taxonConcept : oldSynonym.taxonConcept;
+                if(utilsService.isAdmin(springSecurityService.currentUser)){
+                    if(oldSynonym.contributors.size() > 0) {
+                        oldSynonym.contributors.clear();
+                    }
+                }else{ 
+                    oldSynonym.removeFromContributors(springSecurityService.currentUser);
+                }
+                taxonConcept = taxonConcept?:(speciesInstance ? speciesInstance.taxonConcept : oldSynonym);
                 taxonConcept.removeSynonym(oldSynonym);
                 if(oldSynonym.contributors.size() == 0) {
                     oldSynonym.delete(failOnError:true) //should not delete synonym entry
@@ -1339,8 +1357,13 @@ class SpeciesService extends AbstractObjectService  {
             String msg = '';
             def content;
             try{
-                oldCommonname.removeFromContributors(springSecurityService.currentUser);
-                
+                if(utilsService.isAdmin(springSecurityService.currentUser)){
+                    if(oldCommonname.contributors.size() > 0) {
+                        oldCommonname.contributors.clear();
+                       }
+                }else{ 
+                    oldCommonname.removeFromContributors(springSecurityService.currentUser);
+                }
                 if(oldCommonname.contributors.size() == 0) {
                     oldCommonname.delete(failOnError:true)
                 } else {
@@ -1371,16 +1394,29 @@ class SpeciesService extends AbstractObjectService  {
     /**
     * Create Species given species name and atleast one taxon hierarchy
     */
-    def createSpecies(String speciesName, int rank, List taxonRegistryNames, Language language) {
+    def createSpecies(String speciesName, int rank, List taxonRegistryNames, String colId, Language language, Map taxonHirMatch = null) {
         
         def speciesInstance = new Species();
         List<TaxonomyRegistry> taxonRegistry;
         List errors = [];
-        Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames], errors:errors];
+        Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames, taxonHirMatch:taxonHirMatch], errors:errors];
 
-        XMLConverter converter = new XMLConverter();
-        speciesInstance.taxonConcept = converter.getTaxonConceptFromName(speciesName, rank);
-		 if(speciesInstance.taxonConcept) {
+		XMLConverter converter = new XMLConverter();
+		def td
+		//if colId is given then creating name from col info
+		if(colId){
+			td = namelistService.createNameFromColId(colId, false)
+		}else{
+			td = converter.getTaxonConceptFromName(speciesName, rank);
+		}
+		speciesInstance.taxonConcept = td
+		if(speciesInstance.taxonConcept) {
+//			boolean shouldProceed = speciesInstance.taxonConcept.postProcess()
+//			if(!shouldProceed){
+//				result['success'] = false;
+//				result['msg'] = "Multiple11 matches from col. Please select one to proceed."// messageSource.getMessage("info.message.missing", null, LCH.getLocale())
+//				return result
+//			}
 			speciesInstance.title = speciesInstance.taxonConcept.italicisedForm;
             //taxonconcept is being used as guid
             speciesInstance.guid = converter.constructGUID(speciesInstance);
@@ -1406,10 +1442,11 @@ class SpeciesService extends AbstractObjectService  {
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
             //CHK if current user has permission to add details to the species
             if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
-                def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
-
-                List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
-                def tD = tR.taxonDefinition
+				
+//				def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
+//              List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
+//              def tD = tR.taxonDefinition
+				def tD = speciesInstance.taxonConcept
                 if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;
                     result['status'] = 'requirePermission';
@@ -1420,13 +1457,14 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             //save taxonomy hierarchy
-            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language); 
+            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language, false, false, null, taxonHirMatch); 
             result.putAll(result1);
             result.speciesInstance = speciesInstance;
-			speciesInstance.taxonConcept.postProcess()
+			//speciesInstance.taxonConcept.postProcess()
 			result.taxonRegistry = taxonRegistry;
             result.errors.addAll(errors);
 			
+			speciesInstance.taxonConcept.postProcess()
         }
        return result;
     }
@@ -1518,7 +1556,7 @@ class SpeciesService extends AbstractObjectService  {
 
         }
 */
-          return DwCSpeciesExporter.getInstance().exportSpecieData( null, dl)
+          return DwCSpeciesExporter.getInstance().exportSpecieData( null, dl, params.webaddress)
         //return exportSpeciesData(speciesInstanceList, null, dl)
 
     }
@@ -1578,11 +1616,11 @@ class SpeciesService extends AbstractObjectService  {
 
         def queryParams = [:]
         def activeFilters = [:]
-        queryParams.max = Math.min(params.max ? params.max.toInteger() : 42, 100);
+        queryParams.max = Math.min(params.max ? params.max.toInteger() : 40, 100);
         queryParams.offset = params.offset ? params.offset.toInteger() : 0
 
         if(queryParams.max < 0 ) {
-            queryParams.max = 42 
+            queryParams.max = 40 
         }
 
         if(queryParams.offset < 0) {
@@ -1733,9 +1771,9 @@ class SpeciesService extends AbstractObjectService  {
                 queryParams['classification'] = classification.id 
                 activeFilters['classification'] = classification.id
                 query += " join s.taxonConcept.hierarchies as reg "
-                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!')";
                 countQuery += " join s.taxonConcept.hierarchies as reg "
-                countFilterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                countFilterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!')";
 
                 speciesCountQuery += " join s.taxonConcept.hierarchies as reg "
                 speciesStatusCountQuery += " join s.taxonConcept.hierarchies as reg "
@@ -2277,19 +2315,15 @@ def checking(){
     }
 	
 	/////////////////////////// Online edit and bulk upload //////////////////////////
-	ScientificName searchIBP(def parsedName, int rank, NameStatus status =  NameStatus.ACCEPTED ){
+	List<ScientificName> searchIBP(def parsedName, int rank=-1, NameStatus status = null){
 		if(parsedName instanceof String){
 			parsedName = new TaxonomyDefinition(canonicalForm:parsedName.trim())
 		}
-		List taxonList = NamelistService.searchIBP( parsedName.canonicalForm, null, status, rank, false, parsedName.normalizedForm)
+		List taxonList = NamelistService.searchIBP( parsedName.canonicalForm, null, status, rank, false, parsedName.canonicalForm)
 		if(taxonList.isEmpty())
 			return null
 		
-		if(taxonList.size() > 1){
-			log.error '############  ' + "IBP serch returning mulitiple result: should not happen " + taxonList
-		}
-		
-		return taxonList[0]
+		return taxonList
 	}
 	
 	

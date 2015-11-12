@@ -10,8 +10,8 @@ import com.octo.captcha.component.image.fontgenerator.RandomFontGenerator
 import com.octo.captcha.component.image.backgroundgenerator.GradientBackgroundGenerator
 import com.octo.captcha.component.image.color.SingleColorGenerator
 import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
-import grails.plugin.springsecurity.SecurityConfigType;
 import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
+import grails.plugin.springsecurity.SecurityConfigType;
 import org.apache.log4j.Priority
 
 // locations to search for config files that get merged into the main config
@@ -341,7 +341,7 @@ speciesPortal {
         STATUS = 'status'
         INFORMATION_LISTING = "Information Listing"
         REFERENCES = "References"
-
+		RANK = "Rank"
         CONCEPT = "concept"
         CATEGORY = "category"
         SUBCATEGORY = "subcategory"
@@ -350,6 +350,10 @@ speciesPortal {
         AUDIO = "audio"
         VIDEO = "video"
         DOCUMENTS = "Documents"
+		NAME_SOURCE = "Name Source"
+		VIA_SOURCE = "Via Source"
+		NAME_SOURCE_ID = "Name Source Id"
+		
     }
     group {
         ALL = "All"
@@ -559,12 +563,16 @@ environments {
             'grails.app.services.com.odobo',
             'org.pac4j'
             debug   'grails.app.services.species.participation.DigestService'
+            debug   'grails.app.services.species.participation.NamesIndexerService'
+            debug   'grails.app.services.species.participation.NameslistService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
             debug   'grails.app.controllers.species'
             debug   'grails.app.controllers.content'
             debug   'grails.app.controllers.utils'
+
+            debug   'species.sourcehandler.XMLConverter'
 
             debug   'grails.plugin.springsecurity.openid'
             debug    'grails.app.filters.species'
@@ -591,6 +599,7 @@ environments {
             debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
             debug   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
+			debug   'grails.app.services.speciespage.SpeciesUploadService'
         }
     }
     test {
@@ -1607,8 +1616,6 @@ new Color(0, 0, 0)
 180000, // maxCaptchaStoreSize
 75000
 )
-
-/*soundCaptcha = new DefaultManageableSoundCaptchaService()*/
 }
 
 NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";

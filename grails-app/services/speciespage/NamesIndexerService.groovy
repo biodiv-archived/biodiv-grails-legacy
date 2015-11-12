@@ -19,15 +19,25 @@ import species.ScientificName.TaxonomyRank;
 import species.participation.Recommendation
 import species.search.Lookup
 import species.search.Record
+import species.search.*
 import species.search.TSTLookup
+import species.search.TSTAutocomplete
+import species.search.TernaryTreeNode
+import species.search.Record
 import species.search.Lookup.LookupResult
 import species.utils.ImageType;
 import species.utils.ImageUtils;
 
+import com.esotericsoftware.kryo.Kryo
+import com.esotericsoftware.kryo.io.Output
+import com.esotericsoftware.kryo.io.Input
+import com.esotericsoftware.kryo.serializers.FieldSerializer
+import com.esotericsoftware.kryo.serializers.*;
 class NamesIndexerService {
 
 	static transactional = false
 	def grailsApplication;
+    def utilsService;
 
 	private static final log = LogFactory.getLog(this);
 	private Lookup lookup = new TSTLookup();
@@ -170,7 +180,7 @@ class NamesIndexerService {
 			String icon = record.icon
 			
 			def languageName = Language.read(record.languageId)?.name 
-			result.add([value:record.canonicalForm, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, languageName:languageName, "category":"Names"]);
+			result.add([value:record.originalName, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, languageName:languageName, "category":"Names"]);
 		}
 		return result;
 	}
@@ -225,7 +235,7 @@ class NamesIndexerService {
 		int max = params.max ? params.int('max'): 5;
         int rank = params.rank ? params.int('rank'):TaxonomyRank.SPECIES.ordinal();
         String term = params.term?:''
-		if(term && rank == TaxonomyRank.SPECIES.ordinal()) {
+		if(term && rank >= TaxonomyRank.SPECIES.ordinal()) {
 			List<LookupResult> lookupResults = lookup.lookup(term.toLowerCase(), true, max, params.nameFilter);
 			result = getFormattedResult(lookupResults,  params.term)
 		} else {
@@ -243,21 +253,38 @@ class NamesIndexerService {
 	/**
 	 *
 	 */
-	synchronized boolean load(String storeDir) {
-		File f = new File(storeDir, FILENAME);
-		if(!f.exists() || !f.canRead()) {
-			rebuild();
-		} else {
-			log.info "Loading autocomplete index from : "+f.getAbsolutePath();
-			def startTime = System.currentTimeMillis()
-			f.withObjectInputStream(lookup.getClass().classLoader){ ois ->
-				lookup = ois.readObject( )
-			}
-			log.info "Loading autocomplete index done";
-			log.info "Time taken to load names index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
-			return true;
-		}
-	}
+    synchronized boolean load(String storeDir) {
+        File f = new File(storeDir, FILENAME);
+        if(!f.exists() || !f.canRead()) {
+            rebuild();
+        } else {
+            log.info "Loading autocomplete index from : "+f.getAbsolutePath();
+            def startTime = System.currentTimeMillis()
+            /*Kryo kryo = new Kryo();
+
+            kryo.register(TSTLookup);
+            kryo.register(TSTAutocomplete);
+            kryo.register(TernaryTreeNode);
+            kryo.register(Record);
+            kryo.register(ArrayList.class, new CollectionSerializer());
+            kryo.register(HashMap.class, new MapSerializer());
+            kryo.setReferences(false);
+            kryo.setRegistrationRequired(true);
+            FieldSerializer someClassSerializer = new FieldSerializer(kryo, TSTLookup.class);
+            kryo.register(TSTLookup.class, someClassSerializer)
+
+            Input input = new Input(new FileInputStream(f));
+            lookup = kryo.readObject(input, TSTLookup);
+             */
+
+            f.withObjectInputStream(lookup.getClass().classLoader){ ois ->
+                lookup = ois.readObject( )
+            }
+            log.info "Loading autocomplete index done";
+            log.info "Time taken to load names index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+            return true;
+        }
+    }
 
 	/**
 	 *
@@ -281,6 +308,57 @@ class NamesIndexerService {
 		log.info "Time taken to store index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
 		return true;
 	}
+
+    boolean storeKryo(String storeDir) {
+        this.load(storeDir);
+		File f = new File(storeDir);
+		if(!f.exists()) {
+			if(!f.mkdir()) {
+				log.error "Could not create directory : "+storeDir;
+			}
+		}
+		if (!f.exists() || !f.isDirectory() || !f.canWrite()) {
+			return false;
+		}
+
+        Kryo kryo = new Kryo();
+
+        kryo.register(TSTLookup);
+        kryo.register(TSTAutocomplete);
+        kryo.register(TernaryTreeNode);
+        kryo.register(Record);
+        kryo.register(ArrayList.class, new CollectionSerializer());
+        kryo.register(HashMap.class, new MapSerializer());
+        kryo.setReferences(false);
+        kryo.setRegistrationRequired(true);
+        FieldSerializer someClassSerializer = new FieldSerializer(kryo, TSTLookup.class);
+        kryo.register(TSTLookup.class, someClassSerializer)
+
+		def startTime = System.currentTimeMillis();
+		File data = new File(f, FILENAME+".kryo");
+        
+        Output output = new Output(new FileOutputStream(data));
+        kryo.writeObject(output, lookup);
+        output.close();
+        println "==========================="
+        Input input = new Input(new FileInputStream(storeDir+'/'+FILENAME+".kryo"));
+        def lookup2 = kryo.readObject(input, TSTLookup);
+        println lookup2;
+
+        utilsService.benchmark('lookup2.lookup') {
+        println lookup2.lookup('ruf', true, 5, null);
+        }
+        utilsService.benchmark('lookup.lookup') {
+        println lookup.lookup('ruf', true, 5, null);
+        }
+
+        input.close();
+
+		log.info "Time taken to store index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+		return true;
+
+    }
+
 
 	/**
 	 * 	

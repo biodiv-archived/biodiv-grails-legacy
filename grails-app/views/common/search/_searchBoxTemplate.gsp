@@ -37,7 +37,9 @@ $(document).ready(function() {
                     'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
                     'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
                     'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
-                    'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}"
+                    'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}",
+                    'editSpeciesPageURL' : "${uGroup.createLink(controller:'species', action:'editSpeciesPage')}"
+                                
                 },
 		'speciesName':"${params.speciesName }",
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
@@ -55,8 +57,10 @@ $(document).ready(function() {
                 'species':{
                     'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
                     'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
+                    'saveUrl':"${uGroup.createLink(controller:'species', action:'save')}",
                     'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
-                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'deleteSpecies')}"
+                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}",
+                    'hasPermissionToCreateSpeciesPageUrl':"${uGroup.createLink(controller:'species', action:'hasPermissionToCreateSpeciesPage')}"
                 },
                 'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
                 'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
@@ -68,8 +72,9 @@ $(document).ready(function() {
                 'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
                 'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
                 'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
-                'downloadNamesMapperURL' : "${uGroup.createLink(controller:'species', action:'downloadNamesMapper','userGroup':userGroupInstance) }",
+                'generateNamesReportURL' : "${uGroup.createLink(controller:'species', action:'generateNamesReport','userGroup':userGroupInstance) }",
                 'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
+                'uploadNamesURL' : "${uGroup.createLink(action:'uploadNames', controller:'species', 'userGroup':userGroupInstance)}",
                 'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
                 'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",
                 'getLicenseFromDB' :  "${uGroup.createLink(action:'getLicenseList', controller:'species', 'userGroup':userGroupInstance)}",

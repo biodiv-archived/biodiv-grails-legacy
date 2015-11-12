@@ -121,12 +121,12 @@ modules = {
 	list_utils {
 		resource url:'/js/jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js'
 		resource url:'/js/jquery/jquery.url.js'
-		resource url:'/js/jquery/jquery.autopager-1.0.0.js'
 //		resource url:[dir:'js/jquery/jquery.jqGrid-4.1.2/css',file:'ui.jqgrid.css']
 //		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/i18n/grid.locale-en.js'
 //		resource url:'/js/jquery/jquery.jqGrid-4.1.2/js/jquery.jqGrid.min.js'
 		resource url:'/js/jstree-3.1.1/dist/themes/default/style.css'
 		resource url:'/js/jstree-3.1.1/dist/jstree.min.js'
+		resource url:'/js/jquery/jquery.autopager-1.0.0.js'
         resource url:'/js/species/observations/list.js'
 	}
 
@@ -219,6 +219,10 @@ modules = {
 		resource url:'/js/wysihtml5.js'
        // resource url:'/js/species/speciesPermission.js'
         //resource url:'http://malsup.github.com/jquery.form.js'
+        
+        resource url:'/js/jquery/jquery.autopager-1.0.0.js'
+        resource url:'/js/species/observations/list.js'
+
 	}
 	
 	species_list {
@@ -402,6 +406,10 @@ modules = {
     }
 
     curation {
+		dependsOn 'comment, activityfeed'
+
+		resource url:'/js/species/taxonhierarchy.js'
+        resource url:'/js/species/speciesPermission.js'
         resource url:'/js/species/curation.js'
         resource url:'/css/namelist.css'
     }

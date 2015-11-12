@@ -6,7 +6,7 @@ abstract class NamesSorucedata extends Sourcedata {
 
     List<SUser> contributors;
 	static hasMany = [contributors: SUser]
-	
+	def utilsService;
     static constraints = {
     
 	}
@@ -15,7 +15,7 @@ abstract class NamesSorucedata extends Sourcedata {
         tablePerHierarchy false
         //tablePerSubClass true
     }
-
+    
 	def beforeInsert(){
 		super.beforeInsert()
 		if(!contributors){
@@ -30,7 +30,7 @@ abstract class NamesSorucedata extends Sourcedata {
 	def updateContributors(List<SUser> users){
 		if(!users) return
 		
-		def toBeAddedUser = (!contributors)? users : users.minus(contributors)
+		def toBeAddedUser = (!contributors)? users : []
 
 		toBeAddedUser.each { u ->
 			this.addToContributors(u)
@@ -43,6 +43,6 @@ abstract class NamesSorucedata extends Sourcedata {
 
     boolean isContributor(SUser user) {
         if(!user) user = springSecurityService.currentUser;
-        return this.contributors.contains(user);
+        return this.contributors.contains(user) || utilsService.isAdmin(user);
     }
 }

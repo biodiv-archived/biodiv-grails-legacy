@@ -130,7 +130,7 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
                 $('.fbJustConnect').click(function() {
                         var clickedObject = this;
                         var scope = { scope: "" };
-                        scope.scope = "email,user_about_me,user_location,user_activities,user_hometown,manage_notifications,user_website";
+                        scope.scope = "email,user_about_me,user_location,user_hometown,user_website";
                         
                         window.fbEnsure(function() {
                                 FB.login(function(response) {
@@ -179,7 +179,7 @@ window.fbAsyncInit = function() {
                     cookie : true,
                     xfbml: true,
                     oauth  : true,
-                    version: 'v2.2',
+                    version: 'v2.4',
                     logging : true
         });
         window.facebookInitialized = true;

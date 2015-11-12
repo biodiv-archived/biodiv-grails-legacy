@@ -35,6 +35,11 @@ public class SpreadsheetWriter {
             int sheetNo = 0;
             writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
             writeHeadersInFormat(wb, headerMarkers, orderedArray);
+            Sheet sheet = wb.getSheet("headerMetadata");
+            if(sheet != null) {
+                wb.setSheetOrder("headerMetadata", 2);
+            }
+            
             FileOutputStream out = new FileOutputStream(f);
             wb.write(out);
             out.close();

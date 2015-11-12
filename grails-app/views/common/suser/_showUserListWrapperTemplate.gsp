@@ -41,6 +41,9 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 								class=" sort_filter_label ${params.sort == 'lastLoginDate'?'active':'' }"
 								value="lastLoginDate"> <g:message code="button.last.login" />  </a></li>
 							<li class="group_option"><a
+								class=" sort_filter_label ${params.sort == 'dateCreated'?'active':'' }"
+								value="dateCreated"> <g:message code="button.latest" />  </a></li>
+							<li class="group_option"><a
 								class=" sort_filter_label  ${params.sort == 'name'?'active':'' }"
 								value="name"> <g:message code="default.name.label" /> </a></li>
 							<g:if test="${isSearch}">

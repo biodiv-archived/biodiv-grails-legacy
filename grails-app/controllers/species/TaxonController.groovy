@@ -116,14 +116,16 @@ class TaxonController {
                 rs = sql.rows(sqlStr, [classSystem:classSystem, position:position])
             }
             else if(level == TaxonomyRank.SPECIES.ordinal()) {
+                println level;
+                println position;
                 sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
-                    (classSystem?"s.classification_id = :classSystem and ":"")+
-                    (position?"t.position = :position and ": "")+
-                    +"t.rank = "+level+" and \
-                    s.path ~ '^"+parentId+"_[0-9]+\$' "
+                    (classSystem?"s.classification_id = :classSystem and ":" ")+
+                    (position?"t.position = :position and ": " ")+
+                    "t.rank = "+level+" and "+
+                    "s.path ~ '^"+parentId+"_[0-9]+\$' "
                     rs = sql.rows(sqlStr , [classSystem:classSystem, position:position]);
             } else {
                 sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
@@ -153,8 +155,8 @@ class TaxonController {
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
-                    (position?"t.position = :position and ": "")
-                    +"t.rank = "+level+" and \
+                    (position?"t.position = :position and ": "")+
+                    "t.rank = "+level+" and \
                     s.path ~ '^"+parentId+"_[0-9]+\$' group by s.path, t.id, t.name";
                 rs = sql.rows(sqlStr, [position:position]);
             } else {
@@ -750,5 +752,44 @@ class TaxonController {
             xml { render result as XML }
         }
     }
+
+    @Secured(['ROLE_ADMIN'])   
+    def mergeIntoIBPHierarchy() {   
+        def msg;               
+
+        def errors = [], result = [success:false]; 
+        if(params.taxonId && params.sourceHier) {
+            TaxonomyDefinition taxon = TaxonomyDefinition.read(params.long('taxonId'));
+            Classification sourceHie = Classification.read(params.long('sourceHier'));
+            Classification ibpHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+            //get all children 
+            def rs = new ArrayList<GroovyRowResult>();
+            TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(taxon, sourceHie);
+
+            getHierarchyNodes( rs, taxon.rank+1, TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal(), tr.path, sourceHie.id, true, true, [], null);
+            println "++++++++++++++++++++++++++++++++++++++"
+            println "++++++++++++++++++++++++++++++++++++++"
+            println rs.size()
+            println rs.taxonid;        
+            println rs.path
+            println "++++++++++++++++++++++++++++++++++++++"
+            println "++++++++++++++++++++++++++++++++++++++"
+	def sql = new Sql(dataSource)
+	dataSource.setUnreturnedConnectionTimeout(50000);
+	
+            rs.taxonid.each { t ->
+                println t
+              sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
+
+            def taxon1 = TaxonomyDefinition.read(t);
+              taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
+              }
+        } else {
+            render ([success:false, msg:"", errors:[]] as JSON)                                                                                       
+        }
+
+    }
+
 }
 

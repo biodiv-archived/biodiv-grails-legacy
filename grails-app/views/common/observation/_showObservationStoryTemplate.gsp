@@ -156,13 +156,6 @@
                     <g:else>
                     ${observationInstance.placeName}
                     </g:else>
-                    <!-- <br /> Lat:
-                    <g:formatNumber number="${observationInstance.latitude}"
-                    type="number" maxFractionDigits="2" />
-                    , Long:
-                    <g:formatNumber number="${observationInstance.longitude}"
-                    type="number" maxFractionDigits="2" />
-                    -->
                 </div>
             </div>
 
@@ -292,17 +285,14 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-     /* Added for  Species Update*/
         var group_icon = $('.group_icon_show');
         var group_icon_show_wrap = $('.group_icon_show_wrap');
-        //var habitat_icon = $('.habitat_icon_show');
         var label_group = $('label.group');
         var propagateGrpHab = $('.propagateGrpHab');
         $('.propagateGrpHab .control-group  label').hide();
 
         $('.edit_group_btn').click(function(){            
             group_icon_show_wrap.hide();
-            //habitat_icon.hide();
             label_group.hide();
             propagateGrpHab.show();
 
@@ -316,22 +306,15 @@ $(document).ready(function(){
                     dataType: 'json', 
                     type: 'GET',  
                     beforeSubmit: function(formData, jqForm, options) {
-                        /*console.log(formData);
-                        if(formData.group_id == formData.prev_group){
-                            alert("Nothing Changes!");
-                            return false;
-                        }*/
                     },               
                     success: function(data, statusText, xhr, form) {
                             console.log(data);
                             group_icon.removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);                           
                             group_icon_show_wrap.show();
-                            //habitat_icon.show();
                             propagateGrpHab.hide();
                             updateFeeds();
                     },
                     error:function (xhr, ajaxOptions, thrownError){
-                        //successHandler is used when ajax login succedes
                         var successHandler = this.success, errorHandler = showUpdateStatus;
                         handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
                     } 

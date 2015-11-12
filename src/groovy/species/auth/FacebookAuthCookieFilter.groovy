@@ -82,27 +82,28 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                         token.user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
                         Authentication authentication = null
                         authentication = authenticationManager.authenticate(token);
+                        if (authentication && authentication.authenticated) {
 
 
+                            // Store to SecurityContextHolder
+                            SecurityContextHolder.context.authentication = authentication;
 
-                        // Store to SecurityContextHolder
-                        SecurityContextHolder.context.authentication = authentication;
+                            // Fire event only if its the authSuccess url
+                            if (this.eventPublisher != null && (url == '/login/authSuccess' || url == '/oauth/google/success')) {
+                                eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
+                            }
 
-                        // Fire event only if its the authSuccess url
-                        if (this.eventPublisher != null && (url == '/login/authSuccess' || url == '/oauth/google/success')) {
-                            eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("SecurityContextHolder populated with FacebookAuthToken: '"
+                                + SecurityContextHolder.context.authentication + "'");
+                            }
+                            try {
+                                chain.doFilter(request, response);
+                            } finally {
+                                SecurityContextHolder.context.authentication = null;
+                            }
+                            return
                         }
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("SecurityContextHolder populated with FacebookAuthToken: '"
-                            + SecurityContextHolder.context.authentication + "'");
-                        }
-                        try {
-                            chain.doFilter(request, response);
-                        } finally {
-                            SecurityContextHolder.context.authentication = null;
-                        }
-                        return
                     }
                 } catch(UsernameNotFoundException e) {
                     logger.info("UsernameNotFoundException: $e.message")

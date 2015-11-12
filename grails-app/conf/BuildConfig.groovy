@@ -14,7 +14,7 @@ grails.project.fork = [
 // configure settings for the test-app JVM, uses the daemon by default
 test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 // configure settings for the run-app JVM
-run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
+run: [maxMemory: 3072, minMemory: 2048, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the run-war JVM
 war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false, jvmArgs:["-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]],
 // configure settings for the Console UI JVM
@@ -132,6 +132,7 @@ grails.project.dependency.resolution = {
         runtime ('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
+        compile 'com.esotericsoftware:kryo-shaded:3.0.3'
     }
 
     plugins { 
@@ -188,6 +189,7 @@ grails.project.dependency.resolution = {
         compile ":quartz:1.0.2"
         compile ":rateable:0.7.1"
         //      compile ":recaptcha:0.5.2"
+        compile ':recaptcha:1.6.0'
         compile ":rest:0.8"
         compile ":tagcloud:0.3"
         compile ":taggable:1.0.1"
@@ -206,8 +208,10 @@ grails.project.dependency.resolution = {
         //        delete(file:"${stagingDir}/WEB-INF/lib/hibernate-core-3.3.1.GA.jar")
     }
 
-    grails.tomcat.jvmArgs = ["-server", "-XX:MaxPermSize=512m", "-XX:MaxNewSize=256m", "-XX:NewSize=256m",
-    "-Xms768m", "-Xmx1024m", "-XX:SurvivorRatio=128", "-XX:MaxTenuringThreshold=0",
+    /*grails.tomcat.jvmArgs = ["-server", "-XX:MaxPermSize=512m", "-XX:MaxNewSize=256m", "-XX:NewSize=256m",
+    "-Xms2G", "-Xmx3G", "-XX:SurvivorRatio=128", "-XX:MaxTenuringThreshold=0",
     "-XX:+UseTLAB", "-XX:+UseConcMarkSweepGC", "-XX:+CMSClassUnloadingEnabled",
-    "-XX:+CMSIncrementalMode", "-XX:-UseGCOverheadLimit", "-XX:+ExplicitGCInvokesConcurrent", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]
+    "-XX:+CMSIncrementalMode", "-XX:-UseGCOverheadLimit", "-XX:+ExplicitGCInvokesConcurrent", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]*/
+
+    grails.tomcat.jvmArgs = ["-server", "-noverify", "-XX:PermSize=256m", "-XX:MaxPermSize=256m", "-Xmx3G", "-Xms2048M", "-XX:+UseParallelGC", "-Djava.net.preferIPv4Stack=true", "-Dsun.reflect.inflationThreshold=100000", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]
 }

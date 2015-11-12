@@ -2983,3 +2983,25 @@ small {
     .input-append.input-block-level > input {
           width: 100%;
       }
+
+.taxon10 {
+    margin-left:20px;
+}
+
+.nameSuggestions{
+	font-size: 14px;
+}
+
+/*Added */
+
+.dirty_list{
+	 background-color:lightgrey; //#C0504D;
+}
+
+.working_list{
+	background-color:khaki; //#FF9900;
+}
+
+.clean_list{
+	background-color:beige; //#3399FF;
+}

@@ -3,7 +3,7 @@
 <%@page import="species.Species"%>
 
 
-<div class="species_title">
+<div class="species_title species_title_${observationInstance.id}">
 	<%
 		def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()
 		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();
@@ -22,25 +22,26 @@
 	%>
 	<g:set var="speciesLinkHtml" value="${raw(speciesLink.replaceAll('"',"'"))}" />
 	<g:set var="sName" value="${raw(observationInstance.fetchFormattedSpeciesCall())}" />
+
 	<g:set var="sNameTitle" value="${observationInstance.fetchSpeciesCall()}" />
 
     <% def status = ''; def position=''; def taxon; %>
     <g:if test="${observationInstance.maxVotedReco?.taxonConcept}">
-    <% status = observationInstance.maxVotedReco.taxonConcept.status.label(); %>
-    <% position = observationInstance.maxVotedReco.taxonConcept.position; %>
-    <% taxon = observationInstance.maxVotedReco.taxonConcept; %>
-    <g:if test="${observationInstance.maxVotedReco.taxonConcept.status == NameStatus.SYNONYM}">
-    <% status += ' of ';%>
-    <g:each in="${observationInstance.maxVotedReco.taxonConcept.fetchAcceptedNames()}" var="acceptedName">
-    <% def s = acceptedName.findSpecies()%>
-    <g:if test="${s}">
-    <% status += "<a href='"+uGroup.createLink(controller:'species', action:'show', id:s.id)+"'>"+acceptedName.italicisedForm+"</a>"%> 
-    </g:if>
-    <g:else>
-    <% status += acceptedName.italicisedForm%> 
-    </g:else>
-    </g:each>
-    </g:if>
+        <% status = observationInstance.maxVotedReco.taxonConcept.status.label(); %>
+        <% position = observationInstance.maxVotedReco.taxonConcept.position; %>
+        <% taxon = observationInstance.maxVotedReco.taxonConcept; %>
+        <g:if test="${observationInstance.maxVotedReco.taxonConcept.status == NameStatus.SYNONYM}">
+            <% status += ' of ';%>
+            <g:each in="${observationInstance.maxVotedReco.taxonConcept.fetchAcceptedNames()}" var="acceptedName">
+                <% def s = acceptedName.findSpecies()%>
+                <g:if test="${s}">
+                    <% status += "<a href='"+uGroup.createLink(controller:'species', action:'show', id:s.id)+"'>"+acceptedName.italicisedForm+"</a>"%> 
+                </g:if>
+                <g:else>
+                    <% status += acceptedName.italicisedForm%> 
+                </g:else>
+            </g:each>
+        </g:if>
     </g:if>
 
 	<g:if test="${observationInstance.isChecklist}">

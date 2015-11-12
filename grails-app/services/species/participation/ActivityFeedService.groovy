@@ -146,6 +146,7 @@ class ActivityFeedService {
 	}
 	
 	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null, isShowable=null, flushImmidiatly=true){
+        println "===========================ADDING ACTIVITY FEED";
 		//to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
@@ -384,16 +385,7 @@ class ActivityFeedService {
 				break
             case TAXON_NAME_UPDATED :
                 activityTitle = getLocalizedMessage(activityType)
-                def instance = TaxonomyDefinition.read(feedInstance.rootHolderId.toLong());
-				if(instance.position == NamesMetadata.NamePosition.WORKING) {
-                    text = feedInstance.activityDescrption.replaceAll(' \\.', '.<br/>');
-                } else {
-                    text = "Raw list reason - " + feedInstance.activityDescrption + '<br/>';
-                }
-                text += "Number of COL Matches - " + instance.noOfCOLMatches + "<br/>"
-                if(instance.isFlagged) {
-                    text += "IsFlagged - reason " + instance.flaggingReason.tokenize('###')[-1];
-                }
+				text = feedInstance.activityDescrption
                 break
 			case[SPECIES_CREATED, SPECIES_FIELD_UPDATED, SPECIES_FIELD_CREATED, SPECIES_FIELD_DELETED, SPECIES_SYNONYM_CREATED,SPECIES_SYNONYM_UPDATED, SPECIES_SYNONYM_DELETED, SPECIES_COMMONNAME_CREATED, SPECIES_COMMONNAME_UPDATED, SPECIES_COMMONNAME_DELETED, SPECIES_HIERARCHY_CREATED,SPECIES_HIERARCHY_DELETED ] :
 				activityTitle = feedInstance.activityDescrption

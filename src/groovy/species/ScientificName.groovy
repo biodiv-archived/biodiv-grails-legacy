@@ -171,17 +171,20 @@ abstract class ScientificName extends NamesMetadata {
 	String normalizedForm;
 	String italicisedForm;
 	String binomialForm;
-
-    //Transient variable to store activity on a name,
-    //later to be used for activity feed description
-    String tempActivityDescription;
-
-	static transients = [ 'tempActivityDescription' ]
+	
+	// current activity description
+	String activityDescription;
 
 	static constraints = {
 		normalizedForm nullable:true;
 		italicisedForm nullable:true;
 		binomialForm nullable:true;
 		status nullable:true;
+		activityDescription nullable:true;
 	}
+	
+	def beforeInsert(){
+		super.beforeInsert()
+	}
+	
 }

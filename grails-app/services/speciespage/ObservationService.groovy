@@ -240,71 +240,74 @@ class ObservationService extends AbstractObjectService {
                 log.debug "==================UUID GENERATED======== " + uuidRand
                 observationInstance.resource.each { resource ->
                     log.debug "=============FOR RESOURCE=========== " + resource + " =======ITS CONTEXT ======== " + resource.context?.value() + " =====ITS FILE NAME===== " +  resource.fileName
-                    if(resource.context?.value() == Resource.ResourceContext.USER.toString()){
+                    if((resource.context?.value() == Resource.ResourceContext.USER.toString())){
                         log.debug "========CONTEXT IS USER========= " 
-                        def usersResFolder = resource.fileName.tokenize('/')[0]
-                        log.debug "======USERS RES FOLDER========== " + usersResFolder
-                        def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
-                        log.debug "======OBV DIR FROM CONFIG======= " + obvDir
-                        if(!obvDir.exists()) {
-                            obvDir.mkdir();
-                        }
-                        /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
-                        obvDir = new File(obvDir, uuidRand);
-                        log.debug "=====NEW OBV DIR CREATED======== " + obvDir
-                        obvDir.mkdir();                
-                        /////change filename of resource to this uuid and inside that check for clash of filename
-                        File newUniq = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
-                        def a = newUniq.getAbsolutePath().tokenize('/')[-1]
-                        def newFileName = a.tokenize('.')[0]
-                        log.debug "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
-                        //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
-                        String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
-                        def usersResDir = new File(userRootDir, usersResFolder)
-                        def finalSuffix = ""
-                        log.debug "=========ITERATING IN THIS USER RES FOLDER ========= " + usersResDir
-                        usersResDir.eachFileRecurse (FileType.FILES) { file ->
-                            log.debug "=========PICKED UP THIS FILE==================== " + file
-                            def fName = file.getName();
-                            def tokens = fName.tokenize("_");
-                            def nameSuffix = ""
-                            if(tokens.size() == 1){
-                                nameSuffix = "."+fName.tokenize(".")[-1] 
-                                finalSuffix = nameSuffix
-                            }
-                            else {
-                                tokens.each{ t->
-                                    if(!t.isNumber()){
-                                        nameSuffix = nameSuffix + "_" + t
-                                    }
-                                }
-                            }
-                            log.debug "========NAME SUFFIX======== " + nameSuffix
-                            Path source = Paths.get(file.getAbsolutePath());
-                            Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
-                            log.debug "=======SOURCE============= " + source 
-                            log.debug "====DESTINATION=========== " + destination
-                            try {
-                                //Files moved but empty folder there
-                                log.debug "===================MOVING FILE================================"
-                                Files.move(source, destination);
-                            } catch (IOException e) {
-                                log.debug "======EXCEPTION IN MOVING FILE==============="
-                                e.printStackTrace();
-                            }
-                        }
-                        try{
-                            log.debug "=========DELETING DIRECTORY=========="
-                            FileUtils.deleteDirectory(usersResDir);
-
-                        }catch(IOException e){
-                            log.debug "========ERROR IN DELETION=========="
-                            e.printStackTrace();
-                        }                        
-                        //// UPDATING FILE NAME OF RES IN DB
-                        ////check format of filename---- slash kaise hai
-                        log.debug "=======UPDATING RESOURCE FILE NAME WITH======== : " + "/"+ uuidRand +"/"+ newFileName + finalSuffix
-                        resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+						if( resource.type != Resource.ResourceType.VIDEO){
+	                        def usersResFolder = resource.fileName.tokenize('/')[0]
+	                        log.debug "======USERS RES FOLDER========== " + usersResFolder
+	                        def obvDir = new File(grailsApplication.config.speciesPortal.observations.rootDir);
+	                        log.debug "======OBV DIR FROM CONFIG======= " + obvDir
+	                        if(!obvDir.exists()) {
+	                            obvDir.mkdir();
+	                        }
+	                        /////UUID FIRST TYM HI FOR A OBV,NEXT TYM SE USE SAME UUID ---DONE
+	                        obvDir = new File(obvDir, uuidRand);
+	                        log.debug "=====NEW OBV DIR CREATED======== " + obvDir
+	                        obvDir.mkdir();                
+	                        /////change filename of resource to this uuid and inside that check for clash of filename
+	                        File newUniq = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(resource.fileName.tokenize('/')[-1]));
+	                        def a = newUniq.getAbsolutePath().tokenize('/')[-1]
+	                        def newFileName = a.tokenize('.')[0]
+	                        log.debug "=====NEW UNIQUE FILE NAME IN THIS NEW OBVDIR======== " + newFileName
+	                        //ITERATING OVER RESOURCES FOLDER IN USERSRES AND COPYING IN NEW NAME
+	                        String userRootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
+	                        def usersResDir = new File(userRootDir, usersResFolder)
+	                        def finalSuffix = ""
+	                        log.debug "=========ITERATING IN THIS USER RES FOLDER ========= " + usersResDir
+	                        usersResDir.eachFileRecurse (FileType.FILES) { file ->
+	                            log.debug "=========PICKED UP THIS FILE==================== " + file
+	                            def fName = file.getName();
+	                            def tokens = fName.tokenize("_");
+	                            def nameSuffix = ""
+	                            if(tokens.size() == 1){
+	                                nameSuffix = "."+fName.tokenize(".")[-1] 
+	                                finalSuffix = nameSuffix
+	                            }
+	                            else {
+	                                tokens.each{ t->
+	                                    if(!t.isNumber()){
+	                                        nameSuffix = nameSuffix + "_" + t
+	                                    }
+	                                }
+	                            }
+	                            log.debug "========NAME SUFFIX======== " + nameSuffix
+	                            Path source = Paths.get(file.getAbsolutePath());
+	                            Path destination = Paths.get(grailsApplication.config.speciesPortal.observations.rootDir +"/"+ uuidRand +"/"+ newFileName + nameSuffix );
+	                            log.debug "=======SOURCE============= " + source 
+	                            log.debug "====DESTINATION=========== " + destination
+	                            try {
+	                                //Files moved but empty folder there
+	                                log.debug "===================MOVING FILE================================"
+	                                Files.move(source, destination);
+	                            } catch (IOException e) {
+	                                log.debug "======EXCEPTION IN MOVING FILE==============="
+	                                e.printStackTrace();
+	                            }
+	                        }
+	                        try{
+	                            log.debug "=========DELETING DIRECTORY=========="
+	                            FileUtils.deleteDirectory(usersResDir);
+	
+	                        }catch(IOException e){
+	                            log.debug "========ERROR IN DELETION=========="
+	                            e.printStackTrace();
+	                        }                        
+	                        //// UPDATING FILE NAME OF RES IN DB
+	                        ////check format of filename---- slash kaise hai
+	                        log.debug "=======UPDATING RESOURCE FILE NAME WITH======== : " + "/"+ uuidRand +"/"+ newFileName + finalSuffix
+	                        resource.fileName = "/"+ uuidRand +"/"+ newFileName + finalSuffix
+						}		
+						
                         log.debug "=======UPDATING RESOURCE CONTEXT======"
                         resource.saveResourceContext(observationInstance)
 
@@ -312,11 +315,13 @@ class ObservationService extends AbstractObjectService {
                         ////////////////////
                         ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
                         log.debug "============UPDATING STATUS OF THIS USER RESOURCE========== " + usersRes
+						if(usersRes){
                         usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
                         if(!usersRes.save(flush:true)){
                             usersRes.errors.allErrors.each { log.error it }
                             return false
                         }
+						}
 
                     }
                 }
@@ -629,14 +634,14 @@ class ObservationService extends AbstractObjectService {
     }
     
     Map getRelatedObvForSpecies(resInstance, int limit, int offset){
-        def taxonConcept = resInstance.taxonConcept
-        List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+        def taxon = resInstance.taxonConcept
+        //List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
         def resList = []
         def obvLinkList = []
-        if(scientificNameRecos){
-            def resIdList = Observation.executeQuery ('''
-                select r.id, obv.id from Observation obv join obv.resource r where obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by obv.lastRevised desc
-                ''', ['scientificNameRecos': scientificNameRecos, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
+        if(taxon) {
+            def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+            def resIdList = Observation.executeQuery ("select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc", ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
 
              /*
             def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
@@ -661,25 +666,35 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getRelatedObservationByTaxonConcept(long taxonConceptId, int limit, long offset){
-        def taxonConcept = TaxonomyDefinition.read(taxonConceptId);
-        if(!taxonConcept) return ['observations':[], 'count':0]
+        def taxon = TaxonomyDefinition.read(taxonConceptId);
+        if(!taxon) return ['observations':[], 'count':0]
 
-            List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
-        if(scientificNameRecos) {
-            def criteria = Observation.createCriteria();
+        //List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+        //if(scientificNameRecos) {
+        if(taxon) {
+            def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+            String query = "select obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc";
+            def resIdList = Observation.executeQuery (query, ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
+
+
+            /*def criteria = Observation.createCriteria();
             def observations = criteria.list (max: limit, offset: offset) {
                 and {
                     'in'("maxVotedReco", scientificNameRecos)
-                        eq("isDeleted", false)
-                        //eq("isShowable", true)
+                    eq("isDeleted", false)
+                    //eq("isShowable", true)
                 }
                 order("lastRevised", "desc")
-            }
-            def count = observations.totalCount;
+            }*/
+            String countQuery = "select count(*) from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') ";
+            def countRes = Observation.executeQuery (countQuery, ['classification':classification, 'isDeleted': false]);
+
+
+            def count = countRes[0]//observations.totalCount;
             def result = [];
-            def iter = observations.iterator();
+            def iter = resIdList.iterator();
             while(iter.hasNext()){
-                def obv = iter.next();
+                def obv = Observation.read(iter.next());
                 result.add(['observation':obv, 'title':obv.fetchSpeciesCall()]);
             }
             return ['observations':result, 'count':count]
@@ -701,7 +716,7 @@ class ObservationService extends AbstractObjectService {
     }
 
     Map getRecommendation(params){
-        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName)
+        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName, params.speciesId)
     }
 
     /**
@@ -711,14 +726,14 @@ class ObservationService extends AbstractObjectService {
     * languageName
     * 
     **/
-    Map getRecommendations(String recoName, String canName, String commonName, String languageName) {
+    Map getRecommendations(String recoName, String canName, String commonName, String languageName, Long speciesId=null) {
         def languageId = Language.getLanguage(languageName).id;
         //		def refObject = params.observation?:Observation.get(params.obvId);
 
         //if source of recommendation is other that observation (i.e Checklist)
         //		refObject = refObject ?: params.refObject
         Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
-        Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco);
+        Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId);
 
         //		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
 
@@ -1124,7 +1139,12 @@ class ObservationService extends AbstractObjectService {
             }
         }
 
-        if(params.userGroup || params.webaddress) {
+        if(params.webaddress) {
+            def userGroupInstance =	utilsService.getUserGroup(params)
+            params.userGroup = userGroupInstance;
+        }
+
+        if(params.userGroup) {
             log.debug "Filtering from usergourp : ${params.userGroup}"
             userGroupQuery = " join obv.userGroups userGroup "
             query += userGroupQuery
@@ -1286,9 +1306,9 @@ class ObservationService extends AbstractObjectService {
         }
         
         if(params.filterProperty == 'taxonConcept') {
-            def taxonConcept = TaxonomyDefinition.read(params.filterPropertyValue.toLong());
-            if(taxonConcept) {
-                List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
+            def taxon = TaxonomyDefinition.read(params.filterPropertyValue.toLong());
+            if(taxon) {
+                List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxon);
                 if(scientificNameRecos) {
                     filterQuery += " and obv.maxVotedReco in (:scientificNameRecos)"
                         queryParams['scientificNameRecos'] = scientificNameRecos
@@ -1297,6 +1317,27 @@ class ObservationService extends AbstractObjectService {
                         activeFilters["parentId"] = params.parentId
                         activeFilters["filterPropertyValue"] = params.filterPropertyValue;
                 }
+                /*queryParams['taxon'] = taxon.id
+                activeFilters['taxon'] = taxon.id
+                taxonQuery = " join obv.maxVotedReco.taxonConcept.hierarchies as reg "
+                query += taxonQuery;
+
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id 
+                activeFilters['classification'] = classification.id
+ 
+                filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                
+                activeFilters["filterProperty"] = params.filterProperty
+                activeFilters["parentId"] = params.parentId
+                activeFilters["filterPropertyValue"] = params.filterPropertyValue;
+                */
+
             }
         }
 		
@@ -2391,6 +2432,11 @@ class ObservationService extends AbstractObjectService {
      * used for download and post in bulk
      */
     def getObservationList(params, max, offset, action){
+        println "===========================================+++++"
+        println "===========================================+++++"
+        println "===========================================+++++"
+        println "===========================================+++++"
+        println params;
 		if(Utils.isSearchAction(params, action)){
             //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
@@ -2399,7 +2445,7 @@ class ObservationService extends AbstractObjectService {
                 res.add(Observation.read(obvId))
             }
             return res
-        }else if(params.webaddress){
+        } else if(params.webaddress){
             def userGroupInstance =	userGroupService.get(params.webaddress)
             if (!userGroupInstance){
                 log.error "user group not found for id  $params.id  and webaddress $params.webaddress"

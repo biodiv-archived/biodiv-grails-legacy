@@ -59,6 +59,9 @@ function attachThumbnailAndProcess(me , images) {
 
     if($( "input[name='resType']" ).val() == "species.auth.SUser") {
         var count = $("input[name='lastUploaded']").val();
+        if(count == undefined){
+        	count = 0;
+        }
         var start = 0;
         var w = 1; 
         var end = start + w; 
