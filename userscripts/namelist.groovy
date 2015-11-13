@@ -816,7 +816,7 @@ def IBPhierarchyDirtlistABOVESpsToDrop() {
 
 def copyIBPHierarchyToCOLClassification() {
     def classifi = Classification.findByName("Catalogue of Life Taxonomy Hierarchy");
-    def ibpClass = Classification.findByName("IBP Taxonomy Hierarchy");
+    def ibpClass = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
     def start = new Date();
 	int limit = 50, offset = 0;
     int counter = 0;
