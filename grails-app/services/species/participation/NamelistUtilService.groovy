@@ -187,7 +187,7 @@ class NamelistUtilService {
 		int i = 0
 		int offset = 0
 		int limit = 1000
-		def ibpHier = Classification.findByName('IBP Taxonomy Hierarchy')
+		def ibpHier = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 		f.withWriter { out ->
 			out.println "id|name|rank|colId|paths|colIdPath"
 			while(true){
@@ -642,7 +642,7 @@ class NamelistUtilService {
 		
 		Date startDate = new Date();
 		List hirList = [Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
-		def ibp_classifi = Classification.findByName("IBP Taxonomy Hierarchy");
+		def ibp_classifi = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 		def admin = SUser.read(1L);
 		
 		def taxons;
@@ -729,7 +729,7 @@ class NamelistUtilService {
 	}
 		
 	public TaxonomyRegistry saveIBPHir(TaxonomyDefinition td, Long parentId){
-		Classification ibpHir = Classification.findByName("IBP Taxonomy Hierarchy");
+		Classification ibpHir = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 		TaxonomyDefinition  pTd = TaxonomyDefinition.read(parentId)
 		
 		if(!td || !pTd)
