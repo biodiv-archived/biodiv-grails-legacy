@@ -52,7 +52,7 @@
 								</ckeditor:editor>
 							</td>
 						</tr>
-
+						<g:render template="language_wrapTemplate" model="['newsletterInstance':newsletterInstance]" />
 						<tr class="prop">
 							<td valign="top"
 								class="value ${hasErrors(bean: newsletterInstance, field: 'sticky', 'errors')}">
