@@ -531,6 +531,7 @@ $(document).ready(function(){
                             //habitat_icon.show();
                             $('#propagateGrpHab_'+data.instance.id).hide();
                             $('.prev_group_'+data.instance.id).val(data.model.prev_group);
+                            updateFeeds();
                     },
                     error:function (xhr, ajaxOptions, thrownError){
                         //successHandler is used when ajax login succedes
