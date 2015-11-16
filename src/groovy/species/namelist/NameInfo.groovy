@@ -138,7 +138,7 @@ class NameInfo {
 			
 			//writing header
 			Row row =  sheet.createRow(0);
-			List arr = ['Name', 'Index', 'Source Name', 'Match Found', 'Rank', 'Status', 'Group', 'Position', 'Id', 'Target Position']
+			List arr = ['Name', 'Index', 'Source Name', 'Match Found', 'Matched Name' ,'Rank', 'Status', 'Group', 'Position', 'Id', 'Target Position']
 			Cell cell;
 			int k = 0;
 			arr.each {
@@ -163,8 +163,10 @@ class NameInfo {
 					cell.setCellValue(name.sourceName);
 					cell = row.getCell(3, Row.CREATE_NULL_AS_BLANK);
 					cell.setCellValue("");
+					cell = row.getCell(4, Row.CREATE_NULL_AS_BLANK);
+					cell.setCellValue("");
 					if(name.rank > -1 ){
-						cell = row.getCell(4, Row.CREATE_NULL_AS_BLANK);
+						cell = row.getCell(5, Row.CREATE_NULL_AS_BLANK);
 						cell.setCellValue(ScientificName.TaxonomyRank.getTRFromInt(name.rank)?.value());
 					}
 				}else{
@@ -178,11 +180,11 @@ class NameInfo {
 						//println "--------------------- row created "
 						int i = 3
 						r.each { k1,v1 ->
-							if(!k1.equalsIgnoreCase("name")){
+							//if(!k1.equalsIgnoreCase("name")){
 								cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
 								cell.setCellValue(v1);
 								i++;
-							}
+							//																															}
 						}
 						
 					}
