@@ -408,5 +408,5 @@ alter table download_log alter column offset_param set not null;
 #21 Oct 2015
 ALTER TABLE species_bulk_upload ADD COLUMN  upload_type varchar(255);
 
-
-
+#16th Nov 2015 
+drop index if exists last_updated_comment_idx, root_holder_type_comment_idx, last_updated_comment_idx;
