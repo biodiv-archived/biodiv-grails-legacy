@@ -835,7 +835,7 @@ class UserGroupService {
 	}
 
 
-	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order) {
+	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order,currentLanguage) {
 		String query = "from Newsletter newsletter ";
 		def queryParams = [:]
 		if(userGroupInstance) {
@@ -849,6 +849,9 @@ class UserGroupService {
 			}
 		} else {
 			query += " where newsletter.userGroup is null"
+		}
+		if(currentLanguage){
+			query += " and language="+currentLanguage.id;
 		}
 		
 		if(max && max != -1) {

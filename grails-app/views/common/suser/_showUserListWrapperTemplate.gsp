@@ -23,6 +23,9 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 							<g:elseif test="${params.sort == 'name'}">
                                                 <g:message code="default.name.label" />
                                             </g:elseif>
+                                            <g:elseif test="${params.sort == 'dateCreated'}">
+                                            	<g:message code="button.latest.user" />
+                                            </g:elseif>
                                             <g:elseif test="${params.sort == 'score'}">
                                                <g:message code="button.relevancy" /> 
                                             </g:elseif>

@@ -1,6 +1,7 @@
 package utils
 
 import species.groups.UserGroup;
+import species.Language;
 
 class Newsletter {
     String title
@@ -8,6 +9,8 @@ class Newsletter {
     String newsitem
 	boolean sticky = false;
     int displayOrder;
+    int parentId;
+    Language language;
 
 	static belongsTo = [userGroup: UserGroup]
     static constraints = {
@@ -16,6 +19,8 @@ class Newsletter {
         newsitem type:'text'
 		userGroup nullable:true;
         displayOrder nullable:false;
+        parentId nullable:false;
+        language nullable:false;
     }
 	
 	static mappings = {

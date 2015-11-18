@@ -79,9 +79,9 @@
                 </g:if>
 
 
-                <div class="group_icon_show_wrap">
+                <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
                     <span
-                        class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()}"
+                        class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()}"
                         title="${observationInstance.group?.name}"></span>
                 <g:if test="${showDetails && !showFeatured}">        
                     <div class="btn btn-small btn-primary edit_group_btn">Edit
@@ -94,7 +94,7 @@
                     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
                 </g:if>
                 <g:if test="${!showFeatured}">
-                 <div class="column propagateGrpHab">
+                 <div class="column propagateGrpHab" id="propagateGrpHab_${observationInstance.id}">
                  <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                                 method="GET">
                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
@@ -296,33 +296,7 @@ $(document).ready(function(){
             label_group.hide();
             propagateGrpHab.show();
 
-        });        
-   
-
-    $('#updateSpeciesGrp').bind('submit', function(event) {
-
-         $(this).ajaxSubmit({ 
-                    url: "${uGroup.createLink(controller:'observation', action:'updateSpeciesGrp')}",
-                    dataType: 'json', 
-                    type: 'GET',  
-                    beforeSubmit: function(formData, jqForm, options) {
-                    },               
-                    success: function(data, statusText, xhr, form) {
-                            console.log(data);
-                            group_icon.removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);                           
-                            group_icon_show_wrap.show();
-                            propagateGrpHab.hide();
-                            updateFeeds();
-                    },
-                    error:function (xhr, ajaxOptions, thrownError){
-                        var successHandler = this.success, errorHandler = showUpdateStatus;
-                        handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-                    } 
-
-                 });    
-               
-            event.preventDefault(); 
-        });
+        }); 
 });
 </script>
 </g:if>
