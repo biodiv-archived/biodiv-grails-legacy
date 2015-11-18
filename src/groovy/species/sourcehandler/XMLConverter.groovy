@@ -1593,6 +1593,10 @@ class XMLConverter extends SourceConverter {
 	                sfield.viaDatasource = viaDatasource
 	            }
 	            sfield.uploadTime = new Date();
+				sfield.matchDatabaseName = taxonConcept.matchDatabaseName
+				taxonConcept.contributors.each { userContributor ->
+					sfield.addToContributors(userContributor)
+				}
 	            if(!sfield.save(flush:true)) {
 	                sfield.errors.each { log.error it }
 	            }
