@@ -9,6 +9,7 @@ import species.groups.UserGroup;
 import species.utils.Utils;
 import grails.converters.JSON;
 import grails.plugin.springsecurity.annotation.Secured;
+import species.Language;
 
 class NewsletterController {
 
@@ -66,7 +67,7 @@ class NewsletterController {
 	def save() {
 		log.debug params
 		def newsletterInstance;
-		
+		params.language = params.language?Language.get(params.language):Language.findByThreeLetterCode('eng');
 		if(params.userGroup) {
 			def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
 			params.userGroup = userGroupInstance;
@@ -190,6 +191,7 @@ class NewsletterController {
 			//XXX removing user group info from cloned params as its coming as string
 			Map validMap = new HashMap(params)
 			validMap.remove("userGroup")
+			validMap.language = Language.get(validMap.language);
 			newsletterInstance.properties = validMap
 			if(params.userGroup) {
 				def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);

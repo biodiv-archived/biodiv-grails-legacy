@@ -67,6 +67,8 @@ import species.AcceptedSynonym;
 import species.sourcehandler.exporter.DwCSpeciesExporter
 import java.io.File ;
 import species.participation.NamelistService
+import species.participation.RecommendationVote;
+
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -1941,6 +1943,7 @@ class SpeciesService extends AbstractObjectService  {
     
     def updateSpecies(params, species){
         def resources = []
+        def obvList = []
         def speciesRes = species.resources
         if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField"){
             def resourcesXML = createResourcesXML(params);
@@ -2005,6 +2008,7 @@ class SpeciesService extends AbstractObjectService  {
                     if(obv.size() == 1 ){
                         def obvIns = obv.get(0)
                         if(obvIns.isLocked == false){
+                            obvList.add(obvIns);
                             obvIns.isLocked = true
                         }
                         if(!obvIns.save(flush:true)){
@@ -2067,6 +2071,15 @@ class SpeciesService extends AbstractObjectService  {
             otherParams['resURLs'] = resURLs
             otherParams['spId'] = species.id
             //ADD FEED AND SEND
+            if(obvList.size() > 0 && params.resourceListType == "fromRelatedObv" ){
+                obvList.each{ obvInstance ->
+                    def recommendation = obvInstance.maxVotedReco;
+                    def mailType = utilsService.OBV_LOCKED;                    
+                    def recommendation_vote = RecommendationVote.findWhere(recommendation: recommendation, observation:obvInstance);                    
+                    def activityFeed = activityFeedService.addActivityFeed(obvInstance, recommendation_vote, springSecurityService.currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendation, null));
+                    utilsService.sendNotificationMail(mailType, obvInstance, null, "", activityFeed);
+                }
+            }
             def feedInstance = activityFeedService.addActivityFeed(species, species, springSecurityService.currentUser, ActivityFeedService.SPECIES_UPDATED);
             utilsService.sendNotificationMail(ActivityFeedService.SPECIES_UPDATED, species, null, "", feedInstance, otherParams);
         }
