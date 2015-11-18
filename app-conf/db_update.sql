@@ -413,8 +413,9 @@ drop index if exists last_updated_comment_idx, root_holder_type_comment_idx, roo
 
 #16th Nov 2015
 ALTER TABLE newsletter ADD language_id bigint;
-update newsletter set language_id=123 where user_group_id is null;
-update newsletter set language_id = 137 where user_group_id is not null;
+update newsletter set language_id=205 where user_group_id is null;
+# wikwio // update newsletter set language_id=123 where user_group_id is null;
+#wikwio  // update newsletter set language_id = 137 where user_group_id is not null;
 alter table newsletter alter column language_id set not null;
 
 
@@ -422,5 +423,5 @@ ALTER TABLE newsletter ADD parent_id bigint;
 update newsletter set parent_id=0;
 alter table newsletter alter column parent_id set not null;
 
-update newsletter set language_id = 137 where id in (60,53,52,55,51,54,45,57);
+#wikwio  //update newsletter set language_id = 137 where id in (60,53,52,55,51,54,45,57);
 
