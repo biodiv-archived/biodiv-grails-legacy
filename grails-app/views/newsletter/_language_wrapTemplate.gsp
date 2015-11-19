@@ -4,7 +4,7 @@
 		class="value ${hasErrors(bean: newsletterInstance, field: 'language', 'errors')}">
 		<select name="language">
 		<g:each in="${localeLanguages}" var="localeLanguage">
-				<option value='${localeLanguage.id}' ${(newsletterInstance?.language?.id == localeLanguage.id) ? 'selected' : ''}>${localeLanguage.name}</option>										
+				<option value="${localeLanguage.id}" rel="${localeLanguage.id}" ${(newsletterInstance?.language?.id == localeLanguage.id) ? "selected" : ""}>${localeLanguage.name}</option>										
 		</g:each>
 		</select>								
 	</td>
