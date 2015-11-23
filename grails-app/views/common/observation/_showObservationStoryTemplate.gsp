@@ -3,10 +3,7 @@
 <%@page import="species.utils.ImageType"%>
 <style>
     <g:if test="${!showDetails}">
-
-    .observation .prop .value {
-        margin-left:260px;
-    }
+    
     .group_icon_show_wrap{
         float:left;
     }

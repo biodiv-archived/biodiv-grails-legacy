@@ -6,7 +6,11 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 <%@ page import="species.Classification"%>
 <%@ page import="species.ScientificName.TaxonomyRank"%>
-
+<style>
+    .observation .prop .value {
+        margin-left:260px;
+    }
+</style>
 <div class="">
 
 
