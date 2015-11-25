@@ -138,7 +138,7 @@ class NameInfo {
 			
 			//writing header
 			Row row =  sheet.createRow(0);
-			List arr = ['Name', 'Index', 'Source Name', 'Match Found', 'Matched Name' ,'Rank', 'Status', 'Group', 'Position', 'Id', 'Target Position']
+			List arr = ['Name', 'Index', 'Source Name', 'Match Found', 'Matched Name' ,'Rank', 'Status', 'Group', 'Position', 'Id', 'Target Position' , 'Target Status']
 			Cell cell;
 			int k = 0;
 			arr.each {
@@ -180,11 +180,9 @@ class NameInfo {
 						//println "--------------------- row created "
 						int i = 3
 						r.each { k1,v1 ->
-							//if(!k1.equalsIgnoreCase("name")){
-								cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
-								cell.setCellValue(v1);
-								i++;
-							//																															}
+							cell = row.getCell(i, Row.CREATE_NULL_AS_BLANK);
+							cell.setCellValue(v1);
+							i++;
 						}
 						
 					}
