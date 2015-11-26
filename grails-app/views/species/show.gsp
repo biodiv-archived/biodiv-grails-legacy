@@ -346,7 +346,6 @@
 
 
             </r:script>
-            <script type="text/javascript" src="/biodiv/js/species/speciesPermission.js"></script>
         </body>
 
     </html>
