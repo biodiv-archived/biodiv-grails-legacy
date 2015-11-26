@@ -518,7 +518,8 @@ class TaxonomyDefinition extends ScientificName {
 					createTargetHirFromTaxonReg(latestHir, ibpClassification)
 				}
 			}
-			if(!save()) {
+			def obj = merge()
+			if(!obj.save()) {
 				this.errors.allErrors.each { log.error it }
 			}
 		}
@@ -529,13 +530,16 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	def updateNameSignature(List userList = [springSecurityService.currentUser]){
+		println "================== user list for activity feed " + userList
 		def ns = createNameSignature()
 		if(ns != activityDescription){
 			if(!save()) {
 				this.errors.allErrors.each { log.error it }
 			}else{
 				userList.each {
-					activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
+					println "Adding feed for following author " + it
+					if(it)
+						activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
 				}
 			}
 			
