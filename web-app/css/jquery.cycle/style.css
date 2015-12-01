@@ -1,7 +1,7 @@
 .cycle-slideshow { max-width: 640px; margin: 10px auto }
 .cycle-slideshow > div { width: 100%; height: 100% }
 .cycle-slideshow > img { width: 100%; height: 100% }
-iframe,object,embed { width: 100%; height: 100% }
+object,embed { width: 100%; height: 100% }
 
 /* in case script does not load */
 .cycle-slideshow img:first-child {

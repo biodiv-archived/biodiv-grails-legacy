@@ -1,4 +1,6 @@
 <%@page import="species.utils.Utils"%>
+<%@page import ="org.springframework.web.servlet.support.RequestContextUtils" %>
+
 <script type="text/javascript">
     window.appContext = '';
     window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
@@ -196,9 +198,12 @@
 								class="${(params.controller == 'chart')?' active':''}"><a
 								href="${uGroup.createLink(controller:'chart')}"
 								title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a> </li>
+							<% def lang_code = RequestContextUtils.getLocale(request); 
+							   def aboutus_list = ['en':48,'fr':53];
+							%>
 							<li
 								class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
-								href="/page/48" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a></li>	
+								href="/page/${aboutus_list[lang_code.toString()]}" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a></li>	
 						</ul>
 					</li>
 				</ul>
