@@ -863,7 +863,6 @@ class NamelistService {
         //if(acceptedNameList.size() == 0) {
             //create acceptedName
             log.debug "Creating/Updating accepted name of this synonym"
-            def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def result = addIBPHierarchyFromCol(colAcceptedNameData);
             acceptedName = result.lastTaxonInIBPHierarchy;
         //}
@@ -927,8 +926,7 @@ class NamelistService {
             println colAcceptedNameData;
             colAcceptedNameData.curatingTaxonId = temp;
         }
-        def fieldsConfig = grailsApplication.config.speciesPortal.fields
-        def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+        def classification = Classification.fetchIBPClassification()
         Map taxonRegistryNamesTemp = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
         println "======USE THIS ==== " + taxonRegistryNamesTemp
         List taxonRegistryNames = [];
