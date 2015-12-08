@@ -409,4 +409,17 @@ alter table download_log alter column offset_param set not null;
 ALTER TABLE species_bulk_upload ADD COLUMN  upload_type varchar(255);
 
 
+#25 Nov 2015
+alter table document add column visit_count integer not null default 0;
+alter table document add column rating integer not null default 0;
+alter table document add column is_deleted boolean not null default 'false';
+
+alter table observation add column protocol varchar(255);
+update observation set protocol='SINGLE_OBSERVATION';
+alter table observation alter column protocol set  not null;
+
+alter table observation add column basis_of_record varchar(255);
+update observation set basis_of_record='HUMAN_OBSERVATION';
+alter table observation alter column basis_of_record set  not null;
+
 

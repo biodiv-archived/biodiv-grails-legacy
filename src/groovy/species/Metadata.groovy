@@ -17,6 +17,7 @@ import speciespage.ObservationService;
 import species.participation.Featured;
 import species.utils.Utils;
 import species.Language;
+import species.dataset.DataSet;
 
 abstract class Metadata {
 	
@@ -60,8 +61,6 @@ abstract class Metadata {
 			}
 		}
 	}
-
-	
 	
 	//Geographic Coverage
 	String placeName;
@@ -86,6 +85,21 @@ abstract class Metadata {
 	
     Date createdOn = new Date();
 	Date lastRevised = createdOn;
+
+    // Language
+    Language language;
+
+	License license
+
+    String externalId;
+    String externalUrl;
+    String viaId;
+    String viaCode;
+
+    Date lastInterpreted;
+    Date lastCrawled;
+
+    DataSet dataset;
 
     def grailsApplication
 	def activityFeedService
@@ -116,6 +130,25 @@ abstract class Metadata {
 				return true
 			}
 			return val < new Date() && val >= obj.fromDate
+		}
+		license nullable:false
+		language nullable:false
+		externalId nullable:true
+		externalUrl nullable:true
+		viaId nullable:true
+		viaCode nullable:true
+		dataset nullable:true
+        lastInterpreted nullable:true, validator : {val, obj ->
+			if(!val){
+				return true
+			} 
+			return val < new Date()
+		}
+        lastCrawled nullable:true, validator : {val, obj ->
+			if(!val){
+				return true
+			} 
+			return val < new Date()
 		}
     }
 	

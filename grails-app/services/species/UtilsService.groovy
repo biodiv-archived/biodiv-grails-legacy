@@ -17,6 +17,7 @@ import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
+import org.apache.commons.lang.time.DateUtils;
 
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
@@ -69,6 +70,8 @@ class UtilsService {
     
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
+
+    static final String[] DATE_PATTERNS = ['dd/MM/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z'];
 
     public void cleanUpGorm() {
         cleanUpGorm(true)
@@ -1032,22 +1035,23 @@ class UtilsService {
             return result;
 //        } 
     }
-	
+
 	static Date parseDate(date, sendNew = true){
 		try {
             if(!sendNew) {
                 Date d;
                 if(date) {
-                    d = Date.parse("dd/MM/yyyy", date) 
+                    d = DateUtils.parseDate(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date) 
                     d.set(['hourOfDay':23, 'minute':59, 'second':59]);
                 }else {
                     d = null
                 }
                 return d
-            }else {
-			    return date? Date.parse("dd/MM/yyyy", date):new Date();
+            } else {
+			    return date ? DateUtils.parseDate(date, DATE_PATTERNS) : new Date();
             }
 		} catch (Exception e) {
+            e.printStackTrace();
 			// TODO: handle exception
 		}
 		return null;

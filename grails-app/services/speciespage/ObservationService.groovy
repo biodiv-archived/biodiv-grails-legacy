@@ -74,7 +74,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 import species.groups.UserGroupController;
 import species.groups.UserGroup;
-import species.AbstractObjectService;
+import species.AbstractMetadataService;
 import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
@@ -83,7 +83,7 @@ import species.ScientificName.TaxonomyRank;
 
 import species.NamesMetadata.NameStatus;
 
-class ObservationService extends AbstractObjectService {
+class ObservationService extends AbstractMetadataService {
 
     static transactional = false
 
@@ -104,84 +104,39 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @return
      */
-    Observation createObservation(params) {
-        //log.info "Creating observations from params : "+params
-        Observation observation = new Observation();
-		updateObservation(params, observation);
-        return observation;
+    Observation create(params) {
+        return super.create(Observation.class, params);
     }
+
     /**
      * 
      * @param params
      * @param observation
      */
-    void updateObservation(params, observation, boolean updateResources = true){
-        //log.debug "Updating obv with params ${params}"
-        
-        if(params.author)  {
-            observation.author = params.author;
-        }
+    Observation updateObservation(params, observation, boolean updateResources = true){
+        return update(observation, params, Observation.class, updateResources);
+    }
 
-        if(params.url) {
-            observation.url = params.url;
-        }
-        observation.group = params.group?:SpeciesGroup.get(params.group_id);
+    Observation update(observation, params, klass = null, boolean updateResources = true){
+        log.debug "Updating obv with params ${params}"
+        observation = super.update(observation, params, Observation.class);
         observation.notes = params.notes;
-        if( params.fromDate != ""){
-            observation.fromDate = parseDate(params.fromDate);
-            observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
-        }
-        observation.placeName = params.placeName//?:observation.reverseGeocodedName;
-        observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
-
-        //XXX remove this line and column from domain class and database after all migration in wikwio and bhutan
-		observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
-		
-		def locScale =  Metadata.LocationScale.getEnum(params.locationScale)
-		observation.locationScale = locScale?:Metadata.LocationScale.APPROXIMATE
-        observation.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
-
-        observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
         observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
-            println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            println "1 SETTING LICENCE TYPE"
-            println observation.agreeTerms
-            println params
-        if(params.license_0) {
-            log.debug "Setting license to ${params.license_0}"
-            observation.license = (new XMLConverter()).getLicenseByType(params.license_0, false)
-            println observation.license
-        } else if(observation.agreeTerms) {
-            println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            println "SETTING LICENCE TYPE"
-            log.debug "Setting license to ${LicenseType.CC_BY}"
-            observation.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
-        }
+
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
-        observation.language = params.locale_language;
-
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        //        if(params.latitude && params.longitude) {
-        //            observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-        //        } else 
-        if(params.areas) {
-            WKTReader wkt = new WKTReader(geometryFactory);
-            try {
-                Geometry geom = wkt.read(params.areas);
-                observation.topology = geom;
-            } catch(ParseException e) {
-                log.error "Error parsing polygon wkt : ${params.areas}"
-            }
+        if(params.url) {
+            observation.url = params.url;
         }
 
 		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
-
-
 	        def resourcesXML = createResourcesXML(params);
+            println "--------------------------"
+            println resourcesXML
+            println "--------------------------"
             def instance = observation
             if(params.action == "bulkSave"){
                 instance = springSecurityService.currentUser
@@ -189,16 +144,15 @@ class ObservationService extends AbstractObjectService {
 	        def resources = saveResources(instance, resourcesXML);
 	        observation.resource?.clear();
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-            
+           println"RESSSSSSSSSOOOOOOOUUUUUUUUUUURRRRRRRRRRRRRRCCCCCCCEEEEEE" 
 	        resources.each { resource ->
                 if(!resource.context){
                     resource.saveResourceContext(observation)
                 }
 	            observation.addToResource(resource);
-                
 	        }
-            
 		}
+        return observation;
     }
 
     Map saveObservation(params, sendMail=true, boolean updateResources = true){
@@ -208,7 +162,7 @@ class ObservationService extends AbstractObjectService {
         try {
 
             if(params.action == "save" || params.action == "bulkSave"){
-                observationInstance = createObservation(params);
+                observationInstance = create(params);
                 feedType = activityFeedService.OBSERVATION_CREATED
                 feedAuthor = observationInstance.author
                 mailType = utilsService.OBSERVATION_ADDED
@@ -222,15 +176,25 @@ class ObservationService extends AbstractObjectService {
                     mailType = activityFeedService.OBSERVATION_UPDATED
                 }
             }
-            if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+            def result = super.save(observationInstance, params, sendMail, feedAuthor, feedType, null);
+
+            if(result.success) {
                 log.debug "Successfully created observation : "+observationInstance
                 params.obvId = observationInstance.id
-                activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
+                /*activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
 
                 saveObservationAssociation(params, observationInstance, sendMail)
 
                 if(sendMail)
                     utilsService.sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+                */
+                
+                log.debug "Saving ratings for the resources"
+                observationInstance?.resource?.each { res ->
+                    if(res.rating) {
+                        res.rate(springSecurityService.currentUser, res.rating);
+                    }
+                }
 
                 params["createNew"] = true
                 params["oldAction"] = params.action
@@ -316,11 +280,11 @@ class ObservationService extends AbstractObjectService {
                         ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
                         log.debug "============UPDATING STATUS OF THIS USER RESOURCE========== " + usersRes
 						if(usersRes){
-                        usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
-                        if(!usersRes.save(flush:true)){
-                            usersRes.errors.allErrors.each { log.error it }
-                            return false
-                        }
+                            usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
+                            if(!usersRes.save(flush:true)){
+                                usersRes.errors.allErrors.each { log.error it }
+                                return false
+                            }
 						}
 
                     }
@@ -351,7 +315,7 @@ class ObservationService extends AbstractObjectService {
      * @return
      * saving Groups, tags and resources
      */
-    def saveObservationAssociation(params, observationInstance, boolean sendMail = true){
+    /*def saveObservationAssociation(params, observationInstance, boolean sendMail = true){
         def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
         observationInstance.setTags(tags);
 
@@ -370,7 +334,7 @@ class ObservationService extends AbstractObjectService {
                 res.rate(springSecurityService.currentUser, res.rating);
             }
         }
-    }
+    }*/
 
     /**
      *
@@ -1431,10 +1395,6 @@ class ObservationService extends AbstractObjectService {
         return pl
     }
 
-    Date parseDate(date){
-		return utilsService.parseDate(date)
-    }
-
     /**
     * getUserGroupObservations
     */
@@ -1953,21 +1913,6 @@ class ObservationService extends AbstractObjectService {
         return false;
     }
 
-    def setUserGroups(Observation observationInstance, List userGroupIds, boolean sendMail = true) {
-        if(!observationInstance) return
-
-        def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
-        def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
-        if(userGroupIds.size() == 0) {
-            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups, sendMail);
-        } else {
-            userGroupIds.removeAll(toRemainInUserGroups)
-            userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds, sendMail);
-            obvInUserGroups.removeAll(toRemainInUserGroups)
-            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups, sendMail);
-        }
-    }
-
     def nameTerms(params) {
         List result = new ArrayList();
 
@@ -2434,11 +2379,6 @@ class ObservationService extends AbstractObjectService {
      * used for download and post in bulk
      */
     def getObservationList(params, max, offset, action){
-        println "===========================================+++++"
-        println "===========================================+++++"
-        println "===========================================+++++"
-        println "===========================================+++++"
-        println params;
 		if(Utils.isSearchAction(params, action)){
             //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList

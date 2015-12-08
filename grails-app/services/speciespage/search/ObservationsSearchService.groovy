@@ -143,6 +143,9 @@ class ObservationsSearchService extends AbstractSearchService {
 
             String memberInfo = ""
             List allMembers = utilsServiceBean.getParticipants(obv)
+            println "====================++"
+            println allMembers;
+            println "====================++"
             allMembers.each { mem ->
                 memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
                 doc.addField(searchFieldsConfig.MEMBERS, memberInfo);

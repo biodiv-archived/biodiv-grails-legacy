@@ -30,10 +30,13 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import species.sourcehandler.exporter.DwCObservationExporter; 
+import species.sourcehandler.importer.DwCObservationImporter;
 import species.sourcehandler.exporter.DwCSpeciesExporter
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import grails.converters.JSON;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
+import species.participation.Observation.BasisOfRecord;
+import species.participation.Observation.ProtocolType;
 
 class ObvUtilService {
 
@@ -52,6 +55,7 @@ class ObvUtilService {
 	static final String LOCATION_SCALE   = "location scale"
 	static final String LONGITUDE    = "longitude"
 	static final String LATITUDE   = "latitude"
+	static final String TOPOLOGY   = "topology"
 	static final String LICENSE   = "license"
 	static final String COMMENT   = "comment"
 	static final String NOTES  = "notes"
@@ -61,13 +65,27 @@ class ObvUtilService {
 	static final String AUTHOR_EMAIL   = "user email"
 	static final String AUTHOR_URL   = "user"
 	static final String AUTHOR_NAME   = "user name"
+	static final String ORIGINAL_AUTHOR_NAME   = "original user name"
 	static final String OBSERVATION_ID   = "id"
 	static final String CREATED_ON   = "created on"
 	static final String UPDATED_ON   = "updated on"
 	static final String OBSERVATION_URL   = "observation url"
+	static final String EXTERNAL_ID   = "externalId"
 	static final String NUM_IDENTIFICATION_AGREEMENT   = "no. of identification agreements"
 	static final String NUM_IDENTIFICATION_DISAGREEMENT   = "no. of identification disagreements"
-	
+	static final String IDENTIFIED_BY   = "identifiedBy"
+	static final String DATE_IDENTIFIED   = "dateIdentified"
+	static final String COLLECTION_ID   = "collectionId"
+	static final String COLLECTION_CODE   = "collectionCode"
+	static final String BASISOFRECORD   = "basisOfRecord"
+	static final String PROTOCOL   = "protocol"
+	static final String EXTERNAL_DATASET_KEY   = "externalDatasetKey"
+	static final String LAST_CRAWLED   = "lastCrawled"
+	static final String CATALOG_NUMBER   = "catalogNumber"
+	static final String PUBLISHING_COUNTRY   = "publishingCountry"
+	static final String ACCESS_RIGHTS = "accessRights"
+	static final String INFORMATION_WITHHELD   = "informationWitheld"
+ 
 	//task related
 	static final String  SUCCESS = "Success";
 	static final String  FAILED = "Failed";
@@ -551,7 +569,7 @@ class ObvUtilService {
 		processBatch(params)
 	}
 
-	private processBatch(params){
+	def processBatch(params){
 		/*
 		def spreadSheets =  obvDir.listFiles(new FileFilter(){
 					boolean accept(File pathname){
@@ -575,18 +593,18 @@ class ObvUtilService {
 			return
 		}
 		
-		def resultObv = [] 
+		List resultObv = [] 
 		int i = 0;
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
 			if(m[IMAGE_FILE_NAMES].trim() != ""){
-				uploadObservation(imageDir, m,resultObv)
+				uploadObservation(imageDir, m, resultObv)
 				i++
 				if(i > BATCH_SIZE){
 					utilsService.cleanUpGorm(true)
 					def obvs = resultObv.collect { Observation.read(it) }
-					try{
+					try {
 						observationsSearchService.publishSearchIndex(obvs, true);
-					}catch (Exception e) {
+					} catch (Exception e) {
 						log.error e.printStackTrace();
 					}
 					resultObv.clear();
@@ -596,34 +614,43 @@ class ObvUtilService {
 		}
 	}
 	
-	private uploadObservation(imageDir, Map m, resultObv){
-		Map obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
-		if(obvParams.isEmpty()){
+	def uploadObservation(imageDir, Map m, List resultObv) {
+		Map obvParams = [:];
+
+        if(m[IMAGE_FILE_NAMES]) {
+            obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
+        }
+
+		/*if(obvParams.isEmpty()){
 			log.error "No image file .. aborting this obs upload with params " + m
-		}else{
+		} else {*/
 			populateParams(obvParams, m)
+            log.debug "Populated Obv Params ${obvParams}"
 			saveObv(obvParams, resultObv)
 			log.debug "observation saved"
-		}
+		//}
 	}
 	
 	private populateParams(Map obvParams, Map m){
 		
 		//mandatory
-		obvParams['group_id'] = (SpeciesGroup.findByName(m[SPECIES_GROUP].trim())? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()).id : SpeciesGroup.findByName('Others').id)
-		obvParams['habitat_id'] = (Habitat.findByName(m[HABITAT].trim())? Habitat.findByName(m[HABITAT].trim()).id :  Habitat.findByName('Others').id )
+		obvParams['group_id'] = m[SPECIES_GROUP]?((SpeciesGroup.findByName(m[SPECIES_GROUP].trim())? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()).id : SpeciesGroup.findByName('Others').id)):SpeciesGroup.findByName('Others').id
+		obvParams['habitat_id'] = m[HABITAT] ? (Habitat.findByName(m[HABITAT].trim())? Habitat.findByName(m[HABITAT].trim()).id :  Habitat.findByName('Others').id ):Habitat.findByName('Others').id 
 		obvParams['longitude'] = (m[LONGITUDE] ?:"76.658279")
 		obvParams['latitude'] = (m[LATITUDE] ?: "12.32112")
 		obvParams['location_accuracy'] = 'Approximate'
 		obvParams['locationScale'] = m[LOCATION_SCALE]
 		obvParams['placeName'] = m[LOCATION]
 		obvParams['reverse_geocoded_name'] = (m[LOCATION] ?: "National Highway 6, Maharashtra, India")
-		
+		obvParams['topology'] = m[TOPOLOGY];
+
 		//reco related
 		obvParams['recoName'] = m[SN]
 		obvParams['commonName'] = m[CN] 
 		obvParams['languageName'] = m[LANGUAGE]
 		obvParams['recoComment'] = m[COMMENT]
+		obvParams['identifiedBy'] = m[IDENTIFIED_BY]
+		obvParams['dateIdentified'] = m[DATE_IDENTIFIED]
 		
 		//tags, grouplist, notes
 		obvParams['notes'] = m[NOTES]
@@ -634,9 +661,22 @@ class ObvUtilService {
 		obvParams['fromDate'] = m[OBSERVED_ON]
 		
 		//author
-		obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
+        if(m[AUTHOR_EMAIL]) {
+		    obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
+        } else {
+            obvParams['author'] = springSecurityService.currentUser ?: SUser.read(1L); 
+        }
+        
+        if(m[ORIGINAL_AUTHOR_NAME])
+		    obvParams['originalAuthor'] = m[ORIGINAL_AUTHOR_NAME]
 		
-		obvParams['geoPrivacy'] = m["geoprivacy"]
+		obvParams['externalId'] = m[EXTERNAL_ID]
+		obvParams['externalUrl'] = m[OBSERVATION_URL]
+		obvParams['viaId'] = m[COLLECTION_ID]
+		obvParams['viaCode'] = m[COLLECTION_CODE]
+
+        if(m['geoprivacy'] || m[GEO_PRIVACY])
+    		obvParams['geoPrivacy'] = m["geoprivacy"] ?: m[GEO_PRIVACY];
 
         obvParams['resourceListType'] = "ofObv"
 
@@ -645,9 +685,25 @@ class ObvUtilService {
         obvParams['locale_language'] = utilsService.getCurrentLanguage();
 		
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        if(obvParams.latitude && obvParams.longitude) {
+        if(!obvParams.topology && obvParams.latitude && obvParams.longitude) {
             obvParams.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(obvParams.longitude?.toFloat(), obvParams.latitude?.toFloat())));
         } 
+
+        if(m[DwCObservationImporter.ANNOTATION_HEADER])
+            obvParams['checklistAnnotations'] = m[DwCObservationImporter.ANNOTATION_HEADER] as JSON;
+
+
+		obvParams['basisOfRecord'] = m[BASISOFRECORD] ? BasisOfRecord.getEnum(m[BASISOFRECORD]): null;
+		obvParams['prtocol'] = m[PROTOCOL]? ProtocolType.getEnum(m[PROTOCOL]):null;
+		obvParams['externalDatasetKey'] = m[EXTERNAL_DATASET_KEY]
+		obvParams['lastCrawled'] = m[LAST_CRAWLED]
+		obvParams['catalogNumber'] = m[CATALOG_NUMBER]
+		obvParams['publishingCountry'] = m[PUBLISHING_COUNTRY]
+		obvParams['accessRights'] = m[ACCESS_RIGHTS]
+		obvParams['informationWitheld'] = m[INFORMATION_WITHHELD]
+        if(m['mediaInfo']) {
+            obvParams.putAll(m['mediaInfo']);
+        }
  	}
 	
 	private getUserGroupIds(String names){
@@ -669,45 +725,53 @@ class ObvUtilService {
 		return gIds.join(",")
 	}
 	
-	private saveObv(Map params, result){
-		if(!params.author){
+	private List saveObv(Map params, List result) {
+		if(!params.author && !params.originalAuthor) {
 			log.error "Author not found for params $params"
 			return
 		}
 		
 		def observationInstance;
 		try {
-			observationInstance =  observationService.createObservation(params);
+			observationInstance =  observationService.create(params);
+
+            observationInstance.clearErrors();
 
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				log.debug "Successfully created observation : "+observationInstance
 
 				params.obvId = observationInstance.id
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+                
+                params.identifiedBy = params.identifiedBy
+
 				addReco(params, observationInstance)
 				def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
 				observationInstance.setTags(tags);
 
 				if(params.groupsWithSharingNotAllowed) {
 					observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
-				}else {
+				} else {
 					if(params.userGroupsList) {
 						def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
 						observationService.setUserGroups(observationInstance, userGroups, false);
 					}
 				}
+
 				if(!observationInstance.save(flush:true)){
 					observationInstance.errors.allErrors.each { log.error it }
 				}
+
 				result.add(observationInstance.id)
 				
-			}else {
-					observationInstance.errors.allErrors.each { log.error it }
-			}
+            } else {
+                observationInstance.errors.allErrors.each { log.error it }
+            }
 		}catch(e) {
 				log.error "error in creating observation"
 				e.printStackTrace();
 		}
+        return result;
 	}
 	
 	private addReco(params, Observation observationInstance){
@@ -718,17 +782,25 @@ class ObvUtilService {
 		
 		def recommendationVoteInstance
 		if(reco){
-			recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, confidence:confidence); 
+		    recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
+            if(!recommendationVoteInstance) {
+			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy, confidence:confidence); 
+            }
 		}
 		
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
-			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, params.author);
-			observationInstance.lastRevised = new Date();
+			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, params.identifiedBy);
+
+            Date dateIdentified = params.dateIdentified ? utilsService.parseDate(params.dateIdentified) : new Date()
+			observationInstance.lastRevised = dateIdentified;
 			//saving max voted species name for observation instance
 			observationInstance.calculateMaxVotedSpeciesName();
 			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
-		}
+        } else {
+            recommendationVoteInstance.errors.allErrors.each { log.error it }
+        }
+
 			
 	}
 
@@ -743,10 +815,10 @@ class ObvUtilService {
 				log.debug "uploading file $f"
 				if(f.length()  > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
 					log.debug 'File size cannot exceed ${104857600/1024}KB'
-				}else if(f.length() == 0) {
+				} else if(f.length() == 0) {
 					log.debug 'File cannot be empty'
-				}else {
-					if(!obvDir) {
+				} else {
+                if(!obvDir) {
 
 						obvDir = new File(rootDir);
 						if(!obvDir.exists()) {

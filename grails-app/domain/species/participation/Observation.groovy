@@ -2,6 +2,7 @@ package species.participation
 
 import grails.plugin.springsecurity.SpringSecurityUtils;
 
+import species.DataObject;
 import species.utils.ImageType;
 import species.utils.Utils
 import org.grails.taggable.*
@@ -21,11 +22,10 @@ import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
 import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
-import species.Metadata;
 import speciespage.ObservationService;
 import species.Species;
 
-class Observation extends Metadata implements Taggable, Rateable {
+class Observation extends DataObject {
 	
 	def dataSource
 	def commentService;
@@ -56,14 +56,91 @@ class Observation extends Metadata implements Taggable, Rateable {
 			return this.value;
 		}
 	}
+    
+	public enum BasisOfRecord {
+		PRESERVED_SPECIMEN ("Preserved Specimen"),
+		FOSSIL_SPECIMEN ("Fossil Specimen"),
+		LIVING_SPECIMEN ("Living Specimen"),
+		HUMAN_OBSERVATION ("Human Observation"),
+		MACHINE_OBSERVATION ("Machine Observation")
+		
+		private String value;
 
-    SUser author;
+		BasisOfRecord(String value) {
+			this.value = value;
+		}
+
+		String value() {
+			return this.value;
+		}
+		
+		static BasisOfRecord getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof BasisOfRecord)
+				return value
+			
+			value = value.toUpperCase().trim()
+			switch(value){
+				case 'PRESERVED_SPECIMEN':
+					return BasisOfRecord.PRESERVED_SPECIMEN
+				case 'FOSSIL_SPECIMEN':
+					return BasisOfRecord.FOSSIL_SPECIMEN
+				case 'LIVING_SPECIMEN':
+					return BasisOfRecord.LIVING_SPECIMEN
+				case 'HUMAN_OBSERVATION':
+					return BasisOfRecord.HUMAN_OBSERVATION
+				case 'MACHINE_OBSERVATION':
+					return BasisOfRecord.MACHINE_OBSERVATION
+				default:
+					return null	
+			}
+		}
+	}
+
+	public enum ProtocolType {
+
+        DWC_ARCHIVE,
+        TEXT,
+        LIST,
+        SINGLE_OBSERVATION,
+        MULTI_OBSERVATION,
+        MOBILE,
+        API,
+        OTHER
+
+		private String value;
+
+		String value() {
+			return this.value;
+		}
+		
+		static ProtocolType getEnum(value){
+/*			if(!value) return null
+			
+			if(value instanceof BasisOfRecord)
+				return value
+			
+			value = value.toUpperCase().trim()
+			switch(value){
+				case 'PRESERVED_SPECIMEN':
+					return BasisOfRecord.PRESERVED_SPECIMEN
+				case 'FOSSIL_SPECIMEN':
+					return BasisOfRecord.FOSSIL_SPECIMEN
+				case 'LIVING_SPECIMEN':
+					return BasisOfRecord.LIVING_SPECIMEN
+				case 'HUMAN_OBSERVATION':
+					return BasisOfRecord.HUMAN_OBSERVATION
+				case 'MACHINE_OBSERVATION':
+					return BasisOfRecord.MACHINE_OBSERVATION
+				default:
+					return null	
+			}
+*/		}
+	}
+
 	String notes;
-	int rating;
-	long visitCount = 0;
-    boolean isDeleted = false;
-	int flagCount = 0;
-	int featureCount = 0;
+    //boolean isDeleted = false;
     String searchText;
     //if observation locked due to pulling of images in species
     boolean isLocked = false;
@@ -79,13 +156,16 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
-    
-    // Language
-    Language language;
+    BasisOfRecord basisOfRecord = BasisOfRecord.HUMAN_OBSERVATION;
+    ProtocolType protocol = ProtocolType.SINGLE_OBSERVATION;
+    String externalDatasetKey;
+    Date lastCrawled;
+    String catalogNumber;
+    String publishingCountry = 'IN';
+    String accessRights;
+    String informationWithheld;
 
-    License license;
-
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup, annotations:Annotation];
+	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists]
  
  	static constraints = {
@@ -98,20 +178,23 @@ class Observation extends Metadata implements Taggable, Rateable {
 			//XXX ignoring validator for checklist and its child observation. 
 			//all the observation generated from checklist will have source id in advance based on that we are ignoring validation.
 			// Genuine observation will not have source id and checklist as false
-			if(!obj.sourceId && !obj.isChecklist) 
+			if(!obj.sourceId && !obj.isChecklist && !obj.externalId) 
 				val && val.size() > 0 
 		}
-		language nullable:false
-        featureCount nullable:false
 		latitude nullable: false
 		longitude nullable:false
 		topology nullable:false
-		fromDate nullable:false
+        fromDate nullable:false
 		placeName blank:false
-        license nullable:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
-	}
+        externalDatasetKey nullable:true
+        lastCrawled nullable:true
+        catalogNumber nullable:true
+        publishingCountry nullable:true
+        accessRights nullable:true
+        informationWithheld nullable:true
+    }
 
 	static mapping = {
 		//version false
@@ -120,7 +203,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		checklistAnnotations type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
-	 }
+	 } 
 
 	/**
 	 * TODO: return resources in rating order and choose first
@@ -313,11 +396,6 @@ class Observation extends Metadata implements Taggable, Rateable {
 		Sql sql =  Sql.newInstance(dataSource);
 		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.observation_id = :obvId", [obvId:id])
 		return result[0]["count"]
-	}
-
-	
-	def incrementPageVisit(){
-		visitCount++
 	}
 
 	//XXX: comment this method before checklist migration
@@ -587,7 +665,9 @@ class Observation extends Metadata implements Taggable, Rateable {
 			cl.fetchColumnNames().each { name ->
 				res.put(name, m[name])
 			}
-		}
+		} else {
+            res = JSON.parse(checklistAnnotations);
+        }
 		return res
 	}
 

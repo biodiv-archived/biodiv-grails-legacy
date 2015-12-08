@@ -26,7 +26,7 @@ import species.License.LicenseType
 import content.Project
 
 import species.sourcehandler.XMLConverter
-import species.AbstractObjectService;
+import species.AbstractMetadataService;
 
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
@@ -58,7 +58,7 @@ import species.Metadata
 import species.Classification;
 
 
-class DocumentService extends AbstractObjectService {
+class DocumentService extends AbstractMetadataService {
 
 	static transactional = false
 	
@@ -69,49 +69,27 @@ class DocumentService extends AbstractObjectService {
     def sessionFactory
 	def activityFeedService
 	
-	Document createDocument(params) {
-
-
-		def document = new Document()
-		updateDocument(document, params)
-
-		return document
+	Document create(params) {
+        return super.create(Document.class, params);
 	}
 
+	Document updateDocument(Document document, params) {
+        return update(document, params, Document.class)
+    }
 
-	def updateDocument(Document document, params) {
+	Document update(Document document, params, klass = null) {
 		params.remove('latitude')
 		params.remove('longitude')
 		def locationScale = params.remove('locationScale')
-		document.properties = params
+        
+        document = super.update(document, params, Document.class);
+
 		document.group = null
 		document.habitat = null
 		//document.latitude = document.latitude ?:0.0
 		//document.longitude = document.longitude ?:0.0
-		document.placeName = params.placeName
-		document.reverseGeocodedName = params.reverse_geocoded_name
-		document.locationAccuracy = params.location_accuracy
-		document.locationScale = Metadata.LocationScale.getEnum(locationScale)
-		document.language = params.locale_language 
-		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-		if(params.areas) {
-			WKTReader wkt = new WKTReader(geometryFactory);
-			try {
-				Geometry geom = wkt.read(params.areas);
-				document.topology = geom;
-			} catch(ParseException e) {
-				log.error "Error parsing polygon wkt : ${params.areas}"
-			}
-		}
-
-        if(params.licenseName) 
-    		document.license  = (new XMLConverter()).getLicenseByType(params.licenseName, false)
-		    //document.license = License.findByName(License.LicenseType(params.licenseName))
-        else {
-		    document.license =  License.findByName(LicenseType.CC_BY)
-        }
-
-		document.notes = params.description? params.description.trim() :null
+	
+        document.notes = params.description? params.description.trim() :null
 		document.contributors = params.contributors? params.contributors.trim() :null
 		document.attribution = params.attribution? params.attribution.trim() :null
 		
@@ -123,27 +101,12 @@ class DocumentService extends AbstractObjectService {
 
 		document.habitats  = []
 		params.habitat.each {key, value ->
+            log.debug key
+            log.debug value;
 			document.addToHabitats(Habitat.read(value.toLong()));
 		}
+        return document;
 	}
-
-
-	def setUserGroups(Document documentInstance, List userGroupIds, boolean sendMail = true) {
-		if(!documentInstance) return
-
-		def docInUserGroups = documentInstance.userGroups.collect { it.id + ""}
-		def toRemainInUserGroups =  docInUserGroups.intersect(userGroupIds);
-		if(userGroupIds.size() == 0) {
-			log.debug 'removing document from usergroups'
-			userGroupService.removeDocumentFromUserGroups(documentInstance, docInUserGroups, sendMail);
-		} else {
-			userGroupIds.removeAll(toRemainInUserGroups)
-			userGroupService.postDocumenttoUserGroups(documentInstance, userGroupIds, sendMail);
-			docInUserGroups.removeAll(toRemainInUserGroups)
-			userGroupService.removeDocumentFromUserGroups(documentInstance, docInUserGroups, sendMail);
-		}
-	}
-
 
 	/**
 	 * Update Documents with the values set in form. Document uploader component allows creation of multiple documents 

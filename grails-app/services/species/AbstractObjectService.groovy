@@ -239,11 +239,12 @@ class AbstractObjectService {
         List source = [];
         List ratings = [];
         List contributor = [];
+        List annotations = [];
         //List resContext = [];
 
         
         params.each { key, val ->
-        
+         
             int index = -1;
             if(key.startsWith('file_') || key.startsWith('url_')) {
 
@@ -260,6 +261,8 @@ class AbstractObjectService {
            
             if(index != -1) {
                 if(val != "") {
+                    println val
+                    println "8"
                     files.add(val);
 
                     titles.add(params.get('title_'+index));
@@ -272,17 +275,28 @@ class AbstractObjectService {
                     if( params.speciesId != null ){
                         contributor.add(params.get('contributor_'+index));
                     }
+                    annotations.add(params.get('media_annotations_'+index));
                 }
             }
         }
+        println "%55555555555555555555555"
+        println files
+        println url
         files.eachWithIndex { file, key ->
             Node image;
           
             if(file) {
+                println key
+                println type.getAt(key)
                 if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
                     image = new Node(images, "image");
                     File f = new File(uploadDir, file);
-                    new Node(image, "fileName", f.absolutePath);
+                    if(f.exists())
+                        new Node(image, "fileName", f.absolutePath);
+                    else if(url.getAt(key)) {
+                        new Node(image, "fileName", file);
+                        new Node(image, "url", url.getAt(key));
+                    }
                 } else if(type.getAt(key).equalsIgnoreCase(ResourceType.VIDEO.value())) {
                     image = new Node(videos, "video");
                     new Node(image, "fileName", file);
@@ -299,6 +313,7 @@ class AbstractObjectService {
                 new Node(image, "rating", ratings.getAt(key));
                 new Node(image, "user", springSecurityService.currentUser?.id);
                 new Node(image, "language", params.locale_language);
+                new Node(image, "annotations", annotations.getAt(key));
                 //new Node(image, "resContext", resContext.getAt(key));
                 if( params.resourceListType == "ofObv" || params.resourceListType == "usersResource" ){
                     if(!params.author){
@@ -316,7 +331,10 @@ class AbstractObjectService {
                 log.warn("No reference key for image : "+key);
             } 
         }
+println "=============================="
+println resources;
 
+println "=============================="
         return resources;
     }
 

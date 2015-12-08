@@ -31,6 +31,7 @@ import species.TaxonomyRegistry
 import species.License.LicenseType
 import species.Resource.ResourceType
 import species.SpeciesField.AudienceType
+import species.ScientificName
 import species.ScientificName.RelationShip
 import species.ScientificName.TaxonomyRank
 import species.groups.SpeciesGroup;
@@ -1031,40 +1032,51 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
+        println ";;;;;;;;;;;;;;;::::"
+        println imageNode
         File tempFile = getImageFile(imageNode, relImagesFolder);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
+        def absUrl = imageNode.url?.text() ? imageNode.url?.text() : "";
         def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
         
         log.debug "Creating image resource : "+tempFile;
-        if(tempFile && tempFile.exists()) {
-			
-			//copying file
-            relImagesFolder = relImagesFolder.trim();
-            File root = new File(resourcesRootDir , relImagesFolder);
-            if(!root.exists() && !root.mkdirs()) {
-                log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
-                addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
-            }
-            log.debug "in dir : "+root.absolutePath;
-            File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
-			if(!imageFile.exists()) {
-                try {
-                    Utils.copy(tempFile, imageFile);
-                    if( resourceType.toString() == "IMAGE"){
-                        ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
-                      }  
-                } catch(FileNotFoundException e) {
-                    log.error "File not found : "+tempFile.absolutePath;
-                    addToSummary("File not found : "+tempFile.absolutePath)
+        if((tempFile && tempFile.exists()) || absUrl) {
+            
+            Resource res;
+            String path;
+
+			if(tempFile && tempFile.exists()) {
+                //copying file
+                relImagesFolder = relImagesFolder.trim();
+                File root = new File(resourcesRootDir , relImagesFolder);
+                if(!root.exists() && !root.mkdirs()) {
+                    log.error "COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath();
+                    addToSummary("COULD NOT CREATE DIR FOR SPECIES : "+root.getAbsolutePath())
                 }
+                log.debug "in dir : "+root.absolutePath;
+                File imageFile = new File(root, Utils.cleanFileName(tempFile.getName()));
+                if(!imageFile.exists()) {
+                    try {
+                        Utils.copy(tempFile, imageFile);
+                        if( resourceType.toString() == "IMAGE"){
+                            ImageUtils.createScaledImages(imageFile, imageFile.getParentFile());
+                        }  
+                    } catch(FileNotFoundException e) {
+                        log.error "File not found : "+tempFile.absolutePath;
+                        addToSummary("File not found : "+tempFile.absolutePath)
+                    }
+                }
+                path = imageFile.absolutePath.replace(resourcesRootDir, "");
+                res = Resource.findByFileNameAndType(path, resourceType);
+            } else if(absUrl) {
+                path = null;
+                res = Resource.findByUrlAndType(absUrl, resourceType);
             }
-            String path = imageFile.absolutePath.replace(resourcesRootDir, "");
-            def res = Resource.findByFileNameAndType(path, resourceType);
 
             if(!res) {
                 log.debug "Creating new resource"
                 res = new Resource(type : resourceType, fileName:path, description:imageNode.caption?.text(), mimeType:imageNode.mimeType?.text(),language:imageNode.language[0]?.value());
-                res.url = sourceUrl
+                res.url = absUrl?:sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
                     res.addToContributors(con);
@@ -1075,13 +1087,15 @@ class XMLConverter extends SourceConverter {
                 for(License l : getLicenses(imageNode, true)) {
                     res.addToLicenses(l);
                 }
+                if(imageNode.annotations?.text()) {
+                    res.annotations = imageNode.annotations?.text()
+                }
                 if(!res.save(flush:true)){
                     res.errors.allErrors.each { log.error it }
                 }
-                
             } else {
                 log.debug "Updating resource metadata"
-                res.url = sourceUrl
+                res.url = absUrl ?: sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 res.description = imageNode.caption?.text();
                 res.language    = imageNode.language[0]?.value();
@@ -1098,6 +1112,11 @@ class XMLConverter extends SourceConverter {
                     println "=====LICENSE on EXISTING RES!!!======== " + l + "===RES== " + res
                     res.addToLicenses(l);
                 }
+                if(imageNode.annotations?.text()) {
+                    println "###################################SAVING Annotations"
+                    res.annotations = imageNode.annotations?.text()
+                }
+
                 //res.merge();
                 //res.refresh();
                 if(!res.save(flush:true)){
@@ -1135,7 +1154,8 @@ class XMLConverter extends SourceConverter {
                 }
             }
         } 
-
+println ";;;;;;;;;;;;;;;;;;;;;;;;;"
+println sourceUrl;
         if(!tempFile.exists()) {
             if(sourceUrl) {
                 //downloading from web
@@ -1310,16 +1330,18 @@ class XMLConverter extends SourceConverter {
 
             } else {
                 File tempFile = getImageFile(it);
-                if(tempFile) {
+                //if(tempFile) {
                     //check if the fileName is a physical file on disk and create a resource from it
                     def resource = createImage(it, s.taxonConcept.canonicalForm, ResourceType.IMAGE);
                     if(resource) {
                         resources.add(resource)
                     }
+                /*if(tempFile) {
+                    //just for logging
                 } else {
                     log.error "COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}"
                     addToSummary("COULD NOT FIND REFERENCE TO THE IMAGE ${fileName}")
-                }
+                }*/
             }
         }
         return resources;
@@ -2313,6 +2335,8 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     static int getTaxonRank(String rankStr) {
+        return ScientificName.TaxonomyRank.getTaxonRank(rankStr);
+        /* // moved to TaxonRank
         MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
         def request = null;
         try {
@@ -2328,6 +2352,7 @@ class XMLConverter extends SourceConverter {
             }
         }
         return -1;
+        */
     }
 
     /**

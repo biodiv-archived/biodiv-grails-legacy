@@ -87,11 +87,15 @@ class Resource extends Sourcedata implements Rateable {
 	ResourceContext context;
     def grailsApplication
     Language language;
+    String annotations;
+    String accessRights;
+
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
 	static belongsTo = [SpeciesField, Observation];
 	
 	static mapping = {
 		description type:'text';
+		annotations type:'text';
 		sort "id"
 	}
 	
@@ -104,6 +108,8 @@ class Resource extends Sourcedata implements Rateable {
 		licenses  validator : { val, obj -> val && val.size() > 0 }
         rating(nullable:false, min:0, max:5);
         context(nullable:true);
+        annotations(nullable:true);
+        accessRights(nullable:true);
     }
 	
 	static transients = ['baseUrl']

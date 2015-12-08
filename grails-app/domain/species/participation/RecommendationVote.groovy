@@ -32,6 +32,7 @@ class RecommendationVote {
 	float userWeight;
 	String comment;
 	Recommendation commonNameReco;
+    String originalAuthor;
 	
 	static belongsTo = [observation:Observation, author:SUser];
 	
@@ -42,6 +43,7 @@ class RecommendationVote {
 		commonNameReco nullable:true, blank: true;
 		comment nullable:true, blank: true;
 		comment (size:0..400);
+        originalAuthor (nullable:true);
 	}
 	
 	static mapping = {

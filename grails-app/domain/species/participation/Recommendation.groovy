@@ -71,7 +71,7 @@ class Recommendation {
 		   eq('observation', obv)
 		   min('votedOn')
 	   }
-	   map.put("authors", recos.collect{it.author})
+	   map.put("authors", recos.collect{[it.author,it.originalAuthor]})
 	   map.put("votedOn", recos.collect{it.votedOn})
 	   map.put("noOfVotes", recos.size())
 	   

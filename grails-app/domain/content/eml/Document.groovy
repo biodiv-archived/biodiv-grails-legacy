@@ -4,13 +4,11 @@ import java.util.Date;
 
 import species.Resource;
 import species.License;
-import species.Metadata
+import species.DataObject;
 import species.auth.SUser;
 import species.groups.UserGroup;
 import species.groups.SpeciesGroup;
 import species.Habitat;
-import org.grails.taggable.Taggable;
-import org.grails.rateable.*
 import species.participation.Flag;
 import species.participation.Follow;
 import species.participation.Featured;
@@ -23,7 +21,7 @@ import content.eml.DocSciName;
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/index.html
  *
  */
-class Document extends Metadata implements Comparable, Taggable, Rateable {
+class Document extends DataObject implements Comparable {
 	
 	def springSecurityService;
 	def documentService
@@ -66,10 +64,7 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
     }
 
 	DocumentType type
-    int flagCount = 0;
-    int featureCount = 0;
 	String title
-	SUser author;
 	
 	UFile uFile   //covers physical file formats
 	String uri
@@ -78,7 +73,6 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	String contributors;
 	String attribution;
 	
-	License license
 	String doi
 	
 	//source holder(i.e project, group)
@@ -91,14 +85,11 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 	//Date createdOn  <=== dateCreated
 	//Date lastRevised <=== lastUpdated
 
-	// Language
-    Language language;
-	
-	boolean deleted
+	//boolean deleted
 	
 	boolean agreeTerms = false	
 	
-	static transients = [ 'deleted' ]
+	//static transients = [ 'isDeleted' ]
 
 	
 	static constraints = {
@@ -110,15 +101,12 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		uri validator : {val, obj -> 
 			val || obj.uFile
 		},nullable:true
-		language nullable:false
 		contributors nullable:true
 		attribution  nullable:true	
 		sourceHolderId nullable:true
 		sourceHolderType nullable:true
-		author nullable:true
 		notes nullable:true
 		doi nullable:true
-		license nullable:false
     	featureCount nullable:false
 		agreeTerms nullable:true
 		locationScale(nullable: true)
@@ -131,32 +119,32 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
 		habitat nullable:true
 	}
 	
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, userGroups:UserGroup, docSciNames:DocSciName]
+	static hasMany = [userGroups: UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, docSciNames:DocSciName]
 	static belongsTo = [SUser, UserGroup]
-	
-	static mapping = {
-		notes type:"text"
-		attribution type:"text"
-		contributors type:"text"
-		title type:"text"
-	}
 
-     List fetchAllFlags(){
+    static mapping = {
+        notes type:"text"
+        attribution type:"text"
+        contributors type:"text"
+        title type:"text"
+    }
+
+    List fetchAllFlags(){
         def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
         return fList;
-	}
+    }
 
     def boolean fetchIsFollowing(SUser user=springSecurityService.currentUser){
-		return Follow.fetchIsFollowing(this, user)
-	}
+        return Follow.fetchIsFollowing(this, user)
+    }
 
     String title() {
         return this.title;
     }
 
     String fetchSpeciesCall(){
-		return this.title;
-	}
+        return this.title;
+    }
 
     String notes(Language userLanguage = null) {
         return this.notes?:'';
@@ -166,32 +154,32 @@ class Document extends Metadata implements Comparable, Taggable, Rateable {
         return this.notes?:'';
     }
 
-	def getOwner() {
-		return author;
-	}
-	
-	def setSource(parent) {
-		this.sourceHolderId = parent.id
-		this.sourceHolderType = parent.class.getCanonicalName()
-	}
-	
-	def fetchSource(){
-		if(sourceHolderId && sourceHolderType){
-			return grailsApplication.getArtefact("Domain",sourceHolderType)?.getClazz()?.read(sourceHolderId)
-		}
-	}
-	
-	def beforeDelete(){
-		activityFeedService.deleteFeed(this)
-	}
-    
-    Resource mainImage() {  
-		String reprImage = "Document.png"
-	    String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
-        return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
- 	}
+    def getOwner() {
+        return author;
+    }
 
- 	
+    def setSource(parent) {
+        this.sourceHolderId = parent.id
+        this.sourceHolderType = parent.class.getCanonicalName()
+    }
+
+    def fetchSource(){
+        if(sourceHolderId && sourceHolderType){
+            return grailsApplication.getArtefact("Domain",sourceHolderType)?.getClazz()?.read(sourceHolderId)
+        }
+    }
+
+    def beforeDelete(){
+        activityFeedService.deleteFeed(this)
+    }
+
+    Resource mainImage() {  
+        String reprImage = "Document.png"
+        String name = (new File(grailsApplication.config.speciesPortal.content.rootDir + "/" + reprImage)).getName()
+        return new Resource(fileName: "documents"+File.separator+name, type:Resource.ResourceType.IMAGE, context:Resource.ResourceContext.DOCUMENT, baseUrl:grailsApplication.config.speciesPortal.content.serverURL) 
+    }
+
+
 
 	def beforeUpdate(){
 		if(isDirty() && isDirty('topology')){

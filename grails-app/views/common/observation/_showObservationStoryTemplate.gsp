@@ -208,6 +208,113 @@
                         datetime="${observationInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
+
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-user"></i><g:message code="default.originalauthor.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-user"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${observationInstance.originalAuthor}
+                    </div>
+                </div>
+
+                <g:if test="${observationInstance.externalId}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.externalId.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${observationInstance.externalUrl} (${observationInstance.externalId})
+                    </div>
+                </div>
+                </g:if>
+
+                <g:if test="${observationInstance.viaId}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.viaId.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${observationInstance.viaCode} (${observationInstance.viaId})
+                    </div>
+                </div>
+                </g:if>
+
+
+                <g:if test="${observationInstance.externalDatasetKey}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.externalDatasetKey.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${observationInstance.externalDatasetKey}
+                    </div>
+                </div>
+                </g:if>
+                
+
+                <g:if test="${observationInstance.catalogNumber}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.catalogNumber.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${observationInstance.catalogNumber}
+                    </div>
+                </div>
+                </g:if>
+
+                <g:if test="${observationInstance.accessRights}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${observationInstance.accessRights}
+                    </div>
+                </div>
+                </g:if>
+
+                <g:if test="${observationInstance.informationWithheld}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.informationWithheld.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${observationInstance.informationWithheld}
+                    </div>
+                </div>
+                </g:if>
+
+
                 <g:if test="${observationInstance.isChecklist && observationInstance.fetchAttributions()}">
                 <div class="prop" >
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
