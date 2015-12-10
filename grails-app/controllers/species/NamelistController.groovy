@@ -8,6 +8,7 @@ import species.TaxonomyDefinition;
 import grails.plugin.springsecurity.annotation.Secured;
 import species.NamesParser;
 import species.sourcehandler.XMLConverter;
+import species.participation.NamelistService
 import species.participation.Recommendation;
 import species.participation.Observation;
 import species.NamesMetadata.NameStatus;

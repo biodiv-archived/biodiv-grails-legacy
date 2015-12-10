@@ -23,6 +23,9 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 							<g:elseif test="${params.sort == 'name'}">
                                                 <g:message code="default.name.label" />
                                             </g:elseif>
+                                            <g:elseif test="${params.sort == 'dateCreated'}">
+                                            	<g:message code="button.latest.user" />
+                                            </g:elseif>
                                             <g:elseif test="${params.sort == 'score'}">
                                                <g:message code="button.relevancy" /> 
                                             </g:elseif>
@@ -40,6 +43,9 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 							<li class="group_option"><a
 								class=" sort_filter_label ${params.sort == 'lastLoginDate'?'active':'' }"
 								value="lastLoginDate"> <g:message code="button.last.login" />  </a></li>
+							<li class="group_option"><a
+								class=" sort_filter_label ${params.sort == 'dateCreated'?'active':'' }"
+								value="dateCreated"> <g:message code="button.latest.user" />  </a></li>
 							<li class="group_option"><a
 								class=" sort_filter_label  ${params.sort == 'name'?'active':'' }"
 								value="name"> <g:message code="default.name.label" /> </a></li>

@@ -1319,7 +1319,8 @@ println "2222222222222222222"
 	def pages() {
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
-		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order);
+		def currentLanguage = utilsService.getCurrentLanguage(request);
+		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order,currentLanguage);
 		render (view:"pages", model:['userGroupInstance':userGroupInstance, 'newsletters':newsletters])
 	} 
 	

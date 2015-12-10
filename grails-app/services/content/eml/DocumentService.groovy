@@ -44,6 +44,8 @@ import species.groups.UserGroup;
 import static java.nio.file.StandardCopyOption.*
 import java.nio.file.Paths;
 import species.participation.Discussion;
+import species.participation.Featured
+
 
 import groovyx.net.http.HTTPBuilder
 import static groovyx.net.http.ContentType.JSON
@@ -795,6 +797,8 @@ class DocumentService extends AbstractMetadataService {
     def documentDelete(Document documentInstance){
         userGroupService.removeDocumentFromUserGroups(documentInstance, documentInstance.userGroups.collect{it.id})
 
+        def featuredDocument = Featured.findByObjectId(documentInstance.id); 
+        featuredDocument?.delete(flush: true);
 
         def  docTokenId =DocumentTokenUrl.findByDoc(documentInstance)
         docTokenId.delete();

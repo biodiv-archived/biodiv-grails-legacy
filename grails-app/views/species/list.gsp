@@ -44,8 +44,8 @@
                     <div class="observation">
                         <s:speciesFilter></s:speciesFilter>
                             <div class="btn-group pull-left" style="z-index: 10">	
-                                <obv:download
-                                model="['source':'Species', 'requestObject':request, 'downloadTypes':[DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'speciesList']" />
+<%--                                <obv:download--%>
+<%--                                model="['source':'Species', 'requestObject':request, 'downloadTypes':[DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'speciesList']" />--%>
 
                                 <button class='createPage btn btn-primary pull-right' style="display:none;" title='Create page for the selected taxon'><i class="icon-plus"></i>Create page</button>
                             </div>

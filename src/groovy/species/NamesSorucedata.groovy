@@ -30,6 +30,10 @@ abstract class NamesSorucedata extends Sourcedata {
 	def updateContributors(List<SUser> users){
 		if(!users) return
 		
+		if (!this.isAttached()) {
+			this.attach()
+		}
+		
 		def toBeAddedUser = (!contributors)? users : []
 
 		toBeAddedUser.each { u ->

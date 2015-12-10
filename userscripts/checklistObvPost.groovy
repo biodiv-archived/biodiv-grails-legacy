@@ -474,7 +474,7 @@ def deleteName(){
 
 def updateNameAndCreateIbpHir(){
 	def nlSer = ctx.getBean("namelistUtilService");
-	def ibpHir = Classification.findByName("IBP Taxonomy Hierarchy");
+	def ibpHir = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 	File file = new File("/apps/git/biodiv/namelist/after-migration/raw_names_without_ibpHir_tocorrectandsnap.csv");
 	//File file = new File("/home/sandeept/namesync/thomas/raw_names_without_ibpHir_tocorrectandsnap.csv")
 	def lines = file.readLines();
@@ -568,7 +568,7 @@ def migSyn(){
 
 def test(){
 	List hirList = [ Classification.findByName('Catalogue of Life Taxonomy Hierarchy'), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
-	def trHir = Classification.findByName("IBP Taxonomy Hierarchy");
+	def trHir = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 	TaxonomyDefinition.get(421973).snapToIBPHir(hirList, trHir)
 }
 

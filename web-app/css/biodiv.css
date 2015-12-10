@@ -293,9 +293,9 @@ h6 {
 	width: 100px;
 }
 
-.observation .prop .value {
+/*.observation .prop .value {
 	margin-left: 110px;
-}
+}*/
 
 /* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */
 /*  	margin-left: 22px;  */
@@ -3009,4 +3009,18 @@ small {
 
 .nameSuggestions{
 	font-size: 14px;
+}
+
+/*Added */
+
+.dirty_list{
+	 background-color:lightgrey; //#C0504D;
+}
+
+.working_list{
+	background-color:khaki; //#FF9900;
+}
+
+.clean_list{
+	background-color:beige; //#3399FF;
 }

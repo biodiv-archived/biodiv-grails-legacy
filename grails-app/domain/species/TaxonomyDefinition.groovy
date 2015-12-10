@@ -138,7 +138,7 @@ class TaxonomyDefinition extends ScientificName {
    }
    	
 	List<TaxonomyDefinition> fetchDefaultHierarchy() {
-        def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+        def classification = Classification.fetchIBPClassification()
         return parentTaxonRegistry(classification).get(classification);
     }
 	
@@ -251,6 +251,34 @@ class TaxonomyDefinition extends ScientificName {
 			   
    }
    
+   	public boolean createTargetHirFromTaxonReg(TaxonomyRegistry tr, Classification targetClassifi){
+		TaxonomyRegistry targetHir = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, targetClassifi)
+		if(targetHir){
+			return true
+		}
+		
+		if(!tr.parentTaxonDefinition){
+			log.debug "Came up to kingdom level but no Target hir found so straing target hir from kingdom"
+			TaxonomyRegistry ibpTr = new TaxonomyRegistry()
+			ibpTr.classification = targetClassifi
+			ibpTr.taxonDefinition = this
+			ibpTr.path = id
+			ibpTr.contributors = null
+			
+			if(!ibpTr.save(flush:true)){
+				 ibpTr.errors.allErrors.each { log.error it }
+			}
+			return true
+		}
+		
+		println "============= calling for parent " + tr.parentTaxonDefinition
+		
+		tr.parentTaxonDefinition.createTargetHirFromTaxonReg(tr.parentTaxon, targetClassifi)
+		_sanpToImmediateParent(tr, targetClassifi)
+		
+		return true   
+   }
+   
    Map fetchGeneralInfo(){
 	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
    }
@@ -319,14 +347,14 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	public postProcess(){
-		curateNameByCol()
-		
-		println "----------------------------------- adding col hir"
-		addColHir()
-		
+		if(position != NamesMetadata.NamePosition.CLEAN){
+			curateNameByCol()
+			println "----------------------------------- adding col hir"
+			addColHir()
+		}
 		println "---------------------- adding IBP hir"
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
-		def trHir = Classification.findByName("IBP Taxonomy Hierarchy");
+		def trHir = Classification.fetchIBPClassification()
 		snapToIBPHir(hirList, trHir)
 		
 	}
@@ -461,22 +489,38 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	
-	def updatePosition(String pos, Map nameSourceInfo = [:] ){
+	def updatePosition(String pos, Map nameSourceInfo = [:], TaxonomyRegistry latestHir = null){
 		def newPosition = NamesMetadata.NamePosition.getEnum(pos)
 		if(newPosition){
 			this.position = newPosition
 			if(this.position == NamesMetadata.NamePosition.CLEAN){
+				// name is moving to clean state.. overwrite all info from spreadsheet
+				println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
 				def fieldsConfig = grailsApplication.config.speciesPortal.fields
 				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
 				def tmpMatchId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
 				def tmpViaDatasource = nameSourceInfo.get("" + fieldsConfig.VIA_SOURCE)
-				if(tmpMatchDatabaseName || tmpMatchId || tmpViaDatasource){
-					matchDatabaseName = tmpMatchDatabaseName
-					matchId = tmpMatchId
-					viaDatasource = tmpViaDatasource
+				matchDatabaseName = tmpMatchDatabaseName
+				matchId = tmpMatchId
+				viaDatasource = tmpViaDatasource
+				//this one should create ibp hir and getting priority over all the hirerchies
+				if(latestHir){
+					//deleting old ibp hir if any
+					Classification ibpClassification = Classification.fetchIBPClassification()
+					TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, ibpClassification)
+					if(tr){
+						try{
+							println  " >>>>>>>>>>>>>>. Deleting old ibp hir " + tr
+							tr.delete(flush:true)
+						}catch(e){
+							log.debug e.printStackTrace()
+						}
+					}
+					createTargetHirFromTaxonReg(latestHir, ibpClassification)
 				}
 			}
-			if(!save()) {
+			def obj = merge()
+			if(!obj.save()) {
 				this.errors.allErrors.each { log.error it }
 			}
 		}
@@ -487,13 +531,16 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	def updateNameSignature(List userList = [springSecurityService.currentUser]){
+		println "================== user list for activity feed " + userList
 		def ns = createNameSignature()
 		if(ns != activityDescription){
 			if(!save()) {
 				this.errors.allErrors.each { log.error it }
 			}else{
 				userList.each {
-					activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
+					println "Adding feed for following author " + it
+					if(it)
+						activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
 				}
 			}
 			
@@ -519,6 +566,26 @@ class TaxonomyDefinition extends ScientificName {
 		}
 		
 		return s
+	}
+	
+	
+	def updateNameStatus(String str){
+		NameStatus newStatus = NameStatus.getEnum(str)
+		if(!newStatus)
+			return
+		
+		println "=================== came for updatestatus " + newStatus + " odl status " + status
+		if(newStatus == NameStatus.ACCEPTED)
+			changeToAcceptedName()
+		else{
+			//changeToSynonym()
+			log.errors "Not supported for taxon " + this + " and status " + newStatus
+		}	
+	}
+	
+	boolean changeToAcceptedName(){
+		//placeHolder method actual method is in subclass of synonym merged
+		return true
 	}
 	
 }

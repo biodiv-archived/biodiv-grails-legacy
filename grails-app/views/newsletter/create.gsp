@@ -76,6 +76,10 @@
 						</g:hasErrors>
 					</div>
 				</div>
+				<div class="control-group left-indent">
+       				<g:render template="language_wrapTemplate" model="['newsletterInstance':newsletterInstance]" /> 
+               </div>
+
 
 				<div class="row control-group left-indent">
 

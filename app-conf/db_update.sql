@@ -408,6 +408,16 @@ alter table download_log alter column offset_param set not null;
 #21 Oct 2015
 ALTER TABLE species_bulk_upload ADD COLUMN  upload_type varchar(255);
 
+#16th Nov 2015 
+drop index if exists last_updated_comment_idx, root_holder_type_comment_idx, root_holder_id_comment_idx;
+
+#16th Nov 2015
+ALTER TABLE newsletter ADD language_id bigint;
+update newsletter set language_id=205;
+alter table newsletter alter column language_id set not null;
+ALTER TABLE newsletter ADD parent_id bigint;
+update newsletter set parent_id=0;
+alter table newsletter alter column parent_id set not null;
 
 #25 Nov 2015
 alter table document add column visit_count integer not null default 0;

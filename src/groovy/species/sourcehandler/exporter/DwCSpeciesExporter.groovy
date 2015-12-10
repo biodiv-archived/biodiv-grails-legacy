@@ -235,7 +235,7 @@ def exportSpecieData(directory, DownloadLog dl, String userGroupWebaddress) {
 			specie?.taxonRegistry?.each{ hierarchies->
 			String hierarchy = hierarchies?.clasification?.name 
 
-				if( hierarchy == "IBP Taxonomy Hierarchy" ){
+				if( hierarchy == grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY){
 							ibpHierarchy =hierarchies
 
 				}

@@ -51,9 +51,9 @@ class Comment{
 		//fething this right away
 		author fetch: 'join'
 		
-		rootHolderId index: 'rootHolderId_Index'
-		rootHolderType index: 'rootHolderType_Index'
-		lastUpdated index: 'lastUpdated_Index'
+		rootHolderId index: 'comment_rootHolderId_Index'
+		rootHolderType index: 'comment_rootHolderType_Index'
+		lastUpdated index: 'comment_lastUpdated_Index'
 		
 		commentHolderId index: 'commentHolderId_Index'
 		commentHolderType index: 'commentHolderType_Index'
