@@ -131,7 +131,11 @@ class Resource extends Sourcedata implements Rateable {
 
 		switch(type) {
 			case  ResourceType.IMAGE :
-				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
+                if(url) {
+                    thumbnailUrl = url;
+                } else {
+				    thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
+                }
 				break;
 			case ResourceType.VIDEO :				
                 if( imageType == ImageType.ORIGINAL) {
@@ -159,7 +163,8 @@ class Resource extends Sourcedata implements Rateable {
 		String path = '';
 		switch(this.type){
 			case ResourceType.IMAGE :
-				if(this.observation != null){
+				if(this.observation != null) { 
+                    if(url) return url;
 					path = grailsApplication.config.speciesPortal.observations.rootDir + "/" + this.fileName;
 					return path;
 				}

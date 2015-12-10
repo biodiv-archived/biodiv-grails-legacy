@@ -251,14 +251,17 @@ class DatasetService extends AbstractMetadataService {
         params['externalUrl'] = 'doi.org/10.15468/dl.zjy4hd';
 //        params['originalAuthor'] = createContact() 
         Dataset dataset;
+        def feedType;
         if(params.id) {
             dataset = Dataset.get(params.long('id'));
             dataset = update(dataset, params);
+            feedType = activityFeedService.INSTANCE_UPDATED
         } else {
             dataset = create(params);
+            feedType = activityFeedService.INSTANCE_CREATED
         }
 
-        def resultModel = save(dataset, params, true, null, activityFeedService.INSTANCE_CREATED, null);
+        def resultModel = save(dataset, params, true, null, feedType, null);
 
         /*String datasetEmlXmlStr = new File(datasetEmlXmlFile).text;
 

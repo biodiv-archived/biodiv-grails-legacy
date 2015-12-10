@@ -1038,7 +1038,7 @@ class XMLConverter extends SourceConverter {
         def absUrl = imageNode.url?.text() ? imageNode.url?.text() : "";
         def rate = imageNode.rating?.text() ? imageNode.rating?.text() : "";
         
-        log.debug "Creating image resource : "+tempFile;
+        log.debug "Creating image resource : ${tempFile}  or from absUrl : ${absUrl}";
         if((tempFile && tempFile.exists()) || absUrl) {
             
             Resource res;
@@ -1068,7 +1068,7 @@ class XMLConverter extends SourceConverter {
                 path = imageFile.absolutePath.replace(resourcesRootDir, "");
                 res = Resource.findByFileNameAndType(path, resourceType);
             } else if(absUrl) {
-                path = null;
+                path = 'u';
                 res = Resource.findByUrlAndType(absUrl, resourceType);
             }
 

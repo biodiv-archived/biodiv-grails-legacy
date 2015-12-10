@@ -141,15 +141,15 @@ if(r) {
                                 <g:if test="${r.type == ResourceType.IMAGE}">
                                 
                                 <% imageCount += 1
-                                def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
-                                <%def gallThumbImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.SMALL)%>
+                                def gallImagePath = r.url?:createLinkTo(file: ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE), base:grailsApplication.config.speciesPortal.observations.serverURL)%>
+                                <%def gallThumbImagePath = r.thumbnailUrl()%>
                                 <a target="_blank"
-                                    rel="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-                                    href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
+                                    rel="${gallImagePath}"
+                                    href="${gallImagePath}">
                                                                     
                                     <img class="galleryImage"
-                                    src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
-                                    data-original="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
+                                    src="${gallThumbImagePath}" 
+                                    data-original="${r.url?:createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
                                     title="${r?.description}" /> </a>
 
                                 <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
