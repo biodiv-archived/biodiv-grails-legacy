@@ -423,3 +423,12 @@ update observation set basis_of_record='HUMAN_OBSERVATION';
 alter table observation alter column basis_of_record set  not null;
 
 insert into license(id,name) values (828,'UNSPECIFIED');
+
+alter table dataset add column type varchar(255);
+update dataset set type='OBSERVATIONS';
+alter table dataset alter column type set not null;
+
+ALTER TABLE dataset ALTER COLUMN rights type text;
+ALTER TABLE dataset ALTER COLUMN purpose type text;
+ALTER TABLE dataset ALTER COLUMN additional_info type text;
+ALTER TABLE dataset ALTER COLUMN description type text;

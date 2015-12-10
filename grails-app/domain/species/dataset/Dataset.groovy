@@ -19,7 +19,7 @@ import grails.converters.XML;
 
 class Dataset extends DataSourceMetadata  implements Taggable, Rateable {
 
-/*    public enum DatasetType {
+    public enum DatasetType {
         SPECIES("Species"),
         OBSERVATIONS("Observations"),
         DOCUMENTS("Documents")
@@ -46,9 +46,9 @@ class Dataset extends DataSourceMetadata  implements Taggable, Rateable {
             return this.value();
         }
     }
-*/
-//    DatasetType type
-//    DataSource publisher;
+
+    DatasetType type
+    //    DataSource publisher;
     
     List<String> alternateIdentifiers;
     Contact originalAuthor;
@@ -109,6 +109,9 @@ class Dataset extends DataSourceMetadata  implements Taggable, Rateable {
     }
 	
 	static mapping = {
+        rights type:'text'
+        additionalInfo type:'text'
+        purpose type:'text'
 	}
 
 //	static belongsTo = [DataSource]

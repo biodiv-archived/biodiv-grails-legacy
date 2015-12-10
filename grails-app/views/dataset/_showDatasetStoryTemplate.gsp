@@ -112,7 +112,7 @@
                 </div>
 
 
-                <g:if test="${datasetInstance.externalId}">
+                <g:if test="${datasetInstance.externalUrl}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i><g:message code="default.externalId.label" /></span>
@@ -122,7 +122,7 @@
                     </g:else>
 
                     <div class="value">
-                        ${datasetInstance.externalUrl} (${datasetInstance.externalId})
+                        <a href="${datasetInstance.externalUrl}">${datasetInstance.externalId?:datasetInstance.externalUrl}</a> 
                     </div>
                 </div>
                 </g:if>
@@ -141,6 +141,38 @@
                     </div>
                 </div>
                 </g:if>
+
+                <g:if test="${datasetInstance.language}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="button.language" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${datasetInstance.language.name}
+                    </div>
+                </div>
+                </g:if>
+
+
+                <g:if test="${datasetInstance.rights}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${datasetInstance.rights}
+                    </div>
+                </div>
+                </g:if>
+
 
 
                

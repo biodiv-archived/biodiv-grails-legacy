@@ -666,7 +666,7 @@ class Observation extends DataObject {
 			cl.fetchColumnNames().each { name ->
 				res.put(name, m[name])
 			}
-		} else {
+		} else if(checklistAnnotations) {
             res = JSON.parse(checklistAnnotations);
         }
 		return res

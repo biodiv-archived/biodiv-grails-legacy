@@ -84,6 +84,7 @@ import static org.springframework.http.HttpStatus.*;
 import species.ScientificName.TaxonomyRank;
 
 import species.NamesMetadata.NameStatus;
+import species.dataset.Dataset.DatasetType;
 
 class DatasetService extends AbstractMetadataService {
 
@@ -250,26 +251,36 @@ class DatasetService extends AbstractMetadataService {
 
     Map uploadDwCDataset(Map params) {
         String directory = params.path;
-        params['title'] = "GBIF Dataset"
-        params['description'] = "" 
+        String datasetMetadataStr = new File(params.path+"/metadata.xml").text;
+
+        def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
+println datasetMetadata.dataset;
+        params['title'] = datasetMetadata.dataset.title.text()
+        params['description'] = datasetMetadata.dataset.abstract.para.text();
         params['author'] = springSecurityService.currentUser; 
-        params['externalUrl'] = 'doi.org/10.15468/dl.zjy4hd';
+        params['externalId'] = datasetMetadata.attributes().packageId;
+        params['externalUrl'] = 'http://doi.org/'+params['externalId'];
+        params['type'] = DatasetType.OBSERVATIONS;
+        params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
+        params['language'] = datasetMetadata.dataset.language.text();
+
 //        params['originalAuthor'] = createContact() 
         Dataset dataset;
         def feedType;
         if(params.id) {
             dataset = Dataset.get(params.long('id'));
             dataset = update(dataset, params);
-            feedType = activityFeedService.INSTANCE_UPDATED
+            feedType = activityFeedService.INSTANCE_UPDATED;
         } else {
             dataset = create(params);
-            feedType = activityFeedService.INSTANCE_CREATED
+            feedType = activityFeedService.INSTANCE_CREATED;
         }
 
         def resultModel = [:]
+
         Dataset.withTransaction {
             resultModel = save(dataset, params, true, null, feedType, null);
-        }
+        } 
 
         if(resultModel.success) {
             /*String datasetEmlXmlStr = new File(datasetEmlXmlFile).text;
@@ -284,7 +295,7 @@ class DatasetService extends AbstractMetadataService {
             //TODO:BATCH CONVERT AND CREATE OF OBSERVATION
             List resultObv = [];
             obvParamsList.each { obvParams ->
-                obvParams['observation url'] = 'GBIF';
+                obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
                 obvParams['dataset'] = dataset;
                 obvUtilService.uploadObservation(null, obvParams, resultObv);
             }
@@ -295,8 +306,10 @@ class DatasetService extends AbstractMetadataService {
             } catch (Exception e) {
                 log.error e.printStackTrace();
             }
+        } else {
+            log.error "Error while saving dataset ${resultModel}";
         }
-        println resultModel;
+
         return resultModel
     }
 } 

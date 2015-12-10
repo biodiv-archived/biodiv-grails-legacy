@@ -238,7 +238,7 @@
                 </g:if>
 
 
-                <g:if test="${observationInstance.externalId}">
+                <g:if test="${observationInstance.externalUrl}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i><g:message code="default.externalId.label" /></span>
@@ -248,7 +248,7 @@
                     </g:else>
 
                     <div class="value">
-                        ${observationInstance.externalUrl} (${observationInstance.externalId})
+                        <a href="${observationInstance.externalUrl}">${observationInstance.externalId}</a> 
                     </div>
                 </div>
                 </g:if>
