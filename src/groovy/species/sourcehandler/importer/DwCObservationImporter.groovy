@@ -27,7 +27,7 @@ class DwCObservationImporter {
         return _instance;
     }
 
-    List importObservationData(String directory) {
+    Map importObservationData(String directory) {
         log.info "Darwin Core import started"
 
         if(!directory)
@@ -38,12 +38,15 @@ class DwCObservationImporter {
         Map mediaInfo = [:];
         if(mediaReader)
             mediaInfo = readMedia();
-        List obvParamsList = importObservations(mediaInfo);
-        closeReaders();
-        return obvParamsList;
+        return ['observations':[], 'mediaInfo':mediaInfo];
+        //closeReaders();
     }
 
-    protected void initReaders(String targetDir) {
+    List next(Map mediaInfo, int limit) {
+        return importObservations(mediaInfo, limit);
+    }
+
+    void initReaders(String targetDir) {
         File target = new File(targetDir)
         if(!target.exists()){
             return;
@@ -53,7 +56,7 @@ class DwCObservationImporter {
         mediaReader = getCSVReader(targetDir, 'multimedia.txt')
     }
 
-    protected void closeReaders() {
+    void closeReaders() {
         observationReader.close()
         mediaReader?.close()
     }
@@ -115,7 +118,6 @@ class DwCObservationImporter {
                 mediaHeader[i] = mappedMediaHeader;
             }
         }
-        println mediaHeader;
     }
 
     protected String getMappedObvHeader(String header, Map dwcObvMapping) {
@@ -136,9 +138,6 @@ class DwCObservationImporter {
             mediaParams[x.obvExternalId] << x;            
             row = mediaReader.readNext()
         }
-        println "====================+++++++"
-        println mediaParams
-        println "====================+++++++"
         return mediaParams;
     }
 
@@ -155,20 +154,18 @@ class DwCObservationImporter {
         return m;
     }
 
-    private List importObservations(Map mediaInfo) {
+    private List importObservations(Map mediaInfo, int limit) {
         List obvParams = [];
+        int no=1;
+
         String[] row = observationReader.readNext()
         while(row) {
             def p = importObservation(row);
-            println mediaInfo[p['externalId']];
-            println "-----------____"
             Map m = [:];
             if(mediaInfo[p['externalId']]) {
                 mediaInfo[p['externalId']].eachWithIndex { media, i ->
                     media.eachWithIndex { mInfo ->
                         def v = mInfo.value;
-                        println "************************"
-                        println mInfo
                         switch(mInfo.value) {
                             case 'StillImage' :
                             v = ResourceType.IMAGE.value();
@@ -191,9 +188,9 @@ class DwCObservationImporter {
             }
             p['mediaInfo'] = m;
             obvParams << p 
+            if(no++ >= limit) break;
             row = observationReader.readNext()
         }
-        println obvParams;
         return obvParams;
     }
 
@@ -209,31 +206,6 @@ class DwCObservationImporter {
                 m[ANNOTATION_HEADER][dwcObvHeader[i]] = row[i];  
             }
         }
-        println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-        println m[ANNOTATION_HEADER]
         return m;
     }
-
-    /*private class ObservationIterator implements Iterator {
-
-        int index;
-
-        @Override
-        public boolean hasNext() {
-
-            if(index < names.length){
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public Object next() {
-
-            if(this.hasNext()){
-                return names[index++];
-            }
-            return null;
-        }       
-    }*/
 }

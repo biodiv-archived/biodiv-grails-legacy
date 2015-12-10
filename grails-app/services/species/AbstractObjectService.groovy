@@ -261,8 +261,6 @@ class AbstractObjectService {
            
             if(index != -1) {
                 if(val != "") {
-                    println val
-                    println "8"
                     files.add(val);
 
                     titles.add(params.get('title_'+index));
@@ -279,15 +277,10 @@ class AbstractObjectService {
                 }
             }
         }
-        println "%55555555555555555555555"
-        println files
-        println url
         files.eachWithIndex { file, key ->
             Node image;
           
             if(file) {
-                println key
-                println type.getAt(key)
                 if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
                     image = new Node(images, "image");
                     File f = new File(uploadDir, file);
@@ -331,10 +324,7 @@ class AbstractObjectService {
                 log.warn("No reference key for image : "+key);
             } 
         }
-println "=============================="
-println resources;
 
-println "=============================="
         return resources;
     }
 

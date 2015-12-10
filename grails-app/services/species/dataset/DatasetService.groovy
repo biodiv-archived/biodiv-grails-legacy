@@ -90,6 +90,8 @@ class DatasetService extends AbstractMetadataService {
 
     static transactional = false
 
+    public static final int IMPORT_BATCH_SIZE = 50;
+
     def messageSource;
     def activityFeedService
     def obvUtilService;
@@ -103,7 +105,6 @@ class DatasetService extends AbstractMetadataService {
     }
 
     Dataset update(Dataset instance, params) {
-        println "@@@@@@@@@@@@@@@"
         instance.properties = params;
 
         instance.clearErrors();
@@ -254,7 +255,6 @@ class DatasetService extends AbstractMetadataService {
         String datasetMetadataStr = new File(params.path+"/metadata.xml").text;
 
         def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
-println datasetMetadata.dataset;
         params['title'] = datasetMetadata.dataset.title.text()
         params['description'] = datasetMetadata.dataset.abstract.para.text();
         params['author'] = springSecurityService.currentUser; 
@@ -283,29 +283,36 @@ println datasetMetadata.dataset;
         } 
 
         if(resultModel.success) {
-            /*String datasetEmlXmlStr = new File(datasetEmlXmlFile).text;
-
-            def datasetEmlXml = new XmlParser().parseText(datasetEmlXmlStr);
-            Map params = readEML(datasetEmlXml);
-
-            Dataset dataset = new Dataset(params);
-             */
             DwCObservationImporter dwcImporter = DwCObservationImporter.getInstance();
-            List obvParamsList = dwcImporter.importObservationData(directory);
-            //TODO:BATCH CONVERT AND CREATE OF OBSERVATION
-            List resultObv = [];
-            obvParamsList.each { obvParams ->
-                obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
-                obvParams['dataset'] = dataset;
-                obvUtilService.uploadObservation(null, obvParams, resultObv);
-            }
+            Map o = dwcImporter.importObservationData(directory);
+            int i=0;
 
-            def obvs = resultObv.collect { Observation.read(it) }
-            try {
-                observationsSearchService.publishSearchIndex(obvs, true);
-            } catch (Exception e) {
-                log.error e.printStackTrace();
+            List obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+            while(obvParamsList) {
+                println "******************************"+obvParamsList.size()
+                List resultObv = [];
+                obvParamsList.each { obvParams ->
+                    obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
+                    obvParams['dataset'] = dataset;
+                    obvUtilService.uploadObservation(null, obvParams, resultObv);
+                }
+
+                def obvs = resultObv.collect { Observation.read(it) }
+                try {
+                    observationsSearchService.publishSearchIndex(obvs, true);
+                } catch (Exception e) {
+                    log.error e.printStackTrace();
+                }
+                i += obvs.size();
+                
+                log.debug "Saved observations : ${i}";
+
+				utilsService.cleanUpGorm(true)
+				resultObv.clear();
+                obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
             }
+            log.debug "Total number of observations saved for dataset ${dataset} are : ${i}";
+            dwcImporter.closeReaders();
         } else {
             log.error "Error while saving dataset ${resultModel}";
         }

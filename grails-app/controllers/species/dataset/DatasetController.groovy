@@ -120,7 +120,7 @@ class DatasetController extends AbstractObjectController {
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
                 def model = utilsService.getSuccessModel("", datasetInstance, OK.value());
-                model['observations'] = Observation.findAllByDataset(datasetInstance);
+                model['observations'] = Observation.findAllByDataset(datasetInstance, [max:50, offset:0]);
                 model['observationsCount'] = Observation.countByDataset(datasetInstance);
 
                 withFormat {

@@ -1153,8 +1153,6 @@ class XMLConverter extends SourceConverter {
                 }
             }
         } 
-println ";;;;;;;;;;;;;;;;;;;;;;;;;"
-println sourceUrl;
         if(!tempFile.exists()) {
             if(sourceUrl) {
                 //downloading from web
