@@ -51,7 +51,7 @@
             </g:each>	
         </tbody>
     </table>
-    <g:if test="${observationsCount > (params.max?:50)}">
+    <g:if test="${observationsCount > (params.max?params.int('max'):10)}">
     <div class="centered">
         <div class="btn loadMore">
             <span class="progress" style="display: none;"><g:message code="msg.loading" /> </span> <span
@@ -62,7 +62,7 @@
     <div class="paginateButtons" style="visibility: hidden; clear: both">
         <p:paginate total="${observationsCount?:0}" action="${'observationData'}" controller="${params.controller?:'checklist'}"
         userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
-        max="${params.max}"  params="${[id:checklistInstance.id]}"/>
+        max="${params.max?params.int('max'):10}"  params="${[id:checklistInstance.id]}"/>
     </div>
 </div>
 <r:script>

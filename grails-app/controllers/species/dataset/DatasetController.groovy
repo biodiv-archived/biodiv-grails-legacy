@@ -120,12 +120,12 @@ class DatasetController extends AbstractObjectController {
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
                 def model = utilsService.getSuccessModel("", datasetInstance, OK.value());
-                model['observations'] = Observation.findAllByDataset(datasetInstance, [max:50, offset:0]);
+                model['observations'] = Observation.findAllByDataset(datasetInstance, [max:10, offset:0]);
                 model['observationsCount'] = Observation.countByDataset(datasetInstance);
 
                 withFormat {
                     html {
-                            return [datasetInstance: datasetInstance, observations:model.observations, observationsCount:model.observationsCount, 'userLanguage':userLanguage]
+                            return [datasetInstance: datasetInstance, observations:model.observations, observationsCount:model.observationsCount, 'userLanguage':userLanguage, max:10]
                     } 
                     json  { render model as JSON }
                     xml { render model as JSON }
@@ -142,6 +142,19 @@ class DatasetController extends AbstractObjectController {
                 xml { render model as XML }
             }
         }
+	}
+
+	def observationData = {
+        if(!params.id) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
+            redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+        }
+
+        Dataset datasetInstance = Dataset.read(params.id.toLong());
+		List observations =  Observation.findAllByDataset(datasetInstance, [max:params.int('max'), offset:params.int('offset')]);
+        int observationsCount = Observation.countByDataset(datasetInstance);
+		def model = ['observations':observations, 'observationsCount':observationsCount, 'checklistInstance':datasetInstance, 'max':10]
+		render(template:"/common/checklist/showChecklistDataTemplate", model:model);
 	}
 
 	def list() {
