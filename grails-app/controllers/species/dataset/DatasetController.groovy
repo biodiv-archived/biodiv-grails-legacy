@@ -202,31 +202,30 @@ class DatasetController extends AbstractObjectController {
         } catch(NumberFormatException e) { 
             params.offset = 0 
         }
-       
-		def max = Math.min(params.max ? params.int('max') : 24, 100)
-		def offset = params.offset ? params.int('offset') : 0
-		def filteredDataset = datasetService.getFilteredDatasets(params, max, offset, false)
-		def datasetInstanceList = filteredObservation.datasetInstanceList
-        		
-        def queryParams = filteredObservation.queryParams
-		def activeFilters = filteredObservation.activeFilters
-        def canPullResource = filteredDocument.canPullResource
-	    def count = filteredDocument.instanceTotal	
 
-		activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
-        
-            if(params.append?.toBoolean() && session["obv_ids_list"]) {
-                session["dataset_ids_list"].addAll(datasetInstanceList.collect {
-                    params.fetchField?it[0]:it.id
-                }); 
-            } else {
-                session["dataset_ids_list_params"] = params.clone();
-                session["dataset_ids_list"] = datasetInstanceList.collect {
-                    params.fetchField?it[0]:it.id
-                };
-            }
-		log.debug "Storing all dataset ids list in session ${session['dataset_ids_list']} for params ${params}";
-		return [datasetInstanceList: datasetInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset', canPullResource:userGroupService.getResourcePullPermission(params)]
+        def max = Math.min(params.max ? params.int('max') : 24, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        def filteredDataset = datasetService.getFilteredDatasets(params, max, offset, false)
+        def instanceList = filteredDataset.instanceList
+
+        def queryParams = filteredDataset.queryParams
+        def activeFilters = filteredDataset.activeFilters
+        def count = filteredDataset.instanceTotal	
+
+        activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
+
+        if(params.append?.toBoolean() && session["obv_ids_list"]) {
+            session["dataset_ids_list"].addAll(instanceList.collect {
+                params.fetchField?it[0]:it.id
+            }); 
+        } else {
+            session["dataset_ids_list_params"] = params.clone();
+            session["dataset_ids_list"] = instanceList.collect {
+                params.fetchField?it[0]:it.id
+            };
+        }
+        log.debug "Storing all dataset ids list in session ${session['dataset_ids_list']} for params ${params}";
+        return [observationInstanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset']
 	}
 
 }
