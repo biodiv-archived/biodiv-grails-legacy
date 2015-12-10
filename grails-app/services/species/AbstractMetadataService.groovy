@@ -155,7 +155,7 @@ class AbstractMetadataService extends AbstractObjectService {
             setAssociations(instance, params, sendMail);
 
             if(sendMail)
-                utilsService.sendNotificationMail(feedType, instance, request, params.webaddress);
+                utilsService.sendNotificationMail(feedType, instance, null, params.webaddress);
 
             if(searchService)
                 searchService.publishSearchIndex(instance, true);

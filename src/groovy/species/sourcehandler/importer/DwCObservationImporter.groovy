@@ -202,7 +202,9 @@ class DwCObservationImporter {
         observationHeader.eachWithIndex { header, i ->
             if(header && row.size()>i && row[i]) {
                 m[header] = row[i]
-            } else if(row[i]) {
+            } 
+            
+            if(row[i]) {
                 if(!m[ANNOTATION_HEADER]) m[ANNOTATION_HEADER] =  new java.util.LinkedHashMap();
                 m[ANNOTATION_HEADER][dwcObvHeader[i]] = row[i];  
             }

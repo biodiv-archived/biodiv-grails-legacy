@@ -83,6 +83,7 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationLocationTemplate", model:attrs.model);
 		}
 	}
+
 	def showTagsSummary = {attrs, body->
 		if(attrs.model.observationInstance) {
 			def tags = observationService.getRelatedTagsFromObservation(attrs.model.observationInstance)

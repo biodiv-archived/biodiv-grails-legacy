@@ -21,10 +21,11 @@ abstract class DataSourceMetadata {
 
     static constraints = {
         title nullable:false
+        contacts nullable:true;
     }
 
     static mapping = {
-        notes type:'text'
+        description type:'text'
         tablePerHierarchy false
         //        tablePerSubClass true
     }

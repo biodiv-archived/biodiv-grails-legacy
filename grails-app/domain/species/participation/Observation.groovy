@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
 import speciespage.ObservationService;
 import species.Species;
+import species.dataset.Dataset;
 
 class Observation extends DataObject {
 	
@@ -166,7 +167,7 @@ class Observation extends DataObject {
     String informationWithheld;
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
-	static belongsTo = [SUser, UserGroup, Checklists]
+	static belongsTo = [SUser, UserGroup, Checklists, Dataset]
  
  	static constraints = {
 		notes nullable:true

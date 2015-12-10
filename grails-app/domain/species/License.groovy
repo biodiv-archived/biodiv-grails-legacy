@@ -18,7 +18,8 @@ class License {
 		CC_BY_ND("CC BY-ND"),
 		CC_BY_NC("CC BY-NC"),		
 		CC_BY_NC_SA("CC BY-NC-SA"),
-		CC_BY_NC_ND("CC BY-NC-ND");
+		CC_BY_NC_ND("CC BY-NC-ND"),
+        UNSPECIFIED("Unspecified");
 		//COPYRIGHT("Copyright");
 
 		private String value;
@@ -39,7 +40,8 @@ class License {
 				CC_BY_ND,
 				CC_BY_NC,				
 				CC_BY_NC_SA,
-				CC_BY_NC_ND ]
+				CC_BY_NC_ND,
+                UNSPECIFIED]
 		}
 
 		public String toString() {
@@ -65,6 +67,8 @@ class License {
         		case CC_BY_NC_SA : return "Attribution-NonCommercial-ShareAlike"
 
         		case CC_BY_NC_ND : return "Attribution-NonCommercial-NoDerivs"
+
+        		case UNSPECIFIED : return "Unspecified"
             }
         }
 	}

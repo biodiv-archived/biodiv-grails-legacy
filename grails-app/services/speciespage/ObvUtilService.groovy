@@ -674,6 +674,7 @@ class ObvUtilService {
 		obvParams['externalUrl'] = m[OBSERVATION_URL]
 		obvParams['viaId'] = m[COLLECTION_ID]
 		obvParams['viaCode'] = m[COLLECTION_CODE]
+		obvParams['dataset'] = m['dataset']
 
         if(m['geoprivacy'] || m[GEO_PRIVACY])
     		obvParams['geoPrivacy'] = m["geoprivacy"] ?: m[GEO_PRIVACY];

@@ -144,7 +144,6 @@ class ObservationService extends AbstractMetadataService {
 	        def resources = saveResources(instance, resourcesXML);
 	        observation.resource?.clear();
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-           println"RESSSSSSSSSOOOOOOOUUUUUUUUUUURRRRRRRRRRRRRRCCCCCCCEEEEEE" 
 	        resources.each { resource ->
                 if(!resource.context){
                     resource.saveResourceContext(observation)

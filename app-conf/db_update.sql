@@ -422,4 +422,4 @@ alter table observation add column basis_of_record varchar(255);
 update observation set basis_of_record='HUMAN_OBSERVATION';
 alter table observation alter column basis_of_record set  not null;
 
-
+insert into license(id,name) values (828,'UNSPECIFIED');

@@ -222,6 +222,22 @@
                     </div>
                 </div>
 
+                <g:if test="${observationInstance.dataset}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-book"></i><g:message code="dataset.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-book"></i>
+                    </g:else>
+
+                    <div class="value">
+                        <g:link url="${uGroup.createLink(controller:'dataset', action:'show', id:observationInstance.dataset.id, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }">${observationInstance.dataset.title}</g:link>
+                    </div>
+                </div>
+                </g:if>
+
+
                 <g:if test="${observationInstance.externalId}">
                 <div class="prop">
                     <g:if test="${showDetails}">

@@ -17,7 +17,7 @@ import speciespage.ObservationService;
 import species.participation.Featured;
 import species.utils.Utils;
 import species.Language;
-import species.dataset.DataSet;
+import species.dataset.Dataset;
 
 abstract class Metadata {
 	
@@ -99,7 +99,7 @@ abstract class Metadata {
     Date lastInterpreted;
     Date lastCrawled;
 
-    DataSet dataset;
+    Dataset dataset;
 
     def grailsApplication
 	def activityFeedService

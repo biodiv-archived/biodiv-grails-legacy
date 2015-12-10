@@ -16,5 +16,5 @@ class DataSource extends DataSourceMetadata {
     static mapping = {
     }
 
-    static hasMany = [dataSets : DataSet];
+    static hasMany = [datasets : Dataset];
 }
