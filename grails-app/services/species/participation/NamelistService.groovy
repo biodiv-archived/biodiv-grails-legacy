@@ -74,6 +74,12 @@ class NamelistService {
 
     public static Map namesBeforeSave = [:];
     public static Map namesAfterSave = [:];
+	
+	
+	//XXX: this map is used to store new name created by col only for bulk and name upload. This is needed because hibernet is not
+	//flushing data in db and same name is duplicated within one bulk name upload
+	//this map will be cleared by every bulk upload thread at the end to avoid memory build up
+	private static Map COL_CREATED_NAME = [:]
 
 	def dataSource
     def groupHandlerService
@@ -91,7 +97,7 @@ class NamelistService {
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
         SEARCH_IBP_COUNTER ++;
-        println "======PARAMS FOR SEARCH IBP ===== " + canonicalForm +"--- "+authorYear +"--- "+ status + "--- "+ rank + " :::: userauthoryear " + useAuthorYear ;
+        println "======PARAMS FOR SEARCH IBP ===== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " :::: userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         //Decide in what class to search TaxonomyDefinition/SynonymsMerged
         def res = [];
 		
@@ -174,7 +180,16 @@ class NamelistService {
 				}
 			}			
         }
+		
+		if(res.isEmpty()){
+			String key = canonicalForm + rank 
+			def resName = COL_CREATED_NAME.get(key)
+			if(resName){
+				res = [resName]
+			}
+		}
 		println "=========== FINAL SEARCH RESULT " + res
+		
 		return res;
     }
     
@@ -268,10 +283,13 @@ class NamelistService {
 		colRes = colRes[0]
 		String status = colRes.nameStatus
 		if(status.equalsIgnoreCase('accepted')){
-			return createAcceptedNameFromColId(colId, runPostProcess)
+			td = createAcceptedNameFromColId(colId, runPostProcess)
 		}else{
-			return createSynonymFromColId(colId, runPostProcess)
+			td = createSynonymFromColId(colId, runPostProcess)
 		}
+		
+		COL_CREATED_NAME.put(td.canonicalForm + td.rank , td)
+		return td
 	}
 	
 	private ScientificName createAcceptedNameFromColId(String colId, boolean runPostProcess){
@@ -285,8 +303,7 @@ class NamelistService {
 		if(runPostProcess){
 			td.postProcess()
 		}
-		
-		println  "---------- Created accepted name from col Id " + colId
+		//println  "---------- Created accepted name from col Id " + colId
 		return td
 	}
 	
@@ -1549,7 +1566,7 @@ class NamelistService {
                 success = true;
             }
             
-            println "=========DONE UPDATING ATTRIBUTES ========\n"
+            println "=========DONE UPDATING ATTRIBUTES ========\n" + sciName
 
         } catch (Exception e) {
             success = false;
@@ -2209,7 +2226,9 @@ class NamelistService {
 	}
 
 	
-	
+	public static void clearCOLNameFromMemory(){
+		COL_CREATED_NAME.clear()
+	}
 	
 	
 	
