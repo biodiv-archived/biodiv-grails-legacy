@@ -266,33 +266,37 @@ class DatasetService extends AbstractMetadataService {
             feedType = activityFeedService.INSTANCE_CREATED
         }
 
-        def resultModel = save(dataset, params, true, null, feedType, null);
-
-        /*String datasetEmlXmlStr = new File(datasetEmlXmlFile).text;
-
-        def datasetEmlXml = new XmlParser().parseText(datasetEmlXmlStr);
-        Map params = readEML(datasetEmlXml);
-        
-        Dataset dataset = new Dataset(params);
-*/
-        DwCObservationImporter dwcImporter = DwCObservationImporter.getInstance();
-        List obvParamsList = dwcImporter.importObservationData(directory);
-        //TODO:BATCH CONVERT AND CREATE OF OBSERVATION
-        List resultObv = [];
-        obvParamsList.each { obvParams ->
-            obvParams['observation url'] = 'GBIF';
-            obvParams['dataset'] = dataset;
-            obvUtilService.uploadObservation(null, obvParams, resultObv);
+        def resultModel = [:]
+        Dataset.withTransaction {
+            resultModel = save(dataset, params, true, null, feedType, null);
         }
 
-        def obvs = resultObv.collect { Observation.read(it) }
-        try {
-            observationsSearchService.publishSearchIndex(obvs, true);
-        } catch (Exception e) {
-            log.error e.printStackTrace();
-        }
+        if(resultModel.success) {
+            /*String datasetEmlXmlStr = new File(datasetEmlXmlFile).text;
 
-        println dataset;
+            def datasetEmlXml = new XmlParser().parseText(datasetEmlXmlStr);
+            Map params = readEML(datasetEmlXml);
+
+            Dataset dataset = new Dataset(params);
+             */
+            DwCObservationImporter dwcImporter = DwCObservationImporter.getInstance();
+            List obvParamsList = dwcImporter.importObservationData(directory);
+            //TODO:BATCH CONVERT AND CREATE OF OBSERVATION
+            List resultObv = [];
+            obvParamsList.each { obvParams ->
+                obvParams['observation url'] = 'GBIF';
+                obvParams['dataset'] = dataset;
+                obvUtilService.uploadObservation(null, obvParams, resultObv);
+            }
+
+            def obvs = resultObv.collect { Observation.read(it) }
+            try {
+                observationsSearchService.publishSearchIndex(obvs, true);
+            } catch (Exception e) {
+                log.error e.printStackTrace();
+            }
+        }
+        println resultModel;
         return resultModel
     }
 } 
