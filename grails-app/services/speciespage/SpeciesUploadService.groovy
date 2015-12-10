@@ -71,6 +71,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import species.participation.NamesReportGenerator
+import species.participation.NamelistService
 
 class SpeciesUploadService {
 
@@ -91,7 +92,7 @@ class SpeciesUploadService {
 	def speciesSearchService;
 	def springSecurityService
 	def speciesPermissionService;
-    def namelistService;
+    //def namelistService;
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -365,6 +366,7 @@ class SpeciesUploadService {
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				cleanUpGorm();
+				NamelistService.clearCOLNameFromMemory()
 			}
 		}
 		
