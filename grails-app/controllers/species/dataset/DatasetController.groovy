@@ -19,7 +19,7 @@ class DatasetController extends AbstractObjectController {
 
     def datasetService;
 
-	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
+	static allowedMethods = [show:'GET', index:'GET', list:'GET',  update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
 	def index = {
@@ -70,7 +70,7 @@ class DatasetController extends AbstractObjectController {
 		if(result.success){
             withFormat {
                 html {
-                    render(view: "show", model: [datasetInstance: result.instance])
+			        redirect(action: "show", id: result.instance.id)
                 }
                 json {
                     render result as JSON 
@@ -216,10 +216,4 @@ class DatasetController extends AbstractObjectController {
 		return [datasetInstanceList: datasetInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset', canPullResource:userGroupService.getResourcePullPermission(params)]
 	}
 
-	@Secured(['ROLE_USER'])
-    def test() {
-        params.locale_language = utilsService.getCurrentLanguage(request);
-        Map model = datasetService.uploadDwCDataset(params);
-        render model as JSON
-    }
 }

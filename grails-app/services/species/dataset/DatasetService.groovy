@@ -243,6 +243,11 @@ class DatasetService extends AbstractMetadataService {
         return new Contact(params);
     }
 */
+
+    def save(params, sendMail) {
+        return uploadDwCDataset(params);
+    }
+
     Map uploadDwCDataset(Map params) {
         String directory = params.path;
         params['title'] = "GBIF Dataset"
