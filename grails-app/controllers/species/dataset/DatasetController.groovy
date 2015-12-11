@@ -225,7 +225,7 @@ class DatasetController extends AbstractObjectController {
             };
         }
         log.debug "Storing all dataset ids list in session ${session['dataset_ids_list']} for params ${params}";
-        return [observationInstanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset']
+        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset']
 	}
 
 }
