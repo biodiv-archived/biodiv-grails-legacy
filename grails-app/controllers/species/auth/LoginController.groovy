@@ -99,6 +99,7 @@ class LoginController {
 		} else {
             params.remove('action');
             params.remove('controller');
+            params.remove('format');
             if(!params.token) {
                 params.remove('token');
             } 
@@ -106,6 +107,9 @@ class LoginController {
             def model;
             if(params.id) {
                 params.id = Long.parseLong(params.id);
+                SUser m = SUser.read(params.id);
+                params.username = m.email;
+                params.roles = SUserRole.findAllBySUser(m).collect {it.role.authority};
                 model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), params);
             } else if(params.error) {
                 model = utilsService.getErrorModel(params.message, null, params.int('error'))
