@@ -65,8 +65,10 @@ class RecommendationService {
 			if(dupReco && (reco.id == dupReco.id)){
 				log.debug "Same reco found in database so igonoring save $reco   ... duplicate reco $dupReco"
 			} else {
-                dupReco.taxonConcept = reco.taxonConcept;
-                reco = dupReco;
+                if(dupReco && reco.taxonConcept) {
+                    dupReco.taxonConcept = reco.taxonConcept;
+                    reco = dupReco;
+                }
 				if(reco.save()) {
 					noOfRecords++;
 					if(addToTree)
