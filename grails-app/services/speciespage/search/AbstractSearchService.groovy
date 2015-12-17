@@ -125,7 +125,7 @@ abstract class AbstractSearchService {
      * @param id
      * @return
      */
-    def delete(long id) {
+    def delete(String id) {
         log.info "Deleting ${this.getClass().getName()} from search index"
         try {
             solrServer.deleteByQuery("id:${id}");

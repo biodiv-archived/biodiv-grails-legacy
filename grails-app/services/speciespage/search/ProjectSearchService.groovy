@@ -103,4 +103,7 @@ class ProjectSearchService extends AbstractSearchService {
         return commitDocs(docs, commit);
 	}
 
+    def delete(long id) {
+        super.delete(Project.simpleName +"_"+id.toString());
+    }
 }

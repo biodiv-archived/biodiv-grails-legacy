@@ -139,4 +139,8 @@ class ResourceSearchService extends AbstractSearchService {
         return doc
 
     }
+
+    def delete(long id) {
+        super.delete(Resource.simpleName +"_"+id.toString());
+    }
 }
