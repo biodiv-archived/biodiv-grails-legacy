@@ -991,9 +991,11 @@ class SpeciesUploadService {
 			}
 			log.debug "Reverting changes of species before delete $s ===="
 			s = s.merge()
-			s.delete(flush:true)
-			log.debug "Deleted ${s}"
-			return true
+			if(s.delete(flush:true)) {
+			    log.debug "Deleted ${s}"
+			    speciesSearchService.delete(s.id);
+			    return true
+            }
 		}catch (Exception e) {
 			log.error "Error in Delete/Reverting ${s}"
 			e.printStackTrace()
@@ -1014,7 +1016,6 @@ class SpeciesUploadService {
 			Species.withTransaction{
 				if(success){
 					rollBackSpeciesUpdate(s, sFields, s.resources.collect{it}, user, null)
-					speciesSearchService.delete(s.id);
 				}
 			}
 		}catch(e){
