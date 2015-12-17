@@ -8,8 +8,8 @@ import speciespage.search.SUserSearchService
 import species.Species
 
 def speciesSearchService = ctx.getBean("speciesSearchService");
-speciesSearchService.deleteIndex();
-speciesSearchService.publishSearchIndex([Species.read(33875)]);
+//speciesSearchService.deleteIndex();
+speciesSearchService.publishSearchIndex([Species.read(276152L)]);
 speciesSearchService.optimize();
 /*
 def newsletterSearchService = ctx.getBean("newsletterSearchService");
