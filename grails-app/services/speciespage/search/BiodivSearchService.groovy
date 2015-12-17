@@ -486,7 +486,9 @@ class BiodivSearchService extends AbstractSearchService {
             params.query = aq;
         }
 
-        paramsList.add('q', Utils.cleanSearchQuery(params.query));
+        String cleanSearchQuery = Utils.cleanSearchQuery(params.query);
+        if(!cleanSearchQuery) cleanSearchQuery = "id:*"
+        paramsList.add('q', cleanSearchQuery);
         //options
         if(offset>= 0)
             paramsList.add('start', offset);
