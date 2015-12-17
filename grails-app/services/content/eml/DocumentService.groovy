@@ -801,7 +801,7 @@ class DocumentService extends AbstractMetadataService {
         featuredDocument?.delete(flush: true);
 
         def  docTokenId =DocumentTokenUrl.findByDoc(documentInstance)
-        docTokenId.delete();
+        docTokenId?.delete();
         List docSciNameId = DocSciName.findAllByDocument(documentInstance)
         docSciNameId.each {
         it.delete();

@@ -124,4 +124,7 @@ class DocumentSearchService extends AbstractSearchService {
         return commitDocs(docs, commit);
 	}
 
+    def delete(long id) {
+        super.delete(Document.simpleName +"_"+id.toString());
+    }
 }

@@ -107,4 +107,8 @@ class NewsletterSearchService extends AbstractSearchService {
         return commitDocs(docs, commit);
 	}
 
+    def delete(long id) {
+        super.delete(Newsletter.simpleName +"_"+id.toString());
+    }
+
 }

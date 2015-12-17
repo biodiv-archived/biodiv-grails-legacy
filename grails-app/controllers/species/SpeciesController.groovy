@@ -188,7 +188,12 @@ class SpeciesController extends AbstractObjectController {
                             flash.message =  messageSource.getMessage("default.species.success.Create", null, RCU.getLocale(request))
                             speciesUploadService.postProcessSpecies([speciesInstance]);
                         //}
-                        
+                            try {
+                                speciesSearchService.publishSearchIndex([speciesInstance]);
+                            } catch(e) {
+                                e.printStackTrace()
+                            }
+
                         def feedInstance = activityFeedService.addActivityFeed(speciesInstance, null, springSecurityService.currentUser, activityFeedService.SPECIES_CREATED);
 
                         utilsService.sendNotificationMail(activityFeedService.SPECIES_CREATED, speciesInstance, request, params.webaddress, feedInstance, ['info':activityFeedService.SPECIES_CREATED]);
