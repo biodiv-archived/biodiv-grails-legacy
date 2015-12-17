@@ -288,8 +288,8 @@ class TaxonomyDefinition extends ScientificName {
         return;
     }
 
-    List<SynonymsMerged> fetchSynonyms() {
-        return AcceptedSynonym.fetchSynonyms(this);
+    List<SynonymsMerged> fetchSynonyms(def particularValue = '') {
+        return AcceptedSynonym.fetchSynonyms(this,particularValue);
     }
 
     def removeSynonym(SynonymsMerged syn) {

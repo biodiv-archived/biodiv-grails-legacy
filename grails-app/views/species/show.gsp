@@ -92,7 +92,12 @@
 
             .add_file_container {
                 padding: 55px 10px !important;
-            }    
+            } 
+
+            #commonNames select{
+                width:245px;
+                margin-left:-15px;
+            }   
             
         </style>
 
