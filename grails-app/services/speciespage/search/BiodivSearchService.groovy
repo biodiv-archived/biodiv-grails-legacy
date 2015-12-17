@@ -358,8 +358,8 @@ class BiodivSearchService extends AbstractSearchService {
                     if(!value.equalsIgnoreCase('All')) {
                         paramsList.add('fq', key+":"+value)
                     }
-                } else if(key.equalsIgnoreCase(searchFieldsConfig.LICENSE)) {
-                    paramsList.add('fq', key+":("+value+')')
+                } else if(key.equalsIgnoreCase(searchFieldsConfig.LICENSE) || key.equalsIgnoreCase(searchFieldsConfig.TAG) || key.equalsIgnoreCase(searchFieldsConfig.USER_GROUP_WEBADDRESS) || key.equalsIgnoreCase(searchFieldsConfig.CONTEXT) || key.equalsIgnoreCase(searchFieldsConfig.CONTAINER) || key.equalsIgnoreCase(searchFieldsConfig.DOC_TYPE)) {
+                    paramsList.add('fq', key+':"'+value+'"')
                 } else if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
                     if(i++ == 0) {
                         aq = key + ':('+value+')';
