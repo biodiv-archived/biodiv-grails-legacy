@@ -61,10 +61,14 @@ class RecommendationService {
 		int noOfRecords = 0;
 		def startTime = System.currentTimeMillis()
 		recos.eachWithIndex { Recommendation reco, index ->
-			def dupReco = searchReco(reco.name, reco.isScientificName, reco.languageId, reco.taxonConcept)
+			def dupReco = searchReco(reco.name, reco.isScientificName, reco.languageId, null)
 			if(dupReco && (reco.id == dupReco.id)){
 				log.debug "Same reco found in database so igonoring save $reco   ... duplicate reco $dupReco"
-			}else{
+			} else {
+                if(dupReco && reco.taxonConcept) {
+                    dupReco.taxonConcept = reco.taxonConcept;
+                    reco = dupReco;
+                }
 				if(reco.save()) {
 					noOfRecords++;
 					if(addToTree)

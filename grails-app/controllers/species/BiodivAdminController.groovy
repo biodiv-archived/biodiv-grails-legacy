@@ -89,6 +89,25 @@ class BiodivAdminController {
         redirect(action: "index")
     }
 
+    def syncRecosFromTaxonConcepts = {
+        try {
+            log.debug "Syncing names into recommendations"
+            List taxonConcepts = [];
+            params.id?.split(',').each { 
+                def s = Species.read(Integer.parseInt(it));
+                if(s) taxonConcepts << s.taxonConcept;
+            }
+            render namesLoaderService.syncRecosFromTaxonConcepts(taxonConcepts, true);
+            //flash.message = messageSource.getMessage("default.admin.success.loaded.name", null, RCU.getLocale(request))
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+
+        //redirect(action: "index")
+    }
+
+
     def reloadSpeciesSearchIndex = {
         try {
             if(params.deleteIndex)

@@ -267,4 +267,10 @@ class ObservationsSearchService extends AbstractSearchService {
         }
         return resourcesDocs;
     }
+
+    def delete(long id) {
+        super.delete(Observation.simpleName +"_"+id.toString());
+    }
+
+
 }

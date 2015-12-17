@@ -209,7 +209,7 @@ window.fbEnsure = function(callback) {
                 return;
         js = d.createElement(s);
         js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";//#xfbml=1&appId=${fbAppId}
+        js.src = "https://connect.facebook.net/en_US/sdk.js";//#xfbml=1&appId=${fbAppId}
 
         fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
@@ -296,7 +296,7 @@ function gapiInit() {
 (function() {
 var po = document.createElement('script'); 
 po.type = 'text/javascript'; po.async = true;
-po.src = 'http://apis.google.com/js/plusone.js?onload=renderGooglePlus';
+po.src = 'https://apis.google.com/js/plusone.js?onload=renderGooglePlus';
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 })();
 </r:script>
