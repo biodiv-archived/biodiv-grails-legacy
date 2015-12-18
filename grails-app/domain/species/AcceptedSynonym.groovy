@@ -30,7 +30,7 @@ class AcceptedSynonym {
                 synonyms.add(it.synonym);
             }
         }
-        return synonyms;
+        return synonyms.sort{ s1, s2 -> return s1.name <=> s2.name };
     }
 
     static List<TaxonomyDefinition> fetchAcceptedNames(SynonymsMerged synonym) {
