@@ -288,8 +288,8 @@ class TaxonomyDefinition extends ScientificName {
         return;
     }
 
-    List<SynonymsMerged> fetchSynonyms() {
-        return AcceptedSynonym.fetchSynonyms(this);
+    List<SynonymsMerged> fetchSynonyms(def particularValue = '') {
+        return AcceptedSynonym.fetchSynonyms(this,particularValue);
     }
 
     def removeSynonym(SynonymsMerged syn) {
@@ -495,6 +495,7 @@ class TaxonomyDefinition extends ScientificName {
 			this.position = newPosition
 			if(this.position == NamesMetadata.NamePosition.CLEAN){
 				// name is moving to clean state.. overwrite all info from spreadsheet
+				println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
 				def fieldsConfig = grailsApplication.config.speciesPortal.fields
 				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
 				def tmpMatchId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)

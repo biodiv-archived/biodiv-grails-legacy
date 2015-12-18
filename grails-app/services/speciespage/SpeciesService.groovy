@@ -942,8 +942,8 @@ class SpeciesService extends AbstractObjectService  {
             	return [success:false, msg:messageSource.getMessage("info.fieldid.not.found", messagesourcearg, LCH.getLocale())]
             }
         }
-
-        if(speciesInstance && !speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+        def isContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser);
+        if(speciesInstance && !isContributor) {
             return [success:false, msg:messageSource.getMessage("info.no.permission", null, LCH.getLocale())]
         }
         println "=====2========"
@@ -1010,7 +1010,7 @@ class SpeciesService extends AbstractObjectService  {
                 def content;
                 msg = messageSource.getMessage("info.success.update.synonym", null, LCH.getLocale());
                 //content = Synonyms.findAllByTaxonConcept(taxonConcept) ;
-                content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
+                content = taxonConcept ? taxonConcept.fetchSynonyms('less') :  null;
                 String activityType, mailType, description;
                 if(oldSynonym) {
                     description = ActivityFeedService.SPECIES_SYNONYM_UPDATED+" : "+oldSynonym.name+" changed to "+synonyms[0].name
@@ -1023,7 +1023,7 @@ class SpeciesService extends AbstractObjectService  {
                     println "========SYNONYMS========== " + synonyms
                     return [success:true,/* id:speciesId,*/ msg:msg, type:'synonym', content:content,taxonConcept:taxonConcept,dataInstance:synonyms[0], activityType:activityType, mailType:mailType, activityDesc:description]  
                 }
-                return [success:true, id:speciesId, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType, activityDesc:description]
+                return [success:true, id:speciesId, msg:msg, type:'synonym', isContributor:isContributor, content:content, speciesInstance:speciesInstance, activityType:activityType, mailType:mailType, activityDesc:description]
             }
         }
     }
@@ -1278,13 +1278,13 @@ class SpeciesService extends AbstractObjectService  {
             messagesourcearg[0] = oldSynonym.id;
             return [success:false, msg:messageSource.getMessage("info.synonym.id.not.found", messagesourcearg, LCH.getLocale())]
         } 
-
+         def isContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser);
         if(speciesInstance) {
             if(!oldSynonym.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
 
-            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            if(!isContributor) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.delete.synonym", null, LCH.getLocale())]
             }
         }
@@ -1312,8 +1312,8 @@ class SpeciesService extends AbstractObjectService  {
                 }
                 msg = messageSource.getMessage("info.success.remove.synonym", null, LCH.getLocale());
                 //content = taxonConcept ? Synonyms.findAllByTaxonConcept(taxonConcept) :  null;
-                content = taxonConcept ? taxonConcept.fetchSynonyms() :  null;
-                return [success:true, id:speciesInstance?.id, msg:msg, type:'synonym', content:content, speciesInstance:speciesInstance, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED, activityDesc:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
+                content = taxonConcept ? taxonConcept.fetchSynonyms('less') :  null;
+                return [success:true, id:speciesInstance?.id, msg:msg, type:'synonym', isContributor:isContributor,content:content, speciesInstance:speciesInstance, taxonConcept:taxonConcept, activityType:ActivityFeedService.SPECIES_SYNONYM_DELETED, activityDesc:ActivityFeedService.SPECIES_SYNONYM_DELETED+" : "+oldSynonym.name, mailType:ActivityFeedService.SPECIES_SYNONYM_DELETED]
             } 
             catch(e) {
                 e.printStackTrace();

@@ -101,4 +101,8 @@ class SUserSearchService extends AbstractSearchService {
         return commitDocs(docs, commit);
 	}
 
+    def delete(long id) {
+        String className = org.hibernate.Hibernate.getClass(suser).getSimpleName()  
+        super.delete(className.simpleName +"_"+id.toString());
+    }
 }

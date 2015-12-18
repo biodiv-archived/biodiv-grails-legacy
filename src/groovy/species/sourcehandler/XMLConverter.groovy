@@ -1,5 +1,6 @@
 package species.sourcehandler
 
+import groovy.sql.Sql
 import groovy.util.Node;
 
 import java.util.List
@@ -1515,6 +1516,8 @@ class XMLConverter extends SourceConverter {
 	                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource, n, taxonContributors);
 	                if(sfield) {
 	                    //adding contributors
+						
+						println "--------------------- contribtors to be added for " + sfield + "  contr " + getUserContributors(n)
 	                    sfield.updateContributors(getUserContributors(n))
 	                    synonyms.add(sfield);
 	                }
@@ -1554,10 +1557,10 @@ class XMLConverter extends SourceConverter {
 				sfield.matchDatabaseName = taxonConcept.matchDatabaseName
 				
 				
-				taxonContributors = taxonContributors ?: taxonConcept.contributors
-				taxonContributors.each { userContributor ->
-					sfield.addToContributors(userContributor)
-				}
+//				taxonContributors = taxonContributors ?: taxonConcept.contributors
+//				taxonContributors.each { userContributor ->
+//					sfield.addToContributors(userContributor)
+//				}
 	            if(!sfield.save(flush:true)) {
 	                sfield.errors.each { log.error it }
 	            }
@@ -1650,7 +1653,7 @@ class XMLConverter extends SourceConverter {
         String spellCheckMsg = ''
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
-            println "==CREATING FIELD NODES for classification ${it}------------------------=== " + taxonNodes
+            println "==CREATING FIELD NODES for classification ${it.name}------------------------=== " + taxonNodes
 			def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
             def t = getTaxonHierarchyRes.taxonRegistry;
             spellCheckMsg = getTaxonHierarchyRes.spellCheckMsg;
@@ -1820,10 +1823,10 @@ class XMLConverter extends SourceConverter {
             //    def cleanSciName = Utils.cleanSciName(scientificName);
             //    name = cleanSciName
             //    println "===NAME=== " + name 
-            //} else 
+            //} else
+			 
             if(name) {
                 name = Utils.cleanSciName(name);
-                println "===NAME=== " + name 
             }
             if(name) {
                 println "===NAME=== " + name 
@@ -2005,7 +2008,8 @@ class XMLConverter extends SourceConverter {
                                 //taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
-                                println "=====SAVING NEW TAXON================================== "
+                                println "=====SAVING NEW TAXON======================#######============ " + parsedName
+								
                                 log.debug "Saving taxon definition"
                                 taxon = parsedName;
                                 taxon.rank = rank;
@@ -2077,7 +2081,9 @@ class XMLConverter extends SourceConverter {
                                         newNameSaved = false;
                                     }
                                 }
-                                taxon=taxon.merge();
+								
+								taxon=taxon.merge();
+									
 								println "--------- saving taxon finally ---------------------"
                                 if(!taxon.save(flush:true)) {
                                     taxon.errors.each { log.error it }
@@ -2452,13 +2458,13 @@ class XMLConverter extends SourceConverter {
         SessionFactory sessionFactory = ctx.getBean("sessionFactory")
         def hibSession = sessionFactory?.getCurrentSession()
         if(hibSession) {
-            log.debug "Flushing and clearing session"
+            log.debug "Flushing session after creating new name----"
             try {
                 hibSession.flush()
             } catch(ConstraintViolationException e) {
                 e.printStackTrace()
             }
-            //         hibSession.clear()
+			//hibSession.clear()
         }
     }
 

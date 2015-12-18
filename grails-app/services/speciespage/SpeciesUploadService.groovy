@@ -71,6 +71,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import species.participation.NamesReportGenerator
+import species.participation.NamelistService
 
 class SpeciesUploadService {
 
@@ -91,7 +92,7 @@ class SpeciesUploadService {
 	def speciesSearchService;
 	def springSecurityService
 	def speciesPermissionService;
-    def namelistService;
+    //def namelistService;
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -365,6 +366,7 @@ class SpeciesUploadService {
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				cleanUpGorm();
+				NamelistService.clearCOLNameFromMemory()
 			}
 		}
 		
@@ -989,9 +991,11 @@ class SpeciesUploadService {
 			}
 			log.debug "Reverting changes of species before delete $s ===="
 			s = s.merge()
-			s.delete(flush:true)
-			log.debug "Deleted ${s}"
-			return true
+			if(s.delete(flush:true)) {
+			    log.debug "Deleted ${s}"
+			    speciesSearchService.delete(s.id);
+			    return true
+            }
 		}catch (Exception e) {
 			log.error "Error in Delete/Reverting ${s}"
 			e.printStackTrace()
@@ -1012,7 +1016,6 @@ class SpeciesUploadService {
 			Species.withTransaction{
 				if(success){
 					rollBackSpeciesUpdate(s, sFields, s.resources.collect{it}, user, null)
-					speciesSearchService.delete(s.id);
 				}
 			}
 		}catch(e){

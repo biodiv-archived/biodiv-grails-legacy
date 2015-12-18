@@ -101,5 +101,7 @@ class UserGroupSearchService extends AbstractSearchService {
         return commitDocs(docs, commit);
 	}
 
-
+    def delete(long id) {
+        super.delete(UserGroup.simpleName +"_"+id.toString());
+    }
 }
