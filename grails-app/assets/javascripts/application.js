@@ -118,7 +118,6 @@
 
 ////= require maps
 ////= require OpenLayers-2.10/OpenLayers.js
-////= require biodiv/maps/am.js
 ////= require biodiv/maps/map-search.js
 ////= require biodiv/maps/mapapp.js
 ////= require biodiv/maps/cookie-chef.js
@@ -129,6 +128,8 @@
 //= require biodiv/content.js
 
 ////= require species
+//= require biodiv/maps/am.js
+//= require OpenLayers-2.10/OpenLayers.js
 //= require biodiv/speciesfield.js
 //= require biodiv/species.js
 

@@ -182,7 +182,7 @@ var getSnippetHTML = function(carousel, item) {
 
                             +'</div>'
         }
-                        + '</div>'
+        eleHTML +=   + '</div>'
 
 /*        eleHTML +=      '<div class="observation_story_body toggle_story" style="display:none;">' +
                             '<div class="prop">'+

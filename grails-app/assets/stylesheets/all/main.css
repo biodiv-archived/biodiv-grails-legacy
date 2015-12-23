@@ -16,68 +16,6 @@ textarea {
 	vertical-align: top;
 }*/
 
-/* PAGINATION */
-.paginateButtons {
-	/*background: #fff url(/assets/all/skin/shadow.jpg) bottom repeat-x;*/
-	color: #666;
-	font-size: 10px;
-	overflow: hidden;
-	padding: 10px 3px;
-}
-
-.paginateButtons a {
-	background: #fff;
-	border: 0px solid #ccc;
-	border-color: #ccc #aaa #aaa #ccc;
-	margin: 0 3px;
-	padding: 2px 4px;
-	text-shadow: 0 1px 2px #afafaf;
-	font-size: 1.2em;
-}
-
-.paginateButtons a:hover {
-	text-decoration: underline;
-}
-
-.paginateBar {
-	color: #666;
-	font-size: 9px;
-	width: 50px;
-	padding: 10px 3px;
-	position: fixed;
-	height: '100%',
-}
-
-.paginateBar ul {
-	float: left;
-	background: white;
-	padding: 0;
-	text-align: center;
-	border: 1px solid #CCC;
-	list-style: none;
-	margin: 0;
-	z-index: 99;
-}
-
-.paginateBar li {
-	list-style: none;
-	margin: 0;
-	padding: 5px 3px;
-}
-
-.paginateBar a {
-	background: #fff;
-	border: 1px solid #ccc;
-	border-color: #ccc #aaa #aaa #ccc;
-	color: #666;
-	margin: 0 3px;
-	padding: 2px 6px;
-}
-
-.paginateButtons span {
-	padding: 2px 3px;
-}
-
 /* DIALOG */
 div.dialog {
 	clear: both;
