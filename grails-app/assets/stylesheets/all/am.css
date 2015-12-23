@@ -155,7 +155,7 @@ margin-bottom:2px;
 
 #panel_show_bttn {
 z-index: 2000;
-background-image: url("../images/left_arrow.png");
+background-image: url("/assets/all/left_arrow.png");
 background-repeat: no-repeat;
 background-position: left center;
 height:51px;
@@ -171,7 +171,7 @@ box-shadow:0 0 3px #000000;
 
 #panel_hide_bttn {
 z-index: 2000;
-background-image: url("../images/right_arrow.png");
+background-image: url("/assets/all/right_arrow.png");
 background-repeat: no-repeat;
 background-position: left center;
 height:51px;
@@ -190,7 +190,7 @@ box-shadow:0 0 3px #000000;
 
 #panel_toggle_bttn {
 z-index: 2000;
-background-image: url("../images/right_arrow.png");
+background-image: url("/assets/all/right_arrow.png");
 background-repeat: no-repeat;
 background-position: left center;
 height:51px;
@@ -366,7 +366,7 @@ background-color: #D4EDC9;
 }
 
 .collapsible_box_title {
-background-image: url("../images/triangle.png");
+background-image: url("/assets/all/triangle.png");
 background-repeat: no-repeat;
 }
 
@@ -385,45 +385,45 @@ z-index:1009;
 }
 
 .olControlPanel .olControlMouseDefaultsItemActive {
-    background-image: url("../images/pan_on.png");
+    background-image: url("/assets/all/pan_on.png");
     background-repeat: no-repeat;
 }
 
 .olControlPanel .olControlMouseDefaultsItemInactive {
-    background-image: url("../images/pan_off.png");
+    background-image: url("/assets/all/pan_off.png");
     background-repeat: no-repeat;
 }
 
 .olControlPanel .olControlZoomBoxItemActive{
-    background-image: url("../images/zoom_on.png");
+    background-image: url("/assets/all/zoom_on.png");
     background-repeat: no-repeat;
 }
 
 .olControlPanel .olControlZoomBoxItemInactive {
-    background-image: url("../images/zoom_off.png");
+    background-image: url("/assets/all/zoom_off.png");
     background-repeat: no-repeat;
 }
 
 .olControlPanel .pathMeasureTool.olControlMeasureItemActive{
-    background-image: url("../images/map_tools.png");
+    background-image: url("/assets/all/map_tools.png");
     background-repeat: no-repeat;
     background-position: 0px -22px;
 }
 
 .olControlPanel .pathMeasureTool.olControlMeasureItemInactive{
-    background-image: url("../images/map_tools.png");
+    background-image: url("/assets/all/map_tools.png");
     background-repeat: no-repeat;
     background-position: 0px 0px;
 }
 
 .olControlPanel .areaMeasureTool.olControlMeasureItemActive{
-    background-image: url("../images/map_tools.png");
+    background-image: url("/assets/all/map_tools.png");
     background-repeat: no-repeat;
     background-position: 0px -66px;
 }
 
 .olControlPanel .areaMeasureTool.olControlMeasureItemInactive{
-    background-image: url("../images/map_tools.png");
+    background-image: url("/assets/all/map_tools.png");
     background-repeat: no-repeat;
     background-position: 0px -44px;
 }
@@ -443,7 +443,7 @@ z-index:1009;
 }
 
 .zoom_to_extent {
-background-image: url("../images/zoom-to-extent.png");
+background-image: url("/assets/all/zoom-to-extent.png");
 background-repeat: no-repeat;
 background-position: left center;
 cursor:pointer;      
@@ -490,7 +490,7 @@ color:#5e5e5e;
 }
 
 #shadow {
-background-image: url("../images/shadow.png");
+background-image: url("/assets/all/shadow.png");
 background-repeat: repeat-x;
 font-size: 0px;
 height: 5px;
@@ -576,7 +576,7 @@ z-index:100;
 }
 
 .attribution_link {
-background-image: url("../images/by.png");
+background-image: url("/assets/all/by.png");
 background-repeat: no-repeat;
 background-position: -24 0;
 height:24px;
@@ -648,7 +648,7 @@ text-decoration:underline;
 
 .layer_download_link {
 position:relative;
-background-image: url("../images/download.png");
+background-image: url("/assets/all/download.png");
 background-repeat: no-repeat;
 background-position: left center;
 opacity:0.5;
@@ -704,7 +704,7 @@ text-decoration:underline;
 }
 
 .close_button {
-background-image: url("../images/close_round.png");
+background-image: url("/assets/all/close_round.png");
 background-repeat: no-repeat;
 background-position: 0 0;
 height:24px;
@@ -750,7 +750,7 @@ background-position: -24 0;
     font-size:0.8em;
 }
 .add_to_map {
-background-image: url("../images/add.png");
+background-image: url("/assets/all/add.png");
 background-repeat: no-repeat;
 background-position: left center;
 opacity:0.5;      
@@ -762,7 +762,7 @@ opacity:1;
 }
 
 .remove_from_map {
-background-image: url("../images/remove.png");
+background-image: url("/assets/all/remove.png");
 background-repeat: no-repeat;
 background-position: left center;
 opacity:0.5;      
@@ -773,7 +773,7 @@ opacity:1;
 }
 
 .layer_details_link {
-background-image: url("../images/info.png");
+background-image: url("/assets/all/info.png");
 background-repeat: no-repeat;
 background-position: left center;
 opacity:0.5;      
@@ -809,7 +809,7 @@ z-index:100;
 }
 
 .layer_link {
-background-image: url("../images/link.png");
+background-image: url("/assets/all/link.png");
 background-repeat: no-repeat;
 background-position: left center;
 opacity:0.5;      

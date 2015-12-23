@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'group.value.user')} "/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<asset:javascript src="userGroups.js" />
 </head>
 <body>
 	

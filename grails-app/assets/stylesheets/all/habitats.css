@@ -1,4 +1,4 @@
-.habitats_sprites, .habitats_sprites.active { background-image: url(../images/group_icons/habitat/all_small_sprite.png); background-color: transparent; background-repeat: no-repeat; }
+.habitats_sprites, .habitats_sprites.active { background-image: url(/assets/all/group_icons/habitat/all_small_sprite.png); background-color: transparent; background-repeat: no-repeat; }
 
 .habitats_sprites.all_gall_th { width: 32px; height: 32px; background-position: -33px -483px; }
 .habitats_sprites.all_gall_th:hover { background-position: -33px -515px; }

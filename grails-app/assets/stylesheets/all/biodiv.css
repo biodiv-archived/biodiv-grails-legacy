@@ -4,7 +4,7 @@
  */
 
 body { /*     background-color: #ffffff; */
-	/*     background-image: url('../images/header.png'); */
+	/*     background-image: url('/assets/all/header.png'); */
 	/*background-color: #ffffff;*/
 	background-repeat: no-repeat;
 	background-position: 0 38px;
@@ -55,7 +55,7 @@ h6 {
 .page-footer {
 	height: 221px;
 	width: 725px;
-	background-image: url('../images/footer.png');
+	background-image: url('/assets/all/footer.png');
 	position: fixed;
 	bottom: 0;
 	right: 0;
@@ -452,8 +452,8 @@ div.errors {
 }
 
 .add_image {
-	background-image: url('../images/add_photo.png');
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-photo.png'),sizingMethod='crop');
+	background-image: url('/assets/all/add_photo.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 200px;
@@ -462,8 +462,8 @@ div.errors {
 	border-bottom: 3px red;
 }
 .add_video {
-	background-image: url('../images/add_video.png');
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-video.png'),sizingMethod='crop');
+	background-image: url('/assets/all/add_video.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
 	width: 170px;
@@ -471,8 +471,8 @@ div.errors {
 	cursor: pointer;
 }
 .add_audio {
-	background-image: url('../images/add_audio.png');
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('../images/add-audio.png'),sizingMethod='crop');
+	background-image: url('/assets/all/add_audio.png');
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-audio.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 	width: 200px;
 	height: 65px;
@@ -598,7 +598,7 @@ textarea#featureNotes {
 }
 
 .featured {
-    background: url('../images/featured_star.png') no-repeat right top;
+    background: url('/assets/all/featured_star.png') no-repeat right top;
     width: 35px; 
     height: 50px;
     left:0px;
@@ -692,7 +692,7 @@ ul#recoSummary {
 }
 
 .close_button {
-	background: url('../images/close.png') no-repeat center left;
+	background: url('/assets/all/close.png') no-repeat center left;
 	width: 24px;
 	height: 24px;
 	position: absolute;
@@ -1017,7 +1017,7 @@ i {
 }
 
 .toolbar a.close {
-	background: url('../images/close.png') no-repeat;
+	background: url('/assets/all/close.png') no-repeat;
 	cursor: pointer;
 	float: right;
 }
@@ -1027,7 +1027,7 @@ i {
 }
 
 .taxaHierarchy {
-	background: url('../images/tree.png') 5px 25% no-repeat;
+	background: url('/assets/all/tree.png') 5px 25% no-repeat;
 	margin-left: 0;
 	margin-right: 5px;
 	padding-left: 5px;
@@ -1054,7 +1054,7 @@ i {
 
 /* MESSAGES AND ERRORS */
 .message {
-	background: #f3f8fc url('../images/skin/information.png') 8px 50%
+	background: #f3f8fc url('/assets/all/skin/information.png') 8px 50%
 		no-repeat;
 	border: 1px solid #b2d1ff;
 	color: #006dba;
@@ -1076,7 +1076,7 @@ i {
 }
 
 .errors li {
-	background: url('../images/skin/exclamation.png') no-repeat 8px 0%;
+	background: url('/assets/all/skin/exclamation.png') no-repeat 8px 0%;
 	line-height: 16px;
 	padding-left: 30px;
 }
@@ -1431,7 +1431,7 @@ span.cke_skin_kama {
 	border-bottom: 3px solid #003846;
 }
 
-#ibp-footer { /* 	background-image: url('../images/footer-big.jpg'); */
+#ibp-footer { /* 	background-image: url('/assets/all/footer-big.jpg'); */
 	/* 	background-size: 100%; */
 	background-color: #ffffff;
 	color: #5E5E5E;
@@ -1874,7 +1874,7 @@ li#userOrEmail-new {
 #feedback_button {
 	width: 50px;
 	height: 120px;
-	background-image: url("../images/feedback.png");
+	background-image: url("/assets/all/feedback.png");
 	position: fixed;
 	left: -10px;
 	top: 50%;
@@ -2093,14 +2093,14 @@ line-height: 11px;
 }
 
 .icon-group {
-	background-image: url('../images/glyphicons_043_group.png');
+	background-image: url('/assets/all/glyphicons_043_group.png');
 	background-position:0 0;
 	width:22px;
 		
 }
 
 .icon-group-gray {
-	background-image: url('../images/glyphicons_043_group_gray.png');
+	background-image: url('/assets/all/glyphicons_043_group_gray.png');
 	background-position:0 0;
 	width:22px;
 }
@@ -2385,7 +2385,7 @@ div.noOfRatings {
 .pdficon {
 	width: 16px;
 	height: 16px;
-	background: url('../images/pdficon.jpg');
+	background: url('/assets/all/pdficon.jpg');
 	cursor: pointer;
 }
 
@@ -2447,7 +2447,7 @@ div.noOfRatings {
 /*    background-color: whitesmoke;
     border: solid grey 1px;
 */    line-height:2.5;
-    background-image: url('../images/stack.png');
+    background-image: url('/assets/all/stack.png');
     padding-left: 20px;
     color: #0c8040;
 }
@@ -2518,7 +2518,7 @@ div.noOfRatings {
 }
 
 .icon-group-gray:hover {
-        background-image: url('../images/glyphicons_043_group_white.png');
+        background-image: url('/assets/all/glyphicons_043_group_white.png');
 } 
 .resource_in_groups .sidebar_section {
 	margin-bottom: 0px;
@@ -2534,7 +2534,7 @@ div.noOfRatings {
 }
 
 .feature_icon {
-    background:url('../images/features.png');
+    background:url('/assets/all/features.png');
     width:32px;
     height:32px;
 }
@@ -2604,22 +2604,22 @@ small {
 }
 
 #home #species_entry {
-    background-image: url('../images/species.png');
+    background-image: url('/assets/all/species.png');
 }
 #home #explore {
-    background-image: url('../images/explore.png');
+    background-image: url('/assets/all/explore.png');
 }
 #home #documents {
-    background-image: url('../images/documents.png');
+    background-image: url('/assets/all/documents.png');
 }
 #home #observations {
-    background-image: url('../images/observations.png');
+    background-image: url('/assets/all/observations.png');
 }
 #home #groups_entry {
-    background-image: url('../images/groups.png');
+    background-image: url('/assets/all/groups.png');
 }
 #home #dashboard {
-    background-image: url('../images/discussions.png');
+    background-image: url('/assets/all/discussions.png');
 }   
 
 #home .entry:hover {
@@ -2974,7 +2974,7 @@ small {
 
 
 .taxaHierarchy {
-	background: url(../images/tree.png) 5px 50% no-repeat;
+	background: url(/assets/all/tree.png) 5px 50% no-repeat;
 	margin-left: 0;
 	margin-right: 5px;
 	padding-left: 5px;

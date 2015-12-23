@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="Projects" />
 <g:render template="/common/titleTemplate" model="['title':title]" />
-<asset:javascript src="add_file.js" />
 
 <style>
 <!--

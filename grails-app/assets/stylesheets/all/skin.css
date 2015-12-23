@@ -204,7 +204,7 @@
     border:0;            
 }
 .jcarousel-skin-ie7 .jcarousel-prev-horizontal {
-    background: url("../../../../../images/arrow-left-right.png") no-repeat scroll 0 0 transparent;
+    background: url("/assets/all/arrow-left-right.png") no-repeat scroll 0 0 transparent;
     cursor: pointer;
     height: 100%;
     position: absolute;
@@ -217,7 +217,7 @@
     opacity:1;       
 }
 .jcarousel-skin-ie7 .jcarousel-next-horizontal {
-    background: url("../../../../../images/arrow-left-right.png") no-repeat scroll 0 0 transparent;
+    background: url("/assets/all/arrow-left-right.png") no-repeat scroll 0 0 transparent;
     background-position: -17px 0;            
     cursor: pointer;
     height: 100%;

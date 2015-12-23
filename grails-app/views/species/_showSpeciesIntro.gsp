@@ -16,7 +16,7 @@
     <div style="padding-bottom:10px">
                 <center>
             <div id="gallerySpinner" class="spinner">
-                <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}"
                 alt="${message(code:'spinner.alt',default:'Loading...')}" />
             </div>
         </center>

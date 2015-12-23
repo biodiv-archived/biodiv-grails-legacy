@@ -7,7 +7,6 @@
         <g:set var="title" value="${checklistInstance.title}"/>
         <g:set var="description" value="${Utils.stripHTML(checklistInstance.notes?:'')}" />
         <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-        <asset:javascript src="checklist.js"/>
         <style>
             .observation_story .observation_footer {
                 margin-top:50px;

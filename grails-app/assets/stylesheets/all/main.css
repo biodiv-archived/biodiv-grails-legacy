@@ -18,7 +18,7 @@ textarea {
 
 /* PAGINATION */
 .paginateButtons {
-	/*background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;*/
+	/*background: #fff url(/assets/all/skin/shadow.jpg) bottom repeat-x;*/
 	color: #666;
 	font-size: 10px;
 	overflow: hidden;
@@ -178,12 +178,12 @@ th.name {
 /* } */
 
 /* .ui-icon-help { */
-/* 	background: url(../images/skin/icon-help.png) no-repeat; */
+/* 	background: url(/assets/all/skin/icon-help.png) no-repeat; */
 /* 	float: right; */
 /* 	margin-left: .3em;								 */
 /* } */
 .ui-icon-info {
-	background-image: url("../images/by.png");
+	background-image: url("/assets/all/by.png");
 	background-repeat: no-repeat;
 	background-position: 0 0;
 	height: 16px;
@@ -197,7 +197,7 @@ th.name {
 }
 
 .ui-icon-edit {
-	background-image: url("../images/edit.png");
+	background-image: url("/assets/all/edit.png");
 	background-repeat: no-repeat;
 	background-position: 0 0;
 	height: 16px;
@@ -210,7 +210,7 @@ th.name {
 }
 
 .ui-icon-help {
-	background-image: url("../images/help.png");
+	background-image: url("/assets/all/help.png");
 	background-repeat: no-repeat;
 	background-position: 0 0;
 	height: 16px;
@@ -255,7 +255,7 @@ th.name {
 }
 
 .toolbar a.close {
-	background: url(../images/skin/close.png) no-repeat;
+	background: url(/assets/all/skin/close.png) no-repeat;
 	cursor: pointer;
 	float: right;
 }
@@ -381,7 +381,7 @@ img {
 }*/
 
 .searchButton {
-	background: #ffffff url(../images/search.png) no-repeat scroll center;
+	background: #ffffff url(/assets/all/search.png) no-repeat scroll center;
 	width: 42px;
 	border: 1px solid #aeaeae;
 	border-radius: 5px;
@@ -390,7 +390,7 @@ img {
 }
 
 .demo {
-	background: url(../images/demo-1.png) left no-repeat;
+	background: url(/assets/all/demo-1.png) left no-repeat;
 	border: none;
 	padding-left: 30px;
 	padding-top: 5px;
@@ -438,7 +438,7 @@ img {
 
 /*
 .heading {
-	background: #fff url(../images/skin/shadow.jpg) repeat-x center;
+	background: #fff url(/assets/all/skin/shadow.jpg) repeat-x center;
 	padding: 3px;
 	border-bottom: 3px solid #A9DA92;
 }*/
@@ -838,7 +838,7 @@ ul.thumbwrap li.poor_species_content div.poor_species_content {
 }
 
 .close_button {
-	background: url(../images/close.png) no-repeat center left;
+	background: url(/assets/all/close.png) no-repeat center left;
 	width: 24px;
 	height: 24px;
 	position: absolute;
@@ -960,7 +960,7 @@ ul.thumbwrap li.poor_species_content div.poor_species_content {
 	width: 300px;
 	padding: 5px;
 	cursor: default;
-	background: url('../images/arrow-down.png') no-repeat scroll 96% 50%;
+	background: url('/assets/all/arrow-down.png') no-repeat scroll 96% 50%;
 	border: 1px solid #9e9e9e;
 	font-size: 1em;
 	font-weight: bold;
@@ -999,7 +999,7 @@ ul.thumbwrap .license_options li:hover {
 }
 
 .list_style_button {
-	background-image: url('../images/list_view.png');
+	background-image: url('/assets/all/list_view.png');
 	background-repeat: no-repeat;
 	background-position: 0 -19px;
 	width: 19px;
@@ -1011,7 +1011,7 @@ ul.thumbwrap .license_options li:hover {
 }
 
 .grid_style_button {
-	background-image: url('../images/list_view.png');
+	background-image: url('/assets/all/list_view.png');
 	background-repeat: no-repeat;
 	background-position: 0 0;
 	width: 19px;
@@ -1048,7 +1048,7 @@ ul.thumbwrap .license_options li:hover {
 }
 
 .map_view_button {
-	background-image: url('../images/map.png');
+	background-image: url('/assets/all/map.png');
 	background-repeat: no-repeat;
 	background-position: 0 0;
 	width: 19px;
@@ -1061,7 +1061,7 @@ ul.thumbwrap .license_options li:hover {
 }
 
 #add_file {
-	background-image: url('../images/add-photo.png');
+	background-image: url('/assets/all/add-photo.png');
 	background-repeat: no-repeat;
 	background-position: 10px 10px;
 	width: 220px;
@@ -1139,13 +1139,13 @@ ul.thumbwrap .license_options li:hover {
 }
 
 .prop .name.observations_summary {
-	background: url('../images/binoculars-icon.png')  no-repeat ;	
+	background: url('/assets/all/binoculars-icon.png')  no-repeat ;	
 	height: 20px;
     width: 20px;
 }
 
 .prop .name.tags_summary {
-	background: url('../images/tag.png')  no-repeat ;	
+	background: url('/assets/all/tag.png')  no-repeat ;	
 	height: 20px;
     width: 20px;
 }

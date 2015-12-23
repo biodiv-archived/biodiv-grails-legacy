@@ -60,8 +60,8 @@ var hintLike = $(ele).attr('title');
         },
         hints: [hintLike],
 
-        starOff  : 'like-icon.png',
-        starOn   : 'liked-icon.png'
+        starOff  : '../like-icon.png',
+        starOn   : '../liked-icon.png'
     });
 }
 
@@ -84,9 +84,9 @@ function rate(ele, successHandler, inputName) {
         },
         hints: ['Bad', 'Poor', 'Ok', 'Good', 'Best'],
         halfShow:true,
-        starHalf : 'star-half.png',
-        starOff  : 'star-off.png',
-        starOn   : 'star-on.png'
+        starHalf : '../star-half.png',
+        starOff  : '../star-off.png',
+        starOn   : '../star-on.png'
     });
 }
 

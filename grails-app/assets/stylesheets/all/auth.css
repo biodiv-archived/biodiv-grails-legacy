@@ -84,12 +84,12 @@ input+.external_bttn, .external_bttn {
 
 .facebookButton {
 	margin-left: 6px;
-	background-image: url('../images/external_providers.png');
+	background-image: url('/assets/all/external_providers.png');
 	background-position: 0 0;
 }
 
 .googleButton {
-	background-image: url('../images/external_providers.png');
+	background-image: url('/assets/all/external_providers.png');
 	background-position: 0 -33px;
 }
 
@@ -98,7 +98,7 @@ input+.external_bttn, .external_bttn {
 }
 
 .yahooButton {
-	background-image: url('../images/external_providers.png');
+	background-image: url('/assets/all/external_providers.png');
 	background-position: 0 -99px;
 }
 

@@ -3,7 +3,6 @@
     <head>
         <title><g:message code="msg.Google.Visualization.API.plugin" /></title>
         <meta name="layout" content="main" />
-        <asset:javascript src="chart" />
         <gvisualization:apiImport/>
     </head>
        <body>

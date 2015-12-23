@@ -36,7 +36,6 @@
                 <span style="float:left;"
                     class="habitat_icon group_icon habitats_sprites active ${Habitat.findByName('All').iconClass()}"
                     title="${Habitat.findByName('All').name}"></span>
-                <!--img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}" style="width:22px;"/-->
                 <span class="display_value"><g:message code="default.select.habitat.label" /> </span>
             <b class="caret"></b>
             </div>
@@ -48,7 +47,6 @@
                     class="habitat_icon group_icon habitats_sprites active ${h.iconClass()}"
                     title="${h.name}"></span>
 
-                    <!--img src="${resource(dir:'images/group_icons',file:'All.png', absolute:true)}" style="width:22px;"/-->
                     <span class="display_value">${h.name}</span>
 
                     </div>

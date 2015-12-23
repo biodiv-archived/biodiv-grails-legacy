@@ -10,7 +10,6 @@
     <head>
         <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <asset:javascript src="create.js"/>
         <style>
             .imagesList{
                 background-color: #fefad5;

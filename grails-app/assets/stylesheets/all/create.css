@@ -101,7 +101,7 @@ input.dms_field {
 }
 
 .slick-header-menubutton {
-    background-image: url(../../images/dropdown_active.gif);
+    background-image: url(..//assets/all/dropdown_active.gif);
     display:visible;
     margin-right:3px;
 }
@@ -131,7 +131,7 @@ input.dms_field {
 }
 
 .icon-help {
-    background-image: url(../images/help.png);
+    background-image: url(/assets/all/help.png);
 }
 .combobox-container .add-on {
 	right: -26px;

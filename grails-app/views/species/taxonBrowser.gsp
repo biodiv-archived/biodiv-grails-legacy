@@ -10,7 +10,6 @@
 	value="${message(code: 'species.label', default: 'Species')}" />
 <title><g:message code="taxonbrowser.taxonomy.browser" /></title>
 
-<asset:javascript src="species_show.js"/>
 <style type="text/css">
     </style>
 

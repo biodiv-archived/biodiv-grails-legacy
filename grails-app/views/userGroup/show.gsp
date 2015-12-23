@@ -7,7 +7,6 @@
 <g:set var="title" value="${userGroupInstance.name}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<asset:javascript src="userGroups.js" />
 <style>
 .comment-textbox {
 	width: 100%;

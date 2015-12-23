@@ -21,7 +21,6 @@
 	padding: 5px;
 }
 </style>
-<asset:javascript src="observations_list" />
 </head>
 <body>
 	<div class="span12">

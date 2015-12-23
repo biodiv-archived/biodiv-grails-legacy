@@ -6,7 +6,6 @@
 <g:set var="title" value="${g.message(code:'button.contribute')}"/>
 <g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
 
-<asset:javascript src="species"/>
 <g:javascript src="species/util.js"/>
 
 </head>

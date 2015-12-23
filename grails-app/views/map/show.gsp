@@ -4,7 +4,6 @@
     <head>
         <g:set var="title" value="${params?.title?:g.message(code:"button.maps") }"/>
         <g:render template="/common/titleTemplate"/>
-        <asset:javascript src="maps" />
         <style>
             div.container.outer-wrapper{
                 width:100%;

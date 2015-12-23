@@ -31,7 +31,6 @@ if(r) {
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 
-<asset:javascript src="show.js"/>
 
 <style>
 .nameContainer {

@@ -7,8 +7,6 @@
     <g:set var="title" value="${params.action?.capitalize()}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<asset:javascript src="userGroups.js" />
-<asset:javascript src="show.js" />
 <style>
 .thumbnail {
 	margin: 0 25px;

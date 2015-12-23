@@ -15,8 +15,7 @@
 </title>
 
 <link rel="shortcut icon"
-	href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
-<asset:javascript src="admin" />
+	href="${assetPath(src:'/all/favicon.ico')}" type="image/x-icon" />
 
 <%-- tab icons --%>
 <style>

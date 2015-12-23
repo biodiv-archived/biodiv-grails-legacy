@@ -106,9 +106,7 @@
             <span class="name"><g:message code="default.licenses.label" /></span>
 
             <div class="value">
-                <img
-                src="${resource(dir:'images/license',file:documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
-                title="${documentInstance.license.name}" />
+                <asset:image src="/all/license/${documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png'}" absolute="true" title="${documentInstance.license.name}" />
             </div>
         </div>
         </g:if>

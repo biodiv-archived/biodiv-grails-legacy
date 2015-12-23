@@ -3,7 +3,6 @@
 <head>
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' /></title>
-<asset:javascript src="userGroups.js"/>
 </head>
 
 <body>

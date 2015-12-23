@@ -35,8 +35,8 @@
             </div>
         </g:if>
              <div class="footer-item"> 
-                <img src="${resource(dir:'images/license',file:observationInstance?.license?.name?.getIconFilename()+'.png', absolute:true)}"
-                title="${observationInstance.license.name}"/>
+
+                <asset:image src="/all/license/${observationInstance?.license?.name?.getIconFilename().toLowerCase()+'.png'}" absolute="true" title="${observationInstance.license.name}" />
             </div>
        
     </g:if>

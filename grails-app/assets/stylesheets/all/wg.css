@@ -6,7 +6,7 @@
 #branding #logo a div{
 	width: 250px;
 	height: 80px;
-	background-image: url(../images/map-logo2.png);
+	background-image: url(/assets/all/map-logo2.png);
   cursor: hand;
   cursor: pointer;
 }

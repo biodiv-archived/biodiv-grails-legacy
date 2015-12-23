@@ -5,7 +5,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'group.value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<asset:javascript src="userGroups.js" />
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;

@@ -9,8 +9,6 @@
         <g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
         <g:set var="entityName" value="${g.message(code:'button.documents')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <asset:javascript src="add_file.js"/>
-        <asset:javascript src="show.js"/>
         <style type="text/css">
             .thumbnails>.thumbnail {
             margin: 0 0 10px 0px;

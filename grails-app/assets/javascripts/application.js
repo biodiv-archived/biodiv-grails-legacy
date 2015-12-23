@@ -57,7 +57,7 @@
 //= require bootstrap.plugins/bootstrap_gallery/blueimp-gallery-youtube.js
 //= require bootstrap.plugins/bootstrap_gallery/jquery.blueimp-gallery.min.js
 
-//= require jquery.plugins/jquery.sparkline.min.js
+//= require jquery.plugins/jquery.sparkline.min.js 
 //= require jquery.plugins/jquery.history.js
 //= require jquery.plugins/jquery.url.js
 //= require jquery.plugins/jstree.min.js
@@ -100,7 +100,6 @@
 //= require biodiv/observations/map.js
 
 ////add_file
-//= require fileuploader.js
 //= require biodiv/content.js
 //= require biodiv/location/location-picker.js
 
@@ -118,11 +117,11 @@
 //= require biodiv/curation.js
 
 ////= require maps
-//= require OpenLayers-2.10/OpenLayers.js
-//= require biodiv/maps/am.js
-//= require biodiv/maps/map-search.js
-//= require biodiv/maps/mapapp.js
-//= require biodiv/maps/cookie-chef.js
+////= require OpenLayers-2.10/OpenLayers.js
+////= require biodiv/maps/am.js
+////= require biodiv/maps/map-search.js
+////= require biodiv/maps/mapapp.js
+////= require biodiv/maps/cookie-chef.js
 
 ////= require show
 //= require jquery.plugins/jsrender.js

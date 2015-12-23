@@ -10,7 +10,6 @@
 <g:set var="title" value="${g.message(code:'showobservationstoryfooter.title.species')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<asset:javascript src="species.js" />
 </head>
 <body>
 	<g:include controller="species" action="list" model="['userGroup':userGroupInstance, 'params':params]"/>

@@ -13,6 +13,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         <title><g:layoutTitle/></title>
 
         <asset:javascript src="jquery.js"/>
+        <asset:javascript src="fileuploader.js"/>
         <asset:stylesheet href="application.css"/>
         <g:layoutHead />
         <ckeditor:resources />
@@ -25,7 +26,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         <g:set var="userGroupInstance" value="${userGroupInstance}"/>
         <g:if test="${userGroupInstance && userGroupInstance.theme}">
         <link rel="stylesheet" type="text/css"
-        href="${resource(dir:'group-themes', file:userGroupInstance.theme + '.css')}" />
+        href="${assetPath(src:'/all/group-themes/'+userGroupInstance.theme + '.css')}" />
 
         </g:if>
 
@@ -59,7 +60,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 
             <domain:showSiteFooter />
         </div>
-
+ 
         <asset:javascript src="application.js"/>
         <asset:deferredScripts/>
     </body>

@@ -7,7 +7,6 @@
 <g:set var="title" value="${documentInstance.title}"/>
 <g:set var="description" value="${Utils.stripHTML(documentInstance.notes?:'') }" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-<asset:javascript src="show.js"/>
 </head>
 <body>
     <div class="span12">

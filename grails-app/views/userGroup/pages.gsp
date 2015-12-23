@@ -12,7 +12,6 @@
 
 <g:set var="title" value="${g.message(code:'ugroup.value.pages')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<asset:javascript src="userGroups.js" />
 <style>
     #contentMenu > .nav-tabs > .active > a {
         font-weight:normal;

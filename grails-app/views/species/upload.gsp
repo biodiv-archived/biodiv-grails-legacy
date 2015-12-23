@@ -8,7 +8,6 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <asset:javascript src="bulkupload" />
     </head>
     <body>
         <div id="uploadSpeciesDiv">
@@ -132,7 +131,9 @@
                         class="btn btn-primary" style="float: right; margin-right: 5px;">
                         <g:message code="button.upload.names" /></a>
                         
-                    <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;"><img class="uploadingSpecies" src="../images/rotate.gif"></div>
+                    <div id="speciesLoader" style="display:none; float: right; margin-right: 5px;">i
+                        <asset:image class="uploadingSpecies" src="/all/rotate.gif" absolute="true"/>
+                    </div>
                     <span class="policy-text"> <g:message code="upload.submit.upload" /> <a href="/terms"><g:message code="link.terms.conditions" />          </a> <g:message code="button.propogate" /><g:message code="register.index.use.of.site" /></span>
                 </div>
                 </div>

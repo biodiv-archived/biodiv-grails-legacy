@@ -5,7 +5,6 @@
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.discussions')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<asset:javascript src="add_file.js" />
 
 <style>
 .control-group.error  .help-inline {

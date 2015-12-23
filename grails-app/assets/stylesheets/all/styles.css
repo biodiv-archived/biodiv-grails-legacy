@@ -108,22 +108,22 @@ text-decoration:underline;
 }
 
 .paginate_disabled_previous {
-  background-image:url(../images/back_disabled.jpg);
+  background-image:url(/assets/all/back_disabled.jpg);
   float:left;
 }
 
 .paginate_enabled_previous {
-  background-image:url(../images/back_enabled.jpg);
+  background-image:url(/assets/all/back_enabled.jpg);
   float:left;
 }
 
 .paginate_disabled_next {
-  background-image:url(../images/forward_disabled.jpg);
+  background-image:url(/assets/all/forward_disabled.jpg);
   float:left;
 }
 
 .paginate_enabled_next {
-  background-image:url(../images/forward_enabled.jpg);
+  background-image:url(/assets/all/forward_enabled.jpg);
   float:left;
 }
 
@@ -250,14 +250,14 @@ text-decoration:underline;
 }
 
 #mlocate_popup .validated {
-	background: transparent url(../images/validated.png) no-repeat scroll 0 0;
+	background: transparent url(/assets/all/validated.png) no-repeat scroll 0 0;
   width: 30px;
   height: 30px;
   float: right;
 }
 
 #mlocate_popup .notvalidated {
-	background: transparent url(../images/not_validated.png) no-repeat scroll 0 0;
+	background: transparent url(/assets/all/not_validated.png) no-repeat scroll 0 0;
   width: 30px;
   height: 30px;
   float: right;
@@ -402,14 +402,14 @@ text-decoration:underline;
 }
 
 #detailsPane .validated {
-	background: transparent url(../images/validated.png) no-repeat scroll 0 0;
+	background: transparent url(/assets/all/validated.png) no-repeat scroll 0 0;
   width: 30px;
   height: 30px;
   float: right;
 }
 
 #detailsPane .notvalidated {
-	background: transparent url(../images/not_validated.png) no-repeat scroll 0 0;
+	background: transparent url(/assets/all/not_validated.png) no-repeat scroll 0 0;
   width: 30px;
   height: 30px;
   float: right;
@@ -1057,7 +1057,7 @@ height:150px;
 display:none;    
 float:left;    
 background-color:#ffffff;      
-background-image:url("../images/up_handle.png");    
+background-image:url("/assets/all/up_handle.png");    
 background-position:0 0;
 height:15px;
 width:720px;       
@@ -1065,7 +1065,7 @@ z-index:10;
 }
 
 #secondary_content_close:hover {
-background-image:url("../images/up_handle.png");    
+background-image:url("/assets/all/up_handle.png");    
 background-position:0 -15px;
 height:15px;
 width:720px;       
@@ -1078,7 +1078,7 @@ display:none;
 }
 
 #shadow-up {
-background-image: url("../images/shadow.png");
+background-image: url("/assets/all/shadow.png");
 background-repeat: repeat-x;
 -webkit-transform: rotate(-180deg);
 -moz-transform: rotate(-180deg);
@@ -1089,7 +1089,7 @@ width: 100%;
 z-index: 2000;
 }
 #shadow-down {
-background-image: url("../images/shadow.png");
+background-image: url("/assets/all/shadow.png");
 background-repeat: repeat-x;
 font-size: 0px;
 height: 5px;
@@ -1112,7 +1112,7 @@ float:left;
 }
 
 #movers-row div:hover	{
-background-image:url(../images/dot.png);    
+background-image:url(/assets/all/dot.png);    
 background-position: 5px 7px;
 background-repeat: no-repeat; 
 }
@@ -1218,7 +1218,7 @@ text-shadow: 1px -1px 1px #999999;
 .coda-nav-left, .coda-nav-right { float: left; display:none; }
 .coda-nav-left a, .coda-nav-right a { display: block; text-align: center; text-decoration: none }
 
-.photo-meta-data { background: url(../images/transpBlack.png); padding: 10px; height: 85px; top: 270px; position: relative; z-index: 9999; color: white; font-size: 12px; }
+.photo-meta-data { background: url(/assets/all/transpBlack.png); padding: 10px; height: 85px; top: 270px; position: relative; z-index: 9999; color: white; font-size: 12px; }
 .photo-meta-data span { font-size: 12px; }
 
 .panel-wrapper h2 {
@@ -1503,7 +1503,7 @@ width:100%;
 .pdffile_icon {
     width: 16px;
     height: 16px;
-    background: url(../images/pdficon.jpg);
+    background: url(/assets/all/pdficon.jpg);
     cursor: pointer;
 }
 /* Adjust fieldset in Views Filters */

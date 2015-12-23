@@ -41,7 +41,6 @@
 
         <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
 
-        <asset:javascript src="species_show"/>
 
         <style>
             .container_16 {
@@ -155,8 +154,6 @@
             src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
 
         <asset:script>
-        //google.load("search", "1");
-        // Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 
         $(document).ready(function(){
             if(${sparse}) {
@@ -275,7 +272,7 @@
                     <h5>${g.message(code:'heading.occurence.map')}</h5>
                     <div id="mapSpinner" class="spinner">
                         <center>
-                            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                            <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}"
                             alt="${message(code:'spinner.alt',default:'Loading...')}" />
                         </center>
                     </div>
@@ -284,7 +281,7 @@
                     <div id="map1311326056727" class="occurenceMap"
                         style="height: 350px; width: 100%"></div>
                     <div class="alert alert-info">
-                        <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
+                        <img src="${assetPath(src:'/all/maplegend.png')}" alt="map legend"/>
                         ${g.message(code:'info.about.map.species')}
                     </div>
 

@@ -7,7 +7,6 @@
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'project.label', default: 'Project')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
-        <asset:javascript src="add_file.js" />
     </head>
     <body>
         <div class="nav">

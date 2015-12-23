@@ -5,7 +5,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'button.dashboard')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<asset:javascript src="chart.js" />
 <gvisualization:apiImport />
 </head>
 <body>

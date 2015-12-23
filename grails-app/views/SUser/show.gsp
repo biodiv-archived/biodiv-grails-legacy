@@ -19,8 +19,6 @@
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
 
 
-<asset:javascript src="show.js" />
-<asset:javascript src="chart.js" />
 <gvisualization:apiImport />
 <g:set var="entityName"
 	value="${message(code: 'SUser.label', default: 'SUser')}" />

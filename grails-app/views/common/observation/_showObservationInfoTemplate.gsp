@@ -5,11 +5,11 @@
 	<div class="icons-bar">
 		<div class="observation-icons">
 			<img class="group_icon" title="${observationInstance.group?.name}"
-				src='${createLinkTo(dir:'images', file: observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}' />
+				src='${assetPath(src:'/all/'+ observationInstance.group.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}' />
 			<g:if test="${observationInstance.habitat}">
 				<img class="habitat_icon group_icon"
 					title="${observationInstance.habitat.name}"
-					src='${createLinkTo(dir: 'images', file:observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}' />
+					src='${assetPath(src: '/all/'+observationInstance.habitat.icon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}' />
 			</g:if>
 
 		</div>

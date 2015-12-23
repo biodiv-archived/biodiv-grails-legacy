@@ -13,7 +13,6 @@
             padding: 5px;
         }
         </style>
-        <asset:javascript src="core"/>
     </head>
     <body>
         <div class="span12">

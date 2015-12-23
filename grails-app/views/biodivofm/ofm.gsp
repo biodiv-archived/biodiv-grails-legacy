@@ -6,16 +6,16 @@
 
         <title><g:message code="ofm.file.manager"/></title>
 
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'js/ofm/styles', file:'reset.css', plugin: 'ckeditor')}" />
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'js/ofm/scripts/jquery.filetree', file:'jqueryFileTree.css', plugin: 'ckeditor')}" />
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'js/ofm/scripts/jquery.contextmenu', file:'jquery.contextMenu-1.01.css', plugin: 'ckeditor')}" />
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'js/ofm/styles', file:'filemanager.css', plugin: 'ckeditor')}" />
+        <link rel="stylesheet" type="text/css" href="${assetPath(src:'js/ofm/styles/reset.css', plugin: 'ckeditor')}" />
+        <link rel="stylesheet" type="text/css" href="${assetPath(src:'js/ofm/scripts/jquery.filetree/jqueryFileTree.css', plugin: 'ckeditor')}" />
+        <link rel="stylesheet" type="text/css" href="${assetPath(src:'js/ofm/scripts/jquery.contextmenu/jquery.contextMenu-1.01.css', plugin: 'ckeditor')}" />
+        <link rel="stylesheet" type="text/css" href="${assetPath(src:'js/ofm/styles/filemanager.css', plugin: 'ckeditor')}" />
         <!--[if IE]>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'js/ofm/styles', file:'ie.css', plugin: 'ckeditor')}" />
+        <link rel="stylesheet" type="text/css" href="${assetPath(src:'js/ofm/styles/ie.css', plugin: 'ckeditor')}" />
         <![endif]-->
 
         <script type="text/javascript">
-            var ofmBase ="${resource(dir: 'js/ofm', plugin: 'ckeditor')}";
+            var ofmBase ="${assetPath(src:'js/ofm', plugin: 'ckeditor')}";
             var culture = '${ofm.currentLocale()}';
             var autoload = true;
             var showFullPath = false;
@@ -64,14 +64,14 @@
                 <li class="delete separator"><a href="#delete"></a></li>
             </ul>
 
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts', file:'jquery-1.6.1.min.js', plugin: 'ckeditor')}"></script>
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts', file:'jquery.form-2.63.js', plugin: 'ckeditor')}"></script>
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts/jquery.splitter', file:'jquery.splitter-1.5.1.js', plugin: 'ckeditor')}"></script>
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts/jquery.filetree', file:'jqueryFileTree.js', plugin: 'ckeditor')}"></script>
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts/jquery.contextmenu', file:'jquery.contextMenu-1.01.js', plugin: 'ckeditor')}"></script>
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts', file:'jquery.impromptu-3.1.min.js', plugin: 'ckeditor')}"></script>
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts', file:'jquery.tablesorter-2.0.5b.min.js', plugin: 'ckeditor')}"></script>
-            <script type="text/javascript" src="${resource(dir: 'js/ofm/scripts', file:'filemanager.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/jquery-1.6.1.min.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/jquery.form-2.63.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/jquery.splitter/jquery.splitter-1.5.1.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/jquery.filetree/jqueryFileTree.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/jquery.contextmenu/jquery.contextMenu-1.01.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/jquery.impromptu-3.1.min.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/jquery.tablesorter-2.0.5b.min.js', plugin: 'ckeditor')}"></script>
+            <script type="text/javascript" src="${assetPath(src:'js/ofm/scripts/filemanager.js', plugin: 'ckeditor')}"></script>
         </div>
     </body>
 </html>

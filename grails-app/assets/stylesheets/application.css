@@ -1,6 +1,6 @@
 /*
 *= require jquery
-*= require jquery-ui-1.10.3.custom.min.css
+*= require all/jquery-ui-1.10.3.custom.min.css
 
 //bootstrap
  *= require bootstrap
@@ -19,7 +19,7 @@
 *= require ie/L.Control.Locate.ie.css
 *= require all/leaflet.awesome-markers.css
 *= require all/Control.FullScreen.css
-*= require all/dist/leaflet.draw.css
+*= require all/leaflet.draw.css
 *= require ie/leaflet.draw.ie.css
 *= require all/MarkerCluster.css
 *= require all/MarkerCluster.Default.css
@@ -32,10 +32,7 @@
 *= require all/tagit/tagit-custom.css
 *= require all/blueimp-gallery.css
 *= require all/jstree-style.css
-*= require OpenLayers-2.10/theme/default/style.css
 *= require SlickGrid-2.0.2/slick.grid.css
-//*= require SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css
-//*= require SlickGrid-2.0.2/examples/examples.css
 *= require SlickGrid-2.0.2/slick.headerbuttons.css
 *= require SlickGrid-2.0.2/slick.headermenu.css
 
@@ -51,8 +48,6 @@
 *= require all/uploader.css
 *= require all/create.css
 *= require all/location_picker.css
-*= require all/am.css
-*= require all/styles.css
 *= require all/augmented-maps.css
 */
 

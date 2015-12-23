@@ -1,6 +1,5 @@
 <head>
 <meta name="layout" content="main" />
-<asset:javascript src="auth" />
 <title><g:message code="button.login" /></title>
 </head>
 

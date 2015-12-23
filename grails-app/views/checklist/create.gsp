@@ -16,7 +16,6 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.checklist.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <asset:javascript src="bulkupload.js"/>
         <style>
             .upload_file div {
                 display:inline-block;
@@ -107,7 +106,11 @@
 
                         <div id="gridSection" class="section checklist-slickgrid ${params.action=='create'?'hide':''}">
                             <span id="addNewColumn" class="btn-link"><g:message code="checklist.create.add.new.column" /></span>
-                            <span class="help-inline"> <g:message code="checklist.create.mark.name" /> <img src="${resource(dir:'images', file:'dropdown_active.gif',absolute:'true')}"/>)</span>
+                            <span class="help-inline"> <g:message code="checklist.create.mark.name" /> 
+                                <asset:image src="/all/dropdown_active.gif" absolute="true"/>
+
+                            </span>
+
                             
                             <div id="myGrid" class="" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
