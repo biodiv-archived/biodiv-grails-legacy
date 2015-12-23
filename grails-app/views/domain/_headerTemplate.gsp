@@ -1,10 +1,4 @@
 <%@page import="species.utils.Utils"%>
-<script type="text/javascript">
-    window.appContext = '';
-    window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
-    window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
-</script>
-
 <div class="container group-theme navbar" style="width:100%;margin-bottom:0px;">
 	<div>
 		<g:if test="${userGroupInstance  && userGroupInstance.id }">

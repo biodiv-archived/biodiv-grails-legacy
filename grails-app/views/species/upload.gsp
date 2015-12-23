@@ -8,7 +8,7 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="species_upload" />
+        <asset:javascript src="bulkupload" />
     </head>
     <body>
         <div id="uploadSpeciesDiv">
@@ -166,7 +166,7 @@
                  
 
         </body>
-        <r:script>
+        <asset:script>
         $(document).ready(function() {
         /*
             var contributor_autofillUsersComp = $("#userAndEmailList_${contributor_autofillUsersId}").autofillUsers({
@@ -179,5 +179,5 @@
             });
         */            
        });
-        </r:script>
+        </asset:script>
     </html>

@@ -16,7 +16,7 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.checklist.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="checklist_create"/>
+        <asset:javascript src="bulkupload.js"/>
         <style>
             .upload_file div {
                 display:inline-block;
@@ -228,7 +228,7 @@
             </div>
         </div>
 
-        <r:script>
+        <asset:script>
         $(document).ready(function(){
                         <%
             if(observationInstance?.group) {
@@ -281,7 +281,7 @@
             uploadResource.SIGNATURE = "${signature}";
 
         });
-        </r:script>
+        </asset:script>
 
     </body>
 </html>

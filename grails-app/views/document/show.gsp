@@ -7,7 +7,7 @@
 <g:set var="title" value="${documentInstance.title}"/>
 <g:set var="description" value="${Utils.stripHTML(documentInstance.notes?:'') }" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-<r:require modules="content_view, activityfeed, comment" />
+<asset:javascript src="show.js"/>
 </head>
 <body>
     <div class="span12">
@@ -46,7 +46,7 @@
                         <%
                         def y="${g.message(code:'info.document.delete')}"
                         %>
-						<r:script>
+						<asset:script>
 						function deleteDocument(){
                             var test="${y}";
                             
@@ -54,7 +54,7 @@
 								document.forms.deleteForm.submit();
 							}
 						}
-						</r:script>
+						</asset:script>
 	                                        </div>					
 						
 				</sUser:ifOwns>

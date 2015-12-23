@@ -14,8 +14,7 @@
 <g:set var="title" value="${g.message(code:'showobservationstoryfooter.title.species')}"/>
 <g:render template="/common/titleTemplate" model="['title':title, 'description':'', 'canonicalUrl':canonicalUrl, 'imagePath':'']"/>
 
-<r:require modules="species"/>
-<r:require modules="species_list" />
+<asset:javascript src="species"/>
 
 </head>
 <body>
@@ -140,7 +139,7 @@
 
 	</script>
 
-	<r:script>
+	<asset:script>
     $(document).ready(function() {
         var taxonBrowserOptions = {
             expandAll:false,
@@ -241,6 +240,6 @@
 
     });
 
-	</r:script>
+	</asset:script>
     </body>
 </html>

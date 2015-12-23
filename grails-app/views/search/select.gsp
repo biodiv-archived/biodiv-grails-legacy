@@ -2,7 +2,6 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.search.heading')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="search" />
         <style>
             .thumbnails>li {
             margin:2px;

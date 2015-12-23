@@ -60,7 +60,7 @@
     <input class="habitat" type="hidden" name="habitat_id"></input>
 </div>
 
-<r:script>
+<asset:script>
 
 $(document).ready(function(){
     $(".selected_habitat").unbind('click').click(function(){
@@ -80,5 +80,5 @@ $(document).ready(function(){
     });
 });
 
-</r:script>
+</asset:script>
 </div>

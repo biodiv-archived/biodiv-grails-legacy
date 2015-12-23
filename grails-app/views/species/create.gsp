@@ -5,7 +5,8 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="observations_create, curation"/>
+        <asset:javascript src="create.js"/>
+        <asset:javascript src="curation.js"/>
         <style>
             #addSpeciesPage .add-on {
             height:20px;
@@ -112,7 +113,7 @@
         </div>
 
     </body>
-    <r:script>
+    <asset:script>
     $(document).ready(function() {
         $("#page").autofillNames({
             'appendTo' : '#nameSuggestions',
@@ -185,5 +186,5 @@
         	addSpeciesPage("${uGroup.createLink(action:'save', controller:'species', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}");
         });
     });
-    </r:script>
+    </asset:script>
 </html>

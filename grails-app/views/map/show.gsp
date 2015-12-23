@@ -4,7 +4,7 @@
     <head>
         <g:set var="title" value="${params?.title?:g.message(code:"button.maps") }"/>
         <g:render template="/common/titleTemplate"/>
-        <r:require modules="maps" />
+        <asset:javascript src="maps" />
         <style>
             div.container.outer-wrapper{
                 width:100%;
@@ -47,7 +47,7 @@
             </div>
 
         </div>
-        <r:script>
+        <asset:script>
             $(document).ready(function() {
             loadGoogleMapsAPI(function() {
 
@@ -114,7 +114,7 @@
                 });
                 })
             });
-        </r:script>
+        </asset:script>
     </body>
 
 </html>

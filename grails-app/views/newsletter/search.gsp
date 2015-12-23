@@ -21,7 +21,7 @@
 	padding: 5px;
 }
 </style>
-<r:require modules="observations_list" />
+<asset:javascript src="observations_list" />
 </head>
 <body>
 	<div class="span12">
@@ -46,7 +46,7 @@
 
 	</div>
 
-	<r:script>
+	<asset:script>
 		$(document).ready(function() {
 			$(".list_view").show();
 	
@@ -55,7 +55,7 @@
 		    });
 			
 		});
-	</r:script>
+	</asset:script>
 </body>
 
 </html>

@@ -99,7 +99,7 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 
 </div>
 
-<r:script>
+<asset:script>
 $(document).ready(function() {
 	$("#username").focus().autocomplete({
 		minLength: 3,
@@ -110,4 +110,4 @@ $(document).ready(function() {
 
 <s2ui:initCheckboxes/>
 
-</r:script>
+</asset:script>

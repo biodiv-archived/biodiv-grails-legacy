@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta name="layout" content="main" />
-<r:require modules="species_list" />
+<asset:javascript src="species.js" />
 <title><g:message code="cuation.names.species.names.list" /></title>
 </head>
 <body>

@@ -19,7 +19,8 @@
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
 
 
-<r:require modules="observations_show,chart" />
+<asset:javascript src="show.js" />
+<asset:javascript src="chart.js" />
 <gvisualization:apiImport />
 <g:set var="entityName"
 	value="${message(code: 'SUser.label', default: 'SUser')}" />
@@ -312,7 +313,7 @@ def contact_me_text=g.message(code:'button.contact.me')
 
 
 
-	<r:script>
+	<asset:script>
 	var userRecoffset = 0;
         $(document).ready(function() {
             updateMapView({'user':'${user?.id}'});
@@ -342,7 +343,7 @@ def contact_me_text=g.message(code:'button.contact.me')
 
 
 	});
-</r:script>
+</asset:script>
 <script type="text/javascript">
 $(document).ready(function(){
     window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'user', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";

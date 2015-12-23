@@ -35,15 +35,6 @@
             </g:each>
         </div>
     </li>
-    <script type="text/javascript">
-    $(document).ready(function(){
-        $('.lang_c').click(function(){
-            if(!$(this).hasClass('disabled')){
-                setLanguage($(this).attr('rel'));
-            }                
-        });
-    });
-    </script>
     </g:if>
 
     <li>

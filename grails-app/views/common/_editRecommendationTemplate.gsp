@@ -91,5 +91,5 @@
 
 
 
-<r:script>
-</r:script>
+<asset:script>
+</asset:script>

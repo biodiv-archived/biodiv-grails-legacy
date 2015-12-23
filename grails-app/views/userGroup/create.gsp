@@ -5,7 +5,7 @@
 <head>
 <g:set var="title" value="${g.message(code:'group.value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="userGroups_create" />
+<asset:javascript src="userGroups.js" />
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;
@@ -407,7 +407,7 @@ max-width: 100%;
 		</div>
 	
 </div>
-	<r:script>
+	<asset:script>
 $(document).ready(function() {
 
 
@@ -604,7 +604,7 @@ $(document).ready(function() {
  	
         $('.dropdown-toggle').dropdown()
 });
-</r:script>
+</asset:script>
 
 </body>
 

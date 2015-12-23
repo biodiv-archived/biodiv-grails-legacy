@@ -29,7 +29,7 @@
 	</div>
 </div>
 
-<r:script>
+<asset:script>
 $('#download-close').click(function(){
 	$('#download-options').hide();
 });
@@ -80,5 +80,5 @@ $(document).ready(function(){
      	});
 
 });     	
-</r:script>
+</asset:script>
 

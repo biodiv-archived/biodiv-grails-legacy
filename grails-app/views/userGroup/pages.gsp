@@ -12,7 +12,7 @@
 
 <g:set var="title" value="${g.message(code:'ugroup.value.pages')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="pages" />
+<asset:javascript src="userGroups.js" />
 <style>
     #contentMenu > .nav-tabs > .active > a {
         font-weight:normal;
@@ -86,7 +86,7 @@
 	</div>
 
 
-	<r:script>
+	<asset:script>
 		$(document).ready(function(){
 			var baseURL = "${uGroup.createLink('controller':'newsletter', 'action':'show', 'userGroup':userGroupInstance) }";
 			<%if(userGroupInstance ) {%>
@@ -113,6 +113,6 @@
 				$('a.pageTab:first').click();
 			<%}%>
 		});
-	</r:script>
+	</asset:script>
 </body>
 </html>

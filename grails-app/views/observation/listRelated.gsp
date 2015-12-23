@@ -8,7 +8,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="observations_list" />
 <style>
 .observations_list {
 	top: 0;
@@ -68,7 +67,7 @@
 </script>
 
 
-	<r:script>
+	<asset:script>
 	$(document).ready(function() {
 		initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		$('#tc_tagcloud a').click(function(){
@@ -77,6 +76,6 @@
 	    	return false;
 	 	});
 	});
-</r:script>
+</asset:script>
 </body>
 </html>

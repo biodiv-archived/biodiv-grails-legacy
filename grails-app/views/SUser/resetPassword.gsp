@@ -3,7 +3,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'register.value.reset')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="auth" />
 <style type="text/css">
 .openid-loginbox .form-horizontal .control-label {
 	width: 150px;

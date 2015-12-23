@@ -1,0 +1,23 @@
+.popup_item_key {
+font-size:0.8em;
+}
+
+.popup_item_value {
+font-size:0.8em;
+font-weight:bold;
+
+}
+
+table.popup_table {
+width:100%;
+margin-bottom:2px;
+}
+table.popup_table td {
+padding:2px;    
+}
+
+table.popup_table td.first{
+width:7em;    
+text-align:right;      
+}
+

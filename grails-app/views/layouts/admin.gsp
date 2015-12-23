@@ -16,7 +16,7 @@
 
 <link rel="shortcut icon"
 	href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
-<r:require modules="admin" />
+<asset:javascript src="admin" />
 
 <%-- tab icons --%>
 <style>
@@ -46,12 +46,6 @@
 	background-position: 4px center;
 }
 </style>
-
-<script type="text/javascript">
-    window.appContext = '${request.contextPath}';
-    window.appIBPDomain = '${grailsApplication.config.ibp.domain}'
-    window.appWGPDomain = '${grailsApplication.config.wgp.domain}'
-</script>
 <g:layoutHead />
 <s2ui:resources module='spring-security-ui' />
 <r:layoutResources />

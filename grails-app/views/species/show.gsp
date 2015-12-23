@@ -41,7 +41,7 @@
 
         <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
 
-        <r:require modules="species_show"/>
+        <asset:javascript src="species_show"/>
 
         <style>
             .container_16 {
@@ -154,7 +154,7 @@
         <script type="text/javascript"
             src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
 
-        <r:script>
+        <asset:script>
         //google.load("search", "1");
         // Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
 
@@ -169,10 +169,10 @@
             }
             });
 
-        </r:script>
+        </asset:script>
 
         <%String space = speciesInstance.taxonConcept.canonicalForm%>
-            <r:script type='text/javascript'> 
+            <asset:script type='text/javascript'> 
                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
 
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
@@ -196,7 +196,7 @@
                     //uiColor:'#AADC6F'
                 };
                 var speciesId = ${speciesInstance?.id}
-            </r:script>
+            </asset:script>
     </head>
 
     <body>
@@ -339,7 +339,7 @@
             </g:each>
 
             </script>	
-            <r:script>
+            <asset:script>
             $(document).ready(function() {
                 var uploadResource; 
                 window.params.carousel = {maxHeight:150, maxWidth:210}
@@ -350,7 +350,7 @@
             });
 
 
-            </r:script>
+            </asset:script>
 
         </body>
 

@@ -1,0 +1,66 @@
+
+#branding {
+	height: 80px;
+}
+
+#branding #logo a div{
+	width: 250px;
+	height: 80px;
+	background-image: url(../images/map-logo2.png);
+  cursor: hand;
+  cursor: pointer;
+}
+
+#wg_logo {
+height: 80px;
+width: auto;        
+}
+
+#top_nav_bar {
+position:absolute;
+top:0;
+left:300px;
+font-size:1em;
+font-weight:bold;
+z-index:2000;
+}
+
+#top_nav_bar ul{
+list-style: none;
+}
+
+#top_nav_bar li{
+display: inline;
+padding:10px 10px 3px 10px;
+cursor:pointer;
+}
+
+#top_nav_bar li#maps_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #f0575a;
+}
+
+#top_nav_bar li#checklists_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #7764a2;
+}
+
+#top_nav_bar li#collaborate_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #145b9b;
+}
+
+#top_nav_bar li#species_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #00a4be;
+}
+
+#top_nav_bar li#themes_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #45a989;
+}
+
+#top_nav_bar li#about_nav_link:hover{
+background-color: #fafafa;
+border-bottom:3px solid #003846;
+}

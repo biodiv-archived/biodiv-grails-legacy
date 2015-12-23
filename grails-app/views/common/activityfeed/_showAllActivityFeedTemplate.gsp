@@ -48,8 +48,8 @@
 	    
     </g:if>
 </div>
-<r:script>
+<asset:script>
 	$(document).ready(function(){
 		setUpFeed("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 	});
-</r:script>
+</asset:script>

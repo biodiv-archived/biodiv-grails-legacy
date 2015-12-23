@@ -85,17 +85,12 @@
 </p>
 	</div>
 </div>
-<r:script>
+<asset:script>
 $(document).ready(function(){
-	$(".youtube_container").each(function(){
-		loadYoutube(this);
-	});
-	
 	last_actions();
-
 });
 
-</r:script>
+</asset:script>
 
 <g:set var="fbAppId" value="" />
 <%
@@ -106,7 +101,7 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 }
 %>
 
-<r:script>
+<asset:script>
 
         $(document).ready(function() {
                 
@@ -286,9 +281,9 @@ function gapiInit() {
                 'extensions' : extensions
         });
         
-</r:script>
+</asset:script>
 
-<r:script>
+<asset:script>
 //Twitter
 !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
 
@@ -299,8 +294,8 @@ po.type = 'text/javascript'; po.async = true;
 po.src = 'https://apis.google.com/js/plusone.js?onload=renderGooglePlus';
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 })();
-</r:script>
-<r:script>
+</asset:script>
+<asset:script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -308,6 +303,6 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 
 ga('create', 'UA-3185202-1', 'auto');
 ga('send', 'pageview');
-</r:script>
+</asset:script>
 
 

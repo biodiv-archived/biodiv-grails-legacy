@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'title.value.document')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="core" />
 </head>
 <body>
 	<div class="page-header" style="margin-left:20px;">

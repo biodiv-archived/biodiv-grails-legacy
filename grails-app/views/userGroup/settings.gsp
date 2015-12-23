@@ -8,7 +8,8 @@
 <g:set var="title" value="${g.message(code:'ugroup.value.settings')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<r:require modules="userGroups_show" />
+<asset:javascript src="userGroups.js" />
+<asset:javascript src="show.js" />
 </head>
 <body>
 
@@ -43,14 +44,14 @@
 		</div>
 	</div>
 
-<r:script>
+<asset:script>
 $(document).ready(function(){
 	$('#groupSettingForm').bind('submit', function(event) {
 		$('#homePage').val(getSelectedVal('home_page_label'));
 		$('#theme').val(getSelectedVal('theme_label')); 
 	});
 });
-</r:script>
+</asset:script>
 
 </body>
 </html>

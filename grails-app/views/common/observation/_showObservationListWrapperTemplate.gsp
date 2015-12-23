@@ -142,7 +142,7 @@
 
 	<!-- main_content end -->
 </div>
-<r:script type="text/javascript">
+<asset:script type="text/javascript">
 $(document).ready(function() {
     window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
 
@@ -173,7 +173,7 @@ $(document).ready(function() {
     });
 
 });
-</r:script>
+</asset:script>
 <script>
     var taxonRanks = [];
     <g:each in="${TaxonomyRank.list()}" var="t">
@@ -189,7 +189,7 @@ $(document).ready(function() {
     });
 
 </script>
-<r:script>
+<asset:script>
 $(document).ready(function() {
         var taxonBrowserOptions = {
             expandAll:false,
@@ -202,4 +202,4 @@ $(document).ready(function() {
         }
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
 });
-</r:script>
+</asset:script>

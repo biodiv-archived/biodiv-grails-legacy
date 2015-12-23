@@ -31,7 +31,7 @@ if(r) {
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 
-<r:require modules="observations_show"/>
+<asset:javascript src="show.js"/>
 
 <style>
 .nameContainer {
@@ -173,9 +173,9 @@ if(r) {
 
                         </g:else>
                         <g:if test="${imageCount == 0 && audioCount != 0}">
-                            <r:script>
+                            <asset:script>
                                 $(".noTitle").hide();
-                            </r:script>
+                            </asset:script>
                         </g:if>
                     </div>
                     </div>
@@ -291,7 +291,7 @@ $(document).ready(function(){
 </script>
 
 
-    <r:script>
+    <asset:script>
     
    
     var observationId = ${observationInstance.id};
@@ -456,7 +456,7 @@ $(document).ready(function(){
         }
     }
 
-</r:script>
+</asset:script>
 
 
 </body>

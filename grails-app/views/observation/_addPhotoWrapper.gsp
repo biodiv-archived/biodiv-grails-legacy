@@ -42,7 +42,7 @@
     </div>
 </div>
 
-<r:script>
+<asset:script>
     $(document).ready(function(){
         filepicker.setKey("${grailsApplication.config.speciesPortal.observations.filePicker.key}");
         if("${resourceListType}" == "fromRelatedObv"){
@@ -67,4 +67,4 @@
         }
         $(".resourceListType").val($(".resourceListTypeFilled").val());
     });
-</r:script>
+</asset:script>

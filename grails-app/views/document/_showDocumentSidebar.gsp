@@ -16,7 +16,7 @@ Map nameId = sciNames.nameDisplayValues
 def docId = DocumentTokenUrl.findByDoc(documentInstance)
 String status = docId?.status
 %>
-<r:require modules="pages" />
+<asset:javascript src="pages" />
 <div  class="span4">
     <div style = "clear:both; border:1px solid #CECECE;overflow:hidden"><h5> Taxa mentioned in this document </h5></div>
     <div id="gnrdscientificNamesList" class="sidebar_section pre-scrollable" style="clear:both; border:1px solid #CECECE;overflow:x">

@@ -9,7 +9,8 @@
 
 <g:set var="title" value="${g.message(code:'ugroup.value.pages')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="userGroups_show" />
+<asset:javascript src="show.js" />
+<asset:javascript src="userGroups.js" />
 </head>
 <body>
 

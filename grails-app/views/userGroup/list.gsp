@@ -5,7 +5,7 @@
 <head>
 <g:set var="title" value="${g.message(code:'group.value.user')} "/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="userGroups_list" />
+<asset:javascript src="userGroups.js" />
 </head>
 <body>
 <style type="text/css">
@@ -32,7 +32,7 @@
 			window.params.tagsLink = "${uGroup.createLink(controller:'userGroup', action: 'tags')}";
 		});
 	</script>
-	<r:script>
+	<asset:script>
 /*		$( "#search" ).unbind('click');
 		$( "#search" ).click(function() {          
 			var target = "${createLink(action:'search')}" + window.location.search;
@@ -49,7 +49,7 @@ $('.observations_list').bind('scroll', function() {
         }
 });
 
-	</r:script>
+	</asset:script>
 
 </body>
 </html>

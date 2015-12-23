@@ -7,7 +7,7 @@
 <g:set var="title" value="${userGroupInstance.name}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<r:require modules="userGroups_show,userGroups_list,comment" />
+<asset:javascript src="userGroups.js" />
 <style>
 .comment-textbox {
 	width: 100%;
@@ -32,7 +32,7 @@
 		});
 	</script>
 	
-	<r:script>
+	<asset:script>
 		$(document).ready(function(){
             if($(".homepage-content").length == 0) {
                 var url = "${userGroupInstance.homePage ?: uGroup.createLink(mapping:'userGroup', controller:'userGroup', action:'about', userGroup:userGroupInstance)}";
@@ -45,6 +45,6 @@
                 $('.page-header').hide();
             }
 		});
-	</r:script>
+	</asset:script>
 </body>
 </html>

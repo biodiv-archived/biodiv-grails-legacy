@@ -13,7 +13,7 @@
 <head>
 <g:set var="title" value="${g.message(code:'value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="observations_show" />
+<asset:javascript src="show.js" />
 <style>
 .form-horizontal .control-label {
 	width: 90px;
@@ -384,7 +384,7 @@
 						</form>
 						<div id="deleteConfirmDialog" title="Are you sure?"></div>
 
-						<r:script>
+						<asset:script>
 							$(document).ready(function() {
 								$("#deleteButton").button().bind('click', function() {
 									$('#deleteConfirmDialog').dialog('open');
@@ -405,7 +405,7 @@
 									}
 								});
 							});
-						</r:script>
+						</asset:script>
 					</g:if>
 				</sUser:isAdmin>
 
@@ -431,7 +431,7 @@
 
 
 
-	<r:script>
+	<asset:script>
 		$(document).ready(function() {
 			$('#username').focus();
 
@@ -576,7 +576,7 @@
                 });
             });
 		});
-	</r:script>
+	</asset:script>
 
 </body>
 </html>

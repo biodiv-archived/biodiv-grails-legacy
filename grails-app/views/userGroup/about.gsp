@@ -8,7 +8,8 @@
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
 
-<r:require modules="userGroups_show" />
+<asset:javascript src="show.js" />
+<asset:javascript src="userGroups.js" />
 </head>
 <body>
 	<div class="observation span12 bodymarker">
@@ -131,7 +132,7 @@
 	</div>
 
 
-	<r:script>
+	<asset:script>
 			function reloadMembers(url) {
 				var membersUrl = (url)?url:"${createLink(mapping:'userGroup', action:'members', params:['webaddress':userGroupInstance.webaddress]) }"  
 				$.ajax({
@@ -182,6 +183,6 @@
 				//reloadFounders();
 				//reloadMembers();
 			});
-		</r:script>
+		</asset:script>
 </body>
 </html>

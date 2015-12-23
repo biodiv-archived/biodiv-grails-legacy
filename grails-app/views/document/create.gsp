@@ -6,7 +6,7 @@
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<r:require modules="add_file" />
+<asset:javascript src="add_file.js" />
 
 <style>
 .control-group.error  .help-inline {
@@ -305,7 +305,7 @@ CKEDITOR.replace('description', config);
                                 </form>
                             </div>
 <%def alert_msg=g.message(code:'document.error.message')%>
-	<r:script>
+	<asset:script>
 	
 	$(document).ready(function() {
     
@@ -438,8 +438,8 @@ CKEDITOR.replace('description', config);
 
 		
     
-        </r:script>
-        <r:script>
+        </asset:script>
+        <asset:script>
 
  $("#link-fetch").focusout(function() {
    getScientificNames();
@@ -472,6 +472,6 @@ function getScientificNames(){
 
 }
 
-</r:script>
+</asset:script>
 </body>
 </html>

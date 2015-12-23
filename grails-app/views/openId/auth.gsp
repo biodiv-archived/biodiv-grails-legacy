@@ -1,6 +1,6 @@
 <head>
 <meta name="layout" content="main" />
-<r:require modules="auth" />
+<asset:javascript src="auth" />
 <title><g:message code="button.login" /></title>
 </head>
 

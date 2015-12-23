@@ -5,7 +5,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'title.value.newsletter')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="core" />
 </head>
 <body>
 	<div class="span9">
@@ -82,7 +81,7 @@
 		</div>
 	</div>
 
-            <r:script type='text/javascript'> 
+            <asset:script type='text/javascript'> 
                 CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
 
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
@@ -104,6 +103,6 @@
 		$(document).ready(function(){
                     CKEDITOR.replace('newsitem', config);
 		});
-	</r:script>
+	</asset:script>
 </body>
 </html>

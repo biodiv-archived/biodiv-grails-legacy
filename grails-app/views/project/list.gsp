@@ -4,7 +4,7 @@
 <head>
 <g:set var="title" value="Projects" />
 <g:render template="/common/titleTemplate" model="['title':title]" />
-<r:require modules="content_view" />
+<asset:javascript src="add_file.js" />
 
 <style>
 <!--
@@ -64,7 +64,7 @@
 		</div>
 		<g:render template="/project/projectSidebar" />
 	</div>
-	<r:script>
+	<asset:script>
 
 $(document).ready(function(){
 
@@ -77,7 +77,7 @@ $(document).ready(function(){
 });
 
 
-</r:script>
+</asset:script>
 
 </body>
 </html>

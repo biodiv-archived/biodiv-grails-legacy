@@ -73,7 +73,7 @@
             </g:each>
             </script>
 
-            <r:script>
+            <asset:script>
 
             $(document).ready(function() {
             var taxonBrowserOptions = {
@@ -88,6 +88,6 @@
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
             });
 
-            </r:script>
+            </asset:script>
 
 

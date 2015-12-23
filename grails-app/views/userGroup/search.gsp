@@ -3,7 +3,7 @@
 <head>
 <meta name='layout' content='main' />
 <title><g:message code='spring.security.ui.user.search' /></title>
-<r:require modules="userGroups_list"/>
+<asset:javascript src="userGroups.js"/>
 </head>
 
 <body>
@@ -20,7 +20,7 @@
 	</div>
 
 
-	<r:script>
+	<asset:script>
 	$(document).ready(function() {
 
 		$('.sort_filter_label').click(function() {
@@ -56,6 +56,6 @@
 		}
 		$("#searchBox").submit();
 	});
-	</r:script>
+	</asset:script>
 </body>
 </html>

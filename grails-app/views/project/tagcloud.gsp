@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="Project Tags"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="core" />
 </head>
 <body>
     <div class="span12">
