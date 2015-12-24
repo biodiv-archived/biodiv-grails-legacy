@@ -179,7 +179,7 @@ $(document).ready(function(){
 function loadSpeciesnameReco(){
     $('.showObvDetails').each(function(){
         var observationId = $(this).attr('rel');
-        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="/biodiv/images/spinner.gif" /></li>')
+        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" /></li>')
         preLoadRecos(3, 0, false,observationId);
     });
 }

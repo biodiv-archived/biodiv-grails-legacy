@@ -3087,3 +3087,9 @@ small {
 .clean_list{
 	background-color:beige; //#3399FF;
 }
+
+.add_obv_tags_wrapper .sidebar-section {
+    width:100%;
+    float:none;
+    margin:0px;
+}

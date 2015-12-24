@@ -387,9 +387,10 @@ function rating() {
 function last_actions() {
     $(".ellipsis.multiline").trunk8({
         lines:2,
-    tooltip:false,
-    fill: '&hellip; <a id="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
+        tooltip:false,
+        fill: '&hellip; <a id="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
     });
+
     $('#read-more').on('click', function (event) {
         $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
 
@@ -452,6 +453,10 @@ function last_actions() {
 		$("#leave").attr('data-leaveUrl', leaveUrl)
 		$('#leaveUsModalDialog').modal('show');
 	});
+
+    $(".youtube_container").each(function(){
+        loadYoutube(this);
+    });
 }
 
 function loadSuggestedGroups(targetComp, url,offset){	

@@ -86,11 +86,11 @@
 //= require SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js
 
 ////= require create
+//= require jquery.plugins/filepicker.js
 //= require jquery.plugins/jquery.exif.js
 //= require biodiv/observations/addResource.js
 //= require biodiv/observations/create.js
 //= require jquery.plugins/jquery.tmpl.min.js
-//= require jquery.plugins/filepicker.js
 //= require biodiv/observations/bulkObvCreate.js
 
 ////= require checklist

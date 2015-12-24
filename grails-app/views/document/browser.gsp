@@ -14,7 +14,9 @@
             margin: 0 0 10px 0px;
             width:100%;
             }
-
+            tr.mainContent td {
+                word-break:break-word;
+            }
 
         </style>
     </head>
