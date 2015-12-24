@@ -15,6 +15,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         <asset:javascript src="jquery.js"/>
         <asset:javascript src="fileuploader.js"/>
         <asset:stylesheet href="application.css"/>
+        <asset:stylesheet src="/all/${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.app.siteCode}.css"/>
         <g:layoutHead />
         <ckeditor:resources />
 
@@ -23,10 +24,10 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
         <script src="https://apis.google.com/js/auth.js" type="text/javascript">
         </script>
+
         <g:set var="userGroupInstance" value="${userGroupInstance}"/>
         <g:if test="${userGroupInstance && userGroupInstance.theme}">
-        <link rel="stylesheet" type="text/css"
-        href="${assetPath(src:'/all/group-themes/'+userGroupInstance.theme + '.css')}" />
+        <link rel="stylesheet" type="text/css" href="${assetPath(src:'/all/group-themes/'+userGroupInstance.theme + '.css')}" />
 
         </g:if>
 
