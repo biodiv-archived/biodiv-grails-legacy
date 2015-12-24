@@ -132,14 +132,7 @@
 
         <g:set var="conceptCounter" value="${1}" />
 
-        <!-- 
-        <ckeditor:resources />
-        <script type="text/javascript" src="ckEditorConfig.js" />
-
-        
-        <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
-        -->
-        <script type="text/javascript">
+       <script type="text/javascript">
 
         occurrenceCount = undefined
         function getOccurrenceCount(data) {
@@ -170,7 +163,7 @@
 
         <%String space = speciesInstance.taxonConcept.canonicalForm%>
             <asset:script type='text/javascript'> 
-                CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+            CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
                     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },

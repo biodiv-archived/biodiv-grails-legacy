@@ -128,8 +128,8 @@
 //= require biodiv/content.js
 
 ////= require species
-//= require biodiv/maps/am.js
 //= require OpenLayers-2.10/OpenLayers.js
+//= require biodiv/maps/am.js
 //= require biodiv/speciesfield.js
 //= require biodiv/species.js
 
