@@ -1,6 +1,7 @@
 package species
 
 import grails.converters.JSON;
+import grails.converters.XML;
 
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList
@@ -32,33 +33,40 @@ class SearchController {
         params['userLangauge'] = utilsService.getCurrentLanguage(request); 
        
         def model = biodivSearchService.select(params);
+
         model['userLanguage'] = params.userLanguage;
-        if(params.loadMore?.toBoolean()){
-            params.remove('isGalleryUpdate');
-            render(template:"/search/showSearchResultsListTemplate", model:model);
-            return;
-        } else if(params.format?.equalsIgnoreCase("json")) {
-            model.remove('userLanguage');
-            model.remove('responseHeader');
-
-            render model as JSON
-        } else if(!params.isGalleryUpdate?.toBoolean()){
-            params.remove('isGalleryUpdate');
-            render (view:"select", model:model)
-            return;
-        } else {
-            params.remove('isGalleryUpdate');
+        model.remove('responseHeader');
+ 
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model['resultType'] = 'search result'
-            def listHtml =  g.render(template:"/search/showSearchResultsListTemplate", model:model);
-            def filterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model['obvListHtml'] =  g.render(template:"/search/showSearchResultsListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
 
-            listHtml = listHtml.replaceAll(/\n|\t|\s+/,' ');
-            def filterPanel = g.render(template:"/search/sidebar", model:[modules:model.objectTypes, sGroups:model.sGroups, tags:model.tags, contributors:model.contributors]);
-            def result = [obvListHtml:listHtml, obvFilterMsgHtml:filterMsgHtml, filterPanel:filterPanel,  instanceTotal:model.instanceTotal]
-            render result as JSON
-            return;
+            model['filterPanel'] = g.render(template:"/search/sidebar", model:[modules:model.objectTypes, sGroups:model.sGroups, tags:model.tags, contributors:model.contributors]);
+
+            model['obvListHtml'] = model['obvListHtml'].replaceAll(/\n|\t|\s+/,' ');
+            model.remove('instanceList');
         }
-        return;
+
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+
+        withFormat {
+            html {
+                if(params.loadMore?.toBoolean()){
+                    params.remove('isGalleryUpdate');
+                    render(template:"/search/showSearchResultsListTemplate", model:model.model);
+                    return;
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    params.remove('isGalleryUpdate');
+                    render (view:"select", model:model.model)
+                    return;
+                } else {
+                    return;
+                }
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
     }
 
     /**
