@@ -41,7 +41,7 @@ function show_speciesRefField(){
 
 }
 
-var addReference = function(childCount, id) {
+function addReference(childCount, id) {
     sid = id + "_" + (childCount - 1)
         var clone = $("#reference" + sid).clone()
         var htmlId = 'referencesList[' + id + "_" + childCount + '].';
@@ -64,7 +64,7 @@ var addReference = function(childCount, id) {
     referenceInput.focus();
 }
 
-var deleteReferenceHandler = function() {
+function deleteReferenceHandler() {
     // find the parent div
     var prnt = $(this).parents(".reference-div");
     // find the deleted hidden input
@@ -82,7 +82,7 @@ var deleteReferenceHandler = function() {
     }
 }
 
-var positionTOC = function() {
+function positionTOC() {
     var pos = $("#fieldstoc").position().top + $("#fieldstoc").height();
     $(window).scroll(function() {
         if ($(window).scrollTop() >= pos) {
@@ -99,7 +99,7 @@ var positionTOC = function() {
     });
 }
 
-var showOccurence = function(speciesName) {
+function showOccurence(speciesName) {
     loadGoogleMapsAPI(function() {
         var mapOptions = {
             popup_enabled : true,
@@ -134,7 +134,7 @@ var showOccurence = function(speciesName) {
     });
 }
 
-var updateEditorContent = function() {
+function updateEditorContent() {
     var editor = $('.fieldEditor').ckeditorGet();
     if (editor.checkDirty()) {
         $(textarea[name = 'description']).val(editor.getData());
@@ -178,7 +178,7 @@ var initializeCKEditor = function() {
      */
 }
 
-var getGoogleImages = function(imageSearch, page) {
+function getGoogleImages(imageSearch, page) {
     if (page >= 8)
         return;
     imageSearch.gotoPage(page);
