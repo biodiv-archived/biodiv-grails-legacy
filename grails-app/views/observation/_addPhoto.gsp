@@ -151,14 +151,14 @@
         
         <div id="license_div_{{>i}}" class="license_div pull-left dropdown">
             <a id="selected_license_{{>i}}" class="btn dropdown-toggle" data-toggle="dropdown">
-                <img src="${resource(dir:'images/license',file:'cc_by.png', absolute:true)}" title="${g.message(code:'title.set.license')}"/>
+                <img src="${assetPath(src:'/all/license/'+'cc_by.png', absolute:true)}" title="${g.message(code:'title.set.license')}"/>
                 <b class="caret"></b>
             </a>            
                 <ul id="license_options_{{>i}}" class="dropdown-menu license_options">
                 <span><g:message code="default.choose.license.label" /></span>
                 <g:each in="${species.License.list()}" var="l">
                     <li class="license_option" onclick="selectLicense($(this), {{>i}})">
-                    <img src="${resource(dir:'images/license',file:l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
+                    <img src="${assetPath(src:'/all/license/'+l?.name.getIconFilename()+'.png', absolute:true)}"/><span style="display:none;">${l?.name?.value}</span>
                 </li>
                 </g:each>
             </ul>

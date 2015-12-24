@@ -3,7 +3,6 @@
 <head>
 <meta name="layout" content="main" />
 <title><g:message code="views.error" /></title>
-<r:require modules="core" />
 </head>
 
 <body>

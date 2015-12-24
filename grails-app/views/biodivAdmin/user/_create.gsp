@@ -53,9 +53,9 @@ tabData << [name: 'roles',    icon: 'icon_role', messageCode: 'spring.security.u
 
 </g:form>
 
-<r:script>
+<asset:script>
 $(document).ready(function() {
 	$('#username').focus();
 	<s2ui:initCheckboxes/>
 });
-</r:script>
+</asset:script>

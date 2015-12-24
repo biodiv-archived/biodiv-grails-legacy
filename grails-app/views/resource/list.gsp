@@ -14,7 +14,6 @@
 	value="${message(code: 'resource.label')}" />
 <title><g:message code="default.list.label" args="[entityName]" />
 </title>
-<r:require modules="observations_list,prettyPhoto" />
 </head>
 <body>
 
@@ -80,7 +79,7 @@ $(document).ready(function() {
 	
 });
 </script>
-<r:script>
+<asset:script>
 $(document).ready(function(){
     function changepicturecallback() {
         var activeimage = $("#fullResImage");
@@ -166,7 +165,7 @@ $(document).ready(function(){
         social_tools: ''
     });
 });
-</r:script>
+</asset:script>
 
 	</div>
 </body>

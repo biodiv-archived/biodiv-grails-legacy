@@ -20,13 +20,17 @@ class AcceptedSynonym {
         //}
     }
     
-    static List<SynonymsMerged> fetchSynonyms(TaxonomyDefinition accepted) {
+    static List<SynonymsMerged> fetchSynonyms(TaxonomyDefinition accepted,def particularValue = '') {
         def res = AcceptedSynonym.findAllByAccepted(accepted);
         List<SynonymsMerged> synonyms = [];
         res.each {
-            synonyms.add(it.synonym);
+            if(particularValue){
+                synonyms.add(it.synonym.fetchLimitInfo());
+            }else{
+                synonyms.add(it.synonym);
+            }
         }
-        return synonyms;
+        return synonyms.sort{ s1, s2 -> return s1.name <=> s2.name };
     }
 
     static List<TaxonomyDefinition> fetchAcceptedNames(SynonymsMerged synonym) {

@@ -83,7 +83,7 @@
             <div class="value">
                 <g:each in="${resourceInstance?.licenses}" var="licenseInstance">
                 <img
-                src="${resource(dir:'images/license',file:licenseInstance.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+                src="${assetPath(src:'/all/license/'+licenseInstance.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
                 title="${licenseInstance.name}" />
                 </g:each>
             </div>

@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="observations_list" />
 <style>
     
     .map_wrapper {
@@ -307,7 +306,7 @@ $(document).ready(function(){
 </script>
 
 
-<r:script>
+<asset:script>
 $(document).ready(function(){
     $(".selected_group").off('click').on('click',function(){
         $(this).closest(".groups_super_div").find(".group_options").toggle();
@@ -332,7 +331,7 @@ $(document).ready(function(){
 
 });
 
-</r:script>
+</asset:script>
 <g:if test="${params?.view == 'list'}">
   <script type="text/javascript">
   $(document).ready(function(){     

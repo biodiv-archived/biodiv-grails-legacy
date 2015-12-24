@@ -143,7 +143,7 @@
 	</div>
 </div>
 </g:if>
-	<r:script>
+	<asset:script>
             function refreshList(bounds){
                 <g:if test="{params.id}">
                 var url = "${uGroup.createLink( controller:'checklist', action: "filteredMapBasedChecklistList",'userGroupWebaddress':userGroup?.webaddress, id:params.id)}" + location.search
@@ -166,4 +166,4 @@
             $(function(){
                 refreshList();
             });
-        </r:script>
+        </asset:script>

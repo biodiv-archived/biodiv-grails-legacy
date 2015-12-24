@@ -30,8 +30,7 @@
 						<g:textField name="referencesList[${i}].title"
 							value="${referenceInstance?.title}" />
 						<span class="del-reference">
-        					<img src="${resource(dir:'images/skin', file:'icon-delete.png')}"
-            					style="vertical-align:middle;"/>
+                            <asset:image src="/all/skin/icon-delete.png" absolute="true" style="vertical-align:middle;"/>
     					</span>
 					</td>
 				</tr>

@@ -16,7 +16,7 @@
     <div style="padding-bottom:10px">
                 <center>
             <div id="gallerySpinner" class="spinner">
-                <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}"
                 alt="${message(code:'spinner.alt',default:'Loading...')}" />
             </div>
         </center>
@@ -56,7 +56,7 @@
                     <g:else>
                     <% def fileName = speciesInstance.fetchSpeciesGroup().icon(ImageType.LARGE).fileName%>
                     <img class="group_icon galleryImage" 
-                             src="${createLinkTo(dir: 'images', file: fileName, absolute:true)}" 
+                             src="${assetPath(src: '/all/'+fileName, absolute:true)}" 
                              title="${g.message(code:'title.show.contribute')}"/>
                     </g:else>
 
@@ -88,7 +88,7 @@
                     <div class="observation-icons">		
                         <img class="group_icon species_group_icon"  
                         title="${speciesInstance.fetchSpeciesGroup()?.name}"
-                        src='${createLinkTo(dir: 'images', file: speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
+                        src='${assetPath(src: '/all/'+ speciesInstance.fetchSpeciesGroupIcon(ImageType.VERY_SMALL)?.fileName?.trim(), absolute:true)}'/>
 
                         <g:if test="${speciesInstance.taxonConcept.threatenedStatus}">
                         <s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept.threatenedStatus]"/>

@@ -5,7 +5,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'button.dashboard')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="chart" />
 <gvisualization:apiImport />
 </head>
 <body>
@@ -32,7 +31,5 @@
 		
 		<chart:showStats model="['title':g.message(code:'common.observation.species.pages'), columns:speciesData.columns, data:speciesData.data,, htmlData:speciesData.htmlData, htmlColumns:speciesData.htmlColumns]"/>
 	</div>
-	<r:script>
-	</r:script>
 </body>
 </html>

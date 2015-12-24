@@ -92,7 +92,7 @@
     </div>
 </g:if>
 
-<r:script>
+<asset:script>
 
     function markChecklistObvs(checklistObvPoints, mapLocationPicker) {
         if(mapLocationPicker.markers) {
@@ -164,5 +164,5 @@
             </g:if>
         });
     });
-</r:script>
+</asset:script>
 

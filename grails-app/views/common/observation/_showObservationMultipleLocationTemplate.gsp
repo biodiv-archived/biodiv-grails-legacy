@@ -15,8 +15,8 @@
                     <div id="big_map_canvas">
                         <center>
                             <div id="spinner" class="spinner">
-                            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
-                                alt="${message(code:'spinner.alt',default:'Loading...')}" />
+
+                            <asset:image src="/all/spinner.gif" absolute="true" alt="${message(code:'spinner.alt',default:'Loading...')}"/>
                             </div>
                        </center>
                     </div>

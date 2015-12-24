@@ -6,7 +6,6 @@
 <head>
 <g:set var="title" value="Projects"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="add_file" />
 <style type="text/css">
 .block {
     background-color:whitesmoke;
@@ -436,7 +435,7 @@ CKEDITOR.replace('misc', config);
 
 
 
-	<r:script>
+	<asset:script>
 	
 				
 		
@@ -465,7 +464,7 @@ CKEDITOR.replace('misc', config);
         });
         
 
-        </r:script>
+        </asset:script>
 
 
 </body>

@@ -4,8 +4,6 @@
 <g:set var="title" value="${g.message(code:'title.value.register')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 </title>
-
-<r:require modules="auth" />
 <style>
 .openid-loginbox .form-horizontal .control-label {
 	width: 120px;

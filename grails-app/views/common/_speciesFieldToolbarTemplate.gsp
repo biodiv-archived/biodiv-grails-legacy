@@ -27,7 +27,7 @@
 				<g:each in="${speciesFieldInstance?.licenses}" var="license">
 					<a class="license" href="${license?.url}" target="_blank"><img
 						class="icon"
-						src="${createLinkTo(dir:'images/license', file: license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+						src="${assetPath(src:'/all/license/'+license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
 						alt="${license?.name.value()}" /> </a>
 				</g:each>
 			</g:if>			

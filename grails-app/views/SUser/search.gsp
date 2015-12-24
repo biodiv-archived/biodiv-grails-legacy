@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="susers_list" />
 <style type="text/css">
 .thumbnails>li {
         margin:0 1px 5px 0px;

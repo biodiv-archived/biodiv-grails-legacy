@@ -18,10 +18,10 @@
 	<obv:showMapInput model="[observationInstance:coverageInstance, obvInfoFeeder:coverageInstance, locationHeading:'Geographical Coverage', 'sourceInstance':sourceInstance]"></obv:showMapInput>
 </div>
 
-<r:script>
+<asset:script>
 $(document).ready(function() {
 	intializesSpeciesHabitatInterest();
 	
 });
-</r:script>
+</asset:script>
 

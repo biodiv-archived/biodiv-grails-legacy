@@ -4,7 +4,6 @@
 <title><g:message code="views.error" /></title>
 <g:javascript src="species/util.js" />
 <meta name="layout" content="main" />
-<r:require modules="core" />
 </head>
 
 <body>

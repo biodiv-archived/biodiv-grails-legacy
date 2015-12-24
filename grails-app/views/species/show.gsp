@@ -41,7 +41,6 @@
 
         <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
 
-        <r:require modules="species_show"/>
 
         <style>
             .container_16 {
@@ -92,7 +91,12 @@
 
             .add_file_container {
                 padding: 55px 10px !important;
-            }    
+            } 
+
+            #commonNames select{
+                width:245px;
+                margin-left:-15px;
+            }   
             
         </style>
 
@@ -128,14 +132,7 @@
 
         <g:set var="conceptCounter" value="${1}" />
 
-        <!-- 
-        <ckeditor:resources />
-        <script type="text/javascript" src="ckEditorConfig.js" />
-
-        
-        <script type="text/javascript" src="/sites/all/themes/wg/scripts/am.js"></script>
-        -->
-        <script type="text/javascript">
+       <script type="text/javascript">
 
         occurrenceCount = undefined
         function getOccurrenceCount(data) {
@@ -149,9 +146,7 @@
         <script type="text/javascript"
             src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
 
-        <r:script>
-        //google.load("search", "1");
-        // Galleria.loadTheme('${resource(dir:'js/galleria/1.2.7/themes/classic/',file:'galleria.classic.min.js')}');
+        <asset:script>
 
         $(document).ready(function(){
             if(${sparse}) {
@@ -164,11 +159,11 @@
             }
             });
 
-        </r:script>
+        </asset:script>
 
         <%String space = speciesInstance.taxonConcept.canonicalForm%>
-            <r:script type='text/javascript'> 
-                CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+            <asset:script type='text/javascript'> 
+            CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
                     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },
@@ -191,7 +186,7 @@
                     //uiColor:'#AADC6F'
                 };
                 var speciesId = ${speciesInstance?.id}
-            </r:script>
+            </asset:script>
     </head>
 
     <body>
@@ -270,7 +265,7 @@
                     <h5>${g.message(code:'heading.occurence.map')}</h5>
                     <div id="mapSpinner" class="spinner">
                         <center>
-                            <img src="${resource(dir:'images',file:'spinner.gif', absolute:true)}"
+                            <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}"
                             alt="${message(code:'spinner.alt',default:'Loading...')}" />
                         </center>
                     </div>
@@ -279,7 +274,7 @@
                     <div id="map1311326056727" class="occurenceMap"
                         style="height: 350px; width: 100%"></div>
                     <div class="alert alert-info">
-                        <img src="${resource(dir:'images', file:'maplegend.png')}" alt="map legend"/>
+                        <img src="${assetPath(src:'/all/maplegend.png')}" alt="map legend"/>
                         ${g.message(code:'info.about.map.species')}
                     </div>
 
@@ -334,7 +329,7 @@
             </g:each>
 
             </script>	
-            <r:script>
+            <asset:script>
             $(document).ready(function() {
                 var uploadResource; 
                 window.params.carousel = {maxHeight:150, maxWidth:210}
@@ -345,7 +340,7 @@
             });
 
 
-            </r:script>
+            </asset:script>
 
         </body>
 

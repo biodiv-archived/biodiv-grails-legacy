@@ -105,7 +105,7 @@ if (isOpenId) {
 	</form>
 </g:if>
 
-<r:script>
+<asset:script>
 $(document).ready(function() {
 	$('#username').focus();
 
@@ -116,4 +116,4 @@ $(document).ready(function() {
 	   document.forms.runAsForm.submit();
 	});
 });
-</r:script>
+</asset:script>

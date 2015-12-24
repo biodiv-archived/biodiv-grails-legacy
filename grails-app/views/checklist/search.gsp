@@ -3,7 +3,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'title.checklists')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="observations_list" />
 </head>
 <body>
 
@@ -22,7 +21,7 @@
 
 	</div>
 
-	<r:script>
+	<asset:script>
 
 $(document).ready(function(){
 
@@ -35,6 +34,6 @@ $(document).ready(function(){
 });
 
 
-</r:script>
+</asset:script>
 </body>
 </html>

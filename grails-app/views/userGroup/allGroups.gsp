@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'ugroup.value.usergroups')} "/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="userGroups_list" />
 </head>
 <body>
 
