@@ -139,7 +139,7 @@ def obvId = observationInstance?.id
     <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
         <g:if test="${styleviewcheck}">    
             <li style="text-align: center;">
-                <img src="/biodiv/images/spinner.gif" />
+                <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
             </li>
         </g:if>
     </ul>

@@ -265,8 +265,7 @@
                     <h5>${g.message(code:'heading.occurence.map')}</h5>
                     <div id="mapSpinner" class="spinner">
                         <center>
-                            <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}"
-                            alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                            <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
                         </center>
                     </div>
 

@@ -51,7 +51,8 @@ function adjustHeight() {
 var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction, ajaxLoginCancelCallbackFunction;
 
 var reloadLoginInfo = function() {
-    console.log('reloading login info');
+    if(typeof window.appContext == 'undefined')
+        window.appContext = '';
     $.ajax({
         url : window.appContext+"/SUser/loginTemplate",
         success : function(data) {
@@ -63,7 +64,6 @@ var reloadLoginInfo = function() {
 }
 
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
-console.log(json)
     if (json.success || json.status == 'success') {		
         if (ajaxLoginSuccessCallbackFunction) {
             ajaxLoginSuccessCallbackFunction(json,

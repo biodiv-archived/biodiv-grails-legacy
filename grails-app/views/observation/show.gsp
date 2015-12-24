@@ -123,7 +123,7 @@ if(r) {
                 </div>
                 <center>
                     <div id="gallerySpinner" class="spinner">
-                        <r:img uri="${grailsApplication.config.grails.serverURL}/images/spinner.gif" width="20" height="20"/>
+                        <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
                     </div>
                 </center>
                                       
