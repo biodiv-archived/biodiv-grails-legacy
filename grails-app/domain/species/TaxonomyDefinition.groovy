@@ -560,7 +560,7 @@ class TaxonomyDefinition extends ScientificName {
 		s += "Match Id : " + matchId + lineBreak
 
 		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
-		s += "Number of COL Matches : " + noOfCOLMatches + lineBreak
+		//s += "Number of COL Matches : " + noOfCOLMatches + lineBreak
 		if(isFlagged) {
 			s += "IsFlagged reason : " + flaggingReason.tokenize('###')[-1];
 		}
@@ -588,4 +588,27 @@ class TaxonomyDefinition extends ScientificName {
 		return true
 	}
 	
+	
+	def updateContributors(List<SUser> users){
+		if(!users) return
+		
+		if (!this.isAttached()) {
+			this.attach()
+		}
+		
+		//not adding contributors to existing accepted name above genus level
+		if(contributors && (status == NameStatus.ACCEPTED) && (rank < 7))
+			return
+		
+		users.minus(contributors)
+		
+		users.each { u ->
+			this.addToContributors(u)
+		}
+		
+		if(!save(flush:true)){
+			this.errors.allErrors.each { log.error it }
+		}
+	}
+
 }
