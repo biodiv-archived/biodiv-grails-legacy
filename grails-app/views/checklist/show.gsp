@@ -7,7 +7,6 @@
         <g:set var="title" value="${checklistInstance.title}"/>
         <g:set var="description" value="${Utils.stripHTML(checklistInstance.notes?:'')}" />
         <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-        <r:require modules="checklist"/>
         <style>
             .observation_story .observation_footer {
                 margin-top:50px;
@@ -97,7 +96,7 @@
                 </div>
 
             </div>	
-            <r:script>
+            <asset:script>
             $(document).ready(function(){
             var species = $.url(decodeURIComponent(window.location.search)).param()["species"]
             if(species){
@@ -105,6 +104,6 @@
             $(".checklist-data ." + species).css("background-color","#66FF66");
             }
             });
-            </r:script>
+            </asset:script>
         </body>
     </html>

@@ -10,7 +10,6 @@
 <g:set var="title" value="${g.message(code:'showobservationstoryfooter.title.species')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<r:require modules="species" />
 </head>
 <body>
 	<g:include controller="species" action="list" model="['userGroup':userGroupInstance, 'params':params]"/>
@@ -24,11 +23,11 @@
 		});
 		
 	</script>
-	<r:script>
+	<asset:script>
 		$(document).ready(function(){
 			$(".grid_view").show();
 		});
 		
-	</r:script>
+	</asset:script>
 </body>
 </html>

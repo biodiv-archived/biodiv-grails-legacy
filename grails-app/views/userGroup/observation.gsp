@@ -8,7 +8,6 @@
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<r:require modules="userGroups_show, observations_list" />
 </head>
 <body>
 
@@ -41,7 +40,7 @@
 		</div>
 
 	</div>
-	<r:script>
-	</r:script>
+	<asset:script>
+	</asset:script>
 </body>
 </html>

@@ -4,7 +4,6 @@
 <html>
 <head>
 <meta name="layout" content="main" />
-<r:require modules="species_list" />
 <title><g:message code="cuation.names.species.names.list" /></title>
 </head>
 <body>

@@ -52,7 +52,7 @@
 	</div>
 </div>
 
-<r:script>
+<asset:script>
 $(document).ready(function(){
 	$(".deleteFlagIcon").tooltip({"placement":"right"});
 });
@@ -98,7 +98,7 @@ function removeFlag(flagId, flagComponent){
 	});
 }
 
-</r:script>
+</asset:script>
 
 <style>
 

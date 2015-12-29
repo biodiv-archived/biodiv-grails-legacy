@@ -121,7 +121,7 @@
 </ul>
 </div>
 
-<r:script>
+<asset:script>
 	$(document).ready(function(){
 	function registerCustomFieldEvent(){
 		$('input.cfRaidioButtonSelector').unbind('change').change( function(){
@@ -170,4 +170,4 @@
   		
   		
 });
-</r:script>
+</asset:script>

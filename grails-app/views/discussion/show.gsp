@@ -6,7 +6,6 @@
 <g:set var="title" value="${discussionInstance.subject}"/>
 <g:set var="description" value="${Utils.stripHTML(discussionInstance.body?:'') }" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
-<r:require modules="content_view, activityfeed, comment" />
 </head>
 <body>
     <div class="span12">
@@ -45,7 +44,7 @@
                         <%
                         def y="${g.message(code:'info.discussion.delete')}"
                         %>
-						<r:script>
+						<asset:script>
 						function deleteDocument(){
                             var test="${y}";
                             
@@ -53,7 +52,7 @@
 								document.forms.deleteForm.submit();
 							}
 						}
-						</r:script>
+						</asset:script>
 	                                        </div>					
 				</sUser:ifOwns>
 				<s:showHeadingAndSubHeading

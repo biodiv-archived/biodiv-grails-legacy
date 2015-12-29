@@ -9,7 +9,6 @@
 	value="${message(code: 'strategicDirection.label', default: 'StrategicDirection')}" />
 <title><g:message code="default.create.label"
 		args="[entityName]" /></title>
-<r:require modules="core" />
 </head>
 <body>
 	<div class="nav">

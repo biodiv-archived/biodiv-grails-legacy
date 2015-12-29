@@ -1,8 +1,8 @@
-<r:script> 
+<asset:script> 
 $(document).ready(function() {
     relatedStory("${relatedInstanceList}", "${filterProperty}", "${id}", "${userGroupWebaddress}", "${filterPropertyValue}")
 });
-</r:script>
+</asset:script>
 
     <g:if test="${relatedInstanceList && filterProperty == 'featureBy'}">
     <g:if test="${controller.toLowerCase().equals('featured')}">

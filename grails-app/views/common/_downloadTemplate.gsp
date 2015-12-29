@@ -39,7 +39,7 @@
 		</div>
 </div>
 
-<r:script>
+<asset:script>
 $('.download-close').click(function(){
     var me = this;
     var download_box = $(me).parents('.download-box');
@@ -64,4 +64,4 @@ $('.download-action').click(function(){
 		} 
     	});
 });
-</r:script>
+</asset:script>

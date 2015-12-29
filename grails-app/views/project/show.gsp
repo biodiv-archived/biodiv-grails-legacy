@@ -10,7 +10,7 @@
 <g:render template="/common/titleTemplate"
 	model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl]" />
 
-<r:require modules="content_view" />
+<asser:javascript src="show.js"/>
 
 <style type="text/css">
 .tag {
@@ -73,13 +73,13 @@
 								<input type="hidden" name="id" value="${projectInstance.id}" />
 							</form>
 
-							<r:script>
+							<asset:script>
                             function deleteProject(){
                             if(confirm('This project will be deleted. Are you sure ?')){
                             document.forms.deleteForm.submit();
                             }
                             }
-                            </r:script>
+                            </asset:script>
 						</sUser:isCEPFAdmin>
 
 					</div>
@@ -360,12 +360,12 @@
 
 		<g:render template="/project/projectSidebar" />
 	</div>
-	<r:script>
+	<asset:script>
 		$(document).ready(function() {
 	//		window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
 	//		initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
 		});
-	</r:script>
+	</asset:script>
 
 
 </body>

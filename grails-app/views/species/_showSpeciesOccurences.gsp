@@ -12,7 +12,7 @@
 
     <div class="alert alert-info">
         <g:message code="showspeciesoccurences.map.indicative" />
-        <img src="${resource(dir:'images',file:'maplegend.png', absolute:true)}"/>
+        <img src="${assetPath(src:'/all/maplegend.png', absolute:true)}"/>
     </div>
 
     <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance]" />       

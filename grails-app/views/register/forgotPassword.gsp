@@ -3,7 +3,6 @@
 <head>
 <g:set var="title" value="Forgot Password"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="auth" />
 </head>
 <style>
 form {

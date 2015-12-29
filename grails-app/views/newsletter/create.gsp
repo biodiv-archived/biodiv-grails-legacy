@@ -10,7 +10,6 @@
 	padding: 10px;
 }
 </style>
-<r:require modules="core" />
 </head>
 <body>
 	<div class="span11">

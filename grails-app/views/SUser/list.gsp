@@ -4,8 +4,6 @@
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'user', action:'list', base:Utils.getIBPServerDomain()])}" />
 <g:set var="title" value="${g.message(code:'title.value.users')}"/>
 <g:render template="/common/titleTemplate" model="['title':title, 'canonicalUrl':canonicalUrl]"/>
-
-<r:require modules="susers_list"/>
 <g:set var="entityName"
 	value="${message(code: 'sUser.label', default: 'Users')}" />
 <style>

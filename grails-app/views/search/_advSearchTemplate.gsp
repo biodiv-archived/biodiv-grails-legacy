@@ -159,7 +159,7 @@
 
     <div class="clearfix"></div>
 
-<r:script>
+<asset:script>
 
 $(document).ready(function(){
     <%
@@ -285,4 +285,4 @@ $(document).ready(function(){
         }
     });
 });
-</r:script>
+</asset:script>

@@ -5,7 +5,6 @@
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.discussions')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<r:require modules="add_file" />
 
 <style>
 .control-group.error  .help-inline {
@@ -87,7 +86,7 @@ input.dms_field {
                             </textarea>
 
                             <script type='text/javascript'>
-                                CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+                                CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 
                                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
 CKEDITOR.replace('description', config);
@@ -185,7 +184,7 @@ CKEDITOR.replace('description', config);
                                 </form>
                             </div>
 <%def alert_msg=g.message(code:'discussion.error.message')%>
-	<r:script>
+	<asset:script>
 	
 	$(document).ready(function() {
     
@@ -242,6 +241,6 @@ CKEDITOR.replace('description', config);
 
 		
     
-        </r:script>
+        </asset:script>
 </body>
 </html>

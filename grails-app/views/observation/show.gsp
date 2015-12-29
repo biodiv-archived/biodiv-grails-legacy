@@ -31,7 +31,6 @@ if(r) {
 
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath, 'videoPath':videoPath]"/>
 
-<r:require modules="observations_show"/>
 
 <style>
 .nameContainer {
@@ -124,7 +123,7 @@ if(r) {
                 </div>
                 <center>
                     <div id="gallerySpinner" class="spinner">
-                        <r:img uri="${grailsApplication.config.grails.serverURL}/images/spinner.gif" width="20" height="20"/>
+                        <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
                     </div>
                 </center>
                                       
@@ -173,9 +172,9 @@ if(r) {
 
                         </g:else>
                         <g:if test="${imageCount == 0 && audioCount != 0}">
-                            <r:script>
+                            <asset:script>
                                 $(".noTitle").hide();
-                            </r:script>
+                            </asset:script>
                         </g:if>
                     </div>
                     </div>
@@ -291,7 +290,7 @@ $(document).ready(function(){
 </script>
 
 
-    <r:script>
+    <asset:script>
     
    
     var observationId = ${observationInstance.id};
@@ -456,7 +455,7 @@ $(document).ready(function(){
         }
     }
 
-</r:script>
+</asset:script>
 
 
 </body>

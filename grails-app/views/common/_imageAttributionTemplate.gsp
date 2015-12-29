@@ -14,7 +14,7 @@
         </g:if>    
             <g:each in="${resource?.licenses}" var="l">
             <a href="${l?.url}" target="_blank"> <img class="icon" style="height:auto;margin-right:2px;"
-                src="${createLinkTo(dir:'images/license', file: l?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+                src="${assetPath(src:'/all/license/'+l?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
                 alt="${l?.name.value()}" /> </a>
             </g:each>
 

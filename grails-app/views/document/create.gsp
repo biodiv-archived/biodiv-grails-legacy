@@ -6,7 +6,6 @@
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.documents')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 
-<r:require modules="add_file" />
 
 <style>
 .control-group.error  .help-inline {
@@ -166,8 +165,10 @@ $(document).ready(function(){
                             <div id="licenseDiv" class="licence_div dropdown">
 
                                 <a id="selected_license" class="btn dropdown-toggle btn-mini"
-                                    data-toggle="dropdown"> <img
-                                    src="${documentInstance.license?resource(dir:'images/license',file:documentInstance.license.name.getIconFilename()+'.png'):resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+                                    data-toggle="dropdown"> 
+                                    
+                                    <img
+                                    src="${documentInstance.license?assetPath(src:'/all/license/'+documentInstance.license.name.getIconFilename()+'.png', absolute:true):assetPath(src:'/all/license/'+'cc_by.png', absolute:true)}"
                                     title="${g.message(code:'title.set.license')}" /> <b class="caret"></b>
                                 </a>
 
@@ -177,7 +178,7 @@ $(document).ready(function(){
                                     <li class="license_option"
                                     onclick="$('#license').val($.trim($(this).text()));$('#selected_license').find('img:first').replaceWith($(this).html());">
                                     <img
-                                    src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span
+                                    src="${assetPath(src:'/all/license/'+l?.name?.getIconFilename()+'.png', absolute:true)}" /><span
                                         style="display: none;"> ${l?.name?.value}
                                     </span>
                                     </li>
@@ -305,7 +306,7 @@ CKEDITOR.replace('description', config);
                                 </form>
                             </div>
 <%def alert_msg=g.message(code:'document.error.message')%>
-	<r:script>
+	<asset:script>
 	
 	$(document).ready(function() {
     
@@ -438,8 +439,8 @@ CKEDITOR.replace('description', config);
 
 		
     
-        </r:script>
-        <r:script>
+        </asset:script>
+        <asset:script>
 
  $("#link-fetch").focusout(function() {
    getScientificNames();
@@ -472,6 +473,6 @@ function getScientificNames(){
 
 }
 
-</r:script>
+</asset:script>
 </body>
 </html>

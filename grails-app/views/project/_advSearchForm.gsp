@@ -51,7 +51,7 @@
 
 </div>
 
-<r:script>
+<asset:script>
 
 $(document).ready(function(){
 	
@@ -76,4 +76,4 @@ $(document).ready(function(){
 	$("#uGroup_${(queryParams && queryParams.uGroup)?queryParams.uGroup:(params.webaddress?'THIS_GROUP':'ALL')}").click();
 
 });
-</r:script>
+</asset:script>
