@@ -130,6 +130,7 @@ class DatasourceService extends AbstractMetadataService {
             feedType = activityFeedService.INSTANCE_CREATED;
         }
 
+        datasource.language = params.locale_language;
 
         Datasource.withTransaction {
             result = save(datasource, params, true, null, feedType, null);

@@ -263,7 +263,7 @@ def datasourceService;
         String directory = params.path;
         String datasetMetadataStr = new File(params.path+"/metadata.xml").text;
 
-        Map dsParams = [:];
+        /*Map dsParams = [:];
         dsParams['id'] = "1";
         dsParams['title'] = 'Global Biodiversity Information Facility';
         dsParams['description'] = '''The Global Biodiversity Information Facility (GBIF) is an international open data infrastructure, funded by governments.
@@ -276,6 +276,7 @@ def datasourceService;
        println ";;;;;;;;;;;;;;;;;;;;;;;;;;"
        println result1
        println ";;;;;;;;;;;;;;;;;;;;;;;;;;"
+       */
         def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
         params['title'] = datasetMetadata.dataset.title.text()
         params['description'] = datasetMetadata.dataset.abstract.para.text();

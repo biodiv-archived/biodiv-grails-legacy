@@ -11,6 +11,12 @@ import grails.plugin.springsecurity.annotation.Secured
 import static org.springframework.http.HttpStatus.*;
 import species.participation.Observation;
 import species.dataset.Datasource;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.grails.taggable.*
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
+import species.utils.ImageUtils;
+import species.utils.Utils;
 
 class DatasourceController extends AbstractObjectController {
 	
@@ -65,6 +71,11 @@ class DatasourceController extends AbstractObjectController {
 	private saveAndRender(params, sendMail=true){
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = datasourceService.save(params, sendMail)
+        println "*********************************"
+        println "*********************************"
+        println result
+        println "*********************************"
+        println "*********************************"
 		if(result.success){
             withFormat {
                 html {
@@ -209,6 +220,103 @@ class DatasourceController extends AbstractObjectController {
         }
         log.debug "Storing all datasource ids list in session ${session['datasource_ids_list']} for params ${params}";
         return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'datasource']
+	}
+
+	@Secured(['ROLE_USER'])
+	def upload_resource() {
+		try {
+			if(ServletFileUpload.isMultipartContent(request)) {
+				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+				def rs = [:]
+				Utils.populateHttpServletRequestParams(request, rs);
+				def resourcesInfo = [];
+				def rootDir = grailsApplication.config.speciesPortal.datasource.rootDir
+				File datasourceDir;
+				def message;
+
+				if(!params.resources) {
+					message = g.message(code: 'no.file.attached', default:'No file is attached')
+				}
+
+				params.resources.each { f ->
+					log.debug "Saving datasource logo file ${f.originalFilename}"
+
+					// List of OK mime-types
+					//TODO Move to config
+					def okcontents = [
+						'image/png',
+						'image/jpeg',
+						'image/pjpeg',
+						'image/gif',
+						'image/jpg'
+					]
+
+					if (! okcontents.contains(f.contentType)) {
+						message = g.message(code: 'resource.file.invalid.extension.message', args: [
+							okcontents,
+							f.originalFilename
+						])
+					}
+					else if(f.size > grailsApplication.config.speciesPortal.userGroups.logo.MAX_IMAGE_SIZE) {
+						message = g.message(code: 'resource.file.invalid.max.message', args: [
+							grailsApplication.config.speciesPortal.datasource.logo.MAX_IMAGE_SIZE/1024,
+							f.originalFilename,
+							((int)f.size/1024)+'KB'
+						], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.datasource.logo.MAX_IMAGE_SIZE/1024}KB");
+					}
+					else if(f.empty) {
+						message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+					}
+					else {
+						if(!datasourceDir) {
+							if(!params.dir) {
+								datasourceDir = new File(rootDir);
+								if(!datasourceDir.exists()) {
+									datasourceDir.mkdir();
+								}
+								datasourceDir = new File(datasourceDir, UUID.randomUUID().toString()+File.separator+"resources");
+								datasourceDir.mkdirs();
+							} else {
+								datasourceDir = new File(rootDir, params.dir);
+								datasourceDir.mkdir();
+							}
+						}
+
+						File file = utilsService.getUniqueFile(datasourceDir, Utils.generateSafeFileName(f.originalFilename));
+						f.transferTo( file );
+						ImageUtils.createScaledImages(file, datasourceDir);
+						resourcesInfo.add([fileName:file.name, size:f.size]);
+					}
+				}
+				log.debug resourcesInfo
+				// render some XML markup to the response
+				if(datasourceDir && resourcesInfo) {
+					render(contentType:"text/xml") {
+						userGroup {
+							dir(datasourceDir.absolutePath.replace(rootDir, ""))
+							resources {
+								for(r in resourcesInfo) {
+									image('fileName':r.fileName, 'size':r.size){}
+								}
+							}
+						}
+					}
+				} else {
+					response.setStatus(500)
+					message = [error:message]
+					render message as JSON
+				}
+			} else {
+				response.setStatus(500)
+				def message = [error:g.message(code: 'no.file.attached', default:'No file is attached')]
+				render message as JSON
+			}
+		} catch(e) {
+			e.printStackTrace();
+			response.setStatus(500)
+			def message = [error:g.message(code: 'file.upload.fail', default:'Error while processing the request.')]
+			render message as JSON
+		}
 	}
 
 }

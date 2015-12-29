@@ -232,6 +232,16 @@ speciesPortal {
         }
     }
 
+    datasource {
+        rootDir = "${app.rootDir}/datasource"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/datasource"
+        //serverURL = "http://localhost/${appName}/userGroups"
+        logo {
+            MAX_IMAGE_SIZE = 51200
+        }
+    }
+
+
     users {
         rootDir = "${app.rootDir}/users"
         serverURL = "http://localhost/${appName}/users"
