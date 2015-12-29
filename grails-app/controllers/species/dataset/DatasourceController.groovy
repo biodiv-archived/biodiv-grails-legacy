@@ -58,7 +58,6 @@ class DatasourceController extends AbstractObjectController {
 		}
 	}
 
-
 	@Secured(['ROLE_ADMIN'])
 	def save() {
 	    saveAndRender(params, false)
@@ -233,7 +232,7 @@ class DatasourceController extends AbstractObjectController {
         return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'datasource']
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_ADMIN'])
 	def upload_resource() {
 		try {
 			if(ServletFileUpload.isMultipartContent(request)) {

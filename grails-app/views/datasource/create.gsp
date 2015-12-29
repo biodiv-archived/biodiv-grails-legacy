@@ -288,7 +288,7 @@ $(document).ready(function() {
                             return myXhr;
                         },
 			success: function(responseXML, statusText, xhr, form) {
-                        	$("#createGroupSubmit").removeClass('disabled');
+                        	$("#createDatasourceSubmit").removeClass('disabled');
 				$(form).find("span.msg").html("");
 				var rootDir = '${grailsApplication.config.speciesPortal.datasource.serverURL}'
 				var dir = $(responseXML).find('dir').text();

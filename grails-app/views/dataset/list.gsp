@@ -19,7 +19,7 @@
 
             <uGroup:rightSidebar/>
 
-            <g:render template="/dataset/showDatasetListWrapperTemplate"/>
+            <g:render template="/datasource/showDatasourceListWrapperTemplate"/>
         </div>
     </body>
 </html>

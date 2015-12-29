@@ -280,8 +280,10 @@
                 model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
 
             <div class="story-footer" style="right:3px;">
-                <sUser:showUserTemplate
-                model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
+                <g:if test="${!observationInstance.dataset}">
+                    <sUser:showUserTemplate
+                        model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
+                </g:if>
             </div>
         </div>
         </div>
