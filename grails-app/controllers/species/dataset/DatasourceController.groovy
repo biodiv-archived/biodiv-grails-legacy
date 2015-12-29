@@ -87,11 +87,6 @@ class DatasourceController extends AbstractObjectController {
 	private saveAndRender(params, sendMail=true){
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = datasourceService.save(params, sendMail)
-        println "*********************************"
-        println "*********************************"
-        println result
-        println "*********************************"
-        println "*********************************"
 		if(result.success){
             withFormat {
                 html {

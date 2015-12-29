@@ -879,6 +879,10 @@ environments {
                 rootDir = "${app.rootDir}/userGroups"
                 serverURL = "http://${servername}/${appName}/userGroups"
             }
+            datasource {
+                rootDir = "${app.rootDir}/datasource"
+                serverURL = "http://${servername}/${appName}/datasource"
+            }
             users {
                 rootDir = "${app.rootDir}/users"
                 serverURL = "http://${servername}/${appName}/users"
@@ -1013,6 +1017,10 @@ environments {
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
                 serverURL = "http://${servername}/${appName}/userGroups"
+            }
+            datasource {
+                rootDir = "${app.rootDir}/datasource"
+                serverURL = "http://${servername}/${appName}/datasource"
             }
             users {
                 rootDir = "${app.rootDir}/users"

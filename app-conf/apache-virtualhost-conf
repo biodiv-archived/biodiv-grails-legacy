@@ -19,7 +19,6 @@
 
 #   RewriteCond %{REQUEST_URI} !(^(/biodiv/(observations|newsletters|group-themes|users|userGroups|img|content)|(wgp_maps|geoserver)))
     RewriteRule (^(/biodiv/(observations|newsletters|group-themes|users|userGroups|img|content|group_icons|datasource)|(wgp_maps|geoserver))) - [L]
-    
     RewriteCond %{REQUEST_URI} ^/content
     RewriteRule /(.*)$    http://localhost/biodiv/$1 [P,L]
 
