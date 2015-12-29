@@ -233,8 +233,8 @@ speciesPortal {
     }
 
     datasource {
-        rootDir = "${app.rootDir}/datasource"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/datasource"
+        rootDir = "${app.rootDir}/datasources"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/datasources"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -880,8 +880,8 @@ environments {
                 serverURL = "http://${servername}/${appName}/userGroups"
             }
             datasource {
-                rootDir = "${app.rootDir}/datasource"
-                serverURL = "http://${servername}/${appName}/datasource"
+                rootDir = "${app.rootDir}/datasources"
+                serverURL = "http://${servername}/${appName}/datasources"
             }
             users {
                 rootDir = "${app.rootDir}/users"
@@ -1019,8 +1019,8 @@ environments {
                 serverURL = "http://${servername}/${appName}/userGroups"
             }
             datasource {
-                rootDir = "${app.rootDir}/datasource"
-                serverURL = "http://${servername}/${appName}/datasource"
+                rootDir = "${app.rootDir}/datasources"
+                serverURL = "http://${servername}/${appName}/datasources"
             }
             users {
                 rootDir = "${app.rootDir}/users"
