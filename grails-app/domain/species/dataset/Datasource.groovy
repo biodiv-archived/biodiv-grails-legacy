@@ -35,7 +35,7 @@ class Datasource extends DatasourceMetadata implements Taggable, Rateable {
             log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.datasource.rootDir.toString()+this.icon
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
-		return new Resource(fileName:grailsApplication.config.speciesPortal.datasource.serverURL+this.icon, type:ResourceType.ICON, title:this.name);
+		return new Resource(fileName:grailsApplication.config.speciesPortal.datasource.serverURL+this.icon, type:ResourceType.ICON, title:this.title);
 	}
 
 	Resource mainImage() {

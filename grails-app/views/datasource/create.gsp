@@ -135,7 +135,7 @@ max-width: 100%;
 									code="datasource.website.label" default="${g.message(code:'datasource.website.label')}" /> </label>
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
-									<g:textField name="website" value="${datasourceInstance?.website}" placeholder="${g.message(code:'button.create.datasource')}" />
+									<g:textField name="website" value="${datasourceInstance?.website}" placeholder="${g.message(code:'button.create.website')}" />
 									<div class="help-inline">
 										<g:hasErrors bean="${datasourceInstance}" field="website">
 											<g:eachError bean="${datasourceInstance}" field="website">
@@ -216,7 +216,7 @@ max-width: 100%;
 				<div class="" style="margin-top: 20px; margin-bottom: 40px;">
 				
 					<g:if test="${datasourceInstance?.id}">
-						<a href="${createLink(mapping:'datasource', action:'show', params:['webaddress':datasourceInstance.webaddress])}" class="btn"
+						<a href="${createLink(mapping:'datasource', action:'show', id:datasourceInstance.id)}" class="btn"
 							style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
 					</g:if>
 					<g:else>
@@ -228,8 +228,8 @@ max-width: 100%;
 						<div class="btn btn-danger"
 							style="float: right; margin-right: 5px;">
 							<a
-								href="${createLink(mapping:'datasource', action:'delete', params:['webaddress':datasourceInstance.webaddress])}"
-								onclick="return confirm('${message(code: 'default.datasource.delete.confirm.message')}');"><g:message code="button.delete.group" /></a>
+								href="${createLink(mapping:'datasource', action:'delete', id:datasourceInstance?.id)}"
+				        onclick="return confirm('${message(code: 'default.datasource.delete.confirm.message')}');"><g:message code="button.delete.datasource" /></a>
 						</div>
 					</g:if>
 					 <a id="createDatasourceSubmit"

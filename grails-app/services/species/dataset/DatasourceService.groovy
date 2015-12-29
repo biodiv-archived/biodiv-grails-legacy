@@ -113,8 +113,27 @@ class DatasourceService extends AbstractMetadataService {
             instance.author = springSecurityService.currentUser;
         }
 
+		instance.icon = getDatasourceIcon(params.icon);
+
        return instance;
     }
+
+    private String getDatasourceIcon(String icon) {
+		if(!icon) return;
+
+		def resource = null;
+		def rootDir = grailsApplication.config.speciesPortal.datasource.rootDir
+
+		File iconFile = new File(rootDir , icon);
+		if(!iconFile.exists()) {
+			log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
+		}
+
+		resource = iconFile.absolutePath.replace(rootDir, "");
+
+		return resource;
+	}
+
 
     def save(params, sendMail) {
         def result;

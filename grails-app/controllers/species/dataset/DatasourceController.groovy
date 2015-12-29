@@ -43,6 +43,22 @@ class DatasourceController extends AbstractObjectController {
         return [datasourceInstance: datasourceInstance]
 	}
 
+    @Secured(['ROLE_ADMIN'])
+	def edit() {
+		def datasourceInstance = Datasource.findWhere(id:params.id?.toLong(), isDeleted:false)
+		if (!datasourceInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'datasource.label', default: 'Datasource'), params.id])}"
+			redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "list")
+		} else if(utilsService.ifOwns(datasourceInstance.author)) {
+			render(view: "create", model: [datasourceInstance: datasourceInstance, 'springSecurityService':springSecurityService])
+		} else {
+			flash.message = "${message(code: 'edit.denied.message')}"
+			redirect (url:uGroup.createLink(action:'show', controller:"datasource", id:datasourceInstance.id, 'userGroupWebaddress':params.webaddress))
+		}
+	}
+
+
 	@Secured(['ROLE_ADMIN'])
 	def save() {
 	    saveAndRender(params, false)

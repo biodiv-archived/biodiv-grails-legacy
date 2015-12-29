@@ -88,8 +88,26 @@
                 </div>
 
                 <div class="span4">
-
                     <div class="sidebar_section">
+<g:set var="mainImage" value="${datasourceInstance?.mainImage()}" />
+<%def imagePath = mainImage?mainImage.fileName : null%>
+
+
+                        <div class="snippet">
+                            <div class="figure pull-left observation_story_image" 
+                                title='${datasourceInstance.title}'>
+                                <g:link url="${datasourceInstance.website}">
+                                <div style="position:relative;margin:auto;">
+                                    <g:if test="${imagePath}">
+                                    <img class="img-polaroid" style="opacity:0.7" src="${imagePath}"/>
+                                    </g:if>
+                                    <g:else>
+                                    </g:else>
+                                </div>
+                                </g:link>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
 
