@@ -30,7 +30,7 @@
                             <td>
                                 <div class="figure pull-left observation_story_image" style="height:150px;">
                                     <a
-                                        href="${uGroup.createLink(controller:'datasource', action:'show', 'pos':pos)}">
+                                        href="${uGroup.createLink(controller:'datasource', action:'show', id:instance.id)}">
                                         <img
                                         class="normal_profile_pic"
                                         src="${instance.mainImage()?.fileName}" title="${instance.title}"

@@ -11,7 +11,7 @@
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
 
             <span class="badge ${featured?'featured':''}" style="display:inherit;"  title="${(featureCount>0) ? 'Featured in this group':''}"> </span>
-            <div class="figure pull-left" style="display: table; width:32px;height: ${showDetails ? '100px;':'40px;'};">
+            <div class="figure pull-left" style="display: table; width:110px;height: ${showDetails ? '100px;':'40px;'};">
                 <a target="_blank"
                     href="${uGroup.createLink('controller':'datasource', 'action':'show', id:instance.id)}">
                     <g:if test="${featured}">

@@ -27,7 +27,9 @@
             <i class="pull-left icon-share-alt"></i>
             </g:else>
                 <div class="value">
+                    <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
                     ${datasetInstance.title}
+                    </g:link>
                 </div>
             </div>
 
