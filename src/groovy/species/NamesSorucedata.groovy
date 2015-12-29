@@ -34,9 +34,9 @@ abstract class NamesSorucedata extends Sourcedata {
 			this.attach()
 		}
 		
-		def toBeAddedUser = (!contributors)? users : []
-
-		toBeAddedUser.each { u ->
+		users.minus(contributors)
+		
+		users.each { u ->
 			this.addToContributors(u)
 		}
 		
