@@ -286,7 +286,7 @@ def datasourceService;
         params['type'] = DatasetType.OBSERVATIONS;
         params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
         params['language'] = datasetMetadata.dataset.language.text();
-        params['datasource'] = result1.instance;
+        params['datasource'] = Datasource.read(params.long('datasource'));
 
 //        params['originalAuthor'] = createContact() 
         Dataset dataset;
