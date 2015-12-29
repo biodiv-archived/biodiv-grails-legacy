@@ -50,6 +50,7 @@ import species.Language;
 import species.Species;
 import species.Metadata
 import species.SpeciesPermission;
+import species.dataset.Dataset;
 
 
 //import org.apache.lucene.document.DateField;
@@ -130,7 +131,7 @@ class ObservationService extends AbstractMetadataService {
             observation.url = params.url;
         }
 
-		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
+        //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
 	        def resourcesXML = createResourcesXML(params);
@@ -1323,6 +1324,19 @@ class ObservationService extends AbstractMetadataService {
  
                 filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
+            }
+        }
+		
+        if(params.dataset) {
+            def dataset = Dataset.read(params.dataset.toLong());
+            println "*************************************"
+            println dataset
+            println "*************************************"
+            if(dataset){
+                queryParams['dataset'] = dataset.id
+                activeFilters['dataset'] = dataset.id
+
+                filterQuery += " and obv.dataset.id = :dataset ";
             }
         }
 		

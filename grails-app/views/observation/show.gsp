@@ -182,7 +182,6 @@ if(r) {
                
                 <g:render template="/species/speciesaudio" model="['resourceInstance': observationInstance , 'resourcesInstanceList' : observationInstanceListResources]"/>
 
-
                     <obv:showStory
                         model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
@@ -231,7 +230,19 @@ if(r) {
                                                                                        
                     <uGroup:objectPostToGroupsWrapper 
                         model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
-                    <div class="union-comment">
+
+                        <%
+                        def annotations = observationInstance.fetchChecklistAnnotation()
+                        %>
+                        <g:if test="${annotations?.size() > 0}">
+                        <div class="sidebar_section">
+                            <h5><g:message code="heading.annotations" /></h5>
+                            <div>
+                                <obv:showAnnotation model="[annotations:annotations]" />
+                            </div>
+                        </div>  
+                        </g:if>
+                        <div class="union-comment">
                     <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />
                     <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                     </div>
@@ -258,17 +269,6 @@ if(r) {
                                         </div>
                                         
                                     </div>
-                                    <%
-                                    def annotations = observationInstance.fetchChecklistAnnotation()
-                                    %>
-                                    <g:if test="${annotations?.size() > 0}">
-                                    <div class="sidebar_section">
-                                        <h5><g:message code="heading.annotations" /></h5>
-                                        <div>
-                                            <obv:showAnnotation model="[annotations:annotations]" />
-                                        </div>
-                                    </div>  
-                                    </g:if>
                                     
  				
                                     

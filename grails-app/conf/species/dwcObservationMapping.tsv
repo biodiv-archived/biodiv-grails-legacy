@@ -1,225 +1,225 @@
-Column name	meta.xml	db column name	percentNULL	Comments	Priority	IBP tablename	Comment									
-gbifID	http://rs.gbif.org/terms/1.0/gbifID	gbifid	0	Required	P1	externalId	This will be the dataset ID from where we have got the data. Need to add a column that will have externalSource as well.	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09
-basisOfRecord	http://rs.tdwg.org/dwc/terms/basisOfRecord	basisofrecord	0	Required	P0	basisOfRecord	This will be enum following TDWG standards	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION
-countryCode	http://rs.tdwg.org/dwc/terms/countryCode	countrycode	0		X			IN	IN	IN	IN	IN	IN	IN	IN	IN
-datasetKey	http://rs.gbif.org/terms/1.0/datasetKey	datasetkey	0	Required	P1	externalDatasetKey	externaldatasetID	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e
-lastInterpreted	http://rs.gbif.org/terms/1.0/lastInterpreted	lastinterpreted	0	 	P1		Timestamp of the last time the record has been (re)interpreted by GBIF. If this has changed, we will have to get the record again from GBIF and update our records	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z
-hasCoordinate	http://rs.gbif.org/terms/1.0/hasCoordinate	hascoordinate	0		X			TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-hasGeospatialIssues	http://rs.gbif.org/terms/1.0/hasGeospatialIssues	hasgeospatialissues	0		X			FALSE	FALSE	FALSE	FALSE	FALSE	FALSE	FALSE	FALSE	FALSE
-protocol	http://rs.gbif.org/terms/1.0/protocol	protocol	0	Required	P1	protocol	We will need this, but can be with the dataset. We can have data coming in DwC, TXT or direct APIs.	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE
-lastCrawled	http://rs.gbif.org/terms/1.0/lastCrawled	lastcrawled	0	Required	P1	lastCrawled	We should store wrt our system. But we will need this field to know when the aggregator can crawled from the promary source. 	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z
-institutionCode	http://rs.tdwg.org/dwc/terms/institutionCode	institutioncode	0.0087		P1		We will need this as the primary source of data. It is the via code. But we sold use the same name as in standards. It may be useful to have this.	CLO	CLO	CLO	CLO	CLO	CLO	CLO	CLO	CLO
-kingdom	http://rs.tdwg.org/dwc/terms/kingdom	kingdom	0.00883333		X			Animalia	Animalia	Animalia	Animalia	Animalia	Animalia	Animalia	Animalia	Animalia
-scientificName	http://rs.tdwg.org/dwc/terms/scientificName	scientificname	0.00883333	Required	P0	scientific name	Important	Chloropsis aurifrons (Temminck, 1829)	Turdoides striata (Dumont, 1823)	Leptocoma minima	Ictinaetus malayensis (Temminck, 1822)	Pycnonotus jocosus (Linnaeus, 1758)	Psilopogon MÃ¼ller, 1835	Micropternus brachyurus	Psittacula krameri (Scopoli, 1769)	Pericrocotus flammeus (Forster, 1781)
-taxonRank	http://rs.tdwg.org/dwc/terms/taxonRank	taxonrank	0.00883333		X			SPECIES	SPECIES	SPECIES	SPECIES	SPECIES	GENUS	SPECIES	SPECIES	SPECIES
-taxonKey	http://rs.gbif.org/terms/1.0/taxonKey	taxonkey	0.00883333		X			5230726	7340537	6088706	5229198	2486151	2478743	5844053	2479226	2486819
-kingdomKey	http://rs.gbif.org/terms/1.0/kingdomKey	kingdomkey	0.00883333		X			1	1	1	1	1	1	1	1	1
-genericName	http://rs.gbif.org/terms/1.0/genericName	genericname	0.00883333		X			Chloropsis	Turdoides	Leptocoma	Ictinaetus	Pycnonotus	Psilopogon	Micropternus	Psittacula	Pericrocotus
-catalogNumber	http://rs.tdwg.org/dwc/terms/catalogNumber	catalognumber	0.0100333	Required	P1	catalogNumber		OBS281420272	OBS281420271	OBS281420276	OBS281420274	OBS281420273	OBS281420275	OBS281423864	OBS281423917	OBS281423840
-publishingCountry	http://rs.gbif.org/terms/1.0/publishingCountry	publishingcountry	0.0103333	Required	P1	publishingCountry		US	US	US	US	US	US	US	US	US
-collectionCode	http://rs.tdwg.org/dwc/terms/collectionCode	collectioncode	0.0112333	Required	P1	collectionCode		EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD
-phylum	http://rs.tdwg.org/dwc/terms/phylum	phylum	0.0203667		X			Chordata	Chordata	Chordata	Chordata	Chordata	Chordata	Chordata	Chordata	Chordata
-phylumKey	http://rs.gbif.org/terms/1.0/phylumKey	phylumkey	0.0203667		X			44	44	44	44	44	44	44	44	44
-class	http://rs.tdwg.org/dwc/terms/class	class	0.0205667		X			Aves	Aves	Aves	Aves	Aves	Aves	Aves	Aves	Aves
-classKey	http://rs.gbif.org/terms/1.0/classKey	classkey	0.0205667		X			212	212	212	212	212	212	212	212	212
-order	http://rs.tdwg.org/dwc/terms/order	order1	0.0285333		X			Passeriformes	Passeriformes	Passeriformes	Accipitriformes	Passeriformes	Piciformes	Piciformes	Psittaciformes	Passeriformes
-orderKey	http://rs.gbif.org/terms/1.0/orderKey	orderkey	0.0285333		X			729	729	729	7191147	729	724	724	1445	729
-family	http://rs.tdwg.org/dwc/terms/family	family	0.0329667		X			Irenidae	Sylviidae	Nectariniidae	Accipitridae	Pycnonotidae	Ramphastidae	Picidae	Psittacidae	Campephagidae
-familyKey	http://rs.gbif.org/terms/1.0/familyKey	familykey	0.0329667		X			6177	5285	5259	2877	5277	9343	9333	9340	9284
-genus	http://rs.tdwg.org/dwc/terms/genus	genus	0.0393333		X			Chloropsis	Turdoides	Leptocoma	Ictinaetus	Pycnonotus	Psilopogon	Micropternus	Psittacula	Pericrocotus
-genusKey	http://rs.gbif.org/terms/1.0/genusKey	genuskey	0.0393333		X			2488919	2493296	3241500	3242861	2486114	2478743	4849441	2479192	2486811
-specificEpithet	http://rs.tdwg.org/dwc/terms/specificEpithet	specificepithet	0.1036		X			aurifrons	striata	minima	malayensis	jocosus		brachyurus	krameri	flammeus
-speciesKey	http://rs.gbif.org/terms/1.0/speciesKey	specieskey	0.103933		X			5230726	7340537	6088706	5229198	2486151		5844053	2479226	2486819
-species	http://rs.gbif.org/terms/1.0/species	species	0.103933		X			Chloropsis aurifrons	Turdoides striata	Leptocoma minima	Ictinaetus malayensis	Pycnonotus jocosus		Micropternus brachyurus	Psittacula krameri	Pericrocotus flammeus
-lastParsed	http://rs.gbif.org/terms/1.0/lastParsed	lastparsed	0.1124	 	P1			2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z
-identifier	http://purl.org/dc/terms/identifier	identifier	0.17		P1		 This does not seem to be standard. OccurrenceID should be better. There are some that have Identifier, but do not have OccurrenceID. We will not be able to trace a record if we did not have this. It can be a key-value	URN:catalog:CLO:EBIRD:OBS281420272	URN:catalog:CLO:EBIRD:OBS281420271	URN:catalog:CLO:EBIRD:OBS281420276	URN:catalog:CLO:EBIRD:OBS281420274	URN:catalog:CLO:EBIRD:OBS281420273	URN:catalog:CLO:EBIRD:OBS281420275	URN:catalog:CLO:EBIRD:OBS281423864	URN:catalog:CLO:EBIRD:OBS281423917	URN:catalog:CLO:EBIRD:OBS281423840
-recordedBy	http://rs.tdwg.org/dwc/terms/recordedBy	recordedby	0.181267	Required	P0	original user name		obsr452383	obsr452383	obsr452383	obsr452383	obsr452383	obsr452383	obsr538498	obsr538498	obsr538498
-locality	http://rs.tdwg.org/dwc/terms/locality	locality	0.183733		P0	location title	We should keep the placeName as the user has provided. And derive the locality as a taluka from the map for all IBP observations	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Tamdi Surla	Tamdi Surla	Tamdi Surla
-occurrenceID	http://rs.tdwg.org/dwc/terms/occurrenceID	occurrenceid	0.190733		P1			URN:catalog:CLO:EBIRD:OBS281420272	URN:catalog:CLO:EBIRD:OBS281420271	URN:catalog:CLO:EBIRD:OBS281420276	URN:catalog:CLO:EBIRD:OBS281420274	URN:catalog:CLO:EBIRD:OBS281420273	URN:catalog:CLO:EBIRD:OBS281420275	URN:catalog:CLO:EBIRD:OBS281423864	URN:catalog:CLO:EBIRD:OBS281423917	URN:catalog:CLO:EBIRD:OBS281423840
-issue	http://rs.gbif.org/terms/1.0/issue	issue	0.201367	 	P1			GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84;TAXON_MATCH_FUZZY	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84;TAXON_MATCH_HIGHERRANK	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84
-year	http://rs.tdwg.org/dwc/terms/year	year	0.243467	 	X			2014	2014	2014	2014	2014	2014	2014	2014	2014
-decimalLatitude	http://rs.tdwg.org/dwc/terms/decimalLatitude	decimallatitude	0.2479	Required	P0	latitude	Important	11.3382	11.3382	11.3382	11.3382	11.3382	11.3382	15.4354	15.4354	15.4354
-decimalLongitude	http://rs.tdwg.org/dwc/terms/decimalLongitude	decimallongitude	0.2479	Required	P0	longitude	Important	76.1112	76.1112	76.1112	76.1112	76.1112	76.1112	74.2381	74.2381	74.2381
-month	http://rs.tdwg.org/dwc/terms/month	month	0.255267	 	X			11	11	11	11	11	11	5	5	5
-day	http://rs.tdwg.org/dwc/terms/day	day	0.2639	 	X			16	16	16	16	16	16	8	8	8
-eventDate	http://rs.tdwg.org/dwc/terms/eventDate	eventdate	0.263933	Required	P0	observed on	Important	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-05-08T00:00Z	2014-05-08T00:00Z	2014-05-08T00:00Z
-county	http://rs.tdwg.org/dwc/terms/county	county	0.4014	Required	P1	location title		Malappuram	Malappuram	Malappuram	Malappuram	Malappuram	Malappuram	South Goa	South Goa	South Goa
-stateProvince	http://rs.tdwg.org/dwc/terms/stateProvince	stateprovince	0.302167	Required	P0	location title		Kerala	Kerala	Kerala	Kerala	Kerala	Kerala	Goa	Goa	Goa
-rights	http://purl.org/dc/terms/rights	rights	0.386833	Required	P0	license		http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0
-accessRights	http://purl.org/dc/terms/accessRights	accessrights	0.388933	Required	P1	accessRights		http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html
-vernacularName	http://rs.tdwg.org/dwc/terms/vernacularName	vernacularname	0.431467	Required	P0	common name		Golden-fronted Leafbird	Jungle Babbler	Crimson-backed Sunbird	Black Eagle	Red-whiskered Bulbul	White-cheeked Barbet	Rufous Woodpecker	Rose-ringed Parakeet	Orange Minivet
-continent	http://rs.tdwg.org/dwc/terms/continent	continent	0.793467		X											
-higherClassification	http://rs.tdwg.org/dwc/terms/higherClassification	higherclassification	0.814933		X											
-higherGeography	http://rs.tdwg.org/dwc/terms/higherGeography	highergeography	0.855267		X											
-nomenclaturalCode	http://rs.tdwg.org/dwc/terms/nomenclaturalCode	nomenclaturalcode	0.8672		X											
-type	http://purl.org/dc/terms/type	type	0.8958		X											
-preparations	http://rs.tdwg.org/dwc/terms/preparations	preparations	0.8989		X											
-modified	http://purl.org/dc/terms/modified	modified	0.9099		X											
-language	http://purl.org/dc/terms/language	language	0.917167		X											
-elevation	http://rs.gbif.org/terms/1.0/elevation	elevation	0.927133		X											
-institutionID	http://rs.tdwg.org/dwc/terms/institutionID	institutionid	0.9341		X											
-startDayOfYear	http://rs.tdwg.org/dwc/terms/startDayOfYear	startdayofyear	0.935933		X											
-collectionID	http://rs.tdwg.org/dwc/terms/collectionID	collectionid	0.9369		X	collectionId										
-identifiedBy	http://rs.tdwg.org/dwc/terms/identifiedBy	identifiedby	0.9393		X	identifiedBy										
-verbatimLocality	http://rs.tdwg.org/dwc/terms/verbatimLocality	verbatimlocality	0.942367		X											
-verbatimEventDate	http://rs.tdwg.org/dwc/terms/verbatimEventDate	verbatimeventdate	0.942533		X											
-recordNumber	http://rs.tdwg.org/dwc/terms/recordNumber	recordnumber	0.9443		X											
-verbatimTaxonRank	http://rs.tdwg.org/dwc/terms/verbatimTaxonRank	verbatimtaxonrank	0.947567		X											
-otherCatalogNumbers	http://rs.tdwg.org/dwc/terms/otherCatalogNumbers	othercatalognumbers	0.9522		X											
-sex	http://rs.tdwg.org/dwc/terms/sex	sex	0.9539		X											
-mediaType	http://rs.gbif.org/terms/1.0/mediaType	mediatype	0.958567		X											
-dynamicProperties	http://rs.tdwg.org/dwc/terms/dynamicProperties	dynamicproperties	0.959867		X											
-infraspecificEpithet	http://rs.tdwg.org/dwc/terms/infraspecificEpithet	infraspecificepithet	0.960567		X											
-ownerInstitutionCode	http://rs.tdwg.org/dwc/terms/ownerInstitutionCode	ownerinstitutioncode	0.9617		X											
-endDayOfYear	http://rs.tdwg.org/dwc/terms/endDayOfYear	enddayofyear	0.961733		X											
-references	http://purl.org/dc/terms/references	references1	0.961933		X											
-occurrenceStatus	http://rs.tdwg.org/dwc/terms/occurrenceStatus	occurrencestatus	0.9653		X											
-establishmentMeans	http://rs.tdwg.org/dwc/terms/establishmentMeans	establishmentmeans	0.965367		X											
-verbatimElevation	http://rs.tdwg.org/dwc/terms/verbatimElevation	verbatimelevation	0.966867		X											
-occurrenceRemarks	http://rs.tdwg.org/dwc/terms/occurrenceRemarks	occurrenceremarks	0.967833		X											
-georeferenceProtocol	http://rs.tdwg.org/dwc/terms/georeferenceProtocol	georeferenceprotocol	0.968167		X											
-informationWithheld	http://rs.tdwg.org/dwc/terms/informationWithheld	informationwithheld	0.974867	Required	X	informationWithheld										
-dateIdentified	http://rs.tdwg.org/dwc/terms/dateIdentified	dateidentified	0.9763		X	dateIdentified										
-associatedSequences	http://rs.tdwg.org/dwc/terms/associatedSequences	associatedsequences	0.9766		X											
-georeferenceVerificationStatus	http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus	georeferenceverificationstatus	0.978567		X											
-typeStatus	http://rs.tdwg.org/dwc/terms/typeStatus	typestatus	0.979167		X											
-rightsHolder	http://purl.org/dc/terms/rightsHolder	rightsholder	0.9792		X											
-datasetName	http://rs.tdwg.org/dwc/terms/datasetName	datasetname	0.9793		X											
-fieldNumber	http://rs.tdwg.org/dwc/terms/fieldNumber	fieldnumber	0.9797		X											
-georeferencedBy	http://rs.tdwg.org/dwc/terms/georeferencedBy	georeferencedby	0.980833		X											
-datasetID	http://rs.tdwg.org/dwc/terms/datasetID	datasetid	0.9827		X											
-locationRemarks	http://rs.tdwg.org/dwc/terms/locationRemarks	locationremarks	0.982733		X											
-georeferencedDate	http://rs.tdwg.org/dwc/terms/georeferencedDate	georeferenceddate	0.9831		X											
-georeferenceSources	http://rs.tdwg.org/dwc/terms/georeferenceSources	georeferencesources	0.984033		X											
-depth	http://rs.gbif.org/terms/1.0/depth	depth	0.984367		X											
-disposition	http://rs.tdwg.org/dwc/terms/disposition	disposition	0.986067		X											
-verbatimCoordinateSystem	http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem	verbatimcoordinatesystem	0.986633		X											
-taxonID	http://rs.tdwg.org/dwc/terms/taxonID	taxonid	0.9879		X											
-elevationAccuracy	http://rs.gbif.org/terms/1.0/elevationAccuracy	elevationaccuracy	0.9888		X											
-depthAccuracy	http://rs.gbif.org/terms/1.0/depthAccuracy	depthaccuracy	0.988833		X											
-georeferenceRemarks	http://rs.tdwg.org/dwc/terms/georeferenceRemarks	georeferenceremarks	0.9899		X											
-taxonRemarks	http://rs.tdwg.org/dwc/terms/taxonRemarks	taxonremarks	0.9904		X											
-lifeStage	http://rs.tdwg.org/dwc/terms/lifeStage	lifestage	0.9906		X			Goodtohave								
-habitat	http://rs.tdwg.org/dwc/terms/habitat	habitat	0.990867		X			Goodtohave								
-created	http://purl.org/dc/terms/created	created	0.991533		X											
-reproductiveCondition	http://rs.tdwg.org/dwc/terms/reproductiveCondition	reproductivecondition	0.993567		X											
-previousIdentifications	http://rs.tdwg.org/dwc/terms/previousIdentifications	previousidentifications	0.993833		X											
-waterBody	http://rs.tdwg.org/dwc/terms/waterBody	waterbody	0.994267		X											
-coordinateAccuracy	http://rs.gbif.org/terms/1.0/coordinateAccuracy	coordinateaccuracy	0.9951		X											
-fieldNotes	http://rs.tdwg.org/dwc/terms/fieldNotes	fieldnotes	0.995733		X											
-bibliographicCitation	http://purl.org/dc/terms/bibliographicCitation	bibliographiccitation	0.9958		X											
-samplingProtocol	http://rs.tdwg.org/dwc/terms/samplingProtocol	samplingprotocol	0.996		X											
-identificationID	http://rs.tdwg.org/dwc/terms/identificationID	identificationid	0.996333		X											
-eventRemarks	http://rs.tdwg.org/dwc/terms/eventRemarks	eventremarks	0.996567		X											
-identificationRemarks	http://rs.tdwg.org/dwc/terms/identificationRemarks	identificationremarks	0.996567		X											
-source	http://purl.org/dc/terms/source	source	0.996667		X											
-locationID	http://rs.tdwg.org/dwc/terms/locationID	locationid	0.997467		X											
-scientificNameID	http://rs.tdwg.org/dwc/terms/scientificNameID	scientificnameid	0.997567		X											
-eventTime	http://rs.tdwg.org/dwc/terms/eventTime	eventtime	0.9979		X											
-identificationQualifier	http://rs.tdwg.org/dwc/terms/identificationQualifier	identificationqualifier	0.998033		X											
-eventID	http://rs.tdwg.org/dwc/terms/eventID	eventid	0.9981		X											
-municipality	http://rs.tdwg.org/dwc/terms/municipality	municipality	0.9981		X											
-identificationVerificationStatus	http://rs.tdwg.org/dwc/terms/identificationVerificationStatus	identificationverificationstatus	0.998167		X											
-identificationReferences	http://rs.tdwg.org/dwc/terms/identificationReferences	identificationreferences	0.9983		X											
-typifiedName	http://rs.gbif.org/terms/1.0/typifiedName	typifiedname	0.998333		X											
-associatedReferences	http://rs.tdwg.org/dwc/terms/associatedReferences	associatedreferences	0.998367		X											
-earliestPeriodOrLowestSystem	http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem	earliestperiodorlowestsystem	0.998467		X											
-associatedOccurrences	http://rs.tdwg.org/dwc/terms/associatedOccurrences	associatedres	0.998633		X											
-earliestEraOrLowestErathem	http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem	earliesteraorlowesterathem	0.998833		X											
-license	http://purl.org/dc/terms/license	license	0.998933		X											
-earliestEpochOrLowestSeries	http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries	earliestepochorlowestseries	0.998933		X											
-associatedTaxa	http://rs.tdwg.org/dwc/terms/associatedTaxa	associatedtaxa	0.998967		X											
-island	http://rs.tdwg.org/dwc/terms/island	island	0.999033		X											
-originalNameUsage	http://rs.tdwg.org/dwc/terms/originalNameUsage	originalnameusage	0.999033		X											
-latestEraOrHighestErathem	http://rs.tdwg.org/dwc/terms/latestEraOrHighestErathem	latesteraorhighesterathem	0.999067		X											
-locationAccordingTo	http://rs.tdwg.org/dwc/terms/locationAccordingTo	locationaccordingto	0.9991		X											
-earliestEonOrLowestEonothem	http://rs.tdwg.org/dwc/terms/earliestEonOrLowestEonothem	earliesteonorlowesteonothem	0.999133		X											
-latestEonOrHighestEonothem	http://rs.tdwg.org/dwc/terms/latestEonOrHighestEonothem	latesteonorhighesteonothem	0.999133		X											
-latestPeriodOrHighestSystem	http://rs.tdwg.org/dwc/terms/latestPeriodOrHighestSystem	latestperiodorhighestsystem	0.999133		X											
-islandGroup	http://rs.tdwg.org/dwc/terms/islandGroup	islandgroup	0.999167		X											
-behavior	http://rs.tdwg.org/dwc/terms/behavior	behavior	0.999267		X											
-formation	http://rs.tdwg.org/dwc/terms/formation	formation	0.9995		X											
-latestEpochOrHighestSeries	http://rs.tdwg.org/dwc/terms/latestEpochOrHighestSeries	latestepochorhighestseries	0.999567		X											
-earliestAgeOrLowestStage	http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage	earliestageorloweststage	0.999733		X											
-latestAgeOrHighestStage	http://rs.tdwg.org/dwc/terms/latestAgeOrHighestStage	latestageorhigheststage	0.9998		X											
-verbatimDepth	http://rs.tdwg.org/dwc/terms/verbatimDepth	verbatimdepth	0.9998		X											
-geologicalContextID	http://rs.tdwg.org/dwc/terms/geologicalContextID	geologicalcontextid	0.9999		X											
-bed	http://rs.tdwg.org/dwc/terms/bed	bed	0.999967		X											
-group	http://rs.tdwg.org/dwc/terms/group	group1	0.999967		X											
-individualID	http://rs.tdwg.org/dwc/terms/individualID	individualid	0.999967		X											
-namePublishedIn	http://rs.tdwg.org/dwc/terms/namePublishedIn	namepublishedin	0.999967		X											
-taxonomicStatus	http://rs.tdwg.org/dwc/terms/taxonomicStatus	taxonomicstatus	0.999967		X											
-verbatimSRS	http://rs.tdwg.org/dwc/terms/verbatimSRS	verbatimsrs	0.999967		X											
-abstract	http://purl.org/dc/terms/abstract	abstract	1		X											
-accrualMethod	http://purl.org/dc/terms/accrualMethod	accrualmethod	1		X											
-accrualPeriodicity	http://purl.org/dc/terms/accrualPeriodicity	accrualperiodicity	1		X											
-accrualPolicy	http://purl.org/dc/terms/accrualPolicy	accrualpolicy	1		X											
-alternative	http://purl.org/dc/terms/alternative	alternative	1		X											
-audience	http://purl.org/dc/terms/audience	audience	1		X											
-available	http://purl.org/dc/terms/available	available	1		X											
-conformsTo	http://purl.org/dc/terms/conformsTo	conformsto	1		X											
-contributor	http://purl.org/dc/terms/contributor	contributor	1		X											
-coverage	http://purl.org/dc/terms/coverage	coverage	1		X											
-creator	http://purl.org/dc/terms/creator	creator	1		X											
-date	http://purl.org/dc/terms/date	date	1		X											
-dateAccepted	http://purl.org/dc/terms/dateAccepted	dateaccepted	1		X											
-dateCopyrighted	http://purl.org/dc/terms/dateCopyrighted	datecopyrighted	1		X											
-dateSubmitted	http://purl.org/dc/terms/dateSubmitted	datesubmitted	1		X											
-description	http://purl.org/dc/terms/description	description	1		X											
-educationLevel	http://purl.org/dc/terms/educationLevel	educationlevel	1		X											
-extent	http://purl.org/dc/terms/extent	extent	1		X											
-format	http://purl.org/dc/terms/format	format	1		X											
-hasFormat	http://purl.org/dc/terms/hasFormat	hasformat	1		X											
-hasPart	http://purl.org/dc/terms/hasPart	haspart	1		X											
-hasVersion	http://purl.org/dc/terms/hasVersion	hasversion	1		X											
-instructionalMethod	http://purl.org/dc/terms/instructionalMethod	instructionalmethod	1		X											
-isFormatOf	http://purl.org/dc/terms/isFormatOf	isformatof	1		X											
-isPartOf	http://purl.org/dc/terms/isPartOf	ispartof	1		X											
-isReferencedBy	http://purl.org/dc/terms/isReferencedBy	isreferencedby	1		X											
-isReplacedBy	http://purl.org/dc/terms/isReplacedBy	isreplacedby	1		X											
-isRequiredBy	http://purl.org/dc/terms/isRequiredBy	isrequiredby	1		X											
-isVersionOf	http://purl.org/dc/terms/isVersionOf	isversionof	1		X											
-issued	http://purl.org/dc/terms/issued	issued	1		X											
-mediator	http://purl.org/dc/terms/mediator	mediator	1		X											
-medium	http://purl.org/dc/terms/medium	medium	1		X											
-provenance	http://purl.org/dc/terms/provenance	provenance	1		X											
-publisher	http://purl.org/dc/terms/publisher	publisher	1		X											
-relation	http://purl.org/dc/terms/relation	relation	1		X											
-replaces	http://purl.org/dc/terms/replaces	replaces	1		X											
-requires	http://purl.org/dc/terms/requires	requires	1		X											
-spatial	http://purl.org/dc/terms/spatial	spatial	1		X											
-subject	http://purl.org/dc/terms/subject	subject	1		X											
-tableOfContents	http://purl.org/dc/terms/tableOfContents	tableofcontents	1		X											
-temporal	http://purl.org/dc/terms/temporal	temporal	1		X											
-title	http://purl.org/dc/terms/title	title	1		X											
-valid	http://purl.org/dc/terms/valid	valid	1		X											
-acceptedNameUsage	http://rs.tdwg.org/dwc/terms/acceptedNameUsage	acceptednameusage	1		X											
-acceptedNameUsageID	http://rs.tdwg.org/dwc/terms/acceptedNameUsageID	acceptednameusageid	1		X											
-dataGeneralizations	http://rs.tdwg.org/dwc/terms/dataGeneralizations	datageneralizations	1		X											
-footprintSRS	http://rs.tdwg.org/dwc/terms/footprintSRS	footprintsrs	1		X											
-footprintSpatialFit	http://rs.tdwg.org/dwc/terms/footprintSpatialFit	footprintspatialfit	1		X											
-footprintWKT	http://rs.tdwg.org/dwc/terms/footprintWKT	footprintwkt	1		X											
-higherGeographyID	http://rs.tdwg.org/dwc/terms/higherGeographyID	highergeographyid	1		X											
-highestBiostratigraphicZone	http://rs.tdwg.org/dwc/terms/highestBiostratigraphicZone	highestbiostratigraphiczone	1		X											
-individualCount	http://rs.tdwg.org/dwc/terms/individualCount	individualcount	1		X											
-lithostratigraphicTerms	http://rs.tdwg.org/dwc/terms/lithostratigraphicTerms	lithostratigraphicterms	1		X											
-lowestBiostratigraphicZone	http://rs.tdwg.org/dwc/terms/lowestBiostratigraphicZone	lowestbiostratigraphiczone	1		X											
-materialSampleID	http://rs.tdwg.org/dwc/terms/materialSampleID	materialsampleid	1		X											
-maximumDistanceAboveSurfaceInMeters	http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters	maximumdistanceabovesurfaceinmeters	1		X											
-member	http://rs.tdwg.org/dwc/terms/member	member	1		X											
-minimumDistanceAboveSurfaceInMeters	http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters	minimumdistanceabovesurfaceinmeters	1		X											
-nameAccordingTo	http://rs.tdwg.org/dwc/terms/nameAccordingTo	nameaccordingto	1		X											
-nameAccordingToID	http://rs.tdwg.org/dwc/terms/nameAccordingToID	nameaccordingtoid	1		X											
-namePublishedInID	http://rs.tdwg.org/dwc/terms/namePublishedInID	namepublishedinid	1		X											
-namePublishedInYear	http://rs.tdwg.org/dwc/terms/namePublishedInYear	namepublishedinyear	1		X											
-nomenclaturalStatus	http://rs.tdwg.org/dwc/terms/nomenclaturalStatus	nomenclaturalstatus	1		X											
-originalNameUsageID	http://rs.tdwg.org/dwc/terms/originalNameUsageID	originalnameusageid	1		X											
-parentNameUsage	http://rs.tdwg.org/dwc/terms/parentNameUsage	parentnameusage	1		X											
-parentNameUsageID	http://rs.tdwg.org/dwc/terms/parentNameUsageID	parentnameusageid	1		X											
-pointRadiusSpatialFit	http://rs.tdwg.org/dwc/terms/pointRadiusSpatialFit	pointradiusspatialfit	1		X											
-samplingEffort	http://rs.tdwg.org/dwc/terms/samplingEffort	samplingeffort	1		X											
-subgenus	http://rs.tdwg.org/dwc/terms/subgenus	subgenus	1		X											
-taxonConceptID	http://rs.tdwg.org/dwc/terms/taxonConceptID	taxonconceptid	1		X											
-distanceAboveSurface	http://rs.gbif.org/terms/1.0/distanceAboveSurface	distanceabovesurface	1		X											
-distanceAboveSurfaceAccuracy	http://rs.gbif.org/terms/1.0/distanceAboveSurfaceAccuracy	distanceabovesurfaceaccuracy	1		X											
-subgenusKey	http://rs.gbif.org/terms/1.0/subgenusKey	subgenuskey	1		X											
+Column name	meta.xml	db column name	percentNULL	Comments	Priority	Order of keys 	IBP tablename	Comment									
+gbifID	http://rs.gbif.org/terms/1.0/gbifID	gbifid	0	Required	P1	0	externalId	This will be the dataset ID from where we have got the data. Need to add a column that will have externalSource as well.	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09	1.20E+09
+datasetKey	http://rs.gbif.org/terms/1.0/datasetKey	datasetkey	0	Required	P1	0	externalDatasetKey	externaldatasetID	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e	4fa7b334-ce0d-4e88-aaae-2e0c138d049e
+lastParsed	http://rs.gbif.org/terms/1.0/lastParsed	lastparsed	0.1124	 	P1	1			2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z
+basisOfRecord	http://rs.tdwg.org/dwc/terms/basisOfRecord	basisofrecord	0	Required	P0	1.01	basisOfRecord	This will be enum following TDWG standards	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION	HUMAN_OBSERVATION
+recordedBy	http://rs.tdwg.org/dwc/terms/recordedBy	recordedby	0.181267	Required	P0	1.1	original user name		obsr452383	obsr452383	obsr452383	obsr452383	obsr452383	obsr452383	obsr538498	obsr538498	obsr538498
+rights	http://purl.org/dc/terms/rights	rights	0.386833	Required	P0	1.11	license		http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0	http://creativecommons.org/publicdomain/zero/1.0
+accessRights	http://purl.org/dc/terms/accessRights	accessrights	0.388933	Required	P1	1.12	accessRights		http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html	http://vertnet.org/resources/norms.html
+eventDate	http://rs.tdwg.org/dwc/terms/eventDate	eventdate	0.263933	Required	P0	1.2	observed on	Important	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-11-16T00:00Z	2014-05-08T00:00Z	2014-05-08T00:00Z	2014-05-08T00:00Z
+day	http://rs.tdwg.org/dwc/terms/day	day	0.2639	 	X	1.21			16	16	16	16	16	16	8	8	8
+month	http://rs.tdwg.org/dwc/terms/month	month	0.255267	 	X	1.22			11	11	11	11	11	11	5	5	5
+year	http://rs.tdwg.org/dwc/terms/year	year	0.243467	 	X	1.23			2014	2014	2014	2014	2014	2014	2014	2014	2014
+locality	http://rs.tdwg.org/dwc/terms/locality	locality	0.183733		P0	1.3	location title	We should keep the placeName as the user has provided. And derive the locality as a taluka from the map for all IBP observations	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Kakkadampoyil	Tamdi Surla	Tamdi Surla	Tamdi Surla
+stateProvince	http://rs.tdwg.org/dwc/terms/stateProvince	stateprovince	0.302167	Required	P0	1.31	location title		Kerala	Kerala	Kerala	Kerala	Kerala	Kerala	Goa	Goa	Goa
+county	http://rs.tdwg.org/dwc/terms/county	county	0.4014	Required	P1	1.32	location title		Malappuram	Malappuram	Malappuram	Malappuram	Malappuram	Malappuram	South Goa	South Goa	South Goa
+countryCode	http://rs.tdwg.org/dwc/terms/countryCode	countrycode	0		X	1.33			IN	IN	IN	IN	IN	IN	IN	IN	IN
+decimalLatitude	http://rs.tdwg.org/dwc/terms/decimalLatitude	decimallatitude	0.2479	Required	P0	1.41	latitude	Important	11.3382	11.3382	11.3382	11.3382	11.3382	11.3382	15.4354	15.4354	15.4354
+decimalLongitude	http://rs.tdwg.org/dwc/terms/decimalLongitude	decimallongitude	0.2479	Required	P0	1.42	longitude	Important	76.1112	76.1112	76.1112	76.1112	76.1112	76.1112	74.2381	74.2381	74.2381
+scientificName	http://rs.tdwg.org/dwc/terms/scientificName	scientificname	0.00883333	Required	P0	10.1	scientific name	Important	Chloropsis aurifrons (Temminck, 1829)	Turdoides striata (Dumont, 1823)	Leptocoma minima	Ictinaetus malayensis (Temminck, 1822)	Pycnonotus jocosus (Linnaeus, 1758)	Psilopogon MÃ¼ller, 1835	Micropternus brachyurus	Psittacula krameri (Scopoli, 1769)	Pericrocotus flammeus (Forster, 1781)
+vernacularName	http://rs.tdwg.org/dwc/terms/vernacularName	vernacularname	0.431467	Required	P0	10.11	common name		Golden-fronted Leafbird	Jungle Babbler	Crimson-backed Sunbird	Black Eagle	Red-whiskered Bulbul	White-cheeked Barbet	Rufous Woodpecker	Rose-ringed Parakeet	Orange Minivet
+species	http://rs.gbif.org/terms/1.0/species	species	0.103933		X	10.12			Chloropsis aurifrons	Turdoides striata	Leptocoma minima	Ictinaetus malayensis	Pycnonotus jocosus		Micropternus brachyurus	Psittacula krameri	Pericrocotus flammeus
+speciesKey	http://rs.gbif.org/terms/1.0/speciesKey	specieskey	0.103933		X	10.13			5230726	7340537	6088706	5229198	2486151		5844053	2479226	2486819
+taxonRank	http://rs.tdwg.org/dwc/terms/taxonRank	taxonrank	0.00883333		X	10.14			SPECIES	SPECIES	SPECIES	SPECIES	SPECIES	GENUS	SPECIES	SPECIES	SPECIES
+specificEpithet	http://rs.tdwg.org/dwc/terms/specificEpithet	specificepithet	0.1036		X	10.15			aurifrons	striata	minima	malayensis	jocosus		brachyurus	krameri	flammeus
+taxonKey	http://rs.gbif.org/terms/1.0/taxonKey	taxonkey	0.00883333		X	10.15			5230726	7340537	6088706	5229198	2486151	2478743	5844053	2479226	2486819
+genericName	http://rs.gbif.org/terms/1.0/genericName	genericname	0.00883333		X	10.2			Chloropsis	Turdoides	Leptocoma	Ictinaetus	Pycnonotus	Psilopogon	Micropternus	Psittacula	Pericrocotus
+genus	http://rs.tdwg.org/dwc/terms/genus	genus	0.0393333		X	10.21			Chloropsis	Turdoides	Leptocoma	Ictinaetus	Pycnonotus	Psilopogon	Micropternus	Psittacula	Pericrocotus
+genusKey	http://rs.gbif.org/terms/1.0/genusKey	genuskey	0.0393333		X	10.22			2488919	2493296	3241500	3242861	2486114	2478743	4849441	2479192	2486811
+family	http://rs.tdwg.org/dwc/terms/family	family	0.0329667		X	10.3			Irenidae	Sylviidae	Nectariniidae	Accipitridae	Pycnonotidae	Ramphastidae	Picidae	Psittacidae	Campephagidae
+familyKey	http://rs.gbif.org/terms/1.0/familyKey	familykey	0.0329667		X	10.31			6177	5285	5259	2877	5277	9343	9333	9340	9284
+order	http://rs.tdwg.org/dwc/terms/order	order1	0.0285333		X	10.4			Passeriformes	Passeriformes	Passeriformes	Accipitriformes	Passeriformes	Piciformes	Piciformes	Psittaciformes	Passeriformes
+orderKey	http://rs.gbif.org/terms/1.0/orderKey	orderkey	0.0285333		X	10.41			729	729	729	7191147	729	724	724	1445	729
+class	http://rs.tdwg.org/dwc/terms/class	class	0.0205667		X	10.5			Aves	Aves	Aves	Aves	Aves	Aves	Aves	Aves	Aves
+classKey	http://rs.gbif.org/terms/1.0/classKey	classkey	0.0205667		X	10.51			212	212	212	212	212	212	212	212	212
+phylum	http://rs.tdwg.org/dwc/terms/phylum	phylum	0.0203667		X	10.6			Chordata	Chordata	Chordata	Chordata	Chordata	Chordata	Chordata	Chordata	Chordata
+phylumKey	http://rs.gbif.org/terms/1.0/phylumKey	phylumkey	0.0203667		X	10.61			44	44	44	44	44	44	44	44	44
+kingdom	http://rs.tdwg.org/dwc/terms/kingdom	kingdom	0.00883333		X	10.7			Animalia	Animalia	Animalia	Animalia	Animalia	Animalia	Animalia	Animalia	Animalia
+kingdomKey	http://rs.gbif.org/terms/1.0/kingdomKey	kingdomkey	0.00883333		X	10.71			1	1	1	1	1	1	1	1	1
+protocol	http://rs.gbif.org/terms/1.0/protocol	protocol	0	Required	P1	20.1	protocol	We will need this, but can be with the dataset. We can have data coming in DwC, TXT or direct APIs.	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE	DWC_ARCHIVE
+lastCrawled	http://rs.gbif.org/terms/1.0/lastCrawled	lastcrawled	0	Required	P1	20.11	lastCrawled	We should store wrt our system. But we will need this field to know when the aggregator can crawled from the promary source. 	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z
+collectionCode	http://rs.tdwg.org/dwc/terms/collectionCode	collectioncode	0.0112333	Required	P1	20.2	collectionCode		EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD	EBIRD
+institutionCode	http://rs.tdwg.org/dwc/terms/institutionCode	institutioncode	0.0087		P1	20.21		We will need this as the primary source of data. It is the via code. But we sold use the same name as in standards. It may be useful to have this.	CLO	CLO	CLO	CLO	CLO	CLO	CLO	CLO	CLO
+catalogNumber	http://rs.tdwg.org/dwc/terms/catalogNumber	catalognumber	0.0100333	Required	P1	20.22	catalogNumber		OBS281420272	OBS281420271	OBS281420276	OBS281420274	OBS281420273	OBS281420275	OBS281423864	OBS281423917	OBS281423840
+publishingCountry	http://rs.gbif.org/terms/1.0/publishingCountry	publishingcountry	0.0103333	Required	P1	20.23	publishingCountry		US	US	US	US	US	US	US	US	US
+lastInterpreted	http://rs.gbif.org/terms/1.0/lastInterpreted	lastinterpreted	0	 	P1	20.3		Timestamp of the last time the record has been (re)interpreted by GBIF. If this has changed, we will have to get the record again from GBIF and update our records	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z	2015-11-10T06:35Z
+identifier	http://purl.org/dc/terms/identifier	identifier	0.17		P1	20.31		 This does not seem to be standard. OccurrenceID should be better. There are some that have Identifier, but do not have OccurrenceID. We will not be able to trace a record if we did not have this. It can be a key-value	URN:catalog:CLO:EBIRD:OBS281420272	URN:catalog:CLO:EBIRD:OBS281420271	URN:catalog:CLO:EBIRD:OBS281420276	URN:catalog:CLO:EBIRD:OBS281420274	URN:catalog:CLO:EBIRD:OBS281420273	URN:catalog:CLO:EBIRD:OBS281420275	URN:catalog:CLO:EBIRD:OBS281423864	URN:catalog:CLO:EBIRD:OBS281423917	URN:catalog:CLO:EBIRD:OBS281423840
+occurrenceID	http://rs.tdwg.org/dwc/terms/occurrenceID	occurrenceid	0.190733		P1	20.32			URN:catalog:CLO:EBIRD:OBS281420272	URN:catalog:CLO:EBIRD:OBS281420271	URN:catalog:CLO:EBIRD:OBS281420276	URN:catalog:CLO:EBIRD:OBS281420274	URN:catalog:CLO:EBIRD:OBS281420273	URN:catalog:CLO:EBIRD:OBS281420275	URN:catalog:CLO:EBIRD:OBS281423864	URN:catalog:CLO:EBIRD:OBS281423917	URN:catalog:CLO:EBIRD:OBS281423840
+hasCoordinate	http://rs.gbif.org/terms/1.0/hasCoordinate	hascoordinate	0		X	20.4			TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
+issue	http://rs.gbif.org/terms/1.0/issue	issue	0.201367	 	P1	20.41			GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84;TAXON_MATCH_FUZZY	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84;TAXON_MATCH_HIGHERRANK	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84	GEODETIC_DATUM_ASSUMED_WGS84
+hasGeospatialIssues	http://rs.gbif.org/terms/1.0/hasGeospatialIssues	hasgeospatialissues	0		X	20.42			FALSE	FALSE	FALSE	FALSE	FALSE	FALSE	FALSE	FALSE	FALSE
+continent	http://rs.tdwg.org/dwc/terms/continent	continent	0.793467		X	100											
+higherClassification	http://rs.tdwg.org/dwc/terms/higherClassification	higherclassification	0.814933		X	100											
+higherGeography	http://rs.tdwg.org/dwc/terms/higherGeography	highergeography	0.855267		X	100											
+nomenclaturalCode	http://rs.tdwg.org/dwc/terms/nomenclaturalCode	nomenclaturalcode	0.8672		X	100											
+type	http://purl.org/dc/terms/type	type	0.8958		X	100											
+preparations	http://rs.tdwg.org/dwc/terms/preparations	preparations	0.8989		X	100											
+modified	http://purl.org/dc/terms/modified	modified	0.9099		X	100											
+language	http://purl.org/dc/terms/language	language	0.917167		X	100											
+elevation	http://rs.gbif.org/terms/1.0/elevation	elevation	0.927133		X	100											
+institutionID	http://rs.tdwg.org/dwc/terms/institutionID	institutionid	0.9341		X	100											
+startDayOfYear	http://rs.tdwg.org/dwc/terms/startDayOfYear	startdayofyear	0.935933		X	100											
+collectionID	http://rs.tdwg.org/dwc/terms/collectionID	collectionid	0.9369		X	100	collectionId										
+identifiedBy	http://rs.tdwg.org/dwc/terms/identifiedBy	identifiedby	0.9393		X	100	identifiedBy										
+verbatimLocality	http://rs.tdwg.org/dwc/terms/verbatimLocality	verbatimlocality	0.942367		X	100											
+verbatimEventDate	http://rs.tdwg.org/dwc/terms/verbatimEventDate	verbatimeventdate	0.942533		X	100											
+recordNumber	http://rs.tdwg.org/dwc/terms/recordNumber	recordnumber	0.9443		X	100											
+verbatimTaxonRank	http://rs.tdwg.org/dwc/terms/verbatimTaxonRank	verbatimtaxonrank	0.947567		X	100											
+otherCatalogNumbers	http://rs.tdwg.org/dwc/terms/otherCatalogNumbers	othercatalognumbers	0.9522		X	100											
+sex	http://rs.tdwg.org/dwc/terms/sex	sex	0.9539		X	100											
+mediaType	http://rs.gbif.org/terms/1.0/mediaType	mediatype	0.958567		X	100											
+dynamicProperties	http://rs.tdwg.org/dwc/terms/dynamicProperties	dynamicproperties	0.959867		X	100											
+infraspecificEpithet	http://rs.tdwg.org/dwc/terms/infraspecificEpithet	infraspecificepithet	0.960567		X	100											
+ownerInstitutionCode	http://rs.tdwg.org/dwc/terms/ownerInstitutionCode	ownerinstitutioncode	0.9617		X	100											
+endDayOfYear	http://rs.tdwg.org/dwc/terms/endDayOfYear	enddayofyear	0.961733		X	100											
+references	http://purl.org/dc/terms/references	references1	0.961933		X	100											
+occurrenceStatus	http://rs.tdwg.org/dwc/terms/occurrenceStatus	occurrencestatus	0.9653		X	100											
+establishmentMeans	http://rs.tdwg.org/dwc/terms/establishmentMeans	establishmentmeans	0.965367		X	100											
+verbatimElevation	http://rs.tdwg.org/dwc/terms/verbatimElevation	verbatimelevation	0.966867		X	100											
+occurrenceRemarks	http://rs.tdwg.org/dwc/terms/occurrenceRemarks	occurrenceremarks	0.967833		X	100											
+georeferenceProtocol	http://rs.tdwg.org/dwc/terms/georeferenceProtocol	georeferenceprotocol	0.968167		X	100											
+informationWithheld	http://rs.tdwg.org/dwc/terms/informationWithheld	informationwithheld	0.974867	Required	X	100	informationWithheld										
+dateIdentified	http://rs.tdwg.org/dwc/terms/dateIdentified	dateidentified	0.9763		X	100	dateIdentified										
+associatedSequences	http://rs.tdwg.org/dwc/terms/associatedSequences	associatedsequences	0.9766		X	100											
+georeferenceVerificationStatus	http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus	georeferenceverificationstatus	0.978567		X	100											
+typeStatus	http://rs.tdwg.org/dwc/terms/typeStatus	typestatus	0.979167		X	100											
+rightsHolder	http://purl.org/dc/terms/rightsHolder	rightsholder	0.9792		X	100											
+datasetName	http://rs.tdwg.org/dwc/terms/datasetName	datasetname	0.9793		X	100											
+fieldNumber	http://rs.tdwg.org/dwc/terms/fieldNumber	fieldnumber	0.9797		X	100											
+georeferencedBy	http://rs.tdwg.org/dwc/terms/georeferencedBy	georeferencedby	0.980833		X	100											
+datasetID	http://rs.tdwg.org/dwc/terms/datasetID	datasetid	0.9827		X	100											
+locationRemarks	http://rs.tdwg.org/dwc/terms/locationRemarks	locationremarks	0.982733		X	100											
+georeferencedDate	http://rs.tdwg.org/dwc/terms/georeferencedDate	georeferenceddate	0.9831		X	100											
+georeferenceSources	http://rs.tdwg.org/dwc/terms/georeferenceSources	georeferencesources	0.984033		X	100											
+depth	http://rs.gbif.org/terms/1.0/depth	depth	0.984367		X	100											
+disposition	http://rs.tdwg.org/dwc/terms/disposition	disposition	0.986067		X	100											
+verbatimCoordinateSystem	http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem	verbatimcoordinatesystem	0.986633		X	100											
+taxonID	http://rs.tdwg.org/dwc/terms/taxonID	taxonid	0.9879		X	100											
+elevationAccuracy	http://rs.gbif.org/terms/1.0/elevationAccuracy	elevationaccuracy	0.9888		X	100											
+depthAccuracy	http://rs.gbif.org/terms/1.0/depthAccuracy	depthaccuracy	0.988833		X	100											
+georeferenceRemarks	http://rs.tdwg.org/dwc/terms/georeferenceRemarks	georeferenceremarks	0.9899		X	100											
+taxonRemarks	http://rs.tdwg.org/dwc/terms/taxonRemarks	taxonremarks	0.9904		X	100											
+lifeStage	http://rs.tdwg.org/dwc/terms/lifeStage	lifestage	0.9906		X	100			Goodtohave								
+habitat	http://rs.tdwg.org/dwc/terms/habitat	habitat	0.990867		X	100			Goodtohave								
+created	http://purl.org/dc/terms/created	created	0.991533		X	100											
+reproductiveCondition	http://rs.tdwg.org/dwc/terms/reproductiveCondition	reproductivecondition	0.993567		X	100											
+previousIdentifications	http://rs.tdwg.org/dwc/terms/previousIdentifications	previousidentifications	0.993833		X	100											
+waterBody	http://rs.tdwg.org/dwc/terms/waterBody	waterbody	0.994267		X	100											
+coordinateAccuracy	http://rs.gbif.org/terms/1.0/coordinateAccuracy	coordinateaccuracy	0.9951		X	100											
+fieldNotes	http://rs.tdwg.org/dwc/terms/fieldNotes	fieldnotes	0.995733		X	100											
+bibliographicCitation	http://purl.org/dc/terms/bibliographicCitation	bibliographiccitation	0.9958		X	100											
+samplingProtocol	http://rs.tdwg.org/dwc/terms/samplingProtocol	samplingprotocol	0.996		X	100											
+identificationID	http://rs.tdwg.org/dwc/terms/identificationID	identificationid	0.996333		X	100											
+eventRemarks	http://rs.tdwg.org/dwc/terms/eventRemarks	eventremarks	0.996567		X	100											
+identificationRemarks	http://rs.tdwg.org/dwc/terms/identificationRemarks	identificationremarks	0.996567		X	100											
+source	http://purl.org/dc/terms/source	source	0.996667		X	100											
+locationID	http://rs.tdwg.org/dwc/terms/locationID	locationid	0.997467		X	100											
+scientificNameID	http://rs.tdwg.org/dwc/terms/scientificNameID	scientificnameid	0.997567		X	100											
+eventTime	http://rs.tdwg.org/dwc/terms/eventTime	eventtime	0.9979		X	100											
+identificationQualifier	http://rs.tdwg.org/dwc/terms/identificationQualifier	identificationqualifier	0.998033		X	100											
+eventID	http://rs.tdwg.org/dwc/terms/eventID	eventid	0.9981		X	100											
+municipality	http://rs.tdwg.org/dwc/terms/municipality	municipality	0.9981		X	100											
+identificationVerificationStatus	http://rs.tdwg.org/dwc/terms/identificationVerificationStatus	identificationverificationstatus	0.998167		X	100											
+identificationReferences	http://rs.tdwg.org/dwc/terms/identificationReferences	identificationreferences	0.9983		X	100											
+typifiedName	http://rs.gbif.org/terms/1.0/typifiedName	typifiedname	0.998333		X	100											
+associatedReferences	http://rs.tdwg.org/dwc/terms/associatedReferences	associatedreferences	0.998367		X	100											
+earliestPeriodOrLowestSystem	http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem	earliestperiodorlowestsystem	0.998467		X	100											
+associatedOccurrences	http://rs.tdwg.org/dwc/terms/associatedOccurrences	associatedres	0.998633		X	100											
+earliestEraOrLowestErathem	http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem	earliesteraorlowesterathem	0.998833		X	100											
+license	http://purl.org/dc/terms/license	license	0.998933		X	100											
+earliestEpochOrLowestSeries	http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries	earliestepochorlowestseries	0.998933		X	100											
+associatedTaxa	http://rs.tdwg.org/dwc/terms/associatedTaxa	associatedtaxa	0.998967		X	100											
+island	http://rs.tdwg.org/dwc/terms/island	island	0.999033		X	100											
+originalNameUsage	http://rs.tdwg.org/dwc/terms/originalNameUsage	originalnameusage	0.999033		X	100											
+latestEraOrHighestErathem	http://rs.tdwg.org/dwc/terms/latestEraOrHighestErathem	latesteraorhighesterathem	0.999067		X	100											
+locationAccordingTo	http://rs.tdwg.org/dwc/terms/locationAccordingTo	locationaccordingto	0.9991		X	100											
+earliestEonOrLowestEonothem	http://rs.tdwg.org/dwc/terms/earliestEonOrLowestEonothem	earliesteonorlowesteonothem	0.999133		X	100											
+latestEonOrHighestEonothem	http://rs.tdwg.org/dwc/terms/latestEonOrHighestEonothem	latesteonorhighesteonothem	0.999133		X	100											
+latestPeriodOrHighestSystem	http://rs.tdwg.org/dwc/terms/latestPeriodOrHighestSystem	latestperiodorhighestsystem	0.999133		X	100											
+islandGroup	http://rs.tdwg.org/dwc/terms/islandGroup	islandgroup	0.999167		X	100											
+behavior	http://rs.tdwg.org/dwc/terms/behavior	behavior	0.999267		X	100											
+formation	http://rs.tdwg.org/dwc/terms/formation	formation	0.9995		X	100											
+latestEpochOrHighestSeries	http://rs.tdwg.org/dwc/terms/latestEpochOrHighestSeries	latestepochorhighestseries	0.999567		X	100											
+earliestAgeOrLowestStage	http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage	earliestageorloweststage	0.999733		X	100											
+latestAgeOrHighestStage	http://rs.tdwg.org/dwc/terms/latestAgeOrHighestStage	latestageorhigheststage	0.9998		X	100											
+verbatimDepth	http://rs.tdwg.org/dwc/terms/verbatimDepth	verbatimdepth	0.9998		X	100											
+geologicalContextID	http://rs.tdwg.org/dwc/terms/geologicalContextID	geologicalcontextid	0.9999		X	100											
+bed	http://rs.tdwg.org/dwc/terms/bed	bed	0.999967		X	100											
+group	http://rs.tdwg.org/dwc/terms/group	group1	0.999967		X	100											
+individualID	http://rs.tdwg.org/dwc/terms/individualID	individualid	0.999967		X	100											
+namePublishedIn	http://rs.tdwg.org/dwc/terms/namePublishedIn	namepublishedin	0.999967		X	100											
+taxonomicStatus	http://rs.tdwg.org/dwc/terms/taxonomicStatus	taxonomicstatus	0.999967		X	100											
+verbatimSRS	http://rs.tdwg.org/dwc/terms/verbatimSRS	verbatimsrs	0.999967		X	100											
+abstract	http://purl.org/dc/terms/abstract	abstract	1		X	100											
+accrualMethod	http://purl.org/dc/terms/accrualMethod	accrualmethod	1		X	100											
+accrualPeriodicity	http://purl.org/dc/terms/accrualPeriodicity	accrualperiodicity	1		X	100											
+accrualPolicy	http://purl.org/dc/terms/accrualPolicy	accrualpolicy	1		X	100											
+alternative	http://purl.org/dc/terms/alternative	alternative	1		X	100											
+audience	http://purl.org/dc/terms/audience	audience	1		X	100											
+available	http://purl.org/dc/terms/available	available	1		X	100											
+conformsTo	http://purl.org/dc/terms/conformsTo	conformsto	1		X	100											
+contributor	http://purl.org/dc/terms/contributor	contributor	1		X	100											
+coverage	http://purl.org/dc/terms/coverage	coverage	1		X	100											
+creator	http://purl.org/dc/terms/creator	creator	1		X	100											
+date	http://purl.org/dc/terms/date	date	1		X	100											
+dateAccepted	http://purl.org/dc/terms/dateAccepted	dateaccepted	1		X	100											
+dateCopyrighted	http://purl.org/dc/terms/dateCopyrighted	datecopyrighted	1		X	100											
+dateSubmitted	http://purl.org/dc/terms/dateSubmitted	datesubmitted	1		X	100											
+description	http://purl.org/dc/terms/description	description	1		X	100											
+educationLevel	http://purl.org/dc/terms/educationLevel	educationlevel	1		X	100											
+extent	http://purl.org/dc/terms/extent	extent	1		X	100											
+format	http://purl.org/dc/terms/format	format	1		X	100											
+hasFormat	http://purl.org/dc/terms/hasFormat	hasformat	1		X	100											
+hasPart	http://purl.org/dc/terms/hasPart	haspart	1		X	100											
+hasVersion	http://purl.org/dc/terms/hasVersion	hasversion	1		X	100											
+instructionalMethod	http://purl.org/dc/terms/instructionalMethod	instructionalmethod	1		X	100											
+isFormatOf	http://purl.org/dc/terms/isFormatOf	isformatof	1		X	100											
+isPartOf	http://purl.org/dc/terms/isPartOf	ispartof	1		X	100											
+isReferencedBy	http://purl.org/dc/terms/isReferencedBy	isreferencedby	1		X	100											
+isReplacedBy	http://purl.org/dc/terms/isReplacedBy	isreplacedby	1		X	100											
+isRequiredBy	http://purl.org/dc/terms/isRequiredBy	isrequiredby	1		X	100											
+isVersionOf	http://purl.org/dc/terms/isVersionOf	isversionof	1		X	100											
+issued	http://purl.org/dc/terms/issued	issued	1		X	100											
+mediator	http://purl.org/dc/terms/mediator	mediator	1		X	100											
+medium	http://purl.org/dc/terms/medium	medium	1		X	100											
+provenance	http://purl.org/dc/terms/provenance	provenance	1		X	100											
+publisher	http://purl.org/dc/terms/publisher	publisher	1		X	100											
+relation	http://purl.org/dc/terms/relation	relation	1		X	100											
+replaces	http://purl.org/dc/terms/replaces	replaces	1		X	100											
+requires	http://purl.org/dc/terms/requires	requires	1		X	100											
+spatial	http://purl.org/dc/terms/spatial	spatial	1		X	100											
+subject	http://purl.org/dc/terms/subject	subject	1		X	100											
+tableOfContents	http://purl.org/dc/terms/tableOfContents	tableofcontents	1		X	100											
+temporal	http://purl.org/dc/terms/temporal	temporal	1		X	100											
+title	http://purl.org/dc/terms/title	title	1		X	100											
+valid	http://purl.org/dc/terms/valid	valid	1		X	100											
+acceptedNameUsage	http://rs.tdwg.org/dwc/terms/acceptedNameUsage	acceptednameusage	1		X	100											
+acceptedNameUsageID	http://rs.tdwg.org/dwc/terms/acceptedNameUsageID	acceptednameusageid	1		X	100											
+dataGeneralizations	http://rs.tdwg.org/dwc/terms/dataGeneralizations	datageneralizations	1		X	100											
+footprintSRS	http://rs.tdwg.org/dwc/terms/footprintSRS	footprintsrs	1		X	100											
+footprintSpatialFit	http://rs.tdwg.org/dwc/terms/footprintSpatialFit	footprintspatialfit	1		X	100											
+footprintWKT	http://rs.tdwg.org/dwc/terms/footprintWKT	footprintwkt	1		X	100											
+higherGeographyID	http://rs.tdwg.org/dwc/terms/higherGeographyID	highergeographyid	1		X	100											
+highestBiostratigraphicZone	http://rs.tdwg.org/dwc/terms/highestBiostratigraphicZone	highestbiostratigraphiczone	1		X	100											
+individualCount	http://rs.tdwg.org/dwc/terms/individualCount	individualcount	1		X	100											
+lithostratigraphicTerms	http://rs.tdwg.org/dwc/terms/lithostratigraphicTerms	lithostratigraphicterms	1		X	100											
+lowestBiostratigraphicZone	http://rs.tdwg.org/dwc/terms/lowestBiostratigraphicZone	lowestbiostratigraphiczone	1		X	100											
+materialSampleID	http://rs.tdwg.org/dwc/terms/materialSampleID	materialsampleid	1		X	100											
+maximumDistanceAboveSurfaceInMeters	http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters	maximumdistanceabovesurfaceinmeters	1		X	100											
+member	http://rs.tdwg.org/dwc/terms/member	member	1		X	100											
+minimumDistanceAboveSurfaceInMeters	http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters	minimumdistanceabovesurfaceinmeters	1		X	100											
+nameAccordingTo	http://rs.tdwg.org/dwc/terms/nameAccordingTo	nameaccordingto	1		X	100											
+nameAccordingToID	http://rs.tdwg.org/dwc/terms/nameAccordingToID	nameaccordingtoid	1		X	100											
+namePublishedInID	http://rs.tdwg.org/dwc/terms/namePublishedInID	namepublishedinid	1		X	100											
+namePublishedInYear	http://rs.tdwg.org/dwc/terms/namePublishedInYear	namepublishedinyear	1		X	100											
+nomenclaturalStatus	http://rs.tdwg.org/dwc/terms/nomenclaturalStatus	nomenclaturalstatus	1		X	100											
+originalNameUsageID	http://rs.tdwg.org/dwc/terms/originalNameUsageID	originalnameusageid	1		X	100											
+parentNameUsage	http://rs.tdwg.org/dwc/terms/parentNameUsage	parentnameusage	1		X	100											
+parentNameUsageID	http://rs.tdwg.org/dwc/terms/parentNameUsageID	parentnameusageid	1		X	100											
+pointRadiusSpatialFit	http://rs.tdwg.org/dwc/terms/pointRadiusSpatialFit	pointradiusspatialfit	1		X	100											
+samplingEffort	http://rs.tdwg.org/dwc/terms/samplingEffort	samplingeffort	1		X	100											
+subgenus	http://rs.tdwg.org/dwc/terms/subgenus	subgenus	1		X	100											
+taxonConceptID	http://rs.tdwg.org/dwc/terms/taxonConceptID	taxonconceptid	1		X	100											
+distanceAboveSurface	http://rs.gbif.org/terms/1.0/distanceAboveSurface	distanceabovesurface	1		X	100											
+distanceAboveSurfaceAccuracy	http://rs.gbif.org/terms/1.0/distanceAboveSurfaceAccuracy	distanceabovesurfaceaccuracy	1		X	100											
+subgenusKey	http://rs.gbif.org/terms/1.0/subgenusKey	subgenuskey	1		X	100											

@@ -3,7 +3,7 @@ package species
 import content.eml.Contact;
 import species.auth.SUser;
 
-abstract class DataSourceMetadata {
+abstract class DatasourceMetadata {
 
     //https://knb.ecoinformatics.org/#external//emlparser/docs/eml-2.1.1/./eml-dataset.html
     //http://ibif.gov.in:8080/ipt/eml.do?r=spider_namdapha

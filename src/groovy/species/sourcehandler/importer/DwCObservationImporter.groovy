@@ -15,7 +15,7 @@ class DwCObservationImporter {
 
     private CSVReader observationReader
     private CSVReader mediaReader
-    private String[] observationHeader;
+    private def observationHeader;
     private String[] dwcObvHeader;
     private String[] dwcMediaHeader;
     private String[] mediaHeader;
@@ -75,10 +75,20 @@ class DwCObservationImporter {
         //read dwcObvMapping
         InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
         Map dwcObvMapping = [:];
+        int l=0;
         dwcObvMappingFile.eachLine { line ->
+            if(l++>0) { 
             String[] parts = line.split(/\t/)
-            if(parts.size()>6 && parts[6])
-                dwcObvMapping[parts[1]] = parts[6]
+            println parts
+            if(parts.size()>8 && (parts[6] || parts[7])) {
+                println "========"+parts[6]+"================="+Float.parseFloat(parts[6])
+                dwcObvMapping[parts[1]] = ['field':parts[7], 'order':Float.parseFloat(parts[6])];
+            }
+            else if(parts.size()>7 && parts[6]) {
+                println "========"+parts[6]+"================="+Float.parseFloat(parts[6])
+                dwcObvMapping[parts[1]] = ['field':'', 'order':Float.parseFloat(parts[6])];
+            }
+            }
         }
 
         InputStream dwcMultimediaMappingFile = this.class.classLoader.getResourceAsStream('species/dwcMultimediaMapping.tsv')
@@ -104,11 +114,20 @@ class DwCObservationImporter {
         }
 
         dwcObvHeader = observationReader.readNext();
-        observationHeader = new String[dwcObvHeader.size()];
+        observationHeader = new ArrayList();//new Map[dwcObvHeader.size()];
+        println dwcObvMapping
         dwcObvHeader.eachWithIndex { h, i ->
-            String mappedObvHeader = getMappedObvHeader(metaFields[i], dwcObvMapping);
+            println h+"   "+i
+            Map mappedObvHeader = getMappedObvHeader(metaFields[i], dwcObvMapping);
+            if(!mappedObvHeader)mappedObvHeader = [:];
+            mappedObvHeader['url'] = metaFields[i];
+            mappedObvHeader['column'] = i;
+            println mappedObvHeader
+
             observationHeader[i] = mappedObvHeader;
         }
+        observationHeader.sort {it?it.order:10000000}
+        println observationHeader;
        
         if(mediaReader) {
             dwcMediaHeader = mediaReader.readNext();
@@ -120,7 +139,7 @@ class DwCObservationImporter {
         }
     }
 
-    protected String getMappedObvHeader(String header, Map dwcObvMapping) {
+    protected Map getMappedObvHeader(String header, Map dwcObvMapping) {
         return dwcObvMapping[header];
     }
     
@@ -177,7 +196,7 @@ class DwCObservationImporter {
                             v = ResourceType.AUDIO.value();
                             break;
                         }
-                        if(mInfo.key.equals(MEDIA_ANNOTATION_HEADER)) {
+                         if(mInfo.key.equals(MEDIA_ANNOTATION_HEADER)) {
                             m[mInfo.key+"_"+i] = v as JSON;
                         } else {
                             m[mInfo.key+"_"+i] = v;
@@ -195,17 +214,29 @@ class DwCObservationImporter {
     }
 
     private Map importObservation(String[] row) {
-        Map m = [:];
+        Map m = new LinkedHashMap();
         observationHeader.eachWithIndex { header, i ->
-            if(header && row.size()>i && row[i]) {
-                m[header] = row[i]
-            } 
-            
-            if(row[i]) {
-                if(!m[ANNOTATION_HEADER]) m[ANNOTATION_HEADER] =  new java.util.LinkedHashMap();
-                m[ANNOTATION_HEADER][dwcObvHeader[i]] = row[i];  
+            if(header) {
+                if(header.field && row.size()>header.column && row[header.column]) {
+                    m[header.field] = row[header.column]
+                } 
+
+                if(row[header.column]) {
+                    if(!m[ANNOTATION_HEADER]) m[ANNOTATION_HEADER] =  new java.util.LinkedHashMap();
+                    String value = row[header.column];
+                    switch(dwcObvHeader[header.column].toLowerCase()) {
+                        case 'gbifid' :
+                            value = "http://www.gbif.org/occurrence/"+value; break;
+                        case 'datasetkey' :
+                            value = 'http://www.gbif.org/dataset/'+value; break;
+                    } 
+                    m[ANNOTATION_HEADER][dwcObvHeader[header.column]] = ['value':value, 'order':header.order];  
+                }
             }
         }
+        println "888888888888888888888"
+        println m
+        println "888888888888888888888"
         return m;
     }
 }

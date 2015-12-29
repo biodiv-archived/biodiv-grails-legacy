@@ -117,27 +117,33 @@ class Observation extends DataObject {
 		}
 		
 		static ProtocolType getEnum(value){
-/*			if(!value) return null
+			if(!value) return null
 			
-			if(value instanceof BasisOfRecord)
+			if(value instanceof ProtocolType)
 				return value
 			
 			value = value.toUpperCase().trim()
 			switch(value){
-				case 'PRESERVED_SPECIMEN':
-					return BasisOfRecord.PRESERVED_SPECIMEN
-				case 'FOSSIL_SPECIMEN':
-					return BasisOfRecord.FOSSIL_SPECIMEN
-				case 'LIVING_SPECIMEN':
-					return BasisOfRecord.LIVING_SPECIMEN
-				case 'HUMAN_OBSERVATION':
-					return BasisOfRecord.HUMAN_OBSERVATION
-				case 'MACHINE_OBSERVATION':
-					return BasisOfRecord.MACHINE_OBSERVATION
+				case 'DWC_ARCHIVE':
+					return ProtocolType.DWC_ARCHIVE
+				case 'TEXT':
+					return ProtocolType.TEXT
+				case 'LIST':
+					return ProtocolType.LIST
+				case 'SINGLE_OBSERVATION':
+					return ProtocolType.SINGLE_OBSERVATION
+				case 'MULTI_OBSERVATION':
+					return ProtocolType.MULTI_OBSERVATION
+				case 'MOBILE':
+					return ProtocolType.MOBILE
+				case 'API':
+					return ProtocolType.API
+				case 'OTHER':
+					return ProtocolType.OTHER
 				default:
 					return null	
 			}
-*/		}
+		}
 	}
 
 	String notes;
@@ -668,6 +674,7 @@ class Observation extends DataObject {
 			}
 		} else if(checklistAnnotations) {
             res = JSON.parse(checklistAnnotations);
+            res = res.sort { it.value.order }
         }
 		return res
 	}

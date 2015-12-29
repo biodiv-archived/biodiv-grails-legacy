@@ -442,3 +442,17 @@ ALTER TABLE dataset ALTER COLUMN rights type text;
 ALTER TABLE dataset ALTER COLUMN purpose type text;
 ALTER TABLE dataset ALTER COLUMN additional_info type text;
 ALTER TABLE dataset ALTER COLUMN description type text;
+ALTER TABLE datasource ALTER COLUMN description type text;
+
+#28th Dec 2015
+alter table dataset add column datasource_id bigint;
+update dataset set datasource_id='1';
+alter table dataset alter column datasource_id set  not null;
+alter table datasource add column is_deleted boolean not null default 'false';
+
+ALTER TABLE datasource ADD language_id bigint;
+alter table datasource add constraint language_id foreign key (language_id) references language(id) match full;
+update datasource set language_id = 205;
+alter table datasource alter column language_id set not null;
+
+

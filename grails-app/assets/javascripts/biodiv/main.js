@@ -41,6 +41,7 @@ function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler,
 function adjustHeight() {
     $(".ellipsis").ellipsis();
     $('.snippet .observation_story_image').each(function() {
+        console.log($(this).next())
         $(this).css({
             'height': $(this).next().height()
         });

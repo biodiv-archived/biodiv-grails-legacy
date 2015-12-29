@@ -694,8 +694,8 @@ class ObvUtilService {
             obvParams['checklistAnnotations'] = m[DwCObservationImporter.ANNOTATION_HEADER] as JSON;
 
 
-		obvParams['basisOfRecord'] = m[BASISOFRECORD] ? BasisOfRecord.getEnum(m[BASISOFRECORD]): null;
-		obvParams['prtocol'] = m[PROTOCOL]? ProtocolType.getEnum(m[PROTOCOL]):null;
+		obvParams['basisOfRecord'] = m[BASISOFRECORD] ? BasisOfRecord.getEnum(m[BASISOFRECORD]): BasisOfRecord.HUMAN_OBSERVATION;
+		obvParams['protocol'] = m[PROTOCOL]? ProtocolType.getEnum(m[PROTOCOL]) : ProtocolType.MULTI_OBSERVATION;
 		obvParams['externalDatasetKey'] = m[EXTERNAL_DATASET_KEY]
 		obvParams['lastCrawled'] = m[LAST_CRAWLED]
 		obvParams['catalogNumber'] = m[CATALOG_NUMBER]

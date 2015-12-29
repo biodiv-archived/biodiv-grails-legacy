@@ -1,12 +1,12 @@
 package species.dataset;
 
-import species.DataSourceMetadata;
+import species.DatasourceMetadata;
 import species.DataObject;
 import species.Language;
 import content.eml.GeospatialCoverage;
 import content.eml.TemporalCoverage;
 import content.eml.TaxonomicCoverage;
-import species.dataset.DataSource;
+import species.dataset.Datasource;
 import species.ResponsibleParty;
 import content.eml.Contact;
 import species.License;
@@ -17,7 +17,7 @@ import species.participation.Observation;
 import grails.converters.JSON;
 import grails.converters.XML;
 
-class Dataset extends DataSourceMetadata  implements Taggable, Rateable {
+class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
 
     public enum DatasetType {
         SPECIES("Species"),
@@ -48,7 +48,7 @@ class Dataset extends DataSourceMetadata  implements Taggable, Rateable {
     }
 
     DatasetType type
-    //    DataSource publisher;
+    Datasource datasource;
     
     List<String> alternateIdentifiers;
     Contact originalAuthor;
