@@ -15,7 +15,7 @@
 </style>
 	<div class="span12">
     <%
-    def group=g.message(code:'default.datasource.label')
+    def datasource=g.message(code:'default.datasource.label')
     %>
 		<uGroup:showSubmenuTemplate   model="['entityName':datasource]"/>
 		
