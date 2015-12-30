@@ -740,11 +740,13 @@ class TaxonController {
         def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
 
         def result = [:];
-        ids.split(',').each { id ->
-            def rs = new ArrayList<GroovyRowResult>();
-            getHierarchyNodes(rs, 0, 1, id, classification.id, false, false, null);
+        if(ids) {
+            ids.split(',').each { id ->
+                def rs = new ArrayList<GroovyRowResult>();
+                getHierarchyNodes(rs, 0, 1, id, classification.id, false, false, null);
 
-            result[id] =  buildHierarchyResult(rs, classification.id)
+                result[id] =  buildHierarchyResult(rs, classification.id)
+            }
         }
 
         withFormat {
