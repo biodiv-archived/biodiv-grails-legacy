@@ -1,8 +1,17 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
-<div class="observation_story" style="height:100%;">
-             
+<%@page import="species.participation.Observation"%>
+
+<div class="sidebar_section observation_story species_story" style="height:100%;width:100%;margin:0px;">
+    <h5>
+        <span class="name"><g:message code="dataset.label" /> : </span>
+        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
+        ${datasetInstance.title}
+        </g:link>
+
+    </h5>
+
 
     <g:if test="${showFeatured}">
     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
@@ -19,19 +28,64 @@
     </g:if>
     <g:else>
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-        <div class="prop">
+                <div class="prop">
             <g:if test="${showDetails}">
-            <span class="name"><i class="icon-share-alt"></i><g:message code="default.name.label" /></span>
+            <span class="name"><i class="icon-share-alt"></i><g:message code="showdataset.observationCount" /></span>
             </g:if>
             <g:else>
             <i class="pull-left icon-share-alt"></i>
             </g:else>
                 <div class="value">
-                    <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
-                    ${datasetInstance.title}
+                    <span class="stats_number" title="No of Observations">${Observation.countByDataset(datasetInstance)}</span>
+                    <g:link class="btn btn-small btn-primary" url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
+                    View All
                     </g:link>
                 </div>
-            </div>
+            </div> 
+            <g:if test="${datasetInstance.description}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
+                        <div class="value notes_view linktext">                        
+                        <%  def styleVar = 'block';
+                            def clickcontentVar = '' 
+                        %> 
+                        <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
+                                <%  
+                                    styleVar = "none"
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
+                                %>
+                            </g:if>
+                            
+                            ${raw(clickcontentVar)}
+                            <div style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description))}</div>
+                    
+                        </div>
+                    </g:if>
+                    <g:else>
+                    <div class="value notes_view linktext ${showDetails?'':'ellipsis'}">
+                        ${raw(Utils.stripHTML(datasetInstance.description))}
+                    </div>
+
+                    </g:else>
+                </div>
+            </g:if>
+
+            <g:if test="${datasetInstance.rights}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        ${datasetInstance.rights}
+                    </div>
+                </div>
+                </g:if>
+
 
             <g:if test="${showDetails}">
                 <div class="prop">
@@ -75,91 +129,9 @@
                     </div>
                 </div>
                 </g:if>
-
-                <g:if test="${datasetInstance.viaId}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-globe"></i><g:message code="default.viaId.label" /></span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-globe"></i>
-                    </g:else>
-
-                    <div class="value">
-                        ${datasetInstance.viaCode} (${datasetInstance.viaId})
-                    </div>
-                </div>
-                </g:if>
-
-                <g:if test="${datasetInstance.language}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-globe"></i><g:message code="button.language" /></span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-globe"></i>
-                    </g:else>
-
-                    <div class="value">
-                        ${datasetInstance.language.name}
-                    </div>
-                </div>
-                </g:if>
-
-
-                <g:if test="${datasetInstance.rights}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-globe"></i>
-                    </g:else>
-
-                    <div class="value">
-                        ${datasetInstance.rights}
-                    </div>
-                </div>
-                </g:if>
-
-
-
                
            </g:if>
 
-            <g:if test="${datasetInstance.description}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
-                        <div class="value notes_view linktext">                        
-                        <%  def styleVar = 'block';
-                            def clickcontentVar = '' 
-                        %> 
-                        <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
-                                <%  
-                                    styleVar = "none"
-                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
-                                %>
-                            </g:if>
-                            
-                            ${raw(clickcontentVar)}
-                            <div style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description))}</div>
-                    
-                        </div>
-                    </g:if>
-                    <g:else>
-                    <div class="value notes_view linktext ${showDetails?'':'ellipsis'}">
-                        ${raw(Utils.stripHTML(datasetInstance.description))}
-                    </div>
-
-                    </g:else>
-                </div>
-            </g:if>
-
-        <div class="row observation_footer" style="margin-left:0px;">
-            <div class="story-footer" style="right:3px;">
-            </div>
-        </div>
         </div>
         </g:else>
     </div>

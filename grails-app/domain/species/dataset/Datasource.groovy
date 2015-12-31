@@ -10,6 +10,7 @@ import species.utils.ImageType;
 import species.utils.ImageUtils;
 import org.grails.taggable.Taggable;
 import org.grails.rateable.*
+import species.participation.Observation;
 
 class Datasource extends DatasourceMetadata implements Taggable, Rateable {
 
@@ -54,4 +55,8 @@ class Datasource extends DatasourceMetadata implements Taggable, Rateable {
         return this.description;
     }
 
+    long noOfObservations() {
+        def query = "select count(*) from Observation obv where obv.dataset.datasource.id = :datasourceId and obv.isDeleted = false "
+        return Observation.executeQuery(query, ['datasourceId':this.id])[0]
+    }
 }

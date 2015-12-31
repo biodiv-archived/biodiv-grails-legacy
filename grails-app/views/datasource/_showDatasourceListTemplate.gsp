@@ -16,9 +16,11 @@
 			<table class="table table-hover span8" style="margin-left: 0px;">
 				<thead>
 					<tr>
-						<th style="width:20%"><g:message code="datasource.name.label" /></th>
+						<th style="width:30%"><g:message code="datasource.name.label" /></th>
 						<th style="width:20%"><g:message code="default.name.label" /></th>
 						<th><g:message code="button.datasets" /></th>
+						<th><g:message code="default.observation.label"/></th>
+						<th><g:message code="button.last.updated" /></th>
 					</tr>
 				</thead>
 				<tbody class="mainContentList">
@@ -44,6 +46,15 @@
                             <td>
                                 ${Dataset.countByDatasource(instance)}
                             </td>
+                            <td>
+                                ${instance.noOfObservations()}
+                            </td>
+                            <td>
+                                <time class="timeago"
+                                    datetime="${instance.lastRevised?.getTime()}"></time>
+                            </td>
+
+
 
 
 

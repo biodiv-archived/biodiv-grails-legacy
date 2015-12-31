@@ -28,7 +28,7 @@
             <a target="_blank"
                 href="${uGroup.createLink('controller':'datasource', 'action':'show', id:instance.id)}">
                 <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:200px'};"
-                    title="${instance.title}"> ${instance.title} </span> 
+                    title="${instance.title}"><b>Datasource : </b> ${instance.title} </span> 
             </a>
             <g:if test="${instance && instance.id}">
             <div class="footer-item" title="${g.message(code:'showdatasource.title.datasetCount')}">

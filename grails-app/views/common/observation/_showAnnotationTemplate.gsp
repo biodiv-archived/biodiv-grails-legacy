@@ -1,7 +1,7 @@
 <g:if test="${annotations.size() > 0 }">
 	<div>
 		<table class="table table-hover"
-			style="margin-left: 0px;table-layout:fixed;">
+			style="margin-left: 0px;table-layout:fixed;display:block;height:300px;overflow-y:auto;">
 			<tbody class="mainContentList">
 				<g:each in="${annotations}" status="i"
 					var="annot">

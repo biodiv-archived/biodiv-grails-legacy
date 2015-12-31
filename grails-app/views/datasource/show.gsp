@@ -54,31 +54,21 @@
                     </div>
                     <div style="clear:both;"></div>
                 </div>	
-                <div class="span12" style="margin-left:0px; padding:4px; background-color:whitesmoke">
-                    <!--g:render template="/common/observation/showObservationStoryActionsTemplate"
-                    model="['instance':datasourceInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, 'hideFollow':true]" /-->
 
-                </div>
-
-
-                <div class="span8 right-shadow-box observation" style="margin:0">
+                <div class="span12 right-shadow-box observation" style="margin:0">
                     <g:render template="/datasource/showDatasourceStoryTemplate" model="['datasourceInstance':datasourceInstance, showDetails:true,'userLanguage':userLanguage]"/>
+
                     <div class="mainContentList">
                         <div class="mainContent">
-                            <%
-                            def styleviewcheck = (params?.view=="list")? true:false;
-                            %>
-
-                            <ul class="list_view thumbnails obvListwrapper">
+                            <ul class="list_view obvListwrapper" style="list-style:none;margin-left:0px;">
                                 <g:each in="${Dataset.findAllByDatasource(datasourceInstance)}" var="datasetInstance">
-        						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="clear: both;margin-left:0px;background-color:transparent; ${styleviewcheck ? 'width:100%;':''}">
-                                    <g:render template="/dataset/showDatasetSnippetTemplate" model="['datasetInstance':datasetInstance, showDetails:true,'userLanguage':userLanguage]"/>
+                                <li style="margin-top:10px;">
+                                <g:render template="/dataset/showDatasetSnippetTemplate" model="['datasetInstance':datasetInstance, showDetails:true,'userLanguage':userLanguage]"/>
                                 </li>
                                 </g:each>
                             </ul>			
                         </div>
                     </div>
-
 
                     <div class="union-comment">
                         <feed:showAllActivityFeeds model="['rootHolder':datasourceInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
@@ -87,29 +77,6 @@
 
                 </div>
 
-                <div class="span4">
-                    <div class="sidebar_section">
-<g:set var="mainImage" value="${datasourceInstance?.mainImage()}" />
-<%def imagePath = mainImage?mainImage.fileName : null%>
-
-
-                        <div class="snippet">
-                            <div class="figure pull-left observation_story_image" 
-                                title='${datasourceInstance.title}'>
-                                <g:link url="${datasourceInstance.website}">
-                                <div style="position:relative;margin:auto;">
-                                    <g:if test="${imagePath}">
-                                    <img class="img-polaroid" style="opacity:0.7" src="${imagePath}"/>
-                                    </g:if>
-                                    <g:else>
-                                    </g:else>
-                                </div>
-                                </g:link>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>	
         </div>

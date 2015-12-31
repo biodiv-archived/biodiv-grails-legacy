@@ -135,9 +135,6 @@ class ObservationService extends AbstractMetadataService {
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
 	        def resourcesXML = createResourcesXML(params);
-            println "--------------------------"
-            println resourcesXML
-            println "--------------------------"
             def instance = observation
             if(params.action == "bulkSave"){
                 instance = springSecurityService.currentUser
@@ -155,18 +152,18 @@ class ObservationService extends AbstractMetadataService {
         return observation;
     }
 
-    Map saveObservation(params, sendMail=true, boolean updateResources = true){
+    Map saveObservation(params, sendMail=true, boolean updateResources = true) {
         //TODO:edit also calls here...handle that wrt other domain objects
         params.author = springSecurityService.currentUser;
         def observationInstance, feedType, feedAuthor, mailType; 
         try {
 
-            if(params.action == "save" || params.action == "bulkSave"){
+            if(params.action == "save" || params.action == "bulkSave") {
                 observationInstance = create(params);
                 feedType = activityFeedService.OBSERVATION_CREATED
                 feedAuthor = observationInstance.author
                 mailType = utilsService.OBSERVATION_ADDED
-            }else{
+            } else {
                 observationInstance = Observation.get(params.id.toLong())
                 params.author = observationInstance.author;
                 updateObservation(params, observationInstance, updateResources)

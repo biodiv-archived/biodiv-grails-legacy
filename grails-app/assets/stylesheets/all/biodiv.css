@@ -353,7 +353,7 @@ h6 {
 /* 	clear:none; */
 /* } */
 .observation_story .prop .name {
-	width: 100px;
+	width: 150px;
 }
 
 /*.observation .prop .value {
@@ -2499,7 +2499,7 @@ div.noOfRatings {
     filter: alpha(opacity = 50);      
 }
 
-.checklistCount {
+.listtemplate_icon {
     position: absolute;
     font-size: 3em;
     font-style: normal;
@@ -2510,9 +2510,12 @@ div.noOfRatings {
 /*    background-color: whitesmoke;
     border: solid grey 1px;
 */    line-height:2.5;
-    background-image: url('/assets/all/stack.png');
     padding-left: 20px;
     color: #0c8040;
+}
+
+.checklistCount {
+    background-image: url('/assets/all/stack.png');
 }
 
 .slick-cell.validReco, .validReco {

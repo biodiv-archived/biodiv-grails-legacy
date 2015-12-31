@@ -29,8 +29,15 @@ def obvId = observationInstance?.id
 					title="${g.message(code:'showobservationsnippet.title.contribute')}" />
 			</g:else>
                         <g:if test="${observationInstance?.isChecklist}">
-                        <div class="checklistCount">${observationInstance?.speciesCount}</div>
+                        <div class="listtemplate_icon checklistCount">${observationInstance?.speciesCount}</div>
                         </g:if>
+                        <g:elseif test="${observationInstance?.dataset}">
+                        <div class="listtemplate_icon">
+                            <img
+                            class="user-icon small_profile_pic" style="height:55px;max-height:55px;width:auto;max-width:55px;"
+                            src="${observationInstance.dataset.datasource.mainImage()?.fileName}" title="${observationInstance.dataset.datasource.title}" alt="${observationInstance.dataset.datasource.title}" /> 
+                        </div>
+                        </g:elseif>
 		</g:link>
                 <!--div class="mouseover" style="padding-left:0px;">
                 </div-->
