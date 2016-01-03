@@ -2509,9 +2509,10 @@ div.noOfRatings {
     height: 55px;
 /*    background-color: whitesmoke;
     border: solid grey 1px;
-*/    line-height:2.5;
-    padding-left: 20px;
+    line-height:2.5;
+*/    padding-left: 20px;
     color: #0c8040;
+    display:table-cell;
 }
 
 .checklistCount {

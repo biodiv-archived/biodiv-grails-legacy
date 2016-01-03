@@ -18,7 +18,6 @@
                     </g:if>
                     <g:else>
                     <img
-                    class="${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
                     src="${instance.mainImage()?.fileName}" title="${instance.title}"
                     alt="${instance.title}" /> 
                     </g:else>

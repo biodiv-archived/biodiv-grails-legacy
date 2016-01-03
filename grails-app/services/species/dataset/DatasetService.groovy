@@ -263,20 +263,6 @@ def datasourceService;
         String directory = params.path;
         String datasetMetadataStr = new File(params.path+"/metadata.xml").text;
 
-        /*Map dsParams = [:];
-        dsParams['id'] = "1";
-        dsParams['title'] = 'Global Biodiversity Information Facility';
-        dsParams['description'] = '''The Global Biodiversity Information Facility (GBIF) is an international open data infrastructure, funded by governments.
-        It allows anyone, anywhere to access data about all types of life on Earth, shared across national boundaries via the Internet.
-        By encouraging and helping institutions to publish data according to common standards, GBIF enables research not possible before, and informs better decisions to conserve and sustainably use the biological resources of the planet.
-        GBIF operates through a network of nodes, coordinating the biodiversity information facilities of Participant countries and organizations, collaborating with each other and the Secretariat to share skills, experiences and technical capacity'''  
-        dsParams['website'] = 'http://www.gbif.org/';
-        def result1 = datasourceService.save(dsParams, false);
-       println ";;;;;;;;;;;;;;;;;;;;;;;;;;"
-       println ";;;;;;;;;;;;;;;;;;;;;;;;;;"
-       println result1
-       println ";;;;;;;;;;;;;;;;;;;;;;;;;;"
-       */
         def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
         params['title'] = datasetMetadata.dataset.title.text()
         params['description'] = datasetMetadata.dataset.abstract.para.text();

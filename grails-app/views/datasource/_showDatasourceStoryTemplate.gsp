@@ -21,7 +21,7 @@
         </g:link>
     </div>
 
-    <div class="observation_story">
+    <div class="observation_story" style="width:auto;">
         <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
             <g:if test="${datasourceInstance.description}">
             <div class="prop">
