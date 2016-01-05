@@ -336,7 +336,7 @@ h6 {
 	font-size: 0.8em;
 }
 
-.prop .name,.prop .name .label {
+.prop .name, .prop .name .label {
 	float: left;
 	text-align: left;
 	color: # #5E5E5E;
@@ -363,6 +363,13 @@ h6 {
 /* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */
 /*  	margin-left: 22px;  */
 /* } */
+.prop .value {
+    margin: 2px 0px;
+    margin-left: 150px;
+    line-height: 20px;
+    border-bottom: solid 1px #ddd;
+}
+
 .observation-icons {
 /*	float: right;
 	margin-right: 10px;*/
@@ -742,6 +749,8 @@ ul#recoSummary {
 	padding: 2px;
 	position: relative;
         width:100%;
+}
+.observation_story_body, .species_story {
 	background-color: #ffffff;
 }
 
@@ -786,7 +795,7 @@ ul#recoSummary {
 .sidebar_section { /* 	overflow: visible; */
 	/* 	padding-bottom: 10px; */
 	margin-bottom: 20px;
-	/*border: 1px solid #CECECE;*/
+	border: 1px solid #CECECE;
         border-radius: 3px;
 }
 

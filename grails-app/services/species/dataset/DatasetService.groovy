@@ -8,6 +8,7 @@ import groovy.text.SimpleTemplateEngine
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.taggable.TagLink;
 import species.Classification;
+import content.eml.UFile;
 
 import java.util.Date;
 import java.util.List;
@@ -53,6 +54,7 @@ import species.Species;
 import species.Metadata
 import species.SpeciesPermission;
 import content.eml.Contact;
+import org.apache.commons.io.FilenameUtils;
 
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
@@ -96,7 +98,7 @@ class DatasetService extends AbstractMetadataService {
     def activityFeedService
     def obvUtilService;
     def observationsSearchService;
-def datasourceService;
+    def datasourceService;
 
     Dataset create(params) {
         //return super.create(Dataset.class, params);
@@ -260,73 +262,103 @@ def datasourceService;
     }
 
     Map uploadDwCDataset(Map params) {
-        String directory = params.path;
-        String datasetMetadataStr = new File(params.path+"/metadata.xml").text;
+        String zipFile = params.path?:params.uFile?.path;
+        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        zipFile = config.speciesPortal.content.rootDir + zipFile;
 
-        def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
-        params['title'] = datasetMetadata.dataset.title.text()
-        params['description'] = datasetMetadata.dataset.abstract.para.text();
-        params['author'] = springSecurityService.currentUser; 
-        params['externalId'] = datasetMetadata.attributes().packageId;
-        params['externalUrl'] = 'http://doi.org/'+params['externalId'];
-        params['type'] = DatasetType.OBSERVATIONS;
-        params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
-        params['language'] = datasetMetadata.dataset.language.text();
-        params['datasource'] = Datasource.read(params.long('datasource'));
-
-//        params['originalAuthor'] = createContact() 
-        Dataset dataset;
-        def feedType;
-        if(params.id) {
-            dataset = Dataset.get(params.long('id'));
-            dataset = update(dataset, params);
-            feedType = activityFeedService.INSTANCE_UPDATED;
-        } else {
-            dataset = create(params);
-            feedType = activityFeedService.INSTANCE_CREATED;
+        boolean r = true;//validateDwCA(zipFile);
+        if(!r) {
+            return [success:false, msg:'Invalid DwC-A file']
         }
+
+        File zipF = new File(zipFile);
+        File destDir = zipF.getParentFile();
+        /*new File(zipF.getParentFile(),  zipF.getName())
+        if(!destDir.exists()) {
+            destDir.mkdir()
+        }*/
+
+        def ant = new AntBuilder().unzip( src: zipFile,
+            dest: destDir, overwrite:true)
+
 
         def resultModel = [:]
+        File directory = new File(destDir, FilenameUtils.removeExtension(zipF.getName()));
+        File metadataFile = new File(directory, "metadata.xml");
+        if(directory && metadataFile) {
+            String datasetMetadataStr = metadataFile.text;
 
-        Dataset.withTransaction {
-            resultModel = save(dataset, params, true, null, feedType, null);
-        } 
-
-        if(resultModel.success) {
-            DwCObservationImporter dwcImporter = DwCObservationImporter.getInstance();
-            Map o = dwcImporter.importObservationData(directory);
-            int i=0;
-
-            List obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
-            while(obvParamsList) {
-                println "******************************"+obvParamsList.size()
-                List resultObv = [];
-                obvParamsList.each { obvParams ->
-                    obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
-                    obvParams['dataset'] = dataset;
-                    obvUtilService.uploadObservation(null, obvParams, resultObv);
-                }
-
-                def obvs = resultObv.collect { Observation.read(it) }
-                try {
-                    observationsSearchService.publishSearchIndex(obvs, true);
-                } catch (Exception e) {
-                    log.error e.printStackTrace();
-                }
-                i += obvs.size();
-                
-                log.debug "Saved observations : ${i}";
-
-				utilsService.cleanUpGorm(true)
-				resultObv.clear();
-                obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+            def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
+            params['title'] = params.title?:datasetMetadata.dataset.title.text()
+            params['description'] = params.description?:datasetMetadata.dataset.abstract.para.text();
+            params['author'] = springSecurityService.currentUser; 
+            params['externalId'] = datasetMetadata.attributes().packageId;
+            params['externalUrl'] = 'http://doi.org/'+params['externalId'];
+            params['type'] = DatasetType.OBSERVATIONS;
+            params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
+            params['language'] = datasetMetadata.dataset.language.text();
+            params['datasource'] = Datasource.read(params.long('datasource'));
+            UFile f = new UFile()
+            f.size = zipF.length()
+            f.path = params.uFile.path;//zipF.getAbsolutePath().replaceFirst(contentRootDir, "")
+            if(f.save()) {
+                params['uFile'] = f
             }
-            log.debug "Total number of observations saved for dataset ${dataset} are : ${i}";
-            dwcImporter.closeReaders();
-        } else {
-            log.error "Error while saving dataset ${resultModel}";
-        }
+            //params['uFile'] = params.uFile; 
+    //        params['originalAuthor'] = createContact() 
+            Dataset dataset;
+            def feedType;
+            if(params.id) {
+                dataset = Dataset.get(params.long('id'));
+                dataset = update(dataset, params);
+                feedType = activityFeedService.INSTANCE_UPDATED;
+            } else {
+                dataset = create(params);
+                feedType = activityFeedService.INSTANCE_CREATED;
+            }
 
+
+            Dataset.withTransaction {
+                resultModel = save(dataset, params, true, null, feedType, null);
+            } 
+
+            if(resultModel.success) {
+                DwCObservationImporter dwcImporter = DwCObservationImporter.getInstance();
+                Map o = dwcImporter.importObservationData(directory.getAbsolutePath());
+                int i=0;
+
+                List obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+                while(obvParamsList) {
+                    println "******************************"+obvParamsList.size()
+                    List resultObv = [];
+                    obvParamsList.each { obvParams ->
+                        obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
+                        obvParams['dataset'] = dataset;
+                        obvUtilService.uploadObservation(null, obvParams, resultObv);
+                    }
+
+                    def obvs = resultObv.collect { Observation.read(it) }
+                    try {
+                        observationsSearchService.publishSearchIndex(obvs, true);
+                    } catch (Exception e) {
+                        log.error e.printStackTrace();
+                    }
+                    i += obvs.size();
+                    
+                    log.debug "Saved observations : ${i}";
+
+                    utilsService.cleanUpGorm(true)
+                    resultObv.clear();
+                    obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+                }
+                log.debug "Total number of observations saved for dataset ${dataset} are : ${i}";
+                dwcImporter.closeReaders();
+            } else {
+                log.error "Error while saving dataset ${resultModel}";
+            }
+        } else {
+            resultModel = [success:false, msg:'Invalid file']
+        }
         return resultModel
     }
 

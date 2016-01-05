@@ -9,6 +9,7 @@ import content.eml.TaxonomicCoverage;
 import species.dataset.Datasource;
 import species.ResponsibleParty;
 import content.eml.Contact;
+import content.eml.UFile;
 import species.License;
 import species.Metadata;
 import org.grails.taggable.Taggable;
@@ -76,6 +77,8 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
     String viaId
     String viaCode
 
+	UFile uFile   //covers physical file formats
+
     boolean isDeleted = false;   
     // EML specific properties which are not persisted on the dataset table!
     //List<Citation> bibliographicCitations = Lists.newArrayList();
@@ -106,6 +109,7 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
         geographicCoverages nullable:true;
         temporalCoverages nullable:true;
         taxonomicCoverages nullable:true;
+        uFile nullable:true;
     }
 	
 	static mapping = {

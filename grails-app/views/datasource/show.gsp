@@ -36,6 +36,12 @@
 
                         <div class="pull-right">
                             <sUser:ifOwns model="['user':datasourceInstance.author]">
+
+                            <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'dataset', action:'create', datasource:datasourceInstance.id)}"
+                                ><i class="icon-plus"></i><g:message code="button.create.dataset" /></a>
+
+
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'datasource', action:'edit', id:datasourceInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                                 <i class="icon-edit"></i><g:message code="button.edit" /></a>
@@ -48,7 +54,7 @@
 
                         </div>
                         <s:showHeadingAndSubHeading
-                            model="['heading':datasourceInstance.title, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+                            model="['preText':'Datasource : ', 'heading':datasourceInstance.title, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 
                         </div>
                     </div>

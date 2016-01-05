@@ -220,20 +220,27 @@ class UtilsService {
 
 
     //Create file with given filename
-    def File createFile(String fileName, String uploadDir, String contentRootDir) {
+    def File createFile(String fileName, String uploadDir, String contentRootDir, boolean retainOriginalFileName=false) {
         File uploaded
         if (uploadDir) {
             File fileDir = new File(contentRootDir + "/"+ uploadDir)
             if(!fileDir.exists())
                 fileDir.mkdirs()
-                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+                if(retainOriginalFileName) {
+                    uploaded = new File(fileDir, fileName);
+                } else {
+                    uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+                }
 
         } else {
 
             File fileDir = new File(contentRootDir)
             if(!fileDir.exists())
                 fileDir.mkdirs()
-                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+                if(retainOriginalFileName) {
+                } else {
+                    uploaded = new File(fileDir, fileName);
+                }
             //uploaded = File.createTempFile('grails', 'ajaxupload')
         }
 

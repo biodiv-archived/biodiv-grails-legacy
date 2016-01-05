@@ -62,6 +62,9 @@ import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class AbstractMetadataService extends AbstractObjectService {
 
+    private static final String GBIF_SITE = 'http://api.gbif.org'
+	private static final String GBIF_DWCA_VALIDATOR = 'http://tools.gbif.org/dwca-validator/validatews.do'
+ 
     def create(klass, params) {
         def instance = klass.newInstance();
         instance = update(instance, params, klass)
@@ -211,6 +214,25 @@ class AbstractMetadataService extends AbstractObjectService {
 
     Date parseDate(date){
 		return utilsService.parseDate(date)
+    }
+
+    boolean validateDwCA(String zipFile) {
+        
+        def http = new HTTPBuilder()
+        http.request( GBIF_DWCA_VALIDATOR, GET, JSON ) { req ->
+            uri.query = [ archiveUrl:zipFile]
+            headers.Accept = 'application/json'
+
+            response.success = { resp, reader ->
+                assert resp.statusLine.statusCode == 200
+                println "Got response: ${resp.statusLine}"
+                println "Content-Type: ${resp.headers.'Content-Type'}"
+                def jsonText =  reader.text
+                println "========GBIF DWCA Validator Result====== " + jsonText
+                return jsonText?jsonText.valid:false
+            }
+            response.'404' = { println 'Not found' }
+        }
     }
 
 

@@ -1,6 +1,6 @@
 <g:if test="${heading}">
     <h1 class="${headingClass?:''}" title="${heading.replaceAll('<.*>','')}">
-        ${raw(heading)}
+        <g:if test="${preText}"><small>${preText}</small></g:if>${raw(heading)}
         <g:render template="/namelist/statusTemplate" model="[position:position, status:status, taxon:taxon]"/>
     </h1>
 </g:if>

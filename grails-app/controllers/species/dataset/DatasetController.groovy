@@ -26,25 +26,38 @@ class DatasetController extends AbstractObjectController {
 		redirect(action: "list", params: params)
 	}
     
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
 	def create() {
 		def datasetInstance = new Dataset()
 		
         datasetInstance.properties = params;
-		datasetInstance.group = SpeciesGroup.findByName(SpeciesGroup.SpeciesGroupType.ALL.value())
-		datasetInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
 
 		def author = springSecurityService.currentUser;
-        
+
         return [datasetInstance: datasetInstance]
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_ADMIN'])
 	def save() {
 	    saveAndRender(params, false)
 	}
 
-	@Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
+	def edit() {
+		def datasetInstance = Dataset.findWhere(id:params.id?.toLong(), isDeleted:false)
+		if (!datasetInstance) {
+			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
+			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+			//redirect(action: "list")
+		} else if(utilsService.ifOwns(datasetInstance.author)) {
+			render(view: "create", model: [datasetInstance: datasetInstance, 'springSecurityService':springSecurityService])
+		} else {
+			flash.message = "${message(code: 'edit.denied.message')}"
+			redirect (url:uGroup.createLink(action:'show', controller:"dataset", id:datasetInstance.id, 'userGroupWebaddress':params.webaddress))
+		}
+	}
+
+	@Secured(['ROLE_ADMIN'])
 	def update() {
 		def datasetInstance = Dataset.get(params.long('id'))
         def msg;
@@ -70,7 +83,7 @@ class DatasetController extends AbstractObjectController {
 		if(result.success){
             withFormat {
                 html {
-			        redirect(action: "show", id: result.instance.id)
+			        redirect(controller:'datasource', action: "show", id: result.instance.datasource.id)
                 }
                 json {
                     render result as JSON 

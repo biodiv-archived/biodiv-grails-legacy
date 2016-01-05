@@ -3,14 +3,26 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 
-<div class="sidebar_section observation_story species_story" style="height:100%;width:100%;margin:0px;">
+<div class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
     <h5>
         <span class="name"><g:message code="dataset.label" /> : </span>
         <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
         ${datasetInstance.title}
         </g:link>
-
+    
     </h5>
+    <sUser:ifOwns model="['user':datasetInstance.author]">
+
+        <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+            href="${uGroup.createLink(controller:'dataset', action:'edit', id:datasetInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+            <i class="icon-edit"></i><g:message code="button.edit" /></a>
+
+        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+            href="${uGroup.createLink(controller:'dataset', action:'deleted', id:datasetInstance.id)}"
+            onclick="return confirm('${message(code: 'default.delete.confirm.message', args:['dataset'], default: 'This dataset will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+
+        </sUser:ifOwns>
+
 
 
     <g:if test="${showFeatured}">
@@ -37,9 +49,9 @@
             </g:else>
                 <div class="value">
                     <span class="stats_number" title="No of Observations">${Observation.countByDataset(datasetInstance)}</span>
-                    <g:link class="btn btn-small btn-primary" url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
+                    <div><g:link class="btn btn-small btn-primary" url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
                     View All
-                    </g:link>
+                    </g:link></div>
                 </div>
             </div> 
             <g:if test="${datasetInstance.description}">
