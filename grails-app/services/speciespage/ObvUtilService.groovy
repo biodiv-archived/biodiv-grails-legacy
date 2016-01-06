@@ -614,7 +614,7 @@ class ObvUtilService {
 		}
 	}
 	
-	def uploadObservation(imageDir, Map m, List resultObv) {
+	boolean uploadObservation(imageDir, Map m, List resultObv, File uploadLog=null) {
 		Map obvParams = [:];
 
         if(m[IMAGE_FILE_NAMES]) {
@@ -626,24 +626,22 @@ class ObvUtilService {
 		} else {*/
 			populateParams(obvParams, m)
             log.debug "Populated Obv Params ${obvParams}"
-			saveObv(obvParams, resultObv)
-			log.debug "observation saved"
+			return saveObv(obvParams, resultObv, uploadLog)
 		//}
 	}
 	
-	private populateParams(Map obvParams, Map m){
+	private void populateParams(Map obvParams, Map m){
 		
 		//mandatory
 		obvParams['group_id'] = m[SPECIES_GROUP]?((SpeciesGroup.findByName(m[SPECIES_GROUP].trim())? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()).id : SpeciesGroup.findByName('Others').id)):SpeciesGroup.findByName('Others').id
 		obvParams['habitat_id'] = m[HABITAT] ? (Habitat.findByName(m[HABITAT].trim())? Habitat.findByName(m[HABITAT].trim()).id :  Habitat.findByName('Others').id ):Habitat.findByName('Others').id 
-		obvParams['longitude'] = (m[LONGITUDE] ?:"76.658279")
-		obvParams['latitude'] = (m[LATITUDE] ?: "12.32112")
+		obvParams['longitude'] = m[LONGITUDE]
+		obvParams['latitude'] = m[LATITUDE]
 		obvParams['location_accuracy'] = 'Approximate'
 		obvParams['locationScale'] = m[LOCATION_SCALE]
 		obvParams['placeName'] = m[LOCATION]
-		obvParams['reverse_geocoded_name'] = (m[LOCATION] ?: "National Highway 6, Maharashtra, India")
+		obvParams['reverse_geocoded_name'] = m[LOCATION]
 		obvParams['topology'] = m[TOPOLOGY];
-
 		//reco related
 		obvParams['recoName'] = m[SN]
 		obvParams['commonName'] = m[CN] 
@@ -726,10 +724,13 @@ class ObvUtilService {
 		return gIds.join(",")
 	}
 	
-	private List saveObv(Map params, List result) {
+	private boolean saveObv(Map params, List result, File uploadLog=null) {
+        boolean success = false;
 		if(!params.author && !params.originalAuthor) {
 			log.error "Author not found for params $params"
-			return
+            if(uploadLog) uploadLog << "\nAuthor not found for params $params"
+
+			return false
 		}
 		
 		def observationInstance;
@@ -740,6 +741,8 @@ class ObvUtilService {
 
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				log.debug "Successfully created observation : "+observationInstance
+                if(uploadLog) uploadLog <<  "\nSuccessfully created observation : "+observationInstance
+                success=true;
 
 				params.obvId = observationInstance.id
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
@@ -747,6 +750,7 @@ class ObvUtilService {
                 params.identifiedBy = params.identifiedBy
 
 				addReco(params, observationInstance)
+                if(uploadLog) uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT  :  "+observationInstance.maxVotedReco?.taxonConcept
 println "======NAME PRESENT IN TAXONCONCEPT  :  "+observationInstance.maxVotedReco?.taxonConcept
                 if(observationInstance.maxVotedReco?.taxonConcept && observationInstance.dataset) {
                     observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
@@ -765,19 +769,28 @@ println "======NAME PRESENT IN TAXONCONCEPT  :  "+observationInstance.maxVotedRe
 				}
 
 				if(!observationInstance.save(flush:true)){
-					observationInstance.errors.allErrors.each { log.error it }
+                    if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
+					observationInstance.errors.allErrors.each { 
+                        if(uploadLog) uploadLog << "\n"+it; 
+                        log.error it 
+                    }
 				}
 
 				result.add(observationInstance.id)
 				
             } else {
-                observationInstance.errors.allErrors.each { log.error it }
+                if(uploadLog) uploadLog <<  "\nError in observation creation : "+observationInstance
+                observationInstance.errors.allErrors.each { 
+                    if(uploadLog) uploadLog << "\n"+it; 
+                    log.error it;
+                }
             }
-		}catch(e) {
+		} catch(e) {
 				log.error "error in creating observation"
+                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
 				e.printStackTrace();
 		}
-        return result;
+        return success;
 	}
 	
 	private addReco(params, Observation observationInstance){

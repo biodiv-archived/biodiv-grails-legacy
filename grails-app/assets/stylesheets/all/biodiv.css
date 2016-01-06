@@ -367,7 +367,7 @@ h6 {
     margin: 2px 0px;
     margin-left: 150px;
     line-height: 20px;
-    border-bottom: solid 1px #ddd;
+   /* border-bottom: solid 1px #ddd;*/
 }
 
 .observation-icons {
@@ -3105,4 +3105,11 @@ small {
     width:100%;
     float:none;
     margin:0px;
+}
+
+.img-polaroid {
+    border-radius: 6px;
+    width: 110px;
+    height: 55px;
+    margin: 5px;
 }

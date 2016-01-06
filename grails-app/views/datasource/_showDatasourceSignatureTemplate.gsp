@@ -6,12 +6,12 @@
 <%@page import="species.dataset.Dataset"%>
 
 <div class="thumbnail clearfix signature"
-    style="margin-left: 0px;width:${showDetails?'auto;':'250px;'} max-width:${showDetails?'100%;':'250px;'}">
+    style="margin-left: 0px;width:${showDetails?'auto;':'250px;'} max-width:${showDetails?'100%;':'250px;'}margin:10px 0px;">
     <div class="snippet tablet"
-        style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
+        style="display: table; width:100%;height: ${showDetails ? '50px;':'40px;'}">
 
             <span class="badge ${featured?'featured':''}" style="display:inherit;"  title="${(featureCount>0) ? 'Featured in this group':''}"> </span>
-            <div class="figure pull-left" style="display: table; width:110px;height: ${showDetails ? '100px;':'40px;'};">
+            <div class="figure pull-left" style="display: table; width:110px;height: ${showDetails ? '50px;':'40px;'};margin-right:10px;">
                 <a target="_blank"
                     href="${uGroup.createLink('controller':'datasource', 'action':'show', id:instance.id)}">
                     <g:if test="${featured}">

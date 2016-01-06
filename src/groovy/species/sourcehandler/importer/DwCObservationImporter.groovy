@@ -27,14 +27,15 @@ class DwCObservationImporter {
         return _instance;
     }
 
-    Map importObservationData(String directory) {
+    Map importObservationData(String directory, File uploadLog=null) {
         log.info "Darwin Core import started"
+        if(uploadLog) uploadLog << "\nDarwin Core import started"
 
         if(!directory)
             return;
 
         initReaders(directory);
-        readHeaders(directory); 
+        readHeaders(directory, uploadLog); 
         Map mediaInfo = [:];
         if(mediaReader)
             mediaInfo = readMedia();
@@ -71,7 +72,7 @@ class DwCObservationImporter {
         return null;
     }
 
-    protected void readHeaders(String directory) {
+    protected void readHeaders(String directory, File uploadLog=null) {
         //read dwcObvMapping
         InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
         Map dwcObvMapping = [:];
@@ -128,6 +129,7 @@ class DwCObservationImporter {
         }
         observationHeader.sort {it?it.order:10000000}
         println observationHeader;
+        if(uploadLog) uploadLog << "\n\n ObservationHeader : ${observationHeader}"
        
         if(mediaReader) {
             dwcMediaHeader = mediaReader.readNext();

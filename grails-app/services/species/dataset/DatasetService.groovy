@@ -285,7 +285,14 @@ class DatasetService extends AbstractMetadataService {
         def resultModel = [:]
         File directory = new File(destDir, FilenameUtils.removeExtension(zipF.getName()));
         File metadataFile = new File(directory, "metadata.xml");
+        
+        File uploadLog = new File(destDir, 'upload.log');
+        if(uploadLog.exists()) uploadLog.delete();
+
+        Date startTime = new Date();
         if(directory && metadataFile) {
+            uploadLog << "\nUploading dataset in DwCA format present at : ${zipF.getAbsolutePath()}";
+            uploadLog << "\nDataset upload start time : ${startTime}"
             String datasetMetadataStr = metadataFile.text;
 
             def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
@@ -324,17 +331,22 @@ class DatasetService extends AbstractMetadataService {
 
             if(resultModel.success) {
                 DwCObservationImporter dwcImporter = DwCObservationImporter.getInstance();
-                Map o = dwcImporter.importObservationData(directory.getAbsolutePath());
-                int i=0;
+                Map o = dwcImporter.importObservationData(directory.getAbsolutePath(), uploadLog);
+                int noOfUploadedObv=0, noOfFailedObv=0;
 
                 List obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
                 while(obvParamsList) {
-                    println "******************************"+obvParamsList.size()
                     List resultObv = [];
                     obvParamsList.each { obvParams ->
                         obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
                         obvParams['dataset'] = dataset;
-                        obvUtilService.uploadObservation(null, obvParams, resultObv);
+                        uploadLog << "\n\n----------------------------------------------------------------------";
+                        uploadLog << "\nUploading observation with params ${obvParams}"
+                        if(obvUtilService.uploadObservation(null, obvParams, resultObv, uploadLog)) {
+                            noOfUploadedObv++;
+                        } else {
+                            noOfFailedObv++;
+                        }
                     }
 
                     def obvs = resultObv.collect { Observation.read(it) }
@@ -343,15 +355,18 @@ class DatasetService extends AbstractMetadataService {
                     } catch (Exception e) {
                         log.error e.printStackTrace();
                     }
-                    i += obvs.size();
                     
-                    log.debug "Saved observations : ${i}";
-
+                    log.debug "Saved observations : noOfUploadedObv : ${noOfUploadedObv} noOfFailedObv : ${noOfFailedObv}";
                     utilsService.cleanUpGorm(true)
                     resultObv.clear();
                     obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
                 }
-                log.debug "Total number of observations saved for dataset ${dataset} are : ${i}";
+                log.debug "Total number of observations saved for dataset ${dataset} are : ${noOfUploadedObv}";
+                
+                uploadLog << "\n\n----------------------------------------------------------------------";
+                uploadLog << "\nTotal number of observations saved for dataset (${dataset}) are : ${noOfUploadedObv}";
+                uploadLog << "\nTotal number of observations failed in loading for dataset (${dataset}) are : ${noOfFailedObv}";
+                uploadLog << "\nTotal time taken for dataset upload ${((new Date()).getTime() - startTime.getTime()/1000)} sec"
                 dwcImporter.closeReaders();
             } else {
                 log.error "Error while saving dataset ${resultModel}";
@@ -359,6 +374,7 @@ class DatasetService extends AbstractMetadataService {
         } else {
             resultModel = [success:false, msg:'Invalid file']
         }
+        uploadLog <<  "\nUpload result while saving dataset ${resultModel}";
         return resultModel
     }
 

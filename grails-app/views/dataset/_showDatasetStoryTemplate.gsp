@@ -70,13 +70,14 @@
                             </g:if>
                             
                             ${raw(clickcontentVar)}
-                            <div style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description))}</div>
+                            <div style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
                     
                         </div>
                     </g:if>
                     <g:else>
+                    <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
                     <div class="value notes_view linktext ${showDetails?'':'ellipsis'}">
-                        ${raw(Utils.stripHTML(datasetInstance.description))}
+                        ${raw(desc)}
                     </div>
 
                     </g:else>
