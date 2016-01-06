@@ -113,7 +113,7 @@
                                                                         <textarea id="summary" name="summary" class="input-block-level" style="height:200px;padding:4px 6px;" placeholder="Write a small summary about the project.">${projectInstance?.summary}</textarea>
 
                                                                         <script type='text/javascript'>
-                                                                            CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+                                                                            CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 
                                                                             var image_config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic', 'Image' ]]};
 CKEDITOR.replace('summary', image_config);

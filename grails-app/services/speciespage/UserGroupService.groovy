@@ -835,7 +835,7 @@ class UserGroupService {
 	}
 
 
-	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order,currentLanguage) {
+	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order, def currentLanguage= null) {
 		String query = "from Newsletter newsletter ";
 		def queryParams = [:]
 		if(userGroupInstance) {
