@@ -3093,3 +3093,10 @@ small {
     float:none;
     margin:0px;
 }
+
+.img-polaroid {
+    border-radius: 6px;
+    width: 110px;
+    height: 55px;
+    margin: 5px;
+}

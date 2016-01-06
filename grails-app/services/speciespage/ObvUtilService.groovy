@@ -612,12 +612,12 @@ class ObvUtilService {
 		//mandatory
 		obvParams['group_id'] = (SpeciesGroup.findByName(m[SPECIES_GROUP].trim())? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()).id : SpeciesGroup.findByName('Others').id)
 		obvParams['habitat_id'] = (Habitat.findByName(m[HABITAT].trim())? Habitat.findByName(m[HABITAT].trim()).id :  Habitat.findByName('Others').id )
-		obvParams['longitude'] = (m[LONGITUDE] ?:"76.658279")
-		obvParams['latitude'] = (m[LATITUDE] ?: "12.32112")
+		obvParams['longitude'] = m[LONGITUDE]
+		obvParams['latitude'] = m[LATITUDE]
 		obvParams['location_accuracy'] = 'Approximate'
 		obvParams['locationScale'] = m[LOCATION_SCALE]
 		obvParams['placeName'] = m[LOCATION]
-		obvParams['reverse_geocoded_name'] = (m[LOCATION] ?: "National Highway 6, Maharashtra, India")
+		obvParams['reverse_geocoded_name'] = m[LOCATION]
 		
 		//reco related
 		obvParams['recoName'] = m[SN]

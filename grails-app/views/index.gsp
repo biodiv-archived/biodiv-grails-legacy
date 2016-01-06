@@ -76,6 +76,36 @@
                     </div>
                 </div>
             </div>
+
+            <div class="navblock" style="margin-top:20px;">
+                <b><big>&nbsp;<a name="partners"><g:message code="link.partners" /></a></big></b>
+                <div>
+                            <a href="http://www.altlawforum.org/"><img class="img-polaroid" src="/sites/default/files/alf_standard.png"></a>
+                            <a><img class="img-polaroid" src="/sites/default/files/abct_standard.png"></a>
+                            <a href="http://www.atree.org/"><img class="img-polaroid" src="/sites/default/files/atree.png"></a>
+                            <a href="http://www.azimpremjiuniversity.edu.in/"><img class="img-polaroid" src="/sites/default/files/apu_standard.png"></a>
+                            <a href="http://bnhs.org/bnhs/"><img class="img-polaroid" src="/sites/default/files/bnhsmod.png"></a>
+                            <a href="http://careearthtrust.org/"><img class="img-polaroid" src="/sites/default/files/careearthmod.png"></a>
+                            <a href="http://www.feralindia.org/"><img class="img-polaroid" src="/sites/default/files/feral_standard.png"></a>
+                            <a href="http://fes.org.in//"><img class="img-polaroid" src="/sites/default/files/fes.png"></a>
+                            <a href="http://www.frlht.org/"><img class="img-polaroid" src="/sites/default/files/frlht_standardmod.png"></a>
+                            <a href="http://ihstuniversity.org/"><img class="img-polaroid" src="/sites/default/files/frlht_standard.png"></a>
+                            <a href="http://www.hornbillfoundation.org/"><img class="img-polaroid" src="/sites/default/files/wghf_standard.png"></a>
+                            <a href="http://www.ifpindia.org/"><img class="img-polaroid" src="/sites/default/files/ifp_logo.png"></a>
+                            <a href="http://www.ifoundbutterflies.org/"><img class="img-polaroid" src="/sites/default/files/ifoundbutterflies_standard.png"></a>
+                            <a href="http://keystone-foundation.org/"><img class="img-polaroid" src="/sites/default/files/keystone_standard.png"></a>
+                            <a href="http://www.madrascrocodilebank.org/"><img class="img-polaroid" src="/sites/default/files/mcbt_standard.png"></a>
+                            <a href="http://www.ncbs.res.in/"><img class="img-polaroid" src="/sites/default/files/ncbs_standard.png"></a>
+                            <a href="http://osgeo.in/"><img class="img-polaroid" src="/sites/default/files/osgeo_standard.png"></a>
+                            <a href="http://sacon.in/"><img class="img-polaroid" src="/sites/default/files/sacon_standard.png"></a>
+                            <a href="http://strandls.com/"><img class="img-polaroid" src="/sites/default/files/strand.png"></a>
+                            <a href="http://www.wwfindia.org/"><img class="img-polaroid" src="/sites/default/files/wwf_standard.png"></a>
+                            <a href="http://zooreach.org/"><img class="img-polaroid" src="/sites/default/files/zoo_standard.png"></a>
+
+            </div>
+            </div>
+
+
         </div>
         <asset:script>
         $(document).ready(function() {
