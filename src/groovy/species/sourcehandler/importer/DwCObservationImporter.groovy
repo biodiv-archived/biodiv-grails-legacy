@@ -218,7 +218,11 @@ class DwCObservationImporter {
         observationHeader.eachWithIndex { header, i ->
             if(header) {
                 if(header.field && row.size()>header.column && row[header.column]) {
-                    m[header.field] = row[header.column]
+                    if(m[header.field]) {
+                        m[header.field] += ', '+row[header.column]
+                    } else {
+                        m[header.field] = row[header.column]
+                    }
                 } 
 
                 if(row[header.column]) {

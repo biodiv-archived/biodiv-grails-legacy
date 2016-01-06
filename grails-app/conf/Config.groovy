@@ -446,6 +446,14 @@ speciesPortal {
         CONTAINER = 'container'
         RESOURCETYPE = 'resourcetype'
         USER = 'user'
+        EXTERNAL_ID = 'external_id'
+        EXTERNAL_URL = 'external_url'
+        VIA_ID = 'via_id'
+        VIA_CODE = 'via_code'
+        DATASET = 'dataset'
+        ORIGINAL_AUTHOR = 'original_author'
+        BASIS_OF_RECORD = 'basis_of_record'
+        PROTOCOL = 'protocol'
     }
 
     nameSearchFields {
