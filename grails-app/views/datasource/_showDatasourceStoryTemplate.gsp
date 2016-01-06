@@ -27,7 +27,7 @@
             <div class="prop">
                 <g:if test="${showDetails}">
                 <!--span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span-->
-                <div class="value notes_view linktext">                        
+                <div class="linktext">                        
                     <%  def styleVar = 'block';
                     def clickcontentVar = '' 
                     %> 

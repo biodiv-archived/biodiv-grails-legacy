@@ -2450,14 +2450,15 @@ class ObservationService extends AbstractMetadataService {
         return model;
     }
 
-    def Map updateSpeciesGrp(params,observationInstance){
+    def Map updateSpeciesGrp(params,observationInstance, boolean sendMail=true){
         def prevgroupIcon = observationInstance.group.iconClass();
        if(observationInstance.group.id != params.group_id){
             def new_des = observationInstance.group.name+" to ";            
             observationInstance.group  = params.group?:SpeciesGroup.get(params.group_id);
             observationInstance.save();
             def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED,new_des+""+observationInstance.group.name);
-            utilsService.sendNotificationMail(activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED, observationInstance, null, null, activityFeed);
+            if(sendMail)
+                utilsService.sendNotificationMail(activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED, observationInstance, null, null, activityFeed);
         }
         return [ 'groupName' : observationInstance?.group?.name,'groupIcon' : observationInstance.group.iconClass(),'prevgroupIcon':prevgroupIcon,'prev_group':params.group_id]
 

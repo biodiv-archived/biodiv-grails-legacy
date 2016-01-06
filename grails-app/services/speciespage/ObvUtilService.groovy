@@ -747,6 +747,11 @@ class ObvUtilService {
                 params.identifiedBy = params.identifiedBy
 
 				addReco(params, observationInstance)
+println "======NAME PRESENT IN TAXONCONCEPT  :  "+observationInstance.maxVotedReco?.taxonConcept
+                if(observationInstance.maxVotedReco?.taxonConcept && observationInstance.dataset) {
+                    observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
+                }
+
 				def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
 				observationInstance.setTags(tags);
 
