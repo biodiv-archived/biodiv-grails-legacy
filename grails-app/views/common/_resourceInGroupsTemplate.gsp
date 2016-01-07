@@ -2,18 +2,13 @@
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
 
-
-
- <% def observationUserGroups = observationInstance.userGroups;
+<% def observationUserGroups = observationInstance.userGroups;
     if(observationInstance.hasProperty('sourceId')){
         if(observationInstance.id != observationInstance.sourceId){
             observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
         }
     }
 %>
-
-
-
 <div class="resource_in_groups prop" rel="${isList}" style="display:${( observationUserGroups.size()==0 && isList) ? 'none;': 'block;' }">
     <%
     ug = new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName, icon:'/'+grailsApplication.config.speciesPortal.app.logo);

@@ -97,7 +97,14 @@ def obvId = observationInstance?.id
                     <b>-</b>&nbsp; <time class="timeago" datetime="${observationInstance.toDate.getTime()}"></time>
                     </g:if>
                 </div>
-            </div>            
+            </div> 
+            <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">                
+                <span class="name"><i class="icon-time"></i><g:message code="default.submitted.on.label" /></span>
+                <div class="value">
+                    <time class="timeago"
+                    datetime="${observationInstance.createdOn.getTime()}"></time>                    
+                </div>
+            </div>           
             <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);
                def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()%>
             <div class="prop" style="margin-top: ${(commonName)?'26px;':'46px;'} ${styleviewcheck?'clear:inherit;': 'clear:both;'}">
@@ -133,8 +140,7 @@ def obvId = observationInstance?.id
 
                 </div>
               
-            </div>
-            </div>
+            </div>            
 
 <div class="recommendations sidebar_section" style="width: 97%;float: right;top: 0px;padding-bottom: 3px;margin-bottom: -3px;position: relative;">
 <div>
