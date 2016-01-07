@@ -624,10 +624,9 @@ class ObvUtilService {
 		/*if(obvParams.isEmpty()){
 			log.error "No image file .. aborting this obs upload with params " + m
 		} else {*/
-			populateParams(obvParams, m)
-            log.debug "Populated Obv Params ${obvParams}"
-			return saveObv(obvParams, resultObv, uploadLog)
-		//}
+        populateParams(obvParams, m)
+        log.debug "Populated Obv Params ${obvParams}"
+        return saveObv(obvParams, resultObv, uploadLog)
 	}
 	
 	private void populateParams(Map obvParams, Map m){
@@ -734,7 +733,7 @@ class ObvUtilService {
 		}
 		
 		def observationInstance;
-		try {
+		//try {
 			observationInstance =  observationService.create(params);
 
             observationInstance.clearErrors();
@@ -750,9 +749,9 @@ class ObvUtilService {
                 params.identifiedBy = params.identifiedBy
 
 				addReco(params, observationInstance)
-                if(uploadLog) uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT  :  "+observationInstance.maxVotedReco?.taxonConcept
-println "======NAME PRESENT IN TAXONCONCEPT  :  "+observationInstance.maxVotedReco?.taxonConcept
-                if(observationInstance.maxVotedReco?.taxonConcept && observationInstance.dataset) {
+                if(uploadLog) uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
+println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
+                if(observationInstance.dataset && observationInstance.maxVotedReco?.taxonConcept &&observationInstance.maxVotedReco?.taxonConcept.group ) {
                     observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
                 }
 
@@ -785,11 +784,11 @@ println "======NAME PRESENT IN TAXONCONCEPT  :  "+observationInstance.maxVotedRe
                     log.error it;
                 }
             }
-		} catch(e) {
-				log.error "error in creating observation"
-                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
-				e.printStackTrace();
-		}
+		//} catch(e) {
+		//		log.error "error in creating observation"
+        //        if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
+		//		e.printStackTrace();
+		//}
         return success;
 	}
 	

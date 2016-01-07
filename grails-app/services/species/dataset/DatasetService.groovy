@@ -335,38 +335,64 @@ class DatasetService extends AbstractMetadataService {
                 int noOfUploadedObv=0, noOfFailedObv=0;
 
                 List obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+                boolean flushSingle = false;
                 while(obvParamsList) {
                     List resultObv = [];
-                    obvParamsList.each { obvParams ->
-                        obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
-                        obvParams['dataset'] = dataset;
-                        uploadLog << "\n\n----------------------------------------------------------------------";
-                        uploadLog << "\nUploading observation with params ${obvParams}"
-                        if(obvUtilService.uploadObservation(null, obvParams, resultObv, uploadLog)) {
-                            noOfUploadedObv++;
-                        } else {
-                            noOfFailedObv++;
-                        }
-                    }
-
-                    def obvs = resultObv.collect { Observation.read(it) }
+                    int tmpNoOfUploadedObv = 0, tmpNoOfFailedObv= 0;
                     try {
-                        observationsSearchService.publishSearchIndex(obvs, true);
+                        obvParamsList.each { obvParams ->
+                            if(flushSingle) {
+                                log.info "Retrying batch obv with flushSingle"
+                                uploadLog << "\n Retrying batch obv with flushSingle"
+                            }
+                            obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
+                            obvParams['dataset'] = dataset;
+                            uploadLog << "\n\n----------------------------------------------------------------------";
+                            uploadLog << "\nUploading observation with params ${obvParams}"
+                            try {
+                                if(obvUtilService.uploadObservation(null, obvParams, resultObv, uploadLog)) {
+                                    tmpNoOfUploadedObv++;
+                                } else {
+                                    tmpNoOfFailedObv++;
+                                }
+                            } catch(Exception e) {
+                                tmpNoOfFailedObv++;
+                                if(flushSingle) { 
+                                    utilsService.cleanUpGorm(true)
+                                    uploadLog << "\n"+e.getMessage()
+                                }
+                                else
+                                    throw e;
+                            }
+                        }
+
+                        def obvs = resultObv.collect { Observation.read(it) }
+                        try {
+                            observationsSearchService.publishSearchIndex(obvs, true);
+                        } catch (Exception e) {
+                            log.error e.printStackTrace();
+                        }
+
+                        noOfUploadedObv += tmpNoOfUploadedObv;
+                        noOfFailedObv += tmpNoOfFailedObv;
+                        log.debug "Saved observations : noOfUploadedObv : ${noOfUploadedObv} noOfFailedObv : ${noOfFailedObv}";
+                        obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+                        flushSingle = false;
                     } catch (Exception e) {
-                        log.error e.printStackTrace();
+                        log.error "error in creating observation."
+                        if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}." 
+                        e.printStackTrace();
+                        flushSingle = true;
                     }
-                    
-                    log.debug "Saved observations : noOfUploadedObv : ${noOfUploadedObv} noOfFailedObv : ${noOfFailedObv}";
                     utilsService.cleanUpGorm(true)
                     resultObv.clear();
-                    obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
                 }
                 log.debug "Total number of observations saved for dataset ${dataset} are : ${noOfUploadedObv}";
                 
                 uploadLog << "\n\n----------------------------------------------------------------------";
                 uploadLog << "\nTotal number of observations saved for dataset (${dataset}) are : ${noOfUploadedObv}";
                 uploadLog << "\nTotal number of observations failed in loading for dataset (${dataset}) are : ${noOfFailedObv}";
-                uploadLog << "\nTotal time taken for dataset upload ${((new Date()).getTime() - startTime.getTime()/1000)} sec"
+                uploadLog << "\nTotal time taken for dataset upload ${((new Date()).getTime() - startTime.getTime())/1000} sec"
                 dwcImporter.closeReaders();
             } else {
                 log.error "Error while saving dataset ${resultModel}";

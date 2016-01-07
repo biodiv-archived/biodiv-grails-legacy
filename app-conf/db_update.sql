@@ -456,3 +456,4 @@ update datasource set language_id = 205;
 alter table datasource alter column language_id set not null;
 
 
+alter table observation alter column place_name drop not null;
