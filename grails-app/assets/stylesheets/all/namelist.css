@@ -15,7 +15,7 @@ a.not_in_use {
     margin:10px 0px;
 }
 
-input[type=text], select {
+.metadataDetails .tab-content{
     min-height : 24px !important;
     height : 24px;
     margin-bottom:5px;
