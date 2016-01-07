@@ -42,7 +42,7 @@ a.not_in_use {
     border: 2px solid #3D6798 !important;
     border-bottom-color: transparent !important;
 }
-.tab-content{
+ .metadataDetails .tab-content{
 /*    overflow-y: scroll;*/
     height: 157px;
     overflow-x: hidden !important;
@@ -164,7 +164,7 @@ a.not_in_use {
     -moz-border-radius: 4px;
     border-radius: 4px;
 }
-.tab-content td, .tab-content th {
+ .metadataDetails .tab-content td, .metadataDetails .tab-content th {
     text-align:center;
     border: 1px solid #ccc;
 }
@@ -179,7 +179,7 @@ a.not_in_use {
 .save_button, .remove_button{ 
     text-align:left;
 }
-.tab-content>.span*{
+ .metadataDetails .tab-content>.span*{
     margin-left:2px;
 }
 .super_family, .sub_family, .sub_genus, .infra_species{
