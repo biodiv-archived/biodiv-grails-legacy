@@ -10,7 +10,7 @@ def obvId = observationInstance?.id
 <g:if test="${observationInstance}">
     <g:set var="featureCount" value="${observationInstance.featureCount}"/>
 </g:if>
-<div class="snippet tablet ${styleviewcheck?'snippettablet': ''}">
+<div class="snippet tablet ${styleviewcheck?'snippettablet': ''}" style="height:100%;">
     <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
                 </span>
 
@@ -52,8 +52,8 @@ def obvId = observationInstance?.id
         %>
    </g:if>
 </g:each>
-     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery</a>
-	<div class="caption species_title_wrapper" style="${styleviewcheck?'display:none;': ''}" >
+     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery<i class="icon-share icon-white"></i></a>
+	<div class="caption" style="${styleviewcheck?'height:0px;': 'height:50px;'}" >
 		<obv:showStoryTablet
 			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
 		<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
@@ -134,7 +134,9 @@ def obvId = observationInstance?.id
                 </div>
               
             </div>
-<div class="recommendations sidebar_section" style="width: 97%;float: right;top: -44px;padding-bottom: 3px;margin-bottom: -48px;position: relative;">
+            </div>
+
+<div class="recommendations sidebar_section" style="width: 97%;float: right;top: 0px;padding-bottom: 3px;margin-bottom: -3px;position: relative;">
 <div>
     <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
         <g:if test="${styleviewcheck}">    
@@ -150,7 +152,7 @@ def obvId = observationInstance?.id
     </div>
 </div>
 <g:if test="${!observationInstance.isLocked}">
-<a href="javascript:void(0);" class="clickSuggest pull-right">Click to suggest</a>
+<a href="javascript:void(0);" class="clickSuggest pull-right">Click to suggest<i class="icon-chevron-down"></i></a>
 <div class="input-append" style="width:98%; display:none; height: 130px;">
     <g:hasErrors bean="${recommendationInstance}">
         <div class="errors">
@@ -180,3 +182,5 @@ def obvId = observationInstance?.id
 
 </div>
 </g:if>
+ <br>
+ <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />

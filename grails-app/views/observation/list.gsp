@@ -61,7 +61,7 @@
           position: absolute;
           color: white;
           font-weight: bold;
-          padding: 0px 33px;
+          padding: 0px 25px;
           text-decoration: none;
     }
     .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited, .view_bootstrap_gallery:focus{
@@ -78,9 +78,29 @@
     .snippettablet{
         padding: 5px;
     }
+    .signature .snippettablet{
+         padding: 0px;
+     }
     .recoName, #recoComment{
         width:419px !important;
     }
+    .reco_block{
+         margin-bottom:0px !important;
+     }
+     .resource_in_groups{
+         margin-top: -10px;
+         margin-bottom: 5px !important;
+         background-color: #D4DFE1;
+         padding: 8px 0px;
+         margin-top: 5px;
+     }
+     .clickSuggest{
+           margin: 0% 40%;
+     }
+     .resource_in_groups .tile{
+         margin-top:0px;
+      }
+     
 </style>
 </head>
 <body>
@@ -189,6 +209,7 @@ function addListLayout(){
     $('.prop').css('clear','inherit');
     $('.showObvDetails, .view_bootstrap_gallery').show();
     $('.species_title_wrapper').hide();
+    $('.species_title_wrapper').parent().css({'height':'0px'});
     loadSpeciesnameReco();
     initializeLanguage();
 
@@ -199,6 +220,7 @@ function addGridLayout(){
     $('.snippet.tablet').removeClass('snippettablet');
     $('.prop').css('clear','both');
     $('.species_title_wrapper').show();
+    $('.species_title_wrapper').parent().css({'height':'50px'});
     $('.showObvDetails, .view_bootstrap_gallery').hide();
 }
 

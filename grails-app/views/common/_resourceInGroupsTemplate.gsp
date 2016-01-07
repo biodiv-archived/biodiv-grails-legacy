@@ -2,7 +2,19 @@
 <%@page import="species.participation.Featured"%>
 <%@page import="species.participation.Observation"%>
 
-<div class="resource_in_groups">
+
+
+ <% def observationUserGroups = observationInstance.userGroups;
+    if(observationInstance.hasProperty('sourceId')){
+        if(observationInstance.id != observationInstance.sourceId){
+            observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
+        }
+    }
+%>
+
+
+
+<div class="resource_in_groups prop" rel="${isList}" style="display:${( observationUserGroups.size()==0 && isList) ? 'none;': 'block;' }">
     <%
     ug = new UserGroup(name:grailsApplication.config.speciesPortal.app.siteName, icon:'/'+grailsApplication.config.speciesPortal.app.logo);
     ug.id = 0L;
@@ -37,20 +49,11 @@
             </li>
 
         </g:each>
-            <g:if test="${!featuredInUserGroups.containsKey(ug.id)}">
-            <li class="pull-left reco_block"  style="margin-bottom:12px;list-style:none;">
-            <uGroup:showUserGroupSignature model="[ 'userGroup':ug, featured:false]" />
+            <g:if test="${!featuredInUserGroups.containsKey(ug.id) && !isList}">
+                    <li class="pull-left reco_block"  style="margin-bottom:12px;list-style:none;">
+                    <uGroup:showUserGroupSignature model="[ 'userGroup':ug, featured:false]" />
             </li>
             </g:if>
- 
-        <% def observationUserGroups = observationInstance.userGroups;
-        if(observationInstance.hasProperty('sourceId')){
-            if(observationInstance.id != observationInstance.sourceId){
-                observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
-            }
-        }
-        %>
-
         <g:each in="${observationUserGroups}" var="userGroup">
             <g:if test="${!featuredInUserGroups.containsKey(userGroup.id)}">
             <li class="pull-left reco_block"  style="margin-bottom:12px;list-style:none;">
