@@ -90,12 +90,22 @@
      .resource_in_groups{
          margin-top: -10px;
          margin-bottom: 5px !important;
-         background-color: #D4DFE1;
+         /*background-color: #D4DFE1;
          padding: 8px 0px;
-         margin-top: 5px;
+         margin-top: 5px;*/
      }
      .clickSuggest{
-           margin: 0% 40%;
+          margin: 0% 39%;         
+          margin-top: -22px;
+          padding: 2px 0px 0px 5px;
+          background-color: #a6dfc8;
+          text-decoration: none;
+     }
+     .clickSuggest i{
+        margin-left:3px;
+     }
+     .comment-popup{
+        width:100px;
      }
      .resource_in_groups .tile{
          margin-top:0px;
