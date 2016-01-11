@@ -615,18 +615,29 @@ class ObvUtilService {
 	}
 	
 	boolean uploadObservation(imageDir, Map m, List resultObv, File uploadLog=null) {
-		Map obvParams = [:];
+        Map obvParams = [:];
+        boolean result;
 
-        if(m[IMAGE_FILE_NAMES]) {
-            obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
+        utilsService.benchmark ('uploadObv') {
+            utilsService.benchmark ('uploadImage') {
+                if(m[IMAGE_FILE_NAMES]) {
+                    obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
+                }
+            }
+
+            /*if(obvParams.isEmpty()){
+              log.error "No image file .. aborting this obs upload with params " + m
+              } else {*/
+            utilsService.benchmark ('populateParams') {
+                populateParams(obvParams, m)
+            }
+
+            log.debug "Populated Obv Params ${obvParams}"
+            utilsService.benchmark('saveObv') {
+                result = saveObv(obvParams, resultObv, uploadLog)
+            }
         }
-
-		/*if(obvParams.isEmpty()){
-			log.error "No image file .. aborting this obs upload with params " + m
-		} else {*/
-        populateParams(obvParams, m)
-        log.debug "Populated Obv Params ${obvParams}"
-        return saveObv(obvParams, resultObv, uploadLog)
+        return result;
 	}
 	
 	private void populateParams(Map obvParams, Map m){
@@ -748,24 +759,31 @@ class ObvUtilService {
                 
                 params.identifiedBy = params.identifiedBy
 
-				addReco(params, observationInstance)
+                utilsService.benchmark('addReco') {
+				    addReco(params, observationInstance)
+                }
+
                 if(uploadLog) uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
 println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
                 if(observationInstance.dataset && observationInstance.maxVotedReco?.taxonConcept &&observationInstance.maxVotedReco?.taxonConcept.group ) {
                     observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
                 }
 
-				def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
-				observationInstance.setTags(tags);
+                utilsService.benchmark('settags') {
+                    def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
+                    observationInstance.setTags(tags);
+                }
 
-				if(params.groupsWithSharingNotAllowed) {
-					observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
-				} else {
-					if(params.userGroupsList) {
-						def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-						observationService.setUserGroups(observationInstance, userGroups, false);
-					}
-				}
+                utilsService.benchmark('setGroups') {
+                    if(params.groupsWithSharingNotAllowed) {
+                        observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
+                    } else {
+                        if(params.userGroupsList) {
+                            def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
+                            observationService.setUserGroups(observationInstance, userGroups, false);
+                        }
+                    }
+                }
 
 				if(!observationInstance.save(flush:true)){
                     if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance

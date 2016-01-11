@@ -256,7 +256,7 @@ class SpeciesController extends AbstractObjectController {
         }
 		else {
             if(params.editMode) {
-                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()) {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                     def model = utilsService.getErrorModel(flash.message, null, OK.value())
@@ -340,7 +340,7 @@ class SpeciesController extends AbstractObjectController {
 
 		Map map = new LinkedHashMap();
 		ArrayList fieldsConnectionArray = new ArrayList(fields.size());
-        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user)
+        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user) || utilsService.isAdmin();
         ArrayList fieldsArray = new ArrayList(fields.size());
 		for(Field field : fields) {
 			Map finalLoc;
@@ -669,7 +669,7 @@ class SpeciesController extends AbstractObjectController {
                 result = speciesService.addDescription(speciesId, fieldId, value);
                 def html = [];
                 if(result.speciesInstance) {
-                    boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.speciesInstance, springSecurityService.currentUser);
+                    boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.speciesInstance, springSecurityService.currentUser)|| utilsService.isAdmin();
 
                     result.content.each {sf ->
                         boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);

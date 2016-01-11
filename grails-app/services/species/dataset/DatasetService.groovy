@@ -262,6 +262,8 @@ class DatasetService extends AbstractMetadataService {
     }
 
     Map uploadDwCDataset(Map params) {
+        def resultModel = [:]
+        utilsService.benchmark('uploadDwcDataset') {
         String zipFile = params.path?:params.uFile?.path;
         def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
         zipFile = config.speciesPortal.content.rootDir + zipFile;
@@ -282,7 +284,6 @@ class DatasetService extends AbstractMetadataService {
             dest: destDir, overwrite:true)
 
 
-        def resultModel = [:]
         File directory = new File(destDir, FilenameUtils.removeExtension(zipF.getName()));
         File metadataFile = new File(directory, "metadata.xml");
         
@@ -401,6 +402,7 @@ class DatasetService extends AbstractMetadataService {
             resultModel = [success:false, msg:'Invalid file']
         }
         uploadLog <<  "\nUpload result while saving dataset ${resultModel}";
+        }
         return resultModel
     }
 

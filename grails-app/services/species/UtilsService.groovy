@@ -38,6 +38,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import grails.converters.JSON;
+import species.auth.Role;
+import species.auth.SUser;
+
 class UtilsService {
 
     def grailsApplication;
@@ -905,7 +908,7 @@ class UtilsService {
 
     //////////////////////TIME LOGGING/////////////////////
 
-    def benchmark(String blockName, Closure closure) {
+    def infomark(String blockName, Closure closure) {
         def start = System.currentTimeMillis()  
         closure.call()  
         def now = System.currentTimeMillis()  
@@ -975,9 +978,13 @@ class UtilsService {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.email == email || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
 
-	boolean isAdmin(id) {
-		if(!id) return false
+    boolean isAdmin() {
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+	}
+
+	boolean isAdmin(SUser user) {
+		if(!user) return false
+		return SUser.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
 	}
 	
 	boolean isCEPFAdmin(id) {

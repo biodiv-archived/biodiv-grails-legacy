@@ -92,7 +92,7 @@ class SpeciesPermissionService {
 
     boolean addTaxonUser(SUser user, TaxonomyDefinition taxonConcept, SpeciesPermission.PermissionType permissionType){
         if(!isTaxonContributor(taxonConcept, user, [permissionType])) {
-            log.debug "adding taxon user ${user} to ${taxonConcept} with permission ${permissionType}"
+            log.info "adding taxon user ${user} to ${taxonConcept} with permission ${permissionType}"
             try{
                 def newCon = new SpeciesPermission(author:user, taxonConcept : taxonConcept, permissionType: permissionType.toString())
                 if(!newCon.save(flush:true)){
@@ -133,7 +133,7 @@ class SpeciesPermissionService {
             inList('permissionType', permissions)
             inList('taxonConcept',  parentTaxons)
         }
-        if((res && res.size() > 0) || (utilsService.isAdmin(user))) {
+        if((res && res.size() > 0)) {
             return true
         } else {
             return false
