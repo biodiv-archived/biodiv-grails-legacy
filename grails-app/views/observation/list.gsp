@@ -141,7 +141,27 @@
 	</div>
 
 
-    <div id="links" class="links12" style="display:none;"></div>
+<%-- For AddReco Component --%>
+
+<div id="addRecommendation_wrap">
+ <form id="addRecommendation" name="addRecommendation"
+    action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
+    method="GET" class="form-horizontal addRecommendation ">
+    <div class="reco-input">
+    <reco:create
+        model="['recommendationInstance':recommendationInstance]" />
+        <input type="hidden" name='obvId'
+                value="" />
+        
+         <input type="submit"
+                value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
+    </div>
+    
+</form>
+</div>
+
+
+<div id="links" class="links12" style="display:none;"></div>
 <div id="blueimp-gallery" class="blueimp-gallery">
     <div class="slides"></div>
     <h3 class="title"></h3>
@@ -294,18 +314,30 @@ $(document).ready(function(){
     });
 
     $(document).on('click','.clickSuggest',function(){  
-        $(this).next().toggle('slow');
+        var obv_id = $(this).attr('rel');
+       var ele_nxt = $(this).next();
+       var wrap_place = ele_nxt.find('.addRecommendation_wrap_place');
+       wrap_place.is(':empty')
+       if(!ele_nxt.is(':visible') && !$.trim( wrap_place.html() ).length){
+            wrap_place.html($('#addRecommendation_wrap').html());
+            wrap_place.find('.addRecommendation').addClass('addRecommendation_'+obv_id);
+            wrap_place.find('input[type="hidden"][name="obvId"]').val(obv_id);
+            initializeNameSuggestion();
+            initializeLanguage(wrap_place.find('.languageComboBox'));
+        }
+        ele_nxt.toggle('slow');
+
     });
 
        $(document).on('submit','.addRecommendation', function(event) {
             var that = $(this);
-            $(this).ajaxSubmit({ 
+            $(this).ajaxSubmit({
                 url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
                 dataType: 'json', 
                 type: 'GET',
                 beforeSubmit: function(formData, jqForm, options) {
                     console.log(formData);
-                    updateCommonNameLanguage();
+                    updateCommonNameLanguage(that.find('.languageComboBox'));
                     return true;
                 }, 
                 success: function(data, statusText, xhr, form) {
@@ -330,7 +362,7 @@ $(document).ready(function(){
                     var successHandler = this.success, errorHandler = showUpdateStatus;
                     handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
                 } 
-            });
+            }); 
             event.preventDefault();
         });
 

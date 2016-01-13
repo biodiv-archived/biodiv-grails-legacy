@@ -158,7 +158,7 @@ def obvId = observationInstance?.id
     </div>
 </div>
 <g:if test="${!observationInstance.isLocked}">
-<a href="javascript:void(0);" class="clickSuggest pull-right">Click to suggest<i class="icon-chevron-down"></i></a>
+<a href="javascript:void(0);" class="clickSuggest pull-right" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
 <div class="input-append" style="width:98%; display:none; height: 130px;">
     <g:hasErrors bean="${recommendationInstance}">
         <div class="errors">
@@ -169,22 +169,9 @@ def obvId = observationInstance?.id
         <div class="errors">
             <g:renderErrors bean="${recommendationVoteInstance}" as="list" />
         </div>
-    </g:hasErrors>                     
-
-        <form id="addRecommendation" name="addRecommendation"
-            action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
-            method="GET" class="form-horizontal addRecommendation addRecommendation_${observationInstance.id}">
-            <div class="reco-input">
-            <reco:create
-                model="['recommendationInstance':recommendationInstance]" />
-                <input type="hidden" name='obvId'
-                        value="${observationInstance.id}" />
-                
-                 <input type="submit"
-                        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
-            </div>
-            
-        </form>
+    </g:hasErrors>
+    <div class="addRecommendation_wrap_place">
+    </div>    
 
 </div>
 </g:if>

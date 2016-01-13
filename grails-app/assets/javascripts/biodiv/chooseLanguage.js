@@ -14,13 +14,20 @@ function myBlur(e){
     this.$element.val(oldVal);
 }
 
-function initializeLanguage(){
-    $('.languageComboBox').each( function( index ) {
+function initializeLanguage(that){
+    that = that || $('.languageComboBox');
+    that.each( function( index ) {
         langComboBoxArray[index] = $(this);
         $(this).combobox();
     });
     $.each(langComboBoxArray, function(index,value){
-        var langCombo = value;
+        var langCombo = value;        
+        var is_Exist= langCombo.parent().parent();
+        var is_ExistLn = langCombo.parent().parent().find('input[type="text"][name="languageName"]');
+        if(is_ExistLn.size() > 0){ 
+            is_ExistLn.next().remove();
+            is_ExistLn.remove();
+        }
         doCustomization(langCombo);
         var defaultLang = $(value).data("defaultlanguage");
         langCombo.val(defaultLang).attr("selected",true);
@@ -29,8 +36,8 @@ function initializeLanguage(){
 }
 
 
-function updateCommonNameLanguage(){
-    var langCombo = $(".languageComboBox");
+function updateCommonNameLanguage(that){
+    var langCombo = that || $(".languageComboBox");
     var langComboVal = langCombo.val();
     if(langComboVal != null){
         langComboVal = langComboVal.toLowerCase()
