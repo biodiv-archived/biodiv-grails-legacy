@@ -183,14 +183,16 @@ function preLoadRecos(max, offset, seeAllClicked,observationId) {
         success: function(data) {
             if(data.status == 'success' || data.success == true) {
                 if(offset>0) {
-                    showRecos(data, 'append',observationId);
+                    showRecos(data, null,observationId);
                 } else {
                     showRecos(data, null,observationId);
                 }
                 //$("#recoSummary").html(data.recoHtml);
                 var uniqueVotes = parseInt(data.model.uniqueVotes);
                 if(uniqueVotes > offset+max){
-                    seeMore.show();
+                    if(max >= 0){
+                        seeMore.show();
+                    }                    
                 } else {
                     seeMore.hide();
                 }
