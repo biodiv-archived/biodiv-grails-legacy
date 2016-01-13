@@ -153,7 +153,7 @@ def obvId = observationInstance?.id
     </ul>
     <div id="seeMoreMessage_${observationInstance.id}" 
         class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="display:none;"></div>
-    <div id="seeMore_${observationInstance.id}" class="btn btn-mini" style="display:none;">
+    <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:none;">
         <g:message code="button.show.all" />
     </div>
 </div>

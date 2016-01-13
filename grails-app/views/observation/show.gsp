@@ -196,7 +196,7 @@ if(r) {
 
                             </ul>
                             <div id="seeMoreMessage_${observationInstance.id}" class="message"></div>
-                            <div id="seeMore_${observationInstance.id}" class="btn btn-mini"><g:message code="button.show.all" /></div>
+                            <div id="seeMore_${observationInstance.id}" class="btn btn-mini" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});"><g:message code="button.show.all" /></div>
                         </div>
                         <div style="width:100%;">
                             <g:hasErrors bean="${recommendationInstance}">
@@ -423,10 +423,6 @@ $(document).ready(function(){
         $(".nav a.disabled").click(function() {
             return false;
         })
-
-        $("#seeMore").click(function(){
-            preLoadRecos(-1, 3, true,observationId);
-        });
 
         preLoadRecos(3, 0, false,observationId);
         //loadObjectInGroups();
