@@ -143,7 +143,7 @@
 
 <%-- For AddReco Component --%>
 
-<div id="addRecommendation_wrap">
+<div id="addRecommendation_wrap" style="display:none;">
  <form id="addRecommendation" name="addRecommendation"
     action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
     method="GET" class="form-horizontal addRecommendation ">
