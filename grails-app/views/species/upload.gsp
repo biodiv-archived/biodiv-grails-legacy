@@ -169,6 +169,8 @@
         </body>
         <asset:script>
         $(document).ready(function() {
+
+            intializesSpeciesHabitatInterest(false);
         /*
             var contributor_autofillUsersComp = $("#userAndEmailList_${contributor_autofillUsersId}").autofillUsers({
             usersUrl : '${createLink(controller:'SUser', action: 'terms')}'

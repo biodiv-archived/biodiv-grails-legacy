@@ -153,6 +153,7 @@ $(document).ready(function(){
     initializeLanguage();
     $(".CustomField_multiselectcombo").multiselect();
 
+    intializesSpeciesHabitatInterest(false);
 });
 
 function deleteObservation(){

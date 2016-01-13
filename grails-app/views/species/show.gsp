@@ -335,6 +335,7 @@
                 window.params.species.name = "${speciesName}"
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
                 window.params.queryParamsMax = 8;
+                intializesSpeciesHabitatInterest(false);
                 updateGallery('/species/list', 8, 0, undefined, true);
             });
 

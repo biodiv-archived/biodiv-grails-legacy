@@ -233,6 +233,8 @@
 
         <asset:script>
         $(document).ready(function(){
+            
+            intializesSpeciesHabitatInterest(false);
                         <%
             if(observationInstance?.group) {
             out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
