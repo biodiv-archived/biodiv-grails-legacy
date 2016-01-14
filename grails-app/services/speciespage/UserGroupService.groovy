@@ -1406,7 +1406,7 @@ class UserGroupService {
 		
 		SUser currUser = springSecurityService.currentUser;
 		//returning true for user with admin role
-		if(utilsService.isAdmin(currUser?.id)){
+		if(utilsService.isAdmin(currUser)){
 			return true
 		}
 		

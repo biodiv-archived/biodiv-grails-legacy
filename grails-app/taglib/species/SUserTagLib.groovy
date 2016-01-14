@@ -162,7 +162,7 @@ class SUserTagLib {
 	def isAdmin = { attrs, body ->
 		def user = attrs.model ? attrs.model.user : null;
 		user = user?:springSecurityService.getCurrentUser()
-		if (utilsService.isAdmin(user?.id)) {
+		if (utilsService.isAdmin(user)) {
 			out << body()
 		}
 	}

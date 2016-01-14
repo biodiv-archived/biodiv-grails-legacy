@@ -220,7 +220,7 @@ abstract class Metadata {
 			return 0
 		}
 		//for backend thred e.g download request reqUser will be passed as argument
-		if(reqUser && (reqUser.id == author.id || utilsService.isAdmin(reqUser.id))){
+		if(reqUser && (reqUser.id == author.id || utilsService.isAdmin(reqUser))){
 			return 0
 		}
 		return Utils.getRandomFloat()
