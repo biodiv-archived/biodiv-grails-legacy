@@ -67,7 +67,7 @@ $(document).ready(function(){
     });
 
     $('#observationMediaFilter').button();
-    if(window.params.isMediaFilter ==  undefined || window.params.isMediaFilter == 'true' ){
+    if(window.params.isMediaFilter ==  undefined || window.params.isMediaFilter == 'true' || window.params.isMediaFilter == ''){
         $("#observationMediaAllFilterButton").removeClass('active');
         $("#observationMediaOnlyFilterButton").addClass('active');
     }else{
