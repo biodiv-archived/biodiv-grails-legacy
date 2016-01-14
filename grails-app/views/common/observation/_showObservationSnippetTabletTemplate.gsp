@@ -176,4 +176,6 @@ def obvId = observationInstance?.id
 </div>
 </g:if>
  <br>
- <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />
+<g:if test="${observationInstance}">
+    <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />
+</g:if>
