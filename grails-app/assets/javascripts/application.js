@@ -105,7 +105,7 @@
 
 ////bulkupload
 //= require biodiv/parseUtil.js
-//= require biodiv/jquery.csv-0.71.min.js
+//= require jquery.plugins/jquery.csv-0.71.min.js
 //= require biodiv/observations/upload.js
 
 ////= require chart
