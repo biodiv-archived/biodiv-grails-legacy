@@ -40,6 +40,8 @@ import org.apache.commons.codec.binary.Hex;
 import grails.converters.JSON;
 import species.auth.Role;
 import species.auth.SUser;
+import species.auth.SUserRole;
+
 
 class UtilsService {
 
@@ -984,7 +986,7 @@ class UtilsService {
 
 	boolean isAdmin(SUser user) {
 		if(!user) return false
-		return SUser.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
+		return SUserRole.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
 	}
 	
 	boolean isCEPFAdmin(id) {
