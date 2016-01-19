@@ -4,8 +4,8 @@
 
 <% def observationUserGroups = observationInstance.userGroups;
     if(observationInstance.hasProperty('sourceId')){
-        if(observationInstance.id != observationInstance.sourceId){
-            observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
+        if(observationInstance.id != observationInstance.sourceId && observationInstance?.sourceId){
+            observationUserGroups.addAll(Observation.read(observationInstance?.sourceId).userGroups);
         }
     }
 %>
