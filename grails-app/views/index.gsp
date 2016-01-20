@@ -80,7 +80,7 @@
             <div class="navblock" style="margin-top:20px;">
                 <b><big>&nbsp;<a name="partners"><g:message code="link.partners" /></a></big></b>
                 <div class="partners">
-                            <a href="http://www.altlawforum.org/"><img class="img-polaroid" src="/sites/default/files/alf_standard.png"></a>
+<%--                            <a href="http://www.altlawforum.org/"><img class="img-polaroid" src="/sites/default/files/alf_standard.png"></a>--%>
                             <a><img class="img-polaroid" src="/sites/default/files/abct_standard.png"></a>
                             <a href="http://www.atree.org/"><img class="img-polaroid" src="/sites/default/files/atree.png"></a>
                             <a href="http://www.azimpremjiuniversity.edu.in/"><img class="img-polaroid" src="/sites/default/files/apu_standard.png"></a>
