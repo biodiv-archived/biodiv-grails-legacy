@@ -62,14 +62,6 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
-    private static long SEARCH_IBP_COUNTER = 0;
-    private static long CAN_ZERO = 0;
-    private static long CAN_SINGLE = 0;
-    private static long CAN_MULTIPLE = 0;
-    private static long AFTER_CAN_MULTI_ZERO = 0;
-    private static long AFTER_CAN_MULTI_SINGLE = 0;
-    private static long AFTER_CAN_MULTI_MULTI = 0;
-    
     public static Set namesInWKG = new HashSet();
 
     public static Map namesBeforeSave = [:];
@@ -96,10 +88,8 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-        SEARCH_IBP_COUNTER ++;
         println "======PARAMS FOR SEARCH IBP ===== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " :::: userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
-        //Decide in what class to search TaxonomyDefinition/SynonymsMerged
-        def res = [];
+        List res = [];
 		
         def clazz
         if(status == NameStatus.ACCEPTED || !status) {
@@ -107,10 +97,29 @@ class NamelistService {
         } else {
             clazz = SynonymsMerged.class; 
         }
-        //println "====SEARCHING ON IBP IN CLASS ====== " + clazz
-        clazz.withNewTransaction{
+        
+		clazz.withNewTransaction{
+			if(normalizedForm || authorYear){
+				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
+				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
+				println "Searching using normalized form + rank + status"
+				res = clazz.withCriteria(){
+					and{
+						eq('normalizedForm', normalizedForm)
+						if(status) eq('status', status)
+						if(rank >= 0)
+							eq('rank', rank)
+						if(!searchInNull){
+							isNotNull('position')
+						}
+					}
+				}
+			}
 			
-            println  "Searching canonical + rank + status"
+			if(res)
+				return res
+			
+			println  "No result in Normalized form using canonical form now"
             res = clazz.withCriteria(){
 				and{
 					eq('canonicalForm', canonicalForm)
@@ -130,57 +139,8 @@ class NamelistService {
 					}
 				}
             }
+		}
 			
-			//CANONICAL ZERO MATCH OR SINGLE MATCH
-            if(res.size() < 2) { 
-                if(res.size() == 0 ) {
-                    CAN_ZERO ++;
-                } else {
-                    CAN_SINGLE ++;
-					
-                }
-            }
-            //CANONICAL MULTIPLE MATCH
-            else {
-                CAN_MULTIPLE ++;
-                println " constructed normalized form + rank + status"
-				if(!authorYear) authorYear = '';
-                res = clazz.withCriteria(){
-					and{
-						eq('normalizedForm', canonicalForm + " " + authorYear)
-						if(status) eq('status', status)
-						if(rank >= 0)
-							eq('rank', rank)
-						if(!searchInNull){
-							isNotNull('position')
-						}
-					}
-                }
-                if(res.size() == 1) {
-                    AFTER_CAN_MULTI_SINGLE ++;
-                }else if(res.size() == 0) {
-                    AFTER_CAN_MULTI_ZERO ++;
-				}else {
-                	AFTER_CAN_MULTI_MULTI ++;
-                }
-            }
-			
-			if(res.isEmpty() && normalizedForm){
-				println "Searching normalized form + rank + status"
-				res = clazz.withCriteria(){
-					and{
-						eq('normalizedForm', normalizedForm)
-						if(status) eq('status', status)
-						if(rank >= 0)
-							eq('rank', rank)
-						if(!searchInNull){
-							isNotNull('position')
-						}
-					}
-				}
-			}			
-        }
-		
 		if(res.isEmpty()){
 			String key = canonicalForm + rank 
 			def resName = COL_CREATED_NAME.get(key)
@@ -188,8 +148,8 @@ class NamelistService {
 				res = [resName]
 			}
 		}
-		println "=========== FINAL SEARCH RESULT " + res
 		
+		println "=========== FINAL SEARCH RESULT " + res
 		return res;
     }
     
@@ -238,7 +198,7 @@ class NamelistService {
 						return
 					}
 					
-					List ibpResult = searchIBP(name.canonicalForm, null, null, names[i].rank)
+					List ibpResult = searchIBP(name.canonicalForm, name.authorYear, null, names[i].rank, false, name.normalizedForm, true)
 					ibpResult.each { TaxonomyDefinition t ->
 		                t = TaxonomyDefinition.get(t.id)
 						tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
