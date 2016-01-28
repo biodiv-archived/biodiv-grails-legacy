@@ -149,7 +149,7 @@ if(r) {
                                     <img class="galleryImage"
                                     src="${gallThumbImagePath}" 
                                     data-original="${r.url?:createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
-                                    title="${r?.description}" /> </a>
+                                    /> </a>
 
                                 <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
                                 </g:if>
@@ -310,7 +310,7 @@ $(document).ready(function(){
             lightbox: false,
             carousel : true,
             transition : 'pulse',
-            image_pan_smoothness : 5,
+            imagePanSmoothness : 5,
             showInfo : true,
             dataSelector : ".galleryImage",
             debug : false,
@@ -321,6 +321,7 @@ $(document).ready(function(){
             thumbnails:true,
             showCounter:true,
             idleMode:false,
+            imageCrop:false,
             youtube : {
                             modestbranding: 1,
                             autohide: 1,

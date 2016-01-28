@@ -3,7 +3,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
 <head>
-<g:set var="title" value="${g.message(code:'datasource.value.user')} "/>
+<g:set var="title" value="${g.message(code:'button.datasources')} "/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
 </head>
 <body>

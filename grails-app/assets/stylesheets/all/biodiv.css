@@ -749,9 +749,9 @@ ul#recoSummary {
 	padding: 2px;
 	position: relative;
         width:100%;
+	background-color: #ffffff;
 }
 .observation_story_body, .species_story {
-	background-color: #ffffff;
 }
 
 .addObservation .imagesList, #addResourcesModal .imagesList, #addSpFieldResourcesModal .imagesList {
@@ -3112,4 +3112,17 @@ small {
     width: 110px;
     height: 55px;
     margin: 5px;
+}
+
+
+.observations_list thead th {
+	background: rgba(106, 201, 162, 0.2);
+}
+
+.observations_list .table tbody tr:hover td, .observations_list  .table tbody tr:hover th {
+	background-color: #FEFAD5;
+}
+
+.observations_list .table {
+	background-color: white;
 }

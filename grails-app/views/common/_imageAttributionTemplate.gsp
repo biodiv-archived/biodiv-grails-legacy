@@ -54,10 +54,6 @@
         <g:if test="${resource.url}">
         <a href="${resource.url}" target="_blank"><b><g:message code="link.image.source" /></b> </a>
         </g:if>
-        <g:if test="${resource.accessRights}">
-            ${resource.accessRights}
-        </g:if>
- 
         <g:if test="${resource.annotations}">
             <obv:showAnnotation model="[annotations:JSON.parse(resource.annotations)]" />
         </g:if>
