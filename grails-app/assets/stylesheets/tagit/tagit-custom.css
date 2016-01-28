@@ -1,0 +1,100 @@
+
+/* ul.tagit li { */
+/*     -moz-border-radius: 5px; */
+/*     border-radius: 5px; */
+/*     display: block; */
+/*     float: left; */
+/*     margin: 2px 5px 2px 0; */
+/*     position: relative; */
+/* } */
+
+ul.tagit li.tagit-choice {
+    background-color: #DEE7F8;
+    border: 1px solid #CAD8F3;
+/*     padding: 2px 13px 3px 4px; */
+/*     max-width: 200px; */
+/*     width:auto; */
+}
+
+ul.tagit li.tagit-choice.selected {
+    background-color: #f5b0b0;
+    border-color: #f76464;
+}
+
+ul.tagit li.tagit-choice:hover {
+    background-color: #bbcef1;
+    border-color: #6d95e0;
+    cursor: hand; 
+    cursor: pointer;
+}
+
+/* ul.tagit li.tagit-new { */
+/*     padding: 2px 4px 3px; */
+/*     padding: 2px 4px 1px; */
+/*     padding: 2px 4px 1px 0; */
+/* } */
+
+/* ul.tagit li.tagit-choice input { */
+/*     display: block; */
+/*     float: left; */
+/*     margin: 0 5px 0 0; */
+/*     padding-top: 2px; */
+/*     padding-bottom: 2px; */
+/* } */
+
+/* ul.tagit li.tagit-choice a.tagit-close { */
+/*     color: #777777; */
+/*     cursor: pointer; */
+/*     font-size: 12px; */
+/*     font-weight: bold; */
+/*     outline: medium none; */
+/*     padding: 2px 0 2px 3px; */
+/*     text-decoration: none; */
+/*     position: absolute; */
+/*     display: block; */
+/*     top: 0; */
+/*     right: 3px; */
+/*     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.7); */
+/* } */
+
+/* ul.tagit li.tagit-choice a.tagit-close:hover { */
+/*     color: #535353; */
+/* } */
+
+/* ul.tagit input[type="text"] { */
+/*     -moz-box-sizing: border-box; */
+/*     border: none !important; */
+/*     margin: 0 !important; */
+/*     padding: 0 !important; */
+/*     width: inherit !important; */
+/*     outline: none; */
+/* } */
+
+/* .tagit-hiddenSelect { */
+/*     display:none; */
+/* } */
+
+/* .view_tags ul.tagit li.tagit-choice a.tagit-close { */
+/* display:none; */
+/* } */
+
+/* .view_tags ul.tagit li.tagit-new { */
+/* display:none; */
+/* } */
+
+/* .view_tags ul.tagit { */
+/*     cursor: default; */
+/*     overflow: auto; */
+/*     width: 97%; */
+/*     padding: 3px; */
+/*     margin-top: 2px; */
+/*     margin-right: 6px; */
+/*     margin-bottom: 2px; */
+/*     background-color: transparent; */
+/*     border: 0; */
+/*     clear:both; */
+/* } */
+
+/* .view_tags ul.tagit li.tagit-choice { */
+/*     cursor: pointer; */
+/* } */

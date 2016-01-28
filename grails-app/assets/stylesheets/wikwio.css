@@ -1,0 +1,332 @@
+/**
+ *  * All common style rules for biodiv application
+ *   * Any specific rules have to go into ${grailsApplication.config.speciesPortal.app.codeName}.css
+ *    */     
+#big_map_canvas {
+    height: 200px;
+    width: 100%;
+}   
+
+.span4 #big_map_canvas {
+    height: 200px; 
+}   
+
+.span6 #big_map_canvas {
+    height: 200px; 
+}
+
+/**
+ *  * Style used to position the map of bhutan
+ *   * */
+.span12  {
+        width:960px;
+}
+.span4 {
+        width:320px;
+        margin-left:10px;
+}
+/**#big_map_canvas  {
+        height: 200px;
+        width: 320px;
+}*/
+
+/**
+ * Accordian Styles
+ * **/
+.accordion {
+	position:relative;
+	margin:0;
+	padding: 0px;
+	width:960px;
+	height:300px;
+	overflow: hidden;
+}
+
+.accordion ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	display: block;
+	height: 300px;
+	position: relative;
+}
+
+.accordion ul li {
+	width: 160px;
+	float: left;
+	display: block;
+	overflow: hidden;
+}
+
+.accordion ul li a {
+	text-indent: -1000px;
+	background:#fff repeat scroll 0%;
+	border-right: 2px solid #fff;
+	cursor:pointer;
+	display:block;
+	overflow: hidden;
+	height: 300px;
+}
+
+.accordion ul li#species a {
+	background: url(../images/accordion/species.png) repeat scroll 0%;
+}
+
+.accordion ul li#observations a {
+	background: url(../images/accordion/observations.png) repeat scroll 0%;
+}
+
+.accordion ul li#maps a {
+	background: url(../images/accordion/maps.png) repeat scroll 0%;
+}
+
+.accordion ul li#documents a {
+	background: url(../images/accordion/documents.png) repeat scroll 0%;
+}
+
+.accordion ul li#groups a {
+	background: url(../images/accordion/groups.png) repeat scroll 0%;scroll
+}
+
+.accordion ul li#about-us a{
+	background: url('../images/accordion/about-us.png') repeat scroll 0%;
+	border-right-style: none;
+}
+
+.clear {
+	clear: both;
+}
+
+
+/**
+ *Custom Colors for BBP
+ * */
+div.container.group-theme.navbar {
+	width:960px;
+	height:90px;
+}
+
+/*
+div.navbar.navbar-static-top.btn {
+	background-color: rgb(255, 163, 102);
+	background-image: none;
+}
+
+div.navbar-inner  {
+	background-color: rgb(255, 163, 102);
+}
+
+div#species_main_wrapper {
+	background-color: rgb(222, 239, 222);
+}
+*/
+
+a.collapsed  {
+	background-color: rgb(68, 68, 68);
+	background-image: none;
+}
+
+a.btn.btn-success {
+	background-color: rgb(68, 68, 68);
+	background-image: none;
+}
+
+html {
+	background-color: rgb(222, 239, 222);
+}
+
+.navbar .nav .active a, .navbar .nav .active a:hover, .navbar .nav .active a:focus {
+	background-color: rgb(255, 227, 209);
+}
+
+/*#ibp-footer  {
+	background-color: rgb(244, 233, 201);
+	background-image: none;
+}
+
+#ibp-header  {
+	background-color: rgb(244, 233, 201);
+	background-image: none;
+}
+*/
+
+#feedback_button {
+	display:none;
+}
+
+/*
+.container .outer-wrapper  {
+	background-color: rgb(244, 233, 201);
+}
+*/
+
+.contributeButton a {
+	background-color: #4B6400; 
+	background-image: none;
+}
+
+.contributeButton {
+	background-color: #5D7419; 
+}
+
+#ibp-header-bar  {
+	height:32px;
+	line-height:15px;
+}
+
+#ibp-header-bar .navbar-inner {
+	height:32px;
+}
+
+#ibp-header-bar .navbar-inner .container {
+	height:32px;
+}
+
+.navbar .nav .active a, .navbar .nav .active a:hover, .navbar .nav .active a:focus {
+	background-color: #B2CC80;
+}
+
+.thumbnail .rich_species_content  {
+	margin: 1px 7px 7px 1px;
+	padding: 0.5px;
+}
+
+#imagelogo {
+	height:45px;
+	width:350px;
+}
+
+.brand  {
+	width:350px;
+	margin-left: 140px;
+}
+
+.pull-right  {
+	float:right;
+}
+
+
+/***OVERWITES************/
+/* Bootstrap overrides */
+/*body{
+	background:#f0fccf;
+}*/
+div.navbar.navbar-static-top.btn{
+	background:#8ca643;
+}
+
+/* Custom CSS */
+#ibp-header{
+	background:url('../images/header-bg.jpg') no-repeat center center fixed;
+	border-bottom:1px solid #829c38;
+	 -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+	background-size: cover;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/header-bg.jpg', sizingMethod='scale');
+	-ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/header-bg.jpg', sizingMethod='scale')";
+	zoom:1;
+}
+#ibp-header .navbar .nav>li>a, #ibp-header .navbar .nav>li>a:hover{
+}
+
+#ibp-footer, .gradient-bg-reverse{
+	background:#8ca643;
+}
+.links_box_column li, .links_box_column li a{
+	color:#fff;
+}
+.powered{
+	/*background:#fff;*/
+	font-size:.8em;
+}
+.about-us{
+	background:#fff;
+	padding:10px;
+	margin-bottom:10px;10pxoverflow: auto;
+}
+
+h2{
+	color:#db7421;
+	font-size:1.5em;
+	margin:0;
+}
+.about-us a{
+	display:block;
+	float:right;
+	color:#db7421;
+}
+
+/*.table  {
+	width:630px;
+}*/
+
+#map1311326056727  {
+	height:370px;
+	width:100%;
+}
+
+.writeup  {
+	width:700px;
+	float:left;
+}
+
+ .staticnav  {
+	width:200px;
+	float:right;
+	margin-top:20px;
+ }
+
+ .donors_logo  {
+	width:100px;
+	height:100px;
+ }
+
+ .quote {
+	height:10px;
+	width:10px;
+ }
+
+ /*Side Navigation */
+#sidenav ul  {
+	list-style-type: none;
+}
+
+#sidenav ul li  {
+	width:300px;
+	height:30px;
+}
+
+#sidenav ul li a  {
+	color: #db7421;
+	text-decoration:none;
+}
+
+#sidenav ul li a:hover  {
+	color: #B2CC80;
+}
+
+#sidenav ul li a:active  {
+	color: black;
+}
+
+
+
+
+/*Maps TOC  */
+ .layer_explorer_sidebar_items li a   {
+	padding-left:15px;
+ }
+
+
+.logo {
+border: 0 none;
+height: 90px;
+max-width: 220px;
+margin-left: 0px;
+margin-right: 16px;
+}
+#home #IDAOTool {
+background-image: url(../images/IDAO.png);
+}
+

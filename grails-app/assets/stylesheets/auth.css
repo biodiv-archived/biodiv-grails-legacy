@@ -1,0 +1,108 @@
+#createButton {
+	float: right;
+	margin: 3px;
+}
+
+div.openid-loginbox {
+	width: 450px;
+	margin-left: auto;
+	margin-right: auto;
+	/* 	background: #F5F5F5; */
+	border: 1px solid #E5E5E5;
+	padding: 15px;
+	margin: 10px auto;
+}
+
+.openid-loginbox-inner {
+	width: 100%;
+}
+
+td.openid-loginbox-title {
+	border-bottom: 1px #c0c0ff solid;
+	padding: 10px;
+	width: 100%;
+	font-size: 18px;
+}
+
+.openid-loginbox-useopenid {
+	font-weight: normal;
+	font-size: 14px;
+}
+
+.external_providers img {
+	border: 0;
+	vertical-align: middle;
+	padding-right: 3px;
+}
+
+.openid-loginbox-userpass {
+	border-top: 1px #eee solid;
+	margin: 3px 3px 3px 8px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%
+}
+
+table.openid-loginbox-userpass td {
+	height: 25px;
+	padding: 3px;
+}
+
+.openid-loginbox .form-horizontal .control-label {
+	width: 78px;
+	font-weight: bold;
+}
+
+.openid-loginbox .form-horizontal .controls {
+	margin-left: 90px;
+}
+
+form {
+	margin: 0 0;
+}
+
+legend+.control-group {
+	margin: 0;
+}
+
+input+.external_bttn, .external_bttn {
+	cursor: pointer;	
+	width: 100px;
+	height: 33px;
+	border: 0;	
+	float: left;
+	margin: 3px;
+	background-repeat : no-repeat;
+}
+
+
+.fbJustConnect {
+	opacity: 0;
+ 	filter: alpha(opacity = 0);         
+	float: right; /*IE hack*/
+}
+
+.facebookButton {
+	margin-left: 6px;
+	background-image: url('../images/external_providers.png');
+	background-position: 0 0;
+}
+
+.googleButton {
+	background-image: url('../images/external_providers.png');
+	background-position: 0 -33px;
+}
+
+.googleConnect {
+	opacity: 0;
+}
+
+.yahooButton {
+	background-image: url('../images/external_providers.png');
+	background-position: 0 -99px;
+}
+
+.yahooConnect {
+	opacity: 0;
+}
+
