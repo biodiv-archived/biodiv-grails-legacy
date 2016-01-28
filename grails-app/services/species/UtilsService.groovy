@@ -41,6 +41,8 @@ import org.apache.commons.codec.binary.Hex;
 import grails.converters.JSON;
 import species.auth.Role;
 import species.auth.SUser;
+import species.auth.SUserRole;
+
 
 class UtilsService {
 
