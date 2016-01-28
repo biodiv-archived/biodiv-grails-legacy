@@ -2,7 +2,7 @@
 <%@page import="species.utils.ImageType"%>
 <g:set var="mainImage" value="${observationInstance?.mainImage()}" />
 <%
-def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource ? '.png' :null): null;
+def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource||observationInstance.dataset ? '.png' :null): null;
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance?.id
 %>
@@ -183,6 +183,4 @@ def obvId = observationInstance?.id
 </div>
 </g:if>
  <br>
-<g:if test="${observationInstance}">
     <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />
-</g:if>

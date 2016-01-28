@@ -25,6 +25,9 @@ import content.eml.Coverage;
 import speciespage.ObservationService;
 import species.Species;
 import species.dataset.Dataset;
+import au.com.bytecode.opencsv.CSVReader;
+import java.io.InputStream;
+
 
 class Observation extends DataObject {
 	
@@ -63,7 +66,10 @@ class Observation extends DataObject {
 		FOSSIL_SPECIMEN ("Fossil Specimen"),
 		LIVING_SPECIMEN ("Living Specimen"),
 		HUMAN_OBSERVATION ("Human Observation"),
-		MACHINE_OBSERVATION ("Machine Observation")
+		MACHINE_OBSERVATION ("Machine Observation"),
+        MATERIAL_SAMPLE("Material Sample"),
+        OBSERVATION("Observation"),
+        UNKNOWN("Unknown")
 		
 		private String value;
 
@@ -93,8 +99,13 @@ class Observation extends DataObject {
 					return BasisOfRecord.HUMAN_OBSERVATION
 				case 'MACHINE_OBSERVATION':
 					return BasisOfRecord.MACHINE_OBSERVATION
+				case 'MATERIAL_SAMPLE':
+					return BasisOfRecord.MATERIAL_SAMPLE
+				case 'OBSERVATION':
+					return BasisOfRecord.OBSERVATION
+	
 				default:
-					return null	
+					return BasisOfRecord.UNKNOWN	
 			}
 		}
 	}
@@ -102,6 +113,8 @@ class Observation extends DataObject {
 	public enum ProtocolType {
 
         DWC_ARCHIVE,
+        DIGIR,
+        BIOCASE,
         TEXT,
         LIST,
         SINGLE_OBSERVATION,
@@ -126,6 +139,10 @@ class Observation extends DataObject {
 			switch(value){
 				case 'DWC_ARCHIVE':
 					return ProtocolType.DWC_ARCHIVE
+			case 'DIGIR':
+					return ProtocolType.DIGIR
+			case 'BIOCASE':
+					return ProtocolType.BIOCASE
 				case 'TEXT':
 					return ProtocolType.TEXT
 				case 'LIST':
@@ -218,7 +235,8 @@ class Observation extends DataObject {
 	 */
 	Resource mainImage() {
 		def res = listResourcesByRating(1);
-        if(res) 
+        println res.fileName;
+        if(res && !res.fileName[0].equals('i')) 
             return res[0]
 		else
 			return group?.icon(ImageType.ORIGINAL)
@@ -511,7 +529,7 @@ class Observation extends DataObject {
     String summary(Language userLanguage=null) {
         String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
 		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
-        desc += " at <b>'" + (this.placeName.trim()?:this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
+        desc += " at <b>'" + (this.placeName?.trim()?'':this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
         return desc
     }
 
@@ -674,7 +692,24 @@ class Observation extends DataObject {
 			}
 		} else if(checklistAnnotations) {
             res = JSON.parse(checklistAnnotations);
-            res = res.sort { it.value.order }
+            
+            //read dwcObvMapping
+            InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
+            Map dwcObvMapping = [:];
+            int l=0;
+            dwcObvMappingFile.eachLine { line ->
+                if(l++>0) { 
+                    String[] parts = line.split(/\t/)
+                    if(parts.size()>=8 && (parts[6] || parts[7])) {
+                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'field':parts[7], 'order':Float.parseFloat(parts[6])];
+                    }
+                    else if(parts.size()>=7 && parts[6]) {
+                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'field':'', 'order':Float.parseFloat(parts[6])];
+                    }
+                }
+            }
+
+            res = res.sort { println it;dwcObvMapping[it.key.toLowerCase()].order }
         }
 		return res
 	}

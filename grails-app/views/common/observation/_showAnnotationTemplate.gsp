@@ -5,12 +5,12 @@
 			<tbody class="mainContentList">
 				<g:each in="${annotations}" status="i"
 					var="annot">
+                    <g:if test="${annot.value}">
 					<tr class="mainContent">
 						<td style="word-wrap:break-word;">
 							${annot.key.replaceAll("_", " ").capitalize()}
 						</td>
 						<td class="ellipsis multiline" style="word-wrap:break-word;">
-                            ${annot.value.class}
                             <g:if test="${annot.value instanceof Map}">
                                 <span class="linktext">
                                     ${annot.value.value}
@@ -20,7 +20,8 @@
 							    ${annot.value}
                             </g:else>
 						</td>
-					</tr>
+                    </tr>
+                    </g:if>
 				</g:each>
 			</tbody>
 		</table>

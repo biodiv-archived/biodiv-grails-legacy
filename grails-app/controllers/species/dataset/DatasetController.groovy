@@ -243,4 +243,12 @@ class DatasetController extends AbstractObjectController {
         return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset']
 	}
 
+	@Secured(['ROLE_ADMIN'])
+    def uploadGbifData() {
+        def uploadLog = new File(params.logFile);
+        if(uploadLog.exists()) uploadLog.delete();
+        println "Printing log to : "+ uploadLog.getAbsolutePath()
+        datasetService.importGBIFObservations(Dataset.read(params.id), new File(params.dwcArchivePath), uploadLog);
+        render ""
+    }
 }

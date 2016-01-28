@@ -134,22 +134,25 @@ class ObservationService extends AbstractMetadataService {
         //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
-	        def resourcesXML = createResourcesXML(params);
-            def instance = observation
-            if(params.action == "bulkSave"){
-                instance = springSecurityService.currentUser
-            }
-	        def resources = saveResources(instance, resourcesXML);
-	        observation.resource?.clear();
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-	        resources.each { resource ->
-                if(!resource.context){
-                    resource.saveResourceContext(observation)
-                }
-	            observation.addToResource(resource);
-	        }
-		}
+            updateResources(observation, params);
+    	}
         return observation;
+    }
+
+    void updateResource(instance, params) {
+        def resourcesXML = createResourcesXML(params);
+        if(params.action == "bulkSave"){
+            instance = springSecurityService.currentUser
+        }
+        def resources = saveResources(instance, resourcesXML);
+        observation.resource?.clear();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        resources.each { resource ->
+            if(!resource.context){
+                resource.saveResourceContext(observation)
+            }
+            observation.addToResource(resource);
+        }
     }
 
     Map saveObservation(params, sendMail=true, boolean updateResources = true) {
@@ -688,13 +691,20 @@ class ObservationService extends AbstractMetadataService {
     * 
     **/
     Map getRecommendations(String recoName, String canName, String commonName, String languageName, Long speciesId=null) {
-        def languageId = Language.getLanguage(languageName).id;
         //		def refObject = params.observation?:Observation.get(params.obvId);
 
         //if source of recommendation is other that observation (i.e Checklist)
         //		refObject = refObject ?: params.refObject
-        Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
-        Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId);
+        Recommendation commonNameReco, scientificNameReco;
+        if(commonName) {
+            utilsService.benchmark('findReco.commonName') {
+                def languageId = Language.getLanguage(languageName).id;
+                commonNameReco = recommendationService.findReco(commonName, false, languageId, null, true, null, false);
+            }
+        }
+        utilsService.benchmark('findReco.sciName') {
+            scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId, false);
+        }
 
         //		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
 

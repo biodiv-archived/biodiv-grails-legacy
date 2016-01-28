@@ -104,6 +104,9 @@ class ObvUtilService {
 	def commentService
     def messageSource;
 
+    SpeciesGroup defaultSpeciesGroup;
+    Habitat defaultHabitat;
+
 	///////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
@@ -618,6 +621,9 @@ class ObvUtilService {
         Map obvParams = [:];
         boolean result;
 
+        if(!defaultSpeciesGroup) defaultSpeciesGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
+        if(!defaultHabitat) defaultHabitat = Habitat.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
+
         utilsService.benchmark ('uploadObv') {
             utilsService.benchmark ('uploadImage') {
                 if(m[IMAGE_FILE_NAMES]) {
@@ -632,9 +638,10 @@ class ObvUtilService {
                 populateParams(obvParams, m)
             }
 
+
             log.debug "Populated Obv Params ${obvParams}"
             utilsService.benchmark('saveObv') {
-                result = saveObv(obvParams, resultObv, uploadLog)
+                result = saveObv(obvParams, resultObv, uploadLog, true)
             }
         }
         return result;
@@ -643,8 +650,10 @@ class ObvUtilService {
 	private void populateParams(Map obvParams, Map m){
 		
 		//mandatory
-		obvParams['group_id'] = m[SPECIES_GROUP]?((SpeciesGroup.findByName(m[SPECIES_GROUP].trim())? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()).id : SpeciesGroup.findByName('Others').id)):SpeciesGroup.findByName('Others').id
-		obvParams['habitat_id'] = m[HABITAT] ? (Habitat.findByName(m[HABITAT].trim())? Habitat.findByName(m[HABITAT].trim()).id :  Habitat.findByName('Others').id ):Habitat.findByName('Others').id 
+        SpeciesGroup sG = m[SPECIES_GROUP] ? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()) : null
+		obvParams['group_id'] = m[SPECIES_GROUP]?(sG ? sG.id : defaultSpeciesGroup.id):defaultSpeciesGroup.id
+        Habitat h = m[HABITAT] ? Habitat.findByName(m[HABITAT].trim()) : null;
+        obvParams['habitat_id'] = m[HABITAT] ? ( h ? h.id :  defaultHabitat.id ): defaultHabitat.id 
 		obvParams['longitude'] = m[LONGITUDE]
 		obvParams['latitude'] = m[LATITUDE]
 		obvParams['location_accuracy'] = 'Approximate'
@@ -734,7 +743,7 @@ class ObvUtilService {
 		return gIds.join(",")
 	}
 	
-	private boolean saveObv(Map params, List result, File uploadLog=null) {
+	private boolean saveObv(Map params, List result, File uploadLog=null, boolean newObv=false) {
         boolean success = false;
 		if(!params.author && !params.originalAuthor) {
 			log.error "Author not found for params $params"
@@ -755,44 +764,12 @@ class ObvUtilService {
                 success=true;
 
 				params.obvId = observationInstance.id
-				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                
-                params.identifiedBy = params.identifiedBy
-
-                utilsService.benchmark('addReco') {
-				    addReco(params, observationInstance)
+                if(!newObv) {
+                    //TODO: new observation dont add activityfeed else add
+                    activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
                 }
 
-                if(uploadLog) uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
-println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
-                if(observationInstance.dataset && observationInstance.maxVotedReco?.taxonConcept &&observationInstance.maxVotedReco?.taxonConcept.group ) {
-                    observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
-                }
-
-                utilsService.benchmark('settags') {
-                    def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
-                    observationInstance.setTags(tags);
-                }
-
-                utilsService.benchmark('setGroups') {
-                    if(params.groupsWithSharingNotAllowed) {
-                        observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
-                    } else {
-                        if(params.userGroupsList) {
-                            def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-                            observationService.setUserGroups(observationInstance, userGroups, false);
-                        }
-                    }
-                }
-
-				if(!observationInstance.save(flush:true)){
-                    if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
-					observationInstance.errors.allErrors.each { 
-                        if(uploadLog) uploadLog << "\n"+it; 
-                        log.error it 
-                    }
-				}
-
+                postProcessObervation(params, observationInstance, newObv);
 				result.add(observationInstance.id)
 				
             } else {
@@ -809,32 +786,90 @@ println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} 
 		//}
         return success;
 	}
-	
-	private addReco(params, Observation observationInstance){
-		def recoResultMap = observationService.getRecommendation(params);
+
+    private postProcessObervation(params, observationInstance, boolean newObv=false) {
+        params.identifiedBy = params.identifiedBy;
+
+        utilsService.benchmark('addReco') {
+            addReco(params, observationInstance, newObv)
+        }
+
+        if(uploadLog) 
+            uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id;
+        println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
+        if(observationInstance.dataset && observationInstance.maxVotedReco?.taxonConcept &&observationInstance.maxVotedReco?.taxonConcept.group ) {
+            observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
+        }
+
+        utilsService.benchmark('settags') {
+            def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
+            observationInstance.setTags(tags);
+        }
+
+        utilsService.benchmark('setGroups') {
+            if(params.groupsWithSharingNotAllowed) {
+                observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
+            } else {
+                if(params.userGroupsList) {
+                    def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
+                    observationService.setUserGroups(observationInstance, userGroups, false);
+                }
+            }
+        }
+
+        if(!observationInstance.save(flush:true)){
+            if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
+                observationInstance.errors.allErrors.each { 
+                    if(uploadLog) uploadLog << "\n"+it; 
+                    log.error it 
+                }
+        }
+    }
+
+	private addReco(params, Observation observationInstance, boolean newObv=false){
+		def recoResultMap;
+        utilsService.benchmark('observationService.getRecommendation') {
+            params.flushImmediately = false;
+            recoResultMap = observationService.getRecommendation(params);
+        }
 		def reco = recoResultMap.mainReco;
 		def commonNameReco =  recoResultMap.commonNameReco;
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
 		
 		def recommendationVoteInstance
+        Date dateIdentified = params.dateIdentified ? utilsService.parseDate(params.dateIdentified) : observationInstance.createdOn;
 		if(reco){
-		    recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
+            utilsService.benchmark('RecommendationVote.findByAuthorAndObservation') {
+		        recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
+            }
             if(!recommendationVoteInstance) {
-			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy, confidence:confidence); 
+			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy, confidence:confidence, votedOn:dateIdentified); 
             }
 		}
 		
-		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save(flush: true)) {
+        utilsService.benchmark('savingRecoVote') {
+		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save()) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
 			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, params.identifiedBy);
 
-            Date dateIdentified = params.dateIdentified ? utilsService.parseDate(params.dateIdentified) : new Date()
 			observationInstance.lastRevised = dateIdentified;
-			//saving max voted species name for observation instance
-			observationInstance.calculateMaxVotedSpeciesName();
-			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+            utilsService.benchmark('observationInstance.calculateMaxVotedSpeciesName') {
+			    //saving max voted species name for observation instance
+                //TODO: new obv and from bulk upload set it by default
+                if(newObv) {
+                    observationInstance.maxVotedReco = recommendationVoteInstance.recommendation;
+                } else {
+    			    observationInstance.calculateMaxVotedSpeciesName();
+                }
+            }
+
+            if(!newObv) {
+                //TODO: new observation dont add activityfeed else add
+                def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+            }
         } else {
             recommendationVoteInstance.errors.allErrors.each { log.error it }
+        }
         }
 
 			

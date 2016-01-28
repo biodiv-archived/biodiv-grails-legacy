@@ -10,7 +10,10 @@ class Language {
 	String region;
 	//to identify language for curation
 	boolean isDirty = false;
-	
+
+    static Language defaultLanguage;
+    static transients = ['defaultLanguage']
+
     static constraints = {
 		threeLetterCode(blank:false, nullable:false, unique:true);
 		twoLetterCode(nullable:true);
@@ -28,8 +31,9 @@ class Language {
 		Language lang = null;
 		
 		if(!languageName || languageName.trim() == ""){
-			lang = Language.findByNameIlike(DEFAULT_LANGUAGE);
-		}else{ 
+            if(!Language.defaultLanguage) Language.defaultLanguage = Language.findByName(DEFAULT_LANGUAGE);
+			return Language.defaultLanguage;
+        } else{ 
 			lang = Language.findByNameIlike(languageName.trim());
 			if(!lang){
 				//inserting new language

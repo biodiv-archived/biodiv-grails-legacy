@@ -434,6 +434,8 @@ alter table observation alter column basis_of_record set  not null;
 
 insert into license(id,name) values (828,'UNSPECIFIED');
 
+alter sequence hibernate_sequence restart with 600000;
+
 alter table dataset add column type varchar(255);
 update dataset set type='OBSERVATIONS';
 alter table dataset alter column type set not null;
@@ -445,15 +447,48 @@ ALTER TABLE dataset ALTER COLUMN description type text;
 ALTER TABLE datasource ALTER COLUMN description type text;
 
 #28th Dec 2015
-alter table dataset add column datasource_id bigint;
-update dataset set datasource_id='1';
-alter table dataset alter column datasource_id set  not null;
-alter table datasource add column is_deleted boolean not null default 'false';
-
-ALTER TABLE datasource ADD language_id bigint;
-alter table datasource add constraint language_id foreign key (language_id) references language(id) match full;
-update datasource set language_id = 205;
-alter table datasource alter column language_id set not null;
-
 
 alter table observation alter column place_name drop not null;
+alter table observation alter column reverse_geocoded_name drop not null ;
+alter table observation alter column place_name type text;
+alter table observation alter column reverse_geocoded_name type text;
+
+
+
+#20thJan2016
+create index external_id_idx on observation(external_id);
+
+drop view observation_locations ;
+drop view checklist_species_locations;
+drop view checklist_species_view;
+ALTER TABLE recommendation ALTER COLUMN name type text;
+
+
+create view observation_locations as  SELECT obs.id,
+    'observation:'::text || obs.id AS source,
+        r.name AS species_name,
+            obs.topology,
+                obs.last_revised
+                   FROM observation obs,
+                    recommendation r
+                      WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND obs.is_showable = true;
+
+create view checklist_species_view as SELECT obs.source_id AS id,
+    r.name AS species_name
+       FROM observation obs,
+        recommendation r
+          WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND obs.is_showable = false
+          GROUP BY obs.source_id, r.name;
+
+
+create view checklist_species_locations as SELECT csv.id,
+'checklist:'::text || csv.id AS source,
+    cls.title,
+        csv.species_name,
+            obs.topology
+                FROM checklist_species_view csv,
+                observation obs,
+                    checklists cls
+                        WHERE csv.id = obs.id AND obs.id = cls.id;
+
+

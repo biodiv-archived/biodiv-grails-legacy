@@ -5,6 +5,7 @@ import species.utils.Utils;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 import species.groups.UserGroup;
 import species.auth.SUser;
+import species.auth.SUserRole;
 import species.participation.ActivityFeed;
 import species.participation.Comment;
 import speciespage.ObvUtilService
@@ -51,6 +52,8 @@ class UtilsService {
     def messageSource;
     //def observationService
  //   def activityFeedService
+
+    Language defaultLanguage;
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_RECOMMENDED = "speciesRecommended";
@@ -267,10 +270,11 @@ class UtilsService {
     Language getCurrentLanguage(request = null){
        // println "====================================="+request
         
+        if(!defaultLanguage) defaultLanguage = Language.getLanguage(Language.DEFAULT_LANGUAGE);
         String langStr = LCH.getLocale()
         def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
         def languageInstance = Language.findByTwoLetterCode(twoLetterCode);
-        return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
+        return languageInstance ? languageInstance : defaultLanguage;
     }
 
     ///////////////////////////MAIL RELATED///////////////////////
@@ -908,7 +912,7 @@ class UtilsService {
 
     //////////////////////TIME LOGGING/////////////////////
 
-    def infomark(String blockName, Closure closure) {
+    def benchmark(String blockName, Closure closure) {
         def start = System.currentTimeMillis()  
         closure.call()  
         def now = System.currentTimeMillis()  
@@ -984,7 +988,7 @@ class UtilsService {
 
 	boolean isAdmin(SUser user) {
 		if(!user) return false
-		return SUser.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
+		return SUserRole.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
 	}
 	
 	boolean isCEPFAdmin(id) {

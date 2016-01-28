@@ -86,7 +86,7 @@ def log4jConsoleLogLevel = Priority.DEBUG
 
 grails.gorm.default.mapping = {
 cache true
-id generator:'increment'
+/*id generator:'increment'*/
 /* Added by the Hibernate Spatial Plugin. */
 'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
 'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.GeometryCollection)
@@ -592,9 +592,9 @@ environments {
 
             debug   'grails.plugin.springsecurity.openid'
             debug    'grails.app.filters.species'
-            fatal    'jdbc.sqltiming'
+            info    'jdbc.sqltiming'
             info    'jdbc.connection'
-            fatal   'jdbc.sqlonly'
+            info   'jdbc.sqlonly'
             fatal   'jdbc.audit'
             fatal   'jdbc.resultset'
             fatal   'jdbc.resultsettable'
