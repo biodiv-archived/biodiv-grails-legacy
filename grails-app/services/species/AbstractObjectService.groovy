@@ -80,7 +80,7 @@ class AbstractObjectService {
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
                     boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
+					item.imageLink = image.thumbnailUrl(isChecklist||obv.dataset ? null: iconBasePath, isChecklist||obv.dataset ? '.png' :null)//thumbnailUrl(iconBasePath)
 				} else if(image.type == ResourceType.VIDEO) {
 					item.imageLink = image.thumbnailUrl()
 				} else if(image.type == ResourceType.AUDIO) {
