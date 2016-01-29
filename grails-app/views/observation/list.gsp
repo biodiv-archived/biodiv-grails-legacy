@@ -4,7 +4,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="observations_list" />
 <style>
     
     .map_wrapper {
@@ -62,7 +61,7 @@
           position: absolute;
           color: white;
           font-weight: bold;
-          padding: 0px 33px;
+          padding: 0px 25px;
           text-decoration: none;
     }
     .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited, .view_bootstrap_gallery:focus{
@@ -79,9 +78,39 @@
     .snippettablet{
         padding: 5px;
     }
+    .signature .snippettablet{
+         padding: 0px;
+     }
     .recoName, #recoComment{
         width:419px !important;
     }
+    .reco_block{
+         margin-bottom:0px !important;
+     }
+     .resource_in_groups{
+         margin-top: -10px;
+         margin-bottom: 5px !important;
+         /*background-color: #D4DFE1;
+         padding: 8px 0px;
+         margin-top: 5px;*/
+     }
+     .clickSuggest{
+          margin: 0% 39%;         
+          margin-top: -22px;
+          padding: 2px 0px 0px 5px;
+          background-color: #a6dfc8;
+          text-decoration: none;
+     }
+     .clickSuggest i{
+        margin-left:3px;
+     }
+     .comment-popup{
+        width:100px;
+     }
+     .resource_in_groups .tile{
+         margin-top:0px;
+      }
+     
 </style>
 </head>
 <body>
@@ -112,7 +141,27 @@
 	</div>
 
 
-    <div id="links" class="links12" style="display:none;"></div>
+<%-- For AddReco Component --%>
+
+<div id="addRecommendation_wrap" style="display:none;">
+ <form id="addRecommendation" name="addRecommendation"
+    action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
+    method="GET" class="form-horizontal addRecommendation ">
+    <div class="reco-input">
+    <reco:create
+        model="['recommendationInstance':recommendationInstance]" />
+        <input type="hidden" name='obvId'
+                value="" />
+        
+         <input type="submit"
+                value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
+    </div>
+    
+</form>
+</div>
+
+
+<div id="links" class="links12" style="display:none;"></div>
 <div id="blueimp-gallery" class="blueimp-gallery">
     <div class="slides"></div>
     <h3 class="title"></h3>
@@ -180,7 +229,7 @@ $(document).ready(function(){
 function loadSpeciesnameReco(){
     $('.showObvDetails').each(function(){
         var observationId = $(this).attr('rel');
-        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="/biodiv/images/spinner.gif" /></li>')
+        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" /></li>')
         preLoadRecos(3, 0, false,observationId);
     });
 }
@@ -190,6 +239,7 @@ function addListLayout(){
     $('.prop').css('clear','inherit');
     $('.showObvDetails, .view_bootstrap_gallery').show();
     $('.species_title_wrapper').hide();
+    $('.species_title_wrapper').parent().css({'height':'0px'});
     loadSpeciesnameReco();
     initializeLanguage();
 
@@ -200,6 +250,7 @@ function addGridLayout(){
     $('.snippet.tablet').removeClass('snippettablet');
     $('.prop').css('clear','both');
     $('.species_title_wrapper').show();
+    $('.species_title_wrapper').parent().css({'height':'50px'});
     $('.showObvDetails, .view_bootstrap_gallery').hide();
 }
 
@@ -263,18 +314,30 @@ $(document).ready(function(){
     });
 
     $(document).on('click','.clickSuggest',function(){  
-        $(this).next().toggle('slow');
+        var obv_id = $(this).attr('rel');
+       var ele_nxt = $(this).next();
+       var wrap_place = ele_nxt.find('.addRecommendation_wrap_place');
+       wrap_place.is(':empty')
+       if(!ele_nxt.is(':visible') && !$.trim( wrap_place.html() ).length){
+            wrap_place.html($('#addRecommendation_wrap').html());
+            wrap_place.find('.addRecommendation').addClass('addRecommendation_'+obv_id);
+            wrap_place.find('input[type="hidden"][name="obvId"]').val(obv_id);
+            initializeNameSuggestion();
+            initializeLanguage(wrap_place.find('.languageComboBox'));
+        }
+        ele_nxt.toggle('slow');
+
     });
 
        $(document).on('submit','.addRecommendation', function(event) {
             var that = $(this);
-            $(this).ajaxSubmit({ 
+            $(this).ajaxSubmit({
                 url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
                 dataType: 'json', 
                 type: 'GET',
                 beforeSubmit: function(formData, jqForm, options) {
                     console.log(formData);
-                    updateCommonNameLanguage();
+                    updateCommonNameLanguage(that.find('.languageComboBox'));
                     return true;
                 }, 
                 success: function(data, statusText, xhr, form) {
@@ -299,7 +362,7 @@ $(document).ready(function(){
                     var successHandler = this.success, errorHandler = showUpdateStatus;
                     handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
                 } 
-            });
+            }); 
             event.preventDefault();
         });
 
@@ -307,7 +370,7 @@ $(document).ready(function(){
 </script>
 
 
-<r:script>
+<asset:script>
 $(document).ready(function(){
     $(".selected_group").off('click').on('click',function(){
         $(this).closest(".groups_super_div").find(".group_options").toggle();
@@ -332,7 +395,7 @@ $(document).ready(function(){
 
 });
 
-</r:script>
+</asset:script>
 <g:if test="${params?.view == 'list'}">
   <script type="text/javascript">
   $(document).ready(function(){     

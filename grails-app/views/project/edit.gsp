@@ -7,7 +7,6 @@
         <meta name="layout" content="main" />
         <g:set var="entityName" value="${message(code: 'project.label', default: 'Project')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
-        <r:require modules="add_file" />
     </head>
     <body>
         <div class="nav">

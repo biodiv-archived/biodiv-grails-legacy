@@ -65,8 +65,8 @@
         max="${params.max}"  params="${[id:checklistInstance.id]}"/>
     </div>
 </div>
-<r:script>
+<asset:script>
 $(document).ready(function() {
     $('tbody.rowlink').rowlink()
 });
-</r:script>
+</asset:script>

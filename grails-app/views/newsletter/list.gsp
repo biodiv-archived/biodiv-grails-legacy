@@ -13,7 +13,6 @@
             padding: 5px;
         }
         </style>
-        <r:require modules="core"/>
     </head>
     <body>
         <div class="span12">

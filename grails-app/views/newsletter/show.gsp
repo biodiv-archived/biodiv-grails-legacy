@@ -33,7 +33,6 @@
 	font-style: italic;
 }
 </style>
-<r:require modules="core, distinct_reco" />
 </head>
 <body>
 	<div id="pageContent" class="observation  span8"  style="margin-left:0px;">

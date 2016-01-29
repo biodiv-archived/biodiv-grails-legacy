@@ -438,18 +438,23 @@ class SpeciesUploadService {
 				noOfInsertions += saveSpecies(species);
 			}
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
-			log.error "OptimisticLockingFailureException : $e.message"
-			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
+			//log.error "OptimisticLockingFailureException : $e.message"
+			//log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
 			converter.addToSummary(e)
 		}catch (org.springframework.dao.DataIntegrityViolationException e) {
-			log.error "DataIntegrityViolationException : $e.message"
-			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
+			//log.error "DataIntegrityViolationException : $e.message"
+			//log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
 			converter.addToSummary(e)
 		} catch(ConstraintViolationException e) {
-			log.error "ConstraintViolationException : $e.message"
-			log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
+			//log.error "ConstraintViolationException : $e.message"
+			//log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
+			e.printStackTrace()
+			converter.addToSummary(e)
+		}catch(Exception e) {
+			//log.error "Exception : $e.message"
+			//log.error "Trying to add species in the batch are ${species*.taxonConcept*.name.join(' , ')}"
 			e.printStackTrace()
 			converter.addToSummary(e)
 		}

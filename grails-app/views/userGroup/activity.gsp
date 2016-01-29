@@ -6,7 +6,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'ugroup.value.activity')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="userGroups_show,comment" />
 <style>
 .comment-textbox {
 	width: 100%;

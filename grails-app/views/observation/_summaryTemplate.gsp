@@ -47,7 +47,7 @@
     <input id="status" name="status" type="hidden" value="${(queryParam?.status)?:''}"></input>
 </div>
 
-<r:script>
+<asset:script>
 $(document).ready(function() {
     $('#summary_section taxonRank').click(function(e) {
     $('#taxonRank').val($(e.target).data('value')); 
@@ -61,4 +61,4 @@ $(document).ready(function() {
     });
 });
 
-</r:script>
+</asset:script>

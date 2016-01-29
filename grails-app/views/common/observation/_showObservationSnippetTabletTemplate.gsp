@@ -10,7 +10,7 @@ def obvId = observationInstance?.id
 <g:if test="${observationInstance}">
     <g:set var="featureCount" value="${observationInstance.featureCount}"/>
 </g:if>
-<div class="snippet tablet ${styleviewcheck?'snippettablet': ''}">
+<div class="snippet tablet ${styleviewcheck?'snippettablet': ''}" style="height:100%;">
     <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}">
                 </span>
 
@@ -52,8 +52,8 @@ def obvId = observationInstance?.id
         %>
    </g:if>
 </g:each>
-     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery</a>
-	<div class="caption species_title_wrapper" style="${styleviewcheck?'display:none;': ''}" >
+     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery<i class="icon-share icon-white"></i></a>
+	<div class="caption" style="${styleviewcheck?'height:0px;': 'height:50px;'}" >
 		<obv:showStoryTablet
 			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
 		<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
@@ -97,10 +97,17 @@ def obvId = observationInstance?.id
                     <b>-</b>&nbsp; <time class="timeago" datetime="${observationInstance.toDate.getTime()}"></time>
                     </g:if>
                 </div>
-            </div>            
+            </div> 
+            <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">                
+                <span class="name"><i class="icon-time"></i><g:message code="default.submitted.on.label" /></span>
+                <div class="value">
+                    <time class="timeago"
+                    datetime="${observationInstance.createdOn.getTime()}"></time>                    
+                </div>
+            </div>           
             <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);
                def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()%>
-            <div class="prop" style="margin-top: ${(commonName)?'26px;':'46px;'} ${styleviewcheck?'clear:inherit;': 'clear:both;'}">
+            <div class="prop" style="margin-top: ${(commonName)?'0px;':'23px;'} ${styleviewcheck?'clear:inherit;': 'clear:both;'}">
                 <div style="float:left;">
                     <div class="figure user-icon pull-left" style="display:table;height:32px;">
                         <a href="${userLink}"> 
@@ -133,24 +140,25 @@ def obvId = observationInstance?.id
 
                 </div>
               
-            </div>
-<div class="recommendations sidebar_section" style="width: 97%;float: right;top: -44px;padding-bottom: 3px;margin-bottom: -48px;position: relative;">
+            </div>            
+
+<div class="recommendations sidebar_section" style="width: 97%;float: right;top: 0px;padding-bottom: 3px;margin-bottom: -3px;position: relative;">
 <div>
     <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
         <g:if test="${styleviewcheck}">    
             <li style="text-align: center;">
-                <img src="/biodiv/images/spinner.gif" />
+                <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
             </li>
         </g:if>
     </ul>
     <div id="seeMoreMessage_${observationInstance.id}" 
-        class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="margin-bottom: 0px;display:none;"></div>
-    <div id="seeMore_${observationInstance.id}" class="btn btn-mini" style="display:none;">
+        class="message ${ (!observationInstance.isLocked) ? '': 'isLocked'}" style="display:none;"></div>
+    <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:none;">
         <g:message code="button.show.all" />
     </div>
 </div>
 <g:if test="${!observationInstance.isLocked}">
-<a href="javascript:void(0);" class="clickSuggest pull-right">Click to suggest</a>
+<a href="javascript:void(0);" class="clickSuggest pull-right" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
 <div class="input-append" style="width:98%; display:none; height: 130px;">
     <g:hasErrors bean="${recommendationInstance}">
         <div class="errors">
@@ -161,22 +169,13 @@ def obvId = observationInstance?.id
         <div class="errors">
             <g:renderErrors bean="${recommendationVoteInstance}" as="list" />
         </div>
-    </g:hasErrors>                     
-
-        <form id="addRecommendation" name="addRecommendation"
-            action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
-            method="GET" class="form-horizontal addRecommendation addRecommendation_${observationInstance.id}">
-            <div class="reco-input">
-            <reco:create
-                model="['recommendationInstance':recommendationInstance]" />
-                <input type="hidden" name='obvId'
-                        value="${observationInstance.id}" />
-                
-                 <input type="submit"
-                        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
-            </div>
-            
-        </form>
+    </g:hasErrors>
+    <div class="addRecommendation_wrap_place">
+    </div>    
 
 </div>
+</g:if>
+ <br>
+<g:if test="${observationInstance}">
+    <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />
 </g:if>

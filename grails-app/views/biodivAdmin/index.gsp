@@ -3,7 +3,6 @@
         <g:set var="title" value="${g.message(code:'default.pagetitle.admin.console')}"/>
         <meta name="layout" content="main" />
         <title>${title}</title>
-        <r:require modules="core" />
     </head>
     <body>
         <div class="span12">

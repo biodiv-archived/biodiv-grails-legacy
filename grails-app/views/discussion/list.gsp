@@ -5,7 +5,6 @@
         <g:set var="title" value="${g.message(code:'showusergroupsig.title.discussions')}"/>
         <g:set var="entityName" value="${g.message(code:'button.discussions')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="add_file, content_view, activityfeed" />
         <style type="text/css">
             .thumbnails>.thumbnail {
             margin: 0 0 10px 0px;

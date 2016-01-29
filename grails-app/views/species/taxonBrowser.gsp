@@ -10,7 +10,6 @@
 	value="${message(code: 'species.label', default: 'Species')}" />
 <title><g:message code="taxonbrowser.taxonomy.browser" /></title>
 
-<r:require modules="species_show"/>
 <style type="text/css">
     </style>
 
@@ -100,7 +99,7 @@
             </g:each>
             </script>	
 
-        <r:script>
+        <asset:script>
         $(document).ready(function() {
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
                 expandAll:false,
@@ -158,6 +157,6 @@
                 });
             });*/
         });
-        </r:script>
+        </asset:script>
     </body>
 </html>

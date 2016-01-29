@@ -440,13 +440,15 @@ class XMLConverter extends SourceConverter {
 					taxonHierarchy.each { th ->
 						th = th.merge()
 						th.save();
-						th.taxonDefinition.updateNameSignature(getUserContributors(speciesNameNode.data))
 						if(th.taxonDefinition == taxonConcept){
 							latestHir = th
+						}else{
+							th.taxonDefinition.updateNameSignature(getUserContributors(speciesNameNode.data))
 						}
 					}
 					
 					taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species), latestHir)
+					taxonConcept.updateNameSignature(getUserContributors(speciesNameNode.data))
 					
 					List<SynonymsMerged> synonyms;
 
@@ -1516,7 +1518,6 @@ class XMLConverter extends SourceConverter {
 	                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource, n, taxonContributors);
 	                if(sfield) {
 	                    //adding contributors
-						
 						println "--------------------- contribtors to be added for " + sfield + "  contr " + getUserContributors(n)
 	                    sfield.updateContributors(getUserContributors(n))
 	                    synonyms.add(sfield);
@@ -1816,15 +1817,8 @@ class XMLConverter extends SourceConverter {
         List<TaxonomyDefinition> sortedFieldNodes = new ArrayList<TaxonomyDefinition>();;
         fieldNodes.each { fieldNode ->
             String name = getData(fieldNode.data);
-            println "===NAME===--------------- " + name 
             int rank = getTaxonRank(fieldNode?.subcategory?.text());
             Language language = fieldNode.language[0].value();
-            //if(classification.name.equalsIgnoreCase(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY) && rank == TaxonomyRank.SPECIES.ordinal()) {
-            //    def cleanSciName = Utils.cleanSciName(scientificName);
-            //    name = cleanSciName
-            //    println "===NAME=== " + name 
-            //} else
-			 
             if(name) {
                 name = Utils.cleanSciName(name);
             }
@@ -1851,12 +1845,6 @@ class XMLConverter extends SourceConverter {
                     log.debug "Taxon : "+name+" and rank : "+rank;
                     
                     if(name && rank >= 0) {
-                        //TODO:HACK to populate sciName in species level of taxon hierarchy
-                        //              if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {// && rank == TaxonomyRank.SPECIES.ordinal()) {
-                        //                  def cleanSciName = cleanSciName(scientificName);
-                        //                  name = cleanSciName
-                        //              }
-
                         def parsedName = parsedNames.get(i++);
                         log.debug "Parsed name ${parsedName?.canonicalForm}"
                         if(parsedName?.canonicalForm) {
@@ -1866,8 +1854,6 @@ class XMLConverter extends SourceConverter {
                             //TODO: how to get status in each case?
 							String parsedAuthorYear = parsedName.authorYear
                             println "authoryear >>>>>>>>>>>>>>>>>> " + parsedAuthorYear
-//                            def ctx = ApplicationHolder.getApplication().getMainContext();
-//                            namelistService = ctx.getBean("namelistService");
                             boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
 							
@@ -2089,7 +2075,6 @@ class XMLConverter extends SourceConverter {
                                     taxon.errors.each { log.error it }
                                 }
                                 NamelistService.namesInWKG.add(taxon.id)
-                                taxon.updateContributors(getUserContributors(fieldNode.data))
                                 if(fromCOL) {
                                     //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
                                     //taxon = namelistService.updateAttributes(taxon, res);
@@ -2154,6 +2139,8 @@ class XMLConverter extends SourceConverter {
                                 println "TAXON SAVED WITH NULL STATUS===========================" + taxon.status + "   id " + taxon.id
 								
                             }
+							//updating contributors
+							taxon.updateContributors(getUserContributors(fieldNode.data))
 							//updating name status given in sheet
 							taxon.updateNameStatus(fieldNode?.status?.text())
 							//saving taxon new position
@@ -2234,9 +2221,6 @@ class XMLConverter extends SourceConverter {
                 }
             }
         }
-        //      if(classification.name.equalsIgnoreCase(getFieldFromName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY))) {
-        //          updateSpeciesGroup(taxonEntities);
-        //      }
         return ['taxonRegistry' : taxonEntities, 'spellCheckMsg' : spellCheckMsg];
     }
 

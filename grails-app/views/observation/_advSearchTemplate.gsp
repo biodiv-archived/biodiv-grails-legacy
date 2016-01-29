@@ -16,7 +16,7 @@
 
 </div>
 
-<r:script>
+<asset:script>
 
 $(document).ready(function(){
     <%
@@ -50,7 +50,7 @@ $(document).ready(function(){
 
     $('#observedOn span.date').html(startDate.toString('dd/MM/yyyy') + ' - ' + endDate.toString('dd/MM/yyyy'));
 });
-</r:script>
+</asset:script>
 
 
 

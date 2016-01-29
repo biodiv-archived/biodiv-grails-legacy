@@ -8,7 +8,6 @@
     <head>
         <meta name="layout" content="main" />
         <title>${grailsApplication.config.speciesPortal.app.siteName}</title>
-        <r:require modules="core" />
         <style>
             #home .entry {
                 border-radius: 7px 7px 0px 0px;
@@ -112,5 +111,10 @@
         </div>--> 
         </div>
         </div>
+        <asset:script>
+        $(document).ready(function() {
+            relatedStory([], "latestUpdatedObservations", "latestUpdatedObservations", "", "");
+        });
+        </asset:script>
     </body>
 </html>

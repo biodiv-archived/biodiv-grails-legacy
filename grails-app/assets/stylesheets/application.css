@@ -1,0 +1,54 @@
+/*
+*= require jquery
+*= require all/jquery-ui-1.10.3.custom.min.css
+
+//bootstrap
+ *= require bootstrap
+*= require all/bootstrap-combobox.css
+*= require all/bootstrap-rowlink.min.css
+*= require all/bootstrap-editable.css
+*= require all/bootstrap-wysihtml5-0.0.2.css
+*= require all/bootstrap-multiselect.css
+
+//leaflet
+*= require all/leaflet.css
+*= require ie/leaflet.ie.css
+*= require all/Leaflet.Coordinates-0.1.1.css
+*= require all/leaflet.label.css
+*= require all/L.Control.Locate.css
+*= require ie/L.Control.Locate.ie.css
+*= require all/leaflet.awesome-markers.css
+*= require all/Control.FullScreen.css
+*= require all/leaflet.draw.css
+*= require ie/leaflet.draw.ie.css
+*= require all/MarkerCluster.css
+*= require all/MarkerCluster.Default.css
+*= require ie/MarkerCluster.Default.ie.css
+
+*= require all/tableSorter.css
+*= require all/daterangepicker.css
+*= require all/skin.css
+*= require all/tagit/jquery.tagit.css
+*= require all/tagit/tagit-custom.css
+*= require all/blueimp-gallery.css
+*= require all/jstree-style.css
+*= require SlickGrid-2.0.2/slick.grid.css
+*= require SlickGrid-2.0.2/slick.headerbuttons.css
+*= require SlickGrid-2.0.2/slick.headermenu.css
+
+// biodiv specific
+*= require all/biodiv.css
+*= require all/auth.css
+*= require all/navigation.css
+*= require all/speciesGroups.css
+*= require all/habitats.css
+*= require all/comment.css
+*= require all/activityfeed.css
+*= require all/content.css
+*= require all/uploader.css
+*= require all/create.css
+*= require all/location_picker.css
+*= require all/augmented-maps.css
+*= require all/namelist.css
+*/
+

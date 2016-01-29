@@ -1,4 +1,4 @@
-<r:script>
+<asset:script>
 $(document).ready(function(){
     var columns = ${checklistColumns ?: 'undefined'} 
     var data = ${checklistData ?: 'undefined'}
@@ -15,4 +15,4 @@ $(document).ready(function(){
     	loadGrid("${uGroup.createLink(controller:'checklist', action:'getObservationGrid')}", "${observationInstance?.id}");
     }
 });
-</r:script>
+</asset:script>

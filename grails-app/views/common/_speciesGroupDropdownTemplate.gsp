@@ -66,7 +66,7 @@
 
 
 <g:if test="${action != 'show'}">
-<r:script>
+<asset:script>
 $(document).ready(function(){
     $(".selected_group").off('click').on('click',function(){
         $(this).closest(".groups_super_div").find(".group_options").toggle();
@@ -91,6 +91,6 @@ $(document).ready(function(){
 
 });
 
-</r:script>
+</asset:script>
 </g:if>
 </div>

@@ -71,7 +71,7 @@
 
 					<a id="selected_license_${docId}"
 						class="btn dropdown-toggle btn-mini" data-toggle="dropdown"> <img
-						src="${documentInstance?.license?resource(dir:'images/license',file:documentInstance.license.name.getIconFilename()+'.png'):resource(dir:'images/license',file:'cc_by.png', absolute:true)}"
+						src="${documentInstance?.license?assetPath(src:'/all/license/'+documentInstance.license.name.getIconFilename()+'.png', absolute:true):assetPath(src:'/all/license/'+'cc_by.png', absolute:true)}"
 						title="Set a license for this file" /> <b class="caret"></b>
 					</a>
 
@@ -82,7 +82,7 @@
 							<li class="license_option"
 								onclick="$('#license_${docId}').val($.trim($(this).text()));$('#selected_license_${docId}').find('img:first').replaceWith($(this).html());">
 								<img
-								src="${resource(dir:'images/license',file:l?.name?.getIconFilename()+'.png', absolute:true)}" /><span
+								src="${assetPath(src:'/all/license/'+l?.name?.getIconFilename()+'.png', absolute:true)}" /><span
 								style="display: none;"> ${l?.name?.value}
 							</span>
 							</li>

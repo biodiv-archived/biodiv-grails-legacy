@@ -45,14 +45,14 @@
 	</div>
 </div>
 
-<r:script>
+<asset:script>
 $(document).ready(function() {
 	$('#username').focus();
 });
 
 <s2ui:initCheckboxes/>
 
-</r:script>
+</asset:script>
 
 </body>
 </html>

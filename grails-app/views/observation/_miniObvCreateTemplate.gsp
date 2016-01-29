@@ -19,7 +19,7 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 field="resource" />
             </div>
         </div>    
-        <div class="imageHolder" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;background: url(${createLinkTo(dir: 'images', file: 'dragndropgrey.png', absolute:true)})"></div>
+        <div class="imageHolder" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)})"></div>
 
         <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
@@ -66,10 +66,10 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
         <input class="agreeTerms" type="checkbox" name='agreeTerms' style ="display:none;"/>
     </div>
 </form>
-<r:script>
+<asset:script>
 
 $(document).ready(function(){
 
 });
 
-</r:script>
+</asset:script>

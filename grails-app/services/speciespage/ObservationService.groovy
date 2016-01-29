@@ -182,11 +182,12 @@ class ObservationService extends AbstractObjectService {
 
 
 	        def resourcesXML = createResourcesXML(params);
-            def instance = observation
+            def rootDirLocatorInstance = observation
             if(params.action == "bulkSave"){
-                instance = springSecurityService.currentUser
+				//in bulk save resource images will be stored in user dir locatoin
+                rootDirLocatorInstance = springSecurityService.currentUser
             }
-	        def resources = saveResources(instance, resourcesXML);
+	        def resources = saveResources(rootDirLocatorInstance, resourcesXML);
 	        observation.resource?.clear();
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             

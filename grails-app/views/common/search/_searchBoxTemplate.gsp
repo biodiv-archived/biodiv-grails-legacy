@@ -18,13 +18,14 @@
 </div>
 <input type="hidden" id="userLanguage" value="${userLanguage?.id}" />
 <script type="text/javascript">
-$(document).ready(function() {    
+$(document).ready(function() {
     window.params = {
                 'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",
                 'offset':"${params.offset}",
                 'isGalleryUpdate':'true',
+                'isMediaFilter' : '${params.isMediaFilter}',
                 'resDeleteUrl' : "${uGroup.createLink(controller:'resource', action: 'deleteUsersResourceById')}",
                 'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
                 "queryParamsMax":"${queryParams?.max}",
@@ -45,13 +46,13 @@ $(document).ready(function() {
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
 		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
 		'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
-		'dropDownIconUrl' : "${resource(dir:'images', file:'dropdown_active.gif',absolute:'true')}",
+        'dropDownIconUrl' : "${assetPath(src:'/all/dropdown_active.gif', absolute:true)}",
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
 		'searchController' : "${controller}",
 		'carousel':{maxHeight:150, maxWidth:150},
-                'imagesPath': "${resource(dir:'images', absolute:true)}",
+                'imagesPath': "${assetPath(src:'/all/images', absolute:true)}",
                 'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
-                'defaultMarkerIcon':"${resource(dir:'js/Leaflet/dist/images', file:'')}",
+                'defaultMarkerIcon':"${assetPath(src:'/all/images', absolute:true)}",
                 'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
                 'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}",
                 'species':{

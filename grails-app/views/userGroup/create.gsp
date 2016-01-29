@@ -5,7 +5,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'group.value.user')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="userGroups_create" />
 <style>
 .btn-group.open .dropdown-menu {
 	top: 43px;
@@ -150,7 +149,7 @@ max-width: 100%;
 								<textarea id="description" name="description" placeholder="${g.message(code:'ugroup.small.description')}">${userGroupInstance?.description}</textarea>
 								
 								<script type='text/javascript'>
-									CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+                                    CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 									
 									var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
 									CKEDITOR.replace('description', config);
@@ -407,7 +406,7 @@ max-width: 100%;
 		</div>
 	
 </div>
-	<r:script>
+	<asset:script>
 $(document).ready(function() {
 
 
@@ -604,7 +603,7 @@ $(document).ready(function() {
  	
         $('.dropdown-toggle').dropdown()
 });
-</r:script>
+</asset:script>
 
 </body>
 

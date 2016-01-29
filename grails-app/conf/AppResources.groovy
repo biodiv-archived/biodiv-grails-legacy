@@ -8,24 +8,9 @@ modules = {
 		jquery { 
             defaultBundle 'core' 
         }
-
-		/*'jquery-ui' {
-			defaultBundle 'core'
-			resource id:'js', url:[dir:'plugins',file:'jquery-ui-1.8.15/jquery-ui/js/jquery-ui-1.8.15.custom.min.js'],
-					nominify: true, disposition: 'defer'
-					
-		}
-
-		'jquery-theme' {
-			resource id:'theme',
-					url:[dir: 'css',
-						file:'jquery-ui.css'],
-					attrs:[media:'screen, projection']
-		
-        }*/
-
 	}
 
+//done app
 	core {
 		dependsOn 'jquery, jquery-ui,carousel,leaflet'
 		defaultBundle 'core'
@@ -85,39 +70,41 @@ modules = {
 		resource url:'/js/species/search.js'
 		resource url:'/js/jquery.cookie.js'
 	}
-
+//deprecate 
 	auth {
 		dependsOn 'core'
 	}
-
+//deprecate
 	gallery {
 		//resource url:[dir:'js/galleria/1.3.5/themes/classic/',file:'galleria.classic.css']
 		//resource url:'/js/galleria/1.3.5/galleria-1.3.5.js'
 		//resource url:'/js/galleria/1.3.5/themes/classic/galleria.classic.min.js'
 	}
+//done app
 	bootstrap_gallery{
 		resource url:[dir:'js/bootstrap_gallery/css/',file:'blueimp-gallery.css']
 		resource url:'/js/bootstrap_gallery/js/blueimp-helper.js'
-		resource url:'/js/bootstrap_gallery/js/blueimp-gallery.js'		
+		resource url:'/js/bootstrap_gallery/js/blueimp-gallery.min.js'		
 		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-fullscreen.js'
 		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-indicator.js'
 		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-video.js'
 		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-vimeo.js'
 		resource url:'/js/bootstrap_gallery/js/blueimp-gallery-youtube.js'
-		resource url:'/js/bootstrap_gallery/js/jquery.blueimp-gallery.js'
+		resource url:'/js/bootstrap_gallery/js/jquery.blueimp-gallery.min.js'
 	}
+//done app
 	carousel {
 		resource url:[dir:'js/jquery/jquery.jcarousel-0.2.8/themes/classic/',file:'skin.css']
 		resource url:'/js/jquery/jquery.jcarousel-0.2.8/jquery.jcarousel.js'
 		resource url:'/js/species/carousel.js'
 	}
-
+//done app
 	tagit {
 		resource url:'/css/tagit/jquery.tagit.css'
 		resource url:'/css/tagit/tagit-custom.css'
 		resource url:'/js/tag-it.js'
 	}
-
+//done app
 	list_utils {
 		resource url:'/js/jquery/jquery-history-1.7.1/scripts/bundled/html4+html5/jquery.history.js'
 		resource url:'/js/jquery/jquery.url.js'
@@ -133,7 +120,7 @@ modules = {
 	location_utils { 
         resource url:'/js/location/google/markerclusterer.js'		 
     }
-
+//done app
 	observations {
 		dependsOn 'core, tagit'
 		defaultBundle 'core'
@@ -147,15 +134,15 @@ modules = {
 		resource url:'/js/bootstrap-combobox.js'
 		resource url:'/js/species/observations/map.js'
 	}
-
+//done show
 	observations_show {
 		dependsOn 'observations, gallery, carousel, comment, activityfeed'
 
 		resource url:'/js/species/observations/show.js'
-		resource url:'/js/jquery/jquery.sparkline.min.js'
+//		resource url:'/js/jquery/jquery.sparkline.min.js'
         resource url:'/js/species/chooseLanguage.js'
 	} 
-
+//done create
 	observations_create {
 		dependsOn 'observations'
 
@@ -168,11 +155,11 @@ modules = {
         resource url:'/js/species/observations/bulkObvCreate.js'
         resource url:'/js/species/chooseLanguage.js'
 	}
-
+//done app
     distinct_reco {
         resource url:'/js/species/observations/distinctReco.js'
     }
-
+//done app
 	observations_list { 
 		dependsOn 'observations, bootstrap_gallery, list_utils, comment, activityfeed, distinct_reco'
 		
@@ -180,7 +167,7 @@ modules = {
 		resource url:'/js/species/observations/show.js'
 		resource url:'/js/species/chooseLanguage.js'
 	}
-
+//done app
 	susers_list { 
 		dependsOn 'core, list_utils'
 	
@@ -190,7 +177,7 @@ modules = {
 		//resource url:'/js/species/observations/list.js'
 		//resource url:'/js/species/users/list.js'
 	}
-
+//done species
 	species {
 		dependsOn 'core, list_utils, tagit'
 
@@ -201,18 +188,18 @@ modules = {
 		resource url:'/js/species/speciesfield.js'
 		resource url:'/js/species/species.js'
 	}
-
+//done species_show
 	species_show {
 		dependsOn 'species, maps, gallery, comment, activityfeed, observations_create'
 
 		resource url:'/css/augmented-maps.css'
 		resource url:'/css/bootstrap-wysihtml5-0.0.2.css'
-		resource url:'/css/jquery.tocify.css'
+//		resource url:'/css/jquery.tocify.css'
 		
-		resource url:'/js/jquery/jquery.tocify.min.js'
+//		resource url:'/js/jquery/jquery.tocify.min.js'
 		//resource url:'/js/galleria/1.3.5/plugins/flickr/galleria.flickr.min.js'
 		//resource url:'/js/jquery.collapser/jquery.collapser.min.js'
-		resource url:'/js/jquery/jquery.jqDock-1.8/jquery.jqDock.min.js'
+//		resource url:'/js/jquery/jquery.jqDock-1.8/jquery.jqDock.min.js'
 		resource url:'/js/floating-1.7.js'
 		resource url:'/js/wysihtml5-0.3.0_rc2.min.js'
 		resource url:'/js/bootstrap-wysihtml5-0.0.2.min.js'		
@@ -224,20 +211,20 @@ modules = {
         resource url:'/js/species/observations/list.js'
 
 	}
-	
+//done species	
 	species_list {
 		dependsOn 'observations_list'
 
         resource url:'/js/species/speciesPermission.js'
 	}
-
+//done app
 	search {
 		dependsOn 'observations_list'
 
 	}
-
+//done app
 	admin { dependsOn	'core' }
-
+//done userGroup
 	pages {
 		resource url: '/css/jquery.cycle/style.css'
 		resource url:'/js/species/pages.js'
@@ -245,7 +232,7 @@ modules = {
 		resource url: '/js/jquery.cycle2/jquery.cycle2.video.min.js'
 		resource url: '/js/jquery.cycle2/jquery.cycle2.center.min.js'
 	}
-	
+//done show,userGroups	
 	userGroups_show {
 		dependsOn 'observations, gallery, carousel, activityfeed, pages'
 
@@ -253,25 +240,25 @@ modules = {
 		resource url:'/js/species/observations/show.js'
 		resource url:'/js/species/userGroups/main.js'
 	}
-
+//done userGroup
 	userGroups_create {
 		dependsOn 'observations'	
 		resource url:'/js/species/userGroups/main.js'
 	}
-
+//done userGroups
 	userGroups_list {
 		dependsOn 'observations, location_utils, list_utils'
 		
 		//resource url:'/js/species/observations/list.js'
 		resource url:'/js/species/userGroups/main.js'		
 	}
-
+//done
 	comment{
 		resource url:'/css/comment.css'
 		
 		resource url:'/js/comment.js'
 	}
-	
+//done
 	activityfeed {
 		dependsOn 'core'
 		
@@ -280,7 +267,7 @@ modules = {
 		
 		resource url:'/js/activityfeed.js'
 	}
-	
+//done slickgrid	
 	slickgrid {
 		resource url:'/js/SlickGrid-2.0.2/slick.grid.css'
 //		resource url:'/js/SlickGrid-2.0.2/css/smoothness/jquery-ui-1.8.16.custom.css'
@@ -300,7 +287,7 @@ modules = {
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellrangeselector.js'
 		resource url:'/js/SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js'
 	}
-	
+//done checklist	
 	checklist {
 		dependsOn 'location_utils, list_utils, tagit, comment, activityfeed'
 
@@ -310,13 +297,13 @@ modules = {
 		resource url:'/js/location/location-picker.js'
 		resource url:'/js/species/observations/map.js'
 	}
-	
+//done checklist	
     checklist_list {
 		dependsOn 'checklist'
 
 		//resource url:'/js/species/observations/list.js'
     }
-
+//done bulkupload
 	checklist_create {
 		dependsOn 'observations_create, checklist, slickgrid, add_file'
 		
@@ -324,11 +311,11 @@ modules = {
 		resource url:'/js/species/jquery.csv-0.71.min.js'
         resource url:'/js/species/observations/upload.js'
 	}
-    
+//done bulkupload
     species_upload {
         dependsOn 'checklist_create'
     }
-
+//done
 	chart {
 		dependsOn 'core'
 		
@@ -339,7 +326,7 @@ modules = {
         resource url:[plugin: 'ajax-uploader-1.1', dir: 'js', file: 'fileuploader.js']
         resource url:[plugin: 'ajax-uploader-1.1', dir: 'css', file: 'uploader.css']
     }
-
+//done add_file, create.css
 	add_file {
 		dependsOn 'core, tagit, list_utils, ajaxfileuploader'
 		
@@ -348,7 +335,7 @@ modules = {
 		resource url:'/css/location_picker.css'
 		resource url:'/js/location/location-picker.js'
 	}
-	
+//done show.js	
 	content_view {
 		dependsOn 'core,  tagit'
 		resource url:'/css/main.css'
@@ -358,11 +345,11 @@ modules = {
 		
 	}
 
-    prettyPhoto {
+    /*prettyPhoto {
         resource url:'/css/prettyPhoto.css'
 		resource url:'/js/jquery/jquery.prettyPhoto.js'
-    }
-
+    }*/
+//done
     leaflet {
         resource url:'js/Leaflet/dist/leaflet.css'
         resource url:'js/Leaflet/dist/leaflet.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
@@ -390,7 +377,7 @@ modules = {
         resource url:'js/Leaflet/plugins/Leaflet.markercluster/dist/MarkerCluster.Default.ie.css', wrapper: { s -> "<!--[if IE]>$s<![endif]-->" }
  
     }
-
+//done in maps.css maps.js
     maps {
     	dependsOn 'core'
 		
@@ -404,7 +391,7 @@ modules = {
 		resource url:'/js/species/maps/mapapp.js'
 		resource url:'/js/species/maps/cookie-chef.js'
     }
-
+//done curation.js
     curation {
 		dependsOn 'comment, activityfeed'
 
@@ -413,7 +400,7 @@ modules = {
         resource url:'/js/species/curation.js'
         resource url:'/css/namelist.css'
     }
-
+//done app
     document_list {
         dependsOn 'observations_list'
     }

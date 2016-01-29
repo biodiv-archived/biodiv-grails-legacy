@@ -9,7 +9,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'showusergroupsig.title.observations')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="observations_create"/>
 <style>
     .latlng{
         margin-left: 285px !important;
@@ -134,7 +133,7 @@
         </div>
     </div>
 
-<r:script>	
+<asset:script>	
     var add_file_button = '<li class="add_file addedResource" style="display:none;z-index:10;"><div class="add_file_container"><div class="add_image"></div><div class="add_video editable"></div></div><div class="progress"><div class="translucent_box"></div><div class="progress_bar"></div ><div class="progress_msg"></div ></div></li>';
 
 
@@ -154,6 +153,7 @@ $(document).ready(function(){
     initializeLanguage();
     $(".CustomField_multiselectcombo").multiselect();
 
+    intializesSpeciesHabitatInterest(false);
 });
 
 function deleteObservation(){
@@ -164,7 +164,7 @@ function deleteObservation(){
     }                       
 }
 
-</r:script>
+</asset:script>
 
 </body>
 </html>

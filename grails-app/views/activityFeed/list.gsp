@@ -4,7 +4,6 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.pagetitle.activity')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
-        <r:require modules="activityfeed,comment"/>
         <style>
             .thumbnail .observation_story {
             width:715px;
@@ -31,8 +30,5 @@
                 <feed:showFeedWithFilter model="[feedType:feedType, feedCategory:'All','feedOrder':'latestFirst']" />
             </div>
         </div>
-
-        <r:script>
-        </r:script>
     </body>
 </html>

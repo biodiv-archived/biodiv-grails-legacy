@@ -1,6 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
-<b>    <obv:showSpeciesName
+<b  class="species_title_wrapper" style="${styleviewcheck?'display:none;': ''}">    <obv:showSpeciesName
     model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress,isListView:true]" />
 </b>
 <!--div class="user-icon pull-right">

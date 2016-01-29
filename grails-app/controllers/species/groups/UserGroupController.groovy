@@ -269,7 +269,7 @@ class UserGroupController {
 		if (!userGroupInstance) {
 			//flash.message = "${message(code: 'userGroup.default.not.found.message', args: [params.webaddress])}"
 			//redirect(action: "list")
-		} else if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION)) {
+		} else if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), userGroupInstance, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser) ) {
 			render(view: "create", model: [userGroupInstance: userGroupInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"

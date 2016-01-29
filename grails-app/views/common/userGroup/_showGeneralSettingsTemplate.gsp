@@ -64,7 +64,7 @@
 		</div>
 	</div>
 
-<r:script>
+<asset:script>
 $(document).ready(function(){
 	$('.home_page_label').each(function() {
 		var caret = '<span class="caret"></span>'
@@ -81,5 +81,5 @@ $(document).ready(function(){
 	});
 	
 });
-</r:script>
+</asset:script>
 

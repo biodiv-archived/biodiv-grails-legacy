@@ -92,7 +92,7 @@ def check_repeat_heading = [];
 	</div>
 </div>
 
-<r:script type="text/javascript">
+<asset:script type="text/javascript">
 
 function save_reference(that,action,speciesid,fieldId,pk,cid,text_val){
 	var act = '';
@@ -229,5 +229,5 @@ function save_reference(that,action,speciesid,fieldId,pk,cid,text_val){
 
 	});
 
-</r:script>
+</asset:script>
 

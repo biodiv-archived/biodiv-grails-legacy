@@ -2,7 +2,6 @@
 <head>
 <g:set var="title" value="Observations"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="observations_list" />
 <style>
     .thumbnails>li {
         margin:2px;

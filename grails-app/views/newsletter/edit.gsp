@@ -5,7 +5,6 @@
 <head>
 <g:set var="title" value="${g.message(code:'title.value.newsletter')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
-<r:require modules="core" />
 </head>
 <body>
 	<div class="span9">
@@ -82,8 +81,8 @@
 		</div>
 	</div>
 
-            <r:script type='text/javascript'> 
-                CKEDITOR.plugins.addExternal( 'confighelper', '${request.contextPath}/js/ckeditor/plugins/confighelper/' );
+            <asset:script type='text/javascript'> 
+                CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
                     { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },
@@ -104,6 +103,6 @@
 		$(document).ready(function(){
                     CKEDITOR.replace('newsitem', config);
 		});
-	</r:script>
+	</asset:script>
 </body>
 </html>

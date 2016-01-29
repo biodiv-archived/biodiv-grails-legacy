@@ -10,7 +10,8 @@
 	    <g:link mapping="userGroupGeneric" action="list" absolute='true'><g:message code="text.see.all" /></g:link>
 	</li>
 	<li class="group_load" style="text-align:center;overflow-x:hidden; overflow-y:auto;">
-	  <g:img uri="/images/rotate.gif"/> 
+      <asset:image src="/all/rotate.gif" absolute="true"/>
+
 	</li>
 	</ul>	
 </li>

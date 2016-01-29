@@ -49,7 +49,7 @@
 	<div class="clearfix"></div>
 
 </div>
-<r:script>
+<asset:script>
 
 $(document).ready(function(){
 		$('#advSearchForm :input:not(input[type=hidden])').each(function(index, ele) {
@@ -80,4 +80,4 @@ $(document).ready(function(){
 	
 	
 });
-</r:script>
+</asset:script>

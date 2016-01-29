@@ -150,7 +150,7 @@ grails.project.dependency.resolution = {
         compile ':hibernate:3.6.10.16'
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
-        runtime ":resources:1.2.8"
+//        runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
         compile ":spring-security-acl:2.0-RC2"
@@ -174,7 +174,7 @@ grails.project.dependency.resolution = {
         //compile ":error-pages-fix:0.2"
         compile ":ajax-uploader:1.1"
         compile ":cache-headers:1.1.5"
-        runtime ":cached-resources:1.0"
+//        runtime ":cached-resources:1.0"
         compile ":ckeditor:3.6.3.0"
         compile ':scaffolding:2.0.3' 
         compile ':email-confirmation:1.0.5'
@@ -194,8 +194,10 @@ grails.project.dependency.resolution = {
         compile ":tagcloud:0.3"
         compile ":taggable:1.0.1"
         //runtime ":yui-minify-resources:0.1.5"
-        runtime ":zipped-resources:1.0"
+//        runtime ":zipped-resources:1.0"
         compile ":grails-ant:0.1.3"
+        compile "org.grails.plugins:twitter-bootstrap:2.3.2.2"
+        compile "org.grails.plugins:asset-pipeline:2.6.10"
     } 
 
     grails.war.resources = { stagingDir ->

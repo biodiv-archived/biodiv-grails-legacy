@@ -264,7 +264,7 @@ class UtilsService {
 
     public sendNotificationMail(String notificationType, def obv, request, String userGroupWebaddress, ActivityFeed feedInstance=null, otherParams = null) {
         def conf = SpringSecurityUtils.securityConfig
-        log.debug "Sending email"
+        log.info "Sending email"
         try {
 
             def targetController =  getTargetController(obv)//obv.getClass().getCanonicalName().split('\\.')[-1]
@@ -672,7 +672,7 @@ class UtilsService {
                         templateMap['userID'] = toUser.id
                     }
 
-                    log.debug "Sending email to ${toUser}"
+                    log.info "Sending email to ${toUser}"
                     try{
                         mailService.sendMail {
                             to toUser.email
