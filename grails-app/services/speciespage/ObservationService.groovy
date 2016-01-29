@@ -115,10 +115,10 @@ class ObservationService extends AbstractMetadataService {
      * @param observation
      */
     Observation updateObservation(params, observation, boolean updateResources = true){
-        return update(observation, params, Observation.class, updateResources);
+        return update(observation, params, Observation.class, true, updateResources);
     }
 
-    Observation update(observation, params, klass = null, boolean updateResources = true){
+    Observation update(observation, params, klass = null, boolean update=true, boolean updateResources = true){
         log.debug "Updating obv with params ${params}"
         observation = super.update(observation, params, Observation.class);
         observation.notes = params.notes;
@@ -134,7 +134,7 @@ class ObservationService extends AbstractMetadataService {
         //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
-            updateResources(observation, params);
+            updateResource(observation, params);
     	}
         return observation;
     }
@@ -145,13 +145,13 @@ class ObservationService extends AbstractMetadataService {
             instance = springSecurityService.currentUser
         }
         def resources = saveResources(instance, resourcesXML);
-        observation.resource?.clear();
+        instance.resource?.clear();
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         resources.each { resource ->
             if(!resource.context){
                 resource.saveResourceContext(observation)
             }
-            observation.addToResource(resource);
+            instance.addToResource(resource);
         }
     }
 
@@ -938,8 +938,8 @@ class ObservationService extends AbstractMetadataService {
         log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
         //log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
         //log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
-        log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
-        log.debug "speciesStatusCountQuery : "+queryParts.speciesStatusCountQuery;
+        //log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
+        //log.debug "speciesStatusCountQuery : "+queryParts.speciesStatusCountQuery;
 
         log.debug query;
         log.debug queryParts.queryParams;
@@ -947,8 +947,8 @@ class ObservationService extends AbstractMetadataService {
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
         //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
         //def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
-        def speciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
-        def speciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
+        //def speciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
+        //def speciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
@@ -956,7 +956,7 @@ class ObservationService extends AbstractMetadataService {
 			if(checklistCountQuery)
             	checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-            speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            //speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
             //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
         } 
@@ -983,8 +983,8 @@ class ObservationService extends AbstractMetadataService {
 		}
 
         allObservationCountQuery.setProperties(queryParts.queryParams)
-        speciesCountQuery.setProperties(queryParts.queryParams)
-        speciesStatusCountQuery.setProperties(queryParts.queryParams)
+        //speciesCountQuery.setProperties(queryParts.queryParams)
+        //speciesStatusCountQuery.setProperties(queryParts.queryParams)
         allObservationCount = allObservationCountQuery.list()[0]
         /*def speciesCounts = speciesCountQuery.list()
         speciesCount = speciesCounts[0]

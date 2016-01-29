@@ -64,7 +64,9 @@ class ObservationController extends AbstractObjectController {
     def speciesService;
     def setupService;
     def springSecurityFilterChain
- 
+
+    def sessionFactory;
+
 	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
@@ -103,9 +105,18 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def list() {
-		def model = runLastListQuery(params);
-        model.userLanguage = utilsService.getCurrentLanguage(request);
+		def model;
+        utilsService.logSql {
+        utilsService.benchmark('observation.list') {
+        model = runLastListQuery(params);
+        }
+        }
 
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+        /*Map cacheEntries = sessionFactory.getStatistics()
+                .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
+                        .getEntries();
+*/
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
@@ -439,14 +450,15 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private def runLastListQuery(Map params) {
-		if(params.webaddress) {
+/*		if(params.webaddress) {
 			def userGroupController = new UserGroupController();
 			return userGroupController.getUserGroupObservationsList(params)
 		} else if(params.action == 'search') {
 			return observationService.getObservationsFromSearch(params);
 		} else {
-			return getObservationList(params);
-		}
+*/
+        return getObservationList(params);
+//		}
 	}
 	
 	@Secured(['ROLE_USER'])

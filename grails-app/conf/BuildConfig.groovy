@@ -142,9 +142,10 @@ grails.project.dependency.resolution = {
 
         compile ":scaffolding:2.0.1"
         //TODO enable this plugin
-        compile (':cache:1.1.6') {
+        compile (':cache:1.1.8') {
                 excludes "servlet-api" 
         }
+        compile "org.grails.plugins:cache-ehcache:1.0.5"
 //        runtime ":database-migration:1.4.0"
 
         compile ':hibernate:3.6.10.16'
@@ -198,6 +199,8 @@ grails.project.dependency.resolution = {
         compile ":grails-ant:0.1.3"
         compile "org.grails.plugins:twitter-bootstrap:2.3.2.2"
         compile "org.grails.plugins:asset-pipeline:2.6.10"
+        //compile ":redis:1.6.6"
+
     } 
 
     grails.war.resources = { stagingDir ->

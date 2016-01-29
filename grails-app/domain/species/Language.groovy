@@ -25,6 +25,7 @@ class Language {
 	static mapping = {
 		version false;
 		sort 'name';
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	public static Language getLanguage(String languageName){
@@ -64,4 +65,19 @@ class Language {
 	public static filteredList(){
 		return Language.findAllByIsDirtyOrRegionIsNotNull(true).collect{it.name;} ;
 	}
+
+    static List<Language> list() { 
+        return Language.createCriteria().list {
+            order('name', 'asc')
+            cache true
+        }
+    }
+
+    static Language findByName(String whatever) { 
+        return Language.createCriteria().get {
+            eq 'name', whatever
+            cache true
+        }
+    }
+
 }

@@ -15,7 +15,6 @@ class SpeciesGroup {
 	String name;
 	SpeciesGroup parentGroup;
 	int groupOrder;
-	
 	def grailsApplication;
 	
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
@@ -30,6 +29,7 @@ class SpeciesGroup {
 	static mapping = {
 		version  false;
 		sort groupOrder:"asc"
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	Resource icon(ImageType type) {
@@ -91,4 +91,18 @@ class SpeciesGroup {
 	String iconClass() {
 		return this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')+'_gall_th';
 	}
+
+    static List<SpeciesGroup> list() { 
+        return SpeciesGroup.createCriteria().list {
+            order('groupOrder', 'asc')
+            cache true
+        }
+    }
+
+    static SpeciesGroup findByName(String whatever) { 
+        return SpeciesGroup.createCriteria().get {
+            eq 'name', whatever
+            cache true
+        }
+    } 
 }

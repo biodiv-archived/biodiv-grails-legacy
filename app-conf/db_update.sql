@@ -492,3 +492,7 @@ create view checklist_species_locations as SELECT csv.id,
                         WHERE csv.id = obs.id AND obs.id = cls.id;
 
 
+create sequence document_id_seq start 
+create sequence observation_id_seq start 
+create sequence species_id_seq start
+ create sequence suser_id_seq start

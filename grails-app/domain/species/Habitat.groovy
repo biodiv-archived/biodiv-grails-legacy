@@ -62,6 +62,7 @@ class Habitat {
 	static mapping = {
 		version false;
 		sort habitatOrder:"asc"
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	Resource icon(ImageType type) {
@@ -79,4 +80,19 @@ class Habitat {
 	String iconClass() {
 		return this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')+'_gall_th';
 	}
+    
+    static List<Habitat> list() { 
+        return Habitat.createCriteria().list {
+            order('habitatOrder','asc')
+            cache true
+        }
+    }
+
+    static Habitat findByName(String whatever) { 
+        return Habitat.createCriteria().get {
+            eq 'name', whatever
+            cache true
+        }
+    }
+
 }

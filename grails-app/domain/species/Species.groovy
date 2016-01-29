@@ -75,7 +75,8 @@ class Species implements Rateable {
 	}
 
 	static mapping = {
-		id generator:'species.utils.PrefillableUUIDHexGenerator'
+		id generator:'species.utils.PrefillableUUIDHexGenerator', params:[sequence_name: "species_id_seq"] 
+
 		fields sort : 'field'
 		autoTimestamp false
 	}

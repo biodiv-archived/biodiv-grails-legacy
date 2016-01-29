@@ -227,6 +227,7 @@ class Observation extends DataObject {
 		checklistAnnotations type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
+        id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "observation_id_seq"] 
 	 } 
 
 	/**
@@ -235,7 +236,6 @@ class Observation extends DataObject {
 	 */
 	Resource mainImage() {
 		def res = listResourcesByRating(1);
-        println res.fileName;
         if(res && !res.fileName[0].equals('i')) 
             return res[0]
 		else
@@ -709,7 +709,7 @@ class Observation extends DataObject {
                 }
             }
 
-            res = res.sort { println it;dwcObvMapping[it.key.toLowerCase()].order }
+            res = res.sort { dwcObvMapping[it.key.toLowerCase()].order }
         }
 		return res
 	}

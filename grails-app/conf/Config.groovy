@@ -1805,3 +1805,91 @@ grails.mime.disable.accept.header.userAgents = []
 // Added by the Spring Security OAuth plugin:
 grails.plugin.springsecurity.oauth.domainClass = 'species.auth.OAuthID'
 grails.plugin.springsecurity.oauth.registration.askToLinkOrCreateAccountUri = '/login/openIdCreateAccount'
+
+grails{
+    cache {
+        enabled = true
+        ehcache {
+            ehcacheXmlLocation = 'classpath:ehcache.xml' // conf/ehcache.xml
+            reloadable = false
+        }
+    }
+}
+
+grails.cache.config = {
+    defaults {
+        maxElementsInMemory 10000
+        eternal false
+        overflowToDisk false
+        maxElementsOnDisk 0
+    }
+    domain {
+        name SpeciesGroup
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 10
+        maxElementsOnDisk 100
+    }
+    domain {
+        name Habitat
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 10
+        maxElementsOnDisk 100
+    }
+    domain {
+        name License
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 10
+        maxElementsOnDisk 100
+    }
+    domain {
+        name Language
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 10
+        maxElementsOnDisk 100
+    }
+    cache {
+        name "${app.name}"
+        eternal false
+        overflowToDisk true
+        maxElementsInMemory 10000
+        maxElementsOnDisk 10000000
+    }
+
+    defaultCache {
+        maxElementsInMemory 10000
+        eternal false
+        timeToIdleSeconds 120
+        timeToLiveSeconds 120
+        overflowToDisk true
+        maxElementsOnDisk 10000000
+        diskPersistent false
+        diskExpiryThreadIntervalSeconds 120
+        memoryStoreEvictionPolicy 'LRU'
+    }
+}
+/*
+grails {
+    redis {
+        poolConfig {
+            // jedis pool specific tweaks here, see jedis docs & src
+            // ex: testWhileIdle = true
+        }
+        timeout = 2000 //default in milliseconds
+        //password = "somepassword" //defaults to no password
+
+        // requires either host & port combo, or a sentinels and masterName combo
+
+        // use a single redis server (use only if nore using sentinel cluster)
+        port = 6379
+        host = "localhost"
+
+        // use redis-sentinel cluster as opposed to a single redis server (use only if not use host/port)
+        //sentinels = [ "host1:6379", "host2:6379", "host3:6379" ] // list of sentinel instance host/ports
+        //masterName = "mymaster" // the name of a master the sentinel cluster is configured to monitor
+    }
+}
+*/

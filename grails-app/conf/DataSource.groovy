@@ -28,6 +28,8 @@ hibernate {
     cache.use_query_cache = true
     cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // For Hibernate before 4.0
     //cache.provider_class = 'net.sf.ehcache.hibernate.EhCacheProvider'
+    generate_statistics=true
+    cache.use_structured_entries=true
 }
 
 // environment specific settings

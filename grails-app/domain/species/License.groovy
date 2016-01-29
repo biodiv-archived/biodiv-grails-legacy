@@ -81,7 +81,10 @@ class License {
 		url(nullable:true);
 	}
 
-	static mapping = { version false; }
+	static mapping = { 
+        version false; 
+        cache usage: 'read-only', include: 'non-lazy'
+    }
 	
 	
 	static LicenseType fetchLicenseType(String value){
@@ -90,5 +93,19 @@ class License {
 				return l
 		}
 	}
+
+    static List<License> list() { 
+        return License.createCriteria().list {
+            cache true
+        }
+    }
+
+    static License findByName(LicenseType whatever) { 
+        return License.createCriteria().get {
+            eq 'name', whatever
+            cache true
+        }
+    } 
+
 }
 
