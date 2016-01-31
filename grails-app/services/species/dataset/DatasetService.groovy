@@ -289,6 +289,9 @@ class DatasetService extends AbstractMetadataService {
             def ant = new AntBuilder().unzip( src: zipFile,
             dest: destDir, overwrite:true)
             directory = new File(destDir, FilenameUtils.removeExtension(zipF.getName()));
+            if(!directory.exists()) {
+                directory = destDir;
+            }
             metadataFile = new File(directory, "metadata.xml");
         }
 
@@ -453,7 +456,7 @@ class DatasetService extends AbstractMetadataService {
 
             alter table '''+tmpBaseDataTable+''' add column clean_sciName text, add column canonicalForm text, add column observation_id bigint, add column recommendation_id bigint, add column commonname_reco_id bigint, add column external_url text, add column eventDate1 timestamp without time zone, add column lastCrawled1 timestamp without time zone, add column lastInterpreted1 timestamp without time zone, add column dateIdentified1 timestamp without time zone, add column place_name text, add column group_id bigint, add column habitat_id bigint, add column topology geometry, alter column  decimallongitude type numeric USING NULLIF(decimallongitude, '')::numeric, alter column decimallatitude type numeric USING NULLIF(decimallatitude, '')::numeric, add column license1 bigint;
 
-            update '''+tmpBaseDataTable+''' set eventDate1=to_date(eventDate, 'yyyy-MM-ddTHH:miZ'), lastCrawled1=to_date(lastCrawled, 'yyyy-MM-ddTHH:miZ'), lastInterpreted1=to_date(lastInterpreted, 'yyyy-MM-ddTHH:miZ'), dateIdentified1=to_date(dateIdentified, 'yyyy-MM-ddTHH:miZ'), external_url = 'http://www.gbif.org/occurrence/'|| gbifId, observation_id=nextval('observation_id_sequence'), place_name=concat_ws(', ', locality, stateProvince, county), topology=CASE WHEN decimallatitude is not null and decimallongitude is not null THEN ST_SetSRID(ST_MakePoint(decimallongitude, decimallatitude), 4326) ELSE NULL END, basisOfRecord=CASE WHEN basisOfRecord IS null THEN 'HUMAN_OBSERVATION' ELSE basisOfRecord END, protocol= CASE WHEN protocol IS null THEN 'DWC_ARCHIVE' ELSE protocol END;
+            update '''+tmpBaseDataTable+''' set eventDate1=to_date(eventDate, 'yyyy-MM-ddTHH:miZ'), lastCrawled1=to_date(lastCrawled, 'yyyy-MM-ddTHH:miZ'), lastInterpreted1=to_date(lastInterpreted, 'yyyy-MM-ddTHH:miZ'), dateIdentified1=to_date(dateIdentified, 'yyyy-MM-ddTHH:miZ'), external_url = 'http://www.gbif.org/occurrence/'|| gbifId, observation_id=nextval('observation_id_seq'), place_name=concat_ws(', ', locality, stateProvince, county), topology=CASE WHEN decimallatitude is not null and decimallongitude is not null THEN ST_SetSRID(ST_MakePoint(decimallongitude, decimallatitude), 4326) ELSE NULL END, basisOfRecord=CASE WHEN basisOfRecord IS null THEN 'HUMAN_OBSERVATION' ELSE basisOfRecord END, protocol= CASE WHEN protocol IS null THEN 'DWC_ARCHIVE' ELSE protocol END;
             
             update '''+tmpBaseDataTable+''' set license1= CASE WHEN rights like '%/publicdomain/%' THEN 821 WHEN rights like '%/by/%' THEN 822 WHEN rights like '%/by-sa/%' THEN 823 WHEN rights like '%/by-nc/%' or rights='Creative Commons Attribution Non Commercial (CC-BY-NC) 4.0 License.' THEN 825 WHEN rights like '%/by-nc-sa/%' THEN 826 WHEN rights like '%/by-nc-nd/%' THEN 827 WHEN rights like '%/by-nd/%' THEN 824 ELSE 822 END;
             
