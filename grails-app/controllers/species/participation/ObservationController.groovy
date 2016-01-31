@@ -107,9 +107,7 @@ class ObservationController extends AbstractObjectController {
 	def list() {
 		def model;
         utilsService.logSql {
-        utilsService.benchmark('observation.list') {
-        model = runLastListQuery(params);
-        }
+            model = runLastListQuery(params);
         }
 
         model.userLanguage = utilsService.getCurrentLanguage(request);

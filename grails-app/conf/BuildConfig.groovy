@@ -49,12 +49,13 @@ grails.project.dependency.resolution = {
         // from public Maven repositories
         mavenLocal()
         mavenCentral()
-        mavenRepo "http://repository.codehaus.org"
+        //mavenRepo "http://repository.codehaus.org"
+        mavenRepo "https://repo.grails.org/grails/plugins" 
         mavenRepo "http://download.java.net/maven/2/"
         mavenRepo 'http://download.osgeo.org/webdav/geotools'
         mavenRepo 'http://www.hibernatespatial.org/repository'
         mavenRepo "http://repository.jboss.com/maven2/"
-        mavenRepo "http://snapshots.repository.codehaus.org"
+        //mavenRepo "http://snapshots.repository.codehaus.org"
         mavenRepo "https://repository.jboss.org/nexus/content/groups/public"
         mavenRepo "http://repo.desirableobjects.co.uk/"
         mavenRepo "http://mvnrepository.com/artifact/"
@@ -148,13 +149,16 @@ grails.project.dependency.resolution = {
         compile "org.grails.plugins:cache-ehcache:1.0.5"
 //        runtime ":database-migration:1.4.0"
 
-        compile ':hibernate:3.6.10.16'
+        compile (':hibernate:3.6.10.16') {
+            excludes 'ehcache-core'
+        }
+
         compile ':hibernate-spatial:0.0.4'
         compile ':hibernate-spatial-postgresql:0.0.4'
 //        runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
-        compile ":spring-security-acl:2.0-RC2"
+        compile "org.grails.plugins:spring-security-acl:2.0.1"
 
         compile (":spring-security-rest:1.4.0") {
                 excludes 'spring-security-core', 'cors'
@@ -200,7 +204,8 @@ grails.project.dependency.resolution = {
         compile "org.grails.plugins:twitter-bootstrap:2.3.2.2"
         compile "org.grails.plugins:asset-pipeline:2.6.10"
         //compile ":redis:1.6.6"
-
+        compile "org.grails.plugins:app-info:1.1.1"
+        compile "org.grails.plugins:app-info-hibernate:0.4.1"
     } 
 
     grails.war.resources = { stagingDir ->

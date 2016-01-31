@@ -83,7 +83,7 @@ class License {
 
 	static mapping = { 
         version false; 
-        cache usage: 'read-only', include: 'non-lazy'
+//        cache usage: 'read-only', include: 'non-lazy'
     }
 	
 	

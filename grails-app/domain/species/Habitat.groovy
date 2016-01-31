@@ -62,7 +62,7 @@ class Habitat {
 	static mapping = {
 		version false;
 		sort habitatOrder:"asc"
-        cache usage: 'read-only', include: 'non-lazy'
+    //    cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	Resource icon(ImageType type) {

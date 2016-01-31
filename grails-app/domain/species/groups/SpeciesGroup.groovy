@@ -29,7 +29,7 @@ class SpeciesGroup {
 	static mapping = {
 		version  false;
 		sort groupOrder:"asc"
-        cache usage: 'read-only', include: 'non-lazy'
+//        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	Resource icon(ImageType type) {

@@ -1757,31 +1757,33 @@ grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
 grails.plugin.springsecurity.rest.token.validation.enableAnonymousAccess = true
 grails.plugin.springsecurity.rest.token.rendering.tokenPropertyName = "token"
 //APPINFO
-
 grails.plugins.dynamicController.mixins = [
-'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'app.info.custom.example.MyConfigControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController'
+    'com.burtbeckwith.grails.plugins.appinfo.hibernate.HibernateControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'app.info.custom.example.MyConfigControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController'
 ]
 
 
@@ -1823,34 +1825,7 @@ grails.cache.config = {
         overflowToDisk false
         maxElementsOnDisk 0
     }
-    domain {
-        name SpeciesGroup
-        eternal true
-        overflowToDisk true
-        maxElementsInMemory 10
-        maxElementsOnDisk 100
-    }
-    domain {
-        name Habitat
-        eternal true
-        overflowToDisk true
-        maxElementsInMemory 10
-        maxElementsOnDisk 100
-    }
-    domain {
-        name License
-        eternal true
-        overflowToDisk true
-        maxElementsInMemory 10
-        maxElementsOnDisk 100
-    }
-    domain {
-        name Language
-        eternal true
-        overflowToDisk true
-        maxElementsInMemory 10
-        maxElementsOnDisk 100
-    }
+   
     cache {
         name "${app.name}"
         eternal false
@@ -1869,6 +1844,34 @@ grails.cache.config = {
         diskPersistent false
         diskExpiryThreadIntervalSeconds 120
         memoryStoreEvictionPolicy 'LRU'
+    }
+    cache {
+        name 'species.groups.SpeciesGroup'
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 20
+        maxElementsOnDisk 100
+    }
+    cache {
+        name 'species.Habitat'
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 20
+        maxElementsOnDisk 100
+    }
+    cache {
+        name 'species.License'
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 10
+        maxElementsOnDisk 100
+    }
+    cache {
+        name 'species.Language'
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 1000
+        maxElementsOnDisk 1000
     }
 }
 /*
