@@ -285,7 +285,7 @@ class DatasetService extends AbstractMetadataService {
         }*/
         File directory = zipF.getParentFile();
         File metadataFile;
-        if(FilenameUtils.getExtension('zip')) {
+        if(FilenameUtils.getExtension(zipF)) {
             def ant = new AntBuilder().unzip( src: zipFile,
             dest: destDir, overwrite:true)
             directory = new File(destDir, FilenameUtils.removeExtension(zipF.getName()));
