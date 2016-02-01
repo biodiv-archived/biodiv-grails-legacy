@@ -70,6 +70,7 @@ function updateRelativeTime(){
 }
 
 function feedPostProcess(){
+    console.log('feedPostProcess start');
 	$(".ellipsis.multiline").trunk8({
 		lines:2,
                 tooltip:false,

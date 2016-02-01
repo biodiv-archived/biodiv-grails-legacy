@@ -85,6 +85,7 @@ function requestModeratorshipAction(me, url) {
 }
 
 function membership_actions() {
+    console.log('membership_actions')
 	$(".joinUs").bind('click', function() {
 		joinAction($(this), window.joinUsUrl);
 	})
@@ -278,6 +279,7 @@ function membership_actions() {
      	});
 	});
 	
+    console.log('membership_actions done')
 }
 
 //this is called from domain/_headerTemplate
@@ -350,7 +352,7 @@ function init_header(statsUrl) {
 	membership_actions();
 	
 	init_stats(statsUrl);
-	
+    console.log('init-headers done')	
 }
 
 function loadYoutube(youtube_container) {
@@ -385,19 +387,20 @@ function rating() {
 }
 
 function last_actions() {
+    console.log('last actions');
     $(".ellipsis.multiline").trunk8({
         lines:2,
         tooltip:false,
-        fill: '&hellip; <a id="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
+        fill: '&hellip; <a class="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
     });
 
-    $('#read-more').on('click', function (event) {
-        $(this).parent().trunk8('revert').append(' <a id="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
+    $('.read-more').on('click', function (event) {
+        $(this).parent().trunk8('revert').append(' <a class="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
 
         return false;
     });
 
-    $('#read-less').on('click', function (event) {
+    $('.read-less').on('click', function (event) {
         $(this).parent().trunk8();
 
         return false;
@@ -457,6 +460,7 @@ function last_actions() {
     $(".youtube_container").each(function(){
         loadYoutube(this);
     });
+    console.log('last actions done');
 }
 
 function loadSuggestedGroups(targetComp, url,offset){	
@@ -506,7 +510,6 @@ $('.dropdown-menu').bind('scroll', function() {
 });
 $(document).click(function(){		
  	$(".dropdown-menu").hide();
- 	console.log("ss");
  	$(document).unbind('click');
 });
 }
@@ -517,6 +520,7 @@ function init_stats(statsUrl){
  		type: 'GET',
  		dataType: "json",
 		success: function(data) {
+            console.log(data);
 			var comp = $(".statsTicker.speciesUpdateCount");
 			if(parseInt(data.Species) == 0){
 				comp.hide();
@@ -548,6 +552,7 @@ function init_stats(statsUrl){
 				comp.text(' ' + data.Discussion);
 				comp.show();
 			}
+            console.log('stats data inserted');
 			return false;
 			
 		}, error: function(xhr, status, error) {

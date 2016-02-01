@@ -58,7 +58,7 @@
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
-                        <div class="value notes_view linktext readmore ellipsis"> 
+                        <div class="value notes_view linktext ellipsis multiline"> 
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
                         %> 
@@ -76,7 +76,7 @@
                     </g:if>
                     <g:else>
                     <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
-                    <div class="value notes_view linktext readmore ellipsis">
+                    <div class="value notes_view linktext ellipsis multiline">
                         ${raw(desc)}
                     </div>
 

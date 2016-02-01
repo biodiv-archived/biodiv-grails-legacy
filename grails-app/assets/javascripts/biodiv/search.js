@@ -1,6 +1,6 @@
 
 $(document).ready(function() {
-    
+    console.log('search.js start');    
     $('#filterPanel').on("change", ".searchFilter", function() {
         if($(this).hasClass('active')){
             $(this).removeClass('active');
@@ -20,6 +20,8 @@ $(document).ready(function() {
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, true);
         return false;
     });
+
+    console.log('search.js end');    
 });
 
 function resetSearchFilters($ele) {

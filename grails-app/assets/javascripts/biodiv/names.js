@@ -19,7 +19,7 @@
         if(_options.appendTo == undefined && appendTo.length > 0) {
             _options.appendTo = appendTo;
         }
-
+        if(_options.appendTo == undefined) return;
         console.log(_options.appendTo);
         var result = $(this).catcomplete({
                appendTo:_options.appendTo,
@@ -93,7 +93,9 @@
 }(window.jQuery));
 
 $(document).ready(function() {
+    console.log('names.js start');
     initializeNameSuggestion();
+    console.log('names.js end');
 });
 
 function cancelRecoComment() {

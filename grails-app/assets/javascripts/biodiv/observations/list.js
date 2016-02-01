@@ -7,6 +7,7 @@
     };
  
 $(document).ready(function(){
+    console.log('obv.list.js start');
     $('#selected_sort').tooltip({placement:'top'});
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
@@ -355,26 +356,10 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-/*    $('.list_view_bttn').on('click', function() {
-        $('.grid_view').hide();
-        $('.list_view').show();
-        $(this).addClass('active');
-        $('.grid_view_bttn').removeClass('active');
-        $.cookie("listing", "list", {path    : '/'});
-        adjustHeight();
-    });
-
-    $('.grid_view_bttn').on('click', function() {
-        $('.grid_view').show();
-        $('.list_view').hide();
-        $(this).addClass('active');
-        $('.list_view_bttn').removeClass('active');
-        $.cookie("listing", "grid", {path    : '/'});
-    });
-*/    
-   
-
+    console.log('obv.click.loadmore');
     $('.observation').on("click", ".loadMore", function() {
+
+        console.log('obv.click.loadmore start');
         $.autopager({
 
             autoLoad : false,
@@ -436,10 +421,12 @@ $(document).ready(function(){
             }
         });
 
+        console.log('obv.click.loadmore end');
         $.autopager('load');
         return false;
     });
     
+    console.log('download-form.submit');
     $('.download-form').bind('submit', function(event) {
             var downloadFrom = $(this).find('input[name="downloadFrom"]').val();
             var filterUrl = '';
@@ -490,6 +477,7 @@ $(document).ready(function(){
 	     	event.preventDefault();
      	});
 
+    console.log('eat cookies');
     //	last_actions();
     eatCookies();
 
@@ -497,23 +485,26 @@ $(document).ready(function(){
         updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);
     }); 
 
-     /* Added for  Species Update*/
-        var group_icon = $('.group_icon_show');
-        var label_group = $('label.group');
-        var propagateGrpHab = $('.propagateGrpHab');
-        $('.propagateGrpHab .control-group  label').hide();
+    /* Added for  Species Update*/
+    var group_icon = $('.group_icon_show');
+    var label_group = $('label.group');
+    var propagateGrpHab = $('.propagateGrpHab');
+    $('.propagateGrpHab .control-group  label').hide();
 
-        $(document).on('click','.edit_group_btn',function(){
-            var obvId = $(this).attr('id');           
-            $('#group_icon_show_wrap_'+obvId).hide();
-            //habitat_icon.hide();
-            label_group.hide();
-            $('#propagateGrpHab_'+obvId).show();
+    console.log('document..edit_group_btn');
+    $(document).on('click','.edit_group_btn',function(){
+        var obvId = $(this).attr('id');           
+        $('#group_icon_show_wrap_'+obvId).hide();
+        //habitat_icon.hide();
+        label_group.hide();
+        $('#propagateGrpHab_'+obvId).show();
 
-        }); 
+    }); 
 
-        $(document).on('submit','#updateSpeciesGrp', function(event) {
+    console.log('document.#updateSpeciesGrp');
+    $(document).on('submit','#updateSpeciesGrp', function(event) {
 
+        console.log('updateSpeciesGrp ajaxSubmit start');
          $(this).ajaxSubmit({ 
                     url: "/observation/updateSpeciesGrp",
                     dataType: 'json', 
@@ -543,38 +534,34 @@ $(document).ready(function(){
                
             event.preventDefault(); 
         }); 
+
+        console.log('obv.list.js end');
 });
 
 /**
  */
 function eatCookies() {	
-    var hashString = window.location.hash.substring(1)
-        if ($.cookie("listing") == "list") {
-            if(!hashString.startsWith('l')) {
-                if(hashString.startsWith('g')) {
-                    window.location.hash = "l"+hashString.substring(1);
-                } else if(hashString){
-                    window.location.hash = "l"+hashString;
-                }
+    console.log('eatCookies');
+    var hashString = window.location.hash.substring(1);
+    if ($.cookie("listing") == "list") {
+        if(!hashString.startsWith('l')) {
+            if(hashString.startsWith('g')) {
+                window.location.hash = "l"+hashString.substring(1);
+            } else if(hashString){
+                window.location.hash = "l"+hashString;
             }
-/*            $('.list_view').show();
-            $('.grid_view').hide();
-            $('.grid_view_bttn').removeClass('active');
-            $('.list_view_bttn').addClass('active');
-*/        } else {
-            if(!hashString.startsWith('g')) {
-                if(hashString.startsWith('l')) {
-                    window.location.hash = "g"+hashString.substring(1);
-                } else if(hashString){
-                    window.location.hash = "g"+hashString;
-                }
+        }
+    } else {
+        if(!hashString.startsWith('g')) {
+            if(hashString.startsWith('l')) {
+                window.location.hash = "g"+hashString.substring(1);
+            } else if(hashString){
+                window.location.hash = "g"+hashString;
             }
-/*            $('.grid_view').show();
-            $('.list_view').not('.single_list_view').hide();
-            $('.grid_view_bttn').addClass('active');
-            $('.list_view_bttn').removeClass('active');
-*/        }
+        }
+    }
     adjustHeight();
+    console.log('eatCookies end');
 }
 
 function getSelectedGroup() {

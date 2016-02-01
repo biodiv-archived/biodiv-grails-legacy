@@ -39,13 +39,15 @@ function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler,
 }
 
 function adjustHeight() {
-    $(".ellipsis").ellipsis();
+    console.log('adjustHeight start');
+//    $(".ellipsis").trunk8();
     $('.snippet .observation_story_image').each(function() {
         console.log($(this).next())
         $(this).css({
             'height': $(this).next().height()
         });
     });
+    console.log('adjustHeight end');
 }
 // Callback to execute whenever ajax login is successful.
 // Todo some thing meaningful with the response data
