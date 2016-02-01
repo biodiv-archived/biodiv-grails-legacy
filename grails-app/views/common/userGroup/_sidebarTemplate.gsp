@@ -46,3 +46,12 @@
 
 
 </ul>
+ <asset:script>
+    $(document).ready(function(){
+        $('.lang_c').click(function(){
+            if(!$(this).hasClass('disabled')){
+                setLanguage($(this).attr('rel'));
+            }                
+        });
+    });
+ </asset:script> 

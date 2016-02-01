@@ -5,27 +5,27 @@
       <td align="center">
       
       &nbsp;&nbsp;
-      <a href="http://www.cirad.fr" target="_blank"> <img src="http://portal.wikwio.org/biodiv/logo/Cirad_sans-texte.gif" width="100" height="74" border="0"></a>
+      <a href="http://www.cirad.fr" target="_blank"> <img src="images/partnerlogo/Cirad_sans_texte.jpg" width="100" height="74" border="0"></a>
       &nbsp;&nbsp;
-      <a href="http://www.ifpindia.org" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/IFP-anglais_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.ifpindia.org" target="_blank"><img src="images/partnerlogo/IFP-anglais_logo.png" width="100" height="74" border="0"></a>
       &nbsp;&nbsp;
-      <a href="http://www.fofifa.mg" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/FOFIFA_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.fofifa.mg" target="_blank"><img src="images/partnerlogo/FOFIFA_logo.png" width="100" height="74" border="0"></a>
       &nbsp;&nbsp;
-      <a href="http://www.msiri.mu/" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/MCIA-LOGO1.png" width="100" height="74" border="0"></a>
+      <a href="http://www.msiri.mu/" target="_blank"><img src="images/partnerlogo/MCIA-LOGO1.png" width="100" height="74" border="0"></a>
       &nbsp;&nbsp;
-      <a href="http://www.msiri.mu/" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/MSIRI-2_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.msiri.mu/" target="_blank"><img src="images/partnerlogo/MSIRI-2_logo.png" width="100" height="74" border="0"></a>
       &nbsp;&nbsp;
-      <a href="http://www.cndrs-comores.org" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/CNDRS2_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.cndrs-comores.org" target="_blank"><img src="images/partnerlogo/CNDRS2_logo.png" width="100" height="74" border="0"></a>
       </td>
       </tr>
       <tr>
       <td align="center">
       &nbsp;&nbsp;
-      <a href="http://www.europa.eu/index_fr.htm" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/UE-TC_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.europa.eu/index_fr.htm" target="_blank"><img src="images/partnerlogo/UE-TC_logo.png" width="100" height="74" border="0"></a>
       &nbsp;&nbsp;
-      <a href="http://www.acp-st.eu/" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/acp-st_logo.png" width="75" height="70" target="_blank" border="0"></a>
+      <a href="http://www.acp-st.eu/" target="_blank"><img src="images/partnerlogo/acp-st_logo.png" width="75" height="70" target="_blank" border="0"></a>
       &nbsp;&nbsp;
-      <a href="http://www.acp.int/" target="_blank"><img src="http://wikwio.server308.com/site-images/partnerlogo/ACP.jpg" width="100" height="75" border="0"></a>
+      <a href="http://www.acp.int/" target="_blank"><img src="images/partnerlogo/ACP.jpg" width="100" height="75" border="0"></a>
       </td>
       </tr>
       </tbody></table>
@@ -99,7 +99,7 @@ ${g.message(code:'text.supported.on')}<br />
  ${g.message(code:'text.powered.by')}<a href="https://github.com/strandls/biodiv" target="_blank"> ${g.message(code:'link.informatics.platform')}</a> ${g.message(code:'text.technology.partner')} <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank" > ${g.message(code:'technology.partner.strandlifesciences')} </p>
 	</div>
 </div>
-<r:script>
+<asset:script>
 $(document).ready(function(){
 	$(".youtube_container").each(function(){
 		loadYoutube(this);
@@ -109,7 +109,7 @@ $(document).ready(function(){
 
 });
 
-</r:script>
+</asset:script>
 
 <g:set var="fbAppId" value="" />
 <%
@@ -120,7 +120,7 @@ fbAppId =  grailsApplication.config.speciesPortal.ibp.facebook.appId;
 }
 %>
 
-<r:script>
+<asset:script>
 
         $(document).ready(function() {
                 
@@ -287,9 +287,9 @@ window.fbEnsure = function(callback) {
                 'extensions' : extensions
         });
         
-</r:script>
+</asset:script>
 
-<r:script>
+<asset:script>
 //Twitter
 !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
 
@@ -300,8 +300,8 @@ po.type = 'text/javascript'; po.async = true;
 po.src = 'http://apis.google.com/js/plusone.js?onload=renderGooglePlus';
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 })();
-</r:script>
-<r:script>
+</asset:script>
+<asset:script>
 
  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -310,6 +310,6 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
 
   ga('create', 'UA-48037338-1', 'wikwio.org');
   ga('send', 'pageview');
-</r:script>
+</asset:script>
 
 

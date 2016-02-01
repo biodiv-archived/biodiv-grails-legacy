@@ -12,9 +12,7 @@
             #home .entry {
                 border-radius: 7px 7px 0px 0px;
             }
-            #stats .entry {
-                height: 40px;
-                padding: 20px 0px 0px 0px;
+            #stats .entry {                
                 border-radius: 0px 0px 7px 7px;
             }
             #home #species_entry {

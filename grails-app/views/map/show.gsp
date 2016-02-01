@@ -9,6 +9,9 @@
                 width:100%;
             }
         </style>
+        <script type="text/javascript" src="/assets/biodiv/maps/map-search.js"></script>
+        <script type="text/javascript" src="/assets/biodiv/maps/mapapp.js"></script>
+        <script type="text/javascript" src="/assets/biodiv/maps/cookie-chef.js"></script>
     </head>
     <body>
         <div>

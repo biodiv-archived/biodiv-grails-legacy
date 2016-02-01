@@ -38,6 +38,7 @@
 
 // biodiv specific
 *= require all/biodiv.css
+*= require all/am.css
 *= require all/auth.css
 *= require all/navigation.css
 *= require all/speciesGroups.css
