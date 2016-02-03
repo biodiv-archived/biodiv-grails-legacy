@@ -163,7 +163,9 @@ class SpeciesUploadService {
 		
 		//writing log after upload
 		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
-		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " + res.log
+		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " 
+		mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
+		mylog += "  \n\n    Developer log \n\n" + res.log
 		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		errorFile.write(mylog)
 		
@@ -276,7 +278,7 @@ class SpeciesUploadService {
 		result['uploadCount'] = uploadCount
 		result['summary'] = converter ? converter.getSummary():""
 		result['log'] = converter ? converter.getLogs() : ""
-		
+		result['idSummary'] = converter ? converter.idSummaryLog : ""
 		return result
 	}
 
@@ -344,6 +346,7 @@ class SpeciesUploadService {
 		int noOfSpecies = content.size();
 		
 		log.info " CONTENT SIZE " + noOfSpecies
+		int processNameCount = 0
 		boolean isAborted = false
 		List contentSubLists = content.collate(BATCH_SIZE)
 		contentSubLists.each { contentSubList ->
@@ -365,8 +368,15 @@ class SpeciesUploadService {
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
+				converter.idSummaryLog += res.idSummary
 				cleanUpGorm();
 				NamelistService.clearCOLNameFromMemory()
+				
+			}
+			
+			processNameCount += contentSubList.size()
+			if(processNameCount%5 == 0){
+				println "------------------- processNameCount " + processNameCount
 			}
 		}
 		
@@ -413,19 +423,22 @@ class SpeciesUploadService {
         converter.setLogAppender(fa);
 		
 		List species = []
-
+		StringBuilder sb = new StringBuilder()
 		int noOfInsertions = 0;
 		try {
 			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
 				for(Node speciesElement : speciesElements) {
+					sb.append(converter.fetchSpeciesName(speciesElement))
 					Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
 						if(s){
 							s.postProcess()
 							species.add(s)
 							noOfInsertions++;
+							sb.append("|" + s.id)
 						}
 					}
+					sb.append("\n")
 				}
 			}else{
 				for(Node speciesElement : speciesElements) {
@@ -459,7 +472,7 @@ class SpeciesUploadService {
 			converter.addToSummary(e)
 		}
 
-		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs()];
+		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs(), 'idSummary':sb.toString()];
 	}
 
 	/** 

@@ -23,6 +23,7 @@ import static groovyx.net.http.Method.GET
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.ContentType.XML
 import groovy.sql.Sql
+import grails.util.Holders
 import groovy.util.XmlParser
 import grails.converters.JSON;
 import wslite.soap.*
@@ -189,6 +190,11 @@ class NamelistService {
 	        TaxonomyDefinition.withNewTransaction {
 		        nl.each { TaxonomyDefinition name ->
 					i++
+					
+					if(i%100 == 0){
+						log.debug "---------------------------------------- current count " + i
+					}
+					
 					List tmpRes = []
 					if(!name || !name.canonicalForm) {
 						log.debug "Name is not parsed by Names Parser " + name
@@ -213,7 +219,13 @@ class NamelistService {
 								if(rr != names[i].rank){
 									addToList = false
 								}
-								
+							}else{ // rank is given species or infraspecies
+								int wCount = name.canonicalForm.trim().count(" ") + 1
+								if((wCount == 1) && (rr > 8 )){ // if single word
+									addToList = false
+								}else if((wCount == 2) && (rr != 9)){
+									addToList = false
+								}
 							}
 							if(addToList){
 								tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
@@ -1704,7 +1716,16 @@ class NamelistService {
 	
 	public List searchCOL(String input, String searchBy) {
 		//http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
-
+		
+		File sourceDir = new File(Holders.config.speciesPortal.namelist.rootDir)
+		if(searchBy == 'name'){
+			File xmlFile = new File(sourceDir,  "" + input.replaceAll(' ', '_') + ".xml")
+			if(xmlFile.exists()){
+				println "COL ::: XML file found"
+				return responseAsMap(xmlFile.text, searchBy)
+			}
+		}
+		
 		def http = new HTTPBuilder()
 		http.request( COL_SITE, GET, TEXT ) { req ->
 			uri.path = COL_URI
@@ -1760,8 +1781,16 @@ class NamelistService {
 	}
 
 	List responseAsMap(String xmlText, String searchBy) {
-		def results = new XmlParser().parseText(xmlText)
-		return responseAsMap(results, searchBy)
+		def results = []
+		try {
+			results = new XmlParser().parseText(xmlText)
+			return responseAsMap(results, searchBy)
+		}catch(e){
+			log.debug "Error in xml text "  + xmlText
+			e.printStackTrace()
+		}
+		//returning empty result
+		return results
 	}
 
 	String generateVerbatim (colResult) {
