@@ -142,6 +142,7 @@ if(r) {
                                 <% imageCount += 1
                                 def gallImagePath = r.url?:createLinkTo(file: ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE), base:grailsApplication.config.speciesPortal.observations.serverURL)%>
                                 <%def gallThumbImagePath = r.thumbnailUrl()%>
+                                <g:if test="${!r.url?.contains('no-image')}">
                                 <a target="_blank"
                                     rel="${gallImagePath}"
                                     href="${gallImagePath}">
@@ -150,7 +151,11 @@ if(r) {
                                     src="${gallThumbImagePath}" 
                                     data-original="${r.url?:createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
                                     /> </a>
-
+                                </g:if>
+                                <g:else>
+                                <img class="galleryImage" 
+                                src="${observationInstance.group?.icon(ImageType.ORIGINAL).thumbnailUrl(null, '.png', ImageType.LARGE)}" />
+                                </g:else>
                                 <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
                                 </g:if>
                                 <g:elseif test="${r.type == ResourceType.VIDEO}">
@@ -235,10 +240,10 @@ if(r) {
                         def annotations = observationInstance.fetchChecklistAnnotation()
                         %>
                         <g:if test="${annotations?.size() > 0}">
-                        <div class="sidebar_section">
+                        <div class="sidebar_section" style="margin-bottom:0px;">
                             <h5><g:message code="heading.annotations" /></h5>
                             <div>
-                                <obv:showAnnotation model="[annotations:annotations]" />
+                                <obv:showAnnotation model="[annotations:annotations, height:297]" />
                             </div>
                         </div>  
                         </g:if>
@@ -351,6 +356,9 @@ $(document).ready(function(){
                                 galleriaInfo.css('cssText', 'top : 350px !important');
                                 var galleriaSlideUp = $(".galleria-info .slideUp");
                                 galleriaSlideUp.trigger('click');
+                                $(e.imageTarget).css({'width':'auto', 'height':'400px', 'position':'', top:'', 'left':'', 'margin':'auto'});
+                                $('.linktext').linkify();
+
                             });
 
                             this.bind('lightbox_image', function(e){

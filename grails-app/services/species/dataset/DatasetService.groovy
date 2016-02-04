@@ -313,6 +313,7 @@ class DatasetService extends AbstractMetadataService {
                 params['externalUrl'] = 'http://doi.org/'+params['externalId'];
                 params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
                 params['language'] = datasetMetadata.dataset.language.text();
+                params['publicationDate'] = utilsService.parseDate(datasetMetadata.dataset.pubDate.text());
             }
 
             params['author'] = springSecurityService.currentUser; 
@@ -468,8 +469,8 @@ class DatasetService extends AbstractMetadataService {
 
             uploadLog << "\nCreating distinct sciName table for parsing";
             conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);
-            conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_parsedNamess+"(id serial primary key, sciName text, clean_sciName text, canonicalForm text, genus text, family text, order1 text, class text, phylum text, kingdom text, commonName text)");
-            conn.executeInsert("INSERT INTO "+ tmpBaseDataTable_parsedNamess +  " (sciName, genus, family, order1, class, phylum, kingdom, commonname) select scientificname, genus, family, order1, class, phylum, kingdom, vernacularname from "+tmpNewBaseDataTable + " group by scientificname, genus, family, order1, class,phylum,kingdom, vernacularname");
+            conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_parsedNamess+"(id serial primary key, sciName text, clean_sciName text, canonicalForm text, species text, genus text, family text, order1 text, class text, phylum text, kingdom text, commonName text, taxonrank text)");
+            conn.executeInsert("INSERT INTO "+ tmpBaseDataTable_parsedNamess +  " (sciName, species, genus, family, order1, class, phylum, kingdom, commonname, taxonrank) select scientificname, species, genus, family, order1, class, phylum, kingdom, vernacularname,taxonrank from "+tmpNewBaseDataTable + " group by scientificname, species, genus, family, order1, class,phylum,kingdom, vernacularname,taxonrank");
 
         } finally {
             conn.close();
@@ -610,7 +611,7 @@ class DatasetService extends AbstractMetadataService {
 
             update '''+tmpBaseDataTable_multimedia+''' set type1= CASE WHEN type='StillImage' THEN 'IMAGE'  WHEN type='MovingImage' THEN 'VIDEO' WHEN type='SOUND' THEN 'AUDIO' ELSE 'IMAGE' END, license1=CASE WHEN license like '%/publicdomain/%' THEN 821 WHEN license like '%/by/%' THEN 822 WHEN license like '%/by-sa/%' THEN 823 WHEN license like '%/by-nc/%' or license='Creative Commons Attribution Non Commercial (CC-BY-NC) 4.0 License.' THEN 825 WHEN license like '%/by-nc-sa/%' THEN 826 WHEN license like '%/by-nc-nd/%' THEN 827 WHEN license like '%/by-nd/%' THEN 824 ELSE 822 END, identifier= CASE WHEN identifier IS NULL THEN '''+"'"+grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg"+"'"+''' ELSE identifier END;
 
-            update '''+tmpBaseDataTable_multimedia+''' set annotations = g.data from (select id as xid, row_to_json((select d from (select gbifId, type, identifier, format, license, references1 as references, rightsHolder, title, publisher, source, description, created, creator, contributor, audience) d))::text as data from gbifdata_multimedia) as  g where g.xid=id;
+            update '''+tmpBaseDataTable_multimedia+''' set annotations = g.data from (select id as xid, row_to_json((select d from (select 'http://www.gbif.org/occurrence/'||gbifId as gbifId, type, identifier, format, license, references1 as references, rightsHolder, title, publisher, source, description, created, creator, contributor, audience) d))::text as data from gbifdata_multimedia) as  g where g.xid=id;
 
             alter table resource add column gbifID bigint;
         insert into resource (id, version,description,file_name,mime_type,type,url,rating,upload_time,uploader_id,context,language_id,access_rights,annotations,gbifID) select nextval('hibernate_sequence'), 0,title,'i',format,type1,identifier,0,'''+"'"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'"+'''::timestamp,'''+currentUser.id+''','OBSERVATION','''+Language.getLanguage().id+''',license,annotations,gbifID  from '''+tmpBaseDataTable_multimedia+''' where identifier is not null;

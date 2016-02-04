@@ -150,7 +150,7 @@ grails.project.dependency.resolution = {
 //        runtime ":database-migration:1.4.0"
 
         compile (':hibernate:3.6.10.16') {
-            excludes 'ehcache-core'
+            //excludes 'ehcache-core'
         }
 
         compile ':hibernate-spatial:0.0.4'

@@ -204,7 +204,7 @@ class ResourcesService extends AbstractObjectService {
     }
 
     def deleteUsersResources(){
-        def result = UsersResource.findAllByStatus(UsersResourceStatus.NOT_USED)
+        def result = UsersResource.findAllByStatus(UsersResourceStatus.NOT_USED, [cache:false])
         def res = []
         result.each{
             res.add(it.res)

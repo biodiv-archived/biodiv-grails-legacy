@@ -3126,3 +3126,7 @@ small {
 .observations_list .table {
 	background-color: white;
 }
+.annotationsWrapper {
+    background-color:#fff;
+    clear:both;
+}

@@ -1,5 +1,5 @@
 package species.participation
-
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +44,8 @@ import static org.springframework.http.HttpStatus.*;
 import species.sourcehandler.exporter.DwCObservationExporter; 
 import species.sourcehandler.exporter.DwCSpeciesExporter; 
 import java.math.BigDecimal
-
+import org.springframework.orm.hibernate3.SessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -66,7 +67,7 @@ class ObservationController extends AbstractObjectController {
     def springSecurityFilterChain
 
     def sessionFactory;
-
+def grailsCacheManager;
 	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
@@ -1865,5 +1866,37 @@ def filterChain() {
         return;
     }
 
+def t() {
+    def statistics = sessionFactory.statistics
+    //            render "simple = ${SpeciesGroup.findByName('Others')}, 
+    render "hits: ${statistics.secondLevelCacheHitCount}, misses: ${statistics.secondLevelCacheMissCount} ${statistics}"
+    render grailsApplication.mainContext.eventTriggeringInterceptor.datastores
+    utilsService.logSql {
+        SpeciesGroup.list();
+    }
+    render '<br/><br/>                            '
+    SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
+    render sessionHolder.hasTimeout()
+    render '<br/><br/>                            '
+    render grailsCacheManager
+    render grailsCacheManager.getCacheNames()
+    render '<br/><br/>'
+    render grailsCacheManager.getCache('').getAllKeys();
+    render grailsCacheManager.getCache('species.groups.SpeciesGroup').getAllKeys();
 
+    //          render GrailsHibernateUtil.isCacheQueriesByDefault(grailsApplication);
+    //          render grailsCacheManager.getCache('org.hibernate.cache.StandardQueryCache').getNativeCache();
+    //          render cache
+    def realCache = sessionFactory.queryCache.region.ehcache;
+    render realCache
+    render '<br/><br/>                            '
+    for (key in realCache.keys) {
+        render key
+        render '<br/><br/>                            '
+        def value = realCache.get(key).value
+        render value 
+        render '<br/><br/>                            '
+
+    }
+}
 }

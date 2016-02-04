@@ -1,6 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.UtilsService"%>
 <style>
     <g:if test="${!showDetails}">
     
@@ -276,6 +277,16 @@
                     </div>		
                 </div>
                 </g:if>
+                
+                <g:if test="${observationInstance.dataset}" >
+                <div class="prop">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.citeas.label" /></span>
+                    <div class="value linktext">
+                        ${observationInstance.dataset.datasource.title} (${UtilsService.formatDate(observationInstance.dataset.publicationDate)}) ${observationInstance.dataset.title}
+                    </div>		
+                </div>
+                </g:if>
+
 
                 <div class="prop">
                     <obv:showTagsSummary

@@ -542,7 +542,7 @@ $(document).ready(function(){
  */
 function eatCookies() {	
     console.log('eatCookies');
-    var hashString = window.location.hash.substring(1);
+/*    var hashString = window.location.hash.substring(1);
     if ($.cookie("listing") == "list") {
         if(!hashString.startsWith('l')) {
             if(hashString.startsWith('g')) {
@@ -560,7 +560,7 @@ function eatCookies() {
             }
         }
     }
-    adjustHeight();
+*/    adjustHeight();
     console.log('eatCookies end');
 }
 

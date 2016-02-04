@@ -431,6 +431,7 @@ function last_actions() {
     }
 
     $('.yj-message-body').linkify();
+    console.log('linktext');
     $('.linktext').linkify(); 
     //applying table sorting
     $("table.tablesorter").tablesorter();

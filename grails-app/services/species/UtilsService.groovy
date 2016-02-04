@@ -29,7 +29,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import java.security.InvalidKeyException;
 import java.util.Date;
-
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 
 import java.beans.Introspector;
@@ -1076,6 +1077,27 @@ class UtilsService {
 		}
 		return null;
 	}
+
+    static String getDayOfMonthSuffix(int n) {
+        if(n < 1 || n > 31) return "";
+        if (n >= 11 && n <= 13) {
+            return "th";
+        }
+        switch (n % 10) {
+            case 1:  return "st";
+            case 2:  return "nd";
+            case 3:  return "rd";
+            default: return "th";
+        }
+    }
+
+    static String formatDate(Date date) {
+        SimpleDateFormat dd = new SimpleDateFormat("dd");
+        SimpleDateFormat mmyyyy = new SimpleDateFormat("MMMMM, yyyy");
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        return  dd.format(date) + getDayOfMonthSuffix(c.get(Calendar.DAY_OF_MONTH)) + " " + mmyyyy.format(date);
+    }
 
 	public String getTableNameForGroup(UserGroup ug){
 		return "custom_fields_group_" + ug.id

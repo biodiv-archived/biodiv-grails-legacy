@@ -29,7 +29,7 @@ class SpeciesGroup {
 	static mapping = {
 		version  false;
 		sort groupOrder:"asc"
-//        cache usage: 'read-only', include: 'non-lazy'
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	Resource icon(ImageType type) {
@@ -100,6 +100,7 @@ class SpeciesGroup {
     }
 
     static SpeciesGroup findByName(String whatever) { 
+        println "overridden fn"
         return SpeciesGroup.createCriteria().get {
             eq 'name', whatever
             cache true

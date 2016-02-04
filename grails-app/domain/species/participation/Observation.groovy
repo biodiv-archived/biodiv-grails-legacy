@@ -236,6 +236,8 @@ class Observation extends DataObject {
 	 */
 	Resource mainImage() {
 		def res = listResourcesByRating(1);
+        println res.fileName[0];
+        println "=========="
         if(res && !res.fileName[0].equals('i')) 
             return res[0]
 		else
@@ -701,15 +703,23 @@ class Observation extends DataObject {
                 if(l++>0) { 
                     String[] parts = line.split(/\t/)
                     if(parts.size()>=8 && (parts[6] || parts[7])) {
-                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'field':parts[7], 'order':Float.parseFloat(parts[6])];
+                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'url':parts[1], 'field':parts[7], 'order':Float.parseFloat(parts[6])];
                     }
                     else if(parts.size()>=7 && parts[6]) {
-                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'field':'', 'order':Float.parseFloat(parts[6])];
+                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'url':parts[1], 'field':'', 'order':Float.parseFloat(parts[6])];
                     }
                 }
             }
 
             res = res.sort { dwcObvMapping[it.key.toLowerCase()].order }
+            def m = [:];
+            res.each {
+                if(it.value) {
+                    m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key].url]
+                }
+            }
+            println m
+            res = m;
         }
 		return res
 	}

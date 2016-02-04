@@ -26,7 +26,9 @@ class DigestService {
 
     public sendDigestAction() {
         log.debug "Send digest action called"
-        def digestList = Digest.list()
+        def digestList = Digest.createCriteria().list {
+            cache false
+        }
         def setTime = true
         digestList.each{ dig ->
 			if(!dig.userGroup.sendDigestMail){

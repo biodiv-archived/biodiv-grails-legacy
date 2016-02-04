@@ -50,7 +50,8 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
 
     DatasetType type
     Datasource datasource;
-    
+    Date publicationDate = new Date();
+
     List<String> alternateIdentifiers;
     Contact originalAuthor;
     List<Contact> metadataProvider;
@@ -110,6 +111,7 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
         temporalCoverages nullable:true;
         taxonomicCoverages nullable:true;
         uFile nullable:true;
+        publicationDate nullable:false;
     }
 	
 	static mapping = {

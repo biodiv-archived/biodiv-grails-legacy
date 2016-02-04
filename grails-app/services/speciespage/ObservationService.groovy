@@ -528,11 +528,14 @@ class ObservationService extends AbstractMetadataService {
     }
 
     private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null) {
-        String query = "from Observation o "+(userGroupInstance?" join o.userGroups u":"")+" where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and o.maxVotedReco.taxonConcept=:maxVotedRecoTaxonConcept":"and o.maxVotedReco=:maxVotedReco")+(userGroupInstance?" and u.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
+        def result = [];
+        def count=0;
+        String query = "from Observation o "+(userGroupInstance?" join o.userGroups u":"")+" where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and o.maxVotedReco.taxonConcept.id=:maxVotedRecoTaxonConcept":"and o.maxVotedReco.id=:maxVotedReco")+(userGroupInstance?" and u.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
         def params = ['isDeleted':false, 'obvId':obvId]
-        if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept;
-        else params['maxVotedReco'] = maxVotedReco;
-        if(userGroupInstance) params['userGroupId'] = userGroupInstance.id
+        if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept.id;
+        else params['maxVotedReco'] = maxVotedReco.id;
+        if(userGroupInstance) params['userGroupId'] = userGroupInstance.id;
+        
 	    def observations = Observation.executeQuery(query, params, [max:limit, offset:offset]);
         /*
         def observations = Observation.withCriteria () {
@@ -566,7 +569,6 @@ class ObservationService extends AbstractMetadataService {
         }
         */
 
-        def result = [];
         observations.each {
             def obv;
             if(userGroupInstance) obv = it[0];
@@ -577,7 +579,7 @@ class ObservationService extends AbstractMetadataService {
         if(limit < 0)
             return ["observations":result];
 
-        def count = Observation.createCriteria().count {
+        count = Observation.createCriteria().count {
 //            projections {
 //                count(groupProperty('sourceId'))
 //            }
@@ -593,7 +595,6 @@ class ObservationService extends AbstractMetadataService {
                 }    
             }
         }
-		
         return ["observations":result, "count":count]
     }
     

@@ -41,7 +41,7 @@ class ProcessImageJob {
 	}
 
 	private synchronized getProcessImageRequest(){
-		List scheduledTaskList = ProcessImage.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:5])
+		List scheduledTaskList = ProcessImage.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:5, cache:false])
 		if(scheduledTaskList.isEmpty()){
 			return null
 		}

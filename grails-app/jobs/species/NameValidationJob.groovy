@@ -37,7 +37,7 @@ class NameValidationJob {
 	
 
 	private synchronized getValidationJob(){
-		List scheduledTaskList = NamesReportGenerator.findAllByStatus(Status.SCHEDULED, [sort: "id", order: "asc", max:5])
+		List scheduledTaskList = NamesReportGenerator.findAllByStatus(Status.SCHEDULED, [sort: "id", order: "asc", max:5, cache:false])
 		if(scheduledTaskList.isEmpty()){
 			return null
 		}

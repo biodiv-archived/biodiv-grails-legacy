@@ -25,7 +25,7 @@ class Language {
 	static mapping = {
 		version false;
 		sort 'name';
-    //    cache usage: 'read-only', include: 'non-lazy'
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	public static Language getLanguage(String languageName){

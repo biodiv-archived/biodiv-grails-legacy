@@ -552,12 +552,12 @@ environments {
             error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
             error    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
             error   'org.codehaus.groovy.grails.commons', // core / classloading
-            'org.codehaus.groovy.grails.plugins', // plugins
             'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
             'grails.util'
-            error "grails.plugin" 
+            info 'org.codehaus.groovy.grails.plugins' // plugins
+            info "grails.plugin" 
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
@@ -616,6 +616,9 @@ environments {
             debug   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
 			debug   'grails.app.services.speciespage.SpeciesUploadService'
+            debug   'org.hibernate.cache.EhCache'
+            debug   'org.hibernate.cache.internal.StandardQueryCache'
+            info   'org.hibernate.cache'
         }
     }
     test {
@@ -1808,12 +1811,15 @@ grails.mime.disable.accept.header.userAgents = []
 grails.plugin.springsecurity.oauth.domainClass = 'species.auth.OAuthID'
 grails.plugin.springsecurity.oauth.registration.askToLinkOrCreateAccountUri = '/login/openIdCreateAccount'
 
+// configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
+//grails.hibernate.cache.queries=false
+grails.cache.clearAtStartup = true
 grails{
     cache {
         enabled = true
         ehcache {
-            ehcacheXmlLocation = 'classpath:ehcache.xml' // conf/ehcache.xml
-            reloadable = false
+//            ehcacheXmlLocation = 'classpath:ehcache.xml' // conf/ehcache.xml
+            reloadable = true
         }
     }
 }
@@ -1845,28 +1851,28 @@ grails.cache.config = {
         diskExpiryThreadIntervalSeconds 120
         memoryStoreEvictionPolicy 'LRU'
     }
-    cache {
+    domain {
         name 'species.groups.SpeciesGroup'
         eternal true
         overflowToDisk true
         maxElementsInMemory 20
         maxElementsOnDisk 100
     }
-    cache {
+    domain {
         name 'species.Habitat'
         eternal true
         overflowToDisk true
         maxElementsInMemory 20
         maxElementsOnDisk 100
     }
-    cache {
+    domain {
         name 'species.License'
         eternal true
         overflowToDisk true
         maxElementsInMemory 10
         maxElementsOnDisk 100
     }
-    cache {
+    domain {
         name 'species.Language'
         eternal true
         overflowToDisk true
@@ -1874,6 +1880,7 @@ grails.cache.config = {
         maxElementsOnDisk 1000
     }
 }
+
 /*
 grails {
     redis {

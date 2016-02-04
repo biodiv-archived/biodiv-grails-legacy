@@ -9,16 +9,22 @@
 		def speciesId = observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId();
 		def speciesLink = " "
         def see_checklists=g.message(code:"button.see.checklist")
+        def see_dataset=g.message(code:"button.see.dataset")
         def sourcechecklists=g.message(code:"showspeciesnametemp.title.source")
         def see_species=g.message(code:"button.see.species")
 		if(speciesId && !isHeading){
             def l = uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true)
 			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + l + '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_species+'</a>'
 		} 
-        if(observationInstance.id != observationInstance.sourceId && !isHeading) {
+        if(observationInstance.sourceId && observationInstance.id != observationInstance.sourceId && !isHeading) {
             def l = uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) 
 			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l + '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_checklists+'</a>'
 		}
+        if(observationInstance.dataset && !isHeading) {
+            def l = uGroup.createLink(controller:'datasource', action:'show', id:observationInstance.dataset.datasource.id,  'userGroupWebaddress':params?.webaddress, absolute:true) 
+			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l +'#'+observationInstance.dataset.id+ '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_dataset+'</a>'
+		}
+
 	%>
 	<g:set var="speciesLinkHtml" value="${raw(speciesLink.replaceAll('"',"'"))}" />
 	<g:set var="sName" value="${raw(observationInstance.fetchFormattedSpeciesCall())}" />

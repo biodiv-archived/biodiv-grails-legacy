@@ -493,3 +493,11 @@ create view checklist_species_locations as SELECT csv.id,
 
 drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
 create sequence document_id_seq start 863; create sequence observation_id_seq start 397104; create  sequence species_id_seq start 276169; create sequence suser_id_seq start 8942;
+
+alter table observation add constraint obv_dataset_id_fk foreign key (dataset_id) references dataset(id);
+create index on observation(external_id);
+create index on observation(dataset_id);
+create index on observation(group_id);
+create index on observation(is_deleted);
+create index on observation(is_showable);
+create index on observation(is_checklist);

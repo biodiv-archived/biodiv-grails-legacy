@@ -1,11 +1,13 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.UtilsService"%>
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 
-<div class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
+<div name="${datasetInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
     <h5>
-        <span class="name"><g:message code="dataset.label" /> : </span>
+        <a name="${datasetInstance.id}"></a>
+        <span><g:message code="dataset.label" /> : </span>
         <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
         ${datasetInstance.title}
         </g:link>
@@ -58,7 +60,7 @@
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
-                        <div class="value notes_view linktext ellipsis multiline"> 
+                        <div class="value notes_view"> 
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
                         %> 
@@ -68,9 +70,8 @@
                                     clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
                                 %>
                             </g:if>
-                            
                             ${raw(clickcontentVar)}
-                            <div style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
+                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
                     
                         </div>
                     </g:if>
@@ -142,7 +143,20 @@
                     </div>
                 </div>
                 </g:if>
-               
+
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.citeas.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-info-sign"></i>
+                    </g:else>
+
+                    <div class="value linktext">
+                        ${datasetInstance.datasource.title} (${UtilsService.formatDate(datasetInstance.publicationDate)}) ${datasetInstance.title}
+                    </div>
+                </div>
+   
            </g:if>
 
         </div>
