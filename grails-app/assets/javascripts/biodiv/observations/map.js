@@ -2,7 +2,7 @@
 function refreshMarkers(p, url, callback, mapLocationPicker) {
     if(!p) p = new Array()
 
-    p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy";
+    p['fetchField'] = "id,latitude,longitude,isChecklist,geoPrivacy,title,fromDate";
     p['max'] = -1;
     //delete p['bounds']
     

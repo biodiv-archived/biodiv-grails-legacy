@@ -304,10 +304,7 @@ $(document).ready(function(){
 <%--        dcorateCommentBody($('.yj-message-body')); --%>
 
         $("#seeMoreMessage").hide();
-        $(".readmore").readmore({
-            substr_len : 400,
-            more_link : '<a class="more readmore">&nbsp;More</a>'
-        });
+
         
         $('#gallery1').galleria({
             height : 400,

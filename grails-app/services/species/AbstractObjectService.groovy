@@ -1,7 +1,7 @@
 package species;
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,14 +36,23 @@ class AbstractObjectService {
 		return urlList
 	}
 
+    //when a query is fired for map with fetchFields ... obv is a map
 	protected static List createUrlList2(observations, String iconBasePath) {
 		List urlList = []
 		for(param in observations){
             def obv = param['observation'];
 
-			def item = asJSON(obv, iconBasePath) 
+			def item, controller;
+            if(DomainClassArtefactHandler.isDomainClass(obv.getClass())) {
+                item = asJSON(obv, iconBasePath);
+                controller = UtilsService.getTargetController(obv);
+            } else {
+                item = obv;
+                controller = obv.remove('controller');
+                item.lat = obv.remove('latitude');
+                item.lng = obv.remove('longitude');
+            }
             
-            def controller = UtilsService.getTargetController(obv);
 			item.url = "/" + controller + "/show/" + obv.id
 			item.title = param['title']
             item.type = controller                  

@@ -407,7 +407,12 @@ function last_actions() {
     });
 
     $(".ellipsis:not(.multiline)").trunk8();
-
+    
+    $(".readmore").readmore({
+        substr_len : 400,
+        more_link : '<a class="more readmore">&nbsp;More</a>'
+    });
+    
     $('.collapse').on({
         shown: function(){
             $(this).css('overflow','visible');

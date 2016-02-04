@@ -501,3 +501,5 @@ create index on observation(group_id);
 create index on observation(is_deleted);
 create index on observation(is_showable);
 create index on observation(is_checklist);
+create index on observation(max_voted_reco_id);
+create index on recommendation(taxon_concept_id);

@@ -347,7 +347,7 @@ class ObservationService extends AbstractMetadataService {
         def relatedObv = [observations:[],max:max];
         if(params.filterProperty == "speciesName") {
             UserGroup userGroupInstance = getUserGroup(params);
-            relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset, userGroupInstance)
+            relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset, userGroupInstance, params.fetchField)
         } else if(params.filterProperty == "speciesGroup"){
             relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
         } else if(params.filterProperty == "featureBy") {
@@ -415,8 +415,8 @@ class ObservationService extends AbstractMetadataService {
      * @param params
      * @return
      */
-    Map getRelatedObservationBySpeciesName(long obvId, int limit, int offset, UserGroup userGroupInstance = null){
-        return getRelatedObservationBySpeciesNames(obvId, limit, offset, userGroupInstance)
+    Map getRelatedObservationBySpeciesName(long obvId, int limit, int offset, UserGroup userGroupInstance = null, String fetchFields='*'){
+        return getRelatedObservationBySpeciesNames(obvId, limit, offset, userGroupInstance, fetchFields);
     }
     /**
      * 
@@ -519,24 +519,37 @@ class ObservationService extends AbstractMetadataService {
      * @param params
      * @return
      */
-    Map getRelatedObservationBySpeciesNames(long obvId, int limit, int offset, UserGroup userGroupInstance = null){
+    Map getRelatedObservationBySpeciesNames(long obvId, int limit, int offset, UserGroup userGroupInstance = null, String fetchFields='*'){
         Observation parentObv = Observation.read(obvId);
         if(!parentObv.maxVotedReco) {
             return ["observations":[], "count":0];
         }
-        return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset, userGroupInstance)
+        return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset, userGroupInstance, fetchFields)
     }
 
-    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null) {
+    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null, String fetchFields='*') {
         def result = [];
         def count=0;
-        String query = "from Observation o "+(userGroupInstance?" join o.userGroups u":"")+" where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and o.maxVotedReco.taxonConcept.id=:maxVotedRecoTaxonConcept":"and o.maxVotedReco.id=:maxVotedReco")+(userGroupInstance?" and u.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
+        String ff = ''
+        if(fetchFields) {
+            fetchFields.split(',').each {
+                ff += it + ' as '+ it+', ';
+            }
+            ff='new map('+ff+' '+"'"+'observation'+"'"+' as controller)';
+        } else {
+            ff = 'o';
+        }
+
+        String query = "select "+ff+" from Observation o "+(userGroupInstance?" join o.userGroups u":"")+" where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and o.maxVotedReco.taxonConcept.id=:maxVotedRecoTaxonConcept":"and o.maxVotedReco.id=:maxVotedReco")+(userGroupInstance?" and u.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
         def params = ['isDeleted':false, 'obvId':obvId]
         if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept.id;
         else params['maxVotedReco'] = maxVotedReco.id;
         if(userGroupInstance) params['userGroupId'] = userGroupInstance.id;
         
+        log.debug "getRelatedObservationByReco Sql : ${query} with params ${params}"
+
 	    def observations = Observation.executeQuery(query, params, [max:limit, offset:offset]);
+        println "dsfsdf"
         /*
         def observations = Observation.withCriteria () {
 //            projections {
@@ -579,21 +592,25 @@ class ObservationService extends AbstractMetadataService {
         if(limit < 0)
             return ["observations":result];
 
-        count = Observation.createCriteria().count {
-//            projections {
-//                count(groupProperty('sourceId'))
-//            }
-            and {
-                eq("maxVotedReco", maxVotedReco)
-                eq("isDeleted", false)
-				eq("isChecklist", false)
-				if(obvId) ne("id", obvId)
-                if(userGroupInstance){
-                    userGroups{
-                        eq('id', userGroupInstance.id)
-                    }
-                }    
+        if(!fetchFields) {
+            count = Observation.createCriteria().count {
+                //            projections {
+                //                count(groupProperty('sourceId'))
+                //            }
+                and {
+                    eq("maxVotedReco", maxVotedReco)
+                    eq("isDeleted", false)
+                    eq("isChecklist", false)
+                    if(obvId) ne("id", obvId)
+                        if(userGroupInstance){
+                            userGroups{
+                                eq('id', userGroupInstance.id)
+                            }
+                        }    
+                }
             }
+        } else {
+            count = -1;
         }
         return ["observations":result, "count":count]
     }

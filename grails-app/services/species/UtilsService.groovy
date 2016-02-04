@@ -892,9 +892,9 @@ class UtilsService {
     static getTargetController(domainObj){
         if(domainObj.instanceOf(Checklists)){
             return "checklist"
-        }else if(domainObj.instanceOf(SUser)){
+        } else if(domainObj.instanceOf(SUser)){
             return "user"
-        }else{
+        } else {
             return domainObj.class.getSimpleName().toLowerCase()
         }
     }
