@@ -177,35 +177,41 @@ class SpeciesUploadService {
 		
 		//Every thing is fine then sending mail
 		String link
-		if(res.success){
-			def otherParams = [:]
-			def usersMailList = []
-			usersMailList = speciesPermissionService.getSpeciesAdmin()
-			log.debug "user mail list " + usersMailList
-			def sp = new Species()
-			
-			def linkParams = [:]
-			linkParams["daterangepicker_start"] = SpeciesService.DATE_FORMAT.format(sBulkUploadEntry.startDate) 
-			linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
-			linkParams["sort"] = "lastUpdated"
-			linkParams["user"] = springSecurityService.currentUser?.id
-			link = utilsService.generateLink("species", "list", linkParams)
-			otherParams["link"] = link
-			usersMailList.each{ user ->
-				def uml =[]
-				uml.add(user)
-				otherParams["curator"] = user.name
-				otherParams["usersMailList"] = uml
-				utilsService.sendNotificationMail(utilsService.SPECIES_CURATORS,sp,null,null,null,otherParams)
+		try{
+			if(res.success){
+				def otherParams = [:]
+				def usersMailList = []
+				usersMailList = speciesPermissionService.getSpeciesAdmin()
+				log.debug "user mail list " + usersMailList
+				def sp = new Species()
+				
+				def linkParams = [:]
+				linkParams["daterangepicker_start"] = SpeciesService.DATE_FORMAT.format(sBulkUploadEntry.startDate) 
+				linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
+				linkParams["sort"] = "lastUpdated"
+				linkParams["user"] = springSecurityService.currentUser?.id
+				link = utilsService.generateLink("species", "list", linkParams)
+				otherParams["link"] = link
+				usersMailList.each{ user ->
+					def uml =[]
+					uml.add(user)
+					otherParams["curator"] = user.name
+					otherParams["usersMailList"] = uml
+					utilsService.sendNotificationMail(utilsService.SPECIES_CURATORS,sp,null,null,null,otherParams)
+				}
+				
+				//sending mail to species contributor
+				otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
+				otherParams["speciesCreated"] = sBulkUploadEntry.speciesCreated
+				otherParams["speciesUpdated"] = sBulkUploadEntry.speciesUpdated
+				otherParams["stubsCreated"] = sBulkUploadEntry.stubsCreated
+				utilsService.sendNotificationMail(utilsService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
 			}
-			
-			//sending mail to species contributor
-			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
-			otherParams["speciesCreated"] = sBulkUploadEntry.speciesCreated
-			otherParams["speciesUpdated"] = sBulkUploadEntry.speciesUpdated
-			otherParams["stubsCreated"] = sBulkUploadEntry.stubsCreated
-			utilsService.sendNotificationMail(utilsService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
+		}catch(e){
+			log.error "Error while sending mail"
+			e.printStackTrace()
 		}
+			
 		
 		def msg = ""
 		if(sBulkUploadEntry.status == SpeciesBulkUpload.Status.UPLOADED){
@@ -278,7 +284,7 @@ class SpeciesUploadService {
 		result['uploadCount'] = uploadCount
 		result['summary'] = converter ? converter.getSummary():""
 		result['log'] = converter ? converter.getLogs() : ""
-		result['idSummary'] = converter ? converter.idSummaryLog : ""
+		result['idSummary'] = converter ? converter.idSummaryLog : "\n"
 		return result
 	}
 
@@ -362,7 +368,7 @@ class SpeciesUploadService {
 						speciesElements.add(speciesElement);
 					}
 				}
-				def res = saveSpeciesElementsWrapper(speciesElements, sBulkUploadEntry)
+				def res = saveSpeciesElements(speciesElements, sBulkUploadEntry)
 				speciesElements.clear()
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.summary);
@@ -428,14 +434,16 @@ class SpeciesUploadService {
 		try {
 			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
 				for(Node speciesElement : speciesElements) {
-					sb.append(converter.fetchSpeciesName(speciesElement))
+					String currSpeciesName = converter.fetchSpeciesName(speciesElement)
+					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping \n"
+					sb.append(currSpeciesName)
 					Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
 						if(s){
 							s.postProcess()
 							species.add(s)
 							noOfInsertions++;
-							sb.append("|" + s.id)
+							sb.append("|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)
 						}
 					}
 					sb.append("\n")

@@ -132,11 +132,8 @@ class NamelistService {
 					}
 					//XXX in curation while taking col hir. we want author year column to be used forcefully 
 					// in other cases we will not use untill gets multiple matches 
-					if(useAuthorYear){
-						if(authorYear)
-							eq('authorYear', authorYear)
-						else
-							isNull('authorYear')	
+					if(useAuthorYear && authorYear){
+						eq('authorYear', authorYear)
 					}
 				}
             }
