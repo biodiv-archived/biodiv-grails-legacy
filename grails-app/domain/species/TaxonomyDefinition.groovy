@@ -1,6 +1,7 @@
 package species
 
 import java.util.List;
+import org.hibernate.Hibernate;
 
 import species.ScientificName.TaxonomyRank
 import species.groups.SpeciesGroup;
@@ -353,6 +354,11 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	public postProcess(){
+		if( this.instanceOf(SynonymsMerged)){
+			println "Not doing any post process for synonyms"
+			return
+		}
+		
 		if((position != NamesMetadata.NamePosition.CLEAN) && doColCuration){
 			curateNameByCol()
 			println "----------------------------------- adding col hir"

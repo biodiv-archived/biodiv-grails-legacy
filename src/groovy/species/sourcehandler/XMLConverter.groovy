@@ -536,13 +536,19 @@ class XMLConverter extends SourceConverter {
 			return null
 		}
 		
+		
+		if(nameNode.ibpId){
+			println "Ibp id is given for this synonym so returning the same " + nameNode
+			return SynonymsMerged.read(Long.parseLong(nameNode.ibpId.text()))
+		}
+		
 		if(!nameNode.colId){
 			println "Col Id is not given for this synonym so ignoring it  " + nameNode
 			return null
 		}
-		
 		try {
-			return ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(getData(nameNode.colId))
+			def colId = nameNode.colId.text()
+			return ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
 		}catch(e){
 			e.printStackTrace()
 		}
