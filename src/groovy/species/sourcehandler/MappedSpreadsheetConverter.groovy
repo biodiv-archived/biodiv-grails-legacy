@@ -35,8 +35,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	private Map synonymMap 
 	protected boolean multipleMatchingRow = false
 	
-	//to return assigned id for each name
-	String idSummaryLog = ""
+//	//to return assigned id for each name
+//	String idSummaryLog = ""
 	
 	public MappedSpreadsheetConverter() {
 		imagesMetaData = [];

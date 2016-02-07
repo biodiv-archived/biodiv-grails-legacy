@@ -419,3 +419,5 @@ ALTER TABLE newsletter ADD parent_id bigint;
 update newsletter set parent_id=0;
 alter table newsletter alter column parent_id set not null;
 
+ALTER TABLE species_bulk_upload ADD COLUMN log_file_path character varying(255);
+

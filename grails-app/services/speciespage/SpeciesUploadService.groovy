@@ -164,7 +164,7 @@ class SpeciesUploadService {
 		//writing log after upload
 		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
 		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " 
-		mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
+		//mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
 		mylog += "  \n\n    Developer log \n\n" + res.log
 		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		errorFile.write(mylog)
@@ -284,7 +284,7 @@ class SpeciesUploadService {
 		result['uploadCount'] = uploadCount
 		result['summary'] = converter ? converter.getSummary():""
 		result['log'] = converter ? converter.getLogs() : ""
-		result['idSummary'] = converter ? converter.idSummaryLog : "\n"
+		//result['idSummary'] = converter ? converter.idSummaryLog : "\n"
 		return result
 	}
 
@@ -374,7 +374,7 @@ class SpeciesUploadService {
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
-				converter.idSummaryLog += res.idSummary
+				sBulkUploadEntry?.writeLog(res.idSummary)
 				cleanUpGorm();
 				NamelistService.clearCOLNameFromMemory()
 				
@@ -435,7 +435,7 @@ class SpeciesUploadService {
 			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
 				for(Node speciesElement : speciesElements) {
 					String currSpeciesName = converter.fetchSpeciesName(speciesElement)
-					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping \n"
+					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping"
 					sb.append(currSpeciesName)
 					Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
@@ -446,7 +446,6 @@ class SpeciesUploadService {
 							sb.append("|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)
 						}
 					}
-					sb.append("\n")
 				}
 			}else{
 				for(Node speciesElement : speciesElements) {

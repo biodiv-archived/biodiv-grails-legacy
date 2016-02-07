@@ -439,8 +439,9 @@ class XMLConverter extends SourceConverter {
 			def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
 			addToSummary("<<< NAME >>> "  + speciesName)
 			
+			String nameRunningStatusText = getData(speciesNameNode.nameRunningStatus)?.trim()
 			String nameMatchStatus = getData(speciesNameNode.matchStatus)
-			if("synonym".equalsIgnoreCase(nameMatchStatus)){
+			if((!"new".equals(nameRunningStatusText)) && ("synonym".equalsIgnoreCase(nameMatchStatus))){
 				return addNameAsSynonym(speciesNameNode)
 			}
 			
@@ -498,7 +499,7 @@ class XMLConverter extends SourceConverter {
 							}  
 						}
 					}
-
+					updateUserPrefForColCuration(taxonConcept, speciesNameNode)
 					return taxonConcept;
 				} else {
 					log.error "TaxonConcept is not found"
@@ -512,6 +513,14 @@ class XMLConverter extends SourceConverter {
 			log.error "ERROR CONVERTING Name : "+e.getMessage();
 			e.printStackTrace();
 			addToSummary(e);
+		}
+	}
+	
+	private void updateUserPrefForColCuration(TaxonomyDefinition taxonConcept, Node nameNode){
+		String nameRunningStatusText = getData(nameNode.nameRunningStatus)?.trim()
+		if("new".equals(nameRunningStatusText)){
+			println "Name is forcefully created as new so setting flag to avoid col curation  " + nameNode
+			taxonConcept.doColCuration = false
 		}
 	}
 	
@@ -2053,7 +2062,7 @@ class XMLConverter extends SourceConverter {
                                 //taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
-                                println "=====SAVING NEW TAXON======================#######============ " + parsedName
+                                println "=====SAVING NEW TAXON==========>>>>>>>>>>>>>>>>>>============#######============ " + parsedName
 								
                                 log.debug "Saving taxon definition"
                                 taxon = parsedName;
@@ -2299,6 +2308,13 @@ class XMLConverter extends SourceConverter {
 		def colId = nameNode?.colId?.text();
 		def nameRunningStatus = nameNode?.nameRunningStatus?.text();
 		
+		
+		println "----------------------- name running status " + nameRunningStatus
+		// to force creation of new node
+		if("new".equalsIgnoreCase(nameRunningStatus)){
+			return []
+		}
+		
 		println "----------------- ibp id  " +  ibpId + "  and col id " + colId
 		if(ibpId){
 			ibpId = Long.parseLong(ibpId.trim());
@@ -2313,10 +2329,6 @@ class XMLConverter extends SourceConverter {
 			return [taxon]
 		}
 		
-		// to force creation of new node
-		if(nameRunningStatus == "new"){
-			return []
-		}
 		
 		
 		return NamelistService.searchIBP(parsedName.canonicalForm, parsedName.authorYear, status, rank, searchInNull, parsedName.normalizedForm, useAuthorYear)

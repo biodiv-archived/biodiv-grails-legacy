@@ -31,6 +31,10 @@ class TaxonomyDefinition extends ScientificName {
 	
 	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
+	
+	//When user want to create absolute new name and dont want to use col curation at any point of the time then
+	// set this flat to false 
+	boolean doColCuration = true
 
     def grailsApplication
 	def namelistService
@@ -61,6 +65,8 @@ class TaxonomyDefinition extends ScientificName {
 		version false;
 		tablePerHierarchy true
 	}
+	
+	static transients = [ "doColCuration" ]
 
     Species findSpecies() {
         return Species.findByTaxonConcept(this);
@@ -347,7 +353,7 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	public postProcess(){
-		if(position != NamesMetadata.NamePosition.CLEAN){
+		if((position != NamesMetadata.NamePosition.CLEAN) && doColCuration){
 			curateNameByCol()
 			println "----------------------------------- adding col hir"
 			addColHir()
@@ -602,12 +608,17 @@ class TaxonomyDefinition extends ScientificName {
 		
 		users.minus(contributors)
 		
-		users.each { u ->
-			this.addToContributors(u)
-		}
-		
-		if(!save(flush:true)){
-			this.errors.allErrors.each { log.error it }
+		try{
+			
+			users.each { u ->
+				this.addToContributors(u)
+			}
+			
+			if(!save(flush:true)){
+				this.errors.allErrors.each { log.error it }
+			}
+		}catch(e){
+			e.printStackTrace()
 		}
 	}
 
