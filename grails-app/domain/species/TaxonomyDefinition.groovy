@@ -11,6 +11,7 @@ import species.participation.NamelistService
 import species.sourcehandler.XMLConverter;
 import species.participation.ActivityFeedService
 import species.auth.SUser
+import grails.converters.JSON
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -31,6 +32,7 @@ class TaxonomyDefinition extends ScientificName {
     Long speciesId;	
 	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
+    String defaultHierarchy;
 
     def grailsApplication
 	def namelistService
@@ -54,6 +56,7 @@ class TaxonomyDefinition extends ScientificName {
 		oldId nullable:true;
 		dirtyListReason nullable:true;
 		lowercaseMatchName nullable:true;
+		defaultHierarchy nullable:true;
 	}
 
 	static mapping = {
@@ -139,9 +142,14 @@ class TaxonomyDefinition extends ScientificName {
  	   return result;
    }
    	
-	List<TaxonomyDefinition> fetchDefaultHierarchy() {
+	List fetchDefaultHierarchy() {
+        if(defaultHierarchy) 
+            return JSON.parse(this.defaultHierarchy);
+        return null;
+        /*
         def classification = Classification.fetchIBPClassification()
         return parentTaxonRegistry(classification).get(classification);
+        */
     }
 	
 	String fetchRootName(){

@@ -33,6 +33,7 @@ import species.participation.Comment;
 import species.participation.ActivityFeed;
 import species.utils.ImageType;
 import species.Language;
+import species.Contributor;
 import species.NamesMetadata.NamePosition;
 import content.eml.UFile;
 
@@ -75,7 +76,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(License) {
-            return ['name': it.name.value(), 'url':it.name]
+            return ['name': it.name.value(), 'url':it.url]
         }
 
         JSON.registerObjectMarshaller(Featured) {
@@ -106,7 +107,7 @@ class CustomObjectMarshallers {
             List<TaxonomyDefinition> defaultHierarchy = it.fetchDefaultHierarchy();
             String parentName = defaultHierarchy ? defaultHierarchy[-2].canonicalForm : null
             String group = defaultHierarchy ?  defaultHierarchy[0].canonicalForm : null
-            List<Map> defaultHierarchyMap = defaultHierarchy.collect { ['id':it.id, 'name':it.name, 'canonicalForm':it.canonicalForm, 'rank':it.rank, 'speciesId':it.speciesId]};
+            List<Map> defaultHierarchyMap = defaultHierarchy//.collect { ['id':it.id, 'name':it.name, 'canonicalForm':it.canonicalForm, 'rank':it.rank, 'speciesId':it.speciesId]};
             return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'defaultHierarchy':defaultHierarchyMap, 'group':it.group, 'parentName':parentName, 'position':it.position.value(), speciesId:it.speciesId]
         }
 
@@ -131,11 +132,12 @@ class CustomObjectMarshallers {
                 r['taxonomyDefinition'] = it.taxonConcept;
             }
             println 'taxonConcept'
-            Long speciesId = it.taxonConcept?.findSpeciesId();
+/*            Long speciesId = it.taxonConcept?.findSpeciesId();
             if(speciesId) {
                 r['speciesId'] = speciesId;
             }
             println 'speciesId'
+*/
             if(it.languageId) {
                 r['language'] = Language.read(it.languageId);
             }
@@ -242,6 +244,10 @@ class CustomObjectMarshallers {
 
         JSON.registerObjectMarshaller(NamePosition) {
             return it.value();
+        }
+        
+        JSON.registerObjectMarshaller(Contributor) {
+            return ['name':it.name];
         }
     }
     }

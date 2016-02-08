@@ -35,7 +35,6 @@ class ObservationMarshaller {
 
 
                 resource : obv.listResourcesByRating(),
-                recommendationVote : obv.recommendationVote,
                 userGroups : obv.userGroups,
                 annotations : obv.annotations,
                 language : obv.language,
@@ -52,6 +51,7 @@ class ObservationMarshaller {
                 noOfVideos : obv.noOfVideos,
                 noOfAudio : obv.noOfAudio
             ]
+                //recommendationVote : obv.recommendationVote,
 println "main obv json"
             if(obv.dataset) {
                 result['dataset_id'] = obv.dataset.id;
