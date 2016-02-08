@@ -603,19 +603,17 @@ class TaxonomyDefinition extends ScientificName {
 	
 	def updateContributors(List<SUser> users){
 		if(!users) return
-		
-		if (!this.isAttached()) {
-			this.attach()
-		}
-		
-		//not adding contributors to existing accepted name above genus level
-		if(contributors && (status == NameStatus.ACCEPTED) && (rank < 7))
-			return
-		
-		users.minus(contributors)
-		
 		try{
+			if (!this.isAttached()) {
+				this.attach()
+			}
 			
+			//not adding contributors to existing accepted name above genus level
+			if(contributors && (status == NameStatus.ACCEPTED) && (rank < 7))
+				return
+			
+			users.minus(contributors)
+		
 			users.each { u ->
 				this.addToContributors(u)
 			}
@@ -623,8 +621,8 @@ class TaxonomyDefinition extends ScientificName {
 			if(!save(flush:true)){
 				this.errors.allErrors.each { log.error it }
 			}
-		}catch(e){
-			e.printStackTrace()
+		}catch(Exception e){
+			log.error e.getMessage()
 		}
 	}
 
