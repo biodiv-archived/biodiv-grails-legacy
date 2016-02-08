@@ -1381,7 +1381,7 @@ class SpeciesController extends AbstractObjectController {
 		
 		if(taxonId){
 			def taxon = TaxonomyDefinition.read(taxonId)
-			Species species = Species.findByTaxonConcept(taxon);
+			Species species = Species.get(taxon.findSpeciesId());
 			if(!species){
 				species = speciesUploadService.createSpeciesStub(taxon)
 			}
@@ -1519,7 +1519,7 @@ class SpeciesController extends AbstractObjectController {
 					// one result in ibp system so redirecting to species page
 					else {
                         //CHK if a species page exists for this concept
-                        Species species = Species.findByTaxonConcept(taxon);
+			            Species species = Species.get(taxon.findSpeciesId());
                         taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
@@ -1724,7 +1724,7 @@ class SpeciesController extends AbstractObjectController {
 
         } 
 
-        def s = Species.findByTaxonConcept(tD);
+        def s = Species.get(tD.findSpeciesId());
         if(s) {
             result = [success:false];
             render result as JSON

@@ -160,7 +160,7 @@ class AbstractObjectService {
 
         def featured = []
         def count = 0;
-        def queryParams = [:];
+        def queryParams = [cache:true];
         def countQuery,query;
         if(type) {
             queryParams["type"] = type

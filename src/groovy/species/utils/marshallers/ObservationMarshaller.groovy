@@ -7,6 +7,7 @@ class ObservationMarshaller {
     
     void register() {
        JSON.registerObjectMarshaller( Observation) { Observation obv ->
+           println "Observation Marshaller"
             Map result = [
                 id : obv.id,
                 title: obv.fetchFormattedSpeciesCall(),
@@ -45,13 +46,23 @@ class ObservationMarshaller {
 
                 visitCount : obv.visitCount,
                 flagCount : obv.flagCount,
-                featureCount : obv.featureCount
+                featureCount : obv.featureCount,
+                noOfIdentifications : obv.noOfIdentifications,
+                noOfImages : obv.noOfImages,
+                noOfVideos : obv.noOfVideos,
+                noOfAudio : obv.noOfAudio
             ]
+println "main obv json"
+            if(obv.dataset) {
+                result['dataset_id'] = obv.dataset.id;
+            }
 
             if(obv.isChecklist && obv.isShowable) {
+                result['checklist_id'] = obv.sourceId;
                 result['checklistAnnotations'] = obv.checklistAnnotations;
             }
 
+println "bfr maxReco"
             Map maxVotedReco = new HashMap();
             if(obv.maxVotedReco) {
                 if(obv.maxVotedReco.isScientificName) {

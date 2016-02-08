@@ -2,6 +2,9 @@ package species.participation
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
 
 import org.grails.taggable.*
 import groovy.text.SimpleTemplateEngine
@@ -46,6 +49,8 @@ import species.sourcehandler.exporter.DwCSpeciesExporter;
 import java.math.BigDecimal
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import org.hibernate.FetchMode;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -243,7 +248,10 @@ def grailsCacheManager;
 	}
 	
 	def occurrences() {
-		def result = observationService.getObservationOccurences(params)
+		def result;
+        utilsService.logSql {
+            result = observationService.getObservationOccurences(params)
+        }
         def model = utilsService.getSuccessModel('', null, OK.value(), result);
         withFormat {
             json { render model as JSON }
@@ -346,8 +354,34 @@ def grailsCacheManager;
         params.id = params.long('id');
         def msg;
         if(params.id) {
-			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
-			if (!observationInstance) {
+//			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false, [fetch:['author':'eager', 'reprImage':'eager', 'maxVotedReco':'eager', 'maxVotedReco.taxonConcept':'eager', 'recommendationVote':'join', 'resource':'join'], lazy:['recommendationVote':'false', 'resource':'false']])
+            def c = Observation.createCriteria();
+            Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
+            def currentLevel = sqlLogger.level
+            sqlLogger.setLevel(Level.TRACE)
+            def observationInstance;
+            observationInstance = c.get {
+                and {
+                    eq ('id', params.id)
+                    eq ('isDeleted', false)
+                }
+                fetchMode   'group', FetchMode.JOIN
+                fetchMode   'habitat', FetchMode.JOIN
+                fetchMode   'author', FetchMode.JOIN
+                fetchMode   'reprImage', FetchMode.JOIN
+                fetchMode   'maxVotedReco', FetchMode.JOIN
+                fetchMode   'maxVotedReco.taxonConcept', FetchMode.JOIN
+
+                fetchMode   'resource', FetchMode.JOIN
+                fetchMode   'resource.licenses', FetchMode.JOIN
+                fetchMode   'recommendationVote', FetchMode.JOIN
+                fetchMode   'recommendationVote.author', FetchMode.JOIN
+                fetchMode   'recommendationVote.recommendation.taxonConcept', FetchMode.JOIN
+                fetchMode   'userGroups', FetchMode.JOIN
+                fetchMode   'annotations', FetchMode.JOIN
+            }
+			
+        if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
                 withFormat {
@@ -401,6 +435,7 @@ def grailsCacheManager;
                 json { render model as JSON }
                 xml { render model as XML }
             }
+        sqlLogger.setLevel(currentLevel)
         }
 	}
 
@@ -1632,7 +1667,9 @@ def grailsCacheManager;
 		    if(params.actionType == 'search') {
                 distinctRecoListResult = observationService.getDistinctRecoListFromSearch(params, max, offset);
             } else {
-                distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
+                utilsService.logSql {
+                    distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
+                }
             }
 
             if(distinctRecoListResult.distinctRecoList.size() > 0) {
@@ -1675,7 +1712,9 @@ def grailsCacheManager;
 		    if(params.actionType == 'search') {
                 speciesGroupCountListResult = observationService.getSpeciesGroupCountFromSearch(params);
             } else {
-                speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
+                utilsService.logSql {
+                    speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
+                }
             }
 
             if(speciesGroupCountListResult.speciesGroupCountList.size() > 0) {

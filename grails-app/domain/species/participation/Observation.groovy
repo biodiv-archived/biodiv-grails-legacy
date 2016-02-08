@@ -189,6 +189,13 @@ class Observation extends DataObject {
     String accessRights;
     String informationWithheld;
 
+    Resource reprImage;
+
+    int noOfImages=0;
+    int noOfVideos=0;
+    int noOfAudio=0;
+    int noOfIdentifications=0;
+
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists, Dataset]
  
@@ -218,6 +225,7 @@ class Observation extends DataObject {
         publishingCountry nullable:true
         accessRights nullable:true
         informationWithheld nullable:true
+        reprImage nullable:true
     }
 
 	static mapping = {
@@ -235,13 +243,16 @@ class Observation extends DataObject {
 	 * @return
 	 */
 	Resource mainImage() {
-		def res = listResourcesByRating(1);
-        println res.fileName[0];
-        println "=========="
-        if(res && !res.fileName[0].equals('i')) 
+		def res = reprImage ? [reprImage] : null;//:listResourcesByRating(1);
+        println this.id
+        if(res && !res.fileName[0].equals('i'))  {
+            println "Main Image =========="
+            println res[0].fileName;
             return res[0]
-		else
+        } else {
+            println "MainImage =========="
 			return group?.icon(ImageType.ORIGINAL)
+        }
 	}
 
 	/**
@@ -284,12 +295,15 @@ class Observation extends DataObject {
 			return null
 		}
 		def recoIds = []
+        
+        this.noOfIdentifications = 0;
 
 		int maxCount = res[0]["votecount"]
 		res.each{ reco ->
 			if(reco["votecount"] == maxCount){
 				recoIds << reco["recoid"]
 			}
+            this.noOfIdentifications += reco["votecount"];
 		}
 
 		if(recoIds.size() == 1){
@@ -426,24 +440,31 @@ class Observation extends DataObject {
 	}
 
 	//XXX: comment this method before checklist migration
-	def beforeUpdate(){
+	def beforeUpdate() {
+        log.debug 'Observation beforeUpdate'
 		if(isDirty() && !isDirty('visitCount') && !isDirty('version')){
+			if(isDirty('resource')) {
+                updateResources();
+            }
 			updateIsShowable()
 			
-			if(isDirty('topology')){
+			if(isDirty('topology')) {
 				updateLatLong()
 			}
 			lastRevised = new Date();
 		}
 	}
 	
-	def beforeInsert(){
+	def beforeInsert() {
+        log.debug 'Observation beforeInsert'
 		updateLocationScale()
-		updateIsShowable()
 		updateLatLong()
+        updateResources();
+		updateIsShowable()
 	}
 	
-	def afterInsert(){
+	def afterInsert() {
+        log.debug 'Observation afterInsert'
 		sourceId = sourceId ?:id
 	}
 	
@@ -451,7 +472,7 @@ class Observation extends DataObject {
 		//XXX uncomment this method when u actully abt to change isShowable variable
 		// (ie. if media added to obv of checklist then this method should be uncommented)
 		//activityFeedService.updateIsShowable(this)
-	}
+    }
 	
 	def getPageVisitCount(){
 		return visitCount;
@@ -465,17 +486,40 @@ class Observation extends DataObject {
         def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
         return fList;
 	}
-	
-	private updateIsShowable(){
+
+    //Should be called after updateResource
+	private void updateIsShowable(){
 //		//Suppressing all checklist generated observation even if they have media
 //		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
 //		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
 //		
 		
 		//showing all observation those have media
-		isShowable = (isChecklist || (resource && !resource.isEmpty())) ? true : false
+		isShowable = (isChecklist || (noOfImages || noOfVideos || noOfAudio)) ? true : false
 	}
 	
+	private void updateResources() {
+        log.debug "Observation updateResources";
+		noOfImages = noOfVideos = noOfAudio = 0;
+        resource.each {
+            if(it.type == ResourceType.IMAGE) noOfImages++;
+            else if(it.type == ResourceType.VIDEO) noOfVideos++;
+            else if(it.type == ResourceType.AUDIO) noOfAudio++;
+        }
+        updateReprImage();
+	}
+
+	private void updateReprImage() {
+        log.debug "Observation updateReprImage"
+        def res = listResourcesByRating(1)
+        if(res && !res.fileName[0].equals('i')) 
+            res = res[0]
+		else 
+			res = null;//group?.icon(ImageType.ORIGINAL)
+            
+        this.reprImage = res;
+    }
+
 	private updateChecklistAnnotation(recoVote){
 		def m = fetchChecklistAnnotation()
 		if(!m){
@@ -660,14 +704,14 @@ class Observation extends DataObject {
         }
 
         def results = sql.rows(query, queryParams);
-        def idList = results.collect { it[0] }
+        def idList = results.collect { println "1 : "+it;it[0] }
 
         if(idList) {
             def instances = Resource.withCriteria {  
                 inList 'id', idList 
                 cache params.cache
             }
-            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+            results.collect {  r-> println "2 : "+r;instances.find { i -> r[0] == i.id } }                           
         } else {
             []
         }
@@ -677,11 +721,13 @@ class Observation extends DataObject {
         def result = Observation.executeQuery ('''
             select r.type, count(*) from Observation obv join obv.resource r where obv.id=:obvId group by r.type order by r.type
             ''', [obvId:this.id]);
+        println result
         return result;
+        //return [[ResourceType.IMAGE, noOfImages], [ResourceType.VIDEO, noOfVideos], [ResourceType.AUDIO,noOfAudio]];
 	}
 	
 	def fetchRecoVoteOwnerCount(){
-		return RecommendationVote.countByObservation(this)
+		return noOfIdentifications;//RecommendationVote.countByObservation(this)
 	}
 	
 	def fetchChecklistAnnotation(){

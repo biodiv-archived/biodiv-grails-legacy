@@ -1051,7 +1051,7 @@ class ObservationService extends AbstractMetadataService {
 		params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         //params.userName = springSecurityService.currentUser.username;
 
-        def queryParams = [isDeleted : false]
+        def queryParams = [:];
         def activeFilters = [:]
 
         def query = "select "
@@ -1079,7 +1079,7 @@ class ObservationService extends AbstractMetadataService {
         //def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
         def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '';
-        def filterQuery = " where obv.isDeleted = :isDeleted "
+        def filterQuery = " where obv.isDeleted = false "
         
         if(params.featureBy == "true" || params.userGroup || params.webaddress){
             params.userGroup = getUserGroup(params);
@@ -1399,15 +1399,15 @@ class ObservationService extends AbstractMetadataService {
 
         
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
-		def speciesCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.rank having obv.maxVotedReco.taxonConcept.rank in :ranks"
-        queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
+		//def speciesCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.rank having obv.maxVotedReco.taxonConcept.rank in :ranks"
+        //queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
 
-		def speciesStatusCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.status having obv.maxVotedReco.taxonConcept.status in :statuses"
-        queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
+		//def speciesStatusCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.status having obv.maxVotedReco.taxonConcept.status in :statuses"
+        //queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
 
         orderByClause = " order by " + orderByClause;
 
-        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, speciesCountQuery:speciesCountQuery, speciesStatusCountQuery:speciesStatusCountQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 

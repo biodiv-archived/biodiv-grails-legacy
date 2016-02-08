@@ -28,7 +28,7 @@ class TaxonomyDefinition extends ScientificName {
     String oldId;
     boolean isDeleted = false;
     String dirtyListReason;
-	
+    Long speciesId;	
 	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
 
@@ -63,11 +63,13 @@ class TaxonomyDefinition extends ScientificName {
 	}
 
     Species findSpecies() {
-        return Species.findByTaxonConcept(this);
+        if(speciesId)
+            return Species.get(speciesId);//Species.findByTaxonConcept(this);
+        else return null;
     }
 
 	Long findSpeciesId() {
-		return findSpecies()?.id
+		return speciesId;//findSpecies()?.id
 	}
 
 	void setName(String name) {
@@ -328,7 +330,7 @@ class TaxonomyDefinition extends ScientificName {
 	def createSpeciesStub() {
 		if(!id) return;
 
-		Species s = Species.findByTaxonConcept(this);
+		Species s = Species.get(this.findSpeciesId());
 		if(s){
 			return s
 		}

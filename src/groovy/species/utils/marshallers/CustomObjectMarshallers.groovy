@@ -7,7 +7,6 @@ import species.SpeciesField;
 import species.UserGroupTagLib;
 import species.Synonyms;
 import species.CommonNames;
-import species.TaxonomyDefinition;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
@@ -103,14 +102,21 @@ class CustomObjectMarshallers {
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'group':it.fetchRootName(), parentName:it.fetchParentName(), 'position':it.position.value()]
+            println 'TaxonomyDefinition Marshaller'
+            List<TaxonomyDefinition> defaultHierarchy = it.fetchDefaultHierarchy();
+            String parentName = defaultHierarchy ? defaultHierarchy[-2].canonicalForm : null
+            String group = defaultHierarchy ?  defaultHierarchy[0].canonicalForm : null
+            List<Map> defaultHierarchyMap = defaultHierarchy.collect { ['id':it.id, 'name':it.name, 'canonicalForm':it.canonicalForm, 'rank':it.rank, 'speciesId':it.speciesId]};
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'defaultHierarchy':defaultHierarchyMap, 'group':it.group, 'parentName':parentName, 'position':it.position.value(), speciesId:it.speciesId]
         }
 
         JSON.registerObjectMarshaller(Classification) {
+            println 'Classification Marshaller'
             return ['id':it.id, 'name':it.name, 'citation':it.citation]
         }
 
         JSON.registerObjectMarshaller(TaxonomyRegistry) {
+            println 'TaxonomyRegistry Marshaller'
             return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
         }
         
@@ -119,22 +125,26 @@ class CustomObjectMarshallers {
         }
  
         JSON.registerObjectMarshaller(Recommendation) {
+            println 'Recommendation Marshaller'
             def r = ['id':it.id, 'name':it.name];
             if(it.taxonConcept) {
                 r['taxonomyDefinition'] = it.taxonConcept;
             }
+            println 'taxonConcept'
             Long speciesId = it.taxonConcept?.findSpeciesId();
             if(speciesId) {
                 r['speciesId'] = speciesId;
             }
+            println 'speciesId'
             if(it.languageId) {
                 r['language'] = Language.read(it.languageId);
             }
-
+            println 'language'
             return r;
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
+            println 'RecommendationVote Marshaller'
             def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence?.value(), votedOn: it.votedOn];
             if(it.commonNameReco) {
                 r['commonNameReco'] = it.commonNameReco
@@ -146,10 +156,12 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(UserGroup) {
+            println 'UserGroup Marshaller'
             return ['id':it.id, 'name':it.name, 'description' : it.description, 'domainName':it.domainName, 'webaddress':it.webaddress, 'foundedOn':it.foundedOn, 'icon':it.icon ];
         }
 
         JSON.registerObjectMarshaller(Resource) {
+            println 'Resource Marshaller'
             def basePath = '';
             
             if(it.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){

@@ -1879,6 +1879,14 @@ grails.cache.config = {
         maxElementsInMemory 1000
         maxElementsOnDisk 1000
     }
+    domain {
+        name 'species.Classification'
+        eternal true
+        overflowToDisk true
+        maxElementsInMemory 10
+        maxElementsOnDisk 10
+    }
+
 }
 
 /*

@@ -80,4 +80,10 @@ class Language {
         }
     }
 
+    static Language findByTwoLetterCode(String whatever) { 
+        return Language.createCriteria().get {
+            eq 'twoLetterCode', whatever
+            cache true
+        }
+    }
 }

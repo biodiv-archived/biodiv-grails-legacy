@@ -494,12 +494,32 @@ create view checklist_species_locations as SELECT csv.id,
 drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
 create sequence document_id_seq start 863; create sequence observation_id_seq start 397104; create  sequence species_id_seq start 276169; create sequence suser_id_seq start 8942;
 
+#1st Feb 2016
 alter table observation add constraint obv_dataset_id_fk foreign key (dataset_id) references dataset(id);
+
+alter table observation add column no_of_images integer not null default 0, add column no_of_videos integer not null default 0,  add column no_of_audio integer not null default 0, add column repr_image bigint, add column no_of_identifications integer not null default 0;
+
+update observation set no_of_images = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='IMAGE') g;
+update observation set no_of_videos = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='VIDEO') g;
+update observation set no_of_audio = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='AUDIO') g;
+
+create table tmp as select observation_id, count(*) as count from recommendation_vote group by observation_id;
+
+update observation set no_of_identifications = g.count from (select * from tmp) g where g.observation_id=id;
+
+create table tmp as select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='resource' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref order by observation_id asc, avg desc, resource_id asc;
+
+update observation set repr_image = g.resource_id from (select b.observation_id,b.resource_id from (select observation_id, max(avg) as max_avg from tmp group by observation_id) a inner join tmp b on a.observation_id=b.observation_id where b.avg=a.max_avg) g where g.observation_id=id;
+
 create index on observation(external_id);
 create index on observation(dataset_id);
 create index on observation(group_id);
-create index on observation(is_deleted);
-create index on observation(is_showable);
-create index on observation(is_checklist);
 create index on observation(max_voted_reco_id);
 create index on recommendation(taxon_concept_id);
+create index on observation(is_checklist, is_deleted, is_showable);
+create index on observation(last_revised desc, id asc);
+
+alter table taxonomy_definition add column species_id bigint;
+alter table taxonomy_definition add foreign key(species_id) references species(id);
+update taxonomy_definition set species_id = s.sid from (select taxon_concept_id, id as sid from species) s  where s.taxon_concept_id = id;
+

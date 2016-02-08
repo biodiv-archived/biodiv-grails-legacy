@@ -58,7 +58,7 @@ class RecommendationVote {
     def updateSpeciesTimeStamp() {
         def taxCon = this.recommendation?.taxonConcept
         if(taxCon) {
-            def sp = Species.findByTaxonConcept(taxCon);
+            def sp = Species.get(taxCon.findSpeciesId());//Species.findByTaxonConcept(taxCon);
             if(sp) {
             sp.lastUpdated = new Date();
             if(!sp.save(flush:true)) {

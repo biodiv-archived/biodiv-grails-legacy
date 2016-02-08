@@ -46,7 +46,7 @@
 
 
 						<td title="${taxonConcept?.normalizedForm }">
-							<% def species =  taxonConcept?Species.findByTaxonConcept(taxonConcept):null%>
+							<% def species =  taxonConcept?Species.get(taxonConcept.findSpeciesId()):null%>
 							<g:if test="${species}">
 								<a target="_blank"
 									href="${uGroup.createLink(controller:'species', action:'show', id:species.id, userGroupWebaddress:params.webaddress)}">
