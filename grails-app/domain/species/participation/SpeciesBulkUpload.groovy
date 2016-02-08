@@ -113,6 +113,7 @@ class SpeciesBulkUpload {
 				this.errors.allErrors.each { log.error it }
 			}
 			println "----------------------- logFile path " + logFilePath
+			logFile << "Name|Taxon Id|Status|Position|Rank|Col Id"
 		}
 		
 		def ln = System.getProperty('line.separator')

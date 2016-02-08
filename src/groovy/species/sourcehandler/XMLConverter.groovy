@@ -191,7 +191,6 @@ class XMLConverter extends SourceConverter {
 		int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
 		
 		NameInfo n = new NameInfo(speciesName, rank, index)
-		
 		//getting hir
 		List taxonNodes = getNodesFromCategory(species.children(), "author contributed taxonomy hierarchy");
 		//println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
@@ -240,12 +239,11 @@ class XMLConverter extends SourceConverter {
 		return node
 	}
 	
-	private boolean addScNameNode(Node species, Node nameNode){
+	private boolean addScNameNode(Node species, Node nameNode, String rank){
 		String nameRunningStatusText = getData(nameNode.nameRunningStatus)
-		String rank = getData(nameNode.rank);
 		
 		println "------------------- name node " + nameNode
-		println "------------------------------ " + rank
+		println "--------------------rank ---------- " + rank
 		
 		if("ignore".equals(nameRunningStatusText)){
 			println "Name is in ignore status so not doing any thing  " + nameNode
@@ -437,7 +435,9 @@ class XMLConverter extends SourceConverter {
 			
 			//XXX: sending just the first element need to decide on this if list has multiple elements
 			def speciesName = getData((speciesNameNode && speciesNameNode.data)?speciesNameNode.data[0]:null);
-			addToSummary("<<< NAME >>> "  + speciesName)
+			int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
+			String rankStr = TaxonomyRank.getTRFromInt(rank).value()
+			addToSummary("<<< NAME >>> "  + speciesName + "  <<< Rank >>> " + rank)
 			
 			String nameRunningStatusText = getData(speciesNameNode.nameRunningStatus)?.trim()
 			String nameMatchStatus = getData(speciesNameNode.matchStatus)
@@ -446,7 +446,7 @@ class XMLConverter extends SourceConverter {
 			}
 			
 			//adding scientific name as last node in author contribute hir so that author year and other info picked from scientific name column
-			if(speciesName && addScNameNode(species, speciesNameNode)){
+			if(speciesName && addScNameNode(species, speciesNameNode, rankStr)){
 				
 				//getting classification hierarchies and saving these taxon definitions
 				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true).taxonRegistry;
@@ -456,7 +456,6 @@ class XMLConverter extends SourceConverter {
 
 				// if the author contributed taxonomy hierarchy is not specified
 				// then the taxonConept is null and sciName of species is saved as concept and is used to create the page
-				int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
 				taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
 				
 				if(taxonConcept) {
@@ -526,10 +525,8 @@ class XMLConverter extends SourceConverter {
 	
 	private TaxonomyDefinition addNameAsSynonym(Node nameNode){
 		String nameRunningStatusText = getData(nameNode.nameRunningStatus)
-		String rank = getData(nameNode.rank);
 		
 		println "------------------- name node " + nameNode
-		println "------------------------------ " + rank
 		
 		if("ignore".equals(nameRunningStatusText)){
 			println "Name is in ignore status so not doing any thing  " + nameNode
@@ -1897,14 +1894,14 @@ class XMLConverter extends SourceConverter {
                 name = Utils.cleanSciName(name);
             }
             if(name) {
-                println "===NAME=== " + name 
+                println "===NAME=== " + name + "  rank " + rank
                 names.putAt(rank, name);
             }
             sortedFieldNodes.putAt(rank, fieldNode)
         }
+		println "=Input PARSING NAMES====== " + names
         parsedNames = namesParser.parse(names);
         fieldNodes = sortedFieldNodes;
-        println "=PARSING NAMES====== " + names
         println "XML CONVERTER PARSED NAMES===== " + parsedNames 
         String spellCheckMsg = ''
         int i=0;
