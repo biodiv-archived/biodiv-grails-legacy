@@ -1725,7 +1725,7 @@ class XMLConverter extends SourceConverter {
         String spellCheckMsg = ''
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
-            println "==CREATING FIELD NODES for classification ${it.name}------------------------=== " + taxonNodes
+            //println "==CREATING FIELD NODES for classification ${it.name}------------------------=== " + taxonNodes
 			def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
             def t = getTaxonHierarchyRes.taxonRegistry;
             spellCheckMsg = getTaxonHierarchyRes.spellCheckMsg;
@@ -2210,6 +2210,7 @@ class XMLConverter extends SourceConverter {
                                 println "TAXON SAVED WITH NULL STATUS===========================" + taxon.status + "   id " + taxon.id
 								
                             }
+							taxon = taxon.merge();
 							//updating contributors
 							taxon.updateContributors(getUserContributors(fieldNode.data))
 							//updating name status given in sheet

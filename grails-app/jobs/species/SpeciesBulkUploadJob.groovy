@@ -8,6 +8,7 @@ class SpeciesBulkUploadJob {
 	
 	def speciesUploadService
 	def utilsService
+	def dataSource
 	
     static triggers = {
       simple startDelay: 1000l, repeatInterval: 5000l // starts after 1 second  and execute job once in 5 seconds 
@@ -20,8 +21,10 @@ class SpeciesBulkUploadJob {
 		}
 		
 		scheduledTaskList.each { SpeciesBulkUpload dl ->
+			int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
 			try{
 				log.debug "starting task $dl"
+				dataSource.setUnreturnedConnectionTimeout(500);
 				speciesUploadService.upload(dl)
 				//dl.updateStatus(Status.SUCCESS)
 				//utilsService.sendNotificationMail(utilsService.DOWNLOAD_REQUEST, dl, null, null, null);
@@ -29,6 +32,9 @@ class SpeciesBulkUploadJob {
 				log.debug " Error while running task $dl"
 				e.printStackTrace()
 				dl.updateStatus(Status.FAILED)
+			}finally {
+            	log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+				dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 			}
 		}
     }

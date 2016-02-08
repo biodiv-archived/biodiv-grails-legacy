@@ -107,7 +107,7 @@ class SpeciesBulkUpload {
 	def writeLog(String content){
 		if(!logFilePath){
 			String contentRootDir = Holders.config.speciesPortal.content.rootDir
-			logFile = utilsService.createFile("logFile.txt" , "species", contentRootDir)
+			logFile = utilsService.createFile("logFile.csv" , "species", contentRootDir)
 			logFilePath = logFile.getAbsolutePath();
 			if(!this.save(flush:true)){
 				this.errors.allErrors.each { log.error it }
