@@ -503,9 +503,9 @@ alter table observation add constraint obv_dataset_id_fk foreign key (dataset_id
 
 alter table observation add column no_of_images integer not null default 0, add column no_of_videos integer not null default 0,  add column no_of_audio integer not null default 0, add column repr_image bigint, add column no_of_identifications integer not null default 0;
 
-update observation set no_of_images = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='IMAGE') g;
-update observation set no_of_videos = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='VIDEO') g;
-update observation set no_of_audio = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='AUDIO') g;
+update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='IMAGE' group by observation_id) g where g.observation_id = id;
+update observation set no_of_videos = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='VIDEO' group by observation_id) g where g.observation_id = id;
+update observation set no_of_audio = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='AUDIO' group by observation_id) g where g.observation_id = id;
 
 create table tmp as select observation_id, count(*) as count from recommendation_vote group by observation_id;
 
