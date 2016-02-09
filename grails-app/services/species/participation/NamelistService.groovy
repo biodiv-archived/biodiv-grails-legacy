@@ -280,8 +280,13 @@ class NamelistService {
 		def colRes = searchCOL(colId, 'id')[0]
 		String accepteNameColId = colRes.acceptedNamesList[0].id
 		TaxonomyDefinition td = createAcceptedNameFromColId(accepteNameColId, runPostProcess)
-		td.createSpeciesStub()
 		def syn =  SynonymsMerged.findByMatchId(colId)
+		//some times accepted name is available but synonym not got added so by this call making sure synonym must be added
+		if(!syn){
+			td.addSynonymFromCol(searchCOL(accepteNameColId, 'id')[0].synList)
+			syn =  SynonymsMerged.findByMatchId(colId)
+		}
+		td.createSpeciesStub()
 		println "---------------created synonym " + syn
 		return syn
 	}

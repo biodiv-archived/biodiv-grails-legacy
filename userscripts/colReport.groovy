@@ -112,8 +112,25 @@ def runReportGeneration() {
 	println "=========END========= " + new Date()
 }
 
+
+def addFieldForGbif(){
+	String concept = 'Nomenclature and Classification'
+	String category = "GBIF Taxonomy Hierarchy"
+	def language =  Language.findByNameIlike(Language.DEFAULT_LANGUAGE)
+	
+	def ll = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Sub-Family', 'Genus', 'Sub-Genus', 'Species', 'Infraspecies']
+	
+	int ii = 90
+	ll.each { subCategory ->
+		def f = new Field(language: language, concept:concept, category:category, subCategory:subCategory, description:'Place holder for ' + subCategory, displayOrder:ii, connection:ii)
+		f.save(flush:true)
+		ii++
+	}
+}
+
+addFieldForGbif()
 //nameParse()
-uploadGbifNames(false)
+//uploadGbifNames(false)
 //gbifNamesReport()
 //runReportGeneration()
 //nohup grails -Dgrails.env=pamba  run-script userscripts/colReport.groovy >> gbif.txt 2>&1

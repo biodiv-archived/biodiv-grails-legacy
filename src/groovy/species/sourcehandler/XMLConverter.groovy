@@ -117,7 +117,7 @@ class XMLConverter extends SourceConverter {
 		updateNode(node, speciesMap, k)
 		
 		//updating taxon hir here for ibp and col match
-		List taxonNodes = getNodesFromCategory(species.children(), "author contributed taxonomy hierarchy");
+		List taxonNodes = getNodesFromCategory(species.children(), fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
 		
 		taxonNodes.each { tn ->
 			if(tn && tn.data){
@@ -192,7 +192,7 @@ class XMLConverter extends SourceConverter {
 		
 		NameInfo n = new NameInfo(speciesName, rank, index)
 		//getting hir
-		List taxonNodes = getNodesFromCategory(species.children(), "author contributed taxonomy hierarchy");
+		List taxonNodes = getNodesFromCategory(species.children(), fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
 		//println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
 		taxonNodes.each { tn ->
 			rank = getTaxonRank(tn.subcategory.text())
@@ -257,10 +257,14 @@ class XMLConverter extends SourceConverter {
 			parentNode.remove(taxonLastNode)
 		}
 		
+		
+		String targetClassName = getTargetClassificationName(species)
+		println "-------------------------- target classification name " + targetClassName
+		
 		//creating new node having all info as scientific name
 		Node field = new Node(species, "field");
 		Node concept = new Node(field, "concept", fieldsConfig.NOMENCLATURE_AND_CLASSIFICATION);
-		Node category = new Node(field, "category", fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+		Node category = new Node(field, "category", targetClassName);
 		Node subcategory = new Node(field, "subcategory", rank);
 		
 		field.append(nameNode.language)
@@ -288,6 +292,23 @@ class XMLConverter extends SourceConverter {
 		}
 		
 		return true
+	}
+	
+	
+	private String getTargetClassificationName(Node species){
+		String res
+		Classification.list().each {
+			if(res){
+				return
+			}
+			
+			List taxonNodes = getNodesFromCategory(species.children(), it.name);
+			if(taxonNodes){
+				res = it.name
+			}
+		}
+		
+		return res //fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY
 	}
 	
     public Species convertSpecies(Node species) {
@@ -1899,7 +1920,7 @@ class XMLConverter extends SourceConverter {
             }
             sortedFieldNodes.putAt(rank, fieldNode)
         }
-		println "=Input PARSING NAMES====== " + names
+		//println "=Input PARSING NAMES====== " + names
         parsedNames = namesParser.parse(names);
         fieldNodes = sortedFieldNodes;
         println "XML CONVERTER PARSED NAMES===== " + parsedNames 
@@ -1924,7 +1945,7 @@ class XMLConverter extends SourceConverter {
                             
                             //TODO: how to get status in each case?
 							String parsedAuthorYear = parsedName.authorYear
-                            println "authoryear >>>>>>>>>>>>>>>>>> " + parsedAuthorYear
+                            //println "authoryear >>>>>>>>>>>>>>>>>> " + parsedAuthorYear
                             boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
 							
