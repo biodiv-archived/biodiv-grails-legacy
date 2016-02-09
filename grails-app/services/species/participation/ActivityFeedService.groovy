@@ -146,8 +146,7 @@ class ActivityFeedService {
 	}
 	
 	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null, isShowable=null, flushImmidiatly=true){
-        println "===========================ADDING ACTIVITY FEED";
-		//to support discussion on comment thread
+        //to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
 		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){

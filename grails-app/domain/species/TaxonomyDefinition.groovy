@@ -278,8 +278,6 @@ class TaxonomyDefinition extends ScientificName {
 			return true
 		}
 		
-		println "============= calling for parent " + tr.parentTaxonDefinition
-		
 		tr.parentTaxonDefinition.createTargetHirFromTaxonReg(tr.parentTaxon, targetClassifi)
 		_sanpToImmediateParent(tr, targetClassifi)
 		
@@ -361,10 +359,10 @@ class TaxonomyDefinition extends ScientificName {
 		
 		if((position != NamesMetadata.NamePosition.CLEAN) && doColCuration){
 			curateNameByCol()
-			println "----------------------------------- adding col hir"
+			log.debug "Adding col hir ==="
 			addColHir()
 		}
-		println "---------------------- adding IBP hir"
+		log.debug "Adding IBP hir ==="
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
 		def trHir = Classification.fetchIBPClassification()
 		snapToIBPHir(hirList, trHir)
@@ -428,18 +426,16 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	private boolean curateNameByCol(){
-		println "-------------matchId------------------ " + matchId
+		log.debug "-------------matchId------------------ " + matchId
 		if((status != NameStatus.ACCEPTED) || matchId )
 			return true
 		
 		def colData = namelistService.searchCOL(canonicalForm, 'name')
-		println "--------------------------- " + colData
 		def acceptedMatch = namelistService.validateColMatch(this, colData)
 		if(colData && !acceptedMatch){
 			log.debug "No match found on col so returning without adding col hir"
 			return false
 		}
-		println "------------------ came here " + acceptedMatch
 		if(!acceptedMatch){
 			log.debug "No match found on col so returning without adding col hir"
 			return false
@@ -543,14 +539,12 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	def updateNameSignature(List userList = [springSecurityService.currentUser]){
-		println "================== user list for activity feed " + userList
 		def ns = createNameSignature()
 		if(ns != activityDescription){
 			if(!save()) {
 				this.errors.allErrors.each { log.error it }
 			}else{
 				userList.each {
-					println "Adding feed for following author " + it
 					if(it)
 						activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
 				}

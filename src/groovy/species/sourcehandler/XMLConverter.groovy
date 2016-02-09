@@ -242,11 +242,11 @@ class XMLConverter extends SourceConverter {
 	private boolean addScNameNode(Node species, Node nameNode, String rank){
 		String nameRunningStatusText = getData(nameNode.nameRunningStatus)
 		
-		println "------------------- name node " + nameNode
+		//println "------------------- name node " + nameNode
 		println "--------------------rank ---------- " + rank
 		
 		if("ignore".equals(nameRunningStatusText)){
-			println "Name is in ignore status so not doing any thing  " + nameNode
+			//println "Name is in ignore status so not doing any thing  " + nameNode
 			return false
 		}	
 		
@@ -259,7 +259,6 @@ class XMLConverter extends SourceConverter {
 		
 		
 		String targetClassName = getTargetClassificationName(species)
-		println "-------------------------- target classification name " + targetClassName
 		
 		//creating new node having all info as scientific name
 		Node field = new Node(species, "field");
@@ -539,15 +538,13 @@ class XMLConverter extends SourceConverter {
 	private void updateUserPrefForColCuration(TaxonomyDefinition taxonConcept, Node nameNode){
 		String nameRunningStatusText = getData(nameNode.nameRunningStatus)?.trim()
 		if("new".equals(nameRunningStatusText)){
-			println "Name is forcefully created as new so setting flag to avoid col curation  " + nameNode
+			println "Name is forcefully created as new so setting flag to avoid col curation  " //+ nameNode
 			taxonConcept.doColCuration = false
 		}
 	}
 	
 	private TaxonomyDefinition addNameAsSynonym(Node nameNode){
 		String nameRunningStatusText = getData(nameNode.nameRunningStatus)
-		
-		println "------------------- name node " + nameNode
 		
 		if("ignore".equals(nameRunningStatusText)){
 			println "Name is in ignore status so not doing any thing  " + nameNode
@@ -1740,20 +1737,17 @@ class XMLConverter extends SourceConverter {
      * Saves any new taxondefinition found 
      */
      def getClassifications(List speciesNodes, String scientificName, boolean saveHierarchy = true, boolean abortOnNewName = false, boolean fromCOL = false, otherParams= null) {
-        log.debug "Getting classifications for ${scientificName}"
+        //log.debug "Getting classifications for ${scientificName}"
         def classifications = Classification.list();
         List<TaxonomyRegistry> taxonHierarchies = new ArrayList<TaxonomyRegistry>();
         String spellCheckMsg = ''
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
-            //println "==CREATING FIELD NODES for classification ${it.name}------------------------=== " + taxonNodes
-			def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
+            def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
             def t = getTaxonHierarchyRes.taxonRegistry;
             spellCheckMsg = getTaxonHierarchyRes.spellCheckMsg;
             if(t) {
-                //def ctx = ApplicationHolder.getApplication().getMainContext();
-                //def utilsService = ctx.getBean("utilsService");
-				cleanUpGorm();
+            	cleanUpGorm();
                 taxonHierarchies.addAll(t);
             }
         }
@@ -1775,7 +1769,7 @@ class XMLConverter extends SourceConverter {
     }
 
     List<TaxonomyRegistry> getTaxonHierarchyOld(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true) {
-        log.debug "Getting classification hierarchy : "+classification.name;
+        //log.debug "Getting classification hierarchy : "+classification.name;
 
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
 
@@ -1896,11 +1890,6 @@ class XMLConverter extends SourceConverter {
      */
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
-        log.debug "Getting classification hierarchy : "+classification.name;
-        //println "================ABORT ON NEW NAME================ " + abortOnNewName + "=====FROM COL=== " + fromCOL + "other params " + otherParams
-		//println "============OTHER PARAMS ========= " + otherParams
-		println "============ SNAME------------- " + scientificName
-        //to be used only in case of namelist
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
 
@@ -1915,7 +1904,7 @@ class XMLConverter extends SourceConverter {
                 name = Utils.cleanSciName(name);
             }
             if(name) {
-                println "===NAME=== " + name + "  rank " + rank
+                println "===NAME=== " + name + "  ===rank=== " + rank
                 names.putAt(rank, name);
             }
             sortedFieldNodes.putAt(rank, fieldNode)
@@ -1923,14 +1912,13 @@ class XMLConverter extends SourceConverter {
 		//println "=Input PARSING NAMES====== " + names
         parsedNames = namesParser.parse(names);
         fieldNodes = sortedFieldNodes;
-        println "XML CONVERTER PARSED NAMES===== " + parsedNames 
         String spellCheckMsg = ''
         int i=0;
         boolean flag = true;
         fieldNodes.each { fieldNode ->
             if(flag) {
                 if(fieldNode) {
-                    log.debug "Adding taxonomy registry from node: "+fieldNode;
+                    //log.debug "Adding taxonomy registry from node: "+fieldNode;
                     int rank = getTaxonRank(fieldNode?.subcategory?.text());
                     String name = getData(fieldNode.data);
 
@@ -1945,12 +1933,10 @@ class XMLConverter extends SourceConverter {
                             
                             //TODO: how to get status in each case?
 							String parsedAuthorYear = parsedName.authorYear
-                            //println "authoryear >>>>>>>>>>>>>>>>>> " + parsedAuthorYear
                             boolean searchInNull = false;
 							boolean useAuthorYear = (otherParams?true:false)
 							
 							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode)
-                            println "========SEARCH RESULT------>>> #################======== " + searchIBPResult
                             TaxonomyDefinition taxon = null;
                             
                             //if from curation
@@ -2086,8 +2072,6 @@ class XMLConverter extends SourceConverter {
                                 //taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
-                                println "=====SAVING NEW TAXON==========>>>>>>>>>>>>>>>>>>============#######============ " + parsedName
-								
                                 log.debug "Saving taxon definition"
                                 taxon = parsedName;
                                 taxon.rank = rank;
@@ -2137,7 +2121,6 @@ class XMLConverter extends SourceConverter {
                                     }
                                     println "=======FINAL NAME STATUS======= " + finalNameStatus;
                                     taxon.status = finalNameStatus; 
-                                    println "==============NEW NAME SAVED IN BETWEEN HIERARCHY======================="
                                     taxon.position = NamePosition.WORKING;
                                     newNameSaved = false;
                                 }
@@ -2152,7 +2135,6 @@ class XMLConverter extends SourceConverter {
                                         //No name with null status
                                         //taxon.status = null;
                                         //even no proper match from COL
-                                        println "==============NEW NAME SAVED IN BETWEEN HIERARCHY======================="
                                         newNameSaved = true;
                                     }else {
                                         //because new name saved from COL details
@@ -2161,9 +2143,7 @@ class XMLConverter extends SourceConverter {
                                 }
 								
 								taxon=taxon.merge();
-									
-								println "--------- saving taxon finally ---------------------"
-                                if(!taxon.save(flush:true)) {
+								if(!taxon.save(flush:true)) {
                                     taxon.errors.each { log.error it }
                                 }
                                 NamelistService.namesInWKG.add(taxon.id)
@@ -2172,7 +2152,6 @@ class XMLConverter extends SourceConverter {
                                     //taxon = namelistService.updateAttributes(taxon, res);
                                 }
                             } else if(taxon && fromCOL) {
-								println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> coming here"
 								if(fieldNode == fieldNodes.last()){
 									taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
 									taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
@@ -2208,7 +2187,7 @@ class XMLConverter extends SourceConverter {
                                 //save oldTaxon
                                 taxon = oldTaxon;
                             } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
-                                println "=====TAXON WAS THERE================================== "
+                                //println "=====TAXON WAS THERE================================== "
                                 /*
                                 def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
                                 if(synonym)
@@ -2262,7 +2241,7 @@ class XMLConverter extends SourceConverter {
                             }
 
                             def ent = registry?registry:new TaxonomyRegistry();
-							println "===========REGISTRY=========== " + ent
+							//println "===========REGISTRY=========== " + ent
 							
                             ent.taxonDefinition = taxon
                             ent.classification = classification;
@@ -2274,7 +2253,7 @@ class XMLConverter extends SourceConverter {
                             }*/
                             ent.parentTaxon = parentTaxon;
 							ent.parentTaxonDefinition = ent.parentTaxon?.taxonDefinition
-                            log.debug("Parent Taxon : "+ent.parentTaxon)
+                            //log.debug("Parent Taxon : "+ent.parentTaxon)
                             ent.path = path;
                             //same taxon at same parent and same path may exist from same classification.
                             if(registry) {
@@ -2282,7 +2261,7 @@ class XMLConverter extends SourceConverter {
                                 if(saveTaxonHierarchy) {
                                     if(ent.classification == ibpHierarchy) {
                                         log.debug "Saving taxon registry entity : "+ent;
-                                        println "=====UPDATING existing IBP TAXON REGISTRY================================== "
+                                        //println "=====UPDATING existing IBP TAXON REGISTRY================================== "
                                         if(!ent.save(flush:true)) {
                                             ent.errors.each { log.error it }
                                         } else {
@@ -2294,7 +2273,6 @@ class XMLConverter extends SourceConverter {
                                 taxonEntities.add(registry);
                             } else if(saveTaxonHierarchy) {
                                 log.debug "Saving taxon registry entity : "+ent;
-                                println "????????????????????=====SAVING NEW TAXON REGISTRY================================== "
                                 if(!ent.save(flush:true)) {
 									println "---TAXON SAVE ################## Error"
                                     ent.errors.each { log.error it }
@@ -2303,7 +2281,6 @@ class XMLConverter extends SourceConverter {
                                 }
                                 ent.updateContributors(getUserContributors(fieldNode.data))
                                 taxonEntities.add(ent);
-                                println "=======SAVING THIS TAX REG======= " + ent
                             }
 
                         } else {
@@ -2334,13 +2311,12 @@ class XMLConverter extends SourceConverter {
 		def nameRunningStatus = nameNode?.nameRunningStatus?.text();
 		
 		
-		println "----------------------- name running status " + nameRunningStatus
 		// to force creation of new node
 		if("new".equalsIgnoreCase(nameRunningStatus)){
 			return []
 		}
 		
-		println "----------------- ibp id  " +  ibpId + "  and col id " + colId
+		//println "----------------- ibp id  " +  ibpId + "  and col id " + colId
 		if(ibpId){
 			ibpId = Long.parseLong(ibpId.trim());
 			return [TaxonomyDefinition.get(ibpId)]
@@ -2546,7 +2522,6 @@ class XMLConverter extends SourceConverter {
         SessionFactory sessionFactory = ctx.getBean("sessionFactory")
         def hibSession = sessionFactory?.getCurrentSession()
         if(hibSession) {
-            log.debug "Flushing session after creating new name----"
             try {
                 hibSession.flush()
             } catch(ConstraintViolationException e) {

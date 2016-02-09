@@ -89,7 +89,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-        println "======PARAMS FOR SEARCH IBP ===== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " :::: userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
+        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
 		
         def clazz
@@ -103,7 +103,6 @@ class NamelistService {
 			if(normalizedForm || authorYear){
 				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
 				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
-				println "Searching using normalized form + rank + status"
 				res = clazz.withCriteria(){
 					and{
 						eq('normalizedForm', normalizedForm)
@@ -120,7 +119,7 @@ class NamelistService {
 			if(res)
 				return res
 			
-			println  "No result in Normalized form using canonical form now"
+			//println  "No result in Normalized form using canonical form now"
             res = clazz.withCriteria(){
 				and{
 					eq('canonicalForm', canonicalForm)
@@ -147,7 +146,7 @@ class NamelistService {
 			}
 		}
 		
-		println "=========== FINAL SEARCH RESULT " + res
+		println "== FINAL SEARCH RESULT " + res
 		return res;
     }
     
@@ -272,7 +271,6 @@ class NamelistService {
 		if(runPostProcess){
 			td.postProcess()
 		}
-		//println  "---------- Created accepted name from col Id " + colId
 		return td
 	}
 	
@@ -717,7 +715,7 @@ class NamelistService {
     //Handles name moving from accepted to synonym & vice versa
     //also updates IBP Hierarchy if no status change and its accepted name
     private def updateStatus(ScientificName sciName, Map colMatch) {
-        println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
+        //println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
         
         boolean success = false;
         def errors = [];
@@ -903,7 +901,7 @@ class NamelistService {
     private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
-        println "Adding IBP hierarchy from ${colAcceptedNameData}"
+        //println "Adding IBP hierarchy from ${colAcceptedNameData}"
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
@@ -919,7 +917,6 @@ class NamelistService {
         }
         def classification = Classification.fetchIBPClassification()
         Map taxonRegistryNamesTemp = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
-        println "======USE THIS ==== " + taxonRegistryNamesTemp
         List taxonRegistryNames = [];
         taxonRegistryNamesTemp.each { key, value ->
             taxonRegistryNames[Integer.parseInt(key)] = value;
@@ -934,9 +931,8 @@ class NamelistService {
 		metadata1['source'] = colAcceptedNameData['source']?:colAcceptedNameData['matchDatabaseName']
 		metadata1['via'] = colAcceptedNameData['sourceDatabase']
         colAcceptedNameData['metadata'] = metadata1
-        println "=====T R N======= " + taxonRegistryNames
-        println colAcceptedNameData;
-		//boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
+        //println "=====T R N======= " + taxonRegistryNames
+        //boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
         //From UI uncomment
         def result;
         //TaxonomyRegistry.withNewSession {
@@ -1475,7 +1471,7 @@ class NamelistService {
     }
 
     private Map updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
-        println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
+        //println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
         boolean success = false;
         def errors = [];
         try {

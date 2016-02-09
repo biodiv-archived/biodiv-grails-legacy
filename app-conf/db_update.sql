@@ -421,5 +421,11 @@ alter table newsletter alter column parent_id set not null;
 
 
 #7th feb 2016
-ALTER TABLE species_bulk_upload ADD COLUMN log_file_path character varying(255);
+CREATE INDEX normalized_form_idx ON taxonomy_definition(normalized_form);
+CREATE INDEX status_idx ON taxonomy_definition(status);
+CREATE INDEX rank_idx ON taxonomy_definition(rank);
+CREATE INDEX position_idx ON taxonomy_definition(position);
+CREATE INDEX match_id_idx ON taxonomy_definition(match_id);
+
+
 
