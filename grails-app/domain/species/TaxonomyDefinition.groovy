@@ -485,10 +485,15 @@ class TaxonomyDefinition extends ScientificName {
 					synToAdd.authorYear = syn.authorString
 					synToAdd.relationship = XMLConverter.getRelationship(null)
 					
-					if(!synToAdd.save(flush:true)){
-						synToAdd.errors.allErrors.each { println  it }
+					try{
+						synToAdd = synToAdd.merge()
+						if(!synToAdd.save(flush:true)){
+							synToAdd.errors.allErrors.each { println  it }
+						}
+						addSynonym(synToAdd)
+					}catch(e){
+						e.printStackTrace()
 					}
-					addSynonym(synToAdd)
 				}
 			}
 			
