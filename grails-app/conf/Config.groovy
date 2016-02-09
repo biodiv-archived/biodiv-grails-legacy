@@ -1812,7 +1812,7 @@ grails.plugin.springsecurity.oauth.domainClass = 'species.auth.OAuthID'
 grails.plugin.springsecurity.oauth.registration.askToLinkOrCreateAccountUri = '/login/openIdCreateAccount'
 
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
-//grails.hibernate.cache.queries=false
+grails.hibernate.cache.queries=false
 grails.cache.clearAtStartup = true
 grails{
     cache {
@@ -1833,11 +1833,11 @@ grails.cache.config = {
     }
    
     cache {
-        name "${app.name}"
+        name "featured"
         eternal false
-        overflowToDisk true
-        maxElementsInMemory 10000
-        maxElementsOnDisk 10000000
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
     }
 
     defaultCache {
@@ -1845,11 +1845,11 @@ grails.cache.config = {
         eternal false
         timeToIdleSeconds 120
         timeToLiveSeconds 120
-        overflowToDisk true
-        maxElementsOnDisk 10000000
+        overflowToDisk false
         diskPersistent false
-        diskExpiryThreadIntervalSeconds 120
-        memoryStoreEvictionPolicy 'LRU'
+        //maxElementsOnDisk 10000000
+        //diskExpiryThreadIntervalSeconds 120
+        //memoryStoreEvictionPolicy 'LRU'
     }
     domain {
         name 'species.groups.SpeciesGroup'
@@ -1886,6 +1886,14 @@ grails.cache.config = {
         maxElementsInMemory 10
         maxElementsOnDisk 10
     }
+    domain {
+        name 'species.groups.UserGroup'
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+
 
 }
 

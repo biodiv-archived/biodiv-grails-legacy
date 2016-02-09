@@ -82,6 +82,7 @@ class Habitat {
 	}
     
     static List<Habitat> list() { 
+        println "Habitat overridden fn for cache"
         return Habitat.createCriteria().list {
             order('habitatOrder','asc')
             cache true
@@ -89,6 +90,7 @@ class Habitat {
     }
 
     static Habitat findByName(String whatever) { 
+        println "Habitat overridden fn for cache"
         return Habitat.createCriteria().get {
             eq 'name', whatever
             cache true

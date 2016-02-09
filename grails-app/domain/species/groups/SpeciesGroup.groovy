@@ -94,7 +94,7 @@ class SpeciesGroup {
 	}
 
     static List<SpeciesGroup> list() { 
-        println "overridden fn for cache"
+        println "SpeciesGroup overridden fn for cache"
         return SpeciesGroup.createCriteria().list {
             order('groupOrder', 'asc')
             cache true
@@ -102,7 +102,7 @@ class SpeciesGroup {
     }
 
     static SpeciesGroup findByName(String whatever) { 
-        println "overridden fn for cache"
+        println "SpeciesGroup overridden fn for cache"
         return SpeciesGroup.createCriteria().get {
             eq 'name', whatever
             cache true

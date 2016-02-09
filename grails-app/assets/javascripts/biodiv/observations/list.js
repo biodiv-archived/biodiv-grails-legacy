@@ -1,10 +1,10 @@
-    var checkView = false;
-    var handlePaginateButtons = function() {
-    	$('.paginateButtons a.active').removeClass('active');
-    	$(this).addClass('active');
-        updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
-        return false;
-    };
+var checkView = false;
+var handlePaginateButtons = function() {
+    $('.paginateButtons a.active').removeClass('active');
+    $(this).addClass('active');
+    updateGallery($(this).attr('href'), window.params.queryParamsMax, undefined, undefined, window.params.isGalleryUpdate);
+    return false;
+};
  
 $(document).ready(function(){
     console.log('obv.list.js start');
@@ -1330,7 +1330,7 @@ function appendGallery(ovbId,images){
 function loadSpeciesnameReco(){
     $('.showObvDetails').each(function(){
         var observationId = $(this).attr('rel');
-        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="'+window.params.spinnerURL+'" alt="${message(code:'spinner.alt',default:'Loading...')}" /></li>')
+        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="'+window.params.spinnerURL+'" alt="Loading..." /></li>')
         preLoadRecos(3, 0, false,observationId);
     });
 }

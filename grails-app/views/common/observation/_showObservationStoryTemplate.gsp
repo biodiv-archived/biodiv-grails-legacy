@@ -54,17 +54,18 @@
 </style>
 <div class="observation_story">
     <div style="height:27px;">
+        <g:if test="${showDetails && !showFeatured}">
         <%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
         %>
-        <g:if test="${showDetails && !showFeatured}">
+
         <s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
             </g:if>
             <div class="observation-icons">
 
-                <g:if test="${showDetails && speciesInstance && speciesInstance.taxonConcept?.threatenedStatus}">
+                <g:if test="${showDetails && maxVotedReco?.taxonConcept?.threatenedStatus}">
                 <div style="float:left;">
-                    <s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
+                    <s:showThreatenedStatus model="['threatenedStatus':maxVotedReco.taxonConcept?.threatenedStatus]"/>
                     </div>
                     </g:if>
 

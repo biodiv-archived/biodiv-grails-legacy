@@ -186,8 +186,8 @@ class ActivityFeedService {
 		return af
 	}
 	
-	def getDomainObject(className, id){
-        return utilsService.getDomainObject(className, id);
+	def getDomainObject(className, id, List eagerFetchProperties=null){
+        return utilsService.getDomainObject(className, id, eagerFetchProperties);
 	}
 	
 	// this will return class of object in general used in comment framework

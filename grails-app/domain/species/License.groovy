@@ -95,12 +95,14 @@ class License {
 	}
 
     static List<License> list() { 
+        println "License overridden fn for cache"
         return License.createCriteria().list {
             cache true
         }
     }
 
     static License findByName(LicenseType whatever) { 
+        println "License overridden fn for cache"
         return License.createCriteria().get {
             eq 'name', whatever
             cache true

@@ -198,7 +198,8 @@ class Observation extends DataObject {
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists, Dataset]
- 
+    static List eagerFetchProperties = ['author','maxVotedReco', 'resource', 'maxVotedReco.taxonConcept'];
+
  	static constraints = {
 		notes nullable:true
 		searchText nullable:true
@@ -718,12 +719,12 @@ class Observation extends DataObject {
     }
 
 	List fetchResourceCount(){
-        def result = Observation.executeQuery ('''
+/*      def result = Observation.executeQuery ('''
             select r.type, count(*) from Observation obv join obv.resource r where obv.id=:obvId group by r.type order by r.type
             ''', [obvId:this.id]);
-        println result
         return result;
-        //return [[ResourceType.IMAGE, noOfImages], [ResourceType.VIDEO, noOfVideos], [ResourceType.AUDIO,noOfAudio]];
+*/
+        return [[ResourceType.IMAGE, noOfImages], [ResourceType.VIDEO, noOfVideos], [ResourceType.AUDIO,noOfAudio]];
 	}
 	
 	def fetchRecoVoteOwnerCount(){
