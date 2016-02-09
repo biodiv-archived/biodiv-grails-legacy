@@ -343,7 +343,7 @@
 
             <script type="text/javascript">                                                            
                    $(document).ready(function(){
-                        galleryAjax(window.params.getResourceUrl+'/'+${speciesInstance.id},null);
+                        galleryAjax(window.params.getResourceUrl+'/'+${speciesInstance.id},'species');
                     }) 
             </script>
         </body>
