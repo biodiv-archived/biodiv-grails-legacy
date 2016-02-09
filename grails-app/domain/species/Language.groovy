@@ -67,6 +67,7 @@ class Language {
 	}
 
     static List<Language> list() { 
+        println "Language overridden fn for cache"
         return Language.createCriteria().list {
             order('name', 'asc')
             cache true
@@ -74,6 +75,7 @@ class Language {
     }
 
     static Language findByName(String whatever) { 
+        println "Language overridden fn for cache"
         return Language.createCriteria().get {
             eq 'name', whatever
             cache true
@@ -81,6 +83,7 @@ class Language {
     }
 
     static Language findByTwoLetterCode(String whatever) { 
+        println "Language overridden fn for cache"
         return Language.createCriteria().get {
             eq 'twoLetterCode', whatever
             cache true

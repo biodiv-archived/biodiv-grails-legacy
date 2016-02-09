@@ -83,6 +83,7 @@ import static org.springframework.http.HttpStatus.*;
 import species.ScientificName.TaxonomyRank;
 
 import species.NamesMetadata.NameStatus;
+import grails.plugin.cache.Cacheable;
 
 class ObservationService extends AbstractMetadataService {
 
@@ -938,7 +939,7 @@ class ObservationService extends AbstractMetadataService {
     Type geometryType = new CustomType(new GeometryUserType()); 
     q.setParameter(:geoExp0, geom, geometryType); 
      */
-    Map getFilteredObservations(def params, max, offset, isMapView = false) {
+    Map getFilteredObservations(def params, max, offset, isMapView = false, List eagerFetchProperties=null) {
 
         def queryParts = getFilteredObservationsFilterQuery(params) 
         String query = queryParts.query;
@@ -2416,7 +2417,7 @@ class ObservationService extends AbstractMetadataService {
     /*
      * used for download and post in bulk
      */
-    def getObservationList(params, max, offset, action){
+    def getObservationList(params, max, offset, String action, List eagerFetchProperties=null){
 		if(Utils.isSearchAction(params, action)){
             //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
@@ -2433,7 +2434,7 @@ class ObservationService extends AbstractMetadataService {
             }
             return getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
         }else{
-            return getFilteredObservations(params, max, offset, false).observationInstanceList
+            return getFilteredObservations(params, max, offset, false, eagerFetchProperties).observationInstanceList
         }
     }
 

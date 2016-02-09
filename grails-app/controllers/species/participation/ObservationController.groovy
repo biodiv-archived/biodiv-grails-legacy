@@ -115,17 +115,19 @@ def grailsCacheManager;
         utilsService.logSql {
             model = runLastListQuery(params);
         }
-
-        model.userLanguage = utilsService.getCurrentLanguage(request);
+println "bfr renderin"
         /*Map cacheEntries = sessionFactory.getStatistics()
                 .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
                         .getEntries();
 */
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.userLanguage = utilsService.getCurrentLanguage(request);
             model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+            println 'obvListHtml'
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            println 'obvFilterMsgHtml'
             def tagsHtml = "";
             if(model.showTags) {
                 //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
@@ -139,14 +141,17 @@ def grailsCacheManager;
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
+println "1"
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
+                    println "2"
                     model.model['width'] = 300;
                     model.model['height'] = 200;
                     render (view:"list", model:model.model)
                     return;
                 } else {
+                    println "3"
 /*                    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
                     def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
                     def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -174,7 +179,7 @@ def grailsCacheManager;
 		render model as JSON
 	}
 
-	protected def getObservationList(params) {
+	protected def getObservationList(params, List eagerFetchProperties=null) {
         try { 
             params.max = params.max?Integer.parseInt(params.max.toString()):24 
         } catch(NumberFormatException e) { 
@@ -194,7 +199,7 @@ def grailsCacheManager;
         }
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
-		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
+		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false, eagerFetchProperties)
 		def observationInstanceList = filteredObservation.observationInstanceList
         
 //        //Because returning source Ids instead of actual obv ins
@@ -491,7 +496,7 @@ def grailsCacheManager;
 			return observationService.getObservationsFromSearch(params);
 		} else {
 */
-        return getObservationList(params);
+        return getObservationList(params, Observation.eagerFetchProperties);
 //		}
 	}
 	
@@ -1895,6 +1900,7 @@ def filterChain() {
         return;
 
     }
+
 @Secured(['ROLE_USER'])
     def updateSpeciesGrp(){
         log.debug params
@@ -1910,30 +1916,37 @@ def t() {
     //            render "simple = ${SpeciesGroup.findByName('Others')}, 
     render "hits: ${statistics.secondLevelCacheHitCount}, misses: ${statistics.secondLevelCacheMissCount} ${statistics}"
     render grailsApplication.mainContext.eventTriggeringInterceptor.datastores
-    utilsService.logSql {
-        SpeciesGroup.list();
-    }
     render '<br/><br/>                            '
     SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
     render sessionHolder.hasTimeout()
     render '<br/><br/>                            '
     render grailsCacheManager
-    render grailsCacheManager.getCacheNames()
+    render '<b>'+grailsCacheManager.getCacheNames()+'</b>'
     render '<br/><br/>'
-    render grailsCacheManager.getCache('').getAllKeys();
-    render grailsCacheManager.getCache('species.groups.SpeciesGroup').getAllKeys();
+//    printCacheEntries(grailsCacheManager.getCache('species.groups.SpeciesGroup'));
+//    printCacheEntries(grailsCacheManager.getCache('species.groups.UserGroup'));
+//    printCacheEntries(grailsCacheManager.getCache('species.Habitat'));
+//    printCacheEntries(grailsCacheManager.getCache('species.Language'));
+//    printCacheEntries(grailsCacheManager.getCache('species.Classification'));
+    printCacheEntries(grailsCacheManager.getCache('featured'));
+    printCacheEntries(grailsCacheManager.getCache('org.hibernate.cache.StandardQueryCache'));
 
     //          render GrailsHibernateUtil.isCacheQueriesByDefault(grailsApplication);
     //          render grailsCacheManager.getCache('org.hibernate.cache.StandardQueryCache').getNativeCache();
     //          render cache
-    def realCache = sessionFactory.queryCache.region.ehcache;
-    render realCache
+}
+
+private printCacheEntries(cache) {
+    def realCache = cache.getNativeCache();
+    render "<b>${cache.name} cache entries : </b>"
     render '<br/><br/>                            '
     for (key in realCache.keys) {
         render key
         render '<br/><br/>                            '
-        def value = realCache.get(key).value
-        render value 
+        def e = realCache.get(key)
+        if(e) {
+            render "${e.value} -- Expiration Time : ${e.getExpirationTime()} -- Creation time: ${e.getCreationTime()} -- getLastUpdateTime() : ${e.getLastUpdateTime()} -- getTimeToLive() :${e.getTimeToLive() }"
+        }
         render '<br/><br/>                            '
 
     }

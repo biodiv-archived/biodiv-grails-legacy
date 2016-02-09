@@ -26,7 +26,6 @@ class Classification {
     static List<Classification> list() { 
         println "Classification overridden fn for cache"
         return Classification.createCriteria().list {
-            order('groupOrder', 'asc')
             cache true
         }
     }

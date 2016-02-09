@@ -16,6 +16,7 @@ import species.participation.Observation;
 import species.Species;
 
 import org.apache.commons.logging.LogFactory;
+import grails.plugin.cache.Cacheable;
 
 class AbstractObjectService {
     
@@ -26,7 +27,7 @@ class AbstractObjectService {
     def utilsService;
 
 	protected static final log = LogFactory.getLog(this);
-
+    
     /**
     */
     protected static List createUrlList2(observations) {
@@ -140,12 +141,15 @@ class AbstractObjectService {
     */
     protected Map getFeaturedObject(Long ugId, int limit, long offset, String controller){
         log.debug "Getting featured objects for ${controller} in usergroup ${ugId?ugId:'IBP'}. limit:${limit} offset:${offset}"
+        def result;
         String type = ""
         String type1 = ""
+        List eagerFetchProperties = [];
         //TODO:change hardcoded string to class definitions
         if (controller == "observation") {
             type = "species.participation.Observation";
             type1 = "species.participation.Checklists";
+            eagerFetchProperties =  Observation.eagerFetchProperties;
         }
         else if (controller == "species") {
             type = "species.Species";
@@ -153,9 +157,9 @@ class AbstractObjectService {
         else if (controller == "document") {
             type = "content.eml.Document";
         }
-		else if (controller == "discussion") {
-			type = "species.participation.Discussion";
-		}else {    
+        else if (controller == "discussion") {
+            type = "species.participation.Discussion";
+        }else {    
         }
 
         def featured = []
@@ -167,7 +171,7 @@ class AbstractObjectService {
             queryParams["type1"] = type1
 
             countQuery = "select count(*) from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
-        
+
             query = "from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
         } else {
             countQuery = "select count(*) from Featured feat "
@@ -179,7 +183,7 @@ class AbstractObjectService {
             countQuery += ' and feat.userGroup.id = :ugId'
             query +=  ' and feat.userGroup.id = :ugId'
         }
-        
+
         log.debug "CountQuery:"+ countQuery + " params: "+queryParams
         count = Featured.executeQuery(countQuery, queryParams)
 
@@ -190,30 +194,30 @@ class AbstractObjectService {
         query += orderByClause
 
         log.debug "FeaturedQuery:"+ query + " params: "+queryParams
-        println "FeaturedQuery:"+ query + " params: "+queryParams
-        
+
         featured = Featured.executeQuery(query, queryParams);
         def observations = [:]
         featured.each {
-            def observation = activityFeedService.getDomainObject(it.objectType,it.objectId)
+            def observation = activityFeedService.getDomainObject(it.objectType, it.objectId, eagerFetchProperties);
             def featuredNotes = [];
             if(observations.containsKey(observation)) {
                 featuredNotes = observations.get(observation);
             } else {
                 observations.put(observation, featuredNotes);
             }
-            //JSON marsheller is registered in Bootstrap
+            //JSON marsheller for this featured object is registered in Bootstrap
             featuredNotes << it
         }
-		
-        def result = []
+
         def i = 0;
-        observations.each {key,value ->
+        result = [];
+        observations.each { key,value ->
             result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':utilsService.getTargetController(key)]);
         }
-		
-        return['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
-                		
+
+        result = ['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
+        return result
+
     }
 
 

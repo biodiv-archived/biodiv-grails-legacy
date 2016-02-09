@@ -34,11 +34,10 @@
                 <span class="">${observationInstance.speciesCount}</span>
             </div>
         </g:if>
-             <div class="footer-item"> 
+        <div class="footer-item"> 
+            <asset:image src="/all/license/${observationInstance?.license?.name?.getIconFilename().toLowerCase()+'.png'}" absolute="true" title="${observationInstance.license.name}" />
+        </div>
 
-                <asset:image src="/all/license/${observationInstance?.license?.name?.getIconFilename().toLowerCase()+'.png'}" absolute="true" title="${observationInstance.license.name}" />
-            </div>
-       
     </g:if>
     
     <g:if test="${!hidePost}">

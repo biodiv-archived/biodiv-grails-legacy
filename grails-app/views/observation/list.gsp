@@ -131,11 +131,9 @@
             </div>
 
             <uGroup:rightSidebar/>
-            <obv:featured 
-            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance, 'userLanguage' : userLanguage]" />
 
-<%--            <h4><g:message code="heading.browse.observations" /></h4>--%>
             <obv:showObservationsListWrapper />
+
 	</div>
 
 
@@ -146,13 +144,12 @@
     action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
     method="GET" class="form-horizontal addRecommendation ">
     <div class="reco-input">
-    <reco:create
-        model="['recommendationInstance':recommendationInstance]" />
+        <reco:create/>
         <input type="hidden" name='obvId'
-                value="" />
-        
-         <input type="submit"
-                value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
+        value="" />
+
+        <input type="submit"
+        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
     </div>
     
 </form>
@@ -174,7 +171,7 @@
     $(document).ready(function() {
         window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', userGroupWebaddress:params.webaddress) }";
         window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
-        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+        //initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
     });
 </script>
 

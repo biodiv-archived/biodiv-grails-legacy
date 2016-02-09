@@ -21,6 +21,7 @@ class ObservationTagLib {
     def chartService;
 	def customFieldService;
     //def SUserService;
+    def utilsService;
 
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
@@ -346,7 +347,10 @@ class ObservationTagLib {
     def featured = { attrs, body ->
         if(attrs.model) {
             def p = [limit:1, offset:0, filterProperty:'featureBy', controller:attrs.model.controller, userGroup:attrs.model.userGroupInstance]
-            def related = observationService.getRelatedObservations(p)?.relatedObv
+            def related;
+            utilsService.logSql ({
+            related = observationService.getRelatedObservations(p)?.relatedObv
+            }, 'ObservationTaglib > featured');
             if(related) {
                 attrs.model['relatedInstanceList'] = related.observations;
                 attrs.model['relatedInstanceListTotal'] = related.count;

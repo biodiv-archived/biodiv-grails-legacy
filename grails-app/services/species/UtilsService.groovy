@@ -53,6 +53,7 @@ class UtilsService {
     def mailService;
     def springSecurityService
     def messageSource;
+    def grailsCacheManager;
     //def observationService
  //   def activityFeedService
 
@@ -847,7 +848,7 @@ class UtilsService {
         return desc
     }
 
-    def getDomainObject(className, id){
+    def getDomainObject(className, id, List eagerFetchProperties = null){
         def retObj = null
         if(!className || className.trim() == ""){
             return retObj
@@ -859,8 +860,14 @@ class UtilsService {
             retObj = [objectType:className, id:id]
             break
             default:
-            retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
-            break
+            retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.withCriteria(uniqueResult:true) {
+                eq ('id', id)
+                if(eagerFetchProperties) {
+                    eagerFetchProperties.each {
+                        fetchMode(it, org.hibernate.FetchMode.EAGER)
+                    }
+                }
+            }
         }
         return retObj
     }
@@ -922,8 +929,8 @@ class UtilsService {
         log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"  
     }  
 
-    static def logSql(Closure closure) {
-        println "%%%%%%%%%%%% logging sql"  
+    static def logSql(Closure closure, String blockName="") {
+        println "%%%%%%%%%%%% logging sql ${blockName}"  
         Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
         Level currentLevel = sqlLogger.level
         sqlLogger.setLevel(Level.TRACE)
@@ -1102,5 +1109,19 @@ class UtilsService {
 	public String getTableNameForGroup(UserGroup ug){
 		return "custom_fields_group_" + ug.id
 	}
+
+    def getFromCache(String cacheName, String cacheKey) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Returning from cache ${cache.name}" 
+        return cache.get(cacheKey)?.get();
+    }
+
+    def putInCache(String cacheName, String cacheKey, value) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
+        cache.put(cacheKey,value);
+    }
 }
 

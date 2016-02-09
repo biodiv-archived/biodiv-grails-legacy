@@ -35,6 +35,8 @@ class Featured extends AbstractAction {
 	Date expireTime;
 	private static final log = LogFactory.getLog(this);
 
+	static fetchMode = [userGroup: 'eager']
+
     static constraints = {
         language nullable:false
         author(unique: ['objectId', 'objectType', 'userGroup'])

@@ -39,6 +39,7 @@ import species.participation.ResourceRedirect
 
 
 import static org.springframework.http.HttpStatus.*;
+import grails.plugin.cache.Cacheable;
 
 abstract class AbstractObjectController {
     
@@ -46,8 +47,31 @@ abstract class AbstractObjectController {
     def observationService;
 
     def related() {
-        def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-        return formatRelatedResults(relatedObv, params);
+        def result = [];
+
+        if(params.filterProperty?.equals('featureBy')) {
+            String cacheKey = "${params.webaddress?:'IBP'}-${params.controller}-${params.action}-${params.filterProperty}-${params.filterPropertyValue}-${params.max?:1}-${params.offset?:0}"
+            String cacheName = 'featured';
+
+            result = utilsService.getFromCache(cacheName, cacheKey);
+            if(!result) {
+                utilsService.logSql( {
+                    def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+                    result = formatRelatedResults(relatedObv, params);
+                }, 'AbstractObjectController > related > featureBy');
+                utilsService.putInCache(cacheName, cacheKey, result);
+            }
+        } else {
+            utilsService.logSql( {
+                def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+                result = formatRelatedResults(relatedObv, params);
+            }, 'AbstractObjectController > related');
+        }
+
+        withFormat {
+            json { render result as JSON }
+            xml { render result as XML }
+        }
     }
 
     protected formatRelatedResults(relatedObv, params) {
@@ -82,11 +106,8 @@ abstract class AbstractObjectController {
             }
             relatedObv.observations = urlList
         }
-        def model = utilsService.getSuccessModel("", null, OK.value(), relatedObv)
-        withFormat {
-            json { render model as JSON }
-            xml { render model as XML }
-        }
+        return utilsService.getSuccessModel("", null, OK.value(), relatedObv)
+
     }
 	
 	def getTargetInstance(Class clazz, id){
