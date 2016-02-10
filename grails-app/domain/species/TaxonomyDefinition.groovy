@@ -551,6 +551,7 @@ class TaxonomyDefinition extends ScientificName {
 				this.errors.allErrors.each { log.error it }
 			}else{
 				userList.each {
+					println "--Adding actvity Feed for user " + it + "  FEED " + ns
 					if(it)
 						activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
 				}
