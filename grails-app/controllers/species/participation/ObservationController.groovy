@@ -376,14 +376,6 @@ println "1"
                 fetchMode   'reprImage', FetchMode.JOIN
                 fetchMode   'maxVotedReco', FetchMode.JOIN
                 fetchMode   'maxVotedReco.taxonConcept', FetchMode.JOIN
-
-                fetchMode   'resource', FetchMode.JOIN
-                fetchMode   'resource.licenses', FetchMode.JOIN
-                fetchMode   'recommendationVote', FetchMode.JOIN
-                fetchMode   'recommendationVote.author', FetchMode.JOIN
-                fetchMode   'recommendationVote.recommendation.taxonConcept', FetchMode.JOIN
-                fetchMode   'userGroups', FetchMode.JOIN
-                fetchMode   'annotations', FetchMode.JOIN
             }
 			
         if (!observationInstance) {

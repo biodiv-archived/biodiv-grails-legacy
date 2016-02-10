@@ -46,6 +46,7 @@ if(userGroup && userGroup.id) {
                 <i class="icon-user"></i>
                 ${membersCount}
             </div>
+            <%--        
             <div class="footer-item" title="${g.message(code:'showobservationstoryfooter.title.species')}">
                 <i class="icon-leaf"></i>
                 ${userGroup.noOfSpecies()}
@@ -60,8 +61,8 @@ if(userGroup && userGroup.id) {
             </div>
             <div class="footer-item" title="${g.message(code:'showusergroupsig.title.discussions')}">
                 <i class="icon-comment"></i>
-                ${userGroup.noOfDocuments()}
             </div>
+            --%>
             </g:if>
     </div>
 </div>

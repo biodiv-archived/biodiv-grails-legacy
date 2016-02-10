@@ -1893,7 +1893,20 @@ grails.cache.config = {
         timeToLiveSeconds 21600//6hrs
         maxElementsInMemory 100
     }
-
+    domain {
+        name 'species.dataset.DataSource'
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+    domain {
+        name 'species.dataset.DataSet'
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
 
 }
 

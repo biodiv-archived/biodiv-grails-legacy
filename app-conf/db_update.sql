@@ -501,11 +501,11 @@ create sequence document_id_seq start 863; create sequence observation_id_seq st
 ALTER TABLE observation DISABLE TRIGGER ALL ;
 alter table observation add constraint obv_dataset_id_fk foreign key (dataset_id) references dataset(id);
 
-alter table observation add column no_of_images integer not null default 0, add column no_of_videos integer not null default 0,  add column no_of_audio integer not null default 0, add column repr_image bigint, add column no_of_identifications integer not null default 0;
+alter table observation add column no_of_images integer not null default 0, add column no_of_videos integer not null default 0,  add column no_of_audio integer not null default 0, add column repr_image_id bigint, add column no_of_identifications integer not null default 0;
 
-update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id r.type='IMAGE' group by observation_id) g where g.observation_id = id;
-update observation set no_of_videos = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='VIDEO') g;
-update observation set no_of_audio = g.count from (select count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id where  or1.observation_id=id and r.type='AUDIO') g;
+update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='IMAGE' group by observation_id) g where g.observation_id = id;
+update observation set no_of_videos = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='VIDEO' group by observation_id) g where g.observation_id = id;
+update observation set no_of_audios = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='AUDIO' group by observation_id) g where g.observation_id = id;
 
 create table tmp as select observation_id, count(*) as count from recommendation_vote group by observation_id;
 
@@ -515,7 +515,7 @@ drop table tmp;
 
 create table tmp as select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='resource' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref order by observation_id asc, avg desc, resource_id asc;
 
-update observation set repr_image = g.resource_id from (select b.observation_id,b.resource_id from (select observation_id, max(avg) as max_avg from tmp group by observation_id) a inner join tmp b on a.observation_id=b.observation_id where b.avg=a.max_avg) g where g.observation_id=id;
+update observation set repr_image_id = g.resource_id from (select b.observation_id,b.resource_id from (select observation_id, max(avg) as max_avg from tmp group by observation_id) a inner join tmp b on a.observation_id=b.observation_id where b.avg=a.max_avg) g where g.observation_id=id;
 
 drop table tmp;
 
@@ -538,4 +538,14 @@ update taxonomy_definition set species_id = s.sid from (select taxon_concept_id,
 #adding defaultHierarchy json to taxon_definition table
 alter table taxonomy_definition add column default_hierarchy text;
 update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 265799 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id;
+
+#10thFeb 2016
+#creating single license for resource instead of multiple
+alter table resource add column license_id bigint;
+alter table resource add foreign key (license_id) references license(id);
+update resource set license_id = g.license_id from (select license_id,resource_licenses_id from resource_license group by resource_licenses_id, license_id) g where g.resource_licenses_id=id;
+update resource set license_id=822 where license_id is null;
+alter table resource alter column license_id set not null;
+
+#creating single contributor instead of multiple for resource
 

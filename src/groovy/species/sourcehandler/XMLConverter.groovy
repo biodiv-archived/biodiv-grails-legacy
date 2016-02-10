@@ -1040,7 +1040,7 @@ class XMLConverter extends SourceConverter {
                     res.addToAttributors(con);
                 }
                 for(License l : getLicenses(imageNode, true)) {
-                    res.addToLicenses(l);
+                    res.license = l;
                 }
                 if(imageNode.annotations?.text()) {
                     res.annotations = imageNode.annotations?.text()
@@ -1065,7 +1065,7 @@ class XMLConverter extends SourceConverter {
                 }
                 for(License l : getLicenses(imageNode, true)) {
                     println "=====LICENSE on EXISTING RES!!!======== " + l + "===RES== " + res
-                    res.addToLicenses(l);
+                    res.license = l
                 }
                 if(imageNode.annotations?.text()) {
                     println "###################################SAVING Annotations"

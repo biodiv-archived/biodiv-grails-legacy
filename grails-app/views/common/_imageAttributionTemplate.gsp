@@ -13,7 +13,7 @@
 
             <obv:rating model="['resource':resource, 'class':'gallery_rating']"/>
         </g:if>    
-            <g:each in="${resource?.licenses}" var="l">
+            <g:each in="${resource?.license}" var="l">
             <a href="${l?.url}" target="_blank"> <img class="icon" style="height:auto;margin-right:2px;"
                 src="${assetPath(src:'/all/license/'+l?.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
                 alt="${l?.name.value()}" /> </a>

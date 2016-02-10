@@ -198,7 +198,7 @@ class Observation extends DataObject {
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists, Dataset]
-    static List eagerFetchProperties = ['author','maxVotedReco', 'resource', 'maxVotedReco.taxonConcept'];
+    static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
 
  	static constraints = {
 		notes nullable:true

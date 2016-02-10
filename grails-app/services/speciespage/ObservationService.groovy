@@ -941,7 +941,7 @@ class ObservationService extends AbstractMetadataService {
      */
     Map getFilteredObservations(def params, max, offset, isMapView = false, List eagerFetchProperties=null) {
 
-        def queryParts = getFilteredObservationsFilterQuery(params) 
+        def queryParts = getFilteredObservationsFilterQuery(params, eagerFetchProperties) 
         String query = queryParts.query;
         long checklistCount = 0, allObservationCount = 0, speciesCount = 0, subSpeciesCount = 0;
 
@@ -1045,7 +1045,7 @@ class ObservationService extends AbstractMetadataService {
     /**
      *
      **/
-    def getFilteredObservationsFilterQuery(params) {
+    def getFilteredObservationsFilterQuery(params, List eagerFetchProperties = null) {
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
@@ -1076,7 +1076,7 @@ class ObservationService extends AbstractMetadataService {
         else {
             query += " obv "
         }
-        query += " from Observation obv "
+        query += " from Observation obv inner join fetch obv.author left join fetch obv.maxVotedReco left outer join fetch obv.reprImage "
         //def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
         def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '';

@@ -520,7 +520,7 @@ class DatasetService extends AbstractMetadataService {
             try {
                 conn = new Sql(dataSource);
                 resultObv.eachWithIndex { t, index ->
-                    conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set canonicalForm = :canonicalForm, clean_sciName=:clean_sciName where sciName = :sciName", [canonicalForm:parsedNames[index]?.canonicalForm, clean_sciName:parsedNames[index]?.name, sciName:t.sciName]);
+                    conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set canonicalForm = :canonicalForm, clean_sciName=:clean_sciName where sciName = :sciName and species = :species and genus=:genus and family=:family and order1=:order1 and class=:class and phylum=:phylum and kingdom=:kingdom and commonname=:commonname and taxonrank=:taxonrank", [canonicalForm:parsedNames[index]?.canonicalForm, clean_sciName:parsedNames[index]?.name, sciName:t.sciName, species:t.species, genus:t.genus, family:t.family, order1:t.order1, class:t.class, phylum:t.phylum, kingdom:t.kingdom, commonname:t.commonname, taxonrank:t.taxonrank]);
                 }
             } finally {
                 conn.close();

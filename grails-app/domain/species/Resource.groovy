@@ -89,8 +89,9 @@ class Resource extends Sourcedata implements Rateable {
     Language language;
     String annotations;
     String accessRights;
+    License license;
 
-	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
+	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation];
 	static belongsTo = [SpeciesField, Observation];
 	
 	static mapping = {
@@ -105,7 +106,7 @@ class Resource extends Sourcedata implements Rateable {
 		url(nullable:true);
 		description(nullable:true);
 		mimeType(nullable:true);
-		licenses  validator : { val, obj -> val && val.size() > 0 }
+		//licenses  validator : { val, obj -> val && val.size() > 0 }
         rating(nullable:false, min:0, max:5);
         context(nullable:true);
         annotations(nullable:true);
