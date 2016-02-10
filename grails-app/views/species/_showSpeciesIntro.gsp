@@ -29,7 +29,7 @@
             </g:if>
             <ul>
                 <li><a href="#resourceTabs-1"><g:message code="button.images" /></a></li>
-                <li><a id="flickrImages" href="#resourceTabs-3"><g:message code="button.flickr.images" /></a></li>
+                <!-- <li><a id="flickrImages" href="#resourceTabs-3"><g:message code="button.flickr.images" /></a></li> -->
             </ul>
             <div id="resourceTabs-1">
                 <!--a class="myeditable" href="#">Contribute Images</a-->
@@ -37,8 +37,33 @@
                 <div class="story-footer" style="right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
                     <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;']"/>
                 </div>
+
+                <div class="gallery_wrapper">
+
+                    <div class="container1 noselect">
+                        <div class="mover">
+
+                        </div>
+                    <div class="nav_thumb inactive" id="left"><</div>
+                    <div class="nav_thumb" id="right">></div>
+                    </div>
+
+
+                    <div id="blueimp-image-carousel" class="blueimp-gallery blueimp-gallery-carousel blueimp-gallery-controls">
+                        <div class="slides"></div>
+                        <h3 class="title"></h3>
+                        <a class="prev">‹</a>
+                        <a class="next">›</a>
+                        <a class="play-pause"></a>
+                        <a class="anchor_resource_link" target="_blank">asdsad</a>
+                    </div>
+
+                    <div class="image_info">    
+                    </div>
+
+                </div>              
                 
-                <div id="gallery1" class="gallery" style="margin-top: 60px;">
+                <div id="gallery1" class="gallery" style="margin-top: 60px;display:none;">
                     <%
                         def resSize = resourcesInstanceList.size()
                         def imageResSize = 0;
@@ -61,11 +86,11 @@
 
                 </div>
                 </div>
-                <div id="resourceTabs-3">						
+                <!-- <div id="resourceTabs-3">						
                     <div id="gallery3" style="margin-top: 60px;"></div>
                     <div id="flickrBranding"></div><br/>
                     <div class="message ui-corner-all"><g:message code="showspeciesintro.irrelevant.images" /></div>
-                </div> 
+                </div> -->
             </div>
         </div>
         </g:if>

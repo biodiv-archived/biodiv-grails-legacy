@@ -92,9 +92,9 @@ function feedPostProcess(){
 	$('.yj-message-body').linkify();
 	updateRelativeTime();
         rating();
-	$(".youtube_container").each(function(){
+	/*$(".youtube_container").each(function(){
 		loadYoutube(this);
-	});
+	});*/
 }
 
 //to show relative date

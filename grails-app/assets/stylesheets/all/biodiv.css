@@ -3130,3 +3130,112 @@ small {
     background-color:#fff;
     clear:both;
 }
+
+
+
+/* For Gallery changes */
+
+.mover img{
+    padding: 5px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+.mover{
+    display: inline-block;
+    position: absolute;
+    left: 0px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.mover img{
+    width:100px;
+    height:75px;
+}
+.container1{
+    position: relative;
+    height: 85px;
+    overflow: hidden;
+    background-color:grey;
+    z-index:1;
+    top:20px;
+}
+.gallery_wrapper #left, .gallery_wrapper #right {
+    cursor: pointer;
+    position: relative;
+}
+.nav_thumb {      
+  color: white;
+  font-size: 20px;
+  padding: 30px 10px;
+  font-weight: bold;  
+  background-color: grey;
+}
+.gallery_wrapper #left {
+    float: left;
+}
+.gallery_wrapper #right {
+    float: right;
+}
+.inactive{
+    color: rgb(182, 177, 177);
+}
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.blueimp-gallery-carousel{
+    margin-top:0px;
+    box-shadow: none;
+    height:30px;
+}
+
+.gallery_wrapper{
+    position:relative;
+}
+.image_info {
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    background-color: rgb(56, 54, 54);
+    opacity: .6;
+    color: white;
+    padding: 5px 0px;
+}
+.image_info a{
+    color:white;
+    float: left;
+}
+.conts_wrap{
+      margin-left: 10px !important;
+}
+.conts_wrap h5{
+    
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+.conts_wrap ol{
+  margin-left: 70px;
+}
+.conts_wrap ol li{
+    float:left;
+    font-style: italic
+}
+.license .icon{
+    border-radius:0px;
+    box-shadow:none;
+}
+.slideUp{
+    background-image: url(/assets/glyphicons-halflings-white.png);
+}
+.play-pause{
+      bottom: 60px !important;
+}
+
+#resourceTabs{
+	height: 485px;
+	background: none;
+}
