@@ -36,12 +36,11 @@
                 
                 <g:if
 				test="${imagePath}">
-				<img class="img-polaroid" src="${imagePath}" />
+                <span class="img-polaroid" style="background-image:url(${imagePath});">
+                </span>
 			</g:if>
 			<g:else>
-				<img class="img-polaroid"
-					src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-					title="${g.message(code:'showobservationsnippet.title.contribute')}" />
+				<span class="img-polaroid" title="${g.message(code:'showobservationsnippet.title.contribute')}" style="background-image:url(${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)});">
 			</g:else>
 		</g:link>
 	</div>

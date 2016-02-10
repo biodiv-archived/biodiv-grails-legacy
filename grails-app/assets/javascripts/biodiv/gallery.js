@@ -113,7 +113,7 @@
             output += '<div class="span6">';
             output += '<div class="license span12">';
                     output += '<a class="span7" href="'+resource.licenses[0]['url']+'" target="_blank">';
-                    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../assets/all/license/'+resource.licenses[0]['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.licenses[0]['name']+'">';
+                    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.licenses[0]['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.licenses[0]['name']+'">';
                     output += '</a>';
                     output += '<div class="rating_form span4">';
                     output += '<form class="ratingForm" method="get" title="Rate it">';
