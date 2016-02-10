@@ -546,6 +546,7 @@ class TaxonomyDefinition extends ScientificName {
 	def updateNameSignature(List userList = [springSecurityService.currentUser]){
 		def ns = createNameSignature()
 		if(ns != activityDescription){
+			activityDescription = ns
 			if(!save()) {
 				this.errors.allErrors.each { log.error it }
 			}else{

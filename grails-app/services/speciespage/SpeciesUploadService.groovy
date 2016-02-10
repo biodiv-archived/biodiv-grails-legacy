@@ -440,7 +440,6 @@ class SpeciesUploadService {
 					Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
 						if(s){
-							s.postProcess()
 							species.add(s)
 							noOfInsertions++;
 							sb.append("|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)

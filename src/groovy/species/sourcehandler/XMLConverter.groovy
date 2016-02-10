@@ -492,6 +492,8 @@ class XMLConverter extends SourceConverter {
 					}
 					
 					taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species), latestHir)
+					updateUserPrefForColCuration(taxonConcept, speciesNameNode)
+					taxonConcept.postProcess()
 					taxonConcept.updateNameSignature(getUserContributors(speciesNameNode.data))
 					
 					List<SynonymsMerged> synonyms;
@@ -518,7 +520,6 @@ class XMLConverter extends SourceConverter {
 							}  
 						}
 					}
-					updateUserPrefForColCuration(taxonConcept, speciesNameNode)
 					return taxonConcept;
 				} else {
 					log.error "TaxonConcept is not found"
