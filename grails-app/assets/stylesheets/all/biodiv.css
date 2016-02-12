@@ -219,10 +219,14 @@ h6 {
 	max-height: 150px;
 	max-width: 150px;
         padding:0px;
-/* 	height:100%; */
-/* 	width: auto; */
+	height:150px; 
+ 	width: 150px; 
 	display: -moz-inline-box; /* Firefox 2 */
 	display: inline-block;
+	background-repeat:no-repeat; 
+	background-position:center;
+	background-size: 150px 150px;
+
 }
 
 .thumbnail .figure .mouseover, .thumbnail .figure .mouseoverfix {

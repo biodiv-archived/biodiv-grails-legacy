@@ -21,22 +21,21 @@ def obvId = observationInstance?.id
                 
                 <g:if
 				test="${imagePath}">
-				<img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
-					src="${imagePath}" />
+                <% imagePath = imagePath.replaceAll('http://indiabiodiversity.localhost.org/','http://indiabiodiversity.org/')%>
+				<span class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''} background-image:url(${imagePath});">
+                </span>
 			</g:if>
-			<g:else>
-				<img class="img-polaroid"
-					src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-					title="${g.message(code:'showobservationsnippet.title.contribute')}" />
+			<g:else>                
+                <span class="img-polaroid" title="${g.message(code:'showobservationsnippet.title.contribute')}" style="background-image:url(${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)});">
+                </span>
 			</g:else>
                         <g:if test="${observationInstance?.isChecklist}">
                         <div class="listtemplate_icon checklistCount">${observationInstance?.speciesCount}</div>
                         </g:if>
                         <g:elseif test="${observationInstance?.dataset}">
                         <div class="listtemplate_icon" style="line-height:55px;">
-                            <img
-                            class="img-polaroid" style="max-height:55px;max-width:55px;"
-                            src="${observationInstance.dataset.datasource.mainImage()?.fileName}" title="${observationInstance.dataset.datasource.title}" alt="${observationInstance.dataset.datasource.title}" /> 
+                            <span class="img-polaroid" title="${observationInstance.dataset.datasource.title}" style="background-image:url(${observationInstance.dataset.datasource.mainImage()?.fileName});">
+                            </span>                            
                         </div>
                         </g:elseif>
 		</g:link>
