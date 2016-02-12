@@ -128,7 +128,70 @@ def addFieldForGbif(){
 	}
 }
 
-addFieldForGbif()
+
+
+def getAccepteNameId(String id){
+	if(!id)
+		return
+	
+	try{		
+		id = Long.parseLong(id)
+		TaxonomyDefinition td = TaxonomyDefinition.read(id)
+		if(!td){
+			return
+		}
+		
+		if("accepted".equalsIgnoreCase(td.status.value())){
+			return id
+		}
+		
+		def accList = AcceptedSynonym.fetchAcceptedNames(td)
+		println "synonym id " + id + "   accList " + accList
+		if(accList.size() == 1){
+			return accList[0].id
+		}
+	}catch(e){
+		println e.message
+	}
+		
+}
+
+def addAcceptedTaxonId(){
+	def ds = ctx.getBean("dataSource");
+	ds.setUnreturnedConnectionTimeout(500);
+	int count = 0
+	NamesParser namesParser = new NamesParser();
+	def rowList = []
+	new File("/tmp/t1.csv").splitEachLine("\\t") {
+		if(!it)
+			return
+		
+		count++
+		if(count == 1)
+			return
+		
+		if(count%100 == 0)
+			println "----------------- count " + count
+					
+		def fields = it;
+		def id = fields[0].trim()
+		def name = fields[1].trim()
+		def parsedName = fields[2].trim()
+		def taxonId  = fields[3]?.trim()
+		def accId = getAccepteNameId(taxonId)
+		def tmp = [id, name, parsedName, taxonId, accId]
+		rowList << tmp
+	}
+	
+	new File("/tmp/t2.csv").withWriter { out ->
+		rowList.each {
+		  out.println it.join("|")
+		}
+	}
+}
+	
+addAcceptedTaxonId()
+//addFieldForGbif()
 //nameParse()
 //uploadGbifNames(false)
 //gbifNamesReport()

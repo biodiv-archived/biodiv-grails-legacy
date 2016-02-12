@@ -471,7 +471,7 @@ class XMLConverter extends SourceConverter {
 				//getting classification hierarchies and saving these taxon definitions
 				List<TaxonomyRegistry> taxonHierarchy = getClassifications(species.children(), speciesName, true).taxonRegistry;
 
-				//taxonConcept is being taken from only author contributed taxonomy hierarchy
+				//taxonConcept is being taken from taxonomy hierarchy
 				TaxonomyDefinition taxonConcept = getTaxonConcept(taxonHierarchy);
 
 				// if the author contributed taxonomy hierarchy is not specified
