@@ -858,7 +858,7 @@ println "1"
                     log.debug msg;
 					//saving max voted species name for observation instance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 		            
                     //just updates species time stamp on recommendation
@@ -1046,7 +1046,7 @@ println "1"
 				} else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 				
                     //just updates species time stamp on recommendation
@@ -1122,7 +1122,7 @@ println "1"
 			   recommendationVoteInstance.delete(flush: true, failOnError:true)
 			   log.debug "Successfully deleted reco vote : "+recommendationVoteInstance
 			   observationInstance.calculateMaxVotedSpeciesName();
-			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+			   def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
 			   observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 		
                 //just updates species time stamp on recommendation
@@ -1368,7 +1368,7 @@ println "1"
 			commonNameReco =  recoResultMap.commonNameReco;
 		}
 		
-		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence);
+		RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence, givenSciName:recoName, givenCommonName:commonName);
 
 		if(!reco){
 			def msg = "Not a valid recommendation"
@@ -1754,8 +1754,10 @@ println "1"
 
             if(recVo){
                 if(reco != recVo.recommendation) {
+                    String givenSciName = recVo.givenName;
+                    String givenCommonName = recVo.givenCommonName;
                     recVo.delete(flush: true, failOnError:true)
-                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence )
+                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:givenSciName, givenCommonName:givenCommonName )
                     if(!newRecVo.save(flush:true)){
                         newRecVo.errors.allErrors.each { log.error it } 
                     }
@@ -1765,8 +1767,9 @@ println "1"
                 }
                 
             }
-            if(!recVo){
-                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence )
+
+            if(!recVo) {
+                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:params.recoName, givenCommonName:params.commonName);
                 if(!newRecVo.save(flush:true)){
                     newRecVo.errors.allErrors.each { log.error it } 
                 }
@@ -1776,7 +1779,7 @@ println "1"
             msg = messageSource.getMessage("default.observation.locked", null, RCU.getLocale(request))
             mailType = utilsService.OBV_LOCKED;
             activityFeed = activityFeedService.addActivityFeed(obv, newRecVo, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(newRecVo.recommendation, null));
-        }else{
+        } else {
             obv.removeResourcesFromSpecies()
             obv.isLocked = false;
             obv.calculateMaxVotedSpeciesName()

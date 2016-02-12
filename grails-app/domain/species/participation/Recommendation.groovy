@@ -1,7 +1,5 @@
 package species.participation
 
-import org.junit.Before;
-
 import species.Language;
 import species.TaxonomyDefinition;
 import species.auth.Role;

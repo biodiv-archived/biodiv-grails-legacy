@@ -445,7 +445,7 @@ class DatasetService extends AbstractMetadataService {
         String occurencesFileName = (new File(directory, 'occurrence.txt')).getAbsolutePath(); 
         String multimediaFileName = (new File(directory, 'multimedia.txt')).getAbsolutePath(); 
         Date startTime = new Date();
-        try {
+         try {
             uploadLog << "\nCreating base table for ${occurencesFileName}";
 
             conn.execute('''
@@ -465,11 +465,11 @@ class DatasetService extends AbstractMetadataService {
             create table '''+tmpNewBaseDataTable+''' as select g.*,a.data from '''+tmpBaseDataTable+''' g join  (select gbifID, row_to_json((select d from (select 'http://www.gbif.org/occurrence/'||gbifID as gbifID, abstract, accessRights, accrualMethod, accrualPeriodicity, accrualPolicy, alternative, audience, available, bibliographicCitation, conformsTo, contributor, coverage, created, creator, date, dateAccepted, dateCopyrighted, dateSubmitted, description, educationLevel, extent, format, hasFormat, hasPart, hasVersion, identifier, instructionalMethod, isFormatOf, isPartOf, isReferencedBy, isReplacedBy, isRequiredBy, isVersionOf, issued, language, license, mediator, medium, modified, provenance, publisher, references1 as references, relation, replaces, requires, rights, rightsHolder, source, spatial, subject, tableOfContents, temporal, title, type, valid, acceptedNameUsage, acceptedNameUsageID, associatedres, associatedReferences, associatedSequences, associatedTaxa, basisOfRecord, bed, behavior, catalogNumber, class, collectionCode, collectionID, continent, countryCode, county, dataGeneralizations, datasetID, datasetName, dateIdentified, day, decimalLatitude, decimalLongitude, disposition, dynamicProperties, earliestAgeOrLowestStage, earliestEonOrLowestEonothem, earliestEpochOrLowestSeries, earliestEraOrLowestErathem, earliestPeriodOrLowestSystem, endDayOfYear, establishmentMeans, eventDate, eventID, eventRemarks, eventTime, family, fieldNotes, fieldNumber, footprintSRS, footprintSpatialFit, footprintWKT, formation, genus, geologicalContextID, georeferencedDate, georeferenceProtocol, georeferenceRemarks, georeferenceSources, georeferenceVerificationStatus, georeferencedBy, group1 as group, habitat, higherClassification, higherGeography, higherGeographyID, highestBiostratigraphicZone, identificationID, identificationQualifier, identificationReferences, identificationRemarks, identificationVerificationStatus, identifiedBy, individualCount, individualID, informationWithheld, infraspecificEpithet, institutionCode, institutionID, island, islandGroup, kingdom, latestAgeOrHighestStage, latestEonOrHighestEonothem, latestEpochOrHighestSeries, latestEraOrHighestErathem, latestPeriodOrHighestSystem, lifeStage, lithostratigraphicTerms, locality, locationAccordingTo, locationID, locationRemarks, lowestBiostratigraphicZone, materialSampleID, maximumDistanceAboveSurfaceInMeters, member, minimumDistanceAboveSurfaceInMeters, month, municipality, nameAccordingTo, nameAccordingToID, namePublishedIn, namePublishedInID, namePublishedInYear, nomenclaturalCode, nomenclaturalStatus, occurrenceID, occurrenceRemarks, occurrenceStatus, order1 as order, originalNameUsage, originalNameUsageID, otherCatalogNumbers, ownerInstitutionCode, parentNameUsage, parentNameUsageID, phylum, pointRadiusSpatialFit, preparations, previousIdentifications, recordNumber, recordedBy, reproductiveCondition, samplingEffort, samplingProtocol, scientificName, scientificNameID, sex, specificEpithet, startDayOfYear, stateProvince, subgenus, taxonConceptID, taxonID, taxonRank, taxonRemarks, taxonomicStatus, typeStatus, verbatimCoordinateSystem, verbatimDepth, verbatimElevation, verbatimEventDate, verbatimLocality, verbatimSRS, verbatimTaxonRank, vernacularName, waterBody, year,'http://www.gbif.org/dataset/'||datasetKey as datasetKey, publishingCountry, lastInterpreted, coordinateAccuracy, elevation, elevationAccuracy, depth, depthAccuracy, distanceAboveSurface, distanceAboveSurfaceAccuracy, issue, mediaType, hasCoordinate, hasGeospatialIssues, taxonKey, kingdomKey, phylumKey, classKey, orderKey, familyKey, genusKey, subgenusKey, speciesKey, species, genericName, typifiedName, protocol, lastParsed, lastCrawled ) d))::text as data from gbifdata) a on g.gbifid=a.gbifid order by g.gbifid;
             alter table '''+tmpNewBaseDataTable+''' alter column gbifID type bigint using gbifID::bigint, add constraint gbifid_new_pk primary key(gbifid);
             ''');
-            uploadLog << "\nTime taken for creating annotations ${((new Date()).getTime() - startTime.getTime())/1000} sec"
+             uploadLog << "\nTime taken for creating annotations ${((new Date()).getTime() - startTime.getTime())/1000} sec"
 
             uploadLog << "\nCreating distinct sciName table for parsing";
             conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);
-            conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_parsedNamess+"(id serial primary key, sciName text, clean_sciName text, canonicalForm text, species text, genus text, family text, order1 text, class text, phylum text, kingdom text, commonName text, taxonrank text)");
+            conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_parsedNamess+"(id serial primary key, sciName text, clean_sciName text, canonicalForm text, species text, genus text, family text, order1 text, class text, phylum text, kingdom text, commonName text, taxonrank text, taxonId bigint, recommendation_id bigint)");
             conn.executeInsert("INSERT INTO "+ tmpBaseDataTable_parsedNamess +  " (sciName, species, genus, family, order1, class, phylum, kingdom, commonname, taxonrank) select scientificname, species, genus, family, order1, class, phylum, kingdom, vernacularname,taxonrank from "+tmpNewBaseDataTable + " group by scientificname, species, genus, family, order1, class,phylum,kingdom, vernacularname,taxonrank");
 
         } finally {
@@ -489,7 +489,7 @@ class DatasetService extends AbstractMetadataService {
         
         Date s = new Date();
         Date t_date = new Date();
-        while(true) {
+/*        while(true) {
             s = new Date();
 
             try {
@@ -532,14 +532,14 @@ class DatasetService extends AbstractMetadataService {
             uploadLog << "\nTime taken for parsing and updating ${limit} distinct names ${((new Date()).getTime() - s.getTime())/1000} sec"
         }
         uploadLog << "\nTime taken for parsing and updating canonical forms for distinct names is ${((new Date()).getTime() - t_date.getTime())/1000} sec"
-
+*/
         uploadLog << "\nInserting new names into recommendations";
         s = new Date();
         try {
             conn = new Sql(dataSource);
 
             uploadLog << "\nInserting new sci names into recommendations";
-            noOfSciNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.canonicalform, 't', lower(t.canonicalForm), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.canonicalform) = r.lowercase_name and r.is_scientific_name='t' where r.name is null and t.canonicalform is not null group by t.canonicalform");
+            noOfSciNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name,taxon_concept_id, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.canonicalform, 't', t.taxonId, lower(t.canonicalForm), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.canonicalForm) = r.lowercase_name and t.taxonId=r.taxon_concept_id and r.is_scientific_name='t' where r.name is null and t.canonicalForm is not null group by t.canonicalForm, t.taxonId");
 
             println noOfSciNames;
             uploadLog << "\nInserting new common names into recommendations";
@@ -549,7 +549,19 @@ class DatasetService extends AbstractMetadataService {
         }
         uploadLog << "\nTime taken for inserting new recommendations ${noOfSciNames.size()} and ${noOfCommonNames.size()} ${((new Date()).getTime() - s.getTime())/1000} sec"
 
-        uploadLog << "\nUpdating all sciNames with their canonicalForm";
+        uploadLog << "\nUpdating all sciNames with their recommendaitonIds";
+        s = new Date();
+        try {
+            conn = new Sql(dataSource);
+            //FIX:sciName could be repeated in parsed_names table
+            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = canonicalform and taxonId = r.taxon_concept_id");
+        } finally {
+            conn.close();
+        }
+        uploadLog << "\nTime taken for updating all canonicalForms ${((new Date()).getTime() - s.getTime())/1000} sec"
+
+
+/*        uploadLog << "\nUpdating all sciNames with their canonicalForm";
         s = new Date();
         try {
             conn = new Sql(dataSource);
@@ -559,13 +571,13 @@ class DatasetService extends AbstractMetadataService {
             conn.close();
         }
         uploadLog << "\nTime taken for updating all canonicalForms ${((new Date()).getTime() - s.getTime())/1000} sec"
-
+*/
 
         uploadLog << "\nUpdating all sciNames with their reco ids";
         s = new Date();
         try {
             conn = new Sql(dataSource);
-            conn.executeUpdate("update " + tmpNewBaseDataTable + " set recommendation_id = t1.id, group_id=t2.group_id, habitat_id=:defaultHabitatId from recommendation t1 join taxonomy_definition t2 on t1.taxon_concept_id is not null and t1.taxon_concept_id=t2.id where t1.name = canonicalform",  [defaultHabitatId:Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]) ;
+            conn.executeUpdate("update " + tmpNewBaseDataTable + " set recommendation_id = t1.recommendation_id, group_id=t2.group_id, habitat_id=:defaultHabitatId from "+tmpBaseDataTable_parsedNamess+" t1 join taxonomy_definition t2 on t1.taxon_concept_id is not null and t1.taxon_concept_id = t2.id where t1.sciName = scientificName and t1.species = species and t1.genus=genus and t1.family=family and t1.order1=order1 and t1.class=class and t1.phylum=phylum and t1.kingdom=kingdom and t1.commonname=commonname and t1.taxonrank=taxonrank",  [defaultHabitatId:Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]) ;
             conn.executeUpdate("update " + tmpNewBaseDataTable + " set commonname_reco_id = t1.id from recommendation t1 where t1.name = vernacularname;") ;
         } finally {
             conn.close();
@@ -613,11 +625,11 @@ class DatasetService extends AbstractMetadataService {
 
             update '''+tmpBaseDataTable_multimedia+''' set annotations = g.data from (select id as xid, row_to_json((select d from (select 'http://www.gbif.org/occurrence/'||gbifId as gbifId, type, identifier, format, license, references1 as references, rightsHolder, title, publisher, source, description, created, creator, contributor, audience) d))::text as data from gbifdata_multimedia) as  g where g.xid=id;
 
-            alter table resource add column gbifID bigint;
-        insert into resource (id, version,description,file_name,mime_type,type,url,rating,upload_time,uploader_id,context,language_id,access_rights,annotations,gbifID) select nextval('hibernate_sequence'), 0,title,'i',format,type1,identifier,0,'''+"'"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'"+'''::timestamp,'''+currentUser.id+''','OBSERVATION','''+Language.getLanguage().id+''',license,annotations,gbifID  from '''+tmpBaseDataTable_multimedia+''' where identifier is not null;
+        alter table resource add column gbifID bigint;
+        insert into resource (id, version,description,file_name,mime_type,type,url,rating,upload_time,uploader_id,context,language_id,access_rights,annotations,gbifID,license_id) select nextval('hibernate_sequence'), 0,title,'i',format,type1,identifier,0,'''+"'"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'"+'''::timestamp,'''+currentUser.id+''','OBSERVATION','''+Language.getLanguage().id+''',license,annotations,gbifID,license1  from '''+tmpBaseDataTable_multimedia+''' where identifier is not null;
 
         insert into observation_resource(observation_id, resource_id) select o.id, r.id from observation o, resource r where cast(o.external_id as integer)=r.gbifID;
-        insert into resource_license(resource_licenses_id, license_id) select r.id, license1 from '''+tmpBaseDataTable_multimedia+''' o,resource r where o.gbifId=r.gbifID;
+//        insert into resource_license(resource_licenses_id, license_id) select r.id, license1 from '''+tmpBaseDataTable_multimedia+''' o,resource r where o.gbifId=r.gbifID;
 
         insert into contributor(id, name) select nextval('hibernate_sequence') as id, rightsholder from '''+tmpBaseDataTable_multimedia+''' where rightsholder is not null and rightsholder not in (select distinct(name) from contributor) group by rightsholder;
 

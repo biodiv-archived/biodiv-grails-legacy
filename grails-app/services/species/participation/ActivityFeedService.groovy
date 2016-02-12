@@ -434,7 +434,25 @@ class ActivityFeedService {
 	}
 	
 	def getSpeciesNameHtml(recoVote, params){
-		return getSpeciesNameHtmlFromReco(recoVote.recommendation, params)
+		return getSpeciesNameHtmlFromReco(recoVote, params)
+	}
+	
+	def getSpeciesNameHtmlFromRecoVote(recoVote, params){
+		if(!recoVote){
+			return ""
+		}
+		
+		def speciesId = recoVote?.recommendation?.taxonConcept?.findSpeciesId();
+		String sb = ""
+		if(speciesId != null){
+			sb =  '<a href="' + utilsService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$recoVote.givenSciName</i>" + "</a>"
+            //sb = sb.replaceAll('"|\'','\\\\"')
+		}else if(recoVote.recommendation.isScientificName){
+			sb = "<i>$recoVote.givenSciName</i>"
+		}else{
+			sb = recoVote.givenCommonName
+		}
+		 return "" + sb
 	}
 	
 	def getSpeciesNameHtmlFromReco(reco, params){
@@ -454,7 +472,6 @@ class ActivityFeedService {
 		}
 		 return "" + sb
 	}
-	
 	def getUserHyperLink(user, userGroup){
 		String sb = '<a href="' +  utilsService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
         return sb;

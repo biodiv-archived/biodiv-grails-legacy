@@ -33,7 +33,8 @@ class RecommendationVote {
 	String comment;
 	Recommendation commonNameReco;
     String originalAuthor;
-	
+    String givenSciName;
+    String givenCommonName;
 	static belongsTo = [observation:Observation, author:SUser];
 	
 	static constraints = {
@@ -44,10 +45,14 @@ class RecommendationVote {
 		comment nullable:true, blank: true;
 		comment (size:0..400);
         originalAuthor (nullable:true);
+        givenSciName (nullable:true);
+        givenCommonName (nullable:true);
 	}
 	
 	static mapping = {
 		comment type:'text';
+        givenSciName type:'text';
+        givenCommonName type:'text';
 	}
 	
 	def beforeDelete(){

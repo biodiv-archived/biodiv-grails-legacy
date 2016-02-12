@@ -549,3 +549,11 @@ alter table resource alter column license_id set not null;
 
 #creating single contributor instead of multiple for resource
 
+#11th Feb 2016
+alter table recommendation alter column is_scientific_name set not null;
+alter table recommendation add column accepted_taxon_concept_id bigint;
+update recommendation_vote set given_sci_name=reco.name from recommendation reco where reco.is_scientific_name='t' and reco.id=recommendation_id;
+select rv.voted_on, rv.recommendation_id, rv.common_name_reco_id from recommendation_vote rv, recommendation r where r.is_scientific_name='f' and rv.recommendation_id=r.id;
+update recommendation_vote set given_common_name=reco.name from recommendation reco where reco.is_scientific_name='f' and reco.id=common_name_reco_id;
+
+

@@ -101,8 +101,8 @@
 
     $(document).ready (function() {
         $('.list').on('updatedGallery', function() {
-            //loadSpeciesGroupCount();
-            //updateDistinctRecoTable();
+            loadSpeciesGroupCount();
+            updateDistinctRecoTable();
         });
     });
 
@@ -145,6 +145,6 @@ $(document).ready(function() {
     if(${params.taxon?:false}){
         taxonBrowserOptions['taxonId'] = "${params.taxon}";
     }
-    //$('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+    $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
 });
 </asset:script>

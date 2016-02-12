@@ -48,8 +48,7 @@
     <g:if test="${r.observationImage}">
     <a href="${uGroup.createLink([action:"show", controller:"observation", id:r.obvId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
 
-        <img style="width: 75px; height: 75px;"
-        src="${r.observationImage}">
+        <img style="width: 75px; height: 75px;" src="${r.observationImage}">
     </a>
     </g:if>
 
@@ -68,17 +67,18 @@
         </a>
         </g:if>
         <g:elseif test="${r.isScientificName}">
-        <i>${r.name}</i>
+            <i>${r.name}</i>
         </g:elseif>
         <g:else>
-        ${r.name}
+            ${r.name}
         </g:else>
         <g:if test="${r.synonymOf}">
-        (Synonym of <i>${r.synonymOf}</i>)
+            (Synonym of <i>${r.synonymOf}</i>)
         </g:if>
         
-        ${r.commonNames}</span>
-        <comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':r.observationInstance?:observationInstance]" />
+        ${r.commonNames}
+    </span>
+    <comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':r.observationInstance?:observationInstance]" />
         <%--				<obv:showRecoComment--%>
         <%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>
 
