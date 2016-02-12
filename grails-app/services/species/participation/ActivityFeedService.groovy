@@ -19,6 +19,10 @@ class ActivityFeedService {
 	static final String COMMENT_ADDED = "Added a comment"
 	static final String COMMENT_IN_REPLY_TO = "In reply to"
 	
+    //instance related
+	static final String INSTANCE_CREATED = "Instance created"
+	static final String INSTANCE_UPDATED = "Instance updated"
+
 	
 	//checklist related
 	static final String CHECKLIST_CREATED = "Checklist created"
@@ -181,8 +185,8 @@ class ActivityFeedService {
 		return af
 	}
 	
-	def getDomainObject(className, id){
-        return utilsService.getDomainObject(className, id);
+	def getDomainObject(className, id, List eagerFetchProperties=null){
+        return utilsService.getDomainObject(className, id, eagerFetchProperties);
 	}
 	
 	// this will return class of object in general used in comment framework

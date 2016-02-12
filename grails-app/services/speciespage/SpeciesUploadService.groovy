@@ -879,7 +879,7 @@ class SpeciesUploadService {
 	private Collection<Species> getAffectedSpecies(List sFields, List tRegs){
 		def sList = sFields.collect{it.species}
 		tRegs.each { TaxonomyRegistry tr ->
-			def s = Species.findByTaxonConcept(tr.taxonDefinition)
+			def s = Species.get(tr.taxonDefinition.findSpeciesId())
 			if(s)
 				sList << s
 		}

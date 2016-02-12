@@ -257,7 +257,7 @@ class SpeciesController extends AbstractObjectController {
         }
 		else {
             if(params.editMode) {
-                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()) {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                     def model = utilsService.getErrorModel(flash.message, null, OK.value())
@@ -341,7 +341,7 @@ class SpeciesController extends AbstractObjectController {
 
 		Map map = new LinkedHashMap();
 		ArrayList fieldsConnectionArray = new ArrayList(fields.size());
-        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user)
+        boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(speciesInstance, user) || utilsService.isAdmin();
         ArrayList fieldsArray = new ArrayList(fields.size());
 		for(Field field : fields) {
 			Map finalLoc;
@@ -670,7 +670,7 @@ class SpeciesController extends AbstractObjectController {
                 result = speciesService.addDescription(speciesId, fieldId, value);
                 def html = [];
                 if(result.speciesInstance) {
-                    boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.speciesInstance, springSecurityService.currentUser);
+                    boolean isSpeciesContributor = speciesPermissionService.isSpeciesContributor(result.speciesInstance, springSecurityService.currentUser)|| utilsService.isAdmin();
 
                     result.content.each {sf ->
                         boolean isSpeciesFieldContributor = speciesPermissionService.isSpeciesFieldContributor(sf, springSecurityService.currentUser);
@@ -1404,7 +1404,7 @@ class SpeciesController extends AbstractObjectController {
 		
 		if(taxonId){
 			def taxon = TaxonomyDefinition.read(taxonId)
-			Species species = Species.findByTaxonConcept(taxon);
+			Species species = Species.get(taxon.findSpeciesId());
 			if(!species){
 				species = speciesUploadService.createSpeciesStub(taxon)
 			}
@@ -1542,7 +1542,7 @@ class SpeciesController extends AbstractObjectController {
 					// one result in ibp system so redirecting to species page
 					else {
                         //CHK if a species page exists for this concept
-                        Species species = Species.findByTaxonConcept(taxon);
+			            Species species = Species.get(taxon.findSpeciesId());
                         taxonRegistry = taxon.parentTaxonRegistry();
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
@@ -1747,7 +1747,7 @@ class SpeciesController extends AbstractObjectController {
 
         } 
 
-        def s = Species.findByTaxonConcept(tD);
+        def s = Species.get(tD.findSpeciesId());
         if(s) {
             result = [success:false];
             render result as JSON
@@ -1783,5 +1783,14 @@ render speciesInstanceList;
 
         });
         println "=====================++++"
+    }
+
+
+    def getSpeciesResource(){
+        if(params.id){            
+            //params.id = params.long('id');
+            def speciesInstance = Species.get(params.long('id'));
+            render speciesInstance?.listResourcesByRating() as JSON;
+        }
     }
 }

@@ -20,10 +20,10 @@
 
         </g:if>
         <g:each in="${r.authors}" var="author">
-        <a href="${uGroup.createLink(controller:'user', action:'show', id:author?.id)}" title="${author?.name }">
+        <a href="${uGroup.createLink(controller:'user', action:'show', id:author[0]?.id)}" title="${author[0]?.name}">
             <img class="small_profile_pic"
-            src="${author?.profilePicture(ImageType.SMALL)}"
-            title="${author.name}" />
+            src="${author[0]?.profilePicture(ImageType.SMALL)}"
+            title="${author[1]?'Original Author:'+author[1]+', Uploader:'+author[0]:author[0]}" />
         </a>
         </g:each>
 

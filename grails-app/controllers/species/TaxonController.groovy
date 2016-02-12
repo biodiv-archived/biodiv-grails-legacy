@@ -20,6 +20,7 @@ import species.auth.SUser;
 import species.ScientificName.RelationShip
 import species.NamesMetadata.NamePosition;
 import grails.converters.XML;
+import grails.plugin.cache.Cacheable;
 
 class TaxonController {
 
@@ -42,7 +43,8 @@ class TaxonController {
     /**
      * 
      */
-    def listHierarchy = {
+    @Cacheable('taxon')
+    def listHierarchy() {
         //cache "taxonomy_results"
         includeOriginHeader();
 
@@ -61,6 +63,7 @@ class TaxonController {
 
         long startTime = System.currentTimeMillis();
         def rs = new ArrayList<GroovyRowResult>();
+
         if(expandSpecies) {
             //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
             //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);

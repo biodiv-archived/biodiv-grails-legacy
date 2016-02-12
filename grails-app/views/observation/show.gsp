@@ -66,11 +66,6 @@ if(r) {
 </style>
 </head>
 <body>
-
-<link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.css">
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/galleria.1.4.2-youtubeV3.js"></script>
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.min.js"></script>
-
             <div class="observation  span12">
                             <obv:showSubmenuTemplate/>
                             
@@ -117,71 +112,46 @@ if(r) {
                                </div>
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
-                <div class="noTitle" style="height:400px;position:relative">
-                <div class="story-footer" style="padding: 3px 3px;right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
+                <div class="noTitle" style="height:462px;position:relative">
+                <div class="story-footer" style="padding: 3px 3px;right:0;bottom:331px;z-index:5;background-color:whitesmoke" >
                 <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
                 </div>
                 <center>
                     <div id="gallerySpinner" class="spinner">
                         <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
                     </div>
+
+
+                    <div class="gallery_wrapper" style="display:none;">
+
+                        <div class="container1 noselect">
+                            <div class="mover">
+
+                            </div>
+                            <div class="nav_thumb inactive" id="left"><</div>
+                            <div class="nav_thumb" id="right">></div>
+                        </div>
+
+                        <div id="blueimp-image-carousel" class="blueimp-gallery blueimp-gallery-carousel blueimp-gallery-controls">
+                            <div class="slides"></div>
+                            <h3 class="title"></h3>
+                            <a class="prev">‹</a>
+                            <a class="next">›</a>
+                            <a class="play-pause"></a>
+                        </div>
+
+                        <div class="image_info">    
+                        </div>
+
+                    </div>
+
                 </center>
                                       
-                    <div id="gallery1" style="visibility:hidden; margin-top: 60px;">
-                         <% def audioResource = 0 
-                            def audioCount    = 0
-                            def imageCount = 0
-                            def observationInstanceListResources  %>
-                        <g:if test="${observationInstance.resource}">
-                            <%  
-                                observationInstanceListResources = observationInstance.listResourcesByRating()
-                            %>
-                            <g:each in="${observationInstanceListResources}" var="r">
-                                <g:if test="${r.type == ResourceType.IMAGE}">
-                                
-                                <% imageCount += 1
-                                def gallImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.LARGE)%>
-                                <%def gallThumbImagePath = ImageUtils.getFileName(r.fileName.trim(), ImageType.SMALL)%>
-                                <a target="_blank"
-                                    rel="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}"
-                                    href="${createLinkTo(file: gallImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}">
-                                                                    
-                                    <img class="galleryImage"
-                                    src="${createLinkTo(file: gallThumbImagePath, base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
-                                    data-original="${createLinkTo(file: r.fileName.trim(), base:grailsApplication.config.speciesPortal.observations.serverURL)}" 
-                                    title="${r?.description}" /> </a>
-
-                                <g:imageAttribution model="['resource':r, base:grailsApplication.config.speciesPortal.observations.serverURL]" />
-                                </g:if>
-                                <g:elseif test="${r.type == ResourceType.VIDEO}">
-                                    <%
-                                        imageCount += 1
-                                    %> 
-                                    <a href="${r.url }"><span class="video galleryImage"><g:message code="link.watch.in.youtube" /></span></a>
-                                    <g:imageAttribution model="['resource':r]" />
-                                </g:elseif>
-                                <g:elseif test="${r.type == ResourceType.AUDIO}">                                                                    
-                                    <% audioCount = audioCount +1 %>
-                                </g:elseif>
-                            </g:each>
-                                                
-                        </g:if>
-                        <g:else>
-                            <img class="galleryImage" style=" ${observationInstance.sourceId? 'opacity:0.7;' :''}"
-                            src="${observationInstance.mainImage()?.thumbnailUrl(null, !observationInstance.resource ? '.png' :null, ImageType.LARGE)}" />
-
-                        </g:else>
-                        <g:if test="${imageCount == 0 && audioCount != 0}">
-                            <asset:script>
-                                $(".noTitle").hide();
-                            </asset:script>
-                        </g:if>
-                    </div>
+                    
                     </div>
 
                
                 <g:render template="/species/speciesaudio" model="['resourceInstance': observationInstance , 'resourcesInstanceList' : observationInstanceListResources]"/>
-
 
                     <obv:showStory
                         model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
@@ -231,7 +201,19 @@ if(r) {
                                                                                        
                     <uGroup:objectPostToGroupsWrapper 
                         model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
-                    <div class="union-comment">
+
+                        <%
+                        def annotations = observationInstance.fetchChecklistAnnotation()
+                        %>
+                        <g:if test="${annotations?.size() > 0}">
+                        <div class="sidebar_section" style="margin-bottom:0px;">
+                            <h5><g:message code="heading.annotations" /></h5>
+                            <div>
+                                <obv:showAnnotation model="[annotations:annotations, height:297]" />
+                            </div>
+                        </div>  
+                        </g:if>
+                        <div class="union-comment">
                     <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />
                     <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
                     </div>
@@ -258,17 +240,6 @@ if(r) {
                                         </div>
                                         
                                     </div>
-                                    <%
-                                    def annotations = observationInstance.fetchChecklistAnnotation()
-                                    %>
-                                    <g:if test="${annotations?.size() > 0}">
-                                    <div class="sidebar_section">
-                                        <h5><g:message code="heading.annotations" /></h5>
-                                        <div>
-                                            <obv:showAnnotation model="[annotations:annotations]" />
-                                        </div>
-                                    </div>  
-                                    </g:if>
                                     
  				
                                     
@@ -285,7 +256,7 @@ if(r) {
                             </div>
 <script type="text/javascript">
 $(document).ready(function(){
-    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes',userGroupWebaddress:params.webaddress) }";
+    window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes',userGroupWebaddress:params.webaddress) }";    
 });
 </script>
 
@@ -296,76 +267,7 @@ $(document).ready(function(){
     var observationId = ${observationInstance.id};
     $(document).ready(function(){
 <%--        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");--%>
-<%--        dcorateCommentBody($('.yj-message-body')); --%>
-
-        $("#seeMoreMessage").hide();
-        $(".readmore").readmore({
-            substr_len : 400,
-            more_link : '<a class="more readmore">&nbsp;More</a>'
-        });
-        
-        $('#gallery1').galleria({
-            height : 400,
-            preload : 1,
-            lightbox: false,
-            carousel : true,
-            transition : 'pulse',
-            image_pan_smoothness : 5,
-            showInfo : true,
-            dataSelector : ".galleryImage",
-            debug : false,
-            thumbQuality : false,
-            maxScaleRatio : 1,
-            minScaleRatio : 1,
-            _toggleInfo: false,
-            thumbnails:true,
-            showCounter:true,
-            idleMode:false,
-            youtube : {
-                            modestbranding: 1,
-                            autohide: 1,
-                            color: 'white',
-                            hd: 1,
-                            rel: 0,
-                            showinfo: 1
-            },
-            dataConfig : function(img) {
-                            return {
-                                // tell Galleria to grab the content from the .desc div as caption
-                                description : $(img).parent().next('.notes').html(),
-                                _biodiv_url:$(img).data('original')
-                            };
-            },
-            extend : function(options) {
-                            this.bind('image', function(e) {
-                                $(e.imageTarget).click(this.proxy(function() {
-                                    window.open(Galleria.get(0).getData()._biodiv_url);
-                                    //this.openLightbox();
-                                }));
-                            });
-                            
-                            this.bind('loadfinish', function(e){
-                                galleryImageLoadFinish();
-                                var galleriaInfo = $(".galleria-info");
-                                galleriaInfo.css('cssText', 'top : 350px !important');
-                                var galleriaSlideUp = $(".galleria-info .slideUp");
-                                galleriaSlideUp.trigger('click');
-                            });
-
-                            this.bind('lightbox_image', function(e){
-                                //$(".galleria-lightbox-title").append('<a target="_blank" href="'+Galleria.get(0).getData()._biodiv_url+'"><g:message code="show.view.full.image" /> </a>');
-                            })
-
-                        }
-                });
-                Galleria.ready(function() {
-                    
-                    $("#gallerySpinner").hide();
-                    $("#gallery1").css('visibility', 'visible');
-                    //$(".galleria-thumbnails-container").hide();
-
-                });
-    
+<%--        dcorateCommentBody($('.yj-message-body')); --%>      
 
         
         $('#voteCountLink').click(function() {
@@ -453,6 +355,12 @@ $(document).ready(function(){
 
 </asset:script>
 
+<script type="text/javascript">
+    $(document).ready(function(){
+        var obvUrl = window.params.getObvJSONurl+'/'+${observationInstance.id}+'.json';
+            galleryAjax(obvUrl,'observation');
+    });
+</script>
 
 </body>
 </html>

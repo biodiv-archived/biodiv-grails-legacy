@@ -130,14 +130,10 @@
                 <div style="clear:both;"></div>
             </div>
 
-
-
             <uGroup:rightSidebar/>
-            <obv:featured 
-            model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue':true , 'id':'featureBy', 'userGroupInstance':userGroupInstance, 'userLanguage' : userLanguage]" />
 
-<%--            <h4><g:message code="heading.browse.observations" /></h4>--%>
             <obv:showObservationsListWrapper />
+
 	</div>
 
 
@@ -148,13 +144,12 @@
     action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
     method="GET" class="form-horizontal addRecommendation ">
     <div class="reco-input">
-    <reco:create
-        model="['recommendationInstance':recommendationInstance]" />
+        <reco:create/>
         <input type="hidden" name='obvId'
-                value="" />
-        
-         <input type="submit"
-                value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
+        value="" />
+
+        <input type="submit"
+        value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;  right: -9px;" />
     </div>
     
 </form>
@@ -171,130 +166,37 @@
     <a class="play-pause"></a>
     <ol class="indicator"></ol>
 </div>
+
 <script type="text/javascript">
- function appendGallery(ovbId,images){
-        $("#links").removeClass();
-        $("#links").addClass('links'+ovbId);
-        var carouselLinks = [],
-        linksContainer = $('.links'+ovbId),
-        baseUrl,
-        thumbUrl;
-        $.each(images, function (index, photo) {
-            console.log("photo ="+photo);
-            baseUrl = "${grailsApplication.config.speciesPortal.observations.serverURL}"+photo;
-            //thumbUrl = "http://indiabiodiversity.org/biodiv/observations/"+folderpath+"/"+photo+"_th1.jpg";
-            //console.log(thumbUrl);
-            $('<a/>')
-                .append($('<img>').prop('src', baseUrl))
-                .prop('href', baseUrl)                
-                .attr('data-gallery', '')
-                .appendTo(linksContainer);
-            console.log(carouselLinks);
-            carouselLinks.push({
-                href: baseUrl              
-            });
-        }); 
-
-        $('.links'+ovbId+' a:first').trigger('click');
-        
-
-    }
-
-$(document).ready(function(){   
-
-    $(document).on('click','.view_bootstrap_gallery',function(){
-            // Load demo images from flickr:    
-    var ovbId       = $(this).attr('rel');
-    var images  = $(this).attr('data-img').split(",");
-    $('#links').empty();
-   //console.log(images);
-   // return false;
-    appendGallery(ovbId,images);           
-
+    $(document).ready(function() {
+        window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', userGroupWebaddress:params.webaddress) }";
+        window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
+        //initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
     });
-});
-
- </script>
-
-	<script type="text/javascript">
-		$(document).ready(function() {
-            window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes', userGroupWebaddress:params.webaddress) }";
-			window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}";
-            initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
-                });
-	</script>
+</script>
 
 <g:if test="${!activeFilters.isChecklistOnly}">
-<script type="text/javascript">
-function loadSpeciesnameReco(){
-    $('.showObvDetails').each(function(){
-        var observationId = $(this).attr('rel');
-        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" /></li>')
-        preLoadRecos(3, 0, false,observationId);
-    });
-}
-function addListLayout(){
-    $('.thumbnails>li').css({'width':'100%'}).addClass('addmargin');
-    $('.snippet.tablet').addClass('snippettablet');
-    $('.prop').css('clear','inherit');
-    $('.showObvDetails, .view_bootstrap_gallery').show();
-    $('.species_title_wrapper').hide();
-    $('.species_title_wrapper').parent().css({'height':'0px'});
-    loadSpeciesnameReco();
-    initializeLanguage();
-
-}
-
-function addGridLayout(){
-    $('.thumbnails>li').css({'width':'inherit'}).removeClass('addmargin');
-    $('.snippet.tablet').removeClass('snippettablet');
-    $('.prop').css('clear','both');
-    $('.species_title_wrapper').show();
-    $('.species_title_wrapper').parent().css({'height':'50px'});
-    $('.showObvDetails, .view_bootstrap_gallery').hide();
-}
-
-function checkUrl(viewText,changeText){
-    var ls = window.location.search;
-    ls = ls.slice(1);
-    if((!params['view'] || params['view'] == viewText) && !ls){
-        var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?view='+changeText;
-        window.history.pushState({path:newurl},'',newurl);               
-    }else{
-        if(ls.split("&").length == 1){
-            var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?view='+changeText;
-            window.history.pushState({path:newurl},'',newurl);   
-        }else{
-        var lang_key = "view=";
-        var ps = ls.split("&");
-        var flag, i;
-        if(ps) {
-            for(i=0; i<ps.length; i++){
-                if(ps[i].indexOf(lang_key) == 0){
-                    flag = true;
-                    break;
-                }
-                else{
-                    flag = false;
-                }
-            }
-
-            if(flag){
-                ps[i] = lang_key + changeText;
-                ls = ps.join("&");
-            }
-            else{
-                ls += "&" + lang_key + changeText;
-            }
-        }
-
-        newurl = window.location.href.replace(window.location.search, "?"+ls);
-        window.history.pushState({path:newurl},'',newurl);
-
-        }
-    }
-}
+<asset:script>
 $(document).ready(function(){
+    $(".selected_group").off('click').on('click',function(){
+        $(this).closest(".groups_super_div").find(".group_options").toggle();
+    });
+
+    $(document).on('click',".group_option",function(){
+        var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
+           if(is_save_btn_exists.length == 1){
+                is_save_btn_exists.show();
+           }
+       
+
+        $(this).closest(".groups_super_div").find(".group").val($(this).val());
+        $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
+        $(this).closest(".group_options").hide();
+        //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
+        if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
+            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
+        }
+    });
     $(document).on('click','#obvList',function(){           
             checkUrl("grid","list");
             params['view'] = "list"; 
@@ -332,7 +234,7 @@ $(document).ready(function(){
        $(document).on('submit','.addRecommendation', function(event) {
             var that = $(this);
             $(this).ajaxSubmit({
-                url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
+                url:window.params.observation.addRecommendationVoteURL,
                 dataType: 'json', 
                 type: 'GET',
                 beforeSubmit: function(formData, jqForm, options) {
@@ -365,45 +267,26 @@ $(document).ready(function(){
             }); 
             event.preventDefault();
         });
-
-});
-</script>
-
-
-<asset:script>
-$(document).ready(function(){
-    $(".selected_group").off('click').on('click',function(){
-        $(this).closest(".groups_super_div").find(".group_options").toggle();
-        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
-    });
-
-    $(document).on('click',".group_option",function(){
-        var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
-           if(is_save_btn_exists.length == 1){
-                is_save_btn_exists.show();
-           }
-       
-
-        $(this).closest(".groups_super_div").find(".group").val($(this).val());
-        $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
-        $(this).closest(".group_options").hide();
-        //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-        if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
-            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
-        }
-    });
+        
+        
+        $(document).on('click','.view_bootstrap_gallery',function(){
+            var ovbId = $(this).attr('rel');
+            var images = $(this).attr('data-img').split(",");
+            $('#links').empty();
+            appendGallery(ovbId,images);           
+        });
 
 });
 
 </asset:script>
 <g:if test="${params?.view == 'list'}">
-  <script type="text/javascript">
+  <asset:script type="text/javascript">
   $(document).ready(function(){     
         checkView = true;   
         $('#obvList').trigger('click');
         $('.obvListwrapper').show();
     });
-  </script>
+  </asset:script>
 </g:if>
 </g:if>
 </body>

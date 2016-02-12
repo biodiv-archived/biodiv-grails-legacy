@@ -15,8 +15,9 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 class Coverage {
-	
-	String placeName;
+
+
+    String placeName;
 	String reverseGeocodedName
 	
 	
@@ -26,10 +27,10 @@ class Coverage {
 	
 	float latitude;
 	float longitude;
-
 	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat]
-	
 
+	static belongsTo = [Document]
+	
     static constraints = {
 		placeName(nullable:true)
 		reverseGeocodedName(nullable:true)
@@ -49,8 +50,7 @@ class Coverage {
         }
     }
 
-	static belongsTo = [Document]
-	
+
 	def beforeUpdate(){
 		if(isDirty('topology')){
 			updateLatLong()

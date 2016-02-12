@@ -4,7 +4,7 @@ dataSource {
     //Added bu hibernatespatial plugin
 // //     driverClassName = "org.postgis.DriverWrapper"
     dialect = org.hibernatespatial.postgis.PostgisDialect
-//    logSql = true
+    logSql = true
     properties {
         //TODO: following params to be enabled after testing for connection leak
         //maxActive = 50
@@ -26,8 +26,12 @@ dataSource {
 hibernate {
     cache.use_second_level_cache = true
     cache.use_query_cache = true
-    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // For Hibernate before 4.0
+//    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
+
+    cache.region.factory_class = 'grails.plugin.cache.ehcache.hibernate.BeanEhcacheRegionFactory' // For Hibernate before 4.0
     //cache.provider_class = 'net.sf.ehcache.hibernate.EhCacheProvider'
+    generate_statistics=true
+    cache.use_structured_entries=true
 }
 
 // environment specific settings

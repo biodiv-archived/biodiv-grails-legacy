@@ -2,6 +2,7 @@ package species.participation
 
 import grails.plugin.springsecurity.SpringSecurityUtils;
 
+import species.DataObject;
 import species.utils.ImageType;
 import species.utils.Utils
 import org.grails.taggable.*
@@ -21,11 +22,14 @@ import grails.util.GrailsNameUtils;
 import org.grails.rateable.*
 import com.vividsolutions.jts.geom.Geometry
 import content.eml.Coverage;
-import species.Metadata;
 import speciespage.ObservationService;
 import species.Species;
+import species.dataset.Dataset;
+import au.com.bytecode.opencsv.CSVReader;
+import java.io.InputStream;
 
-class Observation extends Metadata implements Taggable, Rateable {
+
+class Observation extends DataObject {
 	
 	def dataSource
 	def commentService;
@@ -56,14 +60,111 @@ class Observation extends Metadata implements Taggable, Rateable {
 			return this.value;
 		}
 	}
+    
+	public enum BasisOfRecord {
+		PRESERVED_SPECIMEN ("Preserved Specimen"),
+		FOSSIL_SPECIMEN ("Fossil Specimen"),
+		LIVING_SPECIMEN ("Living Specimen"),
+		HUMAN_OBSERVATION ("Human Observation"),
+		MACHINE_OBSERVATION ("Machine Observation"),
+        MATERIAL_SAMPLE("Material Sample"),
+        OBSERVATION("Observation"),
+        UNKNOWN("Unknown")
+		
+		private String value;
 
-    SUser author;
+		BasisOfRecord(String value) {
+			this.value = value;
+		}
+
+		String value() {
+			return this.value;
+		}
+		
+		static BasisOfRecord getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof BasisOfRecord)
+				return value
+			
+			value = value.toUpperCase().trim()
+			switch(value){
+				case 'PRESERVED_SPECIMEN':
+					return BasisOfRecord.PRESERVED_SPECIMEN
+				case 'FOSSIL_SPECIMEN':
+					return BasisOfRecord.FOSSIL_SPECIMEN
+				case 'LIVING_SPECIMEN':
+					return BasisOfRecord.LIVING_SPECIMEN
+				case 'HUMAN_OBSERVATION':
+					return BasisOfRecord.HUMAN_OBSERVATION
+				case 'MACHINE_OBSERVATION':
+					return BasisOfRecord.MACHINE_OBSERVATION
+				case 'MATERIAL_SAMPLE':
+					return BasisOfRecord.MATERIAL_SAMPLE
+				case 'OBSERVATION':
+					return BasisOfRecord.OBSERVATION
+	
+				default:
+					return BasisOfRecord.UNKNOWN	
+			}
+		}
+	}
+
+	public enum ProtocolType {
+
+        DWC_ARCHIVE,
+        DIGIR,
+        BIOCASE,
+        TEXT,
+        LIST,
+        SINGLE_OBSERVATION,
+        MULTI_OBSERVATION,
+        MOBILE,
+        API,
+        OTHER
+
+		private String value;
+
+		String value() {
+			return this.value;
+		}
+		
+		static ProtocolType getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof ProtocolType)
+				return value
+			
+			value = value.toUpperCase().trim()
+			switch(value){
+				case 'DWC_ARCHIVE':
+					return ProtocolType.DWC_ARCHIVE
+			case 'DIGIR':
+					return ProtocolType.DIGIR
+			case 'BIOCASE':
+					return ProtocolType.BIOCASE
+				case 'TEXT':
+					return ProtocolType.TEXT
+				case 'LIST':
+					return ProtocolType.LIST
+				case 'SINGLE_OBSERVATION':
+					return ProtocolType.SINGLE_OBSERVATION
+				case 'MULTI_OBSERVATION':
+					return ProtocolType.MULTI_OBSERVATION
+				case 'MOBILE':
+					return ProtocolType.MOBILE
+				case 'API':
+					return ProtocolType.API
+				case 'OTHER':
+					return ProtocolType.OTHER
+				default:
+					return null	
+			}
+		}
+	}
+
 	String notes;
-	int rating;
-	long visitCount = 0;
-    boolean isDeleted = false;
-	int flagCount = 0;
-	int featureCount = 0;
+    //boolean isDeleted = false;
     String searchText;
     //if observation locked due to pulling of images in species
     boolean isLocked = false;
@@ -79,15 +180,26 @@ class Observation extends Metadata implements Taggable, Rateable {
 	
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
-    
-    // Language
-    Language language;
+    BasisOfRecord basisOfRecord = BasisOfRecord.HUMAN_OBSERVATION;
+    ProtocolType protocol = ProtocolType.SINGLE_OBSERVATION;
+    String externalDatasetKey;
+    Date lastCrawled;
+    String catalogNumber;
+    String publishingCountry = 'IN';
+    String accessRights;
+    String informationWithheld;
 
-    License license;
+    Resource reprImage;
 
-	static hasMany = [resource:Resource, recommendationVote:RecommendationVote, userGroups:UserGroup, annotations:Annotation];
-	static belongsTo = [SUser, UserGroup, Checklists]
- 
+    int noOfImages=0;
+    int noOfVideos=0;
+    int noOfAudio=0;
+    int noOfIdentifications=0;
+
+	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
+	static belongsTo = [SUser, UserGroup, Checklists, Dataset]
+    static List eagerFetchProperties = ['author','maxVotedReco', 'resource', 'maxVotedReco.taxonConcept'];
+
  	static constraints = {
 		notes nullable:true
 		searchText nullable:true
@@ -98,20 +210,24 @@ class Observation extends Metadata implements Taggable, Rateable {
 			//XXX ignoring validator for checklist and its child observation. 
 			//all the observation generated from checklist will have source id in advance based on that we are ignoring validation.
 			// Genuine observation will not have source id and checklist as false
-			if(!obj.sourceId && !obj.isChecklist) 
+			if(!obj.sourceId && !obj.isChecklist && !obj.externalId) 
 				val && val.size() > 0 
 		}
-		language nullable:false
-        featureCount nullable:false
 		latitude nullable: false
 		longitude nullable:false
 		topology nullable:false
-		fromDate nullable:false
+        fromDate nullable:false
 		placeName blank:false
-        license nullable:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
-	}
+        externalDatasetKey nullable:true
+        lastCrawled nullable:true
+        catalogNumber nullable:true
+        publishingCountry nullable:true
+        accessRights nullable:true
+        informationWithheld nullable:true
+        reprImage nullable:true
+    }
 
 	static mapping = {
 		//version false
@@ -120,18 +236,24 @@ class Observation extends Metadata implements Taggable, Rateable {
 		checklistAnnotations type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
-	 }
+        id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "observation_id_seq"] 
+	 } 
 
 	/**
 	 * TODO: return resources in rating order and choose first
 	 * @return
 	 */
 	Resource mainImage() {
-		def res = listResourcesByRating(1);
-        if(res) 
+		def res = reprImage ? [reprImage] : null;//:listResourcesByRating(1);
+        println this.id
+        if(res && !res.fileName[0].equals('i'))  {
+            println "Main Image =========="
+            println res[0].fileName;
             return res[0]
-		else
+        } else {
+            println "MainImage =========="
 			return group?.icon(ImageType.ORIGINAL)
+        }
 	}
 
 	/**
@@ -174,12 +296,15 @@ class Observation extends Metadata implements Taggable, Rateable {
 			return null
 		}
 		def recoIds = []
+        
+        this.noOfIdentifications = 0;
 
 		int maxCount = res[0]["votecount"]
 		res.each{ reco ->
 			if(reco["votecount"] == maxCount){
 				recoIds << reco["recoid"]
 			}
+            this.noOfIdentifications += reco["votecount"];
 		}
 
 		if(recoIds.size() == 1){
@@ -315,30 +440,32 @@ class Observation extends Metadata implements Taggable, Rateable {
 		return result[0]["count"]
 	}
 
-	
-	def incrementPageVisit(){
-		visitCount++
-	}
-
 	//XXX: comment this method before checklist migration
-	def beforeUpdate(){
+	def beforeUpdate() {
+        log.debug 'Observation beforeUpdate'
 		if(isDirty() && !isDirty('visitCount') && !isDirty('version')){
+			if(isDirty('resource')) {
+                updateResources();
+            }
 			updateIsShowable()
 			
-			if(isDirty('topology')){
+			if(isDirty('topology')) {
 				updateLatLong()
 			}
 			lastRevised = new Date();
 		}
 	}
 	
-	def beforeInsert(){
+	def beforeInsert() {
+        log.debug 'Observation beforeInsert'
 		updateLocationScale()
-		updateIsShowable()
 		updateLatLong()
+        updateResources();
+		updateIsShowable()
 	}
 	
-	def afterInsert(){
+	def afterInsert() {
+        log.debug 'Observation afterInsert'
 		sourceId = sourceId ?:id
 	}
 	
@@ -346,7 +473,7 @@ class Observation extends Metadata implements Taggable, Rateable {
 		//XXX uncomment this method when u actully abt to change isShowable variable
 		// (ie. if media added to obv of checklist then this method should be uncommented)
 		//activityFeedService.updateIsShowable(this)
-	}
+    }
 	
 	def getPageVisitCount(){
 		return visitCount;
@@ -360,17 +487,40 @@ class Observation extends Metadata implements Taggable, Rateable {
         def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
         return fList;
 	}
-	
-	private updateIsShowable(){
+
+    //Should be called after updateResource
+	private void updateIsShowable(){
 //		//Suppressing all checklist generated observation even if they have media
 //		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
 //		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
 //		
 		
 		//showing all observation those have media
-		isShowable = (isChecklist || (resource && !resource.isEmpty())) ? true : false
+		isShowable = (isChecklist || (noOfImages || noOfVideos || noOfAudio)) ? true : false
 	}
 	
+	private void updateResources() {
+        log.debug "Observation updateResources";
+		noOfImages = noOfVideos = noOfAudio = 0;
+        resource.each {
+            if(it.type == ResourceType.IMAGE) noOfImages++;
+            else if(it.type == ResourceType.VIDEO) noOfVideos++;
+            else if(it.type == ResourceType.AUDIO) noOfAudio++;
+        }
+        updateReprImage();
+	}
+
+	private void updateReprImage() {
+        log.debug "Observation updateReprImage"
+        def res = listResourcesByRating(1)
+        if(res && !res.fileName[0].equals('i')) 
+            res = res[0]
+		else 
+			res = null;//group?.icon(ImageType.ORIGINAL)
+            
+        this.reprImage = res;
+    }
+
 	private updateChecklistAnnotation(recoVote){
 		def m = fetchChecklistAnnotation()
 		if(!m){
@@ -426,7 +576,7 @@ class Observation extends Metadata implements Taggable, Rateable {
     String summary(Language userLanguage=null) {
         String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
 		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
-        desc += " at <b>'" + (this.placeName.trim()?:this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
+        desc += " at <b>'" + (this.placeName?.trim()?'':this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
         return desc
     }
 
@@ -555,28 +705,30 @@ class Observation extends Metadata implements Taggable, Rateable {
         }
 
         def results = sql.rows(query, queryParams);
-        def idList = results.collect { it[0] }
+        def idList = results.collect { println "1 : "+it;it[0] }
 
         if(idList) {
             def instances = Resource.withCriteria {  
                 inList 'id', idList 
                 cache params.cache
             }
-            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+            results.collect {  r-> println "2 : "+r;instances.find { i -> r[0] == i.id } }                           
         } else {
             []
         }
     }
 
 	List fetchResourceCount(){
-        def result = Observation.executeQuery ('''
+/*      def result = Observation.executeQuery ('''
             select r.type, count(*) from Observation obv join obv.resource r where obv.id=:obvId group by r.type order by r.type
             ''', [obvId:this.id]);
         return result;
+*/
+        return [[ResourceType.IMAGE, noOfImages], [ResourceType.VIDEO, noOfVideos], [ResourceType.AUDIO,noOfAudio]];
 	}
 	
 	def fetchRecoVoteOwnerCount(){
-		return RecommendationVote.countByObservation(this)
+		return noOfIdentifications;//RecommendationVote.countByObservation(this)
 	}
 	
 	def fetchChecklistAnnotation(){
@@ -587,7 +739,35 @@ class Observation extends Metadata implements Taggable, Rateable {
 			cl.fetchColumnNames().each { name ->
 				res.put(name, m[name])
 			}
-		}
+		} else if(checklistAnnotations) {
+            res = JSON.parse(checklistAnnotations);
+            
+            //read dwcObvMapping
+            InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
+            Map dwcObvMapping = [:];
+            int l=0;
+            dwcObvMappingFile.eachLine { line ->
+                if(l++>0) { 
+                    String[] parts = line.split(/\t/)
+                    if(parts.size()>=8 && (parts[6] || parts[7])) {
+                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'url':parts[1], 'field':parts[7], 'order':Float.parseFloat(parts[6])];
+                    }
+                    else if(parts.size()>=7 && parts[6]) {
+                        dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'url':parts[1], 'field':'', 'order':Float.parseFloat(parts[6])];
+                    }
+                }
+            }
+
+            res = res.sort { dwcObvMapping[it.key.toLowerCase()].order }
+            def m = [:];
+            res.each {
+                if(it.value) {
+                    m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key].url]
+                }
+            }
+            println m
+            res = m;
+        }
 		return res
 	}
 

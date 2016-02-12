@@ -163,7 +163,15 @@ class ChecklistService {
 				
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
 
-				observationService.saveObservationAssociation(params, checklistInstance)
+				observationService.setAssociations(checklistInstance, params)
+
+                log.debug "Saving ratings for the resources"
+                checklistInstance?.resource?.each { res ->
+                    if(res.rating) {
+                        res.rate(springSecurityService.currentUser, res.rating);
+                    }
+                }
+
 
 				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					

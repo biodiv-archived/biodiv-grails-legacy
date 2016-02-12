@@ -75,7 +75,8 @@ class Species implements Rateable {
 	}
 
 	static mapping = {
-		id generator:'species.utils.PrefillableUUIDHexGenerator'
+		id generator:'species.utils.PrefillableUUIDHexGenerator', params:[sequence_name: "species_id_seq"] 
+
 		fields sort : 'field'
 		autoTimestamp false
 	}
@@ -288,6 +289,9 @@ class Species implements Rateable {
     }
 
     def afterInsert() {
+        this.taxonConcept.speciesId = this.id
+        this.taxonConcept.save();
+
 		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
 		//http://jira.grails.org/browse/GRAILS-4453
 		try{
@@ -317,6 +321,8 @@ class Species implements Rateable {
     }
 
     def beforeDelete(){
+        this.taxonConcept.speciesId = null
+        this.taxonConcept.save();
         activityFeedService.deleteFeed(this)
     }
 

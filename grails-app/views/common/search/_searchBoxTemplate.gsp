@@ -20,6 +20,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
     window.params = {
+                'getObvJSONurl' : "${uGroup.createLink(controller:'observation', action:'show', userGroupWebaddress:params.webaddress)}",
+                'getResourceUrl' : "${uGroup.createLink(controller:'species', action:'getSpeciesResource', userGroupWebaddress:params.webaddress)}",
                 'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",
@@ -46,6 +48,7 @@ $(document).ready(function() {
 		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
 		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
 		'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
+        'spinnerURL' : "${assetPath(src:'/all/spinner.gif', absolute:true)}",
         'dropDownIconUrl' : "${assetPath(src:'/all/dropdown_active.gif', absolute:true)}",
 		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
 		'searchController' : "${controller}",
@@ -90,6 +93,8 @@ $(document).ready(function() {
                     uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
                     distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
                     speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+                    'addRecommendationVoteURL' : "${uGroup.createLink(controller:'observation', action:'addRecommendationVote', 'userGroup':userGroupInstance )}",
+                    'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}"
 
                 },
                 'recommendation': {

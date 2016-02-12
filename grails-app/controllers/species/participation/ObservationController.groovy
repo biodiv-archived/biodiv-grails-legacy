@@ -1,7 +1,10 @@
 package species.participation
-
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
 
 import org.grails.taggable.*
 import groovy.text.SimpleTemplateEngine
@@ -44,7 +47,10 @@ import static org.springframework.http.HttpStatus.*;
 import species.sourcehandler.exporter.DwCObservationExporter; 
 import species.sourcehandler.exporter.DwCSpeciesExporter; 
 import java.math.BigDecimal
+import org.springframework.orm.hibernate3.SessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import org.hibernate.FetchMode;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -64,7 +70,9 @@ class ObservationController extends AbstractObjectController {
     def speciesService;
     def setupService;
     def springSecurityFilterChain
- 
+
+    def sessionFactory;
+def grailsCacheManager;
 	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
@@ -103,14 +111,23 @@ class ObservationController extends AbstractObjectController {
 	}
 
 	def list() {
-		def model = runLastListQuery(params);
-        model.userLanguage = utilsService.getCurrentLanguage(request);
-
+		def model;
+        utilsService.logSql {
+            model = runLastListQuery(params);
+        }
+println "bfr renderin"
+        /*Map cacheEntries = sessionFactory.getStatistics()
+                .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
+                        .getEntries();
+*/
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.userLanguage = utilsService.getCurrentLanguage(request);
             model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
+            println 'obvListHtml'
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            println 'obvFilterMsgHtml'
             def tagsHtml = "";
             if(model.showTags) {
                 //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
@@ -124,14 +141,17 @@ class ObservationController extends AbstractObjectController {
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
+println "1"
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
+                    println "2"
                     model.model['width'] = 300;
                     model.model['height'] = 200;
                     render (view:"list", model:model.model)
                     return;
                 } else {
+                    println "3"
 /*                    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
                     def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
                     def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -159,7 +179,7 @@ class ObservationController extends AbstractObjectController {
 		render model as JSON
 	}
 
-	protected def getObservationList(params) {
+	protected def getObservationList(params, List eagerFetchProperties=null) {
         try { 
             params.max = params.max?Integer.parseInt(params.max.toString()):24 
         } catch(NumberFormatException e) { 
@@ -179,7 +199,7 @@ class ObservationController extends AbstractObjectController {
         }
 		def max = Math.min(params.max ? params.int('max') : 24, 100)
 		def offset = params.offset ? params.int('offset') : 0
-		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false)
+		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false, eagerFetchProperties)
 		def observationInstanceList = filteredObservation.observationInstanceList
         
 //        //Because returning source Ids instead of actual obv ins
@@ -233,7 +253,10 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	def occurrences() {
-		def result = observationService.getObservationOccurences(params)
+		def result;
+        utilsService.logSql {
+            result = observationService.getObservationOccurences(params)
+        }
         def model = utilsService.getSuccessModel('', null, OK.value(), result);
         withFormat {
             json { render model as JSON }
@@ -336,8 +359,34 @@ class ObservationController extends AbstractObjectController {
         params.id = params.long('id');
         def msg;
         if(params.id) {
-			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false)
-			if (!observationInstance) {
+//			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false, [fetch:['author':'eager', 'reprImage':'eager', 'maxVotedReco':'eager', 'maxVotedReco.taxonConcept':'eager', 'recommendationVote':'join', 'resource':'join'], lazy:['recommendationVote':'false', 'resource':'false']])
+            def c = Observation.createCriteria();
+            Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
+            def currentLevel = sqlLogger.level
+            sqlLogger.setLevel(Level.TRACE)
+            def observationInstance;
+            observationInstance = c.get {
+                and {
+                    eq ('id', params.id)
+                    eq ('isDeleted', false)
+                }
+                fetchMode   'group', FetchMode.JOIN
+                fetchMode   'habitat', FetchMode.JOIN
+                fetchMode   'author', FetchMode.JOIN
+                fetchMode   'reprImage', FetchMode.JOIN
+                fetchMode   'maxVotedReco', FetchMode.JOIN
+                fetchMode   'maxVotedReco.taxonConcept', FetchMode.JOIN
+
+                fetchMode   'resource', FetchMode.JOIN
+                fetchMode   'resource.licenses', FetchMode.JOIN
+                fetchMode   'recommendationVote', FetchMode.JOIN
+                fetchMode   'recommendationVote.author', FetchMode.JOIN
+                fetchMode   'recommendationVote.recommendation.taxonConcept', FetchMode.JOIN
+                fetchMode   'userGroups', FetchMode.JOIN
+                fetchMode   'annotations', FetchMode.JOIN
+            }
+			
+        if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
                 withFormat {
@@ -391,6 +440,7 @@ class ObservationController extends AbstractObjectController {
                 json { render model as JSON }
                 xml { render model as XML }
             }
+        sqlLogger.setLevel(currentLevel)
         }
 	}
 
@@ -439,14 +489,15 @@ class ObservationController extends AbstractObjectController {
 	}
 	
 	private def runLastListQuery(Map params) {
-		if(params.webaddress) {
+/*		if(params.webaddress) {
 			def userGroupController = new UserGroupController();
 			return userGroupController.getUserGroupObservationsList(params)
 		} else if(params.action == 'search') {
 			return observationService.getObservationsFromSearch(params);
 		} else {
-			return getObservationList(params);
-		}
+*/
+        return getObservationList(params, Observation.eagerFetchProperties);
+//		}
 	}
 	
 	@Secured(['ROLE_USER'])
@@ -1621,7 +1672,9 @@ class ObservationController extends AbstractObjectController {
 		    if(params.actionType == 'search') {
                 distinctRecoListResult = observationService.getDistinctRecoListFromSearch(params, max, offset);
             } else {
-                distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
+                utilsService.logSql {
+                    distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
+                }
             }
 
             if(distinctRecoListResult.distinctRecoList.size() > 0) {
@@ -1664,7 +1717,9 @@ class ObservationController extends AbstractObjectController {
 		    if(params.actionType == 'search') {
                 speciesGroupCountListResult = observationService.getSpeciesGroupCountFromSearch(params);
             } else {
-                speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
+                utilsService.logSql {
+                    speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
+                }
             }
 
             if(speciesGroupCountListResult.speciesGroupCountList.size() > 0) {
@@ -1845,6 +1900,7 @@ def filterChain() {
         return;
 
     }
+
 @Secured(['ROLE_USER'])
     def updateSpeciesGrp(){
         log.debug params
@@ -1855,5 +1911,44 @@ def filterChain() {
         return;
     }
 
+def t() {
+    def statistics = sessionFactory.statistics
+    //            render "simple = ${SpeciesGroup.findByName('Others')}, 
+    render "hits: ${statistics.secondLevelCacheHitCount}, misses: ${statistics.secondLevelCacheMissCount} ${statistics}"
+    render grailsApplication.mainContext.eventTriggeringInterceptor.datastores
+    render '<br/><br/>                            '
+    SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
+    render sessionHolder.hasTimeout()
+    render '<br/><br/>                            '
+    render grailsCacheManager
+    render '<b>'+grailsCacheManager.getCacheNames()+'</b>'
+    render '<br/><br/>'
+//    printCacheEntries(grailsCacheManager.getCache('species.groups.SpeciesGroup'));
+//    printCacheEntries(grailsCacheManager.getCache('species.groups.UserGroup'));
+//    printCacheEntries(grailsCacheManager.getCache('species.Habitat'));
+//    printCacheEntries(grailsCacheManager.getCache('species.Language'));
+//    printCacheEntries(grailsCacheManager.getCache('species.Classification'));
+    printCacheEntries(grailsCacheManager.getCache('featured'));
+    printCacheEntries(grailsCacheManager.getCache('org.hibernate.cache.StandardQueryCache'));
 
+    //          render GrailsHibernateUtil.isCacheQueriesByDefault(grailsApplication);
+    //          render grailsCacheManager.getCache('org.hibernate.cache.StandardQueryCache').getNativeCache();
+    //          render cache
+}
+
+private printCacheEntries(cache) {
+    def realCache = cache.getNativeCache();
+    render "<b>${cache.name} cache entries : </b>"
+    render '<br/><br/>                            '
+    for (key in realCache.keys) {
+        render key
+        render '<br/><br/>                            '
+        def e = realCache.get(key)
+        if(e) {
+            render "${e.value} -- Expiration Time : ${e.getExpirationTime()} -- Creation time: ${e.getCreationTime()} -- getLastUpdateTime() : ${e.getLastUpdateTime()} -- getTimeToLive() :${e.getTimeToLive() }"
+        }
+        render '<br/><br/>                            '
+
+    }
+}
 }

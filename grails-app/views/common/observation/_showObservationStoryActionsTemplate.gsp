@@ -5,7 +5,7 @@
     <div class="breadcrumb" style="margin-bottom:20px">
         <g:if test="${ibpClassification}">
         <g:each in="${ibpClassification}" var="taxonDefinition" status="i">
-        <a href="${uGroup.createLink('controller':params.controller, 'action':'list', params:['taxon':taxonDefinition.id])}"><span class='rank${taxonDefinition.rank} '> ${raw(taxonDefinition.italicisedForm)}</span></a>
+        <a href="${uGroup.createLink('controller':params.controller, 'action':'list', params:['taxon':taxonDefinition.id])}"><span class='rank${taxonDefinition.rank} '> <i>${raw(taxonDefinition.name)}</i></span></a>
         <g:if test="${i<ibpClassification.size()-1}">></g:if>
         </g:each> 
         </g:if>

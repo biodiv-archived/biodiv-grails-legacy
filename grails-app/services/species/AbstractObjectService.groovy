@@ -1,7 +1,7 @@
 package species;
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +16,7 @@ import species.participation.Observation;
 import species.Species;
 
 import org.apache.commons.logging.LogFactory;
+import grails.plugin.cache.Cacheable;
 
 class AbstractObjectService {
     
@@ -26,7 +27,7 @@ class AbstractObjectService {
     def utilsService;
 
 	protected static final log = LogFactory.getLog(this);
-
+    
     /**
     */
     protected static List createUrlList2(observations) {
@@ -36,14 +37,23 @@ class AbstractObjectService {
 		return urlList
 	}
 
+    //when a query is fired for map with fetchFields ... obv is a map
 	protected static List createUrlList2(observations, String iconBasePath) {
 		List urlList = []
 		for(param in observations){
             def obv = param['observation'];
 
-			def item = asJSON(obv, iconBasePath) 
+			def item, controller;
+            if(DomainClassArtefactHandler.isDomainClass(obv.getClass())) {
+                item = asJSON(obv, iconBasePath);
+                controller = UtilsService.getTargetController(obv);
+            } else {
+                item = obv;
+                controller = obv.remove('controller');
+                item.lat = obv.remove('latitude');
+                item.lng = obv.remove('longitude');
+            }
             
-            def controller = UtilsService.getTargetController(obv);
 			item.url = "/" + controller + "/show/" + obv.id
 			item.title = param['title']
             item.type = controller                  
@@ -80,7 +90,7 @@ class AbstractObjectService {
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
                     boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist ? null: iconBasePath, isChecklist ? '.png' :null)//thumbnailUrl(iconBasePath)
+					item.imageLink = image.thumbnailUrl(isChecklist||obv.dataset ? null: iconBasePath, isChecklist||obv.dataset ? '.png' :null)//thumbnailUrl(iconBasePath)
 				} else if(image.type == ResourceType.VIDEO) {
 					item.imageLink = image.thumbnailUrl()
 				} else if(image.type == ResourceType.AUDIO) {
@@ -131,12 +141,15 @@ class AbstractObjectService {
     */
     protected Map getFeaturedObject(Long ugId, int limit, long offset, String controller){
         log.debug "Getting featured objects for ${controller} in usergroup ${ugId?ugId:'IBP'}. limit:${limit} offset:${offset}"
+        def result;
         String type = ""
         String type1 = ""
+        List eagerFetchProperties = [];
         //TODO:change hardcoded string to class definitions
         if (controller == "observation") {
             type = "species.participation.Observation";
             type1 = "species.participation.Checklists";
+            eagerFetchProperties =  Observation.eagerFetchProperties;
         }
         else if (controller == "species") {
             type = "species.Species";
@@ -144,21 +157,21 @@ class AbstractObjectService {
         else if (controller == "document") {
             type = "content.eml.Document";
         }
-		else if (controller == "discussion") {
-			type = "species.participation.Discussion";
-		}else {    
+        else if (controller == "discussion") {
+            type = "species.participation.Discussion";
+        }else {    
         }
 
         def featured = []
         def count = 0;
-        def queryParams = [:];
+        def queryParams = [cache:true];
         def countQuery,query;
         if(type) {
             queryParams["type"] = type
             queryParams["type1"] = type1
 
             countQuery = "select count(*) from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
-        
+
             query = "from Featured feat where (feat.objectType = :type or feat.objectType = :type1) "
         } else {
             countQuery = "select count(*) from Featured feat "
@@ -170,7 +183,7 @@ class AbstractObjectService {
             countQuery += ' and feat.userGroup.id = :ugId'
             query +=  ' and feat.userGroup.id = :ugId'
         }
-        
+
         log.debug "CountQuery:"+ countQuery + " params: "+queryParams
         count = Featured.executeQuery(countQuery, queryParams)
 
@@ -181,30 +194,30 @@ class AbstractObjectService {
         query += orderByClause
 
         log.debug "FeaturedQuery:"+ query + " params: "+queryParams
-        println "FeaturedQuery:"+ query + " params: "+queryParams
-        
+
         featured = Featured.executeQuery(query, queryParams);
         def observations = [:]
         featured.each {
-            def observation = activityFeedService.getDomainObject(it.objectType,it.objectId)
+            def observation = activityFeedService.getDomainObject(it.objectType, it.objectId, eagerFetchProperties);
             def featuredNotes = [];
             if(observations.containsKey(observation)) {
                 featuredNotes = observations.get(observation);
             } else {
                 observations.put(observation, featuredNotes);
             }
-            //JSON marsheller is registered in Bootstrap
+            //JSON marsheller for this featured object is registered in Bootstrap
             featuredNotes << it
         }
-		
-        def result = []
+
         def i = 0;
-        observations.each {key,value ->
+        result = [];
+        observations.each { key,value ->
             result.add([ 'observation':key, 'title': key.fetchSpeciesCall(), 'featuredNotes':value, 'controller':utilsService.getTargetController(key)]);
         }
-		
-        return['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
-                		
+
+        result = ['observations':result,'count':count[0], 'controller':controller?:'abstractObject']
+        return result
+
     }
 
 
@@ -239,11 +252,12 @@ class AbstractObjectService {
         List source = [];
         List ratings = [];
         List contributor = [];
+        List annotations = [];
         //List resContext = [];
 
         
         params.each { key, val ->
-        
+         
             int index = -1;
             if(key.startsWith('file_') || key.startsWith('url_')) {
 
@@ -272,6 +286,7 @@ class AbstractObjectService {
                     if( params.speciesId != null ){
                         contributor.add(params.get('contributor_'+index));
                     }
+                    annotations.add(params.get('media_annotations_'+index));
                 }
             }
         }
@@ -282,7 +297,12 @@ class AbstractObjectService {
                 if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
                     image = new Node(images, "image");
                     File f = new File(uploadDir, file);
-                    new Node(image, "fileName", f.absolutePath);
+                    if(f.exists())
+                        new Node(image, "fileName", f.absolutePath);
+                    else if(url.getAt(key)) {
+                        new Node(image, "fileName", file);
+                        new Node(image, "url", url.getAt(key));
+                    }
                 } else if(type.getAt(key).equalsIgnoreCase(ResourceType.VIDEO.value())) {
                     image = new Node(videos, "video");
                     new Node(image, "fileName", file);
@@ -299,6 +319,7 @@ class AbstractObjectService {
                 new Node(image, "rating", ratings.getAt(key));
                 new Node(image, "user", springSecurityService.currentUser?.id);
                 new Node(image, "language", params.locale_language);
+                new Node(image, "annotations", annotations.getAt(key));
                 //new Node(image, "resContext", resContext.getAt(key));
                 if( params.resourceListType == "ofObv" || params.resourceListType == "usersResource" ){
                     if(!params.author){

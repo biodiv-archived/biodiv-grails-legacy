@@ -15,7 +15,6 @@ class SpeciesGroup {
 	String name;
 	SpeciesGroup parentGroup;
 	int groupOrder;
-	
 	def grailsApplication;
 	
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
@@ -30,6 +29,7 @@ class SpeciesGroup {
 	static mapping = {
 		version  false;
 		sort groupOrder:"asc"
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	Resource icon(ImageType type) {
@@ -46,6 +46,7 @@ class SpeciesGroup {
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
 
+        println "using group_icon"
 		def r = new Resource('fileName':"group_icons/speciesGroups/${name}", 'type':ResourceType.IMAGE, 'title':"You can contribute!!!");
         r['baseUrl'] = grailsApplication.config.grails.serverURL
         return r;
@@ -91,4 +92,20 @@ class SpeciesGroup {
 	String iconClass() {
 		return this.name?.trim()?.toLowerCase()?.replaceAll(/ /, '_')+'_gall_th';
 	}
+
+    static List<SpeciesGroup> list() { 
+        println "SpeciesGroup overridden fn for cache"
+        return SpeciesGroup.createCriteria().list {
+            order('groupOrder', 'asc')
+            cache true
+        }
+    }
+
+    static SpeciesGroup findByName(String whatever) { 
+        println "SpeciesGroup overridden fn for cache"
+        return SpeciesGroup.createCriteria().get {
+            eq 'name', whatever
+            cache true
+        }
+    } 
 }

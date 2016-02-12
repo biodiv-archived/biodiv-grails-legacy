@@ -219,10 +219,14 @@ h6 {
 	max-height: 150px;
 	max-width: 150px;
         padding:0px;
-/* 	height:100%; */
-/* 	width: auto; */
+	height:150px; 
+ 	width: 150px; 
 	display: -moz-inline-box; /* Firefox 2 */
 	display: inline-block;
+	background-repeat:no-repeat; 
+	background-position:center;
+	background-size: 150px 150px;
+
 }
 
 .thumbnail .figure .mouseover, .thumbnail .figure .mouseoverfix {
@@ -336,7 +340,7 @@ h6 {
 	font-size: 0.8em;
 }
 
-.prop .name,.prop .name .label {
+.prop .name, .prop .name .label {
 	float: left;
 	text-align: left;
 	color: # #5E5E5E;
@@ -353,7 +357,7 @@ h6 {
 /* 	clear:none; */
 /* } */
 .observation_story .prop .name {
-	width: 100px;
+	width: 150px;
 }
 
 /*.observation .prop .value {
@@ -363,6 +367,13 @@ h6 {
 /* .prop .value, .observations_list .prop .value, .activityfeed .prop .value{ */
 /*  	margin-left: 22px;  */
 /* } */
+.prop .value {
+    margin: 2px 0px;
+    margin-left: 150px;
+    line-height: 20px;
+   /* border-bottom: solid 1px #ddd;*/
+}
+
 .observation-icons {
 /*	float: right;
 	margin-right: 10px;*/
@@ -744,6 +755,8 @@ ul#recoSummary {
         width:100%;
 	background-color: #ffffff;
 }
+.observation_story_body, .species_story {
+}
 
 .addObservation .imagesList, #addResourcesModal .imagesList, #addSpFieldResourcesModal .imagesList {
 	background-color: #fefad5;
@@ -786,7 +799,7 @@ ul#recoSummary {
 .sidebar_section { /* 	overflow: visible; */
 	/* 	padding-bottom: 10px; */
 	margin-bottom: 20px;
-	/*border: 1px solid #CECECE;*/
+	border: 1px solid #CECECE;
         border-radius: 3px;
 }
 
@@ -2499,7 +2512,7 @@ div.noOfRatings {
     filter: alpha(opacity = 50);      
 }
 
-.checklistCount {
+.listtemplate_icon {
     position: absolute;
     font-size: 3em;
     font-style: normal;
@@ -2509,10 +2522,14 @@ div.noOfRatings {
     height: 55px;
 /*    background-color: whitesmoke;
     border: solid grey 1px;
-*/    line-height:2.5;
-    background-image: url('/assets/all/stack.png');
-    padding-left: 20px;
+    line-height:2.5;
+*/    padding-left: 20px;
     color: #0c8040;
+    display:table-cell;
+}
+
+.checklistCount {
+    background-image: url('/assets/all/stack.png');
 }
 
 .slick-cell.validReco, .validReco {
@@ -3099,4 +3116,130 @@ small {
     width: 110px;
     height: 55px;
     margin: 5px;
+}
+
+
+.observations_list thead th {
+	background: rgba(106, 201, 162, 0.2);
+}
+
+.observations_list .table tbody tr:hover td, .observations_list  .table tbody tr:hover th {
+	background-color: #FEFAD5;
+}
+
+.observations_list .table {
+	background-color: white;
+}
+.annotationsWrapper {
+    background-color:#fff;
+    clear:both;
+}
+
+
+
+/* For Gallery changes */
+
+.mover img{
+    padding: 5px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+.mover{
+    display: inline-block;
+    position: absolute;
+    left: 0px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.mover img{
+    width:100px;
+    height:75px;
+}
+.container1{
+    position: relative;
+    height: 85px;
+    overflow: hidden;
+    background-color:grey;
+    z-index:1;
+    top:20px;
+}
+.gallery_wrapper #left, .gallery_wrapper #right {
+    cursor: pointer;
+    position: relative;
+}
+.nav_thumb {      
+  color: white;
+  font-size: 20px;
+  padding: 30px 10px;
+  font-weight: bold;  
+  background-color: grey;
+}
+.gallery_wrapper #left {
+    float: left;
+}
+.gallery_wrapper #right {
+    float: right;
+}
+.inactive{
+    color: rgb(182, 177, 177);
+}
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.blueimp-gallery-carousel{
+    margin-top:0px;
+    box-shadow: none;
+    height:30px;
+}
+
+.gallery_wrapper{
+    position:relative;
+}
+.image_info {
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    background-color: rgb(56, 54, 54);
+    opacity: .6;
+    color: white;
+    padding: 5px 0px;
+}
+.image_info a{
+    color:white;
+    float: left;
+}
+.conts_wrap{
+      margin-left: 10px !important;
+}
+.conts_wrap h5{
+    
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+.conts_wrap ol{
+  margin-left: 70px;
+}
+.conts_wrap ol li{
+    float:left;
+    font-style: italic
+}
+.license .icon{
+    border-radius:0px;
+    box-shadow:none;
+}
+.slideUp{
+    background-image: url(/assets/glyphicons-halflings-white.png);
+}
+.play-pause{
+      bottom: 60px !important;
+}
+
+#resourceTabs{
+	height: 485px;
+	background: none;
 }

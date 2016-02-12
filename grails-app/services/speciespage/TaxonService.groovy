@@ -1014,7 +1014,7 @@ class TaxonService {
 		taxonConcepts.eachWithIndex { taxonConcept, index ->
 			def species = speciesService.createSpeciesStub(taxonConcept);
 
-			Species existingSpecies = Species.findByTaxonConcept(taxonConcept);
+			Species existingSpecies = Species.get(taxonConcept.findSpeciesId());
 			if(!existingSpecies) {
 				s.add(species);
 			}

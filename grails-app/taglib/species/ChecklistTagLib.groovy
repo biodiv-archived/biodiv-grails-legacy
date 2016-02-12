@@ -21,6 +21,7 @@ class ChecklistTagLib {
 	def showData= {attrs, body->
 		if(!attrs.model.observations){
 			attrs.model.observations = checklistService.getObservationData(attrs.model.checklistInstance.id)
+            attrs.model.observationsCount = attrs.model.checklistInstance.speciesCount;
 		}
 		out << render(template:"/common/checklist/showChecklistDataTemplate", model:attrs.model);
 	}

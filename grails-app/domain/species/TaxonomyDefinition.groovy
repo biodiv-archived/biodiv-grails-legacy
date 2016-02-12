@@ -12,6 +12,7 @@ import species.participation.NamelistService
 import species.sourcehandler.XMLConverter;
 import species.participation.ActivityFeedService
 import species.auth.SUser
+import grails.converters.JSON
 
 class TaxonomyDefinition extends ScientificName {
 
@@ -29,13 +30,14 @@ class TaxonomyDefinition extends ScientificName {
     String oldId;
     boolean isDeleted = false;
     String dirtyListReason;
-	
+    Long speciesId;	
 	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
 	
 	//When user want to create absolute new name and dont want to use col curation at any point of the time then
 	// set this flat to false 
 	boolean doColCuration = true
+    String defaultHierarchy;
 
     def grailsApplication
 	def namelistService
@@ -59,6 +61,7 @@ class TaxonomyDefinition extends ScientificName {
 		oldId nullable:true;
 		dirtyListReason nullable:true;
 		lowercaseMatchName nullable:true;
+		defaultHierarchy nullable:true;
 	}
 
 	static mapping = {
@@ -70,11 +73,13 @@ class TaxonomyDefinition extends ScientificName {
 	static transients = [ "doColCuration" ]
 
     Species findSpecies() {
-        return Species.findByTaxonConcept(this);
+        if(speciesId)
+            return Species.get(speciesId);//Species.findByTaxonConcept(this);
+        else return null;
     }
 
 	Long findSpeciesId() {
-		return findSpecies()?.id
+		return speciesId;//findSpecies()?.id
 	}
 
 	void setName(String name) {
@@ -144,9 +149,14 @@ class TaxonomyDefinition extends ScientificName {
  	   return result;
    }
    	
-	List<TaxonomyDefinition> fetchDefaultHierarchy() {
+	List fetchDefaultHierarchy() {
+        if(defaultHierarchy) 
+            return JSON.parse(this.defaultHierarchy);
+        return null;
+        /*
         def classification = Classification.fetchIBPClassification()
         return parentTaxonRegistry(classification).get(classification);
+        */
     }
 	
 	String fetchRootName(){
@@ -333,7 +343,7 @@ class TaxonomyDefinition extends ScientificName {
 	def createSpeciesStub() {
 		if(!id) return;
 
-		Species s = Species.findByTaxonConcept(this);
+		Species s = Species.get(this.findSpeciesId());
 		if(s){
 			return s
 		}

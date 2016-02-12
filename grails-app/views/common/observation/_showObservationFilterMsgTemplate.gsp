@@ -6,6 +6,7 @@
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <%@ page import="species.NamesMetadata"%>
 <%@ page import="species.TaxonomyDefinition"%>
+<%@ page import="species.dataset.Dataset"%>
 <script type="text/javascript">
 	function setDefaultGroup(){
 		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
@@ -129,7 +130,28 @@
                 </span>
                            </g:elseif>
 
-
+			<g:if
+				test="${queryParam.key == 'dataset' && queryParam.value instanceof Long }">
+				<g:if test="${queryParam.value && Dataset.read(queryParam.value)}">
+                                  <g:message code="text.in" />   <span class="highlight"><a
+						href="${uGroup.createLink(
+						controller:params.controller, action:params.action,
+						params:[dataset: queryParam.value, isMediaFilter:false])}">
+                        ${Dataset.read(queryParam.value).title} </a>
+                    
+                        <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                        </span>
+                            </g:if>
+			</g:if>
+			<g:elseif test="${queryParam.key == 'dataset' && queryParam.value}">
+                           		 <g:message code="text.in" /> <span class="highlight"><a
+					href="${uGroup.createLink(
+					controller:params.controller, action:params.action,
+					params:[dataset: queryParam.value.id, isMediaFilter:false])}">
+						${queryParam.value.title } </a>  
+                 <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                </span>
+            </g:elseif>
 
 			<g:if
 				test="${queryParam.key == 'taxonRank' && queryParam.value instanceof Integer }">

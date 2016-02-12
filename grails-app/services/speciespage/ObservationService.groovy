@@ -50,6 +50,7 @@ import species.Language;
 import species.Species;
 import species.Metadata
 import species.SpeciesPermission;
+import species.dataset.Dataset;
 
 
 //import org.apache.lucene.document.DateField;
@@ -74,7 +75,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 import species.groups.UserGroupController;
 import species.groups.UserGroup;
-import species.AbstractObjectService;
+import species.AbstractMetadataService;
 import species.participation.UsersResource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
@@ -82,8 +83,9 @@ import static org.springframework.http.HttpStatus.*;
 import species.ScientificName.TaxonomyRank;
 
 import species.NamesMetadata.NameStatus;
+import grails.plugin.cache.Cacheable;
 
-class ObservationService extends AbstractObjectService {
+class ObservationService extends AbstractMetadataService {
 
     static transactional = false
 
@@ -104,116 +106,68 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @return
      */
-    Observation createObservation(params) {
-        //log.info "Creating observations from params : "+params
-        Observation observation = new Observation();
-		updateObservation(params, observation);
-        return observation;
+    Observation create(params) {
+        return super.create(Observation.class, params);
     }
+
     /**
      * 
      * @param params
      * @param observation
      */
-    void updateObservation(params, observation, boolean updateResources = true){
-        //log.debug "Updating obv with params ${params}"
-        
-        if(params.author)  {
-            observation.author = params.author;
-        }
+    Observation updateObservation(params, observation, boolean updateResources = true){
+        return update(observation, params, Observation.class, true, updateResources);
+    }
 
+    Observation update(observation, params, klass = null, boolean update=true, boolean updateResources = true){
+        log.debug "Updating obv with params ${params}"
+        observation = super.update(observation, params, Observation.class);
+        observation.notes = params.notes;
+
+        observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
+
+        observation.sourceId = params.sourceId ?: observation.sourceId
+        observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
         if(params.url) {
             observation.url = params.url;
         }
-        observation.group = params.group?:SpeciesGroup.get(params.group_id);
-        observation.notes = params.notes;
-        if( params.fromDate != ""){
-            observation.fromDate = parseDate(params.fromDate);
-            observation.toDate = params.toDate ? parseDate(params.toDate) : observation.fromDate
-        }
-        observation.placeName = params.placeName//?:observation.reverseGeocodedName;
-        observation.reverseGeocodedName = params.reverse_geocoded_name?:observation.placeName
 
-        //XXX remove this line and column from domain class and database after all migration in wikwio and bhutan
-		observation.locationAccuracy = params.location_accuracy?:params.locationAccuracy;
-		
-		def locScale =  Metadata.LocationScale.getEnum(params.locationScale)
-		observation.locationScale = locScale?:Metadata.LocationScale.APPROXIMATE
-        observation.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
-
-        observation.habitat = params.habitat?:Habitat.get(params.habitat_id);
-
-        observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
-            println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            println "1 SETTING LICENCE TYPE"
-            println observation.agreeTerms
-            println params
-        if(params.license_0) {
-            log.debug "Setting license to ${params.license_0}"
-            observation.license = (new XMLConverter()).getLicenseByType(params.license_0, false)
-            println observation.license
-        } else if(observation.agreeTerms) {
-            println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            println "SETTING LICENCE TYPE"
-            log.debug "Setting license to ${LicenseType.CC_BY}"
-            observation.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
-        }
-        observation.sourceId = params.sourceId ?: observation.sourceId
-        observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
-        observation.language = params.locale_language;
-
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        //        if(params.latitude && params.longitude) {
-        //            observation.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-        //        } else 
-        if(params.areas) {
-            WKTReader wkt = new WKTReader(geometryFactory);
-            try {
-                Geometry geom = wkt.read(params.areas);
-                observation.topology = geom;
-            } catch(ParseException e) {
-                log.error "Error parsing polygon wkt : ${params.areas}"
-            }
-        }
-
-		//XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
+        //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
 		if(updateResources){
-
-
-	        def resourcesXML = createResourcesXML(params);
-            def rootDirLocatorInstance = observation
-            if(params.action == "bulkSave"){
-				//in bulk save resource images will be stored in user dir locatoin
-                rootDirLocatorInstance = springSecurityService.currentUser
-            }
-	        def resources = saveResources(rootDirLocatorInstance, resourcesXML);
-	        observation.resource?.clear();
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            
-	        resources.each { resource ->
-                if(!resource.context){
-                    resource.saveResourceContext(observation)
-                }
-	            observation.addToResource(resource);
-                
-	        }
-            
-		}
+            updateResource(observation, params);
+    	}
+        return observation;
     }
 
-    Map saveObservation(params, sendMail=true, boolean updateResources = true){
+    void updateResource(instance, params) {
+        def resourcesXML = createResourcesXML(params);
+        if(params.action == "bulkSave"){
+            instance = springSecurityService.currentUser
+        }
+        def resources = saveResources(instance, resourcesXML);
+        instance.resource?.clear();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        resources.each { resource ->
+            if(!resource.context){
+                resource.saveResourceContext(observation)
+            }
+            instance.addToResource(resource);
+        }
+    }
+
+    Map saveObservation(params, sendMail=true, boolean updateResources = true) {
         //TODO:edit also calls here...handle that wrt other domain objects
         params.author = springSecurityService.currentUser;
         def observationInstance, feedType, feedAuthor, mailType; 
         try {
 
-            if(params.action == "save" || params.action == "bulkSave"){
-                observationInstance = createObservation(params);
+            if(params.action == "save" || params.action == "bulkSave") {
+                observationInstance = create(params);
                 feedType = activityFeedService.OBSERVATION_CREATED
                 feedAuthor = observationInstance.author
                 mailType = utilsService.OBSERVATION_ADDED
-            }else{
+            } else {
                 observationInstance = Observation.get(params.id.toLong())
                 params.author = observationInstance.author;
                 updateObservation(params, observationInstance, updateResources)
@@ -223,15 +177,25 @@ class ObservationService extends AbstractObjectService {
                     mailType = activityFeedService.OBSERVATION_UPDATED
                 }
             }
-            if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
+            def result = super.save(observationInstance, params, sendMail, feedAuthor, feedType, null);
+
+            if(result.success) {
                 log.debug "Successfully created observation : "+observationInstance
                 params.obvId = observationInstance.id
-                activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
+                /*activityFeedService.addActivityFeed(observationInstance, null, feedAuthor, feedType);
 
                 saveObservationAssociation(params, observationInstance, sendMail)
 
                 if(sendMail)
                     utilsService.sendNotificationMail(mailType, observationInstance, null, params.webaddress);
+                */
+                
+                log.debug "Saving ratings for the resources"
+                observationInstance?.resource?.each { res ->
+                    if(res.rating) {
+                        res.rate(springSecurityService.currentUser, res.rating);
+                    }
+                }
 
                 params["createNew"] = true
                 params["oldAction"] = params.action
@@ -317,11 +281,11 @@ class ObservationService extends AbstractObjectService {
                         ////  CHECK STATUS SET CORRECT----DOES CHECKLIST CALL COME HERE???
                         log.debug "============UPDATING STATUS OF THIS USER RESOURCE========== " + usersRes
 						if(usersRes){
-                        usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
-                        if(!usersRes.save(flush:true)){
-                            usersRes.errors.allErrors.each { log.error it }
-                            return false
-                        }
+                            usersRes.status = UsersResource.UsersResourceStatus.USED_IN_OBV
+                            if(!usersRes.save(flush:true)){
+                                usersRes.errors.allErrors.each { log.error it }
+                                return false
+                            }
 						}
 
                     }
@@ -352,7 +316,7 @@ class ObservationService extends AbstractObjectService {
      * @return
      * saving Groups, tags and resources
      */
-    def saveObservationAssociation(params, observationInstance, boolean sendMail = true){
+    /*def saveObservationAssociation(params, observationInstance, boolean sendMail = true){
         def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
         observationInstance.setTags(tags);
 
@@ -371,7 +335,7 @@ class ObservationService extends AbstractObjectService {
                 res.rate(springSecurityService.currentUser, res.rating);
             }
         }
-    }
+    }*/
 
     /**
      *
@@ -384,7 +348,7 @@ class ObservationService extends AbstractObjectService {
         def relatedObv = [observations:[],max:max];
         if(params.filterProperty == "speciesName") {
             UserGroup userGroupInstance = getUserGroup(params);
-            relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset, userGroupInstance)
+            relatedObv = getRelatedObservationBySpeciesName(params.id?params.id.toLong():params.filterPropertyValue.toLong(), max, offset, userGroupInstance, params.fetchField)
         } else if(params.filterProperty == "speciesGroup"){
             relatedObv = getRelatedObservationBySpeciesGroup(params.filterPropertyValue.toLong(),  max, offset)
         } else if(params.filterProperty == "featureBy") {
@@ -452,8 +416,8 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @return
      */
-    Map getRelatedObservationBySpeciesName(long obvId, int limit, int offset, UserGroup userGroupInstance = null){
-        return getRelatedObservationBySpeciesNames(obvId, limit, offset, userGroupInstance)
+    Map getRelatedObservationBySpeciesName(long obvId, int limit, int offset, UserGroup userGroupInstance = null, String fetchFields='*'){
+        return getRelatedObservationBySpeciesNames(obvId, limit, offset, userGroupInstance, fetchFields);
     }
     /**
      * 
@@ -556,21 +520,37 @@ class ObservationService extends AbstractObjectService {
      * @param params
      * @return
      */
-    Map getRelatedObservationBySpeciesNames(long obvId, int limit, int offset, UserGroup userGroupInstance = null){
+    Map getRelatedObservationBySpeciesNames(long obvId, int limit, int offset, UserGroup userGroupInstance = null, String fetchFields='*'){
         Observation parentObv = Observation.read(obvId);
         if(!parentObv.maxVotedReco) {
             return ["observations":[], "count":0];
         }
-        return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset, userGroupInstance)
+        return getRelatedObservationByReco(obvId, parentObv.maxVotedReco, limit, offset, userGroupInstance, fetchFields)
     }
 
-    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null) {
-        String query = "from Observation o "+(userGroupInstance?" join o.userGroups u":"")+" where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and o.maxVotedReco.taxonConcept=:maxVotedRecoTaxonConcept":"and o.maxVotedReco=:maxVotedReco")+(userGroupInstance?" and u.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
+    private Map getRelatedObservationByReco(long obvId, Recommendation maxVotedReco, int limit=3, int offset=0 , UserGroup userGroupInstance = null, String fetchFields='*') {
+        def result = [];
+        def count=0;
+        String ff = ''
+        if(fetchFields) {
+            fetchFields.split(',').each {
+                ff += it + ' as '+ it+', ';
+            }
+            ff='new map('+ff+' '+"'"+'observation'+"'"+' as controller)';
+        } else {
+            ff = 'o';
+        }
+
+        String query = "select "+ff+" from Observation o "+(userGroupInstance?" join o.userGroups u":"")+" where o.isDeleted = :isDeleted and o.id != :obvId "+(maxVotedReco.taxonConcept?"and o.maxVotedReco.taxonConcept.id=:maxVotedRecoTaxonConcept":"and o.maxVotedReco.id=:maxVotedReco")+(userGroupInstance?" and u.id=:userGroupId":"")+" order by o.isShowable desc, o.lastRevised desc";
         def params = ['isDeleted':false, 'obvId':obvId]
-        if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept;
-        else params['maxVotedReco'] = maxVotedReco;
-        if(userGroupInstance) params['userGroupId'] = userGroupInstance.id
+        if(maxVotedReco.taxonConcept) params['maxVotedRecoTaxonConcept'] = maxVotedReco.taxonConcept.id;
+        else params['maxVotedReco'] = maxVotedReco.id;
+        if(userGroupInstance) params['userGroupId'] = userGroupInstance.id;
+        
+        log.debug "getRelatedObservationByReco Sql : ${query} with params ${params}"
+
 	    def observations = Observation.executeQuery(query, params, [max:limit, offset:offset]);
+        println "dsfsdf"
         /*
         def observations = Observation.withCriteria () {
 //            projections {
@@ -603,7 +583,6 @@ class ObservationService extends AbstractObjectService {
         }
         */
 
-        def result = [];
         observations.each {
             def obv;
             if(userGroupInstance) obv = it[0];
@@ -614,23 +593,26 @@ class ObservationService extends AbstractObjectService {
         if(limit < 0)
             return ["observations":result];
 
-        def count = Observation.createCriteria().count {
-//            projections {
-//                count(groupProperty('sourceId'))
-//            }
-            and {
-                eq("maxVotedReco", maxVotedReco)
-                eq("isDeleted", false)
-				eq("isChecklist", false)
-				if(obvId) ne("id", obvId)
-                if(userGroupInstance){
-                    userGroups{
-                        eq('id', userGroupInstance.id)
-                    }
-                }    
+        if(!fetchFields) {
+            count = Observation.createCriteria().count {
+                //            projections {
+                //                count(groupProperty('sourceId'))
+                //            }
+                and {
+                    eq("maxVotedReco", maxVotedReco)
+                    eq("isDeleted", false)
+                    eq("isChecklist", false)
+                    if(obvId) ne("id", obvId)
+                        if(userGroupInstance){
+                            userGroups{
+                                eq('id', userGroupInstance.id)
+                            }
+                        }    
+                }
             }
+        } else {
+            count = -1;
         }
-		
         return ["observations":result, "count":count]
     }
     
@@ -728,13 +710,20 @@ class ObservationService extends AbstractObjectService {
     * 
     **/
     Map getRecommendations(String recoName, String canName, String commonName, String languageName, Long speciesId=null) {
-        def languageId = Language.getLanguage(languageName).id;
         //		def refObject = params.observation?:Observation.get(params.obvId);
 
         //if source of recommendation is other that observation (i.e Checklist)
         //		refObject = refObject ?: params.refObject
-        Recommendation commonNameReco = recommendationService.findReco(commonName, false, languageId, null);
-        Recommendation scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId);
+        Recommendation commonNameReco, scientificNameReco;
+        if(commonName) {
+            utilsService.benchmark('findReco.commonName') {
+                def languageId = Language.getLanguage(languageName).id;
+                commonNameReco = recommendationService.findReco(commonName, false, languageId, null, true, null, false);
+            }
+        }
+        utilsService.benchmark('findReco.sciName') {
+            scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId, false);
+        }
 
         //		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
 
@@ -950,7 +939,7 @@ class ObservationService extends AbstractObjectService {
     Type geometryType = new CustomType(new GeometryUserType()); 
     q.setParameter(:geoExp0, geom, geometryType); 
      */
-    Map getFilteredObservations(def params, max, offset, isMapView = false) {
+    Map getFilteredObservations(def params, max, offset, isMapView = false, List eagerFetchProperties=null) {
 
         def queryParts = getFilteredObservationsFilterQuery(params) 
         String query = queryParts.query;
@@ -968,8 +957,8 @@ class ObservationService extends AbstractObjectService {
         log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
         //log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
         //log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
-        log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
-        log.debug "speciesStatusCountQuery : "+queryParts.speciesStatusCountQuery;
+        //log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
+        //log.debug "speciesStatusCountQuery : "+queryParts.speciesStatusCountQuery;
 
         log.debug query;
         log.debug queryParts.queryParams;
@@ -977,8 +966,8 @@ class ObservationService extends AbstractObjectService {
         def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
         //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
         //def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
-        def speciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
-        def speciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
+        //def speciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
+        //def speciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         if(params.bounds && boundGeometry) {
@@ -986,7 +975,7 @@ class ObservationService extends AbstractObjectService {
 			if(checklistCountQuery)
             	checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-            speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            //speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
             //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
         } 
@@ -1013,8 +1002,8 @@ class ObservationService extends AbstractObjectService {
 		}
 
         allObservationCountQuery.setProperties(queryParts.queryParams)
-        speciesCountQuery.setProperties(queryParts.queryParams)
-        speciesStatusCountQuery.setProperties(queryParts.queryParams)
+        //speciesCountQuery.setProperties(queryParts.queryParams)
+        //speciesStatusCountQuery.setProperties(queryParts.queryParams)
         allObservationCount = allObservationCountQuery.list()[0]
         /*def speciesCounts = speciesCountQuery.list()
         speciesCount = speciesCounts[0]
@@ -1063,7 +1052,7 @@ class ObservationService extends AbstractObjectService {
 		params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         //params.userName = springSecurityService.currentUser.username;
 
-        def queryParams = [isDeleted : false]
+        def queryParams = [:];
         def activeFilters = [:]
 
         def query = "select "
@@ -1091,7 +1080,7 @@ class ObservationService extends AbstractObjectService {
         //def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
         def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '';
-        def filterQuery = " where obv.isDeleted = :isDeleted "
+        def filterQuery = " where obv.isDeleted = false "
         
         if(params.featureBy == "true" || params.userGroup || params.webaddress){
             params.userGroup = getUserGroup(params);
@@ -1364,6 +1353,19 @@ class ObservationService extends AbstractObjectService {
             }
         }
 		
+        if(params.dataset) {
+            def dataset = Dataset.read(params.dataset.toLong());
+            println "*************************************"
+            println dataset
+            println "*************************************"
+            if(dataset){
+                queryParams['dataset'] = dataset.id
+                activeFilters['dataset'] = dataset.id
+
+                filterQuery += " and obv.dataset.id = :dataset ";
+            }
+        }
+		
 		if(params.isMediaFilter.toBoolean()){
 			filterQuery += " and obv.isShowable = true ";
 		}
@@ -1398,15 +1400,15 @@ class ObservationService extends AbstractObjectService {
 
         
 		def allObservationCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
-		def speciesCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.rank having obv.maxVotedReco.taxonConcept.rank in :ranks"
-        queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
+		//def speciesCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.rank having obv.maxVotedReco.taxonConcept.rank in :ranks"
+        //queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
 
-		def speciesStatusCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.status having obv.maxVotedReco.taxonConcept.status in :statuses"
-        queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
+		//def speciesStatusCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+" group by obv.maxVotedReco.taxonConcept.status having obv.maxVotedReco.taxonConcept.status in :statuses"
+        //queryParams['statuses'] = [NameStatus.ACCEPTED, NameStatus.SYNONYM]
 
         orderByClause = " order by " + orderByClause;
 
-        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, speciesCountQuery:speciesCountQuery, speciesStatusCountQuery:speciesStatusCountQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+        return [query:query, allObservationCountQuery:allObservationCountQuery, checklistCountQuery:checklistCountQuery, distinctRecoQuery:distinctRecoQuery, distinctRecoCountQuery:distinctRecoCountQuery, speciesGroupCountQuery:speciesGroupCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 
@@ -1430,10 +1432,6 @@ class ObservationService extends AbstractObjectService {
         def lr = gf.createLinearRing(arr)
         def pl = gf.createPolygon(lr, null)
         return pl
-    }
-
-    Date parseDate(date){
-		return utilsService.parseDate(date)
     }
 
     /**
@@ -1954,21 +1952,6 @@ class ObservationService extends AbstractObjectService {
         return false;
     }
 
-    def setUserGroups(Observation observationInstance, List userGroupIds, boolean sendMail = true) {
-        if(!observationInstance) return
-
-        def obvInUserGroups = observationInstance.userGroups.collect { it.id + ""}
-        def toRemainInUserGroups =  obvInUserGroups.intersect(userGroupIds);
-        if(userGroupIds.size() == 0) {
-            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups, sendMail);
-        } else {
-            userGroupIds.removeAll(toRemainInUserGroups)
-            userGroupService.postObservationtoUserGroups(observationInstance, userGroupIds, sendMail);
-            obvInUserGroups.removeAll(toRemainInUserGroups)
-            userGroupService.removeObservationFromUserGroups(observationInstance, obvInUserGroups, sendMail);
-        }
-    }
-
     def nameTerms(params) {
         List result = new ArrayList();
 
@@ -2434,12 +2417,7 @@ class ObservationService extends AbstractObjectService {
     /*
      * used for download and post in bulk
      */
-    def getObservationList(params, max, offset, action){
-        println "===========================================+++++"
-        println "===========================================+++++"
-        println "===========================================+++++"
-        println "===========================================+++++"
-        println params;
+    def getObservationList(params, max, offset, String action, List eagerFetchProperties=null){
 		if(Utils.isSearchAction(params, action)){
             //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
@@ -2456,7 +2434,7 @@ class ObservationService extends AbstractObjectService {
             }
             return getUserGroupObservations(userGroupInstance, params, max, offset).observationInstanceList;
         }else{
-            return getFilteredObservations(params, max, offset, false).observationInstanceList
+            return getFilteredObservations(params, max, offset, false, eagerFetchProperties).observationInstanceList
         }
     }
 
@@ -2501,14 +2479,15 @@ class ObservationService extends AbstractObjectService {
         return model;
     }
 
-    def Map updateSpeciesGrp(params,observationInstance){
+    def Map updateSpeciesGrp(params,observationInstance, boolean sendMail=true){
         def prevgroupIcon = observationInstance.group.iconClass();
        if(observationInstance.group.id != params.group_id){
             def new_des = observationInstance.group.name+" to ";            
             observationInstance.group  = params.group?:SpeciesGroup.get(params.group_id);
             observationInstance.save();
             def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance,  springSecurityService.currentUser, activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED,new_des+""+observationInstance.group.name);
-            utilsService.sendNotificationMail(activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED, observationInstance, null, null, activityFeed);
+            if(sendMail)
+                utilsService.sendNotificationMail(activityFeedService.OBSERVATION_SPECIES_GROUP_UPDATED, observationInstance, null, null, activityFeed);
         }
         return [ 'groupName' : observationInstance?.group?.name,'groupIcon' : observationInstance.group.iconClass(),'prevgroupIcon':prevgroupIcon,'prev_group':params.group_id]
 

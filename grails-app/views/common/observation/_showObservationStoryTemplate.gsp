@@ -1,6 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.UtilsService"%>
 <style>
     <g:if test="${!showDetails}">
     
@@ -52,59 +53,73 @@
 
 </style>
 <div class="observation_story">
-    	<%
+    <div style="height:27px;">
+        <g:if test="${showDetails && !showFeatured}">
+        <%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
         %>
-        <g:if test="${showDetails && !showFeatured}">
-        	<s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
-        </g:if>
+
+        <s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
+            </g:if>
             <div class="observation-icons">
 
-                <g:if test="${showDetails && speciesInstance && speciesInstance.taxonConcept?.threatenedStatus}">
+                <g:if test="${showDetails && maxVotedReco?.taxonConcept?.threatenedStatus}">
                 <div style="float:left;">
-                    <s:showThreatenedStatus model="['threatenedStatus':speciesInstance.taxonConcept?.threatenedStatus]"/>
+                    <s:showThreatenedStatus model="['threatenedStatus':maxVotedReco.taxonConcept?.threatenedStatus]"/>
                     </div>
-                </g:if>
+                    </g:if>
 
 
-            	<g:if test="${observationInstance.habitat}">
-                <div style="float: left;">
-                <span
-                    class="habitat_icon_show group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
-                    title="${observationInstance.habitat.name}"></span>
-                </div>
-                </g:if>
-
-
-                <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
-                    <span
-                        class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()}"
-                        title="${observationInstance.group?.name}"></span>
-                <g:if test="${showDetails && !showFeatured}">        
-                    <div class="btn btn-small btn-primary edit_group_btn">Edit
+                    <g:if test="${observationInstance.habitat}">
+                    <div style="float: left;">
+                        <span
+                            class="habitat_icon_show group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}"
+                            title="${observationInstance.habitat.name}"></span>
                     </div>
-                </g:if>    
+                    </g:if>
+
+
+                    <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
+                        <span
+                            class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()}"
+                            title="${observationInstance.group?.name}"></span>
+                        <g:if test="${showDetails && !showFeatured}">        
+                        <div class="btn btn-small btn-primary edit_group_btn">Edit
+                        </div>
+                        </g:if>    
+                    </div>
+
+
+                    <g:if test="${showFeatured}">
+                    <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
+                    </g:if>
+                    <g:if test="${!showFeatured}">
+                    <div class="column propagateGrpHab" id="propagateGrpHab_${observationInstance.id}">
+                        <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
+                            method="GET">
+                            <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
+                            <input type="hidden" name="prev_group" value="${observationInstance?.group?.id}" />
+                            <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
+                            <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
+                        </form>
+                    </div>
+                    </g:if>
+
+
                 </div>
-              
+            </div>
+
+
+
+
+
+
+
+
+
+
 
                 <g:if test="${showFeatured}">
-                    <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
-                </g:if>
-                <g:if test="${!showFeatured}">
-                 <div class="column propagateGrpHab" id="propagateGrpHab_${observationInstance.id}">
-                 <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
-                                method="GET">
-                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
-                    <input type="hidden" name="prev_group" value="${observationInstance?.group?.id}" />
-                    <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
-                    <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
-                </form>
-                </div>
-                </g:if>
-
-               
-            </div>
-            <g:if test="${showFeatured}">
             <div class="featured_body">
                 <div class="featured_title ellipsis"> 
                     <div class="heading">
@@ -124,8 +139,15 @@
             </div>
             </g:if>
             <g:else>
+        
+
         <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-           <div class="prop">
+
+            <g:if test="${observationInstance.dataset}">
+                <g:render template="/datasource/showDatasourceSignatureTemplate" model="['instance':observationInstance.dataset.datasource, 'showDetails':true]"/>
+            </g:if>
+
+            <div class="prop">
                 <g:if test="${showDetails}">
                 <span class="name"><i class="icon-share-alt"></i><g:message code="default.name.label" /></span>
                 </g:if>
@@ -198,6 +220,7 @@
                         datetime="${observationInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
+
                 <g:if test="${observationInstance.isChecklist && observationInstance.fetchAttributions()}">
                 <div class="prop" >
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
@@ -255,6 +278,16 @@
                     </div>		
                 </div>
                 </g:if>
+                
+                <g:if test="${observationInstance.dataset}" >
+                <div class="prop">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.citeas.label" /></span>
+                    <div class="value linktext">
+                        ${observationInstance.dataset.datasource.title} (${UtilsService.formatDate(observationInstance.dataset.publicationDate)}) ${observationInstance.dataset.title}
+                    </div>		
+                </div>
+                </g:if>
+
 
                 <div class="prop">
                     <obv:showTagsSummary
@@ -268,8 +301,10 @@
                 model="['observationInstance':observationInstance, 'showDetails':showDetails, 'showLike':true]" />
 
             <div class="story-footer" style="right:3px;">
-                <sUser:showUserTemplate
-                model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
+                <g:if test="${!observationInstance.dataset}">
+                    <sUser:showUserTemplate
+                        model="['userInstance':observationInstance.author, 'userGroup':userGroup]" />
+                </g:if>
             </div>
         </div>
         </div>

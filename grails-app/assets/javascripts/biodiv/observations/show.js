@@ -260,7 +260,6 @@ function showObservationMapView(obvId, observedOn, mapLocationPicker) {
     //var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
     refreshMarkers(params, window.params.observation.relatedObservationsUrl, function(data){
         google.load('visualization', '1', {packages: ['corechart', 'table'], callback:function(){
-            data.model.observations.push({'observedOn':observedOn});
             drawVisualization(data.model.observations);
         }});
     }, mapLocationPicker);
@@ -284,7 +283,7 @@ function drawVisualization(rows) {
     if(rows) {
         var ignoreDate = -19800000 // representing Thu Jan 01 1970 00:00:00 GMT+0530 (IST) in miliseconds
         for(var i=0; i<rows.length; i++) {
-            var obvDate = new Date(rows[i].observedOn);
+            var obvDate = new Date(rows[i].fromDate);
             if(obvDate.getTime() != ignoreDate){
                 //data.addRow([obvDate, 1]);
                 d.push([obvDate, 1]);

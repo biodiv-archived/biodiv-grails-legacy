@@ -420,12 +420,131 @@ update newsletter set parent_id=0;
 alter table newsletter alter column parent_id set not null;
 
 
+
+#25 Nov 2015
+#Please stop app before running these queries
+alter table document add column visit_count integer not null default 0;
+alter table document add column rating integer not null default 0;
+alter table document add column is_deleted boolean not null default 'false';
+
+alter table observation add column protocol varchar(255);
+update observation set protocol='SINGLE_OBSERVATION';
+alter table observation alter column protocol set  not null;
+
+alter table observation add column basis_of_record varchar(255);
+update observation set basis_of_record='HUMAN_OBSERVATION';
+alter table observation alter column basis_of_record set  not null;
+
+insert into license(id,name) values (828,'UNSPECIFIED');
+
+alter sequence hibernate_sequence restart with 600000;
+
+alter table dataset add column type varchar(255);
+update dataset set type='OBSERVATIONS';
+alter table dataset alter column type set not null;
+
+ALTER TABLE dataset ALTER COLUMN rights type text;
+ALTER TABLE dataset ALTER COLUMN purpose type text;
+ALTER TABLE dataset ALTER COLUMN additional_info type text;
+ALTER TABLE dataset ALTER COLUMN description type text;
+ALTER TABLE datasource ALTER COLUMN description type text;
+
+#28th Dec 2015
+
+alter table observation alter column place_name drop not null;
+alter table observation alter column reverse_geocoded_name drop not null ;
+alter table observation alter column place_name type text;
+alter table observation alter column reverse_geocoded_name type text;
+
+
+
+#20thJan2016
+#Please stop app before running these queries
+create index external_id_idx on observation(external_id);
+
+drop view observation_locations ;
+drop view checklist_species_locations;
+drop view checklist_species_view;
+ALTER TABLE recommendation ALTER COLUMN name type text;
+
+
+create view observation_locations as  SELECT obs.id,
+    'observation:'::text || obs.id AS source,
+        r.name AS species_name,
+            obs.topology,
+                obs.last_revised
+                   FROM observation obs,
+                    recommendation r
+                      WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND obs.is_showable = true;
+
+create view checklist_species_view as SELECT obs.source_id AS id,
+    r.name AS species_name
+       FROM observation obs,
+        recommendation r
+          WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND obs.is_showable = false
+          GROUP BY obs.source_id, r.name;
+
+
+create view checklist_species_locations as SELECT csv.id,
+'checklist:'::text || csv.id AS source,
+    cls.title,
+        csv.species_name,
+            obs.topology
+                FROM checklist_species_view csv,
+                observation obs,
+                    checklists cls
+                        WHERE csv.id = obs.id AND obs.id = cls.id;
+
+drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
+create sequence document_id_seq start 863; create sequence observation_id_seq start 397104; create  sequence species_id_seq start 276169; create sequence suser_id_seq start 8942;
+
+#1st Feb 2016
+#Please stop app before running these queries
+ALTER TABLE observation DISABLE TRIGGER ALL ;
+alter table observation add constraint obv_dataset_id_fk foreign key (dataset_id) references dataset(id);
+
+alter table observation add column no_of_images integer not null default 0, add column no_of_videos integer not null default 0,  add column no_of_audio integer not null default 0, add column repr_image bigint, add column no_of_identifications integer not null default 0;
+
+update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='IMAGE' group by observation_id) g where g.observation_id = id;
+update observation set no_of_videos = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='VIDEO' group by observation_id) g where g.observation_id = id;
+update observation set no_of_audio = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='AUDIO' group by observation_id) g where g.observation_id = id;
+
+create table tmp as select observation_id, count(*) as count from recommendation_vote group by observation_id;
+
+update observation set no_of_identifications = g.count from (select * from tmp) g where g.observation_id=id;
+
+drop table tmp;
+
+create table tmp as select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='resource' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref order by observation_id asc, avg desc, resource_id asc;
+
+update observation set repr_image = g.resource_id from (select b.observation_id,b.resource_id from (select observation_id, max(avg) as max_avg from tmp group by observation_id) a inner join tmp b on a.observation_id=b.observation_id where b.avg=a.max_avg) g where g.observation_id=id;
+
+drop table tmp;
+
+create index on observation(external_id);
+create index on observation(dataset_id);
+create index on observation(group_id);
+create index on observation(max_voted_reco_id);
+create index on recommendation(taxon_concept_id);
+create index on observation(is_checklist, is_deleted, is_showable);
+create index on observation(last_revised desc, id asc);
+
+ALTER TABLE observation ENABLE TRIGGER ALL ;
+
+#8th Feb 2016
+#Please stop app before running these queries
+alter table taxonomy_definition add column species_id bigint;
+alter table taxonomy_definition add foreign key(species_id) references species(id);
+update taxonomy_definition set species_id = s.sid from (select taxon_concept_id, id as sid from species) s  where s.taxon_concept_id = id;
+
+#adding defaultHierarchy json to taxon_definition table
+alter table taxonomy_definition add column default_hierarchy text;
+update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 265799 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id;
+
 #7th feb 2016
 CREATE INDEX normalized_form_idx ON taxonomy_definition(normalized_form);
 CREATE INDEX status_idx ON taxonomy_definition(status);
 CREATE INDEX rank_idx ON taxonomy_definition(rank);
 CREATE INDEX position_idx ON taxonomy_definition(position);
 CREATE INDEX match_id_idx ON taxonomy_definition(match_id);
-
-
 

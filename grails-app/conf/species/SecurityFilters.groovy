@@ -145,7 +145,6 @@ class SecurityFilters {
 
 
                 }
-println "after rendering"
                 log.debug "after rendering"
             }
 
@@ -199,7 +198,7 @@ println "after rendering"
                     log.error "$msg \n\texception: $e.message", e
                 }
                 else {
-                    log.info msg
+                    log.debug msg
                 }
             }
 

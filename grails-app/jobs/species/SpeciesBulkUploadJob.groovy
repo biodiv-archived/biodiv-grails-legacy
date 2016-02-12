@@ -55,7 +55,7 @@ class SpeciesBulkUploadJob {
 			return null
 		}
 		
-		List scheduledTaskList = SpeciesBulkUpload.findAllByStatus(Status.SCHEDULED, [sort: "id", order: "asc", max:1])
+		List scheduledTaskList = SpeciesBulkUpload.findAllByStatus(Status.SCHEDULED, [sort: "id", order: "asc", max:1, cache:false])
 		if(scheduledTaskList.isEmpty()){
 			return null
 		}

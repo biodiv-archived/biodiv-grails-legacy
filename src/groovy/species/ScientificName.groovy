@@ -1,6 +1,9 @@
 package species
 
 import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.MessageSource
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.codehaus.groovy.grails.commons.ApplicationHolder;
 
 abstract class ScientificName extends NamesMetadata {
 
@@ -116,6 +119,24 @@ abstract class ScientificName extends NamesMetadata {
 		static TaxonomyRank getTRFromInt(int i){
 			return list()[i]
 		}
+
+    static int getTaxonRank(String rankStr) {
+        MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
+        def request = null;
+        try {
+            request = RequestContextHolder.currentRequestAttributes().request
+        } catch (e) {
+            //log.debug "No thread bound request"
+        }
+
+        for(def type : list()) {
+            String message = request ? messageSource.getMessage(type.getCodes()[0], null, RCU.getLocale(request)) : type.value()
+            if(type.value().equalsIgnoreCase(rankStr) || message.equalsIgnoreCase(rankStr)) {
+                return type.ordinal();
+            }
+        }
+        return -1;
+    }
 
         static int nextPrimaryRank(int i) {
             switch (i) {

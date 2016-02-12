@@ -3,14 +3,6 @@
 def iconClass='';
 def noOfResources = noOfResources?:instance.fetchResourceCount();
 %>
-
-<%--
-<g:if test="${bottom}">
-    <button id="viewThumbnails" class="footer-item" style="margin-left:0px;float:right;">
-        <i class="icon-th" title="${g.message(code:'noofresources.view.thumbnails')}"></i>
-    </button>
-</g:if> --%>
-
 <g:if test="${noOfResources}">
     <g:each in="${noOfResources}" var="no">
         <div class="footer-item" style="float:right;">

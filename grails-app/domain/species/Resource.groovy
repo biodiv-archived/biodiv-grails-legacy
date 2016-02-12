@@ -87,11 +87,15 @@ class Resource extends Sourcedata implements Rateable {
 	ResourceContext context;
     def grailsApplication
     Language language;
+    String annotations;
+    String accessRights;
+
 	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
 	static belongsTo = [SpeciesField, Observation];
 	
 	static mapping = {
 		description type:'text';
+		annotations type:'text';
 		sort "id"
 	}
 	
@@ -104,6 +108,8 @@ class Resource extends Sourcedata implements Rateable {
 		licenses  validator : { val, obj -> val && val.size() > 0 }
         rating(nullable:false, min:0, max:5);
         context(nullable:true);
+        annotations(nullable:true);
+        accessRights(nullable:true);
     }
 	
 	static transients = ['baseUrl']
@@ -125,7 +131,11 @@ class Resource extends Sourcedata implements Rateable {
 
 		switch(type) {
 			case  ResourceType.IMAGE :
-				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
+                if(url) {
+                    thumbnailUrl = url;
+                } else {
+				    thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
+                }
 				break;
 			case ResourceType.VIDEO :				
                 if( imageType == ImageType.ORIGINAL) {
@@ -153,7 +163,8 @@ class Resource extends Sourcedata implements Rateable {
 		String path = '';
 		switch(this.type){
 			case ResourceType.IMAGE :
-				if(this.observation != null){
+				if(this.observation != null) { 
+                    if(url) return url;
 					path = grailsApplication.config.speciesPortal.observations.rootDir + "/" + this.fileName;
 					return path;
 				}

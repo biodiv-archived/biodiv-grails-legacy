@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Resource.ResourceType"%>
+<%@page import="grails.converters.JSON"%>
 
 <g:if test="${resource}">
 <div class="notes" style="text-align: left;font: italic 12px/1.4 georgia,serif;margin: 0;color: black;">
@@ -53,7 +54,9 @@
         <g:if test="${resource.url}">
         <a href="${resource.url}" target="_blank"><b><g:message code="link.image.source" /></b> </a>
         </g:if>
-
+        <g:if test="${resource.annotations}">
+            <obv:showAnnotation model="[annotations:JSON.parse(resource.annotations)]" />
+        </g:if>
     </div>
 </div>
 </g:if>

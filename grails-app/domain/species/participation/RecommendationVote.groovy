@@ -32,6 +32,7 @@ class RecommendationVote {
 	float userWeight;
 	String comment;
 	Recommendation commonNameReco;
+    String originalAuthor;
 	
 	static belongsTo = [observation:Observation, author:SUser];
 	
@@ -42,6 +43,7 @@ class RecommendationVote {
 		commonNameReco nullable:true, blank: true;
 		comment nullable:true, blank: true;
 		comment (size:0..400);
+        originalAuthor (nullable:true);
 	}
 	
 	static mapping = {
@@ -56,7 +58,7 @@ class RecommendationVote {
     def updateSpeciesTimeStamp() {
         def taxCon = this.recommendation?.taxonConcept
         if(taxCon) {
-            def sp = Species.findByTaxonConcept(taxCon);
+            def sp = Species.get(taxCon.findSpeciesId());//Species.findByTaxonConcept(taxCon);
             if(sp) {
             sp.lastUpdated = new Date();
             if(!sp.save(flush:true)) {

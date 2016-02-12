@@ -216,7 +216,7 @@ function loadIFrame() {
 function initGalleryTabs() {
     var tabs = $("#resourceTabs").tabs();
     if(tabs.length == 0) return;
-    if($("#resourceTabs-1 img").length > 0) {
+    /*if($("#resourceTabs-1 img").length > 0) {
 
         //TODO:load gallery  images by ajax call getting response in json  
         $('.gallery').galleria({
@@ -285,7 +285,9 @@ function initGalleryTabs() {
     } else {
         $("#resourceTabs").tabs("remove", 0);
     }
+*/
 
+    $("#resourceTabs").css('visibility', 'visible');
     $(".defaultSpeciesConcept").prev("a").trigger('click');	
 
     var flickrGallery;
@@ -310,7 +312,7 @@ function initGalleryTabs() {
         return flickrGallery;
     }
 
-    var flickr = new Galleria.Flickr();
+   // var flickr = new Galleria.Flickr();
     $("#flickrImages").click(function() {
         flickr.setOptions({
             max: 20,
