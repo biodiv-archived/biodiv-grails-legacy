@@ -22,13 +22,13 @@
         console.log(resources.length);
         $.each(resources, function (index, photo) {
         // Adding Thumbnail
-        $('.mover').append('<img class="thumb thumb_'+index+'" rel="'+index+'" src="'+photo.icon.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org")+'" />')     
+        $('.mover').append('<img class="thumb thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" />')     
         
         // For Slider 
         index = index+1;
         if(photo.type == 'Image'){
             carouselLinks.push({
-                 href: photo.url.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org").replace('.jpg','_gall.jpg'),
+                 href: photo.url.replace('.jpg','_gall.jpg'),
                  title: index+'/'+resources.length
             });
         }else if(photo.type == 'Video'){
