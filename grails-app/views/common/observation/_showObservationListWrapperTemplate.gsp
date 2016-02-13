@@ -88,6 +88,55 @@
             <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
                 <obv:showObservationsList />
             </div>
+            <div class="span4" style="position:relative;top:20px">
+
+                <uGroup:objectPostToGroupsWrapper 
+                model="[canPullResource:canPullResource, 'objectType':Observation.class.canonicalName, 'userGroup':userGroup]" />
+                <div id="taxonBrowser">
+                    <div class="taxonomyBrowser sidebar_section" style="position:relative">
+                        <h5><g:message code="button.taxon.browser" /></h5> 
+                        <div id="taxaHierarchy">
+
+                            <%
+                            def classifications = [];
+                            Classification.list().each {
+                            classifications.add([it.id, it, null]);
+                            }
+                            classifications = classifications.sort {return it[1].name}; 
+                            %>
+
+                            <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, 'expandAll':false, 'queryParams':queryParams, selectedClassification:queryParams.classification]"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- 
+                <g:render template="/observation/summaryTemplate" model="['speciesCount':speciesCount, 'subSpeciesCount':subSpeciesCount]"/>
+                -->
+                <div id="observations_list_map" class="observation sidebar_section"
+                    style="clear:both;overflow:hidden;display:none;">
+                    <h5><g:message code="default.species.distribution.label" /></h5>
+                    <obv:showObservationsLocation
+                    model="['observationInstanceList':totalObservationInstanceList, 'userGroup':userGroup]">
+                    </obv:showObservationsLocation>
+                    <a id="refreshListForBounds" data-toggle="dropdown"
+                        href="#"><i class="icon-refresh"></i>
+                        <g:message code="button.refresh.list" /></a>
+                    <a id="resetMap" data-toggle="dropdown"
+                        href="#"><i class="icon-refresh"></i>
+                        <g:message code="button.reset" /></a>
+
+                    <div><i class="icon-info"></i><g:message code="map.limit.info" /></div>
+                    <input id="isMapView" name="isMapView" value="${params.isMapView}" type="hidden"/>
+                    <input id="bounds" name="bounds" value="${activeFilters?.bounds}" type="hidden"/>
+                    <input id="tag" name="tag" value="${params.tag}" type="hidden"/>
+                </div>
+                <div class="sidebar_section" style="clear:both;overflow:hidden;">
+                    <h5> <g:message code="default.species.groups.label" /> </h5>
+                    <div id="speciesGroupCountList"></div>
+                </div>
+                <g:render template="/observation/distinctRecoTableTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
+
+            </div>
         </div>
     </div>
 
