@@ -511,7 +511,7 @@ alter table observation add column no_of_images integer not null default 0, add 
 
 update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='IMAGE' group by observation_id) g where g.observation_id = id;
 update observation set no_of_videos = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='VIDEO' group by observation_id) g where g.observation_id = id;
-update observation set no_of_audios = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='AUDIO' group by observation_id) g where g.observation_id = id;
+update observation set no_of_audio = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='AUDIO' group by observation_id) g where g.observation_id = id;
 
 create table tmp as select observation_id, count(*) as count from recommendation_vote group by observation_id;
 
@@ -542,7 +542,7 @@ alter table taxonomy_definition add foreign key(species_id) references species(i
 update taxonomy_definition set species_id = s.sid from (select taxon_concept_id, id as sid from species) s  where s.taxon_concept_id = id;
 
 #adding defaultHierarchy json to taxon_definition table
-alter table taxonomy_definition add column default_hierarchy text;
+alter table taxonomy_definition alter column default_hierarchy type text;
 update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 265799 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id;
 
 #10thFeb 2016
@@ -557,7 +557,7 @@ alter table resource alter column license_id set not null;
 
 #11th Feb 2016
 alter table recommendation alter column is_scientific_name set not null;
-alter table recommendation add column accepted_taxon_concept_id bigint;
+alter table recommendation_vote add column given_sci_name text, add column given_common_name text;
 update recommendation_vote set given_sci_name=reco.name from recommendation reco where reco.is_scientific_name='t' and reco.id=recommendation_id;
 update recommendation_vote set given_common_name=reco.name from recommendation reco where reco.is_scientific_name='f' and reco.id=common_name_reco_id;
 

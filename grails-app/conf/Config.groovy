@@ -1854,35 +1854,30 @@ grails.cache.config = {
     domain {
         name 'species.groups.SpeciesGroup'
         eternal true
-        overflowToDisk true
         maxElementsInMemory 20
         maxElementsOnDisk 100
     }
     domain {
         name 'species.Habitat'
         eternal true
-        overflowToDisk true
         maxElementsInMemory 20
         maxElementsOnDisk 100
     }
     domain {
         name 'species.License'
         eternal true
-        overflowToDisk true
         maxElementsInMemory 10
         maxElementsOnDisk 100
     }
     domain {
         name 'species.Language'
         eternal true
-        overflowToDisk true
         maxElementsInMemory 1000
         maxElementsOnDisk 1000
     }
     domain {
         name 'species.Classification'
         eternal true
-        overflowToDisk true
         maxElementsInMemory 10
         maxElementsOnDisk 10
     }
