@@ -188,17 +188,19 @@ class BootStrap {
     }
 
     def initCaches() {
-        SpeciesGroup.list().each {
-            SpeciesGroup.get(it.id);
-        }
-        Habitat.list().each {
-            Habitat.get(it.id);
-        }
-        Language.list().each {
-            Language.get(it.id)
-        }
-        Classification.list().each {
-            Classification.get(it.id)
+        SpeciesGroup.withTransaction {
+            SpeciesGroup.list().each {
+                SpeciesGroup.get(it.id);
+            }
+            Habitat.list().each {
+                Habitat.get(it.id);
+            }
+            Language.list().each {
+                Language.get(it.id)
+            }
+            Classification.list().each {
+                Classification.get(it.id)
+            }
         }
     }
 

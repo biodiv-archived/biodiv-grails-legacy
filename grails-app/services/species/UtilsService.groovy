@@ -930,12 +930,17 @@ class UtilsService {
     }  
 
     static def logSql(Closure closure, String blockName="") {
-        println "%%%%%%%%%%%% logging sql ${blockName}"  
         Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
         Level currentLevel = sqlLogger.level
-        sqlLogger.setLevel(Level.TRACE)
+        if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+            println "%%%%%%%%%%%% logging sql ${blockName}"  
+            sqlLogger.setLevel(Level.TRACE)
+        }
         def result = closure.call()
-        sqlLogger.setLevel(currentLevel)
+
+        if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+            sqlLogger.setLevel(currentLevel)
+        }
         result
     }
 

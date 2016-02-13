@@ -509,7 +509,7 @@ create sequence suser_id_seq start ;
 ALTER TABLE observation DISABLE TRIGGER ALL ;
 alter table observation add constraint obv_dataset_id_fk foreign key (dataset_id) references dataset(id);
 
-alter table observation add column no_of_images integer not null default 0, add column no_of_videos integer not null default 0,  add column no_of_audio integer not null default 0, add column repr_image_id bigint, add column no_of_identifications integer not null default 0;
+alter table observation add column no_of_images integer not null default 0, add column no_of_videos integer not null default 0,  add column no_of_audio integer not null default 0, add column no_of_identifications integer not null default 0;
 
 update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='IMAGE' group by observation_id) g where g.observation_id = id;
 update observation set no_of_videos = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='VIDEO' group by observation_id) g where g.observation_id = id;
@@ -570,13 +570,4 @@ alter table recommendation_vote add column given_sci_name text, add column given
 update recommendation_vote set given_sci_name=reco.name from recommendation reco where reco.is_scientific_name='t' and reco.id=recommendation_id;
 update recommendation_vote set given_common_name=reco.name from recommendation reco where reco.is_scientific_name='f' and reco.id=common_name_reco_id;
 
-alter table '''+tmpNewBaseDataTable+''' add column key text;
-update '''+tmpNewBaseDataTable+''' set key=concat(scientificname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
-alter table '''+tmpBaseDataTable_namesList+''' add column key text;
-update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
-alter table '''+tmpBaseDataTable_parsedNamess+''' add column key text;
-update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
-
-
-select rv.voted_on, rv.recommendation_id, rv.common_name_reco_id from recommendation_vote rv, recommendation r where r.is_scientific_name='f' and rv.recommendation_id=r.id;
 
