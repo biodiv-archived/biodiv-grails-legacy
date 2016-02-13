@@ -433,7 +433,7 @@ class ActivityFeedService {
 	}
 	
 	def getSpeciesNameHtml(recoVote, params){
-		return getSpeciesNameHtmlFromReco(recoVote, params)
+		return getSpeciesNameHtmlFromReco(recoVote.recommendation, params)
 	}
 	
 	def getSpeciesNameHtmlFromRecoVote(recoVote, params){
