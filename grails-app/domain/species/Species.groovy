@@ -294,24 +294,28 @@ class Species implements Rateable {
 
 		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
 		//http://jira.grails.org/browse/GRAILS-4453
-		Species.withNewSession{
-	        HashSet contributors = new HashSet();
+		try{
+			Species.withNewSession{
+		        HashSet contributors = new HashSet();
+		
+		        //TODO:looks like this is gonna be heavy on every save ... gotta change
+				this.fields?.each { contributors.addAll(it.contributors)}
+				def sContributors =  this.taxonConcept.contributors
+				if(sContributors)
+	            	contributors.addAll(sContributors)
+		        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+		        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+		        
+		        //Saving current user as contributor for the species
+		        if(speciesPermissionService.addContributors(this, new ArrayList(contributors))) {
+	                log.debug "Added permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
+	            } else {
+	                log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
+	            }
 	
-	        //TODO:looks like this is gonna be heavy on every save ... gotta change
-			this.fields?.each { contributors.addAll(it.contributors)}
-			def sContributors =  this.taxonConcept.contributors
-			if(sContributors)
-            	contributors.addAll(sContributors)
-	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
-	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
-	        
-	        //Saving current user as contributor for the species
-	        if(speciesPermissionService.addContributors(this, new ArrayList(contributors))) {
-                log.debug "Added permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
-            } else {
-                log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
-            }
-
+			}
+		}catch(e){
+			e.printStackTrace()
 		}
         
     }

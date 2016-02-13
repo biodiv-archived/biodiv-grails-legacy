@@ -38,6 +38,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import species.participation.NamelistService
 import species.NamesMetadata
+import species.participation.SpeciesBulkUpload
 
 class SpeciesController extends AbstractObjectController {
 
@@ -1116,6 +1117,28 @@ class SpeciesController extends AbstractObjectController {
 			log.debug "Starting names upload"
 			render(text:res as JSON, contentType:'text/html')
 		}
+	}
+	
+	@Secured(['ROLE_SPECIES_ADMIN'])
+	def uploadGbifNames() {
+		log.debug params.xlsxFileUrl
+		if(params.xlsxFileUrl){
+			Language languageInstance = utilsService.getCurrentLanguage(request);
+			params.locale_language = languageInstance;
+			log.debug  "Choosen languauge is ${languageInstance}"
+			params.uploadType = "namesUpload"
+			File sFile = new File(params.xlsxFileUrl)
+			if(!speciesUploadService.validateUserSheetForName(sFile)){
+				println  'Name validation failed !!!'
+				render 'Name validation failed !!!'
+				return
+			}
+			def sBulkUploadEntry =  SpeciesBulkUpload.create(springSecurityService.currentUser, new Date(), null, sFile.getAbsolutePath(), null, null, params.uploadType)
+			log.debug "Starting names upload"
+			render "Starting names upload" + sBulkUploadEntry
+			return
+		}
+		render "please specify file name "
 	}
 	
 	@Secured(['ROLE_SPECIES_ADMIN'])

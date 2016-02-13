@@ -1,6 +1,7 @@
 package species
 
 import java.util.List;
+import org.hibernate.Hibernate;
 
 import species.ScientificName.TaxonomyRank
 import species.groups.SpeciesGroup;
@@ -32,6 +33,10 @@ class TaxonomyDefinition extends ScientificName {
     Long speciesId;	
 	// added this column for optimizing case insensitive sql query
 	String lowercaseMatchName
+	
+	//When user want to create absolute new name and dont want to use col curation at any point of the time then
+	// set this flat to false 
+	boolean doColCuration = true
     String defaultHierarchy;
 
     def grailsApplication
@@ -65,6 +70,8 @@ class TaxonomyDefinition extends ScientificName {
 		tablePerHierarchy true
         defaultHierarchy type:'text'
 	}
+	
+	static transients = [ "doColCuration" ]
 
     Species findSpecies() {
         if(speciesId)
@@ -282,8 +289,6 @@ class TaxonomyDefinition extends ScientificName {
 			return true
 		}
 		
-		println "============= calling for parent " + tr.parentTaxonDefinition
-		
 		tr.parentTaxonDefinition.createTargetHirFromTaxonReg(tr.parentTaxon, targetClassifi)
 		_sanpToImmediateParent(tr, targetClassifi)
 		
@@ -358,12 +363,17 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	public postProcess(){
-		if(position != NamesMetadata.NamePosition.CLEAN){
+		if( this.instanceOf(SynonymsMerged)){
+			println "Not doing any post process for synonyms"
+			return
+		}
+		
+		if((position != NamesMetadata.NamePosition.CLEAN) && doColCuration){
 			curateNameByCol()
-			println "----------------------------------- adding col hir"
+			log.debug "Adding col hir ==="
 			addColHir()
 		}
-		println "---------------------- adding IBP hir"
+		log.debug "Adding IBP hir ==="
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
 		def trHir = Classification.fetchIBPClassification()
 		snapToIBPHir(hirList, trHir)
@@ -427,18 +437,16 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	private boolean curateNameByCol(){
-		println "-------------matchId------------------ " + matchId
+		log.debug "-------------matchId------------------ " + matchId
 		if((status != NameStatus.ACCEPTED) || matchId )
 			return true
 		
 		def colData = namelistService.searchCOL(canonicalForm, 'name')
-		println "--------------------------- " + colData
 		def acceptedMatch = namelistService.validateColMatch(this, colData)
 		if(colData && !acceptedMatch){
 			log.debug "No match found on col so returning without adding col hir"
 			return false
 		}
-		println "------------------ came here " + acceptedMatch
 		if(!acceptedMatch){
 			log.debug "No match found on col so returning without adding col hir"
 			return false
@@ -488,10 +496,15 @@ class TaxonomyDefinition extends ScientificName {
 					synToAdd.authorYear = syn.authorString
 					synToAdd.relationship = XMLConverter.getRelationship(null)
 					
-					if(!synToAdd.save(flush:true)){
-						synToAdd.errors.allErrors.each { println  it }
+					try{
+						synToAdd = synToAdd.merge()
+						if(!synToAdd.save(flush:true)){
+							synToAdd.errors.allErrors.each { println  it }
+						}
+						addSynonym(synToAdd)
+					}catch(e){
+						e.printStackTrace()
 					}
-					addSynonym(synToAdd)
 				}
 			}
 			
@@ -542,14 +555,14 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	def updateNameSignature(List userList = [springSecurityService.currentUser]){
-		println "================== user list for activity feed " + userList
 		def ns = createNameSignature()
 		if(ns != activityDescription){
+			activityDescription = ns
 			if(!save()) {
 				this.errors.allErrors.each { log.error it }
 			}else{
 				userList.each {
-					println "Adding feed for following author " + it
+					println "--Adding actvity Feed for user " + it + "  FEED " + ns
 					if(it)
 						activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
 				}
@@ -603,22 +616,23 @@ class TaxonomyDefinition extends ScientificName {
 	def updateContributors(List<SUser> users){
 		if(!users) return
 		
-		if (!this.isAttached()) {
-			this.attach()
-		}
-		
 		//not adding contributors to existing accepted name above genus level
 		if(contributors && (status == NameStatus.ACCEPTED) && (rank < 7))
 			return
 		
-		users.minus(contributors)
+		try{
+			users.minus(contributors)
 		
-		users.each { u ->
-			this.addToContributors(u)
-		}
-		
-		if(!save(flush:true)){
-			this.errors.allErrors.each { log.error it }
+			users.each { u ->
+				this.addToContributors(u)
+			}
+			
+			if(!save(flush:true)){
+				this.errors.allErrors.each { log.error it }
+			}
+		}catch(Exception e){
+			log.error e.getMessage()
+			e.printStackTrace()
 		}
 	}
 

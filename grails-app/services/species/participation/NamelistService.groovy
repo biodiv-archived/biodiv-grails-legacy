@@ -23,6 +23,7 @@ import static groovyx.net.http.Method.GET
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.ContentType.XML
 import groovy.sql.Sql
+import grails.util.Holders
 import groovy.util.XmlParser
 import grails.converters.JSON;
 import wslite.soap.*
@@ -62,14 +63,6 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
-    private static long SEARCH_IBP_COUNTER = 0;
-    private static long CAN_ZERO = 0;
-    private static long CAN_SINGLE = 0;
-    private static long CAN_MULTIPLE = 0;
-    private static long AFTER_CAN_MULTI_ZERO = 0;
-    private static long AFTER_CAN_MULTI_SINGLE = 0;
-    private static long AFTER_CAN_MULTI_MULTI = 0;
-    
     public static Set namesInWKG = new HashSet();
 
     public static Map namesBeforeSave = [:];
@@ -96,10 +89,8 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-        SEARCH_IBP_COUNTER ++;
-        println "======PARAMS FOR SEARCH IBP ===== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " :::: userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
-        //Decide in what class to search TaxonomyDefinition/SynonymsMerged
-        def res = [];
+        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
+        List res = [];
 		
         def clazz
         if(status == NameStatus.ACCEPTED || !status) {
@@ -107,66 +98,11 @@ class NamelistService {
         } else {
             clazz = SynonymsMerged.class; 
         }
-        //println "====SEARCHING ON IBP IN CLASS ====== " + clazz
-        clazz.withNewTransaction{
-			
-            println  "Searching canonical + rank + status"
-            res = clazz.withCriteria(){
-				and{
-					eq('canonicalForm', canonicalForm)
-					if(status) eq('status', status)
-					if(rank >= 0)
-						eq('rank', rank)
-					if(!searchInNull){
-						isNotNull('position')
-					}
-					//XXX in curation while taking col hir. we want author year column to be used forcefully 
-					// in other cases we will not use untill gets multiple matches 
-					if(useAuthorYear){
-						if(authorYear)
-							eq('authorYear', authorYear)
-						else
-							isNull('authorYear')	
-					}
-				}
-            }
-			
-			//CANONICAL ZERO MATCH OR SINGLE MATCH
-            if(res.size() < 2) { 
-                if(res.size() == 0 ) {
-                    CAN_ZERO ++;
-                } else {
-                    CAN_SINGLE ++;
-					
-                }
-            }
-            //CANONICAL MULTIPLE MATCH
-            else {
-                CAN_MULTIPLE ++;
-                println " constructed normalized form + rank + status"
-				if(!authorYear) authorYear = '';
-                res = clazz.withCriteria(){
-					and{
-						eq('normalizedForm', canonicalForm + " " + authorYear)
-						if(status) eq('status', status)
-						if(rank >= 0)
-							eq('rank', rank)
-						if(!searchInNull){
-							isNotNull('position')
-						}
-					}
-                }
-                if(res.size() == 1) {
-                    AFTER_CAN_MULTI_SINGLE ++;
-                }else if(res.size() == 0) {
-                    AFTER_CAN_MULTI_ZERO ++;
-				}else {
-                	AFTER_CAN_MULTI_MULTI ++;
-                }
-            }
-			
-			if(res.isEmpty() && normalizedForm){
-				println "Searching normalized form + rank + status"
+        
+		clazz.withNewTransaction{
+			if(normalizedForm || authorYear){
+				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
+				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
 				res = clazz.withCriteria(){
 					and{
 						eq('normalizedForm', normalizedForm)
@@ -178,9 +114,30 @@ class NamelistService {
 						}
 					}
 				}
-			}			
-        }
-		
+			}
+			
+			if(res)
+				return res
+			
+			//println  "No result in Normalized form using canonical form now"
+            res = clazz.withCriteria(){
+				and{
+					eq('canonicalForm', canonicalForm)
+					if(status) eq('status', status)
+					if(rank >= 0)
+						eq('rank', rank)
+					if(!searchInNull){
+						isNotNull('position')
+					}
+					//XXX in curation while taking col hir. we want author year column to be used forcefully 
+					// in other cases we will not use untill gets multiple matches 
+					if(useAuthorYear && authorYear){
+						eq('authorYear', authorYear)
+					}
+				}
+            }
+		}
+			
 		if(res.isEmpty()){
 			String key = canonicalForm + rank 
 			def resName = COL_CREATED_NAME.get(key)
@@ -188,8 +145,8 @@ class NamelistService {
 				res = [resName]
 			}
 		}
-		println "=========== FINAL SEARCH RESULT " + res
 		
+		println "== FINAL SEARCH RESULT " + res
 		return res;
     }
     
@@ -229,6 +186,11 @@ class NamelistService {
 	        TaxonomyDefinition.withNewTransaction {
 		        nl.each { TaxonomyDefinition name ->
 					i++
+					
+					if(i%100 == 0){
+						log.debug "---------------------------------------- current count " + i
+					}
+					
 					List tmpRes = []
 					if(!name || !name.canonicalForm) {
 						log.debug "Name is not parsed by Names Parser " + name
@@ -238,7 +200,7 @@ class NamelistService {
 						return
 					}
 					
-					List ibpResult = searchIBP(name.canonicalForm, null, null, names[i].rank)
+					List ibpResult = searchIBP(name.canonicalForm, name.authorYear, null, names[i].rank, false, name.normalizedForm, true)
 					ibpResult.each { TaxonomyDefinition t ->
 		                t = TaxonomyDefinition.get(t.id)
 						tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
@@ -253,7 +215,13 @@ class NamelistService {
 								if(rr != names[i].rank){
 									addToList = false
 								}
-								
+							}else{ // rank is given species or infraspecies
+								int wCount = name.canonicalForm.trim().count(" ") + 1
+								if((wCount == 1) && (rr > 8 )){ // if single word
+									addToList = false
+								}else if((wCount == 2) && (rr != 9)){
+									addToList = false
+								}
 							}
 							if(addToList){
 								tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
@@ -303,7 +271,6 @@ class NamelistService {
 		if(runPostProcess){
 			td.postProcess()
 		}
-		//println  "---------- Created accepted name from col Id " + colId
 		return td
 	}
 	
@@ -311,8 +278,13 @@ class NamelistService {
 		def colRes = searchCOL(colId, 'id')[0]
 		String accepteNameColId = colRes.acceptedNamesList[0].id
 		TaxonomyDefinition td = createAcceptedNameFromColId(accepteNameColId, runPostProcess)
-		td.createSpeciesStub()
 		def syn =  SynonymsMerged.findByMatchId(colId)
+		//some times accepted name is available but synonym not got added so by this call making sure synonym must be added
+		if(!syn){
+			td.addSynonymFromCol(searchCOL(accepteNameColId, 'id')[0].synList)
+			syn =  SynonymsMerged.findByMatchId(colId)
+		}
+		td.createSpeciesStub()
 		println "---------------created synonym " + syn
 		return syn
 	}
@@ -743,7 +715,7 @@ class NamelistService {
     //Handles name moving from accepted to synonym & vice versa
     //also updates IBP Hierarchy if no status change and its accepted name
     private def updateStatus(ScientificName sciName, Map colMatch) {
-        println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
+        //println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
         
         boolean success = false;
         def errors = [];
@@ -929,7 +901,7 @@ class NamelistService {
     private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
-        println "Adding IBP hierarchy from ${colAcceptedNameData}"
+        //println "Adding IBP hierarchy from ${colAcceptedNameData}"
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
@@ -945,7 +917,6 @@ class NamelistService {
         }
         def classification = Classification.fetchIBPClassification()
         Map taxonRegistryNamesTemp = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
-        println "======USE THIS ==== " + taxonRegistryNamesTemp
         List taxonRegistryNames = [];
         taxonRegistryNamesTemp.each { key, value ->
             taxonRegistryNames[Integer.parseInt(key)] = value;
@@ -960,9 +931,8 @@ class NamelistService {
 		metadata1['source'] = colAcceptedNameData['source']?:colAcceptedNameData['matchDatabaseName']
 		metadata1['via'] = colAcceptedNameData['sourceDatabase']
         colAcceptedNameData['metadata'] = metadata1
-        println "=====T R N======= " + taxonRegistryNames
-        println colAcceptedNameData;
-		//boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
+        //println "=====T R N======= " + taxonRegistryNames
+        //boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
         //From UI uncomment
         def result;
         //TaxonomyRegistry.withNewSession {
@@ -1501,7 +1471,7 @@ class NamelistService {
     }
 
     private Map updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
-        println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
+        //println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
         boolean success = false;
         def errors = [];
         try {
@@ -1744,7 +1714,16 @@ class NamelistService {
 	
 	public List searchCOL(String input, String searchBy) {
 		//http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
-
+		
+		File sourceDir = new File(Holders.config.speciesPortal.namelist.rootDir)
+		if(searchBy == 'name'){
+			File xmlFile = new File(sourceDir,  "" + input.replaceAll(' ', '_') + ".xml")
+			if(xmlFile.exists()){
+				println "COL ::: XML file found"
+				return responseAsMap(xmlFile.text, searchBy)
+			}
+		}
+		
 		def http = new HTTPBuilder()
 		http.request( COL_SITE, GET, TEXT ) { req ->
 			uri.path = COL_URI
@@ -1800,8 +1779,16 @@ class NamelistService {
 	}
 
 	List responseAsMap(String xmlText, String searchBy) {
-		def results = new XmlParser().parseText(xmlText)
-		return responseAsMap(results, searchBy)
+		def results = []
+		try {
+			results = new XmlParser().parseText(xmlText)
+			return responseAsMap(results, searchBy)
+		}catch(e){
+			log.debug "Error in xml text "  + xmlText
+			e.printStackTrace()
+		}
+		//returning empty result
+		return results
 	}
 
 	String generateVerbatim (colResult) {

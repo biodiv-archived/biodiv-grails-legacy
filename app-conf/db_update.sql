@@ -419,6 +419,8 @@ ALTER TABLE newsletter ADD parent_id bigint;
 update newsletter set parent_id=0;
 alter table newsletter alter column parent_id set not null;
 
+
+
 #25 Nov 2015
 #Please stop app before running these queries
 alter table document add column visit_count integer not null default 0;
@@ -545,6 +547,13 @@ update taxonomy_definition set species_id = s.sid from (select taxon_concept_id,
 alter table taxonomy_definition alter column default_hierarchy type text;
 update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 265799 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id;
 
+#7th feb 2016
+CREATE INDEX normalized_form_idx ON taxonomy_definition(normalized_form);
+CREATE INDEX status_idx ON taxonomy_definition(status);
+CREATE INDEX rank_idx ON taxonomy_definition(rank);
+CREATE INDEX position_idx ON taxonomy_definition(position);
+CREATE INDEX match_id_idx ON taxonomy_definition(match_id);
+
 #10thFeb 2016
 #creating single license for resource instead of multiple
 alter table resource add column license_id bigint;
@@ -570,3 +579,4 @@ update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genu
 
 
 select rv.voted_on, rv.recommendation_id, rv.common_name_reco_id from recommendation_vote rv, recommendation r where r.is_scientific_name='f' and rv.recommendation_id=r.id;
+

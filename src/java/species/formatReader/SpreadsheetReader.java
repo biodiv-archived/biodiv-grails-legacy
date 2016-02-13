@@ -107,6 +107,7 @@ public class SpreadsheetReader {
                 }
             }
         }
+        
 		for (Row row : sheet) {
 			if (row.getRowNum() <= headerRowNo)
 				continue;
@@ -117,7 +118,13 @@ public class SpreadsheetReader {
 				String key = (String) headerConfig.get("name");
 				int index = Integer.parseInt((String) headerConfig
                                         .get("position"));
-                                String value = getCellText(row.getCell(index, Row.CREATE_NULL_AS_BLANK));
+				String value;
+								try{
+									value = getCellText(row.getCell(index, Row.CREATE_NULL_AS_BLANK));
+								}catch(RuntimeException e){
+									System.out.println("Error in Sheet Reading ||| Row Num " + row.getRowNum() + " === index " + index + "  column Name " + key);
+									throw(e);
+								}
                                 // String validTagName =
                                 // DocumentUtils.convertToValidXMLTagName(key);
                                 validRow = validRow || !value.equals("");

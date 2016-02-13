@@ -15,6 +15,7 @@ import org.apache.log4j.FileAppender;
 import species.utils.Utils;
 import species.Language;
 import species.namelist.NameInfo;
+import species.ScientificName.TaxonomyRank
 
 
 class MappedSpreadsheetConverter extends SourceConverter {
@@ -45,10 +46,13 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
 	public initCurationInfo(String file){
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, NameInfo.TAXON_NAMES_SHEET, 0);
+		println "Checking TAXON_NAMES_SHEET for duplicates"
 		updateMap(content, speciesNameMap)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.HIR_SHEET, 0);
-		updateMap(content, taxonHirMap)
+		println "Checking HIR_SHEET for duplicates"
+		updateMap(content, taxonHirMap, true)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.SYNONYMS_SHEET, 0);
+		println "Checking SYNONYM for duplicates"
 		updateMap(content, synonymMap)
 		
 //		println '---------------------------------------------------'
@@ -60,14 +64,16 @@ class MappedSpreadsheetConverter extends SourceConverter {
 //		println '---------------------------------------------------'
 	}
 	
-	private updateMap(List<Map> content, Map targetMap){
+	private updateMap(List<Map> content, Map targetMap, boolean useRank=false){
 		if(content){
 			content.each { Map m ->
 				if(!m['name'])
 					return
-					
-				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name']
+				
+				String rankSuffix = useRank ? (m['rank'] ? ( KEY_SEP + m['rank'].trim().toLowerCase()):''):''  		
+				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name'] + rankSuffix
 				if(targetMap.containsKey(key)){
+					println " Multiple matching rows for given key " + key
 					multipleMatchingRow = true
 				}
 				m.id = m.id ? m.id.split('\\.')[0]:""
@@ -80,37 +86,32 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 		boolean isValid = true
 		
-		
-		
 		nList.each { NameInfo sc -> 
-			if(!isValid)
-				return
-			
 			String key = sc.sourceIndex +  KEY_SEP + sc.sourceName +  KEY_SEP + sc.name
-			if(!speciesNameMap.containsKey(key)){
-				println "--- sm --- ??????????? key not present    key " +  key + "  ndoe "  + sc
-				println " map " + speciesNameMap
+			if(!speciesNameMap.containsKey(key) || !speciesNameMap.get(key)['match found']){
+				println "--- sm --- ??????????? key not present  or match colum is empty  key " +  key + "  ndoe "  + sc
+				//println " map " + speciesNameMap
 				isValid = false
-				return
+				//return
 			}
 			
+			
 			sc.taxonHir.each { NameInfo ti ->
-				key = ti.sourceIndex +  KEY_SEP + ti.sourceName +  KEY_SEP + ti.name
-				if(!taxonHirMap.containsKey(key)){
-					println "------- tm---- ??????????? key not presen  key " +  key + "  ndoe " + ti
-					println " map " + taxonHirMap
-					
+				key = ti.sourceIndex +  KEY_SEP + ti.sourceName +  KEY_SEP + ti.name + KEY_SEP + TaxonomyRank.getTRFromInt(ti.rank).value().toLowerCase()
+				if(!taxonHirMap.containsKey(key) || !taxonHirMap.get(key)['match found']){
+					println "------- tm---- ??????????? key not presen  or match colum is empty  key " +  key + "  ndoe " + ti
+					//println " map keys " + taxonHirMap.keySet()
 					isValid = false
 					return
 				}
+				
 			}
 			
 			sc.synonyms.each { NameInfo ti ->
 				key = ti.sourceIndex +  KEY_SEP + ti.sourceName +  KEY_SEP + ti.name
-				if(!synonymMap.containsKey(key)){
-					println "----- syn ---- ??????????? key not present  key " +  key + "  ndoe " + ti
-					println " map " + synonymMap
-					
+				if(!synonymMap.containsKey(key)|| !synonymMap.get(key)['match found']){
+					println "----- syn ---- ??????????? key not present  or match colum is empty  key " +  key + "  ndoe " + ti
+					//println " map " + synonymMap
 					isValid = false
 					return
 				}
@@ -603,6 +604,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			sNodeList << converter.createSpeciesXML(m)
 		}
 		
+		
+		//creating nameinfo object from input name sheet(ist sheet)
 		List nameInfoList = []
 		int index = 1
 		XMLConverter xc = new XMLConverter()
@@ -610,11 +613,15 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			nameInfoList << xc.populateNameDetail(it, index++)
 		}
 		
+		log.debug "Nameinfo list size " + nameInfoList.size()
+		
+		//taking info from the matched sheet generate system (taxonname, hier, synonyms)
 		converter.initCurationInfo(f.getAbsolutePath())
 		if(converter.multipleMatchingRow){
 			return false
 		}
 		
+		//now validating for unique entry for each name
 		return converter.validate(nameInfoList);
 	}
 	
