@@ -435,7 +435,8 @@ alter table observation alter column basis_of_record set  not null;
 
 insert into license(id,name) values (828,'UNSPECIFIED');
 
-alter sequence hibernate_sequence restart with 600000;
+select max(id) from activity_feed;
+alter sequence hibernate_sequence restart with ;
 
 alter table dataset add column type varchar(255);
 update dataset set type='OBSERVATIONS';
@@ -494,10 +495,15 @@ create view checklist_species_locations as SELECT csv.id,
                         WHERE csv.id = obs.id AND obs.id = cls.id;
 
 drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
-create sequence document_id_seq start 863; create sequence observation_id_seq start 397104; create  sequence species_id_seq start 276169; create sequence suser_id_seq start 8942;
+select max(id) from document; select max(id) from observation; select max(id) from species; select max(id) from suser;
+create sequence document_id_seq start ;
+create sequence observation_id_seq start ;
+create  sequence species_id_seq start ; 
+create sequence suser_id_seq start ;
 
 #1st Feb 2016
 #Please stop app before running these queries
+# Upload gbif data before this
 ALTER TABLE observation DISABLE TRIGGER ALL ;
 alter table observation add constraint obv_dataset_id_fk foreign key (dataset_id) references dataset(id);
 
@@ -553,7 +559,14 @@ alter table resource alter column license_id set not null;
 alter table recommendation alter column is_scientific_name set not null;
 alter table recommendation add column accepted_taxon_concept_id bigint;
 update recommendation_vote set given_sci_name=reco.name from recommendation reco where reco.is_scientific_name='t' and reco.id=recommendation_id;
-select rv.voted_on, rv.recommendation_id, rv.common_name_reco_id from recommendation_vote rv, recommendation r where r.is_scientific_name='f' and rv.recommendation_id=r.id;
 update recommendation_vote set given_common_name=reco.name from recommendation reco where reco.is_scientific_name='f' and reco.id=common_name_reco_id;
 
+alter table '''+tmpNewBaseDataTable+''' add column key text;
+update '''+tmpNewBaseDataTable+''' set key=concat(scientificname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
+alter table '''+tmpBaseDataTable_namesList+''' add column key text;
+update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
+alter table '''+tmpBaseDataTable_parsedNamess+''' add column key text;
+update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
 
+
+select rv.voted_on, rv.recommendation_id, rv.common_name_reco_id from recommendation_vote rv, recommendation r where r.is_scientific_name='f' and rv.recommendation_id=r.id;

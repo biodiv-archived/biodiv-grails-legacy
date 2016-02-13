@@ -63,6 +63,7 @@ class TaxonomyDefinition extends ScientificName {
 		sort "rank"
 		version false;
 		tablePerHierarchy true
+        defaultHierarchy type:'text'
 	}
 
     Species findSpecies() {

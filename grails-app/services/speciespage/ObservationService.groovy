@@ -802,6 +802,14 @@ class ObservationService extends AbstractMetadataService {
         def nearbyObservations = []
 
         try {
+/*            Observation observation = Observation.read(Long.parseLong(observationId));
+            String centroid = 'POINT('+observation.longitude+'  '+observation.latitude+')';
+           def rows = sql.rows("select count(*) as count from observation as g1 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_MakePoint(${centroid}))/1000) < :maxRadius and g1.is_deleted = false", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
+            totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
+            limit = Math.min(limit, maxObvs - offset);
+            def resultSet = sql.rows("select g1.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology),ST_MakePoint(${centroid}))/1000) as distance from observation as g1 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_GeomFromText('${centroid}'))/1000) < :maxRadius and g1.is_deleted = false order by ST_Distance(g1.topology, ST_GeomFromText('${centroid}')), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
+*/
+
             def rows = sql.rows("select count(*) as count from observation as g1, observation as g2 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
