@@ -51,6 +51,7 @@ function youtube_parser(url){
 function updateGallery1(resources){
     if(resources.length == 0){
         console.log('Error: Resources is Empty');
+        $('.noTitle, #gallerySpinner').hide();
         return false;
     }        
     initializeGallery(resources);        
@@ -185,7 +186,7 @@ function update_imageAttribute(resource,ele,index){
 
 
     if(resource.url){
-        output += '<a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
+        output += '<br /><a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
     }
 
     if(resource.annotations){
