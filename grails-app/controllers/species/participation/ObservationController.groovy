@@ -376,6 +376,7 @@ println "1"
                 fetchMode   'reprImage', FetchMode.JOIN
                 fetchMode   'maxVotedReco', FetchMode.JOIN
                 fetchMode   'maxVotedReco.taxonConcept', FetchMode.JOIN
+                fetchMode   'dataset.datasource', FetchMode.JOIN
             }
 			
         if (!observationInstance) {
