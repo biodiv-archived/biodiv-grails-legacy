@@ -33,7 +33,7 @@
             </ul>
             <div id="resourceTabs-1">
                 <!--a class="myeditable" href="#">Contribute Images</a-->
-                    <div class="noTitle" style="height: 462px;position:relative">
+                    <div class="galleryWrapper">
                         <g:render template="/observation/galleryTemplate" model="['instance': speciesInstance]"/>
                     </div>
                 </div>

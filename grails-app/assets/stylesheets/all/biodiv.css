@@ -3222,6 +3222,7 @@ small {
     opacity: .6;
     color: white;
     padding: 5px 0px;
+    overflow: hidden;
 }
 .image_info a{
     color:white;
@@ -3282,4 +3283,21 @@ small {
 
 .gallery_wrapper .jcarousel-skin-ie7 .jcarousel-clip-horizontal{
 	width: 565px;
+}
+
+.audioAttr{
+	  background-color: white !important;
+}
+
+.audio_container{
+	height: 120px;
+}
+
+.audio_container #playlist{
+	  height: 23px;
+}
+
+.galleryWrapper{
+	height: 450px;
+	position:relative;
 }

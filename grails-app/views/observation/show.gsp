@@ -118,7 +118,7 @@ if(r) {
                         <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
                     </div>
                 </center>
-                <div class="noTitle" style="height: 462px;position:relative">
+                <div class="galleryWrapper">
                     <g:render template="/observation/galleryTemplate" model="['instance': observationInstance]"/>
                 </div>
                
