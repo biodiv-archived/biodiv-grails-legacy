@@ -2522,11 +2522,25 @@ div.noOfRatings {
     height: 55px;
 /*    background-color: whitesmoke;
     border: solid grey 1px;
-    line-height:2.5;
-*/    padding-left: 20px;
+*/    line-height:2.5;
+    padding-left: 20px;
     color: #0c8040;
     display:table-cell;
 }
+.thumbnail .figure .listtemplate_icon.img-polaroid {
+	max-height: 55px;
+	max-width: 55px;
+    padding:0px;
+	height:55px; 
+ 	width: 55px; 
+	display: -moz-inline-box; /* Firefox 2 */
+	display: inline-block;
+	background-repeat:no-repeat; 
+	background-position:center;
+	background-size: 55px 55px;
+
+}
+
 
 .checklistCount {
     background-image: url('/assets/all/stack.png');
