@@ -376,6 +376,7 @@ println "1"
                 fetchMode   'reprImage', FetchMode.JOIN
                 fetchMode   'maxVotedReco', FetchMode.JOIN
                 fetchMode   'maxVotedReco.taxonConcept', FetchMode.JOIN
+                fetchMode   'dataset.datasource', FetchMode.JOIN
             }
 			
         if (!observationInstance) {
@@ -1906,6 +1907,7 @@ def filterChain() {
         return;
     }
 
+@Secured(['ROLE_ADMIN'])
 def t() {
     def statistics = sessionFactory.statistics
     //            render "simple = ${SpeciesGroup.findByName('Others')}, 

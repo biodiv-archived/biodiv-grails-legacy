@@ -205,10 +205,15 @@ var getSnippetTabletHTML = function(carousel, item) {
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
-	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
+	var imageTag = '<span class="img-polaroid" stype="background-image:url("' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
+
+    var listTemplateIcon = '';
+    if(item.dataset_id) {
+        listTemplateIcon = '<div class="listtemplate_icon img-polaroid" title="${'+item.datasource_title+'}" style="background-image:url('+item.datasource_mainImage+');"/>'
+    }
 
 	var notes = item.notes?item.notes:''
 	var summary = item.summary?item.summary:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption">'+(notes?notes:summary)+'</div></div></div>';
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + listTemplateIcon + '</a></div><div class="'+'ellipsis multiline caption">'+(notes?notes:summary)+'</div></div></div>';
 
 }

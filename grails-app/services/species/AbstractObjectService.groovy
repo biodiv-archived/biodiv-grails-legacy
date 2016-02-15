@@ -90,7 +90,7 @@ class AbstractObjectService {
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
                     boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist||obv.dataset ? null: iconBasePath, isChecklist||obv.dataset ? '.png' :null)//thumbnailUrl(iconBasePath)
+					item.imageLink = image.thumbnailUrl(isChecklist||(obv.hasProperty('habitat') && obv.dataset) ? null: iconBasePath, isChecklist|| ( obv.hasProperty('dataset') && obv.dataset) ? '.png' :null)//thumbnailUrl(iconBasePath)
 				} else if(image.type == ResourceType.VIDEO) {
 					item.imageLink = image.thumbnailUrl()
 				} else if(image.type == ResourceType.AUDIO) {
@@ -107,6 +107,11 @@ class AbstractObjectService {
             if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
             if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
             if(obj.hasProperty('isChecklist') && obj.isChecklist) item.isChecklist = obj.isChecklist
+            if(obj.hasProperty('dataset') && obj.dataset) {
+                item.dataset_id = obj.dataset.id
+                item.datasource_title = obj.dataset.datasource.title;
+                item.datasource_mainImage = obj.dataset.datasource.mainImage()?.fileName
+            }
             if(obj.hasProperty('fromDate') && obj.fromDate) item.observedOn = obj.fromDate.getTime();
 			if(obj.hasProperty('geoPrivacy') && obj.geoPrivacy){
 				item.geoPrivacy = obj.geoPrivacy

@@ -121,15 +121,14 @@ if(r) {
                 <div class="galleryWrapper">
                     <g:render template="/observation/galleryTemplate" model="['instance': observationInstance]"/>
                 </div>
-               
 
-                    <obv:showStory
-                        model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
-                    
-                    <obv:showCustomFields model="['observationInstance':observationInstance]"/>
-                     
-                        
+                <obv:showStory
+                model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
+
+                <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+
+
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
                         <div>
                             <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
@@ -189,41 +188,25 @@ if(r) {
                     </div>
                 </div>
 
-                                <div class="span4">
-                                        <obv:showLocation
-                                        model="['observationInstance':observationInstance]" />
+                <div class="span4">
+                    <obv:showLocation model="['observationInstance':observationInstance]" />
 
-                                    <!-- obv:showRating model="['observationInstance':observationInstance]" /-->
-                                    <!--  static species content -->
+                    <div class="sidebar_section">
+                        <h5><g:message code="observation.show.related.observations" /> </h5>
+                        <div class="tile" style="clear: both">
+                            <div class="title"><g:message code="observation.show.other.observations" /><span class="item_count"></span></div>
+                            <obv:showRelatedStory
+                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
+                        </div>
+                        <div class="tile">
+                            <div class="title"><g:message code="text.observations.nearby" /></div>
+                            <obv:showRelatedStory
+                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearByRelated', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
+                        </div>
 
-                                    <div class="sidebar_section">
-                                        <h5><g:message code="observation.show.related.observations" /> </h5>
-                                        <div class="tile" style="clear: both">
-                                            <div class="title"><g:message code="observation.show.other.observations" /><span class="item_count"></span></div>
-                                            <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
-                                        </div>
-                                        <div class="tile">
-                                            <div class="title"><g:message code="text.observations.nearby" /></div>
-                                            <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearByRelated', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
-                                        </div>
-                                        
-                                    </div>
-                                    
- 				
-                                    
-                                    <%--                    <div class="sidebar_section">--%>
-                                        <%--                        <h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
-                                        <%--                        <chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
-                                        <%--                    </div>--%>
-                                    <!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
-                                    <!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
-
-                                </div>
-
-
-                            </div>
+                    </div>
+                </div>
+            </div>
 <script type="text/javascript">
 $(document).ready(function(){
     window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes',userGroupWebaddress:params.webaddress) }";    
