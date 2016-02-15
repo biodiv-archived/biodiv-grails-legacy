@@ -1,39 +1,39 @@
-var carouselLinks =[],gallery ;
+var carouselLinks =[],gallery,defaultObvThumb ;
 
 //For Audio 
-        var audio;
-        var playlist;
-        var tracks;
-        var current;
+var audio;
+var playlist;
+var tracks;
+var current;
 
-        //audioInit();
-        function audioInit(){
+//audioInit();
+function audioInit(){
+    current = 0;
+    audio = $('audio');
+    playlist = $('#playlist');
+    tracks = playlist.find('li a');
+    len = tracks.length - 1;
+    audio[0].volume = .10;
+    //audio[0].play();
+    playlist.find('a').click(function(e){
+        e.preventDefault();
+        link = $(this);                
+        $('.audioAttr').hide();
+        $('.audioAttr_'+$(this).attr('rel')).show();
+        current = link.parent().index();
+        run(link, audio[0]);    
+    });
+/*    audio[0].addEventListener('ended',function(e){
+        current++;
+        if(current == len){
             current = 0;
-            audio = $('audio');
-            playlist = $('#playlist');
-            tracks = playlist.find('li a');
-            len = tracks.length - 1;
-            audio[0].volume = .10;
-            //audio[0].play();
-            playlist.find('a').click(function(e){
-                e.preventDefault();
-                link = $(this);                
-                $('.audioAttr').hide();
-                $('.audioAttr_'+$(this).attr('rel')).show();
-                current = link.parent().index();
-                run(link, audio[0]);    
-            });
-        /*    audio[0].addEventListener('ended',function(e){
-                current++;
-                if(current == len){
-                    current = 0;
-                    link = playlist.find('a')[0];
-                }else{
-                    link = playlist.find('a')[current];    
-                }
-                run($(link),audio[0]);
-            }); */
+            link = playlist.find('a')[0];
+        }else{
+            link = playlist.find('a')[current];    
         }
+        run($(link),audio[0]);
+    }); */
+}
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
@@ -80,6 +80,8 @@ function initializeGallery(resources,domainObj){
     var gallCount =0;
     $.each(isImageOrVideo, function (index, photo) {
         gallCount +=1;
+        photo.url = (photo.url)?photo.url:defaultObvThumb.replace('_th1','_gall');
+        photo.icon = (photo.icon)?photo.icon:defaultObvThumb;
         if(photo.type == 'Image' || photo.type == 'Video'){
             // Adding Thumbnail
             $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
@@ -309,9 +311,12 @@ function galleryAjax(url,domainObj){
     if(domainObj == 'observation'){
         console.log('observation==========================');
         console.log(result.instance.resource);
+        defaultObvThumb = result.instance.thumbnail;
         updateGallery1(result.instance.resource,domainObj);
+
     }else{
         console.log('species==========================');
+        defaultObvThumb = result.thumbnail;
         updateGallery1(result,domainObj);
     }
     });
