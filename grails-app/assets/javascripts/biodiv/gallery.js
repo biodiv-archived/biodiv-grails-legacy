@@ -1,5 +1,47 @@
 var carouselLinks =[],gallery ;
 
+//For Audio 
+        var audio;
+        var playlist;
+        var tracks;
+        var current;
+
+        //audioInit();
+        function audioInit(){
+            current = 0;
+            audio = $('audio');
+            playlist = $('#playlist');
+            tracks = playlist.find('li a');
+            len = tracks.length - 1;
+            audio[0].volume = .10;
+            //audio[0].play();
+            playlist.find('a').click(function(e){
+                e.preventDefault();
+                link = $(this);                
+                $('.audioAttr').hide();
+                $('.audioAttr_'+$(this).attr('rel')).show();
+                current = link.parent().index();
+                run(link, audio[0]);    
+            });
+        /*    audio[0].addEventListener('ended',function(e){
+                current++;
+                if(current == len){
+                    current = 0;
+                    link = playlist.find('a')[0];
+                }else{
+                    link = playlist.find('a')[current];    
+                }
+                run($(link),audio[0]);
+            }); */
+        }
+        function run(link, player){
+                player.src = link.attr('href');
+                par = link.parent();
+                par.addClass('active').siblings().removeClass('active');
+                audio[0].load();
+                audio[0].play();
+        }
+
 function youtube_parser(url){
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
     var match = url.match(regExp);
@@ -12,33 +54,72 @@ function updateGallery1(resources){
         return false;
     }        
     initializeGallery(resources);        
-    //For Slider Content
-    update_imageAttribute(resources,$('.image_info'));
-    rate($('.star_gallery_rating'));      
-    $('.imageAttr:first').show();
+   
+    rate($('.star_gallery_rating'));   
     $('.mover img').css('opacity','initial');
+
+
 }
 function initializeGallery(resources){
     console.log(resources.length);
+    var isAudio = [];
+    var isImageOrVideo = [];
     $.each(resources, function (index, photo) {
-        // Adding Thumbnail
-       $('.mover').append('<img class="thumb thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" />')     
-        
-        // For Slider 
-        index = index+1;
+             if(photo.type == 'Image' || photo.type == 'Video'){
+                    isImageOrVideo.push(photo);
+              }else if(photo.type == 'Audio'){
+                    isAudio.push(photo);
+              }
+
+    });
+    var gallCount =0;
+    $.each(isImageOrVideo, function (index, photo) {
+        gallCount +=1;
+        if(photo.type == 'Image' || photo.type == 'Video'){
+            // Adding Thumbnail
+            $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org")+'" /></li>');
+
+        }    
+        // For Slider         
         if(photo.type == 'Image'){
             carouselLinks.push({
-                 href: photo.url.replace('.jpg','_gall.jpg'),
-                 title: index+'/'+resources.length
+                 href: photo.url.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org").replace('.jpg','_gall.jpg'),
+                 title: gallCount+'/'+isImageOrVideo.length
             });
         }else if(photo.type == 'Video'){
             carouselLinks.push({
                  youtube: youtube_parser(photo.url),
                  type: 'text/html',
-                 title: index+'/'+resources.length
+                 title: gallCount+'/'+isImageOrVideo.length
             });
         }
+
+        update_imageAttribute(photo,$('.image_info'),index);
    });
+
+    if(isAudio.length >= 1){
+        $('.noTitle').after('<div class="audio_container" style="height: 130px;"></div>');
+        $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace("indiabiodiversity.localhost.org", "indiabiodiversity.org").replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
+        $.each(isAudio, function (index, resource) {
+            $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index));
+        });
+        $('.audio_container div').first().show();
+    }
+
+    if(isAudio.length >= 2) {
+        var audio_playlist = '<ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">';
+        $.each(isAudio, function (index, audio) {
+            audio_playlist += '<li class="active" style="display: inline;">';
+            audio_playlist += '<a href="'+audio.url.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org").replace('biodiv/','biodiv/observations/')+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
+            audio_playlist += '</li>';
+        });
+        audio_playlist += '</ul>';
+        $('.audio_container').prepend(audio_playlist);
+        audioInit();        
+    }
+
+
+    $('.jc').jcarousel();
     console.log(carouselLinks);
     // Initialize the Gallery as image carousel:
     gallery = blueimp.Gallery(carouselLinks, {
@@ -48,29 +129,32 @@ function initializeGallery(resources){
                 // Callback function executed when the Gallery is initialized.
                 $('#gallerySpinner').hide();
                 $('.gallery_wrapper').show();
+
+               // $('.image_info div').first().show();
+               // alert("fddddd");
             },           
-            onslideend: function (index, slide) {
+            onslideend: function (index, slide) {                
                 // Callback function executed after the slide change transition.
                 $('.thumb').css('opacity','0.6');
                 $('.thumb_'+index).css('opacity','initial');
-                if($('.imageAttr_'+index).hasClass('open')){
-                    $('.image_info').css('height','auto');
-                }
-                $('.imageAttr').hide();
-                $('.imageAttr_'+index).show();
+                if($('.imageAttr_'+index,'.videoAttr_'+index).hasClass('open')){
+                        $('.image_info').css('height','auto');
+                    }
+                $('.imageAttr, .videoAttr').hide();
+                $('.imageAttr_'+index+', .videoAttr_'+index).show();
                 $('.thumb').removeClass('active');
                 $('.thumb_'+index).addClass('active');
-                //$('.image_info').html(index);             
+                //$('.image_info').html(index);                        
             },          
     });
-    carouselInit();
 }
 
-function update_imageAttribute(resourceList,ele){
+function update_imageAttribute(resource,ele,index){
     var output = '';
-    $.each(resourceList, function (index, resource) {
-        output += '<div class="row-fluid imageAttr imageAttr_'+index+'" style="display:none;">';
-        output += ' <div class="span6">';
+    var resourceType = resource.type.toLowerCase();  
+
+        output += '<div class="row-fluid '+resourceType+'Attr '+resourceType+'Attr_'+index+'" style="display:none;">';
+        output += '<div class="span6">';
 
         if(resource.description){
             output += '<div class="span5 ellipsis multiline" style="margin-left:0px">'+resource.description+'</div>';
@@ -112,8 +196,8 @@ function update_imageAttribute(resourceList,ele){
     output += '</div>';
     output += '<div class="span6">';
     output += '<div class="license span12">';
-    output += '<a class="span7" href="'+resource.licenses[0]['url']+'" target="_blank">';
-    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.licenses[0]['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.licenses[0]['name']+'">';
+    output += '<a class="span7" href="'+resource.licenses['url']+'" target="_blank">';
+    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.licenses['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.licenses['name']+'">';
     output += '</a>';
     output += '<div class="rating_form span4">';
     output += '<form class="ratingForm" method="get" title="Rate it">';
@@ -127,61 +211,18 @@ function update_imageAttribute(resourceList,ele){
         ratings = 'rating';
     }                     
     output += '(3 '+ratings+')';
-            output += '</div>';
-            output += '</form>';
-            output += '</div>'; 
-            output += '<i class="slideUp pull-right open icon-chevron-down" rel="58"></i>';                                       
-            output += '</div>';
-            output += '</div>';
-            output += '</div>';
-            });    
-    ele.html(output);    
+    output += '</div>';
+    output += '</form>';
+    output += '</div>'; 
+    output += '<i class="slideUp pull-right open icon-chevron-down" rel="58"></i>';                                       
+    output += '</div>';
+    output += '</div>';
+    output += '</div>';            
+    ele.append(output);    
 
 }
 
-function carouselInit(){
-    var proc = false;
-    var k = 2;
-    var mover = $('.mover');
-    var run = $('.container1').outerWidth();
-
-    $('.gallery_wrapper #right').on('click',function(){    
-        if(proc){return false;}
-        proc = true;
-
-
-        var pos = parseInt(mover.css('left'),10)-run;
-        var curr = mover.outerWidth()+pos;
-
-        if(curr>run/k){ 
-            mover.animate({left:'-='+run/k+'px'},function(){proc=false;});
-            $('.inactive').removeClass('inactive');
-        }else{
-            mover.animate({left:'-='+curr+'px'},function(){proc=false;});
-            $(this).addClass('inactive');
-        }
-
-    });
-    $('.gallery_wrapper #left').on('click',function(){
-        if(proc){return false;}
-        proc = true;
-
-        var pos = parseInt(mover.css('left'),10);
-        var curr = mover.outerWidth()+pos;
-
-        if(pos < -run/k){
-            mover.animate({left:'+='+run/k+'px'},function(){proc=false;});
-            $('.inactive').removeClass('inactive');
-        }else if(pos <= 0){
-            mover.animate({left:'+='+(-pos)+'px'},function(){proc=false;});
-            $(this).addClass('inactive');
-        }
-
-    });
-
-}
-
-$(document).on('click','.mover img',function(){
+$(document).on('click','.jc img',function(){
 
     var that = $(this);
     if(!that.hasClass('active')){

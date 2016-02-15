@@ -63,6 +63,7 @@ if(r) {
 .commonName {
     width:282px !important;
 }
+
 </style>
 </head>
 <body>
@@ -112,10 +113,10 @@ if(r) {
                                </div>
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
-                <div class="noTitle" style="height:462px;position:relative">
-                <div class="story-footer" style="padding: 3px 3px;right:0;bottom:331px;z-index:5;background-color:whitesmoke" >
-                <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
-                </div>
+                <div class="noTitle" style="height: 462px;position:relative">
+                    <div class="story-footer" style="padding: 3px 3px;right:0;bottom:331px;z-index:5;background-color:whitesmoke" >
+                    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
+                    </div>
                 <center>
                     <div id="gallerySpinner" class="spinner">
                         <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
@@ -125,11 +126,10 @@ if(r) {
                     <div class="gallery_wrapper" style="display:none;">
 
                         <div class="container1 noselect">
-                            <div class="mover">
-
+                            <div class="jc jcarousel-skin-ie7">
+                                    <ul class="jc_ul">
+                                    </ul>
                             </div>
-                            <div class="nav_thumb inactive" id="left"><</div>
-                            <div class="nav_thumb" id="right">></div>
                         </div>
 
                         <div id="blueimp-image-carousel" class="blueimp-gallery blueimp-gallery-carousel blueimp-gallery-controls">
@@ -145,15 +145,10 @@ if(r) {
 
                     </div>
 
-                </center>
-                                      
-                    
-                    </div>
-
+                </center>                                     
+                </div>
                
-                <g:render template="/species/speciesaudio" model="['resourceInstance': observationInstance , 'resourcesInstanceList' : observationInstanceListResources]"/>
-
-                    <obv:showStory
+             <obv:showStory
                         model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
                     
