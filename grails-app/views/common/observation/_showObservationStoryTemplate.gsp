@@ -307,7 +307,7 @@
                 </g:if>
             </div>
         </div>
-        </div>
+       
         </g:else>
     </div>
 

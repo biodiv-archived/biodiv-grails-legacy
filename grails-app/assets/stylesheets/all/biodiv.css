@@ -3257,3 +3257,27 @@ small {
 	height: 485px;
 	background: none;
 }
+
+.gallery_wrapper .jcarousel-skin-ie7{
+  width: 610px;
+}
+
+
+
+.gallery_wrapper .jc{
+    width: 565px;
+    height:75px;
+}
+.gallery_wrapper .jc ul li img{
+    padding: 0px;
+    border: 0px;
+    width: 100px;
+    max-height: 75px;
+}
+.gallery_wrapper .jcarousel-skin-ie7 .jcarousel-item-horizontal{
+    width:100px !important;
+}
+
+.gallery_wrapper .jcarousel-skin-ie7 .jcarousel-clip-horizontal{
+	width: 565px;
+}

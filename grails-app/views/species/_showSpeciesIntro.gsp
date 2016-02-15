@@ -41,11 +41,10 @@
                 <div class="gallery_wrapper">
 
                     <div class="container1 noselect">
-                        <div class="mover">
-
+                        <div class="jc jcarousel-skin-ie7">
+                                <ul class="jc_ul">
+                                </ul>
                         </div>
-                    <div class="nav_thumb inactive" id="left"><</div>
-                    <div class="nav_thumb" id="right">></div>
                     </div>
 
 
@@ -101,9 +100,7 @@
             </div>
 
         </g:else>
-
-        <g:render template="/species/speciesaudio" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor , 'resourcesInstanceList' : resourcesInstanceList]"/>
-
+     
         <div style="background-color:white">
 
             <!-- species page icons -->
