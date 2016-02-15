@@ -448,7 +448,7 @@ class DatasetService extends AbstractMetadataService {
         String namesFileName = (new File(directory, 'gbif_names_all_with_idswithoutspchar.csv')).getAbsolutePath(); 
         Date startTime = new Date();
          try {
-/*            uploadLog << "\nCreating base table for ${occurencesFileName}";
+            uploadLog << "\nCreating base table for ${occurencesFileName}";
 
             conn.execute('''
             drop table  if exists '''+tmpBaseDataTable+''';
@@ -479,7 +479,7 @@ class DatasetService extends AbstractMetadataService {
             alter table '''+tmpBaseDataTable_parsedNamess+''' add column key text;
             update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
             ''')
-*/
+
 
             uploadLog << "\nTime taken for creating annotations ${((new Date()).getTime() - startTime.getTime())/1000} sec"
 
@@ -580,7 +580,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         try {
             conn = new Sql(dataSource);
             //FIX:sciName could be repeated in parsed_names table
-            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = canonicalform and taxonId = r.taxon_concept_id");
+            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = lower(canonicalform) and taxonId = r.taxon_concept_id");
         } finally {
             conn.close();
         }
