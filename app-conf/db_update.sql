@@ -571,3 +571,6 @@ update recommendation_vote set given_sci_name=reco.name from recommendation reco
 update recommendation_vote set given_common_name=reco.name from recommendation reco where reco.is_scientific_name='f' and reco.id=common_name_reco_id;
 
 
+#15 Feb
+update recommendation set accepted_name_id = taxon_concept_id;
+

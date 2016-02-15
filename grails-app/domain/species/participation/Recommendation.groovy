@@ -21,6 +21,9 @@ class Recommendation {
 	// added this column for optimizing case insensitive sql query 
 	String lowercaseName;
 	
+	//to store accpeted Match Name
+	TaxonomyDefinition acceptedName;
+	
 	static constraints = {
 		name(blank:false, unique:['taxonConcept', 'languageId']);
 		taxonConcept nullable:true;
@@ -28,6 +31,7 @@ class Recommendation {
         isFlagged nullable:true;
 		lowercaseName nullable:true;
 		flaggingReason nullable:true;
+		acceptedName nullable:true;
 	}
 
 	static mapping = { 
