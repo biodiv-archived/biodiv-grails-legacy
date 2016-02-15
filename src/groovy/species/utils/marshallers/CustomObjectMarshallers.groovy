@@ -165,17 +165,10 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(Resource) {
             println 'Resource Marshaller'
             def basePath = '';
-            
-            if(it.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
-                basePath = grailsApplication.config.speciesPortal.observations.serverURL
-            }
-            else if(it.context?.value() == Resource.ResourceContext.SPECIES.toString() || it?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
-                basePath = grailsApplication.config.speciesPortal.resources.serverURL
-            }
-
+            String originalUrl = it.thumbnailUrl(basePath, null, ImageType.ORIGINAL);
             def imagePath = it.thumbnailUrl(basePath);
 
-            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'totalRatings':it.totalRatings?:0, 'averageRating':it.averageRating?:0, 'license':it.license, 'contributors':it.contributors, 'attributors': it.attributors];
+            return ['id':it.id, url:originalUrl, 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'totalRatings':it.totalRatings?:0, 'averageRating':it.averageRating?:0, 'license':it.license, 'contributors':it.contributors, 'attributors': it.attributors, 'annotations':it.fetchAnnotations()];
         }
 	
 		JSON.registerObjectMarshaller(Comment) {

@@ -1907,6 +1907,7 @@ def filterChain() {
         return;
     }
 
+@Secured(['ROLE_ADMIN'])
 def t() {
     def statistics = sessionFactory.statistics
     //            render "simple = ${SpeciesGroup.findByName('Others')}, 
