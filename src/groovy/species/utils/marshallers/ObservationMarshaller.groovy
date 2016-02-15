@@ -27,7 +27,7 @@ class ObservationMarshaller {
                 
                 author : obv.author,
 
-                thumbnail : obv.mainImage()?.thumbnailUrl(null, !obv.resource ? '.png':null),
+                thumbnail : obv.mainImage()?.thumbnailUrl(null, !obv.resource || obv.dataset ? '.png':null),
                 notes : obv.notes,
                 summary : obv.summary(),
 
