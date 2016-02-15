@@ -16,8 +16,8 @@
 		</span>
 			 </a>
 
-<%--			<div class="story-footer" style="position:static;">
-				<div class="footer-item" title="${g.message(code:'showusergroupsig.title.observations')}">
+			<div class="story-footer" style="position:static;">
+<%--				<div class="footer-item" title="${g.message(code:'showusergroupsig.title.observations')}">
 					<i class="icon-screenshot"></i>
 					<obv:showNoOfObservationsOfUser model="['user':userInstance , 'userGroup':userGroupInstance]"/>
 				</div>

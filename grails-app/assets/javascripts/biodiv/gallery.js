@@ -196,12 +196,12 @@ function update_imageAttribute(resource,ele,index){
     output += '</div>';
     output += '<div class="span6">';
     output += '<div class="license span12">';
-    output += '<a class="span7" href="'+resource.licenses['url']+'" target="_blank">';
-    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.licenses['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.licenses['name']+'">';
+    output += '<a class="span7" href="'+resource.license['url']+'" target="_blank">';
+    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.license['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.license['name']+'">';
     output += '</a>';
     output += '<div class="rating_form span4">';
     output += '<form class="ratingForm" method="get" title="Rate it">';
-    output += '<span class="star_gallery_rating pull-right" title="Rate" data-score="'+resource.rating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
+    output += '<span class="star_gallery_rating pull-right" title="Rate" data-score="'+resource.averageRating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
     output += '</span>';
     output += '<div class="noOfRatings">'; 
     var ratings ='';
@@ -210,7 +210,7 @@ function update_imageAttribute(resource,ele,index){
     }else{
         ratings = 'rating';
     }                     
-    output += '(3 '+ratings+')';
+    output += '('+resource.totalRatings+' rating'+(resource.totalRatings>1?'s':'')+')';
     output += '</div>';
     output += '</form>';
     output += '</div>'; 

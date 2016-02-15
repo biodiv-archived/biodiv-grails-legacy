@@ -10,14 +10,14 @@
         %>
 
         <s:showSpeciesExternalLink model="['speciesInstance':speciesInstance]"/>
-            </g:if>
+        </g:if>
             <div class="observation-icons">
 
                 <g:if test="${showDetails && maxVotedReco?.taxonConcept?.threatenedStatus}">
                 <div style="float:left;">
                     <s:showThreatenedStatus model="['threatenedStatus':maxVotedReco.taxonConcept?.threatenedStatus]"/>
                     </div>
-                    </g:if>
+                </g:if>
 
 
                     <g:if test="${observationInstance.habitat}">

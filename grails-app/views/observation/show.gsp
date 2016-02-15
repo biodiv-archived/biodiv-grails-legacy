@@ -113,48 +113,47 @@ if(r) {
                                </div>
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
-                <div class="noTitle" style="height: 462px;position:relative">
-                    <div class="story-footer" style="padding: 3px 3px;right:0;bottom:331px;z-index:5;background-color:whitesmoke" >
-                    <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
-                    </div>
-                <center>
-                    <div id="gallerySpinner" class="spinner">
-                        <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
-                    </div>
-
-
-                    <div class="gallery_wrapper" style="display:none;">
-
-                        <div class="container1 noselect">
-                            <div class="jc jcarousel-skin-ie7">
-                                    <ul class="jc_ul">
-                                    </ul>
+                    <div class="noTitle" style="height: 462px;position:relative">
+                        <div class="story-footer" style="padding: 3px 3px;right:0;bottom:331px;z-index:5;background-color:whitesmoke" >
+                            <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
+                        </div>
+                        <center>
+                            <div id="gallerySpinner" class="spinner">
+                                <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
                             </div>
-                        </div>
 
-                        <div id="blueimp-image-carousel" class="blueimp-gallery blueimp-gallery-carousel blueimp-gallery-controls">
-                            <div class="slides"></div>
-                            <h3 class="title"></h3>
-                            <a class="prev">‹</a>
-                            <a class="next">›</a>
-                            <a class="play-pause"></a>
-                        </div>
 
-                        <div class="image_info">    
-                        </div>
+                            <div class="gallery_wrapper" style="display:none;">
 
+                                <div class="container1 noselect">
+                                    <div class="jc jcarousel-skin-ie7">
+                                        <ul class="jc_ul">
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div id="blueimp-image-carousel" class="blueimp-gallery blueimp-gallery-carousel blueimp-gallery-controls">
+                                    <div class="slides"></div>
+                                    <h3 class="title"></h3>
+                                    <a class="prev">‹</a>
+                                    <a class="next">›</a>
+                                    <a class="play-pause"></a>
+                                </div>
+
+                                <div class="image_info">    
+                                </div>
+
+                            </div>
+
+                        </center>                                     
                     </div>
 
-                </center>                                     
-                </div>
-               
-             <obv:showStory
-                        model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
+                    <obv:showStory model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
-                    
+
                     <obv:showCustomFields model="['observationInstance':observationInstance]"/>
-                     
-                        
+
+
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
                         <div>
                             <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
@@ -214,41 +213,25 @@ if(r) {
                     </div>
                 </div>
 
-                                <div class="span4">
-                                        <obv:showLocation
-                                        model="['observationInstance':observationInstance]" />
+                <div class="span4">
+                    <obv:showLocation model="['observationInstance':observationInstance]" />
 
-                                    <!-- obv:showRating model="['observationInstance':observationInstance]" /-->
-                                    <!--  static species content -->
+                    <div class="sidebar_section">
+                        <h5><g:message code="observation.show.related.observations" /> </h5>
+                        <div class="tile" style="clear: both">
+                            <div class="title"><g:message code="observation.show.other.observations" /><span class="item_count"></span></div>
+                            <obv:showRelatedStory
+                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
+                        </div>
+                        <div class="tile">
+                            <div class="title"><g:message code="text.observations.nearby" /></div>
+                            <obv:showRelatedStory
+                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearByRelated', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
+                        </div>
 
-                                    <div class="sidebar_section">
-                                        <h5><g:message code="observation.show.related.observations" /> </h5>
-                                        <div class="tile" style="clear: both">
-                                            <div class="title"><g:message code="observation.show.other.observations" /><span class="item_count"></span></div>
-                                            <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related','filterProperty': 'speciesName', 'id':'a','userGroupInstance':userGroupInstance]" />
-                                        </div>
-                                        <div class="tile">
-                                            <div class="title"><g:message code="text.observations.nearby" /></div>
-                                            <obv:showRelatedStory
-                                            model="['observationInstance':observationInstance, 'observationId': observationInstance.id, 'controller':'observation', 'action':'related', 'filterProperty': 'nearByRelated', 'id':'nearBy', 'userGroupInstance':userGroupInstance]" />
-                                        </div>
-                                        
-                                    </div>
-                                    
- 				
-                                    
-                                    <%--                    <div class="sidebar_section">--%>
-                                        <%--                        <h5>Top 5 Contributors of ${observationInstance.group.name}</h5>--%>
-                                        <%--                        <chart:showStats model="['title':'Top 5 Contributors', statsType:ChartService.USER_OBSERVATION_BY_SPECIESGROUP,  speciesGroupId:observationInstance.group.id, hAxisTitle:'User', hideBarChart:true, width:300, hideTitle:true]"/>--%>
-                                        <%--                    </div>--%>
-                                    <!-- obv:showTagsSummary model="['observationInstance':observationInstance]" /-->
-                                    <!-- obv:showObvStats  model="['observationInstance':observationInstance]"/-->
-
-                                </div>
-
-
-                            </div>
+                    </div>
+                </div>
+            </div>
 <script type="text/javascript">
 $(document).ready(function(){
     window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'observation', action:'getRecommendationVotes',userGroupWebaddress:params.webaddress) }";    
