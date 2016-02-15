@@ -475,6 +475,11 @@ class DatasetService extends AbstractMetadataService {
             conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);
             conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_parsedNamess+"(id serial primary key, sciName text, clean_sciName text, canonicalForm text, species text, genus text, family text, order1 text, class text, phylum text, kingdom text, commonName text, taxonrank text, taxonId bigint, acceptedId bigint, recommendation_id bigint)");
             conn.executeInsert("INSERT INTO "+ tmpBaseDataTable_parsedNamess +  " (sciName, species, genus, family, order1, class, phylum, kingdom, commonname, taxonrank) select scientificname, species, genus, family, order1, class, phylum, kingdom, vernacularname,taxonrank from "+tmpNewBaseDataTable + " group by scientificname, species, genus, family, order1, class,phylum,kingdom, vernacularname,taxonrank");
+            conn.execute('''
+            alter table '''+tmpBaseDataTable_parsedNamess+''' add column key text;
+            update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
+            ''')
+
 
             uploadLog << "\nTime taken for creating annotations ${((new Date()).getTime() - startTime.getTime())/1000} sec"
 
@@ -486,8 +491,6 @@ class DatasetService extends AbstractMetadataService {
 conn.execute('''
 alter table '''+tmpBaseDataTable_namesList+''' add column key text;
 update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
-alter table '''+tmpBaseDataTable_parsedNamess+''' add column key text;
-update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
 ''')
 
             conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " as x set canonicalForm = n.canonicalForm, taxonId = n.taxonId, acceptedId = n.acceptedId from "+tmpBaseDataTable_namesList+" n where n.key=x.key");
@@ -577,7 +580,7 @@ update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genu
         try {
             conn = new Sql(dataSource);
             //FIX:sciName could be repeated in parsed_names table
-            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = canonicalform and taxonId = r.taxon_concept_id");
+            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = lower(canonicalform) and taxonId = r.taxon_concept_id");
         } finally {
             conn.close();
         }
