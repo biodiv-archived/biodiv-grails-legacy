@@ -1078,13 +1078,15 @@ class ObservationService extends AbstractMetadataService {
             }
             query = query [0..-2];
             queryParams['fetchField'] = params.fetchField
-        }else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
+            query += " from Observation obv ";
+        } else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
             query += " g2 "
+            query += " from Observation obv inner join fetch obv.author left join fetch obv.maxVotedReco left outer join fetch obv.reprImage ";
         } 
         else {
             query += " obv "
+            query += " from Observation obv inner join fetch obv.author left join fetch obv.maxVotedReco left outer join fetch obv.reprImage ";
         }
-        query += " from Observation obv inner join fetch obv.author left join fetch obv.maxVotedReco left outer join fetch obv.reprImage "
         //def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
         def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '';
