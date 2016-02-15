@@ -77,13 +77,13 @@ function initializeGallery(resources){
         gallCount +=1;
         if(photo.type == 'Image' || photo.type == 'Video'){
             // Adding Thumbnail
-            $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org")+'" /></li>');
+            $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
 
         }    
         // For Slider         
         if(photo.type == 'Image'){
             carouselLinks.push({
-                 href: photo.url.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org").replace('.jpg','_gall.jpg'),
+                 href: photo.url.replace('.jpg','_gall.jpg'),
                  title: gallCount+'/'+isImageOrVideo.length
             });
         }else if(photo.type == 'Video'){
@@ -99,7 +99,7 @@ function initializeGallery(resources){
 
     if(isAudio.length >= 1){
         $('.noTitle').after('<div class="audio_container" style="height: 130px;"></div>');
-        $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace("indiabiodiversity.localhost.org", "indiabiodiversity.org").replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
+        $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
         $.each(isAudio, function (index, resource) {
             $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index));
         });
@@ -110,7 +110,7 @@ function initializeGallery(resources){
         var audio_playlist = '<ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">';
         $.each(isAudio, function (index, audio) {
             audio_playlist += '<li class="active" style="display: inline;">';
-            audio_playlist += '<a href="'+audio.url.replace("indiabiodiversity.localhost.org", "indiabiodiversity.org").replace('biodiv/','biodiv/observations/')+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
+            audio_playlist += '<a href="'+audio.url.replace('biodiv/','biodiv/observations/')+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
             audio_playlist += '</li>';
         });
         audio_playlist += '</ul>';
