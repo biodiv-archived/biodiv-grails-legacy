@@ -96,11 +96,7 @@
             #commonNames select{
                 width:245px;
                 margin-left:-15px;
-            } 
-            .gallery_wrapper{
-                top: -20px;
-            }  
-            
+            }            
         </style>
 
         <!--[if lt IE 8]><style>

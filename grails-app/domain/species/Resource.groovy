@@ -10,6 +10,7 @@ import species.utils.Utils;
 import org.grails.rateable.*
 import content.eml.Document;
 import species.participation.UsersResource;
+import grails.converters.JSON
 
 class Resource extends Sourcedata implements Rateable {
 	
@@ -132,7 +133,9 @@ class Resource extends Sourcedata implements Rateable {
 
 		switch(type) {
 			case  ResourceType.IMAGE :
-                if(url) {
+                if(url && url.endsWith('no-image.jpg')) {
+                    return ;
+                } else if(url) {
                     thumbnailUrl = url;
                 } else {
 				    thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
@@ -232,5 +235,17 @@ class Resource extends Sourcedata implements Rateable {
 		}
 		
 	}
-	
+
+    def fetchAnnotations() {
+        def m = [:];
+        if(this.annotations) {
+            JSON.parse(this.annotations).each {
+                if(it.value) {
+                    m[it.key] = ['value':it.value]
+                }
+            }
+        }
+        return m
+            
+    }
 }

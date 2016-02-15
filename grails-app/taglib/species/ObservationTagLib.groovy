@@ -251,7 +251,6 @@ class ObservationTagLib {
 		out << render(template:"/observation/showCustomFieldsTemplate", model:attrs.model);
 	}
 
-	
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource

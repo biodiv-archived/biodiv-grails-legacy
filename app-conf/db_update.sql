@@ -534,6 +534,9 @@ create index on observation(max_voted_reco_id);
 create index on recommendation(taxon_concept_id);
 create index on observation(is_checklist, is_deleted, is_showable);
 create index on observation(last_revised desc, id asc);
+CREATE INDEX observation_topology_gist ON observation USING GIST (topology);
+ANALYZE observation;
+VACUUM ANALYZE observation;
 
 ALTER TABLE observation ENABLE TRIGGER ALL ;
 

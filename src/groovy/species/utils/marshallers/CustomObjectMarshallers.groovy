@@ -165,17 +165,12 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(Resource) {
             println 'Resource Marshaller'
             def basePath = '';
-            
-            if(it.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
-                basePath = grailsApplication.config.speciesPortal.observations.serverURL
-            }
-            else if(it.context?.value() == Resource.ResourceContext.SPECIES.toString() || it?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
-                basePath = grailsApplication.config.speciesPortal.resources.serverURL
-            }
-
+            String originalUrl = it.thumbnailUrl(basePath, null, ImageType.ORIGINAL);
             def imagePath = it.thumbnailUrl(basePath);
-
-            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'licenses':it.license, 'contributors':it.contributors, 'attributors': it.attributors];
+            def result = ['id':it.id, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'license':it.license, 'contributors':it.contributors, 'attributors': it.attributors, 'annotations':it.fetchAnnotations()];
+            if(originalUrl) result['url'] = originalUrl;
+            if(imagePath) result['icon'] = imagePath;
+            return result;
         }
 	
 		JSON.registerObjectMarshaller(Comment) {

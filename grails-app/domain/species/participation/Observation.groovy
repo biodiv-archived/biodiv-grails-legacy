@@ -245,13 +245,9 @@ class Observation extends DataObject {
 	 */
 	Resource mainImage() {
 		def res = reprImage ? [reprImage] : null;//:listResourcesByRating(1);
-        println this.id
         if(res && !res.fileName[0].equals('i'))  {
-            println "Main Image =========="
-            println res[0].fileName;
             return res[0]
         } else {
-            println "MainImage =========="
 			return group?.icon(ImageType.ORIGINAL)
         }
 	}
@@ -705,14 +701,14 @@ class Observation extends DataObject {
         }
 
         def results = sql.rows(query, queryParams);
-        def idList = results.collect { println "1 : "+it;it[0] }
+        def idList = results.collect { it[0] }
 
         if(idList) {
             def instances = Resource.withCriteria {  
                 inList 'id', idList 
                 cache params.cache
             }
-            results.collect {  r-> println "2 : "+r;instances.find { i -> r[0] == i.id } }                           
+            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
         } else {
             []
         }
@@ -765,7 +761,6 @@ class Observation extends DataObject {
                     m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key].url]
                 }
             }
-            println m
             res = m;
         }
 		return res

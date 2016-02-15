@@ -89,11 +89,7 @@
                     <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:i]"/>
                 </g:if>
                 <%
-                    def licenseList = r?.licenses?.asList()
-                    def firstLicense
-                    if(licenseList.size() != 0){
-                        firstLicense = licenseList.first()
-                    }
+                def firstLicense = r?.license
                 %>
                 <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':firstLicense]"/>
                

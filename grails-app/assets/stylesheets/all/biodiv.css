@@ -3222,6 +3222,7 @@ small {
     opacity: .6;
     color: white;
     padding: 5px 0px;
+    overflow: hidden;
 }
 .image_info a{
     color:white;
@@ -3236,7 +3237,7 @@ small {
     margin-top: 0px;
 }
 .conts_wrap ol{
-  margin-left: 70px;
+  /*margin-left: 70px;*/
 }
 .conts_wrap ol li{
     float:left;
@@ -3262,7 +3263,9 @@ small {
   width: 610px;
 }
 
-
+.gallery_wrapper{
+    top: -20px;
+}  
 
 .gallery_wrapper .jc{
     width: 565px;
@@ -3281,3 +3284,63 @@ small {
 .gallery_wrapper .jcarousel-skin-ie7 .jcarousel-clip-horizontal{
 	width: 565px;
 }
+
+.audioAttr{
+	  background-color: white !important;
+}
+
+.audio_container{
+	height: 120px;
+}
+
+.audio_container #playlist{
+	  height: 23px;
+}
+
+.galleryWrapper{
+	height: 450px;
+	position:relative;
+}
+li.group_option{
+    height:30px;
+}
+li.group_option span{
+    padding: 0px;
+    float: left;
+}
+.groups_super_div{
+    margin-top: -15px;
+    margin-right: 10px;
+}
+.groups_div > .dropdown-toggle{
+    height: 25px;
+}
+.group_options, .group_option{
+    min-width: 110px;
+}
+.save_group_btn{
+    float: right;
+    margin-right: 11px;
+    margin-top: -9px;
+}
+.group_icon_show_wrap{
+    border: 1px solid #ccc;
+    float: right;
+    height: 33px;
+    margin-right: 4px;
+}
+.edit_group_btn{
+    top: -10px;
+    position: relative;
+    margin-right: 12px;
+}
+.propagateGrpHab{
+    display:none;
+    float: right;
+    margin-top: -5px;
+}
+
+.group_icon_show_wrap{
+        float:left;
+    }
+
