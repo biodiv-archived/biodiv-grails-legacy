@@ -3236,7 +3236,7 @@ small {
     margin-top: 0px;
 }
 .conts_wrap ol{
-  margin-left: 70px;
+  /*margin-left: 70px;*/
 }
 .conts_wrap ol li{
     float:left;
@@ -3262,7 +3262,9 @@ small {
   width: 610px;
 }
 
-
+.gallery_wrapper{
+    top: -20px;
+}  
 
 .gallery_wrapper .jc{
     width: 565px;

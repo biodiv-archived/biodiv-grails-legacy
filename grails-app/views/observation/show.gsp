@@ -113,45 +113,20 @@ if(r) {
                                </div>
 
                 <div class="span8 right-shadow-box" style="margin: 0;">
-                    <div class="noTitle" style="height: 462px;position:relative">
-                        <div class="story-footer" style="padding: 3px 3px;right:0;bottom:331px;z-index:5;background-color:whitesmoke" >
-                            <g:render template="/common/observation/noOfResources" model="['instance':observationInstance, 'bottom':'bottom:55px;']"/>
-                        </div>
-                        <center>
-                            <div id="gallerySpinner" class="spinner">
-                                <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
-                            </div>
-
-
-                            <div class="gallery_wrapper" style="display:none;">
-
-                                <div class="container1 noselect">
-                                    <div class="jc jcarousel-skin-ie7">
-                                        <ul class="jc_ul">
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div id="blueimp-image-carousel" class="blueimp-gallery blueimp-gallery-carousel blueimp-gallery-controls">
-                                    <div class="slides"></div>
-                                    <h3 class="title"></h3>
-                                    <a class="prev">‹</a>
-                                    <a class="next">›</a>
-                                    <a class="play-pause"></a>
-                                </div>
-
-                                <div class="image_info">    
-                                </div>
-
-                            </div>
-
-                        </center>                                     
+                <center>
+                    <div id="gallerySpinner" class="spinner">
+                        <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
                     </div>
+                </center>
+                <div class="noTitle" style="height: 462px;position:relative">
+                    <g:render template="/observation/galleryTemplate" model="['instance': observationInstance]"/>
+                </div>
 
-                    <obv:showStory model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
+                <obv:showStory
+                model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
 
-                    <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+                <obv:showCustomFields model="['observationInstance':observationInstance]"/>
 
 
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
