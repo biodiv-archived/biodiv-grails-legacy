@@ -3248,7 +3248,9 @@ small {
   width: 610px;
 }
 
-
+.gallery_wrapper{
+    top: -20px;
+}  
 
 .gallery_wrapper .jc{
     width: 565px;
