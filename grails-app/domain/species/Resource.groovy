@@ -133,7 +133,9 @@ class Resource extends Sourcedata implements Rateable {
 
 		switch(type) {
 			case  ResourceType.IMAGE :
-                if(url) {
+                if(url && url.endsWith('no-image.jpg')) {
+                    return ;
+                } else if(url) {
                     thumbnailUrl = url;
                 } else {
 				    thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
