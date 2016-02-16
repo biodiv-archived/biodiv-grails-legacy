@@ -1948,4 +1948,17 @@ private printCacheEntries(cache) {
 
     }
 }
+
+def getObjResources(){
+        if(params.id && params.instance){            
+            def objInstance;
+            if(params.instance == 'species'){
+                objInstance = Species.get(params.long('id'));
+            }else if(params.instance == 'observation'){
+                objInstance = Observation.get(params.long('id'));
+            }
+            render objInstance?.listResourcesByRating() as JSON;
+        }
+    }
+
 }

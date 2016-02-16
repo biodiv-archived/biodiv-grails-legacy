@@ -3169,13 +3169,14 @@ small {
     width:100px;
     height:75px;
 }
-.container1{
+.thumb_container{
     position: relative;
     height: 85px;
     overflow: hidden;
     background-color:grey;
     z-index:1;
     top:20px;
+    padding-top: 9px;
 }
 .gallery_wrapper #left, .gallery_wrapper #right {
     cursor: pointer;
@@ -3221,7 +3222,7 @@ small {
     background-color: rgb(56, 54, 54);
     opacity: .6;
     color: white;
-    padding: 5px 0px;
+    padding: 2px 0px;
     overflow: hidden;
 }
 .image_info a{
@@ -3229,12 +3230,14 @@ small {
     float: left;
 }
 .conts_wrap{
-      margin-left: 10px !important;
+    margin-left: 10px !important;
+    margin-top: -10px;
 }
-.conts_wrap h5{
-    
+.conts_wrap_line{
+	margin-left: 6px !important;
+}
+.conts_wrap h5{    
     margin-bottom: 0px;
-    margin-top: 0px;
 }
 .conts_wrap ol{
   /*margin-left: 70px;*/
@@ -3243,9 +3246,19 @@ small {
     float:left;
     font-style: italic
 }
+.conts_wrap_line .annotationsWrapper{
+	background: none;
+}
+.conts_wrap_line .annotationsWrapper table tr td{
+	border-top:none;
+	padding:0px 9px;
+}
 .license .icon{
     border-radius:0px;
     box-shadow:none;
+}
+.license .noOfRatings{
+	margin-left: 30px;
 }
 .slideUp{
     background-image: url(/assets/glyphicons-halflings-white.png);
@@ -3274,7 +3287,6 @@ small {
 .gallery_wrapper .jc ul li img{
     padding: 0px;
     border: 0px;
-    width: 100px;
     max-height: 75px;
 }
 .gallery_wrapper .jcarousel-skin-ie7 .jcarousel-item-horizontal{
@@ -3300,6 +3312,12 @@ small {
 .galleryWrapper{
 	height: 450px;
 	position:relative;
+}
+.galleryWrapper .story-footer{
+	right:0;
+	bottom:336px;
+	z-index:5;
+	background-color:whitesmoke;
 }
 li.group_option{
     height:30px;
@@ -3344,3 +3362,6 @@ li.group_option span{
         float:left;
     }
 
+.gallery_wrapper .blueimp-gallery > .title{
+	font-size: inherit;
+}
