@@ -447,7 +447,7 @@ class DatasetService extends AbstractMetadataService {
         String multimediaFileName = (new File(directory, 'multimedia.txt')).getAbsolutePath(); 
         String namesFileName = (new File(directory, 'gbif_names_all_with_idswithoutspchar.csv')).getAbsolutePath(); 
         Date startTime = new Date();
-/*         try {
+         try {
             uploadLog << "\nCreating base table for ${occurencesFileName}";
 
             conn.execute('''
@@ -502,7 +502,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             conn.close();
         }
         uploadLog << "\nTime taken for creating tables ${((new Date()).getTime() - startTime.getTime())/1000} sec"
-*/
+
         ///////////////////////////
         //Parsing Names
         ///////////////////////////
@@ -567,6 +567,9 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             uploadLog << "\nInserting new sci names into recommendations";
             noOfSciNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name,taxon_concept_id, accepted_name_id, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.canonicalform, 't', t.taxonId, t.acceptedId, lower(t.canonicalForm), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.canonicalForm) = r.lowercase_name and (t.taxonId=r.taxon_concept_id or (t.taxonId is null and r.taxon_concept_id is null)) and r.is_scientific_name='t' where r.name is null and t.canonicalForm is not null group by t.canonicalForm, t.taxonId,t.acceptedId");
 
+            //handling canonical form null by taking in sciname as is
+            noOfSciNames += conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name,taxon_concept_id, accepted_name_id, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.sciname, 't', t.taxonId, t.acceptedId, lower(t.sciname), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on t.sciName=r.name where r.name is null and t.canonicalForm is null and t.sciname is not null");
+
             println noOfSciNames;
             uploadLog << "\nInserting new common names into recommendations";
             noOfCommonNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.commonname, 'f', lower(t.commonname), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.commonname) = r.lowercase_name and (r.is_scientific_name='f' or r.is_scientific_name is null) and r.language_id=:defaultLanguageId where r.name is null and t.commonname is not null group by t.commonname", [defaultLanguageId:Language.getLanguage().id]);
@@ -580,7 +583,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         try {
             conn = new Sql(dataSource);
             //FIX:sciName could be repeated in parsed_names table
-            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = lower(canonicalform) and taxonId = r.taxon_concept_id and acceptedId = r.accepted_name_id");
+            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where ((canonicalform is not null and r.lowercase_name = lower(canonicalform)) or (sciname is not null and r.lowercase_name = lower(sciname))) and ((taxonId is null and r.taxon_concept_id is null) or (taxonId = r.taxon_concept_id)) and ((acceptedId is null and r.accepted_name_id is null) or (acceptedId = r.accepted_name_id))");
         } finally {
             conn.close();
         }
@@ -605,6 +608,9 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             conn = new Sql(dataSource);
 
             conn.executeUpdate("update " + tmpNewBaseDataTable + " as g set recommendation_id = t1.recommendation_id, group_id=t2.group_id, habitat_id=:defaultHabitatId from "+tmpBaseDataTable_parsedNamess+" t1 join taxonomy_definition t2 on t1.taxonid is not null and t1.taxonid = t2.id where t1.key=g.key",  [defaultHabitatId:Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]) ;
+
+            //handling taxonid null case
+            conn.executeUpdate("update " + tmpNewBaseDataTable +"  as g set recommendation_id = t1.recommendation_id, group_id=:defaultSpeciesGroupId,habitat_id=:defaultHabitatId from gbifdata_parsed_names  t1 where g.key=t1.key and t1.taxonid is null and t1.recommendation_id is not null and g.scientificname is not null",  ['defaultSpeciesGroupId':SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id, 'defaultHabitatId':Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]);
 
             conn.executeUpdate("update " + tmpNewBaseDataTable + " set commonname_reco_id = t1.id from recommendation t1 where t1.name = vernacularname;") ;
         } finally {
@@ -662,9 +668,13 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
         insert into resource_contributor(resource_contributors_id,contributor_id) select r.id, c.id from '''+tmpBaseDataTable_multimedia+''' o, resource r, contributor c where o.gbifId=r.gbifID and o.rightsholder=c.name;
 
+        conn.executeUpdate("ALTER TABLE observation DISABLE TRIGGER ALL ;");
         update observation set is_showable='t' where id in (select o.observation_id from observation_resource o, resource r where o.resource_id=r.id and r.gbifid is not null);
 
         ''');
+
+           conn.execute("delete from observation as o1 where o1.id in (select id from observation left outer join observation_resource on id=observation_id where external_id is not null and max_voted_reco_id is null and resource_id is null)");
+        conn.executeUpdate("ALTER TABLE observation ENABLE TRIGGER ALL ;");
 
         } finally {
         conn.close();

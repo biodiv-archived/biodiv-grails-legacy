@@ -205,7 +205,8 @@ var getSnippetTabletHTML = function(carousel, item) {
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
-	var imageTag = '<span class="img-polaroid" stype="background-image:url("' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
+    console.log(item);
+	var imageTag = '<span class="img-polaroid" stype="background-image:url(' + item.imageLink + paramsString  + ');" title="' + item.title  +'" alt="" />';
 
     var listTemplateIcon = '';
     if(item.dataset_id) {
