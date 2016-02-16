@@ -1,6 +1,7 @@
 package species
 
 import java.util.List;
+
 import org.hibernate.Hibernate;
 
 import species.ScientificName.TaxonomyRank
@@ -62,6 +63,7 @@ class TaxonomyDefinition extends ScientificName {
 		dirtyListReason nullable:true;
 		lowercaseMatchName nullable:true;
 		defaultHierarchy nullable:true;
+		speciesId nullable:true;
 	}
 
 	static mapping = {
@@ -497,7 +499,8 @@ class TaxonomyDefinition extends ScientificName {
 					synToAdd.relationship = XMLConverter.getRelationship(null)
 					
 					try{
-						synToAdd = synToAdd.merge()
+						def mergedSyn = synToAdd.merge()
+						synToAdd = mergedSyn ?:synToAdd
 						if(!synToAdd.save(flush:true)){
 							synToAdd.errors.allErrors.each { println  it }
 						}
@@ -544,8 +547,9 @@ class TaxonomyDefinition extends ScientificName {
 				}
 			}
 			def obj = merge()
+			obj = obj?:this
 			if(!obj.save()) {
-				this.errors.allErrors.each { log.error it }
+				obj.errors.allErrors.each { log.error it }
 			}
 		}
 	}
@@ -634,6 +638,22 @@ class TaxonomyDefinition extends ScientificName {
 			log.error e.getMessage()
 			e.printStackTrace()
 		}
+	}
+	
+	static TaxonomyDefinition fetchAccepted(TaxonomyDefinition td) {
+		if(!td)
+			return null
+		
+		if(td.status == NameStatus.ACCEPTED){
+			return td
+		}
+		
+		List acceptedList = AcceptedSynonym.fetchAcceptedNames(td);
+		if(acceptedList &&  (acceptedList.size() == 1)){
+			return acceptedList[0]
+		}
+		
+		return null
 	}
 
 }

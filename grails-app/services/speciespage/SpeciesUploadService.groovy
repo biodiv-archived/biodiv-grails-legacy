@@ -729,7 +729,7 @@ class SpeciesUploadService {
 
     File saveModifiedSpeciesFile(params){
         try{
-        def gData = JSON.parse(params.gridData)
+        def gData //= JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
 
