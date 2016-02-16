@@ -115,7 +115,6 @@ def grailsCacheManager;
         utilsService.logSql {
             model = runLastListQuery(params);
         }
-println "bfr renderin"
         /*Map cacheEntries = sessionFactory.getStatistics()
                 .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
                         .getEntries();
@@ -125,9 +124,7 @@ println "bfr renderin"
             model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
-            println 'obvListHtml'
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-            println 'obvFilterMsgHtml'
             def tagsHtml = "";
             if(model.showTags) {
                 //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})

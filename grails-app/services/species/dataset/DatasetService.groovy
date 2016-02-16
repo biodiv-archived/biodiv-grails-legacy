@@ -668,7 +668,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
         insert into resource_contributor(resource_contributors_id,contributor_id) select r.id, c.id from '''+tmpBaseDataTable_multimedia+''' o, resource r, contributor c where o.gbifId=r.gbifID and o.rightsholder=c.name;
 
-        conn.executeUpdate("ALTER TABLE observation DISABLE TRIGGER ALL ;");
+        ALTER TABLE observation DISABLE TRIGGER ALL;
         update observation set is_showable='t' where id in (select o.observation_id from observation_resource o, resource r where o.resource_id=r.id and r.gbifid is not null);
 
         ''');

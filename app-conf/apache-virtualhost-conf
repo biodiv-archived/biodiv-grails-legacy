@@ -1,7 +1,7 @@
 <VirtualHost *:80>
     ProxyRequests Off
-    ProxyPass /geoserver http://indiabiodiversity.saturn.strandls.com/geoserver
-    ProxyPassReverse /geoserver http://indiabiodiversity.saturn.strandls.com/geoserver
+    ProxyPass /geoserver http://pamba.strandls.com/geoserver
+    ProxyPassReverse /geoserver http://pamba.strandls.com/geoserver
     ServerName indiabiodiversity.localhost.org
     ServerAlias www.indiabiodiversity.localhost.org
     DirectoryIndex index.php index.html index.html index.htm index.shtml
@@ -13,7 +13,7 @@
     RewriteRule /biodiv/datasources/.* - [L]
     RewriteRule ^/biodiv/(datasources|observations|newsletters|group-themes|users|userGroups|img|content|group_icons|datasources)|(wgp_maps|geoserver) - [L]
     RewriteCond  %{REQUEST_URI} ^/(geoserver|biodiv/maps/thumbnails)
-    RewriteRule  /(.*)$ http://indiabiodiversity.saturn.strandls.com/$1 [P,L]
+    RewriteRule  /(.*)$ http://pamba.strandls.com/$1 [P,L]
 
     RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|.*/upload_resource|emailConfirmation|ck|authAjax).*
     RewriteRule ^/biodiv(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P]
