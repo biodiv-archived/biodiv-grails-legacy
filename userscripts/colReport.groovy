@@ -5,6 +5,7 @@ import species.participation.*;
 import species.auth.*;
 import species.*;
 import species.participation.SpeciesBulkUpload.Status
+import groovy.sql.Sql
 
 def uploadGbifNames(newJob=true){
 	def suc = ctx.getBean("speciesUploadService");
@@ -146,7 +147,7 @@ def getAccepteNameId(String id){
 		}
 		
 		def accList = AcceptedSynonym.fetchAcceptedNames(td)
-		println "synonym id " + id + "   accList " + accList
+		//println "synonym id " + id + "   accList " + accList
 		if(accList.size() == 1){
 			return accList[0].id
 		}
@@ -189,8 +190,33 @@ def addAcceptedTaxonId(){
 		}
 	}
 }
+
+
+def addRecoAcceptedId(){
+	def query = " select distinct(r.taxon_concept_id) from recommendation r, taxonomy_definition  td where r.taxon_concept_id = td.id and td.status = 'SYNONYM' and r.taxon_concept_id is not null; "
+
+	def ds = ctx.getBean("dataSource");
+	ds.setUnreturnedConnectionTimeout(500);
+	int count = 0
 	
-addAcceptedTaxonId()
+	Sql conn = new Sql(ds);
+	def idList = conn.rows(query);
+	
+	idList.each {
+		def id = it.taxon_concept_id
+		count++
+		if(count%100 == 0)
+			println "----------------- count " + count
+		
+		def accId = getAccepteNameId('' + id)
+		accId = accId ?: "NULL"
+		conn.executeUpdate("update recommendation set accepted_name_id = " + accId + " where taxon_concept_id = " + id )
+	}
+
+}
+
+addRecoAcceptedId()
+//addAcceptedTaxonId()
 //addFieldForGbif()
 //nameParse()
 //uploadGbifNames(false)

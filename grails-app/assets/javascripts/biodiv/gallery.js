@@ -1,46 +1,50 @@
-var carouselLinks =[],gallery ;
+var carouselLinks =[],gallery,defaultObvThumb ;
 
 //For Audio 
-        var audio;
-        var playlist;
-        var tracks;
-        var current;
+var audio;
+var playlist;
+var tracks;
+var current;
 
-        //audioInit();
-        function audioInit(){
+//audioInit();
+function audioInit(){
+    current = 0;
+    audio = $('audio');
+    playlist = $('#playlist');
+    tracks = playlist.find('li a');
+    len = tracks.length - 1;
+    audio[0].volume = .10;
+    //audio[0].play();
+    playlist.find('a').click(function(e){
+        e.preventDefault();
+        link = $(this);                
+        $('.audioAttr').hide();
+        $('.audioAttr_'+$(this).attr('rel')).show();
+        current = link.parent().index();
+        run(link, audio[0]);    
+    });
+/*    audio[0].addEventListener('ended',function(e){
+        current++;
+        if(current == len){
             current = 0;
-            audio = $('audio');
-            playlist = $('#playlist');
-            tracks = playlist.find('li a');
-            len = tracks.length - 1;
-            audio[0].volume = .10;
-            //audio[0].play();
-            playlist.find('a').click(function(e){
-                e.preventDefault();
-                link = $(this);                
-                $('.audioAttr').hide();
-                $('.audioAttr_'+$(this).attr('rel')).show();
-                current = link.parent().index();
-                run(link, audio[0]);    
-            });
-        /*    audio[0].addEventListener('ended',function(e){
-                current++;
-                if(current == len){
-                    current = 0;
-                    link = playlist.find('a')[0];
-                }else{
-                    link = playlist.find('a')[current];    
-                }
-                run($(link),audio[0]);
-            }); */
+            link = playlist.find('a')[0];
+        }else{
+            link = playlist.find('a')[current];    
         }
-        function run(link, player){
-                player.src = link.attr('href');
-                par = link.parent();
-                par.addClass('active').siblings().removeClass('active');
-                audio[0].load();
-                audio[0].play();
-        }
+        run($(link),audio[0]);
+    }); */
+}
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+function run(link, player){
+        player.src = link.attr('href');
+        par = link.parent();
+        par.addClass('active').siblings().removeClass('active');
+        audio[0].load();
+        audio[0].play();
+}
 
 function youtube_parser(url){
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
@@ -48,20 +52,20 @@ function youtube_parser(url){
     return (match&&match[7].length==11)? match[7] : false;
 }
 
-function updateGallery1(resources){
+function updateGallery1(resources,domainObj){
     if(resources.length == 0){
         console.log('Error: Resources is Empty');
-        $('.noTitle, #gallerySpinner').hide();
+        $('.galleryWrapper, #gallerySpinner').hide();
         return false;
     }        
-    initializeGallery(resources);        
+    initializeGallery(resources,domainObj);        
    
     rate($('.star_gallery_rating'));   
     $('.mover img').css('opacity','initial');
 
 
 }
-function initializeGallery(resources){
+function initializeGallery(resources,domainObj){
     console.log(resources.length);
     var isAudio = [];
     var isImageOrVideo = [];
@@ -76,6 +80,8 @@ function initializeGallery(resources){
     var gallCount =0;
     $.each(isImageOrVideo, function (index, photo) {
         gallCount +=1;
+        photo.url = (photo.url)?photo.url:defaultObvThumb.replace('_th1','_gall');
+        photo.icon = (photo.icon)?photo.icon:defaultObvThumb;
         if(photo.type == 'Image' || photo.type == 'Video'){
             // Adding Thumbnail
             $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
@@ -99,7 +105,12 @@ function initializeGallery(resources){
    });
 
     if(isAudio.length >= 1){
-        $('.noTitle').after('<div class="audio_container" style="height: 130px;"></div>');
+        if(domainObj == 'observation') {
+            $('.galleryWrapper').after('<div class="audio_container"></div>');
+        }else{
+            $('#resourceTabs').after('<div class="audio_container" style="height:110px;"></div>');        
+        }
+        
         $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
         $.each(isAudio, function (index, resource) {
             $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index));
@@ -115,6 +126,11 @@ function initializeGallery(resources){
             audio_playlist += '</li>';
         });
         audio_playlist += '</ul>';
+       if(domainObj == 'observation') {
+            $('.audio_container').css('height','150px');
+        }else{
+             $('.audio_container').css('height','140px')
+        }
         $('.audio_container').prepend(audio_playlist);
         audioInit();        
     }
@@ -189,8 +205,35 @@ function update_imageAttribute(resource,ele,index){
         output += '<br /><a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
     }
 
-    if(resource.annotations){
+    if(resource.annotations && (resource.annotations.length > 0)){
         // Todo for Annotation
+        output += '<div class="annotationsWrapper">';
+        output += '<table class="table table-hover" style="margin: 0px;table-layout:fixed;display:block;overflow-y:auto;">';
+        output += '<tbody>';
+        $.each(resource.annotations, function (index, annotation) {
+            if(annotation.value){
+                output += '<tr>';
+                output += '<td style="word-wrap:break-word;">';
+                if($.isArray(annotation.value) && annotation.value.url) {
+                    output += '<a href="'+annotation.value.url+'">'+annotation.key.replace("_", " ").capitalize()+'</a>';
+                }else{
+                    output += annotation.key.replace("_", " ").capitalize();
+                }
+                output += '</td>';
+                output += '<td class="ellipsis multiline linktext" style="word-wrap:break-word;">';
+                if($.isArray(annotation.value)){
+                    output += annotation.value.value;
+                }else{
+                     output += annotation.value;
+                }
+                output += '</td>';
+                output += '</tr>';
+            }
+        });
+        output += '</tbody>';
+        output += '</table>';
+        output += '</div>';
+
     }
     output += '</div>';
 
@@ -268,10 +311,13 @@ function galleryAjax(url,domainObj){
     if(domainObj == 'observation'){
         console.log('observation==========================');
         console.log(result.instance.resource);
-        updateGallery1(result.instance.resource);
+        defaultObvThumb = result.instance.thumbnail;
+        updateGallery1(result.instance.resource,domainObj);
+
     }else{
         console.log('species==========================');
-        updateGallery1(result);
+        defaultObvThumb = result.thumbnail;
+        updateGallery1(result,domainObj);
     }
     });
 }
