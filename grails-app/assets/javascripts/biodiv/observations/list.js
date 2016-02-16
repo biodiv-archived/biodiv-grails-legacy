@@ -1330,8 +1330,10 @@ function appendGallery(ovbId,images){
 function loadSpeciesnameReco(){
     $('.showObvDetails').each(function(){
         var observationId = $(this).attr('rel');
-        $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="'+window.params.spinnerURL+'" alt="Loading..." /></li>')
-        preLoadRecos(3, 0, false,observationId);
+        if(!$(this).find('.recoSummary_'+observationId).hasClass('addSuccess')){
+            $(".recoSummary_"+observationId).html('<li style="text-align: center;"><img src="'+window.params.spinnerURL+'" alt="Loading..." /></li>')
+            preLoadRecos(3, 0, false,observationId);
+        }
     });
 }
 function addListLayout(){
@@ -1341,7 +1343,7 @@ function addListLayout(){
     $('.showObvDetails, .view_bootstrap_gallery').show();
     $('.species_title_wrapper').hide();
     $('.species_title_wrapper').parent().css({'height':'0px'});
-    loadSpeciesnameReco();
+    //loadSpeciesnameReco();
     initializeLanguage();
 
 }

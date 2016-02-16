@@ -40,7 +40,7 @@
 		
 			<%
 				def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
-				def styleviewcheck = (params?.view=="list")? true:false;
+				def styleviewcheck = (!params?.view || params?.view !="grid")? true:false;
 			%>
 			<ul class="grid_view thumbnails obvListwrapper">
 			
