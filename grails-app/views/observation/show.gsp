@@ -310,8 +310,7 @@ $(document).ready(function(){
 
 <script type="text/javascript">
     $(document).ready(function(){
-        var obvUrl = window.params.getObvJSONurl+'/'+${observationInstance.id}+'.json';
-            galleryAjax(obvUrl,'observation');
+            galleryAjax(window.params.getResourceUrl+'/'+${observationInstance.id},'observation');
     });
 </script>
 

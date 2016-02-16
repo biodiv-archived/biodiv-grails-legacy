@@ -1784,13 +1784,5 @@ render speciesInstanceList;
         });
         println "=====================++++"
     }
-
-
-    def getSpeciesResource(){
-        if(params.id){            
-            //params.id = params.long('id');
-            def speciesInstance = Species.get(params.long('id'));
-            render speciesInstance?.listResourcesByRating() as JSON;
-        }
-    }
+   
 }

@@ -310,25 +310,17 @@ $(document).on('click','.slide .slide-content',function(){
 
 
 function galleryAjax(url,domainObj){
+    console.log(url);
     $.ajax({
         url: url,
         data: {
-            format: 'json'
+            format: 'json',
+            instance:domainObj
         }
     }).done(function (result) {
         console.log(result);
-        console.log(domainObj)
-        var resources;
-    if(domainObj == 'observation'){
-        console.log('observation==========================');
-        console.log(result.instance.resource);
-        defaultObvThumb = result.instance.thumbnail;
-        updateGallery1(result.instance.resource,domainObj);
-
-    }else{
-        console.log('species==========================');
+        console.log(domainObj+'==========================');
         defaultObvThumb = result.thumbnail;
         updateGallery1(result,domainObj);
-    }
     });
 }
