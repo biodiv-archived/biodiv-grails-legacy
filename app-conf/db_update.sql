@@ -577,3 +577,4 @@ update recommendation_vote set given_common_name=reco.name from recommendation r
 #15 Feb
 update recommendation set accepted_name_id = taxon_concept_id;
 
+#run gbifMigration + colReport userscripts before gbifupload

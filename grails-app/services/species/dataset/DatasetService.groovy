@@ -447,7 +447,7 @@ class DatasetService extends AbstractMetadataService {
         String multimediaFileName = (new File(directory, 'multimedia.txt')).getAbsolutePath(); 
         String namesFileName = (new File(directory, 'gbif_names_all_with_idswithoutspchar.csv')).getAbsolutePath(); 
         Date startTime = new Date();
-         try {
+/*         try {
             uploadLog << "\nCreating base table for ${occurencesFileName}";
 
             conn.execute('''
@@ -502,7 +502,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             conn.close();
         }
         uploadLog << "\nTime taken for creating tables ${((new Date()).getTime() - startTime.getTime())/1000} sec"
-
+*/
         ///////////////////////////
         //Parsing Names
         ///////////////////////////
@@ -565,7 +565,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             conn = new Sql(dataSource);
 
             uploadLog << "\nInserting new sci names into recommendations";
-            noOfSciNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name,taxon_concept_id, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.canonicalform, 't', t.taxonId, lower(t.canonicalForm), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.canonicalForm) = r.lowercase_name and (t.taxonId=r.taxon_concept_id or (t.taxonId is null and r.taxon_concept_id is null)) and r.is_scientific_name='t' where r.name is null and t.canonicalForm is not null group by t.canonicalForm, t.taxonId");
+            noOfSciNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name,taxon_concept_id, accepted_name_id, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.canonicalform, 't', t.taxonId, t.acceptedId, lower(t.canonicalForm), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.canonicalForm) = r.lowercase_name and (t.taxonId=r.taxon_concept_id or (t.taxonId is null and r.taxon_concept_id is null)) and r.is_scientific_name='t' where r.name is null and t.canonicalForm is not null group by t.canonicalForm, t.taxonId,t.acceptedId");
 
             println noOfSciNames;
             uploadLog << "\nInserting new common names into recommendations";
@@ -580,7 +580,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         try {
             conn = new Sql(dataSource);
             //FIX:sciName could be repeated in parsed_names table
-            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = lower(canonicalform) and taxonId = r.taxon_concept_id");
+            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where r.lowercase_name = lower(canonicalform) and taxonId = r.taxon_concept_id and acceptedId = r.accepted_name_id");
         } finally {
             conn.close();
         }
