@@ -2230,7 +2230,9 @@ class XMLConverter extends SourceConverter {
                                 println "TAXON SAVED WITH NULL STATUS===========================" + taxon.status + "   id " + taxon.id
 								
                             }
-							taxon = taxon.merge();
+							
+							def mergedTaxon = taxon.merge();
+							taxon = mergedTaxon ?:taxon
 							//updating contributors
 							taxon.updateContributors(getUserContributors(fieldNode.data))
 							//updating name status given in sheet

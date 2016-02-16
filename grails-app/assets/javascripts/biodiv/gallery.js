@@ -142,6 +142,7 @@ function initializeGallery(resources,domainObj){
     gallery = blueimp.Gallery(carouselLinks, {
         container: '#blueimp-image-carousel',
             carousel: true, 
+            titleElement: 'h6',
             onopen: function () {
                 // Callback function executed when the Gallery is initialized.
                 $('#gallerySpinner').hide();
@@ -173,14 +174,14 @@ function update_imageAttribute(resource,ele,index){
         output += '<div class="row-fluid '+resourceType+'Attr '+resourceType+'Attr_'+index+'" style="display:none;">';
         output += '<div class="span6">';
 
-        if(resource.description){
-            output += '<div class="span5 ellipsis multiline" style="margin-left:0px">'+resource.description+'</div>';
-            output += '<div style="clear:both;"></div>'
+        if(resource.description && resource.description != ''){
+            output += '<div class="span12 ellipsis multiline" style="margin-left:0px">'+resource.description+'</div>';            
         }
 
 
         output += '<div class="conts_wrap">'
-        if(resource.contributors.length > 0){
+        if(resource.contributors && Object.keys(resource.contributors).length > 0){
+            output += '<div class="span12 conts_wrap_line">';
             output += '<h5>Contributors</h5>';
             console.log(resource.contributors);        
             $.each(resource.contributors, function (index, contributor) {     
@@ -188,36 +189,36 @@ function update_imageAttribute(resource,ele,index){
                 output += '<li>'+contributor.name+'</li>';
                 output += '</ol>';
             }); 
+            output += '</div>';            
         } 
 
-    if(resource.attributors.length > 0){
+    if(resource.attributors && Object.keys(resource.attributors).length > 0){
+        output += '<div class="span12 conts_wrap_line">';            
         output += '<h5>Attributors</h5>';
         console.log(resource.attributors);        
         $.each(resource.attributors, function (index, attributor) {     
             output += '<ol>';
             output += '<li>'+attributor.name+'</li>';
             output += '</ol>';
-        }); 
+        });
+        output += '</div>';             
     } 
 
-
-    if(resource.url){
-        output += '<br /><a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
-    }
-
-    if(resource.annotations && (resource.annotations.length > 0)){
-        // Todo for Annotation
+    if(resource.annotations && (Object.keys(resource.annotations).length > 0)){
+        output += '<div class="span12 conts_wrap_line">';            
+        output += '<h5>Annotations</h5>';
         output += '<div class="annotationsWrapper">';
-        output += '<table class="table table-hover" style="margin: 0px;table-layout:fixed;display:block;overflow-y:auto;">';
+        output += '<table class="table" style="margin: 0px;table-layout:fixed;display:block;overflow-y:auto;">';
         output += '<tbody>';
-        $.each(resource.annotations, function (index, annotation) {
+        $.each(resource.annotations, function (key,annotation) {
             if(annotation.value){
+                console.log(annotation.value);
                 output += '<tr>';
                 output += '<td style="word-wrap:break-word;">';
                 if($.isArray(annotation.value) && annotation.value.url) {
                     output += '<a href="'+annotation.value.url+'">'+annotation.key.replace("_", " ").capitalize()+'</a>';
                 }else{
-                    output += annotation.key.replace("_", " ").capitalize();
+                    output += key.replace("_", " ").capitalize();
                 }
                 output += '</td>';
                 output += '<td class="ellipsis multiline linktext" style="word-wrap:break-word;">';
@@ -233,8 +234,18 @@ function update_imageAttribute(resource,ele,index){
         output += '</tbody>';
         output += '</table>';
         output += '</div>';
+        output += '</div>';
 
     }
+
+
+    if(resource.url && resource.url !=''){
+        output += '<div class="span12 conts_wrap_line">';
+        output += '<a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
+        output += '</div>';
+    }
+
+
     output += '</div>';
 
     output += '</div>';
@@ -299,25 +310,17 @@ $(document).on('click','.slide .slide-content',function(){
 
 
 function galleryAjax(url,domainObj){
+    console.log(url);
     $.ajax({
         url: url,
         data: {
-            format: 'json'
+            format: 'json',
+            instance:domainObj
         }
     }).done(function (result) {
         console.log(result);
-        console.log(domainObj)
-        var resources;
-    if(domainObj == 'observation'){
-        console.log('observation==========================');
-        console.log(result.instance.resource);
-        defaultObvThumb = result.instance.thumbnail;
-        updateGallery1(result.instance.resource,domainObj);
-
-    }else{
-        console.log('species==========================');
+        console.log(domainObj+'==========================');
         defaultObvThumb = result.thumbnail;
         updateGallery1(result,domainObj);
-    }
     });
 }

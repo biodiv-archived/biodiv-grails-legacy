@@ -19,9 +19,8 @@
 <input type="hidden" id="userLanguage" value="${userLanguage?.id}" />
 <script type="text/javascript">
 $(document).ready(function() {
-    window.params = {
-                'getObvJSONurl' : "${uGroup.createLink(controller:'observation', action:'show', userGroupWebaddress:params.webaddress)}",
-                'getResourceUrl' : "${uGroup.createLink(controller:'species', action:'getSpeciesResource', userGroupWebaddress:params.webaddress)}",
+    window.params = {                
+                'getResourceUrl' : "${uGroup.createLink(controller:'observation', action:'getObjResources', userGroupWebaddress:params.webaddress)}",
                 'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",

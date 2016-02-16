@@ -51,8 +51,7 @@ function addDirtyRows(e, args) {
 };
 
 function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
-    $("#speciesGridSection").show();
-    var options = {
+	var options = {
         editable: true,
         enableAddRow: true,
         enableCellNavigation: true,
@@ -67,6 +66,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
         headerFunction = getSpeciesHeaderMenuOptions;
     }
     else{
+        $("#speciesGridSection").show();
         headerFunction = getHeaderMenuOptions;
     }
 
