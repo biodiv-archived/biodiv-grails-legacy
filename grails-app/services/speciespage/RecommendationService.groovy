@@ -278,12 +278,14 @@ class RecommendationService {
 				//converting common name to title case
 				name = Utils.getTitleCase(Utils.cleanName(name));
 			}
-			def reco;
+			Recommendation reco;
             utilsService.benchmark('searchReco') {
                 reco = searchReco(name, isScientificName, languageId, taxonConceptForNewReco)
             }
 			if(!reco && createNew) {
 				reco = new Recommendation(name:name, taxonConcept:taxonConceptForNewReco, isScientificName:isScientificName, languageId:languageId);
+				reco.acceptedName = TaxonomyDefinition.fetchAccepted(taxonConceptForNewReco)
+				
                 utilsService.benchmark('saveReco') {
                     if(!save(reco, true, false, flushImmediately)) {
                         reco = null;
@@ -304,25 +306,20 @@ class RecommendationService {
 			    like('lowercaseName', name.toLowerCase());
             else 
 			    eq('lowercaseName', name.toLowerCase());
+				
 			eq('isScientificName', isScientificName);
+			
 			(languageId) ? eq('languageId', languageId) : isNull('languageId');
-			if(taxonConcept){
-				eq('taxonConcept', taxonConcept)
-			}
+			
+			(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
 		}
 		
-		if(!recoList || recoList.isEmpty()){
+		if(!recoList){
 			return null
 		}
-		
-		// giving priority to reco which has taxon concept
-		recoList.each { Recommendation r ->
-			if(r.taxonConcept){
-				return r
-			}
-		}
-		
-		//no reco with taxon concept found so returning first one
+			
+		//in this case if result is one then ok. If multiple then also we will will return first because taxonConcept null condition
+		// already put in search criteria
 		return recoList[0]
 	}
 	
