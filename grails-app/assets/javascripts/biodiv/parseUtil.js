@@ -81,13 +81,18 @@ function parseCSVData(data, options) {
                 else{
                     headerFunction = getHeaderMenuOptions;
                 }
-    if(foundHeader){
-        headerCount = headers.length;
-        $.each(headers, function(headerCount, header) {
-            var columnName = header;
-            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, resizable : true, minWidth: 60, header: headerFunction()});
-        });
-    }
+			    if(foundHeader){
+			        headerCount = headers.length;
+			        $.each(headers, function(headerCount, header) {
+			            var columnName = header;
+			            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, resizable : true, minWidth: 60, header: headerFunction()});
+			        });
+			    }
+			    
+			    if(options.res === "species"){
+			    	return false;
+			    }
+			    
             } else if (lineCount >= options.startLine) {
                 if(rowCount < rowLimit){
                     var items = $.csv.toArray(line);

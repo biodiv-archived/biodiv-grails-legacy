@@ -386,7 +386,7 @@ $('#downloadModifiedSpecies').click(function() {
     $("#uploadSpecies").addClass('disabled');
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
-    var gData = JSON.stringify(grid.getData());
+    var gData// = JSON.stringify(grid.getData());
     //console.log(grid.getData().length);
     //console.log(gData);
     var orderedArray = $('#columnOrder').val();
@@ -451,7 +451,7 @@ function uploadSpecies(url){
     $("#speciesLoader").show();
     getTagsForHeaders();
     var xlsxFileUrl = $('#xlsxFileUrl').val();
-    var gData = JSON.stringify(grid.getData());
+    var gData //= JSON.stringify(grid.getData());
     var hm = getHeaderMetadata();
     delete hm["undefined"];
     var orderedArray = $('#columnOrder').val();

@@ -33,7 +33,7 @@ public class SpreadsheetWriter {
         try {
             Workbook wb = WorkbookFactory.create(inp);
             int sheetNo = 0;
-            writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
+            //writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
             writeHeadersInFormat(wb, headerMarkers, orderedArray);
             Sheet sheet = wb.getSheet("headerMetadata");
             if(sheet != null) {
@@ -55,23 +55,11 @@ public class SpreadsheetWriter {
     }
 
     public static void writeDataInSheet(Workbook wb, JSONArray gridData, int sheetNo, String writeContributor, String contEmail, JSONArray orderedArray) {
-        //System.out.println("================================" + writeContributor +"===" + contEmail );
-        /*if(writeContributor.equals("true")){
-            JSONObject r =  gridData.getJSONObject(0);
-            if(!r.has("contributor")){
-                for(int k = 0; k < gridData.length();k++){
-                    JSONObject r1 =  gridData.getJSONObject(k);
-                    r1.put("contributor", contEmail);
-                }
-            }
-        }*/
         Sheet sheet = wb.getSheetAt(sheetNo);
         Iterator<Row> rowIterator = sheet.iterator();
         int index = 0;
         int i = 0;
         boolean headerRow = true;
-        //System.out.println("===JSON ARRAY LENGTH==============");
-        //System.out.println(gridData.length());
         int gDataSize = gridData.length();
         JSONObject rowData = gridData.getJSONObject(index);
         Iterator<String> keys = rowData.keys();
