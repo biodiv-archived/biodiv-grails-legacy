@@ -281,7 +281,7 @@ $(document).ready(function(){
 });
 
 </asset:script>
-<g:if test="${params?.view == 'list'}">
+<g:if test="${!params?.view || params?.view != 'grid'}">
   <asset:script type="text/javascript">
   $(document).ready(function(){     
         checkView = true;   
