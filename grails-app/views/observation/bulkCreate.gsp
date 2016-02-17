@@ -70,7 +70,7 @@
                 -webkit-border-radius: 4px;
                 -moz-border-radius: 4px;
                 border-radius: 4px;
-                height:70px;
+                height:100px;
             }
             .selected_habitat, .selected_group {
                 padding: 4px 3px;
@@ -115,13 +115,13 @@
             input[type="text"]:focus {
                 border-width:2px;
             }
-            .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div {
+/*            .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div {
                 width:200px;
             }
             .addObservation .groups_super_div, .addObservation .habitat_super_div {
                 width : 273px;
             }
-            .combobox-container .add-on {
+*/            .combobox-container .add-on {
                 height: 22px !important;
                 left: 68px !important;
             }
@@ -219,10 +219,10 @@
                                     <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY")]"/>
                                 </div>
                                 <div class="column propagateGrpHab">
-                                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+                                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance, 'action':'show']"/> 
                                 </div>
                                 <div class="column propagateGrpHab">
-                                    <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+                                    <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance, 'action':'show']"/> 
                                 </div>
                                 <div class="column propagateDate">
                                     <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
@@ -367,7 +367,8 @@
                     }
                 });
             }
-            initializeLanguage();
+            initializers();
+            //initializeLanguage();
             
             $(document).click(function(){
                 $(".group_options").hide();

@@ -319,7 +319,7 @@ $(document).ready(function(){
             window.setTimeout(function(){
                 $("#action-tab-content .tab-pane").removeClass('active');
                 tab.parent('li').removeClass('active');
-                },1);
+            },1);
         }
     });
 
@@ -337,11 +337,11 @@ $(document).ready(function(){
 
     $(document).on('click', ".removeQueryFilter", function(){
         var removeParam = undefined;
-        if($('input[name="'+$(this).attr('data-target')+'"]').length != 0)
+        if($('input[name="'+$(this).attr('data-target')+'"]').length != 0) {
             $('input[name="'+$(this).attr('data-target')+'"]').val('')
-        else if($('select[name="'+$(this).attr('data-target')+'"]').length != 0)
+        } else if($('select[name="'+$(this).attr('data-target')+'"]').length != 0) {
             $('select[name="'+$(this).attr('data-target')+'"]').val('')
-        else {
+        } else {
             $( "#searchTextField" ).val('');	
         }
         removeParam = $(this).attr('data-target').replace('#','');
@@ -392,14 +392,7 @@ $(document).ready(function(){
                     $(".loadMore .progress").hide();
                     $(".loadMore .buttonTitle").show();
                 }
-/*                if ($('.grid_view_bttn.active')[0]) {
-                    $('.grid_view').show();
-                    $('.list_view').hide();
-                } else {
-                    $('.grid_view').hide();
-                    $('.list_view').show();
-                }
-*/
+    
                 var a = $('<a href="'+current.url+'"></a>');
                 var url = a.url();
                 var params = url.param();
@@ -408,10 +401,10 @@ $(document).ready(function(){
                 }else{
                     params["view"] = "grid";
                 }
-                delete params["append"]
-                delete params["loadMore"]
+                delete params["append"];
+                delete params["loadMore"];
                 params['max'] = parseInt(params['offset'])+parseInt(params['max']);
-                params['offset'] = 0
+                params['offset'] = 0;
                 var History = window.History;
                 History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
                 updateRelativeTime();
@@ -425,57 +418,57 @@ $(document).ready(function(){
         $.autopager('load');
         return false;
     });
-    
+
     console.log('download-form.submit');
     $('.download-form').bind('submit', function(event) {
-            var downloadFrom = $(this).find('input[name="downloadFrom"]').val();
-            var filterUrl = '';
-            if(downloadFrom == 'uniqueSpecies') {
-                var hostName = 'http://' + document.location.hostname;
-                var target = window.location.pathname + window.location.search;
-                var a = $('<a href="'+target+'"></a>');
-                var url = a.url();
-                var href = url.attr('path');
-                href = href.replace('list', 'distinctReco');
-                var params = getFilterParameters(url);
-                filterUrl = hostName + href + '?';
-                params['actionType'] = 'list';
-                $.each(params, function(key, value){
-                    filterUrl = filterUrl + key + '=' + value + '&';
-                });
-            } else {
-                filterUrl = window.location.href;
-            }
-			var queryString =  window.location.search
-			$(this).ajaxSubmit({ 
-	         	url:window.params.requestExportUrl + queryString,
-				dataType: 'json', 
-				type: 'POST',
-				beforeSubmit: function(formData, jqForm, options) {
-					formData.push({ "name": "filterUrl", "value": filterUrl});
-					//formData.push({ "name": "source", "value": "${source}"});
-					//formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
-				}, 
-	            success: function(data, statusText, xhr, form) {
-                    var msg = '';
-                    for(var i=0; i<data.length; i++) {
+        var downloadFrom = $(this).find('input[name="downloadFrom"]').val();
+        var filterUrl = '';
+        if(downloadFrom == 'uniqueSpecies') {
+            var hostName = 'http://' + document.location.hostname;
+            var target = window.location.pathname + window.location.search;
+            var a = $('<a href="'+target+'"></a>');
+            var url = a.url();
+            var href = url.attr('path');
+            href = href.replace('list', 'distinctReco');
+            var params = getFilterParameters(url);
+            filterUrl = hostName + href + '?';
+            params['actionType'] = 'list';
+            $.each(params, function(key, value){
+                filterUrl = filterUrl + key + '=' + value + '&';
+            });
+        } else {
+            filterUrl = window.location.href;
+        }
+        var queryString =  window.location.search
+        $(this).ajaxSubmit({ 
+            url:window.params.requestExportUrl + queryString,
+            dataType: 'json', 
+            type: 'POST',
+            beforeSubmit: function(formData, jqForm, options) {
+                formData.push({ "name": "filterUrl", "value": filterUrl});
+                //formData.push({ "name": "source", "value": "${source}"});
+                //formData.push({ "name": "downloadObjectId", "value": "${downloadObjectId}"});
+            }, 
+            success: function(data, statusText, xhr, form) {
+                var msg = '';
+                for(var i=0; i<data.length; i++) {
                     if(data[0].success)
-	                	$(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html("Scheduled "+data.length+" job(s) for every 5000 records. "+data[0].msg);
+            $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html("Scheduled "+data.length+" job(s) for every 5000 records. "+data[0].msg);
                     else 
-	                	$(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data[0].msg+"   "+JSON.stringify(data[0].errors));
-                    }
-	            	$('.download-box').find('.download-options').hide();
-	            	$("html, body").animate({ scrollTop: 0 });
-	            	return false;
-	            },
-	            error:function (xhr, ajaxOptions, thrownError){
-	            	//successHandler is used when ajax login succedes
-	            	var successHandler = this.success, errorHandler = null;
-	            	handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-				} 
-	     	});
-	     	event.preventDefault();
-     	});
+            $(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data[0].msg+"   "+JSON.stringify(data[0].errors));
+                }
+                $('.download-box').find('.download-options').hide();
+                $("html, body").animate({ scrollTop: 0 });
+                return false;
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                //successHandler is used when ajax login succedes
+                var successHandler = this.success, errorHandler = null;
+                handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+            } 
+        });
+    event.preventDefault();
+    });
 
     console.log('eat cookies');
     //	last_actions();
@@ -505,37 +498,37 @@ $(document).ready(function(){
     $(document).on('submit','#updateSpeciesGrp', function(event) {
 
         console.log('updateSpeciesGrp ajaxSubmit start');
-         $(this).ajaxSubmit({ 
-                    url: "/observation/updateSpeciesGrp",
-                    dataType: 'json', 
-                    type: 'GET',  
-                    beforeSubmit: function(formData, jqForm, options) {
-                        /*console.log(formData);
-                        if(formData.group_id == formData.prev_group){
-                            alert("Nothing Changes!");
-                            return false;
-                        }*/
-                    },               
-                    success: function(data, statusText, xhr, form) {
-                            $('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
-                            $('#group_icon_show_wrap_'+data.instance.id).show();
-                            //habitat_icon.show();
-                            $('#propagateGrpHab_'+data.instance.id).hide();
-                            $('.prev_group_'+data.instance.id).val(data.model.prev_group);
-                            updateFeeds();
-                    },
-                    error:function (xhr, ajaxOptions, thrownError){
-                        //successHandler is used when ajax login succedes
-                        var successHandler = this.success, errorHandler = showUpdateStatus;
-                        handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-                    } 
+        $(this).ajaxSubmit({ 
+            url: "/observation/updateSpeciesGrp",
+            dataType: 'json', 
+            type: 'GET',  
+            beforeSubmit: function(formData, jqForm, options) {
+                /*console.log(formData);
+                  if(formData.group_id == formData.prev_group){
+                  alert("Nothing Changes!");
+                  return false;
+                  }*/
+            },               
+            success: function(data, statusText, xhr, form) {
+                $('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
+                $('#group_icon_show_wrap_'+data.instance.id).show();
+                //habitat_icon.show();
+                $('#propagateGrpHab_'+data.instance.id).hide();
+                $('.prev_group_'+data.instance.id).val(data.model.prev_group);
+                updateFeeds();
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                //successHandler is used when ajax login succedes
+                var successHandler = this.success, errorHandler = showUpdateStatus;
+                handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+            } 
 
-                 });    
-               
-            event.preventDefault(); 
-        }); 
+        });    
 
-        console.log('obv.list.js end');
+        event.preventDefault(); 
+    }); 
+
+    console.log('obv.list.js end');
 });
 
 /**
@@ -1398,4 +1391,42 @@ function checkUrl(viewText,changeText){
     }
 }
 
+function initializeSpeciesGroupHabitatDropdowns() {
+    console.log('');
+    $(".selected_group").unbind('click').click(function(){
+        $(this).closest(".groups_super_div").find(".group_options").toggle();
+        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
+    });
 
+    $(".group_option").unbind('click').click(function(){
+        var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
+        if(is_save_btn_exists.length == 1){
+            is_save_btn_exists.show();
+        }
+
+
+        $(this).closest(".groups_super_div").find(".group").val($(this).val());
+        $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
+        $(this).closest(".group_options").hide();
+        //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
+        if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
+            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
+        }
+    });
+   
+    $(".selected_habitat").unbind('click').click(function(){
+        $(this).closest(".habitat_super_div").find(".habitat_options").toggle();
+        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
+    });
+
+    $(".habitat_option").unbind('click').click(function(){
+        $(this).closest(".habitat_super_div").find(".habitat").val($(this).val());
+        $(this).closest(".habitat_super_div").find(".selected_habitat").html($(this).html());
+        $(this).closest(".habitat_options").hide();
+        //$(this).closest(".habitat_super_div").find(".selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
+        if($(this).closest(".habitat_super_div").find(".selected_habitat b").length == 0){
+            $('<b class="caret"></b>').insertAfter($(this).closest(".habitat_super_div").find(".selected_habitat .display_value"));
+        }
+
+    });
+}

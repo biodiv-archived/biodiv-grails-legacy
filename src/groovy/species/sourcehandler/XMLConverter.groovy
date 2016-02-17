@@ -1144,7 +1144,7 @@ class XMLConverter extends SourceConverter {
                 if(rate) res.rating = Integer.parseInt(rate);
                 res.description = imageNode.caption?.text();
                 res.language    = imageNode.language[0]?.value();
-                res.licenses?.clear()
+                res.license = null;//?.clear()
                 res.contributors?.clear()
                 res.attributors?.clear();
                 for(Contributor con : getContributors(imageNode, true)) {
@@ -1264,7 +1264,7 @@ class XMLConverter extends SourceConverter {
             res.url = sourceUrl
             if(rate) res.rating = Integer.parseInt(rate);
             res.description = (audioNode.caption?.text()) ? (audioNode.caption?.text()) : "";
-            res.licenses?.clear()
+            res.license = null//?.clear()
             res.contributors?.clear()
             res.attributors?.clear();
             for(Contributor con : getContributors(audioNode, true)) {
@@ -1309,7 +1309,7 @@ class XMLConverter extends SourceConverter {
                 res.addToAttributors(con);
             }
             for(License l : getLicenses(videoNode, true)) {
-                res.addToLicenses(l);
+                res.license = l;
             }
         } else {
             res.fileName = videoNode.get("fileName")?.text(); 
@@ -1318,7 +1318,7 @@ class XMLConverter extends SourceConverter {
             res.description = (videoNode.caption?.text()) ? (videoNode.caption?.text()) : "";
             res.language    = videoNode.language[0]?.value()
 
-            res.licenses?.clear()
+            res.license = null;
             res.contributors?.clear()
             res.attributors?.clear();
             for(Contributor con : getContributors(videoNode, true)) {
@@ -1328,7 +1328,7 @@ class XMLConverter extends SourceConverter {
                 res.addToAttributors(con);
             }
             for(License l : getLicenses(videoNode, true)) {
-                res.addToLicenses(l);
+                res.license = l;
             }
 
         }

@@ -19,6 +19,7 @@
 
 
         </g:if>
+        ${r.authors}
         <g:each in="${r.authors}" var="author">
         <a href="${uGroup.createLink(controller:'user', action:'show', id:author[0]?.id)}" title="${author[0]?.name}">
             <img class="small_profile_pic"

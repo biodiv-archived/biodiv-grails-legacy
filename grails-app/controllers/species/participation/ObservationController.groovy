@@ -353,23 +353,12 @@ println "1"
         def msg;
         if(params.id) {
 //			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false, [fetch:['author':'eager', 'reprImage':'eager', 'maxVotedReco':'eager', 'maxVotedReco.taxonConcept':'eager', 'recommendationVote':'join', 'resource':'join'], lazy:['recommendationVote':'false', 'resource':'false']])
-            def c = Observation.createCriteria();
-            Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
-            def currentLevel = sqlLogger.level
-            sqlLogger.setLevel(Level.TRACE)
             def observationInstance;
-            observationInstance = c.get {
+            observationInstance = Observation.createCriteria().get {
                 and {
                     eq ('id', params.id)
                     eq ('isDeleted', false)
                 }
-                fetchMode   'group', FetchMode.JOIN
-                fetchMode   'habitat', FetchMode.JOIN
-                fetchMode   'author', FetchMode.JOIN
-                fetchMode   'reprImage', FetchMode.JOIN
-                fetchMode   'maxVotedReco', FetchMode.JOIN
-                fetchMode   'maxVotedReco.taxonConcept', FetchMode.JOIN
-                fetchMode   'dataset.datasource', FetchMode.JOIN
             }
 			
         if (!observationInstance) {
@@ -426,7 +415,6 @@ println "1"
                 json { render model as JSON }
                 xml { render model as XML }
             }
-        sqlLogger.setLevel(currentLevel)
         }
 	}
 
