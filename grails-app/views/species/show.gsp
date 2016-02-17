@@ -332,16 +332,11 @@
                 window.params.queryParamsMax = 8;
                 intializesSpeciesHabitatInterest(false);
                 updateGallery('/species/list', 8, 0, undefined, true);
+                galleryAjax(window.params.getResourceUrl+'/'+${speciesInstance.id},'species');
             });
 
 
             </asset:script>
-
-            <script type="text/javascript">                                                            
-                   $(document).ready(function(){
-                        galleryAjax(window.params.getResourceUrl+'/'+${speciesInstance.id},'species');
-                    }) 
-            </script>
         </body>
 
     </html>

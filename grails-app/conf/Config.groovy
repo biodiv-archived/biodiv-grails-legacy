@@ -1848,6 +1848,14 @@ grails.cache.config = {
         maxElementsInMemory 100
     }
 
+    cache {
+        name "resources"
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+
     defaultCache {
         maxElementsInMemory 10000
         eternal false

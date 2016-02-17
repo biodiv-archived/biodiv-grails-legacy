@@ -215,7 +215,7 @@ h6 {
 	max-width: 150px;
 }
 
-.img-poloroid {
+.img-polaroid {
     border:none;
 }
 
@@ -2524,13 +2524,13 @@ div.noOfRatings {
     right: 0;
     bottom: 0;
     width:50%;
-    height:50%
+    height:50%;
 /*    height: 55px;
     background-color: whitesmoke;
     border: solid grey 1px;
     line-height:2;
-*/    padding-left: 20px;
-    color: #0c8040;
+    padding-left: 20px;
+*/    color: #0c8040;
     display:table-cell;
 }
 .thumbnail .figure .listtemplate_icon .img-polaroid {
@@ -2541,6 +2541,9 @@ div.noOfRatings {
     padding:0px;
 	display: -moz-inline-box; /* Firefox 2 */
 	display: inline-block;
+    bottom:0;
+    right:0;
+    position:absolute;
 
 }
 

@@ -1000,6 +1000,9 @@ class ObservationService extends AbstractMetadataService {
         }
         
         hqlQuery.setProperties(queryParts.queryParams);
+        hqlQuery.setReadOnly(true);
+        //hqlQuery.setCacheable(true)
+        //hqlQuery.setCacheRegion('obvList');
         def observationInstanceList = hqlQuery.list();
 
         def distinctRecoList = [];

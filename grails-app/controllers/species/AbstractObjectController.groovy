@@ -28,6 +28,7 @@ import species.groups.UserGroup;
 import species.groups.UserGroupController;
 import species.Habitat;
 import species.Species;
+import species.participation.Observation;
 import species.Resource;
 import species.BlockedMails;
 import species.Resource.ResourceType;
@@ -123,7 +124,9 @@ abstract class AbstractObjectController {
 		return instance
 	}
 
+    @Cacheable('resources')
     def getObjResources(){
+        def result = [:];
         if(params.id){            
             def objInstance;
             if(params.controller == 'species'){
@@ -131,11 +134,12 @@ abstract class AbstractObjectController {
             } else if(params.controller == 'observation'){
                 objInstance = Observation.get(params.long('id'));
             }
-            def resources = objInstance?.listResourcesByRating();
-            if(!resources) {
-                resources = [objInstance.group?.icon(ImageType.ORIGINAL)]
-            }
-            render resources as JSON;
+            result['resources'] = objInstance?.listResourcesByRating();
+            result['defaultThumb'] = objInstance.group?.icon(ImageType.ORIGINAL).thumbnailUrl(null, '.png', null);
+        }
+        withFormat {
+            json { render result as JSON; }
+            xml { render result as XML; }
         }
     }
 

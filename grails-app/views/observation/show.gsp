@@ -292,8 +292,9 @@ $(document).ready(function(){
             $('.iAgree button').removeClass("disabled");
         } 
         initializeLanguage(); 
-         $(".CustomField_multiselectcombo").multiselect();
+        $(".CustomField_multiselectcombo").multiselect();
 
+        galleryAjax(window.params.getResourceUrl+'/'+${observationInstance.id},'observation');
        
 
 
@@ -305,14 +306,7 @@ $(document).ready(function(){
             document.forms.deleteForm.submit();
         }
     }
-
 </asset:script>
-
-<script type="text/javascript">
-    $(document).ready(function(){
-            galleryAjax(window.params.getResourceUrl+'/'+${observationInstance.id},'observation');
-    });
-</script>
 
 </body>
 </html>

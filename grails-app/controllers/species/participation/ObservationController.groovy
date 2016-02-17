@@ -178,9 +178,9 @@ println "1"
 
 	protected def getObservationList(params, List eagerFetchProperties=null) {
         try { 
-            params.max = params.max?Integer.parseInt(params.max.toString()):24 
+            params.max = params.max?Integer.parseInt(params.max.toString()):12 
         } catch(NumberFormatException e) { 
-            params.max = 24 
+            params.max = 12 
         }
         try { 
             params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
@@ -194,7 +194,7 @@ println "1"
                 params.parentId = null 
             }
         }
-		def max = Math.min(params.max ? params.int('max') : 24, 100)
+		def max = Math.min(params.max ? params.int('max') : 12, 100)
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false, eagerFetchProperties)
 		def observationInstanceList = filteredObservation.observationInstanceList
@@ -1905,7 +1905,7 @@ def filterChain() {
     }
 
 @Secured(['ROLE_ADMIN'])
-def t() {
+def caches() {
     def statistics = sessionFactory.statistics
     //            render "simple = ${SpeciesGroup.findByName('Others')}, 
     render "hits: ${statistics.secondLevelCacheHitCount}, misses: ${statistics.secondLevelCacheMissCount} ${statistics}"
@@ -1924,6 +1924,7 @@ def t() {
 //    printCacheEntries(grailsCacheManager.getCache('species.Classification'));
     printCacheEntries(grailsCacheManager.getCache('featured'));
     printCacheEntries(grailsCacheManager.getCache('taxon'));
+    printCacheEntries(grailsCacheManager.getCache('resources'));
     printCacheEntries(grailsCacheManager.getCache('org.hibernate.cache.StandardQueryCache'));
 
     //          render GrailsHibernateUtil.isCacheQueriesByDefault(grailsApplication);

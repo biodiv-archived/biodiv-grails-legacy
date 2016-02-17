@@ -149,7 +149,20 @@
     </g:each>
 
     $(document).ready (function() {
+
+        var taxonBrowserOptions = {
+            expandAll:false,
+            controller:"${params.controller?:'observation'}",
+            action:"${params.action?:'list'}",
+            expandTaxon:"${params.taxon?true:false}"
+        }
+
+        if(${params.taxon?:false}){
+            taxonBrowserOptions['taxonId'] = "${params.taxon}";
+        }
+
         $('.list').on('updatedGallery', function() {
+            $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
             loadSpeciesGroupCount();
             updateDistinctRecoTable();
         });
@@ -185,15 +198,5 @@ $(document).ready(function() {
         refreshMapBounds(mapLocationPicker);
     });
 
-    var taxonBrowserOptions = {
-        expandAll:false,
-        controller:"${params.controller?:'observation'}",
-        action:"${params.action?:'list'}",
-        expandTaxon:"${params.taxon?true:false}"
-    }
-    if(${params.taxon?:false}){
-        taxonBrowserOptions['taxonId'] = "${params.taxon}";
-    }
-    $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
 });
 </asset:script>
