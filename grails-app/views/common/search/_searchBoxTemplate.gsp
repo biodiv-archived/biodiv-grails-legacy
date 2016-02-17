@@ -125,7 +125,10 @@ $(document).ready(function() {
                 },
                 'document':{
                     'listUrl':"${uGroup.createLink('controller':'document', action:'list', 'userGroup':userGroupInstance)}",
-                }
+                },
+                'comment':{
+                    'getAllNewerComments': "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}"
+                 }
  
                 
 	}

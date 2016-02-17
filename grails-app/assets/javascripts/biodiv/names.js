@@ -114,7 +114,11 @@ function initializeNameSuggestion() {
             $(this).closest(".commonNameDiv").next().find(".canName").val( ui.item.desc );
             $(this).closest(".commonNameDiv").next().find(".recoName").val( ui.item.desc );
             if(ui.item.speciesId !== null){
-                  $(this).closest(".commonNameDiv").next().find(".speciesId").val( ui.item.speciesId );
+              $(this).closest(".commonNameDiv").next().find(".speciesId").val( ui.item.speciesId );
+              $(this).closest(".commonNameDiv").next().find(".speciesId").attr('data-species',ui.item.desc );
+            }else{
+              $(this).closest(".commonNameDiv").next().find(".speciesId").val("");
+              $(this).closest(".commonNameDiv").next().find(".speciesId").attr('data-species',"");
             }
             if(ui.item.languageName !== null){
                 $(this).closest(".commonNameDiv").find(".languageComboBox").val(ui.item.languageName).attr("selected",true);
@@ -140,7 +144,7 @@ function initializeNameSuggestion() {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
             $(this).closest(".sciNameDiv").find(".canName").val( ui.item.value );
             $(this).closest(".sciNameDiv").find(".mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
-            $(this).closest(".sciNameDiv").find(".speciesId").val( ui.item.speciesId );
+            $(this).closest(".sciNameDiv").find(".speciesId").val( ui.item.speciesId ).attr('data-species',ui.item.desc );
             return false;
         },open: function(event, ui) {
             //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 

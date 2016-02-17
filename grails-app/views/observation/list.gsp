@@ -328,44 +328,6 @@ $(document).ready(function(){
         ele_nxt.toggle('slow');
 
     });
-
-       $(document).on('submit','.addRecommendation', function(event) {
-            var that = $(this);
-            $(this).ajaxSubmit({
-                url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
-                dataType: 'json', 
-                type: 'GET',
-                beforeSubmit: function(formData, jqForm, options) {
-                    console.log(formData);
-                    updateCommonNameLanguage(that.find('.languageComboBox'));
-                    return true;
-                }, 
-                success: function(data, statusText, xhr, form) {
-                    if(data.status == 'success' || data.success == true) {
-                        console.log(data);
-                        if(data.canMakeSpeciesCall === 'false'){
-                            $('#selectedGroupList').modal('show');
-                        } else{
-                            preLoadRecos(3, 0, false,data.instance.observation);
-                            setFollowButton();
-                            showUpdateStatus(data.msg, data.success?'success':'error');
-                        }
-                        $(".addRecommendation_"+data.instance.observation)[0].reset();
-                        $("#canName").val("");   
-                    } else {
-                        showUpdateStatus(data.msg, data.success?'success':'error');
-                    }                    
-                    return false;
-                },
-                error:function (xhr, ajaxOptions, thrownError){
-                    //successHandler is used when ajax login succedes
-                    var successHandler = this.success, errorHandler = showUpdateStatus;
-                    handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-                } 
-            }); 
-            event.preventDefault();
-        });
-
 });
 </script>
 

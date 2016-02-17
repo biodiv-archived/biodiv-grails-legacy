@@ -211,7 +211,7 @@ if(r) {
                             </g:hasErrors>
                             <form id="addRecommendation" name="addRecommendation"
                                 action="${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}"
-                                method="GET" class="form-horizontal">
+                                method="GET" class="form-horizontal addRecommendation showPage addRecommendation_${observationInstance.id}">
                                 <div class="reco-input">
                                 <reco:create
                                     model="['recommendationInstance':recommendationInstance]" />
@@ -382,44 +382,7 @@ $(document).ready(function(){
             var tg = $(this).contents().first().text();
             window.location.href = "${uGroup.createLink(controller:'observation', action: 'list')}?tag=" + tg ;
          });
-         
-             
-        $('#addRecommendation').bind('submit', function(event) {
-            $(this).ajaxSubmit({ 
-                url:"${uGroup.createLink(controller:'observation', action:'addRecommendationVote')}",
-                dataType: 'json', 
-                type: 'GET',
-                beforeSubmit: function(formData, jqForm, options) {
-                    updateCommonNameLanguage();
-                    return true;
-                }, 
-                success: function(data, statusText, xhr, form) {
-                    if(data.status == 'success' || data.success == true) {
-                        if(data.canMakeSpeciesCall === 'false'){
-                            $('#selectedGroupList').modal('show');
-                        } else{                             
-                            preLoadRecos(3, 0, false,observationId);
-                            updateUnionComment(null, "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}");
-                            updateFeeds();
-                            setFollowButton();
-                            showUpdateStatus(data.msg, data.success?'success':'error');
-                        }
-                    } else {
-                        showUpdateStatus(data.msg, data.success?'success':'error');
-                    }
-                    $("#addRecommendation")[0].reset();
-                    $("#canName").val("");
-                    return false;
-                },
-                error:function (xhr, ajaxOptions, thrownError){
-                    //successHandler is used when ajax login succedes
-                    var successHandler = this.success, errorHandler = showUpdateStatus;
-                    handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-                } 
-            });
-            event.preventDefault();
-        });
-        
+                 
         $(".nav a.disabled").click(function() {
             return false;
         })

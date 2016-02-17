@@ -1314,3 +1314,48 @@ function checkList(){
     }
     $('.obvListwrapper').show();
 }
+
+ 
+ $(document).on('submit','.addRecommendation', function(event) {
+    var that = $(this);
+     if($.trim(that.find('.speciesId').attr('data-species')) != $.trim(that.find('.recoName').val())){
+       that.find('.speciesId').val('');
+     }
+    $(this).ajaxSubmit({
+        url:window.params.observation.addRecommendationVoteURL,
+        dataType: 'json', 
+        type: 'GET',
+        beforeSubmit: function(formData, jqForm, options) {
+            console.log(formData);
+            updateCommonNameLanguage(that.find('.languageComboBox'));
+            return true;
+        }, 
+        success: function(data, statusText, xhr, form) {
+            if(data.status == 'success' || data.success == true) {
+                console.log(data);
+                if(data.canMakeSpeciesCall === 'false'){
+                    $('#selectedGroupList').modal('show');
+                } else{
+                    preLoadRecos(3, 0, false,data.instance.observation);
+                    if(that.hasClass('showPage')){
+                        updateUnionComment(null, window.params.comment.getAllNewerComments);
+                        updateFeeds();
+                    }
+                    setFollowButton();
+                    showUpdateStatus(data.msg, data.success?'success':'error');
+                }
+                $(".addRecommendation_"+data.instance.observation)[0].reset();
+                that.find(".canName").val("");   
+            } else {
+                showUpdateStatus(data.msg, data.success?'success':'error');
+            }                    
+            return false;
+        },
+        error:function (xhr, ajaxOptions, thrownError){
+            //successHandler is used when ajax login succedes
+            var successHandler = this.success, errorHandler = showUpdateStatus;
+            handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+        } 
+    }); 
+    event.preventDefault();
+});
