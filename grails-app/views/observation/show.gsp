@@ -296,7 +296,9 @@ $(document).ready(function(){
         
         var getResourceUrl = "${uGroup.createLink(controller:'observation', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
         galleryAjax(getResourceUrl+'/'+${observationInstance.id},'observation');
-       
+        initializeSpeciesGroupHabitatDropdowns();
+
+
 
 
     });

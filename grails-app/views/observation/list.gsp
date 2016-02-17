@@ -21,10 +21,10 @@
         padding: 0px;
         float: left;
     }
-    .groups_super_div{
+    /*.groups_super_div{
         margin-top: -15px;
         margin-right: 10px;
-    }
+    }*/
     .groups_div > .dropdown-toggle{
           height: 25px;
     }
