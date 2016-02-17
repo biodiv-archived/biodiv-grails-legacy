@@ -939,6 +939,7 @@ class UtilsService {
         def result = closure.call()
 
         if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+            println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"  
             sqlLogger.setLevel(currentLevel)
         }
         result

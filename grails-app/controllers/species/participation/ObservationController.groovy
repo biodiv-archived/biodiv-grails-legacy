@@ -112,9 +112,7 @@ def grailsCacheManager;
 
 	def list() {
 		def model;
-        utilsService.logSql {
-            model = runLastListQuery(params);
-        }
+        model = runLastListQuery(params);
         /*Map cacheEntries = sessionFactory.getStatistics()
                 .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
                         .getEntries();
@@ -251,9 +249,7 @@ println "1"
 	
 	def occurrences() {
 		def result;
-        utilsService.logSql {
-            result = observationService.getObservationOccurences(params)
-        }
+        result = observationService.getObservationOccurences(params)
         def model = utilsService.getSuccessModel('', null, OK.value(), result);
         withFormat {
             json { render model as JSON }
@@ -1662,9 +1658,7 @@ println "1"
 		    if(params.actionType == 'search') {
                 distinctRecoListResult = observationService.getDistinctRecoListFromSearch(params, max, offset);
             } else {
-                utilsService.logSql {
-                    distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
-                }
+                distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
             }
 
             if(distinctRecoListResult.distinctRecoList.size() > 0) {
@@ -1707,9 +1701,7 @@ println "1"
 		    if(params.actionType == 'search') {
                 speciesGroupCountListResult = observationService.getSpeciesGroupCountFromSearch(params);
             } else {
-                utilsService.logSql {
-                    speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
-                }
+                speciesGroupCountListResult = observationService.getSpeciesGroupCount(params);
             }
 
             if(speciesGroupCountListResult.speciesGroupCountList.size() > 0) {

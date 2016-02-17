@@ -36,7 +36,8 @@ class RecommendationVote {
     String givenSciName;
     String givenCommonName;
 	static belongsTo = [observation:Observation, author:SUser];
-	
+
+
 	static constraints = {
 		author(unique:['observation']);
 		votedOn validator : {val -> val < new Date()};

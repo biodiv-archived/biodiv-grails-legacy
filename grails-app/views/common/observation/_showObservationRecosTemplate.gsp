@@ -52,14 +52,6 @@
     </a>
     </g:if>
 
-<!--    <span class="voteCount">
-        <span id="votes_${r.recoId}">
-            ${r.noOfVotes} 
-        </span> 
-    <g:if test="${r.noOfVotes <= 1}"><g:message code="text.user.thinks" /> </g:if>
-    <g:else> <g:message code="text.user.thinks" /></g:else> 
-    <g:message code="text.it.is" />:</span>
--->
     <span class="highlight">
         <g:if test="${r.speciesId}">
         <a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -79,9 +71,6 @@
         ${r.commonNames}
     </span>
     <comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':r.observationInstance?:observationInstance]" />
-        <%--				<obv:showRecoComment--%>
-        <%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>
-
     </div> 
     
     <script type="text/javascript">
@@ -98,9 +87,5 @@
     </script></li>
     </g:each>
     </g:if>
-    <%--<g:else>--%>
-    <%--	<g:message code="recommendations.zero.message" />--%>
-    <%--</g:else>--%>
-
 
 

@@ -328,7 +328,7 @@ class Observation extends DataObject {
 		}
 	}
 
-	private Map suggestedCommonNames(recoId) {
+	Map suggestedCommonNames(recoId) {
 		def englistId = Language.getLanguage(null).id
 		Map langToCommonName = new HashMap()
 		this.recommendationVote.each{ rv ->
@@ -348,7 +348,7 @@ class Observation extends DataObject {
         return langToCommonName;
     }
 
-	private String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
+	String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
 		if(langToCommonName.isEmpty()){
 			return ""
 		}
@@ -388,46 +388,7 @@ class Observation extends DataObject {
 	 * @return
 	 */
 	def getRecommendationVotes(int limit, long offset) {
-		if(limit == 0) limit = 3;
-
-		def sql =  Sql.newInstance(dataSource);
-
-		def recoVoteCount;
-		if(limit == -1) {
-			recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc", [obvId:this.id])
-		} else {
-			recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc limit :max offset :offset", [obvId:this.id, max:limit, offset:offset])
-		}
-
-		def currentUser = springSecurityService.currentUser;
-		def result = [];
-		recoVoteCount.each { recoVote ->
-			def reco = Recommendation.read(recoVote[0]);
-			def map = reco.getRecommendationDetails(this);
-			map.put("noOfVotes", recoVote[1]);
-			map.put("obvId", this.id);
-            map.put("isLocked", this.isLocked);
-			def langToCommonName =  suggestedCommonNames(reco.id);
-            String cNames = getFormattedCommonNames(langToCommonName, true)
-
-			//String cNames = suggestedCommonNames(reco.id, true)
-			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
-			map.put("disAgree", (currentUser in map.authors));
-            if(this.isLocked == false){
-                map.put("showLock", true);
-            }
-            else{
-                def recVo = RecommendationVote.findWhere(recommendation: reco, observation:this);
-                if(recVo && recVo.recommendation == this.maxVotedReco){
-                    map.put("showLock", false);                   
-                }
-                else{
-                    map.put("showLock", true);
-                }
-            }
-			result.add(map);
-		}
-		return ['recoVotes':result, 'totalVotes':this.recommendationVote.size(), 'uniqueVotes':getRecommendationCount()];
+        return observationService.getRecommendationVotes(this, limit, offset);
 	}
 
 	def getRecommendationCount(){

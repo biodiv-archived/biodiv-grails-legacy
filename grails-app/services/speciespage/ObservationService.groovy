@@ -1367,15 +1367,18 @@ class ObservationService extends AbstractMetadataService {
         }
 		
         if(params.dataset) {
-            def dataset = Dataset.read(params.dataset.toLong());
-            println "*************************************"
-            println dataset
-            println "*************************************"
-            if(dataset){
-                queryParams['dataset'] = dataset.id
-                activeFilters['dataset'] = dataset.id
+            if(params.dataset == 'false') {
+                filterQuery += " and obv.dataset is null ";
+                queryParams['dataset'] = false
+                activeFilters['dataset'] = false
+            } else {
+                def dataset = Dataset.read(params.dataset.toLong());
+                if(dataset) {
+                    queryParams['dataset'] = dataset.id
+                    activeFilters['dataset'] = dataset.id
 
-                filterQuery += " and obv.dataset.id = :dataset ";
+                    filterQuery += " and obv.dataset.id = :dataset ";
+                }
             }
         }
 		
@@ -2506,4 +2509,54 @@ class ObservationService extends AbstractMetadataService {
 
     }
 
+    def getRecommendationVotes(Observation observationInstance, int limit, long offset) {
+		if(limit == 0) limit = 3;
+		def sql =  Sql.newInstance(dataSource);
+        
+		def result = [];
+        int totalVotes = 0;
+        int uniqueVotes = 0;
+
+        //utilsService.logSql ({
+
+		def recoVoteCount;
+		if(limit == -1) {
+			recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc", [obvId:observationInstance.id])
+		} else {
+			recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc limit :max offset :offset", [obvId:observationInstance.id, max:limit, offset:offset])
+		}
+
+        uniqueVotes = recoVoteCount.size();
+
+		def currentUser = springSecurityService.currentUser;
+		recoVoteCount.each { recoVote ->
+			def reco = Recommendation.read(recoVote[0]);
+			def map = reco.getRecommendationDetails(observationInstance);
+            totalVotes += recoVote[1];
+			map.put("noOfVotes", recoVote[1]);
+			map.put("obvId", observationInstance.id);
+            map.put("isLocked", observationInstance.isLocked);
+			def langToCommonName =  observationInstance.suggestedCommonNames(reco.id);
+            String cNames = observationInstance.getFormattedCommonNames(langToCommonName, true)
+
+			//String cNames = suggestedCommonNames(reco.id, true)
+			map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
+			map.put("disAgree", (currentUser in map.authors));
+            if(observationInstance.isLocked == false) {
+                map.put("showLock", true);
+            } else {
+                //def recVo = RecommendationVote.findWhere(recommendation: reco, observation:observationInstance);
+                //if(recVo && recVo.recommendation == observationInstance.maxVotedReco){
+                if(reco == observationInstance.maxVotedReco){
+                    map.put("showLock", false);                   
+                }
+                else{
+                    map.put("showLock", true);
+                }
+            }
+			result.add(map);
+		}
+        //} , 'getRecommendationVotes');
+		return ['recoVotes':result, 'totalVotes':totalVotes, 'uniqueVotes':uniqueVotes];
+    }
 }

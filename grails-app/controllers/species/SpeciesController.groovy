@@ -1766,7 +1766,6 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def test() {
-        utilsService.logSql({
             def hibSession = sessionFactory?.getCurrentSession();
             String taxonId=221859;
             //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
@@ -1781,7 +1780,6 @@ render speciesInstanceList;
                 e.printStackTrace();
             }
 
-        });
         println "=====================++++"
     }
    

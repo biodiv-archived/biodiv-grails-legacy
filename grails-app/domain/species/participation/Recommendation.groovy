@@ -4,6 +4,7 @@ import species.Language;
 import species.TaxonomyDefinition;
 import species.auth.Role;
 import species.utils.Utils;
+import org.hibernate.FetchMode;
 
 class Recommendation {
 	
@@ -23,7 +24,7 @@ class Recommendation {
 	
 	//to store accpeted Match Name
 	TaxonomyDefinition acceptedName;
-	
+
 	static constraints = {
 		name(blank:false, unique:['taxonConcept', 'languageId']);
 		taxonConcept nullable:true;
@@ -68,20 +69,22 @@ class Recommendation {
 	   }
 	   
 	   map.put("name", this?.name)
-	   def recos = RecommendationVote.withCriteria {
-		   eq('recommendation', this)
-		   eq('observation', obv)
+	   def recos =  RecommendationVote.withCriteria {
+           and {
+            eq('recommendation', this)
+		    eq('observation', obv)
+           }
 		   min('votedOn')
 	   }
 	   map.put("authors", recos.collect{[it.author,it.originalAuthor]})
 	   map.put("votedOn", recos.collect{it.votedOn})
 	   map.put("noOfVotes", recos.size())
 	   
-	   def allRecos = RecommendationVote.withCriteria {
+	   /*def allRecos = RecommendationVote.withCriteria {
 		   eq('observation', obv)
 	   }
 	   map.put("totalVotes", allRecos.size())
-	   
+	   */
 	   def recoComments = []
 	   recos.each {
 		   String comment = it.comment;
