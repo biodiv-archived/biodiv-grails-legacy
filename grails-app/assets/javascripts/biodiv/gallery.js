@@ -144,7 +144,7 @@ function initializeGallery(resources,domainObj){
     // Initialize the Gallery as image carousel:
     gallery = blueimp.Gallery(carouselLinks, {
         container: '#blueimp-image-carousel',
-            carousel: false, 
+            carousel: true, 
             titleElement: 'h6',
             onopen: function () {
                 // Callback function executed when the Gallery is initialized.

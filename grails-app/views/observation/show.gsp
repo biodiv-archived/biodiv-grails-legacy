@@ -293,8 +293,9 @@ $(document).ready(function(){
         } 
         initializeLanguage(); 
         $(".CustomField_multiselectcombo").multiselect();
-
-        galleryAjax(window.params.getResourceUrl+'/'+${observationInstance.id},'observation');
+        
+        var getResourceUrl = "${uGroup.createLink(controller:'observation', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
+        galleryAjax(getResourceUrl+'/'+${observationInstance.id},'observation');
        
 
 

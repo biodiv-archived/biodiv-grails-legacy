@@ -332,7 +332,8 @@
                 window.params.queryParamsMax = 8;
                 intializesSpeciesHabitatInterest(false);
                 updateGallery('/species/list', 8, 0, undefined, true);
-                galleryAjax(window.params.getResourceUrl+'/'+${speciesInstance.id},'species');
+                var getResourceUrl = "${uGroup.createLink(controller:'species', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
+                galleryAjax(getResourceUrl+'/'+${speciesInstance.id},'species');
             });
 
 
