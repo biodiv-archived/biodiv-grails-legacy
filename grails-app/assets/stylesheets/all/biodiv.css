@@ -3236,11 +3236,17 @@ small {
     float: left;
 }
 .conts_wrap{
-    margin-left: 10px !important;
-    margin-top: -10px;
-}
+  margin-left: 10px !important;   
+  margin: 0px;
+  max-height: 150px;
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+ }
 .conts_wrap_line{
 	margin-left: 6px !important;
+	width: 100%;
+	float: left;
 }
 .conts_wrap h5{    
     margin-bottom: 0px;

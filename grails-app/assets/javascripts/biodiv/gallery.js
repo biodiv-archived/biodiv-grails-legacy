@@ -87,10 +87,13 @@ function initializeGallery(resources,domainObj){
             $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
 
         }    
-        // For Slider         
+        // For Slider    
+        //TODO some More fix here
+        photo.url = (photo.url.indexOf('/biodiv') != -1)?photo.url.replace('.jpg','_gall.jpg'): photo.url;
+
         if(photo.type == 'Image'){
             carouselLinks.push({
-                href: photo.url.replace('.jpg','_gall.jpg'),
+                href: photo.url,
                 title: gallCount+'/'+isImageOrVideo.length
             });
         }else if(photo.type == 'Video'){
@@ -181,29 +184,9 @@ function update_imageAttribute(resource,ele,index){
 
     output += '<div class="conts_wrap">';
     output += '<div class="span12">';
-    output += '<div class="pull-right license">';
-    output += '<a class="span7" href="'+resource.license['url']+'" target="_blank">';
-    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.license['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.license['name']+'">';
-    output += '</a>';
-    output += '<div class="rating_form span4">';
-    output += '<form class="ratingForm" method="get" title="Rate it">';
-    output += '<span class="star_gallery_rating pull-right" title="Rate" data-score="'+resource.averageRating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
-    output += '</span>';
-    output += '<div class="noOfRatings">'; 
-    var ratings ='';
-    if(resource.rating != 1){
-        ratings = 'ratings';
-    }else{
-        ratings = 'rating';
-    }                     
-    output += '('+resource.totalRatings+' rating'+(resource.totalRatings>1?'s':'')+')';
-    output += '</div>';
-    output += '</form>';
-    output += '</div>'; 
-    output += '<i class="slideUp pull-right open icon-chevron-down" rel="58"></i>';                                       
-    output += '</div>';
-
+    output += '<div class="span6">';
     if(resource.contributors && Object.keys(resource.contributors).length > 0){
+
             output += '<div class="conts_wrap_line">';
             output += '<h5>Contributors</h5>';
             console.log(resource.contributors);        
@@ -232,9 +215,36 @@ function update_imageAttribute(resource,ele,index){
         output += '<a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
         output += '</div>';
     }
+    output += '</div>';
 
+
+    output += '<div class="span6">';
+    output += '<div class="license">';
+    output += '<a class="span7" href="'+resource.license['url']+'" target="_blank">';
+    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.license['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.license['name']+'">';
+    output += '</a>';
+    output += '<div class="rating_form span4">';
+    output += '<form class="ratingForm" method="get" title="Rate it">';
+    output += '<span class="star_gallery_rating pull-right" title="Rate" data-score="'+resource.averageRating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
+    output += '</span>';
+    output += '<div class="noOfRatings">'; 
+    var ratings ='';
+    if(resource.rating != 1){
+        ratings = 'ratings';
+    }else{
+        ratings = 'rating';
+    }                     
+    output += '('+resource.totalRatings+' rating'+(resource.totalRatings>1?'s':'')+')';
+    output += '</div>';
+    output += '</form>';
+    output += '</div>'; 
+    output += '<i class="slideUp pull-right open icon-chevron-down" rel="58"></i>';                                       
+    output += '</div>';
+    output += '</div>';
+    output += '</div>';
 
     if(resource.annotations && (Object.keys(resource.annotations).length > 0)){
+        output += '<div class="span12" style="margin-left:0px;">';
         output += '<div class="conts_wrap_line">';            
         output += '<h5>Annotations</h5>';
         output += '<div class="annotationsWrapper">';
@@ -265,11 +275,9 @@ function update_imageAttribute(resource,ele,index){
         output += '</table>';
         output += '</div>';
         output += '</div>';
-
+        output += '</div>';
     }
 
-
-    output += '</div>';
 
     output += '</div>';
     output += '</div>';
@@ -293,7 +301,7 @@ $(document).ready (function() {
     $(document).on('click','.license .slideUp',function(){
         if($(this).hasClass('open')){
             $(this).removeClass('open').addClass('close').removeClass('icon-chevron-down').addClass('icon-chevron-up');
-            $('.image_info').css('height','38px');
+            $('.image_info').css('height','55px');
         }else{
             $(this).addClass('open').removeClass('close').removeClass('icon-chevron-up').addClass('icon-chevron-down');
             $('.image_info').css('height','auto');
