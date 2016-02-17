@@ -277,37 +277,9 @@ $(".applyAll").click(function(){
 });
 
 function initializers(){
-
-    $(".selected_group").unbind('click').click(function(){
-        $(this).closest(".groups_super_div").find(".group_options").toggle();
-        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
-    });
-
-    $(".group_option").unbind('click').click(function(){
-        $(this).closest(".groups_super_div").find(".group").val($(this).val());
-        $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
-        $(this).closest(".group_options").hide();
-        //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-        if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
-            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
-        }
-    });
-   
-    $(".selected_habitat").unbind('click').click(function(){
-        $(this).closest(".habitat_super_div").find(".habitat_options").toggle();
-        //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
-    });
-
-    $(".habitat_option").unbind('click').click(function(){
-        $(this).closest(".habitat_super_div").find(".habitat").val($(this).val());
-        $(this).closest(".habitat_super_div").find(".selected_habitat").html($(this).html());
-        $(this).closest(".habitat_options").hide();
-        //$(this).closest(".habitat_super_div").find(".selected_habitat").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-        if($(this).closest(".habitat_super_div").find(".selected_habitat b").length == 0){
-            $('<b class="caret"></b>').insertAfter($(this).closest(".habitat_super_div").find(".selected_habitat .display_value"));
-        }
-
-    });
+    initializeSpeciesGroupHabitatDropdowns();
+    console.log('bulkCreate');
+    $('.propagateGrpHab .control-group  label').show();
 
     $( ".date" ).datepicker({ 
         changeMonth: true,

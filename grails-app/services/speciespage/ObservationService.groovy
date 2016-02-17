@@ -142,15 +142,16 @@ class ObservationService extends AbstractMetadataService {
 
     void updateResource(instance, params) {
         def resourcesXML = createResourcesXML(params);
+        def rootDirLocatorInstance = instance;
         if(params.action == "bulkSave"){
-            instance = springSecurityService.currentUser
+            rootDirLocatorInstance = springSecurityService.currentUser
         }
-        def resources = saveResources(instance, resourcesXML);
+        def resources = saveResources(rootDirLocatorInstance, resourcesXML);
         instance.resource?.clear();
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         resources.each { resource ->
             if(!resource.context){
-                resource.saveResourceContext(observation)
+                resource.saveResourceContext(instance)
             }
             instance.addToResource(resource);
         }

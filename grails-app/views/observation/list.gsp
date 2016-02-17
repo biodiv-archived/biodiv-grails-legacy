@@ -21,10 +21,10 @@
         padding: 0px;
         float: left;
     }
-    .groups_super_div{
+    /*.groups_super_div{
         margin-top: -15px;
         margin-right: 10px;
-    }
+    }*/
     .groups_div > .dropdown-toggle{
           height: 25px;
     }
@@ -180,25 +180,9 @@
 <g:if test="${!activeFilters.isChecklistOnly}">
 <asset:script>
 $(document).ready(function(){
-    $(".selected_group").off('click').on('click',function(){
-        $(this).closest(".groups_super_div").find(".group_options").toggle();
-    });
 
-    $(document).on('click',".group_option",function(){
-        var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
-           if(is_save_btn_exists.length == 1){
-                is_save_btn_exists.show();
-           }
-       
+    initializeSpeciesGroupHabitatDropdowns();
 
-        $(this).closest(".groups_super_div").find(".group").val($(this).val());
-        $(this).closest(".groups_super_div").find(".selected_group").html($(this).html());
-        $(this).closest(".group_options").hide();
-        //$(this).closest(".groups_super_div").find(".selected_group").css({'background-color':'#e5e5e5', 'border-bottom-color':'#aeaeae'});
-        if($(this).closest(".groups_super_div").find(".selected_group b").length == 0){
-            $('<b class="caret"></b>').insertAfter($(this).closest(".groups_super_div").find(".selected_group .display_value"));
-        }
-    });
     $(document).on('click','#obvList',function(){           
             checkUrl("grid","list");
             params['view'] = "list"; 

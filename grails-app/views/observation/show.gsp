@@ -293,9 +293,12 @@ $(document).ready(function(){
         } 
         initializeLanguage(); 
         $(".CustomField_multiselectcombo").multiselect();
+        
+        var getResourceUrl = "${uGroup.createLink(controller:'observation', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
+        galleryAjax(getResourceUrl+'/'+${observationInstance.id},'observation');
+        initializeSpeciesGroupHabitatDropdowns();
 
-        galleryAjax(window.params.getResourceUrl+'/'+${observationInstance.id},'observation');
-       
+
 
 
     });

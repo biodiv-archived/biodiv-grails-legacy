@@ -19,8 +19,7 @@
 <input type="hidden" id="userLanguage" value="${userLanguage?.id}" />
 <script type="text/javascript">
 $(document).ready(function() {
-    window.params = {                
-                'getResourceUrl' : "${uGroup.createLink(controller:'observation', action:'getObjResources', userGroupWebaddress:params.webaddress)}",
+    window.params = {  
                 'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
                 'controller': "${params.controller}",
                 'actionForBulkCreate': "${params.action}",

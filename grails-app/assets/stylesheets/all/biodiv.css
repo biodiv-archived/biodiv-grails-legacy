@@ -3338,7 +3338,7 @@ li.group_option span{
     padding: 0px;
     float: left;
 }
-.groups_super_div{
+/*.groups_super_div{
     margin-top: -15px;
     margin-right: 10px;
 }
@@ -3347,7 +3347,7 @@ li.group_option span{
 }
 .group_options, .group_option{
     min-width: 110px;
-}
+}*/
 .save_group_btn{
     float: right;
     margin-right: 11px;
@@ -3365,7 +3365,6 @@ li.group_option span{
     margin-right: 12px;
 }
 .propagateGrpHab{
-    display:none;
     float: right;
     margin-top: -5px;
 }

@@ -231,9 +231,9 @@ class ObservationTagLib {
 		
 		def obj = model.sourceInstance
 		String sourceType
-		if(obj.instanceOf(Checklists) || obj.instanceOf(Document)){
+		if(obj?.instanceOf(Checklists) || obj?.instanceOf(Document)){
 			sourceType = 'checklist'
-		}else if(obj.instanceOf(Observation) && (obj.id != obj.sourceId)){ 
+		}else if(obj?.instanceOf(Observation) && (obj?.id != obj.sourceId)){ 
 			sourceType = 'checklist-obv'
 		}else
 			sourceType = 'observation'
