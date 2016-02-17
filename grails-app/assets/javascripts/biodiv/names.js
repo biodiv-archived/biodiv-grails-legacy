@@ -113,6 +113,9 @@ function initializeNameSuggestion() {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
             $(this).closest(".commonNameDiv").next().find(".canName").val( ui.item.desc );
             $(this).closest(".commonNameDiv").next().find(".recoName").val( ui.item.desc );
+            if(ui.item.speciesId !== null){
+                  $(this).closest(".commonNameDiv").next().find(".speciesId").val( ui.item.speciesId );
+            }
             if(ui.item.languageName !== null){
                 $(this).closest(".commonNameDiv").find(".languageComboBox").val(ui.item.languageName).attr("selected",true);
                 $(this).closest(".commonNameDiv").find(".languageComboBox").data('combobox').refresh();
