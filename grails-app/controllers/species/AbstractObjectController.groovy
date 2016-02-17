@@ -123,4 +123,20 @@ abstract class AbstractObjectController {
 		return instance
 	}
 
+    def getObjResources(){
+        if(params.id){            
+            def objInstance;
+            if(params.controller == 'species'){
+                objInstance = Species.get(params.long('id'));
+            } else if(params.controller == 'observation'){
+                objInstance = Observation.get(params.long('id'));
+            }
+            def resources = objInstance?.listResourcesByRating();
+            if(!resources) {
+                resources = [objInstance.group?.icon(ImageType.ORIGINAL)]
+            }
+            render resources as JSON;
+        }
+    }
+
 }

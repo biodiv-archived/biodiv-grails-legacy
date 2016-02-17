@@ -382,5 +382,4 @@ class AbstractObjectService {
     Object getSpeciesGroupIds(groupId){
         return utilsService.getSpeciesGroupIds(groupId);
     }
-
 }

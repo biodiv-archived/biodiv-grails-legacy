@@ -1923,6 +1923,7 @@ def t() {
 //    printCacheEntries(grailsCacheManager.getCache('species.Language'));
 //    printCacheEntries(grailsCacheManager.getCache('species.Classification'));
     printCacheEntries(grailsCacheManager.getCache('featured'));
+    printCacheEntries(grailsCacheManager.getCache('taxon'));
     printCacheEntries(grailsCacheManager.getCache('org.hibernate.cache.StandardQueryCache'));
 
     //          render GrailsHibernateUtil.isCacheQueriesByDefault(grailsApplication);
@@ -1946,16 +1947,5 @@ private printCacheEntries(cache) {
     }
 }
 
-def getObjResources(){
-        if(params.id && params.instance){            
-            def objInstance;
-            if(params.instance == 'species'){
-                objInstance = Species.get(params.long('id'));
-            }else if(params.instance == 'observation'){
-                objInstance = Observation.get(params.long('id'));
-            }
-            render objInstance?.listResourcesByRating() as JSON;
-        }
-    }
 
 }

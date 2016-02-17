@@ -33,7 +33,8 @@ def obvId = observationInstance?.id
                         <div class="listtemplate_icon checklistCount">${observationInstance?.speciesCount}</div>
                         </g:if>
                         <g:elseif test="${observationInstance?.dataset}">
-                        <div class="listtemplate_icon img-polaroid" title="${observationInstance.dataset.datasource.title}" style="background-image:url(${observationInstance.dataset.datasource.mainImage()?.fileName});">
+                        <div class="listtemplate_icon">
+                        <img class="img-polaroid" title="${observationInstance.dataset.datasource.title}" src="${observationInstance.dataset.datasource.mainImage()?.fileName}"/>
                         </div>
                         </g:elseif>
 		</g:link>

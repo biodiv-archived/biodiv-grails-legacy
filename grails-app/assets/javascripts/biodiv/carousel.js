@@ -205,12 +205,11 @@ var getSnippetTabletHTML = function(carousel, item) {
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
-    console.log(item);
-	var imageTag = '<span class="img-polaroid" style="background-image:url(' + item.imageLink + paramsString  + ');" title="' + item.title  +'" alt="" />';
+    var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
 
     var listTemplateIcon = '';
     if(item.dataset_id) {
-        listTemplateIcon = '<div class="listtemplate_icon img-polaroid" title="'+item.datasource_title+'" style="background-image:url('+item.datasource_mainImage+');"/>'
+        listTemplateIcon = '<div class="listtemplate_icon"> <img class="img-polaroid" title="'+item.datasource_title+'" src="'+item.datasource_mainImage+'"/></div>'
     }
 
 	var notes = item.notes?item.notes:''
