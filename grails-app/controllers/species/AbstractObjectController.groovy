@@ -135,7 +135,8 @@ abstract class AbstractObjectController {
                 objInstance = Observation.get(params.long('id'));
             }
             result['resources'] = objInstance?.listResourcesByRating();
-            result['defaultThumb'] = objInstance.group?.icon(ImageType.ORIGINAL).thumbnailUrl(null, '.png', null);
+            //if(objInstance.hasProperty('group'))
+            result['defaultThumb'] = objInstance?.fetchSpeciesGroup()?.icon(ImageType.ORIGINAL)?.thumbnailUrl(null, '.png', null);
         }
         withFormat {
             json { render result as JSON; }
