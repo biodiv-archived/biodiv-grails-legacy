@@ -163,7 +163,7 @@ class ChecklistService {
 				
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
 
-				observationService.setAssociations(checklistInstance, params)
+				observationService.setAssociations(checklistInstance, params, sendMail)
 
                 log.debug "Saving ratings for the resources"
                 checklistInstance?.resource?.each { res ->
