@@ -50,6 +50,10 @@
                 z-index:20;
                 background-color: rgb(106, 201, 162) !important;
             }
+            .userGroupsSuperDiv .thumbnails {
+                margin-left:0px;
+            }
+
             .column.block_row {
                 width:443px;
             }
@@ -354,7 +358,7 @@
         
             if($(".userGroupsSuperDiv").hasClass("span12")){
                 $(".userGroupsSuperDiv").removeClass("span12");
-                $(".userGroupsSuperDiv").addClass("span4");
+                $(".userGroupsSuperDiv").addClass("span5");
             } 
         
             if($( "input[name='resType']" ).val() == "species.auth.SUser") {
@@ -369,21 +373,23 @@
             }
             initializers();
             //initializeLanguage();
-            
-            $(document).click(function(){
-                $(".group_options").hide();
-                $(".habitat_options").hide();
-            });
+
+//            $(document).click(function(){
+//                $('.selected_group').dropdown('toggle');
+//                $('.selected_habitat').dropdown('toggle');
+//                $(".group_options").hide();
+//                $(".habitat_options").hide();
+//            });
 
             /* Clicks within the dropdown won't make
             it past the dropdown itself */
-            $(".group_options").click(function(e){
+/*            $(".group_options").click(function(e){
                 e.stopPropagation();
             });
             $(".habitat_options").click(function(e){
                 e.stopPropagation();
             });
-            
+*/            
             //initialize group toggle
 		    $(".toggleGrpsDiv").unbind("click").click(function(){
 		        var me = this;
@@ -392,7 +398,7 @@
 		    $(".close_user_group").unbind("click").click(function(){
 		        $(this).closest(".postToGrpsToggle").hide();      
 		    });
-            
+           
         });
 
         </asset:script>

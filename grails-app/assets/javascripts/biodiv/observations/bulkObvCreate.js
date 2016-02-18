@@ -340,28 +340,7 @@ function initializers(){
 
     initializeLanguage();
     initializeNameSuggestion();
-    /*var $grpDD = $('.group_options');
-    var $habDD = $('.habitat_options');
-    $(document.body).unbind('click').click(function(){
-        if (!$grpDD.has(this).length || !$habDD.has(this).length  ) { // if the click was not within $div
-            $grpDD.hide();
-            $habDD.hide();
-        }
-    });
-    */
-    /*
-    $(document).unbind("click").click(function(){
-        $(".group_options").hide();
-        $(".habitat_options").hide();
-    });
-
-    $(".group_options").unbind("click").click(function(e){
-        e.stopPropagation();
-    });
-    $(".habitat_options").unbind("click").click(function(e){
-        e.stopPropagation();
-    });
-    */
+   
     if($("input[name='applyToAll']").val() == "true"){
         $(".applyToAll").trigger("click");
     }

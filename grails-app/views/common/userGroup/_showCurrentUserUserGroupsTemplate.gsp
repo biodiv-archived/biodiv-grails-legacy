@@ -113,9 +113,6 @@ def parentGroupId = ''
 <script type="text/javascript">
 //TODO: g:javascript because it is being loaded in ajax way ... needs to change 
 $(document).ready (function(){
-	var parentGroupId = ${parentGroupId?:'undefined'};
-	if(parentGroupId != undefined && parentGroupId != ''){
-    	selectTickUserGroupsSignature(parentGroupId);
-    }
+        selectTickUserGroupsSignature("${parentGroupId}");
 });
 </script>

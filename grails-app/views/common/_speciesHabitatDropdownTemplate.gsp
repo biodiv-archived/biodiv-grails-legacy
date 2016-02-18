@@ -5,32 +5,16 @@
 <div class ="control-group ${hasErrors(bean: observationInstance, field: 'habitat', 'error')}">
 
     <label><g:message code="default.habitats.label" /></label>
+    <g:hasErrors bean="${observationInstance}" field="habitat">
     <div class="help-inline control-label">
         <g:hasErrors bean="${observationInstance}" field="habitat">
         <g:message code="observation.habitat.not_selected" />
         </g:hasErrors>
     </div>
+    </g:hasErrors>
 
 <div class="habitat_super_div" style="clear:both;">
     <div class="habitat_list">
-        <!--select class="ui-widget-content">
-        <option>None</option>
-        <option>Forest</option>
-        <option>Savanna</option>
-        <option>Shrubland</option>
-        <option>Grassland</option>
-        <option>Wetlands</option>
-        <option>Rocky Areas</option>
-        <option>Caves and Subterranean Habitats</option>
-        <option>Desert</option>
-        <option>Marine</option>
-        <option>Artificial - Terrestrial</option>
-        <option>Artificial - Aquatic</option>
-        <option>Introduced Vegetation</option>
-        <option>Other</option>
-        <option>Unknown</option>
-        </select-->	
-
         <div class="habitat_div dropdown" style="z-index:11;">
             <div class="selected_habitat selected_value dropdown-toggle btn" data-toggle="dropdown">
                 <span style="float:left;"
