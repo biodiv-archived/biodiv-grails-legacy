@@ -229,7 +229,6 @@ class Resource extends Sourcedata implements Rateable {
 			default:
 				break
 		}
-		
 		if(!this.save(flush:true)){
 			this.errors.allErrors.each { log.error it }
 		}

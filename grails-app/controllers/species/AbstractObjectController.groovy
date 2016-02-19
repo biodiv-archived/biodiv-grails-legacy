@@ -61,10 +61,8 @@ abstract class AbstractObjectController {
                 utilsService.putInCache(cacheName, cacheKey, result);
             }
         } else {
-            utilsService.logSql( {
-                def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-                result = formatRelatedResults(relatedObv, params);
-            }, 'AbstractObjectController > related');
+            def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+            result = formatRelatedResults(relatedObv, params);
         }
 
         withFormat {

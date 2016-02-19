@@ -1335,7 +1335,7 @@ class UserGroupService {
     }
 
     def updateResourceOnGroups(instance, List userGroupIds, String submitType, boolean sendMail=true) {
-        return updateResourceOnGroup([userGroups:userGroupIds.code.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType], sendMail)
+        return updateResourceOnGroup([userGroups:userGroupIds.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType], sendMail)
     }
 
     def updateResourceOnGroup(instance, UserGroup userGroup, String submitType, boolean sendMail=true) {
@@ -1346,9 +1346,12 @@ class UserGroupService {
 	def updateResourceOnGroup(params, boolean sendMail=true){
 		def r = [:]
 		try{
-			List groups = params['userGroups'].split(",").collect {
-				UserGroup.read(Long.parseLong(it))
-			}
+			List groups = [];
+            if(params['userGroups'] || params['userGroupsList']) {
+                groups = (params['userGroups']?:params['userGroupsList']).split(",").collect {
+				    UserGroup.read(Long.parseLong(it))
+			    }
+            }
 			def objectIds = params['objectIds']
 			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
 			List obvs = []

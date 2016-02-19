@@ -401,9 +401,7 @@ class Observation extends DataObject {
 	def beforeUpdate() {
         log.debug 'Observation beforeUpdate'
 		if(isDirty() && !isDirty('visitCount') && !isDirty('version')){
-			if(isDirty('resource')) {
-                updateResources();
-            }
+            updateResources();
 			updateIsShowable()
 			
 			if(isDirty('topology')) {
@@ -414,7 +412,7 @@ class Observation extends DataObject {
 	}
 	
 	def beforeInsert() {
-        log.debug 'Observation beforeInsert'
+        println 'Observation beforeInsert'
 		updateLocationScale()
 		updateLatLong()
         updateResources();
@@ -422,11 +420,12 @@ class Observation extends DataObject {
 	}
 	
 	def afterInsert() {
-        log.debug 'Observation afterInsert'
+        println 'Observation afterInsert'
 		sourceId = sourceId ?:id
 	}
 	
 	def afterUpdate(){
+        println 'Observation afterUpdate'
 		//XXX uncomment this method when u actully abt to change isShowable variable
 		// (ie. if media added to obv of checklist then this method should be uncommented)
 		//activityFeedService.updateIsShowable(this)
@@ -468,10 +467,24 @@ class Observation extends DataObject {
 	}
 
 	private void updateReprImage() {
-        log.debug "Observation updateReprImage"
-        def res = listResourcesByRating(1)
-        if(res && !res.fileName[0].equals('i')) 
-            res = res[0]
+        println "Observation updateReprImage"
+        println this.resource
+        if(!this.resource) return;
+        Resource highestRatedResource = null;
+        this.resource.each { r ->
+            if(r.id && r.isAttached()) {
+                if(!highestRatedResource || highestRatedResource.averageRating > r.averageRating) {
+                    highestRatedResource = r;
+                }
+            }
+            println r.fileName
+            println r.rating
+            println r.totalRatings
+            println r.averageRating
+        }
+        def res = highestRatedResource;//listResourcesByRating(1)
+        if(res && !res.fileName.equals('i')) 
+            res = res
 		else 
 			res = null;//group?.icon(ImageType.ORIGINAL)
             

@@ -287,7 +287,7 @@ class UserGroupTagLib {
 		userGroups.each {
 			result[it] = false;
 		}
-		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:[userGroups:result]);
+		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:['userGroups':result]);
 	}
     
     
@@ -337,7 +337,7 @@ class UserGroupTagLib {
 		def user = springSecurityService.getCurrentUser();
 		//TODO:optimize count
 		if(user && user.getUserGroups().size() > 0) {
-			out<< body();
+			out << body();
 		}
 	}
 

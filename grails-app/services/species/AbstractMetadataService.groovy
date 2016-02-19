@@ -202,17 +202,18 @@ class AbstractMetadataService extends AbstractObjectService {
 
     def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
 		if(!instance) return
-
+            println "================="
+println userGroupIds
 		def instanceInUserGroups = instance.userGroups.collect { it.id + ""}
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
 			log.debug 'removing instance from usergroups'
-			userGroupService.removeResourceOnGroups(documentInstance, docInUserGroups, sendMail);
+			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
-			userGroupService.addResourceOnGroups(documentInstance, userGroupIds, sendMail);
-			docInUserGroups.removeAll(toRemainInUserGroups)
-			userGroupService.removeResourceOnGroups(documentInstance, docInUserGroups, sendMail);
+			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail);
+			instanceInUserGroups.removeAll(toRemainInUserGroups)
+			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		}
 	}
 
