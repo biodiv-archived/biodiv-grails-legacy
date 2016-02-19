@@ -84,8 +84,7 @@ function initializeGallery(resources,domainObj){
         photo.icon = (photo.icon)?photo.icon:defaultThumb;
         if(photo.type == 'Image' || photo.type == 'Video'){
             // Adding Thumbnail
-            $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
-
+                $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
         }    
         // For Slider    
         //TODO some More fix here
@@ -138,8 +137,8 @@ function initializeGallery(resources,domainObj){
         audioInit();        
     }
 
-
     $('.jc').jcarousel();
+
     console.log(carouselLinks);
     // Initialize the Gallery as image carousel:
     gallery = blueimp.Gallery(carouselLinks, {
@@ -156,6 +155,9 @@ function initializeGallery(resources,domainObj){
             },           
             onslideend: function (index, slide) {                
                 // Callback function executed after the slide change transition.
+                if( index % 5 == 0 ) {
+                    jQuery('.jc').jcarousel('scroll', index+1);
+                }
                 $('.thumb').css('opacity','0.6');
                 $('.thumb_'+index).css('opacity','initial');
                 if($('.imageAttr_'+index,'.videoAttr_'+index).hasClass('open')){
