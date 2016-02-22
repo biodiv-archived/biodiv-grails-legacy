@@ -164,8 +164,10 @@ class ActivityFeedService {
 						activityHolderType:getType(activityHolder), \
 						rootHolderId:rootHolder?.id, rootHolderType:getType(rootHolder), \
 						isShowable:isShowable,\
-						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
-		
+						activityType:activityType, \
+                        subRootHolderType:subRootHolderType, \
+                        subRootHolderId:subRootHolderId, \
+                        activityDescrption:description);
 		ActivityFeed.withNewSession {
 				if(!af.save(flush:flushImmidiatly)){
 					af.errors.allErrors.each { log.error it }
@@ -286,9 +288,11 @@ class ActivityFeedService {
 				break
 			case SPECIES_RECOMMENDED:
 				activityTitle = getLocalizedMessage(SPECIES_RECOMMENDED) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				text = feedInstance.activityDescrption
 				break
 			case SPECIES_AGREED_ON:
 				activityTitle =  getLocalizedMessage(SPECIES_AGREED_ON) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				text = feedInstance.activityDescrption
 				break
             case [utilsService.OBV_LOCKED, utilsService.OBV_UNLOCKED]:
 				activityTitle =  getLocalizedMessage(activityType) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
@@ -397,7 +401,6 @@ class ActivityFeedService {
 				activityTitle = getLocalizedMessage(activityType)
 				break
 		}
-		
 		return [activityTitle:activityTitle, text:text]
 	}
 	
@@ -444,14 +447,15 @@ class ActivityFeedService {
 		def speciesId = recoVote?.recommendation?.taxonConcept?.findSpeciesId();
 		String sb = ""
 		if(speciesId != null){
-			sb =  '<a href="' + utilsService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>$recoVote.givenSciName</i>" + "</a>"
+			sb =  '<a href="' + utilsService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>${recoVote.givenSciName}</i>" + "</a>"
             //sb = sb.replaceAll('"|\'','\\\\"')
 		}else if(recoVote.recommendation.isScientificName){
-			sb = "<i>$recoVote.givenSciName</i>"
+			sb = "<i>${recoVote.givenSciName}</i>"
 		}else{
 			sb = recoVote.givenCommonName
 		}
-		 return "" + sb
+
+		 return "Given name is : " + sb
 	}
 	
 	def getSpeciesNameHtmlFromReco(reco, params){

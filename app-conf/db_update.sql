@@ -578,3 +578,7 @@ update recommendation_vote set given_common_name=reco.name from recommendation r
 update recommendation set accepted_name_id = taxon_concept_id;
 
 #run gbifMigration + colReport userscripts before gbifupload
+
+# 22 Feb 2016
+alter table observation alter column longitude type double precision;
+alter table observation alter column latitude type double precision;
