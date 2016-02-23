@@ -1422,7 +1422,7 @@ function addListLayout(){
     $('.prop').css('clear','inherit');
     $('.showObvDetails, .view_bootstrap_gallery').show();
     $('.species_title_wrapper').hide();
-    $('.species_title_wrapper').parent().css({'height':'0px'});
+    $('.species_title_wrapper').parent().css({'height':'20px'});
     //loadSpeciesnameReco();
     initializeLanguage();
 
