@@ -134,9 +134,9 @@ def obvId = observationInstance?.id
 
     <div class="recommendations sidebar_section" style="width: 97%;float: right;top: 0px;padding-bottom: 3px;margin-bottom: -3px;position: relative;">
     <div>
+        <g:if test="${recoVotes}">
             <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
-               <% def results = observationInstance.getRecommendationVotes(3,0); %>               
-               <g:render template="/common/observation/showObservationRecosTemplate" model ="['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]"/>
+               <g:render template="/common/observation/showObservationRecosTemplate" model ="['observationInstance':observationInstance, 'result':recoVotes.recoVotes, 'totalVotes':recoVotes.totalVotes, 'uniqueVotes':recoVotes.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]"/>
             </ul>
              <g:if test="${observationInstance.isLocked}">
                   <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-success isLocked">
@@ -144,12 +144,13 @@ def obvId = observationInstance?.id
                   </div>
               </g:if>
               <g:else>
-                     <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-info" style="display:none;"></div>                
+              <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-info" style="display:none;"></div>                
               </g:else>
-                    <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:${results.uniqueVotes>=3?'block':'none' };">
-                        <g:message code="button.show.all" />
-                    </div>
-        </div>
+              <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:${recoVotes.uniqueVotes>=3?'block':'none' };">
+                  <g:message code="button.show.all" />
+              </div>
+              </g:if>
+          </div>
         <g:if test="${!observationInstance.isLocked}">
         <a href="javascript:void(0);" class="clickSuggest pull-right" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
         <div class="input-append" style="width:98%; display:none; height: 130px;">

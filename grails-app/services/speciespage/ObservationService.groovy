@@ -2516,16 +2516,128 @@ class ObservationService extends AbstractMetadataService {
 
     }
 
-    def getRecommendationVotes(Observation observationInstance, int limit, long offset) {
+    Map getRecommendationVotes(Observation observationInstance, int limit, long offset) {
+        return getRecommendationVotes([observationInstance], limit, offset).get(observationInstance.id) 
+    }
+
+    Map getRecommendationVotes(List<Observation> observationInstanceList, int limit, long offset) {
 		if(limit == 0) limit = 3;
+        //NOT USING limit and offset as the max distinct recos at the moment is just 5
 		def sql =  Sql.newInstance(dataSource);
-        
-		def result = [];
-        int totalVotes = 0;
-        int uniqueVotes = 0;
+       
+        Map obvListRecoVotesResult = [:];
+        //This query works on view
+        String query = "";
+        List queryParams = [];
+        if(observationInstanceList.size() == 1) {
+            query = "select * from reco_vote_details as rv where rv.observation_id = ?"; 
+            queryParams = [observationInstanceList[0].id]
+        } else {
+            Long[] obvIds = new Long[observationInstanceList.size()];
+            observationInstanceList.eachWithIndex { obv, i ->
+                obvIds[i] = obv.id
+            }
+            queryParams = []
+            query = "select * from reco_vote_details as rv where rv.observation_id in ("+obvIds.join(',')+") order by rv.observation_id";
+        }
+
+        log.debug 'ObservationService : getRecommendationVotes query : '+query+" queryParams: ${queryParams}"
+		List recoVotes = sql.rows(query, queryParams);        
+		SUser currentUser = springSecurityService.currentUser;
+        Map recoMaps = [:];
+	    Long englishId = Language.getLanguage(null).id
+
+        recoVotes.each { recoVote ->
+            Map obvRecoVotesResult = obvListRecoVotesResult.get(recoVote.observation_id);
+            if(!obvRecoVotesResult) {
+                obvRecoVotesResult = ['recoVotes':[], 'totalVotes':0, 'uniqueVotes':0];
+                obvListRecoVotesResult.put(recoVote.observation_id, obvRecoVotesResult);
+            }
+
+            //collecting reco details
+            Map map = [:];
+            if(recoMaps.containsKey(recoVote.reco_id))  {
+                map = recoMaps.get(recoVote.reco_id);
+            } else { 
+                map.put("recoId", recoVote.reco_id);
+                map.put("isScientificName", recoVote.is_scientific_name);
+
+                if(recoVote.taxon_concept_id) {
+                    map.put("speciesId", recoVote.species_id);
+                    map.put("canonicalForm", recoVote.canonical_form)
+                    if(!recoVote.name.equalsIgnoreCase(recoVote.canonical_form) && recoVote.is_scientific_name) {
+                        map.put("synonymOf", recoVote.canonical_form)
+                    }
+                }
+
+                map.put("name", recoVote.name);
+                
+                recoMaps[recoVote.reco_id] = map;
+                obvRecoVotesResult.recoVotes << map;
+            }
+
+            if(recoVote.common_name_reco_id) {
+                if(!map.containsKey('commonNames')) {
+                    map.put('commonNames', [:]);
+                }
+                def cnReco = Recommendation.read(recoVote.common_name_reco_id);
+                def cnLangId = (cnReco.languageId != null)?(cnReco.languageId):englishId
+                if(!map.commonNames.containsKey(cnLangId)) {
+                    map.commonNames[cnLangId] = new HashSet();
+                }
+                map.commonNames[cnLangId].add(cnReco);           
+            }
+
+            if(!map.containsKey('authors')) {
+                map.put('authors', []);
+            }
+            //TODO author details
+            map["authors"] << [SUser.read(recoVote.author_id), recoVote.original_author];//s.collect{[it.author,it.originalAuthor]})
+            if(!map.containsKey('votedOn')) {
+                map.put('votedOn', []);
+            }
+            map["votedOn"] << recoVote.voted_on
+
+            if(!map.containsKey('noOfVotes'))
+                map["noOfVotes"] = 0;
+
+            map["noOfVotes"]++;
+
+            if(recoVote.comment) {
+                if(!map.containsKey('recoComments'))
+                    map["recoComments"] = [];
+                map['recoComments'] << [recoVoteId:recoVote.reco_vote_id, comment:recoVote.comment, author:SUser.read(recoVote.author_id), votedOn:recoVote.voted_on]
+            }
+
+            map.put("obvId", recoVote.observation_id);
+            map.put("isLocked", recoVote.is_locked);
+            if(recoVote.is_locked == false) {
+                map.put("showLock", true);
+            } else {
+                if(recoVote.reco_id == recoVote.max_voted_reco_id){
+                    map.put("showLock", false);                   
+                }
+                else{
+                    map.put("showLock", true);
+                }
+            }
+		}
+
+        obvListRecoVotesResult.each { key, obvRecoVotesResult ->
+            obvRecoVotesResult.recoVotes.each { map ->
+                if(map.commonNames) {
+                    String cNames = Observation.getFormattedCommonNames(map.commonNames, true)
+                    map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
+                }
+                map.put("disAgree", (currentUser in map.authors));
+            }
+
+            obvRecoVotesResult.recoVotes = obvRecoVotesResult.recoVotes.sort {a,b -> b.noOfVotes <=> a.noOfVotes };
+        }
+        return obvListRecoVotesResult;
 
         //utilsService.logSql ({
-
+/*
 		def recoVoteCount;
 		if(limit == -1) {
 			recoVoteCount = sql.rows("select recoVote.recommendation_id as recoId, count(*) as votecount from recommendation_vote as recoVote where recoVote.observation_id = :obvId group by recoVote.recommendation_id order by votecount desc", [obvId:observationInstance.id])
@@ -2565,5 +2677,26 @@ class ObservationService extends AbstractMetadataService {
 		}
         //} , 'getRecommendationVotes');
 		return ['recoVotes':result, 'totalVotes':totalVotes, 'uniqueVotes':uniqueVotes];
+*/    
+    }
+
+    def suggestedCommonNames(Observation observationInstance, Long recoId) {
+		def englishId = Language.getLanguage(null).id
+		Map langToCommonName = new HashMap()
+		observationInstance.recommendationVote.each { rv ->
+			if(rv.recommendation.id == recoId){
+				def cnReco = rv.commonNameReco
+				if(cnReco){
+					def cnLangId = (cnReco.languageId != null)?(cnReco.languageId):englishId
+					def nameList = langToCommonName.get(cnLangId)
+					if(!nameList){
+						nameList = new HashSet()
+						langToCommonName[cnLangId] = nameList
+					}
+					nameList.add(cnReco)
+				}
+			}
+		}
+        return langToCommonName;
     }
 }

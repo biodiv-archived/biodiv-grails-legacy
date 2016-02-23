@@ -118,6 +118,7 @@ def grailsCacheManager;
                         .getEntries();
 */
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.recoVotes = observationService.getRecommendationVotes(model.observationInstanceList, 3, 0);
             model.userLanguage = utilsService.getCurrentLanguage(request);
             model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
@@ -135,31 +136,18 @@ def grailsCacheManager;
 
         withFormat {
             html {
+                if(!model.model.recoVotes)
+                    model.model.recoVotes = observationService.getRecommendationVotes(model.model.observationInstanceList, 3, 0);
+                println model.recoVotes;
                 if(params.loadMore?.toBoolean()){
-println "1"
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
-                    println "2"
                     model.model['width'] = 300;
                     model.model['height'] = 200;
                     render (view:"list", model:model.model)
                     return;
                 } else {
-                    println "3"
-/*                    model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
-                    def obvListHtml =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
-                    def obvFilterMsgHtml = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
-                    def tagsHtml = "";
-                    if(model.showTags) {
-        //				def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-        //				tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-                    }
-                    
-                    def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal,userLanguage:userLanguage]
-
-                    render result as JSON
-*/
                     return;
                 }
             }
@@ -1160,24 +1148,24 @@ println "1"
             def observationInstance = Observation.get(params.id.toLong())
             if (observationInstance) {
                 def results = observationInstance.getRecommendationVotes(params.max, params.offset);
-                def html =  g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]);
+                def html =  results ? g.render(template:"/common/observation/showObservationRecosTemplate", model:['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]) : '';
                 def speciesNameHtml =  g.render(template:"/common/observation/showSpeciesNameTemplate", model:['observationInstance':observationInstance]);
                 def speciesExternalLinkHtml =  g.render(template:"/species/showSpeciesExternalLinkTemplate", model:['speciesInstance':Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())]);
 
                 html = html.replaceAll('\\n|\\t','');
                 def result = [
                 'status' : 'success',
-                recoVotes:results.recoVotes?:'',
+                recoVotes:results?.recoVotes?:'',
                 canMakeSpeciesCall:params.canMakeSpeciesCall,
                 recoHtml:html?:'',
-                totalVotes:results.totalVotes?:'',
-                uniqueVotes:results.uniqueVotes?:'',
+                totalVotes:results?.totalVotes?:'',
+                uniqueVotes:results?.uniqueVotes?:'',
                 msg:params.msg?:'',
                 speciesNameTemplate:speciesNameHtml?:'',
                 speciesExternalLinkHtml:speciesExternalLinkHtml?:'',
                 speciesName:observationInstance.fetchSpeciesCall()?:'']
 
-                if(results?.recoVotes.size() > 0) {
+                if(results&& results.recoVotes?.size() > 0) {
                     def model = utilsService.getSuccessModel('', null, OK.value(), result);
                     withFormat {
                         json { render model as JSON }

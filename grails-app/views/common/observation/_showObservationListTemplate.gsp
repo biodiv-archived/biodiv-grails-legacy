@@ -53,8 +53,7 @@
 					<g:else>
 						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
 					</g:else>
-					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource, 'styleviewcheck':styleviewcheck]"></obv:showSnippetTablet>
+					<obv:showSnippetTablet model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource, 'styleviewcheck':styleviewcheck, 'recoVotes':recoVotes.get(observationInstance.id)]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>
