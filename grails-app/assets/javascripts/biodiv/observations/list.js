@@ -406,7 +406,7 @@ $(document).ready(function(){
                 params['max'] = parseInt(params['offset'])+parseInt(params['max']);
                 params['offset'] = 0;
                 var History = window.History;
-                History.pushState({state:1}, "Species Portal", '?'+decodeURIComponent($.param(params))); 
+                History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
