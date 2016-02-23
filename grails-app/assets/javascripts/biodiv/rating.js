@@ -6,6 +6,10 @@ $(document).ready(function(){
 });
 
 function rateCallback(ele, successHandler) {
+    if(ele.attr("process") == "true"){
+        return false;         
+    }  
+    ele.attr("process", "true");      
     var form = ele.parent();
     var action = (ele.data('action') == 'unlike')?'unrate':'rate'
     var url = "/rating/"+action+'/'+ele.data('id');
@@ -16,6 +20,7 @@ function rateCallback(ele, successHandler) {
             dataType:'json',
             data:{type:ele.data('type')},
             success: function(data, statusText, xhr, form) {
+                ele.attr("process", "false");
                 updateRating(data.avg, data.noOfRatings, ele)
                 if(successHandler) {
                     successHandler(data.avg, data.noOfRatings, rateFn, form);
@@ -23,7 +28,7 @@ function rateCallback(ele, successHandler) {
                 if(ele.data('action') === 'unlike') {
                     ele.data('action', 'like');
                     ele.attr('title', 'Like');
-                    ele.raty('cancel', true);
+                    //ele.raty('cancel', true);
                 } else if(ele.data('action') === 'like') {
                     ele.data('action', 'unlike');
                     ele.attr('title', 'Unlike');
