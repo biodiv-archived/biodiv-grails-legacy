@@ -229,7 +229,7 @@ h6 {
 	display: inline-block;
 	background-repeat:no-repeat; 
 	background-position:center;
-	background-size: 150px 150px;
+	/*background-size: 150px 150px;*/
 
 }
 
@@ -3375,4 +3375,7 @@ li.group_option span{
 
 .gallery_wrapper .blueimp-gallery > .title{
 	font-size: inherit;
+}
+.license_div{
+	width:120px; 
 }

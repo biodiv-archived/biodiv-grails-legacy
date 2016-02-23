@@ -21,7 +21,6 @@ def obvId = observationInstance?.id
                 
                 <g:if
 				test="${imagePath}">
-                <% imagePath = imagePath.replaceAll('http://indiabiodiversity.localhost.org/','http://indiabiodiversity.org/')%>
 				<span class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''} background-image:url(${imagePath});">
                 </span>
 			</g:if>
