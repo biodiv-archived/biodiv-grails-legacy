@@ -362,9 +362,9 @@ class ObservationService extends AbstractMetadataService {
         } else if(params.filterProperty == "nearByRelated"){
             relatedObv = getNearbyObservationsRelated(params.id?:params.filterPropertyValue, max, offset)
         } else if(params.filterProperty == "nearBy"){
-            float lat = params.lat?params.lat.toFloat():-1;
-            float lng = params.long?params.long.toFloat():-1;
-            relatedObv = getNearbyObservations(lat,lng, max, offset)
+            double lat = params.lat?params.lat.toDouble():-1;
+            double lng = params.long?params.long.toDouble():-1;
+            relatedObv = getNearbyObservations(lat, lng, max, offset)
         } else if(params.filterProperty == "taxonConcept") {
             relatedObv = getRelatedObservationByTaxonConcept(params.filterPropertyValue.toLong(), max, offset)
         } else if(params.filterProperty == "latestUpdatedObservations") {
@@ -798,26 +798,26 @@ class ObservationService extends AbstractMetadataService {
     }
 
     Map getNearbyObservationsRelated(String observationId, int limit, int offset){
-        int maxRadius = 200;
+        int maxRadius = 1.79662235//=200km considering 111.32 km per 1 degree;
         int maxObvs = 50;
         def sql =  Sql.newInstance(dataSource);
         long totalResultCount = 0;
         def nearbyObservations = []
 
         try {
-/*            Observation observation = Observation.read(Long.parseLong(observationId));
-            String centroid = 'POINT('+observation.longitude+'  '+observation.latitude+')';
-           def rows = sql.rows("select count(*) as count from observation as g1 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_MakePoint(${centroid}))/1000) < :maxRadius and g1.is_deleted = false", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
-            totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
+            Observation observation = Observation.read(Long.parseLong(observationId));
+            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+//           def rows = sql.rows("select count(*) as count from observation as g1 where ST_DWithin(ST_Centroid(g1.topology), ${centroid}, :maxRadius) and g1.is_deleted = false", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
+//            totalResultCount = Math.min(rows[0].getProperty("count")-1, maxObvs);
             limit = Math.min(limit, maxObvs - offset);
-            def resultSet = sql.rows("select g1.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology),ST_MakePoint(${centroid}))/1000) as distance from observation as g1 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_GeomFromText('${centroid}'))/1000) < :maxRadius and g1.is_deleted = false order by ST_Distance(g1.topology, ST_GeomFromText('${centroid}')), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
-*/
+            def resultSet = sql.rows("select g1.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology),${centroid})/1000) as distance from observation as g1 where ST_DWithin(ST_Centroid(g1.topology), ${centroid}, :maxRadius) and g1.is_deleted = false order by g1.topology <-> ${centroid} limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
 
-            def rows = sql.rows("select count(*) as count from observation as g1, observation as g2 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
+
+/*            def rows = sql.rows("select count(*) as count from observation as g1, observation as g2 where ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
             def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) as distance from observation as g1, observation as g2 where  ROUND(ST_Distance_Sphere(ST_Centroid(g1.topology), ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false and g1.id = :observationId and g1.id <> g2.id order by ST_Distance_Sphere(g1.topology, g2.topology), g2.last_revised desc limit :max offset :offset", [observationId: Long.parseLong(observationId), maxRadius:maxRadius, max:limit, offset:offset])
-
+*/
             for (row in resultSet){
                 nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
             }
@@ -826,10 +826,10 @@ class ObservationService extends AbstractMetadataService {
         } finally {
             sql.close();
         }
-        return ["observations":nearbyObservations, "count":totalResultCount]
+        return ["observations":nearbyObservations];//, "count":totalResultCount]
     }
 
-    Map getNearbyObservations(float latitude, float longitude, int limit, int offset) {
+    Map getNearbyObservations(double latitude, double longitude, int limit, int offset) {
         if(!latitude || ! longitude) return [count:0];
         int maxRadius = 200;
         int maxObvs = 50;
@@ -838,10 +838,10 @@ class ObservationService extends AbstractMetadataService {
         def sql =  Sql.newInstance(dataSource);
         try {
             String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-            def rows = sql.rows("select count(*) as count from observation as g2 where ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false", [maxRadius:maxRadius]);
+            def rows = sql.rows("select count(*) as count from observation as g2 where ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false", [maxRadius:maxRadius]);
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
-            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) < :maxRadius and g2.is_deleted = false order by ST_Distance(${point}, g2.topology), g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
+            def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false order by ${point} <-> g2.topology, g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
 
             for (row in resultSet){
                 nearbyObservations.add(["observation":Observation.findById(row.getProperty("id")), "title":"Found "+row.getProperty("distance")+" km away"])
@@ -1086,7 +1086,7 @@ class ObservationService extends AbstractMetadataService {
             queryParams['fetchField'] = params.fetchField
             query += " from Observation obv ";
         } else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
-            query += " g2 "
+            query += " obv "
             query += " from Observation obv ";
         } 
         else {
@@ -1248,7 +1248,7 @@ class ObservationService extends AbstractMetadataService {
 
         if(params.type == 'nearBy' && params.lat && params.long) {
             String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-            filterQuery += " and ROUND(ST_Distance_Sphere(${point}, ST_Centroid(obv.topology))/1000) < :maxRadius";
+            filterQuery += " and ST_DWithin(${point}, ST_Centroid(obv.topology)), "+(maxRadius/111.32)+")";
             int maxRadius = params.maxRadius?params.int('maxRadius'):200
             queryParams['maxRadius'] = maxRadius;
 
@@ -1256,7 +1256,7 @@ class ObservationService extends AbstractMetadataService {
             activeFilters["long"] = params.long
             activeFilters["maxRadius"] = maxRadius
             
-            orderByClause = " ST_Distance(${point}, obv.topology)" 
+            orderByClause = " ${point} <-> obv.topology" 
         } 
         
         if(params.filterProperty == 'speciesName' && params.parentId) {
@@ -1297,9 +1297,13 @@ class ObservationService extends AbstractMetadataService {
                     params.parentId = null 
                 }
             }
-            nearByRelatedObvQuery = ', Observation as g2';
-            query += nearByRelatedObvQuery;
-            filterQuery += ' and ROUND(ST_Distance_Sphere(ST_Centroid(obv.topology), ST_Centroid(g2.topology))/1000) < :maxNearByRadius and g2.isDeleted = false and obv.id = :parentId '                                              //removed check for not equal to parentId to include it in show page
+            //nearByRelatedObvQuery = ', Observation as g2';
+            //query += nearByRelatedObvQuery;
+            Observation observation = Observation.read(params.parentId);
+            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, "+(params.maxNearByRadius/111.32)+") = true and obv.isDeleted = false "
+
+//            filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, :maxNearByRadius/111.32) and obv.isDeleted = false "                                              //removed check for not equal to parentId to include it in show page
             queryParams['parentId'] = params.parentId
             queryParams['maxNearByRadius'] = params.maxNearByRadius?params.int('maxNearByRadius'):200;
             

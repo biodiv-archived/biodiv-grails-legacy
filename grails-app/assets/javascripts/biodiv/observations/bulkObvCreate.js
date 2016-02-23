@@ -305,7 +305,7 @@ function initializers(){
     });
     if($(".userGroupsSuperDiv").hasClass("span12")){
         $(".userGroupsSuperDiv").removeClass("span12");
-        $(".userGroupsSuperDiv").addClass("span4");
+        $(".userGroupsSuperDiv").addClass("span5");
     }
     $(".imageHolder").droppable({
         accept: ".addedResource.thumbnail",

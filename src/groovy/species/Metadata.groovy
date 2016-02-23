@@ -72,8 +72,8 @@ abstract class Metadata {
 	LocationScale locationScale;
     Geometry topology;
      
-	float latitude;
-	float longitude;
+	double latitude;
+	double longitude;
 	
     //Taxonomic Coverage
     SpeciesGroup group;
