@@ -34,6 +34,7 @@ function rateCallback(ele, successHandler) {
                     ele.attr('title', 'Unlike');
                 }
             }, error:function (xhr, ajaxOptions, thrownError){
+                    ele.attr("process", "false");
                     handleError(xhr, ajaxOptions, thrownError, this.success, function() {
                         var response = $.parseJSON(xhr.responseText);
                         if(response.error){
