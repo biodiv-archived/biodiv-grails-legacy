@@ -528,6 +528,93 @@ $(document).ready(function(){
         event.preventDefault(); 
     }); 
 
+    $(document).on('submit','.addRecommendation', function(event) {
+        var that = $(this);
+        if($.trim(that.find('.speciesId').attr('data-species')) != $.trim(that.find('.recoName').val())){
+            that.find('.speciesId').val('');
+        }
+        $(this).ajaxSubmit({
+            url:window.params.observation.addRecommendationVoteURL,
+            dataType: 'json', 
+            type: 'GET',
+            beforeSubmit: function(formData, jqForm, options) {
+                console.log(formData);
+                updateCommonNameLanguage(that.find('.languageComboBox'));
+                return true;
+            }, 
+            success: function(data, statusText, xhr, form) {
+                if(data.status == 'success' || data.success == true) {
+                    console.log(data);
+                    if(data.canMakeSpeciesCall === 'false'){
+                        $('#selectedGroupList').modal('show');
+                    } else{
+                        preLoadRecos(3, 0, false,data.instance.observation);
+                        if(that.hasClass('showPage')){
+                            updateUnionComment(null, window.params.comment.getAllNewerComments);
+                            updateFeeds();
+                        }
+                        setFollowButton();
+                        showUpdateStatus(data.msg, data.success?'success':'error');
+                    }
+                    $(".addRecommendation_"+data.instance.observation)[0].reset();
+                    that.find(".canName").val("");   
+                } else {
+                    showUpdateStatus(data.msg, data.success?'success':'error');
+                }                    
+                return false;
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                //successHandler is used when ajax login succedes
+                var successHandler = this.success, errorHandler = showUpdateStatus;
+                handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+            } 
+        }); 
+        event.preventDefault();
+    });
+
+    $(document).on('click','#obvList',function(){           
+        checkUrl("grid","list");
+        params['view'] = "list"; 
+        checkView = true;           
+        $(this).addClass('active');
+        $('#obvGrid').removeClass('active');
+        addListLayout();
+    });
+
+    $(document).on('click','#obvGrid',function(){              
+        checkUrl("list","grid");
+        params['view'] = "grid"; 
+        checkView = false;
+        $(this).addClass('active');
+        $('#obvList').removeClass('active');
+        addGridLayout();
+    });
+
+    $(document).on('click','.clickSuggest',function(){  
+        var obv_id = $(this).attr('rel');
+        var ele_nxt = $(this).next();
+        var wrap_place = ele_nxt.find('.addRecommendation_wrap_place');
+        wrap_place.is(':empty')
+        if(!ele_nxt.is(':visible') && !$.trim( wrap_place.html() ).length){
+            wrap_place.html($('#addRecommendation_wrap').html());
+            wrap_place.find('.addRecommendation').addClass('addRecommendation_'+obv_id);
+            wrap_place.find('input[type="hidden"][name="obvId"]').val(obv_id);
+            initializeNameSuggestion();
+            initializeLanguage(wrap_place.find('.languageComboBox'));
+        }
+        ele_nxt.toggle('slow');
+
+    });
+
+    $(document).on('click','.view_bootstrap_gallery',function(){
+        var ovbId = $(this).attr('rel');
+        var images = $(this).attr('data-img').split(",");
+        $('#links').empty();
+        appendGallery(ovbId,images);           
+    });
+    
+    initializeSpeciesGroupHabitatDropdowns();
+    
     console.log('obv.list.js end');
 });
 
@@ -1393,12 +1480,12 @@ function checkUrl(viewText,changeText){
 
 function initializeSpeciesGroupHabitatDropdowns() {
     console.log('initializeSpeciesGroupHabitatDropdowns');
-    var selectedGroupHandler = function(e){
+    /*var selectedGroupHandler = function(e){
         e.stopPropagation();
         //$(this).dropdown('toggle');
         $(this).closest(".groups_super_div").find(".group_options").toggle();
         //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
-    }
+    }*/
     var selectedGroupOptionHandler = function() {
         var is_save_btn_exists = $(this).closest(".groups_super_div").parent().parent().find('.save_group_btn');
         if(is_save_btn_exists.length == 1){
@@ -1413,12 +1500,12 @@ function initializeSpeciesGroupHabitatDropdowns() {
         }
     }
     
-    var selectedHabitatHandler = function(e) {
+    /*var selectedHabitatHandler = function(e) {
         e.stopPropagation();
         //$(this).dropdown('toggle');
         $(this).closest(".habitat_super_div").find(".habitat_options").toggle();
         //$(this).css({'background-color':'#fbfbfb', 'border-bottom-color':'#fbfbfb'});
-    }
+    }*/
 
     var selectedHabitatOptionHandler = function() {
         $(this).closest(".habitat_super_div").find(".habitat").val($(this).val());
@@ -1437,3 +1524,4 @@ function initializeSpeciesGroupHabitatDropdowns() {
     $('.habitat_super_div').off('click', '.habitat_option', selectedHabitatOptionHandler).on('click',".habitat_option",selectedHabitatOptionHandler);
     
 }
+
