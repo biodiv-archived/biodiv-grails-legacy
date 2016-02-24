@@ -48,7 +48,7 @@
                 </g:else>
                 <g:each in="${speciesFieldInstance.resources}" var="r">
                 <g:if test="${r.type == species.Resource.ResourceType.IMAGE}">
-                <li class="figure" style="list-style: none;">
+                <li class="figure" style="list-style: none;width: 200px;padding-right: 5px;float: left;">
 
 
                 <div class="attributionBlock dropdown"

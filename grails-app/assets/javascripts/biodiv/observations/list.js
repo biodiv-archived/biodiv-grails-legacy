@@ -1138,9 +1138,8 @@ function getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpda
     return params;
 }
 
-function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam) {    
+function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam,updateHistory) {    
     var params = getUpdateGalleryParams(target, limit, offset, removeUser, isGalleryUpdate, removeObv, removeSort, isRegularSearch, removeParam);
-
     isGalleryUpdate = (isGalleryUpdate == undefined)?true:isGalleryUpdate
     if(isGalleryUpdate)
     	params["isGalleryUpdate"] = isGalleryUpdate;
@@ -1158,7 +1157,9 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var doc_url = href+'?'+recursiveDecoded;
     var History = window.History;
     delete params["isGalleryUpdate"]
-    History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
+    if(updateHistory != false){
+        History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
+    }
     console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
         $.ajax({
@@ -1183,7 +1184,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
         if(params.isMapView === "true" || params.bounds != undefined) {
             updateMapView(params);
         }
-    } else {
+    } else {    
         window.location = base+doc_url;
     }
 }
@@ -1440,14 +1441,11 @@ function addGridLayout(){
 function checkUrl(viewText,changeText){
     var ls = window.location.search;
     ls = ls.slice(1);
-    if((!params['view'] || params['view'] == viewText) && !ls){
+    if((!params['view'] || params['view'] == viewText) && ( !ls || ls.split("&").length == 1)){
         var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?view='+changeText;
+        newurl += (!ls)?'':'&'+ls;
         window.history.pushState({path:newurl},'',newurl);               
-    }else{
-        if(ls.split("&").length == 1){
-            var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?view='+changeText;
-            window.history.pushState({path:newurl},'',newurl);   
-        }else{
+    }else{      
         var lang_key = "view=";
         var ps = ls.split("&");
         var flag, i;
@@ -1476,7 +1474,6 @@ function checkUrl(viewText,changeText){
 
         }
     }
-}
 
 function initializeSpeciesGroupHabitatDropdowns() {
     console.log('initializeSpeciesGroupHabitatDropdowns');

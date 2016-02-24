@@ -1,4 +1,4 @@
-var carouselLinks =[],gallery,defaultThumb ;
+var gallery;
 
 //For Audio 
 var audio;
@@ -52,124 +52,126 @@ function youtube_parser(url){
     return (match&&match[7].length==11)? match[7] : false;
 }
 
-function updateGallery1(resources,domainObj){
-    if(resources.length == 0){
-        console.log('Error: Resources is Empty');
-        $('.galleryWrapper, #gallerySpinner').hide();
-        return false;
-    }        
-    initializeGallery(resources,domainObj);        
+function updateGallery1(resources,domainObj,defaultThumb){
+    initializeGallery(resources,domainObj,defaultThumb);        
 
-    rate($('.star_gallery_rating'));   
-    $('.mover img').css('opacity','initial');
-
+    if(resources.length > 0){
+        rate($('.star_gallery_rating'));   
+        $('.mover img').css('opacity','initial');
+    }
 
 }
-function initializeGallery(resources,domainObj){
-    console.log(resources.length);
-    var isAudio = [];
-    var isImageOrVideo = [];
-    $.each(resources, function (index, photo) {
-        if(photo.type == 'Image' || photo.type == 'Video'){
-            isImageOrVideo.push(photo);
-        }else if(photo.type == 'Audio'){
-            isAudio.push(photo);
-        }
-
-    });
-    var gallCount =0;
-    $.each(isImageOrVideo, function (index, photo) {
-        gallCount +=1;
-        photo.url = (photo.url)?photo.url:defaultThumb.replace('_th1','_gall');
-        photo.icon = (photo.icon)?photo.icon:defaultThumb;
-        if(photo.type == 'Image' || photo.type == 'Video'){
-            // Adding Thumbnail
-                $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
-        }    
-        // For Slider    
-        //TODO some More fix here
-        photo.url = (photo.url.indexOf('/biodiv') != -1)?photo.url.replace('.jpg','_gall.jpg'): photo.url;
-
-        if(photo.type == 'Image'){
-            carouselLinks.push({
-                href: photo.url,
-                title: gallCount+'/'+isImageOrVideo.length
-            });
-        }else if(photo.type == 'Video'){
-            carouselLinks.push({
-                youtube: youtube_parser(photo.url),
-                type: 'text/html',
-                title: gallCount+'/'+isImageOrVideo.length
-            });
-        }
-
-        update_imageAttribute(photo,$('.image_info'),index);
-    });
-
-    if(isAudio.length >= 1){
-        if(domainObj == 'observation') {
-            $('.galleryWrapper').after('<div class="audio_container"></div>');
-        }else{
-            $('#resourceTabs').after('<div class="audio_container" style="height:110px;"></div>');        
-        }
-
-        $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
-        $.each(isAudio, function (index, resource) {
-            $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index));
-        });
-        $('.audio_container div').first().show();
-    }
-
-    if(isAudio.length >= 2) {
-        var audio_playlist = '<ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">';
-        $.each(isAudio, function (index, audio) {
-            audio_playlist += '<li class="active" style="display: inline;">';
-            audio_playlist += '<a href="'+audio.url.replace('biodiv/','biodiv/observations/')+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
-            audio_playlist += '</li>';
-        });
-        audio_playlist += '</ul>';
-        if(domainObj == 'observation') {
-            $('.audio_container').css('height','150px');
-        }else{
-            $('.audio_container').css('height','140px')
-        }
-        $('.audio_container').prepend(audio_playlist);
-        audioInit();        
-    }
-
-    $('.jc').jcarousel();
-
-    console.log(carouselLinks);
-    // Initialize the Gallery as image carousel:
-    gallery = blueimp.Gallery(carouselLinks, {
-        container: '#blueimp-image-carousel',
-            carousel: true, 
-            titleElement: 'h6',
-            onopen: function () {
-                // Callback function executed when the Gallery is initialized.
-                $('#gallerySpinner').hide();
-                $('.gallery_wrapper').show();
-
-                // $('.image_info div').first().show();
-                // alert("fddddd");
-            },           
-            onslideend: function (index, slide) {                
-                // Callback function executed after the slide change transition.
-                if( index % 5 == 0 ) {
-                    jQuery('.jc').jcarousel('scroll', index+1);
+function initializeGallery(resources,domainObj,defaultThumb){
+    var carouselLinks =[];
+    if(resources.length > 0){
+            var isAudio = [];
+            var isImageOrVideo = [];
+            $.each(resources, function (index, photo) {
+                if(photo.type == 'Image' || photo.type == 'Video'){
+                    isImageOrVideo.push(photo);
+                }else if(photo.type == 'Audio'){
+                    isAudio.push(photo);
                 }
-                $('.thumb').css('opacity','0.6');
-                $('.thumb_'+index).css('opacity','initial');
-                if($('.imageAttr_'+index,'.videoAttr_'+index).hasClass('open')){
-                    $('.image_info').css('height','auto');
+
+            });
+            var gallCount =0;
+            $.each(isImageOrVideo, function (index, photo) {
+                gallCount +=1;
+                photo.url = (photo.url)?photo.url:defaultThumb.replace('_th1','_gall');
+                photo.icon = (photo.icon)?photo.icon:defaultThumb;
+                if(photo.type == 'Image' || photo.type == 'Video'){
+                    // Adding Thumbnail
+                        $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_'+index+'" rel="'+index+'" src="'+photo.icon+'" /></li>');
+                }    
+                // For Slider    
+                //TODO some More fix here
+                photo.url = (photo.url.indexOf('/biodiv') != -1)?photo.url.replace('.jpg','_gall.jpg'): photo.url;
+
+                if(photo.type == 'Image'){
+                    carouselLinks.push({
+                        href: photo.url,
+                        title: gallCount+'/'+isImageOrVideo.length
+                    });
+                }else if(photo.type == 'Video'){
+                    carouselLinks.push({
+                        youtube: youtube_parser(photo.url),
+                        type: 'text/html',
+                        title: gallCount+'/'+isImageOrVideo.length
+                    });
                 }
-                $('.imageAttr, .videoAttr').hide();
-                $('.imageAttr_'+index+', .videoAttr_'+index).show();
-                $('.thumb').removeClass('active');
-                $('.thumb_'+index).addClass('active');
-                //$('.image_info').html(index);                        
-            },          
-    });
+
+                update_imageAttribute(photo,$('.image_info'),index);
+            });
+
+            if(isAudio.length >= 1){
+                if(domainObj == 'observation') {
+                    $('.galleryWrapper').after('<div class="audio_container"></div>');
+                }else{
+                    $('#resourceTabs').after('<div class="audio_container" style="height:110px;"></div>');        
+                }
+
+                $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
+                $.each(isAudio, function (index, resource) {
+                    $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index));
+                });
+                $('.audio_container div').first().show();
+            }
+
+            if(isAudio.length >= 2) {
+                var audio_playlist = '<ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">';
+                $.each(isAudio, function (index, audio) {
+                    audio_playlist += '<li class="active" style="display: inline;">';
+                    audio_playlist += '<a href="'+audio.url.replace('biodiv/','biodiv/observations/')+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
+                    audio_playlist += '</li>';
+                });
+                audio_playlist += '</ul>';
+                if(domainObj == 'observation') {
+                    $('.audio_container').css('height','150px');
+                }else{
+                    $('.audio_container').css('height','140px')
+                }
+                $('.audio_container').prepend(audio_playlist);
+                audioInit();        
+            }
+        }else{
+            $('.jc_ul').append('<li><img class="thumb img-polaroid thumb_1" rel="1" src="'+defaultThumb+'" /></li>');
+            carouselLinks.push({
+                        href: defaultThumb.replace('_th1','_gall')
+                    });
+           
+        }
+
+        $('.jc').jcarousel();
+        // Initialize the Gallery as image carousel:
+        gallery = blueimp.Gallery(carouselLinks, {
+            container: '#blueimp-image-carousel',
+                carousel: true, 
+                titleElement: 'h6',
+                onopen: function () {
+                    // Callback function executed when the Gallery is initialized.
+                    $('#gallerySpinner').hide();
+                    $('.gallery_wrapper').show();
+
+                    // $('.image_info div').first().show();
+                    // alert("fddddd");
+                },           
+                onslideend: function (index, slide) {                
+                    // Callback function executed after the slide change transition.
+                    if( index % 5 == 0 ) {
+                        jQuery('.jc').jcarousel('scroll', index+1);
+                    }
+                    $('.thumb').css('opacity','0.6');
+                    $('.thumb_'+index).css('opacity','initial');
+                    if($('.imageAttr_'+index,'.videoAttr_'+index).hasClass('open')){
+                        $('.image_info').css('height','auto');
+                    }
+                    $('.imageAttr, .videoAttr').hide();
+                    $('.imageAttr_'+index+', .videoAttr_'+index).show();
+                    $('.thumb').removeClass('active');
+                    $('.thumb_'+index).addClass('active');
+                    //$('.image_info').html(index);                        
+                },          
+        });
 }
 
 function update_imageAttribute(resource,ele,index){
@@ -190,8 +192,7 @@ function update_imageAttribute(resource,ele,index){
     if(resource.contributors && Object.keys(resource.contributors).length > 0){
 
             output += '<div class="conts_wrap_line">';
-            output += '<h5>Contributors</h5>';
-            console.log(resource.contributors);        
+            output += '<h5>Contributors</h5>';       
             $.each(resource.contributors, function (index, contributor) {     
                 output += '<ol>';
                 output += '<li>'+contributor.name+'</li>';
@@ -202,8 +203,7 @@ function update_imageAttribute(resource,ele,index){
 
     if(resource.attributors && Object.keys(resource.attributors).length > 0){
         output += '<div class="conts_wrap_line">';            
-        output += '<h5>Attributors</h5>';
-        console.log(resource.attributors);        
+        output += '<h5>Attributors</h5>';       
         $.each(resource.attributors, function (index, attributor) {     
             output += '<ol>';
             output += '<li>'+attributor.name+'</li>';
@@ -254,7 +254,6 @@ function update_imageAttribute(resource,ele,index){
         output += '<tbody>';
         $.each(resource.annotations, function (key,annotation) {
             if(annotation.value){
-                console.log(annotation.value);
                 output += '<tr>';
                 output += '<td style="word-wrap:break-word;">';
                 if($.isArray(annotation.value) && annotation.value.url) {
@@ -328,9 +327,6 @@ function galleryAjax(url,domainObj){
         url: url,
         dataType:'json'
     }).done(function (result) {
-        console.log(result);
-        console.log(domainObj+'==========================');
-        defaultThumb = result.defaultThumb;
-        updateGallery1(result.resources,domainObj);
+        updateGallery1(result.resources,domainObj,result.defaultThumb);        
     });
 }
