@@ -162,10 +162,12 @@
             }
             li.group_option, li.habitat_option {
                 height: 35px;
+                list-style: none;
             }
             .display_value {
                 display: inline-block !important;
                 margin-top: 4px !important;
+                float:initial !important;
             }
             .selected_group .caret, .selected_habitat .caret , .propagateLicense .caret {
                 margin-top: 12px !important;
