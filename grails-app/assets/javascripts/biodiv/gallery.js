@@ -93,10 +93,14 @@ function initializeGallery(resources,domainObj,defaultThumb){
                         title: gallCount+'/'+isImageOrVideo.length
                     });
                 }else if(photo.type == 'Video'){
+                    var videoId = youtube_parser(photo.url);
                     carouselLinks.push({
-                        youtube: youtube_parser(photo.url),
+                        youtube: videoId,
                         type: 'text/html',
-                        title: gallCount+'/'+isImageOrVideo.length
+                        title: gallCount+'/'+isImageOrVideo.length,
+                        youTubeClickToPlay: false,
+                        href: 'https://www.youtube.com/watch?v='+videoId,
+                        poster: 'https://img.youtube.com/vi/'+videoId+'/maxresdefault.jpg'
                     });
                 }
 
@@ -147,6 +151,7 @@ function initializeGallery(resources,domainObj,defaultThumb){
             container: '#blueimp-image-carousel',
                 carousel: true, 
                 titleElement: 'h6',
+                youTubeClickToPlay: false,
                 onopen: function () {
                     // Callback function executed when the Gallery is initialized.
                     $('#gallerySpinner').hide();
@@ -330,3 +335,5 @@ function galleryAjax(url,domainObj){
         updateGallery1(result.resources,domainObj,result.defaultThumb);        
     });
 }
+
+
