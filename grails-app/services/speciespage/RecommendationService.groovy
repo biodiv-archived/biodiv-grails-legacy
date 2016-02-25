@@ -33,7 +33,7 @@ class RecommendationService {
 	 * @return
 	 */
 	boolean save(Recommendation reco, boolean addToTree = true, boolean doSearchReco=true, boolean flushImmediately=true) {
-		def dupReco = doSearchReco ? searchReco(reco.name, reco.isScientificName, reco.languageId, reco.taxonConcept) : null;
+		def dupReco = doSearchReco ? searchReco(reco.name, reco.isScientificName, reco.languageId, reco.taxonConcept, reco.acceptedName) : null;
 	 	if(dupReco && (reco.id == dupReco.id)){
 			log.debug "Same reco found in database so igonoring save $reco  ... duplicate reco $dupReco"
 			return true
@@ -62,15 +62,11 @@ class RecommendationService {
 		int noOfRecords = 0;
 		def startTime = System.currentTimeMillis()
 		recos.eachWithIndex { Recommendation reco, index ->
-			def dupReco = searchReco(reco.name, reco.isScientificName, reco.languageId, null)
+			def dupReco = searchReco(reco.name, reco.isScientificName, reco.languageId, reco.taxonConcept, reco.acceptedName)
 			if(dupReco && (reco.id == dupReco.id)){
 				log.debug "Same reco found in database so igonoring save $reco   ... duplicate reco $dupReco"
 			} else {
-                if(dupReco && reco.taxonConcept) {
-                    dupReco.taxonConcept = reco.taxonConcept;
-                    reco = dupReco;
-                }
-				if(reco.save()) {
+                if(reco.save()) {
 					noOfRecords++;
 					if(addToTree)
 						namesIndexerService.add(reco);
@@ -297,7 +293,7 @@ class RecommendationService {
 		return null;
 	}
 	
-	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept){
+	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept, acceptedName = null){
         println "${name}  ${isScientificName}    ${languageId}    ${taxonConcept}"
         if(!name) return;
 		def c = Recommendation.createCriteria();
@@ -312,6 +308,8 @@ class RecommendationService {
 			(languageId) ? eq('languageId', languageId) : isNull('languageId');
 			
 			(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
+			
+			(acceptedName) ? eq('acceptedName', acceptedName) : isNull('acceptedName');
 		}
 		
 		if(!recoList){

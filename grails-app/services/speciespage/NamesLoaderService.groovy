@@ -64,13 +64,26 @@ class NamesLoaderService {
   
         def conn = new Sql(dataSource)
         def tmpTableName = "tmp_taxon_concept"
+		def viewQuery = """
+			SELECT t.name AS name,
+			       t.canonical_Form AS canonicalForm,
+			       t.normalized_Form AS normalizedForm,
+			       t.binomial_Form AS binomialForm,
+			       t.id AS id
+			FROM Taxonomy_Definition AS t
+			LEFT OUTER JOIN recommendation r ON t.id = r.taxon_concept_id
+			AND t.lowercase_match_name = r.lowercase_name
+			WHERE r.lowercase_name IS NULL
+			  AND t.status = 'ACCEPTED'
+			ORDER BY t.id;
+		"""
         try {
 			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
-            conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as select t.name as name, t.canonical_Form as canonicalForm, t.normalized_Form as normalizedForm, t.binomial_Form as binomialForm, t.id as id from Taxonomy_Definition as t left outer join recommendation r on t.id = r.taxon_concept_id and t.canonical_form = r.name where r.name is null and  t.status = 'ACCEPTED' order by t.id ");
+            conn.executeUpdate("CREATE TABLE " + tmpTableName +  " as " + viewQuery);
         } finally {
             conn.close();
         }
-
+		def taxonConcepts
         while(true) {
             try {
                 try {
@@ -79,7 +92,7 @@ class NamesLoaderService {
                 } finally {
                     conn.close();
                 }
-                noOfNames += syncRecosFromTaxonConcepts(taxonConcepts);
+                noOfNames += syncRecosFromTaxonConcepts(taxonConcepts, addToTree);
                 offset = offset + limit;
 
             } catch (Exception e) {
@@ -98,26 +111,14 @@ class NamesLoaderService {
         return noOfNames;
     }
 
-    int syncRecosFromTaxonConcepts(List<TaxonomyDefinition> taxonConcepts, boolean addToTree) {
+    int syncRecosFromTaxonConcepts(taxonConcepts, boolean addToTree=false) {
         List recos = [];
         int noOfNames = 0;
         TaxonomyDefinition.withNewTransaction {
-            //def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonConcept where taxonConcept not in (select reco.taxonConcept from Recommendation as reco) and taxonConcept.rank >= :minRank", [minRank:minRankToImport])
-            //def taxonConcepts = TaxonomyDefinition.findAllByRankGreaterThanEquals(minRankToImport);
-            //TODO: select returning different loop in every iteration so using order by. find the reaosn and remove this
-
             taxonConcepts.each { taxonConcept ->
                 if(taxonConcept.name) {
                     def taxonObj = TaxonomyDefinition.read(taxonConcept.id)
-                    recos.add(new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonObj));
-                    //					if(!taxonConcept.canonicalform.equals(taxonConcept.name))
-                    //						recos.add(new Recommendation(name:taxonConcept.canonicalform, taxonConcept:taxonObj));
-                    //					if(!taxonConcept.canonicalform.equals(taxonConcept.normalizedform))
-                    //						recos.add(new Recommendation(name:taxonConcept.normalizedform, taxonConcept:taxonObj));
-                    //					if(taxonConcept.binomialform && !taxonConcept.binomialform.equals(taxonConcept.canonicalform))
-                    //						recos.add(new Recommendation(name:taxonConcept.binomialform, taxonConcept:taxonObj));
-                    // TODO giving species subspecies options to parent taxonEntries
-                    //noOfNames++;
+                    recos.add(new Recommendation(name:taxonConcept.canonicalForm, taxonConcept:taxonObj, acceptedName:taxonObj));
                 }
             }
             noOfNames += recommendationService.save(recos, addToTree);
@@ -126,16 +127,82 @@ class NamesLoaderService {
     }
 
     private int updateTaxonConceptForReco(boolean addToTree){
-        String taxonDefQuery = "select r.id as recoid, t.id as taxonid from recommendation as r, taxonomy_definition as t where r.lowercase_name = t.lowercase_match_name and r.taxon_concept_id is null and r.is_scientific_name = true and t.status = 'ACCEPTED'";
-        String synonymQuery = "select r.id as recoid, asyn.accepted_id as taxonid from recommendation as r, taxonomy_definition as t, accepted_synonym as asyn  where t.id = asyn.synonym_id and r.lowercase_name = t.lowercase_match_name and r.taxon_concept_id is null and r.is_scientific_name = true and t.status = 'SYNONYM'";
-        String commnonNameQuery = """
-        select r.id as recoid,  t.id as taxonid, r.language_id as rl, c.language_id as c_lang from recommendation as r, taxonomy_definition as t, common_names as c where 
-        r.lowercase_name = c.lowercase_name and 
-        ((r.language_id is null and c.language_id is null) or (r.language_id is not null and c.language_id is not null and r.language_id = c.language_id ) or (r.language_id = c.language_id )) and 
-        c.taxon_concept_id = t.id and c.taxon_concept_id is not null and
-        r.taxon_concept_id is null and r.is_scientific_name = false and t.status = 'ACCEPTED';
-        """;
-        def queryList = [taxonDefQuery, synonymQuery, commnonNameQuery]
+        String taxonDefQuery = """
+			SELECT r.id AS recoid,
+			       t.id AS taxonid,
+			       t.id AS acceptedid
+			FROM recommendation AS r,
+			     taxonomy_definition AS t
+			WHERE r.lowercase_name = t.lowercase_match_name
+			  AND r.taxon_concept_id IS NULL
+			  AND r.is_scientific_name = TRUE
+			  AND t.status = 'ACCEPTED' """
+		
+		String synonymQuery = """
+			SELECT r.id AS recoid,
+			       asyn.synonym_id AS taxonid,
+			       asyn.accepted_id AS acceptedid
+			FROM recommendation AS r,
+			     taxonomy_definition AS t,
+			     accepted_synonym AS asyn
+			WHERE t.id = asyn.synonym_id
+			  AND r.lowercase_name = t.lowercase_match_name
+			  AND r.taxon_concept_id IS NULL
+			  AND r.is_scientific_name = TRUE
+			  AND t.status = 'SYNONYM'
+			  AND asyn.synonym_id IN
+			    (SELECT synonym_id
+			     FROM accepted_synonym
+			     GROUP BY synonym_id
+			     HAVING count(*) = 1) """
+
+		String commnonNameQuery = """
+			SELECT r.id AS recoid,
+			       c.taxon_concept_id AS taxonid,
+			       c.taxon_concept_id AS acceptedid
+			FROM recommendation AS r,
+			     common_names AS c,
+				 taxonomy_definition AS t
+			WHERE r.lowercase_name = c.lowercase_name
+			  AND ((r.language_id IS NULL
+			        AND c.language_id IS NULL)
+			       OR (r.language_id IS NOT NULL
+			           AND c.language_id IS NOT NULL
+			           AND r.language_id = c.language_id))
+			  AND r.taxon_concept_id IS NULL
+			  AND r.is_scientific_name = FALSE
+			  AND t.id = c.taxon_concept_id
+			  AND t.status = 'ACCEPTED'
+		"""
+		
+		String commnonNameQuerySyn = """
+			SELECT r.id AS recoid,
+			       c.taxon_concept_id AS taxonid,
+			       asyn.accepted_id AS acceptedid
+			FROM recommendation AS r,
+			     common_names AS c,
+				 taxonomy_definition AS t,
+				 accepted_synonym AS asyn
+			WHERE r.lowercase_name = c.lowercase_name
+			  AND ((r.language_id IS NULL
+			        AND c.language_id IS NULL)
+			       OR (r.language_id IS NOT NULL
+			           AND c.language_id IS NOT NULL
+			           AND r.language_id = c.language_id))
+			  AND asyn.synonym_id = c.taxon_concept_id
+			  AND r.taxon_concept_id IS NULL
+			  AND r.is_scientific_name = FALSE
+			  AND t.id = c.taxon_concept_id
+			  AND t.status = 'SYNONYM'
+			  AND asyn.synonym_id IN
+			    (SELECT synonym_id
+			     FROM accepted_synonym
+			     GROUP BY synonym_id
+			     HAVING count(*) = 1)
+		"""
+	
+
+        def queryList = [taxonDefQuery, synonymQuery, commnonNameQuery, commnonNameQuerySyn]
         int limit = BATCH_SIZE, noOfNames = 0
         queryList.each{ query ->
             int offset = 0
@@ -155,16 +222,17 @@ class NamesLoaderService {
                         def recommendationList;
                         try {
                             conn1 = new Sql(dataSource)
-                            recommendationList = conn1.rows("select recoid, taxonid from " + tmpTableName + " order by recoid limit " + limit + " offset " + offset);
+                            recommendationList = conn1.rows("select recoid, taxonid, acceptedid from " + tmpTableName + " order by recoid limit " + limit + " offset " + offset);
                         } finally {
                             conn1.close();
                         }
 
                         Recommendation.withNewTransaction {
                              recommendationList.each { r ->
-								println "${r.recoid} ${r.taxonid}"
+								println "${r.recoid} ${r.taxonid} ${r.acceptedid}"
                                 Recommendation rec = Recommendation.get(r.recoid);
                                 rec.taxonConcept = TaxonomyDefinition.get(r.taxonid);
+								rec.acceptedName = TaxonomyDefinition.get(r.acceptedid);
                                 recos.add(rec);
                                 //noOfNames++;
                             }
@@ -209,11 +277,37 @@ class NamesLoaderService {
         def tmpTableName1 = "tmp_synonyms_1"
 		def tmpTableName2 = "tmp_synonyms_2"
 		
+		def query1 = """
+			SELECT t.lowercase_match_name AS lowercase_match_name,
+			       t.canonical_form AS canonical_form,
+			       asyn.synonym_id AS taxonconcept,
+			       asyn.accepted_id AS acceptedname
+			FROM accepted_synonym AS asyn,
+			     taxonomy_definition AS t
+			WHERE t.id = asyn.synonym_id
+			  AND t.status = 'SYNONYM';
+		"""
+		
+		def query2 = """
+			SELECT n.canonical_form AS canonical_form,
+			       n.taxonconcept AS taxonconcept,
+			       n.acceptedname AS acceptedname
+			FROM tmp_synonyms_1 AS n
+			LEFT OUTER JOIN recommendation r ON n.lowercase_match_name = r.lowercase_name
+			AND n.taxonconcept = r.taxon_concept_id
+			WHERE r.name IS NULL
+			  AND n.canonical_form IS NOT NULL
+			GROUP BY n.canonical_form,
+			         n.taxonconcept,
+			         n.acceptedname
+			ORDER BY n.taxonconcept
+		"""
+		
         try {
 			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName2);
 			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName1);
-            conn.executeUpdate("CREATE TABLE " + tmpTableName1 +  " as select  t.lowercase_match_name  as lowercase_match_name,  t.canonical_form as canonical_form, asyn.accepted_id as taxonconcept from accepted_synonym as asyn, taxonomy_definition as t where t.id = asyn.synonym_id and t.status = 'SYNONYM'");   
-			conn.executeUpdate("CREATE TABLE " + tmpTableName2 +  " as select n.canonical_form as canonical_form, n.taxonconcept as taxonconcept from " + tmpTableName1 + " as n left outer join recommendation r on n.lowercase_match_name = r.lowercase_name  and n.taxonconcept = r.taxon_concept_id  where r.name is null and n.canonical_form is not null group by n.canonical_form, n.taxonconcept order by n.taxonconcept");
+            conn.executeUpdate("CREATE TABLE " + tmpTableName1 +  " as " + query1);   
+			conn.executeUpdate("CREATE TABLE " + tmpTableName2 +  " as " + query2);
  			conn.executeUpdate("ALTER TABLE " + tmpTableName2 +  " ADD COLUMN id SERIAL PRIMARY KEY");
         } finally {
             conn.close();
@@ -222,14 +316,11 @@ class NamesLoaderService {
             def synonyms
             try {
                 conn = new Sql(dataSource);
-                synonyms = conn.rows("select canonical_form, taxonconcept from " + tmpTableName2 + " order by id limit " + limit + " offset " + offset);
+                synonyms = conn.rows("select canonical_form, taxonconcept, acceptedname from " + tmpTableName2 + " order by id limit " + limit + " offset " + offset);
 				
                 Recommendation.withNewTransaction {
-                   //def synonyms = Synonyms.findAll("from Synonyms as synonym left join Recommendation as recommendation with synonym.name = recommendation.name and synonym.taxonConcept = recommendation.taxonConcept where r.name is null)", [max:NAME_BATCH_TO_LOAD, offset:offset]);
-
-                    synonyms.each { synonym ->
-                        recos.add(new Recommendation(name:synonym.canonical_form, taxonConcept:TaxonomyDefinition.get(synonym.taxonconcept)));
-                        //noOfNames++
+					synonyms.each { synonym ->
+                        recos.add(new Recommendation(name:synonym.canonical_form, taxonConcept:TaxonomyDefinition.get(synonym.taxonconcept), acceptedName:TaxonomyDefinition.get(synonym.acceptedname)));
                     }
 
                     offset = offset + limit;		
@@ -266,12 +357,28 @@ class NamesLoaderService {
         def conn = new Sql(dataSource)
         def tmpTableName = "tmp_common_names"
         def selectQuery = """
-        select n.name as name, n.taxon_concept_id as taxonConcept, n.language_id as language from common_names n left outer join recommendation r on 
-        n.lowercase_name = r.lowercase_name and 
-        ((n.taxon_concept_id is null and r.taxon_concept_id is null) or (n.taxon_concept_id is not null and r.taxon_concept_id is not null and n.taxon_concept_id = r.taxon_concept_id) or (n.taxon_concept_id = r.taxon_concept_id)) and
-        ((r.language_id is null and n.language_id is null) or (r.language_id is not null and n.language_id is not null and r.language_id = n.language_id ) or (r.language_id = n.language_id ))
-        where r.name is null and r.is_scientific_name = false 
-        group by n.name, n.taxon_concept_id, n.language_id, n.id order by n.taxon_concept_id
+			SELECT n.name AS name,
+			       n.taxon_concept_id AS taxonConcept,
+			       n.language_id AS LANGUAGE
+			FROM common_names n
+			LEFT OUTER JOIN recommendation r ON n.lowercase_name = r.lowercase_name
+			AND ((n.taxon_concept_id IS NULL
+			      AND r.taxon_concept_id IS NULL)
+			     OR (n.taxon_concept_id IS NOT NULL
+			         AND r.taxon_concept_id IS NOT NULL
+			         AND n.taxon_concept_id = r.taxon_concept_id))
+			AND ((r.language_id IS NULL
+			      AND n.language_id IS NULL)
+			     OR (r.language_id IS NOT NULL
+			         AND n.language_id IS NOT NULL
+			         AND r.language_id = n.language_id))
+			WHERE r.name IS NULL
+			  AND r.is_scientific_name = FALSE
+			GROUP BY n.name,
+			         n.taxon_concept_id,
+			         n.language_id,
+			         n.id
+			ORDER BY n.taxon_concept_id
         """
         try {
 			conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
@@ -289,8 +396,8 @@ class NamesLoaderService {
 
                 Recommendation.withNewTransaction {
                     commonNames.each { cName ->
-                        recos.add(new Recommendation(name:cName.name, isScientificName:false, languageId:cName.language, taxonConcept:TaxonomyDefinition.read(cName.taxonconcept)));
-                        //noOfNames++
+						def td = TaxonomyDefinition.read(cName.taxonconcept)
+                        recos.add(new Recommendation(name:cName.name, isScientificName:false, languageId:cName.language, taxonConcept:td, acceptedName:TaxonomyDefinition.fetchAccepted(td)));
                     }
                     noOfNames += recommendationService.save(recos, addToTree);
                     recos.clear();

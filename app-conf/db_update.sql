@@ -582,3 +582,8 @@ update recommendation set accepted_name_id = taxon_concept_id;
 # 22 Feb 2016
 alter table observation alter column longitude type double precision;
 alter table observation alter column latitude type double precision;
+
+
+#24 feb 2016
+ALTER TABLE recommendation DROP CONSTRAINT recommendation_taxon_concept_id_key; 
+ALTER TABLE recommendation ADD CONSTRAINT recommendation_taxon_concept_id_key UNIQUE (taxon_concept_id, accepted_name_id, name, language_id);
