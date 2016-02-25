@@ -329,26 +329,10 @@ class Observation extends DataObject {
 	}
 
 	Map suggestedCommonNames(recoId) {
-		def englistId = Language.getLanguage(null).id
-		Map langToCommonName = new HashMap()
-		this.recommendationVote.each{ rv ->
-			if(rv.recommendation.id == recoId){
-				def cnReco = rv.commonNameReco
-				if(cnReco){
-					def cnLangId = (cnReco.languageId != null)?(cnReco.languageId):englistId
-					def nameList = langToCommonName.get(cnLangId)
-					if(!nameList){
-						nameList = new HashSet()
-						langToCommonName[cnLangId] = nameList
-					}
-					nameList.add(cnReco)
-				}
-			}
-		}
-        return langToCommonName;
+        return observationService.suggestedCommonNames(this, recoId);
     }
 
-	String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
+	static String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
 		if(langToCommonName.isEmpty()){
 			return ""
 		}

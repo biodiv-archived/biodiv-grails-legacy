@@ -3376,3 +3376,6 @@ li.group_option span{
 .gallery_wrapper .blueimp-gallery > .title{
 	font-size: inherit;
 }
+.license_div{
+	width:120px; 
+}

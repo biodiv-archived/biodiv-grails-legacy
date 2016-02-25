@@ -21,7 +21,6 @@ def obvId = observationInstance?.id
                 
                 <g:if
 				test="${imagePath}">
-                <% imagePath = imagePath.replaceAll('http://indiabiodiversity.localhost.org/','http://indiabiodiversity.org/')%>
 				<span class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''} background-image:url(${imagePath});">
                 </span>
 			</g:if>
@@ -55,7 +54,7 @@ def obvId = observationInstance?.id
    </g:if>
 </g:each>
      <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery<i class="icon-share icon-white"></i></a>
-	<div class="caption" style="${styleviewcheck?'height:0px;': 'height:50px;'}" >
+	<div class="caption" style="${styleviewcheck?'height:20px;': 'height:50px;'}" >
 		<obv:showStoryTablet
 			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>
 		<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
@@ -134,9 +133,11 @@ def obvId = observationInstance?.id
 
     <div class="recommendations sidebar_section" style="width: 97%;float: right;top: 0px;padding-bottom: 3px;margin-bottom: -3px;position: relative;">
     <div>
+        
             <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
-               <% def results = observationInstance.getRecommendationVotes(3,0); %>               
-               <g:render template="/common/observation/showObservationRecosTemplate" model ="['observationInstance':observationInstance, 'result':results.recoVotes, 'totalVotes':results.totalVotes, 'uniqueVotes':results.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]"/>
+              <g:if test="${recoVotes}">
+               <g:render template="/common/observation/showObservationRecosTemplate" model ="['observationInstance':observationInstance, 'result':recoVotes.recoVotes, 'totalVotes':recoVotes.totalVotes, 'uniqueVotes':recoVotes.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]"/>
+              </g:if>
             </ul>
              <g:if test="${observationInstance.isLocked}">
                   <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-success isLocked">
@@ -144,12 +145,12 @@ def obvId = observationInstance?.id
                   </div>
               </g:if>
               <g:else>
-                     <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-info" style="display:none;"></div>                
+              <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-info" style="display:none;"></div>                
               </g:else>
-                    <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:${results.uniqueVotes>=3?'block':'none' };">
-                        <g:message code="button.show.all" />
-                    </div>
-        </div>
+              <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:${recoVotes?.uniqueVotes>=3?'block':'none' };">
+                  <g:message code="button.show.all" />
+              </div>
+          </div>
         <g:if test="${!observationInstance.isLocked}">
         <a href="javascript:void(0);" class="clickSuggest pull-right" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
         <div class="input-append" style="width:98%; display:none; height: 130px;">

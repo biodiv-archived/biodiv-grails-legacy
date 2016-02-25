@@ -372,7 +372,7 @@ class Utils {
 				<div class="preview">
 					<span class="videoId" style="display:none;">${it[1]}</span>
 				  <img class="thumb" src="http://img.youtube.com/vi/${it[1]}/default.jpg"/>
-				  <img class="play" src="https://s-static.ak.fbcdn.net/rsrc.php/v2/yG/r/Gj2ad6O09TZ.png">
+				  <img class="play" src="/assets/all/play_icon.png">
 				</div>
 				<div class="info">
 				  

@@ -44,7 +44,7 @@
     	<uGroup:objectPost model="['objectInstance':observationInstance, 'userGroup':userGroup, canPullResource:canPullResource]" />
     </g:if>	
 	
-    <g:if test="${!showDetails}">
+    <g:if test="${!showDetails && !observationInstance.isChecklist}">
         <g:render template="/common/observation/noOfResources" model="['instance':observationInstance]"/>
     </g:if>
 </div>
