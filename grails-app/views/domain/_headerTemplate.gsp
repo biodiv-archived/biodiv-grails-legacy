@@ -79,11 +79,11 @@
 						title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span  title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
 					</li>
 
-                    <li
+                    <!--li
 						class="${(params.controller == 'datasource' && params.action == 'list')?' active':''}"><a
 						href="${uGroup.createLink('controller':'datasource', 'action':'list', 'userGroup':userGroupInstance)}"
 						title="${g.message(code:'button.datasource')}"><g:message code="button.datasource" /></a>
-					</li>
+					</li -->
 					
 					<li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
 								href="${uGroup.createLink(mapping:'userGroup', 'action':'pages', 'userGroup':userGroupInstance)}"
@@ -168,9 +168,9 @@
                                             href="${uGroup.createLink("controller":"discussion", "action":"list")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
 					</li>
 
-                    <li class=" ${(params.controller == 'datasource')?'active':''}"><a
+                    <!--li class=" ${(params.controller == 'datasource')?'active':''}"><a
                                             href="${uGroup.createLink("controller":"datasource", "action":"list")}" title="${g.message(code:'button.datasource')}"><g:message code="button.datasource" /></a>
-					</li>
+					</li -->
 
 
 					<!--li class="menu-449 first"><a href="/" title="">Home</a></li-->
