@@ -2525,6 +2525,7 @@ class ObservationService extends AbstractMetadataService {
 		def sql =  Sql.newInstance(dataSource);
        
         Map obvListRecoVotesResult = [:];
+        if(!observationInstanceList) return obvListRecoVotesResult;
         //This query works on view
         String query = "";
         List queryParams = [];
