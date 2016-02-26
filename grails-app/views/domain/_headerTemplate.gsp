@@ -90,7 +90,11 @@
 								title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
 					</li>
 					
-					
+					<li
+						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
+						href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
+						title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
+					</li>
 
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> <g:message code="link.more.button" /> <b class="caret"></b> </a>
@@ -179,6 +183,10 @@
 								title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
 					</li>
 					
+					<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
+                                href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
+					</li>
+
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> <g:message code="link.moree" /> <b class="caret"></b> </a>
 
