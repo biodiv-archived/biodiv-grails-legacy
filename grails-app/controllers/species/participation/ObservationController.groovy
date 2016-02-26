@@ -117,9 +117,9 @@ def grailsCacheManager;
                 .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
                         .getEntries();
 */
+        model.userLanguage = utilsService.getCurrentLanguage(request);
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.recoVotes = observationService.getRecommendationVotes(model.observationInstanceList, 3, 0);
-            model.userLanguage = utilsService.getCurrentLanguage(request);
             model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
@@ -1915,6 +1915,5 @@ private printCacheEntries(cache) {
 
     }
 }
-
 
 }
