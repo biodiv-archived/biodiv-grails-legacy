@@ -430,7 +430,6 @@ class UserGroup implements Taggable {
 	}
     
     static UserGroup findByWebaddress(webaddress){
-        println "Usergroup findByWebaddress overriddedn "
     	if(webaddress){
             return UserGroup.createCriteria().get {
                 eq 'webaddress', webaddress
@@ -440,7 +439,6 @@ class UserGroup implements Taggable {
     }
 
     static List<UserGroup> list() { 
-        println "UserGroup overridden fn for cache"
         return UserGroup.createCriteria().list {
             order('name', 'asc')
             cache true
