@@ -36,7 +36,7 @@
                 
                 <g:if
 				test="${imagePath}">
-                <span class="img-polaroid" style="background-image:url(${imagePath});">
+                <span class="img-polaroid" style="background-image:url('${imagePath}');">
                 </span>
 			</g:if>
 			<g:else>
