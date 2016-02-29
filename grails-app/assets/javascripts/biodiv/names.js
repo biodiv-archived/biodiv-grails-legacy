@@ -76,7 +76,7 @@
                         }  
                         return $( "<li class='span3'></li>" )
                             .data( "ui-autocomplete-item", item )
-                            .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+                            .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.synName)?'<br>' + item.synName :'') + ((item.desc)?'<br>[' + item.desc + ']':'')+"</a>" )
                             .appendTo( ul );
                     }
                 };
