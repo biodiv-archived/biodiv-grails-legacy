@@ -6,7 +6,6 @@ def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.reso
 def controller = observationInstance.isChecklist ? 'checklist' :'observation'
 def obvId = observationInstance?.id
 %>
-
 <g:if test="${observationInstance}">
     <g:set var="featureCount" value="${observationInstance.featureCount}"/>
 </g:if>

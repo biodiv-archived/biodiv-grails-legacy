@@ -3299,6 +3299,7 @@ small {
 .gallery_wrapper .jcarousel-skin-ie7 .jcarousel-item-horizontal{
     margin-right: 0px;
   	padding: 0px 2px;
+  	width: 75px !important;
 }
 
 .gallery_wrapper .jcarousel-skin-ie7 .jcarousel-clip-horizontal{
