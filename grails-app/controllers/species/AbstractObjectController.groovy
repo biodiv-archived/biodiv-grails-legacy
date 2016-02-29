@@ -120,20 +120,32 @@ abstract class AbstractObjectController {
 		return instance
 	}
 
-    @Cacheable('resources')
     def getObjResources(){
         def result = [:];
-        if(params.id){            
-            def objInstance;
-            if(params.controller == 'species'){
-                objInstance = Species.get(params.long('id'));
-            } else if(params.controller == 'observation'){
-                objInstance = Observation.get(params.long('id'));
+
+        String cacheKey = "${params.controller}-${params.id}"
+        String cacheName = 'resources';
+
+        result = utilsService.getFromCache(cacheName, cacheKey);
+        if(!result) {
+            result = [:];
+            if(params.id){            
+                def objInstance;
+                if(params.controller == 'species'){
+                    objInstance = Species.get(params.long('id'));
+                } else if(params.controller == 'observation'){
+                    objInstance = Observation.get(params.long('id'));
+                }
+                result['resources'] = objInstance?.listResourcesByRating();
+                //if(objInstance.hasProperty('group'))
+                result['defaultThumb'] = objInstance?.fetchSpeciesGroup()?.icon(ImageType.ORIGINAL)?.thumbnailUrl(null, '.png', null);
             }
-            result['resources'] = objInstance?.listResourcesByRating();
-            //if(objInstance.hasProperty('group'))
-            result['defaultThumb'] = objInstance?.fetchSpeciesGroup()?.icon(ImageType.ORIGINAL)?.thumbnailUrl(null, '.png', null);
+
+            if(result)
+                utilsService.putInCache(cacheName, cacheKey, result);
         }
+
+
         withFormat {
             json { render result as JSON; }
             xml { render result as XML; }

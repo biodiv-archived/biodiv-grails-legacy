@@ -46,7 +46,6 @@ class SpeciesGroup {
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
 
-        println "using group_icon"
 		def r = new Resource('fileName':"group_icons/speciesGroups/${name}", 'type':ResourceType.IMAGE, 'title':"You can contribute!!!");
         r['baseUrl'] = grailsApplication.config.grails.serverURL
         return r;
@@ -94,7 +93,6 @@ class SpeciesGroup {
 	}
 
     static List<SpeciesGroup> list() { 
-        println "SpeciesGroup overridden fn for cache"
         return SpeciesGroup.createCriteria().list {
             order('groupOrder', 'asc')
             cache true
@@ -102,7 +100,6 @@ class SpeciesGroup {
     }
 
     static SpeciesGroup findByName(String whatever) { 
-        println "SpeciesGroup overridden fn for cache"
         return SpeciesGroup.createCriteria().get {
             eq 'name', whatever
             cache true
