@@ -53,7 +53,10 @@ def obvId = observationInstance?.id
         %>
    </g:if>
 </g:each>
+<g:if test="${photonames!=''}">
      <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery<i class="icon-share icon-white"></i></a>
+</g:if>     
+
 	<div class="caption" style="${styleviewcheck?'height:20px;': 'height:50px;'}" >
 		<obv:showStoryTablet
 			model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress]"></obv:showStoryTablet>

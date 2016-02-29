@@ -6,7 +6,6 @@ var playlist;
 var tracks;
 var current;
 
-//audioInit();
 function audioInit(){
     current = 0;
     audio = $('audio');
@@ -23,16 +22,6 @@ function audioInit(){
         current = link.parent().index();
         run(link, audio[0]);    
     });
-    /*    audio[0].addEventListener('ended',function(e){
-          current++;
-          if(current == len){
-          current = 0;
-          link = playlist.find('a')[0];
-          }else{
-          link = playlist.find('a')[current];    
-          }
-          run($(link),audio[0]);
-          }); */
 }
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
@@ -72,8 +61,11 @@ function initializeGallery(resources,domainObj,defaultThumb){
                 }else if(photo.type == 'Audio'){
                     isAudio.push(photo);
                 }
-
             });
+
+    if(isImageOrVideo.length ==0){
+        $('.galleryWrapper, #gallerySpinner').hide();
+    }
             var gallCount =0;
             $.each(isImageOrVideo, function (index, photo) {
                 gallCount +=1;

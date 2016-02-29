@@ -353,6 +353,7 @@ function initializers(){
     $(".close_user_group").unbind("click").click(function(){
         $(this).closest(".postToGrpsToggle").hide();      
     });
+    $(".dropdown-toggle").dropdown();
 }
 
 function sortMediaOnExif() {
