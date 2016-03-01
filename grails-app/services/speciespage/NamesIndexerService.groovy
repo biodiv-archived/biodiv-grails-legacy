@@ -65,25 +65,31 @@ class NamesIndexerService {
 		//TODO fetch in batches
 		def startTime = System.currentTimeMillis()
 		
-		int limit = 200, offset = 0, noOfRecosAdded = 0;
-        def recos;
+		int limit = 1000, offset = 0, noOfRecosAdded = 0;
+        List recos;
 		try{
 			while(true){
-	            Recommendation.withNewTransaction([readOnly:true]) { status ->
-				recos = Recommendation.listOrderById(max:limit, offset:offset, order: "desc")
-				recos.each { reco ->
-					if(addRecoWithAnalyzer(reco, analyzer, lookup1)){
-						noOfRecosAdded++;
+				Recommendation.withTransaction([readOnly:true]){ status ->
+					recos = Recommendation.listOrderById(max:limit, offset:offset, order: "desc")
+					
+					if(!recos) return; //no more results;
+					
+					
+					recos.each { reco ->
+						if(addRecoWithAnalyzer(reco, analyzer, lookup1)){
+							noOfRecosAdded++;
+						}
 					}
+				
 				}
 				
-				offset = offset + limit;
-				println  "=========== total added recos == $noOfRecosAdded"
-				if(!recos) return; //no more results;
-	            }
 				if(!recos) break; //no more results;
-	            recos.clear();
 				
+				offset = offset + limit;
+				println  "=========== total added recos == $noOfRecosAdded " + new Date()
+				
+	            recos.clear();
+				utilsService.cleanUpGorm(true)
 			}
 			
 			synchronized(lookup) {
@@ -154,11 +160,10 @@ class NamesIndexerService {
 		String synName = (reco.taxonConcept && (reco.taxonConcept != reco.acceptedName))? reco.taxonConcept.normalizedForm : null
 		String acceptedName = (reco.taxonConcept && (reco.taxonConcept != reco.acceptedName))? reco.acceptedName?.normalizedForm : null
 		
-		def species = getSpecies(reco.acceptedName);
 		def icon = getIconPath1(reco)
 		def wt = 0;
 		
-		Record r = new Record(recoId:reco.id, originalName:normName, acceptedName:acceptedName, synName:synName, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:species?.id)
+		Record r = new Record(recoId:reco.id, originalName:normName, acceptedName:acceptedName, synName:synName, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:reco.acceptedName?.findSpeciesId())
 		return r
 	}
 	
@@ -201,31 +206,38 @@ class NamesIndexerService {
 
 			def normName = record.originalName
 			def synName = (record.synName && (normName != record.synName)) ? record.synName : null
-			def desc = (record.acceptedName && (normName != record.acceptedName)) ? record.acceptedName : null
+			def acceptedName = (record.acceptedName && (normName != record.acceptedName)) ? record.acceptedName : null
 
- 			println "   " + normName + "  " + desc
-			result.add([recoId:record.recoId, value:normName, label:highlightedName, desc:desc, synName:synName, icon:icon, speciesId:record.speciesId, languageName:languageName, "category":"Names"]);
+ 			println "   " + normName + "  " + acceptedName
+			result.add([recoId:record.recoId, value:normName, label:highlightedName, acceptedName:acceptedName, synName:synName, icon:icon, languageName:languageName, "category":"Names"]);
 		}
 		return result;
 	}
 	
 	String getIconPath1(Recommendation reco){
-		String imagePath = null;
-		def speciesInstance = getSpecies(reco.acceptedName);
-		if(speciesInstance){
-			def mainImage = speciesInstance.mainImage()
-			def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-			if(mainImage?.fileName == speciesGroupIcon.fileName) {
-				imagePath = mainImage.thumbnailUrl(null, '.png');
-			} else{
-				imagePath = mainImage?mainImage.thumbnailUrl():null;
-			}
-		}
-		else{
-			def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
-			imagePath = mainImage?.thumbnailUrl(null, '.png');
-		}
+		//XXX: Use representative image from species here
+		
+		//String imagePath = null;
+		def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
+		String imagePath = mainImage?.thumbnailUrl(null, '.png');
 		return imagePath
+		
+//		
+//		def speciesInstance = getSpecies(reco.acceptedName);
+//		if(speciesInstance){
+//			def mainImage = speciesInstance.mainImage()
+//			def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+//			if(mainImage?.fileName == speciesGroupIcon.fileName) {
+//				imagePath = mainImage.thumbnailUrl(null, '.png');
+//			} else{
+//				imagePath = mainImage?mainImage.thumbnailUrl():null;
+//			}
+//		}
+//		else{
+//			def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
+//			imagePath = mainImage?.thumbnailUrl(null, '.png');
+//		}
+//		return imagePath
 	}
 	
     String getLabel(String originalName , String inputTerm) {

@@ -147,33 +147,6 @@ class RecommendationService {
 		}
 	}
 	
-	
-	public Recommendation getRecoForScientificName(String recoName,  String canonicalName, Recommendation commonNameReco, Long speciesId = null, boolean flushImmediately=true){
-		def reco, taxonConcept;
-        if(speciesId) {
-            //HACK as record in names indexer is not storing taxonId
-            taxonConcept = Species.read(speciesId)?.taxonConcept;
-        }
-		//
-		//first searching by canonical name. this name is present if user select from auto suggest
-		if(canonicalName && (canonicalName.trim() != "")){
-			return findReco(canonicalName, true, null, taxonConcept, true, canonicalName, flushImmediately);
-		}
-		
-		//searching on whatever user typed in scientific name text box
-		if(recoName) {
-			return findReco(recoName, true, null, taxonConcept, true, null, flushImmediately);
-		}
-		
-		//it may possible certain common name may point to species id in that case getting the SN for it
-		if(commonNameReco && commonNameReco.taxonConcept) {
-			TaxonomyDefinition taxOnConcept = commonNameReco.taxonConcept
-			return findReco(taxOnConcept.canonicalForm, true, null, taxOnConcept, true, null, flushImmediately)
-		}
-		
-		return null;
-	}
-	
     /**
     *   @param recoName a pair of sciName and commonName for it
     *   { 1:{
@@ -260,20 +233,18 @@ class RecommendationService {
         return result;
     }
 
-    public Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco, boolean createNew=true, canonicalName=null, boolean flushImmediately=true){
+    public Recommendation findReco(name, isScientificName, languageId, taxonConceptForNewReco, boolean createNew=true, boolean flushImmediately=true){
 		if(name){
 			// if sn then only sending to names parser for common name only cleaning
 			//XXX setting language id null for scientific name
 			if(isScientificName){
-                if(canonicalName)
-                    name = canonicalName
-                else
-				    name = Utils.getCanonicalForm(name);
+                name = Utils.getCanonicalForm(name);
 				languageId = null
 			}else{
 				//converting common name to title case
 				name = Utils.getTitleCase(Utils.cleanName(name));
 			}
+			
 			Recommendation reco;
             utilsService.benchmark('searchReco') {
                 reco = searchReco(name, isScientificName, languageId, taxonConceptForNewReco)
@@ -293,7 +264,7 @@ class RecommendationService {
 		return null;
 	}
 	
-	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept, acceptedName = null){
+	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept){
         println "${name}  ${isScientificName}    ${languageId}    ${taxonConcept}"
         if(!name) return;
 		def c = Recommendation.createCriteria();
@@ -307,18 +278,31 @@ class RecommendationService {
 			
 			(languageId) ? eq('languageId', languageId) : isNull('languageId');
 			
-			(taxonConcept) ? eq('taxonConcept', taxonConcept) : isNull('taxonConcept');
-			
-			(acceptedName) ? eq('acceptedName', acceptedName) : isNull('acceptedName');
+			if(taxonConcept)
+				eq('taxonConcept', taxonConcept)
 		}
 		
 		if(!recoList){
 			return null
 		}
+		
+		if(recoList.size() == 1)
+			return recoList[0]
+		
 			
-		//in this case if result is one then ok. If multiple then also we will will return first because taxonConcept null condition
-		// already put in search criteria
-		return recoList[0]
+		// if taxon concept is not given and multiple result then trying to get one without taxon concept and returning it	
+		Recommendation retReco
+		if(!taxonConcept){
+			recoList.each { Recommendation r ->
+				if(!retReco){
+					if(!r.taxonConcept){
+						retReco = r
+					}
+				}
+			}
+		}
+		
+		return 	retReco	
 	}
 	
 	List<Recommendation> searchRecoByTaxonConcept(taxonConcept){

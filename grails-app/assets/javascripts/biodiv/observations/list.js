@@ -530,9 +530,6 @@ $(document).ready(function(){
 
     $(document).on('submit','.addRecommendation', function(event) {
         var that = $(this);
-        if($.trim(that.find('.speciesId').attr('data-species')) != $.trim(that.find('.recoName').val())){
-            that.find('.speciesId').val('');
-        }
         $(this).ajaxSubmit({
             url:window.params.observation.addRecommendationVoteURL,
             dataType: 'json', 
