@@ -103,7 +103,7 @@ def obvId = observationInstance?.id
     </div>           
     <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);
     def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()%>
-    <div class="prop" style="margin-top: ${(commonName)?'0px;':'23px;'} ${styleviewcheck?'clear:inherit;': 'clear:both;'}">
+    <div class="prop" style="margin-top:27px; ${styleviewcheck?'clear:inherit;': 'clear:both;'}">
         <div style="float:left;">
             <div class="figure user-icon pull-left" style="display:table;height:32px;">
                 <a href="${userLink}"> 

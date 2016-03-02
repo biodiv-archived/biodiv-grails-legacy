@@ -999,7 +999,7 @@ ul#recoSummary {
 }
 
 .small_profile_pic {
-	max-height: 32px;
+	max-height: 24px;
 	min-height: 16px;
 	max-width: 32px;
 	width: auto;
