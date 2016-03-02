@@ -517,6 +517,11 @@ div.errors {
 	position: relative !important;
 }
 
+.figure img{
+	position: absolute;
+  	bottom: 0;
+  	left: 0;
+}
 .addedResource .metadata {
 	font-size: 0.9em;
 }
@@ -999,7 +1004,7 @@ ul#recoSummary {
 }
 
 .small_profile_pic {
-	max-height: 24px;
+	max-height: 32px;
 	min-height: 16px;
 	max-width: 32px;
 	width: auto;
