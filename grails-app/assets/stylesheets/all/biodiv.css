@@ -517,7 +517,7 @@ div.errors {
 	position: relative !important;
 }
 
-.figure img{
+.prop .figure img{
 	position: absolute;
   	bottom: 0;
   	left: 0;

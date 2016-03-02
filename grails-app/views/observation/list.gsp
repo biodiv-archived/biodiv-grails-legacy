@@ -73,7 +73,10 @@
         border: 3px solid #a6dfc8 !important;
     }
     .showObvDetails{
-        padding: 10px 0px;
+      padding: 5px 0px;
+      height: 165px;
+      position: relative;
+      margin-left: 160px;
     }
     .snippettablet{
         padding: 5px;
@@ -110,6 +113,16 @@
      .resource_in_groups .tile{
          margin-top:0px;
       }
+
+    .observation .prop .value {
+      margin-left: 90px;
+    }
+    .bottom_user_fixed{
+      clear: inherit;
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+    }
      
 </style>
 </head>
