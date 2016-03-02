@@ -440,6 +440,7 @@ beans = {
         restAuthenticationProvider = ref('restAuthenticationProvider')
     }
 
+    webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
 }
 
 
