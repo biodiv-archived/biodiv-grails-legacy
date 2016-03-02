@@ -9,6 +9,7 @@ def obvId = observationInstance?.id
 <g:if test="${observationInstance}">
     <g:set var="featureCount" value="${observationInstance.featureCount}"/>
 </g:if>
+
 <div class="snippet tablet ${styleviewcheck?'snippettablet': ''}" style="height:100%;">
     <g:if test="${featureCount}">
         <span class="badge ${(featureCount>0) ? 'featured':''}"  title="${(featureCount>0) ? g.message(code:'text.featured'):''}"></span>
@@ -103,7 +104,7 @@ def obvId = observationInstance?.id
     </div>           
     <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);
     def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()%>
-    <div class="prop" style="margin-top:27px; ${styleviewcheck?'clear:inherit;': 'clear:both;'}">
+    <div class="prop bottom_user_fixed" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">
         <div style="float:left;">
             <div class="figure user-icon pull-left" style="display:table;height:32px;">
                 <a href="${userLink}"> 
@@ -132,9 +133,9 @@ def obvId = observationInstance?.id
             </div>
         </div>
     </div>            
-
+</div>
     <div class="recommendations sidebar_section" style="width: 97%;float: right;top: 0px;padding-bottom: 3px;margin-bottom: -3px;position: relative;">
-    <div>
+        <div>
         
             <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
               <g:if test="${recoVotes}">
@@ -152,7 +153,7 @@ def obvId = observationInstance?.id
               <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:${recoVotes?.uniqueVotes>=3?'block':'none' };">
                   <g:message code="button.show.all" />
               </div>
-          </div>
+        </div>
         <g:if test="${!observationInstance.isLocked}">
         <a href="javascript:void(0);" class="clickSuggest pull-right" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
         <div class="input-append" style="width:98%; display:none; height: 130px;">
@@ -172,4 +173,4 @@ def obvId = observationInstance?.id
         </div>
         </g:if>
         <br>
-        <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />
+    </div>
