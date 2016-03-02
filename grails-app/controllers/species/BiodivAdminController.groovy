@@ -4,7 +4,10 @@ import java.util.Date;
 import java.lang.Float;
 import species.NamesParser;
 import species.Synonyms;
-
+import species.utils.ImageType;
+import species.utils.ImageUtils
+import species.utils.Utils;
+import grails.util.Environment;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 
 import species.auth.SUser;
@@ -31,16 +34,15 @@ class BiodivAdminController {
     def biodivSearchService;
     def messageSource;
     def msg;
-
+    def utilsService;
+    def banner;
     /**
      * 
      */
     def index = {
+         render(view:"index")
     }
 
-    /**
-     * 
-     */
     def setup = {
         try {
             setupService.setupDefs();
@@ -338,6 +340,26 @@ def user = {
             flash.message = e.getMessage()
         }
         redirect(action: "index")
+    }
+
+ /**
+     * 
+     */
+    def contentupdate(){
+        String content = params.content?.trim()
+        try {
+            def bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);
+            bannerMessageFile.withWriter('UTF-8') { writer -> writer.write(content) };
+            utilsService.loadBannerMessageMap();
+            flash.message = "Updated banner message successfully!"
+            redirect(action: "/index")
+        }
+        catch(ex){
+            ex.printStackTrace();
+            flash.error = "Error in Updating"
+            redirect(action: "/index")
+        }
+        
     }
 
 }
