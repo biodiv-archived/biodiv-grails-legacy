@@ -362,7 +362,7 @@ $(document).ready(function(){
         console.log('obv.click.loadmore start');
         $.autopager({
 
-            autoLoad : false,
+            autoLoad : true,
             // a selector that matches a element of next page link
             link : 'div.paginateButtons a.nextLink',
 
@@ -1396,7 +1396,7 @@ function appendGallery(ovbId,images){
             //console.log("photo ="+photo);
             baseUrl = ""+window.params.observation.serverURL+photo;
             $('<a/>')
-                .append($('<img>').prop('src', baseUrl))
+                .append($('<img>'))
                 .prop('href', baseUrl)                
                 .attr('data-gallery', '')
                 .appendTo(linksContainer);
