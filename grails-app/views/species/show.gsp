@@ -331,7 +331,7 @@
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
                 window.params.queryParamsMax = 8;
                 intializesSpeciesHabitatInterest(false);
-                updateGallery('/species/list', 8, 0, undefined, true);
+                updateGallery('/species/list', 8, 0, undefined, true,undefined,undefined,undefined,undefined,false);
                 var getResourceUrl = "${uGroup.createLink(controller:'species', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
                 galleryAjax(getResourceUrl+'/'+${speciesInstance.id},'species');
             });

@@ -76,7 +76,7 @@
                         }  
                         return $( "<li class='span3'></li>" )
                             .data( "ui-autocomplete-item", item )
-                            .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
+                            .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.synName)?'<br>' + item.synName :'') + ((item.desc)?'<br>[' + item.desc + ']':'')+"</a>" )
                             .appendTo( ul );
                     }
                 };
@@ -108,20 +108,19 @@ function initializeNameSuggestion() {
     $('.commonName').autofillNames({
         'nameFilter':'commonNames',
         focus: function( event, ui ) {
-            //$(this).val( ui.item.label.replace(/<.*?>/g,"") );
-            //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         }, select: function( event, ui ) {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
-            $(this).closest(".commonNameDiv").next().find(".canName").val( ui.item.desc );
-            $(this).closest(".commonNameDiv").next().find(".recoName").val( ui.item.desc );
+            $(this).closest(".commonNameDiv").next().find(".recoId").val( ui.item.recoId);
+            var activeRecoName = ui.item.synName ? ui.item.synName : ui.item.acceptedName
+            $(this).closest(".commonNameDiv").next().find(".recoName").val(activeRecoName);
             if(ui.item.languageName !== null){
                 $(this).closest(".commonNameDiv").find(".languageComboBox").val(ui.item.languageName).attr("selected",true);
                 $(this).closest(".commonNameDiv").find(".languageComboBox").data('combobox').refresh();
             }
             return false;
         }, open: function(event, ui) {
-            //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+            //$(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
         }
 
     });
@@ -130,25 +129,18 @@ function initializeNameSuggestion() {
     $('.recoName').autofillNames({
         'nameFilter':'scientificNames',
         focus: function( event, ui ) {
-            $(this).closest(".sciNameDiv").find(".canName").val("");
-            //$(this).val( ui.item.label.replace(/<.*?>/g,"") );
-            //            $(this).parent().find(".nameSuggestions li a").css('border', 0);
             return false;
         },
         select: function( event, ui ) {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
-            $(this).closest(".sciNameDiv").find(".canName").val( ui.item.value );
-            $(this).closest(".sciNameDiv").find(".mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
-            $(this).closest(".sciNameDiv").find(".speciesId").val( ui.item.speciesId );
+            $(this).closest(".sciNameDiv").find(".recoId").val( ui.item.recoId );
             return false;
         },open: function(event, ui) {
-            //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+            //$(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
         }
     });
 
     $(".recoName").keypress(function() {
-        if ($(this).closest(".sciNameDiv").prev().find(".mappedRecoNameForcanName").val() !== $(this).val()) {
-            $(this).closest(".sciNameDiv").find(".canName").val('');
-        }
+    	$(this).closest(".sciNameDiv").find(".recoId").val('');
     });
 }

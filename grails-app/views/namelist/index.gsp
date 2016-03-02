@@ -48,7 +48,7 @@
                 </div>
                 </div-->
             </div>
-            <div class="span3 listarea">
+            <div class="span3 listarea dirty_listarea">
                 <div class="dirty_list taxon_selector_wrapper_span">
                     Raw List
 
@@ -69,7 +69,7 @@
 
 
             </div>
-            <div class="span3 listarea">
+            <div class="span3 listarea working_listarea">
                 <div class="working_list taxon_selector_wrapper_span">
                     Working List
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.workinglist.info')}"></i>
@@ -88,7 +88,7 @@
                 <g:render template="/namelist/actionFieldsTemplate" model="['showArrow':true]"/>
                 </div-->
             </div>
-            <div class="span3 listarea">
+            <div class="span3 listarea clean_listarea">
                 <div class="clean_list taxon_selector_wrapper_span">
                     Clean List
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.cleanlist.info')}"></i>

@@ -9,19 +9,28 @@ class Record implements Comparable<Record>, Serializable {
 	
 	private static final long serialVersionUID = 7526472295622776147L;
 	
-	Long speciesId;
-	//String name;
+	Long recoId
+	
+	//normalized name for searched string
 	String originalName;
-	String icon;
+	//if name is synonym or common name then storing normalized form of accepted name
+	String acceptedName;
+	//if name is common name of synonym then storing synonym normalized form
+	String synName;
+	
+	// for ordering
 	int wt = 0;
-	String canonicalForm;
+	
+	//additional display info
+	Long speciesId;
+	String icon;
 	boolean isScientificName;
 	//if record represent common name then languageId is useful
 	Long languageId;
 	
+	
 	int compareTo(Record r) {
 		if(this.equals(r))return 0;
-		//return this.name.compareTo(r.name)
 	}
 
 	/* (non-Javadoc)
@@ -29,20 +38,7 @@ class Record implements Comparable<Record>, Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((icon == null) ? 0 : icon.hashCode());
-		//result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((originalName == null) ? 0 : originalName.hashCode());
-		result = prime * result + wt;
-		result = prime * result
-				+ ((canonicalForm == null) ? 0 : canonicalForm.hashCode());
-				
-		result = prime * result + ((isScientificName == null) ? 0 : isScientificName.hashCode());
-		result = prime * result + ((languageId == null) ? 0 : languageId.hashCode());
-		
-		return result;
+		return recoId.hashCode()
 	}
 
 	/* (non-Javadoc)
@@ -53,51 +49,22 @@ class Record implements Comparable<Record>, Serializable {
 		if (this.is(obj)) {
 			return true;
 		}
+		
 		if (obj == null) {
 			return false;
 		}
+		
 		if (!(obj instanceof Record)) {
 			return false;
 		}
+		
 		Record other = (Record) obj;
 		
-//		if (name == null) {
-//			if (other.name != null) {
-//				return false;
-//			}
-//		} else if (!name.equals(other.name)) {
-//			return false;
-//		}
-		if (originalName == null) {
-			if (other.originalName != null) {
-				return false;
-			}
-		} else if (!originalName.equals(other.originalName)) {
-			return false;
-		}
-		if (wt != other.wt) {
-			return false;
-		}
-		if (isScientificName != other.isScientificName) {
-			return false;
-		}
-		if (canonicalForm == null) {
-			if (other.canonicalForm != null) {
-				return false;
-			}
-		} else if (!canonicalForm.equals(other.canonicalForm)) {
-			return false;
-		}
-		if (languageId == null) {
-			if (other.languageId != null) {
-				return false;
-			}
-		} else if (!languageId.equals(other.languageId)) {
-			return false;
-		}
-		return true;
+		return (recoId.hashCode() == other.recoId.hashCode())
 	}
 	
-	
+	public String toString() {
+		return this.class.canonicalName + ":" + recoId
+	}
 	
 }

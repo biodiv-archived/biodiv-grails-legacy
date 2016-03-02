@@ -70,7 +70,7 @@
         
         ${r.commonNames}
     </span>
-    <comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':r.observationInstance?:observationInstance]" />
+    <comment:showCommentPopup model="['commentHolder':r.recoId ? Recommendation.read(r.recoId) : null, 'rootHolder':r.observationInstance?:observationInstance, totalCount:r.recoComments?r.recoComments.size():0, comments:r.recoComments]" />
     </div> 
     
     <script type="text/javascript">

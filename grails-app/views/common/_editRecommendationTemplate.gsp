@@ -67,8 +67,7 @@
                             placeholder='${g.message(code:"editrecomendation.placeholder.scientific")}'
                             class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"/>
                         <div class='nameSuggestions' style='display: block;'></div>
-                        <input type="hidden" name="canName" class="canName" value="${species_canonical_name }"/>
-                        <input type="hidden" name="speciesId" class="speciesId" value="${speciesId}" />
+                        <input type="hidden" name="recoId" class="recoId" />
                         
 
                     </div>

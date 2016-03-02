@@ -463,9 +463,9 @@ function last_actions() {
 		$('#leaveUsModalDialog').modal('show');
 	});
 
-    /*$(".youtube_container").each(function(){
+    $(".youtube_container").each(function(){
         loadYoutube(this);
-    });*/
+    });
     console.log('last actions done');
 }
 
