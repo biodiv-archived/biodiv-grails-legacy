@@ -301,13 +301,15 @@ class NamelistController {
     }
 
     def saveAcceptedName() {
-        def acceptedMatch = JSON.parse(params.acceptedMatch);
-        acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
-        ScientificName sciName = null;
-        sciName = namelistService.saveAcceptedName(acceptedMatch);   
-        println "SCIEN NAME =========== " + sciName
         def res = [:];
-        res['acceptedNameId'] = sciName?sciName.id:"";
+        if(params.acceptedMatch) {
+            def acceptedMatch = JSON.parse(params.acceptedMatch);
+            acceptedMatch.parsedRank =  XMLConverter.getTaxonRank(acceptedMatch.rank);
+            ScientificName sciName = null;
+            sciName = namelistService.saveAcceptedName(acceptedMatch);   
+            println "SCIEN NAME =========== " + sciName
+            res['acceptedNameId'] = sciName?sciName.id:"";
+        }
         render res as JSON;
     }
 }
