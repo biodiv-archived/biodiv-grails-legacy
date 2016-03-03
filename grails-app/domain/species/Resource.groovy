@@ -229,9 +229,12 @@ class Resource extends Sourcedata implements Rateable {
 			default:
 				break
 		}
+
 		if(!this.save(flush:true)){
 			this.errors.allErrors.each { log.error it }
-		}
+		} else {
+            utilsService.evictCache('resources', this.context.toLowerCase()+"-"+this.id);
+        }
 		
 	}
 

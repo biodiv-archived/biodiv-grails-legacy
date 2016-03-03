@@ -1129,5 +1129,20 @@ class UtilsService {
         log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
         cache.put(cacheKey,value);
     }
+
+    def evictInCache(String cacheName, String cacheKey) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Evict result in cache ${cache.name} at key ${cacheKey}"
+        cache.evict(cacheKey);
+    }
+
+    def clearCache(String cacheName) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Clearing Cache ${cache.name}"
+        cache.clear();
+    }
+
 }
 

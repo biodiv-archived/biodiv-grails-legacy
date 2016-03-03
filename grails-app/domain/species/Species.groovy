@@ -474,6 +474,8 @@ class Species implements Rateable {
         this.hasMedia = value;
         if(!this.save(flush:true)) {
             this.errors.each { log.error it }
+        } else {
+            utilsService.evictInCache('resources', 'species-'+this.id);
         }
     }
 	
