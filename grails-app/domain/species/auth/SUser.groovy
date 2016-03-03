@@ -80,7 +80,8 @@ class SUser {
 		 * Also you have to be careful not to run into any conditions where the external system 
 		 * could create the same IDs that you generate internally.
 		 */
-		id generator:"species.utils.PrefillableUUIDHexGenerator"
+		id generator:"species.utils.PrefillableUUIDHexGenerator", params:[sequence_name: "suser_id_seq"] 
+
 		password column: '`password`'
 		aboutMe type:"text";
 		autoTimestamp false;

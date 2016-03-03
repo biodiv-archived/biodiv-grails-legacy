@@ -191,7 +191,7 @@ class ChecklistUtilService {
 //	
 //	private createObservationFromRow(List rowData, Checklist cl, Checklists newChecklist){
 //		def basicData = getBasicObvData(cl)
-//		def observationInstance = observationService.createObservation(basicData)
+//		def observationInstance = observationService.create(basicData)
 //		observationInstance.createdOn = observationInstance.lastRevised = observationInstance.fromDate
 //		observationInstance.sourceId = newChecklist.id
 //		

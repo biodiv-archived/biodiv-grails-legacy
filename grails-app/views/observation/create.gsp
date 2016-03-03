@@ -75,9 +75,8 @@
                 <div class="span12 super-section"  style="clear: both">
                     <g:render template="addNotes" model="['observationInstance':observationInstance]"/>
                 </div>
-				
-				
-                <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
+
+                <g:render template="postToUserGroups"  model="['observationInstance':observationInstance]"/>
                 <div class="span12 submitButtons">
 
                     <g:if test="${observationInstance?.id}">
@@ -90,10 +89,9 @@
                     </g:else>
 
                     <g:if test="${observationInstance?.id}">
-                    <div class="btn btn-danger"
-                        style="float: right; margin-right: 5px;">
+                    <div style="float: right; margin-right: 5px;">
 
-                        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                        <a class="btn btn-danger pull-right" style="margin-right: 5px;"
                             href="#"
                             onclick="return deleteObservation();"><i class="icon-trash"></i><g:message code="button.delete.observation" /></a>
                         <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm'>

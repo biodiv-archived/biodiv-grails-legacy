@@ -516,8 +516,8 @@ class NamelistUtilService {
 			}
 		}
 		
-		Species oldSpecies = Species.findByTaxonConcept(oldName)
-		Species newSpecies = Species.findByTaxonConcept(newName)
+		Species oldSpecies = Species.get(oldName.findSpeciesId())
+		Species newSpecies = Species.get(newName.findSpeciesId())
 		
 		//updating species for names
 		if(!newSpecies && oldSpecies){

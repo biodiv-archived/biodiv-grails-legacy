@@ -10,7 +10,10 @@ class Language {
 	String region;
 	//to identify language for curation
 	boolean isDirty = false;
-	
+
+    static Language defaultLanguage;
+    static transients = ['defaultLanguage']
+
     static constraints = {
 		threeLetterCode(blank:false, nullable:false, unique:true);
 		twoLetterCode(nullable:true);
@@ -22,14 +25,16 @@ class Language {
 	static mapping = {
 		version false;
 		sort 'name';
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	public static Language getLanguage(String languageName){
 		Language lang = null;
 		
 		if(!languageName || languageName.trim() == ""){
-			lang = Language.findByNameIlike(DEFAULT_LANGUAGE);
-		}else{ 
+            if(!Language.defaultLanguage) Language.defaultLanguage = Language.findByName(DEFAULT_LANGUAGE);
+			return Language.defaultLanguage;
+        } else{ 
 			lang = Language.findByNameIlike(languageName.trim());
 			if(!lang){
 				//inserting new language
@@ -60,4 +65,25 @@ class Language {
 	public static filteredList(){
 		return Language.findAllByIsDirtyOrRegionIsNotNull(true).collect{it.name;} ;
 	}
+
+    static List<Language> list() { 
+        return Language.createCriteria().list {
+            order('name', 'asc')
+            cache true
+        }
+    }
+
+    static Language findByName(String whatever) { 
+        return Language.createCriteria().get {
+            eq 'name', whatever
+            cache true
+        }
+    }
+
+    static Language findByTwoLetterCode(String whatever) { 
+        return Language.createCriteria().get {
+            eq 'twoLetterCode', whatever
+            cache true
+        }
+    }
 }

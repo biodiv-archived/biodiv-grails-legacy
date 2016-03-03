@@ -12,12 +12,17 @@
 		</button>
 	</div-->
 
+	<%
+		def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
+		def styleviewcheck = ((!queryParams?.view || queryParams?.view !="grid") && !activeFilters.isChecklistOnly)?true:false;		
+	%>
+
 <g:if test="${!activeFilters.isChecklistOnly}">
 	<div class="btn-group pull-right button-bar">
-        <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small">
+        <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small ${styleviewcheck?'active':''}">
         	<i class="icon-th-list"></i>List
         </a>
-       <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small active">
+       <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small ${!styleviewcheck?'active':''}">
        		<i class="icon-th"></i>Grid
        </a>
     </div>
@@ -38,10 +43,7 @@
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
 		
-			<%
-				def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
-				def styleviewcheck = (params?.view=="list")? true:false;
-			%>
+			
 			<ul class="grid_view thumbnails obvListwrapper">
 			
 				<g:each in="${observationInstanceList}" status="i"
@@ -53,8 +55,7 @@
 					<g:else>
 						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
 					</g:else>
-					<obv:showSnippetTablet
-						model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource, 'styleviewcheck':styleviewcheck]"></obv:showSnippetTablet>
+					<obv:showSnippetTablet model="['observationInstance':observationInstance, 'obvTitle':obvTitleList?.get(i), 'pos': ((observationPos != null)?observationPos+i:0), 'userGroup':userGroupInstance, canPullResource:canPullResource, 'styleviewcheck':styleviewcheck, 'recoVotes':recoVotes.get(observationInstance.id)]"></obv:showSnippetTablet>
 					</li>
 
 				</g:each>

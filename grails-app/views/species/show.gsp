@@ -96,8 +96,7 @@
             #commonNames select{
                 width:245px;
                 margin-left:-15px;
-            }   
-            
+            }            
         </style>
 
         <!--[if lt IE 8]><style>
@@ -191,12 +190,8 @@
 
     <body>
 
-    <link rel="stylesheet" href="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.css">
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/galleria.1.4.2-youtubeV3.js"></script>
-<script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/themes/classic/galleria.classic.min.js"></script>
+   
 
-
-    <script src="/${grailsApplication.metadata['app.name']}/js/galleria/1.4.2/plugins/flickr/galleria.flickr.min.js"></script>
         <g:if test="${speciesInstance}">
         <g:set var="featureCount" value="${speciesInstance.featureCount}"/>
         </g:if>
@@ -336,12 +331,13 @@
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
                 window.params.queryParamsMax = 8;
                 intializesSpeciesHabitatInterest(false);
-                updateGallery('/species/list', 8, 0, undefined, true);
+                updateGallery('/species/list', 8, 0, undefined, true,undefined,undefined,undefined,undefined,false);
+                var getResourceUrl = "${uGroup.createLink(controller:'species', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
+                galleryAjax(getResourceUrl+'/'+${speciesInstance.id},'species');
             });
 
 
             </asset:script>
-
         </body>
 
     </html>

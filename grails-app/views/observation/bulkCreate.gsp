@@ -50,6 +50,10 @@
                 z-index:20;
                 background-color: rgb(106, 201, 162) !important;
             }
+            .userGroupsSuperDiv .thumbnails {
+                margin-left:0px;
+            }
+
             .column.block_row {
                 width:443px;
             }
@@ -70,7 +74,7 @@
                 -webkit-border-radius: 4px;
                 -moz-border-radius: 4px;
                 border-radius: 4px;
-                height:70px;
+                height:100px;
             }
             .selected_habitat, .selected_group {
                 padding: 4px 3px;
@@ -115,13 +119,13 @@
             input[type="text"]:focus {
                 border-width:2px;
             }
-            .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div {
+/*            .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div {
                 width:200px;
             }
             .addObservation .groups_super_div, .addObservation .habitat_super_div {
                 width : 273px;
             }
-            .combobox-container .add-on {
+*/            .combobox-container .add-on {
                 height: 22px !important;
                 left: 68px !important;
             }
@@ -158,10 +162,12 @@
             }
             li.group_option, li.habitat_option {
                 height: 35px;
+                list-style: none;
             }
             .display_value {
                 display: inline-block !important;
                 margin-top: 4px !important;
+                float:initial !important;
             }
             .selected_group .caret, .selected_habitat .caret , .propagateLicense .caret {
                 margin-top: 12px !important;
@@ -219,10 +225,10 @@
                                     <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY")]"/>
                                 </div>
                                 <div class="column propagateGrpHab">
-                                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+                                    <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance, 'action':'show']"/> 
                                 </div>
                                 <div class="column propagateGrpHab">
-                                    <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 
+                                    <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance, 'action':'show']"/> 
                                 </div>
                                 <div class="column propagateDate">
                                     <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
@@ -354,7 +360,7 @@
         
             if($(".userGroupsSuperDiv").hasClass("span12")){
                 $(".userGroupsSuperDiv").removeClass("span12");
-                $(".userGroupsSuperDiv").addClass("span4");
+                $(".userGroupsSuperDiv").addClass("span5");
             } 
         
             if($( "input[name='resType']" ).val() == "species.auth.SUser") {
@@ -367,22 +373,25 @@
                     }
                 });
             }
-            initializeLanguage();
-            
-            $(document).click(function(){
-                $(".group_options").hide();
-                $(".habitat_options").hide();
-            });
+            initializers();
+            //initializeLanguage();
+
+//            $(document).click(function(){
+//                $('.selected_group').dropdown('toggle');
+//                $('.selected_habitat').dropdown('toggle');
+//                $(".group_options").hide();
+//                $(".habitat_options").hide();
+//            });
 
             /* Clicks within the dropdown won't make
             it past the dropdown itself */
-            $(".group_options").click(function(e){
+/*            $(".group_options").click(function(e){
                 e.stopPropagation();
             });
             $(".habitat_options").click(function(e){
                 e.stopPropagation();
             });
-            
+*/            
             //initialize group toggle
 		    $(".toggleGrpsDiv").unbind("click").click(function(){
 		        var me = this;
@@ -391,7 +400,7 @@
 		    $(".close_user_group").unbind("click").click(function(){
 		        $(this).closest(".postToGrpsToggle").hide();      
 		    });
-            
+           
         });
 
         </asset:script>

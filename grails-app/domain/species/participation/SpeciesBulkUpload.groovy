@@ -1,16 +1,19 @@
 package species.participation
 
 import java.util.Date;
+import grails.util.Holders;
 import grails.converters.JSON;
-
 import species.Species;
 import species.auth.SUser;
+
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
 
 
 class SpeciesBulkUpload {
 	private static log = LogFactory.getLog(this);
+	
+	def utilsService
 	
 	public enum Status {
 		SCHEDULED("SCHEDULED"),
@@ -40,6 +43,9 @@ class SpeciesBulkUpload {
 	String errorFilePath;
 	String imagesDir;
 	String uploadType;
+	String logFilePath;
+	
+	File logFile
 	
 	int speciesCreated = 0;
 	int speciesUpdated = 0
@@ -51,6 +57,7 @@ class SpeciesBulkUpload {
     static constraints = {
 		filePath nullable:true
 		errorFilePath nullable:true
+		logFilePath nullable:true
 		imagesDir nullable:true
 		endDate nullable:true
 		uploadType nullable:true
@@ -60,6 +67,9 @@ class SpeciesBulkUpload {
 		version : false;
 		notes type:'text';
     }
+	
+	static transients = [ "logFile" ]
+	
 	
 	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, String uploadType=null, Status status = Status.SCHEDULED){
 		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes, uploadType:uploadType)
@@ -93,4 +103,21 @@ class SpeciesBulkUpload {
 		speciesUpdated = res.speciesUpdated
 		stubsCreated = res.stubsCreated
 	}
+	
+	def writeLog(String content){
+		if(!logFilePath){
+			String contentRootDir = Holders.config.speciesPortal.content.rootDir
+			logFile = utilsService.createFile("logFile.csv" , "species", contentRootDir)
+			logFilePath = logFile.getAbsolutePath();
+			if(!this.save(flush:true)){
+				this.errors.allErrors.each { log.error it }
+			}
+			println "----------------------- logFile path " + logFilePath
+			logFile << "Name|Taxon Id|Status|Position|Rank|Col Id"
+		}
+		
+		def ln = System.getProperty('line.separator')
+		logFile << "$ln$content"
+	}
+	
 }

@@ -21,6 +21,7 @@ class ObservationTagLib {
     def chartService;
 	def customFieldService;
     //def SUserService;
+    def utilsService;
 
 	def create = {attrs, body ->
 		out << render(template:"/common/observation/editObservationTemplate", model:attrs.model);
@@ -83,6 +84,7 @@ class ObservationTagLib {
 			out << render(template:"/common/observation/showObservationLocationTemplate", model:attrs.model);
 		}
 	}
+
 	def showTagsSummary = {attrs, body->
 		if(attrs.model.observationInstance) {
 			def tags = observationService.getRelatedTagsFromObservation(attrs.model.observationInstance)
@@ -229,9 +231,9 @@ class ObservationTagLib {
 		
 		def obj = model.sourceInstance
 		String sourceType
-		if(obj.instanceOf(Checklists) || obj.instanceOf(Document)){
+		if(obj?.instanceOf(Checklists) || obj?.instanceOf(Document)){
 			sourceType = 'checklist'
-		}else if(obj.instanceOf(Observation) && (obj.id != obj.sourceId)){ 
+		}else if(obj?.instanceOf(Observation) && (obj?.id != obj.sourceId)){ 
 			sourceType = 'checklist-obv'
 		}else
 			sourceType = 'observation'
@@ -249,7 +251,6 @@ class ObservationTagLib {
 		out << render(template:"/observation/showCustomFieldsTemplate", model:attrs.model);
 	}
 
-	
 	def rating = {attrs, body->
 		//out << render(template:"/common/ratingTemplate", model:attrs.model);
         def resource = attrs.model.resource
@@ -345,7 +346,8 @@ class ObservationTagLib {
     def featured = { attrs, body ->
         if(attrs.model) {
             def p = [limit:1, offset:0, filterProperty:'featureBy', controller:attrs.model.controller, userGroup:attrs.model.userGroupInstance]
-            def related = observationService.getRelatedObservations(p)?.relatedObv
+            def related;
+            related = observationService.getRelatedObservations(p)?.relatedObv
             if(related) {
                 attrs.model['relatedInstanceList'] = related.observations;
                 attrs.model['relatedInstanceListTotal'] = related.count;

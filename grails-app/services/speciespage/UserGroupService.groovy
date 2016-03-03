@@ -535,15 +535,15 @@ class UserGroupService {
 
         switch(objectType) {
             case Observation.simpleName:
-            queryParams['isDeleted'] = false;
-            queryParams['isChecklist'] = false;
-            //queryParams['isShowable'] = true;
-            query = "select count(*) from Observation obv "
-            if(userGroupInstance)
-                query += "join obv.userGroups userGroup where userGroup=:userGroup and "
-            query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist "// and obv.isShowable = :isShowable"
-            count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
-            break;
+                queryParams['isDeleted'] = false;
+                queryParams['isChecklist'] = false;
+                //queryParams['isShowable'] = true;
+                query = "select count(*) from Observation obv "
+                if(userGroupInstance)
+                    query += "join obv.userGroups userGroup where userGroup=:userGroup and "
+                    query += " obv.isDeleted = :isDeleted and obv.isChecklist = :isChecklist "// and obv.isShowable = :isShowable"
+                    count =  Observation.executeQuery(query, queryParams, [cache:true])[0]
+                    break;
             case Checklists.simpleName:
             queryParams['isDeleted'] = false;
             queryParams['isChecklist'] = true;
@@ -1110,7 +1110,8 @@ class UserGroupService {
 	
 	/////////////// DOCUMENTS RELATED /////////////////
 	void postDocumenttoUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
-		log.debug "Posting ${document} to userGroups ${userGroupIds}"
+        addResourceOnGroups(document, userGroupIds, sendMail);
+		/*log.debug "Posting ${document} to userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
@@ -1118,13 +1119,14 @@ class UserGroupService {
 					postDocumentToUserGroup(document, userGroup, sendMail)
 				}
 			}
-		}
+		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postDocumentToUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
-		userGroup.addToDocuments(document);
+        addResourceOnGroup(document, userGroup, sendMail);
+/*		userGroup.addToDocuments(document);
 		if(!userGroup.save()) {
 			log.error "Could not add ${document} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
@@ -1132,10 +1134,11 @@ class UserGroupService {
 			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
 			log.debug "Added ${document} to userGroup ${userGroup}"
 		}
-	}
+*/	}
 
 	void removeDocumentFromUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
-		log.debug "Removing ${document} from userGroups ${userGroupIds}"
+        removeResourceOnGroups(document, userGroupIds, sendMail);
+		/*log.debug "Removing ${document} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong("" + it));
@@ -1143,13 +1146,14 @@ class UserGroupService {
 					removeDocumentFromUserGroup(document, userGroup, sendMail)
 				}
 			}
-		}
+		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeDocumentFromUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
-		userGroup.documents.remove(document);
+        removeResourceOnGroup(document, userGroup, sendMail);
+/*		userGroup.documents.remove(document);
 		if(!userGroup.save()) {
 			log.error "Could not remove ${document} from ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
@@ -1157,32 +1161,36 @@ class UserGroupService {
 			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
 			log.debug "Removed ${document} from userGroup ${userGroup}"
 		}
-	}
+*/	}
 
-	def getDocumentUserGroups(Document documentInstance, int max, long offset) {
+/*
+    def getDocumentUserGroups(Document documentInstance, int max, long offset) {
 		return documentInstance.userGroups;
 	}
 
-	long getNoOfDocumentUserGroups(Document documentInstance) {
+    long getNoOfDocumentUserGroups(Document documentInstance) {
 		String countQuery = "select count(*) from UserGroup userGroup " +
 				"join userGroup.documents document " +
 				"where document=:document and document.isDeleted=:docIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
 		def count = UserGroup.executeQuery(countQuery, [document:documentInstance, docIsDeleted:false, userGroupIsDeleted:false])
 		return count[0]
-	}
+	}*/
 
 	def long getDocumentCountByGroup(UserGroup userGroupInstance){
-		def queryParams = [:]
+        return getCountByGroup(Document.simpleName, userGroupInstance);
+		/*def queryParams = [:]
 		queryParams['userGroup'] = userGroupInstance
 		queryParams['isDeleted'] = false;
 		
 		def query = "select count(*) from Document doc join doc.userGroups userGroup where doc.isDeleted = :isDeleted and userGroup=:userGroup"
 		return Document.executeQuery(query, queryParams)[0]
+        */
 	}
 	
 	/////////////// Discussion RELATED /////////////////
 	void postDiscussiontoUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
-		log.debug "Posting ${discussion} to userGroups ${userGroupIds}"
+        addResourceOnGroup(discussion, userGroupIds, sendMail);
+		/*log.debug "Posting ${discussion} to userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong(it));
@@ -1190,24 +1198,26 @@ class UserGroupService {
 					postDiscussionToUserGroup(discussion, userGroup, sendMail)
 				}
 			}
-		}
+		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postDiscussionToUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
-		userGroup.addToDiscussions(discussion);
+		addResourceOnGroup(discussion, userGroup, sendMail);
+        /*userGroup.addToDiscussions(discussion);
 		if(!userGroup.save()) {
 			log.error "Could not add ${discussion} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
 			log.debug "Added ${discussion} to userGroup ${userGroup}"
-		}
+		}*/
 	}
 
 	void removeDiscussionFromUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
-		log.debug "Removing ${discussion} from userGroups ${userGroupIds}"
+        removeResourceOnGroups(discussion, userGroupIds, sendMail);
+		/*log.debug "Removing ${discussion} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong("" + it));
@@ -1215,20 +1225,21 @@ class UserGroupService {
 					removeDiscussionFromUserGroup(discussion, userGroup, sendMail)
 				}
 			}
-		}
+		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeDiscussionFromUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
-		userGroup.discussions.remove(discussion);
+        addResourceOnGroup(discussion, userGroup, sendMail);
+		/*userGroup.discussions.remove(discussion);
 		if(!userGroup.save()) {
 			log.error "Could not remove ${discussion} from ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
 			log.debug "Removed ${discussion} from userGroup ${userGroup}"
-		}
+		}*/
 	}
 
 	/////////////// PROJECTS RELATED /////////////////
@@ -1247,18 +1258,20 @@ class UserGroupService {
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postProjectToUserGroup(Project project, UserGroup userGroup) {
-		userGroup.addToProjects(project);
+        addResourceOnGroup(project, userGroup);
+		/*userGroup.addToProjects(project);
 		if(!userGroup.save()) {
 			log.error "Could not add ${project} to ${userGroup}"
 			log.error  userGroup.errors.allErrors.each { log.error it }
 		} else {
 			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, true);
 			log.debug "Added ${project} to userGroup ${userGroup}"
-		}
+		}*/
 	}
 
 	void removeProjectFromUserGroups(Project project, List userGroupIds) {
-		log.debug "Removing ${project} from userGroups ${userGroupIds}"
+        removeResourceOnGroups(project, userGroupIds);
+		/*log.debug "Removing ${project} from userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {
 				def userGroup = UserGroup.read(Long.parseLong("" + it));
@@ -1266,12 +1279,14 @@ class UserGroupService {
 					removeProjectFromUserGroup(project, userGroup)
 				}
 			}
-		}
+		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeProjectFromUserGroup(Project project, UserGroup userGroup) {
+        removeResourceOnGroup(project, userGroup);
+        /*
 		userGroup.projects.remove(project);
 		if(!userGroup.save()) {
 			log.error "Could not remove ${project} from ${userGroup}"
@@ -1279,7 +1294,7 @@ class UserGroupService {
 		} else {
 			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, false);
 			log.debug "Removed ${project} from userGroup ${userGroup}"
-		}
+		}*/
 	}
 
 	def getProjectUserGroups(Project projectInstance, int max, long offset) {
@@ -1302,13 +1317,41 @@ class UserGroupService {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////// Bulk posting ////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
-	
-	def updateResourceOnGroup(params){
+
+    def addResourceOnGroups(instance, List userGroupIds, boolean sendMail=true) {
+        return updateResourceOnGroups(instance, userGroupIds, 'post', sendMail);
+    }
+
+    def removeResourceOnGroups(instance, List userGroupIds, boolean sendMail=true) {
+        return updateResourceOnGroups(instance, userGroupIds, 'remove', sendMail);
+    }
+
+    def addResourceOnGroup(instance, UserGroup userGroup, boolean sendMail=true) {
+        return updateResourceOnGroup(instance, userGroup, 'post', sendMail);
+    }
+
+    def removeResourceOnGroup(instance, UserGroup userGroup, boolean sendMail=true) {
+        return updateResourceOnGroup(instance, userGroup, 'remove', sendMail);
+    }
+
+    def updateResourceOnGroups(instance, List userGroupIds, String submitType, boolean sendMail=true) {
+        return updateResourceOnGroup([userGroups:userGroupIds.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType], sendMail)
+    }
+
+    def updateResourceOnGroup(instance, UserGroup userGroup, String submitType, boolean sendMail=true) {
+        return updateResourceOnGroup([userGroups:userGroup.id, objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType], sendMail)
+    }
+
+
+	def updateResourceOnGroup(params, boolean sendMail=true){
 		def r = [:]
 		try{
-			List groups = params['userGroups'].split(",").collect {
-				UserGroup.read(Long.parseLong(it))
-			}
+			List groups = [];
+            if(params['userGroups'] || params['userGroupsList']) {
+                groups = (params['userGroups']?:params['userGroupsList']).split(",").collect {
+				    UserGroup.read(Long.parseLong(it))
+			    }
+            }
 			def objectIds = params['objectIds']
 			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
 			List obvs = []
@@ -1348,7 +1391,7 @@ class UserGroupService {
 					break
 			}
 			
-			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, groupRes, functionString)
+			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, groupRes, functionString, sendMail)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
 		}catch (Exception e) {
@@ -1366,7 +1409,7 @@ class UserGroupService {
 		
 		SUser currUser = springSecurityService.currentUser;
 		//returning true for user with admin role
-		if(utilsService.isAdmin(currUser?.id)){
+		if(utilsService.isAdmin(currUser)){
 			return true
 		}
 		
@@ -1392,7 +1435,7 @@ class UserGroupService {
 		public static final int POST_BATCH_SIZE = 100
 		private static final log = LogFactory.getLog(this);
 		
-		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction){
+		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction, boolean sendMail=true){
 			ResourceFetcher rf
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
 				rf = new ResourceFetcher(params.objectType, params.filterUrl, params.webaddress)
@@ -1411,7 +1454,7 @@ class UserGroupService {
 				boolean success = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
 				if(success){
 					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
-					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false)
+					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false, sendMail)
 					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
 				}
 			}

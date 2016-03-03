@@ -76,7 +76,7 @@ class DocumentTokelUrlJob {
 	}
 
 	private synchronized getDocumentTokelUrl(){
-		List scheduledTaskList = DocumentTokenUrl.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:5])
+		List scheduledTaskList = DocumentTokenUrl.findAllByStatus(ObvUtilService.SCHEDULED, [sort: "createdOn", order: "asc", max:5, cache:false])
 		if(scheduledTaskList.isEmpty()){
 			return null
 		}

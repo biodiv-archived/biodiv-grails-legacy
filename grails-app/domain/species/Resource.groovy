@@ -10,6 +10,7 @@ import species.utils.Utils;
 import org.grails.rateable.*
 import content.eml.Document;
 import species.participation.UsersResource;
+import grails.converters.JSON
 
 class Resource extends Sourcedata implements Rateable {
 	
@@ -87,11 +88,16 @@ class Resource extends Sourcedata implements Rateable {
 	ResourceContext context;
     def grailsApplication
     Language language;
-	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation, licenses:License];
+    String annotations;
+    String accessRights;
+    License license;
+
+	static hasMany = [contributors:Contributor, attributors:Contributor, speciesFields:SpeciesField, observation:Observation];
 	static belongsTo = [SpeciesField, Observation];
 	
 	static mapping = {
 		description type:'text';
+		annotations type:'text';
 		sort "id"
 	}
 	
@@ -101,9 +107,11 @@ class Resource extends Sourcedata implements Rateable {
 		url(nullable:true);
 		description(nullable:true);
 		mimeType(nullable:true);
-		licenses  validator : { val, obj -> val && val.size() > 0 }
+		//licenses  validator : { val, obj -> val && val.size() > 0 }
         rating(nullable:false, min:0, max:5);
         context(nullable:true);
+        annotations(nullable:true);
+        accessRights(nullable:true);
     }
 	
 	static transients = ['baseUrl']
@@ -125,7 +133,13 @@ class Resource extends Sourcedata implements Rateable {
 
 		switch(type) {
 			case  ResourceType.IMAGE :
-				thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
+                if(url && url.endsWith('no-image.jpg')) {
+                    return ;
+                } else if(url && fileName.length() == 1) {
+                    thumbnailUrl = url;
+                } else {
+				    thumbnailUrl = newBaseUrl + "/" + ImageUtils.getFileName(this.fileName, imageType, defaultFileType)
+                }
 				break;
 			case ResourceType.VIDEO :				
                 if( imageType == ImageType.ORIGINAL) {
@@ -138,7 +152,7 @@ class Resource extends Sourcedata implements Rateable {
                 if( imageType == ImageType.ORIGINAL) {
                     return grailsApplication.config.grails.serverURL+this.fileName
                 }
-				thumbnailUrl = grailsApplication.config.grails.serverURL+"/images/audioicon.png"
+				thumbnailUrl = grailsApplication.config.grails.serverURL+"/assets/all/audioicon.png"
 				break;	
             case ResourceType.ICON :
                 break;
@@ -153,7 +167,8 @@ class Resource extends Sourcedata implements Rateable {
 		String path = '';
 		switch(this.type){
 			case ResourceType.IMAGE :
-				if(this.observation != null){
+				if(this.observation != null) { 
+                    if(url) return url;
 					path = grailsApplication.config.speciesPortal.observations.rootDir + "/" + this.fileName;
 					return path;
 				}
@@ -214,11 +229,22 @@ class Resource extends Sourcedata implements Rateable {
 			default:
 				break
 		}
-		
 		if(!this.save(flush:true)){
 			this.errors.allErrors.each { log.error it }
 		}
 		
 	}
-	
+
+    def fetchAnnotations() {
+        def m = [:];
+        if(this.annotations) {
+            JSON.parse(this.annotations).each {
+                if(it.value) {
+                    m[it.key] = ['value':it.value]
+                }
+            }
+        }
+        return m
+            
+    }
 }

@@ -42,20 +42,15 @@
 //= require leaflet/wicket.js
 //= require leaflet/wicket-leaflet.js
 //= require leaflet/leaflet.markercluster-src.js
+//= require bootstrap.plugins/bootstrap_gallery/jquery.blueimp-gallery.min.js
+//= require biodiv/gallery.js
 //= require jquery.plugins/tag-it.min.js
 //= require biodiv/names.js
 //= require biodiv/location/location-picker.js
 //= require jquery.plugins/jsrender.js
 //= require bootstrap.plugins/bootstrap-combobox.js
 //= require biodiv/observations/map.js
-//= require bootstrap.plugins/bootstrap_gallery/blueimp-helper.js
-//= require bootstrap.plugins/bootstrap_gallery/blueimp-gallery.min.js	
-//= require bootstrap.plugins/bootstrap_gallery/blueimp-gallery-fullscreen.js
-//= require bootstrap.plugins/bootstrap_gallery/blueimp-gallery-indicator.js
-//= require bootstrap.plugins/bootstrap_gallery/blueimp-gallery-video.js
-//= require bootstrap.plugins/bootstrap_gallery/blueimp-gallery-vimeo.js
-//= require bootstrap.plugins/bootstrap_gallery/blueimp-gallery-youtube.js
-//= require bootstrap.plugins/bootstrap_gallery/jquery.blueimp-gallery.min.js
+
 
 //= require jquery.plugins/jquery.sparkline.min.js 
 //= require jquery.plugins/jquery.history.js

@@ -28,6 +28,7 @@ import species.groups.UserGroup;
 import species.groups.UserGroupController;
 import species.Habitat;
 import species.Species;
+import species.participation.Observation;
 import species.Resource;
 import species.BlockedMails;
 import species.Resource.ResourceType;
@@ -39,6 +40,7 @@ import species.participation.ResourceRedirect
 
 
 import static org.springframework.http.HttpStatus.*;
+import grails.plugin.cache.Cacheable;
 
 abstract class AbstractObjectController {
     
@@ -46,8 +48,27 @@ abstract class AbstractObjectController {
     def observationService;
 
     def related() {
-        def relatedObv = observationService.getRelatedObservations(params).relatedObv;
-        return formatRelatedResults(relatedObv, params);
+        def result = [];
+
+        if(params.filterProperty?.equals('featureBy')) {
+            String cacheKey = "${params.webaddress?:'IBP'}-${params.controller}-${params.action}-${params.filterProperty}-${params.filterPropertyValue}-${params.max?:1}-${params.offset?:0}"
+            String cacheName = 'featured';
+
+            result = utilsService.getFromCache(cacheName, cacheKey);
+            if(!result) {
+                def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+                result = formatRelatedResults(relatedObv, params);
+                utilsService.putInCache(cacheName, cacheKey, result);
+            }
+        } else {
+            def relatedObv = observationService.getRelatedObservations(params).relatedObv;
+            result = formatRelatedResults(relatedObv, params);
+        }
+
+        withFormat {
+            json { render result as JSON }
+            xml { render result as XML }
+        }
     }
 
     protected formatRelatedResults(relatedObv, params) {
@@ -57,11 +78,6 @@ abstract class AbstractObjectController {
                     relatedObv.observations = observationService.createUrlList2(relatedObv.observations, observationService.getIconBasePath(params.controller));
             } else {
                 log.debug "no related observations"
-            }
-            def model = utilsService.getSuccessModel("", null, OK.value(), relatedObv)
-            withFormat {
-                json { render model as JSON }
-                xml { render model as XML }
             }
         } else {
             def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
@@ -86,12 +102,9 @@ abstract class AbstractObjectController {
                 urlList << item;
             }
             relatedObv.observations = urlList
-            def model = utilsService.getSuccessModel("", null, OK.value(), relatedObv)
-            withFormat {
-                json { render model as JSON }
-                xml { render model as XML }
-            }
         }
+        return utilsService.getSuccessModel("", null, OK.value(), relatedObv)
+
     }
 	
 	def getTargetInstance(Class clazz, id){
@@ -106,5 +119,37 @@ abstract class AbstractObjectController {
 		
 		return instance
 	}
+
+    def getObjResources(){
+        def result = [:];
+
+        String cacheKey = "${params.controller}-${params.id}"
+        String cacheName = 'resources';
+
+        result = utilsService.getFromCache(cacheName, cacheKey);
+        if(!result) {
+            result = [:];
+            if(params.id){            
+                def objInstance;
+                if(params.controller == 'species'){
+                    objInstance = Species.get(params.long('id'));
+                } else if(params.controller == 'observation'){
+                    objInstance = Observation.get(params.long('id'));
+                }
+                result['resources'] = objInstance?.listResourcesByRating();
+                //if(objInstance.hasProperty('group'))
+                result['defaultThumb'] = objInstance?.fetchSpeciesGroup()?.icon(ImageType.ORIGINAL)?.thumbnailUrl(null, '.png', null);
+            }
+
+            if(result)
+                utilsService.putInCache(cacheName, cacheKey, result);
+        }
+
+
+        withFormat {
+            json { render result as JSON; }
+            xml { render result as XML; }
+        }
+    }
 
 }

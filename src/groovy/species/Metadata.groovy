@@ -17,6 +17,7 @@ import speciespage.ObservationService;
 import species.participation.Featured;
 import species.utils.Utils;
 import species.Language;
+import species.dataset.Dataset;
 
 abstract class Metadata {
 	
@@ -60,8 +61,6 @@ abstract class Metadata {
 			}
 		}
 	}
-
-	
 	
 	//Geographic Coverage
 	String placeName;
@@ -73,8 +72,8 @@ abstract class Metadata {
 	LocationScale locationScale;
     Geometry topology;
      
-	float latitude;
-	float longitude;
+	double latitude;
+	double longitude;
 	
     //Taxonomic Coverage
     SpeciesGroup group;
@@ -86,6 +85,21 @@ abstract class Metadata {
 	
     Date createdOn = new Date();
 	Date lastRevised = createdOn;
+
+    // Language
+    Language language;
+
+	License license
+
+    String externalId;
+    String externalUrl;
+    String viaId;
+    String viaCode;
+
+    Date lastInterpreted;
+    Date lastCrawled;
+
+    Dataset dataset;
 
     def grailsApplication
 	def activityFeedService
@@ -121,6 +135,25 @@ abstract class Metadata {
 				return true
 			}
 			return val < new Date() && val >= obj.fromDate
+		}
+		license nullable:false
+		language nullable:false
+		externalId nullable:true
+		externalUrl nullable:true
+		viaId nullable:true
+		viaCode nullable:true
+		dataset nullable:true
+        lastInterpreted nullable:true, validator : {val, obj ->
+			if(!val){
+				return true
+			} 
+			return val < new Date()
+		}
+        lastCrawled nullable:true, validator : {val, obj ->
+			if(!val){
+				return true
+			} 
+			return val < new Date()
 		}
     }
 	
@@ -192,7 +225,7 @@ abstract class Metadata {
 			return 0
 		}
 		//for backend thred e.g download request reqUser will be passed as argument
-		if(reqUser && (reqUser.id == author.id || utilsService.isAdmin(reqUser.id))){
+		if(reqUser && (reqUser.id == author.id || utilsService.isAdmin(reqUser))){
 			return 0
 		}
 		return Utils.getRandomFloat()

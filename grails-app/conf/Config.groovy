@@ -86,7 +86,7 @@ def log4jConsoleLogLevel = Priority.DEBUG
 
 grails.gorm.default.mapping = {
 cache true
-id generator:'increment'
+/*id generator:'increment'*/
 /* Added by the Hibernate Spatial Plugin. */
 'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
 'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.GeometryCollection)
@@ -233,6 +233,16 @@ speciesPortal {
             MAX_IMAGE_SIZE = 51200
         }
     }
+
+    datasource {
+        rootDir = "${app.rootDir}/datasources"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/datasources"
+        //serverURL = "http://localhost/${appName}/userGroups"
+        logo {
+            MAX_IMAGE_SIZE = 51200
+        }
+    }
+
 
     users {
         rootDir = "${app.rootDir}/users"
@@ -438,6 +448,14 @@ speciesPortal {
         CONTAINER = 'container'
         RESOURCETYPE = 'resourcetype'
         USER = 'user'
+        EXTERNAL_ID = 'external_id'
+        EXTERNAL_URL = 'external_url'
+        VIA_ID = 'via_id'
+        VIA_CODE = 'via_code'
+        DATASET = 'dataset'
+        ORIGINAL_AUTHOR = 'original_author'
+        BASIS_OF_RECORD = 'basis_of_record'
+        PROTOCOL = 'protocol'
     }
 
     nameSearchFields {
@@ -536,12 +554,12 @@ environments {
             error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
             error    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
             error   'org.codehaus.groovy.grails.commons', // core / classloading
-            'org.codehaus.groovy.grails.plugins', // plugins
             'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
             'grails.util'
-            error "grails.plugin" 
+            info 'org.codehaus.groovy.grails.plugins' // plugins
+            info "grails.plugin" 
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
@@ -576,9 +594,9 @@ environments {
 
             debug   'grails.plugin.springsecurity.openid'
             debug    'grails.app.filters.species'
-            fatal    'jdbc.sqltiming'
+            info    'jdbc.sqltiming'
             info    'jdbc.connection'
-            fatal   'jdbc.sqlonly'
+            info   'jdbc.sqlonly'
             fatal   'jdbc.audit'
             fatal   'jdbc.resultset'
             fatal   'jdbc.resultsettable'
@@ -600,6 +618,9 @@ environments {
             debug   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
 			debug   'grails.app.services.speciespage.SpeciesUploadService'
+            debug   'org.hibernate.cache.EhCache'
+            debug   'org.hibernate.cache.internal.StandardQueryCache'
+            info   'org.hibernate.cache'
         }
     }
     test {
@@ -871,6 +892,10 @@ environments {
                 rootDir = "${app.rootDir}/userGroups"
                 serverURL = "http://${servername}/${appName}/userGroups"
             }
+            datasource {
+                rootDir = "${app.rootDir}/datasources"
+                serverURL = "http://${servername}/${appName}/datasources"
+            }
             users {
                 rootDir = "${app.rootDir}/users"
                 serverURL = "http://${servername}/${appName}/users"
@@ -1005,6 +1030,10 @@ environments {
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
                 serverURL = "http://${servername}/${appName}/userGroups"
+            }
+            datasource {
+                rootDir = "${app.rootDir}/datasources"
+                serverURL = "http://${servername}/${appName}/datasources"
             }
             users {
                 rootDir = "${app.rootDir}/users"
@@ -1776,31 +1805,33 @@ grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
 grails.plugin.springsecurity.rest.token.validation.enableAnonymousAccess = true
 grails.plugin.springsecurity.rest.token.rendering.tokenPropertyName = "token"
 //APPINFO
-
 grails.plugins.dynamicController.mixins = [
-'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController',
+    'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
 
-'app.info.custom.example.MyConfigControllerMixin' :
-'com.burtbeckwith.appinfo_test.AdminManageController'
+    'com.burtbeckwith.grails.plugins.appinfo.hibernate.HibernateControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController',
+
+    'app.info.custom.example.MyConfigControllerMixin' :
+    'com.burtbeckwith.appinfo_test.AdminManageController'
 ]
 
 
@@ -1824,3 +1855,137 @@ grails.mime.disable.accept.header.userAgents = []
 // Added by the Spring Security OAuth plugin:
 grails.plugin.springsecurity.oauth.domainClass = 'species.auth.OAuthID'
 grails.plugin.springsecurity.oauth.registration.askToLinkOrCreateAccountUri = '/login/openIdCreateAccount'
+
+// configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
+grails.hibernate.cache.queries=false
+grails.cache.clearAtStartup = true
+grails{
+    cache {
+        enabled = true
+        ehcache {
+//            ehcacheXmlLocation = 'classpath:ehcache.xml' // conf/ehcache.xml
+            reloadable = true
+            keyGenerator='customCacheKeyGenerator'
+        }
+    }
+}
+
+grails.cache.config = {
+    defaults {
+        maxElementsInMemory 10000
+        eternal false
+        overflowToDisk false
+        maxElementsOnDisk 0
+    }
+   
+    cache {
+        name "featured"
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+
+    cache {
+        name "taxon"
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+
+    cache {
+        name "resources"
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+
+    defaultCache {
+        maxElementsInMemory 10000
+        eternal false
+        timeToIdleSeconds 120
+        timeToLiveSeconds 120
+        overflowToDisk false
+        diskPersistent false
+        //maxElementsOnDisk 10000000
+        //diskExpiryThreadIntervalSeconds 120
+        //memoryStoreEvictionPolicy 'LRU'
+    }
+    domain {
+        name 'species.groups.SpeciesGroup'
+        eternal true
+        maxElementsInMemory 20
+        maxElementsOnDisk 100
+    }
+    domain {
+        name 'species.Habitat'
+        eternal true
+        maxElementsInMemory 20
+        maxElementsOnDisk 100
+    }
+    domain {
+        name 'species.License'
+        eternal true
+        maxElementsInMemory 10
+        maxElementsOnDisk 100
+    }
+    domain {
+        name 'species.Language'
+        eternal true
+        maxElementsInMemory 1000
+        maxElementsOnDisk 1000
+    }
+    domain {
+        name 'species.Classification'
+        eternal true
+        maxElementsInMemory 10
+        maxElementsOnDisk 10
+    }
+    domain {
+        name 'species.groups.UserGroup'
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+    domain {
+        name 'species.dataset.DataSource'
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+    domain {
+        name 'species.dataset.DataSet'
+        eternal false
+        timeToIdleSeconds 21600//6hrs
+        timeToLiveSeconds 21600//6hrs
+        maxElementsInMemory 100
+    }
+
+}
+
+/*
+grails {
+    redis {
+        poolConfig {
+            // jedis pool specific tweaks here, see jedis docs & src
+            // ex: testWhileIdle = true
+        }
+        timeout = 2000 //default in milliseconds
+        //password = "somepassword" //defaults to no password
+
+        // requires either host & port combo, or a sentinels and masterName combo
+
+        // use a single redis server (use only if nore using sentinel cluster)
+        port = 6379
+        host = "localhost"
+
+        // use redis-sentinel cluster as opposed to a single redis server (use only if not use host/port)
+        //sentinels = [ "host1:6379", "host2:6379", "host3:6379" ] // list of sentinel instance host/ports
+        //masterName = "mymaster" // the name of a master the sentinel cluster is configured to monitor
+    }
+}
+*/

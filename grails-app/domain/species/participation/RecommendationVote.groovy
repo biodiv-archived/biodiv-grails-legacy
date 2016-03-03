@@ -32,9 +32,12 @@ class RecommendationVote {
 	float userWeight;
 	String comment;
 	Recommendation commonNameReco;
-	
+    String originalAuthor;
+    String givenSciName;
+    String givenCommonName;
 	static belongsTo = [observation:Observation, author:SUser];
-	
+
+
 	static constraints = {
 		author(unique:['observation']);
 		votedOn validator : {val -> val < new Date()};
@@ -42,10 +45,15 @@ class RecommendationVote {
 		commonNameReco nullable:true, blank: true;
 		comment nullable:true, blank: true;
 		comment (size:0..400);
+        originalAuthor (nullable:true);
+        givenSciName (nullable:true);
+        givenCommonName (nullable:true);
 	}
 	
 	static mapping = {
 		comment type:'text';
+        givenSciName type:'text';
+        givenCommonName type:'text';
 	}
 	
 	def beforeDelete(){
@@ -56,7 +64,7 @@ class RecommendationVote {
     def updateSpeciesTimeStamp() {
         def taxCon = this.recommendation?.taxonConcept
         if(taxCon) {
-            def sp = Species.findByTaxonConcept(taxCon);
+            def sp = Species.get(taxCon.findSpeciesId());//Species.findByTaxonConcept(taxCon);
             if(sp) {
             sp.lastUpdated = new Date();
             if(!sp.save(flush:true)) {

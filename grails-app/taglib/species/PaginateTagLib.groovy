@@ -264,6 +264,7 @@ class PaginateTagLib {
 	   if (attrs.params) linkParams.putAll(attrs.params)
 	   linkParams.offset = offset - max
 	   linkParams.max = max
+	   linkParams.view=(params?.view && params?.view =="grid")?'grid':'list';
 	   if (params.sort) linkParams.sort = params.sort
 	   if (params.order) linkParams.order = params.order
 	   def linkTagAttrs = [action:action]

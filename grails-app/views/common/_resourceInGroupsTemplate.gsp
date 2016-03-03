@@ -4,7 +4,7 @@
 
 <% def observationUserGroups = observationInstance.userGroups;
     if(observationInstance.hasProperty('sourceId')){
-        if(observationInstance.id != observationInstance.sourceId){
+        if(observationInstance.sourceId && observationInstance.id != observationInstance.sourceId){
             observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
         }
     }
@@ -35,12 +35,14 @@
                 <%featuredInUserGroups.put(0L, true)%>
             </g:else>
             </div>
+            <g:if test="${!isList}">
             <div class="featured_notes linktext">
                 <div style="clear:both;">
                     <b> <small><g:message code="text.featured.on" />  <b>${featuredNotesItem.createdOn.format('MMMMM dd, yyyy')}</b> <g:message code="text.as" /> </small></b>
                     ${featuredNotesItem.notes}
                 </div>
             </div>
+            </g:if>
             </li>
 
         </g:each>

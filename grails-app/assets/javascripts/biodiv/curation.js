@@ -45,9 +45,14 @@ function processingStop() {
 function getNamesFromTaxon(ele , parentId) {
     processingStart();
     changeEditingMode(true);
-    populateNameDetails();
     //var taxonId = $("input#taxon").val();//$(ele).parent("span").find(".taxDefIdVal").val();
     var classificationId = $('#taxaHierarchy option:selected').val();
+
+    $('.name').val(ele.text());
+    var History = window.History;
+    History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param({'taxon':$(ele).data('taxonid'), 'classification':classificationId}))); 
+
+    populateNameDetails();
     var url = window.params.curation.getNamesFromTaxonUrl;
     $.ajax({
         url: url,
@@ -57,11 +62,14 @@ function getNamesFromTaxon(ele , parentId) {
         success: function(data) {
             if(data.success) {
                 data = data.model;
+                
+                $('.listSelector').find('option:eq(1)').prop('selected', true);
+
                 //DIRTY LIST 
                 $('.dl_content ul').remove();
                 if(data.dirtyList.accDL){
                     accDLContent = createListHTML(data.dirtyList.accDL, "accDLContent", false); 
-                    $(accDLContent).appendTo('.dl_content').hide();
+                    $(accDLContent).appendTo('.dl_content').show();
                 }
                 if(data.dirtyList.synDL){
                     //synDLContent = createListHTML(data.dirtyList.synDL, "synDLContent", false); 
@@ -73,14 +81,14 @@ function getNamesFromTaxon(ele , parentId) {
                 }
                 if(data.dirtyList.speciesDL){
                     speciesDLContent = createListHTML(data.dirtyList.speciesDL, "speciesDLContent", false); 
-                    $(speciesDLContent).appendTo('.dl_content').show();
+                    $(speciesDLContent).appendTo('.dl_content').hide();
                 }
 
                 //WORKING LIST
                 $('.wl_content ul').remove();
                 if(data.workingList.accWL){
                     accWLContent = createListHTML(data.workingList.accWL, 'accWLContent', false);
-                    $(accWLContent).appendTo('.wl_content').hide();
+                    $(accWLContent).appendTo('.wl_content').show();
                 }
                 if(data.workingList.synWL){
                     synWLContent = createListHTML(data.workingList.synWL, 'synWLContent', false); 
@@ -92,14 +100,14 @@ function getNamesFromTaxon(ele , parentId) {
                 }
                 if(data.workingList.speciesWL){
                     speciesWLContent = createListHTML(data.workingList.speciesWL, 'speciesWLContent', false); 
-                    $(speciesWLContent).appendTo('.wl_content').show();
+                    $(speciesWLContent).appendTo('.wl_content').hide();
                 }
 
                 //CLEAN LIST
                 $('.cl_content ul').remove();
                 if(data.cleanList.accCL){
                     accCLContent = createListHTML(data.cleanList.accCL, 'accCLContent', false);
-                    $(accCLContent).appendTo('.cl_content').hide();
+                    $(accCLContent).appendTo('.cl_content').show();
                 }
                 if(data.cleanList.synCL){
                     synCLContent = createListHTML(data.cleanList.synCL, 'synCLContent', false);
@@ -111,10 +119,9 @@ function getNamesFromTaxon(ele , parentId) {
                 }
                 if(data.cleanList.speciesCL){
                     speciesCLContent = createListHTML(data.cleanList.speciesCL, 'speciesCLContent', false);
-                    $(speciesCLContent).appendTo('.cl_content').show();
+                    $(speciesCLContent).appendTo('.cl_content').hide();
                 }
 
-                $('.listSelector').find('option:eq(0)').prop('selected', true);
                 if($('.nameDetails.taxon-highlight').length > 0) {
                     var selectedList = $('.nameDetails.taxon-highlight').parent();
                     selectedList.parent().prev().val(selectedList.attr('class')).trigger('change');
@@ -281,7 +288,6 @@ function setOption(selectElement, value, ignoreCase) {
 }
 
 function populateNameDetails(data){
-    console.log(data);
     if(data == undefined || data.length == 0) return;
 
     $(".canBeDisabled input[type='text']").val('');

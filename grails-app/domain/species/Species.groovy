@@ -75,7 +75,8 @@ class Species implements Rateable {
 	}
 
 	static mapping = {
-		id generator:'species.utils.PrefillableUUIDHexGenerator'
+		id generator:'species.utils.PrefillableUUIDHexGenerator', params:[sequence_name: "species_id_seq"] 
+
 		fields sort : 'field'
 		autoTimestamp false
 	}
@@ -141,7 +142,7 @@ class Species implements Rateable {
             queryParams['max'] = max;
         } 
         
-
+        println query;
         def results = sql.rows(query, queryParams);
 
         query = "select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref ";
@@ -159,6 +160,7 @@ class Species implements Rateable {
             queryParams['max'] = max;
         } 
         
+        println query
         def res = sql.rows(query, queryParams)
 
         def idList = results.collect {it[0]}
@@ -288,31 +290,40 @@ class Species implements Rateable {
     }
 
     def afterInsert() {
+        this.taxonConcept.speciesId = this.id
+        this.taxonConcept.save();
+
 		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
 		//http://jira.grails.org/browse/GRAILS-4453
-		Species.withNewSession{
-	        HashSet contributors = new HashSet();
+		try{
+			Species.withNewSession{
+		        HashSet contributors = new HashSet();
+		
+		        //TODO:looks like this is gonna be heavy on every save ... gotta change
+				this.fields?.each { contributors.addAll(it.contributors)}
+				def sContributors =  this.taxonConcept.contributors
+				if(sContributors)
+	            	contributors.addAll(sContributors)
+		        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+		        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+		        
+		        //Saving current user as contributor for the species
+		        if(speciesPermissionService.addContributors(this, new ArrayList(contributors))) {
+	                log.debug "Added permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
+	            } else {
+	                log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
+	            }
 	
-	        //TODO:looks like this is gonna be heavy on every save ... gotta change
-			this.fields?.each { contributors.addAll(it.contributors)}
-			def sContributors =  this.taxonConcept.contributors
-			if(sContributors)
-            	contributors.addAll(sContributors)
-	        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
-	        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
-	        
-	        //Saving current user as contributor for the species
-	        if(speciesPermissionService.addContributors(this, new ArrayList(contributors))) {
-                log.debug "Added permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
-            } else {
-                log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
-            }
-
+			}
+		}catch(e){
+			e.printStackTrace()
 		}
         
     }
 
     def beforeDelete(){
+        this.taxonConcept.speciesId = null
+        this.taxonConcept.save();
         activityFeedService.deleteFeed(this)
     }
 

@@ -36,7 +36,7 @@ String status = docId?.status
                     <td>
                         <%
                         def taxaObj = nameParseValues[sciName.key]?TaxonomyDefinition.findByCanonicalForm(nameParseValues[sciName.key]):null
-                        def speciesObjId = taxaObj?Species.findByTaxonConcept(taxaObj)?.id:null;
+                        def speciesObjId = taxaObj?taxaObj.findSpeciesId():null;
                         def link = ""
                         if(speciesObjId) {
                         link = uGroup.createLink(controller:'species', action:'show', id:speciesObjId, 'userGroupWebaddress':webaddress, absolute:true)

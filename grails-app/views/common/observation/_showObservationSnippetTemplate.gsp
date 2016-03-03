@@ -18,14 +18,12 @@ def obvId = observationInstance.id
                     <div style="position:relative;margin:auto;">
                     <g:if
                             test="${imagePath}">
-                            <img class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''}"
-                                    src="${imagePath}"
-                                    />
+                            <span class="img-polaroid" style=" ${observationInstance.isChecklist? 'opacity:0.7;' :''} background-image:url('${imagePath}');">
+                            </span>
                     </g:if>
                     <g:else>
-                            <img class="galleryImage img-polaroid"
-                                    src="${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}"
-                                    title="${g.message(code:'showobservationsnippet.title.contribute')}" />
+                            <span class="img-polaroid" title="${g.message(code:'showobservationsnippet.title.contribute')}" style="background-image:url(${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)});">
+                </span>
                     </g:else>
                         <g:if test="${observationInstance.isChecklist}">
                         <div class="checklistCount">${observationInstance.speciesCount}</div>

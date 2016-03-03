@@ -57,7 +57,7 @@ var itemAddCallback = function(carousel, first, last, data, state) {
 		} else {
 			carousel.size(data["count"]);
 			if(carousel.options.filterProperty == 'speciesName'){
-                $(carousel.options.carouselDivId).parents(".tile").find(".item_count").html(" ("+data["count"]+" more)");
+                $(carousel.options.carouselDivId).parents(".tile").find(".item_count").html(" ("+data["count"]+")");
             }
 			if(carousel.options.filterProperty == 'taxonConcept'){
                 $(carousel.options.carouselDivId).parents(".sidebar_section").find(".item_count").html(" ("+data["count"]+")");
@@ -205,10 +205,15 @@ var getSnippetTabletHTML = function(carousel, item) {
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
-	var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
+    var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
+
+    var listTemplateIcon = '';
+    if(item.dataset_id) {
+        listTemplateIcon = '<div class="listtemplate_icon"> <img class="img-polaroid" title="'+item.datasource_title+'" src="'+item.datasource_mainImage+'"/></div>'
+    }
 
 	var notes = item.notes?item.notes:''
 	var summary = item.summary?item.summary:''
-	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + '</a></div><div class="'+'ellipsis multiline caption">'+(notes?notes:summary)+'</div></div></div>';
+	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + listTemplateIcon + '</a></div><div class="'+'ellipsis multiline caption">'+(notes?notes:summary)+'</div></div></div>';
 
 }

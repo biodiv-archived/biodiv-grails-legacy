@@ -88,6 +88,7 @@ class UserGroup implements Taggable {
 		description type:'text';
 		//aboutUs type:'text';
 		sort name:"asc"
+        cache true
 	}
 
 
@@ -430,8 +431,18 @@ class UserGroup implements Taggable {
     
     static UserGroup findByWebaddress(webaddress){
     	if(webaddress){
-    		return UserGroup.findWhere(webaddress: webaddress)
+            return UserGroup.createCriteria().get {
+                eq 'webaddress', webaddress
+                cache true
+            }
     	}
     }
-	
+
+    static List<UserGroup> list() { 
+        return UserGroup.createCriteria().list {
+            order('name', 'asc')
+            cache true
+        }
+    }
+
 }

@@ -139,7 +139,15 @@ class ObservationsSearchService extends AbstractSearchService {
 
             doc.addField(searchFieldsConfig.IS_CHECKLIST, obv.isChecklist);
             doc.addField(searchFieldsConfig.IS_SHOWABLE, obv.isShowable);
-            doc.addField(searchFieldsConfig.SOURCE_ID, obv.sourceId);
+            doc.addField(searchFieldsConfig.EXTERNAL_ID, obv.externalId);
+            doc.addField(searchFieldsConfig.EXTERNAL_URL, obv.externalUrl);
+            doc.addField(searchFieldsConfig.VIA_ID, obv.viaId);
+            doc.addField(searchFieldsConfig.VIA_CODE, obv.viaCode);
+            doc.addField(searchFieldsConfig.DATASET, obv.dataset?.id);
+            doc.addField(searchFieldsConfig.ORIGINAL_AUTHOR, obv.originalAuthor);
+
+            doc.addField(searchFieldsConfig.BASIS_OF_RECORD, obv.basisOfRecord);
+            doc.addField(searchFieldsConfig.PROTOCOL, obv.protocol);
 
             String memberInfo = ""
             List allMembers = utilsServiceBean.getParticipants(obv)

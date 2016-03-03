@@ -66,7 +66,6 @@
                     <!--span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span-->
 
                     <div id="myGrid" class="" style="width:100%;height:350px;clear:both;"></div>
-                    <button class="btn btn-primary" id="downloadNamesMapper" style="margin-top: 8px"><g:message code="button.generate" /></button>
                     <div id="nameSuggestions" style="display: block;"></div>
                     <div id="legend" class="hide">
                         <span class="incorrectName badge"><g:message code="error.incorrect.names" /> </span>
@@ -95,9 +94,10 @@
 
                 </div>
                 
-                </table>            
+                </table>
                 <div id="tagHeaders" class="section checklist-slickgrid" style="clear:both;display:none;">
-                    <table id="tableHeader" border="1">
+                	<button class="btn btn-primary" id="downloadNamesMapper" style="margin-top: 8px; margin-bottom:8px"><g:message code="button.generate" /></button>
+                        <table id="tableHeader" border="1">
                         <th class="columnName"><g:message code="upload.column.name" /></th>
                         <th><g:message code="upload.data.columns" /></th>
                         <th><g:message code="upload.header" /></th>

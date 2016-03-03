@@ -163,7 +163,15 @@ class ChecklistService {
 				
 				saveObservationFromChecklist(params, checklistInstance, isGlobalUpdate)
 
-				observationService.saveObservationAssociation(params, checklistInstance)
+				observationService.setAssociations(checklistInstance, params, sendMail)
+
+                log.debug "Saving ratings for the resources"
+                checklistInstance?.resource?.each { res ->
+                    if(res.rating) {
+                        res.rate(springSecurityService.currentUser, res.rating);
+                    }
+                }
+
 
 				observationsSearchService.publishSearchIndex(checklistInstance, true);
 					
@@ -343,7 +351,7 @@ class ChecklistService {
 		def cnReco = res.commonNameReco
 		
 		ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
-		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate);
+		RecommendationVote recommendationVoteInstance = new RecommendationVote(observation:obv, recommendation:reco, commonNameReco:cnReco, author:obv.author, confidence:confidence, votedOn:obv.fromDate, givenSciName:m[cl.sciNameColumn], givenCommonName:m[cl.commonNameColumn]);
 		
 		def user = obv.author;
 		def oldRecoVote = RecommendationVote.findWhere(observation:obv, author:user)

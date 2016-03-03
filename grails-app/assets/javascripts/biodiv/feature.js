@@ -81,6 +81,7 @@ function loadObjectInGroups() {
 }
 
 $(document).ready(function(){
+    console.log('feature.js start');
 	$( ".date" ).datepicker({ 
 	        changeMonth: true,
 	        changeYear: true,
@@ -94,4 +95,6 @@ $(document).ready(function(){
         }
         $("#remainingC").html("Remaining characters : " +(400 - this.value.length));
     });
+
+    console.log('feature.js end');
 });

@@ -7,7 +7,6 @@ import species.SpeciesField;
 import species.UserGroupTagLib;
 import species.Synonyms;
 import species.CommonNames;
-import species.TaxonomyDefinition;
 import species.auth.Role
 import species.auth.SUser
 import species.auth.SUserRole
@@ -34,6 +33,7 @@ import species.participation.Comment;
 import species.participation.ActivityFeed;
 import species.utils.ImageType;
 import species.Language;
+import species.Contributor;
 import species.NamesMetadata.NamePosition;
 import content.eml.UFile;
 
@@ -76,7 +76,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(License) {
-            return ['name': it.name.value(), 'url':it.name]
+            return ['name': it.name.value(), 'url':it.url]
         }
 
         JSON.registerObjectMarshaller(Featured) {
@@ -103,14 +103,21 @@ class CustomObjectMarshallers {
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'group':it.fetchRootName(), parentName:it.fetchParentName(), 'position':it.position.value()]
+            println 'TaxonomyDefinition Marshaller'
+            List<TaxonomyDefinition> defaultHierarchy = it.fetchDefaultHierarchy();
+            String parentName = defaultHierarchy ? (defaultHierarchy.size()==1?null:defaultHierarchy[-2].canonicalForm) : null
+            String group = defaultHierarchy ?  defaultHierarchy[0].canonicalForm : null
+            List<Map> defaultHierarchyMap = defaultHierarchy//.collect { ['id':it.id, 'name':it.name, 'canonicalForm':it.canonicalForm, 'rank':it.rank, 'speciesId':it.speciesId]};
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'defaultHierarchy':defaultHierarchyMap, 'group':it.group, 'parentName':parentName, 'position':it.position.value(), speciesId:it.speciesId]
         }
 
         JSON.registerObjectMarshaller(Classification) {
+            println 'Classification Marshaller'
             return ['id':it.id, 'name':it.name, 'citation':it.citation]
         }
 
         JSON.registerObjectMarshaller(TaxonomyRegistry) {
+            println 'TaxonomyRegistry Marshaller'
             return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
         }
         
@@ -119,22 +126,27 @@ class CustomObjectMarshallers {
         }
  
         JSON.registerObjectMarshaller(Recommendation) {
+            println 'Recommendation Marshaller'
             def r = ['id':it.id, 'name':it.name];
             if(it.taxonConcept) {
                 r['taxonomyDefinition'] = it.taxonConcept;
             }
-            Long speciesId = it.taxonConcept?.findSpeciesId();
+            println 'taxonConcept'
+/*            Long speciesId = it.taxonConcept?.findSpeciesId();
             if(speciesId) {
                 r['speciesId'] = speciesId;
             }
+            println 'speciesId'
+*/
             if(it.languageId) {
                 r['language'] = Language.read(it.languageId);
             }
-
+            println 'language'
             return r;
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
+            println 'RecommendationVote Marshaller'
             def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence?.value(), votedOn: it.votedOn];
             if(it.commonNameReco) {
                 r['commonNameReco'] = it.commonNameReco
@@ -146,22 +158,19 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(UserGroup) {
+            println 'UserGroup Marshaller'
             return ['id':it.id, 'name':it.name, 'description' : it.description, 'domainName':it.domainName, 'webaddress':it.webaddress, 'foundedOn':it.foundedOn, 'icon':it.icon ];
         }
 
         JSON.registerObjectMarshaller(Resource) {
+            println 'Resource Marshaller'
             def basePath = '';
-            
-            if(it.context?.value() == Resource.ResourceContext.OBSERVATION.toString()){
-                basePath = grailsApplication.config.speciesPortal.observations.serverURL
-            }
-            else if(it.context?.value() == Resource.ResourceContext.SPECIES.toString() || it?.context?.value() == Resource.ResourceContext.SPECIES_FIELD.toString()){
-                basePath = grailsApplication.config.speciesPortal.resources.serverURL
-            }
-
+            String originalUrl = it.thumbnailUrl(basePath, null, ImageType.ORIGINAL);
             def imagePath = it.thumbnailUrl(basePath);
-
-            return ['id':it.id, url:it.thumbnailUrl(basePath, null, ImageType.ORIGINAL), 'icon' : imagePath, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'licenses':it.licenses, 'contributors':it.contributors, 'attributors': it.attributors];
+            def result = ['id':it.id, 'uploader':it.uploader, 'type':it.type.value(), 'uploadTime':it.uploadTime, 'rating':it.rating, 'totalRatings':it.totalRatings?:0, 'averageRating':it.averageRating?:0,'license':it.license, 'contributors':it.contributors, 'attributors': it.attributors, 'annotations':it.fetchAnnotations()];
+            if(originalUrl) result['url'] = originalUrl;
+            if(imagePath) result['icon'] = imagePath;
+            return result;
         }
 	
 		JSON.registerObjectMarshaller(Comment) {
@@ -230,6 +239,10 @@ class CustomObjectMarshallers {
 
         JSON.registerObjectMarshaller(NamePosition) {
             return it.value();
+        }
+        
+        JSON.registerObjectMarshaller(Contributor) {
+            return ['name':it.name];
         }
     }
     }

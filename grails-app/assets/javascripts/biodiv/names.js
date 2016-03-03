@@ -19,7 +19,7 @@
         if(_options.appendTo == undefined && appendTo.length > 0) {
             _options.appendTo = appendTo;
         }
-
+        if(_options.appendTo == undefined) return;
         console.log(_options.appendTo);
         var result = $(this).catcomplete({
                appendTo:_options.appendTo,
@@ -93,7 +93,9 @@
 }(window.jQuery));
 
 $(document).ready(function() {
+    console.log('names.js start');
     initializeNameSuggestion();
+    console.log('names.js end');
 });
 
 function cancelRecoComment() {
@@ -113,6 +115,13 @@ function initializeNameSuggestion() {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
             $(this).closest(".commonNameDiv").next().find(".canName").val( ui.item.desc );
             $(this).closest(".commonNameDiv").next().find(".recoName").val( ui.item.desc );
+            if(ui.item.speciesId !== null){
+              $(this).closest(".commonNameDiv").next().find(".speciesId").val( ui.item.speciesId );
+              $(this).closest(".commonNameDiv").next().find(".speciesId").attr('data-species',ui.item.desc );
+            }else{
+              $(this).closest(".commonNameDiv").next().find(".speciesId").val("");
+              $(this).closest(".commonNameDiv").next().find(".speciesId").attr('data-species',"");
+            }
             if(ui.item.languageName !== null){
                 $(this).closest(".commonNameDiv").find(".languageComboBox").val(ui.item.languageName).attr("selected",true);
                 $(this).closest(".commonNameDiv").find(".languageComboBox").data('combobox').refresh();
@@ -137,7 +146,7 @@ function initializeNameSuggestion() {
             $(this).val( ui.item.label.replace(/<.*?>/g,"") );
             $(this).closest(".sciNameDiv").find(".canName").val( ui.item.value );
             $(this).closest(".sciNameDiv").find(".mappedRecoNameForcanName").val(ui.item.label.replace(/<.*?>/g,""));
-            $(this).closest(".sciNameDiv").find(".speciesId").val( ui.item.speciesId );
+            $(this).closest(".sciNameDiv").find(".speciesId").val( ui.item.speciesId ).attr('data-species',ui.item.desc );
             return false;
         },open: function(event, ui) {
             //            $(this).parent().find(".nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 

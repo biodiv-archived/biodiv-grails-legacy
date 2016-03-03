@@ -20,10 +20,10 @@
 
         </g:if>
         <g:each in="${r.authors}" var="author">
-        <a href="${uGroup.createLink(controller:'user', action:'show', id:author?.id)}" title="${author?.name }">
+        <a href="${uGroup.createLink(controller:'user', action:'show', id:author[0]?.id)}" title="${author[0]?.name}">
             <img class="small_profile_pic"
-            src="${author?.profilePicture(ImageType.SMALL)}"
-            title="${author.name}" />
+            src="${author[0]?.profilePicture(ImageType.SMALL)}"
+            title="${author[1]?'Original Author:'+author[1]+', Uploader:'+author[0]:author[0]}" />
         </a>
         </g:each>
 
@@ -48,19 +48,10 @@
     <g:if test="${r.observationImage}">
     <a href="${uGroup.createLink([action:"show", controller:"observation", id:r.obvId, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
 
-        <img style="width: 75px; height: 75px;"
-        src="${r.observationImage}">
+        <img style="width: 75px; height: 75px;" src="${r.observationImage}">
     </a>
     </g:if>
 
-<!--    <span class="voteCount">
-        <span id="votes_${r.recoId}">
-            ${r.noOfVotes} 
-        </span> 
-    <g:if test="${r.noOfVotes <= 1}"><g:message code="text.user.thinks" /> </g:if>
-    <g:else> <g:message code="text.user.thinks" /></g:else> 
-    <g:message code="text.it.is" />:</span>
--->
     <span class="highlight">
         <g:if test="${r.speciesId}">
         <a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -68,20 +59,18 @@
         </a>
         </g:if>
         <g:elseif test="${r.isScientificName}">
-        <i>${r.name}</i>
+            <i>${r.name}</i>
         </g:elseif>
         <g:else>
-        ${r.name}
+            ${r.name}
         </g:else>
         <g:if test="${r.synonymOf}">
-        (Synonym of <i>${r.synonymOf}</i>)
+            (Synonym of <i>${r.synonymOf}</i>)
         </g:if>
         
-        ${r.commonNames}</span>
-        <comment:showCommentPopup model="['commentHolder':Recommendation.read(r.recoId), 'rootHolder':r.observationInstance?:observationInstance]" />
-        <%--				<obv:showRecoComment--%>
-        <%--					model="['recoComments':r.recoComments, 'recoId': r.recoId]" />--%>
-
+        ${r.commonNames}
+    </span>
+    <comment:showCommentPopup model="['commentHolder':r.recoId ? Recommendation.read(r.recoId) : null, 'rootHolder':r.observationInstance?:observationInstance, totalCount:r.recoComments?r.recoComments.size():0, comments:r.recoComments]" />
     </div> 
     
     <script type="text/javascript">
@@ -98,9 +87,5 @@
     </script></li>
     </g:each>
     </g:if>
-    <%--<g:else>--%>
-    <%--	<g:message code="recommendations.zero.message" />--%>
-    <%--</g:else>--%>
-
 
 

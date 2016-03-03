@@ -5,6 +5,7 @@ import species.utils.Utils;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 import species.groups.UserGroup;
 import species.auth.SUser;
+import species.auth.SUserRole;
 import species.participation.ActivityFeed;
 import species.participation.Comment;
 import speciespage.ObvUtilService
@@ -17,6 +18,7 @@ import grails.util.Environment;
 import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
+import org.apache.commons.lang.time.DateUtils;
 
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
@@ -27,7 +29,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import java.security.InvalidKeyException;
 import java.util.Date;
-
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 
 import java.beans.Introspector;
@@ -37,6 +40,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import grails.converters.JSON;
+import species.auth.Role;
+import species.auth.SUser;
+import species.auth.SUserRole;
+
+
 class UtilsService {
 
     def grailsApplication;
@@ -45,8 +53,11 @@ class UtilsService {
     def mailService;
     def springSecurityService
     def messageSource;
+    def grailsCacheManager;
     //def observationService
  //   def activityFeedService
+
+    Language defaultLanguage;
 
     static final String OBSERVATION_ADDED = "observationAdded";
     static final String SPECIES_RECOMMENDED = "speciesRecommended";
@@ -69,6 +80,8 @@ class UtilsService {
     
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
+
+    static final String[] DATE_PATTERNS = ['dd/MM/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
 
     public void cleanUpGorm() {
         cleanUpGorm(true)
@@ -217,20 +230,27 @@ class UtilsService {
 
 
     //Create file with given filename
-    def File createFile(String fileName, String uploadDir, String contentRootDir) {
+    def File createFile(String fileName, String uploadDir, String contentRootDir, boolean retainOriginalFileName=false) {
         File uploaded
         if (uploadDir) {
             File fileDir = new File(contentRootDir + "/"+ uploadDir)
             if(!fileDir.exists())
                 fileDir.mkdirs()
-                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+                if(retainOriginalFileName) {
+                    uploaded = new File(fileDir, fileName);
+                } else {
+                    uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+                }
 
         } else {
 
             File fileDir = new File(contentRootDir)
             if(!fileDir.exists())
                 fileDir.mkdirs()
-                uploaded = getUniqueFile(fileDir, Utils.generateSafeFileName(fileName));
+                if(retainOriginalFileName) {
+                } else {
+                    uploaded = new File(fileDir, fileName);
+                }
             //uploaded = File.createTempFile('grails', 'ajaxupload')
         }
 
@@ -254,10 +274,11 @@ class UtilsService {
     Language getCurrentLanguage(request = null){
        // println "====================================="+request
         
+        if(!defaultLanguage) defaultLanguage = Language.getLanguage(Language.DEFAULT_LANGUAGE);
         String langStr = LCH.getLocale()
         def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
         def languageInstance = Language.findByTwoLetterCode(twoLetterCode);
-        return languageInstance?languageInstance:Language.getLanguage(Language.DEFAULT_LANGUAGE);
+        return languageInstance ? languageInstance : defaultLanguage;
     }
 
     ///////////////////////////MAIL RELATED///////////////////////
@@ -827,7 +848,7 @@ class UtilsService {
         return desc
     }
 
-    def getDomainObject(className, id){
+    def getDomainObject(className, id, List eagerFetchProperties = null){
         def retObj = null
         if(!className || className.trim() == ""){
             return retObj
@@ -839,8 +860,14 @@ class UtilsService {
             retObj = [objectType:className, id:id]
             break
             default:
-            retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.read(id)
-            break
+            retObj = grailsApplication.getArtefact("Domain",className)?.getClazz()?.withCriteria(uniqueResult:true) {
+                eq ('id', id)
+                if(eagerFetchProperties) {
+                    eagerFetchProperties.each {
+                        fetchMode(it, org.hibernate.FetchMode.EAGER)
+                    }
+                }
+            }
         }
         return retObj
     }
@@ -872,9 +899,9 @@ class UtilsService {
     static getTargetController(domainObj){
         if(domainObj.instanceOf(Checklists)){
             return "checklist"
-        }else if(domainObj.instanceOf(SUser)){
+        } else if(domainObj.instanceOf(SUser)){
             return "user"
-        }else{
+        } else {
             return domainObj.class.getSimpleName().toLowerCase()
         }
     }
@@ -902,13 +929,19 @@ class UtilsService {
         log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"  
     }  
 
-    static def logSql(Closure closure) {
-        println "%%%%%%%%%%%% logging sql"  
+    static def logSql(Closure closure, String blockName="") {
         Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
         Level currentLevel = sqlLogger.level
-        sqlLogger.setLevel(Level.TRACE)
+        if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+            println "%%%%%%%%%%%% logging sql ${blockName}"  
+            sqlLogger.setLevel(Level.TRACE)
+        }
         def result = closure.call()
-        sqlLogger.setLevel(currentLevel)
+
+        if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+            println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"  
+            sqlLogger.setLevel(currentLevel)
+        }
         result
     }
 
@@ -965,9 +998,13 @@ class UtilsService {
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.email == email || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
 
-	boolean isAdmin(id) {
-		if(!id) return false
+    boolean isAdmin() {
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+	}
+
+	boolean isAdmin(SUser user) {
+		if(!user) return false
+		return SUserRole.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
 	}
 	
 	boolean isCEPFAdmin(id) {
@@ -1032,29 +1069,65 @@ class UtilsService {
             return result;
 //        } 
     }
-	
+
 	static Date parseDate(date, sendNew = true){
 		try {
             if(!sendNew) {
                 Date d;
                 if(date) {
-                    d = Date.parse("dd/MM/yyyy", date) 
+                    d = DateUtils.parseDate(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date) 
                     d.set(['hourOfDay':23, 'minute':59, 'second':59]);
                 }else {
                     d = null
                 }
                 return d
-            }else {
-			    return date? Date.parse("dd/MM/yyyy", date):new Date();
+            } else {
+			    return date ? DateUtils.parseDate(date, DATE_PATTERNS) : new Date();
             }
 		} catch (Exception e) {
+            e.printStackTrace();
 			// TODO: handle exception
 		}
 		return null;
 	}
 
+    static String getDayOfMonthSuffix(int n) {
+        if(n < 1 || n > 31) return "";
+        if (n >= 11 && n <= 13) {
+            return "th";
+        }
+        switch (n % 10) {
+            case 1:  return "st";
+            case 2:  return "nd";
+            case 3:  return "rd";
+            default: return "th";
+        }
+    }
+
+    static String formatDate(Date date) {
+        SimpleDateFormat dd = new SimpleDateFormat("dd");
+        SimpleDateFormat mmyyyy = new SimpleDateFormat("MMMMM, yyyy");
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        return  dd.format(date) + getDayOfMonthSuffix(c.get(Calendar.DAY_OF_MONTH)) + " " + mmyyyy.format(date);
+    }
+
 	public String getTableNameForGroup(UserGroup ug){
 		return "custom_fields_group_" + ug.id
 	}
+
+    def getFromCache(String cacheName, String cacheKey) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Returning from cache ${cache.name}" 
+        return cache.get(cacheKey)?.get();
+    }
+
+    def putInCache(String cacheName, String cacheKey, value) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
+        cache.put(cacheKey,value);
+    }
 }
 

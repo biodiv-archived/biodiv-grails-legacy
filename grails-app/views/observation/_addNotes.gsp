@@ -1,7 +1,5 @@
 <%@ page import="species.utils.Utils"%>
 <%@page import="java.util.Arrays"%>
-
-
 <div class="section" style="position: relative; overflow: visible;">
     <h3><g:message code="observation.addnotes.additional.information" /> </h3>
     <div class="span6 block">

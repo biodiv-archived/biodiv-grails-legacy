@@ -29,43 +29,19 @@
             </g:if>
             <ul>
                 <li><a href="#resourceTabs-1"><g:message code="button.images" /></a></li>
-                <li><a id="flickrImages" href="#resourceTabs-3"><g:message code="button.flickr.images" /></a></li>
+                <!-- <li><a id="flickrImages" href="#resourceTabs-3"><g:message code="button.flickr.images" /></a></li> -->
             </ul>
             <div id="resourceTabs-1">
                 <!--a class="myeditable" href="#">Contribute Images</a-->
-                <g:set var="resourcesInstanceList" value="${speciesInstance.listResourcesByRating()}"/>
-                <div class="story-footer" style="right:0;bottom:372px;z-index:5;background-color:whitesmoke" >
-                    <g:render template="/common/observation/noOfResources" model="['instance':speciesInstance, 'bottom':'bottom:55px;']"/>
+                    <div class="galleryWrapper">
+                        <g:render template="/observation/galleryTemplate" model="['instance': speciesInstance]"/>
+                    </div>
                 </div>
-                
-                <div id="gallery1" class="gallery" style="margin-top: 60px;">
-                    <%
-                        def resSize = resourcesInstanceList.size()
-                        def imageResSize = 0;
-                        resourcesInstanceList.each {
-                        if(it.type == ResourceType.IMAGE) {
-                            imageResSize += 1 
-                        }
-                        }
-                    %> 
-                    <g:if test="${resourcesInstanceList && imageResSize > 0}">
-                       
-                    <s:showSpeciesImages model="['speciesInstance':speciesInstance , 'resourcesInstanceList' : resourcesInstanceList, 'imageResSize':imageResSize]"></s:showSpeciesImages>
-                    </g:if>
-                    <g:else>
-                    <% def fileName = speciesInstance.fetchSpeciesGroup().icon(ImageType.LARGE).fileName%>
-                    <img class="group_icon galleryImage" 
-                             src="${assetPath(src: '/all/'+fileName, absolute:true)}" 
-                             title="${g.message(code:'title.show.contribute')}"/>
-                    </g:else>
-
-                </div>
-                </div>
-                <div id="resourceTabs-3">						
+                <!-- <div id="resourceTabs-3">						
                     <div id="gallery3" style="margin-top: 60px;"></div>
                     <div id="flickrBranding"></div><br/>
                     <div class="message ui-corner-all"><g:message code="showspeciesintro.irrelevant.images" /></div>
-                </div> 
+                </div> -->
             </div>
         </div>
         </g:if>
@@ -76,9 +52,7 @@
             </div>
 
         </g:else>
-
-        <g:render template="/species/speciesaudio" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor , 'resourcesInstanceList' : resourcesInstanceList]"/>
-
+     
         <div style="background-color:white">
 
             <!-- species page icons -->

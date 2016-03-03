@@ -23,6 +23,7 @@ import static groovyx.net.http.Method.GET
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.ContentType.XML
 import groovy.sql.Sql
+import grails.util.Holders
 import groovy.util.XmlParser
 import grails.converters.JSON;
 import wslite.soap.*
@@ -88,7 +89,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-        println "======PARAMS FOR SEARCH IBP ===== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " :::: userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
+        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
 		
         def clazz
@@ -102,7 +103,6 @@ class NamelistService {
 			if(normalizedForm || authorYear){
 				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
 				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
-				println "Searching using normalized form + rank + status"
 				res = clazz.withCriteria(){
 					and{
 						eq('normalizedForm', normalizedForm)
@@ -119,7 +119,7 @@ class NamelistService {
 			if(res)
 				return res
 			
-			println  "No result in Normalized form using canonical form now"
+			//println  "No result in Normalized form using canonical form now"
             res = clazz.withCriteria(){
 				and{
 					eq('canonicalForm', canonicalForm)
@@ -131,11 +131,8 @@ class NamelistService {
 					}
 					//XXX in curation while taking col hir. we want author year column to be used forcefully 
 					// in other cases we will not use untill gets multiple matches 
-					if(useAuthorYear){
-						if(authorYear)
-							eq('authorYear', authorYear)
-						else
-							isNull('authorYear')	
+					if(useAuthorYear && authorYear){
+						eq('authorYear', authorYear)
 					}
 				}
             }
@@ -149,7 +146,7 @@ class NamelistService {
 			}
 		}
 		
-		println "=========== FINAL SEARCH RESULT " + res
+		println "== FINAL SEARCH RESULT " + res
 		return res;
     }
     
@@ -189,6 +186,11 @@ class NamelistService {
 	        TaxonomyDefinition.withNewTransaction {
 		        nl.each { TaxonomyDefinition name ->
 					i++
+					
+					if(i%100 == 0){
+						log.debug "---------------------------------------- current count " + i
+					}
+					
 					List tmpRes = []
 					if(!name || !name.canonicalForm) {
 						log.debug "Name is not parsed by Names Parser " + name
@@ -213,7 +215,13 @@ class NamelistService {
 								if(rr != names[i].rank){
 									addToList = false
 								}
-								
+							}else{ // rank is given species or infraspecies
+								int wCount = name.canonicalForm.trim().count(" ") + 1
+								if((wCount == 1) && (rr > 8 )){ // if single word
+									addToList = false
+								}else if((wCount == 2) && (rr != 9)){
+									addToList = false
+								}
 							}
 							if(addToList){
 								tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
@@ -263,7 +271,6 @@ class NamelistService {
 		if(runPostProcess){
 			td.postProcess()
 		}
-		//println  "---------- Created accepted name from col Id " + colId
 		return td
 	}
 	
@@ -271,8 +278,13 @@ class NamelistService {
 		def colRes = searchCOL(colId, 'id')[0]
 		String accepteNameColId = colRes.acceptedNamesList[0].id
 		TaxonomyDefinition td = createAcceptedNameFromColId(accepteNameColId, runPostProcess)
-		td.createSpeciesStub()
 		def syn =  SynonymsMerged.findByMatchId(colId)
+		//some times accepted name is available but synonym not got added so by this call making sure synonym must be added
+		if(!syn){
+			td.addSynonymFromCol(searchCOL(accepteNameColId, 'id')[0].synList)
+			syn =  SynonymsMerged.findByMatchId(colId)
+		}
+		td.createSpeciesStub()
 		println "---------------created synonym " + syn
 		return syn
 	}
@@ -703,7 +715,7 @@ class NamelistService {
     //Handles name moving from accepted to synonym & vice versa
     //also updates IBP Hierarchy if no status change and its accepted name
     private def updateStatus(ScientificName sciName, Map colMatch) {
-        println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
+        //println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
         
         boolean success = false;
         def errors = [];
@@ -889,7 +901,7 @@ class NamelistService {
     private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
-        println "Adding IBP hierarchy from ${colAcceptedNameData}"
+        //println "Adding IBP hierarchy from ${colAcceptedNameData}"
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
@@ -905,7 +917,6 @@ class NamelistService {
         }
         def classification = Classification.fetchIBPClassification()
         Map taxonRegistryNamesTemp = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
-        println "======USE THIS ==== " + taxonRegistryNamesTemp
         List taxonRegistryNames = [];
         taxonRegistryNamesTemp.each { key, value ->
             taxonRegistryNames[Integer.parseInt(key)] = value;
@@ -920,9 +931,8 @@ class NamelistService {
 		metadata1['source'] = colAcceptedNameData['source']?:colAcceptedNameData['matchDatabaseName']
 		metadata1['via'] = colAcceptedNameData['sourceDatabase']
         colAcceptedNameData['metadata'] = metadata1
-        println "=====T R N======= " + taxonRegistryNames
-        println colAcceptedNameData;
-		//boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
+        //println "=====T R N======= " + taxonRegistryNames
+        //boolean fromCol = (colAcceptedNameData.fromCOL != null)? fromCOL : false
         //From UI uncomment
         def result;
         //TaxonomyRegistry.withNewSession {
@@ -1461,7 +1471,7 @@ class NamelistService {
     }
 
     private Map updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
-        println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
+        //println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
         boolean success = false;
         def errors = [];
         try {
@@ -1704,7 +1714,16 @@ class NamelistService {
 	
 	public List searchCOL(String input, String searchBy) {
 		//http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
-
+		
+		File sourceDir = new File(Holders.config.speciesPortal.namelist.rootDir)
+		if(searchBy == 'name'){
+			File xmlFile = new File(sourceDir,  "" + input.replaceAll(' ', '_') + ".xml")
+			if(xmlFile.exists()){
+				println "COL ::: XML file found"
+				return responseAsMap(xmlFile.text, searchBy)
+			}
+		}
+		
 		def http = new HTTPBuilder()
 		http.request( COL_SITE, GET, TEXT ) { req ->
 			uri.path = COL_URI
@@ -1760,8 +1779,16 @@ class NamelistService {
 	}
 
 	List responseAsMap(String xmlText, String searchBy) {
-		def results = new XmlParser().parseText(xmlText)
-		return responseAsMap(results, searchBy)
+		def results = []
+		try {
+			results = new XmlParser().parseText(xmlText)
+			return responseAsMap(results, searchBy)
+		}catch(e){
+			log.debug "Error in xml text "  + xmlText
+			e.printStackTrace()
+		}
+		//returning empty result
+		return results
 	}
 
 	String generateVerbatim (colResult) {

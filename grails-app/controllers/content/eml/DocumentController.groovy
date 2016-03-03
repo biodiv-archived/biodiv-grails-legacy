@@ -41,10 +41,10 @@ class DocumentController extends AbstractObjectController {
 	def save() {
 		params.author = springSecurityService.currentUser;
 		params.locale_language = utilsService.getCurrentLanguage(request);
-		def documentInstance = documentService.createDocument(params)
+		def documentInstance = documentService.create(params)
 
 		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
-		if (documentInstance.save(flush: true)) {
+		if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
 
 			flash.message = "${message(code: 'default.created.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
 			activityFeedService.addActivityFeed(documentInstance, null, documentInstance.author, activityFeedService.DOCUMENT_CREATED);

@@ -163,7 +163,9 @@ class SpeciesUploadService {
 		
 		//writing log after upload
 		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
-		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " + res.log
+		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " 
+		//mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
+		mylog += "  \n\n    Developer log \n\n" + res.log
 		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		errorFile.write(mylog)
 		
@@ -175,35 +177,41 @@ class SpeciesUploadService {
 		
 		//Every thing is fine then sending mail
 		String link
-		if(res.success){
-			def otherParams = [:]
-			def usersMailList = []
-			usersMailList = speciesPermissionService.getSpeciesAdmin()
-			log.debug "user mail list " + usersMailList
-			def sp = new Species()
-			
-			def linkParams = [:]
-			linkParams["daterangepicker_start"] = SpeciesService.DATE_FORMAT.format(sBulkUploadEntry.startDate) 
-			linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
-			linkParams["sort"] = "lastUpdated"
-			linkParams["user"] = springSecurityService.currentUser?.id
-			link = utilsService.generateLink("species", "list", linkParams)
-			otherParams["link"] = link
-			usersMailList.each{ user ->
-				def uml =[]
-				uml.add(user)
-				otherParams["curator"] = user.name
-				otherParams["usersMailList"] = uml
-				utilsService.sendNotificationMail(utilsService.SPECIES_CURATORS,sp,null,null,null,otherParams)
+		try{
+			if(res.success){
+				def otherParams = [:]
+				def usersMailList = []
+				usersMailList = speciesPermissionService.getSpeciesAdmin()
+				log.debug "user mail list " + usersMailList
+				def sp = new Species()
+				
+				def linkParams = [:]
+				linkParams["daterangepicker_start"] = SpeciesService.DATE_FORMAT.format(sBulkUploadEntry.startDate) 
+				linkParams["daterangepicker_end"] = SpeciesService.DATE_FORMAT.format(new Date(sBulkUploadEntry.endDate.getTime() + 60*1000))  
+				linkParams["sort"] = "lastUpdated"
+				linkParams["user"] = springSecurityService.currentUser?.id
+				link = utilsService.generateLink("species", "list", linkParams)
+				otherParams["link"] = link
+				usersMailList.each{ user ->
+					def uml =[]
+					uml.add(user)
+					otherParams["curator"] = user.name
+					otherParams["usersMailList"] = uml
+					utilsService.sendNotificationMail(utilsService.SPECIES_CURATORS,sp,null,null,null,otherParams)
+				}
+				
+				//sending mail to species contributor
+				otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
+				otherParams["speciesCreated"] = sBulkUploadEntry.speciesCreated
+				otherParams["speciesUpdated"] = sBulkUploadEntry.speciesUpdated
+				otherParams["stubsCreated"] = sBulkUploadEntry.stubsCreated
+				utilsService.sendNotificationMail(utilsService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
 			}
-			
-			//sending mail to species contributor
-			otherParams["uploadCount"] = res.uploadCount?res.uploadCount:""
-			otherParams["speciesCreated"] = sBulkUploadEntry.speciesCreated
-			otherParams["speciesUpdated"] = sBulkUploadEntry.speciesUpdated
-			otherParams["stubsCreated"] = sBulkUploadEntry.stubsCreated
-			utilsService.sendNotificationMail(utilsService.SPECIES_CONTRIBUTOR,sp,null,null,null,otherParams)
+		}catch(e){
+			log.error "Error while sending mail"
+			e.printStackTrace()
 		}
+			
 		
 		def msg = ""
 		if(sBulkUploadEntry.status == SpeciesBulkUpload.Status.UPLOADED){
@@ -276,7 +284,7 @@ class SpeciesUploadService {
 		result['uploadCount'] = uploadCount
 		result['summary'] = converter ? converter.getSummary():""
 		result['log'] = converter ? converter.getLogs() : ""
-		
+		//result['idSummary'] = converter ? converter.idSummaryLog : "\n"
 		return result
 	}
 
@@ -344,6 +352,7 @@ class SpeciesUploadService {
 		int noOfSpecies = content.size();
 		
 		log.info " CONTENT SIZE " + noOfSpecies
+		int processNameCount = 0
 		boolean isAborted = false
 		List contentSubLists = content.collate(BATCH_SIZE)
 		contentSubLists.each { contentSubList ->
@@ -359,14 +368,21 @@ class SpeciesUploadService {
 						speciesElements.add(speciesElement);
 					}
 				}
-				def res = saveSpeciesElementsWrapper(speciesElements, sBulkUploadEntry)
+				def res = saveSpeciesElements(speciesElements, sBulkUploadEntry)
 				speciesElements.clear()
 				noOfInsertions += res.noOfInsertions;
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
+				sBulkUploadEntry?.writeLog(res.idSummary)
 				cleanUpGorm();
 				NamelistService.clearCOLNameFromMemory()
+				
+			}
+			
+			processNameCount += contentSubList.size()
+			if(processNameCount%5 == 0){
+				println "------------------- processNameCount " + processNameCount
 			}
 		}
 		
@@ -413,17 +429,20 @@ class SpeciesUploadService {
         converter.setLogAppender(fa);
 		
 		List species = []
-
+		StringBuilder sb = new StringBuilder()
 		int noOfInsertions = 0;
 		try {
 			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
 				for(Node speciesElement : speciesElements) {
+					String currSpeciesName = converter.fetchSpeciesName(speciesElement)
+					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping"
+					sb.append(currSpeciesName)
 					Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
 						if(s){
-							s.postProcess()
 							species.add(s)
 							noOfInsertions++;
+							sb.append("|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)
 						}
 					}
 				}
@@ -459,7 +478,7 @@ class SpeciesUploadService {
 			converter.addToSummary(e)
 		}
 
-		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs()];
+		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs(), 'idSummary':sb.toString()];
 	}
 
 	/** 
@@ -710,7 +729,7 @@ class SpeciesUploadService {
 
     File saveModifiedSpeciesFile(params){
         try{
-        def gData = JSON.parse(params.gridData)
+        def gData //= JSON.parse(params.gridData)
         def headerMarkers = JSON.parse(params.headerMarkers)
         def orderedArray = JSON.parse(params.orderedArray);
 
@@ -860,7 +879,7 @@ class SpeciesUploadService {
 	private Collection<Species> getAffectedSpecies(List sFields, List tRegs){
 		def sList = sFields.collect{it.species}
 		tRegs.each { TaxonomyRegistry tr ->
-			def s = Species.findByTaxonConcept(tr.taxonDefinition)
+			def s = Species.get(tr.taxonDefinition.findSpeciesId())
 			if(s)
 				sList << s
 		}

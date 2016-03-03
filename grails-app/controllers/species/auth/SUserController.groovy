@@ -288,7 +288,7 @@ class SUserController extends UserController {
 			String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 
 			//only admin interface has roles information while editing user profile
-			if(utilsService.isAdmin(user.id)) {
+			if(utilsService.isAdmin(user)) {
 				lookupUserRoleClass().removeAll user
 				addRoles user
 			}

@@ -38,6 +38,7 @@ class BootStrap {
 	def springSecurityService
 	def emailConfirmationService
 	def userGroupService
+    def utilsService
 	/**
 	 * 
 	 */
@@ -51,6 +52,7 @@ class BootStrap {
 		initFilters();
 		initEmailConfirmationService();
         initJSONMarshallers();
+        initCaches();
        	}
 
 	def initDefs() {
@@ -183,6 +185,23 @@ class BootStrap {
 
         ctx.getBean( "customObjectMarshallers" ).register();
 
+    }
+
+    def initCaches() {
+        SpeciesGroup.withTransaction {
+            SpeciesGroup.list().each {
+                SpeciesGroup.get(it.id);
+            }
+            Habitat.list().each {
+                Habitat.get(it.id);
+            }
+            Language.list().each {
+                Language.get(it.id)
+            }
+            Classification.list().each {
+                Classification.get(it.id)
+            }
+        }
     }
 
 	/**

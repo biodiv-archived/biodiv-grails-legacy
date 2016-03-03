@@ -2075,8 +2075,9 @@ class SpeciesService extends AbstractObjectService  {
                 obvList.each{ obvInstance ->
                     def recommendation = obvInstance.maxVotedReco;
                     def mailType = utilsService.OBV_LOCKED;                    
-                    def recommendation_vote = RecommendationVote.findWhere(recommendation: recommendation, observation:obvInstance);                    
-                    def activityFeed = activityFeedService.addActivityFeed(obvInstance, recommendation_vote, springSecurityService.currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendation, null));
+                    //FIX: following line will have multiple recoVotes. find Where returns first one.
+                    //def recommendation_vote = RecommendationVote.findWhere(recommendation: recommendation, observation:obvInstance);                    
+                    def activityFeed = activityFeedService.addActivityFeed(obvInstance, obvInstance, springSecurityService.currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendation, null));
                     utilsService.sendNotificationMail(mailType, obvInstance, null, "", activityFeed);
                 }
             }

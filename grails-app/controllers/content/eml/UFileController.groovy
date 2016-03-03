@@ -100,7 +100,8 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = utilsService.createFile(originalFilename, params.uploadDir,contentRootDir)
+            boolean retainOriginalFileName = params.retainOriginalFileName?params.boolean('retainOriginalFileName'):false;
+			File uploaded = utilsService.createFile(originalFilename, params.uploadDir,contentRootDir, retainOriginalFileName)
 			InputStream inputStream = selectInputStream(request)
 
 			ajaxUploaderService.upload(inputStream, uploaded)
@@ -164,7 +165,7 @@ class UFileController {
 				//content = request.inputStream.getBytes()
 				originalFilename = params.qqfile
 			}
-			File uploaded = utilsService.createFile(originalFilename, params.uploadDir, contentRootDir)
+			File uploaded = utilsService.createFile(originalFilename, params.uploadDir, contentRootDir, params.retainOriginalFileName)
 			InputStream inputStream = selectInputStream(request)
 			//check for file size and file type
 

@@ -22,4 +22,17 @@ class Classification {
 	public static Classification fetchIBPClassification(){
 		return Classification.findByName(Holders.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY)
 	}
+
+    static List<Classification> list() { 
+        return Classification.createCriteria().list {
+            cache true
+        }
+    }
+
+    static Classification findByName(String whatever) { 
+        return Classification.createCriteria().get {
+            eq 'name', whatever
+            cache true
+        }
+    } 
 }

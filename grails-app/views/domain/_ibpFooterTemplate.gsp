@@ -25,7 +25,7 @@
 		</div>
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/theportal'><g:message code="link.the.portal" /></a></li>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/theportal'><g:message code="link.the.portal" /></a></li>               
 				<li><a href="${ '/biodiversity_in_india'}"><g:message code="link.biodiversity.india" /></a>
 				</li>
 				<li><a href="${ '/about/whats-new'}"><g:message code="link.what.new" /></a></li>
@@ -60,6 +60,7 @@
 		<div class="links_box_column">
 			<ul>
 				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>
+                <li><a href="http://blog.indiabiodiversity.org/"><g:message code="link.blog" /></a></li>
 				<li><a href="${ '/sitemap'}"><g:message code="link.sitemap" /></a>
 				</li>
                 <li><a href="${ '/biodiv/docs'}"><g:message code="link.apidocs" /></a>
@@ -77,9 +78,14 @@
 
             </div>
     <div class="powered" style="text-align:center;">
-        <p title="India Biodiversity Portal Mobile App"><a href="https://play.google.com/store/apps/details?id=com.mobisys.android.ibp&hl=en">
-            <asset:image src="/all/googleplayicon1.png" absolute="true"/>
-        </a></p>
+        <p title="India Biodiversity Portal Mobile App">
+            <a href="https://play.google.com/store/apps/details?id=com.mobisys.android.ibp&hl=en">
+                <asset:image src="/all/googleplayicon1.png" class="mobile_app_icon" absolute="true"/>
+            </a>
+            <a href="https://itunes.apple.com/in/app/india-biodiversity-portal/id1072650706?mt=8&ign-mpt=uo%3D4">
+                <asset:image src="/all/apple_store1.png" class="mobile_app_icon" absolute="true"/>
+            </a>
+        </p>
         <p> <a target="_blank" href="${grailsApplication.config.speciesPortal.app.facebookUrl}">
             <asset:image src="/all/facebook.png" absolute="true"/>
         </a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}">
@@ -308,7 +314,7 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
 ga('create', 'UA-3185202-1', 'auto');
 ga('send', 'pageview');

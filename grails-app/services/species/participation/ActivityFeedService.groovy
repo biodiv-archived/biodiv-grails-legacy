@@ -19,6 +19,10 @@ class ActivityFeedService {
 	static final String COMMENT_ADDED = "Added a comment"
 	static final String COMMENT_IN_REPLY_TO = "In reply to"
 	
+    //instance related
+	static final String INSTANCE_CREATED = "Instance created"
+	static final String INSTANCE_UPDATED = "Instance updated"
+
 	
 	//checklist related
 	static final String CHECKLIST_CREATED = "Checklist created"
@@ -146,8 +150,7 @@ class ActivityFeedService {
 	}
 	
 	def addActivityFeed(rootHolder, activityHolder, author, activityType, description=null, isShowable=null, flushImmidiatly=true){
-        println "===========================ADDING ACTIVITY FEED";
-		//to support discussion on comment thread
+        //to support discussion on comment thread
 		def subRootHolderType = rootHolder?.class?.getCanonicalName()
 		def subRootHolderId = rootHolder?.id
 		if(activityHolder?.class?.getCanonicalName() == Comment.class.getCanonicalName()){
@@ -161,8 +164,10 @@ class ActivityFeedService {
 						activityHolderType:getType(activityHolder), \
 						rootHolderId:rootHolder?.id, rootHolderType:getType(rootHolder), \
 						isShowable:isShowable,\
-						activityType:activityType, subRootHolderType:subRootHolderType, subRootHolderId:subRootHolderId, activityDescrption:description);
-		
+						activityType:activityType, \
+                        subRootHolderType:subRootHolderType, \
+                        subRootHolderId:subRootHolderId, \
+                        activityDescrption:description);
 		ActivityFeed.withNewSession {
 				if(!af.save(flush:flushImmidiatly)){
 					af.errors.allErrors.each { log.error it }
@@ -182,8 +187,8 @@ class ActivityFeedService {
 		return af
 	}
 	
-	def getDomainObject(className, id){
-        return utilsService.getDomainObject(className, id);
+	def getDomainObject(className, id, List eagerFetchProperties=null){
+        return utilsService.getDomainObject(className, id, eagerFetchProperties);
 	}
 	
 	// this will return class of object in general used in comment framework
@@ -283,9 +288,11 @@ class ActivityFeedService {
 				break
 			case SPECIES_RECOMMENDED:
 				activityTitle = getLocalizedMessage(SPECIES_RECOMMENDED) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				text = feedInstance.activityDescrption
 				break
 			case SPECIES_AGREED_ON:
 				activityTitle =  getLocalizedMessage(SPECIES_AGREED_ON) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
+				text = feedInstance.activityDescrption
 				break
             case [utilsService.OBV_LOCKED, utilsService.OBV_UNLOCKED]:
 				activityTitle =  getLocalizedMessage(activityType) + " " + (activityDomainObj ? getSpeciesNameHtml(activityDomainObj, params):feedInstance.activityDescrption)
@@ -394,7 +401,6 @@ class ActivityFeedService {
 				activityTitle = getLocalizedMessage(activityType)
 				break
 		}
-		
 		return [activityTitle:activityTitle, text:text]
 	}
 	
@@ -433,6 +439,25 @@ class ActivityFeedService {
 		return getSpeciesNameHtmlFromReco(recoVote.recommendation, params)
 	}
 	
+	def getSpeciesNameHtmlFromRecoVote(recoVote, params){
+		if(!recoVote){
+			return ""
+		}
+		
+		def speciesId = recoVote?.recommendation?.taxonConcept?.findSpeciesId();
+		String sb = ""
+		if(speciesId != null){
+			sb =  '<a href="' + utilsService.generateLink("species", "show", [id:speciesId, 'userGroupWebaddress':params?.webaddress]) + '">' + "<i>${recoVote.givenSciName}</i>" + "</a>"
+            //sb = sb.replaceAll('"|\'','\\\\"')
+		}else if(recoVote.recommendation.isScientificName){
+			sb = "<i>${recoVote.givenSciName}</i>"
+		}else{
+			sb = recoVote.givenCommonName
+		}
+
+		 return "Given name is : " + sb
+	}
+	
 	def getSpeciesNameHtmlFromReco(reco, params){
 		if(!reco){
 			return ""
@@ -450,7 +475,6 @@ class ActivityFeedService {
 		}
 		 return "" + sb
 	}
-	
 	def getUserHyperLink(user, userGroup){
 		String sb = '<a href="' +  utilsService.generateLink("SUser", "show", ["id": user.id, userGroup:userGroup, 'userGroupWebaddress':userGroup?.webaddress])  + '">' + "<i>$user.name</i>" + "</a>"
         return sb;

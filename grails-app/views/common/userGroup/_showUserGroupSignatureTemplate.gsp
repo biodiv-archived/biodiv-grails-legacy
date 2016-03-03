@@ -41,11 +41,12 @@ if(userGroup && userGroup.id) {
                 <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:200px'};"
                     title="${userGroupName}"> ${userGroupName} </span> 
             </a>
-            <g:if test="${!showDetails && userGroup && userGroup.id}">
+            <g:if test="${false}"><!--test="${!showDetails && userGroup && userGroup.id}"-->
             <div class="footer-item" title="${g.message(code:'showusergroupsig.title.members')}">
                 <i class="icon-user"></i>
                 ${membersCount}
             </div>
+            <%--        
             <div class="footer-item" title="${g.message(code:'showobservationstoryfooter.title.species')}">
                 <i class="icon-leaf"></i>
                 ${userGroup.noOfSpecies()}
@@ -60,8 +61,8 @@ if(userGroup && userGroup.id) {
             </div>
             <div class="footer-item" title="${g.message(code:'showusergroupsig.title.discussions')}">
                 <i class="icon-comment"></i>
-                ${userGroup.noOfDocuments()}
             </div>
+            --%>
             </g:if>
     </div>
 </div>

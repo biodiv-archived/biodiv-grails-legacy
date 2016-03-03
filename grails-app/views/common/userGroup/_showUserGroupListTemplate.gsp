@@ -66,21 +66,6 @@
 				</div>
 			</div>
 </div>
-
-<style>
-thead th {
-	background: rgba(106, 201, 162, 0.2);
-}
-
-.table tbody tr:hover td,.table tbody tr:hover th {
-	background-color: #FEFAD5;
-}
-
-.table tbody tr td,.table tbody tr th {
-	background-color: white;
-}
-</style>
-
 <script type="text/javascript">
 $(document).ready(function(){
 	

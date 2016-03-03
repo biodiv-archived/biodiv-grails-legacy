@@ -1,7 +1,7 @@
 <VirtualHost *:80>
     ProxyRequests Off
-    ProxyPass /geoserver http://indiabiodiversity.saturn.strandls.com/geoserver
-    ProxyPassReverse /geoserver http://indiabiodiversity.saturn.strandls.com/geoserver
+    ProxyPass /geoserver http://pamba.strandls.com/geoserver
+    ProxyPassReverse /geoserver http://pamba.strandls.com/geoserver
     ServerName indiabiodiversity.localhost.org
     ServerAlias www.indiabiodiversity.localhost.org
     DirectoryIndex index.php index.html index.html index.htm index.shtml
@@ -10,16 +10,18 @@
     DocumentRoot /var/www
     RewriteEngine on
 
+    RewriteRule /biodiv/datasources/.* - [L]
+    RewriteRule ^/biodiv/(datasources|observations|newsletters|group-themes|users|userGroups|img|content|group_icons|datasources)|(wgp_maps|geoserver) - [L]
     RewriteCond  %{REQUEST_URI} ^/(geoserver|biodiv/maps/thumbnails)
-    RewriteRule  /(.*)$ http://indiabiodiversity.saturn.strandls.com/$1 [P,L]
+    RewriteRule  /(.*)$ http://pamba.strandls.com/$1 [P,L]
 
     RewriteCond %{REQUEST_URI} ^/biodiv/(static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|.*/upload_resource|emailConfirmation|ck|authAjax).*
     RewriteRule ^/biodiv(.*)$ http://indiabiodiversity.localhost.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://indiabiodiversity.localhost.org:8080/biodiv
 
 #   RewriteCond %{REQUEST_URI} !(^(/biodiv/(observations|newsletters|group-themes|users|userGroups|img|content)|(wgp_maps|geoserver)))
-    RewriteRule (^(/biodiv/(observations|newsletters|group-themes|users|userGroups|img|content|group_icons)|(wgp_maps|geoserver))) - [L]
-    
+
+
     RewriteCond %{REQUEST_URI} ^/content
     RewriteRule /(.*)$    http://localhost/biodiv/$1 [P,L]
 
@@ -73,7 +75,7 @@
     RewriteRule ^/biodiv/group/the_western_ghats(.*)$ $1 [R=301]
     ProxyPassReverse / http://localhost:8080/biodiv/group/the_western_ghats
 
-    RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|img|images|content))) - [L]
+    RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|img|images|content|datasources))) - [L]
 	
     RewriteCond %{REQUEST_URI} ^/biodiv
 #       RewriteCond %{REQUEST_URI} !(^/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|images|group_icons|content))

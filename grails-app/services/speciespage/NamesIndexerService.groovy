@@ -144,7 +144,7 @@ class NamesIndexerService {
 
 	private Species getSpecies(TaxonomyDefinition taxonConcept) {
 		if(!taxonConcept) return null;
-		return Species.findByTaxonConcept(taxonConcept);
+		return Species.get(taxonConcept.findSpeciesId());
 	}
 	
 	private String getIconPath(mainImage){

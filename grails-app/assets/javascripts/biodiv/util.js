@@ -70,6 +70,7 @@ function updateRelativeTime(){
 }
 
 function feedPostProcess(){
+    console.log('feedPostProcess start');
 	$(".ellipsis.multiline").trunk8({
 		lines:2,
                 tooltip:false,
@@ -91,9 +92,9 @@ function feedPostProcess(){
 	$('.yj-message-body').linkify();
 	updateRelativeTime();
         rating();
-	$(".youtube_container").each(function(){
+	/*$(".youtube_container").each(function(){
 		loadYoutube(this);
-	});
+	});*/
 }
 
 //to show relative date

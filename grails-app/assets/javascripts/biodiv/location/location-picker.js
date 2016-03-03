@@ -901,7 +901,7 @@ function useTitle(obj){
 }(window.jQuery)); 
 
 $(document).ready(function() { 
-  
+    console.log('location-picker start'); 
   $('.placeName').attr('placeholder', $(".placeName").attr('rel')); 
 
 //alert($(".placename").attr('rel'));
@@ -925,5 +925,7 @@ $(document).ready(function() {
   $(function() {
 
   });
+
+  console.log('location-picker end'); 
 });
 
