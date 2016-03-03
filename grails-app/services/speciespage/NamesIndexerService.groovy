@@ -157,11 +157,16 @@ class NamesIndexerService {
 	
 	private Record getRecord(Recommendation reco){
 		String normName = (!reco.isScientificName)? reco.name :(reco.taxonConcept ? reco.taxonConcept.normalizedForm : reco.name)
-		String synName = (reco.taxonConcept && (reco.taxonConcept != reco.acceptedName))? reco.taxonConcept.normalizedForm : null
-		String acceptedName = (reco.taxonConcept && (reco.taxonConcept != reco.acceptedName))? reco.acceptedName?.normalizedForm : null
+		String synName = (reco.taxonConcept && (reco.taxonConcept != reco.acceptedName) && (reco.taxonConcept.normalizedForm != normName))? reco.taxonConcept.normalizedForm : null
+		String acceptedName = (reco.acceptedName && (reco.acceptedName.normalizedForm != normName))? reco.acceptedName.normalizedForm : null
 		
 		def icon = getIconPath1(reco)
-		def wt = 0;
+		
+		//calculating weight
+		int wt = 0
+		wt+= (reco.acceptedName?5:0)
+		wt+= ((reco.acceptedName && reco.acceptedName.speciesId)?5:0)
+		wt+= (!synName?3:0)
 		
 		Record r = new Record(recoId:reco.id, originalName:normName, acceptedName:acceptedName, synName:synName, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt)
 		return r
@@ -205,10 +210,10 @@ class NamesIndexerService {
 			def languageName = Language.read(record.languageId)?.name
 
 			def normName = record.originalName
-			def synName = (record.synName && (normName != record.synName)) ? record.synName : null
-			def acceptedName = (record.acceptedName && (normName != record.acceptedName)) ? record.acceptedName : null
+			def synName = record.synName
+			def acceptedName = record.acceptedName 
 
- 			println "   " + normName + "  " + acceptedName
+ 			println "   " + normName + "  " + acceptedName + " weight " + record.wt
 			result.add([recoId:record.recoId, value:normName, label:highlightedName, acceptedName:acceptedName, synName:synName, icon:icon, languageName:languageName, "category":"Names"]);
 		}
 		return result;

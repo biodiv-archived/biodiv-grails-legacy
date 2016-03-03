@@ -599,3 +599,4 @@ create table tmp1 as select species_resources_id, max(avg) as avg from tmp  x  g
 update species set repr_image_id = g.resource_id from (select tmp.species_resources_id, tmp.resource_id from tmp, tmp1 where tmp.species_resources_id = tmp1.species_resources_id and tmp.avg = tmp1.avg) g where g.species_resources_id = id;
 DROP TABLE IF EXISTS  tmp;
 DROP TABLE IF EXISTS  tmp1;
+

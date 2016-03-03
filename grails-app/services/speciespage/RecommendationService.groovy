@@ -267,6 +267,8 @@ class RecommendationService {
 	private Recommendation searchReco(String name, boolean isScientificName, languageId, taxonConcept){
         println "${name}  ${isScientificName}    ${languageId}    ${taxonConcept}"
         if(!name) return;
+		
+		def acceptedName = TaxonomyDefinition.fetchAccepted(taxonConcept)
 		def c = Recommendation.createCriteria();
 		def recoList = c.list {
             if(name.contains('%'))
@@ -280,6 +282,9 @@ class RecommendationService {
 			
 			if(taxonConcept)
 				eq('taxonConcept', taxonConcept)
+				
+			if(acceptedName)
+				eq('acceptedName', acceptedName)
 		}
 		
 		if(!recoList){

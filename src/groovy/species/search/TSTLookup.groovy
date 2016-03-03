@@ -59,14 +59,14 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			return res;
 		}
 
-		key = key.toLowerCase();
+		key = key.toLowerCase().trim()//.replaceAll("-", " ");
 		int maxCnt = Math.min(num, list.size());
 		HashSet added = new HashSet();
 		if (onlyMorePopular) {
 			LookupPriorityQueue queue = new LookupPriorityQueue(num);
 			for (TernaryTreeNode ttn : list) {
 				for (obj in ttn.val) {
-					//println "=====" +  obj.recoId + "  " + obj.originalName+"   "+obj.acceptedName+"  "+obj.wt 
+					//println "=====" +  obj.recoId + " ori name  " + obj.originalName +"  taxon name "+obj.synName  +"  accname "+obj.acceptedName+"   wt  "+obj.wt 
 					if(nameFilter && nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
 						continue;
 					}
@@ -78,19 +78,13 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 						added.add(obj);
 						//TODO:Hack to push records with exact prefix to the top
 						//clone not supported 
-						def record = new Record()
+						Record record = new Record()
 						PropertyUtils.copyProperties(record, obj);
-						String name = record.originalName.toLowerCase();
-						if(name.startsWith(key)) {
-							record.wt += 3;
-						}
-						if(record.acceptedName){
-							record.wt += 3;
-							
-							//directly pointing to accepted name
-							if(!record.synName){
-								record.wt += 3;
-							}
+						String name = record.originalName.toLowerCase().trim();
+						if(name.equals(key)){
+							record.wt += 20;
+						}else if(name.startsWith(key)) {
+							record.wt += 15;
 						}
 						
 						LookupResult r = new LookupResult(ttn.token, record);
@@ -101,6 +95,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			for (LookupResult lr : queue.getResults()) {
 				res.add(lr);
 			}
+			res = res.reverse()
 		} else {
 			for (int i = 0; i < maxCnt; i++) {
 				TernaryTreeNode ttn = list.get(i);				
