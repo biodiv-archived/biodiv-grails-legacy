@@ -128,35 +128,50 @@ def correctReco(query, isSyn, f){
 	int zeroMatch = 0
 	int count = 0
 	int totalCount = 0
+	int failCount = 0
 	idList.each {
-		def id = it.id
-		def rr = Recommendation.read(id)
-		def rList = searchReco(rr, isSyn)
-		
-		if(rList.isEmpty()){
-			zeroMatch++
-			conn.executeUpdate("update recommendation set accepted_name_id = NULL, taxon_concept_id = NULL where id = " + id)
-		}
-		
-		if(rList.size() == 1){
-			count++
-			conn.executeUpdate("update recommendation_vote set recommendation_id = " + rList[0].id + " where recommendation_id = " + id)
-			conn.executeUpdate("update observation set max_voted_reco_id = " + rList[0].id + " where max_voted_reco_id = " + id)
-		}
-		
-		if(rList.size() > 1){
-			if(id !=  idMap.get(id)){
-				conn.executeUpdate("update recommendation_vote set recommendation_id = " + idMap.get(id) + " where recommendation_id = " + id)
-				conn.executeUpdate("update observation set max_voted_reco_id = " + idMap.get(id) + " where max_voted_reco_id = " + id)
-			}else{
+		try{
+			def id = it.id
+			def rr = Recommendation.read(id)
+			def rList = searchReco(rr, isSyn)
+			
+			println "------------------ " + id 
+			
+			
+			if(rList.isEmpty()){
+				println "inside zero match"
+				zeroMatch++
 				conn.executeUpdate("update recommendation set accepted_name_id = NULL, taxon_concept_id = NULL where id = " + id)
 			}
+			
+			if(rList.size() == 1){
+				println "inside single match " +  id + " map val " + rList[0].id 
+				
+				count++
+				conn.executeUpdate("update recommendation_vote set recommendation_id = " + rList[0].id + " where recommendation_id = " + id)
+				conn.executeUpdate("update observation set max_voted_reco_id = " + rList[0].id + " where max_voted_reco_id = " + id)
+			}
+			
+			if(rList.size() > 1){
+				println "inside multiple match " +  id + " map val " + idMap.get(id)
+				
+				if(id !=  idMap.get(id)){
+					conn.executeUpdate("update recommendation_vote set recommendation_id = " + idMap.get(id) + " where recommendation_id = " + id)
+					conn.executeUpdate("update observation set max_voted_reco_id = " + idMap.get(id) + " where max_voted_reco_id = " + id)
+				}else{
+					conn.executeUpdate("update recommendation set accepted_name_id = NULL, taxon_concept_id = NULL where id = " + id)
+				}
+			}
+			
+			totalCount++
+		}catch(e){
+			println e.message
+			failCount++
+			
 		}
-		
-		totalCount++
 	}
 	
-	println " total count " + totalCount + "  single match count " + count + "  zero Match " + zeroMatch
+	println " total count " + totalCount + "  single match count " + count + "  zero Match " + zeroMatch + " fali count" + failCount
 	
 }
 

@@ -517,6 +517,11 @@ div.errors {
 	position: relative !important;
 }
 
+.prop .figure img{
+	position: absolute;
+  	bottom: 0;
+  	left: 0;
+}
 .addedResource .metadata {
 	font-size: 0.9em;
 }
@@ -1651,7 +1656,7 @@ span.cke_skin_kama {
 }
 
 .sci_name {
-	font-style: italic;
+	font-style: italic !important;
 }
 
 h1,.main_heading .species_title .sci_name {
@@ -3299,6 +3304,7 @@ small {
 .gallery_wrapper .jcarousel-skin-ie7 .jcarousel-item-horizontal{
     margin-right: 0px;
   	padding: 0px 2px;
+  	width: 75px !important;
 }
 
 .gallery_wrapper .jcarousel-skin-ie7 .jcarousel-clip-horizontal{
@@ -3377,4 +3383,8 @@ li.group_option span{
 }
 .mobile_app_icon{
 	height: 32px;
+}
+.blueimp-gallery > .play-pause {
+	right: 46% !important;
+  	top: 47% !important;
 }

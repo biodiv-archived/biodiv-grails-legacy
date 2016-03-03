@@ -362,7 +362,7 @@ $(document).ready(function(){
         console.log('obv.click.loadmore start');
         $.autopager({
 
-            autoLoad : false,
+            autoLoad : true,
             // a selector that matches a element of next page link
             link : 'div.paginateButtons a.nextLink',
 
@@ -570,7 +570,7 @@ $(document).ready(function(){
     });
 
     $(document).on('click','#obvList',function(){           
-        checkUrl("grid","list");
+        checkUrl("grid","list");        
         params['view'] = "list"; 
         checkView = true;           
         $(this).addClass('active');
@@ -1374,10 +1374,11 @@ function loadSpeciesGroupCount() {
     });
 }
 function checkList(){   
-    if(checkView){
+  /*  if(checkView){
         $('#obvList').trigger('click');        
     }
     $('.obvListwrapper').show();
+    */
 }
 
 
@@ -1389,14 +1390,14 @@ function appendGallery(ovbId,images){
         baseUrl,
         thumbUrl;
         $.each(images, function (index, photo) {
-            console.log("photo ="+photo);
+            //console.log("photo ="+photo);
             baseUrl = ""+window.params.observation.serverURL+photo;
             $('<a/>')
-                .append($('<img>').prop('src', baseUrl))
+                .append($('<img>'))
                 .prop('href', baseUrl)                
                 .attr('data-gallery', '')
                 .appendTo(linksContainer);
-            console.log(carouselLinks);
+           // console.log(carouselLinks);
             carouselLinks.push({
                 href: baseUrl              
             });
@@ -1438,9 +1439,8 @@ function addGridLayout(){
 function checkUrl(viewText,changeText){
     var ls = window.location.search;
     ls = ls.slice(1);
-    if((!params['view'] || params['view'] == viewText) && ( !ls || ls.split("&").length == 1)){
+    if((!params['view'] || params['view'] == viewText) && ( !ls && ls.split("&").length == 1)){
         var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?view='+changeText;
-        newurl += (!ls)?'':'&'+ls;
         window.history.pushState({path:newurl},'',newurl);               
     }else{      
         var lang_key = "view=";
@@ -1470,6 +1470,9 @@ function checkUrl(viewText,changeText){
         window.history.pushState({path:newurl},'',newurl);
 
         }
+
+        var nextLink = $('.nextLink');
+        nextLink.attr('href',nextLink.attr('href').replace('view='+viewText,'view='+changeText));        
     }
 
 function initializeSpeciesGroupHabitatDropdowns() {

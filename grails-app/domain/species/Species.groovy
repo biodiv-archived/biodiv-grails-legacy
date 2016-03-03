@@ -128,7 +128,7 @@ class Species implements Rateable {
             queryParams['max'] = max;
         } 
         
-
+        println query;
         def results = sql.rows(query, queryParams);
 
         query = "select id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.id =  c.rating_ref ";
@@ -146,6 +146,7 @@ class Species implements Rateable {
             queryParams['max'] = max;
         } 
         
+        println query
         def res = sql.rows(query, queryParams)
 
         def idList = results.collect {it[0]}

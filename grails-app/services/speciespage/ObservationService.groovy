@@ -537,7 +537,7 @@ class ObservationService extends AbstractMetadataService {
         String ff = ''
         if(fetchFields) {
             fetchFields.split(',').each {
-                ff += it + ' as '+ it+', ';
+                ff += "o."+it + ' as '+ it+', ';
             }
             ff='new map('+ff+' '+"'"+'observation'+"'"+' as controller)';
         } else {
@@ -553,7 +553,6 @@ class ObservationService extends AbstractMetadataService {
         log.debug "getRelatedObservationByReco Sql : ${query} with params ${params}"
 
 	    def observations = Observation.executeQuery(query, params, [max:limit, offset:offset]);
-        println "dsfsdf"
         /*
         def observations = Observation.withCriteria () {
 //            projections {
@@ -590,7 +589,8 @@ class ObservationService extends AbstractMetadataService {
             def obv;
             if(userGroupInstance) obv = it[0];
             else obv = it;
-            result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
+            if(it)
+                result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
         }
 
         if(limit < 0)
@@ -2548,6 +2548,7 @@ class ObservationService extends AbstractMetadataService {
 		def sql =  Sql.newInstance(dataSource);
        
         Map obvListRecoVotesResult = [:];
+        if(!observationInstanceList) return obvListRecoVotesResult;
         //This query works on view
         String query = "";
         List queryParams = [];

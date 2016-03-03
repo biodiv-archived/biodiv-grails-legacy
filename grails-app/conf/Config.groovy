@@ -1820,6 +1820,7 @@ grails{
         ehcache {
 //            ehcacheXmlLocation = 'classpath:ehcache.xml' // conf/ehcache.xml
             reloadable = true
+            keyGenerator='customCacheKeyGenerator'
         }
     }
 }

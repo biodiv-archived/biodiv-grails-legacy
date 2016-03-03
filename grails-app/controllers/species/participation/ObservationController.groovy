@@ -117,9 +117,10 @@ def grailsCacheManager;
                 .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
                         .getEntries();
 */
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+        model.queryParams.view = (params?.view && params?.view=='grid')?'grid':'list';
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.recoVotes = observationService.getRecommendationVotes(model.observationInstanceList, 3, 0);
-            model.userLanguage = utilsService.getCurrentLanguage(request);
             model.resultType = 'observation'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
@@ -139,7 +140,7 @@ def grailsCacheManager;
                 if(!model.model.recoVotes)
                     model.model.recoVotes = observationService.getRecommendationVotes(model.model.observationInstanceList, 3, 0);
                 println model.recoVotes;
-                if(params.loadMore?.toBoolean()){
+                if(params.loadMore?.toBoolean()){                    
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
@@ -1018,7 +1019,7 @@ def grailsCacheManager;
 				} else if(recommendationVoteInstance.save(flush: true)) {
 					log.debug "Successfully added reco vote : "+recommendationVoteInstance
 					observationInstance.calculateMaxVotedSpeciesName();
-					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
+					def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
 					observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
 				
                     //just updates species time stamp on recommendation
@@ -1917,6 +1918,5 @@ private printCacheEntries(cache) {
 
     }
 }
-
 
 }

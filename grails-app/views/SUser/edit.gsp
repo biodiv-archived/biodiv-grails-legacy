@@ -291,7 +291,7 @@
 
                         </div>
 
-						<sUser:isAdmin model="['user':user]">
+						<sUser:isAdmin>
 							<div class="super-section" style="clear: both;">
 								<h5>
 									<i class="icon-cog"></i>
@@ -362,7 +362,7 @@
 <%--								messageCode='default.button.update.label'--%>
 <%--								class="btn btn-primary" style="float: right; margin-right: 5px;" />--%>
 
-							<sUser:isAdmin model="['user':user]">
+							<sUser:isAdmin>
 								<g:if test='${user}'>
 									<a class="btn btn-danger" id="deleteButton"> ${message(code:'default.button.delete.label')}
 									</a>
@@ -377,7 +377,7 @@
 						</div>
 				</form>
 				
-				<sUser:isAdmin model="['user':user]">
+				<sUser:isAdmin>
 					<g:if test='${user}'>
 						<form action="${uGroup.createLink(controller:'user', action:'delete', 'id':user.id)}" method='POST' name='deleteForm'>
 						</form>

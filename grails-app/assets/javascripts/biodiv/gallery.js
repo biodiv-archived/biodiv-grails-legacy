@@ -77,11 +77,11 @@ function initializeGallery(resources,domainObj,defaultThumb){
                 }    
                 // For Slider    
                 //TODO some More fix here
-                photo.url = (photo.url.indexOf('/biodiv') != -1)?photo.url.replace('.jpg','_gall.jpg'): photo.url;
+                //photo.url = (photo.url.indexOf('/biodiv') != -1)?photo.url.replace('.jpg','_gall.jpg'): photo.url;
 
                 if(photo.type == 'Image'){
                     carouselLinks.push({
-                        href: photo.url,
+                        href: (photo.url.indexOf('/biodiv') != -1)?photo.url.replace('.jpg','_gall.jpg'): photo.url,
                         title: gallCount+'/'+isImageOrVideo.length
                     });
                 }else if(photo.type == 'Video'){
@@ -220,7 +220,8 @@ function update_imageAttribute(resource,ele,index){
     output += '<div class="span6">';
     output += '<div class="license">';
     output += '<a class="span7" href="'+resource.license['url']+'" target="_blank">';
-    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+resource.license['name'].replace(' ','_').toLowerCase()+'.png" alt="'+resource.license['name']+'">';
+    var license = (resource.license['name'] == 'Unspecified')? 'CC BY': resource.license['name'];
+    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+license.replace(' ','_').toLowerCase()+'.png" alt="'+license+'">';
     output += '</a>';
     output += '<div class="rating_form span4">';
     output += '<form class="ratingForm" method="get" title="Rate it">';

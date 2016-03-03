@@ -23,7 +23,7 @@
                 <g:link url="${uGroup.createLink(controller:'species', action:'show', id:obvId, 'pos':pos, 'userGroup':userGroup) }" name="g${pos}">
                 
                 <g:if test="${imagePath}">
-                <span class="img-polaroid" style="background-image:url(${imagePath});">
+                <span class="img-polaroid" style="background-image:url('${imagePath}');">
                 </span>
                 </g:if>
                 <g:else>

@@ -56,11 +56,11 @@ class TaxonController {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-        /*combinedHierarchy.merge();
-        if(classSystem == combinedHierarchy.id) {
-            classSystem = null;
-        }*/
+        
+        return _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
+    }
 
+    private _listHierarchy(String parentId, int level, boolean expandAll, boolean expandSpecies, Long classSystem, Long speciesid, boolean expandTaxon, Long taxonId) {
         long startTime = System.currentTimeMillis();
         def rs = new ArrayList<GroovyRowResult>();
 

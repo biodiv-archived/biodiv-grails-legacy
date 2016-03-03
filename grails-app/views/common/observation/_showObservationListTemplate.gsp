@@ -12,12 +12,17 @@
 		</button>
 	</div-->
 
+	<%
+		def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
+		def styleviewcheck = ((!queryParams?.view || queryParams?.view !="grid") && !activeFilters.isChecklistOnly)?true:false;		
+	%>
+
 <g:if test="${!activeFilters.isChecklistOnly}">
 	<div class="btn-group pull-right button-bar">
-        <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small">
+        <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small ${styleviewcheck?'active':''}">
         	<i class="icon-th-list"></i>List
         </a>
-       <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small active">
+       <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small ${!styleviewcheck?'active':''}">
        		<i class="icon-th"></i>Grid
        </a>
     </div>
@@ -38,10 +43,7 @@
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
 		
-			<%
-				def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
-				def styleviewcheck = ((!params?.view || params?.view !="grid") && !activeFilters.isChecklistOnly)? true:false;
-			%>
+			
 			<ul class="grid_view thumbnails obvListwrapper">
 			
 				<g:each in="${observationInstanceList}" status="i"
