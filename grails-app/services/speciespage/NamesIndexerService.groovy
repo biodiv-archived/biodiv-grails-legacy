@@ -163,13 +163,13 @@ class NamesIndexerService {
 		def icon = getIconPath1(reco)
 		def wt = 0;
 		
-		Record r = new Record(recoId:reco.id, originalName:normName, acceptedName:acceptedName, synName:synName, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:reco.acceptedName?.findSpeciesId())
+		Record r = new Record(recoId:reco.id, originalName:normName, acceptedName:acceptedName, synName:synName, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt)
 		return r
 	}
 	
 	private Species getSpecies(TaxonomyDefinition taxonConcept) {
 		if(!taxonConcept) return null;
-		return Species.get(taxonConcept.findSpeciesId());
+		return Species.read(taxonConcept.speciesId);
 	}
 	
 	private String getIconPath(mainImage){
@@ -215,29 +215,15 @@ class NamesIndexerService {
 	}
 	
 	String getIconPath1(Recommendation reco){
-		//XXX: Use representative image from species here
-		
-		//String imagePath = null;
-		def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
-		String imagePath = mainImage?.thumbnailUrl(null, '.png');
+		String imagePath = null;
+		Species speciesInstance = getSpecies(reco.acceptedName);
+		if(speciesInstance && speciesInstance.reprImage){
+			imagePath = speciesInstance.reprImage.thumbnailUrl()
+		}else{
+			def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
+			imagePath = mainImage?.thumbnailUrl(null, '.png');
+		}
 		return imagePath
-		
-//		
-//		def speciesInstance = getSpecies(reco.acceptedName);
-//		if(speciesInstance){
-//			def mainImage = speciesInstance.mainImage()
-//			def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-//			if(mainImage?.fileName == speciesGroupIcon.fileName) {
-//				imagePath = mainImage.thumbnailUrl(null, '.png');
-//			} else{
-//				imagePath = mainImage?mainImage.thumbnailUrl():null;
-//			}
-//		}
-//		else{
-//			def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
-//			imagePath = mainImage?.thumbnailUrl(null, '.png');
-//		}
-//		return imagePath
 	}
 	
     String getLabel(String originalName , String inputTerm) {

@@ -54,20 +54,19 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 	 */
 	List<LookupResult> lookup(String key, boolean onlyMorePopular, int num, String nameFilter) {
 		List<TernaryTreeNode> list = autocomplete.prefixCompletion(root, key, 0);
-		key = key.toLowerCase();
 		List<LookupResult> res = new ArrayList<LookupResult>();
-		if (list == null || list.size() == 0) {
+		if (!list) {
 			return res;
 		}
 
+		key = key.toLowerCase();
 		int maxCnt = Math.min(num, list.size());
 		HashSet added = new HashSet();
 		if (onlyMorePopular) {
 			LookupPriorityQueue queue = new LookupPriorityQueue(num);
 			for (TernaryTreeNode ttn : list) {
 				for (obj in ttn.val) {
-					//log.info obj.recoId + "  " + obj.originalName+"   "+obj.acceptedName+"  "+obj.wt 
-					
+					//println "=====" +  obj.recoId + "  " + obj.originalName+"   "+obj.acceptedName+"  "+obj.wt 
 					if(nameFilter && nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
 						continue;
 					}

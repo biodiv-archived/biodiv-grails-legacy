@@ -723,7 +723,13 @@ class ObservationService extends AbstractMetadataService {
 			}else{
 				//only common name selected from auto suggestion
 				if(!r.isScientificName){
-					return [mainReco:r]
+					if(commonName.equalsIgnoreCase(r.name))
+						return [mainReco:r]
+					else{
+						//only common name selected from auto complete but common name edited and not same as in reco
+						def cReco = recommendationService.findReco(commonName, false, languageId, r.taxonConcept, true, false);
+						return [mainReco:cReco]
+					}	
 				}else{
 					//common name is given and reco id is for scientific name
 					def cReco = recommendationService.findReco(commonName, false, languageId, r.taxonConcept, true, false);

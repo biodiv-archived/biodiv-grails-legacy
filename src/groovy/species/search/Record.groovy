@@ -22,7 +22,7 @@ class Record implements Comparable<Record>, Serializable {
 	int wt = 0;
 	
 	//additional display info
-	Long speciesId;
+	//Long speciesId;
 	String icon;
 	boolean isScientificName;
 	//if record represent common name then languageId is useful

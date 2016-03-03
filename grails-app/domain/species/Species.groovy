@@ -90,26 +90,12 @@ class Species implements Rateable {
     }
 
 	Resource mainImage() {
-        def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-        def images = this.listResourcesByRating(ResourceType.IMAGE, 1);
-        def reprImageMaxRated = images ? images[0]:null;
-        /*
-        if(!reprImage || reprImage?.fileName == speciesGroupIcon.fileName) {
-            def images = this.getImages();
-            println "=========IMAGES========== " + images;
-            this.reprImage = images ? images[0]:null;
-            if(reprImage) {
-                log.debug " Saving representative image for species ===  $reprImage.fileName" ;
-
-                if(!this.save(flush:true)) {
-                    this.errors.each { log.error it }
-                }
-            }			
-        }*/
+        def reprImageMaxRated = reprImage
         if(reprImageMaxRated && (new File(grailsApplication.config.speciesPortal.resources.rootDir+reprImageMaxRated.fileName.trim()).exists() || new File(grailsApplication.config.speciesPortal.observations.rootDir+reprImageMaxRated.fileName.trim()).exists())) {
             return reprImageMaxRated;
         } else {
-            return speciesGroupIcon
+			def speciesGroupIcon =  this.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+		    return speciesGroupIcon
         }
     }
 
