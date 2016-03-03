@@ -5,27 +5,27 @@
       <td align="center">
       
       &nbsp;&nbsp;
-      <a href="http://www.cirad.fr" target="_blank"> <img src="images/partnerlogo/Cirad_sans_texte.jpg" width="100" height="74" border="0"></a>
+      <a href="http://www.cirad.fr" target="_blank"><asset:image src="/all/partnerlogo/Cirad_sans_texte.jpg" absolute="true" class="partner_lg"/> </a>
       &nbsp;&nbsp;
-      <a href="http://www.ifpindia.org" target="_blank"><img src="images/partnerlogo/IFP-anglais_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.ifpindia.org" target="_blank"><asset:image src="/all/partnerlogo/IFP-anglais_logo.png" absolute="true" class="partner_lg"/></a>
       &nbsp;&nbsp;
-      <a href="http://www.fofifa.mg" target="_blank"><img src="images/partnerlogo/FOFIFA_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.fofifa.mg" target="_blank"><asset:image src="/all/partnerlogo/FOFIFA_logo.png" absolute="true" class="partner_lg"/></a>
       &nbsp;&nbsp;
-      <a href="http://www.msiri.mu/" target="_blank"><img src="images/partnerlogo/MCIA-LOGO1.png" width="100" height="74" border="0"></a>
+      <a href="http://www.msiri.mu/" target="_blank"><asset:image src="/all/partnerlogo/MCIA-LOGO1.png" absolute="true" class="partner_lg"/></a>
       &nbsp;&nbsp;
-      <a href="http://www.msiri.mu/" target="_blank"><img src="images/partnerlogo/MSIRI-2_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.msiri.mu/" target="_blank"><asset:image src="/all/partnerlogo/MSIRI-2_logo.png" absolute="true" class="partner_lg"/></a>
       &nbsp;&nbsp;
-      <a href="http://www.cndrs-comores.org" target="_blank"><img src="images/partnerlogo/CNDRS2_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.cndrs-comores.org" target="_blank"><asset:image src="/all/partnerlogo/CNDRS2_logo.png" absolute="true" class="partner_lg"/></a>
       </td>
       </tr>
       <tr>
       <td align="center">
       &nbsp;&nbsp;
-      <a href="http://www.europa.eu/index_fr.htm" target="_blank"><img src="images/partnerlogo/UE-TC_logo.png" width="100" height="74" border="0"></a>
+      <a href="http://www.europa.eu/index_fr.htm" target="_blank"><asset:image src="/all/partnerlogo/UE-TC_logo.png" absolute="true" class="partner_lg"/></a>
       &nbsp;&nbsp;
-      <a href="http://www.acp-st.eu/" target="_blank"><img src="images/partnerlogo/acp-st_logo.png" width="75" height="70" target="_blank" border="0"></a>
+      <a href="http://www.acp-st.eu/" target="_blank"><asset:image src="/all/partnerlogo/acp-st_logo.png" absolute="true" class="partner_lg"/></a>
       &nbsp;&nbsp;
-      <a href="http://www.acp.int/" target="_blank"><img src="images/partnerlogo/ACP.jpg" width="100" height="75" border="0"></a>
+      <a href="http://www.acp.int/" target="_blank"><asset:image src="/all/partnerlogo/ACP.jpg" absolute="true" class="partner_lg"/></a>
       </td>
       </tr>
       </tbody></table>
