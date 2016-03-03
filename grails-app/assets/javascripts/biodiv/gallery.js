@@ -178,18 +178,19 @@ function update_imageAttribute(resource,ele,index){
     output += '<div class="row-fluid '+resourceType+'Attr '+resourceType+'Attr_'+index+'" style="display:none;">';
     output += '<div>';
 
+    output += '<div class="conts_wrap">';
+    output += '<div class="span12">';
+    output += '<div class="conts_wrap_left">';
+
     if(resource.description && resource.description != ''){
-        output += '<div class="span12 ellipsis multiline" style="margin-left:0px">'+resource.description+'</div>';            
+        output += '<div class="ellipsis multiline" style="margin-left:0px">'+resource.description+'</div>';            
     }
 
 
-    output += '<div class="conts_wrap">';
-    output += '<div class="span12">';
-    output += '<div class="span6">';
     if(resource.contributors && Object.keys(resource.contributors).length > 0){
 
             output += '<div class="conts_wrap_line">';
-            output += '<h5>Contributors</h5>';       
+            output += '<h6>Contributors</h6>';       
             $.each(resource.contributors, function (index, contributor) {     
                 output += '<ol>';
                 output += '<li>'+contributor.name+'</li>';
@@ -200,7 +201,7 @@ function update_imageAttribute(resource,ele,index){
 
     if(resource.attributors && Object.keys(resource.attributors).length > 0){
         output += '<div class="conts_wrap_line">';            
-        output += '<h5>Attributors</h5>';       
+        output += '<h6>Attributors</h6>';       
         $.each(resource.attributors, function (index, attributor) {     
             output += '<ol>';
             output += '<li>'+attributor.name+'</li>';
@@ -217,15 +218,15 @@ function update_imageAttribute(resource,ele,index){
     output += '</div>';
 
 
-    output += '<div class="span6">';
+    output += '<div class="conts_wrap_right">';
     output += '<div class="license">';
-    output += '<a class="span7" href="'+resource.license['url']+'" target="_blank">';
+    output += '<a href="'+resource.license['url']+'" target="_blank">';
     var license = (resource.license['name'] == 'Unspecified')? 'CC BY': resource.license['name'];
     output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+license.replace(' ','_').toLowerCase()+'.png" alt="'+license+'">';
     output += '</a>';
-    output += '<div class="rating_form span4">';
+    output += '<div class="rating_form">';
     output += '<form class="ratingForm" method="get" title="Rate it">';
-    output += '<span class="star_gallery_rating pull-right" title="Rate" data-score="'+resource.averageRating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
+    output += '<span class="star_gallery_rating" title="Rate" data-score="'+resource.averageRating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
     output += '</span>';
     output += '<div class="noOfRatings">'; 
     var ratings ='';
@@ -246,7 +247,7 @@ function update_imageAttribute(resource,ele,index){
     if(resource.annotations && (Object.keys(resource.annotations).length > 0)){
         output += '<div class="span12" style="margin-left:0px;">';
         output += '<div class="conts_wrap_line">';            
-        output += '<h5>Annotations</h5>';
+        output += '<h6>Annotations</h6>';
         output += '<div class="annotationsWrapper">';
         output += '<table class="table" style="margin: 0px;table-layout:fixed;display:block;overflow-y:auto;">';
         output += '<tbody>';
