@@ -38,6 +38,7 @@ class NamesIndexerService {
 	static transactional = false
 	def grailsApplication;
     def utilsService;
+	def dataSource
 
 	private static final log = LogFactory.getLog(this);
 	private Lookup lookup = new TSTLookup();
@@ -49,6 +50,10 @@ class NamesIndexerService {
 	 */
 	void rebuild() {
 		log.info "Publishing names to autocomplete index";
+		
+		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+		dataSource.setUnreturnedConnectionTimeout(500);
+		
 		Lookup lookup1 = new TSTLookup();
 
 		setDirty(false);
@@ -60,34 +65,47 @@ class NamesIndexerService {
 		//TODO fetch in batches
 		def startTime = System.currentTimeMillis()
 		
-		int limit = 200, offset = 0, noOfRecosAdded = 0;
-        def recos;
-		while(true){
-            Recommendation.withNewTransaction([readOnly:true]) { status ->
-			recos = Recommendation.listOrderById(max:limit, offset:offset, order: "asc")
-			recos.each { reco ->
-				if(addRecoWithAnalyzer(reco, analyzer, lookup1)){
-					noOfRecosAdded++;
+		int limit = 1000, offset = 0, noOfRecosAdded = 0;
+        List recos;
+		try{
+			while(true){
+				Recommendation.withTransaction([readOnly:true]){ status ->
+					recos = Recommendation.listOrderById(max:limit, offset:offset, order: "desc")
+					
+					if(!recos) return; //no more results;
+					
+					
+					recos.each { reco ->
+						if(addRecoWithAnalyzer(reco, analyzer, lookup1)){
+							noOfRecosAdded++;
+						}
+					}
+				
 				}
+				
+				if(!recos) break; //no more results;
+				
+				offset = offset + limit;
+				println  "=========== total added recos == $noOfRecosAdded " + new Date()
+				
+	            recos.clear();
+				utilsService.cleanUpGorm(true)
 			}
 			
-			offset = offset + limit;
-			log.info "=========== total added recos == $noOfRecosAdded"
-			if(!recos) return; //no more results;
-            }
-			if(!recos) break; //no more results;
-            recos.clear();
+			synchronized(lookup) {
+				lookup = lookup1;
+			}
+	
+			log.info "Added recos : ${noOfRecosAdded}";
+			log.info "Time taken to rebuild index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+	
+			def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
+			store(indexStoreDir);
+		}catch(e){
+			e.printStackTrace()
+		}finally{
+			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		}
-		
-		synchronized(lookup) {
-			lookup = lookup1;
-		}
-
-		log.info "Added recos : ${noOfRecosAdded}";
-		log.info "Time taken to rebuild index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
-
-		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
-		store(indexStoreDir);
 	}
 
 	/**
@@ -116,35 +134,47 @@ class NamesIndexerService {
 			rebuild();
 			return;
 		}
-
 		//log.debug "Adding recommendation : "+reco.name + " with taxonConcept : "+reco.taxonConcept;
-
 		boolean success = false;
-		def species = getSpecies(reco.taxonConcept);
-		def icon = getIconPath1(reco)
-		
 		//log.debug "Generating ngrams"
 		def tokenStream = analyzer.tokenStream("name", new StringReader(reco.name));
 		tokenStream.reset()
 		OffsetAttribute offsetAttribute = tokenStream.getAttribute(OffsetAttribute.class);
 		CharTermAttribute charTermAttribute = tokenStream.getAttribute(CharTermAttribute.class);
-		def wt = 0;
 		while (tokenStream.incrementToken()) {
 			int startOffset = offsetAttribute.startOffset();
 			int endOffset = offsetAttribute.endOffset();
 			String term = charTermAttribute.toString()?.replaceAll("\u00A0|\u2007|\u202F", " ");
 			//log.debug "Adding name term : "+term
 			synchronized(lookup) {
-				success |= lookup.add(term, new Record(originalName:reco.name, canonicalForm:reco.taxonConcept?.canonicalForm, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt, speciesId:species?.id));
+				success |= lookup.add(term, getRecord(reco));
 			}
 		}
         tokenStream.close();
 		return success;
 	}
 
+	
+	private Record getRecord(Recommendation reco){
+		String normName = (!reco.isScientificName)? reco.name :(reco.taxonConcept ? reco.taxonConcept.normalizedForm : reco.name)
+		String synName = (reco.taxonConcept && (reco.taxonConcept != reco.acceptedName) && (reco.taxonConcept.normalizedForm != normName))? reco.taxonConcept.normalizedForm : null
+		String acceptedName = (reco.acceptedName && (reco.acceptedName.normalizedForm != normName))? reco.acceptedName.normalizedForm : null
+		
+		def icon = getIconPath1(reco)
+		
+		//calculating weight
+		int wt = 0
+		wt+= (reco.acceptedName?5:0)
+		wt+= ((reco.acceptedName && reco.acceptedName.speciesId)?5:0)
+		wt+= (!synName?3:0)
+		
+		Record r = new Record(recoId:reco.id, originalName:normName, acceptedName:acceptedName, synName:synName, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt)
+		return r
+	}
+	
 	private Species getSpecies(TaxonomyDefinition taxonConcept) {
 		if(!taxonConcept) return null;
-		return Species.get(taxonConcept.findSpeciesId());
+		return Species.read(taxonConcept.speciesId);
 	}
 	
 	private String getIconPath(mainImage){
@@ -173,35 +203,31 @@ class NamesIndexerService {
 		def result = new ArrayList();
 		lookupResults.each { lookupResult ->
 			def term = lookupResult.key;
-			def record = lookupResult.value;
-			//			String name = term.replaceFirst(/(?i)${params.term}/, "<b>"+params.term+"</b>");
-			//			String highlightedName = record.originalName.replaceFirst(/(?i)${term}/, name);
+			Record record = lookupResult.value;
 			String highlightedName = getLabel(record.originalName, inputTerm);
 			String icon = record.icon
 			
-			def languageName = Language.read(record.languageId)?.name 
-			result.add([value:record.originalName, label:highlightedName, desc:record.canonicalForm, icon:icon, speciesId:record.speciesId, languageName:languageName, "category":"Names"]);
+			def languageName = Language.read(record.languageId)?.name
+
+			def normName = record.originalName
+			def synName = record.synName
+			def acceptedName = record.acceptedName 
+
+ 			println "   " + normName + "  " + acceptedName + " weight " + record.wt
+			result.add([recoId:record.recoId, value:normName, label:highlightedName, acceptedName:acceptedName, synName:synName, icon:icon, languageName:languageName, "category":"Names"]);
 		}
 		return result;
 	}
 	
 	String getIconPath1(Recommendation reco){
 		String imagePath = null;
-		def speciesInstance = getSpecies(reco.taxonConcept);
-		if(speciesInstance){
-			def mainImage = speciesInstance.mainImage()
-			def speciesGroupIcon =  speciesInstance.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
-			if(mainImage?.fileName == speciesGroupIcon.fileName) {
-				imagePath = mainImage.thumbnailUrl(null, '.png');
-			} else{
-				imagePath = mainImage?mainImage.thumbnailUrl():null;
-			}
-		}
-		else{
-			def mainImage = reco.taxonConcept?.group?.icon(ImageType.VERY_SMALL)
+		Species speciesInstance = getSpecies(reco.acceptedName);
+		if(speciesInstance && speciesInstance.reprImage){
+			imagePath = speciesInstance.reprImage.thumbnailUrl()
+		}else{
+			def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
 			imagePath = mainImage?.thumbnailUrl(null, '.png');
 		}
-		//println "=============== image path " + imagePath
 		return imagePath
 	}
 	
@@ -372,5 +398,119 @@ class NamesIndexerService {
 	 */
 	boolean isDirty() {
 		return dirty;
+	}
+	
+	
+	void rebuildTest() {
+		log.info "Publishing names to autocomplete index";
+		
+		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+		dataSource.setUnreturnedConnectionTimeout(500);
+		
+		Lookup lookup1 = new TSTLookup();
+
+		setDirty(false);
+
+		def a = new StandardAnalyzer(Version.LUCENE_4_10_0)
+		def analyzer = new ShingleAnalyzerWrapper(a, 2, 15, ' ', true, true,'')
+		//analyzer.setOutputUnigrams(true);
+
+		//TODO fetch in batches
+		def startTime = System.currentTimeMillis()
+		
+		int limit = 200, offset = 0, noOfRecosAdded = 0;
+		List recos = [];
+		try{
+			//common names with accepted name
+			def tRecos =  Recommendation.withCriteria(){
+					and{
+						isNotNull('acceptedName')
+						eq('isScientificName', false)
+					}
+					
+					maxResults 100
+					order("id", "asc")
+				}
+			recos.addAll(tRecos)
+			
+			
+			// common names without taxon concept
+			tRecos =  Recommendation.withCriteria(){
+				and{
+					isNull('taxonConcept')
+					eq('isScientificName', false)
+				}
+				
+				maxResults 100
+				order("id", "asc")
+			}
+			recos.addAll(tRecos)
+			
+		
+			// common names of synonym having accepted name 
+			tRecos =  Recommendation.withCriteria(){
+				and{
+					isNotNull('taxonConcept')
+					isNotNull('acceptedName')
+					eq('isScientificName', false)
+					neProperty('taxonConcept', 'acceptedName')
+				}
+				
+				maxResults 100
+				order("id", "asc")
+			}
+			recos.addAll(tRecos)
+			
+			//synonym name 
+			tRecos =  Recommendation.withCriteria(){
+					and{
+						isNotNull('acceptedName')
+						eq('isScientificName', true)
+						neProperty('taxonConcept', 'acceptedName')
+					}
+					
+					maxResults 100
+					order("id", "asc")
+			}
+			recos.addAll(tRecos)
+			
+			//accepted name
+			tRecos =  Recommendation.withCriteria(){
+					and{
+						isNotNull('acceptedName')
+						eq('isScientificName', true)
+						eqProperty('taxonConcept', 'acceptedName')
+					}
+					
+					maxResults 100
+					order("id", "asc")
+				}
+			recos.addAll(tRecos)
+			
+			println "----------------- " + recos.size()
+			Recommendation.withNewTransaction([readOnly:true]) { status ->
+				
+				recos.each { reco ->
+					if(addRecoWithAnalyzer(reco, analyzer, lookup1)){
+						noOfRecosAdded++;
+					}
+				}
+			}
+			
+			synchronized(lookup) {
+				lookup = lookup1;
+			}
+	
+			log.info "Added recos : ${noOfRecosAdded}";
+			log.info "Time taken to rebuild index : "+((System.currentTimeMillis() - startTime)/1000) + "(sec)"
+	
+			def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
+			store(indexStoreDir);
+			
+		}catch(e){
+			e.printStackTrace()
+		}finally{
+			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+		}
 	}
 }

@@ -1,6 +1,10 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Stats"%>
-<%@ page contentType="text/html"%>
+<%@page import="species.UtilsService"%>
+<%@page contentType="text/html"%>
+
+<g:set var="utilsService" bean="utilsService"/>
+
 <div id="ibp-header" class="gradient-bg">
 	<div id="ibp-header-bar" class="navbar navbar-static-top" style="margin-bottom: 0px;border-bottom:0px;">
 		<div class="navbar-inner"
@@ -23,7 +27,9 @@
 	</div>
 	<domain:showHeader model="['userGroupInstance':userGroupInstance]" />
          <div class="">
+         
 <%
+String cgroup=(params.webaddress)?params.webaddress:'ibp';
 String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
@@ -72,7 +78,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			${flash.error}
 		</div>
 	</g:if>
-
+<g:if test="${raw(utilsService.getBannerMessage(cgroup))!=null}">
 <%--	<div class="alert alert-info"--%>
 <%--		style="clear: both; margin: 0px; text-align: center;">--%>
 <%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
@@ -87,9 +93,18 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 
 	<div class="alertMsg alert alert-info"
 		style="clear: both; margin: 0px; text-align: center;">
-		The IBP Community Meet will be held on 20th February at NGMA, Bangalore. Register your participation <a target="_blank" href="http://indiabiodiversity.org/page/149">here</a>.
+		<!-- The IBP Community Meet will be held on 20th February at NGMA, Bangalore. Register your participation <a target="_blank" href="http://indiabiodiversity.org/page/149">here</a>. -->
+		${raw(utilsService.getBannerMessage(cgroup))}
+		 
 	</div>
-
+	<g:if test="${params.webaddress!=null}">
+	<div class="alertMsg alert alert-info"
+		style="clear: both; margin: 0px; text-align: center;">
+		${raw(utilsService.getIbpBannerMessage())}
+		 
+	</div>
+	</g:if>
+	</g:if>
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
 		${flash.message}

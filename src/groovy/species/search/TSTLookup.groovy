@@ -54,58 +54,48 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 	 */
 	List<LookupResult> lookup(String key, boolean onlyMorePopular, int num, String nameFilter) {
 		List<TernaryTreeNode> list = autocomplete.prefixCompletion(root, key, 0);
-		key = key.toLowerCase();
-		//println "-----------------"
-		//println key;
 		List<LookupResult> res = new ArrayList<LookupResult>();
-		if (list == null || list.size() == 0) {
+		if (!list) {
 			return res;
 		}
 
+		key = key.toLowerCase().trim()//.replaceAll("-", " ");
 		int maxCnt = Math.min(num, list.size());
 		HashSet added = new HashSet();
-		List inQ = new ArrayList();
 		if (onlyMorePopular) {
 			LookupPriorityQueue queue = new LookupPriorityQueue(num);
 			for (TernaryTreeNode ttn : list) {
 				for (obj in ttn.val) {
-					//println obj.originalName+"   "+obj.canonicalForm+"  "+obj.wt
-					
+					//println "=====" +  obj.recoId + " ori name  " + obj.originalName +"  taxon name "+obj.synName  +"  accname "+obj.acceptedName+"   wt  "+obj.wt 
 					if(nameFilter && nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
 						continue;
 					}
 					if(nameFilter && nameFilter.equalsIgnoreCase("commonNames") && obj.isScientificName){
 						continue;
 					}
+					
 					if(!added.contains(obj)) {
 						added.add(obj);
 						//TODO:Hack to push records with exact prefix to the top
 						//clone not supported 
-						def record = new Record()
+						Record record = new Record()
 						PropertyUtils.copyProperties(record, obj);
-//						record.metaClass.properties.each{
-//							if (it.name != 'metaClass' && it.name != 'class')
-//							  it.setProperty(record, obj.metaClass.getProperty(obj, it.name))
-//						 }
-						//println record
-						//println record.originalName+"  "+record.canonicalForm+"  "+record.wt
-						String name = record.originalName.toLowerCase();
-						boolean hasCanonicalName = inQ.contains(record.canonicalForm);
-						if(name.startsWith(key)) {
-							record.wt += 3;
-						} 
-						if(!hasCanonicalName) {
-							inQ.add(record.canonicalForm);
-							LookupResult r = new LookupResult(ttn.token, record);
-							LookupResult remRes = queue.insertWithOverflow(r);
-							inQ.remove(remRes);
+						String name = record.originalName.toLowerCase().trim();
+						if(name.equals(key)){
+							record.wt += 20;
+						}else if(name.startsWith(key)) {
+							record.wt += 15;
 						}
+						
+						LookupResult r = new LookupResult(ttn.token, record);
+						queue.insertWithOverflow(r);
 					}
 				}
 			}
 			for (LookupResult lr : queue.getResults()) {
 				res.add(lr);
 			}
+			res = res.reverse()
 		} else {
 			for (int i = 0; i < maxCnt; i++) {
 				TernaryTreeNode ttn = list.get(i);				

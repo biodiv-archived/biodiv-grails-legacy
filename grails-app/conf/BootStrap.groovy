@@ -53,7 +53,9 @@ class BootStrap {
 		initEmailConfirmationService();
         initJSONMarshallers();
         initCaches();
-       	}
+        initBannerMessageMap();
+       
+  	}
 
 	def initDefs() {
 		if(Field.count() == 0) {
@@ -204,9 +206,14 @@ class BootStrap {
         }
     }
 
+	def initBannerMessageMap() {
+		utilsService.loadBannerMessageMap();
+	}
 	/**
 	 * 
 	 */
+
+	  
 	def destroy = {
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		//namesIndexerService.store(indexStoreDir);

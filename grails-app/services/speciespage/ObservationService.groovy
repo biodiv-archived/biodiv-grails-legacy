@@ -712,25 +712,42 @@ class ObservationService extends AbstractMetadataService {
     * languageName
     * 
     **/
-    Map getRecommendations(String recoName, String canName, String commonName, String languageName, Long speciesId=null) {
-        //		def refObject = params.observation?:Observation.get(params.obvId);
+    Map getRecommendations(Long recoId, String recoName, String commonName, String languageName) {
+		Recommendation commonNameReco, scientificNameReco;
+		Long languageId = Language.getLanguage(languageName).id;
+		//auto select from ui
+		if(recoId){
+			Recommendation r = Recommendation.get(recoId)
+			if(r.isScientificName){
+				scientificNameReco = r
+				if(commonName)
+					commonNameReco = recommendationService.findReco(commonName, false, languageId, scientificNameReco.taxonConcept, true, false);
+			}else{
+                if(commonName){
+                    if(commonName.toLowerCase() == r.lowercaseName)
+                        commonNameReco = r
+                    else
+                        commonNameReco = recommendationService.findReco(commonName, false, languageId, r.taxonConcept, true, false);
+                }else{
+                    commonNameReco = null
+                }
 
-        //if source of recommendation is other that observation (i.e Checklist)
-        //		refObject = refObject ?: params.refObject
-        Recommendation commonNameReco, scientificNameReco;
-        if(commonName) {
+                if(r.taxonConcept)
+				    scientificNameReco = recommendationService.findReco(r.taxonConcept.canonicalForm, true, null, r.taxonConcept, true, false)//;Recommendation.findByTaxonConceptAndAcceptedName(r.taxonConcept, r.acceptedName)
+			}
+			return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
+		}
+			
+		//reco id is not given
+	    if(commonName) {
             utilsService.benchmark('findReco.commonName') {
-                def languageId = Language.getLanguage(languageName).id;
-                commonNameReco = recommendationService.findReco(commonName, false, languageId, null, true, null, false);
+                commonNameReco = recommendationService.findReco(commonName, false, languageId, null, true, false);
             }
         }
         utilsService.benchmark('findReco.sciName') {
-            scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId, false);
+            scientificNameReco = recommendationService.findReco(recoName, true, null, null, true, false);
         }
 
-        //		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
-
-        //giving priority to scientific name if its available. same will be used in determining species call
         return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
     }
 
