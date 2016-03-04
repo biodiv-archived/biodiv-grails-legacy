@@ -95,7 +95,6 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			for (LookupResult lr : queue.getResults()) {
 				res.add(lr);
 			}
-			res = res.reverse()
 		} else {
 			for (int i = 0; i < maxCnt; i++) {
 				TernaryTreeNode ttn = list.get(i);				

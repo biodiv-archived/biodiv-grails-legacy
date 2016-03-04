@@ -1349,7 +1349,7 @@ class UserGroupService {
 			List groups = [];
             if(params['userGroups'] || params['userGroupsList']) {
                 groups = (params['userGroups']?:params['userGroupsList']).split(",").collect {
-				    UserGroup.read(Long.parseLong(it))
+				    UserGroup.read(Long.parseLong(it.trim()))
 			    }
             }
 			def objectIds = params['objectIds']

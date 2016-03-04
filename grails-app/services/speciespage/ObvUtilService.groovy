@@ -769,7 +769,7 @@ class ObvUtilService {
                     activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
                 }
 
-                postProcessObervation(params, observationInstance, newObv);
+                postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
             } else {
@@ -787,7 +787,7 @@ class ObvUtilService {
         return success;
 	}
 
-    private postProcessObervation(params, observationInstance, boolean newObv=false) {
+    private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null) {
         params.identifiedBy = params.identifiedBy;
 
         utilsService.benchmark('addReco') {
@@ -812,7 +812,7 @@ class ObvUtilService {
             } else {
                 if(params.userGroupsList) {
                     def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-                    observationService.setUserGroups(observationInstance, userGroups, false);
+					observationService.setUserGroups(observationInstance, userGroups, false);
                 }
             }
         }
