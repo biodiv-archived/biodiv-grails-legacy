@@ -13,6 +13,7 @@ import species.participation.UsersResource;
 import grails.converters.JSON
 
 class Resource extends Sourcedata implements Rateable {
+	def utilsService
 	
 	public enum ResourceType {
 		ICON("Icon"),
@@ -233,7 +234,7 @@ class Resource extends Sourcedata implements Rateable {
 		if(!this.save(flush:true)){
 			this.errors.allErrors.each { log.error it }
 		} else {
-            utilsService.evictCache('resources', this.context.toLowerCase()+"-"+this.id);
+            //utilsService.evictInCache('resources', this.context.toString().toLowerCase()+"-"+this.id);
         }
 		
 	}

@@ -702,7 +702,7 @@ class ObservationService extends AbstractMetadataService {
     }
 
     Map getRecommendation(params){
-        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName, params.speciesId)
+        return getRecommendations( params.recoId, params.recoName, params.commonName, params.languageName)
     }
 
     /**
