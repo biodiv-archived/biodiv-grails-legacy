@@ -1419,7 +1419,7 @@ function addListLayout(){
     $('.thumbnails>li').css({'width':'100%'}).addClass('addmargin');
     $('.snippet.tablet').addClass('snippettablet');
     $('.prop').css('clear','inherit');
-    $('.showObvDetails, .view_bootstrap_gallery').show();
+    $('.showObvDetails, .view_bootstrap_gallery, .recommendations').show();
     $('.species_title_wrapper').hide();
     $('.species_title_wrapper').parent().css({'height':'20px'});
     //loadSpeciesnameReco();
@@ -1433,7 +1433,7 @@ function addGridLayout(){
     $('.prop').css('clear','both');
     $('.species_title_wrapper').show();
     $('.species_title_wrapper').parent().css({'height':'50px'});
-    $('.showObvDetails, .view_bootstrap_gallery').hide();
+    $('.showObvDetails, .view_bootstrap_gallery, .recommendations').hide();    
 }
 
 function checkUrl(viewText,changeText){
