@@ -447,7 +447,7 @@ class Observation extends DataObject {
             else if(it.type == ResourceType.VIDEO) noOfVideos++;
             else if(it.type == ResourceType.AUDIO) noOfAudio++;
         }
-        utilsService.evictInCache('resources', 'observation-'+this.id);
+        //utilsService.evictInCache('resources', 'observation-'+this.id);
         updateReprImage();
 	}
 
