@@ -69,7 +69,7 @@ class ImageUtils {
             }
             catch (Exception e1){
                 log.error "Error even on using _gall_th.jpg image for this file " + dir +"/" + name+jpgGall_extension +" target file " + name+extension;
-                e1.printStackTrace()
+                log.error e1.message
             }
 
         } 
