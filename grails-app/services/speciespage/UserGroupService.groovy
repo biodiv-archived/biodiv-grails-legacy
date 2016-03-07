@@ -1464,7 +1464,7 @@ class UserGroupService {
 		
 		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
 			
-			UserGroup.withNewTransaction(){  status ->
+			UserGroup.withTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
@@ -1480,7 +1480,7 @@ class UserGroupService {
 			//XXX: to avoid connection time out posting in batches
 			List resSubLists = obvs.collate(POST_BATCH_SIZE)
 			resSubLists.each { resList ->
-				UserGroup.withNewTransaction(){  status ->
+				UserGroup.withTransaction(){  status ->
 					log.debug submitType + " for group " + ug + "  resources size " +  resList.size()
 					ug = ug.merge()
 					resList.each { obv ->

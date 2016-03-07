@@ -92,17 +92,17 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 function showUpdateStatus(msg, type, $ele) {
     if(!msg) return;
 
-    if($ele == undefined) $ele = $("#seeMoreMessage")
+    if($ele == undefined) $ele = $("#seeMoreMessage");
 
-        if(type === 'info') {
-            $ele.html(msg).show().removeClass().addClass('alert alert-info');
-        } else if(type === 'success') {
-            $ele.html(msg).show().removeClass().addClass('alert alert-success');
-        } else if(type === 'error') {
-            $ele.html(msg).show().removeClass().addClass('alert alert-error');
-        } else {
-            $ele.hide();
-        }
+    if(type === 'info') {
+        $ele.html(msg).show().removeClass().addClass('alert alert-info');
+    } else if(type === 'success') {
+        $ele.html(msg).show().removeClass().addClass('alert alert-success');
+    } else if(type === 'error') {
+        $ele.html(msg).show().removeClass().addClass('alert alert-error');
+    } else {
+        $ele.hide();
+    }
 }
 
 

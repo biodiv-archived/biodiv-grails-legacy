@@ -562,28 +562,10 @@ class ObvUtilService {
 	
 	
 	def batchUpload(request, params){
-		/*
-		File dir = new File("/home/sandeept/obvUpload")
-		dir.listFiles().each { File obvDir ->
-			log.debug "Processing Dir ======== $obvDir"
-			processBatch(obvDir)
-		}
-		*/
 		processBatch(params)
 	}
 
 	def processBatch(params){
-		/*
-		def spreadSheets =  obvDir.listFiles(new FileFilter(){
-					boolean accept(File pathname){
-						return pathname.getName().endsWith("xls")
-					}
-				})
-		if(spreadSheets.length == 0){
-			log.error "Main file not found. Aborting upload"
-			return
-		}
-		*/
 		File imageDir = new File(params.imageDir)
 		if(!imageDir.exists()){
 			log.error "Image dir not found. Aborting upload"
@@ -603,18 +585,24 @@ class ObvUtilService {
 				uploadObservation(imageDir, m, resultObv)
 				i++
 				if(i > BATCH_SIZE){
-					utilsService.cleanUpGorm(true)
-					def obvs = resultObv.collect { Observation.read(it) }
-					try {
-						observationsSearchService.publishSearchIndex(obvs, true);
-					} catch (Exception e) {
-						log.error e.printStackTrace();
-					}
-					resultObv.clear();
+					publishAndGormcleanup(resultObv)
 					i = 0;
 				}
 			}
 		}
+		//last batch
+		publishAndGormcleanup(resultObv)
+	}
+	
+	private publishAndGormcleanup(List resultObv){
+		utilsService.cleanUpGorm(true)
+		def obvs = resultObv.collect { Observation.read(it) }
+		try {
+			observationsSearchService.publishSearchIndex(obvs, true);
+		} catch (Exception e) {
+			log.error e.printStackTrace();
+		}
+		resultObv.clear();
 	}
 	
 	boolean uploadObservation(imageDir, Map m, List resultObv, File uploadLog=null) {
@@ -753,9 +741,8 @@ class ObvUtilService {
 		}
 		
 		def observationInstance;
-		//try {
+		try {
 			observationInstance =  observationService.create(params);
-
             observationInstance.clearErrors();
 
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
@@ -764,11 +751,8 @@ class ObvUtilService {
                 success=true;
 
 				params.obvId = observationInstance.id
-                if(!newObv) {
-                    //TODO: new observation dont add activityfeed else add
-                    activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                }
-
+                activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+                
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
@@ -779,11 +763,11 @@ class ObvUtilService {
                     log.error it;
                 }
             }
-		//} catch(e) {
-		//		log.error "error in creating observation"
-        //        if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
-		//		e.printStackTrace();
-		//}
+		} catch(e) {
+				log.error "error in creating observation"
+                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
+				e.printStackTrace();
+		}
         return success;
 	}
 
@@ -796,7 +780,8 @@ class ObvUtilService {
 
         if(uploadLog) 
             uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id;
-        println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
+        
+		println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
         if(observationInstance.dataset && observationInstance.maxVotedReco?.taxonConcept &&observationInstance.maxVotedReco?.taxonConcept.group ) {
             observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
         }
@@ -805,7 +790,6 @@ class ObvUtilService {
             def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
             observationInstance.setTags(tags);
         }
-
         utilsService.benchmark('setGroups') {
             if(params.groupsWithSharingNotAllowed) {
                 observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
@@ -816,7 +800,7 @@ class ObvUtilService {
                 }
             }
         }
-
+		
         if(!observationInstance.save(flush:true)){
             if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
                 observationInstance.errors.allErrors.each { 
@@ -865,13 +849,10 @@ class ObvUtilService {
     			    observationInstance.calculateMaxVotedSpeciesName();
                 }
             }
-
-            if(!newObv) {
-                //TODO: new observation dont add activityfeed else add
-                def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
-            }
+			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+           
         } else {
-            recommendationVoteInstance.errors.allErrors.each { log.error it }
+            recommendationVoteInstance?.errors?.allErrors?.each { log.error it }
         }
         }
 
@@ -915,7 +896,6 @@ class ObvUtilService {
 		log.debug resourcesInfo
 		return resourcesInfo
 	}
-	
 	
 
 }

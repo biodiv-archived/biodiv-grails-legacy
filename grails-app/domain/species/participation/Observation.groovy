@@ -713,11 +713,11 @@ class Observation extends DataObject {
                 }
             }
 
-            res = res.sort { dwcObvMapping[it.key.toLowerCase()].order }
+            res = res.sort { dwcObvMapping[it.key.toLowerCase()]?dwcObvMapping[it.key.toLowerCase()].order:1000 }
             def m = [:];
             res.each {
                 if(it.value) {
-                    m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key].url]
+                    m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key]?.url?:'']
                 }
             }
             res = m;
