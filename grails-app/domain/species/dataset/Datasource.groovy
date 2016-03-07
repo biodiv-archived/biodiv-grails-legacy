@@ -26,6 +26,7 @@ class Datasource extends DatasourceMetadata implements Taggable, Rateable {
     }
 
     static mapping = {
+        id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "datasource_id_seq"] 
     }
 
     static hasMany = [datasets : Dataset];

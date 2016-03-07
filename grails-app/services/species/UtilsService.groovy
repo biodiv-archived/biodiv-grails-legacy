@@ -1137,8 +1137,9 @@ class UtilsService {
     }
 
     String getBannerMessage(String userGroupWebaddress) {  
-        return bannerMessageMap[userGroupWebaddress];
+        return bannerMessageMap ? bannerMessageMap[userGroupWebaddress]:'';
     }
+
     String getIbpBannerMessage() {  
         return bannerMessageMap["ibp"];
     }

@@ -600,3 +600,8 @@ update species set repr_image_id = g.resource_id from (select tmp.species_resour
 DROP TABLE IF EXISTS  tmp;
 DROP TABLE IF EXISTS  tmp1;
 
+#4thMar datasource and dataset seq
+create sequence datasource_id_seq start 1;
+create sequence dataset_id_seq start 1;
+alter table resource alter column access_rights type varchar(2055);
+

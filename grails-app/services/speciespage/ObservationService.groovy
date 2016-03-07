@@ -2652,6 +2652,7 @@ class ObservationService extends AbstractMetadataService {
 
             obvRecoVotesResult.recoVotes = obvRecoVotesResult.recoVotes.sort {a,b -> b.noOfVotes <=> a.noOfVotes };
         }
+        println obvListRecoVotesResult;
         return obvListRecoVotesResult;
 
         //utilsService.logSql ({
