@@ -6,27 +6,30 @@
 <g:each in="${result}" var="r">
 <li class="reco_block ${r.maxVotedSpeciesName?'max_voted_species_name':''}">
 <div class="">
-    <div class="users" style="  margin-right: 10px;">
-        <g:if test="${!hideAgree}">
-        <div class="iAgree iAgree_${r.obvId}">
-            <g:if test="${!r.disAgree}">
-            <button class="btn btn-primary btn-small nameAgree ${r.isLocked?' disabled ': ''}" style="margin-left: 1px;" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}', this); return true;"><g:message code="button.agree" /></button>
-            </g:if>
-            <g:else>
-            <button class="btn btn-primary btn-small nameRemove ${r.isLocked?' disabled ': ''}" style="margin-left: 1px;" onclick="removeRecoVote(${r.obvId}, ${r.recoId}, '${uGroup.createLink(controller:'observation', action:'removeRecommendationVote')}', this); return true;"><g:message code="button.remove" /></button>
-            </g:else>
-        </div>
-
-
-        </g:if>
+    <div class="users">
         <g:each in="${r.authors}" var="author">
+        <div class="user-icon">
         <a href="${uGroup.createLink(controller:'user', action:'show', id:author[0]?.id)}" title="${author[0]?.name}">
             <img class="small_profile_pic"
             src="${author[0]?.profilePicture(ImageType.SMALL)}"
             title="${author[1]?'Original Author:'+author[1]+', Uploader:'+author[0]:author[0]}" />
         </a>
+        </div>
         </g:each>
 
+
+        <g:if test="${!hideAgree}">
+        <div class="iAgree iAgree_${r.obvId}">
+            <g:if test="${!r.disAgree}">
+            <button class="btn btn-primary btn-small nameAgree ${r.isLocked?' disabled ': ''}" onclick="addAgreeRecoVote(${r.obvId}, ${r.recoId}, ${r.noOfVotes}, $(this).closest('li'), '${uGroup.createLink(controller:'observation', action:'addAgreeRecommendationVote')}', this); return true;"><g:message code="button.agree" /></button>
+            </g:if>
+            <g:else>
+            <button class="btn btn-primary btn-small nameRemove ${r.isLocked?' disabled ': ''}"  onclick="removeRecoVote(${r.obvId}, ${r.recoId}, '${uGroup.createLink(controller:'observation', action:'removeRecommendationVote')}', this); return true;"><g:message code="button.remove" /></button>
+            </g:else>
+        </div>
+
+
+        </g:if>
         <sUser:hasObvLockPerm model="['obvId': r.obvId]">
         <%
             def lockButton
@@ -37,12 +40,13 @@
                 lockButton = g.message(code:"button.unlock")
             }
         %>
-        <a class="lockObvId lockObvId_${r.obvId} pull-right btn btn-primary btn-small ${(lockButton == 'Validate' && r.isLocked)?' disabled ': ''}" style="margin-left: 1px; background: orangered;"
+        <div class="lockObvId lockObvId_${r.obvId} btn btn-primary btn-small ${(lockButton == 'Validate' && r.isLocked)?' disabled ': ''}" style="background: orangered;"
         onclick="lockObv('${uGroup.createLink(controller:'observation', action:'lock', id:observationInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', '${lockButton}', ${r.recoId}, ${r.obvId}, this )">
-        <i class="icon-lock"></i>${lockButton}</a>
+        <i class="icon-lock"></i>${lockButton}</div>
     </sUser:hasObvLockPerm>
 
 
+    <comment:showCommentPopup model="['commentHolder':r.recoId ? Recommendation.read(r.recoId) : null, 'rootHolder':r.observationInstance?:observationInstance, totalCount:r.recoComments?r.recoComments.size():0, comments:r.recoComments]" />
     </div>    
 
     <g:if test="${r.observationImage}">
@@ -52,7 +56,7 @@
     </a>
     </g:if>
 
-    <span class="highlight">
+    <div class="highlight">
         <g:if test="${r.speciesId}">
         <a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
             <i> ${r.name} </i>
@@ -69,8 +73,7 @@
         </g:if>
         
         ${r.commonNames}
-    </span>
-    <comment:showCommentPopup model="['commentHolder':r.recoId ? Recommendation.read(r.recoId) : null, 'rootHolder':r.observationInstance?:observationInstance, totalCount:r.recoComments?r.recoComments.size():0, comments:r.recoComments]" />
+    </div>
     </div> 
     
     <script type="text/javascript">

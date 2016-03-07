@@ -335,9 +335,9 @@ h6 {
 }
 
 .prop {
-	clear: both;
-	margin-bottom: 3px;
-	/* 	overflow: auto; */
+/*	clear: both;
+	margin-bottom: 3px;*/
+	overflow: auto; 
 }
 
 .prop.tablet {
@@ -727,6 +727,7 @@ textarea#featureNotes {
 ul#recoSummary {
 	list-style-type: none;
 	margin: 0;
+    text-align:left;
 }
 
 .btn-primary a,a.btn-primary,a.btn-danger,a.btn-warning,a.btn-success {
@@ -1295,6 +1296,7 @@ li.reco_block {
 	margin-bottom: 3px;
 	border-radius: 5px;
 	min-height: 30px;
+    line-height:35px;
 }
 
 .reco_block.max_voted_species_name {
@@ -1308,13 +1310,15 @@ li.reco_block {
 	float: left;
 }
 
-.iAgree {
-	float: right;
-}
-
 .users {
 	clear: both;
 	float: right;
+}
+.users>div{
+    display:inline-block;
+}
+.users .btn{
+    line-height:26px;
 }
 
 .form-horizontal .control-group {
@@ -1601,7 +1605,7 @@ span.cke_skin_kama {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 	display: none;
 	float: left;
-	left: 0;
+	right: 0;
 	list-style: none outside none;
 	margin: 0;
 	min-width: 400px;
@@ -3248,12 +3252,12 @@ small {
   overflow-x: hidden;
  }
  .conts_wrap .conts_wrap_left{
- 	width: 430px;
+/* 	width: 430px;*/
   	float: left;
  }
  .conts_wrap .conts_wrap_right{
- 	width: 180px;
-  	float: left;
+/* 	width: 180px;*/
+  	float: right;
  }
 
  .conts_wrap .conts_wrap_right a{
@@ -3374,30 +3378,37 @@ li.group_option span{
 .group_options, .group_option{
     min-width: 110px;
 }*/
-.save_group_btn{
+/*.save_group_btn{
     float: right;
     margin-right: 11px;
     margin-top: -9px;
-}
+}*/
 .group_icon_show_wrap{
     border: 1px solid #ccc;
-    float: right;
+    height:32px;
+    float:left;
+/*    float: right;
     height: 33px;
-    margin-right: 4px;
+    margin-right: 4px;*/
 }
-.edit_group_btn{
-    top: -10px;
+.edit_group_btn, .save_group_btn{
+   /* top: -10px;
+    margin-right: 12px;*/
     position: relative;
-    margin-right: 12px;
+    float:left;
+    line-height:26px;
 }
 .propagateGrpHab{
     float: right;
-    margin-top: -5px;
+ /*   margin-top: -5px;*/
 }
-
-.group_icon_show_wrap{
-        float:left;
-    }
+.propagateGrpHab .selected_group {
+    line-height: 26px;
+    padding: 0px;
+}
+.propagateGrpHab .control-group {
+    float:left
+}
 
 .gallery_wrapper .blueimp-gallery > .title{
 	font-size: inherit;

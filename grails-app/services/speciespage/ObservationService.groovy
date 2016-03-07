@@ -2561,7 +2561,7 @@ class ObservationService extends AbstractMetadataService {
 
         log.debug 'ObservationService : getRecommendationVotes query : '+query+" queryParams: ${queryParams}"
 		List recoVotes = sql.rows(query, queryParams);        
-		SUser currentUser = springSecurityService.currentUser;
+		def currentUser = springSecurityService.currentUser;
         Map recoMaps = [:];
 	    Long englishId = Language.getLanguage(null).id
 
@@ -2570,6 +2570,7 @@ class ObservationService extends AbstractMetadataService {
             if(!obvRecoVotesResult) {
                 obvRecoVotesResult = ['recoVotes':[], 'totalVotes':0, 'uniqueVotes':0];
                 obvListRecoVotesResult.put(recoVote.observation_id, obvRecoVotesResult);
+                recoMaps = [:];
             }
 
             //collecting reco details
@@ -2587,7 +2588,6 @@ class ObservationService extends AbstractMetadataService {
                         map.put("synonymOf", recoVote.canonical_form)
                     }
                 }
-
                 map.put("name", recoVote.name);
                 
                 recoMaps[recoVote.reco_id] = map;
@@ -2642,17 +2642,23 @@ class ObservationService extends AbstractMetadataService {
 		}
 
         obvListRecoVotesResult.each { key, obvRecoVotesResult ->
+            int totalVotes = 0;
             obvRecoVotesResult.recoVotes.each { map ->
+                totalVotes += map.noOfVotes;
                 if(map.commonNames) {
                     String cNames = Observation.getFormattedCommonNames(map.commonNames, true)
                     map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
                 }
-                map.put("disAgree", (currentUser in map.authors));
+                map.authors.each {
+                    if(it[0].id == currentUser?.id) {
+                        map.put("disAgree", true);
+                    }
+                }
             }
-
+            obvRecoVotesResult.totalVotes = totalVotes;
+            obvRecoVotesResult.uniqueVotes = obvRecoVotesResult.recoVotes.size();
             obvRecoVotesResult.recoVotes = obvRecoVotesResult.recoVotes.sort {a,b -> b.noOfVotes <=> a.noOfVotes };
         }
-        println obvListRecoVotesResult;
         return obvListRecoVotesResult;
 
         //utilsService.logSql ({

@@ -139,7 +139,6 @@ def grailsCacheManager;
             html {
                 if(!model.model.recoVotes)
                     model.model.recoVotes = observationService.getRecommendationVotes(model.model.observationInstanceList, 3, 0);
-                println model.recoVotes;
                 if(params.loadMore?.toBoolean()){                    
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
@@ -349,10 +348,7 @@ def grailsCacheManager;
                     eq ('isDeleted', false)
                 }
             }
-			println "****************************************************"
-			println "****************************************************"
-			println "****************************************************"
-            observationInstance.errors.allErrors.each { log.error it }
+
         if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -795,7 +791,7 @@ def grailsCacheManager;
 					}
 
 					if(!params["createNew"]){
-                def model = utilsService.getErrorModel(msg, null, OK.value());
+                        def model = utilsService.getErrorModel(msg, null, OK.value());
                         withFormat {
                             html {
                                 redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
@@ -805,7 +801,7 @@ def grailsCacheManager;
                         }
 					} else {
                         if(params.oldAction != "bulkSave"){
-                def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
+                            def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
                             withFormat {
                                 html {
 						            redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))

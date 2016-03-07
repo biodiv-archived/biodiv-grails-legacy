@@ -217,7 +217,6 @@ class Observation extends DataObject {
 		longitude nullable:false
 		topology nullable:false
         fromDate nullable:false
-		placeName blank:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
         externalDatasetKey nullable:true
@@ -482,15 +481,17 @@ class Observation extends DataObject {
 			return
 		}
 		
-		Checklists cl = Checklists.read(sourceId)
-		if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
-			m[cl.sciNameColumn] = recoVote.recommendation.name
-		}
-		if(cl.commonNameColumn && recoVote.commonNameReco){
-			m[cl.commonNameColumn] = recoVote.commonNameReco.name
-		}
-		
-		checklistAnnotations = m as JSON
+        if(sourceId) {
+            Checklists cl = Checklists.read(sourceId)
+            if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
+                m[cl.sciNameColumn] = recoVote.recommendation.name
+            }
+            if(cl.commonNameColumn && recoVote.commonNameReco){
+                m[cl.commonNameColumn] = recoVote.commonNameReco.name
+            }
+
+            checklistAnnotations = m as JSON
+        }
 	}
 	
 	private updateLocationScale(){

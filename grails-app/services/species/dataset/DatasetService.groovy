@@ -634,7 +634,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
             conn.executeUpdate("update observation set protocol=CASE WHEN protocol='TAPIR' or protocol='DIGIR_MANIS' THEN 'OTHER' ELSE protocol END");
 
-            conn.executeUpdate("insert into recommendation_vote select nextval('hibernate_sequence'), 0, 1, 'CERTAIN', observation_id, recommendation_id, 0, COALESCE(dateIdentified1, '"+((new Date()).format('yyyy-MM-dd HH:mm:ss.SSS'))+"'), null, commonname_reco_id, identifiedby from "+tmpNewBaseDataTable+", observation where recommendation_id is not null and observation_id is not null and observation_id=id");
+            conn.executeUpdate("insert into recommendation_vote select nextval('hibernate_sequence'), 0, 1, 'CERTAIN', observation_id, recommendation_id, 0, COALESCE(dateIdentified1, '"+((new Date()).format('yyyy-MM-dd HH:mm:ss.SSS'))+"'), null, commonname_reco_id,  scientificname as given_sci_name, vernacularname as given_common_name, identifiedby as original_author from "+tmpNewBaseDataTable+", observation where recommendation_id is not null and observation_id is not null and observation_id=id");
         } finally {
             conn.close();
         }

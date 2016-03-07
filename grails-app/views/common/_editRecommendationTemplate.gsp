@@ -39,7 +39,7 @@
             <div class="controls">
                 <div class="nameContainer textbox" style="position:relative;">
 
-                    <input type="text" name="commonName" class="commonName input-block-level" style="width:87%"
+                    <input type="text" name="commonName" class="commonName input-block-level" style="width:80%;position:absolute;left:0px;"
                         value="${species_cn_name}" placeholder='${g.message(code:"editrecomendation.placeholder.suggest")}'
                         class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}" />
                     <input type="hidden" class="mappedRecoNameForcanName" />

@@ -66,14 +66,14 @@ def obvId = observationInstance?.id
 
 <div class="showObvDetails" rel="${observationInstance.id}" style="${styleviewcheck?'display:block;': 'display:none;'}">
 
-    <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">
+    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">
         <span class="name"><i class="icon-share-alt"></i><g:message code="default.name.label" /></span>
         <div class="value">
             <obv:showSpeciesName
             model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'isListView':!showDetails]" />
         </div>
     </div>
-    <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">
+    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">
         <span class="name"><i class="icon-map-marker"></i><g:message code="default.place.label" /></span>
         <div class="value ellipsis">
             <g:if test="${observationInstance.placeName == ''}">
@@ -85,7 +85,7 @@ def obvId = observationInstance?.id
        </div>
     </div>
 
-    <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">                
+    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">                
         <span class="name"><i class="icon-time"></i><g:message code="default.observed.on.label" /></span>
         <div class="value">
             <time class="timeago"
@@ -95,7 +95,7 @@ def obvId = observationInstance?.id
             </g:if>
         </div>
     </div> 
-    <div class="prop" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">                
+    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">                
         <span class="name"><i class="icon-time"></i><g:message code="default.submitted.on.label" /></span>
         <div class="value">
             <time class="timeago"
@@ -104,40 +104,37 @@ def obvId = observationInstance?.id
     </div>           
     <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);
     def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()%>
-    <div class="prop bottom_user_fixed" style="${styleviewcheck?'clear:inherit;': 'clear:both;'}">
-        <div style="float:left;">
-            <div class="figure user-icon pull-left" style="display:table;height:32px;">
-                <a href="${userLink}"> 
-                    <img src="${observationInstance.author.profilePicture(ImageType.SMALL)}"
-                    class="small_profile_pic pull-left" title="${observationInstance.author.name}" /></a>
-            </div>
+    <div class="prop bottom_user_fixed" style="${styleviewcheck?'': 'clear:both;'}">
+        <div class="user-icon pull-left" style="display:table;height:32px;">
+            <a href="${userLink}"> 
+                <img src="${observationInstance.author.profilePicture(ImageType.SMALL)}"
+                class="small_profile_pic pull-left" title="${observationInstance.author.name}" /></a>
         </div>
         <div style="float:right">
             <div style="float: left;">
                 <span class="habitat_icon_show group_icon habitats_sprites active urban_gall_th" title="Urban"></span>
             </div>
             <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
-                <span class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()}" title="Plants"></span>
-                <div class="btn btn-small btn-primary edit_group_btn" style="right: -6px;" id="${observationInstance.id}">Edit
+                <span class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()} pull-left" title="Plants"></span>
+                <div class="btn btn-small btn-primary edit_group_btn pull-left" id="${observationInstance.id}">Edit
                 </div>
             </div>
 
-            <div class="propagateGrpHab" id="propagateGrpHab_${observationInstance.id}" style="display:none;">
+            <div class="propagateGrpHab group_icon_show_wrap" id="propagateGrpHab_${observationInstance.id}" style="display:none;">
                 <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                     method="GET">
                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance,'action':'show']"/>
                     <input type="hidden" name="prev_group" class="prev_group_${observationInstance.id}" value="${observationInstance?.group?.id}" />
                     <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
-                    <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;   margin-top: -73px;" value="Save" />
+                    <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
                 </form>
             </div>
         </div>
     </div>            
 </div>
-    <div class="recommendations sidebar_section" style="width: 97%;float: right;top: 0px;padding-bottom: 3px;margin-bottom: -3px;position: relative; ${styleviewcheck? 'display:block;': 'display:none;'}">
+    <div class="recommendations sidebar_section" style="margin-bottom:0px;padding:5px;text-align:center;position: relative; ${styleviewcheck? 'display:block;': 'display:none;'}">
         <div>
-        
-            <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}" style="  margin-left: -9px;margin-right: -10px;">
+            <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
               <g:if test="${recoVotes}">
                <g:render template="/common/observation/showObservationRecosTemplate" model ="['observationInstance':observationInstance, 'result':recoVotes.recoVotes, 'totalVotes':recoVotes.totalVotes, 'uniqueVotes':recoVotes.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]"/>
               </g:if>
@@ -155,7 +152,7 @@ def obvId = observationInstance?.id
               </div>
         </div>
         <g:if test="${!observationInstance.isLocked}">
-        <a href="javascript:void(0);" class="clickSuggest pull-right" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
+        <a href="javascript:void(0);" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
         <div class="input-append" style="width:98%; display:none; height: 130px;">
             <g:hasErrors bean="${recommendationInstance}">
             <div class="errors">
@@ -172,5 +169,4 @@ def obvId = observationInstance?.id
 
         </div>
         </g:if>
-        <br>
     </div>

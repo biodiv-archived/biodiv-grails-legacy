@@ -536,6 +536,7 @@ $(document).ready(function(){
             type: 'GET',
             beforeSubmit: function(formData, jqForm, options) {
                 console.log(formData);
+                formData.push({'name':'format', 'value':'json', 'type':'text'});
                 updateCommonNameLanguage(that.find('.languageComboBox'));
                 return true;
             }, 
@@ -1418,7 +1419,7 @@ function loadSpeciesnameReco(){
 function addListLayout(){
     $('.thumbnails>li').css({'width':'100%'}).addClass('addmargin');
     $('.snippet.tablet').addClass('snippettablet');
-    $('.prop').css('clear','inherit');
+    //$('.prop').css('clear','inherit');
     $('.showObvDetails, .view_bootstrap_gallery, .recommendations').show();
     $('.species_title_wrapper').hide();
     $('.species_title_wrapper').parent().css({'height':'20px'});

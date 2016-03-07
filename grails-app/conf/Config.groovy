@@ -28,7 +28,8 @@ import org.apache.log4j.Priority
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = false // enables the parsing of file extensions from URLs into the request format
-grails.mime.use.accept.header = false
+grails.mime.use.accept.header = true
+grails.mime.disable.accept.header.userAgents = []
 grails.mime.types = [ html: [
 'text/html',
 'application/xhtml+xml'
