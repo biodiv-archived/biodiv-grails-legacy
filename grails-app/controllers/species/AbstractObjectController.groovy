@@ -133,8 +133,10 @@ abstract class AbstractObjectController {
                 def objInstance;
                 if(params.controller == 'species'){
                     objInstance = Species.get(params.long('id'));
+                    result['dataset'] = false
                 } else if(params.controller == 'observation'){
                     objInstance = Observation.get(params.long('id'));
+                    result['dataset'] = (objInstance?.dataset)?true:false;
                 }
                 result['resources'] = objInstance?.listResourcesByRating();
                 //if(objInstance.hasProperty('group'))

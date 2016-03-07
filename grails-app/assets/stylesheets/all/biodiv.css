@@ -3251,6 +3251,9 @@ small {
  	width: 430px;
   	float: left;
  }
+ .dataset .conts_wrap_left{
+ 	width: 420px !important;
+ }
  .conts_wrap .conts_wrap_right{
  	width: 180px;
   	float: left;
