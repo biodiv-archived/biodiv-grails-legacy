@@ -42,11 +42,12 @@ def obvId = observationInstance?.id
 <% def photonames, inc =0; %>
 <g:each in="${observationInstance.resource}" var="r">
    <g:if test="${r.type == ResourceType.IMAGE}">
-        <%            
+        <%   
+            def resourceUrl = (r.fileName.length() >1)?r.fileName:r.url;          
             if(inc == 0){
-                photonames =r.fileName;
+                photonames =resourceUrl;
             }else{
-                photonames+=","+r.fileName;
+                photonames+=","+resourceUrl;
             }
             inc++;
             

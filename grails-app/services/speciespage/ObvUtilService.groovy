@@ -741,7 +741,7 @@ class ObvUtilService {
 		}
 		
 		def observationInstance;
-		//try {
+		try {
 			observationInstance =  observationService.create(params);
             observationInstance.clearErrors();
 
@@ -751,13 +751,10 @@ class ObvUtilService {
                 success=true;
 
 				params.obvId = observationInstance.id
-                if(newObv) {
-                    activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                }
-
+                activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+                
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
-				println "----------- last task " + result
 				
             } else {
                 if(uploadLog) uploadLog <<  "\nError in observation creation : "+observationInstance
@@ -766,11 +763,11 @@ class ObvUtilService {
                     log.error it;
                 }
             }
-		//} catch(e) {
-		//		log.error "error in creating observation"
-        //        if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
-		//		e.printStackTrace();
-		//}
+		} catch(e) {
+				log.error "error in creating observation"
+                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
+				e.printStackTrace();
+		}
         return success;
 	}
 
@@ -852,13 +849,10 @@ class ObvUtilService {
     			    observationInstance.calculateMaxVotedSpeciesName();
                 }
             }
-
-            if(!newObv) {
-                //TODO: new observation dont add activityfeed else add
-                def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
-            }
+			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+           
         } else {
-            recommendationVoteInstance.errors.allErrors.each { log.error it }
+            recommendationVoteInstance?.errors?.allErrors?.each { log.error it }
         }
         }
 

@@ -1464,7 +1464,7 @@ class UserGroupService {
 		
 		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
 			
-			UserGroup.withNewTransaction(){  status ->
+			UserGroup.withTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
