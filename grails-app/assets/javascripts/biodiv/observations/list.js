@@ -1391,7 +1391,7 @@ function appendGallery(ovbId,images){
         thumbUrl;
         $.each(images, function (index, photo) {
             //console.log("photo ="+photo);
-            baseUrl = ""+window.params.observation.serverURL+photo;
+            baseUrl = (photo.indexOf('http://') == -1)?""+window.params.observation.serverURL+photo:photo;
             $('<a/>')
                 .append($('<img>'))
                 .prop('href', baseUrl)                
