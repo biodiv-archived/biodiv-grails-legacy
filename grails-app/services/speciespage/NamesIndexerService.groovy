@@ -225,8 +225,8 @@ class NamesIndexerService {
 		if(speciesInstance && speciesInstance.reprImage){
 			imagePath = speciesInstance.reprImage.thumbnailUrl()
 		}else{
-			def mainImage = reco.acceptedName?.group?.icon(ImageType.VERY_SMALL)
-			imagePath = mainImage?.thumbnailUrl(null, '.png');
+			def mainImage = reco.acceptedName?.group?.icon(ImageType.ORIGINAL)
+			imagePath = mainImage?.thumbnailUrl(null, '.png', ImageType.VERY_SMALL);
 		}
 		return imagePath
 	}

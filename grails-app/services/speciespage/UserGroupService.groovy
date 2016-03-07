@@ -1349,7 +1349,7 @@ class UserGroupService {
 			List groups = [];
             if(params['userGroups'] || params['userGroupsList']) {
                 groups = (params['userGroups']?:params['userGroupsList']).split(",").collect {
-				    UserGroup.read(Long.parseLong(it))
+				    UserGroup.read(Long.parseLong(it.trim()))
 			    }
             }
 			def objectIds = params['objectIds']
@@ -1480,7 +1480,7 @@ class UserGroupService {
 			//XXX: to avoid connection time out posting in batches
 			List resSubLists = obvs.collate(POST_BATCH_SIZE)
 			resSubLists.each { resList ->
-				UserGroup.withNewTransaction(){  status ->
+				UserGroup.withTransaction(){  status ->
 					log.debug submitType + " for group " + ug + "  resources size " +  resList.size()
 					ug = ug.merge()
 					resList.each { obv ->
