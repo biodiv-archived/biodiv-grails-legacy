@@ -349,7 +349,10 @@ def grailsCacheManager;
                     eq ('isDeleted', false)
                 }
             }
-			
+			println "****************************************************"
+			println "****************************************************"
+			println "****************************************************"
+            observationInstance.errors.allErrors.each { log.error it }
         if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
