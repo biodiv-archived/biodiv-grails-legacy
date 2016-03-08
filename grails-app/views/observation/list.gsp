@@ -63,7 +63,7 @@
           font-weight: bold;
           padding: 0px 25px;
           text-decoration: none;
-          text-shadow: 0.2px 0.2px 0.2px #000;
+          text-shadow: #000 0px 0px 2px;
     }
     .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited, .view_bootstrap_gallery:focus{
         color: white;
@@ -91,9 +91,9 @@
          margin-bottom:0px !important;
      }*/
      .resource_in_groups{
+         background-color: #ccc;
          /*margin-top: -10px;
          margin-bottom: 5px !important;
-         background-color: #D4DFE1;
          padding: 8px 0px;
          margin-top: 5px;*/
      }
