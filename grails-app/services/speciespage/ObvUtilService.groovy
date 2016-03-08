@@ -13,6 +13,7 @@ import species.auth.SUser
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup 
 import species.participation.*
+import species.participation.Observation.ProtocolType;
 import species.participation.RecommendationVote.ConfidenceType
 import species.Habitat
 import species.utils.Utils;
@@ -743,6 +744,7 @@ class ObvUtilService {
 		def observationInstance;
 		try {
 			observationInstance =  observationService.create(params);
+            observationInstance.protocol = ProtocolType.BULK_UPLOAD;
             observationInstance.clearErrors();
 
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {

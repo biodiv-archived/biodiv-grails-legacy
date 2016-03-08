@@ -627,12 +627,12 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             conn = new Sql(dataSource);
             //TODO: this is risky as any other obv creation during this time will happen without constraints
             conn.executeUpdate("ALTER TABLE observation DISABLE TRIGGER ALL ;");
-            conn.executeUpdate("insert into observation (id, version, access_rights, agree_terms, author_id, basis_of_record, catalog_number, checklist_annotations, created_on, dataset_id, external_dataset_key, external_id, external_url, feature_count, flag_count, from_date, geo_privacy, group_id, habitat_id, information_withheld, is_checklist, is_deleted, is_locked, is_showable, language_id, last_crawled, last_interpreted, last_revised, latitude, license_id, location_accuracy, location_scale, longitude, max_voted_reco_id, notes, original_author, place_name, protocol, publishing_country, rating, reverse_geocoded_name, search_text, source_id, to_date, topology, via_code, via_id, visit_count) select observation_id, 0, accessRights, 't', "+currentUser.id+", basisOfRecord, catalogNumber, data, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, "+dataset.id+", datasetKey, gbifID, external_url, 0, 0, eventDate1, 'f', COALESCE(group_id, "+SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).id+"), COALESCE(habitat_id, "+Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id+" ), informationWithheld, 'f', 'f', 'f', 'f', "+Language.getLanguage().id+", lastCrawled1, lastInterpreted1, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, decimalLatitude, license1, 'Approximate', 'APPROXIMATE', decimalLongitude, recommendation_id, null, recordedBy, place_name, protocol, publishingCountry, 0, place_name, null, null, eventDate1, topology, collectionCode, collectionID, 0 from "+tmpNewBaseDataTable+" where decimallatitude is not null and decimallongitude is not null and eventDate1 is not null and decimallatitude>=6.74678 and decimallatitude<=35.51769 and decimallongitude>=68.03215 and decimallongitude<=97.40238 order by gbifId");
+            conn.executeUpdate("insert into observation (id, version, access_rights, agree_terms, author_id, basis_of_record, catalog_number, checklist_annotations, created_on, dataset_id, external_dataset_key, external_id, external_url, feature_count, flag_count, from_date, geo_privacy, group_id, habitat_id, information_withheld, is_checklist, is_deleted, is_locked, is_showable, language_id, last_crawled, last_interpreted, last_revised, latitude, license_id, location_accuracy, location_scale, longitude, max_voted_reco_id, notes, original_author, place_name, protocol, publishing_country, rating, reverse_geocoded_name, search_text, source_id, to_date, topology, via_code, via_id, visit_count) select observation_id, 0, accessRights, 't', "+currentUser.id+", basisOfRecord, catalogNumber, data, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, "+dataset.id+", datasetKey, gbifID, external_url, 0, 0, eventDate1, 'f', COALESCE(group_id, "+SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).id+"), COALESCE(habitat_id, "+Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id+" ), informationWithheld, 'f', 'f', 'f', 'f', "+Language.getLanguage().id+", lastCrawled1, lastInterpreted1, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, decimalLatitude, license1, 'Approximate', 'APPROXIMATE', decimalLongitude, recommendation_id, null, recordedBy, place_name, 'DWC_ARCHIVE', publishingCountry, 0, place_name, null, null, eventDate1, topology, collectionCode, collectionID, 0 from "+tmpNewBaseDataTable+" where decimallatitude is not null and decimallongitude is not null and eventDate1 is not null and decimallatitude>=6.74678 and decimallatitude<=35.51769 and decimallongitude>=68.03215 and decimallongitude<=97.40238 order by gbifId");
             //, [datasetId:dataset.id, languageId:Language.getLanguage().id, defaultHabitatId:Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id, defaultSpeciesGroupId:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).id]);
             conn.executeUpdate("ALTER TABLE observation ENABLE TRIGGER ALL ;");
             println "Inserted observations "
 
-            conn.executeUpdate("update observation set protocol=CASE WHEN protocol='TAPIR' or protocol='DIGIR_MANIS' THEN 'OTHER' ELSE protocol END");
+            //conn.executeUpdate("update observation set protocol=CASE WHEN protocol='TAPIR' or protocol='DIGIR_MANIS' THEN 'OTHER' ELSE protocol END");
 
             conn.executeUpdate("insert into recommendation_vote select nextval('hibernate_sequence'), 0, 1, 'CERTAIN', observation_id, recommendation_id, 0, COALESCE(dateIdentified1, '"+((new Date()).format('yyyy-MM-dd HH:mm:ss.SSS'))+"'), null, commonname_reco_id,  scientificname as given_sci_name, vernacularname as given_common_name, identifiedby as original_author from "+tmpNewBaseDataTable+", observation where recommendation_id is not null and observation_id is not null and observation_id=id");
         } finally {
@@ -676,6 +676,19 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         ''');
 
            conn.execute("delete from observation as o1 where o1.id in (select id from observation left outer join observation_resource on id=observation_id where external_id is not null and max_voted_reco_id is null and resource_id is null)");
+
+           conn.execute('''
+           update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='IMAGE' group by observation_id) g where g.observation_id = id;
+           update observation set no_of_videos = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='VIDEO' group by observation_id) g where g.observation_id = id;
+           update observation set no_of_audio = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='AUDIO' group by observation_id) g where g.observation_id = id;
+
+           create table tmp as select observation_id, count(*) as count from recommendation_vote group by observation_id;
+
+           update observation set no_of_identifications = g.count from (select * from tmp) g where g.observation_id=id;
+
+           drop table tmp;
+           '''
+           );
         conn.executeUpdate("ALTER TABLE observation ENABLE TRIGGER ALL ;");
 
         } finally {

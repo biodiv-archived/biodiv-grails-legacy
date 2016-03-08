@@ -111,16 +111,14 @@ class Observation extends DataObject {
 	}
 
 	public enum ProtocolType {
-
-        DWC_ARCHIVE,
-        DIGIR,
-        BIOCASE,
-        TEXT,
-        LIST,
-        SINGLE_OBSERVATION,
-        MULTI_OBSERVATION,
-        MOBILE,
-        API,
+        //https://github.com/gbif/gbif-api/blob/master/src/main/java/org/gbif/api/vocabulary/EndpointType.java
+        DWC_ARCHIVE,//observations as dwc archive
+        TEXT,//CSV upload ... for datasets mainly
+        LIST,//Checklist
+        SINGLE_OBSERVATION,//Single observation through UI
+        MULTI_OBSERVATION,//Multiple observations thru UI
+        BULK_UPLOAD,//XLS File upload of observations along with images
+        MOBILE,//obvs uploaded thru mobile interface
         OTHER
 
 		private String value;
@@ -139,10 +137,6 @@ class Observation extends DataObject {
 			switch(value){
 				case 'DWC_ARCHIVE':
 					return ProtocolType.DWC_ARCHIVE
-			case 'DIGIR':
-					return ProtocolType.DIGIR
-			case 'BIOCASE':
-					return ProtocolType.BIOCASE
 				case 'TEXT':
 					return ProtocolType.TEXT
 				case 'LIST':
@@ -153,8 +147,6 @@ class Observation extends DataObject {
 					return ProtocolType.MULTI_OBSERVATION
 				case 'MOBILE':
 					return ProtocolType.MOBILE
-				case 'API':
-					return ProtocolType.API
 				case 'OTHER':
 					return ProtocolType.OTHER
 				default:
@@ -436,6 +428,8 @@ class Observation extends DataObject {
 		
 		//showing all observation those have media
 		isShowable = (isChecklist || (noOfImages || noOfVideos || noOfAudio)) ? true : false
+        if(isChecklist) 
+            this.protocol = ProtocolType.LIST;
 	}
 	
 	private void updateResources() {
