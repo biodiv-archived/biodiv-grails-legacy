@@ -344,7 +344,12 @@ $(document).ready(function(){
         } else {
             $( "#searchTextField" ).val('');	
         }
+        if($(this).attr('data-target') == 'taxon') {
+            $("input#taxon").val();
+            $('#taxonHierarchy').find(".taxon-highlight").removeClass('taxon-highlight');
+        }
         removeParam = $(this).attr('data-target').replace('#','');
+        console.log(removeParam);
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
         return false;
     });
