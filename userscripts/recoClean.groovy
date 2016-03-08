@@ -175,8 +175,54 @@ def correctReco(query, isSyn, f){
 	
 }
 
-correctReco(accQuery, false, new File("/tmp/acc_reco.csv"))
-correctReco(synQuery, true, new File("/tmp/syn_reco.csv"))
+
+def removeAcceptedDuplicateFromReco(){
+	def ds = ctx.getBean("dataSource");
+	ds.setUnreturnedConnectionTimeout(500);
+	Sql conn = new Sql(ds);
+	
+	String query = '''
+			select name as name, taxon_concept_id as tid, count(*) as c from recommendation where is_scientific_name = true and taxon_concept_id = accepted_name_id group by name, taxon_concept_id having count(*) > 1 order by c desc
+		'''
+	
+	def idList = conn.rows(query);
+	
+	Map corrMap = [:]
+	idList.each { tt ->
+			def name = tt.name 
+			def tid = tt.tid
+			
+			println "  processing " + name +  "   " + tid
+			
+			String q = 'select id as id from recommendation where is_scientific_name = true and taxon_concept_id = accepted_name_id and taxon_concept_id = ' + tid + ' order by last_modified asc';
+			def ll = conn.rows(q)
+			def tlist = []
+			ll.each { yy ->
+				tlist << yy.id
+			}
+			println tlist
+			
+			corrMap.put(tlist.remove(0), tlist)
+	}
+	
+	println corrMap
+	
+	corrMap.each { k, v ->
+		v.each { oldId ->
+			conn.executeUpdate("update recommendation_vote set recommendation_id = " + k + " where recommendation_id = " + oldId)
+			conn.executeUpdate("update observation set max_voted_reco_id = " + k + " where max_voted_reco_id = " + oldId)
+			conn.executeUpdate("delete from recommendation where id = " + oldId)
+		}
+ 		
+	}
+	
+	
+}
+
+removeAcceptedDuplicateFromReco()
+
+//correctReco(accQuery, false, new File("/tmp/acc_reco.csv"))
+//correctReco(synQuery, true, new File("/tmp/syn_reco.csv"))
 
 //recoSearch(accQuery, false, new File("/tmp/acc.csv"))
 //recoSearch(synQuery, true, new File("/tmp/syn.csv"))
