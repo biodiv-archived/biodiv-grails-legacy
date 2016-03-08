@@ -22,7 +22,7 @@ function loadDistinctRecoList() {
         data:params,
         success: function(data) {
             $('#distinctRecoList .distinctRecoHeading').html(data.model.totalRecoCount?(' (' + data.model.totalRecoCount + ')'):'');
-            if(data.success == true) {
+            if(data.success == true && data.model.distinctRecoList) {
                 $.each(data.model.distinctRecoList, function(index, item) {
                     if(item[1])
                     $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
