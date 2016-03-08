@@ -24,8 +24,8 @@
     <ul class="tile" style="list-style: none;background:transparent;">
         <!-- groups where object is featured -->
         <g:each in="${featuredNotes}" var="featuredNotesItem">
-            <li class="reco_block" style="clear:both;overflow:auto;margin-bottom:12px;">
-            <div class="pull-left">
+            <li class="reco_block pull-left" style="clear:both;overflow:auto;margin-bottom:12px;">
+            <div class="">
             <g:if test="${featuredNotesItem.userGroup}">
                 <%featuredInUserGroups.put(featuredNotesItem.userGroup.id, true)%>
                 <uGroup:showUserGroupSignature model="[ 'userGroup':featuredNotesItem.userGroup, featured:true]" />
