@@ -1,8 +1,8 @@
 <g:if test="${annotations.size() > 0 }">
 <div class="annotationsWrapper">
 		<table class="table table-hover"
-            style="margin: 0px;table-layout:fixed;display:block;overflow-y:auto;${height?'height:'+height+'px;':''}">
-			<tbody>
+            style="margin: 0px;${height?'height:'+height+'px;':''}">
+            <tbody>
 				<g:each in="${annotations}" status="i"
 					var="annot">
                     <g:if test="${annot.value}">

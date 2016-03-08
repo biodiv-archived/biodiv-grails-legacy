@@ -74,11 +74,12 @@
 	
 	$(".s2ui_hidden_button").hide();
 
+    //https://developers.google.com/api-client-library/javascript/start/start-js#how-it-looks-in-javascript
     function handleAuthResult(authResult) {
         console.log(authResult);
         if (authResult && !authResult.error) {
-        $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
-        var authParams = {'response': JSON.stringify(authResult).replace(/:/g,' : ')};
+            $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
+            var authParams = {'response': JSON.stringify(authResult).replace(/:/g,' : ')};
             $.ajax({
                 url: window.params.login.googleOAuthSuccessUrl,
                 method:"POST",
@@ -91,12 +92,12 @@
             });
 
         } else {
-            authorizeButton.onclick = handleAuthClick;
+            //authorizeButton.onclick = handleAuthClick;
             alert('Failed to connect to Google');
         }
     }
     function handleAuthClick(event) {
-        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
+        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
         return false;
     }
 

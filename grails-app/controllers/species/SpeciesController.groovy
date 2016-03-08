@@ -1344,6 +1344,8 @@ class SpeciesController extends AbstractObjectController {
         else{
             result = ['success'  : false]
         }
+        println "---------------------------"
+        println result
         render result as JSON
     }
 

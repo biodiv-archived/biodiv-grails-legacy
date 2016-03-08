@@ -165,6 +165,14 @@ class ObservationService extends AbstractMetadataService {
 
             if(params.action == "save" || params.action == "bulkSave") {
                 observationInstance = create(params);
+                if(params.action == 'bulkSave')
+                    observationInstance.protocol = Observation.ProtocolType.MULTI_OBSERVATION
+                else if(params.action == 'save') {
+                    observationInstance.protocol = params.protocol? Observation.ProtocolType.getEnum(params.protocol) : Observation.ProtocolType.SINGLE_OBSERVATION
+                    if(!observationInstance.protocol) {
+                        observationInstance.protocol = Observation.SINGLE_OBSERVATION;
+                    }
+                }
                 feedType = activityFeedService.OBSERVATION_CREATED
                 feedAuthor = observationInstance.author
                 mailType = utilsService.OBSERVATION_ADDED
@@ -700,7 +708,7 @@ class ObservationService extends AbstractMetadataService {
     }
 
     Map getRecommendation(params){
-        return getRecommendations(params.recoName, params.canName, params.commonName, params.languageName, params.speciesId)
+        return getRecommendations( params.recoId, params.recoName, params.commonName, params.languageName)
     }
 
     /**
@@ -710,25 +718,42 @@ class ObservationService extends AbstractMetadataService {
     * languageName
     * 
     **/
-    Map getRecommendations(String recoName, String canName, String commonName, String languageName, Long speciesId=null) {
-        //		def refObject = params.observation?:Observation.get(params.obvId);
+    Map getRecommendations(Long recoId, String recoName, String commonName, String languageName) {
+		Recommendation commonNameReco, scientificNameReco;
+		Long languageId = Language.getLanguage(languageName).id;
+		//auto select from ui
+		if(recoId){
+			Recommendation r = Recommendation.get(recoId)
+			if(r.isScientificName){
+				scientificNameReco = r
+				if(commonName)
+					commonNameReco = recommendationService.findReco(commonName, false, languageId, scientificNameReco.taxonConcept, true, false);
+			}else{
+                if(commonName){
+                    if(commonName.toLowerCase() == r.lowercaseName)
+                        commonNameReco = r
+                    else
+                        commonNameReco = recommendationService.findReco(commonName, false, languageId, r.taxonConcept, true, false);
+                }else{
+                    commonNameReco = null
+                }
 
-        //if source of recommendation is other that observation (i.e Checklist)
-        //		refObject = refObject ?: params.refObject
-        Recommendation commonNameReco, scientificNameReco;
-        if(commonName) {
+                if(r.taxonConcept)
+				    scientificNameReco = recommendationService.findReco(r.taxonConcept.canonicalForm, true, null, r.taxonConcept, true, false)//;Recommendation.findByTaxonConceptAndAcceptedName(r.taxonConcept, r.acceptedName)
+			}
+			return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
+		}
+			
+		//reco id is not given
+	    if(commonName) {
             utilsService.benchmark('findReco.commonName') {
-                def languageId = Language.getLanguage(languageName).id;
-                commonNameReco = recommendationService.findReco(commonName, false, languageId, null, true, null, false);
+                commonNameReco = recommendationService.findReco(commonName, false, languageId, null, true, false);
             }
         }
         utilsService.benchmark('findReco.sciName') {
-            scientificNameReco = recommendationService.getRecoForScientificName(recoName, canName, commonNameReco, speciesId, false);
+            scientificNameReco = recommendationService.findReco(recoName, true, null, null, true, false);
         }
 
-        //		curationService.add(scientificNameReco, commonNameReco, refObject, springSecurityService.currentUser);
-
-        //giving priority to scientific name if its available. same will be used in determining species call
         return [mainReco : (scientificNameReco ?:commonNameReco), commonNameReco:commonNameReco];
     }
 
@@ -2540,7 +2565,7 @@ class ObservationService extends AbstractMetadataService {
 
         log.debug 'ObservationService : getRecommendationVotes query : '+query+" queryParams: ${queryParams}"
 		List recoVotes = sql.rows(query, queryParams);        
-		SUser currentUser = springSecurityService.currentUser;
+		def currentUser = springSecurityService.currentUser;
         Map recoMaps = [:];
 	    Long englishId = Language.getLanguage(null).id
 
@@ -2549,6 +2574,7 @@ class ObservationService extends AbstractMetadataService {
             if(!obvRecoVotesResult) {
                 obvRecoVotesResult = ['recoVotes':[], 'totalVotes':0, 'uniqueVotes':0];
                 obvListRecoVotesResult.put(recoVote.observation_id, obvRecoVotesResult);
+                recoMaps = [:];
             }
 
             //collecting reco details
@@ -2566,7 +2592,6 @@ class ObservationService extends AbstractMetadataService {
                         map.put("synonymOf", recoVote.canonical_form)
                     }
                 }
-
                 map.put("name", recoVote.name);
                 
                 recoMaps[recoVote.reco_id] = map;
@@ -2621,14 +2646,21 @@ class ObservationService extends AbstractMetadataService {
 		}
 
         obvListRecoVotesResult.each { key, obvRecoVotesResult ->
+            int totalVotes = 0;
             obvRecoVotesResult.recoVotes.each { map ->
+                totalVotes += map.noOfVotes;
                 if(map.commonNames) {
                     String cNames = Observation.getFormattedCommonNames(map.commonNames, true)
                     map.put("commonNames", (cNames == "")?"":"(" + cNames + ")");
                 }
-                map.put("disAgree", (currentUser in map.authors));
+                map.authors.each {
+                    if(it[0].id == currentUser?.id) {
+                        map.put("disAgree", true);
+                    }
+                }
             }
-
+            obvRecoVotesResult.totalVotes = totalVotes;
+            obvRecoVotesResult.uniqueVotes = obvRecoVotesResult.recoVotes.size();
             obvRecoVotesResult.recoVotes = obvRecoVotesResult.recoVotes.sort {a,b -> b.noOfVotes <=> a.noOfVotes };
         }
         return obvListRecoVotesResult;

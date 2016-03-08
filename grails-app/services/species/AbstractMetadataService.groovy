@@ -202,8 +202,8 @@ class AbstractMetadataService extends AbstractObjectService {
 
     def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
 		if(!instance) return
-            println "================="
-println userGroupIds
+		println "================="
+		println userGroupIds
 		def instanceInUserGroups = instance.userGroups.collect { it.id + ""}
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {

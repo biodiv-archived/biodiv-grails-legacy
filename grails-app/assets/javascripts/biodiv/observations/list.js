@@ -344,7 +344,12 @@ $(document).ready(function(){
         } else {
             $( "#searchTextField" ).val('');	
         }
+        if($(this).attr('data-target') == 'taxon') {
+            $("input#taxon").val();
+            $('#taxonHierarchy').find(".taxon-highlight").removeClass('taxon-highlight');
+        }
         removeParam = $(this).attr('data-target').replace('#','');
+        console.log(removeParam);
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
         return false;
     });
@@ -530,15 +535,13 @@ $(document).ready(function(){
 
     $(document).on('submit','.addRecommendation', function(event) {
         var that = $(this);
-        if($.trim(that.find('.speciesId').attr('data-species')) != $.trim(that.find('.recoName').val())){
-            that.find('.speciesId').val('');
-        }
         $(this).ajaxSubmit({
             url:window.params.observation.addRecommendationVoteURL,
             dataType: 'json', 
             type: 'GET',
             beforeSubmit: function(formData, jqForm, options) {
                 console.log(formData);
+                formData.push({'name':'format', 'value':'json', 'type':'text'});
                 updateCommonNameLanguage(that.find('.languageComboBox'));
                 return true;
             }, 
@@ -1396,7 +1399,7 @@ function appendGallery(ovbId,images){
         thumbUrl;
         $.each(images, function (index, photo) {
             //console.log("photo ="+photo);
-            baseUrl = ""+window.params.observation.serverURL+photo;
+            baseUrl = (photo.indexOf('http://') == -1)?""+window.params.observation.serverURL+photo:photo;
             $('<a/>')
                 .append($('<img>'))
                 .prop('href', baseUrl)                
@@ -1423,8 +1426,8 @@ function loadSpeciesnameReco(){
 function addListLayout(){
     $('.thumbnails>li').css({'width':'100%'}).addClass('addmargin');
     $('.snippet.tablet').addClass('snippettablet');
-    $('.prop').css('clear','inherit');
-    $('.showObvDetails, .view_bootstrap_gallery').show();
+    //$('.prop').css('clear','inherit');
+    $('.showObvDetails, .view_bootstrap_gallery, .recommendations').show();
     $('.species_title_wrapper').hide();
     $('.species_title_wrapper').parent().css({'height':'20px'});
     //loadSpeciesnameReco();
@@ -1438,7 +1441,7 @@ function addGridLayout(){
     $('.prop').css('clear','both');
     $('.species_title_wrapper').show();
     $('.species_title_wrapper').parent().css({'height':'50px'});
-    $('.showObvDetails, .view_bootstrap_gallery').hide();
+    $('.showObvDetails, .view_bootstrap_gallery, .recommendations').hide();    
 }
 
 function checkUrl(viewText,changeText){

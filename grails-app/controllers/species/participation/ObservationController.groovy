@@ -139,7 +139,6 @@ def grailsCacheManager;
             html {
                 if(!model.model.recoVotes)
                     model.model.recoVotes = observationService.getRecommendationVotes(model.model.observationInstanceList, 3, 0);
-                println model.recoVotes;
                 if(params.loadMore?.toBoolean()){                    
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
@@ -349,7 +348,7 @@ def grailsCacheManager;
                     eq ('isDeleted', false)
                 }
             }
-			
+
         if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -757,6 +756,7 @@ def grailsCacheManager;
 	@Secured(['ROLE_USER'])
 	def addRecommendationVote() {
         params.author = springSecurityService.currentUser;
+		
         //boolean isMobileApp = params.format?.equalsIgnoreCase("json") || params.isMobileApp; 
         String msg; 
         try {
@@ -771,7 +771,7 @@ def grailsCacheManager;
 			//Saves recommendation if its not present
 			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName, params.long('speciesId'));
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.commonName, params.languageName);
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -791,7 +791,7 @@ def grailsCacheManager;
 					}
 
 					if(!params["createNew"]){
-                def model = utilsService.getErrorModel(msg, null, OK.value());
+                        def model = utilsService.getErrorModel(msg, null, OK.value());
                         withFormat {
                             html {
                                 redirect(action:getRecommendationVotes, id:params.obvId, params:[max:3, offset:0, msg:msg, canMakeSpeciesCall:canMakeSpeciesCall])
@@ -801,7 +801,7 @@ def grailsCacheManager;
                         }
 					} else {
                         if(params.oldAction != "bulkSave"){
-                def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
+                            def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
                             withFormat {
                                 html {
 						            redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
@@ -982,6 +982,7 @@ def grailsCacheManager;
 	def addAgreeRecommendationVote() {
 		def msg;
 		params.author = springSecurityService.currentUser;
+	
  
         try {
             params.obvId = params.obvId?.toLong()?:(params.id?.toLong());
@@ -996,7 +997,7 @@ def grailsCacheManager;
 			boolean canMakeSpeciesCall = true//getSpeciesCallPermission(params.obvId)
 			def recVoteResult, recommendationVoteInstance
 			if(canMakeSpeciesCall){
-				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.canName, params.commonName, params.languageName, params.long('speciesId'));
+				recVoteResult = getRecommendationVote(params.long('obvId'), params.author, params.confidence, params.recoId?params.long('recoId'):null, params.recoName, params.commonName, params.languageName);
 				recommendationVoteInstance = recVoteResult?.recVote;
 				msg = recVoteResult?.msg;
 			}
@@ -1321,20 +1322,20 @@ def grailsCacheManager;
     * languageName
 	 * @return
 	 */
-	private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String canName, String commonName, String languageName, Long speciesId) {
+	private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String commonName, String languageName) {
 		def observation = params.observation?:Observation.get(obvId);
 		
 		ConfidenceType confidence = observationService.getConfidenceType(conf?:ConfidenceType.CERTAIN.name());
 		RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
 		
 		def reco, commonNameReco, isAgreeRecommendation = false;
-		if(recoId) {
+		if(recoId && !(recoName || commonName)) {
 			//user presses on agree button so getting reco from id and creating new recoVote without additional common name
 			reco = Recommendation.get(recoId);
 			isAgreeRecommendation = true
 		} else {
 			//add recommendation used so taking both reco and common name reco if available
-			def recoResultMap = observationService.getRecommendations(recoName, canName, commonName, languageName, speciesId)
+			def recoResultMap = observationService.getRecommendations(recoId, recoName, commonName, languageName)
 			reco = recoResultMap.mainReco;
 			commonNameReco =  recoResultMap.commonNameReco;
 		}

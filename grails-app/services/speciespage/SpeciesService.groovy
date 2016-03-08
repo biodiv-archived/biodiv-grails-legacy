@@ -1986,18 +1986,25 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
             int index = 0;
-            resId.each{
+            println "pullImage resources"
+            println resId
+            resId.each {
                 def r = Resource.get(it.toLong())
+                println r
+                println index
                 r.description = captions[index]
                 index++;
+                println speciesRes
                 if(speciesRes && !speciesRes.contains(r)){    
                     resources.add(r)
                 } else if (!speciesRes){
                     resources.add(r)
                 }
+                println resources
             }
 
             if(params.resourceListType == "fromRelatedObv"){
+                println resId
                 resId.each{
                     def rid = it
                     def obv = Observation.withCriteria(){
@@ -2007,17 +2014,25 @@ class SpeciesService extends AbstractObjectService  {
                     }
                     if(obv.size() == 1 ){
                         def obvIns = obv.get(0)
+                        println obvIns
                         if(obvIns.isLocked == false){
+                            println "locking obv"
                             obvList.add(obvIns);
                             obvIns.isLocked = true
                         }
                         if(!obvIns.save(flush:true)){
                             obvIns.errors.allErrors.each { log.error it } 
+                        } else {
+                            log.debug "Observation Locked"
                         }
                     }
                 }
             }
         }
+        println "------------------------------------------"
+        println "------------------------------------------"
+        println "------------------------------------------"
+        println resources
         //species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
@@ -2030,6 +2045,10 @@ class SpeciesService extends AbstractObjectService  {
             }
             species.addToResources(resource);
         }
+        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        println resources;
         //species.merge();
         if(resources.size() > 0) {
             if(species.instanceOf(Species)) {

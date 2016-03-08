@@ -31,10 +31,10 @@
 
                     <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
                         <span
-                            class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()}"
+                            class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()} pull-left"
                             title="${observationInstance.group?.name}"></span>
                         <g:if test="${showDetails && !showFeatured}">        
-                        <div class="btn btn-small btn-primary edit_group_btn" id="${observationInstance.id}">Edit
+                        <div class="btn btn-small btn-primary edit_group_btn pull-left" id="${observationInstance.id}">Edit
                         </div>
                         </g:if>    
                     </div>
@@ -44,7 +44,7 @@
                     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
                     </g:if>
                     <g:if test="${!showFeatured}">
-                    <div class="propagateGrpHab" id="propagateGrpHab_${observationInstance.id}" style="display:none">
+                    <div class="propagateGrpHab group_icon_show_wrap" id="propagateGrpHab_${observationInstance.id}" style="display:none">
                         <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                             method="GET">
                             <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>

@@ -47,9 +47,6 @@ if(r) {
 .btn .combobox-clear {
     margin-top: 3px;
 }
-.btn .caret {
-    margin-top: 3px;
-}
 .nameContainer.textbox #commonName {
     width: 282px;
 }

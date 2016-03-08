@@ -118,6 +118,7 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
         rights type:'text'
         additionalInfo type:'text'
         purpose type:'text'
+        id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "dataset_id_seq"] 
 	}
 
 //	static belongsTo = [DataSource]

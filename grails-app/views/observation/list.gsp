@@ -24,14 +24,14 @@
     /*.groups_super_div{
         margin-top: -15px;
         margin-right: 10px;
-    }*/
+    }
     .groups_div > .dropdown-toggle{
           height: 25px;
-    }
+    }*/
     .group_options, .group_option{
           min-width: 110px;
     }
-    .save_group_btn{
+    /*.save_group_btn{
         float: right;
         margin-right: 11px;
           margin-top: -9px;
@@ -54,7 +54,7 @@
     }
     .commonName{
         width: 79% !important;
-    }    
+    }*/    
 
     .view_bootstrap_gallery{
           margin-top: -20px;
@@ -63,6 +63,7 @@
           font-weight: bold;
           padding: 0px 25px;
           text-decoration: none;
+          text-shadow: #000 0px 0px 2px;
     }
     .view_bootstrap_gallery:hover, .view_bootstrap_gallery:visited, .view_bootstrap_gallery:focus{
         color: white;
@@ -73,8 +74,7 @@
         border: 3px solid #a6dfc8 !important;
     }
     .showObvDetails{
-      padding: 5px 0px;
-      height: 165px;
+      height: 180px;
       position: relative;
       margin-left: 160px;
     }
@@ -87,17 +87,17 @@
     .recoName, #recoComment{
         width:419px !important;
     }
-    .reco_block{
+    /*.reco_block{
          margin-bottom:0px !important;
-     }
+     }*/
      .resource_in_groups{
-         margin-top: -10px;
+         background-color: #ccc;
+         /*margin-top: -10px;
          margin-bottom: 5px !important;
-         /*background-color: #D4DFE1;
          padding: 8px 0px;
          margin-top: 5px;*/
      }
-     .clickSuggest{
+     /*.clickSuggest{
           margin: 0% 39%;         
           margin-top: -22px;
           padding: 2px 0px 0px 5px;
@@ -106,10 +106,7 @@
      }
      .clickSuggest i{
         margin-left:3px;
-     }
-     .comment-popup{
-        width:100px;
-     }
+     }*/
      .resource_in_groups .tile{
          margin-top:0px;
       }
@@ -118,10 +115,11 @@
       margin-left: 90px;
     }
     .bottom_user_fixed{
-      clear: inherit;
+     /* clear: inherit;*/
       position: absolute;
-      bottom: 10px;
+      bottom: 20px;
       width: 100%;
+      overflow:visible;
     }
      
 </style>

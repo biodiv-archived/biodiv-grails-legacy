@@ -590,4 +590,20 @@ ALTER TABLE recommendation DROP CONSTRAINT recommendation_taxon_concept_id_key;
 ALTER TABLE recommendation ADD CONSTRAINT recommendation_taxon_concept_id_key UNIQUE (taxon_concept_id, accepted_name_id, name, language_id);
  
 
+#3rd march update representative image for species
+DROP TABLE IF EXISTS  tmp;
+DROP TABLE IF EXISTS  tmp1;
+create table tmp as ((select resource_id, species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_resource o left outer join (select rl.rating_ref, avg(r.stars), count(r.stars) from rating_link rl, rating r where rl.type='resource' and rl.rating_id = r.id  group by rl.rating_ref) c on o.resource_id =  c.rating_ref, resource r where resource_id = r.id  and r.type = 'IMAGE' )
+union (select resource_id, sf.species_id as species_resources_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from species_field sf join species_field_resources o on species_field_id= sf.id left outer join (select rl.rating_ref, avg(r.stars), count(r.stars) from rating_link rl, rating r where rl.type='resource' and rl.rating_id = r.id group by rl.rating_ref) c on o.resource_id = c.rating_ref, resource r where resource_id = r.id and r.type = 'IMAGE' ));
+create table tmp1 as select species_resources_id, max(avg) as avg from tmp  x  group by x.species_resources_id order by avg, x.species_resources_id;
+update species set repr_image_id = g.resource_id from (select tmp.species_resources_id, tmp.resource_id from tmp, tmp1 where tmp.species_resources_id = tmp1.species_resources_id and tmp.avg = tmp1.avg) g where g.species_resources_id = id;
+DROP TABLE IF EXISTS  tmp;
+DROP TABLE IF EXISTS  tmp1;
 
+#4thMar datasource and dataset seq
+create sequence datasource_id_seq start 1;
+create sequence dataset_id_seq start 1;
+alter table resource alter column access_rights type varchar(2055);
+
+#8 March
+update observation set protocol='LIST' where is_checklist = true or (id != source_id);

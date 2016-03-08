@@ -83,6 +83,8 @@ class UtilsService {
 
     static final String[] DATE_PATTERNS = ['dd/MM/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
 
+    private Map bannerMessageMap;
+
     public void cleanUpGorm() {
         cleanUpGorm(true)
     }
@@ -1128,6 +1130,60 @@ class UtilsService {
         if(!cache) return null;
         log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
         cache.put(cacheKey,value);
+    }  
+    
+    Map getBannerMessages() {  
+        return bannerMessageMap;
     }
+
+    String getBannerMessage(String userGroupWebaddress) {  
+        return bannerMessageMap ? bannerMessageMap[userGroupWebaddress]:'';
+    }
+
+    String getIbpBannerMessage() {  
+        return bannerMessageMap["ibp"];
+    }
+
+    void loadBannerMessageMap() {  
+        log.debug "Loading bannerMessageMap from ${grailsApplication.config.speciesPortal.bannerFilePath}"
+        File bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);        
+        bannerMessageMap = [:];
+        if(bannerMessageFile.exists()) {
+            bannerMessageFile.eachLine { line ->
+                def (gname,bmessage) = line.tokenize('-');
+                gname = gname?.trim();
+                bmessage = (bmessage.replaceAll("</?p>", ''))?.trim();
+                if(gname && bmessage) {
+                    bannerMessageMap[gname.replaceAll("<(.|\n)*?>", '')] = bmessage;   
+                }
+            }
+        }
+      
+        /*
+        def content_array=gapp
+        def rvalue = ''
+        content_array.each {
+            def (gname,bmessage)=it.tokenize('-')
+            if(gname.replaceAll("<(.|\n)*?>", '') == userGroupWebaddress){
+                rvalue = bmessage
+            }
+        }
+        return rvalue;*/
+    }
+
+    def evictInCache(String cacheName, String cacheKey) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Evict result in cache ${cache.name} at key ${cacheKey}"
+        cache.evict(cacheKey);
+    }
+
+    def clearCache(String cacheName) {
+        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        if(!cache) return null;
+        log.debug "Clearing Cache ${cache.name}"
+        cache.clear();
+    }
+
 }
 

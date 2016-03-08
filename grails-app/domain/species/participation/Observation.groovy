@@ -111,16 +111,14 @@ class Observation extends DataObject {
 	}
 
 	public enum ProtocolType {
-
-        DWC_ARCHIVE,
-        DIGIR,
-        BIOCASE,
-        TEXT,
-        LIST,
-        SINGLE_OBSERVATION,
-        MULTI_OBSERVATION,
-        MOBILE,
-        API,
+        //https://github.com/gbif/gbif-api/blob/master/src/main/java/org/gbif/api/vocabulary/EndpointType.java
+        DWC_ARCHIVE,//observations as dwc archive
+        TEXT,//CSV upload ... for datasets mainly
+        LIST,//Checklist
+        SINGLE_OBSERVATION,//Single observation through UI
+        MULTI_OBSERVATION,//Multiple observations thru UI
+        BULK_UPLOAD,//XLS File upload of observations along with images
+        MOBILE,//obvs uploaded thru mobile interface
         OTHER
 
 		private String value;
@@ -139,10 +137,6 @@ class Observation extends DataObject {
 			switch(value){
 				case 'DWC_ARCHIVE':
 					return ProtocolType.DWC_ARCHIVE
-			case 'DIGIR':
-					return ProtocolType.DIGIR
-			case 'BIOCASE':
-					return ProtocolType.BIOCASE
 				case 'TEXT':
 					return ProtocolType.TEXT
 				case 'LIST':
@@ -153,8 +147,6 @@ class Observation extends DataObject {
 					return ProtocolType.MULTI_OBSERVATION
 				case 'MOBILE':
 					return ProtocolType.MOBILE
-				case 'API':
-					return ProtocolType.API
 				case 'OTHER':
 					return ProtocolType.OTHER
 				default:
@@ -217,7 +209,6 @@ class Observation extends DataObject {
 		longitude nullable:false
 		topology nullable:false
         fromDate nullable:false
-		placeName blank:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
 		locationScale nullable:true
@@ -438,6 +429,10 @@ class Observation extends DataObject {
 		
 		//showing all observation those have media
 		isShowable = (isChecklist || (noOfImages || noOfVideos || noOfAudio)) ? true : false
+
+		//updating protocol
+        if(isChecklist || (sourceId  && (id != sourceId))) 
+            this.protocol = ProtocolType.LIST;
 	}
 	
 	private void updateResources() {
@@ -448,6 +443,7 @@ class Observation extends DataObject {
             else if(it.type == ResourceType.VIDEO) noOfVideos++;
             else if(it.type == ResourceType.AUDIO) noOfAudio++;
         }
+        //utilsService.evictInCache('resources', 'observation-'+this.id);
         updateReprImage();
 	}
 
@@ -482,15 +478,17 @@ class Observation extends DataObject {
 			return
 		}
 		
-		Checklists cl = Checklists.read(sourceId)
-		if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
-			m[cl.sciNameColumn] = recoVote.recommendation.name
-		}
-		if(cl.commonNameColumn && recoVote.commonNameReco){
-			m[cl.commonNameColumn] = recoVote.commonNameReco.name
-		}
-		
-		checklistAnnotations = m as JSON
+        if(sourceId) {
+            Checklists cl = Checklists.read(sourceId)
+            if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
+                m[cl.sciNameColumn] = recoVote.recommendation.name
+            }
+            if(cl.commonNameColumn && recoVote.commonNameReco){
+                m[cl.commonNameColumn] = recoVote.commonNameReco.name
+            }
+
+            checklistAnnotations = m as JSON
+        }
 	}
 	
 	private updateLocationScale(){
@@ -713,11 +711,11 @@ class Observation extends DataObject {
                 }
             }
 
-            res = res.sort { dwcObvMapping[it.key.toLowerCase()].order }
+            res = res.sort { dwcObvMapping[it.key.toLowerCase()]?dwcObvMapping[it.key.toLowerCase()].order:1000 }
             def m = [:];
             res.each {
                 if(it.value) {
-                    m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key].url]
+                    m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key]?.url?:'']
                 }
             }
             res = m;

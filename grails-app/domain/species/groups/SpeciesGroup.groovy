@@ -46,7 +46,7 @@ class SpeciesGroup {
 			name = ImageUtils.getFileName(name, type, '.png');
 		}
 
-		def r = new Resource('fileName':"group_icons/speciesGroups/${name}", 'type':ResourceType.IMAGE, 'title':"You can contribute!!!");
+	def r = new Resource('fileName':"group_icons/speciesGroups/${name}", 'type':ResourceType.IMAGE, 'title':"You can contribute!!!");
         r['baseUrl'] = grailsApplication.config.grails.serverURL
         return r;
 	}
