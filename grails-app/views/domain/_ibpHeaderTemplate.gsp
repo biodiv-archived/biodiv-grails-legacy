@@ -78,7 +78,9 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			${flash.error}
 		</div>
 	</g:if>
-<g:if test="${raw(utilsService.getBannerMessage(cgroup))!=null}">
+	<% String bannerMessage=raw(utilsService.getBannerMessage(cgroup)); %>
+<g:if test="${bannerMessage!=""}">
+
 <%--	<div class="alert alert-info"--%>
 <%--		style="clear: both; margin: 0px; text-align: center;">--%>
 <%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
@@ -94,7 +96,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<div class="alertMsg alert alert-info"
 		style="clear: both; margin: 0px; text-align: center;">
 		<!-- The IBP Community Meet will be held on 20th February at NGMA, Bangalore. Register your participation <a target="_blank" href="http://indiabiodiversity.org/page/149">here</a>. -->
-		${raw(utilsService.getBannerMessage(cgroup))}
+		${bannerMessage}
 		 
 	</div>
 	<g:if test="${params.webaddress!=null}">
