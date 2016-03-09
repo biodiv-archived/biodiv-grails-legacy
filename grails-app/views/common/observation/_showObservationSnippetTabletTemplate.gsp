@@ -54,7 +54,6 @@ def obvId = observationInstance?.id
         %>
    </g:if>
 </g:each>
-<% photonames ='';%>
 <g:if test="${photonames!='' && photonames.length() >0}">
      <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery<i class="icon-share icon-white"></i></a>
 </g:if>     
