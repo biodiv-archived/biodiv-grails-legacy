@@ -112,6 +112,7 @@ abstract class Metadata {
 		reverseGeocodedName(nullable:true)
 		latitude(nullable: true)
 		longitude(nullable:true)
+		locationAccuracy(nullable: true)
 		topology (nullable:true)
 //			if(!val){
 //				return true
