@@ -43,7 +43,6 @@ class TaxonController {
     /**
      * 
      */
-    @Cacheable('taxon')
     def listHierarchy() {
         //cache "taxonomy_results"
         includeOriginHeader();

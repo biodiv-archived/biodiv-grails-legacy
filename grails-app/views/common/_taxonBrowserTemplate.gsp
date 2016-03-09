@@ -33,7 +33,7 @@
         <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="Search for taxon" />
         <span id="searchTaxonPrev" class="add-on btn searchTaxonPaginate">&lt;</span>
         <span id="searchTaxonNext" class="add-on btn searchTaxonPaginate">&gt;</span>
-        <span id="searchTaxonButton" class="add-on btn">Search</span>
+        <span id="searchTaxonButton" class="add-on btn"><i class="icon-search"></i></span>
     </div>
     <div class="nameSuggestions" style="display: block;"></div>
 </div>

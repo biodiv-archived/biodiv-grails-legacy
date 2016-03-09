@@ -48,7 +48,21 @@
                 </div>
                 </div-->
             </div>
-            <div class="span3 listarea dirty_listarea">
+
+            <div class="span9 listarea" style="overflow:visible;">
+                 <div id="taxonGrid" class="dl_content" style="width:100%;height:225px"></div>
+                 <div id="taxonPager" style="width:100%;height:20px;"></div>
+                 <div id="inlineFilterPanel" style="background:#dddddd;color:black;">
+                     Filter names with text <input type="text" id="txtSearch" style="margin:3px 0px 3px 0px">
+                     and with <select id="taxonStatusSelect" multiple="multiple">
+                         <g:each in ="${NameStatus.list()}" var="status">
+                         <option value="${status}">${status.label()}</option>
+                         </g:each>
+                     </select>
+                 </div>
+            </div>   
+
+<%--            <div class="span3 listarea dirty_listarea">
                 <div class="dirty_list taxon_selector_wrapper_span">
                     Raw List
 
@@ -109,7 +123,7 @@
 
 
             </div>
-
+            --%>
 
         </div>
 
@@ -147,19 +161,26 @@
                 <input type="hidden" class="id_details" value="">
 
                 <div class="row-fluid form-inline">
-                    <div class="span8">
+                    <div class="span12">
                         <label>Name
                         
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.name.info')}"></i>
                         </label> 
-                        <input type="text" placeholder="Name" class="span5 name" style="width:85%;"/>
+                        <input type="text" placeholder="Name" class="span5 name" style="width:91%;"/>
+                    </div>
+                    <div class="span8" style="width:65.8%;margin-left:0px;">
+                        <label>Canonical Name
+                        
+                            <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.canonicalname.info')}"></i>
+                        </label> 
+                        <input type="text" placeholder="Canonical Name" class="span5 canonicalForm" style="width:71%;" disabled/>
                     </div>
                     <div class="span4">
                         <label> Author
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.authorstring.info')}"></i>
                         </label>
-                        <input type="text" placeholder="Author" class="span3 authorString" style="width:68%;"/>
+                        <input type="text" placeholder="Author" class="span3 authorString" style="width:68%;" disabled/>
                     </div>
                     <div class="span4" style="margin-left:0px;">
                         <label>Status
@@ -181,11 +202,11 @@
                         
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.rank.info')}"></i>
                         </label>
-                        <select id="rankDropDown" class="span5 rank" style="width:70%; margin:left:3px;">
+                        <select id="rankDropDown" class="span5 rank" style="width:70%; margin-left:3px;">
                             <option value="chooseRank">Choose Rank</option>
                             <% def rankCount = 0 %>
                             <g:each in="${TaxonomyRank.list()}" var="t">
-                            <option value="${t.toString().toLowerCase()}">${t}</option>
+                            <option data-ordinal="${t.ordinal()}" value="${t.toString().toLowerCase()}">${t}</option>
                             </g:each>
                         </select>
                     </div>

@@ -1936,6 +1936,7 @@ class XMLConverter extends SourceConverter {
         int i=0;
         boolean flag = true;
         fieldNodes.each { fieldNode ->
+            println "taxon Field Node ${fieldNode}"
             if(flag) {
                 if(fieldNode) {
                     //log.debug "Adding taxonomy registry from node: "+fieldNode;
@@ -1977,9 +1978,15 @@ class XMLConverter extends SourceConverter {
                                             searchIBPResult.each {
                                                 if(it.id == sciName.id){
                                                     isPresent = true;
+                                                    println it.name
+                                                    if(!it.isAttached()) {
+                                                        it.attach();
+                                                    }
                                                 }
                                             }
                                             if(!isPresent) {
+                                                println "IS NOT PRESENT. ADDING SCINAME"
+                                                println sciName.name
                                                 searchIBPResult.add(sciName);
                                             }
                                         //}
@@ -2036,7 +2043,7 @@ class XMLConverter extends SourceConverter {
                                                 }
                                                 sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
                                                 if(!sciName.save()) {
-                                                    sciName.errors.each { log.error it }
+                                                    sciName.errors.each { println it; log.error it }
                                                 }
                                             }
                                         } else {
@@ -2078,7 +2085,7 @@ class XMLConverter extends SourceConverter {
                             TaxonomyDefinition taxon = taxonCriteria.get {
                                 eq("rank", rank);
                                 ilike("canonicalForm", parsedName.canonicalForm);
-                            }
+                            } 
                             */
                             //abort becoz new name saved in curation interface
                             if(newNameSaved && abortOnNewName) {
@@ -2089,6 +2096,7 @@ class XMLConverter extends SourceConverter {
                             }
                             if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
 								println " =========== got raw taxon and reusing it  "
+                                println taxon.name
                                 //taxon = null;
                             }
                             if(!taxon && saveTaxonHierarchy) {
@@ -2213,12 +2221,12 @@ class XMLConverter extends SourceConverter {
                                 if(synonym)
                                     synonym.updateContributors(getUserContributors(fieldNode.data))
                                 */
-                            }
+                            } 
                             //Moving name to Working list, so all names should be in working list,
                             //even if a single name in hierarchy is in dirty list
                             //abort process
-                            if(otherParams && otherParams.moveToWKG) {
-                                if(taxon.position == NamePosition.RAW) {
+                            if (otherParams && otherParams.moveToWKG) {
+                                 if(taxon.position == NamePosition.RAW) {
                                     newNameSaved = true;
                                 }
                             }
@@ -2229,7 +2237,7 @@ class XMLConverter extends SourceConverter {
                             if(taxon.status != NameStatus.ACCEPTED) {
                                 println "TAXON SAVED WITH NULL STATUS===========================" + taxon.status + "   id " + taxon.id
 								
-                            }
+                            } 
 							
 							def mergedTaxon = taxon.merge();
 							taxon = mergedTaxon ?:taxon
@@ -2281,21 +2289,21 @@ class XMLConverter extends SourceConverter {
                             if(registry) {
                                 log.debug "Taxon registry already exists : "+registry;
                                 if(saveTaxonHierarchy) {
-                                    if(ent.classification == ibpHierarchy) {
+                                     if(ent.classification == ibpHierarchy) {
                                         log.debug "Saving taxon registry entity : "+ent;
                                         //println "=====UPDATING existing IBP TAXON REGISTRY================================== "
                                         if(!ent.save(flush:true)) {
                                             ent.errors.each { log.error it }
                                         } else {
                                             log.debug "Saved taxon registry entity : "+ent;
-                                        }
+                                         }
                                     }
                                     ent.updateContributors(getUserContributors(fieldNode.data))
                                 }
                                 taxonEntities.add(registry);
                             } else if(saveTaxonHierarchy) {
                                 log.debug "Saving taxon registry entity : "+ent;
-                                if(!ent.save(flush:true)) {
+                                if(! ent.save(flush:true)) {
 									println "---TAXON SAVE ################## Error"
                                     ent.errors.each { log.error it }
                                 } else {

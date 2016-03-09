@@ -57,13 +57,13 @@ a.not_in_use {
 }
 
 .metadataDetails .listarea { 
-    height : 375px;
+    height : 460px;
     overflow:visible;
 }
 
-.taxon_selector_wrapper{
+.namelist_wrapper .taxon_selector_wrapper{
     //width:285px!important;
-    overflow:hidden;
+    overflow:visible;
 }
 #taxaHierarchy #taxonHierarchy {
     overflow: auto;
@@ -80,13 +80,13 @@ a.not_in_use {
     min-height:24px;
 }
 
-.row-fluid .taxon_selector_wrapper_span.dirty_list{
+.row-fluid .taxon_selector_wrapper_span.dirty_list, .dl_content li.RAW {
     background-color:lightgrey; //#C0504D;
 }
-.row-fluid .taxon_selector_wrapper_span.working_list{
+.row-fluid .taxon_selector_wrapper_span.working_list, .dl_content li.WORKING {
     background-color:khaki; //#FF9900;
 }
-.row-fluid .taxon_selector_wrapper_span.clean_list{
+.row-fluid .taxon_selector_wrapper_span.clean_list,  .dl_content li.CLEAN {
     background-color:mediumaquamarine; //#009933;
 }
 .row-fluid .taxon_selector_wrapper_span.taxon_selector_span{
@@ -196,7 +196,6 @@ a.not_in_use {
 
 .canBeDisabled .rankStrings, .listarea label {
     padding-left:4px;
-    color:white;
     font-weight:bold;
 }
 .canBeDisabled .rankValues {

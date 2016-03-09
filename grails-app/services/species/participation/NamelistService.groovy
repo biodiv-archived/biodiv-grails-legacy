@@ -99,6 +99,8 @@ class NamelistService {
             clazz = SynonymsMerged.class; 
         }
         
+//		clazz.withNewTransaction{
+        //withNewTransaction returns objects attached with a new session. If the same objects exist in old session from where searchIBP is called there would be exceptions. CurateName workflow is one such process
 		clazz.withNewTransaction{
 			if(normalizedForm || authorYear){
 				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
@@ -596,7 +598,8 @@ class NamelistService {
    
     public def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
         println "+++++++++++++++++++++++++++++++++++"
-        println sciName.class
+        println sciName
+        println acceptedMatch
         println "+++++++++++++++++++++++++++++++++++"
 
         Map result = [:];
@@ -626,13 +629,16 @@ class NamelistService {
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
             tempResult = updateAttributes(sciName, acceptedMatch);
+           println sciName.name 
             result.errors << tempResult.errors;
             
             println "======= RESULT FROM UpdateAttributes ${tempResult}";
 
             //adds IBP Hierarchy as well
             tempResult = updateStatus(sciName, acceptedMatch);
+           println sciName.name 
             sciName = TaxonomyDefinition.get(sciName.id);
+           println sciName.name 
             result.errors << tempResult.errors;
             println "======= RESULT FROM UpdateStatus ${tempResult}";
             /*if(r)
@@ -659,6 +665,7 @@ class NamelistService {
             if(moveToRaw) position = NamesMetadata.NamePosition.RAW;
 
             tempResult = updatePosition(sciName, position); 
+           println sciName.name 
             println "======= RESULT FROM UpdatePosition ${tempResult}";
             result.errors << tempResult.errors;
             //taxonService.moveToWKG([taxonReg]);
@@ -666,7 +673,7 @@ class NamelistService {
 
             println "=====SCI NAME ==== " + sciName
             println "=====SCI NAME CLASS ==== " + sciName.class
-            
+           println sciName.name 
             log.debug "Saving sciname ${sciName}"        
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 log.debug "Saved sciname ${sciName}" 
@@ -772,7 +779,7 @@ class NamelistService {
             //handling inside the cases only
             //sciName.status = newStatus;
         } else {        //Do when status does not change and its accepted
-            println "=========STATUS SAME  === "
+            println "=========STATUS SAME  === ${sciName.status}"
             if(sciName.status == NameStatus.ACCEPTED) {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
@@ -901,7 +908,7 @@ class NamelistService {
     private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
-        //println "Adding IBP hierarchy from ${colAcceptedNameData}"
+        println "Adding IBP hierarchy from ${colAcceptedNameData}"
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
@@ -923,6 +930,7 @@ class NamelistService {
         }
 
         log.debug "Adding ${classification} ${taxonRegistryNames}"
+        println "Adding ${classification} ${taxonRegistryNames}"
         SUser contributor = springSecurityService.currentUser?:SUser.read(1L) //findByName('admin');
         //to match the input format
         //getTaxonHierarchy() XMLConverter
@@ -941,6 +949,8 @@ class NamelistService {
             if('COL'.equalsIgnoreCase(metadata1['source']) || 'CatalogueOfLife'.equalsIgnoreCase(metadata1['source']) ||  'Catalogue Of Life'.equalsIgnoreCase(metadata1['source'])) {
                 fromCOL = true; 
             }
+            println "===============++"
+            println colAcceptedNameData
             result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, fromCOL, colAcceptedNameData);
         //}
 
@@ -1471,13 +1481,15 @@ class NamelistService {
     }
 
     private Map updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
-        //println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
+        println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
         boolean success = false;
         def errors = [];
         try {
             NamesParser namesParser = new NamesParser();
             if(!colMatch.canonicalForm) colMatch.canonicalForm = colMatch.name;
-            def name = colMatch.canonicalForm + " " + colMatch.authorString
+            def name = colMatch.canonicalForm
+            if(colMatch.authorString)
+                name = name + " " + colMatch.authorString
             if(!doNotSearch){
                 def res1 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
                 def res2 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
@@ -1514,6 +1526,8 @@ class NamelistService {
                 sciName.normalizedForm = pn.normalizedForm
                 sciName.italicisedForm = pn.italicisedForm
                 sciName.name = pn.name
+                println sciName.name
+                println sciName.canonicalForm
             }
             sciName.authorYear = colMatch.authorString;
             if(sciName.colNameStatus) {
@@ -1531,12 +1545,12 @@ class NamelistService {
             if(!sciName.save(flush:true)) {
                 success = false;
                 errors = sciName.errors.allErrors;
-                sciName.errors.allErrors.each { log.error it }
+                sciName.errors.allErrors.each { println it; log.error it }
             } else {
                 success = true;
             }
             
-            println "=========DONE UPDATING ATTRIBUTES ========\n" + sciName
+            println "=========DONE UPDATING ATTRIBUTES ========" + sciName
 
         } catch (Exception e) {
             success = false;
@@ -1996,6 +2010,7 @@ class NamelistService {
         def offset = params.offset ? params.limit.toLong() : 0
         def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
         def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
+        List ranksToFetch = params.ranksToFetch ? (parentTaxon.rank+','+params.ranksToFetch).split(','):[parentTaxon.rank, nextPrimaryRank];
 
 
 
@@ -2039,8 +2054,8 @@ class NamelistService {
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
                     "s.path like '"+parentId+"%' and " +
-                    "t.rank <= " + nextPrimaryRank +
-                    " order by t.rank, t.name asc limit :limit offset :offset";
+                    "t.rank in ("+ranksToFetch.join(',')+ ") "+
+                    " order by t.rank asc, t.name asc limit :limit offset :offset";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields
@@ -2057,7 +2072,7 @@ class NamelistService {
                 rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
                 }*/
 
-                def s3 = "select s.id as taxonid, s.rank as rank, s.name as name, s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, s.status as status from taxonomy_definition s left outer join  taxonomy_registry reg on s.id = reg.taxon_definition_id and reg.classification_id = :classSystem where s.rank >= :speciesRank and s.status = :acceptedStatus and (reg.path like '%!_"+parentId+"!_%' escape '!'  or reg.path like '"+parentId+"!_%'  escape '!' or reg.path like '%!_"+parentId+"'  escape '!') order by s.name";
+                /*def s3 = "select s.id as taxonid, s.rank as rank, s.name as name, s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, s.status as status from taxonomy_definition s left outer join  taxonomy_registry reg on s.id = reg.taxon_definition_id and reg.classification_id = :classSystem where s.rank >= :speciesRank and s.status = :acceptedStatus and (reg.path like '%!_"+parentId+"!_%' escape '!'  or reg.path like '"+parentId+"!_%'  escape '!' or reg.path like '%!_"+parentId+"'  escape '!') order by s.name";
 
 
                 def sql1 = new Sql(dataSource)
@@ -2072,7 +2087,7 @@ class NamelistService {
                     } else{
                         speciesCL << it
                     }
-                }
+                }*/
             }
 
             println "total result size === " + rs.size()
@@ -2091,13 +2106,13 @@ class NamelistService {
                 def q1 = sql.rows(s1, [taxonId:it.taxonid])
                 q1.each {
                     println "==========TAXA IDS======= " + it.taxonid
-                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                    //if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                         synDL << it
-                    }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                        synWL << it
-                    }else{
-                        synCL << it
-                    }
+                    //}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    //    synWL << it
+                    //}else{
+                    //    synCL << it
+                    //}
                 }
 
                 sql = new Sql(dataSource)
@@ -2123,19 +2138,19 @@ class NamelistService {
             ///////////////////////////////
 
             rs.each {
-                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+            //    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                     accDL << it
-                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                    accWL << it
-                }else{
-                    accCL << it
-                }
+                //}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                //    accWL << it
+                //}else{
+                //    accCL << it
+                //}
             }
             dirtyList['accDL'] = accDL
             dirtyList['synDL'] = synDL
             dirtyList['comDL'] = comDL
             dirtyList['speciesDL'] = speciesDL
-            workingList['accWL'] = accWL
+            /*workingList['accWL'] = accWL
             workingList['synWL'] = synWL
             workingList['comWL'] = comWL
             workingList['speciesWL'] = speciesWL
@@ -2143,8 +2158,10 @@ class NamelistService {
             cleanList['synCL'] = synCL
             cleanList['comCL'] = comCL
             cleanList['speciesCL'] = speciesCL
-        
+            
             return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]
+            */
+            return [dirtyList:dirtyList, ranksToFetch:ranksToFetch]
         } catch(Exception e) {
             e.printStackTrace();
         }

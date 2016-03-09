@@ -110,6 +110,7 @@
 
                             if (me.options.action != 'show' && me.options.action != 'taxonBrowser') {
                                 $(tmp).data('taxonid', nodeData.original.taxonid);
+                                $(tmp).data('rank', nodeData.original.rank);
                                 $(tmp).attr('title', 'Show all '+me.options.controller+'s for this taxon');
                             }
 
