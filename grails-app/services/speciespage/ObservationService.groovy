@@ -1031,7 +1031,14 @@ class ObservationService extends AbstractMetadataService {
         hqlQuery.setReadOnly(true);
         //hqlQuery.setCacheable(true)
         //hqlQuery.setCacheRegion('obvList');
-        def observationInstanceList = hqlQuery.list();
+/*def qTranslator = (new org.hibernate.hql.ast.ASTQueryTranslatorFactory()).createQueryTranslator('123', query, ['limit':3,'max':2], sessionFactory);
+qTranslator.compile(queryParts.queryParams, false);
+println "******************************"
+println qTranslator;
+println qTranslator.getQueryString();
+println qTranslator.getSQLString();
+println "******************************"
+*/        def observationInstanceList = hqlQuery.list();
 
         def distinctRecoList = [];
         def speciesGroupCountList = [];

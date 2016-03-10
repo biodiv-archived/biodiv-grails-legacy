@@ -81,6 +81,7 @@ function initTaxonGrid(ele) {
         editable: false,
         enableAddRow: false,
         forceFitColumns: true,
+        explicitInitialization: true,
         enableColumnReorder: false
     };
     var taxonGridDataView = new Slick.Data.DataView({inlineFilters:true});
@@ -134,7 +135,7 @@ function initTaxonGrid(ele) {
 
     taxonGridDataView.setFilter(nameFilter);
 //    taxonGrid.showTopPanel();
-
+taxonGrid.init();
     return taxonGrid;
 }
 
@@ -1696,7 +1697,7 @@ $(document).ready(function() {
         taxonGridDataView.refresh();
     }
 
-    taxonGrid = initTaxonGrid('#taxonGrid');
+    taxonGrid = initTaxonGrid($('#taxonGrid'));
 //    $("#inlineFilterPanel").appendTo(taxonGrid.getTopPanel()).show();
     $("#inlineFilterPanel").on('keyup', '#txtSearch', function (e) {
         Slick.GlobalEditorLock.cancelCurrentEdit();

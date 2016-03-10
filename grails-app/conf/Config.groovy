@@ -1945,3 +1945,4 @@ grails {
     }
 }
 */
+grails.assets.bundle=true
