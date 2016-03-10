@@ -190,7 +190,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                     return;
                 }
                 if($(ele).parents(".dl_content").length) {
-                    $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, auto-querying CoL for up-to-date name attributes.");
+                    $(".dialogMsgText").html("Existing name attributes from WIKWIO displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for WIKWIO, auto-querying CoL for up-to-date name attributes.");
                     $("#dialogMsg").modal('show');
                     $('.queryDatabase option[value="col"]').attr("selected", "selected");
                     $('.queryString').trigger("click");
@@ -400,7 +400,7 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 $("#dialogMsg").modal('hide');
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
-                $("#externalDbResults h6").html(name +"(IBP status : "+ ibpStatus +")");
+                $("#externalDbResults h6").html(name +"(WIKWIO status : "+ ibpStatus +")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData", true, source);
             	$('#externalDbResults .modal-dialog').on('hidden', function(event) {
             		$(this).unbind();
@@ -421,7 +421,7 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 //alert("Sorry no results found from "+ $("#queryDatabase option:selected").text() + ". Please query an alternative database or input name-attributes manually.");
                 $("#dialogMsg").modal('show');
                 if(addNewName) {
-                    alert("Searching name in IBP Database");
+                    alert("Searching name in WIKWIO Database");
                     searchIBP(name);
                 }
                 
@@ -456,10 +456,10 @@ function searchIBP(name) {
                 $("#dialogMsg").modal('hide');
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
-                $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
+                $("#externalDbResults h6").html(name +"(WIKWIO status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "IBPData", true);
             } else {
-                alert("Sorry no results found from IBP Database. Fill in details manually");
+                alert("Sorry no results found from WIKWIO Database. Fill in details manually");
             }
         }, error: function(xhr, status, error) {
             processingStop();
@@ -617,7 +617,7 @@ function showSearchPopup(data){
 		});
 	} else {
 		$("#dialogMsg").modal('show');
-		colMsg = "No results found for taxon name on IBP. Querying the Catalogue of Life for matches..."
+		colMsg = "No results found for taxon name on WIKWIO. Querying the Catalogue of Life for matches..."
 		$(".dialogMsgText").html(colMsg);
 		searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");	
 	}
@@ -1340,7 +1340,7 @@ function validateName(ele, showNameDetails) {
                 $("#dialogMsg").modal('hide');
                 $("#externalDbResults").modal('show');
                 //TODO : for synonyms
-                $("#externalDbResults h6").html(name +"(IBP status : "+$("#statusDropDown").val()+")");
+                $("#externalDbResults h6").html(name +"(WIKWIO status : "+$("#statusDropDown").val()+")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData", showNameDetails);
             }else {
                 var oldText = $(".dialogMsgText").html();
