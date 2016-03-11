@@ -1722,7 +1722,7 @@ def grailsCacheManager;
 
             if(recVo){
                 if(reco != recVo.recommendation) {
-                    String givenSciName = recVo.givenName;
+                    String givenSciName = recVo.givenSciName;
                     String givenCommonName = recVo.givenCommonName;
                     recVo.delete(flush: true, failOnError:true)
                     newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:givenSciName, givenCommonName:givenCommonName )
@@ -1753,7 +1753,8 @@ def grailsCacheManager;
             msg = messageSource.getMessage("default.observation.unlocked", null, RCU.getLocale(request))
             mailType = utilsService.OBV_UNLOCKED;
             def recommendationVoteInstance =  RecommendationVote.findWhere(recommendation: reco, observation:obv, author: currentUser)
-            activityFeed = activityFeedService.addActivityFeed(obv, recommendationVoteInstance, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+			if(recommendationVoteInstance)
+            	activityFeed = activityFeedService.addActivityFeed(obv, recommendationVoteInstance, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
         }
         if(!obv.save(flush:true)){
             obv.errors.allErrors.each { log.error it } 

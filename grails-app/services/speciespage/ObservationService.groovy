@@ -595,7 +595,7 @@ class ObservationService extends AbstractMetadataService {
             def obv;
             if(userGroupInstance) obv = it[0];
             else obv = it;
-            if(it)
+            if(obv)
                 result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
         }
 
