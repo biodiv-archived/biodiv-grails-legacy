@@ -13,7 +13,6 @@ import com.octo.captcha.component.image.textpaster.NonLinearTextPaster
 import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService
 import grails.plugin.springsecurity.SecurityConfigType;
 import org.apache.log4j.Priority
-import java.io.File;
 
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
