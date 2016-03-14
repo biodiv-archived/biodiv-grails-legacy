@@ -428,7 +428,9 @@ class Observation extends DataObject {
 		
 		//showing all observation those have media
 		isShowable = (isChecklist || (noOfImages || noOfVideos || noOfAudio)) ? true : false
-        if(isChecklist) 
+
+		//updating protocol
+        if(isChecklist || (sourceId  && (id != sourceId))) 
             this.protocol = ProtocolType.LIST;
 	}
 	

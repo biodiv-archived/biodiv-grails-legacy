@@ -198,7 +198,7 @@
             }
 
 
-            me.$element.find('#taxonHierarchy').jstree({
+            var x = me.$element.find('#taxonHierarchy').jstree({
                 'core': {
                     "themes": {
                         'dots': true,
@@ -247,7 +247,9 @@
                 "plugins": [
                     "massload", "search", "sort", "themes", "questionmark", "checkbox"
                 ]
-            }).on('ready.jstree', function() {
+            })
+
+            me.$element.find('#taxonHierarchy').on('ready.jstree', function() {
                 var postData = me.options.postData;
                 postData["expand_species"] = false;
                 postData["expand_taxon"] = false;

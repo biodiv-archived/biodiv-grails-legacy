@@ -3162,9 +3162,9 @@ small {
 .annotationsWrapper {
     background-color:#fff;
     clear:both;
+    height:297px;
+    overflow:auto;
 }
-
-
 
 /* For Gallery changes */
 

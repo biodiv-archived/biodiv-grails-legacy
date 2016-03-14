@@ -605,3 +605,5 @@ create sequence datasource_id_seq start 1;
 create sequence dataset_id_seq start 1;
 alter table resource alter column access_rights type varchar(2055);
 
+#8 March
+update observation set protocol='LIST' where is_checklist = true or (id != source_id);

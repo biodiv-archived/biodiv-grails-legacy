@@ -76,16 +76,14 @@
             </div>
         </div>
 
-        <g:if test="${resourceInstance?.licenses}">
+        <g:if test="${resourceInstance?.license}">
         <div class="prop">
             <span class="name"><i class='icon-ok-sign'></i><g:message code="default.licenses.label" /></span>
 
             <div class="value">
-                <g:each in="${resourceInstance?.licenses}" var="licenseInstance">
                 <img
-                src="${assetPath(src:'/all/license/'+licenseInstance.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
-                title="${licenseInstance.name}" />
-                </g:each>
+                src="${assetPath(src:'/all/license/'+resourceInstance.license.name.value().toLowerCase().replaceAll('\\s+','')+'.png', absolute:true)}"
+                title="${resourceInstance.license.name}" />
             </div>
         </div>
         </g:if>

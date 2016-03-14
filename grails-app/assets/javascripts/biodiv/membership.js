@@ -389,7 +389,7 @@ function rating() {
 function last_actions() {
     console.log('last actions');
     $(".ellipsis.multiline").trunk8({
-        lines:2,
+        lines:4,
         tooltip:false,
         fill: '&hellip; <a class="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
     });
@@ -400,7 +400,7 @@ function last_actions() {
         return false;
     });
 
-    $('.read-less').on('click', function (event) {
+    $(document).on('click', '.read-less', function (event) {
         $(this).parent().trunk8();
 
         return false;

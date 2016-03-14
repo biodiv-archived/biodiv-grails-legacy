@@ -112,8 +112,10 @@ class ObvUtilService {
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	
-	private final static int EXPORT_BATCH_SIZE = 5000;
-
+	private final static int EXPORT_BATCH_SIZE = 10000;
+	private final static int MAX_BATCHES = 1;
+	
+	
 	def requestExport(params){
         log.debug "creating download request"
         DownloadLog dl;
@@ -126,6 +128,8 @@ class ObvUtilService {
             x = 1;
         }
 
+		x = Math.min(x, MAX_BATCHES)
+			
         for( int i=0; i<x; i++) {
             int offset = (i * EXPORT_BATCH_SIZE);
             dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params, offset);
