@@ -9,11 +9,11 @@ import species.utils.ImageUtils
 import species.utils.Utils;
 import grails.util.Environment;
 import grails.plugin.springsecurity.SpringSecurityUtils;
-
 import species.auth.SUser;
 
 import grails.plugin.springsecurity.annotation.Secured;
- import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
+
 @Secured(['ROLE_ADMIN'])
 class BiodivAdminController {
 
@@ -36,6 +36,7 @@ class BiodivAdminController {
     def msg;
     def utilsService;
     def banner;
+    Map bannerMessageMap;
     /**
      * 
      */
@@ -347,11 +348,13 @@ def user = {
      */
     def contentupdate(){
         String content = params.content?.trim()
+        String group = params.groupName?.trim()
+   
         try {
             def bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);
-            bannerMessageFile.withWriter('UTF-8') { writer -> writer.write(content) };
+            bannerMessageFile.append('\n'+group+content);
             utilsService.loadBannerMessageMap();
-            flash.message = "Updated banner message successfully!"
+            flash.message = "Updated banner message content successfully!"
             redirect(action: "/index")
         }
         catch(ex){
@@ -360,6 +363,11 @@ def user = {
             redirect(action: "/index")
         }
         
+    }
+     def getMessage(){     
+       String groupName=params.groupId;
+       def bMessage=utilsService.getBannerMessage(groupName);
+       render (view:"index" , model:[getMessage:bMessage,getGroup:groupName])
     }
 
 }
