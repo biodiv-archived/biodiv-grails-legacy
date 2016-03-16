@@ -491,18 +491,22 @@ $(document).ready(function(){
 
     console.log('document..edit_group_btn');
     $(document).on('click','.edit_group_btn',function(){
-        var obvId = $(this).attr('id');           
+        $(this).parent().hide();
+        $(this).parent().parent().find('.propagateGrpHab').show();
+        $('label.label_group').hide();
+        /*var obvId = $(this).attr('id');           
         $('#group_icon_show_wrap_'+obvId).hide();
         //habitat_icon.hide();
-        label_group.hide();
+        $('label.label_group').hide();
         $('#propagateGrpHab_'+obvId).show();
-
+        */
     }); 
 
     console.log('document.#updateSpeciesGrp');
     $(document).on('submit','#updateSpeciesGrp', function(event) {
 
         console.log('updateSpeciesGrp ajaxSubmit start');
+        var that = $(this);
         $(this).ajaxSubmit({ 
             url: "/observation/updateSpeciesGrp",
             dataType: 'json', 
@@ -515,11 +519,16 @@ $(document).ready(function(){
                   }*/
             },               
             success: function(data, statusText, xhr, form) {
-                $('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
-                $('#group_icon_show_wrap_'+data.instance.id).show();
+                var parentWrap = that.parent();
+                parentWrap.parent().find('.group_icon_show').removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
+                parentWrap.parent().find('.group_icon_show_wrap').show();                
+                parentWrap.parent().find('.prev_group').val(data.model.prev_group);
+                parentWrap.hide();
+                //$('.group_icon_show_'+data.instance.id).removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
+                //$('#group_icon_show_wrap_'+data.instance.id).show();
                 //habitat_icon.show();
-                $('#propagateGrpHab_'+data.instance.id).hide();
-                $('.prev_group_'+data.instance.id).val(data.model.prev_group);
+                //$('#propagateGrpHab_'+data.instance.id).hide();
+                //$('.prev_group_'+data.instance.id).val(data.model.prev_group);
                 updateFeeds();
             },
             error:function (xhr, ajaxOptions, thrownError){
@@ -1179,7 +1188,7 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
                     show_login_dialog();
                 }	    				    			
             },
-            error: function(xhr, status, error) {
+            error: function(xhr, status, error) {      
                 var msg = $.parseJSON(xhr.responseText);
                 $('.message').html(msg);
             }

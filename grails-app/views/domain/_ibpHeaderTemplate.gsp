@@ -78,22 +78,37 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			${flash.error}
 		</div>
 	</g:if>
-    <% String bannerMessage=raw(utilsService.getBannerMessage(cgroup)); %>
-    <g:if test="${bannerMessage!=""}">
-    <div class="alertMsg alert alert-info"
-        style="clear: both; margin: 0px; text-align: center;">
-        ${bannerMessage}
 
-    </div>
-    <g:if test="${params.webaddress!=null}">
-    <div class="alertMsg alert alert-info"
-        style="clear: both; margin: 0px; text-align: center;">
-        ${raw(utilsService.getIbpBannerMessage())}
+	<% 
+	String bannerMessage=raw(utilsService.getBannerMessage(cgroup));
+	String ibpBannerMessage=raw(utilsService.getIbpBannerMessage());
+	 %>
+<g:if test="${bannerMessage!=null && bannerMessage!=""}">
 
-    </div>
-    </g:if>
-    </g:if>
-    <div class="alertMsg ${(flash.message)?'alert':'' }"
+<%--	<div class="alert alert-info"--%>
+<%--		style="clear: both; margin: 0px; text-align: center;">--%>
+<%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
+<%--	</div>--%>
+
+<%--	<div class="alert alert-info"--%>
+<%--		style="clear: both; margin: 0px; text-align: center;">--%>
+<%--		We have deployed a beta version of the <a target="_blank" href="http://indiabiodiversity.org/namelist">name curation interface</a>. Please provide suggestions and feedback.--%>
+<%--This monsoon, <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/show">Frog Watch</a> will be mapping the distribution of the <a target="_blank" href="http://indiabiodiversity.org/species/show/25575">Malabar Tree Toad</a>. Participate by <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/observation/create">uploading</a> observations of this species.--%>
+<%--	</div>--%>
+
+	<div class="alertMsg alert alert-info"
+		style="clear: both; margin: 0px; text-align: center;">
+		${bannerMessage}
+	</div>
+	</g:if>
+	<g:if test="${params.webaddress!=null && ibpBannerMessage!=null}">
+	<div class="alertMsg alert alert-info"
+		style="clear: both; margin: 0px; text-align: center;">
+		${raw(utilsService.getIbpBannerMessage())}
+		 
+	</div>
+	</g:if>
+	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
 		${flash.message}
 	</div>

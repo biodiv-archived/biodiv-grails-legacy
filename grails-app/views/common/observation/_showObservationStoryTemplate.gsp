@@ -29,12 +29,12 @@
                     </g:if>
 
 
-                    <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
+                    <div class="group_icon_show_wrap">
                         <span
-                            class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()} pull-left"
+                            class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left"
                             title="${observationInstance.group?.name}"></span>
                         <g:if test="${showDetails && !showFeatured}">        
-                        <div class="btn btn-small btn-primary edit_group_btn pull-left" id="${observationInstance.id}">Edit
+                        <div class="btn btn-small btn-primary edit_group_btn pull-left">Edit
                         </div>
                         </g:if>    
                     </div>
@@ -48,7 +48,7 @@
                         <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                             method="GET">
                             <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
-                            <input type="hidden" name="prev_group" value="${observationInstance?.group?.id}" />
+                            <input type="hidden" name="prev_group" class="prev_group" value="${observationInstance?.group?.id}" />
                             <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
                             <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
                         </form>

@@ -3426,3 +3426,6 @@ li.group_option span{
 	right: 46% !important;
   	top: 47% !important;
 }
+#recoSummary .users{float:none; }
+#recoSummary .btnagree{float:right;}
+#recoSummary .reco_block{line-height:18px;margin:2px 0px !important;}

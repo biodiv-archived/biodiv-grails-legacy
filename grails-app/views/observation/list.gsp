@@ -121,6 +121,10 @@
       width: 100%;
       overflow:visible;
     }
+
+.users{float:none; }
+.btnagree{float:right;}
+.reco_block{line-height:18px;margin:2px 0px !important;}
      
 </style>
 </head>
