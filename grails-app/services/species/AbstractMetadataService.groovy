@@ -73,7 +73,7 @@ class AbstractMetadataService extends AbstractObjectService {
 
     def update(instance, params, klass = null, update=true) {
         if(klass && params.externalId) {
-            instance = klass.findByExternalId(params.externalId.toLong());
+            instance = klass.findByExternalId(params.externalId);
             if(!instance)
                 instance = klass.newInstance();
             else if(!update) {

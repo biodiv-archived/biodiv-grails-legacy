@@ -105,7 +105,7 @@
                 </g:hasErrors>
 
 
-                <form id="${form_id}" action="${form_action}" method="POST"
+                <form id="${form_id}" action="${form_action}" method="POST"  enctype="multipart/form-data"
                     class="form-horizontal">
                     <input type="hidden" name="id" value="${datasetInstance?.id}"/>
                     <div class="super-section">
@@ -182,41 +182,45 @@ CKEDITOR.replace('description', config);
 
                         <div
                             class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'uFile', 'error')}">
-                            <label class="control-label" for="file"><g:message code="default.resource.label" /> (DwC-A)<span
+                            <label class="control-label" for="file"><g:message code="default.resource.label" /> <span
                                     class="req">*</span></label>
                             <div class="controls" style="">
 
-                                    <%def allowedExtensions="['zip']"%>
-                                    <g:render template='/UFile/docUpload'
-                                    model="['name': 'ufilepath', 'path': datasetInstance?.uFile?.path, 'size':datasetInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'dataset_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
-                                    <% def upload_file_text="${g.message(code:'default.upload.file.label')}"
-                                    %>
-                                    <script type="text/javascript">
+                                <%def allowedExtensions="['csv', 'tsv', 'xlx', 'xlsx','zip']"%>
+                                <g:render template='/UFile/docUpload'
+                                model="['name': 'ufilepath', 'path': datasetInstance?.uFile?.path, 'size':datasetInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'dataset_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                <% def upload_file_text="${g.message(code:'default.upload.file.label')}"
+                                %>
+                                <script type="text/javascript">
 
-                                        $(document).ready(function(){
-                                                $('.qq-upload-button').contents().first()[0].textContent = '${upload_file_text}';
-                                                });
+                                    $(document).ready(function(){
+                                            $('.qq-upload-button').contents().first()[0].textContent = '${upload_file_text}';
+                                            });
 
-</script>
+                                        </script>
 
-                                   <g:message code="loginformtemplate.or" />
-                                       </div>
-                                   </div>
+                                        <g:message code="loginformtemplate.or" />
+                                        <input type="text" id="uFilePath" class="input-block-level" name="path"
+                                        placeholder="${g.message(code:'placeholder.document.enter.url')}"
+                                        value="${datasetInstance?.uFile?.path}" />
+                                        <input type="file" name="multimediaFile" placeholder="Enter media file">
+
+                            </div>
+                        </div>
+
+                        <div
+                            class="row control-group left-indent">
+                            <label class="control-label" for="file">Mapping File</label>
+                            <div class="controls" style="">
+                                <input type="file" name="mappingFile">
+                                <input type="file" name="multimediaMappingFile">
+                            </div>
+                        </div>
 
 
-                                   <div
-                                       class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'datasource', 'error')}"
-                                       style="width: 480px;">
-                                       <label class="control-label" for="uri" style="width: 40px;"><g:message code="default.url.label" /></label>
-                                       <div class="controls">
-                                           <input type="text" id="link-fetch" class="input-block-level" name="path"
-                                           placeholder="${g.message(code:'placeholder.document.enter.url')}"
-                                           value="${datasetInstance?.uFile?.path}" />
-                                       </div>
-                                   </div>
 
-                               </div>
-                           </div>
+                            </div>
+                        </div>
 
                            <div class="" style="margin-top: 20px; margin-bottom: 40px;">
 
@@ -254,6 +258,7 @@ CKEDITOR.replace('description', config);
 
     <asset:script>
     function dataset_upload_callback() {
+        $('#uFilePath').val('');        
     }
 
     $(document).ready(function() {	

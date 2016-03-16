@@ -1092,7 +1092,20 @@ class UtilsService {
 		}
 		return null;
 	}
+/*
+    static Date getUTCDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"));
+        SimpleDateFormat sdf1 = new SimpleDateFormat();
+        sdf1.setTimeZone(TimeZone.getDefault());
 
+        println sdf1.format(date);
+        println sdf.parse(sdf1.format(date))
+        println sdf.format(sdf.parse(sdf1.format(date)));
+
+        return sdf.format(sdf.parse(sdf1.format(date)));
+     }
+*/
     static String getDayOfMonthSuffix(int n) {
         if(n < 1 || n > 31) return "";
         if (n >= 11 && n <= 13) {
