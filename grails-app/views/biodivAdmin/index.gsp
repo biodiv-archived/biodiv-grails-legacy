@@ -44,6 +44,7 @@
 
         <form class="form-horizontal" id="frmgroup" method="post" action="${uGroup.createLink(controller:'biodivAdmin', action:'getMessage')}"> 
          <select name=groupId class=groupId>
+         <option value="ibp">All Group</option>
             <option value=${getGroup}><g:each in="${UserGroup.list()}">
             <g:if test="${it.webaddress==getGroup}">
                 <option value="${it.webaddress}" selected>${it.name}</option>
