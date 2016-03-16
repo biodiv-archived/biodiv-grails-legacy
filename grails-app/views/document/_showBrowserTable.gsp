@@ -40,7 +40,7 @@
 					docNotes = docNotes?.replaceAll("&nbsp;", '')
 				%>
 				<td class="ellipsis multiline" style="max-width:220px;">
-					${docNotes}
+					${raw(docNotes)}
 				</td>
 				<g:if test="${canPullResource}">
 					<td>
