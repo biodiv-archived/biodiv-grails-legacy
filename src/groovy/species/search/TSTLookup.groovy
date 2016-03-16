@@ -80,15 +80,17 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 						//clone not supported 
 						Record record = new Record()
 						PropertyUtils.copyProperties(record, obj);
-						String name = record.originalName.toLowerCase().trim();
-						if(name.equals(key)){
-							record.wt += 20;
-						}else if(name.startsWith(key)) {
-							record.wt += 15;
+						if(record.originalName){
+							String name = record.originalName.toLowerCase().trim();
+							if(name.equals(key)){
+								record.wt += 20;
+							}else if(name.startsWith(key)) {
+								record.wt += 15;
+							}
+							
+							LookupResult r = new LookupResult(ttn.token, record);
+							queue.insertWithOverflow(r);
 						}
-						
-						LookupResult r = new LookupResult(ttn.token, record);
-						queue.insertWithOverflow(r);
 					}
 				}
 			}

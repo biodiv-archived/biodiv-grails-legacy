@@ -2587,9 +2587,9 @@ class ObservationService extends AbstractMetadataService {
 
                 if(recoVote.taxon_concept_id) {
                     map.put("speciesId", recoVote.species_id);
-                    map.put("canonicalForm", recoVote.canonical_form)
-                    if(!recoVote.name.equalsIgnoreCase(recoVote.canonical_form) && recoVote.is_scientific_name) {
-                        map.put("synonymOf", recoVote.canonical_form)
+                    map.put("normalizedForm", recoVote.normalized_form)
+                    if(recoVote.status == NameStatus.SYNONYM && recoVote.is_scientific_name) {
+                        map.put("synonymOf", recoVote.normalized_form)
                     }
                 }
                 map.put("name", recoVote.name);
