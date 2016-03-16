@@ -7,7 +7,7 @@
         <g:if test="${!hideBarChart}">			
         <gvisualization:columnCoreChart elementId="columnCoreChart_${title}" dynamicLoading="${dynamicLoading?:false}"
 				width="${width?:570}" height="${height?:415}"
-				vAxis="${new Expando(title: 'Count', titleColor: 'red')}" hAxis="${new Expando(title: (hAxisTitle?:'Species Group'), titleColor: 'red')}"
+				vAxis="${new Expando(title: g.message(code:'table.count'), titleColor: 'red')}" hAxis="${new Expando(title: (hAxisTitle?:g.message(code:'table.species')), titleColor: 'red')}"
                                 columns="${columns}" data="${data}" legend="bottom"/>
 			<div id="columnCoreChart_${title}" style="float: left;"></div>
 		</g:if>	

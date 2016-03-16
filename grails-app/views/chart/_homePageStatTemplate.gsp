@@ -25,7 +25,7 @@
 <%--			<div>			--%>
 <%--				<gvisualization:columnCoreChart elementId="columnCoreChart_species"--%>
 <%--					width="${300}" height="${405}"--%>
-<%--					vAxis="${new Expando(title: 'Count', titleColor: 'red')}" hAxis="${new Expando(title: (hAxisTitle?:'Species Group'), titleColor: 'red')}"--%>
+<%--					vAxis="${new Expando(title: g.message(code:'table.count'), titleColor: 'red')}" hAxis="${new Expando(title: (hAxisTitle?:g.message(code:'table.species.group')), titleColor: 'red')}"--%>
 <%--					columns="${speciesData.columns}" data="${speciesData.data}"/>--%>
 <%--				<div id="columnCoreChart_species" style="float: left;"></div>--%>
 <%--			</div>--%>

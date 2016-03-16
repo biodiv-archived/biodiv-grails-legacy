@@ -197,7 +197,7 @@
                     break;
                 case 'autofillUsers' : 
                     if(contriEditor == undefined) {
-                        $html.push('<ul class="userOrEmail-list"><input id="userAndEmailList_'+data.fieldid+'" class="autofillUsers" placeholder="Type user name or email id" style="float: left" type="text" /><input name="contributor" type="hidden" /></ul>');
+                        $html.push('<ul class="userOrEmail-list"><input id="userAndEmailList_'+data.fieldid+'" class="autofillUsers" placeholder= "'+window.i8ln.species.abstracteditabletype.type+'" style="float: left" type="text" /><input name="contributor" type="hidden" /></ul>');
                     }
                     break;
             }
