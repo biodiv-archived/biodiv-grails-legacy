@@ -87,7 +87,7 @@
       var diffTime = this.getTimeDistanceInMinutes(absolutTime);
       
       if((diffTime > 60*24) && !this.options.alwaysRelativeTime){
-    	  return absolutTime.toString("MMMM  d, yyyy");
+    	  return new Date((absolutTime.getTime() + this.options.serverTimeDiff)).toString("MMMM  d, yyyy");
       }
       return "" + this.options.lang.prefixes.ago + (this.distanceOfTimeInWords(diffTime)) + this.options.lang.suffix;
     };

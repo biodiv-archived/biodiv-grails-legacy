@@ -8,6 +8,8 @@ class ObservationMarshaller {
     void register() {
        JSON.registerObjectMarshaller( Observation) { Observation obv ->
            println "Observation Marshaller"
+           println obv.fromDate
+           println obv.fromDate.getTime()
             Map result = [
                 id : obv.id,
                 title: obv.fetchFormattedSpeciesCall(),
@@ -50,6 +52,7 @@ class ObservationMarshaller {
                 noOfVideos : obv.noOfVideos,
                 noOfAudio : obv.noOfAudio
             ]
+            println result.fromDate
                 //recommendationVote : obv.recommendationVote,
 println "main obv json"
             if(obv.dataset) {

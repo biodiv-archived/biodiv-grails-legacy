@@ -78,6 +78,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			${flash.error}
 		</div>
 	</g:if>
+
 	<% 
 	String bannerMessage=raw(utilsService.getBannerMessage(cgroup));
 	String ibpBannerMessage=raw(utilsService.getIbpBannerMessage());
