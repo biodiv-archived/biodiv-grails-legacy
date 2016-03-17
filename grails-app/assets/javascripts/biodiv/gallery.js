@@ -310,9 +310,11 @@ $(document).ready (function() {
         }
     });
 
-    $(document).on('click','.slide .slide-content',function(){
+    $(document).on('click','.slide .slide-content',function(event){
         event.preventDefault(0);
         var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.setAttribute("type", "hidden");
         a.target = "_blank";
         if($(this).attr('src')) {
             a.href = $(this).attr('src').replace('_gall.jpg','.jpg');
