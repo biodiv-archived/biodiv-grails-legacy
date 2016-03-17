@@ -224,7 +224,7 @@ function update_imageAttribute(resource,ele,index,defaultThumb){
     output += '<div class="license">';
     output += '<a href="'+resource.license['url']+'" target="_blank">';
     var license = (resource.license['name'] == 'Unspecified')? 'CC BY': resource.license['name'];
-    output += '<img class="icon" style="height:auto;margin-right:2px;" src="../../../assets/all/license/'+license.replace(' ','_').toLowerCase()+'.png" alt="'+license+'">';
+    output += '<img class="icon" style="height:auto;margin-right:2px;" src="'+window.params.imagesPath+'/../license/'+license.replace(' ','_').toLowerCase()+'.png" alt="'+license+'">';
     output += '</a>';
     output += '<div class="rating_form">';
     output += '<form class="ratingForm" method="get" title="Rate it">';
