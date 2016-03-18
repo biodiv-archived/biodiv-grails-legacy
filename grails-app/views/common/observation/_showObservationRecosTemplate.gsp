@@ -5,21 +5,23 @@
 <g:each in="${result}" var="r">
 <li class="reco_block ${r.maxVotedSpeciesName?'max_voted_species_name':''}">
 <div class="">
-    <div class="highlight ellipsis">
-        <g:if test="${r.speciesId}">
+    <g:if test="${r.synonymOf}">
+        def normalizedTitle="(Synonym of <i>${r.synonymOf}</i>)"
+    </g:if>
+    <%  def showName = (r.speciesId)?r.normalizedForm:r.name;%>
+    <div class="highlight ellipsis" title="${showName} ${normalizedTitle} ${r.commonNames}">
+       <g:if test="${r.speciesId}">
         <a href="${uGroup.createLink(action:'show', controller:'species', id:r.speciesId, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-            <i> ${r.normalizedForm} </i>
+            <i> ${showName} </i>
         </a>
         </g:if>
         <g:elseif test="${r.isScientificName}">
-            <i>${r.name}</i>
+            <i>${showName}</i>
         </g:elseif>
         <g:else>
-            ${r.name}
+            ${showName}
         </g:else>
-        <g:if test="${r.synonymOf}">
-            (Synonym of <i>${r.synonymOf}</i>)
-        </g:if>
+        ${normalizedTitle}
         ${r.commonNames}
     </div>
     <div class="users">
