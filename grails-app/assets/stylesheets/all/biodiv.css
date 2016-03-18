@@ -223,9 +223,9 @@ h6 {
 	max-height: 150px;
 	max-width: 150px;
         padding:0px;
-/*	height:150px; 
+	height:150px; 
  	width: 150px; 
-*/	display: -moz-inline-box; /* Firefox 2 */
+	display: -moz-inline-box; /* Firefox 2 */
 	display: inline-block;
 	background-repeat:no-repeat; 
 	background-position:center;
