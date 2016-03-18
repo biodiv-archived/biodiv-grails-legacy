@@ -1165,7 +1165,7 @@ class UtilsService {
             bannerMessageFile.eachLine { line ->
                 def (gname,bmessage) = line.tokenize('-');
                 gname = gname?.trim();
-                bmessage = (bmessage.replaceAll("</?p>", ''))?.trim();
+                bmessage = (bmessage?.replaceAll("</?p>", ''))?.trim();
                 if(gname && bmessage) {
                     bannerMessageMap[gname.replaceAll("<(.|\n)*?>", '')] = bmessage;   
                 }
