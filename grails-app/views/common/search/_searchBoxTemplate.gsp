@@ -156,7 +156,8 @@ $(document).ready(function() {
                 "re":"${g.message(code:'resubmit.form')}",
                 "sub":"${g.message(code:'resubmit.login')}",
                 "un":"${g.message(code:'service.later')}",
-                "er":"${g.message(code:'fix.errors')}"
+                "er":"${g.message(code:'fix.errors')}",
+                "type":"${g.message(code:'placeholder.name.email')}"
                 
             },
             "ajaxLogin" : {
@@ -277,7 +278,15 @@ $(document).ready(function() {
                 "msearch" :"${g.message(code:'default.search')}",
                 "noselect":"${g.message(code:'maps.no.selected')}",
                 "nofeatureselect":"${g.message(code:'maps.no.featured.select')}",
-                "reset":"${g.message(code:'maps.reset')}"
+                "reset":"${g.message(code:'maps.reset')}",
+                "det":"${g.message(code:'maps.details')}",
+                "ln":"${g.message(code:'maps.link')}",
+                "but_1":"${g.message(code:'maps.legend.button1')}",
+                "but_2":"${g.message(code:'maps.legend.button2')}",
+                "but_3":"${g.message(code:'maps.legend.button3')}",
+                "but_4":"${g.message(code:'maps.legend.button4')}",
+                "resAll":"${g.message(code:'maps.resetall')}"
+
             }      
 
 

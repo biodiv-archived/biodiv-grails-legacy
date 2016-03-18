@@ -1346,21 +1346,21 @@ function AugmentedMap(map_div, options) {
       // create zoomBox control object
       var zb = new OpenLayers.Control.ZoomBox({
         eventListeners: zoomListeners,
-        title:"Click and draw a box to zoom into an area"
+        title:window.i8ln.observation.maps.but_2
       });
 
       // create mouseDefaults(navigation icon) object
       var md = new OpenLayers.Control.MouseDefaults({
-        title:'Click on a feature to show information or click and drag to pan'
+        title:window.i8ln.observation.maps.but_1
       });
 
-      var mt_path = new OpenLayers.Control.Measure(OpenLayers.Handler.Path, {title:"Distance measure tool", displayClass: "pathMeasureTool olControlMeasure", persist: true});
+      var mt_path = new OpenLayers.Control.Measure(OpenLayers.Handler.Path, {title:window.i8ln.observation.maps.but_3, displayClass: "pathMeasureTool olControlMeasure", persist: true});
       mt_path.events.on({
                     "measure": handleMeasurements,
                     "measurepartial": handleMeasurements
                 });
 
-      var mt_polygon = new OpenLayers.Control.Measure(OpenLayers.Handler.Polygon, {title: "Area measure tool", displayClass: "areaMeasureTool olControlMeasure", persist: true});
+      var mt_polygon = new OpenLayers.Control.Measure(OpenLayers.Handler.Polygon, {title: window.i8ln.observation.maps.but_4, displayClass: "areaMeasureTool olControlMeasure", persist: true});
       mt_polygon.events.on({
                     "measure": handleMeasurements,
                     "measurepartial": handleMeasurements
@@ -1974,7 +1974,7 @@ function generateHTMLForLayersAsList(layers, hasMap) {
         html = html + '<div class="abstrct"><p>' + layers[i]['abstrct'] + '</p></div>';
         html = html + '<div style="clear:both;">';
         html = html + '<ul class="layer_options">';
-        html = html + '<li class="layer_details_link" onclick="toggleLayerDetails(\'layer_details_' + i + '\',\'' + layers[i].name + '\');">details</li>';
+        html = html + '<li class="layer_details_link" onclick="toggleLayerDetails(\'layer_details_' + i + '\',\'' + layers[i].name + '\');">'+window.i8ln.observation.maps.det+'</li>';
         html = html + '<div id="layer_details_' + i + '" style="display:none;" class="layer_details_box"></div>';
 	
         if (layers[i].name !== undefined && layers_access && layers_access[layers[i].name.replace(getWorkspace()+":", "")]) {
@@ -1983,7 +1983,7 @@ function generateHTMLForLayersAsList(layers, hasMap) {
             html = html + '<div class="layer_download_box" id="' + layer_download_div + '" style="display:none;"></div>';
         }
         var layer_link_div_id = 'layer_link_' + i;
-        html = html + '<li class="layer_link" onclick="toggleLayerLink(\'' + layer_link_div_id + '\',\'' + layers[i].name + '\',\'' + layers[i].title + '\');">link</li>';
+        html = html + '<li class="layer_link" onclick="toggleLayerLink(\'' + layer_link_div_id + '\',\'' + layers[i].name + '\',\'' + layers[i].title + '\');">'+window.i8ln.observation.maps.ln+'</li>';
         html = html + '<div class="layer_link_box" id="' + layer_link_div_id + '" style="display:none;"></div>';
         html = html + '</ul>';
 
@@ -2353,7 +2353,7 @@ function createMapStatusBox(map_div) {
 }
 
 function createResetBox() {
-    var html = '<div id="controls-bar"><ul><li title="Remove all added layers" class="controls_label" onclick="resetMap();">'+window.i8ln.observation.maps.reset+'</li></ul></div>';
+    var html = '<div id="controls-bar"><ul><li title="'+window.i8ln.observation.maps.resAll+'" class="controls_label" onclick="resetMap();">'+window.i8ln.observation.maps.reset+'</li></ul></div>';
     return html;
 }
 

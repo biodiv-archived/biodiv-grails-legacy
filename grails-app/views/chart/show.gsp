@@ -25,7 +25,7 @@
 		
 		<chart:showActivityStats model="['title':g.message(code:'dashboard.activity.monitor.heading'), columns:activityData.columns, data:activityData.data]"/>
 		
-		<chart:showStats model="['title':g.message(code:'heading.user.stats',args:[userData.obvCount]) , columns:userData.columns, data:userData.data, hAxisTitle:'User', htmlData:userData.htmlData, htmlColumns:userData.htmlColumns]"/>
+		<chart:showStats model="['title':g.message(code:'heading.user.stats',args:[userData.obvCount]) , columns:userData.columns, data:userData.data, hAxisTitle:g.message(code:'value.user'), htmlData:userData.htmlData, htmlColumns:userData.htmlColumns]"/>
 		
 		<chart:showStats model="['title':g.message(code:'default.observation.label'), columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns]"/>
 		
