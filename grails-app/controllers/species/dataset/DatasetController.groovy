@@ -50,7 +50,11 @@ class DatasetController extends AbstractObjectController {
 			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
 		} else if(utilsService.ifOwns(datasetInstance.author)) {
-			render(view: "create", model: [datasetInstance: datasetInstance, 'springSecurityService':springSecurityService])
+            String dir = (new File(grailsApplication.config.speciesPortal.content.rootDir + datasetInstance.uFile.path).parentFile).getAbsolutePath().replace(grailsApplication.config.speciesPortal.content.rootDir, '');
+            String multimediaFile = dir + '/multimediaFile.tsv';
+            String mappingFile = dir + '/mappingFile.tsv';
+            String multimediaMappingFile = dir +'/multimediaMappingFile.tsv';
+			render(view: "create", model: [datasetInstance: datasetInstance, multimediaFile:multimediaFile, mappingFile:mappingFile, multimediaMappingFile:multimediaMappingFile, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
 			redirect (url:uGroup.createLink(action:'show', controller:"dataset", id:datasetInstance.id, 'userGroupWebaddress':params.webaddress))

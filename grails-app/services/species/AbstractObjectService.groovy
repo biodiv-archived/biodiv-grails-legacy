@@ -288,9 +288,9 @@ class AbstractObjectService {
                     source.add(params.get('source_'+index));
                     ratings.add(params.get('rating_'+index));
                     //resContext.add(params.get('resContext_'+index));
-                    if( params.speciesId != null ){
+                    //if( params.speciesId != null ){
                         contributor.add(params.get('contributor_'+index));
-                    }
+                    //}
                     annotations.add(params.get('media_annotations_'+index));
                 }
             }
@@ -327,10 +327,10 @@ class AbstractObjectService {
                 new Node(image, "annotations", annotations.getAt(key));
                 //new Node(image, "resContext", resContext.getAt(key));
                 if( params.resourceListType == "ofObv" || params.resourceListType == "usersResource" ){
-                    if(!params.author){
+                    if(!params.author || !contributor.getAt(key)){
                         params.author = springSecurityService.currentUser;
                     }
-                    new Node(image, "contributor", params.author.username); 
+                    new Node(image, "contributor", contributor.getAt(key)?:params.author.username); 
                 }
                 else{
                     new Node(image, "contributor", contributor.getAt(key));

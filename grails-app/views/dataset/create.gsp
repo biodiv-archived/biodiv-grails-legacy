@@ -203,7 +203,8 @@ CKEDITOR.replace('description', config);
                                         <input type="text" id="uFilePath" class="input-block-level" name="path"
                                         placeholder="${g.message(code:'placeholder.document.enter.url')}"
                                         value="${datasetInstance?.uFile?.path}" />
-                                        <input type="file" name="multimediaFile" placeholder="Enter media file">
+                                        <input id="multimediaFile" type="text" name="multimediaFile" value="${multimediaFile}" placeholder="Enter media file">
+                                        <input id="multimediaFileUpload" type="file" name="multimediaFile" placeholder="Enter media file">
 
                             </div>
                         </div>
@@ -212,15 +213,18 @@ CKEDITOR.replace('description', config);
                             class="row control-group left-indent">
                             <label class="control-label" for="file">Mapping File</label>
                             <div class="controls" style="">
-                                <input type="file" name="mappingFile">
-                                <input type="file" name="multimediaMappingFile">
-                            </div>
-                        </div>
-
-
+                                <input id="mappingFile" type="text" name="mappingFile" value="${mappingFile}" placeholder="Enter mapping file">
+                                <input id="mappingFileUpload" type="file" name="mappingFile" placeholder="Enter mapping file">
+                                <input id="multimediaMappingFile" type="text" name="multimediaMappingFile" value="${multimediaMappingFile}" placeholder="Enter multimedia mapping file">
+                                <input id="multimediaMappingFileUpload" type="file" name="multimediaMappingFile" placeholder="Enter multimedia mapping file">
 
                             </div>
                         </div>
+
+
+
+                    </div>
+                </div>
 
                            <div class="" style="margin-top: 20px; margin-bottom: 40px;">
 
@@ -259,7 +263,12 @@ CKEDITOR.replace('description', config);
     <asset:script>
     function dataset_upload_callback() {
         $('#uFilePath').val('');        
+        $('#mappingFile, #multimediaFile, #multimediaMappingFile').val('');
     }
+
+    $('#mappingFileUpload, #multimediaFileUpload, #multimediaMappingFileUpload').change(function(e) {
+        $('#mappingFile, #multimediaFile, #multimediaMappingFile').val('');
+    });
 
     $(document).ready(function() {	
     $("#createDatasetSubmit").click(function(){

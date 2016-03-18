@@ -1124,8 +1124,10 @@ class XMLConverter extends SourceConverter {
                 res.url = absUrl?:sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
+                    println con
                     res.addToContributors(con);
                 }
+                println "-----------------------"
                 for(Contributor con : getAttributions(imageNode, true)) {
                     res.addToAttributors(con);
                 }
@@ -1147,7 +1149,9 @@ class XMLConverter extends SourceConverter {
                 res.license = null;//?.clear()
                 res.contributors?.clear()
                 res.attributors?.clear();
-                for(Contributor con : getContributors(imageNode, true)) {
+                println "-----------------------"
+                for(Contributor  con : getContributors(imageNode, true)) {
+                    println con
                     res.addToContributors(con);
                 }
                 for(Contributor con : getAttributions(imageNode, true)) {

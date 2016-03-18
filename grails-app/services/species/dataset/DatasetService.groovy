@@ -304,6 +304,10 @@ class DatasetService extends AbstractMetadataService {
 
         Date startTime = new Date();
         if(directory) {
+            params['author'] = springSecurityService.currentUser; 
+            params['type'] = DatasetType.OBSERVATIONS;
+            params['datasource'] = Datasource.read(params.long('datasource'));
+ 
             if(metadataFile) {
                 uploadLog << "\nUploading dataset in DwCA format present at : ${zipF.getAbsolutePath()}";
                 uploadLog << "\nDataset upload start time : ${startTime}"
@@ -317,11 +321,10 @@ class DatasetService extends AbstractMetadataService {
                 params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
                 params['language'] = datasetMetadata.dataset.language.text();
                 params['publicationDate'] = utilsService.parseDate(datasetMetadata.dataset.pubDate.text());
+            } else {
+                params['externalUrl'] = params.externalUrl ?: params['datasource'].website;
             }
 
-            params['author'] = springSecurityService.currentUser; 
-            params['type'] = DatasetType.OBSERVATIONS;
-            params['datasource'] = Datasource.read(params.long('datasource'));
             UFile f1 = new UFile()
             f1.size = f.length()
             f1.path = params.uFile.path;//zipF.getAbsolutePath().replaceFirst(contentRootDir, "")
@@ -358,17 +361,31 @@ class DatasetService extends AbstractMetadataService {
                             if(ServletFileUpload.isMultipartContent(request)) {
                                 MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
                                 Utils.populateHttpServletRequestParams(request, rs);
-                            }
-
+                            } 
+ 
                             def multimediaF = params.multimediaFile;
                             def mF = params.mappingFile;
                             def mMF = params.multimediaMappingFile
-                            File multimediaFile = new File(directory.getParentFile(), multimediaF.getName()+'.tsv');
-                            File mappingFile = new File(directory.getParentFile(), mF.getName()+'.tsv');
-                            File multimediaMappingFile = new File(directory.getParentFile(), mMF.getName()+'.tsv');
-                            multimediaF.transferTo(multimediaFile);
-                            mF.transferTo(mappingFile);
-                            mMF.transferTo(multimediaMappingFile);
+                            File multimediaFile, mappingFile, multimediaMappingFile;
+
+                            if(multimediaF instanceof String) {
+                                multimediaFile = new File(config.speciesPortal.content.rootDir, multimediaF );
+                            } else {
+                                multimediaFile = new File(directory, multimediaF.getName()+'.tsv');
+                                multimediaF.transferTo(multimediaFile);
+                            }
+                            if(mF instanceof String) {
+                                mappingFile = new File(config.speciesPortal.content.rootDir, mF );
+                            } else {
+                                mappingFile = new File(directory, mF.getName()+'.tsv');
+                                mF.transferTo(mappingFile);
+                            }
+                            if(mMF instanceof String) {
+                                multimediaMappingFile = new File(config.speciesPortal.content.rootDir, mMF );
+                            } else {
+                                multimediaMappingFile = new File(directory, mMF.getName()+'.tsv');
+                                mMF.transferTo(multimediaMappingFile);
+                            }
 
                             File observationsFile = f;//new File(directory, 'occurence.txt');
                             //File multimediaFile = params.multimediaFile;//new File(directory, 'multimedia.txt');
@@ -411,7 +428,7 @@ class DatasetService extends AbstractMetadataService {
                         log.info "Retrying batch obv with flushSingle"
                         uploadLog << "\n Retrying batch obv with flushSingle"
                     }
-                    obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
+                    //obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
                     obvParams['dataset'] = dataset;
                     uploadLog << "\n\n----------------------------------------------------------------------";
                     uploadLog << "\nUploading observation with params ${obvParams}"

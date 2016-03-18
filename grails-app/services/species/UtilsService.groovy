@@ -81,7 +81,7 @@ class UtilsService {
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
 
-    static final String[] DATE_PATTERNS = ['dd/MM/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
+    static final String[] DATE_PATTERNS = ['dd/MM/yyyy', 'MM/dd/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
 
     private Map bannerMessageMap;
 
@@ -1077,14 +1077,14 @@ class UtilsService {
             if(!sendNew) {
                 Date d;
                 if(date) {
-                    d = DateUtils.parseDate(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date) 
+                    d = DateUtils.parseDateStrictly(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date) 
                     d.set(['hourOfDay':23, 'minute':59, 'second':59]);
                 }else {
                     d = null
                 }
                 return d
             } else {
-			    return date ? DateUtils.parseDate(date, DATE_PATTERNS) : new Date();
+			    return date ? DateUtils.parseDateStrictly(date, DATE_PATTERNS) : new Date();
             }
 		} catch (Exception e) {
             e.printStackTrace();
