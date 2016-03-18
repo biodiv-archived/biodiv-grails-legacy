@@ -233,7 +233,14 @@
                 <div class="prop">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.citeas.label" /></span>
                     <div class="value linktext">
+                        <g:if test="${observationInstance.dataset.externalUrl}">
+                            <a href="${observationInstance.dataset.externalUrl}">
+                        </g:if>
                         ${observationInstance.dataset.datasource.title} (${UtilsService.formatDate(observationInstance.dataset.publicationDate)}) ${observationInstance.dataset.title}
+                        <g:if test="${observationInstance.dataset.externalUrl}">
+                            </a">
+                        </g:if>
+
                     </div>		
                 </div>
                 </g:if>
