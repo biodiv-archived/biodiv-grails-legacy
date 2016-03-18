@@ -41,7 +41,6 @@ class BiodivAdminController {
      * 
      */
     def index = {
-        utilsService.loadBannerMessageMap();
          render(view:"index")
     }
 
