@@ -10,16 +10,16 @@ function langwrap(data,dataLanguage){
     }
 }
 var itemLoadCallback = function(carousel, state) {
-        carousel.last = carousel.last?carousel.last:3;
-        var limit = carousel.last - carousel.first + 1
-        if(limit <=0) limit = carousel.options.scroll
-	var params = {
-		"limit" : limit,
-                "offset" :carousel.first,
-		"filterProperty": carousel.options.filterProperty,
-		"filterPropertyValue": carousel.options.filterPropertyValue,
-		"contextGroupWebaddress":carousel.options.contextGroupWebaddress
-	}
+    carousel.last = carousel.last?carousel.last:3;
+    var limit = carousel.last - carousel.first + 1;
+    if(limit <=0) limit = carousel.options.scroll;
+    var params = {
+        "limit" : limit,
+        "offset" :carousel.first,
+        "filterProperty": carousel.options.filterProperty,
+        "filterPropertyValue": carousel.options.filterPropertyValue,
+        "contextGroupWebaddress":carousel.options.contextGroupWebaddress
+    }
 	if (state == 'prev'){
 		return;
 	}
@@ -137,6 +137,9 @@ var setupCallback = function(carousel) {
 
 var getSnippetHTML = function(carousel, item) {
 	var paramsString = "";
+    if(item.inGroup)
+        item.url = window.params.obvShowPage+'/'+item.id;
+
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
@@ -202,6 +205,11 @@ var getSnippetHTML = function(carousel, item) {
 
 var getSnippetTabletHTML = function(carousel, item) {
 	var paramsString = "";
+    console.log(window.params.obvShowPage)
+    if(item.inGroup)
+        item.url = window.params.obvShowPage+'/'+item.id;
+
+
 	if(carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
