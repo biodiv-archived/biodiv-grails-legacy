@@ -343,31 +343,32 @@ def user = {
         redirect(action: "index")
     }
 
- /**
-     * 
-     */
-    def contentupdate(){
-        String content = params.content?.trim()
-        String group = params.groupName?.trim()
-   
-        try {
-            def bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);
-            bannerMessageFile.append('\n'+group+content);
-            utilsService.loadBannerMessageMap();
-            flash.message = "Updated banner message content successfully!"
-            redirect(action: "/index")
-        }
-        catch(ex){
-            ex.printStackTrace();
-            flash.error = "Error in Updating"
-            redirect(action: "/index")
-        }
-        
+/**
+ * 
+ */
+def contentupdate(){
+    String content = params.content?.trim()
+    String group = params.groupName?.trim()
+
+    try {
+        def bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);
+        bannerMessageFile.append('\n'+group+content);
+        utilsService.loadBannerMessageMap();
+        flash.message = "Updated banner message content successfully!"
+        redirect(action: "index")
     }
-     def getMessage(){     
-       String groupName=params.groupId;
-       def bMessage=utilsService.getBannerMessage(groupName);
-       render (view:"index" , model:[getMessage:bMessage,getGroup:groupName])
+    catch(ex){
+        ex.printStackTrace();
+        flash.error = "Error in Updating"
+        redirect(action: "index")
     }
+
+}
+
+def getMessage(){     
+    String groupName=params.groupId;
+    def bMessage=utilsService.getBannerMessage(groupName);
+    render (view:"index" , model:[getMessage:bMessage,getGroup:groupName])
+}
 
 }

@@ -238,7 +238,7 @@
                         </g:if>
                         ${observationInstance.dataset.datasource.title} (${UtilsService.formatDate(observationInstance.dataset.publicationDate)}) ${observationInstance.dataset.title}
                         <g:if test="${observationInstance.dataset.externalUrl}">
-                            </a">
+                            </a>
                         </g:if>
 
                     </div>		

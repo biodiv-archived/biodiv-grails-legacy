@@ -833,10 +833,14 @@ class ObvUtilService {
 		        recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
             }
             if(!recommendationVoteInstance) {
-			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
+			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
             } else {
                 recommendationVoteInstance.givenSciName = params.recoName;
                 recommendationVoteInstance.givenCommonName = params.commonName;
+                recommendationVoteInstance.author = params.author;
+                recommendationVoteInstance.originalAuthor = params.identifiedBy?:params.originalAuthor;
+                recommendationVoteInstance.confidence = params.confidence;
+                recommendationVoteInstance.votedOn = dateIdentified;
             }
 		}
 		

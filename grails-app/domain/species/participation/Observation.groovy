@@ -237,7 +237,7 @@ class Observation extends DataObject {
 	 */
 	Resource mainImage() {
 		def res = reprImage ? [reprImage] : null;//:listResourcesByRating(1);
-        if(res && !res.fileName[0].equals('i'))  {
+        if(res && res.fileName[0].size() > 1)  {
             return res[0]
         } else {
 			return group?.icon(ImageType.ORIGINAL)
