@@ -84,6 +84,20 @@
             $(".dataset-data ." + species).css("background-color","#66FF66");
             }
             });
+            
+            function deleteDataset(){
+                var test=${message(code: 'default.delete.confirm.message', args:['dataset'], default: 'This dataset will be deleted. Are you sure ?')}';
+                if(confirm(test)){
+                    $.ajax({
+                        url:window.params.dataset.deleteUrl,
+                        method:'POST',
+                        dataType: "json",
+                        data:{'id':$(this).data('id')},
+                        success: function(data) {
+                        }
+                    });
+                }
+            }
             </r:script>
         </body>
     </html>

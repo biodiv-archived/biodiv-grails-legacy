@@ -115,7 +115,7 @@
                                 class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'title', 'error')}">
 
                                 <label for="name" class="control-label"><g:message
-                                    code="dataset.name.label" default="${g.message(code:'dataset.name.label')}" /> </label>
+                                    code="dataset.name.label" default="${g.message(code:'dataset.name.label')}" />*</label>
                                 <div class="controls textbox">
                                     <div class="btn-group" style="z-index: 3;">
                                         <g:textField name="title" value="${datasetInstance?.title}" placeholder="${g.message(code:'button.create.dataset')}" />
@@ -133,7 +133,7 @@
 
                             <div
                                 class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'description', 'error')}">
-                                <label for="description" class="control-label"><g:message code="default.description.label" /></label>
+                                <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
                                 <div class="controls  textbox">
 
                                     <textarea id="description" name="description" placeholder="${g.message(code:'datasource.small.description')}">${datasetInstance?.description?.replaceAll('(?:\r\n|\r|\n)', '<br />')}</textarea>
@@ -159,7 +159,7 @@ CKEDITOR.replace('description', config);
                             class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'datasource', 'error')}">
 
                             <label for="datasource" class="control-label"><g:message
-                                code="datasource.name.label" default="${g.message(code:'datasource.name.label')}" /> </label>
+                                code="datasource.name.label" default="${g.message(code:'datasource.name.label')}" />*</label>
                             <div class="controls textbox">
                                 <div class="btn-group" style="z-index: 3;">
                                     <g:select name="datasource"
@@ -179,6 +179,46 @@ CKEDITOR.replace('description', config);
                                 </div>
                             </div>
                         </div>
+
+                        <div
+                            class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'source', 'error')}">
+
+                            <label for="source" class="control-label"><g:message
+                                code="default.externalId.label" default="${g.message(code:'default.externalId.label')}" /></label>
+                            <div class="controls textbox">
+                                <div class="btn-group" style="z-index: 3;">
+                                    <g:textField name="externalUrl" value="${datasetInstance?.externalUrl}" placeholder="${g.message(code:'button.create.dataset')}" />
+                                    <div class="help-inline">
+                                        <g:hasErrors bean="${datasetInstance}" field="externalUrl">
+                                        <g:eachError bean="${datasetInstance}" field="externalUrl">
+                                        <li><g:message error="${it}" /></li>
+                                        </g:eachError>
+                                        </g:hasErrors>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'attribution', 'error')}">
+
+                            <label for="attribution" class="control-label"><g:message
+                                code="default.attribution.label" default="${g.message(code:'default.attribution.label')}" />*</label>
+                            <div class="controls textbox">
+                                <div class="btn-group" style="z-index: 3;">
+                                    <textarea class="input-block-level" name="attribution" placeholder="${g.message(code:'checklist.details.enter.attribution')}">${datasetInstance?.attribution}</textarea>
+                                    <div class="help-inline">
+                                        <g:hasErrors bean="${datasetInstance}" field="attribution">
+                                        <g:eachError bean="${datasetInstance}" field="attribution">
+                                        <li><g:message error="${it}" /></li>
+                                        </g:eachError>
+                                        </g:hasErrors>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                         <div
                             class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'uFile', 'error')}">

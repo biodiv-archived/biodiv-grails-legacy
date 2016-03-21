@@ -322,7 +322,7 @@ class DatasetService extends AbstractMetadataService {
                 params['language'] = datasetMetadata.dataset.language.text();
                 params['publicationDate'] = utilsService.parseDate(datasetMetadata.dataset.pubDate.text());
             } else {
-                params['externalUrl'] = params.externalUrl ?: params['datasource'].website;
+                params['externalUrl'] = params.externalUrl ?: params['datasource']?.website;
             }
 
             UFile f1 = new UFile()
@@ -918,6 +918,86 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
         return [query:query, allDatasetCountQuery:allDatasetCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
+    }
+
+    def delete(params){
+        String messageCode;
+        String url = utilsService.generateLink(params.controller, 'list', []);
+        String label = Utils.getTitleCase(params.controller?:'Dataset')
+        def messageArgs = [label, params.id]
+        def errors = [];
+        boolean success = false;
+        if(!params.id) {
+            messageCode = 'default.not.found.message'
+        } else {
+            try {
+                def datasetInstance = Dataset.get(params.id.toLong())
+                if (datasetInstance) {
+                    //datasetInstance.removeResourcesFromSpecies()
+                    boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
+                    if(isFeatureDeleted && utilsService.ifOwns(datasetInstance.author)) {
+                        def mailType = activityFeedService.INSTANCE_DELETED
+                        try {
+                            datasetInstance.isDeleted = true;
+
+                            Observation.findAllByDataset(datasetInstance).each {
+                                it.isDeleted = true; 
+                                if(!it.save(flush:true)){
+                                    it.errors.allErrors.each { log.error it } 
+                                }
+                            }
+
+                            if(!datasetInstance.hasErrors() && datasetInstance.save(flush: true)){
+                                utilsService.sendNotificationMail(mailType, datasetInstance, null, params.webaddress);
+                                //observationsSearchService.delete(observationInstance.id);
+                                messageCode = 'default.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'list', [])
+                                ActivityFeed.updateIsDeleted(datasetInstance)
+                                success = true;
+                            } else {
+                                messageCode = 'default.not.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                                datasetInstance.errors.allErrors.each { log.error it }
+                                datasetInstance.errors.allErrors .each {
+                                    def formattedMessage = messageSource.getMessage(it, null);
+                                    errors << [field: it.field, message: formattedMessage]
+                                }
+
+                            }
+                        }
+                        catch (org.springframework.dao.DataIntegrityViolationException e) {
+                            messageCode = 'default.not.deleted.message'
+                            url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                            e.printStackTrace();
+                            log.error e.getMessage();
+                            errors << [message:e.getMessage()];
+                        }
+                    } else {
+                        if(!isFeatureDeleted) {
+                            messageCode = 'default.not.deleted.message'
+                            log.warn "Couldnot delete feature"
+                        }
+                        else {
+                            messageArgs.add(0,'delete');
+                            messageCode = 'default.not.permitted.message'
+                            log.warn "${datasetInstance.author} doesn't own dataset to delete"
+                        }
+                    }
+                } else {
+                    messageCode = 'default.not.found.message'
+                    url = utilsService.generateLink(params.controller, 'list', [])
+                }
+            } catch(e) {
+                e.printStackTrace();
+                url = utilsService.generateLink(params.controller, 'list', [])
+                messageCode = 'default.not.deleted.message'
+                errors << [message:e.getMessage()];
+            }
+        }
+        
+        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
+				
+        return [success:success, url:url, msg:message, errors:errors]
     }
 
 } 

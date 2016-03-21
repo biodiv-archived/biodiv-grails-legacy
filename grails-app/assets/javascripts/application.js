@@ -137,3 +137,4 @@
 ////= require userGroups
 //= require biodiv/userGroups/main.js
 //= require biodiv/pages.js
+//= require biodiv/dataset.js

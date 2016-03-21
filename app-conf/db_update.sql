@@ -611,3 +611,10 @@ update observation set protocol='LIST' where is_checklist = true or (id != sourc
 #16 March
 drop view reco_vote_details;
 create view reco_vote_details as  SELECT rv.id as reco_vote_id, rv.common_name_reco_id, rv.author_id, rv.voted_on, rv.comment, rv.original_author, rv.given_sci_name, rv.given_common_name, r.id as reco_id, r.name, r.is_scientific_name, r.language_id, t.id as taxon_concept_id, t.normalized_form,t.status, t.species_id, o.id as observation_id, o.is_locked, o.max_voted_reco_id FROM recommendation_vote rv inner join recommendation r on rv.recommendation_id=r.id inner join observation o on rv.observation_id=o.id left outer join taxonomy_definition t on t.id = r.taxon_concept_id;
+
+#20thMar2016
+alter table dataset add column attribution text;
+update dataset set attribution='';
+alter table dataset alter column attribution set  not null;
+
+

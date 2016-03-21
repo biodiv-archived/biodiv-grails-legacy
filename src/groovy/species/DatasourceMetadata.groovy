@@ -20,8 +20,9 @@ abstract class DatasourceMetadata {
     //List<Endpoint> endpoints;
 
     static constraints = {
-        title nullable:false
+        title nullable:false;
         contacts nullable:true;
+        description nullable:false;
     }
 
     static mapping = {

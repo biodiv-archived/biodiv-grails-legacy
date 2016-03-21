@@ -79,6 +79,8 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
     String viaCode
 
 	UFile uFile   //covers physical file formats
+    
+    String attribution;
 
     boolean isDeleted = false;   
     // EML specific properties which are not persisted on the dataset table!
@@ -93,7 +95,10 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
     static constraints = {
         importFrom Metadata, include : ['language', 'license', 'externalId', 'externalUrl', 'viaId', 'viaCode'];
   
-        originalAuthor nullable:true;
+        title nullable:false;
+        description nullable:false;
+
+       originalAuthor nullable:true;
 
         alternateIdentifiers nullable:true;
 
@@ -112,6 +117,7 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
         taxonomicCoverages nullable:true;
         uFile nullable:true;
         publicationDate nullable:false;
+        attribution nullable:false;
     }
 	
 	static mapping = {

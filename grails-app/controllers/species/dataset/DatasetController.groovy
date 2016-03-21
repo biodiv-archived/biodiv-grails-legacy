@@ -255,4 +255,19 @@ class DatasetController extends AbstractObjectController {
         datasetService.importGBIFObservations(Dataset.read(params.id), new File(params.dwcArchivePath), uploadLog);
         render ""
     }
+
+    @Secured(['ROLE_USER'])
+	def delete() {
+		def result = datasetService.delete(params)
+        result.remove('url')
+        String url = result.url;
+        withFormat {
+            html {
+                flash.message = result.message
+                redirect (url:url)
+            }
+            json { render result as JSON }
+            xml { render result as XML }
+        }
+	}
 }

@@ -132,9 +132,11 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         },
         'comment':{
             'getAllNewerComments': "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}"
+        },
+        'dataset':{
+            'deleteUrl':"${uGroup.createLink(controller:'dataset', action:'delete')}"
         }
-
-
+ 
         }
 
         window.i8ln = {
