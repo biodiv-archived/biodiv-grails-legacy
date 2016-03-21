@@ -22,7 +22,7 @@ class Datasource extends DatasourceMetadata implements Taggable, Rateable {
     def grailsApplication;
 
     static constraints = {
-        importFrom DatasourceMetadata
+        importFrom DatasourceMetadata, include : ['title', 'description']
 		icon nullable:false
     }
 

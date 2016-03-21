@@ -236,7 +236,7 @@
                         <g:if test="${observationInstance.dataset.externalUrl}">
                             <a href="${observationInstance.dataset.externalUrl}">
                         </g:if>
-                        ${observationInstance.dataset.name}
+                        ${observationInstance.dataset.title}
                         <g:if test="${observationInstance.dataset.externalUrl}">
                             </a>
                         </g:if>

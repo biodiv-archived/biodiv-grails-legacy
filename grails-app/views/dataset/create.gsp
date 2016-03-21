@@ -187,7 +187,7 @@ CKEDITOR.replace('description', config);
                                 code="default.externalId.label" default="${g.message(code:'default.externalId.label')}" /></label>
                             <div class="controls textbox">
                                 <div class="btn-group" style="z-index: 3;">
-                                    <g:textField name="externalUrl" value="${datasetInstance?.externalUrl}" placeholder="${g.message(code:'button.create.dataset')}" />
+                                    <g:textField name="externalUrl" value="${datasetInstance?.externalUrl}" placeholder="Add external url for the datasource" />
                                     <div class="help-inline">
                                         <g:hasErrors bean="${datasetInstance}" field="externalUrl">
                                         <g:eachError bean="${datasetInstance}" field="externalUrl">
@@ -244,7 +244,7 @@ CKEDITOR.replace('description', config);
                                         placeholder="${g.message(code:'placeholder.document.enter.url')}"
                                         value="${datasetInstance?.uFile?.path}" />
                                         <input id="multimediaFile" type="text" name="multimediaFile" value="${multimediaFile}" placeholder="Enter media file">
-                                        <input id="multimediaFileUpload" type="file" name="multimediaFile" placeholder="Enter media file">
+                                        <input id="multimediaFileUpload" type="file" name="multimediaFileUpload" placeholder="Enter media file">
 
                             </div>
                         </div>
@@ -254,9 +254,9 @@ CKEDITOR.replace('description', config);
                             <label class="control-label" for="file">Mapping File</label>
                             <div class="controls" style="">
                                 <input id="mappingFile" type="text" name="mappingFile" value="${mappingFile}" placeholder="Enter mapping file">
-                                <input id="mappingFileUpload" type="file" name="mappingFile" placeholder="Enter mapping file">
+                                <input id="mappingFileUpload" type="file" name="mappingFileUpload" placeholder="Enter mapping file">
                                 <input id="multimediaMappingFile" type="text" name="multimediaMappingFile" value="${multimediaMappingFile}" placeholder="Enter multimedia mapping file">
-                                <input id="multimediaMappingFileUpload" type="file" name="multimediaMappingFile" placeholder="Enter multimedia mapping file">
+                                <input id="multimediaMappingFileUpload" type="file" name="multimediaMappingFileUpload" placeholder="Enter multimedia mapping file">
 
                             </div>
                         </div>

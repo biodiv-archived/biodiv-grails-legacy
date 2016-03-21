@@ -47,7 +47,7 @@ class DatasetController extends AbstractObjectController {
 		def datasetInstance = Dataset.findWhere(id:params.id?.toLong(), isDeleted:false)
 		if (!datasetInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
 		} else if(utilsService.ifOwns(datasetInstance.author)) {
             String dir = (new File(grailsApplication.config.speciesPortal.content.rootDir + datasetInstance.uFile.path).parentFile).getAbsolutePath().replace(grailsApplication.config.speciesPortal.content.rootDir, '');
@@ -57,7 +57,7 @@ class DatasetController extends AbstractObjectController {
 			render(view: "create", model: [datasetInstance: datasetInstance, multimediaFile:multimediaFile, mappingFile:mappingFile, multimediaMappingFile:multimediaMappingFile, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
-			redirect (url:uGroup.createLink(action:'show', controller:"dataset", id:datasetInstance.id, 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'show', controller:"datasource", id:datasetInstance.datasource.id, 'userGroupWebaddress':params.webaddress))
 		}
 	}
 
@@ -73,7 +73,7 @@ class DatasetController extends AbstractObjectController {
             withFormat {
                 html {
                     flash.message = msg;
-			        redirect (url:uGroup.createLink(action:'list', controller:"dataset"))
+			        redirect (url:uGroup.createLink(action:'list', controller:"datasource"))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -127,7 +127,7 @@ class DatasetController extends AbstractObjectController {
                 withFormat {
                     html {
 				        flash.message = model.msg;
-				        redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+				        redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
                     }
                     json { render model as JSON }
                     xml { render model as XML }
@@ -154,7 +154,7 @@ class DatasetController extends AbstractObjectController {
             def model = utilsService.getErrorModel(msg, null, OK.value());
             withFormat {
                 html {
-			        redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+			        redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -165,7 +165,7 @@ class DatasetController extends AbstractObjectController {
 	def observationData = {
         if(!params.id) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
-            redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+            redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
         }
 
         Dataset datasetInstance = Dataset.read(params.id.toLong());

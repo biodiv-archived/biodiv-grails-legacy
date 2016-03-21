@@ -469,7 +469,7 @@ def grailsCacheManager;
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
-		} else if(utilsService.ifOwns(observationInstance.author)) {
+		} else if(utilsService.ifOwns(observationInstance.author) && !observationInstance.dataset) {
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"

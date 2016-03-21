@@ -134,8 +134,14 @@ class ObservationService extends AbstractMetadataService {
 
         //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
+        println "************************************"
+        println "************************************"
+        println "************************************"
+        println "************************************"
+        println observation.version
 		if(updateResources){
             updateResource(observation, params);
+            println observation.version
     	}
         return observation;
     }

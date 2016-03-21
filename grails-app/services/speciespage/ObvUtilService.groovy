@@ -104,6 +104,7 @@ class ObvUtilService {
 	def observationsSearchService
 	def commentService
     def messageSource;
+    def sessionFactory;
 
     SpeciesGroup defaultSpeciesGroup;
     Habitat defaultHabitat;
@@ -750,6 +751,11 @@ class ObvUtilService {
 			observationInstance =  observationService.create(params);
             observationInstance.protocol = ProtocolType.BULK_UPLOAD;
             observationInstance.clearErrors();
+            //following line was needed as : image saving in XMLConverter was calling observation before and afterUpdate.... so obv is gng out of sync
+            println "+++++++++++++++++++++++++++++++++++++"
+            println "+++++++++++++++++++++++++++++++++++++"
+            println "+++++++++++++++++++++++++++++++++++++"
+            println "+++++++++++++++++++++++++++++++++++++"
 
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				log.debug "Successfully created observation : "+observationInstance

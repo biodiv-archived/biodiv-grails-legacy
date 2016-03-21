@@ -67,7 +67,7 @@
                     <div class="mainContentList">
                         <div class="mainContent">
                             <ul class="list_view obvListwrapper" style="list-style:none;margin-left:0px;">
-                                <g:each in="${Dataset.findAllByDatasource(datasourceInstance, [sort:'createdOn', order:'desc'])}" var="datasetInstance">
+                                <g:each in="${Dataset.findAllByDatasourceAndIsDeleted(datasourceInstance, false, [sort:'createdOn', order:'desc'])}" var="datasetInstance">
                                 <li id="dataset_${datasetInstance.id}" style="margin-top:10px;">
                                 <g:render template="/dataset/showDatasetSnippetTemplate" model="['datasetInstance':datasetInstance, showDetails:true,'userLanguage':userLanguage]"/>
                                 </li>

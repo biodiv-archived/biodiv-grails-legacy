@@ -94,11 +94,10 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
 
     static constraints = {
         importFrom Metadata, include : ['language', 'license', 'externalId', 'externalUrl', 'viaId', 'viaCode'];
-  
-        title nullable:false;
-        description nullable:false;
-
-       originalAuthor nullable:true;
+        importFrom DatasourceMetadata, include : ['title', 'description']
+ 
+        datasource nullable:false;
+        originalAuthor nullable:true;
 
         alternateIdentifiers nullable:true;
 
@@ -117,7 +116,7 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
         taxonomicCoverages nullable:true;
         uFile nullable:true;
         publicationDate nullable:false;
-        attribution nullable:false;
+        attribution nullable:false, blank:false;
     }
 	
 	static mapping = {

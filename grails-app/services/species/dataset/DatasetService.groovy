@@ -345,9 +345,7 @@ class DatasetService extends AbstractMetadataService {
             }
 
 
-            Dataset.withTransaction {
-                resultModel = save(dataset, params, true, null, feedType, null);
-            } 
+            resultModel = save(dataset, params, true, null, feedType, null);
 
             if(resultModel.success) {
                     if(params.datasource.title.contains('Global Biodiversity Information Facility')) {
@@ -363,27 +361,29 @@ class DatasetService extends AbstractMetadataService {
                                 Utils.populateHttpServletRequestParams(request, rs);
                             } 
  
-                            def multimediaF = params.multimediaFile;
-                            def mF = params.mappingFile;
-                            def mMF = params.multimediaMappingFile
+                            def multimediaF = params.multimediaFile?:params.multimediaFileUpload;
+                            def mF = params.mappingFile?:params.mappingFileUpload;
+                            def mMF = params.multimediaMappingFile?:params.multimediaMappingFileUpload;
                             File multimediaFile, mappingFile, multimediaMappingFile;
-
+                            
                             if(multimediaF instanceof String) {
                                 multimediaFile = new File(config.speciesPortal.content.rootDir, multimediaF );
                             } else {
-                                multimediaFile = new File(directory, multimediaF.getName()+'.tsv');
+                                multimediaFile = new File(directory, 'multimediaFile.tsv');
                                 multimediaF.transferTo(multimediaFile);
                             }
+                            
                             if(mF instanceof String) {
                                 mappingFile = new File(config.speciesPortal.content.rootDir, mF );
                             } else {
-                                mappingFile = new File(directory, mF.getName()+'.tsv');
+                                mappingFile = new File(directory, 'mappingFile.tsv');
                                 mF.transferTo(mappingFile);
                             }
+
                             if(mMF instanceof String) {
                                 multimediaMappingFile = new File(config.speciesPortal.content.rootDir, mMF );
                             } else {
-                                multimediaMappingFile = new File(directory, mMF.getName()+'.tsv');
+                                multimediaMappingFile = new File(directory, 'multimediaMappingFile.tsv');
                                 mMF.transferTo(multimediaMappingFile);
                             }
 

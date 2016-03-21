@@ -1168,7 +1168,9 @@ class XMLConverter extends SourceConverter {
 
                 //res.merge();
                 //res.refresh();
-                if(!res.save(flush:true)){
+
+                //removing flush:true as in bulk upload this flush is causing observation version to change. We shd flush when parent object is saved
+                if(!res.save(/*flush:true*/)){
                     res.errors.allErrors.each { log.error it }
                 }
                 res.refresh();
