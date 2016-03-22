@@ -58,7 +58,7 @@ class NewsletterController {
 		if(permitted) {
             def newsletterInstance = new Newsletter()
 			newsletterInstance.properties = params
-            return [newsletterInstance: newsletterInstance]
+            return [newsletterInstance: newsletterInstance,userLanguage:utilsService.getCurrentLanguage(request)]
 		}
 		
 	}
@@ -157,14 +157,14 @@ class NewsletterController {
 		else {
 			if(newsletterInstance.userGroup) {
 				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser)) {
-					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
+					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance,userLanguage:utilsService.getCurrentLanguage(request)]
 				} else {
 					flash.message = "${message(code: 'edit.denied.message')}"
 					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':newsletterInstance.userGroup, params:['newsletterId':newsletterInstance.id])
 				}
 			}
 			else if(utilsService.isAdmin(springSecurityService.currentUser)) {
-				[newsletterInstance: newsletterInstance]
+				[newsletterInstance: newsletterInstance,userLanguage:utilsService.getCurrentLanguage(request)]
 			} else {
 				flash.message = "${message(code: 'edit.denied.message')}"
 				redirect(controller:"userGroup", action: "page", params:['newsletterId':newsletterInstance.id])

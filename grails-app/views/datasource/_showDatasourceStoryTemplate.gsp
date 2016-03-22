@@ -13,7 +13,7 @@
         <g:link url="${datasourceInstance.website}">
         <div style="position:relative;margin:auto;">
             <g:if test="${imagePath}">
-            <img class="img-polaroid" style="opacity:0.7" src="${imagePath}"/>
+            <img class="img-polaroid" style="opacity:0.7;height:auto;width:auto;" src="${imagePath}"/>
             </g:if>
             <g:else>
             </g:else>

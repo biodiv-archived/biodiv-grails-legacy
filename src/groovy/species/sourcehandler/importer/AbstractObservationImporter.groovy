@@ -23,8 +23,8 @@ abstract class AbstractObservationImporter {
     protected Map dwcMultimediaMapping;
 
 
-    List next(Map mediaInfo, int limit) {
-        return importObservations(mediaInfo, limit);
+    List next(Map mediaInfo, int limit, File uploadLog=null) {
+        return importObservations(mediaInfo, limit, uploadLog);
     }
 
     void initReaders(File observationsFile, File multimediaFile) {
@@ -237,7 +237,7 @@ abstract class AbstractObservationImporter {
         return m;
     }
 
-    private List importObservations(Map mediaInfo, int limit) {
+    private List importObservations(Map mediaInfo, int limit, File uploadLog=null) {
         log.debug "Reading observations"
         List obvParams = [];
         int no=1;
@@ -245,6 +245,8 @@ abstract class AbstractObservationImporter {
         String[] row = observationReader.readNext()
         while(row) {
             println "from row ${row}"
+            if(uploadLog) "\nReading observation from row ${row}"
+            try {
             def p = importObservation(row);
             Map m = [:];
             if(mediaInfo[p['externalId']]) {
@@ -276,6 +278,11 @@ abstract class AbstractObservationImporter {
             }
             p['mediaInfo'] = m;
             obvParams << p;
+            } catch(Exception e) {
+                e.printStackTrace();
+                if(uploadLog) uploadLog << e.printStackTrace();
+                if(uploadLog) uploadLog << "\n${e.getMessage()}"
+            }
             if(no++ >= limit) break;
             row = observationReader.readNext()
             log.debug "from params ${obvParams}"
@@ -286,6 +293,7 @@ abstract class AbstractObservationImporter {
     private Map importObservation(String[] row) {
         Map m = new LinkedHashMap();
         observationHeader.eachWithIndex { headers, i ->
+            
             headers.each { header ->
                 println header
 

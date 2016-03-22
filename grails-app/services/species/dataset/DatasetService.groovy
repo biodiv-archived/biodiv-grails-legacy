@@ -322,7 +322,7 @@ class DatasetService extends AbstractMetadataService {
                 params['language'] = datasetMetadata.dataset.language.text();
                 params['publicationDate'] = utilsService.parseDate(datasetMetadata.dataset.pubDate.text());
             } else {
-                params['externalUrl'] = params.externalUrl ?: params['datasource'].website;
+                params['externalUrl'] = params.externalUrl ?: params['datasource']?.website;
             }
 
             UFile f1 = new UFile()
@@ -345,9 +345,7 @@ class DatasetService extends AbstractMetadataService {
             }
 
 
-            Dataset.withTransaction {
-                resultModel = save(dataset, params, true, null, feedType, null);
-            } 
+            resultModel = save(dataset, params, true, null, feedType, null);
 
             if(resultModel.success) {
                     if(params.datasource.title.contains('Global Biodiversity Information Facility')) {
@@ -363,27 +361,29 @@ class DatasetService extends AbstractMetadataService {
                                 Utils.populateHttpServletRequestParams(request, rs);
                             } 
  
-                            def multimediaF = params.multimediaFile;
-                            def mF = params.mappingFile;
-                            def mMF = params.multimediaMappingFile
+                            def multimediaF = params.multimediaFile?:params.multimediaFileUpload;
+                            def mF = params.mappingFile?:params.mappingFileUpload;
+                            def mMF = params.multimediaMappingFile?:params.multimediaMappingFileUpload;
                             File multimediaFile, mappingFile, multimediaMappingFile;
-
+                            
                             if(multimediaF instanceof String) {
                                 multimediaFile = new File(config.speciesPortal.content.rootDir, multimediaF );
                             } else {
-                                multimediaFile = new File(directory, multimediaF.getName()+'.tsv');
+                                multimediaFile = new File(directory, 'multimediaFile.tsv');
                                 multimediaF.transferTo(multimediaFile);
                             }
+                            
                             if(mF instanceof String) {
                                 mappingFile = new File(config.speciesPortal.content.rootDir, mF );
                             } else {
-                                mappingFile = new File(directory, mF.getName()+'.tsv');
+                                mappingFile = new File(directory, 'mappingFile.tsv');
                                 mF.transferTo(mappingFile);
                             }
+
                             if(mMF instanceof String) {
                                 multimediaMappingFile = new File(config.speciesPortal.content.rootDir, mMF );
                             } else {
-                                multimediaMappingFile = new File(directory, mMF.getName()+'.tsv');
+                                multimediaMappingFile = new File(directory, 'multimediaMappingFile.tsv');
                                 mMF.transferTo(multimediaMappingFile);
                             }
 
@@ -415,10 +415,11 @@ class DatasetService extends AbstractMetadataService {
     }
 
     private void importObservations(Dataset dataset, File directory, AbstractObservationImporter importer, Map mediaInfo, File uploadLog) {
-        List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE)
+        List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
         int noOfUploadedObv=0, noOfFailedObv=0;
         boolean flushSingle = false;
         Date startTime = new Date();
+        int i=0;
         while(obvParamsList) {
             List resultObv = [];
             int tmpNoOfUploadedObv = 0, tmpNoOfFailedObv= 0;
@@ -459,7 +460,7 @@ class DatasetService extends AbstractMetadataService {
                 noOfUploadedObv += tmpNoOfUploadedObv;
                 noOfFailedObv += tmpNoOfFailedObv;
                 log.debug "Saved observations : noOfUploadedObv : ${noOfUploadedObv} noOfFailedObv : ${noOfFailedObv}";
-                obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE)
+                obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
                 flushSingle = false;
             } catch (Exception e) {
                 log.error "error in creating observation."
@@ -918,6 +919,86 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
         return [query:query, allDatasetCountQuery:allDatasetCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
+    }
+
+    def delete(params){
+        String messageCode;
+        String url = utilsService.generateLink(params.controller, 'list', []);
+        String label = Utils.getTitleCase(params.controller?:'Dataset')
+        def messageArgs = [label, params.id]
+        def errors = [];
+        boolean success = false;
+        if(!params.id) {
+            messageCode = 'default.not.found.message'
+        } else {
+            try {
+                def datasetInstance = Dataset.get(params.id.toLong())
+                if (datasetInstance) {
+                    //datasetInstance.removeResourcesFromSpecies()
+                    boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
+                    if(isFeatureDeleted && utilsService.ifOwns(datasetInstance.author)) {
+                        def mailType = activityFeedService.INSTANCE_DELETED
+                        try {
+                            datasetInstance.isDeleted = true;
+
+                            Observation.findAllByDataset(datasetInstance).each {
+                                it.isDeleted = true; 
+                                if(!it.save(flush:true)){
+                                    it.errors.allErrors.each { log.error it } 
+                                }
+                            }
+
+                            if(!datasetInstance.hasErrors() && datasetInstance.save(flush: true)){
+                                utilsService.sendNotificationMail(mailType, datasetInstance, null, params.webaddress);
+                                //observationsSearchService.delete(observationInstance.id);
+                                messageCode = 'default.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'list', [])
+                                ActivityFeed.updateIsDeleted(datasetInstance)
+                                success = true;
+                            } else {
+                                messageCode = 'default.not.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                                datasetInstance.errors.allErrors.each { log.error it }
+                                datasetInstance.errors.allErrors .each {
+                                    def formattedMessage = messageSource.getMessage(it, null);
+                                    errors << [field: it.field, message: formattedMessage]
+                                }
+
+                            }
+                        }
+                        catch (org.springframework.dao.DataIntegrityViolationException e) {
+                            messageCode = 'default.not.deleted.message'
+                            url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                            e.printStackTrace();
+                            log.error e.getMessage();
+                            errors << [message:e.getMessage()];
+                        }
+                    } else {
+                        if(!isFeatureDeleted) {
+                            messageCode = 'default.not.deleted.message'
+                            log.warn "Couldnot delete feature"
+                        }
+                        else {
+                            messageArgs.add(0,'delete');
+                            messageCode = 'default.not.permitted.message'
+                            log.warn "${datasetInstance.author} doesn't own dataset to delete"
+                        }
+                    }
+                } else {
+                    messageCode = 'default.not.found.message'
+                    url = utilsService.generateLink(params.controller, 'list', [])
+                }
+            } catch(e) {
+                e.printStackTrace();
+                url = utilsService.generateLink(params.controller, 'list', [])
+                messageCode = 'default.not.deleted.message'
+                errors << [message:e.getMessage()];
+            }
+        }
+        
+        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
+				
+        return [success:success, url:url, msg:message, errors:errors]
     }
 
 } 
