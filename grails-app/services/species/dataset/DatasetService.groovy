@@ -415,10 +415,11 @@ class DatasetService extends AbstractMetadataService {
     }
 
     private void importObservations(Dataset dataset, File directory, AbstractObservationImporter importer, Map mediaInfo, File uploadLog) {
-        List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE)
+        List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
         int noOfUploadedObv=0, noOfFailedObv=0;
         boolean flushSingle = false;
         Date startTime = new Date();
+        int i=0;
         while(obvParamsList) {
             List resultObv = [];
             int tmpNoOfUploadedObv = 0, tmpNoOfFailedObv= 0;
@@ -459,7 +460,7 @@ class DatasetService extends AbstractMetadataService {
                 noOfUploadedObv += tmpNoOfUploadedObv;
                 noOfFailedObv += tmpNoOfFailedObv;
                 log.debug "Saved observations : noOfUploadedObv : ${noOfUploadedObv} noOfFailedObv : ${noOfFailedObv}";
-                obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE)
+                obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
                 flushSingle = false;
             } catch (Exception e) {
                 log.error "error in creating observation."

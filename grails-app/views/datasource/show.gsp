@@ -86,10 +86,5 @@
 
             </div>	
         </div>
-        <r:script>
-            $(document).ready(function(){
-            });
-        </r:script>
-
     </body>
 </html>

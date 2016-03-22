@@ -136,7 +136,7 @@
                                 <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
                                 <div class="controls  textbox">
 
-                                    <textarea id="description" name="description" placeholder="${g.message(code:'datasource.small.description')}">${datasetInstance?.description?.replaceAll('(?:\r\n|\r|\n)', '<br />')}</textarea>
+                                    <textarea id="description" name="description" placeholder="${g.message(code:'dataset.small.description')}">${datasetInstance?.description?.replaceAll('(?:\r\n|\r|\n)', '<br />')}</textarea>
 
                                     <script type='text/javascript'>
                                         CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
