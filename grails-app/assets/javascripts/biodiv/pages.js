@@ -29,3 +29,32 @@ function changeDisplayOrder(url, instanceId, typeOfChange, type, parentInsId){
     });
 }
 
+$(document).ready(function(){
+
+    $('.newsl_parent').click(function(){ 
+        if($(this).is(':checked')){ 
+            $('.newsl_subp_selection').hide(); 
+            $('.newsl_subparent').attr('disabled',true); 
+            $('.inp_parentId').val(0);
+        }else{            
+            $('.newsl_subparent').attr('disabled',false);
+        } 
+    });
+
+
+    $('.newsl_subparent').click(function(){
+        if($(this).is(':checked')){ 
+            $('.newsl_subp_selection').show(); 
+            $('.newsl_parent').attr('disabled',true);
+            $('.inp_parentId').val($('.newsl_subp_selection').val()); 
+        }else{
+            $('.inp_parentId').val(0);      
+            $('.newsl_subp_selection').hide(); 
+            $('.newsl_parent').attr('disabled',false);
+        } 
+    });
+
+    $('.newsl_subp_selection').change(function(){
+        $('.inp_parentId').val($(this).val()); 
+    });
+});
