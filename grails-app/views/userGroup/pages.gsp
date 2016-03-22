@@ -31,7 +31,6 @@
 </style>
 </head>
 <body>
-
 	<div class="observation span12">
 		<!-- uGroup:showSubmenuTemplate model="['entityName':'Pages']" /-->
 		<uGroup:rightSidebar model="['userGroupInstance':userGroupInstance]" />
@@ -61,11 +60,30 @@
             					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
                                                 <li><h5><g:message code="default.pages.label" /></h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
-                                                <li id="newsletter_${newsletterInstance.id}"><a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}"><p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                                    ${fieldValue(bean: newsletterInstance, field: "title")}</p>
-                                                            <sUser:permToReorderPages model="['userGroupInstance':userGroupInstance]"><i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}","${newsletterInstance.id}", "down", "newsletter")'></i><i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}", "${newsletterInstance.id}", "up", "newsletter")'></i>
-                                                            </sUser:permToReorderPages>
-                                                        </a></li>
+	                        <g:if test="${newsletterInstance.parentId ==0}">                        
+		                        <li id="newsletter_${newsletterInstance.id}">
+		                            <a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
+		                            	<p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:13px;margin-bottom:2px;">
+		                                	${fieldValue(bean: newsletterInstance, field: "title")}
+		                                </p>
+		                            	<sUser:permToReorderPages model="['userGroupInstance':userGroupInstance]"><i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}","${newsletterInstance.id}", "down", "newsletter")'></i><i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}", "${newsletterInstance.id}", "up", "newsletter")'></i>
+		                                </sUser:permToReorderPages>
+		                            </a>
+		                                <ul>
+		                                <g:each in="${newsletters}" var="subnewsl" status="j">
+                   	                       <g:if test="${subnewsl.parentId ==newsletterInstance.id}">                        
+			                                	<li id="newsletter_${subnewsl.id}">
+			                                		<a data-toggle="tab" class="pageTab" href="#${subnewsl.id}">
+					                            	<p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+					                                	${fieldValue(bean: subnewsl, field: "title")}
+					                                </p>
+					                                </a>
+			                                	</li>
+			                                </g:if>
+		                                </g:each>
+		                                </ul>		                                
+		                        </li>
+	                        </g:if>
 						</g:each>
                         <g:if test="${userGroupInstance && userGroupInstance.name.equals('The Western Ghats')}">
 							<li><a href="/project/list"><g:message code="link.cepf.projects" />  
@@ -99,10 +117,10 @@
   				var contentID = me.attr('href');//e.target.hash; //get anchor
   				if(contentID && contentID != '/project/list') {
 	  				e.preventDefault();
-	  				var History = window.History; 
+	  				var History = window.History;
 		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
 				    	History.pushState({state:1}, document.title, pageURL+'/'+contentID.replace('#',''));
-		            	me.tab('show');
+		            	me.tab('show');		            	
 		           	});
 	           	} 
 			});

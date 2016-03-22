@@ -3241,8 +3241,10 @@ small {
 }
 .image_info a{
     color:white;
-    float: left;
 }
+.license a{
+    float: left;
+ }
 .conts_wrap{
   margin-left: 5px !important;   
   margin: 0px;
