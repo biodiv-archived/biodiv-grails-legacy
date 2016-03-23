@@ -46,7 +46,7 @@
             <button class="btn btn-primary btn-small nameRemove ${r.isLocked?' disabled ': ''}"  onclick="removeRecoVote(${r.obvId}, ${r.recoId}, '${uGroup.createLink(controller:'observation', action:'removeRecommendationVote')}', this); return true;"><g:message code="button.remove" /></button>
             </g:else>
         </g:if>
-        <sUser:hasObvLockPerm model="['obvId': r.obvId]">
+        <sUser:hasObvLockPerm model="['obvId': r.obvId, 'recoId':r.recoId]">
         <%
             def lockButton
             if(r.showLock){
