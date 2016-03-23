@@ -477,7 +477,7 @@ class Observation extends DataObject {
 			return
 		}
 		
-        if(sourceId) {
+        if(sourceId && !dataset_id) {
             Checklists cl = Checklists.read(sourceId)
             if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
                 m[cl.sciNameColumn] = recoVote.recommendation.name
