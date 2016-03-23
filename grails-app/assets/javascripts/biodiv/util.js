@@ -56,7 +56,7 @@ function initRelativeTime(url){
 	 		url: url,
 			dataType: "json",
 			success: function(data) {
-				serverTimeDiff = parseInt(data) - new Date().getTime() + 5000; //5 seconds added to compensate webservice delay
+				serverTimeDiff = (parseInt(data) + new Date().getTimezoneOffset())*1000*60
 				$('body').timeago({serverTimeDiff:serverTimeDiff, alwaysRelativeTime:alwaysRelativeTime});
 			}, error: function(xhr, status, error) {
 				//alert(xhr.responseText);

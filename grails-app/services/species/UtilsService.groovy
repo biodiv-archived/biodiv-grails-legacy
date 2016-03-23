@@ -1173,7 +1173,7 @@ class UtilsService {
                 gname = gname?.trim();
                 bmessage = (bmessage?.replaceAll("</?p>", ''))?.trim();
                 if(gname && bmessage) {
-                    bannerMessageMap[gname.replaceAll("<(.|\n)*?>", '')] = bmessage;   
+                    bannerMessageMap[gname?.replaceAll("<(.|\n)*?>", '')] = bmessage;   
                 }
             }
         }
