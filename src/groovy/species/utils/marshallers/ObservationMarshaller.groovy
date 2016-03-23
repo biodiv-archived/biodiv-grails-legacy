@@ -50,6 +50,7 @@ class ObservationMarshaller {
                 noOfVideos : obv.noOfVideos,
                 noOfAudio : obv.noOfAudio
             ]
+            println result.fromDate
                 //recommendationVote : obv.recommendationVote,
 println "main obv json"
             if(obv.dataset) {

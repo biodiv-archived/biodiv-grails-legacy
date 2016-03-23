@@ -19,9 +19,9 @@
             href="${uGroup.createLink(controller:'dataset', action:'edit', id:datasetInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
             <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
-        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-            href="${uGroup.createLink(controller:'dataset', action:'deleted', id:datasetInstance.id)}"
-            onclick="return confirm('${message(code: 'default.delete.confirm.message', args:['dataset'], default: 'This dataset will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;" data-id="${datasetInstance.id}"
+            href="#"
+            onclick="if(confirm('${message(code: 'default.delete.confirm.message', args:['dataset'], default: 'This dataset will be deleted. Are you sure ?')}')) {deleteDataset(this);}"><i class="icon-trash"></i><g:message code="button.delete" /></a>
 
         </sUser:ifOwns>
 
@@ -146,14 +146,19 @@
 
                 <div class="prop">
                     <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.citeas.label" /></span>
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
                     </g:if>
                     <g:else>
                     <i class="pull-left icon-info-sign"></i>
                     </g:else>
 
                     <div class="value linktext">
+                        <g:if test="${datasetInstance.attribution}">
+                        ${datasetInstance.attribution}
+                        </g:if>
+                        <g:else>
                         ${datasetInstance.datasource.title} (${UtilsService.formatDate(datasetInstance.publicationDate)}) ${datasetInstance.title}
+                        </g:else>
                     </div>
                 </div>
    

@@ -185,10 +185,7 @@
 						data-toggle="dropdown"> <g:message code="link.moree" /> <b class="caret"></b> </a>
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
-
-                            <li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                        href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
-                            </li>
+						
                             <li class="${(params.action == 'pages')?' active':''}"><a
                                 href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages")}"
                                 title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>

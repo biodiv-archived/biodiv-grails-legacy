@@ -3,7 +3,7 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.UtilsService"%>
 <div class="observation_story">
-    <div>
+    <div style="height:25px;">
         <g:if test="${showDetails && !showFeatured}">
         <%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
@@ -29,12 +29,12 @@
                     </g:if>
 
 
-                    <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
+                    <div class="group_icon_show_wrap">
                         <span
-                            class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()} pull-left"
+                            class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left"
                             title="${observationInstance.group?.name}"></span>
                         <g:if test="${showDetails && !showFeatured}">        
-                        <div class="btn btn-small btn-primary edit_group_btn pull-left" id="${observationInstance.id}">Edit
+                        <div class="btn btn-small btn-primary edit_group_btn pull-left">Edit
                         </div>
                         </g:if>    
                     </div>
@@ -48,7 +48,7 @@
                         <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                             method="GET">
                             <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/>
-                            <input type="hidden" name="prev_group" value="${observationInstance?.group?.id}" />
+                            <input type="hidden" name="prev_group" class="prev_group" value="${observationInstance?.group?.id}" />
                             <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
                             <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
                         </form>
@@ -232,12 +232,29 @@
 
                 <g:if test="${observationInstance.dataset}" >
                 <div class="prop">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.citeas.label" /></span>
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="dataset.name.label" /></span>
                     <div class="value linktext">
-                        ${observationInstance.dataset.datasource.title} (${UtilsService.formatDate(observationInstance.dataset.publicationDate)}) ${observationInstance.dataset.title}
+                        <g:if test="${observationInstance.dataset.externalUrl}">
+                            <a href="${observationInstance.dataset.externalUrl}">
+                        </g:if>
+                        ${observationInstance.dataset.title}
+                        <g:if test="${observationInstance.dataset.externalUrl}">
+                            </a>
+                        </g:if>
+
                     </div>		
                 </div>
                 </g:if>
+
+                <g:if test="${observationInstance.externalUrl}" >
+                <div class="prop">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.externalId.label" /></span>
+                    <div class="value linktext">
+                        ${observationInstance.externalUrl}
+                    </div>		
+                </div>
+                </g:if>
+
 
 
                 <div class="prop">

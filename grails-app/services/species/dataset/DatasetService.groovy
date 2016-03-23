@@ -1,6 +1,6 @@
 package species.dataset;
 
-import species.sourcehandler.importer.DwCObservationImporter;
+import species.sourcehandler.importer.*;
 import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
@@ -11,6 +11,8 @@ import species.Classification;
 import content.eml.UFile;
 import species.NamesParser;
 import grails.converters.JSON
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 import java.util.Date;
 import java.util.List;
@@ -268,31 +270,32 @@ class DatasetService extends AbstractMetadataService {
 
     Map uploadDwCDataset(Map params) {
         def resultModel = [:]
-        String zipFile = params.path?:params.uFile?.path;
+        String file = params.path?:params.uFile?.path;
         def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-        zipFile = config.speciesPortal.content.rootDir + zipFile;
+        file = config.speciesPortal.content.rootDir + file;
 
-        boolean r = true;//validateDwCA(zipFile);
-        if(!r) {
-            return [success:false, msg:'Invalid DwC-A file']
-        }
-
-        File zipF = new File(zipFile);
-        File destDir = zipF.getParentFile();
-        /*new File(zipF.getParentFile(),  zipF.getName())
+        File f = new File(file);
+        File destDir = f.getParentFile();
+        /*new File(f.getParentFile(),  f.getName())
         if(!destDir.exists()) {
             destDir.mkdir()
         }*/
-        File directory = zipF.getParentFile();
+        boolean isDwC = false;
+        File directory = f.getParentFile();
         File metadataFile;
-        if(FilenameUtils.getExtension(zipF.getName()).equals('zip')) {
-            def ant = new AntBuilder().unzip( src: zipFile,
+        if(FilenameUtils.getExtension(f.getName()).equals('zip')) {
+            def ant = new AntBuilder().unzip( src: file,
             dest: destDir, overwrite:true)
             directory = new File(destDir, FilenameUtils.removeExtension(zipF.getName()));
             if(!directory.exists()) {
                 directory = destDir;
             }
-            metadataFile = new File(directory, "metadata.xml");
+            isDwC = true;//validateDwCA(file);
+            if(!isDwC) {
+                return [success:false, msg:'Invalid DwC-A file']
+            } else {
+                metadataFile = new File(directory, "metadata.xml");
+            }
         }
 
         
@@ -301,6 +304,10 @@ class DatasetService extends AbstractMetadataService {
 
         Date startTime = new Date();
         if(directory) {
+            params['author'] = springSecurityService.currentUser; 
+            params['type'] = DatasetType.OBSERVATIONS;
+            params['datasource'] = Datasource.read(params.long('datasource'));
+ 
             if(metadataFile) {
                 uploadLog << "\nUploading dataset in DwCA format present at : ${zipF.getAbsolutePath()}";
                 uploadLog << "\nDataset upload start time : ${startTime}"
@@ -314,16 +321,15 @@ class DatasetService extends AbstractMetadataService {
                 params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
                 params['language'] = datasetMetadata.dataset.language.text();
                 params['publicationDate'] = utilsService.parseDate(datasetMetadata.dataset.pubDate.text());
+            } else {
+                params['externalUrl'] = params.externalUrl ?: params['datasource']?.website;
             }
 
-            params['author'] = springSecurityService.currentUser; 
-            params['type'] = DatasetType.OBSERVATIONS;
-            params['datasource'] = Datasource.read(params.long('datasource'));
-            UFile f = new UFile()
-            f.size = zipF.length()
-            f.path = params.uFile.path;//zipF.getAbsolutePath().replaceFirst(contentRootDir, "")
-            if(f.save()) {
-                params['uFile'] = f
+            UFile f1 = new UFile()
+            f1.size = f.length()
+            f1.path = params.uFile.path;//zipF.getAbsolutePath().replaceFirst(contentRootDir, "")
+            if(f1.save()) {
+                params['uFile'] = f1
             }
             //params['uFile'] = params.uFile; 
     //        params['originalAuthor'] = createContact() 
@@ -339,16 +345,53 @@ class DatasetService extends AbstractMetadataService {
             }
 
 
-            Dataset.withTransaction {
-                resultModel = save(dataset, params, true, null, feedType, null);
-            } 
+            resultModel = save(dataset, params, true, null, feedType, null);
 
             if(resultModel.success) {
-                if(params.datasource.title.contains('Global Biodiversity Information Facility')) {
-                    importGBIFObservations(dataset, directory, uploadLog)
-                } else {
-                    importDWCObservations(dataset, directory, uploadLog);
-                }
+                    if(params.datasource.title.contains('Global Biodiversity Information Facility')) {
+                        importGBIFObservations(dataset, directory, uploadLog)
+                    } else {
+                        if(isDwC) {
+                            importDWCObservations(dataset, directory, uploadLog);
+                        } else {
+                            def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()    
+                            def rs = [:]
+                            if(ServletFileUpload.isMultipartContent(request)) {
+                                MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                                Utils.populateHttpServletRequestParams(request, rs);
+                            } 
+ 
+                            def multimediaF = params.multimediaFile?:params.multimediaFileUpload;
+                            def mF = params.mappingFile?:params.mappingFileUpload;
+                            def mMF = params.multimediaMappingFile?:params.multimediaMappingFileUpload;
+                            File multimediaFile, mappingFile, multimediaMappingFile;
+                            
+                            if(multimediaF instanceof String) {
+                                multimediaFile = new File(config.speciesPortal.content.rootDir, multimediaF );
+                            } else {
+                                multimediaFile = new File(directory, 'multimediaFile.tsv');
+                                multimediaF.transferTo(multimediaFile);
+                            }
+                            
+                            if(mF instanceof String) {
+                                mappingFile = new File(config.speciesPortal.content.rootDir, mF );
+                            } else {
+                                mappingFile = new File(directory, 'mappingFile.tsv');
+                                mF.transferTo(mappingFile);
+                            }
+
+                            if(mMF instanceof String) {
+                                multimediaMappingFile = new File(config.speciesPortal.content.rootDir, mMF );
+                            } else {
+                                multimediaMappingFile = new File(directory, 'multimediaMappingFile.tsv');
+                                mMF.transferTo(multimediaMappingFile);
+                            }
+
+                            File observationsFile = f;//new File(directory, 'occurence.txt');
+                            //File multimediaFile = params.multimediaFile;//new File(directory, 'multimedia.txt');
+                            importObservations(dataset, observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
+                        }
+                    }
             } else {
                 log.error "Error while saving dataset ${resultModel}";
             }
@@ -360,12 +403,23 @@ class DatasetService extends AbstractMetadataService {
     }
 
     private void importDWCObservations(Dataset dataset, File directory, File uploadLog) {
-        DwCObservationImporter dwcImporter = DwCObservationImporter.getInstance();
-        Map o = dwcImporter.importObservationData(directory.getAbsolutePath(), uploadLog);
-        int noOfUploadedObv=0, noOfFailedObv=0;
+        DwCObservationImporter obvImporter = DwCObservationImporter.getInstance();
+        Map o = importer.importObservationData(directory.getAbsolutePath(), uploadLog);
+        importObservations(dataset, directory, importer, uploadLog);
+    }
 
-        List obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+    private void importObservations(Dataset dataset, File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File uploadLog) {
+        FileObservationImporter importer = FileObservationImporter.getInstance();
+        Map o = importer.importObservationData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
+        importObservations(dataset, observationsFile.getParentFile(), importer, o.mediaInfo, uploadLog);
+    }
+
+    private void importObservations(Dataset dataset, File directory, AbstractObservationImporter importer, Map mediaInfo, File uploadLog) {
+        List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
+        int noOfUploadedObv=0, noOfFailedObv=0;
         boolean flushSingle = false;
+        Date startTime = new Date();
+        int i=0;
         while(obvParamsList) {
             List resultObv = [];
             int tmpNoOfUploadedObv = 0, tmpNoOfFailedObv= 0;
@@ -375,7 +429,7 @@ class DatasetService extends AbstractMetadataService {
                         log.info "Retrying batch obv with flushSingle"
                         uploadLog << "\n Retrying batch obv with flushSingle"
                     }
-                    obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
+                    //obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
                     obvParams['dataset'] = dataset;
                     uploadLog << "\n\n----------------------------------------------------------------------";
                     uploadLog << "\nUploading observation with params ${obvParams}"
@@ -406,7 +460,7 @@ class DatasetService extends AbstractMetadataService {
                 noOfUploadedObv += tmpNoOfUploadedObv;
                 noOfFailedObv += tmpNoOfFailedObv;
                 log.debug "Saved observations : noOfUploadedObv : ${noOfUploadedObv} noOfFailedObv : ${noOfFailedObv}";
-                obvParamsList = dwcImporter.next(o.mediaInfo, IMPORT_BATCH_SIZE)
+                obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
                 flushSingle = false;
             } catch (Exception e) {
                 log.error "error in creating observation."
@@ -423,8 +477,7 @@ class DatasetService extends AbstractMetadataService {
         uploadLog << "\nTotal number of observations saved for dataset (${dataset}) are : ${noOfUploadedObv}";
         uploadLog << "\nTotal number of observations failed in loading for dataset (${dataset}) are : ${noOfFailedObv}";
         uploadLog << "\nTotal time taken for dataset upload ${((new Date()).getTime() - startTime.getTime())/1000} sec"
-        dwcImporter.closeReaders();
-
+        importer.closeReaders();
     }
 
     //FIX: This code is subjected to SQL INJECTION. Please make sure your data is sanitized
@@ -866,6 +919,86 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
         return [query:query, allDatasetCountQuery:allDatasetCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
+    }
+
+    def delete(params){
+        String messageCode;
+        String url = utilsService.generateLink(params.controller, 'list', []);
+        String label = Utils.getTitleCase(params.controller?:'Dataset')
+        def messageArgs = [label, params.id]
+        def errors = [];
+        boolean success = false;
+        if(!params.id) {
+            messageCode = 'default.not.found.message'
+        } else {
+            try {
+                def datasetInstance = Dataset.get(params.id.toLong())
+                if (datasetInstance) {
+                    //datasetInstance.removeResourcesFromSpecies()
+                    boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
+                    if(isFeatureDeleted && utilsService.ifOwns(datasetInstance.author)) {
+                        def mailType = activityFeedService.INSTANCE_DELETED
+                        try {
+                            datasetInstance.isDeleted = true;
+
+                            Observation.findAllByDataset(datasetInstance).each {
+                                it.isDeleted = true; 
+                                if(!it.save(flush:true)){
+                                    it.errors.allErrors.each { log.error it } 
+                                }
+                            }
+
+                            if(!datasetInstance.hasErrors() && datasetInstance.save(flush: true)){
+                                utilsService.sendNotificationMail(mailType, datasetInstance, null, params.webaddress);
+                                //observationsSearchService.delete(observationInstance.id);
+                                messageCode = 'default.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'list', [])
+                                ActivityFeed.updateIsDeleted(datasetInstance)
+                                success = true;
+                            } else {
+                                messageCode = 'default.not.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                                datasetInstance.errors.allErrors.each { log.error it }
+                                datasetInstance.errors.allErrors .each {
+                                    def formattedMessage = messageSource.getMessage(it, null);
+                                    errors << [field: it.field, message: formattedMessage]
+                                }
+
+                            }
+                        }
+                        catch (org.springframework.dao.DataIntegrityViolationException e) {
+                            messageCode = 'default.not.deleted.message'
+                            url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                            e.printStackTrace();
+                            log.error e.getMessage();
+                            errors << [message:e.getMessage()];
+                        }
+                    } else {
+                        if(!isFeatureDeleted) {
+                            messageCode = 'default.not.deleted.message'
+                            log.warn "Couldnot delete feature"
+                        }
+                        else {
+                            messageArgs.add(0,'delete');
+                            messageCode = 'default.not.permitted.message'
+                            log.warn "${datasetInstance.author} doesn't own dataset to delete"
+                        }
+                    }
+                } else {
+                    messageCode = 'default.not.found.message'
+                    url = utilsService.generateLink(params.controller, 'list', [])
+                }
+            } catch(e) {
+                e.printStackTrace();
+                url = utilsService.generateLink(params.controller, 'list', [])
+                messageCode = 'default.not.deleted.message'
+                errors << [message:e.getMessage()];
+            }
+        }
+        
+        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
+				
+        return [success:success, url:url, msg:message, errors:errors]
     }
 
 } 

@@ -79,6 +79,7 @@ if(r) {
                                             </span>
 
                                             <div class="pull-right">
+                                                <g:if test="${!observationInstance.dataset}">
                                                 <sUser:ifOwns model="['user':observationInstance.author]">
                                                 
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
@@ -93,7 +94,7 @@ if(r) {
                                                 </form>
  
                                                 </sUser:ifOwns>
-
+                                                </g:if>
                                             </div>
                                            <obv:showSpeciesName
                                             model="['observationInstance':observationInstance, 'isHeading':true]" />

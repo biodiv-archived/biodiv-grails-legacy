@@ -104,6 +104,7 @@ class ObvUtilService {
 	def observationsSearchService
 	def commentService
     def messageSource;
+    def sessionFactory;
 
     SpeciesGroup defaultSpeciesGroup;
     Habitat defaultHabitat;
@@ -112,8 +113,10 @@ class ObvUtilService {
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	
-	private final static int EXPORT_BATCH_SIZE = 5000;
-
+	private final static int EXPORT_BATCH_SIZE = 10000;
+	private final static int MAX_BATCHES = 1;
+	
+	
 	def requestExport(params){
         log.debug "creating download request"
         DownloadLog dl;
@@ -126,6 +129,8 @@ class ObvUtilService {
             x = 1;
         }
 
+		x = Math.min(x, MAX_BATCHES)
+			
         for( int i=0; i<x; i++) {
             int offset = (i * EXPORT_BATCH_SIZE);
             dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params, offset);
@@ -746,6 +751,11 @@ class ObvUtilService {
 			observationInstance =  observationService.create(params);
             observationInstance.protocol = ProtocolType.BULK_UPLOAD;
             observationInstance.clearErrors();
+            //following line was needed as : image saving in XMLConverter was calling observation before and afterUpdate.... so obv is gng out of sync
+            println "+++++++++++++++++++++++++++++++++++++"
+            println "+++++++++++++++++++++++++++++++++++++"
+            println "+++++++++++++++++++++++++++++++++++++"
+            println "+++++++++++++++++++++++++++++++++++++"
 
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				log.debug "Successfully created observation : "+observationInstance
@@ -829,10 +839,14 @@ class ObvUtilService {
 		        recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
             }
             if(!recommendationVoteInstance) {
-			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
+			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
             } else {
                 recommendationVoteInstance.givenSciName = params.recoName;
                 recommendationVoteInstance.givenCommonName = params.commonName;
+                recommendationVoteInstance.author = params.author;
+                recommendationVoteInstance.originalAuthor = params.identifiedBy?:params.originalAuthor;
+                recommendationVoteInstance.confidence = params.confidence;
+                recommendationVoteInstance.votedOn = dateIdentified;
             }
 		}
 		

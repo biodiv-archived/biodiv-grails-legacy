@@ -105,7 +105,7 @@
                 </g:hasErrors>
 
 
-                <form id="${form_id}" action="${form_action}" method="POST"
+                <form id="${form_id}" action="${form_action}" method="POST"  enctype="multipart/form-data"
                     class="form-horizontal">
                     <input type="hidden" name="id" value="${datasetInstance?.id}"/>
                     <div class="super-section">
@@ -115,7 +115,7 @@
                                 class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'title', 'error')}">
 
                                 <label for="name" class="control-label"><g:message
-                                    code="dataset.name.label" default="${g.message(code:'dataset.name.label')}" /> </label>
+                                    code="dataset.name.label" default="${g.message(code:'dataset.name.label')}" />*</label>
                                 <div class="controls textbox">
                                     <div class="btn-group" style="z-index: 3;">
                                         <g:textField name="title" value="${datasetInstance?.title}" placeholder="${g.message(code:'button.create.dataset')}" />
@@ -133,10 +133,10 @@
 
                             <div
                                 class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'description', 'error')}">
-                                <label for="description" class="control-label"><g:message code="default.description.label" /></label>
+                                <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
                                 <div class="controls  textbox">
 
-                                    <textarea id="description" name="description" placeholder="${g.message(code:'datasource.small.description')}">${datasetInstance?.description?.replaceAll('(?:\r\n|\r|\n)', '<br />')}</textarea>
+                                    <textarea id="description" name="description" placeholder="${g.message(code:'dataset.small.description')}">${datasetInstance?.description?.replaceAll('(?:\r\n|\r|\n)', '<br />')}</textarea>
 
                                     <script type='text/javascript'>
                                         CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
@@ -159,7 +159,7 @@ CKEDITOR.replace('description', config);
                             class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'datasource', 'error')}">
 
                             <label for="datasource" class="control-label"><g:message
-                                code="datasource.name.label" default="${g.message(code:'datasource.name.label')}" /> </label>
+                                code="datasource.name.label" default="${g.message(code:'datasource.name.label')}" />*</label>
                             <div class="controls textbox">
                                 <div class="btn-group" style="z-index: 3;">
                                     <g:select name="datasource"
@@ -181,42 +181,90 @@ CKEDITOR.replace('description', config);
                         </div>
 
                         <div
+                            class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'source', 'error')}">
+
+                            <label for="source" class="control-label"><g:message
+                                code="default.externalId.label" default="${g.message(code:'default.externalId.label')}" /></label>
+                            <div class="controls textbox">
+                                <div class="btn-group" style="z-index: 3;">
+                                    <g:textField name="externalUrl" value="${datasetInstance?.externalUrl}" placeholder="Add external url for the datasource" />
+                                    <div class="help-inline">
+                                        <g:hasErrors bean="${datasetInstance}" field="externalUrl">
+                                        <g:eachError bean="${datasetInstance}" field="externalUrl">
+                                        <li><g:message error="${it}" /></li>
+                                        </g:eachError>
+                                        </g:hasErrors>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'attribution', 'error')}">
+
+                            <label for="attribution" class="control-label"><g:message
+                                code="default.attribution.label" default="${g.message(code:'default.attribution.label')}" />*</label>
+                            <div class="controls textbox">
+                                <div class="btn-group" style="z-index: 3;">
+                                    <textarea class="input-block-level" name="attribution" placeholder="${g.message(code:'checklist.details.enter.attribution')}">${datasetInstance?.attribution}</textarea>
+                                    <div class="help-inline">
+                                        <g:hasErrors bean="${datasetInstance}" field="attribution">
+                                        <g:eachError bean="${datasetInstance}" field="attribution">
+                                        <li><g:message error="${it}" /></li>
+                                        </g:eachError>
+                                        </g:hasErrors>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div
                             class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'uFile', 'error')}">
-                            <label class="control-label" for="file"><g:message code="default.resource.label" /> (DwC-A)<span
+                            <label class="control-label" for="file"><g:message code="default.resource.label" /> <span
                                     class="req">*</span></label>
                             <div class="controls" style="">
 
-                                    <%def allowedExtensions="['zip']"%>
-                                    <g:render template='/UFile/docUpload'
-                                    model="['name': 'ufilepath', 'path': datasetInstance?.uFile?.path, 'size':datasetInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'dataset_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
-                                    <% def upload_file_text="${g.message(code:'default.upload.file.label')}"
-                                    %>
-                                    <script type="text/javascript">
+                                <%def allowedExtensions="['csv', 'tsv', 'xlx', 'xlsx','zip']"%>
+                                <g:render template='/UFile/docUpload'
+                                model="['name': 'ufilepath', 'path': datasetInstance?.uFile?.path, 'size':datasetInstance?.uFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'dataset_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                <% def upload_file_text="${g.message(code:'default.upload.file.label')}"
+                                %>
+                                <script type="text/javascript">
 
-                                        $(document).ready(function(){
-                                                $('.qq-upload-button').contents().first()[0].textContent = '${upload_file_text}';
-                                                });
+                                    $(document).ready(function(){
+                                            $('.qq-upload-button').contents().first()[0].textContent = '${upload_file_text}';
+                                            });
 
-</script>
+                                        </script>
 
-                                   <g:message code="loginformtemplate.or" />
-                                       </div>
-                                   </div>
+                                        <g:message code="loginformtemplate.or" />
+                                        <input type="text" id="uFilePath" class="input-block-level" name="path"
+                                        placeholder="${g.message(code:'placeholder.document.enter.url')}"
+                                        value="${datasetInstance?.uFile?.path}" />
+                                        <input id="multimediaFile" type="text" name="multimediaFile" value="${multimediaFile}" placeholder="Enter media file">
+                                        <input id="multimediaFileUpload" type="file" name="multimediaFileUpload" placeholder="Enter media file">
+
+                            </div>
+                        </div>
+
+                        <div
+                            class="row control-group left-indent">
+                            <label class="control-label" for="file">Mapping File</label>
+                            <div class="controls" style="">
+                                <input id="mappingFile" type="text" name="mappingFile" value="${mappingFile}" placeholder="Enter mapping file">
+                                <input id="mappingFileUpload" type="file" name="mappingFileUpload" placeholder="Enter mapping file">
+                                <input id="multimediaMappingFile" type="text" name="multimediaMappingFile" value="${multimediaMappingFile}" placeholder="Enter multimedia mapping file">
+                                <input id="multimediaMappingFileUpload" type="file" name="multimediaMappingFileUpload" placeholder="Enter multimedia mapping file">
+
+                            </div>
+                        </div>
 
 
-                                   <div
-                                       class="row control-group left-indent ${hasErrors(bean: datasetInstance, field: 'datasource', 'error')}"
-                                       style="width: 480px;">
-                                       <label class="control-label" for="uri" style="width: 40px;"><g:message code="default.url.label" /></label>
-                                       <div class="controls">
-                                           <input type="text" id="link-fetch" class="input-block-level" name="path"
-                                           placeholder="${g.message(code:'placeholder.document.enter.url')}"
-                                           value="${datasetInstance?.uFile?.path}" />
-                                       </div>
-                                   </div>
 
-                               </div>
-                           </div>
+                    </div>
+                </div>
 
                            <div class="" style="margin-top: 20px; margin-bottom: 40px;">
 
@@ -254,7 +302,13 @@ CKEDITOR.replace('description', config);
 
     <asset:script>
     function dataset_upload_callback() {
+        $('#uFilePath').val('');        
+        $('#mappingFile, #multimediaFile, #multimediaMappingFile').val('');
     }
+
+    $('#mappingFileUpload, #multimediaFileUpload, #multimediaMappingFileUpload').change(function(e) {
+        $('#mappingFile, #multimediaFile, #multimediaMappingFile').val('');
+    });
 
     $(document).ready(function() {	
     $("#createDatasetSubmit").click(function(){

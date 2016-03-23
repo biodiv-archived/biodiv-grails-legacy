@@ -58,7 +58,7 @@ class NewsletterController {
 		if(permitted) {
             def newsletterInstance = new Newsletter()
 			newsletterInstance.properties = params
-            return [newsletterInstance: newsletterInstance]
+            return [newsletterInstance: newsletterInstance,userLanguage:utilsService.getCurrentLanguage(request)]
 		}
 		
 	}
@@ -157,14 +157,14 @@ class NewsletterController {
 		else {
 			if(newsletterInstance.userGroup) {
 				if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), newsletterInstance.userGroup, BasePermission.ADMINISTRATION) || utilsService.isAdmin(springSecurityService.currentUser)) {
-					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance]
+					[userGroupInstance:newsletterInstance.userGroup, newsletterInstance: newsletterInstance,userLanguage:utilsService.getCurrentLanguage(request)]
 				} else {
 					flash.message = "${message(code: 'edit.denied.message')}"
 					redirect url:uGroup.createLink(controller:"userGroup", action: "pages", 'userGroup':newsletterInstance.userGroup, params:['newsletterId':newsletterInstance.id])
 				}
 			}
 			else if(utilsService.isAdmin(springSecurityService.currentUser)) {
-				[newsletterInstance: newsletterInstance]
+				[newsletterInstance: newsletterInstance,userLanguage:utilsService.getCurrentLanguage(request)]
 			} else {
 				flash.message = "${message(code: 'edit.denied.message')}"
 				redirect(controller:"userGroup", action: "page", params:['newsletterId':newsletterInstance.id])
@@ -175,6 +175,7 @@ class NewsletterController {
 	@Secured(['ROLE_USER'])
 	def update() {
 		def newsletterInstance = Newsletter.get(params.id)
+		params.language = params.language?Language.get(params.language):Language.findByThreeLetterCode('eng');
 
 		if (newsletterInstance) {
 			if (params.version) {
@@ -191,7 +192,7 @@ class NewsletterController {
 			//XXX removing user group info from cloned params as its coming as string
 			Map validMap = new HashMap(params)
 			validMap.remove("userGroup")
-			validMap.language = Language.get(validMap.language);
+			validMap.language = params.language;
 			newsletterInstance.properties = validMap
 			if(params.userGroup) {
 				def userGroupInstance = UserGroup.findByWebaddress(params.userGroup);
@@ -202,15 +203,18 @@ class NewsletterController {
 						flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
 						redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
 					} else {
+
+                        userGroupInstance.errors.allErrors.each { log.error it } 
+                        newsletterInstance.errors.allErrors.each { log.error it } 
 						flash.message = "${message(code: 'update.denied.message')}"
 						redirect url:uGroup.createLink(controller:"userGroup", action: "page", 'userGroup':userGroupInstance, params:['newsletterId':newsletterInstance.id])
 					}
-				}else {
+				} else {
 					render(view: "edit", model: [userGroupInstance:userGroupInstance, newsletterInstance: newsletterInstance])
 				}
 			} else {
-				if(utilsService.isAdmin(springSecurityService.currentUser)) {
-					if (!newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
+                if(utilsService.isAdmin(springSecurityService.currentUser)) {
+                    if (!newsletterInstance.hasErrors() && newsletterInstance.save(flush: true)) {
 						postProcessNewsletter(newsletterInstance);
 						flash.message = "${message(code: 'default.updated.message', args: [message(code: 'newsletter.label', default: 'Newsletter'), newsletterInstance.id])}"
 						redirect  url: uGroup.createLink(mapping:'userGroupGeneric', action: "page", id: newsletterInstance.id)

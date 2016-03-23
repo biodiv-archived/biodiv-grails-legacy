@@ -121,6 +121,10 @@
       width: 100%;
       overflow:visible;
     }
+
+.users{float:none; }
+.btnagree{float:right;}
+.reco_block{line-height:18px;margin:2px 0px !important;}
      
 </style>
 </head>
@@ -170,7 +174,7 @@
 
 
 <div id="links" class="links12" style="display:none;"></div>
-<div id="blueimp-gallery" class="blueimp-gallery">
+<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">
     <div class="slides"></div>
     <h3 class="title"></h3>
     <a class="prev">‹</a>

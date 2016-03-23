@@ -231,7 +231,8 @@ class Resource extends Sourcedata implements Rateable {
 				break
 		}
 
-		if(!this.save(flush:true)){
+        //removing flush:true as in bulk upload this flush is causing observation version to change. We shd flush when parent object is saved
+		if(!this.save(/*flush:true*/)){
 			this.errors.allErrors.each { log.error it }
 		} else {
             //utilsService.evictInCache('resources', this.context.toString().toLowerCase()+"-"+this.id);

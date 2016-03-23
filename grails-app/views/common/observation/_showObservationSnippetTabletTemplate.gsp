@@ -115,9 +115,9 @@ def obvId = observationInstance?.id
             <div style="float: left;">
                 <span class="habitat_icon_show group_icon habitats_sprites active urban_gall_th" title="Urban"></span>
             </div>
-            <div class="group_icon_show_wrap" id="group_icon_show_wrap_${observationInstance.id}">
-                <span class="group_icon group_icon_show_${observationInstance.id} species_groups_sprites active ${observationInstance.group.iconClass()} pull-left" title="Plants"></span>
-                <div class="btn btn-small btn-primary edit_group_btn pull-left" id="${observationInstance.id}">Edit
+            <div class="group_icon_show_wrap">
+                <span class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left" title="Plants"></span>
+                <div class="btn btn-small btn-primary edit_group_btn pull-left">Edit
                 </div>
             </div>
 
@@ -125,7 +125,7 @@ def obvId = observationInstance?.id
                 <form id="updateSpeciesGrp"  name="updateSpeciesGrp"                              
                     method="GET">
                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance,'action':'show']"/>
-                    <input type="hidden" name="prev_group" class="prev_group_${observationInstance.id}" value="${observationInstance?.group?.id}" />
+                    <input type="hidden" name="prev_group" class="prev_group" value="${observationInstance?.group?.id}" />
                     <input type="hidden" name="observationId" value="${observationInstance?.id}"> 
                     <input type="submit" class="btn btn-small btn-primary save_group_btn" style="display:none;" value="Save" />
                 </form>

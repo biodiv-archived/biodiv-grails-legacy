@@ -73,7 +73,7 @@ class AbstractMetadataService extends AbstractObjectService {
 
     def update(instance, params, klass = null, update=true) {
         if(klass && params.externalId) {
-            instance = klass.findByExternalId(params.externalId.toLong());
+            instance = klass.findByExternalId(params.externalId);
             if(!instance)
                 instance = klass.newInstance();
             else if(!update) {
@@ -84,7 +84,7 @@ class AbstractMetadataService extends AbstractObjectService {
 
         instance.properties = params;
 
-        instance.clearErrors();
+        //instance.clearErrors();
 
         if(params.author)  {
             instance.author = params.author;
@@ -151,10 +151,10 @@ class AbstractMetadataService extends AbstractObjectService {
 
     def save(instance, params, sendMail, feedAuthor, feedType, searchService) {
         log.debug( "saving instance with params assigned >>>>>>>>>>>>>>>>: "+ instance)
-        
-        instance.clearErrors();
 
-        if (!instance.hasErrors() && instance.save(flush: true)) {
+        //instance.clearErrors();
+
+        if (instance.validate() && !instance.hasErrors() && instance.save(flush: true)) {
             //mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
             //String msg = messageSource.getMessage("instance.label", [instance.id], LCH.getLocale())
             activityFeedService.addActivityFeed(instance, null, instance.author, feedType);

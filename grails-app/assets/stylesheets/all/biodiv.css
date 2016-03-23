@@ -3242,8 +3242,10 @@ small {
 }
 .image_info a{
     color:white;
-    float: left;
 }
+.license a{
+    float: left;
+ }
 .conts_wrap{
   margin-left: 5px !important;   
   margin: 0px;
@@ -3427,3 +3429,6 @@ li.group_option span{
 	right: 46% !important;
   	top: 47% !important;
 }
+#recoSummary .users{float:none; }
+#recoSummary .btnagree{float:right;}
+#recoSummary .reco_block{line-height:18px;margin:2px 0px !important;}

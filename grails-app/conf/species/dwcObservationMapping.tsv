@@ -223,3 +223,6 @@ taxonConceptID	http://rs.tdwg.org/dwc/terms/taxonConceptID	taxonconceptid	1		X	1
 distanceAboveSurface	http://rs.gbif.org/terms/1.0/distanceAboveSurface	distanceabovesurface	1		X	100											
 distanceAboveSurfaceAccuracy	http://rs.gbif.org/terms/1.0/distanceAboveSurfaceAccuracy	distanceabovesurfaceaccuracy	1		X	100											
 subgenusKey	http://rs.gbif.org/terms/1.0/subgenusKey	subgenuskey	1		X	100											
+associatedMedia	http://rs.tdwg.org/dwc/terms/associatedMedia					100											
+organismScope	http://rs.tdwg.org/dwc/terms/organismScope					100											
+country	http://rs.tdwg.org/dwc/terms/country					100											

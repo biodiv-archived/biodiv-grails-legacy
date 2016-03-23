@@ -49,7 +49,7 @@ import species.sourcehandler.exporter.DwCSpeciesExporter;
 import java.math.BigDecimal
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
+import species.SpeciesPermission.PermissionType;
 import org.hibernate.FetchMode;
 
 class ObservationController extends AbstractObjectController {
@@ -70,6 +70,7 @@ class ObservationController extends AbstractObjectController {
     def speciesService;
     def setupService;
     def springSecurityFilterChain
+    def speciesPermissionService;
 
     def sessionFactory;
 def grailsCacheManager;
@@ -469,7 +470,7 @@ def grailsCacheManager;
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
-		} else if(utilsService.ifOwns(observationInstance.author)) {
+		} else if(utilsService.ifOwns(observationInstance.author) && !observationInstance.dataset) {
 			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
@@ -1706,7 +1707,7 @@ def grailsCacheManager;
         }
     }
     
-    @Secured(['ROLE_ADMIN','ROLE_SPECIES_ADMIN'])
+    //    @Secured(['ROLE_ADMIN','ROLE_SPECIES_ADMIN'])
     def lock() {
         def msg = ""
         def obv = Observation.get(params.id.toLong());
@@ -1714,56 +1715,63 @@ def grailsCacheManager;
         def currentUser = springSecurityService.currentUser;
         def mailType = '';
         def activityFeed;
-        if(params.lockType == "Validate"){
-            //current user & reco
-            def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
-            def newRecVo;
-            ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
 
-            if(recVo){
-                if(reco != recVo.recommendation) {
-                    String givenSciName = recVo.givenSciName;
-                    String givenCommonName = recVo.givenCommonName;
-                    recVo.delete(flush: true, failOnError:true)
-                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:givenSciName, givenCommonName:givenCommonName )
+        if(observationService.hasObvLockPerm(obv.id, reco.id)) {
+            if(params.lockType == "Validate"){
+                //current user & reco
+                def recVo = RecommendationVote.findWhere(observation:obv, author: currentUser);
+                def newRecVo;
+                ConfidenceType confidence = observationService.getConfidenceType(ConfidenceType.CERTAIN.name());
+
+                if(recVo){
+                    if(reco != recVo.recommendation) {
+                        String givenSciName = recVo.givenSciName;
+                        String givenCommonName = recVo.givenCommonName;
+                        recVo.delete(flush: true, failOnError:true)
+            newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:givenSciName, givenCommonName:givenCommonName )
+            if(!newRecVo.save(flush:true)){
+                newRecVo.errors.allErrors.each { log.error it } 
+            }
+            } else {
+                //user locking his own reco
+                newRecVo = recVo;
+            }
+
+                }
+
+                if(!recVo) {
+                    newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:params.recoName, givenCommonName:params.commonName);
                     if(!newRecVo.save(flush:true)){
                         newRecVo.errors.allErrors.each { log.error it } 
                     }
-                } else {
-                    //user locking his own reco
-                    newRecVo = recVo;
                 }
-                
+                obv.maxVotedReco = reco; 
+                obv.isLocked = true;
+                msg = messageSource.getMessage("default.observation.locked", null, RCU.getLocale(request))
+                mailType = utilsService.OBV_LOCKED;
+                activityFeed = activityFeedService.addActivityFeed(obv, newRecVo, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(newRecVo.recommendation, null));
+            } else {
+                obv.removeResourcesFromSpecies()
+                obv.isLocked = false;
+                obv.calculateMaxVotedSpeciesName()
+                msg = messageSource.getMessage("default.observation.unlocked", null, RCU.getLocale(request))
+                mailType = utilsService.OBV_UNLOCKED;
+                def recommendationVoteInstance =  RecommendationVote.findWhere(recommendation: reco, observation:obv, author: currentUser)
+                if(recommendationVoteInstance)
+                    activityFeed = activityFeedService.addActivityFeed(obv, recommendationVoteInstance, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
             }
+            if(!obv.save(flush:true)){
+                obv.errors.allErrors.each { log.error it } 
+            }
+            utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
 
-            if(!recVo) {
-                newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:params.recoName, givenCommonName:params.commonName);
-                if(!newRecVo.save(flush:true)){
-                    newRecVo.errors.allErrors.each { log.error it } 
-                }
-            }
-            obv.maxVotedReco = reco; 
-            obv.isLocked = true;
-            msg = messageSource.getMessage("default.observation.locked", null, RCU.getLocale(request))
-            mailType = utilsService.OBV_LOCKED;
-            activityFeed = activityFeedService.addActivityFeed(obv, newRecVo, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(newRecVo.recommendation, null));
+            def result = ['msg': msg]
+            render result as JSON
         } else {
-            obv.removeResourcesFromSpecies()
-            obv.isLocked = false;
-            obv.calculateMaxVotedSpeciesName()
-            msg = messageSource.getMessage("default.observation.unlocked", null, RCU.getLocale(request))
-            mailType = utilsService.OBV_UNLOCKED;
-            def recommendationVoteInstance =  RecommendationVote.findWhere(recommendation: reco, observation:obv, author: currentUser)
-			if(recommendationVoteInstance)
-            	activityFeed = activityFeedService.addActivityFeed(obv, recommendationVoteInstance, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
+            def result = [success:false, 'msg': "${message(code: 'validation.permission.message')} ${uGroup.createLink(controller:'species', action:'contribute')}"];
+            render result as JSON
+            return;
         }
-        if(!obv.save(flush:true)){
-            obv.errors.allErrors.each { log.error it } 
-        }
-		utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
-
-        def result = ['msg': msg]
-        render result as JSON
     }
 
     /*def getRecommendationListJSON(LinkedHashMap result){

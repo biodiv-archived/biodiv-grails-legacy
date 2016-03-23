@@ -113,7 +113,7 @@ max-width: 100%;
 							class="row control-group left-indent ${hasErrors(bean: datasourceInstance, field: 'title', 'error')}">
 
 							<label for="name" class="control-label"><g:message
-									code="datasource.name.label" default="${g.message(code:'datasource.name.label')}" /> </label>
+									code="datasource.name.label" default="${g.message(code:'datasource.name.label')}" /> *</label>
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
 									<g:textField name="title" value="${datasourceInstance?.title}" placeholder="${g.message(code:'button.create.datasource')}" />
@@ -150,7 +150,7 @@ max-width: 100%;
 												
 						<div
                             class="row control-group left-indent ${hasErrors(bean: datasourceInstance, field: 'description', 'error')}">
-								<label for="description" class="control-label"><g:message code="default.description.label" /></label>
+								<label for="description" class="control-label"><g:message code="default.description.label" />*</label>
 							<div class="controls  textbox">
 								
 								<textarea id="description" name="description" placeholder="${g.message(code:'datasource.small.description')}">${datasourceInstance?.description}</textarea>
@@ -175,7 +175,7 @@ max-width: 100%;
                         <div
 							class="row control-group left-indent ${hasErrors(bean: datasourceInstance, field: 'icon', 'error')}">
 							<label for="icon" class="control-label"><g:message
-									code="datasource.icon.label" default="${g.message(code:'usergroup.icon.label')}" /> </label>
+									code="datasource.icon.label" default="${g.message(code:'usergroup.icon.label')}" />*</label>
 							<div class="controls">
 								<div style="z-index: 3;">
 										<div

@@ -81,7 +81,7 @@ class UtilsService {
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
 
-    static final String[] DATE_PATTERNS = ['dd/MM/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
+    static final String[] DATE_PATTERNS = ['dd/MM/yyyy', 'MM/dd/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
 
     private Map bannerMessageMap;
 
@@ -1004,6 +1004,12 @@ class UtilsService {
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
 	}
 
+    boolean isSpeciesAdmin(SUser user) {
+		if(!user) return false
+		return SUserRole.get(user.id, Role.findByAuthority('ROLE_SPECIES_ADMIN').id) != null
+	}
+	
+
 	boolean isAdmin(SUser user) {
 		if(!user) return false
 		return SUserRole.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
@@ -1077,14 +1083,14 @@ class UtilsService {
             if(!sendNew) {
                 Date d;
                 if(date) {
-                    d = DateUtils.parseDate(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date) 
+                    d = DateUtils.parseDateStrictly(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date) 
                     d.set(['hourOfDay':23, 'minute':59, 'second':59]);
                 }else {
                     d = null
                 }
                 return d
             } else {
-			    return date ? DateUtils.parseDate(date, DATE_PATTERNS) : new Date();
+			    return date ? DateUtils.parseDateStrictly(date, DATE_PATTERNS) : new Date();
             }
 		} catch (Exception e) {
             e.printStackTrace();
@@ -1092,7 +1098,20 @@ class UtilsService {
 		}
 		return null;
 	}
+/*
+    static Date getUTCDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"));
+        SimpleDateFormat sdf1 = new SimpleDateFormat();
+        sdf1.setTimeZone(TimeZone.getDefault());
 
+        println sdf1.format(date);
+        println sdf.parse(sdf1.format(date))
+        println sdf.format(sdf.parse(sdf1.format(date)));
+
+        return sdf.format(sdf.parse(sdf1.format(date)));
+     }
+*/
     static String getDayOfMonthSuffix(int n) {
         if(n < 1 || n > 31) return "";
         if (n >= 11 && n <= 13) {
@@ -1140,7 +1159,7 @@ class UtilsService {
         return bannerMessageMap ? bannerMessageMap[userGroupWebaddress]:'';
     }
 
-    String getIbpBannerMessage() {  
+    String getIbpBannerMessage() {   
         return bannerMessageMap["ibp"];
     }
 
@@ -1152,9 +1171,9 @@ class UtilsService {
             bannerMessageFile.eachLine { line ->
                 def (gname,bmessage) = line.tokenize('-');
                 gname = gname?.trim();
-                bmessage = (bmessage.replaceAll("</?p>", ''))?.trim();
+                bmessage = (bmessage?.replaceAll("</?p>", ''))?.trim();
                 if(gname && bmessage) {
-                    bannerMessageMap[gname.replaceAll("<(.|\n)*?>", '')] = bmessage;   
+                    bannerMessageMap[gname?.replaceAll("<(.|\n)*?>", '')] = bmessage;   
                 }
             }
         }

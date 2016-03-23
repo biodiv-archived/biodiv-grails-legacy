@@ -19,124 +19,127 @@
 <input type="hidden" id="userLanguage" value="${userLanguage?.id}" />
 <script type="text/javascript">
 $(document).ready(function() {
-    window.params = {  
-                'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
-                'controller': "${params.controller}",
-                'actionForBulkCreate': "${params.action}",
-                'offset':"${params.offset}",
-                'isGalleryUpdate':'true',
-                'isMediaFilter' : '${params.isMediaFilter}',
-                'resDeleteUrl' : "${uGroup.createLink(controller:'resource', action: 'deleteUsersResourceById')}",
-                'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
-                "queryParamsMax":"${queryParams?.max}",
-                'getProcessedImageUrl' : "${createLink(controller:'observation',  action:'getProcessedImageStatus')}",
-                'curation':{
-                    'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",
-                    'getNameDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getNameDetails')}",
-                    'searchExternalDbUrl' : "${uGroup.createLink('controller':'namelist', action:'searchExternalDb')}",
-                    'getExternalDbDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getExternalDbDetails')}",
-                    'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
-                    'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
-                    'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
-                    'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}",
-                    'editSpeciesPageURL' : "${uGroup.createLink(controller:'species', action:'editSpeciesPage')}"
-                                
-                },
-		'speciesName':"${params.speciesName }",
-		'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
-		'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
-		'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
+        window.params = {  
+        'requestExportUrl' : "${uGroup.createLink(controller:'observation', action:'requestExport', userGroupWebaddress:params.webaddress)}",
+        'controller': "${params.controller}",
+        'actionForBulkCreate': "${params.action}",
+        'offset':"${params.offset}",
+        'isGalleryUpdate':'true',
+        'isMediaFilter' : '${params.isMediaFilter}',
+        'resDeleteUrl' : "${uGroup.createLink(controller:'resource', action: 'deleteUsersResourceById')}",
+        'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
+        "queryParamsMax":"${queryParams?.max}",
+        'getProcessedImageUrl' : "${createLink(controller:'observation',  action:'getProcessedImageStatus')}",
+        'curation':{
+        'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",
+        'getNameDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getNameDetails')}",
+        'searchExternalDbUrl' : "${uGroup.createLink('controller':'namelist', action:'searchExternalDb')}",
+        'getExternalDbDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getExternalDbDetails')}",
+        'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
+        'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
+        'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
+        'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}",
+        'editSpeciesPageURL' : "${uGroup.createLink(controller:'species', action:'editSpeciesPage')}"
+
+        },
+        'speciesName':"${params.speciesName }",
+        'isFlagged':"${params.isFlagged?.toBoolean()?.toString()}",
+        'nameTermsUrl': "${uGroup.createLink(controller:'search', action: 'nameTerms')}",
+        'noImageUrl' : "${createLinkTo(file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)}",
         'spinnerURL' : "${assetPath(src:'/all/spinner.gif', absolute:true)}",
         'dropDownIconUrl' : "${assetPath(src:'/all/dropdown_active.gif', absolute:true)}",
-		'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
-		'searchController' : "${controller}",
-		'carousel':{maxHeight:150, maxWidth:150},
-                'imagesPath': "${assetPath(src:'/all/images', absolute:true)}",
-                'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
-                'defaultMarkerIcon':"${assetPath(src:'/all/images', absolute:true)}",
-                'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
-                'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroup, absolute:true)}",
-                'species':{
-                    'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
-                    'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
-                    'saveUrl':"${uGroup.createLink(controller:'species', action:'save')}",
-                    'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
-                    'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}",
-                    'hasPermissionToCreateSpeciesPageUrl':"${uGroup.createLink(controller:'species', action:'hasPermissionToCreateSpeciesPage')}"
-                },
-                'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
-                'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
-                'login' : {
-                    googleOAuthSuccessUrl : "/oauth/google/success",
+        'IBPDomainUrl':"${Utils.getIBPServerDomain()}",
+        'searchController' : "${controller}",
+        'carousel':{maxHeight:150, maxWidth:150},
+        'imagesPath': "${assetPath(src:'/all/images', absolute:true)}",
+        'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
+        'defaultMarkerIcon':"${assetPath(src:'/all/images', absolute:true)}",
+        'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
+        'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroupInstance, absolute:true)}",
+        'obvShowPage' : "${uGroup.createLink(controller:'observation', action:'show','userGroup':userGroupInstance, absolute:true)}",
+        'species':{
+            'url':"${uGroup.createLink('controller':'species', action:'show', 'userGroup':userGroupInstance)}",
+            'listUrl':"${uGroup.createLink('controller':'species', action:'list', 'userGroup':userGroupInstance)}",
+            'saveUrl':"${uGroup.createLink(controller:'species', action:'save')}",
+            'updateUrl':"${uGroup.createLink(controller:'species', action:'update')}",
+            'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}",
+            'hasPermissionToCreateSpeciesPageUrl':"${uGroup.createLink(controller:'species', action:'hasPermissionToCreateSpeciesPage')}"
+        },
+        'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
+        'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
+        'login' : {
+googleOAuthSuccessUrl : "/oauth/google/success",
 
-                },
-                'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
-                'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
-                'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
-                'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
-                'generateNamesReportURL' : "${uGroup.createLink(controller:'species', action:'generateNamesReport','userGroup':userGroupInstance) }",
-                'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
-                'uploadNamesURL' : "${uGroup.createLink(action:'uploadNames', controller:'species', 'userGroup':userGroupInstance)}",
-                'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
-                'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",
-                'getLicenseFromDB' :  "${uGroup.createLink(action:'getLicenseList', controller:'species', 'userGroup':userGroupInstance)}",
-                'getAudienceFromDB' :  "${uGroup.createLink(action:'getAudienceList', controller:'species', 'userGroup':userGroupInstance)}",
-                'content':{
-                    'url':"${uGroup.createLink('controller':'content')}"
-                },
-                'observation':{
-                    listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-                    occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-                    relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-                    uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
-                    distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
-                    speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
-                    'addRecommendationVoteURL' : "${uGroup.createLink(controller:'observation', action:'addRecommendationVote', 'userGroup':userGroupInstance )}",
-                    'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}"
+        },
+        'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
+        'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
+        'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
+        'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
+        'generateNamesReportURL' : "${uGroup.createLink(controller:'species', action:'generateNamesReport','userGroup':userGroupInstance) }",
+        'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
+        'uploadNamesURL' : "${uGroup.createLink(action:'uploadNames', controller:'species', 'userGroup':userGroupInstance)}",
+        'downloadFile': "${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}",
+        'getDataColumnsDB':  "${uGroup.createLink(action:'getDataColumns', controller:'species', 'userGroup':userGroupInstance)}",
+        'getLicenseFromDB' :  "${uGroup.createLink(action:'getLicenseList', controller:'species', 'userGroup':userGroupInstance)}",
+        'getAudienceFromDB' :  "${uGroup.createLink(action:'getAudienceList', controller:'species', 'userGroup':userGroupInstance)}",
+        'content':{
+            'url':"${uGroup.createLink('controller':'content')}"
+        },
+        'observation':{
+listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+        occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+        relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+        uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
+        distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+        speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+        'addRecommendationVoteURL' : "${uGroup.createLink(controller:'observation', action:'addRecommendationVote', 'userGroup':userGroupInstance )}",
+        'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}"
 
-                },
-                'recommendation': {
-                    'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
-                    'suggest' : "${uGroup.createLink(controller:'recommendation', action: 'suggest', userGroup:userGroupInstance)}"
-                },
-                'action': {
-                    'inGroupsUrl':"${uGroup.createLink(controller:'action', action: 'inGroups', userGroup:userGroupInstance)}"
-                },
-                'map': {
-                    'domain':document.domain,
-                    'geoserverHost':document.domain,
-                    'serverURL':"${grailsApplication.config.speciesPortal.maps.serverURL}"
-                },
-                'ck':{
-                    
-                },
-                'taxon': {
-                    'classification': {
-                        'listUrl':"${uGroup.createLink(controller:'taxon', action:'listHierarchy', userGroupWebaddress:params.webaddress)}",
-                        'createUrl':"${uGroup.createLink(controller:'taxon', action:'create', userGroupWebaddress:params.webaddress)}",
-                        'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
-                        'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
+        },
+        'recommendation': {
+            'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
+            'suggest' : "${uGroup.createLink(controller:'recommendation', action: 'suggest', userGroup:userGroupInstance)}"
+        },
+        'action': {
+            'inGroupsUrl':"${uGroup.createLink(controller:'action', action: 'inGroups', userGroup:userGroupInstance)}"
+        },
+        'map': {
+            'domain':document.domain,
+            'geoserverHost':document.domain,
+            'serverURL':"${grailsApplication.config.speciesPortal.maps.serverURL}"
+        },
+        'ck':{
 
-                    },
-                    'searchUrl':"${uGroup.createLink(controller:'taxon', action:'search', userGroupWebaddress:params.webaddress)}",
-                    'nodesUrl':"${uGroup.createLink(controller:'taxon', action:'nodes', userGroupWebaddress:params.webaddress)}"
-                },
-                'userGroup': {
-                    'joinUsUrl' : "${uGroup.createLink(controller:'userGroup', action:'joinUs') }",
-		            'leaveUrl' : "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }",
-                    'requestMembershipUrl' : "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }"
-                },
-                'document':{
-                    'listUrl':"${uGroup.createLink('controller':'document', action:'list', 'userGroup':userGroupInstance)}",
-                },
-                'comment':{
-                    'getAllNewerComments': "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}"
-                 }
+        },
+        'taxon': {
+            'classification': {
+                'listUrl':"${uGroup.createLink(controller:'taxon', action:'listHierarchy', userGroupWebaddress:params.webaddress)}",
+                'createUrl':"${uGroup.createLink(controller:'taxon', action:'create', userGroupWebaddress:params.webaddress)}",
+                'updateUrl':"${uGroup.createLink(controller:'taxon', action:'update', userGroupWebaddress:params.webaddress)}",
+                'deleteUrl':"${uGroup.createLink(controller:'taxon', action:'delete', userGroupWebaddress:params.webaddress)}"
+
+            },
+            'searchUrl':"${uGroup.createLink(controller:'taxon', action:'search', userGroupWebaddress:params.webaddress)}",
+            'nodesUrl':"${uGroup.createLink(controller:'taxon', action:'nodes', userGroupWebaddress:params.webaddress)}"
+        },
+        'userGroup': {
+            'joinUsUrl' : "${uGroup.createLink(controller:'userGroup', action:'joinUs') }",
+            'leaveUrl' : "${uGroup.createLink(controller:'userGroup', action:'leaveUs') }",
+            'requestMembershipUrl' : "${uGroup.createLink(controller:'userGroup', action:'requestMembership') }"
+        },
+        'document':{
+            'listUrl':"${uGroup.createLink('controller':'document', action:'list', 'userGroup':userGroupInstance)}",
+        },
+        'comment':{
+            'getAllNewerComments': "${uGroup.createLink(controller:'comment', action:'getAllNewerComments')}"
+        },
+        'dataset':{
+            'deleteUrl':"${uGroup.createLink(controller:'dataset', action:'delete')}"
+        }
  
-                
-	}
+        }
 
-    window.i8ln = {
+        window.i8ln = {
         "text" : {
                 "featured" : "${g.message(code:'text.featured.on')}",
                 "in_group" : "${g.message(code:'text.in.group')}",

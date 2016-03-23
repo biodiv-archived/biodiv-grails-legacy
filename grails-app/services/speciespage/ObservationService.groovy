@@ -134,8 +134,14 @@ class ObservationService extends AbstractMetadataService {
 
         //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
+        println "************************************"
+        println "************************************"
+        println "************************************"
+        println "************************************"
+        println observation.version
 		if(updateResources){
             updateResource(observation, params);
+            println observation.version
     	}
         return observation;
     }
@@ -595,7 +601,7 @@ class ObservationService extends AbstractMetadataService {
 
         observations.each {
             def obv;
-            if(userGroupInstance) obv = it[0];
+            if(userGroupInstance && !(it instanceof Observation)) obv = it[0];
             else obv = it;
             if(obv)
                 result.add(['observation':obv, 'title':(obv.isChecklist)? obv.title : maxVotedReco.name]);
@@ -2509,10 +2515,10 @@ println "******************************"
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
 
-    boolean hasObvLockPerm(obvId) {
+    boolean hasObvLockPerm(obvId, recoId) {
         def observationInstance = Observation.get(obvId.toLong());
-        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
-        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+        def taxCon = Recommendation.read(recoId.toLong())?.taxonConcept 
+        return springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || (taxCon && speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])) ) 
     }
 	
 	def Map updateInlineCf(params){
@@ -2598,9 +2604,9 @@ println "******************************"
 
                 if(recoVote.taxon_concept_id) {
                     map.put("speciesId", recoVote.species_id);
-                    map.put("canonicalForm", recoVote.canonical_form)
-                    if(!recoVote.name.equalsIgnoreCase(recoVote.canonical_form) && recoVote.is_scientific_name) {
-                        map.put("synonymOf", recoVote.canonical_form)
+                    map.put("normalizedForm", recoVote.normalized_form)
+                    if(recoVote.status == NameStatus.SYNONYM && recoVote.is_scientific_name) {
+                        map.put("synonymOf", recoVote.normalized_form)
                     }
                 }
                 map.put("name", recoVote.name);

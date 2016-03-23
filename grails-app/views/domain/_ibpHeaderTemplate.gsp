@@ -29,7 +29,8 @@
          <div class="">
          
 <%
-String cgroup=(params.webaddress)?params.webaddress:'ibp';
+String cgroup="";
+cgroup=(params.webaddress)?params.webaddress:'ibp';
 String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
@@ -78,8 +79,21 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 			${flash.error}
 		</div>
 	</g:if>
-	<% String bannerMessage=raw(utilsService.getBannerMessage(cgroup)); %>
-<g:if test="${bannerMessage!=""}">
+
+	<% 
+	String bannerMessage = utilsService.getBannerMessage(cgroup);
+	String ibpBannerMessage = utilsService.getIbpBannerMessage();
+	 %>
+     <g:if test="${cgroup && bannerMessage}">
+     <div class="alertMsg alert alert-info"
+         style="clear: both; margin: 0px; text-align: center;">
+         ${raw(bannerMessage)}
+     </div>
+     </g:if>
+     <g:if test="${ibpBannerMessage}">
+     <div class="alertMsg alert alert-info"
+         style="clear: both; margin: 0px; text-align: center;">
+         ${raw(ibpBannerMessage)}
 
 <%--	<div class="alert alert-info"--%>
 <%--		style="clear: both; margin: 0px; text-align: center;">--%>
@@ -92,20 +106,17 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 <%--This monsoon, <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/show">Frog Watch</a> will be mapping the distribution of the <a target="_blank" href="http://indiabiodiversity.org/species/show/25575">Malabar Tree Toad</a>. Participate by <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/observation/create">uploading</a> observations of this species.--%>
 <%--	</div>--%>
 
-
 	<div class="alertMsg alert alert-info"
 		style="clear: both; margin: 0px; text-align: center;">
-		<!-- The IBP Community Meet will be held on 20th February at NGMA, Bangalore. Register your participation <a target="_blank" href="http://indiabiodiversity.org/page/149">here</a>. -->
 		${bannerMessage}
-		 
 	</div>
-	<g:if test="${params.webaddress!=null}">
+	</g:if>
+	<g:if test="${params.webaddress!=null && ibpBannerMessage!=null && bannerMessage!=ibpBannerMessage}">
 	<div class="alertMsg alert alert-info"
 		style="clear: both; margin: 0px; text-align: center;">
 		${raw(utilsService.getIbpBannerMessage())}
 		 
 	</div>
-	</g:if>
 	</g:if>
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
