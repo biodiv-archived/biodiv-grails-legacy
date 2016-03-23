@@ -33,7 +33,6 @@
                 <div class="progress_msg"></div>
                 <div class="mediaProgressBar" style ="margin-top:117px"></div>
             </div>
-
             </li>
             </g:if>
             <g:each in="${res}" var="r">
@@ -54,7 +53,7 @@
             def imagePath = '';
                 if(r) {
                 if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString() || r.context.value() == Resource.ResourceContext.CHECKLIST.toString()){
-                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations', null, ImageType.LARGE )?:null;
+                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations', null, ImageType.LARGE )?:null;        
                 } else if(r.context.value() == Resource.ResourceContext.USER.toString()){
                     imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/usersRes', null, ImageType.LARGE)?:null;    
                 } else{
@@ -90,19 +89,23 @@
                 </g:if>
                 <%
                 def firstLicense = r?.license
+                def listType="${resourceListType}"
+                def resAlreadyPres = observationInstance.resources.id.asList()
                 %>
-                <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':firstLicense]"/>
+                <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':firstLicense, 'resource':r.context.value()]"/>
                
                 <g:if test="${observationInstance instanceof Species}">
                 <div class="imageMetadataDiv" >
                 <div class="imageMetadataForm" >
-                    <input name="contributor_${i}" type="text" value="${r.contributors.name.join(',')}" placeholder="${g.message(code:'placeholder.contributor')}">
-                    <input name="source_${i}" type="text" value="${resSource}" placeholder="${g.message(code:'placeholder.source')}">
+           
+                    <input name="contributor_${i}" ${(r.context.value()== 'OBSERVATION')?'disabled' :''} type="text" value="${r.contributors.name.join(',')}" placeholder="${g.message(code:'placeholder.contributor')}">
+                    <input name="source_${i}" type="text" value="${resSource}" placeholder="${g.message(code:'placeholder.source')}" ${(r.context.value()== 'OBSERVATION')?'disabled' :''}>
                     <input name="title_${i}" type="text" value="${r.description}" placeholder="${g.message(code:'placeholder.caption')}">
+
+
                     <g:if test="${resourceListType == 'fromRelatedObv' || resourceListType == 'fromSpeciesField'}">
-                        <%
+                             <%
                             def isChecked = ""
-                            def resAlreadyPres = observationInstance.resources.id.asList()
                             if(resAlreadyPres.contains(r.id)){
                                 isChecked = "checked"
                             }
@@ -112,6 +115,7 @@
                         %>
                         <input class="pullImage" name="pullImage_${i}" type="checkbox" value="true" ${isChecked} >
                     </g:if>
+                 
                 </div>
             </div>
             </g:if>
@@ -119,11 +123,11 @@
             </div> 
             <div class="close_button"
                 onclick="removeResource(event, ${i});$('#geotagged_images').trigger('update_map');"></div>
-
             </li>
             <g:set var="i" value="${i-1}" />
+         
             </g:each>
-            
+          
 <!--====== Template ======-->
 <script id="metadataTmpl" type="text/x-jquery-tmpl">
     <li class="addedResource thumbnail addedResource_{{>i}}">
@@ -132,19 +136,16 @@
             <img class='image_{{>i}} geotagged_image' style="width:auto; height: auto;" src='{{>thumbnail}}' exif='true'/> 
         </span>
     </div>
-
     <div class='metadata prop' style="position:relative; top:-30px;">
         <input class="fileName" name="file_{{>i}}" type="hidden" value='{{>file}}'/>
         <input name="url_{{>i}}" type="hidden" value='{{>url}}'/>
         <input name="type_{{>i}}" type="hidden" value='{{>type}}'/>
         
-        
     {{if type != "AUDIO"}}  
-        <%def r = new Resource();%>        
-        <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
+        <%def r = new Resource();%>
+          <obv:rating model="['resource':r, class:'obvcreate', 'hideForm':true, index:1]"/>
     {{/if}}
-        
-        
+
         <div id="license_div_{{>i}}" class="license_div pull-left dropdown">
             <a id="selected_license_{{>i}}" class="btn dropdown-toggle" data-toggle="dropdown">
                 <img src="${assetPath(src:'/all/license/'+'cc_by.png', absolute:true)}" title="${g.message(code:'title.set.license')}"/>
@@ -164,7 +165,7 @@
         <g:if test="${observationInstance instanceof Species}">
             <div class="imageMetadataDiv" >
                 <div class="imageMetadataForm" >
-                    <input name="contributor_{{>i}}" type="text" value="${currentUser?.name}" placeholder="${g.message(code:'placeholder.contributor')}">
+                    <input name="contributor_{{>i}}" type="text" value="${currentUser?.name}"  placeholder="${g.message(code:'placeholder.contributor')}">
                     <input name="source_{{>i}}" type="text" value="" placeholder="${g.message(code:'placeholder.source')}">
                     <input name="title_{{>i}}" type="text" value="" placeholder="${g.message(code:'placeholder.caption')}">
                     <!--input name="resContext_{{>i}}" type="hidden" value = "SPECIES"-->
@@ -173,12 +174,10 @@
         </g:if>
         <g:else>
             <!--input name="resContext_{{>i}}" type="hidden" value = "OBSERVATION"-->
-        </g:else>	
+        </g:else>   
         
    
     </div>
     <div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
     </li>
-
 </script>
-
