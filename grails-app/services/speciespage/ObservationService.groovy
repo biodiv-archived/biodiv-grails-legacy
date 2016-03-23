@@ -2508,10 +2508,10 @@ class ObservationService extends AbstractMetadataService {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
 
-    boolean hasObvLockPerm(obvId) {
+    boolean hasObvLockPerm(obvId, recoId) {
         def observationInstance = Observation.get(obvId.toLong());
-        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
-        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+        def taxCon = Recommendation.read(recoId.toLong())?.taxonConcept 
+        return springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || (taxCon && speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])) ) 
     }
 	
 	def Map updateInlineCf(params){

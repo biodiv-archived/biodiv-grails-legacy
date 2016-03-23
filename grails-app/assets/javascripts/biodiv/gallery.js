@@ -222,8 +222,9 @@ function update_imageAttribute(resource,ele,index,defaultThumb){
 
     output += '<div class="conts_wrap_right">';
     output += '<div class="license">';
-    output += '<a href="'+resource.license['url']+'" target="_blank">';
-    var license = (resource.license['name'] == 'Unspecified')? 'CC BY': resource.license['name'];
+    var url = (resource.license['url'] == 'null')? 'http://creativecommons.org/licenses/by/3.0/':resource.license['url'];
+    var license = (resource.license['name'] == 'Unspecified')? 'CC BY': resource.license['name']; 
+    output += '<a href="'+url+'" target="_blank">';
     output += '<img class="icon" style="height:auto;margin-right:2px;" src="'+window.params.imagesPath+'/../license/'+license.replace(' ','_').toLowerCase()+'.png" alt="'+license+'">';
     output += '</a>';
     output += '<div class="rating_form">';
