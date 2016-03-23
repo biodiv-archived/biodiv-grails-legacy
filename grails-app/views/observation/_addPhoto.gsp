@@ -5,7 +5,6 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.utils.ImageType"%>
 <%@page import= "org.codehaus.groovy.runtime.DateGroovyMethods"%>
-
             <g:set var= "res" value="${resList}" />
             <g:if test="${resourceListType == 'fromRelatedObv'}">
                 <g:set var="i" value="${offset-1}"/>
@@ -39,6 +38,7 @@
             <g:each in="${res}" var="r">
             <%
                 def flag19 = false
+                def validUrl = true;
                 if(resourceListType == "usersResource"){
                     def d = new Date()
                     DateGroovyMethods.clearTime(d)
@@ -48,19 +48,17 @@
                         flag19 = true
                     }
                 }
-            %>
-            <li class="addedResource thumbnail" style="${flag19?'border:1px red solid' :''}">
-            <%
-            def imagePath = '';
+                def imagePath = '';
+                String domainServerUrlwithContext = Utils.getDomainServerUrlWithContext(request) ;
                 if(r) {
                 if(r.context.value() == Resource.ResourceContext.OBSERVATION.toString() || r.context.value() == Resource.ResourceContext.CHECKLIST.toString()){
-                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/observations', null, ImageType.LARGE )?:null;
+                    imagePath = r.thumbnailUrl(domainServerUrlwithContext + '/observations', null, ImageType.LARGE )?:null;
                 } else if(r.context.value() == Resource.ResourceContext.USER.toString()){
-                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + '/usersRes', null, ImageType.LARGE)?:null;    
+                    imagePath = r.thumbnailUrl(domainServerUrlwithContext + '/usersRes', null, ImageType.LARGE)?:null;    
                 } else{
                     def spFolder = grailsApplication.config.speciesPortal.resources.rootDir
                     def finalFolder = spFolder.substring(spFolder.lastIndexOf("/"), spFolder.size())
-                    imagePath = r.thumbnailUrl(Utils.getDomainServerUrlWithContext(request) + finalFolder, null, ImageType.LARGE)?:null;   
+                    imagePath = r.thumbnailUrl(domainServerUrlwithContext + finalFolder, null, ImageType.LARGE)?:null;   
                 }
                 }
                 def resSource = r.url
@@ -71,6 +69,7 @@
                     }
                 }
             %>
+            <li class="addedResource thumbnail" style="${flag19?'border:1px red solid' :''}">
             <div class='figure' style="height: 200px; overflow: hidden;">
                 <span> <img class="image_${i} geotagged_image" style="width: auto; height: auto;"
                     src='${imagePath}' exif='true' /> </span>

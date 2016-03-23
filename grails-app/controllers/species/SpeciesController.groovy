@@ -1358,9 +1358,19 @@ class SpeciesController extends AbstractObjectController {
         params.offset = (params.offset)?params.offset:0
         def spInstance = Species.read(params.speciesId.toLong())
         def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
-        def relatedObv = relatedObvMap.resList
-        def relatedObvCount = relatedObvMap.count
-        def obvLinkList = relatedObvMap.obvLinkList
+        List relatedObv = [];
+        List obvLinkList = [];
+        int i=0;
+        relatedObvMap.resList.eachWithIndex { it, index ->
+            if(it.url && (it.url.endsWith('no-image.jpg') ||  it.fileName.length() == 1)) {
+                log.debug "Ignoring resource from pulling as it as external Url ${it.url}"
+            } else {
+                relatedObv << it
+                obvLinkList[i++] = relatedObvMap.obvLinkList[index];
+            }
+        }
+        
+        def relatedObvCount = relatedObv.size()
         def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:(params.offset.toInteger() + relatedObvCount)]);
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON
