@@ -3,7 +3,7 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.UtilsService"%>
 <div class="observation_story">
-    <div>
+    <div style="height:25px;">
         <g:if test="${showDetails && !showFeatured}">
         <%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
