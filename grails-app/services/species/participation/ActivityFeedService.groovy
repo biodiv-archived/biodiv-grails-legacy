@@ -22,6 +22,7 @@ class ActivityFeedService {
     //instance related
 	static final String INSTANCE_CREATED = "Instance created"
 	static final String INSTANCE_UPDATED = "Instance updated"
+	static final String INSTANCE_DELETED = "Instance deleted"
 
 	
 	//checklist related

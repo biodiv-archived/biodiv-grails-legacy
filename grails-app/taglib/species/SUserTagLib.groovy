@@ -47,7 +47,7 @@ class SUserTagLib {
     *checks the permission for lock/unlock of observation
     */
     def hasObvLockPerm = { attrs, body ->
-        if(observationService.hasObvLockPerm(attrs.model.obvId)) {
+        if(observationService.hasObvLockPerm(attrs.model.obvId, attrs.model.recoId)) {
             out << body()
         } 
     }

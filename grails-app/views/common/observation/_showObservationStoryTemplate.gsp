@@ -3,7 +3,7 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.UtilsService"%>
 <div class="observation_story">
-    <div>
+    <div style="height:25px;">
         <g:if test="${showDetails && !showFeatured}">
         <%
         def speciesInstance = Species.read(observationInstance.maxVotedReco?.taxonConcept?.findSpeciesId())
@@ -231,19 +231,29 @@
 
                 <g:if test="${observationInstance.dataset}" >
                 <div class="prop">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.citeas.label" /></span>
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="dataset.name.label" /></span>
                     <div class="value linktext">
                         <g:if test="${observationInstance.dataset.externalUrl}">
                             <a href="${observationInstance.dataset.externalUrl}">
                         </g:if>
-                        ${observationInstance.dataset.datasource.title} (${UtilsService.formatDate(observationInstance.dataset.publicationDate)}) ${observationInstance.dataset.title}
+                        ${observationInstance.dataset.title}
                         <g:if test="${observationInstance.dataset.externalUrl}">
-                            </a">
+                            </a>
                         </g:if>
 
                     </div>		
                 </div>
                 </g:if>
+
+                <g:if test="${observationInstance.externalUrl}" >
+                <div class="prop">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.externalId.label" /></span>
+                    <div class="value linktext">
+                        ${observationInstance.externalUrl}
+                    </div>		
+                </div>
+                </g:if>
+
 
 
                 <div class="prop">

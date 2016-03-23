@@ -1124,8 +1124,10 @@ class XMLConverter extends SourceConverter {
                 res.url = absUrl?:sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
+                    println con
                     res.addToContributors(con);
                 }
+                println "-----------------------"
                 for(Contributor con : getAttributions(imageNode, true)) {
                     res.addToAttributors(con);
                 }
@@ -1134,9 +1136,6 @@ class XMLConverter extends SourceConverter {
                 }
                 if(imageNode.annotations?.text()) {
                     res.annotations = imageNode.annotations?.text()
-                }
-                if(!res.save(flush:true)){
-                    res.errors.allErrors.each { log.error it }
                 }
             } else {
                 log.debug "Updating resource metadata"
@@ -1147,7 +1146,9 @@ class XMLConverter extends SourceConverter {
                 res.license = null;//?.clear()
                 res.contributors?.clear()
                 res.attributors?.clear();
-                for(Contributor con : getContributors(imageNode, true)) {
+                println "-----------------------"
+                for(Contributor  con : getContributors(imageNode, true)) {
+                    println con
                     res.addToContributors(con);
                 }
                 for(Contributor con : getAttributions(imageNode, true)) {
@@ -1164,11 +1165,14 @@ class XMLConverter extends SourceConverter {
 
                 //res.merge();
                 //res.refresh();
-                if(!res.save(flush:true)){
-                    res.errors.allErrors.each { log.error it }
-                }
-                res.refresh();
+
+                //removing flush:true as in bulk upload this flush is causing observation version to change. We shd flush when parent object is saved
             }
+            if(!res.save(/*flush:true*/)){
+                res.errors.allErrors.each { println it;log.error it }
+            }
+            //res.refresh();
+
             //s.addToResources(res);
             imageNode.appendNode("resource", res);
             log.debug "Successfully created resource " + res;
