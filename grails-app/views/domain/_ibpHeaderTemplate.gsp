@@ -29,7 +29,8 @@
          <div class="">
          
 <%
-String cgroup=(params.webaddress)?params.webaddress:'ibp';
+String cgroup="";
+cgroup=(params.webaddress)?params.webaddress:'ibp';
 String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
@@ -101,7 +102,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		${bannerMessage}
 	</div>
 	</g:if>
-	<g:if test="${params.webaddress!=null && ibpBannerMessage!=null}">
+	<g:if test="${params.webaddress!=null && ibpBannerMessage!=null && bannerMessage!=ibpBannerMessage}">
 	<div class="alertMsg alert alert-info"
 		style="clear: both; margin: 0px; text-align: center;">
 		${raw(utilsService.getIbpBannerMessage())}
