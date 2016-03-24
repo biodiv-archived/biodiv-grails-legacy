@@ -1433,7 +1433,6 @@ function loadSpeciesnameReco(){
 function addListLayout(){
     $('.thumbnails>li').css({'width':'100%'}).addClass('addmargin');
     $('.snippet.tablet').addClass('snippettablet');
-    //$('.prop').css('clear','inherit');
     $('.showObvDetails, .view_bootstrap_gallery, .recommendations').show();
     $('.species_title_wrapper').hide();
     $('.species_title_wrapper').parent().css({'height':'20px'});
@@ -1445,7 +1444,6 @@ function addListLayout(){
 function addGridLayout(){
     $('.thumbnails>li').css({'width':'inherit'}).removeClass('addmargin');
     $('.snippet.tablet').removeClass('snippettablet');
-    $('.prop').css('clear','both');
     $('.species_title_wrapper').show();
     $('.species_title_wrapper').parent().css({'height':'50px'});
     $('.showObvDetails, .view_bootstrap_gallery, .recommendations').hide();    
