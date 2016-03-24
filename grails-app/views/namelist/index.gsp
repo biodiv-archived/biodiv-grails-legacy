@@ -53,9 +53,9 @@
             <div class="span9 listarea" style="overflow:visible;">
                  <div id="taxonGrid" class="dl_content" style="width:100%;height:225px"></div>
                  <div id="listCounts" class="pull-left" style="height:27px;">
-                    <span id="dirtyListCount"></span>
-                    <span id="workingListCount"></span>
-                    <span id="cleanListCount"></span>
+                    <span id="dirtyListCount" class="RAW"></span>
+                    <span id="workingListCount" class="WORKING"></span>
+                    <span id="cleanListCount" class="CLEAN"></span>
                 </div>
                 <div id="taxonPager" class="pull-right" style="height:27px;"></div>
                 <div id="inlineFilterPanel" style="background:#dddddd;color:black;clear:both;">

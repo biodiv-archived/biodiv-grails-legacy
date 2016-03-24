@@ -80,13 +80,13 @@ a.not_in_use {
     min-height:24px;
 }
 
-.row-fluid .taxon_selector_wrapper_span.dirty_list, .dl_content li.RAW {
+.row-fluid .taxon_selector_wrapper_span.dirty_list, .dl_content li.RAW, #listCounts .RAW {
     background-color:lightgrey; //#C0504D;
 }
-.row-fluid .taxon_selector_wrapper_span.working_list, .dl_content li.WORKING {
+.row-fluid .taxon_selector_wrapper_span.working_list, .dl_content li.WORKING, #listCounts .WORKING {
     background-color:khaki; //#FF9900;
 }
-.row-fluid .taxon_selector_wrapper_span.clean_list,  .dl_content li.CLEAN {
+.row-fluid .taxon_selector_wrapper_span.clean_list,  .dl_content li.CLEAN, #listCounts .CLEAN {
     background-color:mediumaquamarine; //#009933;
 }
 .row-fluid .taxon_selector_wrapper_span.taxon_selector_span{
