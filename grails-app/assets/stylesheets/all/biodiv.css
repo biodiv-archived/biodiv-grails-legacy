@@ -507,7 +507,11 @@ div.errors {
 	position: relative;
 	padding: 2px;
 	background-color: #ffffff;
-	height: 210px;
+	height: 242px;
+}
+
+.resources .addedResource input[type="text"]{
+	width: 185px;
 }
 
 .figure {
@@ -575,7 +579,7 @@ div.errors {
 }
 
 .add_file_container {
-	padding: 5px 8px;
+	padding: 18px 8px;
 	position:relative;
 	z-index:100;
 }
@@ -774,7 +778,7 @@ ul#recoSummary {
 	border-top: 1px solid #9E9E9E;
 	box-shadow: 0 2px 11px -3px inset;
 	padding: 10px;
-	min-height: 212px;
+	min-height: 260px;
 }
 
 .close_button {

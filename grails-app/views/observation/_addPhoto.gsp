@@ -118,6 +118,9 @@
                 </div>
             </div>
             </g:if>
+            <g:else>
+                <input name="title_${i}" type="text" value="${r.description}" placeholder="${g.message(code:'placeholder.caption')}">
+            </g:else>
             <input class="resId" name="resId_${i}" type="hidden" value='${r.id}'/>
             </div> 
             <div class="close_button"
@@ -173,6 +176,7 @@
         </g:if>
         <g:else>
             <!--input name="resContext_{{>i}}" type="hidden" value = "OBSERVATION"-->
+            <input name="title_{{>i}}" type="text" value="" placeholder="${g.message(code:'placeholder.caption')}">
         </g:else>   
         
    
