@@ -207,10 +207,11 @@ function getNamesFromTaxon(ele , parentId, ranksToFetch) {
 
                 var taxonData = data.dirtyList.accDL.concat(data.dirtyList.synDL);
                 taxonGridDataView.setItems(taxonData, 'taxonid');
-                // if you don't want the items that are not visible (due to being filtered out
-                // or being on a different page) to stay selected, pass 'false' to the second arg
                 taxonGrid.invalidateAllRows();
                 taxonGrid.render();
+
+                // if you don't want the items that are not visible (due to being filtered out
+                // or being on a different page) to stay selected, pass 'false' to the second arg
                 taxonGridDataView.syncGridSelection(taxonGrid, true);
                 $("#taxonGrid").resizable();
 
