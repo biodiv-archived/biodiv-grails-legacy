@@ -9,6 +9,7 @@
 
     function init() {
       grid.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
+      grid.onColumnsReordered.subscribe(updateColumnOrder);
       options = $.extend({}, defaults, options);
 
       $menu = $("<span class='slick-columnpicker' style='display:none;position:absolute;z-index:20;' />").appendTo(document.body);
@@ -20,9 +21,16 @@
 
     }
 
+    function destroy() {
+      grid.onHeaderContextMenu.unsubscribe(handleHeaderContextMenu);
+      grid.onColumnsReordered.unsubscribe(updateColumnOrder);
+      $menu.remove();
+    }
+
     function handleHeaderContextMenu(e, args) {
       e.preventDefault();
       $menu.empty();
+      updateColumnOrder();
       columnCheckboxes = [];
 
       var $li, $input;
@@ -68,6 +76,28 @@
           .fadeIn(options.fadeSpeed);
     }
 
+    function updateColumnOrder() {
+      // Because columns can be reordered, we have to update the `columns`
+      // to reflect the new order, however we can't just take `grid.getColumns()`,
+      // as it does not include columns currently hidden by the picker.
+      // We create a new `columns` structure by leaving currently-hidden
+      // columns in their original ordinal position and interleaving the results
+      // of the current column sort.
+      var current = grid.getColumns().slice(0);
+      var ordered = new Array(columns.length);
+      for (var i = 0; i < ordered.length; i++) {
+        if ( grid.getColumnIndex(columns[i].id) === undefined ) {
+          // If the column doesn't return a value from getColumnIndex,
+          // it is hidden. Leave it in this position.
+          ordered[i] = columns[i];
+        } else {
+          // Otherwise, grab the next visible column.
+          ordered[i] = current.shift();
+        }
+      }
+      columns = ordered;
+    }
+
     function updateColumn(e) {
       if ($(e.target).data("option") == "autoresize") {
         if (e.target.checked) {
@@ -105,7 +135,16 @@
       }
     }
 
+    function getAllColumns() {
+      return columns;
+    }
+
     init();
+
+    return {
+      "getAllColumns": getAllColumns,
+      "destroy": destroy
+    };
   }
 
   // Slick.Controls.ColumnPicker

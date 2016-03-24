@@ -1,16 +1,16 @@
-//= require SlickGrid-2.0.2/lib/jquery.event.drag-2.0.min.js
-//= require SlickGrid-2.0.2/slick.core.js
-//= require SlickGrid-2.0.2/slick.formatters.js
-//= require SlickGrid-2.0.2/slick.editors.js
-//= require SlickGrid-2.0.2/slick.grid.js
-//= require SlickGrid-2.0.2/slick.dataview.js
-//= require SlickGrid-2.0.2/plugins/slick.headerbuttons.js
-//= require SlickGrid-2.0.2/plugins/slick.headermenu.js
-//= require SlickGrid-2.0.2/plugins/slick.cellrangedecorator.js
-//= require SlickGrid-2.0.2/plugins/slick.cellrangeselector.js
-//= require SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js
-//= require SlickGrid-2.0.2/plugins/slick.rowselectionmodel.js
-//= require SlickGrid-2.0.2/controls/slick.pager.js
-//= require SlickGrid-2.0.2/controls/slick.columnpicker.js
+//= require SlickGrid/lib/jquery.event.drag-2.0.min.js
+//= require SlickGrid/slick.core.js
+//= require SlickGrid/slick.formatters.js
+//= require SlickGrid/slick.editors.js
+//= require SlickGrid/slick.grid.js
+//= require SlickGrid/slick.dataview.js
+//= require SlickGrid/plugins/slick.headerbuttons.js
+//= require SlickGrid/plugins/slick.headermenu.js
+//= require SlickGrid/plugins/slick.cellrangedecorator.js
+//= require SlickGrid/plugins/slick.cellrangeselector.js
+//= require SlickGrid/plugins/slick.cellselectionmodel.js
+//= require SlickGrid/plugins/slick.rowselectionmodel.js
+//= require SlickGrid/controls/slick.pager.js
+//= require SlickGrid/controls/slick.columnpicker.js
 
 

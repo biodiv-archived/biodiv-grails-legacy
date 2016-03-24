@@ -33,11 +33,11 @@
 *= require all/blueimp-gallery.css
 *= require all/blueimp-gallery-video.css
 *= require all/jstree-style.css
-*= require SlickGrid-2.0.2/slick.grid.css
-*= require SlickGrid-2.0.2/slick.headerbuttons.css
-*= require SlickGrid-2.0.2/slick.headermenu.css
-*= require SlickGrid-2.0.2/slick.columnpicker.css
-*= require SlickGrid-2.0.2/slick.pager.css
+*= require SlickGrid/slick.grid.css
+*= require SlickGrid/slick.headerbuttons.css
+*= require SlickGrid/slick.headermenu.css
+*= require SlickGrid/slick.columnpicker.css
+*= require SlickGrid/slick.pager.css
 
 // biodiv specific
 *= require all/biodiv.css
