@@ -1946,4 +1946,3 @@ grails {
 }
 */
 grails.assets.bundle=true
-grails.assets.minifyJs = false

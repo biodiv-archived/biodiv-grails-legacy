@@ -68,7 +68,7 @@
 //= require biodiv/observations/show.js
 //= require biodiv/chooseLanguage.js
 
-////= require slickgrid
+//= require slickgrid
 ////= require create
 //= require jquery.plugins/filepicker.js
 //= require jquery.plugins/jquery.exif.js

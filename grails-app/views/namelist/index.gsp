@@ -13,7 +13,6 @@
 
         <title>NameList - Curation Interface</title>
 
-        <asset:javascript src="slickgrid.js"/>
     </head>
     <body>
 
