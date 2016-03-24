@@ -1004,6 +1004,12 @@ class UtilsService {
 		return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
 	}
 
+    boolean isSpeciesAdmin(SUser user) {
+		if(!user) return false
+		return SUserRole.get(user.id, Role.findByAuthority('ROLE_SPECIES_ADMIN').id) != null
+	}
+	
+
 	boolean isAdmin(SUser user) {
 		if(!user) return false
 		return SUserRole.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
@@ -1167,7 +1173,7 @@ class UtilsService {
                 gname = gname?.trim();
                 bmessage = (bmessage?.replaceAll("</?p>", ''))?.trim();
                 if(gname && bmessage) {
-                    bannerMessageMap[gname.replaceAll("<(.|\n)*?>", '')] = bmessage;   
+                    bannerMessageMap[gname?.replaceAll("<(.|\n)*?>", '')] = bmessage;   
                 }
             }
         }

@@ -31,14 +31,14 @@
                 <input type="hidden" class='relatedImagesOffset' name='relatedImagesOffset' value = ''/>
             </g:if>
             <input class="resourceListTypeFilled" type="hidden" name='resourceListType' value="${resourceListType}" /> 
-            <g:if test="${resourceListType == 'fromRelatedObv'}" >
-            <a class="btn" style="margin-right: 5px;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}", this )'><g:message code="msg.load.more" /></a>
-            </g:if>
         </ul>
         <div class="image-resources-msg help-inline">
             <g:renderErrors bean="${observationInstance}" as="list"
             field="resource" />
         </div>
+        <g:if test="${resourceListType == 'fromRelatedObv'}" >
+            <a class="btn" style="margin-right: 5px;position=relative;float:left;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}", this )'><g:message code="msg.load.more" /></a>
+            </g:if>
     </div>
 </div>
 
@@ -59,6 +59,7 @@
             }
             $(".relatedImagesOffset").val(${resCount});
         }
+
         if("${resourceListType}" == "fromSpeciesField"){
             if(${resCount} == 0){
                 $('#speciesImage-li2').hide();

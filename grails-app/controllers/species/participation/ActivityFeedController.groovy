@@ -16,6 +16,8 @@ import static org.springframework.http.HttpStatus.*;
 class ActivityFeedController {
 	
 	static defaultAction = "list"
+
+	private final static int GMT_OFFSET_IN_MINUTES = TimeZone.getDefault().getRawOffset()/(1000*60)
 	
 	def activityFeedService;
 	def springSecurityService;
@@ -58,7 +60,7 @@ class ActivityFeedController {
 	
 	def getServerTime () {
 		log.debug params
-		render ("" + new Date().getTime()) as JSON
+		render ("" + GMT_OFFSET_IN_MINUTES) as JSON
 	}
 	
 	def index() {

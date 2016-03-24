@@ -44,8 +44,9 @@
 
         <form class="form-horizontal" id="frmgroup" method="post" action="${uGroup.createLink(controller:'biodivAdmin', action:'getMessage')}"> 
          <select name=groupId class=groupId>
+         <option value="">Select Group</option>
          <option value="ibp">All Group</option>
-            <option value=${getGroup}><g:each in="${UserGroup.list()}">
+            <g:each in="${UserGroup.list()}">
             <g:if test="${it.webaddress==getGroup}">
                 <option value="${it.webaddress}" selected>${it.name}</option>
                 </g:if>
@@ -72,7 +73,7 @@
             <textarea name="content" class="content">
                    ${getMessage}
             </textarea>
-            <p class="muted">Message Format Group Name - Banner Message(eg:spiderindia - Spider India Banner Message)</p>
+         <!--   <p class="muted">Message Format Group Name - Banner Message(eg:spiderindia - Spider India Banner Message)</p> -->
             <input type="submit" value="Save" class="btn btn-success" id="savebtn" />  
         </form>
         </div>

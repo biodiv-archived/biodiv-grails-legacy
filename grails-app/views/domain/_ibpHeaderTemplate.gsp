@@ -93,10 +93,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
      <div class="alertMsg alert alert-info"
          style="clear: both; margin: 0px; text-align: center;">
          ${raw(ibpBannerMessage)}
-
-     </div>
-     </g:if>
-     <div class="alertMsg ${(flash.message)?'alert':'' }"
+	</g:if>
+	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
 		${flash.message}
 	</div>
@@ -104,4 +102,5 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<auth:ajaxLogin />
 	<div id="fb-root"></div>
     </div>
+</div>
 </div>

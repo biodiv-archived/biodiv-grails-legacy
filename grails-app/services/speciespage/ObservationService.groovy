@@ -631,16 +631,20 @@ class ObservationService extends AbstractMetadataService {
         return ["observations":result, "count":count]
     }
     
-    Map getRelatedObvForSpecies(resInstance, int limit, int offset){
+    Map getRelatedObvForSpecies(resInstance, int limit, int offset, boolean includeExternalUrls = true) {
         def taxon = resInstance.taxonConcept
         //List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxonConcept);
         def resList = []
         def obvLinkList = []
-        if(taxon) {
+        if(taxon) { 
             def classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
-            def resIdList = Observation.executeQuery ("select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc", ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
-
+            String query = "select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') order by obv.lastRevised desc";
+            if(!includeExternalUrls) {
+                query = "select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') and NOT (r.url != null and length(r.fileName) = 1) order by obv.lastRevised desc"
+            }
+            def resIdList = Observation.executeQuery (query, ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
+println resIdList
              /*
             def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
             def hqlQuery = sessionFactory.currentSession.createQuery(query) 
@@ -658,7 +662,7 @@ class ObservationService extends AbstractMetadataService {
             }
             def resListSize = resList.size()
             return ['resList': resList, 'obvLinkList': obvLinkList, 'count' : resListSize ]
-        } else{
+        } else {
             return ['resList': resList, 'obvLinkList': obvLinkList, 'count': 0]
         }
     }
@@ -2504,10 +2508,10 @@ class ObservationService extends AbstractMetadataService {
     return utilsService.sendNotificationMail(notificationType, obv, request, userGroupWebaddress, feedInstance, otherParams);
     }
 
-    boolean hasObvLockPerm(obvId) {
+    boolean hasObvLockPerm(obvId, recoId) {
         def observationInstance = Observation.get(obvId.toLong());
-        def taxCon = observationInstance.maxVotedReco?.taxonConcept 
-        return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == observationInstance.author.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) ) 
+        def taxCon = Recommendation.read(recoId.toLong())?.taxonConcept 
+        return springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || (taxCon && speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])) ) 
     }
 	
 	def Map updateInlineCf(params){
