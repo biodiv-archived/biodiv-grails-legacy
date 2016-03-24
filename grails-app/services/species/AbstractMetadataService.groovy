@@ -102,6 +102,7 @@ class AbstractMetadataService extends AbstractObjectService {
         if( params.fromDate != ""){
             log.debug "Parsing date ${params.fromDate}"
             instance.fromDate = parseDate(params.fromDate);
+            log.debug "got ${instance.fromDate}"
             instance.toDate = params.toDate ? parseDate(params.toDate) : instance.fromDate
 
         }
@@ -152,7 +153,7 @@ class AbstractMetadataService extends AbstractObjectService {
     def save(instance, params, sendMail, feedAuthor, feedType, searchService) {
         log.debug( "saving instance with params assigned >>>>>>>>>>>>>>>>: "+ instance)
 
-        //instance.clearErrors();
+        instance.clearErrors();
 
         if (instance.validate() && !instance.hasErrors() && instance.save(flush: true)) {
             //mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())

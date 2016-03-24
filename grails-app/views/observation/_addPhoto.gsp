@@ -89,7 +89,7 @@
                 <%
                 def firstLicense = r?.license
                 def listType="${resourceListType}"
-                def resAlreadyPres = observationInstance.resources.id.asList()
+                def resAlreadyPres = observationInstance.hasProperty('resources')?observationInstance.resources.id.asList():observationInstance.resource.id.asList()
                 %>
                 <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':firstLicense, 'resource':r.context.value()]"/>
                
