@@ -2013,14 +2013,26 @@ class NamelistService {
 
 
 
-        def dirtyList = [:]
-        def workingList = [:]
-        def cleanList = [:]
+        Map dirtyList = [:]
+        Map workingList = [:]
+        Map cleanList = [:]
 
-        def accDL = [], accWL = [], accCL = []
-        def synDL = [], synWL = [], synCL = []
-        def comDL = [], comWL = [], comCL = []
-        def speciesDL = [], speciesWL = [], speciesCL = []
+        int dirtyListCount = 0, workingListCount = 0, cleanListCount=0;
+        List accDL = [], accWL = [], accCL = []
+        List synDL = [], synWL = [], synCL = []
+        List comDL = [], comWL = [], comCL = []
+        List speciesDL = [], speciesWL = [], speciesCL = []
+
+        String countSqlStr = "select t.position, count(*) as count \
+                    from taxonomy_registry s, \
+                    taxonomy_definition t \
+                    where \
+                    s.taxon_definition_id = t.id and "+
+                    (classSystem?"s.classification_id = :classSystem and ":"")+
+                    "s.path like '"+parentId+"%' and " +
+                    "t.rank in ("+ranksToFetch.join(',')+ ") "+
+                    "group by t.position ";
+
 
         try {
 
@@ -2091,6 +2103,19 @@ class NamelistService {
 
             println "total result size === " + rs.size()
 
+            def countRs = sql.rows(countSqlStr, [classSystem:classSystem])
+            println countRs
+            countRs.each {
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                    dirtyListCount = it.count;
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    workingListCount = it.count;
+                }else{
+                    cleanListCount = it.count;
+                }
+
+            }
+
             ///////////////////////////////
             rs.each {
                 //NOT SENDING PATH
@@ -2099,19 +2124,23 @@ class NamelistService {
                 //from synonyms s where s.taxon_concept_id = :taxonId";
 
                 sql = new Sql(dataSource)
+                //FIX:limit is not applied on synonyms query
                 def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status\
                 from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId order by s.name";
 
                 def q1 = sql.rows(s1, [taxonId:it.taxonid])
                 q1.each {
                     println "==========TAXA IDS======= " + it.taxonid
-                    //if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                        synDL << it
-                    //}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    synDL << it
+                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                        dirtyListCount++;
+                    } else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                        workingListCount++;
                     //    synWL << it
-                    //}else{
+                    } else{
+                        cleanListCount++;
                     //    synCL << it
-                    //}
+                    }
                 }
 
                 sql = new Sql(dataSource)
@@ -2137,13 +2166,7 @@ class NamelistService {
             ///////////////////////////////
 
             rs.each {
-            //    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                     accDL << it
-                //}else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                //    accWL << it
-                //}else{
-                //    accCL << it
-                //}
             }
             dirtyList['accDL'] = accDL
             dirtyList['synDL'] = synDL
@@ -2160,7 +2183,7 @@ class NamelistService {
             
             return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]
             */
-            return [dirtyList:dirtyList, ranksToFetch:ranksToFetch]
+            return [dirtyList:dirtyList, ranksToFetch:ranksToFetch, dirtyListCount:dirtyListCount, workingListCount:workingListCount, cleanListCount:cleanListCount]
         } catch(Exception e) {
             e.printStackTrace();
         }

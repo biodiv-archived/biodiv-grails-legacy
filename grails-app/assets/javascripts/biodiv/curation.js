@@ -202,6 +202,9 @@ function getNamesFromTaxon(ele , parentId, ranksToFetch) {
 
                 //DIRTY LIST 
                 $('.dl_content ul').remove();
+                $('#taxonPager #dirtyListCount').html('<b>Raw List Count</b> : ' + data.dirtyListCount);
+                $('#taxonPager #workingListCount').html('&nbsp;<b>Working List Count</b> : ' + data.workingListCount);
+                $('#taxonPager #cleanListCount').html('&nbsp;<b>Clean List Count</b> : ' + data.cleanListCount);
                 //*************************************************************8
                 var taxonGridDataView = taxonGrid.getData();
 

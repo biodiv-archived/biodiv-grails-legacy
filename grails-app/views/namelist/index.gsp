@@ -51,7 +51,11 @@
 
             <div class="span9 listarea" style="overflow:visible;">
                  <div id="taxonGrid" class="dl_content" style="width:100%;height:225px"></div>
-                 <div id="taxonPager" style="width:100%;height:20px;"></div>
+                 <div id="taxonPager" style="width:100%;height:20px;">
+                    <span id="dirtyListCount"></span>
+                    <span id="workingListCount"></span>
+                    <span id="cleanListCount"></span>
+                 </div>
                  <div id="inlineFilterPanel" style="background:#dddddd;color:black;">
                      Filter names with text <input type="text" id="txtSearch" style="margin:3px 0px 3px 0px">
                      and with <select id="taxonStatusSelect" multiple="multiple">
