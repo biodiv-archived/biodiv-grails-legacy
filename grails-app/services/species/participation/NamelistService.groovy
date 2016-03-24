@@ -101,7 +101,6 @@ class NamelistService {
         
 //		clazz.withNewTransaction{
         //withNewTransaction returns objects attached with a new session. If the same objects exist in old session from where searchIBP is called there would be exceptions. CurateName workflow is one such process
-		clazz.withNewTransaction{
 			if(normalizedForm || authorYear){
 				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
 				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
@@ -138,7 +137,7 @@ class NamelistService {
 					}
 				}
             }
-		}
+		//}
 			
 		if(res.isEmpty()){
 			String key = canonicalForm + rank 

@@ -94,29 +94,6 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
      <div class="alertMsg alert alert-info"
          style="clear: both; margin: 0px; text-align: center;">
          ${raw(ibpBannerMessage)}
-
-<%--	<div class="alert alert-info"--%>
-<%--		style="clear: both; margin: 0px; text-align: center;">--%>
-<%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
-<%--	</div>--%>
-
-<%--	<div class="alert alert-info"--%>
-<%--		style="clear: both; margin: 0px; text-align: center;">--%>
-<%--		We have deployed a beta version of the <a target="_blank" href="http://indiabiodiversity.org/namelist">name curation interface</a>. Please provide suggestions and feedback.--%>
-<%--This monsoon, <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/show">Frog Watch</a> will be mapping the distribution of the <a target="_blank" href="http://indiabiodiversity.org/species/show/25575">Malabar Tree Toad</a>. Participate by <a target="_blank" href="http://indiabiodiversity.org/group/frog_watch/observation/create">uploading</a> observations of this species.--%>
-<%--	</div>--%>
-
-	<div class="alertMsg alert alert-info"
-		style="clear: both; margin: 0px; text-align: center;">
-		${bannerMessage}
-	</div>
-	</g:if>
-	<g:if test="${params.webaddress!=null && ibpBannerMessage!=null && bannerMessage!=ibpBannerMessage}">
-	<div class="alertMsg alert alert-info"
-		style="clear: both; margin: 0px; text-align: center;">
-		${raw(utilsService.getIbpBannerMessage())}
-		 
-	</div>
 	</g:if>
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
@@ -126,4 +103,5 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<auth:ajaxLogin />
 	<div id="fb-root"></div>
     </div>
+</div>
 </div>
