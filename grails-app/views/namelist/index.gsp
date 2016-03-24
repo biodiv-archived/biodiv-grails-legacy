@@ -13,6 +13,7 @@
 
         <title>NameList - Curation Interface</title>
 
+        <asset:javascript src="slickgrid.js"/>
     </head>
     <body>
 
@@ -51,12 +52,13 @@
 
             <div class="span9 listarea" style="overflow:visible;">
                  <div id="taxonGrid" class="dl_content" style="width:100%;height:225px"></div>
-                 <div id="taxonPager" style="width:100%;height:20px;">
+                 <div id="listCounts" class="pull-left" style="height:27px;">
                     <span id="dirtyListCount"></span>
                     <span id="workingListCount"></span>
                     <span id="cleanListCount"></span>
-                 </div>
-                 <div id="inlineFilterPanel" style="background:#dddddd;color:black;">
+                </div>
+                <div id="taxonPager" class="pull-right" style="height:27px;"></div>
+                <div id="inlineFilterPanel" style="background:#dddddd;color:black;clear:both;">
                      Filter names with text <input type="text" id="txtSearch" style="margin:3px 0px 3px 0px">
                      and with <select id="taxonStatusSelect" multiple="multiple">
                          <g:each in ="${NameStatus.list()}" var="status">

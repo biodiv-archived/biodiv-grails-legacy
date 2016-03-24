@@ -1946,3 +1946,5 @@ grails {
 }
 */
 grails.assets.bundle=true
+grails.assets.minifyJs = false
+grails.assets.excludes = ["SlickGrid-2.0.2/*/*.js", "SlickGrid-2.0.2/*.js"]

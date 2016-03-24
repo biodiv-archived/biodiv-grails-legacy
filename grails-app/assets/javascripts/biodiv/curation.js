@@ -88,7 +88,7 @@ function initTaxonGrid(ele) {
     taxonGrid = new Slick.Grid(ele, taxonGridDataView, taxonGridColumns, taxonGridOptions);
     taxonGrid.setSelectionModel(new Slick.RowSelectionModel());
 
-    //var pager = new Slick.Controls.Pager(taxonGridDataView, taxonGrid, $("#taxonPager"));
+    var pager = new Slick.Controls.Pager(taxonGridDataView, taxonGrid, $("#taxonPager"));
     //var columnpicker = new Slick.Controls.ColumnPicker(taxonGridColumns, taxonGrid, taxonGridOptions);
 
 
@@ -202,9 +202,9 @@ function getNamesFromTaxon(ele , parentId, ranksToFetch) {
 
                 //DIRTY LIST 
                 $('.dl_content ul').remove();
-                $('#taxonPager #dirtyListCount').html('<b>Raw List Count</b> : ' + data.dirtyListCount);
-                $('#taxonPager #workingListCount').html('&nbsp;<b>Working List Count</b> : ' + data.workingListCount);
-                $('#taxonPager #cleanListCount').html('&nbsp;<b>Clean List Count</b> : ' + data.cleanListCount);
+                $('#listCounts #dirtyListCount').html('<b>Raw List Count</b> : ' + data.dirtyListCount);
+                $('#listCounts #workingListCount').html('&nbsp;<b>Working List Count</b> : ' + data.workingListCount);
+                $('#listCounts #cleanListCount').html('&nbsp;<b>Clean List Count</b> : ' + data.cleanListCount);
                 //*************************************************************8
                 var taxonGridDataView = taxonGrid.getData();
 

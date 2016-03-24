@@ -36,6 +36,8 @@
 *= require SlickGrid-2.0.2/slick.grid.css
 *= require SlickGrid-2.0.2/slick.headerbuttons.css
 *= require SlickGrid-2.0.2/slick.headermenu.css
+*= require SlickGrid-2.0.2/slick.columnpicker.css
+*= require SlickGrid-2.0.2/slick.pager.css
 
 // biodiv specific
 *= require all/biodiv.css
