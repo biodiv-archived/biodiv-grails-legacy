@@ -573,21 +573,18 @@ class SpeciesUploadService {
 		//TODO: got to move this to the end of taxon creation
 		for(Species s : species) {
 			try{
-				if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
-					s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
-				}
-				
 				s.afterInsert();
 				def taxonConcept = s.taxonConcept;
-				if(!taxonConcept.isAttached()) {
-					taxonConcept.attach();
-				}
 				groupHandlerService.updateGroup(taxonConcept);
 				def rCount = s.fetchResourceCount();
 	            def rsfCount = s.fetchSpeciesFieldResourceCount();
 	            if(rCount.size() > 0 || rsfCount > 0) {
 					s.updateHasMediaValue(true);
 	            }
+				
+				//this fucntion may time out some times
+				externalLinksService.updateExternalLinks(s.taxonConcept)
+				
 				log.info "post processed spcecies ${s}"
 			}
 			catch(e) {
