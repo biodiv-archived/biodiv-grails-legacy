@@ -1944,7 +1944,11 @@ class SpeciesService extends AbstractObjectService  {
     def updateSpecies(params, species){
         def resources = []
         def obvList = []
+        def speciesResIds = []
         def speciesRes = species.resources
+        speciesRes.each{
+            speciesResIds.add(it.id)
+        }
         if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField"){
             def resourcesXML = createResourcesXML(params);
             resources = saveResources(species, resourcesXML);
@@ -1994,10 +1998,10 @@ class SpeciesService extends AbstractObjectService  {
                 println index
                 r.description = captions[index]
                 index++;
-                println speciesRes
-                if(speciesRes && !speciesRes.contains(r)){    
+                println speciesResIds
+                if(speciesResIds && !speciesResIds.contains(r.id)){    
                     resources.add(r)
-                } else if (!speciesRes){
+                } else if (!speciesResIds){
                     resources.add(r)
                 }
                 println resources
