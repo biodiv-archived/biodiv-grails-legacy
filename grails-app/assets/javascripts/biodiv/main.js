@@ -221,7 +221,7 @@ jQuery(document).ready(function($) {
     }).data( "customCatcomplete" )._renderItem = function( ul, item ) {
         ul.removeClass().addClass("dropdown-menu")
             if(item.category != "Names") {
-                return $( "<li class='span3'  style='list-style:none;'></li>" )
+                return $( "<li class='span6'  style='list-style:none;'></li>" )
                     .data( "ui-autocomplete-item", item )
                     .append( "<a>" + item.label + "</a>" )
                     .appendTo( ul );
@@ -229,7 +229,7 @@ jQuery(document).ready(function($) {
                 if(!item.icon) {
                     item.icon =  window.params.noImageUrl
                 }  
-                return $( "<li class='span3' style='list-style:none;'></li>" )
+                return $( "<li class='span6' style='list-style:none;'></li>" )
                     .data( "ui-autocomplete-item", item )
                     //.append( "<img class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;' class='ui-state-default icon'/><a>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
                     .append( "<a title='"+item.label.replace(/<.*?>/g,"")+"'><img src='" + item.icon+"' class='group_icon' style='float:left; background:url(" + item.icon+" no-repeat); background-position:0 -100px; width:50px; height:50px;opacity:0.4;'/>" + item.label + ((item.desc)?'<br>(' + item.desc + ')':'')+"</a>" )
