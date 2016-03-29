@@ -13,11 +13,11 @@
 			<uGroup:showHeader model="[ 'userGroupInstance':userGroupInstance]" />
 		</g:if>
 		<g:else>
-			<a class="pull-left" href="${grailsApplication.config.speciesPortal.app.siteUrl }" style="margin-left: 0px;"> <img
+			<a class="pull-left" href="http://wikwio.org" style="margin-left: 0px;"> <img
                             class="logo" src="${Utils.getIBPServerDomain()+'/'+grailsApplication.config.speciesPortal.app.logo}"
                             title="${g.message(code:'app.siteName2')}" alt="${g.message(code:'app.siteName')}">
 			</a>
-			<a href="${grailsApplication.config.speciesPortal.app.siteUrl }" class="brand" style="width:100%;float:none;">
+			<a href="${createLink(url:grailsApplication.config.grails.serverURL+"/..") }" class="brand" style="width:100%;float:none;">
                             <h1><g:message code="app.siteName2" /></h1>
 			</a>
         
