@@ -501,10 +501,10 @@ class Observation extends DataObject {
         //    return maxVotedReco.name; //maxVotedReco.taxonConcept.italicisedForm
         if(maxVotedReco.taxonConcept && maxVotedReco.isScientificName) { //sciname from dirty list
 
-           if(!maxVotedReco.name.equalsIgnoreCase(maxVotedReco.taxonConcept.canonicalForm) && maxVotedReco.isScientificName) {
-                return '<i>'+maxVotedReco.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.canonicalForm+'</i>';
-           }
-            return '<i>'+maxVotedReco.name+'</i>'
+            if(maxVotedReco.taxonConcept.status=="SYNONYM" && maxVotedReco.isScientificName) {
+           		return '<i>'+maxVotedReco.taxonConcept.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.normalizedForm+'</i>';
+           	}           
+            return '<i>'+maxVotedReco.taxonConcept.normalizedForm+'</i>'
         } else //common name
 		    return maxVotedReco.name
 	}
