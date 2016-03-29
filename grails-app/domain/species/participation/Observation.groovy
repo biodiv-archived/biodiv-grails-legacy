@@ -528,7 +528,7 @@ class Observation extends DataObject {
     String summary(Language userLanguage=null) {
         String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
 		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
-        desc += " at <b>'" + (this.placeName?.trim()?'':this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
+        desc += " at <b>'" + (this.placeName?.trim()?this.placeName?.trim():this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
         return desc
     }
 
