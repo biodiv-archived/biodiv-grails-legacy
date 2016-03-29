@@ -849,6 +849,8 @@ class UserGroupService {
 			}
 		} else {
 			query += " where newsletter.userGroup is null"
+			query += " and newsletter.sticky=:sticky"
+			queryParams['sticky'] = true;
 		}
 		if(currentLanguage){
 			query += " and language="+currentLanguage.id;
