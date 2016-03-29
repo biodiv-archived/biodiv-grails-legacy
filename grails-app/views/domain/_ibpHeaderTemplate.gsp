@@ -103,3 +103,4 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	<div id="fb-root"></div>
     </div>
 </div>
+</div>
