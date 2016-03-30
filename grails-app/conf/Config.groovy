@@ -195,7 +195,7 @@ speciesPortal {
     domain = "localhost"
     resources {
         rootDir = "${app.rootDir}/img"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/img"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/img"
         images {
             defaultType = "jpg"
             thumbnail {
@@ -220,13 +220,13 @@ speciesPortal {
     observations {
         rootDir = "${app.rootDir}/observations"
         observationDownloadDir = "${download.rootDir}/observations"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/observations"
         //serverURL = "http://localhost/${appName}/observations"
         MAX_IMAGE_SIZE = 104857600
     } 
     userGroups {
         rootDir = "${app.rootDir}/userGroups"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/userGroups"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/userGroups"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -235,7 +235,7 @@ speciesPortal {
 
     datasource {
         rootDir = "${app.rootDir}/datasources"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/datasources"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/datasources"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -259,7 +259,7 @@ speciesPortal {
 
     maps {
         SRID = 4326;
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/maps"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/maps"
     }
 
     content{
@@ -474,7 +474,7 @@ speciesPortal {
     flushImmediately = true
     usersResource {
         rootDir = "${app.rootDir}/usersRes"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/usersRes"   
     }
 
     ibpMapDatabase {
@@ -503,7 +503,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
     development {
-        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+        grails.serverURL = "http://localhost.indiabiodiversity.org/${appName}"
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
@@ -518,8 +518,8 @@ environments {
                 port = 25
             }
         }
-        ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
+        ibp.domain='localhost.indiabiodiversity.org'
+        wgp.domain='thewesternghats.localhost.indiabiodiversity.org'
         //grails.resources.debug=true
         //        grails.resources.mappers.hashandcache.excludes = ['**']
         //grails.resources.flatten = false
@@ -620,6 +620,11 @@ environments {
             debug   'org.hibernate.cache.EhCache'
             debug   'org.hibernate.cache.internal.StandardQueryCache'
             info   'org.hibernate.cache'
+            trace 'org.springframework.security.web.authentication.rememberme',
+                  'org.springframework.security.web.authentication',
+                        'org.springframework.security.web',
+                              'org.springframework.security'
+
         }
     }
     test {
@@ -651,11 +656,11 @@ environments {
             'com.mchange.v2.resourcepool.BasicResourcePool'
             info    'com.linkedin.grails'
         }
-        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+        grails.serverURL = "http://localhost.indiabiodiversity.org/${appName}"
         google.analytics.enabled = false
     }
     production {
-        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+        grails.serverURL = "http://localhost.indiabiodiversity.org/${appName}"
         speciesPortal {
             search.serverURL = "http://localhost:8090/solr"
             names.parser.serverURL = "127.0.0.1"
@@ -670,8 +675,8 @@ environments {
             }
         }
 
-        ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
+        ibp.domain='localhost.indiabiodiversity.org'
+        wgp.domain='thewesternghats.localhost.indiabiodiversity.org'
         //grails.resources.debug=true
         grails.resources.mappers.hashandcache.excludes = ['**']
         //grails.resources.flatten = false
@@ -1198,7 +1203,6 @@ grails.plugin.springsecurity.authority.className = 'species.auth.Role'
 grails.plugin.springsecurity.userLookup.usernamePropertyName = 'email'
 //grails.plugin.springsecurity.auth.loginFormUrl = "/login/authFromDrupal"
 grails.plugin.springsecurity.successHandler.useReferer = true;
-
 //grails.plugin.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
 //grails.plugin.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
 //grails.plugin.springsecurity.providerNames = [
@@ -1224,6 +1228,9 @@ checkin.drupal = false;
 
 grails.plugin.springsecurity.openid.domainClass = 'species.auth.OpenID'
 grails.plugin.springsecurity.openid.userLookup.openIdsPropertyName = "openIds"
+grails.plugin.springsecurity.rememberMe.cookieName='biodiv_remember_me';
+grails.plugin.springsecurity.rememberMe.tokenValiditySeconds=1209600;// (14 days)
+grails.plugin.springsecurity.rememberMe.key="${app.name}"
 grails.plugin.springsecurity.rememberMe.persistent = true
 grails.plugin.springsecurity.rememberMe.persistentToken.domainClassName = 'species.auth.PersistentLogin'
 grails.plugin.springsecurity.roleHierarchy = '''
