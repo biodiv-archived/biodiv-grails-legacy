@@ -66,7 +66,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			LookupPriorityQueue queue = new LookupPriorityQueue(num);
 			for (TernaryTreeNode ttn : list) {
 				for (obj in ttn.val) {
-					//println "=====" +  obj.recoId + " ori name  " + obj.originalName +"  taxon name "+obj.synName  +"  accname "+obj.acceptedName+"   wt  "+obj.wt 
+					//println "=====" +  obj.recoId + " ori name  " + obj.originalName +"  syn name "+obj.synName  +"  accname "+obj.acceptedName+"   wt  "+obj.wt 
 					if(nameFilter && nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
 						continue;
 					}
@@ -83,9 +83,9 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 						if(record.originalName){
 							String name = record.originalName.toLowerCase().trim();
 							if(name.equals(key)){
-								record.wt += 20;
+								record.wt += 100;
 							}else if(name.startsWith(key)) {
-								record.wt += 15;
+								record.wt += 50;
 							}
 							
 							LookupResult r = new LookupResult(ttn.token, record);
