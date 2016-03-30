@@ -216,8 +216,8 @@ abstract class AbstractObservationImporter {
                 mediaParams[x.obvExternalId] = [];
             mediaParams[x.obvExternalId] << x;            
             row = mediaReader.readNext()
-            println "got media params ${mediaParams}"
         }
+        println "got media params ${mediaParams}"
         return mediaParams;
     }
 
