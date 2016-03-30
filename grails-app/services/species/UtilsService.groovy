@@ -754,7 +754,7 @@ class UtilsService {
             templateMap["groups"] = obv.userGroups
         }
         if(obv.instanceOf(Species) && obv.id) {
-            templateMap["obvSName"] = obv.taxonConcept.name  
+            templateMap["obvSName"] = obv.taxonConcept.normalizedForm 
             templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name    
             def imagePath = ''; 
             def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL) 
