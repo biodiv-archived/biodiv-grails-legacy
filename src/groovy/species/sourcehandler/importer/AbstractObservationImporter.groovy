@@ -148,6 +148,7 @@ abstract class AbstractObservationImporter {
         dwcObvHeader = observationReader.readNext();
         observationHeader = new ArrayList();//new Map[dwcObvHeader.size()];
         dwcObvHeader.eachWithIndex { h, i ->
+            if(h) {
             println "----------------------------_______"
             List<String> urls = findMappedColumnInIp(metaFields, h, i);
             urls.each { url ->
@@ -160,6 +161,7 @@ abstract class AbstractObservationImporter {
                 if(!observationHeader[i]) observationHeader[i] = [];
                 observationHeader[i] << mappedObvHeader;
              }
+            }
         } 
         //observationHeader.sort {it?it.order:10000000}
         log.debug "Observation Headers ${observationHeader}"
@@ -169,13 +171,15 @@ abstract class AbstractObservationImporter {
             dwcMediaHeader = mediaReader.readNext();
             mediaHeader = new ArrayList();
             dwcMediaHeader.eachWithIndex { h, i ->
-                List<String> urls = findMappedColumnInIp(multiMediaMetaFields, h, i);
-                urls.each { url ->
-                    def mappedMediaHeader = getMappedMediaHeader(url, dwcMultimediaMapping);
-                    println mappedMediaHeader
-                    if(!mediaHeader[i]) mediaHeader[i] = [];
-                    mediaHeader[i] << mappedMediaHeader;
-                 }
+                if(h) {
+                    List<String> urls = findMappedColumnInIp(multiMediaMetaFields, h, i);
+                    urls.each { url ->
+                        def mappedMediaHeader = getMappedMediaHeader(url, dwcMultimediaMapping);
+                        println mappedMediaHeader
+                        if(!mediaHeader[i]) mediaHeader[i] = [];
+                        mediaHeader[i] << mappedMediaHeader;
+                    }
+                }
              }
          }
         println "Multimedia Headers ${mediaHeader}"
@@ -285,8 +289,8 @@ abstract class AbstractObservationImporter {
             }
             if(no++ >= limit) break;
             row = observationReader.readNext()
-            log.debug "from params ${obvParams}"
         }
+        log.debug "from params ${obvParams}"
         return obvParams;
     }
 
