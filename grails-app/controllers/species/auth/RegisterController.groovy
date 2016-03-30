@@ -522,7 +522,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		if (sub.contains('$')) {
 			sub = evaluate(sub, [domain: Utils.getDomainName(request)])
 		}
-		
+	
 		try {
 			mailService.sendMail {
 				to email

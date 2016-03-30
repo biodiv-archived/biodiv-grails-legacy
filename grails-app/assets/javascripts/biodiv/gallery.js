@@ -146,6 +146,7 @@ function initializeGallery(result,domainObj){
                 carousel: true, 
                 titleElement: 'h6',
                 youTubeClickToPlay: false,
+                preloadRange:1,
                 onopen: function () {
                     // Callback function executed when the Gallery is initialized.
                     $('#gallerySpinner').hide();
