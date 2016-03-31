@@ -584,6 +584,8 @@ environments {
             debug   'grails.app.services.species.participation.NameslistService'
             debug   'species.DigestJob'
             debug   'grails.app.services.speciespage'
+            debug   'grails.app.domain.species'
+            debug   'grails.app.domain.species.participation'
             debug   'grails.app.services.species'
             debug   'grails.app.controllers.species'
             debug   'grails.app.controllers.content'
@@ -620,11 +622,11 @@ environments {
             debug   'org.hibernate.cache.EhCache'
             debug   'org.hibernate.cache.internal.StandardQueryCache'
             info   'org.hibernate.cache'
-            trace 'org.springframework.security.web.authentication.rememberme',
+       /*     trace 'org.springframework.security.web.authentication.rememberme',
                   'org.springframework.security.web.authentication',
                         'org.springframework.security.web',
                               'org.springframework.security'
-
+*/
         }
     }
     test {
