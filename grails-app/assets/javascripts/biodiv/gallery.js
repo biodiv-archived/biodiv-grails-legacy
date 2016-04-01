@@ -109,7 +109,7 @@ function initializeGallery(result,domainObj){
                 $('#resourceTabs').after('<div class="audio_container" style="height:110px;"></div>');        
             }
 
-            $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
+            $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url']+'" type="audio/mpeg"></audio>');
             $.each(isAudio, function (index, resource) {
                 $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index,result.dataset));
             });
@@ -120,7 +120,7 @@ function initializeGallery(result,domainObj){
             var audio_playlist = '<ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">';
             $.each(isAudio, function (index, audio) {
                 audio_playlist += '<li class="active" style="display: inline;">';
-                audio_playlist += '<a href="'+audio.url.replace('biodiv/','biodiv/observations/')+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
+                audio_playlist += '<a href="'+audio.url+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
                 audio_playlist += '</li>';
             });
             audio_playlist += '</ul>';
@@ -176,7 +176,8 @@ function initializeGallery(result,domainObj){
 
 function update_imageAttribute(resource,ele,index,defaultThumb){
     var output = '';
-    var resourceType = resource.type.toLowerCase();  
+    var resourceType = resource.type.toLowerCase();
+    var media_var = (resourceType == 'image')?'Image':'Media';
 
     output += '<div class="row-fluid '+resourceType+'Attr '+resourceType+'Attr_'+index+'" style="display:none;">';
     output += '<div>';
@@ -215,7 +216,7 @@ function update_imageAttribute(resource,ele,index,defaultThumb){
 
     if(resource.url && resource.url !=''){
         output += '<div class="conts_wrap_line">';
-        output += '<a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
+        output += '<a href="'+resource.url+'" target="_blank"><b>View '+media_var+' source</b> </a>';
         output += '</div>';
     }
     output += '</div>';
