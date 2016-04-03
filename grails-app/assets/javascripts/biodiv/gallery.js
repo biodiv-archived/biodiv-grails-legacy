@@ -127,7 +127,7 @@ function initializeGallery(result,domainObj){
             if(domainObj == 'observation') {
                 $('.audio_container').css('height','150px');
             }else{
-                $('.audio_container').css('height','140px')
+                $('.audio_container').addClass('audio_multi');
             }
             $('.audio_container').prepend(audio_playlist);
             audioInit();        
