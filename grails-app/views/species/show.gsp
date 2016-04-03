@@ -182,7 +182,8 @@
                     ignoreEmptyParagraph: true,
                     enterMode:CKEDITOR.ENTER_BR,
                     autoParagraph:false,
-                    fillEmptyBlocks:false
+                    fillEmptyBlocks:false,
+                    contentsCss:'/assets/all/ckeditorCss.css'
                     //uiColor:'#AADC6F'
                 };
                 var speciesId = ${speciesInstance?.id}
