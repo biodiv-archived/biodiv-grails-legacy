@@ -2,7 +2,7 @@
 <%@page import="species.License.LicenseType"%>
 
 <div id="license_div_${i}" class="license_div dropdown">
-    <g:if test="${resource=='SPECIES'}">
+    <g:if test="${isEditable}">
         <a id="selected_license_${i}"
         class="btn dropdown-toggle"
         data-toggle="dropdown">
