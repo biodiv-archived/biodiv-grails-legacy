@@ -108,6 +108,42 @@
             </div>
         </div>--> 
         </div>
+        <div class="navblock" style="margin-top:20px;margin-left: 25px;">
+                <b><big>&nbsp;<a name="partners"><g:message code="link.partners" /></a></big></b>
+                <div class="partners">
+                <!--table border="0" width="940" align="center">
+                             <tbody><tr>
+      <td align="center">
+                            <a href="http://www.cirad.fr"><img class="img-polaroid" src="/assets/all/partnerlogo/Cirad_sans_texte.jpg"></a>
+                            <a href="http://www.ifpindia.org"><img class="img-polaroid" src="/assets/all/partnerlogo/IFP-anglais_logo.png"></a>
+                            <a href="http://www.fofifa.mg"><img class="img-polaroid" src="/assets/all/partnerlogo/FOFIFA_logo.png"></a>
+                            <a href="http://www.msiri.mu/"><img class="img-polaroid" src="/assets/all/partnerlogo/MCIA-LOGO1.png"></a>
+                            <a href="http://www.msiri.mu/"><img class="img-polaroid" src="/assets/all/partnerlogo/MSIRI-2_logo.png"></a>
+                            <a href="http://www.cndrs-comores.org"><img class="img-polaroid" src="/assets/all/partnerlogo/CNDRS2_logo.png"></a>
+                            </td>
+      </tr>
+      <tr>
+                             <td align="center">
+                             <a href="http://www.europa.eu/index_fr.htm"><img class="img-polaroid" src="/assets/all/partnerlogo/UE-TC_logo.png"></a>
+                            <a href="http://www.acp-st.eu/"><img class="img-polaroid" src="/assets/all/partnerlogo/acp-st_logo.png"></a>
+                            <a href="http://www.acp.int/"><img class="img-polaroid" src="/assets/all/partnerlogo/ACP.jpg"></a>
+                            
+                              </td>
+      </tr>
+      </tbody></table!-->
+                             <a href="http://www.cirad.fr"><img class="img-polaroid" src="/assets/all/partnerlogo/Cirad_sans_texte.jpg"></a>
+                            <a href="http://www.ifpindia.org"><img class="img-polaroid" src="/assets/all/partnerlogo/IFP-anglais_logo.png"></a>
+                            <a href="http://www.fofifa.mg"><img class="img-polaroid" src="/assets/all/partnerlogo/FOFIFA_logo.png"></a>
+                            <a href="http://www.msiri.mu/"><img class="img-polaroid" src="/assets/all/partnerlogo/MCIA-LOGO1.png"></a>
+                            <a href="http://www.msiri.mu/"><img class="img-polaroid" src="/assets/all/partnerlogo/MSIRI-2_logo.png"></a>
+                            <a href="http://www.cndrs-comores.org"><img class="img-polaroid" src="/assets/all/partnerlogo/CNDRS2_logo.png"></a>
+                            <a href="http://www.europa.eu/index_fr.htm"><img class="img-polaroid" src="/assets/all/partnerlogo/UE-TC_logo.png"></a>
+                            <a href="http://www.acp-st.eu/"><img class="img-polaroid" src="/assets/all/partnerlogo/acp-st_logo.png"></a>
+                            <a href="http://www.acp.int/"><img class="img-polaroid" src="/assets/all/partnerlogo/ACP.jpg"></a>
+                            
+
+            </div>
+            </div>
         </div>
         <asset:script>
         $(document).ready(function() {

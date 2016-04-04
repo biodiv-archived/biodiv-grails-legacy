@@ -234,11 +234,11 @@ div.navbar.navbar-static-top.btn{
 #ibp-header .navbar .nav>li>a, #ibp-header .navbar .nav>li>a:hover{
 }
 
-#ibp-footer, .gradient-bg-reverse{
+#ibp-foooter, .gradient-bg-down{
 	background:#8ca643;
 }
 .links_box_column li, .links_box_column li a{
-	color:#fff;
+	color:#111;
 }
 .powered{
 	/*background:#fff;*/
