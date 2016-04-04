@@ -14,7 +14,8 @@
 			def isCountryChecked = (defaultAccuracy == "country")? "checked" : ""
 			
 			def isGeoPrivacyChecked = (observationInstance?.geoPrivacy) ? "checked" : ""
-						
+            def lastPlaceName = (observationInstance?.placeName)?observationInstance?.placeName:obvInfoFeeder?.placeName;
+            def lastTopology = (observationInstance?.topology)?:obvInfoFeeder?.topology;
          %>
 		<g:if test="${sourceType == 'observation'  || ((params.action == 'edit') && (sourceType == 'checklist-obv'))}">
         	<input type="radio" style="margin-bottom: 6px;" name="locationScale" value="Accurate" ${isAccurateChecked} /><g:message code="default.accurate.label" /> 
@@ -64,7 +65,7 @@
                 <div class="wrapperParent"  style="text-align:center;width:100%">
                     <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:2;margin-bottom:0px;">
                         <input class="placeName" name="placeName" type="text" title="${g.message(code:'showmapinput.find.place')}"  class="input-block-level" style="width:94%;"
-                        class="section-item" value="${observationInstance?.placeName}" rel="${g.message(code:'default.search')}" />
+                        class="section-item" value="${lastPlaceName}" rel="${g.message(code:'default.search')}" />
 
                         <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>
                         
@@ -73,7 +74,7 @@
                             <g:renderErrors bean="${sourceInstance}" as="list" field="${placeNameField}"/>
                             </g:hasErrors>
                         </div>
-                        <input class='areas' type='hidden' name='areas' value='${observationInstance?.topology?Utils.GeometryAsWKT(observationInstance?.topology):params.areas}'/>
+                        <input class='areas' type='hidden' name='areas' value='${lastTopology?Utils.GeometryAsWKT(lastTopology):params.areas}'/>
 
                         <div class='suggestions' class='dropdown'></div>
                     </div>
