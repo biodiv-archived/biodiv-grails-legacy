@@ -86,18 +86,13 @@
 						href="${uGroup.createLink('controller':'discussion', 'action':'list', 'userGroup':userGroupInstance)}"
 						title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span  title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
 					</li>
-
-                    <li
-						class="${(params.controller == 'datasource' && params.action == 'list')?' active':''}"><a
-						href="${uGroup.createLink('controller':'datasource', 'action':'list', 'userGroup':userGroupInstance)}"
-						title="${g.message(code:'button.datasources')}"><g:message code="button.datasources" /></a>
-					</li>
-					<li
-						class="${(params.controller == 'userGroup' && params.action == 'activity')?' active':''}"><a
-						href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
-						title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
-					</li>
-
+					<li>
+                    	<a href="http://www.wikwio.org/idao" title="${g.message(code:'idao.tool')}"><g:message code="idao.tool" /></a>
+					</li>                 
+					 <li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
+                                href="${uGroup.createLink(mapping:'userGroup', 'action':'pages', 'userGroup':userGroupInstance)}"
+                                title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
+                            </li>
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown"> <g:message code="link.more.button" /> <b class="caret"></b> </a>
 						<ul class="dropdown-menu" style="text-align: left;">
@@ -106,15 +101,7 @@
                                 href="${uGroup.createLink(mapping:'userGroup', 'action':'activity', 'userGroup':userGroupInstance)}"
                                 title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
                             </li>
-
-                            <li class="${(params.controller == 'userGroup' && params.action == 'pages')?' active':''}"><a
-                                href="${uGroup.createLink(mapping:'userGroup', 'action':'pages', 'userGroup':userGroupInstance)}"
-                                title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
-                            </li>
-
-
-
-                                                    <li
+                                               <li
                                                     class="${((params.controller == 'user' && params.action == 'list') ||(params.controller == 'user'))?' active':''}"><a
                                                         href="${uGroup.createLink('controller':'user', 'action':'list', 'userGroup':userGroupInstance)}"
                                                         title="${g.message(code:'default.members.label')}"><g:message code="default.members.label" /></a>
