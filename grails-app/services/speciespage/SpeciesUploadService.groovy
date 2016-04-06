@@ -947,7 +947,9 @@ class SpeciesUploadService {
 		}
 		
 		sFields.removeAll(sFieldToDelete)
-		
+	
+        s.taxonConcept.speciesId = null;
+        s.taxonConcept.save();
 		//removing taxonomy hirarchy if added due to this upload
 		List taxonReg = TaxonomyRegistry.withCriteria(){
 			and{
@@ -983,10 +985,10 @@ class SpeciesUploadService {
 	
 	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
 		try{
-			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
-				reco.taxonConcept = null
-				reco.save(flush:true)
-			}
+//			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
+//				reco.taxonConcept = null
+//				reco.save(flush:true)
+//			}
 //			CommonNames.findAllByTaxonConcept(s.taxonConcept).each { cn ->
 //				cn.delete()
 //			}

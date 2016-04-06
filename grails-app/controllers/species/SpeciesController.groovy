@@ -257,7 +257,8 @@ class SpeciesController extends AbstractObjectController {
         }
 		else {
             if(params.editMode) {
-                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()) {
+                println speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()
+                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) && !utilsService.isAdmin()) {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                     def model = utilsService.getErrorModel(flash.message, null, OK.value())
