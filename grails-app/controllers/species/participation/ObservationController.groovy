@@ -1170,7 +1170,8 @@ def grailsCacheManager;
                 speciesName:observationInstance.fetchSpeciesCall()?:'']
 
                 if(results&& results.recoVotes?.size() > 0) {
-                    def model = utilsService.getSuccessModel('', null, OK.value(), result);
+                    msg = (observationInstance?.isLocked)?messageSource.getMessage("species.validate.message", null, RCU.getLocale(request)):''
+                    def model = utilsService.getSuccessModel(msg, null, OK.value(), result);
                     withFormat {
                         json { render model as JSON }
                         xml { render model as XML}

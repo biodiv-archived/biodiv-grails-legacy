@@ -537,7 +537,9 @@ div.errors {
 	margin: 2px;
 	padding-right: 5px;
 }
-
+.addedResource .metadata{
+	overflow: inherit !important;
+}
 .add_image {
 	background-image: url('/assets/all/add_photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-photo.png'),sizingMethod='crop');
@@ -3163,7 +3165,7 @@ small {
 .observations_list .table {
 	background-color: white;
 }
-.annotationsWrapper {
+.sidebar_section .annotationsWrapper {
     background-color:#fff;
     clear:both;
     height:297px;
@@ -3252,7 +3254,7 @@ small {
 .conts_wrap{
   margin-left: 5px !important;   
   margin: 0px;
-  max-height: 150px;
+  max-height: 100px;
   display: block;
   overflow-y: auto;
   overflow-x: hidden;
@@ -3354,6 +3356,10 @@ small {
 
 .audio_container{
 	height: 120px;
+}
+.audio_multi{
+	height: 140px;
+  	margin-top: 15px;
 }
 
 .audio_container #playlist{

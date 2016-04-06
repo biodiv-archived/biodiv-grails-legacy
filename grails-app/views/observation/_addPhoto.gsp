@@ -5,6 +5,7 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.utils.ImageType"%>
 <%@page import= "org.codehaus.groovy.runtime.DateGroovyMethods"%>
+
             <g:set var= "res" value="${resList}" />
             <g:if test="${resourceListType == 'fromRelatedObv'}">
                 <g:set var="i" value="${offset-1}"/>
@@ -90,8 +91,9 @@
                 def firstLicense = r?.license
                 def listType="${resourceListType}"
                 def resAlreadyPres = observationInstance.hasProperty('resources')?observationInstance.resources?.id?.asList():observationInstance.resource?.id?.asList()
+                def isEditable = (r?.context.value() == 'SPECIES' || (resourceListType == 'ofObv' || resourceListType == 'usersResource'))? true : false
                 %>
-                <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':firstLicense, 'resource':r.context.value()]"/>
+                <g:render template="/observation/selectLicense" model="['i':i, 'selectedLicense':firstLicense, 'isEditable':isEditable]"/>
                
                 <g:if test="${observationInstance instanceof Species}">
                 <div class="imageMetadataDiv" >
