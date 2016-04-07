@@ -20,6 +20,7 @@
                         <input type="radio" name="invitetype" value="contributor" checked>
                         Species page Contributor
                     </label>
+                    <%--
                     <label class="radio">
                         <input type="radio" name="invitetype" value="taxon_curator">
                         Taxon Curator
@@ -28,6 +29,7 @@
                         <input type="radio" name="invitetype" value="taxon_editor">
                         Taxon Editor
                     </label>
+                    --%>
                     <textarea class="inviteMsg comment-textbox" placeholder="${g.message(code:'placeholder.species.about.you')}"></textarea>
                 </form>
             </div>

@@ -47,6 +47,8 @@ import species.auth.SUserRole;
 
 class UtilsService {
 
+    static transactional = false
+
     def grailsApplication;
     def grailsLinkGenerator;
     def sessionFactory
@@ -1160,7 +1162,7 @@ class UtilsService {
     }
 
     String getIbpBannerMessage() {   
-        return bannerMessageMap["ibp"];
+        return bannerMessageMap ? bannerMessageMap["ibp"]:'';
     }
 
     void loadBannerMessageMap() {  

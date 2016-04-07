@@ -155,24 +155,25 @@ class AbstractMetadataService extends AbstractObjectService {
 
         instance.clearErrors();
 
-        if (instance.validate() && !instance.hasErrors() && instance.save(flush: true)) {
+        if (!instance.hasErrors() && instance.save(flush: true)) {
+            println "saved and flushed instance"
             //mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
             //String msg = messageSource.getMessage("instance.label", [instance.id], LCH.getLocale())
             activityFeedService.addActivityFeed(instance, null, instance.author, feedType);
-
+println "activityFeedService.addActivityFeed"
             setAssociations(instance, params, sendMail);
-
+println "setAssociations"
             if(sendMail)
                 utilsService.sendNotificationMail(feedType, instance, null, params.webaddress);
-
+println "sendMail"
             if(searchService)
                 searchService.publishSearchIndex(instance, true);
-
+println "searchService"
             def model = utilsService.getSuccessModel("Saved successfully", instance, OK.value());
             return model
         }
         else {
-
+            println "error in saving instance"
             def errors = [];
 
              instance.errors.allErrors .each {

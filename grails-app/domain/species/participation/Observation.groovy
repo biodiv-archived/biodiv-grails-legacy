@@ -442,7 +442,7 @@ class Observation extends DataObject {
             else if(it.type == ResourceType.VIDEO) noOfVideos++;
             else if(it.type == ResourceType.AUDIO) noOfAudio++;
         }
-        //utilsService.evictInCache('resources', 'observation-'+this.id);
+        utilsService.evictInCache('resources', 'observation-'+this.id);
         updateReprImage();
 	}
 
@@ -453,7 +453,7 @@ class Observation extends DataObject {
         Resource highestRatedResource = null;
         this.resource.each { r ->
             if(r.id && r.isAttached()) {
-                if(!highestRatedResource || highestRatedResource.averageRating > r.averageRating) {
+                if(!highestRatedResource || r.averageRating > highestRatedResource.averageRating) {
                     highestRatedResource = r;
                 }
             }
@@ -467,7 +467,7 @@ class Observation extends DataObject {
             res = res
 		else 
 			res = null;//group?.icon(ImageType.ORIGINAL)
-            
+        println "Updating reprImage to ${res} ${res.fileName} ${res.url}" 
         this.reprImage = res;
     }
 

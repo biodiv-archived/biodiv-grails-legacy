@@ -127,12 +127,12 @@ class UserGroup implements Taggable {
 		//reading complete object again
 		try {
 			other = UserGroup.get(other.id)
-			log.debug other.name
+			//log.debug other.name
 		}catch(e){
 			log.error e.getMessage()
 			UserGroup.withNewSession{
 				other = UserGroup.get(other.id)
-				log.debug other.name
+				//log.debug other.name
 			}
 		}
 		
