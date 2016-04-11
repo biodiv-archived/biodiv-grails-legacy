@@ -131,6 +131,10 @@ abstract class AbstractObjectController {
             result = [:];
             if(params.id){            
                 def objInstance;
+                
+                result['parent'] = params.controller;
+                result['parentId'] = params.id;
+
                 if(params.controller == 'species'){
                     objInstance = Species.get(params.long('id'));
                     result['dataset'] = false

@@ -1196,14 +1196,14 @@ class UtilsService {
         org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Evict result in cache ${cache.name} at key ${cacheKey}"
-        cache.evict(cacheKey);
+        return cache.evict(cacheKey);
     }
 
     def clearCache(String cacheName) {
         org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Clearing Cache ${cache.name}"
-        cache.clear();
+        return cache.clear();
     }
 
 }

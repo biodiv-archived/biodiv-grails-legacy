@@ -371,4 +371,7 @@ def getMessage(){
     render (view:"index" , model:[getMessage:bMessage,getGroup:groupName])
 }
 
+def clearCache() {
+    render utilsService.clearCache(params.name);
+}
 }
