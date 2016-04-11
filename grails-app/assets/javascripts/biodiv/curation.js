@@ -209,7 +209,7 @@ function getNamesFromTaxon(ele , parentId, ranksToFetch) {
                 var taxonGridDataView = taxonGrid.getData();
 
                 var taxonData = data.dirtyList.accDL.concat(data.dirtyList.synDL);
-                taxonGridDataView.setItems(taxonData, 'taxonid');
+                taxonGridDataView.setItems(taxonData, 'id');
                 taxonGrid.invalidateAllRows();
                 taxonGrid.render();
 

@@ -2037,7 +2037,7 @@ class NamelistService {
         try {
 
             if(!parentId) {
-                sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status \
+                sqlStr = "select t.id as id, t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status \
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
@@ -2058,7 +2058,7 @@ class NamelistService {
                 rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
                 }*/
             } else {
-                sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status\
+                sqlStr = "select t.id as id, t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status\
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
@@ -2122,10 +2122,10 @@ class NamelistService {
                 //SENDING IDS as taxonid for synonyms and common names
                 //def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
                 //from synonyms s where s.taxon_concept_id = :taxonId";
-
+                println "GETTING SYNONYMS FOR TAXON ${it.taxonid}"
                 sql = new Sql(dataSource)
                 //FIX:limit is not applied on synonyms query
-                def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status\
+                def s1 = "select concat(acsy.id, '_', s.id) as id, s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status\
                 from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId order by s.name";
 
                 def q1 = sql.rows(s1, [taxonId:it.taxonid])
@@ -2147,8 +2147,8 @@ class NamelistService {
                 def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
                 from common_names c where c.taxon_concept_id = :taxonId order by c.name";
 
-                def q2 = sql.rows(s2, [taxonId:it.taxonid])
-                /*q2.each {
+                /*def q2 = sql.rows(s2, [taxonId:it.taxonid])
+                q2.each {
                   if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
                   comDL << it
                   }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
@@ -2161,7 +2161,7 @@ class NamelistService {
 
             }
 
-            println "==========SYN DL============= " + synDL
+            //println "==========SYN DL============= " + synDL
             println "==========COM DL============= " + comDL
             ///////////////////////////////
 

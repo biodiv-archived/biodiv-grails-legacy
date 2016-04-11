@@ -51,6 +51,12 @@ function addDirtyRows(e, args) {
 };
 
 function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
+
+    if(Slick == undefined) {
+        console.log('Slick grid is not defined');
+        return;
+    }
+
 	var options = {
         editable: true,
         enableAddRow: true,

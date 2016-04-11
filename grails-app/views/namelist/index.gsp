@@ -13,6 +13,8 @@
 
         <title>NameList - Curation Interface</title>
 
+        <asset:javascript src="slickgrid.js"/>
+        <asset:javascript src="biodiv/curation.js"/>
     </head>
     <body>
 

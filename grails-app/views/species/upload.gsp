@@ -8,6 +8,8 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.species.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
+
+        <asset:javascript src="slickgrid.js"/>
     </head>
     <body>
         <div id="uploadSpeciesDiv">

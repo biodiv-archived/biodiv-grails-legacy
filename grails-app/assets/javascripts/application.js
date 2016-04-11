@@ -68,7 +68,7 @@
 //= require biodiv/observations/show.js
 //= require biodiv/chooseLanguage.js
 
-//= require slickgrid
+////= require slickgrid
 ////= require create
 //= require jquery.plugins/filepicker.js
 //= require jquery.plugins/jquery.exif.js
@@ -98,7 +98,7 @@
 ////= require curation
 //= require biodiv/taxonhierarchy.js
 //= require biodiv/speciesPermission.js
-//= require biodiv/curation.js
+////= require biodiv/curation.js
 
 ////= require maps
 ////= require OpenLayers-2.10/OpenLayers.js
