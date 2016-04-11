@@ -45,6 +45,7 @@ abstract class Metadata {
 				return value
 			
 			value = value.toUpperCase().trim()
+            println value
 			switch(value){
 				case 'APPROXIMATE':
 					return LocationScale.APPROXIMATE

@@ -573,21 +573,18 @@ class SpeciesUploadService {
 		//TODO: got to move this to the end of taxon creation
 		for(Species s : species) {
 			try{
-				if(externalLinksService.updateExternalLinks(s.taxonConcept)) {
-					s.taxonConcept = TaxonomyDefinition.get(s.taxonConcept.id);
-				}
-				
 				s.afterInsert();
 				def taxonConcept = s.taxonConcept;
-				if(!taxonConcept.isAttached()) {
-					taxonConcept.attach();
-				}
 				groupHandlerService.updateGroup(taxonConcept);
 				def rCount = s.fetchResourceCount();
 	            def rsfCount = s.fetchSpeciesFieldResourceCount();
 	            if(rCount.size() > 0 || rsfCount > 0) {
 					s.updateHasMediaValue(true);
 	            }
+				
+				//this fucntion may time out some times
+				externalLinksService.updateExternalLinks(s.taxonConcept)
+				
 				log.info "post processed spcecies ${s}"
 			}
 			catch(e) {
@@ -950,7 +947,9 @@ class SpeciesUploadService {
 		}
 		
 		sFields.removeAll(sFieldToDelete)
-		
+	
+        s.taxonConcept.speciesId = null;
+        s.taxonConcept.save();
 		//removing taxonomy hirarchy if added due to this upload
 		List taxonReg = TaxonomyRegistry.withCriteria(){
 			and{
@@ -986,10 +985,10 @@ class SpeciesUploadService {
 	
 	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
 		try{
-			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
-				reco.taxonConcept = null
-				reco.save(flush:true)
-			}
+//			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
+//				reco.taxonConcept = null
+//				reco.save(flush:true)
+//			}
 //			CommonNames.findAllByTaxonConcept(s.taxonConcept).each { cn ->
 //				cn.delete()
 //			}

@@ -102,6 +102,7 @@ class AbstractMetadataService extends AbstractObjectService {
         if( params.fromDate != ""){
             log.debug "Parsing date ${params.fromDate}"
             instance.fromDate = parseDate(params.fromDate);
+            log.debug "got ${instance.fromDate}"
             instance.toDate = params.toDate ? parseDate(params.toDate) : instance.fromDate
 
         }
@@ -152,26 +153,27 @@ class AbstractMetadataService extends AbstractObjectService {
     def save(instance, params, sendMail, feedAuthor, feedType, searchService) {
         log.debug( "saving instance with params assigned >>>>>>>>>>>>>>>>: "+ instance)
 
-        //instance.clearErrors();
+        instance.clearErrors();
 
-        if (instance.validate() && !instance.hasErrors() && instance.save(flush: true)) {
+        if (!instance.hasErrors() && instance.save(flush: true)) {
+            println "saved and flushed instance"
             //mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
             //String msg = messageSource.getMessage("instance.label", [instance.id], LCH.getLocale())
             activityFeedService.addActivityFeed(instance, null, instance.author, feedType);
-
+println "activityFeedService.addActivityFeed"
             setAssociations(instance, params, sendMail);
-
+println "setAssociations"
             if(sendMail)
                 utilsService.sendNotificationMail(feedType, instance, null, params.webaddress);
-
+println "sendMail"
             if(searchService)
                 searchService.publishSearchIndex(instance, true);
-
+println "searchService"
             def model = utilsService.getSuccessModel("Saved successfully", instance, OK.value());
             return model
         }
         else {
-
+            println "error in saving instance"
             def errors = [];
 
              instance.errors.allErrors .each {

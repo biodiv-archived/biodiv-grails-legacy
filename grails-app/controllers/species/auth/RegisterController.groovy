@@ -353,6 +353,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		if (body.contains('$')) {
 			body = evaluate(body, [username: user.name.capitalize(), url: url])
 		}
+        println body
 		try {
 			mailService.sendMail {
 				to user.email
@@ -522,7 +523,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		if (sub.contains('$')) {
 			sub = evaluate(sub, [domain: Utils.getDomainName(request)])
 		}
-		
+	
 		try {
 			mailService.sendMail {
 				to email

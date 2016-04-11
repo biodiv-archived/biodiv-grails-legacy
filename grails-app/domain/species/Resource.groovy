@@ -151,7 +151,7 @@ class Resource extends Sourcedata implements Rateable {
 				break;
 			case ResourceType.AUDIO :								
                 if( imageType == ImageType.ORIGINAL) {
-                    return grailsApplication.config.grails.serverURL+this.fileName
+                   		return newBaseUrl+this.fileName
                 }
 				thumbnailUrl = grailsApplication.config.grails.serverURL+"/assets/all/audioicon.png"
 				break;	

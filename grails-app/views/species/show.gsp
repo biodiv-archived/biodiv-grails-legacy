@@ -96,7 +96,8 @@
             #commonNames select{
                 width:245px;
                 margin-left:-15px;
-            }            
+            }           
+            .citation{background-color:white;padding:15px;} 
         </style>
 
         <!--[if lt IE 8]><style>
@@ -181,7 +182,8 @@
                     ignoreEmptyParagraph: true,
                     enterMode:CKEDITOR.ENTER_BR,
                     autoParagraph:false,
-                    fillEmptyBlocks:false
+                    fillEmptyBlocks:false,
+                    contentsCss:'/assets/all/ckeditorCss.css'
                     //uiColor:'#AADC6F'
                 };
                 var speciesId = ${speciesInstance?.id}
@@ -275,7 +277,16 @@
                     <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />	
 
                     </div-->
-
+                    <!-- Citation  -->
+                    <div class="sidebar_section">
+                     <%     def current_date = new Date()
+                            def domainName=Utils.getIBPServerDomain();  %>
+                            <h5>${g.message(code:'default.citation.title')}</h5>
+                            <div class="citation">
+                    {Author1, Author2...}, (n.d.). <i>${title} </i>. [online] ${grailsApplication.config.speciesPortal.app.siteName},Species Page : {name of species field} Available at: <a href="${domainName+request.forwardURI }">${domainName+request.forwardURI}</a> [Accessed date <g:formatDate format="dd-MMM-yyyy" date="${current_date}" type="date" style="MEDIUM" />].
+                    </div>
+                    </div>
+                    <!-- Citation End -->
                     <uGroup:objectPostToGroupsWrapper 
                     model="['objectType':speciesInstance.class.canonicalName, 'observationInstance':speciesInstance]" />
                     <div class="sidebar_section">
@@ -283,6 +294,7 @@
                         <div class="union-comment">
                             <feed:showAllActivityFeeds model="['rootHolder':speciesInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                             <comment:showAllComments model="['commentHolder':speciesInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
+
                         </div>
                     </div>
 

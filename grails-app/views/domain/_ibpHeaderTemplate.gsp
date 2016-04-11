@@ -29,8 +29,7 @@
          <div class="">
          
 <%
-String cgroup="";
-cgroup=(params.webaddress)?params.webaddress:'ibp';
+String cgroup=params.webaddress;
 String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {

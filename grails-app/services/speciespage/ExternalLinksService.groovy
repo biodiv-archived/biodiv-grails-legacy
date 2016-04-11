@@ -68,18 +68,12 @@ class ExternalLinksService {
 		return saveInNewDBConnection(taxonConcept)
 	}
 	
-	//to avoid jdbc connection time out.
 	private boolean saveInNewDBConnection(TaxonomyDefinition taxonConcept){
-		TaxonomyDefinition.withNewTransaction{
-			taxonConcept = taxonConcept.merge()
-			
-			if(!taxonConcept.save(flush:true)) {
-				taxonConcept.errors.each { log.error it};
-				return false;
-			}
-			
-			return true
+		if(!taxonConcept.save(flush:true)) {
+			taxonConcept.errors.each { log.error it};
+			return false;
 		}
+		return true
 	}
 
 	/**

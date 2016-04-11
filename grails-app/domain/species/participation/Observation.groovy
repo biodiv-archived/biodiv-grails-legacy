@@ -442,7 +442,7 @@ class Observation extends DataObject {
             else if(it.type == ResourceType.VIDEO) noOfVideos++;
             else if(it.type == ResourceType.AUDIO) noOfAudio++;
         }
-        //utilsService.evictInCache('resources', 'observation-'+this.id);
+        utilsService.evictInCache('resources', 'observation-'+this.id);
         updateReprImage();
 	}
 
@@ -453,7 +453,7 @@ class Observation extends DataObject {
         Resource highestRatedResource = null;
         this.resource.each { r ->
             if(r.id && r.isAttached()) {
-                if(!highestRatedResource || highestRatedResource.averageRating > r.averageRating) {
+                if(!highestRatedResource || r.averageRating > highestRatedResource.averageRating) {
                     highestRatedResource = r;
                 }
             }
@@ -467,7 +467,7 @@ class Observation extends DataObject {
             res = res
 		else 
 			res = null;//group?.icon(ImageType.ORIGINAL)
-            
+        println "Updating reprImage to ${res} ${res.fileName} ${res.url}" 
         this.reprImage = res;
     }
 
@@ -477,7 +477,7 @@ class Observation extends DataObject {
 			return
 		}
 		
-        if(sourceId && !dataset_id) {
+        if(sourceId && !datasetId) {
             Checklists cl = Checklists.read(sourceId)
             if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
                 m[cl.sciNameColumn] = recoVote.recommendation.name
@@ -501,10 +501,10 @@ class Observation extends DataObject {
         //    return maxVotedReco.name; //maxVotedReco.taxonConcept.italicisedForm
         if(maxVotedReco.taxonConcept && maxVotedReco.isScientificName) { //sciname from dirty list
 
-           if(!maxVotedReco.name.equalsIgnoreCase(maxVotedReco.taxonConcept.canonicalForm) && maxVotedReco.isScientificName) {
-                return '<i>'+maxVotedReco.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.canonicalForm+'</i>';
-           }
-            return '<i>'+maxVotedReco.name+'</i>'
+            if(maxVotedReco.taxonConcept.status=="SYNONYM" && maxVotedReco.isScientificName) {
+           		return '<i>'+maxVotedReco.taxonConcept.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.normalizedForm+'</i>';
+           	}           
+            return '<i>'+maxVotedReco.taxonConcept.normalizedForm+'</i>'
         } else //common name
 		    return maxVotedReco.name
 	}
@@ -528,7 +528,7 @@ class Observation extends DataObject {
     String summary(Language userLanguage=null) {
         String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
 		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
-        desc += " at <b>'" + (this.placeName?.trim()?'':this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
+        desc += " at <b>'" + (this.placeName?.trim()?this.placeName?.trim():this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
         return desc
     }
 

@@ -908,7 +908,6 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     if(query){
         params['query'] = query;
     }else{
-        // removing old tag from url
         if(params['query'] != undefined){
             delete params['query'];
         }
@@ -935,7 +934,6 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
                 else if(query){
                     params[field] = queryStr;
                 } else {
-                    // removing old tag from url
                     if(params[field] != undefined){
                         delete params[field];
                     }
@@ -1050,11 +1048,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['contributor']
     }
 
-    var tag = getSelectedFilters($("input.tagFilter"))
-    if(tag) {
-        params['tag'] = tag
+    var tagFilter = getSelectedFilters($("input.tagFilter"))
+    if(tagFilter) {
+        params['tagFilter'] = tagFilter
     } else {
-        delete params['tag']
+        delete params['tagiFilter']
     }
 
     var taxon = $("input#taxon").val();
@@ -1433,7 +1431,6 @@ function loadSpeciesnameReco(){
 function addListLayout(){
     $('.thumbnails>li').css({'width':'100%'}).addClass('addmargin');
     $('.snippet.tablet').addClass('snippettablet');
-    //$('.prop').css('clear','inherit');
     $('.showObvDetails, .view_bootstrap_gallery, .recommendations').show();
     $('.species_title_wrapper').hide();
     $('.species_title_wrapper').parent().css({'height':'20px'});
@@ -1445,7 +1442,6 @@ function addListLayout(){
 function addGridLayout(){
     $('.thumbnails>li').css({'width':'inherit'}).removeClass('addmargin');
     $('.snippet.tablet').removeClass('snippettablet');
-    $('.prop').css('clear','both');
     $('.species_title_wrapper').show();
     $('.species_title_wrapper').parent().css({'height':'50px'});
     $('.showObvDetails, .view_bootstrap_gallery, .recommendations').hide();    

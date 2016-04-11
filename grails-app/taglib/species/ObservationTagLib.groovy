@@ -375,9 +375,10 @@ class ObservationTagLib {
             case "fromRelatedObv" :
                 def taxId = resInstance?.taxonConcept.id.toLong()
                 // new func service limit offset sp inst and returns a res list based on params
-                def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 4, 0)
+                boolean includeExternalUrls = false;
+                def relObvMap =  observationService.getRelatedObvForSpecies(resInstance, 4, 0, includeExternalUrls)
                 List relatedObv = [];
-                int ix=0;
+                /*int ix=0;
                 relObvMap.resList.eachWithIndex { it, index ->
                     if(it.url && (it.url.endsWith('no-image.jpg') ||  it.fileName.length() == 1)) {
                         log.debug "Ignoring resource from pulling as it as external Url ${it.url}"
@@ -385,11 +386,12 @@ class ObservationTagLib {
                         relatedObv << it
                         obvLinkList[ix++] = relObvMap.obvLinkList[index];
                     }
-                }
+                }*/
 
-
+                relatedObv = relObvMap.resList;
+                obvLinkList = relObvMap.obvLinkList;
                 resList = relatedObv
-                resCount = relatedObv.size()
+                resCount = relObvMap.count
                 offset = resCount
             break
 

@@ -67,14 +67,14 @@ def obvId = observationInstance?.id
 
 <div class="showObvDetails" rel="${observationInstance.id}" style="${styleviewcheck?'display:block;': 'display:none;'}">
 
-    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">
+    <div class="prop">
         <span class="name"><i class="icon-share-alt"></i><g:message code="default.name.label" /></span>
         <div class="value">
             <obv:showSpeciesName
             model="['observationInstance':observationInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'isListView':!showDetails]" />
         </div>
     </div>
-    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">
+    <div class="prop">
         <span class="name"><i class="icon-map-marker"></i><g:message code="default.place.label" /></span>
         <div class="value ellipsis">
             <g:if test="${observationInstance.placeName == ''}">
@@ -86,7 +86,7 @@ def obvId = observationInstance?.id
        </div>
     </div>
 
-    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">                
+    <div class="prop">                
         <span class="name"><i class="icon-time"></i><g:message code="default.observed.on.label" /></span>
         <div class="value">
             <time class="timeago"
@@ -96,7 +96,7 @@ def obvId = observationInstance?.id
             </g:if>
         </div>
     </div> 
-    <div class="prop" style="${styleviewcheck?'': 'clear:both;'}">                
+    <div class="prop">                
         <span class="name"><i class="icon-time"></i><g:message code="default.submitted.on.label" /></span>
         <div class="value">
             <time class="timeago"
@@ -105,7 +105,7 @@ def obvId = observationInstance?.id
     </div>           
     <% def userLink = uGroup.createLink('controller':'user', action:'show', id:observationInstance.author.id,  userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress);
     def commonName = observationInstance.isChecklist ? observationInstance.title :observationInstance.fetchSuggestedCommonNames()%>
-    <div class="prop bottom_user_fixed" style="${styleviewcheck?'': 'clear:both;'}">
+    <div class="prop bottom_user_fixed">
         <div class="user-icon pull-left" style="display:table;height:32px;">
             <a href="${userLink}"> 
                 <img src="${observationInstance.author.profilePicture(ImageType.SMALL)}"

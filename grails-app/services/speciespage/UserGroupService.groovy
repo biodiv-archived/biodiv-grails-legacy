@@ -849,6 +849,8 @@ class UserGroupService {
 			}
 		} else {
 			query += " where newsletter.userGroup is null"
+			query += " and newsletter.sticky=:sticky"
+			queryParams['sticky'] = true;
 		}
 		if(currentLanguage){
 			query += " and language="+currentLanguage.id;
@@ -1189,7 +1191,7 @@ class UserGroupService {
 	
 	/////////////// Discussion RELATED /////////////////
 	void postDiscussiontoUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
-        addResourceOnGroup(discussion, userGroupIds, sendMail);
+        addResourceOnGroups(discussion, userGroupIds, sendMail);
 		/*log.debug "Posting ${discussion} to userGroups ${userGroupIds}"
 		userGroupIds.each {
 			if(it) {

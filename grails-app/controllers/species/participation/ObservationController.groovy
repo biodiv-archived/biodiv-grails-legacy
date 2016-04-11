@@ -471,7 +471,8 @@ def grailsCacheManager;
 			redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
 		} else if(utilsService.ifOwns(observationInstance.author) && !observationInstance.dataset) {
-			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService])
+		    def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
+			render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature ])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
 			redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress))
@@ -1169,7 +1170,8 @@ def grailsCacheManager;
                 speciesName:observationInstance.fetchSpeciesCall()?:'']
 
                 if(results&& results.recoVotes?.size() > 0) {
-                    def model = utilsService.getSuccessModel('', null, OK.value(), result);
+                    msg = (observationInstance?.isLocked)?messageSource.getMessage("species.validate.message", null, RCU.getLocale(request)):''
+                    def model = utilsService.getSuccessModel(msg, null, OK.value(), result);
                     withFormat {
                         json { render model as JSON }
                         xml { render model as XML}

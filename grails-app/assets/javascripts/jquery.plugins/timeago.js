@@ -104,7 +104,7 @@
 
     TimeAgo.prototype.getTimeDistanceInMinutes = function(absolutTime) {
       var timeDistance;
-      timeDistance = absolutTime.getTime() + this.options.serverTimeDiff;
+      timeDistance = new Date().getTime() - absolutTime.getTime() + this.options.serverTimeDiff;
       return Math.round((Math.abs(timeDistance) / 1000) / 60);
     };
 

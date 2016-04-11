@@ -47,6 +47,8 @@ import species.auth.SUserRole;
 
 class UtilsService {
 
+    static transactional = false
+
     def grailsApplication;
     def grailsLinkGenerator;
     def sessionFactory
@@ -754,7 +756,7 @@ class UtilsService {
             templateMap["groups"] = obv.userGroups
         }
         if(obv.instanceOf(Species) && obv.id) {
-            templateMap["obvSName"] = obv.taxonConcept.name  
+            templateMap["obvSName"] = obv.taxonConcept.normalizedForm 
             templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name    
             def imagePath = ''; 
             def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL) 
@@ -1160,7 +1162,7 @@ class UtilsService {
     }
 
     String getIbpBannerMessage() {   
-        return bannerMessageMap["ibp"];
+        return bannerMessageMap ? bannerMessageMap["ibp"]:'';
     }
 
     void loadBannerMessageMap() {  
@@ -1194,14 +1196,14 @@ class UtilsService {
         org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Evict result in cache ${cache.name} at key ${cacheKey}"
-        cache.evict(cacheKey);
+        return cache.evict(cacheKey);
     }
 
     def clearCache(String cacheName) {
         org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Clearing Cache ${cache.name}"
-        cache.clear();
+        return cache.clear();
     }
 
 }

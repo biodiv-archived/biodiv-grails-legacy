@@ -257,7 +257,8 @@ class SpeciesController extends AbstractObjectController {
         }
 		else {
             if(params.editMode) {
-                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()) {
+                println speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()
+                if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) && !utilsService.isAdmin()) {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
                     def model = utilsService.getErrorModel(flash.message, null, OK.value())
@@ -1357,10 +1358,10 @@ class SpeciesController extends AbstractObjectController {
         }
         params.offset = (params.offset)?params.offset:0
         def spInstance = Species.read(params.speciesId.toLong())
-        def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger())
-        List relatedObv = [];
-        List obvLinkList = [];
-        int i=0;
+        def relatedObvMap = observationService.getRelatedObvForSpecies(spInstance, 4, params.offset.toInteger(), false)
+        List relatedObv = relatedObvMap.resList;
+        List obvLinkList = relatedObvMap.obvLinkList;
+/*        int i=0;
         relatedObvMap.resList.eachWithIndex { it, index ->
             if(it.url && (it.url.endsWith('no-image.jpg') ||  it.fileName.length() == 1)) {
                 log.debug "Ignoring resource from pulling as it as external Url ${it.url}"
@@ -1369,8 +1370,8 @@ class SpeciesController extends AbstractObjectController {
                 obvLinkList[i++] = relatedObvMap.obvLinkList[index];
             }
         }
-        
-        def relatedObvCount = relatedObv.size()
+*/      
+        def relatedObvCount = relatedObvMap.count;
         def addPhotoHtml = g.render(template:"/observation/addPhoto", model:[observationInstance: spInstance, resList: relatedObv, obvLinkList: obvLinkList, resourceListType: params.resourceListType, offset:(params.offset.toInteger() + relatedObvCount)]);
         def result = [addPhotoHtml: addPhotoHtml, relatedObvCount: relatedObvCount]
         render result as JSON

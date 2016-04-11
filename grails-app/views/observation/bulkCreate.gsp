@@ -18,7 +18,7 @@
                 box-shadow: 0 2px 11px -3px inset;
                 padding: 10px;
                 min-height: 212px;
-                height:240px;
+                height:250px;
                 width:870px;
             }
             td {
@@ -77,7 +77,7 @@
                 height:100px;
             }
             .selected_habitat, .selected_group {
-                padding: 4px 3px;
+                padding: 4px 3px !important;
                 width:97%;
                 text-align:center !important;
             }
@@ -139,7 +139,7 @@
             .imagesListWrapper {
                 overflow-x:scroll;
                 overflow-y:hidden;
-                height: 250px;
+                height: 284px;
                 width:884px;
                 margin-left:2px;
             }
@@ -199,6 +199,13 @@
                 margin-right:2px;
                 margin-top:2px;
             }
+            .license_div{
+                width:100%;
+            }
+            .groups_super_div, .habitat_super_div{
+                width: 220px;
+            }
+            
         </style>
     </head>
     <body>
@@ -222,7 +229,7 @@
                             <div >
                                 <div class="column propagateLicense">
                                     <label><g:message code="default.licenses.label" /></label>
-                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY")]"/>
+                                    <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY"),'isEditable':true]"/>
                                 </div>
                                 <div class="column propagateGrpHab">
                                     <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance, 'action':'show']"/> 
