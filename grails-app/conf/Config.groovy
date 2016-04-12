@@ -1954,4 +1954,5 @@ grails {
 }
 */
 grails.assets.bundle=true
-grails.assets.excludes=["SlickGrid/**/*"]
+grails.assets.minifyjs=false
+grails.assets.excludes=["**/SlickGrid/**/*"]

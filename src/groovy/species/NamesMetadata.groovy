@@ -17,9 +17,9 @@ abstract class NamesMetadata extends NamesSorucedata {
 
         static list() {
             [
-            CLEAN,
+            RAW,
             WORKING,
-            RAW
+            CLEAN
             ]
         }
 
@@ -27,10 +27,16 @@ abstract class NamesMetadata extends NamesSorucedata {
             return this.value;
         }
 
-        String toString() {
+        String label() {
+            if(this == RAW) return "Raw" 
+            if(this == WORKING) return "Working" 
+            if(this == CLEAN) return "Clean" 
+        }
+
+/*        String toString() {
             return this.value();
         }
-		
+*/		
 		static NamePosition getEnum(String str){
 			if(!str) return null
 			

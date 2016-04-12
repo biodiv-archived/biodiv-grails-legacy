@@ -3097,10 +3097,14 @@ small {
 	padding-right: 20px;
 }
 
-.RAW {
+.RAW, .RAW a{
     color:red !important;
 }
 .WORKING {
+}
+
+.SYNONYM {
+    list-style:circle;
 }
 
 .breadcrumb {
@@ -3110,27 +3114,63 @@ small {
 }
 
 .input-append.input-block-level {
-      display: table; 
-  }
-  .input-append.input-block-level .add-on {
-        display: table-cell;
-    }
-    .input-append.input-block-level > input {
-          width: 100%;
-      }
+    display: table; 
+}
+.input-append.input-block-level .add-on {
+    display: table-cell;
+}
+.input-append.input-block-level > input {
+    width: 100%;
+}
 
-.taxon10 {
+.taxon0 {
+    margin-left:0px;
+}
+
+.taxon1 {
+    margin-left:10px;
+}
+
+.taxon2 {
     margin-left:20px;
 }
 
+.taxon3 {
+    margin-left:30px;
+}
+
+.taxon4 {
+    margin-left:40px;
+}
+.taxon5 {
+    margin-left:50px;
+}
+
+.taxon6 {
+    margin-left:60px;
+}
+
+.taxon7 {
+    margin-left:70px;
+}
+.taxon8 {
+    margin-left:80px;
+}
+.taxon9 {
+    margin-left:90px;
+}
+.taxon10 {
+    margin-left:100px;
+}
+
 .nameSuggestions{
-	font-size: 14px;
+    font-size: 14px;
 }
 
 /*Added */
 
 .dirty_list{
-	 background-color:lightgrey; //#C0504D;
+    background-color:lightgrey; //#C0504D;
 }
 
 .working_list{

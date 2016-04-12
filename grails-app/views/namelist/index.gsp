@@ -54,18 +54,28 @@
             <div class="span9 listarea" style="overflow:visible;">
                  <div id="taxonGrid" class="dl_content" style="width:100%;height:225px"></div>
                  <div id="listCounts" class="pull-left" style="height:27px;">
+                    <span id="instanceCount"></span>
                     <span id="dirtyListCount" class="RAW"></span>
                     <span id="workingListCount" class="WORKING"></span>
                     <span id="cleanListCount" class="CLEAN"></span>
+                    <span id="acceptedCount"></span>
+                    <span id="synonymCount"></span>
                 </div>
-                <div id="taxonPager" class="pull-right" style="height:27px;"></div>
                 <div id="inlineFilterPanel" style="background:#dddddd;color:black;clear:both;">
-                     Filter names with text <input type="text" id="txtSearch" style="margin:3px 0px 3px 0px">
-                     and with <select id="taxonStatusSelect" multiple="multiple">
+                     <%--Filter names with text <input type="text" id="txtSearch" style="margin:3px 0px 3px 0px">
+                     and with --%>
+                     <select id="taxonStatusSelect" multiple="multiple">
                          <g:each in ="${NameStatus.list()}" var="status">
                          <option value="${status}">${status.label()}</option>
                          </g:each>
                      </select>
+                     <select id="taxonPositionSelect" multiple="multiple">
+                         <g:each in ="${NamePosition.list()}" var="position">
+                         <option value="${position}">${position.label()}</option>
+                         </g:each>
+                     </select>
+
+                    <div id="taxonPager" class="pull-right" style="height:27px;"></div>
                  </div>
             </div>   
 

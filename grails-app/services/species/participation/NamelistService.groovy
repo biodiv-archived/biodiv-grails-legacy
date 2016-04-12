@@ -2006,57 +2006,59 @@ class NamelistService {
         def classSystem = params.classificationId.toLong()
         def parentId = params.parentId
         def limit = params.limit ? params.limit.toInteger() : 100
-        def offset = params.offset ? params.limit.toLong() : 0
+        def offset = params.offset ? params.offset.toLong() : 0
         def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
         def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
         List ranksToFetch = params.ranksToFetch ? (parentTaxon.rank+','+params.ranksToFetch).split(','):[parentTaxon.rank, nextPrimaryRank];
+        List statusToFetch = params.statusToFetch ? (params.statusToFetch).split(','):[NameStatus.ACCEPTED.value().toUpperCase(), NameStatus.SYNONYM.value().toUpperCase()];
+        List positionsToFetch = params.positionsToFetch ? (params.positionsToFetch).split(','):[NamePosition.RAW.value().toUpperCase(), NamePosition.WORKING.value().toUpperCase(), NamePosition.CLEAN.value().toUpperCase()];
 
+        List namesList = []
+        //Map dirtyList = [:]
+        //Map workingList = [:]
+        //Map cleanList = [:]
 
-
-        Map dirtyList = [:]
-        Map workingList = [:]
-        Map cleanList = [:]
-
+        int instanceTotal = 0;
         int dirtyListCount = 0, workingListCount = 0, cleanListCount=0;
-        List accDL = [], accWL = [], accCL = []
-        List synDL = [], synWL = [], synCL = []
-        List comDL = [], comWL = [], comCL = []
-        List speciesDL = [], speciesWL = [], speciesCL = []
+        int acceptedCount = 0, synonymCount = 0, commonNameCount=0;
+        //List accDL = [], accWL = [], accCL = []
+        //List synDL = [], synWL = [], synCL = []
+        //List comDL = [], comWL = [], comCL = []
+        //List speciesDL = [], speciesWL = [], speciesCL = []
+        String countSqlStr='', synCountSqlStr='';
 
-        String countSqlStr = "select t.position, count(*) as count \
+        //CHK: does this query handle synonyms also ... do synonyms have hierarchy? or shd we put status=accepted condition in this query?
+        countSqlStr = "select t.position, t.status, count(*) as count \
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
-                    "s.path like '"+parentId+"%' and " +
-                    "t.rank in ("+ranksToFetch.join(',')+ ") "+
-                    "group by t.position ";
+                    "s.path like '"+parentId+"%' and "+
+                    "t.status = '" +NameStatus.ACCEPTED+"' and "+
+                    "t.rank in ("+ranksToFetch.join(',')+ ") and "+
+                    "t.position in ('"+positionsToFetch.join("','")+ "') "+
+                    "group by t.position, t.status ";
+
+        synCountSqlStr = "select s.position, s.status, count(*) as count from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id in ( select t.id from taxonomy_registry s, taxonomy_definition t where s.taxon_definition_id = t.id and "+ (classSystem?"s.classification_id = :classSystem and ":"") + "s.path like '"+parentId+"%' and " + "t.rank in ("+ranksToFetch.join(',') + ")) and  s.position in ('"+positionsToFetch.join("','") + "') group by s.position, s.status";
 
 
         try {
 
             if(!parentId) {
-                sqlStr = "select t.id as id, t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status \
+                 sqlStr = "select t.id as id, t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status \
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
-                    "t.rank = 0 order by t.name";
+                    "t.status = '" +NameStatus.ACCEPTED+"' and "+
+                    "t.rank = 0 order by t.rank, t.name";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields
                 //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-
-                rs = sql.rows(sqlStr, [classSystem:classSystem])
-                /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                def cl = Classification.read(classSystem.toLong());
-                if(cl == classification) {
-                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
-                }*/
+                 rs = sql.rows(sqlStr, [classSystem:classSystem])
             } else {
                 sqlStr = "select t.id as id, t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status\
                     from taxonomy_registry s, \
@@ -2065,7 +2067,9 @@ class NamelistService {
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
                     "s.path like '"+parentId+"%' and " +
-                    "t.rank in ("+ranksToFetch.join(',')+ ") "+
+                    "t.status = '" +NameStatus.ACCEPTED+"' and "+
+                    "t.rank in ("+ranksToFetch.join(',')+ ") and "+
+                    "t.position in ('"+positionsToFetch.join("','")+ "') "+
                     " order by t.rank asc, t.name asc limit :limit offset :offset";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
@@ -2073,117 +2077,82 @@ class NamelistService {
                 //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
                 println "======================+++++++"
                 println sqlStr;
-                rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
+                println "parentId ${parentId}, classSystem ${classSystem} ranksToFetch ${ranksToFetch} statusToFetch ${statusToFetch} positionsToFetch ${positionsToFetch} limit ${limit} offset ${offset}"
 
-                /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                def cl = Classification.read(classSystem.toLong());
-                if(cl == classification) {
-                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
-                }*/
-
-                /*def s3 = "select s.id as taxonid, s.rank as rank, s.name as name, s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, s.status as status from taxonomy_definition s left outer join  taxonomy_registry reg on s.id = reg.taxon_definition_id and reg.classification_id = :classSystem where s.rank >= :speciesRank and s.status = :acceptedStatus and (reg.path like '%!_"+parentId+"!_%' escape '!'  or reg.path like '"+parentId+"!_%'  escape '!' or reg.path like '%!_"+parentId+"'  escape '!') order by s.name";
-
-
-                def sql1 = new Sql(dataSource)
-
-                def queryParams = ['speciesRank':TaxonomyRank.SPECIES.ordinal(), 'acceptedStatus':NameStatus.ACCEPTED.toString(), 'classSystem':classSystem]
-                def q3 = sql1.rows(s3, queryParams)
-                q3.each {
-                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                        speciesDL << it
-                    } else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                        speciesWL << it
-                    } else{
-                        speciesCL << it
-                    }
-                }*/
-            }
+                rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset]);
+           }
 
             println "total result size === " + rs.size()
 
             def countRs = sql.rows(countSqlStr, [classSystem:classSystem])
             println countRs
             countRs.each {
+                instanceTotal += it.count;
                 if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                    dirtyListCount = it.count;
+                    dirtyListCount += it.count;
                 }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                    workingListCount = it.count;
-                }else{
-                    cleanListCount = it.count;
+                    workingListCount += it.count;
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.CLEAN.value())){
+                    cleanListCount += it.count;
                 }
 
+                switch(it.status.toLowerCase()) {
+                    case NameStatus.ACCEPTED.value().toLowerCase() : acceptedCount += it.count; break;
+                    case NameStatus.SYNONYM.value().toLowerCase() : synonymCount += it.count; break;
+                }
+            }
+
+            def synCountRs = sql.rows(synCountSqlStr, [classSystem:classSystem])
+            println synCountRs
+            synCountRs.each {
+                instanceTotal += it.count;
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                    dirtyListCount += it.count;
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    workingListCount += it.count;
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.CLEAN.value())){
+                    cleanListCount += it.count;
+                }
+
+                switch(it.status.toLowerCase()) {
+                    case NameStatus.ACCEPTED.value().toLowerCase() : acceptedCount += it.count; break;
+                    case NameStatus.SYNONYM.value().toLowerCase() : synonymCount += it.count; break;
+                }
             }
 
             ///////////////////////////////
             rs.each {
+                if(statusToFetch.contains(NameStatus.ACCEPTED.value().toUpperCase())) {
+                    namesList << it;
+                }
                 //NOT SENDING PATH
                 //SENDING IDS as taxonid for synonyms and common names
-                //def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
-                //from synonyms s where s.taxon_concept_id = :taxonId";
-                println "GETTING SYNONYMS FOR TAXON ${it.taxonid}"
-                sql = new Sql(dataSource)
-                //FIX:limit is not applied on synonyms query
-                def s1 = "select concat(acsy.id, '_', s.id) as id, s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status\
-                from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId order by s.name";
+                if(statusToFetch.contains(NameStatus.SYNONYM.value().toUpperCase())) {
+                    println "GETTING SYNONYMS FOR TAXON ${it.taxonid}"
+                    sql = new Sql(dataSource)
+                    //FIX:limit is not applied on synonyms query
+                    def s1 = "select concat(acsy.id, '_', s.id) as id, s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId and s.position in ('"+positionsToFetch.join("','")+"') order by s.name";
 
-                def q1 = sql.rows(s1, [taxonId:it.taxonid])
-                q1.each {
-                    println "==========TAXA IDS======= " + it.taxonid
-                    synDL << it
-                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                        dirtyListCount++;
-                    } else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                        workingListCount++;
-                    //    synWL << it
-                    } else{
-                        cleanListCount++;
-                    //    synCL << it
+                    def q1 = sql.rows(s1, [taxonId:it.taxonid])
+                    q1.each {
+                        println "==========TAXA IDS======= " + it.taxonid
+                        namesList << it
                     }
                 }
 
-                sql = new Sql(dataSource)
-                def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
-                from common_names c where c.taxon_concept_id = :taxonId order by c.name";
+                if(statusToFetch.contains(NameStatus.COMMON.value())) {
+                    sql = new Sql(dataSource)
+                    def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
+                    from common_names c where c.taxon_concept_id = :taxonId order by c.name";
 
-                /*def q2 = sql.rows(s2, [taxonId:it.taxonid])
-                q2.each {
-                  if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                  comDL << it
-                  }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                  comWL << it
-                  }else{
-                  comCL << it
-                  }
-                  }*/
-
+                    /*def q2 = sql.rows(s2, [taxonId:it.taxonid])
+                    q2.each {
+                    }*/
+                }
 
             }
 
-            //println "==========SYN DL============= " + synDL
-            println "==========COM DL============= " + comDL
-            ///////////////////////////////
-
-            rs.each {
-                    accDL << it
-            }
-            dirtyList['accDL'] = accDL
-            dirtyList['synDL'] = synDL
-            dirtyList['comDL'] = comDL
-            dirtyList['speciesDL'] = speciesDL
-            /*workingList['accWL'] = accWL
-            workingList['synWL'] = synWL
-            workingList['comWL'] = comWL
-            workingList['speciesWL'] = speciesWL
-            cleanList['accCL'] = accCL
-            cleanList['synCL'] = synCL
-            cleanList['comCL'] = comCL
-            cleanList['speciesCL'] = speciesCL
-            
-            return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]
-            */
-            return [dirtyList:dirtyList, ranksToFetch:ranksToFetch, dirtyListCount:dirtyListCount, workingListCount:workingListCount, cleanListCount:cleanListCount]
+            return [namesList:namesList, statusToFetch:statusToFetch, positionsToFetch:positionsToFetch, ranksToFetch:ranksToFetch, instanceTotal:instanceTotal, dirtyListCount:dirtyListCount, workingListCount:workingListCount, cleanListCount:cleanListCount, acceptedCount:acceptedCount, synonymCount:synonymCount, limit:limit, offset:offset]
         } catch(Exception e) {
             e.printStackTrace();
         }
