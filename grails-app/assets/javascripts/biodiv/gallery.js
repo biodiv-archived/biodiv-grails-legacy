@@ -306,7 +306,7 @@ $(document).ready (function() {
     $(document).on('click','.license .slideUp',function(){
         if($(this).hasClass('open')){
             $(this).removeClass('open').addClass('close').removeClass('icon-chevron-down').addClass('icon-chevron-up');
-            $('.image_info').css('height','55px');
+            $('.image_info').css('height','40px');
         }else{
             $(this).addClass('open').removeClass('close').removeClass('icon-chevron-up').addClass('icon-chevron-down');
             $('.image_info').css('height','auto');

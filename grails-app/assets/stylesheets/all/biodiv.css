@@ -383,7 +383,7 @@ h6 {
 	margin-right: 10px;*/
         position:absolute;
         right:0px;
-        top:0px;
+        top:5px;
         z-index:2;
 }
 
@@ -3264,7 +3264,7 @@ small {
   	float: left;
  }
  .dataset .conts_wrap_left{
- 	width: 420px !important;
+ 	width: 417px !important;
  }
  .conts_wrap .conts_wrap_right{
 /* 	width: 180px;*/
