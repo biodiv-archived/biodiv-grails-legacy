@@ -1389,7 +1389,7 @@ function reinitializeRows($context) {
     for(var i = 0; i< 4; i++) {
         $context.find(".add_new_row").trigger("click");
     }
-    $context.find(".tab_div:lt("+numRows+")").remove();
+    $context.find(".tab_div:lt("+(numRows-1)+")").remove();
 }
 
 function showProperTabs() {
