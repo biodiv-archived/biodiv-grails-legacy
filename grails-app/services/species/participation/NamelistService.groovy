@@ -63,16 +63,17 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
-    public static Set namesInWKG = new HashSet();
+    //public static Set namesInWKG = new HashSet();
 
-    public static Map namesBeforeSave = [:];
-    public static Map namesAfterSave = [:];
+    //public static Map namesBeforeSave = [:];
+    //public static Map namesAfterSave = [:];
 	
 	
-	//XXX: this map is used to store new name created by col only for bulk and name upload. This is needed because hibernet is not
-	//flushing data in db and same name is duplicated within one bulk name upload
-	//this map will be cleared by every bulk upload thread at the end to avoid memory build up
-	private static Map COL_CREATED_NAME = [:]
+	//XXX: this map is used to store new name created by session for bulk and name upload. This is needed because
+	//if a user want to create new name by saying 'new' in spreadsheet then same name may be created multiple times
+	//it that name appears multiple time in hir sheet 
+	//this map will be cleared by every bulk upload thread to avoid any conflict
+	private static Map NEW_NAME_IN_SESSION = [:]
 
 	def dataSource
     def groupHandlerService
@@ -99,7 +100,7 @@ class NamelistService {
             clazz = SynonymsMerged.class; 
         }
         
-		clazz.withNewTransaction{
+//		clazz.withNewTransaction{
 			if(normalizedForm || authorYear){
 				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
 				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
@@ -136,16 +137,8 @@ class NamelistService {
 					}
 				}
             }
-		}
+//		}
 			
-		if(res.isEmpty()){
-			String key = canonicalForm + rank 
-			def resName = COL_CREATED_NAME.get(key)
-			if(resName){
-				res = [resName]
-			}
-		}
-		
 		println "== FINAL SEARCH RESULT " + res
 		return res;
     }
@@ -255,8 +248,7 @@ class NamelistService {
 		}else{
 			td = createSynonymFromColId(colId, runPostProcess)
 		}
-		
-		COL_CREATED_NAME.put(td.canonicalForm + td.rank , td)
+		addNewNameInSession(td)
 		return td
 	}
 	
@@ -568,7 +560,6 @@ class NamelistService {
         //addIBPHierarchyFromCol(sciName, acceptedMatch);
 
         //already updated in update attributes
-        //updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
         sciName.dirtyListReason = null;
         sciName.noOfCOLMatches = colDataSize;
         /*else if(sciName.status == NameStatus.ACCEPTED) {
@@ -584,8 +575,8 @@ class NamelistService {
             println sciName.position
             log.debug "Saved sciname ${sciName}"
 			sciName.updateNameSignature()
-            namesAfterSave[sciName.id] = sciName.position.value();
-            utilsService.cleanUpGorm(true);
+            //namesAfterSave[sciName.id] = sciName.position.value();
+            //utilsService.cleanUpGorm(true);
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
@@ -658,9 +649,7 @@ class NamelistService {
             if(moveToWKG) position = NamesMetadata.NamePosition.WORKING;
             if(moveToRaw) position = NamesMetadata.NamePosition.RAW;
 
-            tempResult = updatePosition(sciName, position); 
-            println "======= RESULT FROM UpdatePosition ${tempResult}";
-            result.errors << tempResult.errors;
+            updatePosition(sciName, position); 
             //taxonService.moveToWKG([taxonReg]);
 
 
@@ -671,7 +660,7 @@ class NamelistService {
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 log.debug "Saved sciname ${sciName}" 
                 sciName.updateNameSignature()
-				utilsService.cleanUpGorm(true);
+				//utilsService.cleanUpGorm(true);
                 result.success = true;
             } else {
                 result.success = false;
@@ -961,22 +950,9 @@ class NamelistService {
             return [success:success, errors:['Position is empty']];
         }
 
-        namesInWKG.add(sciName.id)
-        namesBeforeSave[sciName.id] = position.value();
         log.debug "Updating position from ${sciName.position} to ${position}"
-        println "Updating position from ${sciName.position} to ${position}"
-        sciName.position = position;
-		
-        if(!sciName.save(flush:true)) {
-            success = false;
-            errors = sciName.errors.allErrors;
-            sciName.errors.allErrors.each { log.error it }
-        } else {
-            success = true;
-        }
-
-        println "\n============== UPDATING POSITION DONE FROM TO ${sciName.position}========"
-        return [success:success, errors:errors];
+        sciName.updatePosition(position.value())
+		return [success:success, errors:errors];
     }
 
     List processColData(File f, ScientificName sn = null) {
@@ -1433,7 +1409,7 @@ class NamelistService {
             def sql= session.createSQLQuery(query)
             sql.setProperties([id:sciName.id, class:'species.TaxonomyDefinition', status:status.toString()]).executeUpdate();
             println " ========executed query =="
-            utilsService.cleanUpGorm(true);
+            //utilsService.cleanUpGorm(true);
             
             //sciName.class = 'species.TaxonomyDefinition';
             //TODO: CHK: sciName = TaxonomyDefinition.get(sciName.id.toLong())
@@ -1449,7 +1425,7 @@ class NamelistService {
             def sql = session.createSQLQuery(query)
             sql.setProperties([id:sciName.id, class:'species.SynonymsMerged', relationship:ScientificName.RelationShip.SYNONYM.toString(), status:status.toString()]).executeUpdate();
             println " ========executed query =="
-            utilsService.cleanUpGorm(true);
+            //utilsService.cleanUpGorm(true);
             
             /*TaxonomyDefinition.executeUpdate(
                     "update TaxonomyDefinition t set t.class = :klass where t.id = :id ", 
@@ -1988,6 +1964,7 @@ class NamelistService {
 	
 	
     public def getNamesFromTaxon(params){
+    	println "===================== params " + params 
         def sql = new Sql(dataSource)
         def sqlStr, rs
         def classSystem = params.classificationId.toLong()
@@ -2213,12 +2190,24 @@ class NamelistService {
 	}
 
 	
-	public static void clearCOLNameFromMemory(){
-		COL_CREATED_NAME.clear()
+	public static void clearSessionNewNames(){
+		NEW_NAME_IN_SESSION.clear()
 	}
 	
+	public static void addNewNameInSession(TaxonomyDefinition td){
+		if(!td || !td.id)
+			return
+			
+		NEW_NAME_IN_SESSION.put(td.canonicalForm + "##" + td.rank , td.id)
+	}
 	
-	
+	public static TaxonomyDefinition getNewNameInSession(String canonicalForm, int rank){
+		if(!canonicalForm)
+			return
+			
+		def tdId = NEW_NAME_IN_SESSION.get(canonicalForm + "##" + rank)
+		return TaxonomyDefinition.get(tdId)
+	}
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////

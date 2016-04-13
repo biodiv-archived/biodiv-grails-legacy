@@ -376,8 +376,6 @@ class SpeciesUploadService {
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				sBulkUploadEntry?.writeLog(res.idSummary)
 				cleanUpGorm();
-				NamelistService.clearCOLNameFromMemory()
-				
 			}
 			
 			processNameCount += contentSubList.size()

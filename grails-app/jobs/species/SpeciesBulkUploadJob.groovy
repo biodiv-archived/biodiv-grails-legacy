@@ -1,10 +1,13 @@
 package species
 
+import groovy.sql.Sql
 import java.util.logging.Logger;
 import species.participation.SpeciesBulkUpload.Status
 import species.participation.SpeciesBulkUpload
+import species.participation.NamelistService
 
 class SpeciesBulkUploadJob {
+	
 	
 	def speciesUploadService
 	def utilsService
@@ -23,19 +26,25 @@ class SpeciesBulkUploadJob {
 		}
 		
 		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(500);
+		dataSource.setUnreturnedConnectionTimeout(100000);
 		
 		try{
 			scheduledTaskList.each { SpeciesBulkUpload dl ->
 				try{
 					println "starting task $dl and sleeping"
+					TaxonomyDefinition.UPDATE_SQL_LIST.clear();
 					speciesUploadService.upload(dl)
 					dl.updateStatus(Status.SUCCESS)
+					utilsService.clearCache("defaultCache")
+					excuteSql()
 					//utilsService.sendNotificationMail(utilsService.DOWNLOAD_REQUEST, dl, null, null, null);
 				}catch (Exception e) {
 					log.debug " Error while running task $dl"
 					e.printStackTrace()
 					dl.updateStatus(Status.FAILED)
+				}finally{
+					TaxonomyDefinition.UPDATE_SQL_LIST.clear();
+					NamelistService.clearSessionNewNames();
 				}
 			}
 		}catch(e){
@@ -65,5 +74,24 @@ class SpeciesBulkUploadJob {
 		
 		JOB_RUNNING = true
 		return scheduledTaskList
+	}
+
+	private void excuteSql(){
+		println "Called for execute sql    >>>>>>>>>>>>>>>>>>>>> "
+		if(!TaxonomyDefinition.UPDATE_SQL_LIST)
+			return
+		//sqlStrings = sqlStrings.reverse()
+		//println "------------ sqlStrings " + TaxonomyDefinition.UPDATE_SQL_LIST
+		Sql sql = new Sql(dataSource)
+		TaxonomyDefinition.UPDATE_SQL_LIST.each { String s ->
+			println "==== query " + s
+			try{
+				int updateCount = sql.executeUpdate(s);
+				println "============ row updated  " + 	updateCount
+				}catch(e){
+					e.printStackTrace()
+				}
+		}
+		TaxonomyDefinition.UPDATE_SQL_LIST.clear();
 	}
 }

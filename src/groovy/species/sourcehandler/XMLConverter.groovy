@@ -483,7 +483,7 @@ class XMLConverter extends SourceConverter {
 					//adding taxonomy classifications
 					TaxonomyRegistry latestHir
 					taxonHierarchy.each { th ->
-						th = th.merge()
+						//th = th.merge()
 						th.save();
 						if(th.taxonDefinition == taxonConcept){
 							latestHir = th
@@ -491,7 +491,8 @@ class XMLConverter extends SourceConverter {
 							th.taxonDefinition.updateNameSignature(getUserContributors(speciesNameNode.data))
 						}
 					}
-					
+
+					//println " latest hir ------------------- <<<<<<<<<>>>>>>>>>>>>>>> " + latestHir
 					taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species), latestHir)
 					updateUserPrefForColCuration(taxonConcept, speciesNameNode)
 					taxonConcept.postProcess()
@@ -1771,11 +1772,11 @@ class XMLConverter extends SourceConverter {
             def t = getTaxonHierarchyRes.taxonRegistry;
             spellCheckMsg = getTaxonHierarchyRes.spellCheckMsg;
             if(t) {
-            	cleanUpGorm();
+            	//cleanUpGorm();
                 taxonHierarchies.addAll(t);
             }
         }
-        return ['taxonRegistry':taxonHierarchies, 'spellCheckMsg':spellCheckMsg];
+		return ['taxonRegistry':taxonHierarchies, 'spellCheckMsg':spellCheckMsg];
     }
 
     private List<Node> getNodesFromCategory(List speciesNodes, String category) {
@@ -1940,117 +1941,84 @@ class XMLConverter extends SourceConverter {
         int i=0;
         boolean flag = true;
         fieldNodes.each { fieldNode ->
-            if(flag) {
-                if(fieldNode) {
-                    //log.debug "Adding taxonomy registry from node: "+fieldNode;
-                    int rank = getTaxonRank(fieldNode?.subcategory?.text());
-                    String name = getData(fieldNode.data);
+            if(flag && fieldNode){
+                //log.debug "Adding taxonomy registry from node: "+fieldNode;
+                int rank = getTaxonRank(fieldNode?.subcategory?.text());
+                String name = getData(fieldNode.data);
 
-                    log.debug "Taxon : "+name+" and rank : "+rank;
+                log.debug "Taxon : "+name+" and rank : "+rank;
+                if(!name || rank < 0) {
+					//return only continue the loop
+					return
+                }
+				
+                def parsedName = parsedNames.get(i++);
+                log.debug "Parsed name ${parsedName?.canonicalForm}"
+                if(parsedName?.canonicalForm) {
+                    //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
+                    //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
                     
-                    if(name && rank >= 0) {
-                        def parsedName = parsedNames.get(i++);
-                        log.debug "Parsed name ${parsedName?.canonicalForm}"
-                        if(parsedName?.canonicalForm) {
-                            //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
-                            //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
-                            
-                            //TODO: how to get status in each case?
-							String parsedAuthorYear = parsedName.authorYear
-                            boolean searchInNull = false;
-							boolean useAuthorYear = (otherParams?true:false)
-							
-							def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode)
-                            TaxonomyDefinition taxon = null;
-                            
-                            //if from curation
-                            //search results is single - choose it
-                            //if multiple -  and if last node - read that taxon from curatingTaxonId
-                            //if its accepted pick that as taxon & flag it
-                            //else if its synonym pick 1st result and flag that synonym
-                            if(otherParams) {
-								//println "============= otherParams  " + otherParams
-                                //DOING THIS BECAUSE IT DIDNT FIND NEWLY MOVED NAME FROM SYNONYM TO ACCEPTED
-                                if(fieldNode == fieldNodes.last()) {
-                                    if(otherParams.curatingTaxonId) {
-                                        TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
-                                        println "=============++++++ 1111 ${sciName.status} ............${otherParams.curatingTaxonStatus}"
-                                        //if(otherParams.curatingTaxonStatus == NameStatus.ACCEPTED) {
-                                            //couldnot use contains()
-                                            boolean isPresent = false;
-                                            searchIBPResult.each {
-                                                if(it.id == sciName.id){
-                                                    isPresent = true;
-                                                }
-                                            }
-                                            if(!isPresent) {
-                                                searchIBPResult.add(sciName);
-                                            }
-                                        //}
+                    //TODO: how to get status in each case?
+					String parsedAuthorYear = parsedName.authorYear
+                    boolean searchInNull = false;
+					boolean useAuthorYear = (otherParams?true:false)
+					
+					def searchIBPResult = searchIBP(parsedName, rank, searchInNull, useAuthorYear, fieldNode)
+                    TaxonomyDefinition taxon = null;
+                    
+                    //if from curation
+                    //search results is single - choose it
+                    //if multiple -  and if last node - read that taxon from curatingTaxonId
+                    //if its accepted pick that as taxon & flag it
+                    //else if its synonym pick 1st result and flag that synonym
+                    if(otherParams) {
+						//println "============= otherParams  " + otherParams
+                        //DOING THIS BECAUSE IT DIDNT FIND NEWLY MOVED NAME FROM SYNONYM TO ACCEPTED
+                        if(fieldNode == fieldNodes.last()) {
+                            if(otherParams.curatingTaxonId) {
+                                TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
+                                println "=============++++++ 1111 ${sciName.status} ............${otherParams.curatingTaxonStatus}"
+                                //if(otherParams.curatingTaxonStatus == NameStatus.ACCEPTED) {
+                                    //couldnot use contains()
+                                    boolean isPresent = false;
+                                    searchIBPResult.each {
+                                        if(it.id == sciName.id){
+                                            isPresent = true;
+                                        }
                                     }
-                                }
-                                if(searchIBPResult.size() == 1) {
-                                    taxon = searchIBPResult[0];
-                                }
-                                if(searchIBPResult.size() > 1 ){
-                                    if(fieldNode == fieldNodes.last()) {
-                                        println "Field node is last node"
-                                        if(otherParams.curatingTaxonId) {
-                                            TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
-                                            println "1=============++++++ 1111 ${sciName.status} ............${otherParams.curatingTaxonStatus}"
-                                            if(sciName.status == NameStatus.ACCEPTED) {
-                                                println "==========sci name status  ${sciName.status} ............${otherParams.curatingTaxonStatus}"
-                                                println "############==== Flagging accepted name " + sciName;
-                                                taxon = sciName;
-                                                taxon.isFlagged = true;
-                                                String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
-                                                searchIBPResult.each {
-                                                    flaggingReason = flaggingReason + it.id.toString() + ", ";
-                                                }
-                                                println "########### Flagging in XML CONVERTER becoz : ${flaggingReason}==============" + taxon
-                                                taxon.flaggingReason = taxon.flaggingReason + " ### " + flaggingReason;
-                                                taxon = taxon.merge();
-                                                if(!taxon.save()) {
-                                                    taxon.errors.each { log.error it }
-                                                }
-                                            } else {
-                                                println "############==== Flagging synonym " + sciName;
-                                                //Pick any working list name if available
-                                                def workingTaxon = null
-                                                def dirtyTaxon = null
-                                                searchIBPResult.each {
-                                                    if(it.position == NamePosition.WORKING && !workingTaxon) {
-                                                        workingTaxon = it;
-                                                    }
-                                                    if(it.position == NamePosition.RAW && !dirtyTaxon) {
-                                                        dirtyTaxon = it;
-                                                    }
-                                                }
-                                                if(workingTaxon) {
-                                                    taxon = workingTaxon
-                                                } else if(dirtyTaxon) {
-                                                    taxon = dirtyTaxon;
-                                                } else {
-                                                    taxon = searchIBPResult[0];
-                                                }
-                                                sciName.isFlagged = true;
-                                                String flaggingReason = "The accepted name for this is a system default.Multiple potential matches exist.IDs- ";
-                                                searchIBPResult.each {
-                                                    flaggingReason = flaggingReason + it.id.toString() + ", ";
-                                                }
-                                                sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
-                                                if(!sciName.save()) {
-                                                    sciName.errors.each { log.error it }
-                                                }
-                                            }
-                                        } else {
-                                            println "==========No curation taxon id"
+                                    if(!isPresent) {
+                                        searchIBPResult.add(sciName);
+                                    }
+                                //}
+                            }
+                        }
+                        if(searchIBPResult.size() == 1) {
+                            taxon = searchIBPResult[0];
+                        }
+                        if(searchIBPResult.size() > 1 ){
+                            if(fieldNode == fieldNodes.last()) {
+                                println "Field node is last node"
+                                if(otherParams.curatingTaxonId) {
+                                    TaxonomyDefinition sciName = TaxonomyDefinition.get(otherParams.curatingTaxonId.toLong());
+                                    println "1=============++++++ 1111 ${sciName.status} ............${otherParams.curatingTaxonStatus}"
+                                    if(sciName.status == NameStatus.ACCEPTED) {
+                                        println "==========sci name status  ${sciName.status} ............${otherParams.curatingTaxonStatus}"
+                                        println "############==== Flagging accepted name " + sciName;
+                                        taxon = sciName;
+                                        taxon.isFlagged = true;
+                                        String flaggingReason = "The name clashes with an existing name on the portal.IDs- ";
+                                        searchIBPResult.each {
+                                            flaggingReason = flaggingReason + it.id.toString() + ", ";
+                                        }
+                                        println "########### Flagging in XML CONVERTER becoz : ${flaggingReason}==============" + taxon
+                                        taxon.flaggingReason = taxon.flaggingReason + " ### " + flaggingReason;
+                                        //taxon = taxon.merge();
+                                        if(!taxon.save()) {
+                                            taxon.errors.each { log.error it }
                                         }
                                     } else {
-                                        println "Field node is not last node"
+                                        println "############==== Flagging synonym " + sciName;
                                         //Pick any working list name if available
-                                        //then dirty
-                                        //then null
                                         def workingTaxon = null
                                         def dirtyTaxon = null
                                         searchIBPResult.each {
@@ -2068,252 +2036,233 @@ class XMLConverter extends SourceConverter {
                                         } else {
                                             taxon = searchIBPResult[0];
                                         }
-                                    }    
-                                } else {
-                                    println "searchIBPResult.....${searchIBPResult.size()}";
-                                }
-                            } else {
-                                if(searchIBPResult.size() > 0) {
-                                    taxon = searchIBPResult[0];
-                                }
-                            }
-                            /*
-                            def taxonCriteria = TaxonomyDefinition.createCriteria();
-                            TaxonomyDefinition taxon = taxonCriteria.get {
-                                eq("rank", rank);
-                                ilike("canonicalForm", parsedName.canonicalForm);
-                            }
-                            */
-                            //abort becoz new name saved in curation interface
-                            if(newNameSaved && abortOnNewName) {
-                                //abort
-                                println "==========ABORTING============  "
-                                flag = false;
-                                return;
-                            }
-                            if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
-								println " =========== got raw taxon and reusing it  "
-                                //taxon = null;
-                            }
-                            if(!taxon && saveTaxonHierarchy) {
-                                log.debug "Saving taxon definition"
-                                taxon = parsedName;
-                                taxon.rank = rank;
-                                taxon.uploadTime = new Date();
-                                if(fieldNode == fieldNodes.last()){
-                                    taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
-                                    taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
-                                    taxon.authorYear = otherParams?.metadata?otherParams.metadata.authorString:"";
-                                }
-                                if(fromCOL) {
-                                    println "=========COL SE REQUIRED==============="
-                                    taxon.matchDatabaseName = "CatalogueOfLife";
-                                    taxon.colNameStatus = NamesMetadata.COLNameStatus.ACCEPTED
-                                    //get its data from col and save
-                                    println "=======NAME======== " + name
-                                    if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
-                                        println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
-                                        taxon.matchId = otherParams.id_details[taxon.canonicalForm];
-                                    }
-                                    //def externalId = otherParams.id_details[name].trim();
-                                    //println "=========EXTERNAL ID===== " + externalId
-                                    String nameStatus = otherParams.nameStatus?:NameStatus.ACCEPTED //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
-                                    println "=========NAMESTATUS===== " + nameStatus
-                                    println "=========NAME STATUS============ " + nameStatus +"======= " + nameStatus.getClass();
-                                    def finalNameStatus;
-                                    switch(nameStatus) {
-                                        case ["accepted","provisionally"] :
-                                        finalNameStatus = NameStatus.ACCEPTED;
-                                        break
-                                        /*
-                                        case "provisionally":
-                                        finalNameStatus = NameStatus.PROV_ACCEPTED;
-                                        break
-                                        */
-
-                                        case ["synonym", "ambiguous", "misapplied"]:
-                                        finalNameStatus = null  //NameStatus.SYNONYM;
-                                        break
-
-                                        case "common" :
-                                        finalNameStatus = null  //NameStatus.COMMON;
-                                        break
-
-                                        default:
-                                        finalNameStatus = null //""
-                                        break
-                                    }
-                                    println "=======FINAL NAME STATUS======= " + finalNameStatus;
-                                    taxon.status = finalNameStatus; 
-                                    taxon.position = NamePosition.WORKING;
-                                    newNameSaved = false;
-                                }
-                                // else search COL
-                                // if single acc name take in
-                                // if single synonym take its acc name and show msg, change return or this function,
-                                //if multiple reject save name with null status.
-                                else {
-                                    //TODO: chk commenting curate here
-                                    //namelistService.curateName(taxon)
-                                    if(!taxon.id){
-                                        //No name with null status
-                                        //taxon.status = null;
-                                        //even no proper match from COL
-                                        newNameSaved = true;
-                                    }else {
-                                        //because new name saved from COL details
-                                        newNameSaved = false;
-                                    }
-                                }
-								
-								taxon=taxon.merge();
-								if(!taxon.save(flush:true)) {
-                                    taxon.errors.each { log.error it }
-                                }
-                                NamelistService.namesInWKG.add(taxon.id)
-                                if(fromCOL) {
-                                    //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
-                                    //taxon = namelistService.updateAttributes(taxon, res);
-                                }
-                            } else if(taxon && fromCOL) {
-								if(fieldNode == fieldNodes.last()){
-									taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
-									taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
-									taxon.authorYear = otherParams?.metadata?otherParams.metadata.authorString:"";
-								}
-							
-                                NamelistService.namesInWKG.add(taxon.id)
-                                /*if(fieldNode == fieldNodes.last()){
-                                    namelistService.namesBeforeSave[taxon.id] = "Working"
-                                }*/
-								
-                                taxon.position = NamePosition.WORKING
-                                taxon.matchDatabaseName = "CatalogueOfLife";
-                                if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
-                                println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
-                                    taxon.matchId = otherParams.id_details[taxon.canonicalForm];
-                                }
-                                taxon = taxon.merge();
-                                if(!taxon.save(flush:true)) {
-                                    taxon.errors.each { println it; log.error it }
-                                }
-
-                                /*if(fieldNode == fieldNodes.last()){
-                                    namelistService.namesAfterSave[taxon.id] = taxon.position.value();
-                                }*/
-                                //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
-                                //taxon = namelistService.updateAttributes(taxon, res);
-                            }else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
-                                def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
-                                spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
-                                //copy names of taxon to old taxon.
-                                //mark it flagged
-                                //save oldTaxon
-                                taxon = oldTaxon;
-                            } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
-                                //println "=====TAXON WAS THERE================================== "
-                                /*
-                                def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
-                                if(synonym)
-                                    synonym.updateContributors(getUserContributors(fieldNode.data))
-                                */
-                            }
-                            //Moving name to Working list, so all names should be in working list,
-                            //even if a single name in hierarchy is in dirty list
-                            //abort process
-                            if(otherParams && otherParams.moveToWKG) {
-                                if(taxon.position == NamePosition.RAW) {
-                                    newNameSaved = true;
-                                }
-                            }
-
-                            //newNameSaved true becoz now this taxon cant be used in hierarchy 
-                            //of a lower level as its status is not accepted 
-                            newNameSaved = newNameSaved || (taxon.status != NameStatus.ACCEPTED)
-                            if(taxon.status != NameStatus.ACCEPTED) {
-                                println "TAXON SAVED WITH NULL STATUS===========================" + taxon.status + "   id " + taxon.id
-								
-                            }
-							
-							def mergedTaxon = taxon.merge();
-							taxon = mergedTaxon ?:taxon
-							//updating contributors
-							taxon.updateContributors(getUserContributors(fieldNode.data))
-							//updating name status given in sheet
-							taxon.updateNameStatus(fieldNode?.status?.text())
-							//saving taxon new position
-							taxon.updatePosition(fieldNode?.position?.text())
-							//updating author year if not from COL
-							if(!fromCOL && parsedAuthorYear){
-								taxon.authorYear = parsedAuthorYear
-								taxon = taxon.merge();
-								if(!taxon.save(flush:true)) {
-									taxon.errors.each { println it; log.error it }
-								}
-							}
-							
-							
-                            def ibpHierarchy = Classification.fetchIBPClassification()
-                            def parentTaxon = getParentTaxon(taxonEntities, rank);
-                            def path = (parentTaxon ? parentTaxon.path+"_":"") + taxon.id;
- 
-                            def criteria = TaxonomyRegistry.createCriteria()
-                            TaxonomyRegistry registry = criteria.get {
-								and{
-									eq("taxonDefinition", taxon);
-									eq("path", path);
-									eq("classification", classification);
-								}
-                            }
-
-                            def ent = registry?registry:new TaxonomyRegistry();
-							//println "===========REGISTRY=========== " + ent
-							
-                            ent.taxonDefinition = taxon
-                            ent.classification = classification;
-                            //all hierarchy from curation interface
-                            //to go under IBP tax hie
-                            //earlier it was just from COL
-                            /*if(otherParams) {
-                                 ent.classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                            }*/
-                            ent.parentTaxon = parentTaxon;
-							ent.parentTaxonDefinition = ent.parentTaxon?.taxonDefinition
-                            //log.debug("Parent Taxon : "+ent.parentTaxon)
-                            ent.path = path;
-                            //same taxon at same parent and same path may exist from same classification.
-                            if(registry) {
-                                log.debug "Taxon registry already exists : "+registry;
-                                if(saveTaxonHierarchy) {
-                                    if(ent.classification == ibpHierarchy) {
-                                        log.debug "Saving taxon registry entity : "+ent;
-                                        //println "=====UPDATING existing IBP TAXON REGISTRY================================== "
-                                        if(!ent.save(flush:true)) {
-                                            ent.errors.each { log.error it }
-                                        } else {
-                                            log.debug "Saved taxon registry entity : "+ent;
+                                        sciName.isFlagged = true;
+                                        String flaggingReason = "The accepted name for this is a system default.Multiple potential matches exist.IDs- ";
+                                        searchIBPResult.each {
+                                            flaggingReason = flaggingReason + it.id.toString() + ", ";
+                                        }
+                                        sciName.flaggingReason = sciName.flaggingReason + " ### " + flaggingReason;
+                                        if(!sciName.save()) {
+                                            sciName.errors.each { log.error it }
                                         }
                                     }
-                                    ent.updateContributors(getUserContributors(fieldNode.data))
-                                }
-                                taxonEntities.add(registry);
-                            } else if(saveTaxonHierarchy) {
-                                log.debug "Saving taxon registry entity : "+ent;
-                                if(!ent.save(flush:true)) {
-									println "---TAXON SAVE ################## Error"
-                                    ent.errors.each { log.error it }
                                 } else {
-                                    log.debug "Saved taxon registry entity : "+ent;
+                                    println "==========No curation taxon id"
                                 }
-                                ent.updateContributors(getUserContributors(fieldNode.data))
-                                taxonEntities.add(ent);
-                            }
-
+                            } else {
+                                println "Field node is not last node"
+                                //Pick any working list name if available
+                                //then dirty
+                                //then null
+                                def workingTaxon = null
+                                def dirtyTaxon = null
+                                searchIBPResult.each {
+                                    if(it.position == NamePosition.WORKING && !workingTaxon) {
+                                        workingTaxon = it;
+                                    }
+                                    if(it.position == NamePosition.RAW && !dirtyTaxon) {
+                                        dirtyTaxon = it;
+                                    }
+                                }
+                                if(workingTaxon) {
+                                    taxon = workingTaxon
+                                } else if(dirtyTaxon) {
+                                    taxon = dirtyTaxon;
+                                } else {
+                                    taxon = searchIBPResult[0];
+                                }
+                            }    
                         } else {
-                            log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
-                            addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
+                            println "searchIBPResult.....${searchIBPResult.size()}";
+                        }
+                    } else {
+                        if(searchIBPResult.size() > 0) {
+                            taxon = searchIBPResult[0];
                         }
                     }
+                    if(newNameSaved && abortOnNewName) {
+                        //abort
+                        println "==========ABORTING============  "
+                        flag = false;
+                        return;
+                    }
+                    if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
+						println " =========== got raw taxon and reusing it  "
+                        //taxon = null;
+                    }
+					boolean addNewNameToSession = (taxon && taxon.id)?false:true
+                    if(!taxon && saveTaxonHierarchy) {
+                        log.debug "Saving taxon definition"
+                        taxon = parsedName;
+                        taxon.rank = rank;
+                        taxon.uploadTime = new Date();
+                        if(fieldNode == fieldNodes.last()){
+                            taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
+                            taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
+                            taxon.authorYear = otherParams?.metadata?otherParams.metadata.authorString:"";
+                        }
+                        if(fromCOL) {
+                            println "=========COL SE REQUIRED==============="
+                            taxon.matchDatabaseName = "CatalogueOfLife";
+                            taxon.colNameStatus = NamesMetadata.COLNameStatus.ACCEPTED
+                            //get its data from col and save
+                            println "=======NAME======== " + name
+                            if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
+                                println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+                                taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                            }
+                            //def externalId = otherParams.id_details[name].trim();
+                            //println "=========EXTERNAL ID===== " + externalId
+                            String nameStatus = otherParams.nameStatus?:NameStatus.ACCEPTED //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
+                            println "=========NAMESTATUS===== " + nameStatus
+                            println "=========NAME STATUS============ " + nameStatus +"======= " + nameStatus.getClass();
+                            def finalNameStatus;
+                            switch(nameStatus) {
+                                case ["accepted","provisionally"] :
+                                finalNameStatus = NameStatus.ACCEPTED;
+                                break
+                                /*
+                                case "provisionally":
+                                finalNameStatus = NameStatus.PROV_ACCEPTED;
+                                break
+                                */
+
+                                case ["synonym", "ambiguous", "misapplied"]:
+                                finalNameStatus = null  //NameStatus.SYNONYM;
+                                break
+
+                                case "common" :
+                                finalNameStatus = null  //NameStatus.COMMON;
+                                break
+
+                                default:
+                                finalNameStatus = null //""
+                                break
+                            }
+                            println "=======FINAL NAME STATUS======= " + finalNameStatus;
+                            taxon.status = finalNameStatus; 
+                            taxon.position = NamePosition.WORKING;
+                            newNameSaved = false;
+                        }
+                        // else search COL
+                        // if single acc name take in
+                        // if single synonym take its acc name and show msg, change return or this function,
+                        //if multiple reject save name with null status.
+                        else {
+                            //TODO: chk commenting curate here
+                            //namelistService.curateName(taxon)
+                            if(!taxon.id){
+                                //No name with null status
+                                //taxon.status = null;
+                                //even no proper match from COL
+                                newNameSaved = true;
+                            }else {
+                                //because new name saved from COL details
+                                newNameSaved = false;
+                            }
+                        }
+						
+						if(!taxon.save(flush:true)) {
+                            taxon.errors.each { log.error it }
+                        }
+                        if(fromCOL) {
+                            //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
+                            //taxon = namelistService.updateAttributes(taxon, res);
+                        }
+                    } else if(taxon && fromCOL) {
+						if(fieldNode == fieldNodes.last()){
+							taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
+							taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
+							taxon.authorYear = otherParams?.metadata?otherParams.metadata.authorString:"";
+						}
+					
+                        taxon.position = NamePosition.WORKING
+                        taxon.matchDatabaseName = "CatalogueOfLife";
+                        if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
+							println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+                            taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                        }
+                        if(!taxon.save(flush:true)) {
+                            taxon.errors.each { println it; log.error it }
+                        }
+                    }else if(otherParams && taxon && otherParams.spellCheck && fieldNode == fieldNodes.last()) {
+                        def oldTaxon = TaxonomyDefinition.get(otherParams.oldTaxonId.toLong());
+                        spellCheckMsg = 'Edit of ' + oldTaxon.name + '('+oldTaxon.id +') to ' + taxon.name +'('+oldTaxon.id +') causes a clash with ' + taxon.name + '('+taxon.id +'). Edit saved and flagged for attention of admin.'
+                        taxon = oldTaxon;
+                    } else if(saveTaxonHierarchy && taxon && parsedName && taxon.name != parsedName.name) {
+                        //println "=====TAXON WAS THERE================================== "
+                        /*
+                        def synonym = saveSynonym(parsedName, getRelationship(null), taxon);
+                        if(synonym)
+                            synonym.updateContributors(getUserContributors(fieldNode.data))
+                        */
+                    }
+                    //Moving name to Working list, so all names should be in working list,
+                    //even if a single name in hierarchy is in dirty list
+                    //abort process
+                    if(otherParams && otherParams.moveToWKG) {
+                        if(taxon.position == NamePosition.RAW) {
+                            newNameSaved = true;
+                        }
+                    }
+
+                    //newNameSaved true becoz now this taxon cant be used in hierarchy 
+                    //of a lower level as its status is not accepted 
+                    newNameSaved = newNameSaved || (taxon.status != NameStatus.ACCEPTED)
+                    if(taxon.status != NameStatus.ACCEPTED) {
+                        println "TAXON SAVED WITH NULL STATUS===========================" + taxon.status + "   id " + taxon.id
+						
+                    }
+					
+					//updating contributors
+					taxon.updateContributors(getUserContributors(fieldNode.data))
+					//updating name status given in sheet
+					taxon.updateNameStatus(fieldNode?.status?.text())
+					//saving taxon new position
+					taxon.updatePosition(fieldNode?.position?.text())
+					//updating author year if not from COL
+					if(!fromCOL && parsedAuthorYear){
+						taxon.authorYear = parsedAuthorYear
+						//taxon = taxon.merge();
+						if(!taxon.save(flush:true)) {
+							taxon.errors.each { println it; log.error it }
+						}
+					}
+					
+					if(addNewNameToSession){
+						NamelistService.addNewNameInSession(taxon)
+					}
+						
+					//saving taxon registry
+                    def parentTaxon = getParentTaxon(taxonEntities, rank);
+                    def path = (parentTaxon ? parentTaxon.path+"_":"") + taxon.id;
+                    def criteria = TaxonomyRegistry.createCriteria()
+                    TaxonomyRegistry ent = criteria.get {
+						and{
+							eq("taxonDefinition", taxon);
+							eq("path", path);
+							eq("classification", classification);
+						}
+                    }
+                    ent = ent?:new TaxonomyRegistry();
+					ent.taxonDefinition = taxon
+                    ent.classification = classification;
+                    ent.parentTaxon = parentTaxon;
+					ent.parentTaxonDefinition = ent.parentTaxon?.taxonDefinition
+                    ent.path = path;
+                    if(saveTaxonHierarchy) {
+                        log.debug "Saving Taxon registry : " +  ent;
+                        if(!ent.save(flush:true)) {
+                        	ent.errors.each { log.error it }
+                        } else {
+                            log.debug "Saved taxon registry entity : "+ent;
+                        	ent.updateContributors(getUserContributors(fieldNode.data))
+                        	taxonEntities.add(ent);
+                        }
+                    }
+                } else {
+                    log.error "Ignoring taxon entry as the name is not parsed : "+parsedName
+                    addToSummary("Ignoring taxon entry as the name is not parsed : "+parsedName)
                 }
             }
         }
@@ -2339,6 +2288,10 @@ class XMLConverter extends SourceConverter {
 		
 		// to force creation of new node
 		if("new".equalsIgnoreCase(nameRunningStatus)){
+			def taxon = NamelistService.getNewNameInSession(parsedName.canonicalForm, rank)
+			if(taxon)
+				return [taxon]
+				
 			return []
 		}
 		
