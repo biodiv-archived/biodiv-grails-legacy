@@ -37,7 +37,6 @@ class SpeciesBulkUploadJob {
 					dl.updateStatus(Status.SUCCESS)
 					utilsService.clearCache("defaultCache")
 					excuteSql()
-					//utilsService.sendNotificationMail(utilsService.DOWNLOAD_REQUEST, dl, null, null, null);
 				}catch (Exception e) {
 					log.debug " Error while running task $dl"
 					e.printStackTrace()

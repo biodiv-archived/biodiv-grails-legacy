@@ -276,7 +276,8 @@ class TaxonomyDefinition extends ScientificName {
    
    // update the path of children in ibp classification when node moves to clean state.
    private void moveChildren(List sqlStrings){
-   		if(rank == 0){
+	   	//not moving children for name at level kingdom, phylum and class
+   		if(rank <= 2){
    			return
    		}
 
@@ -287,7 +288,7 @@ class TaxonomyDefinition extends ScientificName {
 		}
 
 		//println "============ child count " + TaxonomyRegistry.countByParentTaxonAndClassification(tr, ibpClassification)
-		println "=================== moving children for taxon " + this 
+		//println "=================== moving children for taxon " + this 
    		
 		
 		//have to look if this node exist in mid or in start. Note end is not required because we are moviing chlidren 
@@ -597,7 +598,7 @@ class TaxonomyDefinition extends ScientificName {
 			this.position = newPosition
 			if(this.position == NamesMetadata.NamePosition.CLEAN){
 				// name is moving to clean state.. overwrite all info from spreadsheet
-				println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
+				//println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
 				def fieldsConfig = grailsApplication.config.speciesPortal.fields
 				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
 				def tmpMatchId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
@@ -613,7 +614,7 @@ class TaxonomyDefinition extends ScientificName {
 					moveChildren(sqlStrings)
 					UPDATE_SQL_LIST.addAll(sqlStrings)
 					//excuteSql(sqlStrings);
-					println "finished move children === "
+					//println "finished move children === "
 					
 				}
 			}
@@ -673,7 +674,7 @@ class TaxonomyDefinition extends ScientificName {
 		if(!newStatus)
 			return
 		
-		println "=================== came for updatestatus " + newStatus + " odl status " + status
+		//println "=================== came for updatestatus " + newStatus + " odl status " + status
 		if(newStatus == NameStatus.ACCEPTED)
 			changeToAcceptedName()
 		else{

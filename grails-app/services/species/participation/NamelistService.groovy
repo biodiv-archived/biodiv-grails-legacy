@@ -63,13 +63,7 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
-    //public static Set namesInWKG = new HashSet();
-
-    //public static Map namesBeforeSave = [:];
-    //public static Map namesAfterSave = [:];
-	
-	
-	//XXX: this map is used to store new name created by session for bulk and name upload. This is needed because
+ 	//XXX: this map is used to store new name created by session for bulk and name upload. This is needed because
 	//if a user want to create new name by saying 'new' in spreadsheet then same name may be created multiple times
 	//it that name appears multiple time in hir sheet 
 	//this map will be cleared by every bulk upload thread to avoid any conflict
@@ -90,7 +84,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
+        //println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
 		
         def clazz
@@ -139,7 +133,7 @@ class NamelistService {
             }
 //		}
 			
-		println "== FINAL SEARCH RESULT " + res
+		//println "== FINAL SEARCH RESULT " + res
 		return res;
     }
     
