@@ -2004,7 +2004,7 @@ class NamelistService {
         def sql = new Sql(dataSource)
         def sqlStr, rs
         def classSystem = params.classificationId.toLong()
-        def parentId = params.parentId
+        def parentId = params.taxon;
         def limit = params.limit ? params.limit.toInteger() : 100
         def offset = params.offset ? params.offset.toLong() : 0
         def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());

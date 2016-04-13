@@ -150,7 +150,7 @@
                 switch (me.options.controller) {
                     case 'namelist':
                         $("input#taxon").val(selectedTaxonId);
-                        getNamesFromTaxon($me, $me.attr('id').replace('_anchor',''));
+                        getNamesFromTaxon($me, $me.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                         break;
                     default:
                         if ($me.hasClass('taxon-highlight')) {
@@ -273,7 +273,7 @@
                     if(anchor.length > 0) {
                         var parentId = anchor.parent().attr('id');
                         $(this).jstree(true).open_node('#'+parentId);
-                        getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''));
+                        getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                         scrollIntoView(anchor);
                     }
                 }

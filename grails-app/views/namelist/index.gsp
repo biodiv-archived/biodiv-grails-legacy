@@ -4,6 +4,7 @@
 <%@page import="species.NamesMetadata.NamePosition"%>
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
+<%@ page import="species.participation.DownloadLog.DownloadType"%>
 <html>
     <head>
 
@@ -66,16 +67,22 @@
                      and with --%>
                      <select id="taxonStatusSelect" multiple="multiple">
                          <g:each in ="${NameStatus.list()}" var="status">
-                         <option value="${status}">${status.label()}</option>
+
+                        <g:if test="${status != NameStatus.PROV_ACCEPTED && status != NameStatus.COMMON}">
+                         <option value="${status}" ${params.statusToFetch?.contains(status.value.toUpperCase())? "selected='selected'":''}>${status.label()}</option>
+                         </g:if>
                          </g:each>
                      </select>
                      <select id="taxonPositionSelect" multiple="multiple">
                          <g:each in ="${NamePosition.list()}" var="position">
-                         <option value="${position}">${position.label()}</option>
+                         <option value="${position}" ${params.positionsToFetch?.contains(position.value.toUpperCase())? "selected='selected'":''}>${position.label()}</option>
                          </g:each>
                      </select>
 
-                    <div id="taxonPager" class="pull-right" style="height:27px;"></div>
+                     <div class="pull-right">
+                    <div id="taxonPager" style="height:27px;display:inline-block"></div>
+                    <obv:download  model="['source':'TaxonomyDefinition', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], downloadObjectId:params.taxon]" />
+                    </div>
                  </div>
             </div>   
 
@@ -223,7 +230,7 @@
                             <option value="chooseRank">Choose Rank</option>
                             <% def rankCount = 0 %>
                             <g:each in="${TaxonomyRank.list()}" var="t">
-                            <option data-ordinal="${t.ordinal()}" value="${t.toString().toLowerCase()}">${t}</option>
+                            <option data-ordinal="${t.ordinal()}" value="${t.toString().toLowerCase()}" ${params.ranksToFetch?.split(',')?.contains(t.ordinal().toString())? "selected='selected'":''}>${t}</option>
                             </g:each>
                         </select>
                     </div>
