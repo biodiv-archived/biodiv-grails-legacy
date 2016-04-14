@@ -5,6 +5,7 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.Classification"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@ page import="species.TaxonomyDefinition"%>
 <html>
     <head>
 
@@ -81,7 +82,7 @@
 
                      <div class="pull-right">
                     <div id="taxonPager" style="height:27px;display:inline-block"></div>
-                    <obv:download  model="['source':'TaxonomyDefinition', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], downloadObjectId:params.taxon]" />
+                    <obv:download  model="['source':'TaxonomyDefinition', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], downloadObjectId:params.taxon, 'exportFields':TaxonomyDefinition.fetchExportableFields()]" />
                     </div>
                  </div>
             </div>   

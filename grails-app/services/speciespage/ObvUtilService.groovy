@@ -370,12 +370,7 @@ class ObvUtilService {
     }
 
     def CSVWriter getCSVWriter(def directory, def fileName) {
-        //char separator = '\t'
-        File dir =  new File(directory)
-        if(!dir.exists()){
-            dir.mkdirs()
-        }
-        return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
+        return utilsService.getCSVWriter(directory, fileName);
     }
 
 /*    def exportAsDW__specie(downloadDir, obvList, reqUser, dl_id, params_filterUrl){

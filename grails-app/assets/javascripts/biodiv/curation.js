@@ -194,7 +194,7 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
 
     populateNameDetails();
     var url = window.params.curation.getNamesFromTaxonUrl;
-    var params = {'taxon':parentId, 'classificationId':classificationId};
+    var params = {'taxon':$(ele).data('taxonid'), parentId:parentId, 'classificationId':classificationId};
     if(typeof limit != 'undefined') params['limit'] = limit;
     if(typeof offset != 'undefined') params['offset'] = offset;
     if(typeof ranksToFetch != 'undefined') params['ranksToFetch'] = ranksToFetch.join(',');
@@ -203,7 +203,6 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
 
     var History = window.History;
     History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
- 
     $.ajax({
         url: url,
         dataType: "json",
@@ -379,8 +378,13 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
 }
 
 function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) {
+
+    var params = {'taxon':taxonId, 'classification':classificationId};
+    params['ranksToFetch'] = getSelectedRanks().join(',');
+    params['statusToFetch'] = getSelectedStatus().join(',');
+    params['positionsToFetch'] = getSelectedPosition().join(',');
     var History = window.History;
-    History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param({'taxon':taxonId, 'classification':classificationId}))); 
+    History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
 
 
     $("#externalDbResults").modal('hide');

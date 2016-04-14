@@ -656,4 +656,11 @@ class TaxonomyDefinition extends ScientificName {
 		return null
 	}
 
+	def fetchList(params) {
+		return namelistService.getNamesFromTaxon(params);
+	}
+
+    static List fetchExportableFields(def grailsApplication=null) {
+        return [['field':'id', 'name':'TaxonId', 'default':true, 'dbField':'id'], [ 'field' : 'name', 'name':'Name', 'default':true, 'dbField':'name'], ['field':'canonicalForm', 'name':'Canonical Form', 'default':false, 'dbField':'canonical_form'], ['field':'authorYear', 'name':'Author & Year', 'default':true, 'dbField':'author_year'], ['field': 'rank', 'name':'Rank', 'default':true, 'dbField':'rank'], ['field':'status', 'name':'Status', 'default':true, 'dbField':'status'], ['field':'position', 'name':'Position', 'default':true, 'dbField':'position'], ['field':'matchDatabaseName', 'name':'Source', 'default':true, 'dbField':'match_database_name'], ['field':'matchId', 'name':'Match Id', 'default':true, 'dbField':'match_id'], ['field':'viaDatasource', 'name':'Via Database', 'default':true, 'dbField':'via_datasource'], ['field': 'defaultHierarchy', 'name' : grailsApplication?grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY:'Taxonomy Hierarchy', 'default':true, 'dbField':'default_hierarchy'], ['field' : 'group', 'name':'Species Group', 'default':true, 'dbField':'group_id'], ['field':'speciesId', 'name':'Species Id', 'default':false, 'dbField':'species_id'], ['field':'isFlagged', 'name':'Is Flagged', 'default':false, 'dbField':'is_flagged']]; 
+    }
 }

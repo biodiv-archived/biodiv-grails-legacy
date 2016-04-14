@@ -1,48 +1,67 @@
-<div class="download-box btn-group"  style="z-index: 10; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
-    <a class="download-action ${(onlyIcon == 'true')?'':'btn'} ${(params.action=='show')?'btn-link':''} dropdown-toggle" data-toggle="dropdown"
-        href="#" title="Download"> <i class=" icon-download-alt" style="${(downloadFrom=='uniqueSpecies')?'margin-top:-7px':''}"></i>
+<div class="download-box"  style="z-index: 10; display:inline-block; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
+    <a class="download-action ${(onlyIcon == 'true')?'':'btn'} ${(params.action=='show')?'btn-link':''}" role="button" data-toggle="modal" data-target="#downloadModal" href="#downloadModal" title="Download"> <i class=" icon-download-alt" style="${(downloadFrom=='uniqueSpecies')?'margin-top:-7px':''}"></i>
         <g:if test="${onlyIcon == 'false'}">
             <g:message code="button.download" />
         </g:if>
-		</a>
+    </a>
 
-		<div class="download-options popup-form" style="display: none; ${(downloadFrom=='uniqueSpecies')?'left:-399px;font-weight:normal':''} ">
-			<form class="download-form form-horizontal">
-				<div><div class="alert alert-info"><g:message code="msg.link.available" /></div></div>
-				<g:each in="${downloadTypes}" var="downloadType" status="i">
-                    <label>
-					<g:if test="${i > 0}">
+    <form class="download-form form-horizontal">
+        <div id="downloadModal" class="modal download-options hide fade" role="dialog" aria-hidden="true" aria-labelledby="downloadModalLabel">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="downloadModalLabel">Download</h3>
+            </div>
+            <div class="modal-body">
+                <div><div class="alert alert-info"><g:message code="msg.link.available" /></div></div>
+                <g:if test="${exportFields}">
+                <h4>${g.message(code:'download.export.fields')}</h4>
+                <g:each in="${exportFields}" var="exportField">
+                    <span class="checkbox inline">
+                        <input type="checkbox" name="exportFields" value="${exportField.field}" ${exportField.default?'checked="checked"':''} >
+                        ${exportField.name}</input>
+                    </span>
+                </g:each>
+                </g:if>
+                <h4>${g.message(code:'download.export')}</h4>
+                <g:each in="${downloadTypes}" var="downloadType" status="i">
+                <span class="radio inline">
+                    <g:if test="${i > 0}">
                     <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" >
-						${g.message(code:'download.export')} ${downloadType.value()}</input>
-					</g:if>
-					<g:else>
+                    ${downloadType.value()}</input>
+                    </g:if>
+                    <g:else>
                     <input type="radio" style="margin-top: 0px;" name="downloadType" value="${downloadType}" CHECKED >
-						${g.message(code:'download.export')} ${downloadType.value()}</input>
-                        </g:else>
-                    </label>
-				</g:each>
+                    ${downloadType.value()}</input>
+                    </g:else>
+                </span>
+                </g:each>
                 <br />
-				<input type="hidden" name="downloadFrom" value="${downloadFrom}"/>
-				<input type="hidden" name="source" value="${source}"/>
-				<input type="hidden" name="downloadObjectId" value="${downloadObjectId}"/>
-				<input id="instanceTotal" type="hidden" name="instanceTotal" value="${instanceTotal}"/>
-				<textarea class="comment-textbox noComment" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
-				<input class="btn pull-right" type="submit" value="${g.message(code:'button.ok')}" ></input>
-				<div class = "download-close popup-form-close" value="${g.message(code:'button.close')}">
-					<i class="icon-remove"></i>
-				</div>
-			</form>
-			
-			<div class="downloadMessage">
-			</div>
-		</div>
+                <input type="hidden" name="downloadFrom" value="${downloadFrom}"/>
+                <input type="hidden" name="source" value="${source}"/>
+                <input type="hidden" name="downloadObjectId" value="${downloadObjectId}"/>
+                <input id="instanceTotal" type="hidden" name="instanceTotal" value="${instanceTotal}"/>
+                <textarea class="comment-textbox noComment" placeholder="${g.message(code:'placeholder.how.intend')}" name="notes"></textarea>
+                <!--div class = "download-close popup-form-close" value="${g.message(code:'button.close')}">
+                <i class="icon-remove"></i>
+                </div-->
+
+                <div class="downloadMessage">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                <input class="btn download-close" type="submit" value="${g.message(code:'button.ok')}" ></input>
+            </div>
+        </div>
+    </form>
 </div>
 
 <asset:script>
 $('.download-close').click(function(){
-    var me = this;
+    $('#downloadModal').modal('hide');
+    /*var me = this;
     var download_box = $(me).parents('.download-box');
-    $(download_box).find('.download-options').hide();
+    $(download_box).find('.download-options').hide();*/
 });
 
 $('.download-action').click(function(){

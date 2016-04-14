@@ -34,9 +34,12 @@ import speciespage.SpeciesUploadService;
 import species.namelist.NameInfo
 import species.namelist.Utils;
 import species.utils.Utils as UtilsUtils;
+import species.ResourceFetcher;
+import species.AbstractObjectService;
 
-class NamelistService {
-   
+class NamelistService extends AbstractObjectService {
+  
+    static transactional = false;
     private static final String COL_SITE = 'http://www.catalogueoflife.org'
 	private static final String COL_URI = '/annual-checklist/2015/webservice'
     
@@ -68,6 +71,7 @@ class NamelistService {
     public static Map namesBeforeSave = [:];
     public static Map namesAfterSave = [:];
 	
+	private final static int EXPORT_BATCH_SIZE = 10000;
 	
 	//XXX: this map is used to store new name created by col only for bulk and name upload. This is needed because hibernet is not
 	//flushing data in db and same name is duplicated within one bulk name upload
@@ -2001,10 +2005,13 @@ class NamelistService {
 	
 	
     public def getNamesFromTaxon(params){
+        println "=========================================================="
+        println params
+        println "=========================================================="
         def sql = new Sql(dataSource)
         def sqlStr, rs
         def classSystem = params.classificationId.toLong()
-        def parentId = params.taxon;
+        def parentId = params.parentId;
         def limit = params.limit ? params.limit.toInteger() : 100
         def offset = params.offset ? params.offset.toLong() : 0
         def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
@@ -2012,6 +2019,24 @@ class NamelistService {
         List ranksToFetch = params.ranksToFetch ? (parentTaxon.rank+','+params.ranksToFetch).split(','):[parentTaxon.rank, nextPrimaryRank];
         List statusToFetch = params.statusToFetch ? (params.statusToFetch).split(','):[NameStatus.ACCEPTED.value().toUpperCase(), NameStatus.SYNONYM.value().toUpperCase()];
         List positionsToFetch = params.positionsToFetch ? (params.positionsToFetch).split(','):[NamePosition.RAW.value().toUpperCase(), NamePosition.WORKING.value().toUpperCase(), NamePosition.CLEAN.value().toUpperCase()];
+        String exportFields = "t.id as id, t.id as taxonid, t.rank as rank, t.name as name, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, t.position as position, t.status as status, ${classSystem} as classificationid ";
+        String synExportFields = "";
+        
+        List reqExportFields = params.exportFields
+        if(reqExportFields) {
+            exportFields = "";
+            TaxonomyDefinition.fetchExportableFields(grailsApplication).each {
+                if(reqExportFields.contains(it.field)) {
+                    if(it.dbField) 
+                        exportFields += "t."+it.dbField +' as "'+it.name+'", ';
+                }
+            }
+            exportFields = exportFields[0..-3];
+            synExportFields = exportFields;
+        } else {
+            synExportFields = exportFields + ", concat(acsy.id, '_', t.id) as id ";
+            exportFields += ", s.path as path  ";
+        }
 
         List namesList = []
         //Map dirtyList = [:]
@@ -2044,10 +2069,9 @@ class NamelistService {
 
 
         try {
-
             if(!parentId) {
-                 sqlStr = "select t.id as id, t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status \
-                    from taxonomy_registry s, \
+                 sqlStr = "select "+exportFields+
+                    "from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
@@ -2060,8 +2084,8 @@ class NamelistService {
                 //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
                  rs = sql.rows(sqlStr, [classSystem:classSystem])
             } else {
-                sqlStr = "select t.id as id, t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status\
-                    from taxonomy_registry s, \
+                 sqlStr = "select "+exportFields+
+                    "from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
@@ -2075,17 +2099,16 @@ class NamelistService {
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields
                 //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                println "======================+++++++"
-                println sqlStr;
-                println "parentId ${parentId}, classSystem ${classSystem} ranksToFetch ${ranksToFetch} statusToFetch ${statusToFetch} positionsToFetch ${positionsToFetch} limit ${limit} offset ${offset}"
+                log.debug "======================+++++++"
+                log.debug sqlStr;
+                log.debug "parentId ${parentId}, classSystem ${classSystem} ranksToFetch ${ranksToFetch} statusToFetch ${statusToFetch} positionsToFetch ${positionsToFetch} limit ${limit} offset ${offset}"
 
                 rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset]);
            }
 
-            println "total result size === " + rs.size()
+            log.debug "total result size === " + rs.size()
 
             def countRs = sql.rows(countSqlStr, [classSystem:classSystem])
-            println countRs
             countRs.each {
                 instanceTotal += it.count;
                 if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
@@ -2103,7 +2126,6 @@ class NamelistService {
             }
 
             def synCountRs = sql.rows(synCountSqlStr, [classSystem:classSystem])
-            println synCountRs
             synCountRs.each {
                 instanceTotal += it.count;
                 if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
@@ -2131,7 +2153,7 @@ class NamelistService {
                     println "GETTING SYNONYMS FOR TAXON ${it.taxonid}"
                     sql = new Sql(dataSource)
                     //FIX:limit is not applied on synonyms query
-                    def s1 = "select concat(acsy.id, '_', s.id) as id, s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId and s.position in ('"+positionsToFetch.join("','")+"') order by s.name";
+                    def s1 = "select "+synExportFields+" from taxonomy_definition t, accepted_synonym acsy where t.id = acsy.synonym_id and acsy.accepted_id = :taxonId and t.position in ('"+positionsToFetch.join("','")+"') order by t.name";
 
                     def q1 = sql.rows(s1, [taxonId:it.taxonid])
                     q1.each {
@@ -2140,15 +2162,15 @@ class NamelistService {
                     }
                 }
 
-                if(statusToFetch.contains(NameStatus.COMMON.value())) {
+                /*if(statusToFetch.contains(NameStatus.COMMON.value())) {
                     sql = new Sql(dataSource)
                     def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
                     from common_names c where c.taxon_concept_id = :taxonId order by c.name";
 
-                    /*def q2 = sql.rows(s2, [taxonId:it.taxonid])
+                    def q2 = sql.rows(s2, [taxonId:it.taxonid])
                     q2.each {
-                    }*/
-                }
+                    }
+                }*/
 
             }
 
@@ -2236,6 +2258,81 @@ class NamelistService {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+
+    def export(params, dl){
+        if(!dl)
+            return null
+
+            File downloadDir = new File(grailsApplication.config.speciesPortal.namelist.downloadDir)
+            if(!downloadDir.exists()){
+                downloadDir.mkdirs()
+            }
+        log.debug "export type " + dl.type 
+        if(dl.type == DownloadLog.DownloadType.CSV) {
+            return exportAsCSV(downloadDir, dl, params.webaddress)
+        } /*else if(dl.type == DownloadLog.DownloadType.KML) {
+        return exportAsKML(downloadDir, dl, userGroupWebaddress)
+        } else {
+        return exportAsDW(downloadDir, dl, userGroupWebaddress)
+        }*/
+
+    }
+
+    private File exportAsCSV(File downloadDir, DownloadLog dl, String userGroupWebaddress){
+        String folderName = "taxon_"+ + new Date().getTime()
+        String parent_dir = downloadDir.getAbsolutePath() + File.separator + folderName+File.separator + folderName
+        File csvFile = new File(parent_dir, "taxon_" + new Date().getTime() + ".csv")
+
+        def writer = utilsService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+
+        boolean headerAdded = false
+        ResourceFetcher rf = new ResourceFetcher(TaxonomyDefinition.class.canonicalName, dl, userGroupWebaddress, dl.offsetParam.intValue());
+        try {
+            int total = 0;
+            while (total < EXPORT_BATCH_SIZE && rf.hasNext()) {
+                def obvList = rf.next();
+                total += obvList.size();
+                obvList.each { obv ->
+                    log.debug "Writting " + obv
+                    Map m = obv//.fetchExportableValue(dl.author)
+                    if(!headerAdded){
+                        def header = []
+                        for(entry in m){
+                            header.add(entry.getKey())
+                        }
+                        TaxonomyRank.list().each {
+                            println it.value()
+                            header.add(it.value());
+                        }
+                        writer.writeNext(header.toArray(new String[0]))
+                        headerAdded = true
+                    }
+                    String[] array = new String[m.values().size()+TaxonomyRank.list().size()];
+                    int index = 0;
+                    int taxonIndex = m.values().size();
+                    for (entry in m) {
+                        if(entry.getKey().equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY)) {
+                            JSON.parse(entry.getValue()). each {
+                                array[taxonIndex + it.rank] = it.name;
+                            }
+                        } else {
+                            array[index] = getExportableValue(entry.getKey(), (String) entry.getValue());
+                        }
+                        index++;
+                    }
+                    
+                    writer.writeNext(array)
+                }
+            }
+        } catch(e) {
+            e.printStackTrace();
+        }
+        writer.flush()
+        writer.close()
+
+        return csvFile; //archive(downloadDir.getAbsolutePath(), folderName, csvFile, f )
+        //return csvFile
+    }
 
 }

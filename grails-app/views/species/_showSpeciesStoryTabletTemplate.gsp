@@ -2,5 +2,5 @@
 <a
     href="${uGroup.createLink([controller:'species', action:'show', id:speciesInstance.id, userGroup:userGroup])}" style="display:inline-block;width:125px;">
     <span class="species_story ellipsis multiline sci_name"
-        style="display: block;height:50px;padding:0px" title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}">${speciesInstance.taxonConcept.name.trim()}</span> </a>
+        style="display: block;height:50px;padding:0px" title="${speciesInstance.taxonConcept.name.replaceAll('<.*>','')}">${raw(speciesInstance.taxonConcept.italicisedForm.trim())}</span> </a>
 

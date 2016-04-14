@@ -1032,7 +1032,6 @@ ul#recoSummary {
 
 .observations_list {
 	position: relative;
-	top: -40px;
 	/* box-shadow: 8px 0 6px -6px #5e5e5e; */
 	/* background-color: rgba(106, 201, 162, 0.1); */
 }
@@ -1666,7 +1665,7 @@ span.cke_skin_kama {
 }
 
 .sci_name {
-	font-style: italic !important;
+	/*font-style: italic !important;*/
 }
 
 h1,.main_heading .species_title .sci_name {
