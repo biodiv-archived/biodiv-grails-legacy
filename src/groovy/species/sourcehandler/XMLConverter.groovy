@@ -2107,11 +2107,10 @@ class XMLConverter extends SourceConverter {
                             taxon.colNameStatus = NamesMetadata.COLNameStatus.ACCEPTED
                             //get its data from col and save
                             println "=======NAME======== " + name
-                            if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
-                                println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
-                                taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                            if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank]) {
+								println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm + "#" + taxon.rank] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+                                taxon.matchId = otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank];
                             }
-                            //def externalId = otherParams.id_details[name].trim();
                             //println "=========EXTERNAL ID===== " + externalId
                             String nameStatus = otherParams.nameStatus?:NameStatus.ACCEPTED //?: (namelistService.searchCOL(externalId, 'id')[0]).nameStatus;
                             println "=========NAMESTATUS===== " + nameStatus
@@ -2166,7 +2165,6 @@ class XMLConverter extends SourceConverter {
                             taxon.errors.each { log.error it }
                         }
                         if(fromCOL) {
-                            //def res = namelistService.searchCOL( otherParams.id_details[taxon.canonicalForm], "id")[0]
                             //taxon = namelistService.updateAttributes(taxon, res);
                         }
                     } else if(taxon && fromCOL) {
@@ -2178,9 +2176,9 @@ class XMLConverter extends SourceConverter {
 					
                         taxon.position = NamePosition.WORKING
                         taxon.matchDatabaseName = "CatalogueOfLife";
-                        if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm]) {
-							println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm] + "=======TAXON CANONICAL === " + taxon.canonicalForm
-                            taxon.matchId = otherParams.id_details[taxon.canonicalForm];
+                        if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank]) {
+							println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+                            taxon.matchId = otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank];
                         }
                         if(!taxon.save(flush:true)) {
                             taxon.errors.each { println it; log.error it }

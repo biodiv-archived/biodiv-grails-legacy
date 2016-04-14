@@ -84,7 +84,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-        //println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
+//        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
 		
         def clazz
@@ -133,7 +133,7 @@ class NamelistService {
             }
 //		}
 			
-		//println "== FINAL SEARCH RESULT " + res
+//		println "== FINAL SEARCH RESULT " + res
 		return res;
     }
     
@@ -564,7 +564,7 @@ class NamelistService {
         }*/
         println "=======SCI NAME POSITION ========== " + sciName.position
         println "=====SCI NAME ==== " + sciName
-        sciName = sciName.merge();
+        //sciName = sciName.merge();
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"
@@ -1030,8 +1030,8 @@ class NamelistService {
             if(m['species']) {
 				def authStr = ""
                 if(m['id_details']) {
-					authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
-					m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
+					authStr = searchCOL(m.id_details[m['species'] + "#" + "9"], "id")[0].authorString;
+					m.id_details[m['genus'] + " " +m['species']+ "#" + "9"] = m.id_details[m['species']+ "#" + "9"]
                 }
                 result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr?:"";    
             }
@@ -1806,8 +1806,8 @@ class NamelistService {
 			temp[r?.rank?.text()?.toLowerCase()] = generateVerbatim(r);     //r?.name?.text()
 			//GENERATING VERBATIM BASED ON RANK
 			temp['name'] = generateVerbatim(r);
-			
-			id_details[r?.name?.text()] = r?.id?.text();
+			def tmpRank =  XMLConverter.getTaxonRank(r?.rank?.text()?.toLowerCase());
+			id_details[r?.name?.text() + "#" + tmpRank] = r?.id?.text();
 			def cs = r?.name_status?.text()?.tokenize(' ')[0]
 			if(cs == 'provisionally' || cs == 'accepted') {
 				temp['nameStatus'] = 'accepted'
@@ -1850,8 +1850,9 @@ class NamelistService {
 				int maxRank = -1;
 				r.classification.taxon.each { t ->
 					//println t.rank.text() + " == " + t.name.text()
+					tmpRank =  XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());
 					temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
-					id_details[t?.name?.text()] = t?.id?.text()
+					id_details[t?.name?.text() + "#" + tmpRank] = t?.id?.text()
 					colIdPath << t?.id?.text()
 					colNamePath << t?.name?.text()
 					int currRank = XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());

@@ -166,10 +166,13 @@ abstract class NamesMetadata extends NamesSorucedata {
 	
 
 	String matchDatabaseName
+	
+	//to preserve col id
 	String matchId
 
 	IbpSource ibpSource
 	String viaDatasource
+	String nameSourceId
 	
 	//to store reference backbone i.e col, butterfly by kunte default is col, ideally it should be enum
 	//String referenceTaxonomyBackbone = "COL"
@@ -185,6 +188,7 @@ abstract class NamesMetadata extends NamesSorucedata {
 		ibpSource nullable:true;
 		matchDatabaseName nullable:true;
 		matchId nullable:true;
+		nameSourceId nullable:true;
 	}
 
     static mapping = {

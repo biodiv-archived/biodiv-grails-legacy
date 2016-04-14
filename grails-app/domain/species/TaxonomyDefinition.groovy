@@ -208,7 +208,7 @@ class TaxonomyDefinition extends ScientificName {
 
    public boolean snapToIBPHir(List<Classification> hirList, Classification targetHir){
 	   if(TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, targetHir)){
-		   println  "Already has one IBP hierarchy. Returning " + this
+		   //println  "Already has one IBP hierarchy. Returning " + this + " col id " +  matchId
 		   return true
 	   }
 	   
@@ -374,7 +374,7 @@ class TaxonomyDefinition extends ScientificName {
    }
    
    Map fetchGeneralInfo(){
-	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId, nameSourceId:nameSourceId]
    }
 
     def addSynonym(SynonymsMerged syn) {
@@ -601,10 +601,10 @@ class TaxonomyDefinition extends ScientificName {
 				//println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
 				def fieldsConfig = grailsApplication.config.speciesPortal.fields
 				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
-				def tmpMatchId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
+				def tmpNameSourceId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
 				def tmpViaDatasource = nameSourceInfo.get("" + fieldsConfig.VIA_SOURCE)
 				matchDatabaseName = tmpMatchDatabaseName
-				matchId = tmpMatchId
+				nameSourceId = tmpNameSourceId
 				viaDatasource = tmpViaDatasource
 				//this one should create ibp hir and getting priority over all the hirerchies
 				if(latestHir){
