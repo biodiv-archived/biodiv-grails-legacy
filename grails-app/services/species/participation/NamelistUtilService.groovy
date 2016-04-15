@@ -355,7 +355,7 @@ class NamelistUtilService {
 			if(resList.isEmpty())
 				break
 			
-			TaxonomyRegistry.withNewTransaction {
+			//TaxonomyRegistry.withNewTransaction {
 				resList.each{
 					i++
 					if(i%100 == 0){
@@ -379,7 +379,7 @@ class NamelistUtilService {
 						pMap.put(colTr.taxonDefinition, colTr)
 					}
 				}
-			}
+			//}
 			utilsService.cleanUpGorm()
 			pMap.clear()
 			offset += limit
@@ -701,7 +701,7 @@ class NamelistUtilService {
 				if(taxons.isEmpty())
 					break
 				
-				TaxonomyRegistry.withNewTransaction {	
+				//TaxonomyRegistry.withNewTransaction {	
 				taxons.each { t ->
 					i++
 					TaxonomyDefinition td = TaxonomyDefinition.get(t.id)
@@ -712,7 +712,7 @@ class NamelistUtilService {
 						println "failed for " +  td 
 					}
 				}
-				}
+				//}
 				utilsService.cleanUpGorm()
 				offset = offset + limit;
 				

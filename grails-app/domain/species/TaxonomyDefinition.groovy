@@ -208,7 +208,7 @@ class TaxonomyDefinition extends ScientificName {
 
    public boolean snapToIBPHir(List<Classification> hirList, Classification targetHir){
 	   if(TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, targetHir)){
-		   //println  "Already has one IBP hierarchy. Returning " + this + " col id " +  matchId
+		   println  "Already has one IBP hierarchy. Returning >>>  " + this + " col id " +  matchId + "  hir " + TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, targetHir)
 		   return true
 	   }
 	   
@@ -328,6 +328,11 @@ class TaxonomyDefinition extends ScientificName {
    }
 
    	public boolean createTargetHirFromTaxonReg(TaxonomyRegistry tr, Classification targetClassifi){
+		int tCount = TaxonomyRegistry.countByTaxonDefinitionAndClassification(this, targetClassifi)
+		if(tCount > 1){
+			println ">>>>>>>>>>>>>>>>>>>>>>>>>>. more than one ibp hir " +  "    taxon " + this + " hir==  "  + TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, targetClassifi)
+		}
+		   
 		TaxonomyRegistry targetHir = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, targetClassifi)
 		if(targetHir && (targetHir.path == tr.path)){
 			return true
@@ -448,10 +453,10 @@ class TaxonomyDefinition extends ScientificName {
 		
 		if((position != NamesMetadata.NamePosition.CLEAN) && doColCuration){
 			curateNameByCol()
-			log.debug "Adding col hir ==="
+			log.debug "Adding col hir === " + this.name + " id " + this.id
 			addColHir()
 		}
-		log.debug "Adding IBP hir ==="
+		log.debug "Adding IBP hir === "+ this.name + " id " + this.id
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
 		def trHir = Classification.fetchIBPClassification()
 		snapToIBPHir(hirList, trHir)
@@ -462,7 +467,7 @@ class TaxonomyDefinition extends ScientificName {
 		Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
 		def hir = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, classification)
 		if(hir || !matchId){
-			log.debug "Hir already present or No match found on COL"
+			log.debug "Hir already present or No match found on COL " + this
 			return
 		}
 		

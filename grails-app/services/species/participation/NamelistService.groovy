@@ -94,44 +94,42 @@ class NamelistService {
             clazz = SynonymsMerged.class; 
         }
         
-//		clazz.withNewTransaction{
-			if(normalizedForm || authorYear){
-				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
-				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
-				res = clazz.withCriteria(){
-					and{
-						eq('normalizedForm', normalizedForm)
-						if(status) eq('status', status)
-						if(rank >= 0)
-							eq('rank', rank)
-						if(!searchInNull){
-							isNotNull('position')
-						}
-					}
-				}
-			}
-			
-			if(res)
-				return res
-			
-			//println  "No result in Normalized form using canonical form now"
-            res = clazz.withCriteria(){
+		if(normalizedForm || authorYear){
+			String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
+			normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
+			res = clazz.withCriteria(){
 				and{
-					eq('canonicalForm', canonicalForm)
+					eq('normalizedForm', normalizedForm)
 					if(status) eq('status', status)
 					if(rank >= 0)
 						eq('rank', rank)
 					if(!searchInNull){
 						isNotNull('position')
 					}
-					//XXX in curation while taking col hir. we want author year column to be used forcefully 
-					// in other cases we will not use untill gets multiple matches 
-					if(useAuthorYear && authorYear){
-						eq('authorYear', authorYear)
-					}
 				}
-            }
-//		}
+			}
+		}
+		
+		if(res)
+			return res
+		
+		//println  "No result in Normalized form using canonical form now"
+        res = clazz.withCriteria(){
+			and{
+				eq('canonicalForm', canonicalForm)
+				if(status) eq('status', status)
+				if(rank >= 0)
+					eq('rank', rank)
+				if(!searchInNull){
+					isNotNull('position')
+				}
+				//XXX in curation while taking col hir. we want author year column to be used forcefully 
+				// in other cases we will not use untill gets multiple matches 
+				if(useAuthorYear && authorYear){
+					eq('authorYear', authorYear)
+				}
+			}
+        }
 			
 //		println "== FINAL SEARCH RESULT " + res
 		return res;
@@ -759,10 +757,10 @@ class NamelistService {
             if(sciName.status == NameStatus.ACCEPTED) {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
-                result = addIBPHierarchyFromCol(colMatch);
+                //result = addIBPHierarchyFromCol(colMatch);
                 //sciName = result.lastTaxonInIBPHierarchy; 
                 println "======STATUS MEIN SCINAME==== " + sciName
-                result.sciName = result.lastTaxonInIBPHierarchy;
+                result.sciName = sciName //result.lastTaxonInIBPHierarchy;
 
             } else {
                 //sciName = updateAttributes(sciName, colMatch)

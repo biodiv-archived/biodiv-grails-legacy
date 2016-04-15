@@ -492,7 +492,7 @@ class XMLConverter extends SourceConverter {
 						}
 					}
 
-					//println " latest hir ------------------- <<<<<<<<<>>>>>>>>>>>>>>> " + latestHir
+					println " latest hir -------convertname------------ <<<<<<<<<>>>>>>>>>>>>>>> " + latestHir
 					taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species), latestHir)
 					updateUserPrefForColCuration(taxonConcept, speciesNameNode)
 					taxonConcept.postProcess()
@@ -1768,6 +1768,9 @@ class XMLConverter extends SourceConverter {
         String spellCheckMsg = ''
         classifications.each {
             List taxonNodes = getNodesFromCategory(speciesNodes, it.name);
+            if(!taxonNodes){
+            	return
+            }
             def getTaxonHierarchyRes = getTaxonHierarchy(taxonNodes, it, scientificName, saveHierarchy, abortOnNewName, fromCOL ,otherParams)
             def t = getTaxonHierarchyRes.taxonRegistry;
             spellCheckMsg = getTaxonHierarchyRes.spellCheckMsg;
@@ -1914,6 +1917,11 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
+		//XXX: IBP hir will be added automaitcally on post process of taxon def where it checks for duplicacy as well
+		//ibp hir should not be added from anywhere else
+    	if(classification == Classification.fetchIBPClassification()){
+			return
+		}
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
         boolean newNameSaved = false;
         List<TaxonomyRegistry> taxonEntities = new ArrayList<TaxonomyRegistry>();
@@ -1929,7 +1937,7 @@ class XMLConverter extends SourceConverter {
                 name = Utils.cleanSciName(name);
             }
             if(name) {
-                println "===NAME=== " + name + "  ===rank=== " + rank
+                //println "===NAME=== " + name + "  ===rank=== " + rank
                 names.putAt(rank, name);
             }
             sortedFieldNodes.putAt(rank, fieldNode)
@@ -1946,7 +1954,7 @@ class XMLConverter extends SourceConverter {
                 int rank = getTaxonRank(fieldNode?.subcategory?.text());
                 String name = getData(fieldNode.data);
 
-                log.debug "Taxon : "+name+" and rank : "+rank;
+                println "Taxon : "+name+" and rank : "+rank;
                 if(!name || rank < 0) {
 					//return only continue the loop
 					return
@@ -2087,7 +2095,7 @@ class XMLConverter extends SourceConverter {
                         return;
                     }
                     if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
-						println " =========== got raw taxon and reusing it  "
+						println " =========== got taxon and reusing it  " + taxon
                         //taxon = null;
                     }
 					boolean addNewNameToSession = (taxon && taxon.id)?false:true
@@ -2108,7 +2116,7 @@ class XMLConverter extends SourceConverter {
                             //get its data from col and save
                             println "=======NAME======== " + name
                             if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank]) {
-								println "========UPDATING MATCH ID WITH FOR NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm + "#" + taxon.rank] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+								println "========UPDATING NEW TAXON ======= " + otherParams.id_details[taxon.canonicalForm + "#" + taxon.rank] + "=======TAXON CANONICAL === " + taxon.canonicalForm + "  -- id " + taxon.id
                                 taxon.matchId = otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank];
                             }
                             //println "=========EXTERNAL ID===== " + externalId
@@ -2167,7 +2175,7 @@ class XMLConverter extends SourceConverter {
                         if(fromCOL) {
                             //taxon = namelistService.updateAttributes(taxon, res);
                         }
-                    } else if(taxon && fromCOL) {
+                    } else if(taxon && fromCOL && !NamePosition.CLEAN) {
 						if(fieldNode == fieldNodes.last()){
 							taxon.matchDatabaseName = otherParams?.metadata?otherParams.metadata.source:"";
 							taxon.viaDatasource = otherParams?.metadata?otherParams.metadata.via:"";
@@ -2177,7 +2185,7 @@ class XMLConverter extends SourceConverter {
                         taxon.position = NamePosition.WORKING
                         taxon.matchDatabaseName = "CatalogueOfLife";
                         if(otherParams.id_details && otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank]) {
-							println "========UPDATING MATCH ID WITH FOR ALREADY EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank] + "=======TAXON CANONICAL === " + taxon.canonicalForm
+							println "========UPDATING EXISTING TAXON ======= " + otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank] + "=======TAXON CANONICAL === " + taxon.canonicalForm + "  -- id " + taxon.id
                             taxon.matchId = otherParams.id_details[taxon.canonicalForm+ "#" + taxon.rank];
                         }
                         if(!taxon.save(flush:true)) {
@@ -2232,7 +2240,7 @@ class XMLConverter extends SourceConverter {
 					}
 						
 					//saving taxon registry
-                    def parentTaxon = getParentTaxon(taxonEntities, rank);
+					def parentTaxon = getParentTaxon(taxonEntities, rank);
                     def path = (parentTaxon ? parentTaxon.path+"_":"") + taxon.id;
                     def criteria = TaxonomyRegistry.createCriteria()
                     TaxonomyRegistry ent = criteria.get {
