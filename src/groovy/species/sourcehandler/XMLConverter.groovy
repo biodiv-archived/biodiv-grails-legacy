@@ -1919,7 +1919,8 @@ class XMLConverter extends SourceConverter {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
 		//XXX: IBP hir will be added automaitcally on post process of taxon def where it checks for duplicacy as well
 		//ibp hir should not be added from anywhere else
-    	if(classification == Classification.fetchIBPClassification()){
+		println "Adding hir for classification " + Classification?.name
+		if(classification == Classification.fetchIBPClassification()){
 			return
 		}
         //TODO: BREAK HIERARCHY FROM UI ID RAW LIST NAME IN BETWEEN HIERARCHY
@@ -2326,7 +2327,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     static int getTaxonRank(String rankStr) {
-        return ScientificName.TaxonomyRank.getTaxonRank(rankStr);
+		return ScientificName.TaxonomyRank.getTaxonRank(rankStr);
         /* // moved to TaxonRank
         MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
         def request = null;

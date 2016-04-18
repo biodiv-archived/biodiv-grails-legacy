@@ -103,8 +103,7 @@ class SpeciesPermissionService {
 
                 return true;
             } catch (Exception e) {
-                e.printStackTrace();
-
+                //e.printStackTrace();
                 log.error "error adding ${permissionType} to the user. ${e.getMessage()}"
                 return false;
             }
@@ -135,7 +134,6 @@ class SpeciesPermissionService {
         if(!user) return false;
         if(!taxonConcept) return false;
         List parentTaxons = taxonConcept.parentTaxon()
-        println "PARENT TAXONS==================> ${parentTaxons}"
         parentTaxons.add(taxonConcept);
         return isTaxonContributor(parentTaxons, user, permissionTypes);
     }

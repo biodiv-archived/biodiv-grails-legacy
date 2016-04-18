@@ -542,8 +542,8 @@ class NamelistService {
 		if(addHir)
         	sciName = updateStatus(sciName, acceptedMatch).sciName;
 			
-        println "========THE SCI NAME======== " + sciName
-        println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
+        //println "========THE SCI NAME======== " + sciName
+        //println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
         if(!acceptedMatch['parsedRank']) {
             acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
         }
@@ -560,8 +560,8 @@ class NamelistService {
             def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(cl, sciName);
             taxonService.moveToWKG([taxonReg]);
         }*/
-        println "=======SCI NAME POSITION ========== " + sciName.position
-        println "=====SCI NAME ==== " + sciName
+        //println "=======SCI NAME POSITION ========== " + sciName.position
+        //println "=====SCI NAME ==== " + sciName
         //sciName = sciName.merge();
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
@@ -753,13 +753,13 @@ class NamelistService {
             //handling inside the cases only
             //sciName.status = newStatus;
         } else {        //Do when status does not change and its accepted
-            println "=========STATUS SAME  === "
+            //println "=========STATUS SAME  === "
             if(sciName.status == NameStatus.ACCEPTED) {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
                 //result = addIBPHierarchyFromCol(colMatch);
                 //sciName = result.lastTaxonInIBPHierarchy; 
-                println "======STATUS MEIN SCINAME==== " + sciName
+                //println "======STATUS MEIN SCINAME==== " + sciName
                 result.sciName = sciName //result.lastTaxonInIBPHierarchy;
 
             } else {
@@ -857,7 +857,7 @@ class NamelistService {
     }
 
     private Map updateRank(ScientificName sciName, int rank) {
-        println "======= UPDATING RANK ============+"
+        //println "======= UPDATING RANK ============+"
         boolean success = false;
         List errors = [];
         if(sciName.rank != rank) {
@@ -874,7 +874,7 @@ class NamelistService {
         } else {
             success = false;
         }
-        println "======= UPDATING RANK DONE to ${sciName.rank}============+"
+        //println "======= UPDATING RANK DONE to ${sciName.rank}============+"
         return [success:success, errors:errors];
     }
         
@@ -935,7 +935,7 @@ class NamelistService {
     }
 
     public Map updatePosition(ScientificName sciName, NamePosition position) {
-        println "\n============== UPDATING POSITION ========" + position
+        //println "\n============== UPDATING POSITION ========" + position
         boolean success = false;
         List errors = [];
         if(!position) {
@@ -1504,7 +1504,7 @@ class NamelistService {
                 success = true;
             }
             
-            println "=========DONE UPDATING ATTRIBUTES ========\n" + sciName
+            //println "=========DONE UPDATING ATTRIBUTES ========\n" + sciName
 
         } catch (Exception e) {
             success = false;
@@ -1540,7 +1540,7 @@ class NamelistService {
                 colMatchVerbatim = parsedNames[0].normalizedForm;
                 acceptedMatch['parsedName'] = parsedNames[0];
                 acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
-                println "============ACCEPTED MATCH ======= " + acceptedMatch
+                //println "============ACCEPTED MATCH ======= " + acceptedMatch
             }
         }
         if(acceptedMatch) {
