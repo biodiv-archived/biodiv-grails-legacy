@@ -63,16 +63,11 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
-    public static Set namesInWKG = new HashSet();
-
-    public static Map namesBeforeSave = [:];
-    public static Map namesAfterSave = [:];
-	
-	
-	//XXX: this map is used to store new name created by col only for bulk and name upload. This is needed because hibernet is not
-	//flushing data in db and same name is duplicated within one bulk name upload
-	//this map will be cleared by every bulk upload thread at the end to avoid memory build up
-	private static Map COL_CREATED_NAME = [:]
+ 	//XXX: this map is used to store new name created by session for bulk and name upload. This is needed because
+	//if a user want to create new name by saying 'new' in spreadsheet then same name may be created multiple times
+	//it that name appears multiple time in hir sheet 
+	//this map will be cleared by every bulk upload thread to avoid any conflict
+	private static Map NEW_NAME_IN_SESSION = [:]
 
 	def dataSource
     def groupHandlerService
@@ -89,7 +84,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
+//        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
 		
         def clazz
@@ -99,54 +94,44 @@ class NamelistService {
             clazz = SynonymsMerged.class; 
         }
         
-		clazz.withNewTransaction{
-			if(normalizedForm || authorYear){
-				String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
-				normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
-				res = clazz.withCriteria(){
-					and{
-						eq('normalizedForm', normalizedForm)
-						if(status) eq('status', status)
-						if(rank >= 0)
-							eq('rank', rank)
-						if(!searchInNull){
-							isNotNull('position')
-						}
-					}
-				}
-			}
-			
-			if(res)
-				return res
-			
-			//println  "No result in Normalized form using canonical form now"
-            res = clazz.withCriteria(){
+		if(normalizedForm || authorYear){
+			String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
+			normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
+			res = clazz.withCriteria(){
 				and{
-					eq('canonicalForm', canonicalForm)
+					eq('normalizedForm', normalizedForm)
 					if(status) eq('status', status)
 					if(rank >= 0)
 						eq('rank', rank)
 					if(!searchInNull){
 						isNotNull('position')
 					}
-					//XXX in curation while taking col hir. we want author year column to be used forcefully 
-					// in other cases we will not use untill gets multiple matches 
-					if(useAuthorYear && authorYear){
-						eq('authorYear', authorYear)
-					}
 				}
-            }
-		}
-			
-		if(res.isEmpty()){
-			String key = canonicalForm + rank 
-			def resName = COL_CREATED_NAME.get(key)
-			if(resName){
-				res = [resName]
 			}
 		}
 		
-		println "== FINAL SEARCH RESULT " + res
+		if(res)
+			return res
+		
+		//println  "No result in Normalized form using canonical form now"
+        res = clazz.withCriteria(){
+			and{
+				eq('canonicalForm', canonicalForm)
+				if(status) eq('status', status)
+				if(rank >= 0)
+					eq('rank', rank)
+				if(!searchInNull){
+					isNotNull('position')
+				}
+				//XXX in curation while taking col hir. we want author year column to be used forcefully 
+				// in other cases we will not use untill gets multiple matches 
+				if(useAuthorYear && authorYear){
+					eq('authorYear', authorYear)
+				}
+			}
+        }
+			
+//		println "== FINAL SEARCH RESULT " + res
 		return res;
     }
     
@@ -255,8 +240,7 @@ class NamelistService {
 		}else{
 			td = createSynonymFromColId(colId, runPostProcess)
 		}
-		
-		COL_CREATED_NAME.put(td.canonicalForm + td.rank , td)
+		addNewNameInSession(td)
 		return td
 	}
 	
@@ -558,8 +542,8 @@ class NamelistService {
 		if(addHir)
         	sciName = updateStatus(sciName, acceptedMatch).sciName;
 			
-        println "========THE SCI NAME======== " + sciName
-        println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
+        //println "========THE SCI NAME======== " + sciName
+        //println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
         if(!acceptedMatch['parsedRank']) {
             acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
         }
@@ -568,7 +552,6 @@ class NamelistService {
         //addIBPHierarchyFromCol(sciName, acceptedMatch);
 
         //already updated in update attributes
-        //updatePosition(sciName, NamesMetadata.NamePosition.WORKING);
         sciName.dirtyListReason = null;
         sciName.noOfCOLMatches = colDataSize;
         /*else if(sciName.status == NameStatus.ACCEPTED) {
@@ -577,15 +560,15 @@ class NamelistService {
             def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(cl, sciName);
             taxonService.moveToWKG([taxonReg]);
         }*/
-        println "=======SCI NAME POSITION ========== " + sciName.position
-        println "=====SCI NAME ==== " + sciName
-        sciName = sciName.merge();
+        //println "=======SCI NAME POSITION ========== " + sciName.position
+        //println "=====SCI NAME ==== " + sciName
+        //sciName = sciName.merge();
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"
 			sciName.updateNameSignature()
-            namesAfterSave[sciName.id] = sciName.position.value();
-            utilsService.cleanUpGorm(true);
+            //namesAfterSave[sciName.id] = sciName.position.value();
+            //utilsService.cleanUpGorm(true);
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
@@ -658,9 +641,7 @@ class NamelistService {
             if(moveToWKG) position = NamesMetadata.NamePosition.WORKING;
             if(moveToRaw) position = NamesMetadata.NamePosition.RAW;
 
-            tempResult = updatePosition(sciName, position); 
-            println "======= RESULT FROM UpdatePosition ${tempResult}";
-            result.errors << tempResult.errors;
+            updatePosition(sciName, position); 
             //taxonService.moveToWKG([taxonReg]);
 
 
@@ -671,7 +652,7 @@ class NamelistService {
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 log.debug "Saved sciname ${sciName}" 
                 sciName.updateNameSignature()
-				utilsService.cleanUpGorm(true);
+				//utilsService.cleanUpGorm(true);
                 result.success = true;
             } else {
                 result.success = false;
@@ -772,14 +753,14 @@ class NamelistService {
             //handling inside the cases only
             //sciName.status = newStatus;
         } else {        //Do when status does not change and its accepted
-            println "=========STATUS SAME  === "
+            //println "=========STATUS SAME  === "
             if(sciName.status == NameStatus.ACCEPTED) {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
-                result = addIBPHierarchyFromCol(colMatch);
+                //result = addIBPHierarchyFromCol(colMatch);
                 //sciName = result.lastTaxonInIBPHierarchy; 
-                println "======STATUS MEIN SCINAME==== " + sciName
-                result.sciName = result.lastTaxonInIBPHierarchy;
+                //println "======STATUS MEIN SCINAME==== " + sciName
+                result.sciName = sciName //result.lastTaxonInIBPHierarchy;
 
             } else {
                 //sciName = updateAttributes(sciName, colMatch)
@@ -876,7 +857,7 @@ class NamelistService {
     }
 
     private Map updateRank(ScientificName sciName, int rank) {
-        println "======= UPDATING RANK ============+"
+        //println "======= UPDATING RANK ============+"
         boolean success = false;
         List errors = [];
         if(sciName.rank != rank) {
@@ -893,7 +874,7 @@ class NamelistService {
         } else {
             success = false;
         }
-        println "======= UPDATING RANK DONE to ${sciName.rank}============+"
+        //println "======= UPDATING RANK DONE to ${sciName.rank}============+"
         return [success:success, errors:errors];
     }
         
@@ -954,29 +935,16 @@ class NamelistService {
     }
 
     public Map updatePosition(ScientificName sciName, NamePosition position) {
-        println "\n============== UPDATING POSITION ========" + position
+        //println "\n============== UPDATING POSITION ========" + position
         boolean success = false;
         List errors = [];
         if(!position) {
             return [success:success, errors:['Position is empty']];
         }
 
-        namesInWKG.add(sciName.id)
-        namesBeforeSave[sciName.id] = position.value();
         log.debug "Updating position from ${sciName.position} to ${position}"
-        println "Updating position from ${sciName.position} to ${position}"
-        sciName.position = position;
-		
-        if(!sciName.save(flush:true)) {
-            success = false;
-            errors = sciName.errors.allErrors;
-            sciName.errors.allErrors.each { log.error it }
-        } else {
-            success = true;
-        }
-
-        println "\n============== UPDATING POSITION DONE FROM TO ${sciName.position}========"
-        return [success:success, errors:errors];
+        sciName.updatePosition(position.value())
+		return [success:success, errors:errors];
     }
 
     List processColData(File f, ScientificName sn = null) {
@@ -1060,8 +1028,8 @@ class NamelistService {
             if(m['species']) {
 				def authStr = ""
                 if(m['id_details']) {
-					authStr = searchCOL(m.id_details[m['species']], "id")[0].authorString;
-					m.id_details[m['genus'] + " " +m['species']] = m.id_details[m['species']]
+					authStr = searchCOL(m.id_details[m['species'] + "#" + "9"], "id")[0].authorString;
+					m.id_details[m['genus'] + " " +m['species']+ "#" + "9"] = m.id_details[m['species']+ "#" + "9"]
                 }
                 result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr?:"";    
             }
@@ -1433,7 +1401,7 @@ class NamelistService {
             def sql= session.createSQLQuery(query)
             sql.setProperties([id:sciName.id, class:'species.TaxonomyDefinition', status:status.toString()]).executeUpdate();
             println " ========executed query =="
-            utilsService.cleanUpGorm(true);
+            //utilsService.cleanUpGorm(true);
             
             //sciName.class = 'species.TaxonomyDefinition';
             //TODO: CHK: sciName = TaxonomyDefinition.get(sciName.id.toLong())
@@ -1449,7 +1417,7 @@ class NamelistService {
             def sql = session.createSQLQuery(query)
             sql.setProperties([id:sciName.id, class:'species.SynonymsMerged', relationship:ScientificName.RelationShip.SYNONYM.toString(), status:status.toString()]).executeUpdate();
             println " ========executed query =="
-            utilsService.cleanUpGorm(true);
+            //utilsService.cleanUpGorm(true);
             
             /*TaxonomyDefinition.executeUpdate(
                     "update TaxonomyDefinition t set t.class = :klass where t.id = :id ", 
@@ -1536,7 +1504,7 @@ class NamelistService {
                 success = true;
             }
             
-            println "=========DONE UPDATING ATTRIBUTES ========\n" + sciName
+            //println "=========DONE UPDATING ATTRIBUTES ========\n" + sciName
 
         } catch (Exception e) {
             success = false;
@@ -1572,7 +1540,7 @@ class NamelistService {
                 colMatchVerbatim = parsedNames[0].normalizedForm;
                 acceptedMatch['parsedName'] = parsedNames[0];
                 acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
-                println "============ACCEPTED MATCH ======= " + acceptedMatch
+                //println "============ACCEPTED MATCH ======= " + acceptedMatch
             }
         }
         if(acceptedMatch) {
@@ -1836,8 +1804,8 @@ class NamelistService {
 			temp[r?.rank?.text()?.toLowerCase()] = generateVerbatim(r);     //r?.name?.text()
 			//GENERATING VERBATIM BASED ON RANK
 			temp['name'] = generateVerbatim(r);
-			
-			id_details[r?.name?.text()] = r?.id?.text();
+			def tmpRank =  XMLConverter.getTaxonRank(r?.rank?.text()?.toLowerCase());
+			id_details[r?.name?.text() + "#" + tmpRank] = r?.id?.text();
 			def cs = r?.name_status?.text()?.tokenize(' ')[0]
 			if(cs == 'provisionally' || cs == 'accepted') {
 				temp['nameStatus'] = 'accepted'
@@ -1880,8 +1848,9 @@ class NamelistService {
 				int maxRank = -1;
 				r.classification.taxon.each { t ->
 					//println t.rank.text() + " == " + t.name.text()
+					tmpRank =  XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());
 					temp[t?.rank?.text()?.toLowerCase()] = t?.name?.text()
-					id_details[t?.name?.text()] = t?.id?.text()
+					id_details[t?.name?.text() + "#" + tmpRank] = t?.id?.text()
 					colIdPath << t?.id?.text()
 					colNamePath << t?.name?.text()
 					int currRank = XMLConverter.getTaxonRank(t?.rank?.text()?.toLowerCase());
@@ -1988,6 +1957,7 @@ class NamelistService {
 	
 	
     public def getNamesFromTaxon(params){
+    	println "===================== params " + params 
         def sql = new Sql(dataSource)
         def sqlStr, rs
         def classSystem = params.classificationId.toLong()
@@ -2213,12 +2183,24 @@ class NamelistService {
 	}
 
 	
-	public static void clearCOLNameFromMemory(){
-		COL_CREATED_NAME.clear()
+	public static void clearSessionNewNames(){
+		NEW_NAME_IN_SESSION.clear()
 	}
 	
+	public static void addNewNameInSession(TaxonomyDefinition td){
+		if(!td || !td.id)
+			return
+			
+		NEW_NAME_IN_SESSION.put(td.canonicalForm + "##" + td.rank , td.id)
+	}
 	
-	
+	public static TaxonomyDefinition getNewNameInSession(String canonicalForm, int rank){
+		if(!canonicalForm)
+			return
+			
+		def tdId = NEW_NAME_IN_SESSION.get(canonicalForm + "##" + rank)
+		return TaxonomyDefinition.get(tdId)
+	}
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////

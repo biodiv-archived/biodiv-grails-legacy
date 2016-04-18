@@ -99,7 +99,7 @@ function initializeGallery(result,domainObj){
                 });
             }
 
-            update_imageAttribute(photo,$('.image_info'),index,result.dataset);
+            update_imageAttribute(photo,$('.image_info'),index,result.dataset, result.parent, result.parentId);
         });
 
         if(isAudio.length >= 1){
@@ -111,7 +111,7 @@ function initializeGallery(result,domainObj){
 
             $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url']+'" type="audio/mpeg"></audio>');
             $.each(isAudio, function (index, resource) {
-                $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index,result.dataset));
+                $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index,result.dataset, result.parent, result.parentId));
             });
             $('.audio_container div').first().show();
         }
@@ -174,7 +174,7 @@ function initializeGallery(result,domainObj){
         });
 }
 
-function update_imageAttribute(resource,ele,index,defaultThumb){
+function update_imageAttribute(resource,ele,index,defaultThumb, parent, parentId){
     var output = '';
     var resourceType = resource.type.toLowerCase();
     var media_var = (resourceType == 'image')?'Image':'Media';
@@ -231,6 +231,8 @@ function update_imageAttribute(resource,ele,index,defaultThumb){
     output += '</a>';
     output += '<div class="rating_form">';
     output += '<form class="ratingForm" method="get" title="Rate it">';
+    output += '<input type="hidden" name="parent" value="'+parent+'"/>';
+    output += '<input type="hidden" name="parentId" value="'+parentId+'"/>';
     output += '<span class="star_gallery_rating" title="Rate" data-score="'+resource.averageRating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
     output += '</span>';
     output += '<div class="noOfRatings">'; 

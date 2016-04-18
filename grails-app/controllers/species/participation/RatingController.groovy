@@ -7,11 +7,11 @@ import grails.converters.JSON;
 import grails.plugin.springsecurity.annotation.Secured
 
 class RatingController extends RateableController {
-    
+   
 	@Secured(['ROLE_USER'])
     def rate() {
         log.debug params;
-        def result =  rateIt(params.id.toLong(), params.type, params.rating);
+        def result =  rateIt(params.id.toLong(), params.type, params.rating, params.parent, params.parentId.toLong());
         render result as JSON
     }
 
@@ -36,8 +36,9 @@ class RatingController extends RateableController {
                 if(ratingLinks){
                     ratingLinks.each { rl ->
                         def rating = rl.rating
-                        rl.delete();
-                        rating.delete();
+                        if(rl.delete() && rating.delete()) {
+                            updateReprImage(params.parent, params.parentId.toLong());
+                        }
                     }
                 }
             } 
@@ -52,25 +53,34 @@ class RatingController extends RateableController {
         render result as JSON
     }
 
-    private def rateIt(long id, String type, String rate) {
+    private def rateIt(long id, String type, String rate, String parent, Long parentId) {
         def rater = evaluateRater()
         Rating.withTransaction {
             // for an existing rating, update it
             def rating = getRatings(id, type, rater);
             if (rating && rate) {
                 rating[0].stars = rate.toDouble()
-                assert rating[0].save()
+                if(rating[0].save()) {
+                    updateReprImage(parent, parentId);
+                }
             }
             // create a new one otherwise
             else if(rate) {
                 // create Rating
                 rating = new Rating(stars: rate, raterId: rater.id, raterClass: rater.class.name)
-                assert rating.save()
                 def link = new RatingLink(rating: rating, ratingRef: id, type: type)
-                assert link.save()
+                if(rating.save() && link.save()) {
+                    updateReprImage(parent, parentId);
+                }
             }
         }
         return formatRatings(getRatings(id, type));
+    }
+
+    private def updateReprImage(String parent, Long parentId) {
+        def obj = grailsApplication.domainClasses.find { it.clazz.simpleName == parent.capitalize() }.clazz.read(parentId);
+        obj.updateReprImage();
+        obj.save();
     }
 
     private def getRatings(long id, String type, rater=null) {

@@ -54,9 +54,9 @@ class DigestService {
         }
 
         def digestContent;
-        Digest.withTransaction {
+        //Digest.withTransaction {
             digestContent = fetchDigestContent(digest)
-        }
+        //}
 
         log.debug  "Fetched digestContent ${digestContent}"
 
@@ -65,9 +65,9 @@ class DigestService {
         if(digestContent) {
             while(emailFlag){
                 List<SUser> usersEmailList = [];
-                Digest.withTransaction { status ->
+                //Digest.withTransaction { status ->
                     usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
-                }
+                //}
                 if(usersEmailList.size() != 0){
                     sendDigest(digest, usersEmailList, false, digestContent)
                     offset = offset + max
