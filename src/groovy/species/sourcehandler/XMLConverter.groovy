@@ -1919,7 +1919,7 @@ class XMLConverter extends SourceConverter {
     def getTaxonHierarchy(List fieldNodes, Classification classification, String scientificName, boolean saveTaxonHierarchy=true ,boolean abortOnNewName=false, boolean fromCOL = false, otherParams = null) {
 		//XXX: IBP hir will be added automaitcally on post process of taxon def where it checks for duplicacy as well
 		//ibp hir should not be added from anywhere else
-		println "Adding hir for classification " + Classification?.name
+		println "Adding hir for classification " + classification?.name
 		if(classification == Classification.fetchIBPClassification()){
 			return
 		}

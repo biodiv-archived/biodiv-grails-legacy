@@ -288,7 +288,7 @@ class Species implements Rateable {
 		//XXX: hack bug in hiebernet and grails 1.3.7 has to use new session
 		//http://jira.grails.org/browse/GRAILS-4453
 		try{
-			//Species.withNewSession{
+			Species.withNewSession{
 		        HashSet contributors = new HashSet();
 		
 		        //TODO:looks like this is gonna be heavy on every save ... gotta change
@@ -306,7 +306,7 @@ class Species implements Rateable {
 	                log.error "Error while adding permissions on ${this} species and taxon ${this.taxonConcept.id} to ${contributors}"
 	            }
 	
-			//}
+			}
 		}catch(e){
 			e.printStackTrace()
 		}
