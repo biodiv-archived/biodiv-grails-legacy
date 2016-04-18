@@ -221,6 +221,41 @@ class NamelistUtilService {
 	}
 	
 	
+	public void generateSheetMultipleIBPNameList(File f){
+		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
+		dataSource.setUnreturnedConnectionTimeout(50000);
+		def sql =  Sql.newInstance(dataSource);
+		def query  = "select taxon_definition_id as id, classification_id, count(*) as c from taxonomy_registry  where  classification_id = 265799 group by taxon_definition_id, classification_id having count(*) > 1;"
+		int i = 0
+		int offset = 0
+		int limit = 1000
+		def ibpHier = Classification.fetchIBPClassification()
+		f.withWriter { out ->
+			out.println "id|name|rank|colId|paths|idpath"
+			//while(true){
+				def resList = sql.rows(query)
+					
+				resList.each{
+					TaxonomyDefinition tdf = TaxonomyDefinition.get(it.getProperty("id"))
+					def colIdPaths = []
+					def idPaths = []
+					def trs = TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(tdf, ibpHier)
+					trs.each { tr ->
+						out.println tdf.id + "|" + tdf.name + "|" + tdf.rank + "|" + tdf.matchId + "|" + tr.path + "|" + (tr.path.split("_").collect{TaxonomyDefinition.read(Long.parseLong(it)).name}.join("_"))
+						//colIdPaths << (tr.path.split("_").collect{TaxonomyDefinition.read(Long.parseLong(it)).name}.join("_"))
+						//idPaths << tr.path
+					}
+					//out.println tdf.id + "|" + tdf.name + "|" + tdf.rank + "|" + tdf.matchId + "|" + idPaths.join('#') + "|" + colIdPaths.join('#')
+				}
+				utilsService.cleanUpGorm()
+				offset += limit
+				println " new offset " + offset
+			//}
+			
+		}
+		dataSource.setUnreturnedConnectionTimeout(oldTimeOut);
+	}
+	
 	public void verifyAcceptedNamesAndColPath(File inputFile, File outputFile){
 		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
 		dataSource.setUnreturnedConnectionTimeout(50000);
@@ -320,7 +355,7 @@ class NamelistUtilService {
 			if(resList.isEmpty())
 				break
 			
-			TaxonomyRegistry.withNewTransaction {
+			//TaxonomyRegistry.withNewTransaction {
 				resList.each{
 					i++
 					if(i%100 == 0){
@@ -344,7 +379,7 @@ class NamelistUtilService {
 						pMap.put(colTr.taxonDefinition, colTr)
 					}
 				}
-			}
+			//}
 			utilsService.cleanUpGorm()
 			pMap.clear()
 			offset += limit
@@ -666,7 +701,7 @@ class NamelistUtilService {
 				if(taxons.isEmpty())
 					break
 				
-				TaxonomyRegistry.withNewTransaction {	
+				//TaxonomyRegistry.withNewTransaction {	
 				taxons.each { t ->
 					i++
 					TaxonomyDefinition td = TaxonomyDefinition.get(t.id)
@@ -677,7 +712,7 @@ class NamelistUtilService {
 						println "failed for " +  td 
 					}
 				}
-				}
+				//}
 				utilsService.cleanUpGorm()
 				offset = offset + limit;
 				

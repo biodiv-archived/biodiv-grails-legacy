@@ -1281,15 +1281,15 @@ println resIdList
 
         if(params.type == 'nearBy' && params.lat && params.long) {
             String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-            filterQuery += " and ST_DWithin(${point}, ST_Centroid(obv.topology)), "+(maxRadius/111.32)+")";
             int maxRadius = params.maxRadius?params.int('maxRadius'):200
+            filterQuery += " and (ST_DWithin(ST_Centroid(obv.topology), ${point}, "+(maxRadius/111.32)+")) = TRUE ";
             queryParams['maxRadius'] = maxRadius;
 
             activeFilters["lat"] = params.lat
             activeFilters["long"] = params.long
             activeFilters["maxRadius"] = maxRadius
             
-            orderByClause = " ${point} <-> obv.topology" 
+            orderByClause = " ST_Distance(ST_Centroid(obv.topology), ${point})" 
         } 
         
         if(params.filterProperty == 'speciesName' && params.parentId) {

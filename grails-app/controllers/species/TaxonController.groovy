@@ -780,16 +780,22 @@ class TaxonController {
             println rs.path
             println "++++++++++++++++++++++++++++++++++++++"
             println "++++++++++++++++++++++++++++++++++++++"
-	def sql = new Sql(dataSource)
-	dataSource.setUnreturnedConnectionTimeout(50000);
+			def sql = new Sql(dataSource)
+			int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+			dataSource.setUnreturnedConnectionTimeout(50000);
+			try{
+	        rs.taxonid.each { t ->
+	              println t
+	              sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
 	
-            rs.taxonid.each { t ->
-                println t
-              sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
-
-            def taxon1 = TaxonomyDefinition.read(t);
-              taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
-              }
+				  def taxon1 = TaxonomyDefinition.read(t);
+	              taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
+	              }
+			}catch(e){
+				e.printStackTrace()
+			}finally{
+				dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+			}
         } else {
             render ([success:false, msg:"", errors:[]] as JSON)                                                                                       
         }
