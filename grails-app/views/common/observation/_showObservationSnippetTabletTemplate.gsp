@@ -55,7 +55,7 @@ def obvId = observationInstance?.id
    </g:if>
 </g:each>
 <g:if test="${photonames!='' && photonames.length() >0}">
-     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">View gallery<i class="icon-share icon-white"></i></a>
+     <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">${g.message(code:'default.instance.viewGallery')}<i class="icon-share icon-white"></i></a>
 </g:if>     
 
 	<div class="caption" style="${styleviewcheck?'height:20px;': 'height:50px;'}" >
@@ -117,7 +117,7 @@ def obvId = observationInstance?.id
             </div>
             <div class="group_icon_show_wrap">
                 <span class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left" title="Plants"></span>
-                <div class="btn btn-small btn-primary edit_group_btn pull-left">Edit
+                <div class="btn btn-small btn-primary edit_group_btn pull-left">${g.message(code:'default.button.edit.label')}
                 </div>
             </div>
 
@@ -153,7 +153,7 @@ def obvId = observationInstance?.id
               </div>
         </div>
         <g:if test="${!observationInstance.isLocked}">
-        <a href="javascript:void(0);" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">Click to suggest<i class="icon-chevron-down"></i></a>
+        <a href="javascript:void(0);" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">${g.message(code:'default.reco.clickSuggest')}<i class="icon-chevron-down"></i></a>
         <div class="input-append" style="width:98%; display:none; height: 130px;">
             <g:hasErrors bean="${recommendationInstance}">
             <div class="errors">
