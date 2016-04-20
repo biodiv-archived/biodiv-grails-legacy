@@ -491,7 +491,7 @@ class DocumentController extends AbstractObjectController {
         params.id = params.long('instanceId');
      def docSciNames = DocSciName.get(params.id);
         println "=========Doc sci id====="+docSciNames
-         docSciNames.isDeleted="TRUE"
+         docSciNames.isDeleted=true
          docSciNames.save()
     }
         def docSciNamesPrimaray(){
