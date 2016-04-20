@@ -66,6 +66,7 @@ class FileManagerTagLib {
 	def displayFile = {attrs, body->
 		def filePath = attrs["filePath"]
 		def fileName = attrs["fileName"]
+		def fileUrl=attrs["fileUrl"]
 				
 		if(!fileName) {
 			int idx = filePath.lastIndexOf("/");
@@ -91,6 +92,7 @@ class FileManagerTagLib {
 
 			case "PDF":
 							
+				
 				out <<'<a href='+path+' target="_blank"><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>'+ fileName +'</a>' 
 					break
 			default:

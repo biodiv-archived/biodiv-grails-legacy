@@ -34,7 +34,7 @@
                             class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left"
                             title="${observationInstance.group?.name}"></span>
                         <g:if test="${showDetails && !showFeatured}">        
-                        <div class="btn btn-small btn-primary edit_group_btn pull-left">Edit
+                        <div class="btn btn-small btn-primary edit_group_btn pull-left">${g.message(code:'default.button.edit.label')}
                         </div>
                         </g:if>    
                     </div>

@@ -17,6 +17,8 @@
             tr.mainContent td {
                 word-break:break-word;
             }
+        .thumbnail .observation_story{margin-left:150px;}
+
 
         </style>
     </head>
@@ -45,3 +47,4 @@
         </div>
         </body>
     </html>
+
