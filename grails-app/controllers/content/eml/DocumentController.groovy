@@ -462,6 +462,7 @@ class DocumentController extends AbstractObjectController {
 	@Secured(['ROLE_ADMIN'])
 	def bulkUpload(){
 		log.debug params
+        params.language = utilsService.getCurrentLanguage(request);
 		documentService.processBatch(params)
 		render " done "
 	}
@@ -482,6 +483,41 @@ class DocumentController extends AbstractObjectController {
 			
 			documentService.runAllDocuments();
 		}
-	
+	def primaryName(){
+
+        println "============Param Value======"+params.id
+    }
+    def docSciNamesDelete(){
+        params.id = params.long('instanceId');
+     def docSciNames = DocSciName.get(params.id);
+        println "=========Doc sci id====="+docSciNames
+         docSciNames.delete(flush: true)
+               
+    }
+        def docSciNamesPrimaray(){
+        params.id = params.long('instanceId');
+     def docSciNames = DocSciName.get(params.id);
+        println "=========Doc sci id====="+docSciNames
+        docSciNames.primary_name=1;
+        docSciNames.save()
+               
+    }
+     def docSciNamesEdit(){
+        params.id = params.long('instanceId');
+     def docSciNames = DocSciName.get(params.id);
+        println "=========Edit Params====="+params.typeOfChange
+        docSciNames.canonicalForm=params.typeOfChange
+        docSciNames.scientificName=params.typeOfChange
+        docSciNames.save()
+               
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def linkBulkUpload(){
+        log.debug params
+        params.language = utilsService.getCurrentLanguage(request);
+        documentService.processLinkBatch(params)
+        render " done "
+    }
 
 }
