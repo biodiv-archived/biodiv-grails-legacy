@@ -626,7 +626,7 @@ def moveCleanNameSpeciesToGroup(groupId){
 		println s
 		try{
 			sql.execute(s);
-		catch(e){
+		}catch(e){
 			println e.message
 		}
 	}
@@ -664,8 +664,8 @@ def moveCleanNameSpeciesToGroup(groupId){
 //test()
 
 //multipleIbp()
-//deleteHir()
-moveCleanNameSpeciesToGroup(48)
+deleteHir()
+//moveCleanNameSpeciesToGroup(48)
 
 
 
