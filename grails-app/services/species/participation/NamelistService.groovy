@@ -84,7 +84,7 @@ class NamelistService {
 
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
-//        println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
+        //println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
 		
         def clazz
@@ -131,7 +131,7 @@ class NamelistService {
 			}
         }
 			
-//		println "== FINAL SEARCH RESULT " + res
+		//println "== FINAL SEARCH RESULT " + res
 		return res;
     }
     
@@ -212,7 +212,19 @@ class NamelistService {
 								tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
 							}
 						}
+						
+						//No ibp result then searching only by canonical name and rank and excluding author year info
+						//to give all match option for curation
+						if(name.authorYear){
+							ibpResult = searchIBP(name.canonicalForm, null, null, names[i].rank, false, null, false)
+							ibpResult.each { TaxonomyDefinition t ->
+								t = TaxonomyDefinition.get(t.id)
+								tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
+							}
+						}
 					}
+					
+					
 					finalResult[names[i]] = tmpRes
 		        }
 	        }
