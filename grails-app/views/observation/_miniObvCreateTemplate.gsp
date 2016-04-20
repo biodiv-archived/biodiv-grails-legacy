@@ -19,7 +19,9 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
                 field="resource" />
             </div>
         </div>    
-        <div class="imageHolder" style="position: relative; left: 50px; top: 0; width: 150px; height: 250px; padding: 0.5em; margin: 10px;background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)})"></div>
+        <div class="imageHolder">
+            <span class="imageDr"><g:message code="default.resource.drag.drop.label" /></span>
+        </div>
 
         <g:render template="/common/speciesGroupDropdownTemplate" model="['observationInstance':observationInstance]"/> 
         <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance]"/> 

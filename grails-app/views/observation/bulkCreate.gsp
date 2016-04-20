@@ -147,6 +147,23 @@
                 border: 1px solid grey ;
                 background-color: lightgrey ;
                 margin-bottom:90px !important;
+                position: relative; 
+                left: 50px; 
+                top: 0; 
+                width: 150px; 
+                height: 250px; 
+                padding: 0.5em; 
+                margin: 10px;
+                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)})
+            }
+            .imageDr{
+                position: absolute;
+                top: 46%;
+                width: 127px;
+                margin-left: 15px;
+                font-size: 19px;
+                color: grey;
+                line-height: 23px;
             }
             .imagesListWrapper ul {
                 width:100000px;
