@@ -622,7 +622,7 @@ def moveCleanNameSpeciesToGroup(groupId){
 	
 	sql.rows(q).each{
 		def speciesId = it.id
-		String s = "insert into user_group_species (" + speciesId + ", " + groupId + ") " + " where  NOT EXISTS ( select * from user_group_species where species_id = " + speciesId + " and user_group_id = " + groupId ");"
+		String s = "insert into user_group_species values (" + speciesId + ", " + groupId + ") ;
 		println s
 		sql.execute(s);
 	}
