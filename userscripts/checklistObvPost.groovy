@@ -612,6 +612,24 @@ def deleteHir(){
 	}
 }
 
+
+def moveCleanNameSpeciesToGroup(groupId){
+	def dataSource = ctx.getBean("dataSource");
+	dataSource.setUnreturnedConnectionTimeout(50000);
+	def sql = new Sql(dataSource)
+	
+	String q = "select species_id as id from taxonomy_definition where (rank = 9 or rank = 10) and status = 'ACCEPTED' and position = 'CLEAN';"
+	
+	sql.rows(q).each{
+		def speciesId = it.id
+		String s = "insert into user_group_species (" + speciesId + ", " + groupId + ") " + " where  NOT EXISTS ( select * from user_group_species where species_id = " + speciesId + " and user_group_id = " + groupId ");"
+		println s
+		sql.execute(s);
+	}
+	println "== done"
+	
+}
+
 //dmp()
 //splitTreeExport()
 
@@ -642,7 +660,8 @@ def deleteHir(){
 //test()
 
 //multipleIbp()
-deleteHir()
+//deleteHir()
+moveCleanNameSpeciesToGroup(48)
 
 
 
