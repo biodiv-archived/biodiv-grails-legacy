@@ -272,8 +272,14 @@ class Species implements Rateable {
         
 		if(isDirty() && !isDirty('version')){
 			lastUpdated = new Date();
+            updateResources();
         }
     }
+
+    def beforeInsert() {
+        println 'Species beforeInsert'
+        updateResources();
+	}
 
     def afterInsert() {
         this.taxonConcept.speciesId = this.id
@@ -484,4 +490,37 @@ class Species implements Rateable {
     List<Document> findRelatedDocuments() {
         return speciesService.getRelatedDocuments(this);
     }
+
+	private void updateResources() {
+        log.debug "Species updateResources";
+        utilsService.evictInCache('resources', 'species-'+this.id);
+        updateReprImage();
+	}
+
+	private void updateReprImage() {
+        println "Species updateReprImage"
+        println this.resources
+        if(!this.resources) return;
+        Resource highestRatedResource = null;
+        this.resources.each { r ->
+            if(r.id && r.isAttached()) {
+                if(!highestRatedResource || r.averageRating > highestRatedResource.averageRating) {
+                    highestRatedResource = r;
+                }
+            }
+            println r.fileName
+            println r.rating
+            println r.totalRatings
+            println r.averageRating
+        }
+        def res = highestRatedResource;//listResourcesByRating(1)
+        if(res && !res.fileName.equals('i')) 
+            res = res
+		else 
+			res = null;//group?.icon(ImageType.ORIGINAL)
+        println "Updating reprImage to ${res} ${res.fileName} ${res.url}" 
+        this.reprImage = res;
+    }
+
+
 }

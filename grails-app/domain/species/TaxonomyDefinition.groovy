@@ -14,9 +14,11 @@ import species.sourcehandler.XMLConverter;
 import species.participation.ActivityFeedService
 import species.auth.SUser
 import grails.converters.JSON
+import groovy.sql.Sql
 
 class TaxonomyDefinition extends ScientificName {
-
+	
+	public static List UPDATE_SQL_LIST = []
 
 	int rank;
 	String name;
@@ -44,6 +46,7 @@ class TaxonomyDefinition extends ScientificName {
 	def namelistService
 	def namelistUtilService
 	def activityFeedService
+	def dataSource
 	
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
     static mappedBy = [hierarchies:'taxonDefinition']
@@ -205,7 +208,7 @@ class TaxonomyDefinition extends ScientificName {
 
    public boolean snapToIBPHir(List<Classification> hirList, Classification targetHir){
 	   if(TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, targetHir)){
-		   println  "Already has one IBP hierarchy. Returning " + this
+		   println  "Already has one IBP hierarchy. Returning >>>  " + this + " col id " +  matchId + "  hir " + TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, targetHir)
 		   return true
 	   }
 	   
@@ -271,34 +274,112 @@ class TaxonomyDefinition extends ScientificName {
 			   
    }
    
+   // update the path of children in ibp classification when node moves to clean state.
+   private void moveChildren(List sqlStrings){
+	   	//not moving children for name at level kingdom, phylum and class
+   		if(rank <= 2){
+   			return
+   		}
+
+   		Classification ibpClassification = Classification.fetchIBPClassification()
+		TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, ibpClassification)
+		if(!tr){
+			return
+		}
+
+		//println "============ child count " + TaxonomyRegistry.countByParentTaxonAndClassification(tr, ibpClassification)
+		//println "=================== moving children for taxon " + this 
+   		
+		
+		//have to look if this node exist in mid or in start. Note end is not required because we are moviing chlidren 
+		//code here handles both start and mid condition	
+		String newPathPrefix = "'" + tr.path + "_'"
+		String splitter = "'_" + id + "_'"
+		String startOffset =  ("" + id).length() + 1 // if id is 12345 then subsitute is 12345_ so length + 1
+
+		String startSql = "update taxonomy_registry set path =  (" + newPathPrefix + " ||  right(path, char_length(path) - " + startOffset + "))" ;
+		//String midSql = "update taxonomy_registry set path =  (" + newPathPrefix + " ||  split_part( path, " + splitter + ", 2))" ;
+		String midSql = "update taxonomy_registry set path =  (" + newPathPrefix + " ||  right(path, char_length(path)- strpos(path, " + splitter + ") - " + startOffset + "))" ;
+
+		String whereClause = " where classification_id = " + ibpClassification.id  
+		String startCond = " and path like '" + id + "\\_%';"
+		String midCond = " and path like '%\\_" + id + "\\_%';"
+		
+		String startQuery = startSql + whereClause + startCond
+		String midQuery = midSql + whereClause + midCond
+		
+		//println "-------- startQuery " + startQuery
+		//println "-------- midQuery " + midQuery
+
+		sqlStrings.add(startQuery)
+		sqlStrings.add(midQuery)
+
+		/*
+		sqlObj.executeUpdate(startQuery)
+		println " finished start qeery "
+		sqlObj.executeUpdate(midQuery)
+		println " finished end query"
+		*/
+
+		if(tr.parentTaxonDefinition){
+   			tr.parentTaxonDefinition.moveChildren(sqlStrings)
+   		}
+   		
+   }
+
    	public boolean createTargetHirFromTaxonReg(TaxonomyRegistry tr, Classification targetClassifi){
+		int tCount = TaxonomyRegistry.countByTaxonDefinitionAndClassification(this, targetClassifi)
+		if(tCount > 1){
+			println ">>>>>>>>>>>>>>>>>>>>>>>>>>. more than one ibp hir " +  "    taxon " + this + " hir==  "  + TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(this, targetClassifi)
+		}
+		   
 		TaxonomyRegistry targetHir = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, targetClassifi)
-		if(targetHir){
+		if(targetHir && (targetHir.path == tr.path)){
 			return true
 		}
-		
-		if(!tr.parentTaxonDefinition){
-			log.debug "Came up to kingdom level but no Target hir found so straing target hir from kingdom"
-			TaxonomyRegistry ibpTr = new TaxonomyRegistry()
-			ibpTr.classification = targetClassifi
-			ibpTr.taxonDefinition = this
-			ibpTr.path = id
-			ibpTr.contributors = null
-			
-			if(!ibpTr.save(flush:true)){
-				 ibpTr.errors.allErrors.each { log.error it }
+		//updating existing hir with new hir. mostly used when name is in clean state and hir is given by user
+		if(targetHir){
+			if(tr.parentTaxonDefinition){
+				tr.parentTaxonDefinition.createTargetHirFromTaxonReg(tr.parentTaxon, targetClassifi)
+				targetHir.parentTaxon = TaxonomyRegistry.findByTaxonDefinitionAndClassification(tr.parentTaxonDefinition, targetClassifi)
+				targetHir.parentTaxonDefinition = tr.parentTaxonDefinition
+				targetHir.path = tr.path
+			}else{
+				//at kingdom level
+				targetHir.path = id
+				targetHir.parentTaxon = null
+				targetHir.parentTaxonDefinition = null
+				targetHir.contributors = null
+			}
+			if(!targetHir.save(flush:true)){
+				 targetHir.errors.allErrors.each { log.error it }
 			}
 			return true
-		}
-		
-		tr.parentTaxonDefinition.createTargetHirFromTaxonReg(tr.parentTaxon, targetClassifi)
-		_sanpToImmediateParent(tr, targetClassifi)
-		
-		return true   
+			
+		}else{
+			if(!tr.parentTaxonDefinition){
+				log.debug "Came up to kingdom level but no Target hir found so starting target hir from kingdom"
+				TaxonomyRegistry ibpTr = new TaxonomyRegistry()
+				ibpTr.classification = targetClassifi
+				ibpTr.taxonDefinition = this
+				ibpTr.path = id
+				ibpTr.contributors = null
+				
+				if(!ibpTr.save(flush:true)){
+					 ibpTr.errors.allErrors.each { log.error it }
+				}
+				return true
+			}
+			
+			tr.parentTaxonDefinition.createTargetHirFromTaxonReg(tr.parentTaxon, targetClassifi)
+			_sanpToImmediateParent(tr, targetClassifi)
+			
+			return true
+		}   
    }
    
    Map fetchGeneralInfo(){
-	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId, nameSourceId:nameSourceId]
    }
 
     def addSynonym(SynonymsMerged syn) {
@@ -372,10 +453,10 @@ class TaxonomyDefinition extends ScientificName {
 		
 		if((position != NamesMetadata.NamePosition.CLEAN) && doColCuration){
 			curateNameByCol()
-			log.debug "Adding col hir ==="
+			log.debug "Adding col hir === " + this.name + " id " + this.id
 			addColHir()
 		}
-		log.debug "Adding IBP hir ==="
+		log.debug "Adding IBP hir === "+ this.name + " id " + this.id
 		List hirList = [ Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY), Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
 		def trHir = Classification.fetchIBPClassification()
 		snapToIBPHir(hirList, trHir)
@@ -386,7 +467,7 @@ class TaxonomyDefinition extends ScientificName {
 		Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
 		def hir = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, classification)
 		if(hir || !matchId){
-			log.debug "Hir already present or No match found on COL"
+			log.debug "Hir already present or No match found on COL " + this
 			return
 		}
 		
@@ -522,37 +603,33 @@ class TaxonomyDefinition extends ScientificName {
 			this.position = newPosition
 			if(this.position == NamesMetadata.NamePosition.CLEAN){
 				// name is moving to clean state.. overwrite all info from spreadsheet
-				println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
+				//println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
 				def fieldsConfig = grailsApplication.config.speciesPortal.fields
 				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
-				def tmpMatchId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
+				def tmpNameSourceId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
 				def tmpViaDatasource = nameSourceInfo.get("" + fieldsConfig.VIA_SOURCE)
 				matchDatabaseName = tmpMatchDatabaseName
-				matchId = tmpMatchId
+				nameSourceId = tmpNameSourceId
 				viaDatasource = tmpViaDatasource
 				//this one should create ibp hir and getting priority over all the hirerchies
 				if(latestHir){
-					//deleting old ibp hir if any
 					Classification ibpClassification = Classification.fetchIBPClassification()
-					TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, ibpClassification)
-					if(tr){
-						try{
-							println  " >>>>>>>>>>>>>>. Deleting old ibp hir " + tr
-							tr.delete(flush:true)
-						}catch(e){
-							log.debug e.printStackTrace()
-						}
-					}
 					createTargetHirFromTaxonReg(latestHir, ibpClassification)
+					List sqlStrings = []
+					moveChildren(sqlStrings)
+					UPDATE_SQL_LIST.addAll(sqlStrings)
+					//excuteSql(sqlStrings);
+					//println "finished move children === "
+					
 				}
 			}
-			def obj = merge()
-			obj = obj?:this
-			if(!obj.save()) {
-				obj.errors.allErrors.each { log.error it }
+			if(!save()) {
+				errors.allErrors.each { log.error it }
 			}
 		}
 	}
+
+
 	
 	public String fetchLogSummary(){
 		return name + "\n" 
@@ -566,7 +643,7 @@ class TaxonomyDefinition extends ScientificName {
 				this.errors.allErrors.each { log.error it }
 			}else{
 				userList.each {
-					println "--Adding actvity Feed for user " + it + "  FEED " + ns
+					//println "--Adding actvity Feed for user " + it + "  FEED " + ns
 					if(it)
 						activityFeedService.addActivityFeed(this, this, it, ActivityFeedService.TAXON_NAME_UPDATED, ns);
 				}
@@ -602,7 +679,7 @@ class TaxonomyDefinition extends ScientificName {
 		if(!newStatus)
 			return
 		
-		println "=================== came for updatestatus " + newStatus + " odl status " + status
+		//println "=================== came for updatestatus " + newStatus + " odl status " + status
 		if(newStatus == NameStatus.ACCEPTED)
 			changeToAcceptedName()
 		else{

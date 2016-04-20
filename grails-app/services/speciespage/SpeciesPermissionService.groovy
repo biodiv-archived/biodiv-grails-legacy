@@ -18,6 +18,7 @@ import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
 import grails.util.Environment;
 import species.ScientificName.TaxonomyRank;
+import species.sourcehandler.XMLConverter
 
 class SpeciesPermissionService {
 
@@ -102,8 +103,7 @@ class SpeciesPermissionService {
 
                 return true;
             } catch (Exception e) {
-                e.printStackTrace();
-
+                //e.printStackTrace();
                 log.error "error adding ${permissionType} to the user. ${e.getMessage()}"
                 return false;
             }
@@ -115,6 +115,19 @@ class SpeciesPermissionService {
 
     boolean isSpeciesContributor(Species speciesInstance, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
         return (isTaxonContributor(speciesInstance.taxonConcept, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
+    }
+
+    boolean isSpeciesContributor(List<String> taxonRegistryNames, SUser user, List<PermissionType> permissionTypes= [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
+        List<TaxonomyDefinition> parentTaxon = [];
+        XMLConverter converter = new XMLConverter();
+        taxonRegistryNames.eachWithIndex { tr,index ->
+            println tr
+            if(tr) {
+            def t = converter.getTaxonConceptFromName(tr, index);
+            if(t) parentTaxon << t            
+            }
+        }
+        return (isTaxonContributor(parentTaxon, user, permissionTypes) || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN'));
     }
 
     boolean isTaxonContributor(TaxonomyDefinition taxonConcept, SUser user, List<PermissionType> permissionTypes = [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR]) {
@@ -133,6 +146,7 @@ class SpeciesPermissionService {
             inList('permissionType', permissions)
             inList('taxonConcept',  parentTaxons)
         }
+        println "Species Permission Result : ${res}"
         if((res && res.size() > 0)) {
             return true
         } else {

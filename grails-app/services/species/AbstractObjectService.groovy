@@ -365,8 +365,15 @@ class AbstractObjectService {
         }
         converter.setResourcesRootDir(rootDir);
 
-        def relImagesContext = resourcesXML.images.image?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
-
+        def relImagesContext = ""
+        for(def i=0; i<resourcesXML.images.image.size();i++){
+            if(relImagesContext == ""){
+                relImagesContext = resourcesXML.images.image?.getAt(i).fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
+            }
+            if(relImagesContext !="")
+            break;
+        }
+       
         if(relImagesContext == ""){
             relImagesContext = resourcesXML.audios.audio?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
         }

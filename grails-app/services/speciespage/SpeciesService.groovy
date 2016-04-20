@@ -1443,19 +1443,19 @@ class SpeciesService extends AbstractObjectService  {
 
             Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
             //CHK if current user has permission to add details to the species
-            if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser)) {
+            if(!speciesPermissionService.isSpeciesContributor(taxonRegistryNames, springSecurityService.currentUser)) {
 				
 //				def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, springSecurityService.currentUser, language);
 //              List<TaxonomyRegistry> tR = converter.getClassifications(taxonRegistryNodes, speciesName, false).taxonRegistry;
 //              def tD = tR.taxonDefinition
-				def tD = speciesInstance.taxonConcept
-                if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
+				//def tD = speciesInstance.taxonConcept
+                //if(!speciesPermissionService.isTaxonContributor(tD, springSecurityService.currentUser)) {
                     result['success'] = false;
                     result['status'] = 'requirePermission';
                     result['msg'] = 'Please request for permission to contribute.'
                     //result['errors'] = errors
                     return result
-                }
+                //}
             }
 
             //save taxonomy hierarchy
@@ -2169,7 +2169,7 @@ def checking(){
     }  
    
     for ( speciesFieldInstances in speciesFieldInstancesList ) {
-         SpeciesField.withNewTransaction{
+        // SpeciesField.withNewTransaction{
             if(!speciesFieldInstances?.description){
                 speciesFieldInstances.description = "dummy";
                 speciesFieldInstances.save();                
@@ -2193,7 +2193,7 @@ def checking(){
                     println "Passed Existed!"
                 }
             }
-        }
+       // }
     }
     offset = offset+limit; 
     utilsService.cleanUpGorm(true); 

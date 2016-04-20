@@ -442,7 +442,7 @@ class Observation extends DataObject {
             else if(it.type == ResourceType.VIDEO) noOfVideos++;
             else if(it.type == ResourceType.AUDIO) noOfAudio++;
         }
-        //utilsService.evictInCache('resources', 'observation-'+this.id);
+        utilsService.evictInCache('resources', 'observation-'+this.id);
         updateReprImage();
 	}
 
@@ -453,7 +453,7 @@ class Observation extends DataObject {
         Resource highestRatedResource = null;
         this.resource.each { r ->
             if(r.id && r.isAttached()) {
-                if(!highestRatedResource || highestRatedResource.averageRating > r.averageRating) {
+                if(!highestRatedResource || r.averageRating > highestRatedResource.averageRating) {
                     highestRatedResource = r;
                 }
             }
@@ -467,7 +467,7 @@ class Observation extends DataObject {
             res = res
 		else 
 			res = null;//group?.icon(ImageType.ORIGINAL)
-            
+        println "Updating reprImage to ${res} ${res.fileName} ${res.url}" 
         this.reprImage = res;
     }
 
@@ -528,7 +528,7 @@ class Observation extends DataObject {
     String summary(Language userLanguage=null) {
         String authorUrl = userGroupService.userGroupBasedLink('controller':'user', 'action':'show', 'id':this.author.id);
 		String desc = "Observed by <b><a href='"+authorUrl+"'>"+this.author.name.capitalize() +'</a></b>'
-        desc += " at <b>'" + (this.placeName?.trim()?'':this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
+        desc += " at <b>'" + (this.placeName?.trim()?this.placeName?.trim():this.reverseGeocodedName) +"'</b>" + (this.fromDate ?  (" on <b>" +  this.fromDate.format('MMMM dd, yyyy')+'</b>') : "")+".";
         return desc
     }
 

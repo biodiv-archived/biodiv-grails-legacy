@@ -618,3 +618,6 @@ update dataset set attribution='';
 alter table dataset alter column attribution set  not null;
 
 
+#6thApr2016
+update field set sub_category ='Local Endemicity Geographic Entity' where id=64;
+update field set sub_category ='Local Distribution Geographic Entity' where id=61;

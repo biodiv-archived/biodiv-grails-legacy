@@ -376,8 +376,6 @@ class SpeciesUploadService {
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				sBulkUploadEntry?.writeLog(res.idSummary)
 				cleanUpGorm();
-				NamelistService.clearCOLNameFromMemory()
-				
 			}
 			
 			processNameCount += contentSubList.size()
@@ -386,9 +384,9 @@ class SpeciesUploadService {
 			}
 		}
 		
-		Species.withNewTransaction { status ->
+		//Species.withNewTransaction { status ->
 			sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
-		}
+		//}
 		
 		log.info "================================ LOG ============================="
 		println  converter.getLogs()
@@ -437,22 +435,22 @@ class SpeciesUploadService {
 					String currSpeciesName = converter.fetchSpeciesName(speciesElement)
 					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping"
 					sb.append(currSpeciesName)
-					Species.withNewTransaction { status ->
+					//Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
 						if(s){
 							species.add(s)
 							noOfInsertions++;
 							sb.append("|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)
 						}
-					}
+					//}
 				}
 			}else{
 				for(Node speciesElement : speciesElements) {
-					Species.withNewTransaction { status ->
+					//Species.withNewTransaction { status ->
 						Species s = converter.convertSpecies(speciesElement)
 						if(s)
 							species.add(s);
-					}
+					//}
 				}
 				noOfInsertions += saveSpecies(species);
 			}
@@ -505,9 +503,9 @@ class SpeciesUploadService {
 		int noOfInsertions = 0;
 		long startTime = System.currentTimeMillis();
 		
-		Species.withNewTransaction { status ->		
+		//Species.withNewTransaction { status ->		
 			noOfInsertions += saveSpeciesBatch(species);			
-		}
+		//}
 		log.info "Time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		log.info "Number of species that got added : ${noOfInsertions}"
 		return noOfInsertions;
@@ -947,7 +945,9 @@ class SpeciesUploadService {
 		}
 		
 		sFields.removeAll(sFieldToDelete)
-		
+	
+        s.taxonConcept.speciesId = null;
+        s.taxonConcept.save();
 		//removing taxonomy hirarchy if added due to this upload
 		List taxonReg = TaxonomyRegistry.withCriteria(){
 			and{
@@ -983,10 +983,10 @@ class SpeciesUploadService {
 	
 	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
 		try{
-			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
-				reco.taxonConcept = null
-				reco.save(flush:true)
-			}
+//			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
+//				reco.taxonConcept = null
+//				reco.save(flush:true)
+//			}
 //			CommonNames.findAllByTaxonConcept(s.taxonConcept).each { cn ->
 //				cn.delete()
 //			}

@@ -50,7 +50,7 @@
             <i class="pull-left icon-share-alt"></i>
             </g:else>
                 <div class="value">
-                    <span class="stats_number" title="No of Observations">${Observation.countByDataset(datasetInstance)}</span>
+                    <span class="stats_number" title="No of Observations">${Observation.countByDatasetAndIsDeleted(datasetInstance, false)}</span>
                     <div><g:link class="btn btn-small btn-primary" url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
                     View All
                     </g:link></div>

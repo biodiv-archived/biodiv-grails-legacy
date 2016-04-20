@@ -20,10 +20,10 @@
 <g:if test="${!activeFilters.isChecklistOnly}">
 	<div class="btn-group pull-right button-bar">
         <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small ${styleviewcheck?'active':''}">
-        	<i class="icon-th-list"></i>List
+        	<i class="icon-th-list"></i>${g.message(code:'default.instance.list')}
         </a>
        <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small ${!styleviewcheck?'active':''}">
-       		<i class="icon-th"></i>Grid
+       		<i class="icon-th"></i>${g.message(code:'default.instance.grid')}
        </a>
     </div>
 </g:if>

@@ -165,8 +165,8 @@ class NamesIndexerService {
 		//calculating weight
 		int wt = 0
 		wt+= (reco.acceptedName?5:0)
-		wt+= ((reco.acceptedName && reco.acceptedName.speciesId)?5:0)
-		wt+= (!synName?3:0)
+		wt+= ((reco.acceptedName && reco.acceptedName.speciesId)?10:0)
+		wt+= ((reco.taxonConcept && (reco.taxonConcept == reco.acceptedName))?20:0)
 		
 		Record r = new Record(recoId:reco.id, originalName:normName, acceptedName:acceptedName, synName:synName, isScientificName:reco.isScientificName, languageId:reco.languageId, icon:icon, wt:wt)
 		return r

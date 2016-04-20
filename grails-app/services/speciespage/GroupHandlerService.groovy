@@ -129,7 +129,7 @@ class GroupHandlerService {
                     taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
                 }
                 println taxonConcepts
-                TaxonomyDefinition.withNewTransaction {
+               // TaxonomyDefinition.withNewTransaction {
                     taxonConcepts.each { taxonConceptRow ->
                         def taxonConcept = TaxonomyDefinition.get(taxonConceptRow.id);
                         //if(!taxonConcept.group && 
@@ -145,7 +145,7 @@ class GroupHandlerService {
                         count = 0;
                         log.info "Updated group for taxonConcepts ${noOfUpdations}"
                     }
-                }
+                //}
 
             } catch(Exception e) {
                 println e.printStackTrace();

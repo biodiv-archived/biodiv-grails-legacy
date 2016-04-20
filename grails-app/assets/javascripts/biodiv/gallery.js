@@ -99,7 +99,7 @@ function initializeGallery(result,domainObj){
                 });
             }
 
-            update_imageAttribute(photo,$('.image_info'),index,result.dataset);
+            update_imageAttribute(photo,$('.image_info'),index,result.dataset, result.parent, result.parentId);
         });
 
         if(isAudio.length >= 1){
@@ -109,9 +109,9 @@ function initializeGallery(result,domainObj){
                 $('#resourceTabs').after('<div class="audio_container" style="height:110px;"></div>');        
             }
 
-            $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url'].replace('biodiv/','biodiv/observations/')+'" type="audio/mpeg"></audio>');
+            $('.audio_container').html('<audio class="audio_cls" controls style="padding: 8px 0px 0px 0px;width: 100%;"><source src="'+isAudio[0]['url']+'" type="audio/mpeg"></audio>');
             $.each(isAudio, function (index, resource) {
-                $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index,result.dataset));
+                $('.audio_container').append(update_imageAttribute(resource,$('.audio_container'),index,result.dataset, result.parent, result.parentId));
             });
             $('.audio_container div').first().show();
         }
@@ -120,14 +120,14 @@ function initializeGallery(result,domainObj){
             var audio_playlist = '<ul id="playlist" style="padding: 5px 0px 2px 0px;margin: 0px;">';
             $.each(isAudio, function (index, audio) {
                 audio_playlist += '<li class="active" style="display: inline;">';
-                audio_playlist += '<a href="'+audio.url.replace('biodiv/','biodiv/observations/')+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
+                audio_playlist += '<a href="'+audio.url+'" class="btn btn-small btn-success" rel="'+index+'"  >Audio '+index+'</a>';
                 audio_playlist += '</li>';
             });
             audio_playlist += '</ul>';
             if(domainObj == 'observation') {
                 $('.audio_container').css('height','150px');
             }else{
-                $('.audio_container').css('height','140px')
+                $('.audio_container').addClass('audio_multi');
             }
             $('.audio_container').prepend(audio_playlist);
             audioInit();        
@@ -146,6 +146,7 @@ function initializeGallery(result,domainObj){
                 carousel: true, 
                 titleElement: 'h6',
                 youTubeClickToPlay: false,
+                preloadRange:1,
                 onopen: function () {
                     // Callback function executed when the Gallery is initialized.
                     $('#gallerySpinner').hide();
@@ -173,9 +174,10 @@ function initializeGallery(result,domainObj){
         });
 }
 
-function update_imageAttribute(resource,ele,index,defaultThumb){
+function update_imageAttribute(resource,ele,index,defaultThumb, parent, parentId){
     var output = '';
-    var resourceType = resource.type.toLowerCase();  
+    var resourceType = resource.type.toLowerCase();
+    var media_var = (resourceType == 'image')?'Image':'Media';
 
     output += '<div class="row-fluid '+resourceType+'Attr '+resourceType+'Attr_'+index+'" style="display:none;">';
     output += '<div>';
@@ -214,7 +216,7 @@ function update_imageAttribute(resource,ele,index,defaultThumb){
 
     if(resource.url && resource.url !=''){
         output += '<div class="conts_wrap_line">';
-        output += '<a href="'+resource.url+'" target="_blank"><b>View image source</b> </a>';
+        output += '<a href="'+resource.url+'" target="_blank"><b>View '+media_var+' source</b> </a>';
         output += '</div>';
     }
     output += '</div>';
@@ -229,6 +231,8 @@ function update_imageAttribute(resource,ele,index,defaultThumb){
     output += '</a>';
     output += '<div class="rating_form">';
     output += '<form class="ratingForm" method="get" title="Rate it">';
+    output += '<input type="hidden" name="parent" value="'+parent+'"/>';
+    output += '<input type="hidden" name="parentId" value="'+parentId+'"/>';
     output += '<span class="star_gallery_rating" title="Rate" data-score="'+resource.averageRating+'" data-input-name="rating" data-id="'+resource.id+'" data-type="resource" data-action="like" >';
     output += '</span>';
     output += '<div class="noOfRatings">'; 
@@ -304,7 +308,7 @@ $(document).ready (function() {
     $(document).on('click','.license .slideUp',function(){
         if($(this).hasClass('open')){
             $(this).removeClass('open').addClass('close').removeClass('icon-chevron-down').addClass('icon-chevron-up');
-            $('.image_info').css('height','55px');
+            $('.image_info').css('height','40px');
         }else{
             $(this).addClass('open').removeClass('close').removeClass('icon-chevron-up').addClass('icon-chevron-down');
             $('.image_info').css('height','auto');
