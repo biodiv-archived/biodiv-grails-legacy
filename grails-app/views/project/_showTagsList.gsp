@@ -8,7 +8,7 @@ def action = action?action:'browser'
 	<g:if test="${instance?.tags}">        
 		<g:each in="${instance.tags}">
 			<li class="tagit-choice" style="padding:0 5px;">
-				${it}
+				${raw(it)}
 			</li>
 		</g:each>		
 	</g:if>

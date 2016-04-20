@@ -1,5 +1,4 @@
 <%@ page import="species.utils.Utils"%>
-
 <div class="sidebar_section">
     <h5><g:message code="default.species.distribution.label" /></h5>
     <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
@@ -7,15 +6,15 @@
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td colspan="2">
-            <g:if test="${observationInstance.geoPrivacy}">
+            <g:if test="${documentInstance.geoPrivacy}">
                 <g:message code="default.geoprivacy.enabled.label" />
             </g:if>
             <g:else>
-                <g:if test="${observationInstance.placeName != ''}">
-                    <g:set var="location" value="${observationInstance.placeName}"/>
+                <g:if test="${documentInstance.placeName != ''}">
+                    <g:set var="location" value="${documentInstance.placeName}"/>
                 </g:if>
                 <g:else>
-                    <g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
+                    <g:set var="location" value="${documentInstance.reverseGeocodedName}"/>
                 </g:else>
                 <div class="value ellipsis multiline" title="${location}">
                     ${location}
@@ -25,26 +24,19 @@
         </tr>
         <tr>
             <td colspan="2">
-                <div title="${observationInstance.locationScale?.value()}"> ${observationInstance.locationScale?.value()} </div>
+                <div title="${documentInstance.locationScale?.value()}"> ${documentInstance.locationScale?.value()} </div>
         </tr>    
         <tr>
             <td colspan="2">
                 <%
                 def latitude='',longitude='',areas='';
-                def geoPrivacyAdjustment = observationInstance.fetchGeoPrivacyAdjustment()
-                def checklistObvPoints
+                def geoPrivacyAdjustment = documentInstance.fetchGeoPrivacyAdjustment()
 
-                if(observationInstance.isChecklist) {
-                    checklistObvPoints = observationInstance.fetchObservationsLatLongs()
-                }
-                latitude = observationInstance.latitude + geoPrivacyAdjustment
-                longitude = observationInstance.longitude + geoPrivacyAdjustment
+                latitude = documentInstance.latitude + geoPrivacyAdjustment
+                longitude = documentInstance.longitude + geoPrivacyAdjustment
 
-                if(observationInstance?.topology){ 
-                    if(observationInstance.isChecklist)
-                        areas = Utils.GeometryAsWKT(observationInstance?.topology)
-                    else
-                        areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
+                if(documentInstance?.topology){ 
+                   areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
                 } else if(params.areas) {
                     areas = params.areas
                 }
@@ -62,36 +54,10 @@
                 
             </td>
         </tr>
-        <g:each in="${observationInstance.getObservationFeatures()}" var="feature">
-        <tr>
-            <td class=" feature_icon ${feature.key.toLowerCase().replaceAll(/\s+/,'_')}" title="${feature.key}"></td>
-            <td>${feature.value}</td>
-        </tr>
-        </g:each>
+       
     </table>
 </div>  
 
-<g:if test="${!observationInstance.isChecklist && observationInstance.maxVotedReco}">
-    <div class="sidebar_section tile temporalDist">
-        <h5><g:message code="default.temporal.distribution.label" /></h5>
-        <div id="temporalDist" style="height:108px;">
-        </div>
-        <ul>
-            <li><g:message code="default.month.jan" /></li>
-            <li><g:message code="default.month.feb" /></li>
-            <li><g:message code="default.month.mar" /></li>
-            <li><g:message code="default.month.apr" /></li>
-            <li><g:message code="default.month.may" /></li>
-            <li><g:message code="default.month.jun" /></li>
-            <li><g:message code="default.month.jul" /></li>
-            <li><g:message code="default.month.aug" /></li>
-            <li><g:message code="default.month.sep" /></li>
-            <li><g:message code="default.month.oct" /></li>
-            <li><g:message code="default.month.nov" /></li>
-            <li><g:message code="default.month.dec" /></li>
-        </ul>
-    </div>
-</g:if>
 
 <asset:script>
 
@@ -131,12 +97,6 @@
         loadGoogleMapsAPI(function() {
             var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
             mapLocationPicker.initialize();
-            <g:if test="${!observationInstance.isChecklist}">
-                showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()}, mapLocationPicker);
-            </g:if>
-             <g:if test="${observationInstance.isChecklist}">
-                markChecklistObvs(${checklistObvPoints}, mapLocationPicker);
-            </g:if>
 
             var icon;
             
@@ -149,10 +109,10 @@
                 color: 'red'
             });
 
-            if(${observationInstance.geoPrivacy}){
-                icon = (${observationInstance.isChecklist})?mapLocationPicker.geoPrivacyChecklistIcon:mapLocationPicker.geoPrivacyPointIcon;
+            if(${documentInstance.geoPrivacy}){
+                icon = mapLocationPicker.geoPrivacyPointIcon;
             } else {
-                icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;
+                icon = ptIcon;
             }
 
             mapLocationPicker.initArea(false, undefined, undefined, $("#areas").val(), {icon:icon, layer:'Current Observation' });
@@ -160,9 +120,6 @@
             if(mapLocationPicker.searchMarker)
                 mapLocationPicker.map.panTo(mapLocationPicker.searchMarker.getLatLng());
 
-            <g:if test="${!observationInstance.isChecklist}">
-                mapLocationPicker.resetMap();
-            </g:if>
         });
     });
 </asset:script>
