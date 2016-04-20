@@ -622,7 +622,7 @@ def moveCleanNameSpeciesToGroup(groupId){
 	
 	sql.rows(q).each{
 		def speciesId = it.id
-		String s = "insert into user_group_species values (" + speciesId + ", " + groupId + ") ;
+		String s = "insert into user_group_species values (" + speciesId + ", " + groupId + ");"
 		println s
 		sql.execute(s);
 	}
