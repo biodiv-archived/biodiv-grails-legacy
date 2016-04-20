@@ -72,12 +72,14 @@ class Document extends DataObject implements Comparable {
 	String notes // <=== description
 	String contributors;
 	String attribution;
-	
+	String externalurl
 	String doi
+	String placeName
 	
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
+
     //String scientificNames;
 	//XXX uncmment it before migration
 	//Coverage coverage //<== extending metadata now	//Coverage Information
@@ -94,13 +96,8 @@ class Document extends DataObject implements Comparable {
 	
 	static constraints = {
 		title nullable:false, blank:false
-		uFile validator : {val, obj -> 
-			if(!(val || obj.uri))
-				return 'fileOrUrl.validator.invalid' 
-		},nullable:true
-		uri validator : {val, obj -> 
-			val || obj.uFile
-		},nullable:true
+		uFile nullable:true
+		uri nullable:true
 		contributors nullable:true
 		attribution  nullable:true	
 		sourceHolderId nullable:true
@@ -117,6 +114,8 @@ class Document extends DataObject implements Comparable {
 		fromDate(nullable: true)
 		group nullable:true
 		habitat nullable:true
+		externalurl nullable:false,blank:false
+
 	}
 	
 	static hasMany = [userGroups: UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, docSciNames:DocSciName]
@@ -213,18 +212,21 @@ class Document extends DataObject implements Comparable {
 		Map nameValue = [:]
 		Map nameParseValues = [:]
 		Map nameId = [:]
+		Map primaryname = [:]
 		def c = DocSciName.createCriteria()
 			def results = c.list {
 			eq("document", this)
-		    order("displayOrder", "desc")
+		    order("primary_name", "desc")
 			}
 		def docSciNames = results ;//DocSciName.findAllByDocument(this)
 		docSciNames.each{ dsn ->
 		nameValue.put(dsn.scientificName,dsn.frequency)
 		nameParseValues.put(dsn.scientificName,dsn.canonicalForm)
 		nameId.put(dsn.scientificName,dsn.id)
+		primaryname.put(dsn.id,dsn.primary_name)
 		}
-		return [nameValues:nameValue, nameparseValue:nameParseValues, nameDisplayValues:nameId]
+
+		return [nameValues:nameValue, nameparseValue:nameParseValues, nameDisplayValues:nameId,primaryName:primaryname]
 
 	}
 

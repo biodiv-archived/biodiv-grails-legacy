@@ -12,6 +12,7 @@ class DocSciName {
 	String offsetValues;
 	String canonicalForm;
 	int displayOrder;
+	int primary_name
     TaxonomyDefinition taxonConcept;
 
 	static constraints = {

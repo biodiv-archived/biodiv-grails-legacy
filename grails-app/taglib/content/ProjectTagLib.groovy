@@ -20,7 +20,7 @@ class ProjectTagLib {
 	def showTagsCloud = {attrs, body->
 		def model = attrs.model
 		model.tags = documentService.getFilteredTagsByUserGroup(params.webaddress, model.tagType)
-		out << render(template:"/common/observation/showTagsCloudTemplate", model:model);
+		out << render(template:"/common/observation/showTagsCloudTemplate", model:model).decodeHTML();
 	}
 	
 }

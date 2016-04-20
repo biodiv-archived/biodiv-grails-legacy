@@ -6,11 +6,11 @@
     %>
     <div>
         <g:if test="${showFeatured}">
-
         <div class="featured_body">
         <div class="featured_title ellipsis"> 
             <div class="heading">
                 <g:link url="${uGroup.createLink(controller:'document', action:'show', id:documentInstance.id, 'pos':pos, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" name="l${pos}">
+                 ${showFeatured}
                 <span class="ellipsis">${documentInstance.title}</span>
                 </g:link>
             </div>
@@ -28,18 +28,101 @@
                    url = url+documentInstance?.uFile?.path  %>              
                 <iframe id="viewer" src = "${grailsApplication.config.grails.serverURL}/ViewerJS/index.html#${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
             </g:if>
-
-
+           
         <div class="prop">
             <span class="name"><g:message code="default.file.label" /></span>
             <div class="value">
 
                 <fileManager:displayFile
                 filePath="${ documentInstance?.uFile?.path}"
+                fileUrl=""
                 fileName="${ documentInstance?.title}"></fileManager:displayFile>
             </div>
         </div>
         </g:if>
+         <g:else>
+                 <% def extension = "pdf" %>
+            <g:if test="${extension.toUpperCase() == 'PDF' && (showPDFViewer != null)?showPDFViewer:true}">
+                <% url = documentInstance.externalurl %>              
+                <iframe id="viewer" src = "${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
+                </g:if>
+
+                
+                                <div class="sidebar_section">
+                    <a class="speciesFieldHeader" href="#coverageInfo"
+                        data-toggle="collapse"><h5><g:message code="link.coverage.information" /></h5></a>
+                    <div id="coverageInfo" class="speciesField collapse in">
+                        <table>
+
+                            <g:if test="${documentInstance?.speciesGroups}">
+
+
+                                <tr>
+                                    <td class="prop"><span class="grid_3 name"><g:message code="default.species.groups.label" /></span></td>
+                                    <td class="linktext"><g:each
+                                            in="${documentInstance.speciesGroups}"
+                                            var="speciesGroup">
+                                            <button
+                                                class="btn species_groups_sprites ${speciesGroup.iconClass()} active"
+                                                id="${"group_" + speciesGroup.id}"
+                                                value="${speciesGroup.id}" title="${speciesGroup.name}"></button>
+                                        </g:each></td>
+                                </tr>
+                            </g:if>
+                            <g:if test="${documentInstance?.habitats}">
+                                <tr>
+                                    <td class="prop"><span class="name"><g:message code="default.habitats.label" /></span></td>
+
+                                    <td class="linktext"><g:each
+                                            in="${documentInstance.habitats}" var="habitat">
+                                            <button
+                                                class="btn habitats_sprites ${habitat.iconClass()} active"
+                                                id="${"habitat_" + habitat.id}" value="${habitat.id}"
+                                                title="${habitat.name}"
+                                                data-content="${message(code: 'habitat.definition.' + habitat.name)}"
+                                                rel="tooltip" data-original-title="A Title"></button>
+                                        </g:each></td>
+                                </tr>
+                            </g:if>
+
+                            <g:if test="${documentInstance?.placeName || documentInstance?.reverseGeocodedName}">
+                                <tr>
+
+                                                                    <td class="prop"><span class="name">
+                                                                           <g:message code="default.place.label" /> </span></td>
+                                                                    <td>
+                                                                        
+                                                                        <g:if test="${documentInstance?.placeName}">
+                                                                        <g:set var="location" value="${documentInstance.placeName}"/>
+                                                                        </g:if>
+                                                                        <g:else>
+                                                                        <g:set var="location" value="${documentInstance.reverseGeocodedName}"/>
+                                                                        </g:else>
+
+                                                                        <div class="value ellipsis multiline" title="${location}">
+                                                                            ${location}
+                                                                        </div>
+                                        </td>
+                                </tr>
+                            </g:if>
+                            
+                             
+<div class="signature clearfix thumbnail pull-right">
+                             <sUser:showUserTemplate
+                            model="['userInstance':documentInstance.author, 'userGroup':userGroup]" />
+                            </div>
+                        </table>
+                        
+                    </div>
+                </div>
+                  <div class="sidebar_section">
+        <h5><g:message code="Details" /></h5>
+                <div class="prop">
+            <span class="name"><g:message code="default.file.label" /></span>
+            <div class="value">  <a href="${url}"><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>${raw(documentInstance?.title)}</a></div>
+            </div>
+          
+            </g:else>
 
         <g:if test="${documentInstance.uri}">
         <div class="prop">
@@ -68,12 +151,10 @@
               clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+documentInstance?.language?.threeLetterCode.toUpperCase()+'</a>';
             %>
         </g:if>
-                
-
         <g:if
         test="${documentInstance?.notes && documentInstance?.notes.trim() != ''}">
         <div class="prop">
-            <span class="name"><g:message code="default.description.label" /></span>
+            <span class="name align-center"><g:message code="default.description.label" /></span>
             <div class="notes_view linktext value">
                 ${raw(clickcontentVar)}
                 <div style="display:${styleVar}">
@@ -82,6 +163,9 @@
             </div>
         </div>
         </g:if>
+        </div>
+          <div class="sidebar_section">
+        <h5><g:message code="Metadata" /></h5>
         <g:if test="${documentInstance?.contributors}">
         <div class="prop">
             <span class="name"><g:message code="default.contributors.label" /></span>
@@ -110,7 +194,7 @@
             </div>
         </div>
         </g:if>
-
+        
         <g:if test="${showDetails && documentInstance?.fetchSource()}">
         <div class="prop">
             <span class="name"><g:message code="default.source.label" /></span>
@@ -140,9 +224,9 @@
                 model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
             </div>           
         </div>
-
         </g:if>
         </g:else>
+    </div>
     </div>
 </div>
 
