@@ -165,13 +165,15 @@
                 color: grey;
                 line-height: 23px;
             }
-            .imagesListWrapper ul {
+            .imagesListWrapper .imagesList {
                 width:100000px;
                 white-space:nowrap !important;
             }
-            .imagesListWrapper ul li {
-                display : inline !important;
-                z-index:1;
+            .imagesListWrapper .imagesList .addedResource {
+                display : inline !important;                
+            }
+            .resources .addedResource input[type="text"]{
+                float:left;
             }
             li.group_option span, li.habitat_option span {
                 padding: 0px;
@@ -194,6 +196,7 @@
             }
             .propagateLicense .license_div {
                 margin: 0 auto !important;
+                width:100%;
             }
             .propagateLicense a{
                 height:32px !important;
@@ -215,10 +218,7 @@
             .sortMediaOnExif {
                 margin-right:2px;
                 margin-top:2px;
-            }
-            .license_div{
-                width:100%;
-            }
+            }            
             .groups_super_div, .habitat_super_div{
                 width: 220px;
             }

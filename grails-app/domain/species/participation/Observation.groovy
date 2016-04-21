@@ -511,14 +511,14 @@ class Observation extends DataObject {
 	}
 	
 	String fetchSpeciesCall() {
-		if(maxVotedReco.taxonConcept && maxVotedReco.isScientificName) { //sciname from dirty list
+		if(maxVotedReco?.taxonConcept && maxVotedReco?.isScientificName) { //sciname from dirty list
 
             if(maxVotedReco.taxonConcept.status=="SYNONYM" && maxVotedReco.isScientificName) {
            		return maxVotedReco.taxonConcept.name+'- Synonym of '+this.maxVotedReco.taxonConcept.normalizedForm;
            	}           
             return maxVotedReco.taxonConcept.normalizedForm
         } else //common name
-	        return maxVotedReco ? maxVotedReco.name : "Unknown"
+	        return maxVotedReco ? maxVotedReco?.name : "Unknown"
     }
 
 	String title() {
