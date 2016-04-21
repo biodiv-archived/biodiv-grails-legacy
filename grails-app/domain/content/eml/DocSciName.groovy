@@ -14,6 +14,7 @@ class DocSciName {
 	int displayOrder;
 	int primary_name
     TaxonomyDefinition taxonConcept;
+    boolean isDeleted;
 
 	static constraints = {
 		offsetValues (size:0..2000)

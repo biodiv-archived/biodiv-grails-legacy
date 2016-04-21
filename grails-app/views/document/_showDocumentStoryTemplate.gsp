@@ -43,7 +43,7 @@
          <g:else>
                  <% def extension = "pdf" %>
             <g:if test="${extension.toUpperCase() == 'PDF' && (showPDFViewer != null)?showPDFViewer:true}">
-                <% url = documentInstance.externalurl %>              
+                <% url = documentInstance.externalUrl %>              
                 <iframe id="viewer" src = "${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
                 </g:if>
 

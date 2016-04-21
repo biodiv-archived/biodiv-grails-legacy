@@ -72,7 +72,7 @@ class Document extends DataObject implements Comparable {
 	String notes // <=== description
 	String contributors;
 	String attribution;
-	String externalurl
+	
 	String doi
 	String placeName
 	
@@ -90,6 +90,7 @@ class Document extends DataObject implements Comparable {
 	//boolean deleted
 	
 	boolean agreeTerms = false	
+
 	
 	//static transients = [ 'isDeleted' ]
 
@@ -114,7 +115,7 @@ class Document extends DataObject implements Comparable {
 		fromDate(nullable: true)
 		group nullable:true
 		habitat nullable:true
-		externalurl nullable:false,blank:false
+		externalUrl nullable:true,blank:false
 	}
 	
 	static hasMany = [userGroups: UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, docSciNames:DocSciName]
