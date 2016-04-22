@@ -63,6 +63,9 @@
                 height:auto;
                 background-color: #a6dfc8;
             }
+            .miniObvWrapper input[type="text"]{
+                width:133px;
+            }
             .column {
                 width:221px;
                 float: left;
@@ -170,7 +173,8 @@
                 white-space:nowrap !important;
             }
             .imagesListWrapper .imagesList .addedResource {
-                display : inline !important;                
+                display : inline !important;   
+                z-index:15;             
             }
             .resources .addedResource input[type="text"]{
                 float:left;
