@@ -39,6 +39,7 @@ class BootStrap {
 	def emailConfirmationService
 	def userGroupService
     def utilsService
+    def speciesTraitsService;
 	/**
 	 * 
 	 */
@@ -54,6 +55,7 @@ class BootStrap {
         initJSONMarshallers();
         initCaches();
         initBannerMessageMap();
+        speciesTraitsService.init();
        
   	}
 

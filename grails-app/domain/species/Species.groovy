@@ -46,6 +46,7 @@ class Species implements Rateable {
     def speciesUploadService;
     def speciesPermissionService;
     def utilsService;
+    def speciesTraitsService;
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -522,5 +523,7 @@ class Species implements Rateable {
         this.reprImage = res;
     }
 
-
+    List getFacts() {
+        return speciesTraitsService.listFacts(this.id);
+    }
 }

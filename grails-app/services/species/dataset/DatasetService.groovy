@@ -403,14 +403,14 @@ class DatasetService extends AbstractMetadataService {
     }
 
     private void importDWCObservations(Dataset dataset, File directory, File uploadLog) {
-        DwCObservationImporter obvImporter = DwCObservationImporter.getInstance();
-        Map o = importer.importObservationData(directory.getAbsolutePath(), uploadLog);
+        DwCObservationImporter importer = DwCObservationImporter.getInstance();
+        Map o = importer.importData(directory.getAbsolutePath(), uploadLog);
         importObservations(dataset, directory, importer, uploadLog);
     }
 
     private void importObservations(Dataset dataset, File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File uploadLog) {
         FileObservationImporter importer = FileObservationImporter.getInstance();
-        Map o = importer.importObservationData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
+        Map o = importer.importData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
         importObservations(dataset, observationsFile.getParentFile(), importer, o.mediaInfo, uploadLog);
     }
 

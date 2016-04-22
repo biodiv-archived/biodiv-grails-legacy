@@ -56,6 +56,7 @@ class SpeciesController extends AbstractObjectController {
     def messageSource;
     def namelistService;
     def sessionFactory;
+    def speciesTraitsService;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -1795,5 +1796,53 @@ render speciesInstanceList;
 
         println "=====================++++"
     }
-   
+  
+    @Secured(['ROLE_ADMIN'])
+    def uploadFacts () {
+
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def saveFacts() {
+        params.locale_language = utilsService.getCurrentLanguage(request);
+        def result = speciesTraitsService.saveFacts(params)
+        if(result.success){
+            withFormat {
+                html {
+                    redirect(controller:'species', action: "facts")
+                }
+                json {
+                    render result as JSON 
+                }
+                xml {
+                    render result as XML
+                }
+            }
+
+        } else {
+            withFormat {
+                html {
+                    //flash.message = "${message(code: 'error')}";
+                    render(controller:'species', view: "uploadFacts", model: [])
+                }
+                json {
+                    result.remove('instance');
+                    render result as JSON 
+                }
+                xml {
+                    result.remove('instance');
+                    render result as XML
+                }
+            }
+        }
+
+    }
+
+    def facts() {
+        if(params.id)
+            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(params.id.toLong(), params.trait), 'traitsList':speciesTraitsService.listTraits()]);
+        else
+            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(null, params.trait), 'traitsList':speciesTraitsService.listTraits()]);
+
+    }
 }

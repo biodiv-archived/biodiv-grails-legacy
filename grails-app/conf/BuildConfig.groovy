@@ -65,6 +65,7 @@ grails.project.dependency.resolution = {
         mavenRepo "http://repo.marketcetera.org/maven/"
         mavenRepo "http://maven.restlet.org/"
         //mavenRepo "http://localhost:8081/artifactory/plugins-releases-local/"
+        mavenRepo "https://repository.apache.org/content/repositories/releases/"
     }
 
     dependencies {
@@ -134,6 +135,16 @@ grails.project.dependency.resolution = {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
         compile 'com.esotericsoftware:kryo-shaded:3.0.3'
+        compile(group: 'org.apache.jena', name: 'jena-tdb', version: '1.1.2') {
+            excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
+        }
+
+        //compile 'org.apache.jena:jena-csv:1.0.1'
+        /*compile ('com.github.albaker:GroovySparql:0.9.0') {
+            excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
+        }*/
+
+
     }
 
     plugins { 
@@ -202,7 +213,7 @@ grails.project.dependency.resolution = {
 //        runtime ":zipped-resources:1.0"
         compile ":grails-ant:0.1.3"
         compile "org.grails.plugins:twitter-bootstrap:2.3.2.2"
-        compile "org.grails.plugins:asset-pipeline:2.6.10"
+        compile "org.grails.plugins:asset-pipeline:2.7.4"
         //compile ":redis:1.6.6"
         compile "org.grails.plugins:app-info:1.1.1"
         compile "org.grails.plugins:app-info-hibernate:0.4.1"
