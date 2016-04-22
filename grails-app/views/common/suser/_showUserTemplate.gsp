@@ -1,7 +1,7 @@
 <%@page import="species.groups.UserGroup"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
-<div class="signature clearfix thumbnail">
+<div class="signature clearfix">
 		<div class="figure user-icon pull-left" style="display:table;height:32px;">
 			<a href="${uGroup.createLink( 'controller':'user', action:'show', id:userInstance.id, userGroup:userGroup, 'userGroupWebaddress':userGroupWebaddress)}"> <img
 				src="${userInstance.profilePicture(ImageType.SMALL)}"

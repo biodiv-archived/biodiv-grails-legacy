@@ -621,3 +621,7 @@ alter table dataset alter column attribution set  not null;
 #6thApr2016
 update field set sub_category ='Local Endemicity Geographic Entity' where id=64;
 update field set sub_category ='Local Distribution Geographic Entity' where id=61;
+
+#22ndApr2016
+alter table doc_sci_name add column primary_name integer not null default 0;
+alter table doc_sci_name add column is_deleted boolean not null default 'false';

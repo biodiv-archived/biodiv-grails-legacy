@@ -57,7 +57,7 @@ String status = docId?.status
                         link = link.replace("%5D", "");
                         }
                         %>
-                        
+                        <div class="editNameClick_${nameId[sciName.key]}">
                         <g:if test="${speciesObjId}">
                         <a class="species-page-link" style="font-style: normal;" href= "${link}">${sciName.key}</a>
                        <!-- <sUser:permToReorderDocNames model="['documentInstance':documentInstance]">
@@ -72,6 +72,7 @@ String status = docId?.status
                         //</sUser:permToReorderDocNames> -->
                         ${sciName.key}
                         </g:else>
+                        </div>
                         <div class="nameEdit"> 
                         <input type=text name="txtSciName" id="txtSciName_${nameId[sciName.key]}" class="txtSciName" value="${sciName.key}" />
                         </div>
