@@ -103,10 +103,7 @@ ${location}
 </td>
 </tr>
 </g:if>       
-<div class="signature clearfix thumbnail pull-right">
-<sUser:showUserTemplate
-model="['userInstance':documentInstance.author, 'userGroup':userGroup]" />
-</div>
+
 </table>
 
 </div>
@@ -218,9 +215,14 @@ ${sourceObj}</a>
 <div class="value">
 <g:render template="/project/showTagsList"
 model="['instance': documentInstance, 'controller': 'document', 'action':'browser']" />
+</div>
+<div class="signature clearfix thumbnail pull-right">
+<sUser:showUserTemplate
+model="['userInstance':documentInstance.author, 'userGroup':userGroup]" />
 </div>           
 </div>
 </g:if>
+
 </g:else>
 </div>
 
