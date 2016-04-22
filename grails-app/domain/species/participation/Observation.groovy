@@ -211,6 +211,7 @@ class Observation extends DataObject {
         fromDate nullable:false
 		agreeTerms nullable:true
 		checklistAnnotations nullable:true
+		locationScale nullable:true
         externalDatasetKey nullable:true
         lastCrawled nullable:true
         catalogNumber nullable:true
@@ -502,15 +503,22 @@ class Observation extends DataObject {
         if(maxVotedReco.taxonConcept && maxVotedReco.isScientificName) { //sciname from dirty list
 
             if(maxVotedReco.taxonConcept.status=="SYNONYM" && maxVotedReco.isScientificName) {
-           		return '<i>'+maxVotedReco.taxonConcept.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.normalizedForm+'</i>';
+           		return '<i>'+maxVotedReco.taxonConcept.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.italicisedForm+'</i>';
            	}           
-            return '<i>'+maxVotedReco.taxonConcept.normalizedForm+'</i>'
+            return '<i>'+maxVotedReco.taxonConcept.italicisedForm+'</i>'
         } else //common name
 		    return maxVotedReco.name
 	}
 	
 	String fetchSpeciesCall() {
-        return maxVotedReco ? maxVotedReco.name : "Unknown"
+		if(maxVotedReco?.taxonConcept && maxVotedReco?.isScientificName) { //sciname from dirty list
+
+            if(maxVotedReco.taxonConcept.status=="SYNONYM" && maxVotedReco.isScientificName) {
+           		return maxVotedReco.taxonConcept.name+'- Synonym of '+this.maxVotedReco.taxonConcept.normalizedForm;
+           	}           
+            return maxVotedReco.taxonConcept.normalizedForm
+        } else //common name
+	        return maxVotedReco ? maxVotedReco?.name : "Unknown"
     }
 
 	String title() {
