@@ -673,9 +673,8 @@ class DocumentService extends AbstractMetadataService {
 			return 
 		}
 		//other params
-		//println "author=================================" + SUser.findByEmail(m['user email'])
-		//println  "======================================="
-		document.author = springSecurityService.currentUser //SUser.findByEmail(m['user email'].trim())
+		println "author=================================" + SUser.findByEmail(m['user email'])
+		document.author =SUser.findByEmail(m['user email'].trim())//SUser.findByEmail(m['user email'].trim())
 		document.language=params.language
 		document.type = Document.fetchDocumentType(m['type'])
 		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
@@ -727,6 +726,7 @@ class DocumentService extends AbstractMetadataService {
 			documentInstance.setTags(tags)
 			
 			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
+			//println "==========User Group======================" + userGroupIds
 			userGroupIds = userGroupIds.collect { "" + it }
 			setUserGroups(documentInstance, userGroupIds);
 		}
@@ -880,7 +880,6 @@ class DocumentService extends AbstractMetadataService {
         int i = 0;
         def numOfDocs = documentInstanceList.size()
         println numOfDocs;
-        println "==============++++"
         while(i < numOfDocs) {
             DocumentTokenUrl.withNewTransaction { 
                 def instance = documentInstanceList.get(i)
