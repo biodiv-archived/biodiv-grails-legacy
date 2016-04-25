@@ -4,6 +4,7 @@
 .observation_story{width:auto;}
 .observation_story .prop .name {width:90px;}
 .observation_story .prop .width {margin:2px 0 2px 90px;}
+.thumbnail{height:150px;}
 .block-ellipsis {
   display: block;
   display: -webkit-box;

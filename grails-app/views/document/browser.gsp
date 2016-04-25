@@ -17,7 +17,6 @@
             tr.mainContent td {
                 word-break:break-word;
             }
-        .thumbnail .observation_story{margin-left:150px;}
         .prop .value{
         line-height: 20px;
         margin: 2px 0 2px 100px;

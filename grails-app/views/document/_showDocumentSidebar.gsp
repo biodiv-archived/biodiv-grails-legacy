@@ -17,7 +17,9 @@ String status = docId?.status
 
 %>
 <div  class="span4">
+<g:if test="${documentInstance.longitude!=76.658279 && documentInstance.latitude!=12.32112}">
 <g:render template="/document/showDocumentLocationTemplate" model="['documentInstance':documentInstance]"></g:render>
+</g:if>
     <div style = "clear:both; border:1px solid #CECECE;overflow:hidden"><h5> Taxa mentioned in this document </h5></div>
     <div id="gnrdscientificNamesList" class="sidebar_section pre-scrollable" style="clear:both; border:1px solid #CECECE;overflow:x">
         <table class="table table-bordered table-condensed table-striped ">
@@ -57,7 +59,7 @@ String status = docId?.status
                         link = link.replace("%5D", "");
                         }
                         %>
-                        
+                        <div class="editNameClick_${nameId[sciName.key]}">
                         <g:if test="${speciesObjId}">
                         <a class="species-page-link" style="font-style: normal;" href= "${link}">${sciName.key}</a>
                        <!-- <sUser:permToReorderDocNames model="['documentInstance':documentInstance]">
@@ -72,6 +74,7 @@ String status = docId?.status
                         //</sUser:permToReorderDocNames> -->
                         ${sciName.key}
                         </g:else>
+                        </div>
                         <div class="nameEdit"> 
                         <input type=text name="txtSciName" id="txtSciName_${nameId[sciName.key]}" class="txtSciName" value="${sciName.key}" />
                         </div>

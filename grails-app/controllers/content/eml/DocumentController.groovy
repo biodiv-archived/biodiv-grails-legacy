@@ -39,6 +39,7 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def save() {
+        params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
 		params.author = springSecurityService.currentUser;
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def documentInstance = documentService.create(params)
@@ -145,9 +146,10 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])	
 	def update() {
-		def documentInstance = Document.get(params.id)
+		def documentInstance = Document.get(params.id)        
         def msg = "";
 		if (documentInstance) {
+            params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
 			if (params.version) {
 				def version = params.version.toLong()
 				if (documentInstance.version > version) {
