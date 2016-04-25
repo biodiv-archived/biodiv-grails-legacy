@@ -63,7 +63,7 @@
                 height:auto;
                 background-color: #a6dfc8;
             }
-            .miniObvWrapper input[type="text"]{
+            .imageHolder input[type="text"]{
                 width:133px;
             }
             .column {
