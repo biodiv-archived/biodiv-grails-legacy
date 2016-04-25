@@ -589,4 +589,59 @@ class SpeciesTraitsService {
         List<TaxonomyDefinition> parentTaxon = speciesInstance.taxonConcept.parentTaxon();
         return parentTaxon.intersect(trait.taxon).size() > 0
     }
+
+    void loadTraitDefinitions(String file, def languageInstance=null) {
+        CSVReader reader = getCSVReader(new File(file))
+        String[] headers = reader.readNext();//headers
+
+        String[] row = reader.readNext();
+        while(row) {
+            Trait trait = new Trait();
+            headers.eachWithIndex { header, index ->
+                switch(header.toLowerCase()) {
+                    case 'name' : trait.name = row[index].trim(); break;
+                    case 'field' : trait.field = getField(row[index], languageInstance); break;
+                    case 'taxon' : trait.addToTaxon(getTaxon(row[index]); break;
+                    case 'valueConstraits' : trait.addToValueConstraints(getValueContraints(row[index])); break;
+                    case 'ontologyUrl' : trait.ontologyUrl = row[index].trim(); break;
+                    case 'description' : trait.description = row[index].trim(); break;
+                }
+            }
+            if(!trait.hasErrors() && !trait.save()) {
+                trait.errors.allErrors.each { log.error it }
+            }
+            row = reader.readNext();
+        }
+    }
+    
+    private Field getField(String string, languageInstance) {
+        String f[] = string.split('|');
+        Field field;
+        if(f.size() == 1) {
+            f = Field.findByLanguageAndConcept(languageInstance, f[0].trim());
+        } else if (f.size() == 2) {
+            f = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
+        } else  if (f.size() == 3) {
+            f = Field.findAByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
+        } 
+    }
+
+    private List<TaxonomyDefinition> getTaxon(String taxonList) {
+        List t = [];
+        taxonList.split(',').each {
+            def x = TaxonomyDefinition.read(Long.parseLong(it.trim()));
+            if(x)
+                t << x;
+        }
+        return t;
+    }
+
+    private List<ValueConstraint> getValueContraints(String valueConstraitsList) {
+        List t = [];
+        valueContraints.split(',').each {
+            def x = ValueConstraint.getEnum(it.trim())
+            if(x) t << x;
+        }
+        return t;
+    }
 }

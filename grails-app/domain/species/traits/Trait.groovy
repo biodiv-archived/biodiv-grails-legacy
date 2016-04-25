@@ -42,7 +42,36 @@ class Trait {
            }
            return true;
        }
-	}
+
+       static ValueConstraint getEnum(value){
+           if(!value) return null;
+
+           if(value instanceof ValueConstraint)
+               return value
+
+               value = value.toUpperCase().trim()
+               switch(value){
+                   case 'CATEGORICAL':
+                   return ValueConstraint.CATEGORICAL
+                   case 'INTEGER':
+                   return ValueConstraint.INTEGER
+                   case 'FLOAT':
+                   return ValueConstraint.FLOAT
+                   case 'TEXT':
+                   return ValueConstraint.TEXT
+                   case 'BOOLEAN':
+                   return ValueConstraint.BOOLEAN
+                   case 'ORDERED':
+                   return ValueConstraint.ORDERED
+                   case 'RANGE':
+                   return ValueConstraint.RANGE
+                   case 'DATE':
+                   return ValueConstraint.DATE
+                   default:
+                   return null;	
+               }
+       }
+    }
 
     String name;
     Field field;
