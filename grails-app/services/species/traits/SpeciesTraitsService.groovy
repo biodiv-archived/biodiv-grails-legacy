@@ -23,6 +23,8 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import species.traits.Trait;
 import species.Species;
+import species.Field;
+import species.traits.Trait.ValueConstraint;
 
 class SpeciesTraitsService {
 
@@ -601,7 +603,7 @@ class SpeciesTraitsService {
                 switch(header.toLowerCase()) {
                     case 'name' : trait.name = row[index].trim(); break;
                     case 'field' : trait.field = getField(row[index], languageInstance); break;
-                    case 'taxon' : trait.addToTaxon(getTaxon(row[index]); break;
+                    case 'taxon' : trait.addToTaxon(getTaxon(row[index])); break;
                     case 'valueConstraits' : trait.addToValueConstraints(getValueContraints(row[index])); break;
                     case 'ontologyUrl' : trait.ontologyUrl = row[index].trim(); break;
                     case 'description' : trait.description = row[index].trim(); break;

@@ -45,7 +45,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
     }
 
     //dwcObvMapping[url for the field from standard] = [field:IBP field name, order: display order for the field on obv show]
-    protected void readHeaders(File uploadLog=null) {
+    protected String[] readHeaders(File uploadLog=null) {
         //read dwcObvMapping
         InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
         dwcObvMapping = [:];
