@@ -763,8 +763,8 @@ class ObvUtilService {
                 success=true;
 
 				params.obvId = observationInstance.id
-                activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                
+				params.author = observationInstance.author
+				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
@@ -838,7 +838,7 @@ class ObvUtilService {
             utilsService.benchmark('RecommendationVote.findByAuthorAndObservation') {
 		        recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
             }
-            if(!recommendationVoteInstance) {
+		    if(!recommendationVoteInstance) {
 			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
             } else {
                 recommendationVoteInstance.givenSciName = params.recoName;

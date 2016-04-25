@@ -7,7 +7,13 @@
 <g:set var="title" value="${raw(documentInstance.title)}"/>
 <g:set var="description" value="${Utils.stripHTML(documentInstance.notes?:'') }" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
+<style>
+.sidebar_section{
+margin-bottom: 0;
+}
+</style>
 </head>
+
 <body>
     <div class="span12">
         <g:if test="${documentInstance}">
