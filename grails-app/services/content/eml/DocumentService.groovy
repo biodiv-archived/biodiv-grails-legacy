@@ -164,7 +164,7 @@ class DocumentService extends AbstractMetadataService {
 
 			if(params."${docId}.deleted") {
 				//	TODO: Actual delete should be handled by parent form controllers.
-				documentInstance.deleted = (params."${docId}.deleted").toBoolean()
+				documentInstance.isDeleted = (params."${docId}.deleted").toBoolean()
 			}
 
 			if(params."sourceHolderId") {
