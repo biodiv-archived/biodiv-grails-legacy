@@ -15,8 +15,15 @@
             <g:each in="${factsList}" status="i"
             var="fact">
             <tr class="mainContent">
-                <g:if test="${!hideSubject}">
-                <td class="linktext">${fact.species}</td>
+                <g:if test="${!hideSubject && (fact.taxon || fact.species)}">
+                <td class="linktext">
+                    <g:if test="${fact.species}">
+                    <g:link url="${uGroup.createLink('controller':'species', 'action':'show', id:fact.species.id)}">${raw(fact.species.taxonConcept.italicisedForm)}</g:link>
+                    </g:if>
+                    <g:else>
+                    <g:link url="${uGroup.createLink('controller':'namelist', 'action':'show', params:[taxon:fact.taxon.id])}">${raw(fact.taxon.italicisedForm)}</g:link>
+                    </g:else>
+                </td>
                 </g:if>
                 <td>${fact.predicate}</td>
                 <td>${fact.value}

@@ -1840,9 +1840,9 @@ render speciesInstanceList;
 
     def facts() {
         if(params.id)
-            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(params.id.toLong(), params.trait), 'traitsList':speciesTraitsService.listTraits()]);
+            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(params.id.toLong(), params.trait, params.traitValue), 'traitsList':speciesTraitsService.listTraits()]);
         else
-            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(null, params.trait), 'traitsList':speciesTraitsService.listTraits()]);
+            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(null, params.trait, params.traitValue), 'traitsList':speciesTraitsService.listTraits()]);
 
     }
 }

@@ -13,10 +13,10 @@
                         <input type="hidden" name="id" value="${params.id}">
                         <select id="traitName" name="trait" type="text" class="input-xlarge" placeholder="Trait">
                             <g:each in="${traitsList}" var="trait">
-                            <option value="${trait}" ${(params.trait.equalsIgnoreCase(trait))?"selected='selected'":''}>${trait}</option>
+                            <option value="${trait}" ${(params.trait?.equalsIgnoreCase(trait))?"selected='selected'":''}>${trait}</option>
                             </g:each>
                         </select>
-                        <input type="text" class="input-xlarge" placeholder="Value">
+                        <input type="text" class="input-xlarge" name="traitValue" placeholder="Value" value="${params.traitValue?:''}">
                         <button id="traitSearchSubmit" type="submit" class="btn">Search</button>
                     </form>
                 </div>
