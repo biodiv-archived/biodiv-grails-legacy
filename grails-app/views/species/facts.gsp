@@ -8,6 +8,9 @@
         <div class="observation_create">
             <div class="span12">
                 <uGroup:showSubmenuTemplate  model="['entityName':entityName]"/>
+                
+                <obv:showObservationFilterMessage
+	                model="['instanceTotal':factsList.count, 'queryParams':[:], resultType:'fact']" />
                 <div style="margin-bottom:10px;">
                     <form id="traitSearch" class="form-inline">
                         <input type="hidden" name="id" value="${params.id}">
@@ -21,7 +24,7 @@
                     </form>
                 </div>
             </div>
-                <g:render template="/species/factsTable"/>
+                <g:render template="/species/factsTable" model="['factsList':factsList.factsList]"/>
            </div>
         </div>
         <asset:script>

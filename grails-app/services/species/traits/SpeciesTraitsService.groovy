@@ -407,12 +407,13 @@ class SpeciesTraitsService {
         return taxon ? taxon.id : null;
     }
 
-    List listFacts(Long id=null, String trait = null, String traitValue = null) {
+    Map listFacts(Long id=null, String trait = null, String traitValue = null) {
         if(!dataset) {
             init();
         }
  
         def result = [];
+        int count = 0;
         dataset.begin(ReadWrite.READ);
         try {
             String subjectURI;
@@ -430,10 +431,14 @@ class SpeciesTraitsService {
                 "PREFIX j.0: <http://indiabiodiversity.org/schema/terms/>",
                 "PREFIX dc: <http://purl.org/dc/elements/1.1/>");
 
-            String queryString = '';
+            String queryString = '',selectQueryString='', countQueryString='';
             if(trait) {
                 trait = trait.replaceAll("\\s+",'_');
-                queryString =  StrUtils.strjoinNL( pre+"\nSELECT ?taxon ?metadata")
+
+                selectQueryString = "\nSELECT ?taxon ?metadata";
+                countQueryString = "\n SELECT (COUNT(*) AS ?count)";
+
+                queryString ='';
                 if(!traitValue) {
                     queryString =  StrUtils.strjoinNL( queryString+" ?value" )
                 }
@@ -450,17 +455,27 @@ class SpeciesTraitsService {
                 queryString = StrUtils.strjoinNL( queryString+"\n",
                 '}') ; 
             } else {
-                queryString =  StrUtils.strjoinNL( pre+"\nSELECT ?taxon", 
+                selectQueryString = "\nSELECT ?taxon ";
+                countQueryString = "\n SELECT (COUNT(*) AS ?count)"
+                queryString='';
+                queryString =  StrUtils.strjoinNL(queryString+"\n",
                 'WHERE { ',
                 '    ?taxon rdf:type "Taxon" ',
                 '}') ; 
             }
 
-            println queryString
-            Query query = QueryFactory.create(queryString) ;
+            countQueryString = StrUtils.strjoinNL( pre + countQueryString + queryString);
+            println countQueryString
+            Query query = QueryFactory.create(countQueryString) ;
             QueryExecution qe = QueryExecutionFactory.create(query, model);
+            count = qe.execSelect().next().getLiteral('count').getInt();
+
+            selectQueryString = StrUtils.strjoinNL( pre + selectQueryString + queryString);
+            println selectQueryString
+            query = QueryFactory.create(selectQueryString) ;
+            qe = QueryExecutionFactory.create(query, model);
             for (ResultSet rs = qe.execSelect(); rs.hasNext() ; ) {
-                QuerySolution soln = rs.nextSolution();
+                QuerySolution soln = rs.next();
                 if(trait) {
                     Map<String, Object> row = [:]
                     for (Iterator<String> varNames = soln.varNames(); varNames.hasNext(); ) {
@@ -515,7 +530,7 @@ class SpeciesTraitsService {
         } finally {
             dataset.end();
         }
-        return result;
+        return ['factsList':result, 'count':count];
     } 
 
     private List getResourceAsList(Resource resource) {
