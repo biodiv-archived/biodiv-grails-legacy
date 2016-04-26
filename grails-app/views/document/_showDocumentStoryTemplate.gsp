@@ -114,8 +114,7 @@ ${location}
 <span class="name"><g:message code="default.file.label" /></span>
 <div class="value">  <a href="${url}"><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>${raw(documentInstance?.title)}</a></div>
 </div>
-</div>
-</g:else>
+
 
 <g:if test="${documentInstance.uri}">
 <div class="prop">
@@ -157,6 +156,8 @@ ${raw(documentInstance?.notes)}
 </div>
 </g:if>
 </div>
+</g:else>
+
 <div class="sidebar_section">
 <h5><g:message code="Metadata" /></h5>
 <g:if test="${documentInstance?.contributors}">
@@ -222,8 +223,7 @@ model="['userInstance':documentInstance.author, 'userGroup':userGroup]" />
 </div>           
 </div>
 </g:if>
-
 </g:else>
 </div>
-
+</div>
 

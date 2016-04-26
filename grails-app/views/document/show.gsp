@@ -13,7 +13,6 @@ margin-bottom: 0;
 }
 </style>
 </head>
-
 <body>
     <div class="span12">
         <g:if test="${documentInstance}">

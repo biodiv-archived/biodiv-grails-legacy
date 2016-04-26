@@ -1,10 +1,10 @@
 <%@page import="content.Project"%>
 <%@page import="content.eml.Document"%>
 <style>
-.observation_story{width:auto;}
+.observation_story{width:auto;margin-top:10px;}
 .observation_story .prop .name {width:90px;}
 .observation_story .prop .width {margin:2px 0 2px 90px;}
-.thumbnail{height:150px;}
+.addmargin{border:3px solid #a6dfc8 !important;}
 .block-ellipsis {
   display: block;
   display: -webkit-box;
@@ -18,7 +18,7 @@
 </style>
 <ul class="grid_view thumbnails obvListwrapper">
 		<g:each in="${documentInstanceList}" status="i" var="documentInstance">
-		<li class="thumbnail addmargin" style="clear: both; margin-left: 0px; width: 100%;">
+		<li class="thumbnail addmargin" style="clear: both; margin-left: 0px; width: 100%;height:160px;margin-bottom:3px;">
 			<g:render template="/document/listDocumentStoryTemplate" model="['documentInstance':documentInstance, 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'featuredNotes':featuredNotes, featuredOn:featuredOn, showDetails:showDetails, showFeatured:showFeatured]"></g:render>
 			</li>
 		</g:each>

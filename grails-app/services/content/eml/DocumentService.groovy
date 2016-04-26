@@ -674,7 +674,7 @@ class DocumentService extends AbstractMetadataService {
 		}
 		//other params
 		println "author=================================" + SUser.findByEmail(m['user email'])
-		document.author =SUser.findByEmail(m['user email'].trim())//SUser.findByEmail(m['user email'].trim())
+		document.author =SUser.findByEmail(m['user email']?.trim())//SUser.findByEmail(m['user email'].trim())
 		document.language=params.language
 		document.type = Document.fetchDocumentType(m['type'])
 		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))

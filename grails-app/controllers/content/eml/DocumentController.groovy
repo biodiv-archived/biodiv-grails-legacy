@@ -491,22 +491,30 @@ class DocumentController extends AbstractObjectController {
     }
     def docSciNamesDelete(){
         params.id = params.long('instanceId');
-     def docSciNames = DocSciName.get(params.id);
+         def docSciNames = DocSciName.get(params.id);
         println "=========Doc sci id====="+docSciNames
          docSciNames.isDeleted=true
          docSciNames.save()
     }
         def docSciNamesPrimaray(){
         params.id = params.long('instanceId');
-     def docSciNames = DocSciName.get(params.id);
+         def docSciNames = DocSciName.get(params.id);
         println "=========Doc sci id====="+docSciNames
         docSciNames.primary_name=1;
         docSciNames.save()
                
     }
+        def docSciNamesPrimaraydelete(){
+        params.id = params.long('instanceId');
+        def docSciNames = DocSciName.get(params.id);
+        println "=========Doc sci id====="+docSciNames
+        docSciNames.primary_name=0;
+        docSciNames.save()
+               
+    }
      def docSciNamesEdit(){
         params.id = params.long('instanceId');
-     def docSciNames = DocSciName.get(params.id);
+        def docSciNames = DocSciName.get(params.id);
         println "=========Edit Params====="+params.typeOfChange
         docSciNames.canonicalForm=params.typeOfChange
         docSciNames.scientificName=params.typeOfChange
