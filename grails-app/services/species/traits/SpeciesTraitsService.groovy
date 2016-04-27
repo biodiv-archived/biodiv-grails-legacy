@@ -39,16 +39,21 @@ class SpeciesTraitsService {
     private static Map propertyValueIcons;
     def springSecurityService;
     def utilsService;
+    def grailsApplication;
 
     void init() {
         // Make a TDB-backed dataset
-        String directory = "/home/sravanthi/git/biodiv/app-conf/traits" ;
+        def traitsDir = new File(grailsApplication.config.speciesPortal.traits.databaseDir);
+        if(!traitsDir.exists()) {
+            traitsDir.mkdir();
+         }
+        String directory = grailsApplication.config.speciesPortal.traits.databaseDir;
         dataset = getDataset(directory);
         TDB.getContext().set(TDB.symUnionDefaultGraph, true) ;
 
         //TODO: populating icons from file
         //TOBE removed
-        CSVReader reader = getCSVReader(new File('/home/sravanthi/git/biodiv/icons.csv'))
+        CSVReader reader = getCSVReader(new File("${grailsApplication.config.speciesPortal.traits.traitValueFile}"))
         reader.readNext();//headers
 
         propertyValueIcons = [:];
