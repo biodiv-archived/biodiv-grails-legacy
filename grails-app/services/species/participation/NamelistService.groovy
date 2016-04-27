@@ -2045,7 +2045,7 @@ class NamelistService extends AbstractObjectService {
                     "t.position in ('"+positionsToFetch.join("','")+ "') "+
                     "group by t.position, t.status ";
 
-        synCountSqlStr = "select s.position, s.status, count(*) as count from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id in ( select t.id from taxonomy_registry s, taxonomy_definition t where s.taxon_definition_id = t.id and "+ (classSystem?"s.classification_id = :classSystem and ":"") + "s.path like '"+parentId+"%' and " + "t.rank in ("+ranksToFetch.join(',') + ")) and  s.position in ('"+positionsToFetch.join("','") + "') group by s.position, s.status";
+        synCountSqlStr = "select s.position, s.status, count(*) as count from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id in ( select t.id from taxonomy_registry s, taxonomy_definition t where s.taxon_definition_id = t.id and "+ (classSystem?"s.classification_id = :classSystem and ":"") + "s.path like '"+parentId+"%' and " + "t.rank in ("+ranksToFetch.join(',') + ")) and "+"s.rank in ("+ranksToFetch.join(',') + ") and s.position in ('"+positionsToFetch.join("','") + "') group by s.position, s.status";
 
 
         try {
@@ -2133,8 +2133,9 @@ class NamelistService extends AbstractObjectService {
                     println "GETTING SYNONYMS FOR TAXON ${it.taxonid}"
                     sql = new Sql(dataSource)
                     //FIX:limit is not applied on synonyms query
-                    def s1 = "select "+synExportFields+" from taxonomy_definition t, accepted_synonym acsy where t.id = acsy.synonym_id and acsy.accepted_id = :taxonId and t.position in ('"+positionsToFetch.join("','")+"') order by t.name";
 
+                    def s1 = "select "+synExportFields+" from taxonomy_definition t, accepted_synonym acsy where t.id = acsy.synonym_id and acsy.accepted_id = :taxonId and " + "t.rank in ("+ranksToFetch.join(',') + ") and  t.position in ('"+positionsToFetch.join("','") + "') order by t.name";
+                    println s1
                     def q1 = sql.rows(s1, [taxonId:it.taxonid])
                     q1.each {
                         println "==========TAXA IDS======= " + it.taxonid
