@@ -271,6 +271,10 @@ speciesPortal {
     namelist {
         rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
     }	
+    traits{
+            databaseDir = "${app.rootDir}/traits"
+            traitValueFile="${app.rootDir}/icons.csv"
+    }
 
     names.parser.serverURL = "127.0.0.1"
     names.parser.port = 4334
