@@ -229,6 +229,7 @@ class SpeciesTraitsService {
                 Date startTime = new Date();
                 int i=0;
                 while(factsParamsList) {
+                    Trait.withTransaction { 
                     List result = [];
                     int tmpNoOfUploaded = 0, tmpNoOfFailed= 0;
                     try {
@@ -242,9 +243,9 @@ class SpeciesTraitsService {
                                 uploadLog << "\nUploading fact with params ${factParams}"
                             }
                             try {
-                                Long id = factParams['SpeciesId']?.toLong()
+                                Long id = factParams['TaxonId']?.toLong()
                                 if(!id && factParams['Name']) {
-                                    id = findSpeciesIdFromName(factParams['Name']);
+                                    id = findTaxonIdFromName(factParams['Name']);
                                 }
 
                                 if(id) {
@@ -272,7 +273,7 @@ class SpeciesTraitsService {
                                             if(s) stmts << s; 
                                         }
 
-                                        stmts << createStatement(model, id, RDF.type, 'Species');
+                                        stmts << createStatement(model, id, RDF.type, 'Taxon');
 
                                         log.debug "Adding ${stmts} to model";
                                         if(model.add(stmts)) {
@@ -281,7 +282,7 @@ class SpeciesTraitsService {
                                             tmpNoOfFailed++;
                                         }
 
-                                        log.debug "Saving model for species ${id}";
+                                        log.debug "Saving model for taxon ${id}";
                                         //saved for each species
                                         dataset.commit();
                                     } finally {
@@ -289,7 +290,7 @@ class SpeciesTraitsService {
                                     }
                                 } else {
                                     tmpNoOfFailed++;
-                                    log.error "No species id : ${factParams}";
+                                    log.error "No taxon id : ${factParams}";
                                 }
                             } catch(Exception e) {
                                 tmpNoOfFailed++;
@@ -315,6 +316,7 @@ class SpeciesTraitsService {
                     }
                     utilsService.cleanUpGorm(true)
                     result.clear();
+                    }
                 }
                 log.debug "Total number of facts saved are : ${noOfUploaded}";
 
@@ -400,21 +402,23 @@ class SpeciesTraitsService {
                 val = value
             }
         }
+        log.debug "Creating statement ${subject} -> ${property} -> ${val}";
         return model.createStatement(subject, property, val);
     }
 
-    private Long findSpeciesIdFromName(String name) {
+    private Long findTaxonIdFromName(String name) {
         XMLConverter converter = new XMLConverter();
         TaxonomyDefinition taxon = converter.getTaxonConceptFromName(name, TaxonomyRank.SPECIES.ordinal(), false, null);
-        return taxon ? taxon.findSpeciesId() : null;
+        return taxon ? taxon.id : null;
     }
 
-    List listFacts(Long id=null, String trait = null) {
+    Map listFacts(Long id=null, String trait = null, String traitValue = null) {
         if(!dataset) {
             init();
         }
  
         def result = [];
+        int count = 0;
         dataset.begin(ReadWrite.READ);
         try {
             String subjectURI;
@@ -432,26 +436,51 @@ class SpeciesTraitsService {
                 "PREFIX j.0: <http://indiabiodiversity.org/schema/terms/>",
                 "PREFIX dc: <http://purl.org/dc/elements/1.1/>");
 
-            String queryString = '';
+            String queryString = '',selectQueryString='', countQueryString='';
             if(trait) {
                 trait = trait.replaceAll("\\s+",'_');
-                queryString =  StrUtils.strjoinNL( pre+"\nSELECT ?species ?metadata ?value", 
+
+                selectQueryString = "\nSELECT ?taxon ?metadata";
+                countQueryString = "\n SELECT (COUNT(*) AS ?count)";
+
+                queryString ='';
+                if(!traitValue) {
+                    queryString =  StrUtils.strjoinNL( queryString+" ?value" )
+                }
+                queryString = StrUtils.strjoinNL( queryString+"\n",
                 'WHERE { ',
-                '    ?species rdf:type "Species" .',
-                '    ?species j.0:'+trait+' [dc:title ?value] ',
+                '    ?taxon rdf:type "Taxon" .');
+                if(traitValue) {
+                    queryString = StrUtils.strjoinNL( queryString+"\n",
+                    '    ?taxon j.0:'+trait+' [dc:title "'+traitValue+'"] ');
+                } else {
+                    queryString = StrUtils.strjoinNL( queryString+"\n",
+                    '    ?taxon j.0:'+trait+' [dc:title ?value] ')
+                }
+                queryString = StrUtils.strjoinNL( queryString+"\n",
                 '}') ; 
             } else {
-                queryString =  StrUtils.strjoinNL( pre+"\nSELECT ?species", 
+                selectQueryString = "\nSELECT ?taxon ";
+                countQueryString = "\n SELECT (COUNT(*) AS ?count)"
+                queryString='';
+                queryString =  StrUtils.strjoinNL(queryString+"\n",
                 'WHERE { ',
-                '    ?species rdf:type "Species" ',
+                '    ?taxon rdf:type "Taxon" ',
                 '}') ; 
             }
 
-            println queryString
-            Query query = QueryFactory.create(queryString) ;
+            countQueryString = StrUtils.strjoinNL( pre + countQueryString + queryString);
+            println countQueryString
+            Query query = QueryFactory.create(countQueryString) ;
             QueryExecution qe = QueryExecutionFactory.create(query, model);
+            count = qe.execSelect().next().getLiteral('count').getInt();
+
+            selectQueryString = StrUtils.strjoinNL( pre + selectQueryString + queryString);
+            println selectQueryString
+            query = QueryFactory.create(selectQueryString) ;
+            qe = QueryExecutionFactory.create(query, model);
             for (ResultSet rs = qe.execSelect(); rs.hasNext() ; ) {
-                QuerySolution soln = rs.nextSolution();
+                QuerySolution soln = rs.next();
                 if(trait) {
                     Map<String, Object> row = [:]
                     for (Iterator<String> varNames = soln.varNames(); varNames.hasNext(); ) {
@@ -460,16 +489,20 @@ class SpeciesTraitsService {
                         row.put(varName, (varNode.isLiteral() ? varNode.asLiteral().value : varNode.toString()))
                     }
                     row['predicate'] = trait;
+                    if(traitValue)
+                        row['value'] = traitValue
                     println "-------------------------------------______"
                     println row
-                    String iconURL = getIconURLForPropertyValue(row['predicate'], row['value']);
+                    String iconURL = getIconURLForPropertyValue(row['predicate'], row['value']?:traitValue);
                     if(iconURL) 
                         row['icon'] = iconURL;
 
+                    row['taxon'] = TaxonomyDefinition.read(Long.parseLong(row['taxon'].replace(resourceURI, '')))
+                    row['species'] = row['taxon'].findSpecies();
                     result << row
                 } else {
-                    //print all properties of species
-                    Resource subject = soln.getResource("species") ; // Get a result variable - must be a resource
+                    //print all properties of taxon 
+                    Resource subject = soln.getResource("taxon") ; // Get a result variable - must be a resource
                     //while (iter.hasNext()) {
                     //  Resource subject = iter.nextResource();
                     StmtIterator stmtIter = subject.listProperties();
@@ -486,7 +519,9 @@ class SpeciesTraitsService {
                             objectValue = object;
                         }
 
-                        Map r = ['species':subject.toString(), 'predicate':predicate.getLocalName(), 'value':objectValue.toString()];
+                        Map r = ['taxon':subject.toString(), 'predicate':predicate.getLocalName(), 'value':objectValue.toString()];
+                        r['taxon'] = TaxonomyDefinition.read(Long.parseLong(r['taxon'].replace(resourceURI, '')))
+                        r['species'] = r['taxon'].findSpecies();
                         if(metadata) {
                             r['metadata'] = metadata;
                         }
@@ -500,7 +535,7 @@ class SpeciesTraitsService {
         } finally {
             dataset.end();
         }
-        return result;
+        return ['factsList':result, 'count':count];
     } 
 
     private List getResourceAsList(Resource resource) {
@@ -581,8 +616,12 @@ class SpeciesTraitsService {
     } 
     
     private boolean isValidTrait(String traitName, traitValue, Long id) {
+        log.debug "Validating trait ${traitName} with value ${traitValue} for taxon ${id}"
+        //FIX: HACK till loading of traits and validation is inplace
+        return true;
+
         Trait trait = Trait.findByName(traitName);
-        if(!trait) return;
+        if(!trait) return false;
         boolean isValid = false;
         trait.valueContraints.each { constraint ->
             isValid = isValid && constraint.validate(trait, traitValue);
@@ -591,9 +630,9 @@ class SpeciesTraitsService {
     }
 
     private boolean isValidPropertyAsPerTaxon(Trait trait, Long id) {
-        Species speciesInstance = Species.read(id);
-        if(!speciesInstance || !trait) return false;
-        List<TaxonomyDefinition> parentTaxon = speciesInstance.taxonConcept.parentTaxon();
+        TaxonomyDefinition taxonInstance = TaxonomyDefinition.read(id);
+        if(!taxonInstance || !trait) return false;
+        List<TaxonomyDefinition> parentTaxon = taxonInstance.parentTaxon();
         return parentTaxon.intersect(trait.taxon).size() > 0
     }
 
