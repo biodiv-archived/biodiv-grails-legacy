@@ -150,6 +150,9 @@ function submitForms(counter, size, allForms, showListPage){
 function dropAction(event, ui, ele) {
     var clone = $(ui.draggable).clone()
     $(ele).append(clone);
+    var licenseVal = $(".propagateLicense").find("input").val();
+    $(ele).find("li span:contains('"+licenseVal+"')").first().trigger("click");
+
     var draggedImages = $(ele).find(".addedResource");
     var countOfImages = draggedImages.length;
     if(countOfImages == 1){

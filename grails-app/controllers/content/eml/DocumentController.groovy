@@ -39,6 +39,7 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def save() {
+        params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
 		params.author = springSecurityService.currentUser;
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def documentInstance = documentService.create(params)
@@ -145,9 +146,10 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])	
 	def update() {
-		def documentInstance = Document.get(params.id)
+		def documentInstance = Document.get(params.id)        
         def msg = "";
 		if (documentInstance) {
+            params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
 			if (params.version) {
 				def version = params.version.toLong()
 				if (documentInstance.version > version) {
@@ -462,6 +464,7 @@ class DocumentController extends AbstractObjectController {
 	@Secured(['ROLE_ADMIN'])
 	def bulkUpload(){
 		log.debug params
+        params.language = utilsService.getCurrentLanguage(request);
 		documentService.processBatch(params)
 		render " done "
 	}
@@ -482,6 +485,49 @@ class DocumentController extends AbstractObjectController {
 			
 			documentService.runAllDocuments();
 		}
-	
+	def primaryName(){
+
+        println "============Param Value======"+params.id
+    }
+    def docSciNamesDelete(){
+        params.id = params.long('instanceId');
+         def docSciNames = DocSciName.get(params.id);
+        println "=========Doc sci id====="+docSciNames
+         docSciNames.isDeleted=true
+         docSciNames.save()
+    }
+        def docSciNamesPrimaray(){
+        params.id = params.long('instanceId');
+         def docSciNames = DocSciName.get(params.id);
+        println "=========Doc sci id====="+docSciNames
+        docSciNames.primary_name=1;
+        docSciNames.save()
+               
+    }
+        def docSciNamesPrimaraydelete(){
+        params.id = params.long('instanceId');
+        def docSciNames = DocSciName.get(params.id);
+        println "=========Doc sci id====="+docSciNames
+        docSciNames.primary_name=0;
+        docSciNames.save()
+               
+    }
+     def docSciNamesEdit(){
+        params.id = params.long('instanceId');
+        def docSciNames = DocSciName.get(params.id);
+        println "=========Edit Params====="+params.typeOfChange
+        docSciNames.canonicalForm=params.typeOfChange
+        docSciNames.scientificName=params.typeOfChange
+        docSciNames.save()
+               
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def linkBulkUpload(){
+        log.debug params
+        params.language = utilsService.getCurrentLanguage(request);
+        documentService.processLinkBatch(params)
+        render " done "
+    }
 
 }

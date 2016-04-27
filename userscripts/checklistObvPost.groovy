@@ -572,6 +572,68 @@ def test(){
 	TaxonomyDefinition.get(421973).snapToIBPHir(hirList, trHir)
 }
 
+
+def multipleIbp(){
+	def nlSer = ctx.getBean("namelistUtilService");
+	nlSer.generateSheetMultipleIBPNameList(new File("/tmp/multipleibp.csv"))
+}
+
+
+def deleteHir(){
+	def dataSource = ctx.getBean("dataSource");
+	dataSource.setUnreturnedConnectionTimeout(50000);
+	def sql = new Sql(dataSource)
+	
+	String ss = " delete from taxonomy_registry where classification_id = 265799 and path = "
+	String ss1 = " delete from taxonomy_registry where classification_id = 265799 and path like  " 
+	
+	
+	File file = new File("/tmp/multipleibp.csv");
+	def lines = file.readLines();
+	int i=0;
+	lines.each { line ->
+		if(i++ == 0) return;
+		def arr = line.split('\\|');
+		//println " arr ->>> " + arr
+		boolean isDelete =  "delete".equals(arr[3]?.trim()?.toLowerCase())
+		//println "isDelete ==== " + isDelete
+		String pathPrefixEq = "'" +  arr[4].trim() + "'"
+		String pathPrefixLike = "'" +  arr[4].trim() + "\\_%'"
+ 		if(isDelete){
+			 String q = ss + pathPrefixEq
+			 println q
+			 int a = sql.executeUpdate(q)
+			 println "================= delete " + a
+			 q = ss1 + pathPrefixLike
+			 println q
+			 a = sql.executeUpdate(q)
+			 println "================= delete " + a
+		}
+	}
+}
+
+
+def moveCleanNameSpeciesToGroup(groupId){
+	def dataSource = ctx.getBean("dataSource");
+	dataSource.setUnreturnedConnectionTimeout(50000);
+	def sql = new Sql(dataSource)
+	
+	String q = "select species_id as id from taxonomy_definition where (rank = 9 or rank = 10) and status = 'ACCEPTED' and position = 'CLEAN' and species_id is not null;"
+	
+	sql.rows(q).each{
+		def speciesId = it.id
+		String s = "insert into user_group_species values (" + speciesId + ", " + groupId + ");"
+		println s
+		try{
+			sql.execute(s);
+		}catch(e){
+			println e.message
+		}
+	}
+	println "== done"
+	
+}
+
 //dmp()
 //splitTreeExport()
 
@@ -601,7 +663,9 @@ def test(){
 
 //test()
 
-
+//multipleIbp()
+deleteHir()
+//moveCleanNameSpeciesToGroup(48)
 
 
 

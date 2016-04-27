@@ -1,3 +1,4 @@
+<sUser:isAdmin>
 <div class="download-box"  style="z-index: 10; display:inline-block; margin-left: 5px;${instanceTotal == 0 ? 'display:none;' :'' }">
     <a class="download-action ${(onlyIcon == 'true')?'':'btn'} ${(params.action=='show')?'btn-link':''}" role="button" data-toggle="modal" data-target="#downloadModal" href="#downloadModal" title="Download"> <i class=" icon-download-alt" style="${(downloadFrom=='uniqueSpecies')?'margin-top:-7px':''}"></i>
         <g:if test="${onlyIcon == 'false'}">
@@ -55,7 +56,7 @@
         </div>
     </form>
 </div>
-
+</sUser:isAdmin>
 <asset:script>
 $('.download-close').click(function(){
     $('#downloadModal').modal('hide');

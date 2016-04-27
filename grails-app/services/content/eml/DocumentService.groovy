@@ -2,7 +2,7 @@ package content.eml
 
 import java.util.List;
 import java.util.Map;
-
+import org.apache.commons.io.FileUtils
 import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
 import org.grails.tagcloud.TagCloudUtil
 import groovy.sql.Sql
@@ -58,7 +58,7 @@ import java.lang.Boolean;
 import species.NamesParser;
 import species.Metadata
 import species.Classification;
-
+import au.com.bytecode.opencsv.CSVWriter
 
 class DocumentService extends AbstractMetadataService {
 
@@ -70,6 +70,9 @@ class DocumentService extends AbstractMetadataService {
 	def userGroupService
     def sessionFactory
 	def activityFeedService
+	def obvUtilService
+	int successCount=0
+    int failedCount=0
 	
 	Document create(params) {
         return super.create(Document.class, params);
@@ -161,7 +164,7 @@ class DocumentService extends AbstractMetadataService {
 
 			if(params."${docId}.deleted") {
 				//	TODO: Actual delete should be handled by parent form controllers.
-				documentInstance.deleted = (params."${docId}.deleted").toBoolean()
+				documentInstance.isDeleted = (params."${docId}.deleted").toBoolean()
 			}
 
 			if(params."sourceHolderId") {
@@ -525,7 +528,7 @@ class DocumentService extends AbstractMetadataService {
 			log.error "File dir not found. Aborting upload"
 			return
 		}
-		
+
 		File spreadSheet = new File(params.batchFileName)
 		if(!spreadSheet.exists()){
 			log.error "Main batch file not found. Aborting upload"
@@ -554,6 +557,37 @@ class DocumentService extends AbstractMetadataService {
 			}
 		}
 	}
+ 		def processLinkBatch(params){
+		File spreadSheet = new File(params.batchFileName)
+		if(!spreadSheet.exists()){
+			log.error "Main batch file not found. Aborting upload"
+			return
+		}
+		
+		def resultObv = []
+		int i = 0;
+		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
+			println "================" + m
+			
+			if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+
+				uploadLinkDoc(m, resultObv,params)
+				i++
+				if(i > BATCH_SIZE){
+					utilsService.cleanUpGorm(true)
+					def obvs = resultObv.collect { Document.read(it) }
+
+					try{
+						documentSearchService.publishSearchIndex(obvs, true);
+					}catch (Exception e) {
+						log.error e.printStackTrace();
+					}
+					resultObv.clear();
+					i = 0;
+				}
+			}
+		}
+ 	}
 	
 	private uploadDoc(fileDir, Map m, resultObv){
 		Document document = new Document()
@@ -630,7 +664,58 @@ class DocumentService extends AbstractMetadataService {
 			resultObv << document.id
 		}
 	}
+	private uploadLinkDoc(Map m, resultObv,params){
+		Document document = new Document()
+		document.uri = m['uri']
+		document.title = m['title']		
+		if(!document.title){
+			log.error 'title cant be null'
+			return 
+		}
+		//other params
+		println "author=================================" + SUser.findByEmail(m['user email'])
+		document.author =SUser.findByEmail(m['user email']?.trim())//SUser.findByEmail(m['user email'].trim())
+		document.language=params.language
+		document.type = Document.fetchDocumentType(m['type'])
+		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
 	
+        if(!document.license) {
+		    document.license =  License.findByName(LicenseType.CC_BY)
+        }
+
+		document.contributors =  m['contributors']
+		document.attribution =  m['attribution']
+		document.notes =  m['description']
+		
+		document.speciesGroups = []
+		m['species groups'].split(",").each {
+			def s = SpeciesGroup.findByName(it.trim())
+			if(s)
+				document.addToSpeciesGroups(s);
+		}
+
+		document.habitats  = []
+		m['habitat'].split(",").each {
+			def h = Habitat.findByName(it.trim())
+			document.addToHabitats(h);
+		}
+		
+		document.longitude = (m['longitude'] ?:76.658279)
+		document.latitude = (m['lattitude'] ?: 12.32112)
+		document.geoPrivacy = m["geoprivacy"]
+		document.externalUrl=m["externalurl"]
+		document.placeName=m["palce name"]
+//		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+//		if(document.latitude && document.longitude) {
+//			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
+//		}
+		saveDoc(document, m)
+		runCurrentDocuments(document,m)
+		
+		if(document.id){
+			resultObv << document.id
+		}
+	}
 	private saveDoc(documentInstance, Map m) {
 		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
 		if (documentInstance.save(flush: true) && !documentInstance.hasErrors()) {
@@ -641,6 +726,7 @@ class DocumentService extends AbstractMetadataService {
 			documentInstance.setTags(tags)
 			
 			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
+			//println "==========User Group======================" + userGroupIds
 			userGroupIds = userGroupIds.collect { "" + it }
 			setUserGroups(documentInstance, userGroupIds);
 		}
@@ -648,6 +734,43 @@ class DocumentService extends AbstractMetadataService {
 			documentInstance.errors.allErrors.each { log.error it }
 		}
 	}
+
+	def runCurrentDocuments(documentInstance,Map m) {
+				def tokenUrl=""
+				def url= m["externalurl"]
+				def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+                HTTPBuilder http = new HTTPBuilder(hostName)
+                http.request( GET, JSON ) {
+					uri.path = "/name_finder.json"
+					uri.query = [ url:url ]     	
+					headers.Accept = '*/*'
+					response.success = { resp,  reader ->
+					//println "========reader====="+reader;
+					//println "========reader====="+reader.token_url;
+					tokenUrl = reader.token_url;
+                     }
+                    response.'404' = { status = ObvUtilService.FAILED }
+                    }
+                    DocumentTokenUrl.createLog(documentInstance, tokenUrl);
+                 
+                   // File csvFile = new File(grailsApplication.config.speciesPortal.reportPath, "upload_report.csv")
+                    //CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+                    //writer.writeNext("Document Title:#Upload Status:".split("#"))
+                   
+                  //  if(tokenUrl){
+                   // writer.writeNext(("${documentInstance.title}#Success").split("#"))
+                    //successCount++
+                   // }
+                   // else
+                    //{
+                    //	writer.writeNext("${documentInstance}#Failed".split("#"))
+                    //	failedCount++
+                    //}
+                    //writer.writeNext("Total no of document uploaded successfully#${successCount}".split("#"))
+                    //writer.writeNext("Total no of document failed to upload#${failedCount}".split("#"))
+                    //writer.flush()
+					//writer.close()
+   				 }
 
 	Map getGnrdScientificNames(String tokenUrl){
 			//	println "=====token==="+tokenUrl
@@ -751,12 +874,12 @@ class DocumentService extends AbstractMetadataService {
     }
 
     def runDocuments(List documentInstanceList, boolean rerun=false) {
+    	
         def url = '';
         def tokenUrl = '';
         int i = 0;
         def numOfDocs = documentInstanceList.size()
         println numOfDocs;
-        println "==============++++"
         while(i < numOfDocs) {
             DocumentTokenUrl.withNewTransaction { 
                 def instance = documentInstanceList.get(i)
@@ -764,10 +887,12 @@ class DocumentService extends AbstractMetadataService {
                 log.debug instance
                 i++;
                 def p = DocumentTokenUrl.findByDoc(instance)
+
                 if(!p || rerun) {
                     if(instance?.uFile != null){
                         url = grailsApplication.config.speciesPortal.content.serverURL
-                        url = url+instance?.uFile?.path 
+                        url = url+instance?.uFile?.path
+                      //  println url
 
                     } else {
                         url=instance.uri;
@@ -806,7 +931,6 @@ class DocumentService extends AbstractMetadataService {
         docSciNameId.each {
         it.delete();
         }
-
         documentInstance.delete(flush: true, failOnError:true)
     }
 

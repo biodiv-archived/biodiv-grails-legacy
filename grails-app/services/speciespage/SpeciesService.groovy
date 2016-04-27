@@ -2169,7 +2169,7 @@ def checking(){
     }  
    
     for ( speciesFieldInstances in speciesFieldInstancesList ) {
-         SpeciesField.withNewTransaction{
+        // SpeciesField.withNewTransaction{
             if(!speciesFieldInstances?.description){
                 speciesFieldInstances.description = "dummy";
                 speciesFieldInstances.save();                
@@ -2193,7 +2193,7 @@ def checking(){
                     println "Passed Existed!"
                 }
             }
-        }
+       // }
     }
     offset = offset+limit; 
     utilsService.cleanUpGorm(true); 

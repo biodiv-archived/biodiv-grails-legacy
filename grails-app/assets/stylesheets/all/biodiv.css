@@ -288,7 +288,8 @@ h6 {
 }
 
 .ui-autocomplete { 
-    height: 200px; 
+    height: 200px;
+    width:98%; 
     overflow-y: scroll; 
     overflow-x: hidden;
 }
@@ -383,7 +384,7 @@ h6 {
 	margin-right: 10px;*/
         position:absolute;
         right:0px;
-        top:0px;
+        top:5px;
         z-index:2;
 }
 
@@ -545,10 +546,11 @@ div.errors {
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 /* 	background-position: 2px 2px; */
-	width: 200px;
+	width: 170px;
 	height: 65px;
 	cursor: pointer;
 	border-bottom: 3px red;
+	position: relative;
 }
 .add_video {
 	background-image: url('/assets/all/add_video.png');
@@ -558,14 +560,24 @@ div.errors {
 	width: 170px;
 	height: 65px;
 	cursor: pointer;
+	position: relative;
 }
 .add_audio {
 	background-image: url('/assets/all/add_audio.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-audio.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
-	width: 200px;
+	width: 170px;
 	height: 65px;
 	cursor: pointer;
+	position: relative;
+}
+
+.add_resource_text{
+  position: absolute;
+  left: 40%;
+  top: 35%;
+  color: rgb(244, 245, 247);
+  font-style: initial;
 }
 
 .add_file .progress {
@@ -3304,7 +3316,7 @@ small {
   	float: left;
  }
  .dataset .conts_wrap_left{
- 	width: 420px !important;
+ 	width: 417px !important;
  }
  .conts_wrap .conts_wrap_right{
 /* 	width: 180px;*/
