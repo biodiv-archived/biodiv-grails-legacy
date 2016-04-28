@@ -36,6 +36,7 @@ import species.namelist.Utils;
 import species.utils.Utils as UtilsUtils;
 import species.ResourceFetcher;
 import species.AbstractObjectService;
+import species.SpeciesPermission;
 
 class NamelistService extends AbstractObjectService {
   
@@ -84,7 +85,8 @@ class NamelistService extends AbstractObjectService {
 	def sessionFactory;
     def activityFeedService;
 	//def speciesUploadService;
-
+    def speciesPermissionService;
+    
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
         //println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
@@ -2164,13 +2166,15 @@ class NamelistService extends AbstractObjectService {
 	public def getNameDetails(params){
         def taxon = TaxonomyDefinition.read(params.taxonId.toLong());
         NameStatus nameType = taxon.status;
-
+        boolean isTaxonEditor = speciesPermissionService.isTaxonContributor(taxon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR]);
+        def result;
         switch(nameType) {
             case NameStatus.ACCEPTED:
             def taxonDef = taxon;
             def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
-            def result = taxonDef.fetchGeneralInfo()
+            result = taxonDef.fetchGeneralInfo()
             result['taxonId'] = params.taxonId;
+            result['isTaxonEditor'] = isTaxonEditor;
 
             if(taxonReg) {
                 result['taxonRegId'] = taxonReg.id?.toString()
@@ -2194,9 +2198,10 @@ class NamelistService extends AbstractObjectService {
             if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of synonyms table
                 def syn = SynonymsMerged.read(params.taxonId.toLong());
-                def result = syn.fetchGeneralInfo();
+                result = syn.fetchGeneralInfo();
                 result[result['rank']] = params.choosenName;
                 result['acceptedNamesList'] = getAcceptedNamesOfSynonym(syn);
+                result['isTaxonEditor'] = isTaxonEditor;
                 println "========SYNONYMS NAME DETAILS ===== " + result
 
                 def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), syn);
@@ -2214,8 +2219,9 @@ class NamelistService extends AbstractObjectService {
             if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of common names table
                 def com = CommonNames.read(params.taxonId.toLong());
-                def result = com.fetchGeneralInfo()
+                result = com.fetchGeneralInfo()
                 result[result['rank']] = params.choosenName;
+                result['isTaxonEditor'] = isTaxonEditor;
                 result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
                 println "========SYNONYMS NAME DETAILS ===== " + result
                 return result

@@ -571,10 +571,14 @@ function populateNameDetails(data){
 
     //if($(".source").val() == 'COL' || $(".source").val() == 'CatalogueOfLife') {
     var source = data['source']?data['source'].toLowerCase():undefined;
-    if(source == 'col' || source == 'catalogueoflife' || source == 'catalogue of life') {
+    console.log(data);
+    if(source == 'col' || source == 'catalogueoflife' || source == 'catalogue of life' || (data['position'] == 'Clean' && data['isTaxonEditor'] == false)) {
         changeEditingMode(true);
         if(!data['position'])
             $(".position").val("working");
+        if(data['position'] == 'Clean' && data['isTaxonEditor'] == false) {
+            $(".canBeDisabled select.position").prop("disabled", true);
+        }
     } else {
         $(".position").val(data["position"]);
     }
