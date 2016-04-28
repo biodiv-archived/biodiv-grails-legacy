@@ -2107,20 +2107,22 @@ class NamelistService extends AbstractObjectService {
                 }
             }
 
-            def synCountRs = sql.rows(synCountSqlStr, [classSystem:classSystem])
-            synCountRs.each {
-                instanceTotal += it.count;
-                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                    dirtyListCount += it.count;
-                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                    workingListCount += it.count;
-                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.CLEAN.value())){
-                    cleanListCount += it.count;
-                }
+            if(statusToFetch.contains(NameStatus.SYNONYM.value().toUpperCase())) {
+                def synCountRs = sql.rows(synCountSqlStr, [classSystem:classSystem])
+                synCountRs.each {
+                    instanceTotal += it.count;
+                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                        dirtyListCount += it.count;
+                    }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                        workingListCount += it.count;
+                    }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.CLEAN.value())){
+                        cleanListCount += it.count;
+                    }
 
-                switch(it.status.toLowerCase()) {
-                    case NameStatus.ACCEPTED.value().toLowerCase() : acceptedCount += it.count; break;
-                    case NameStatus.SYNONYM.value().toLowerCase() : synonymCount += it.count; break;
+                    switch(it.status.toLowerCase()) {
+                        case NameStatus.ACCEPTED.value().toLowerCase() : acceptedCount += it.count; break;
+                        case NameStatus.SYNONYM.value().toLowerCase() : synonymCount += it.count; break;
+                    }
                 }
             }
 
