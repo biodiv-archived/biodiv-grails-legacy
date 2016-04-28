@@ -2346,7 +2346,7 @@ def checking(){
             canonicalForms << syn.canonicalForm;
         }
 
-        def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms", ['canonicalForms':canonicalForms]);
+        def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms and dsn.isDeleted=:isDeleted", ['canonicalForms':canonicalForms,'isDeleted':false]);
         return docSciNames.document.unique();
 
     }
