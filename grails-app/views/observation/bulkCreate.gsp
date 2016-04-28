@@ -223,7 +223,7 @@
                 margin-right:2px;
                 margin-top:2px;
             }            
-            .groups_super_div, .habitat_super_div{
+            .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div{
                 width: 220px;
             }
             
