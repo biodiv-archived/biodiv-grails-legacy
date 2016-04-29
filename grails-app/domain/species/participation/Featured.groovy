@@ -54,7 +54,7 @@ class Featured extends AbstractAction {
             return true;
         }
 
-        boolean isAuthor = (user == object.author)
+        boolean isAuthor = (user || (user == object.author))
         boolean isAdmin = SpringSecurityUtils.ifAllGranted("ROLE_ADMIN") 
 
         if(isAuthor || isAdmin || ug.isFounder(user) || ug.isExpert(user) ) {

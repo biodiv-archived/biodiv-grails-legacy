@@ -390,168 +390,206 @@ class NamelistUtilService {
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////  MERGE ACCEPTED NAME  ////////////////////////////////////
+	//////////////////////////////////  MERGE NAMES  ////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public mergeSynonym(long oldId, long newId, boolean fullDelete = false){
-		SynonymsMerged oldName = SynonymsMerged.get(oldId)
-		SynonymsMerged newName = SynonymsMerged.get(newId)
+	public boolean changeAccToSyn(long oldId, long newId){
+		ScientificName oldName = ScientificName.get(oldId)
+		ScientificName newName = ScientificName.get(newId)
 		
-		
-		if(!oldName ||  !newName){
-			log.debug "One of name is not exist in the system " + oldId + "  " +  newId
-			return
+		if(oldName && (oldName.status == NamesMetadata.NameStatus.SYNONYM)){
+			log.debug "Name is already synonym... nothing to do... RETURNING " + oldId 
+			return true
 		}
 		
+		if(!oldName || !newName){
+			log.debug "Null id is given for the names  old id " + oldId + " new name " + newName
+			return false
+		}
+		
+		if(newName.status != NamesMetadata.NameStatus.ACCEPTED){
+			log.debug "Status of new name  is not acceepted aborting... new name id " + newId
+			return false
+		}
+		
+		_mergeAccepted(oldName, newName, false)
+		//cache is cleared so reading name again
+		oldName.refresh()// = ScientificName.get(oldId)
+		
+		updateStatusAndClass(oldName,  NamesMetadata.NameStatus.SYNONYM)
+		oldName.refresh()
+		
+		//adding this synonym to new accepted name
+		newName.refresh()// = ScientificName.get(newId)
+		newName.addSynonym(oldName)
+		return true
+	}
+	
+	public boolean changeSynToAcc(long oldId, Map hirMap=null){
+		ScientificName oldName = ScientificName.get(oldId)
+		
+		if(!oldName){
+			log.debug "Null id is given for the names  old id " + oldId
+			return false
+		}
+		
+		if(oldName && (oldName.status == NamesMetadata.NameStatus.ACCEPTED)){
+			log.debug "Name is already accepted... nothing to do... RETURNING " + oldId
+			return true
+		}
+		
+		//removing this name as synonym from all other accepted name
+		oldName.removeAsSynonym()
+		updateStatusAndClass(oldName,  NamesMetadata.NameStatus.ACCEPTED)
+		
+		//TODO have to add ibp hir fir this changed name
+		return true
+	}
+	
+	
+	public boolean deleteName(long id){
+		ScientificName name = ScientificName.get(id)
+		if(!name || name.isDeleted){
+			log.debug "Null id is given for the name or name is already deleted... ABORTING " + id
+			return false
+		}
+		
+		if(name.status == NamesMetadata.NameStatus.SYNONYM){
+			return mergeSynonym(name, null)
+		}
+		
+		//its an accepted name
+		Classification ibpClassification = Classification.fetchIBPClassification()
+		int tCount = TaxonomyRegistry.countByParentTaxonDefinitionAndClassification(name, ibpClassification)
+		if(tCount > 0){
+			log.debug "Given name has children in ibp classification... Aborting delete ... child count  " +  tCount
+			return false
+		}
+		
+		//every thing passed now deleting the accepted name
+		return _mergeAccepted(name, null)
+	} 
+	
+	
+	public boolean mergeNames(long oldId, long newId){
+		ScientificName oldName = ScientificName.get(oldId)
+		ScientificName newName = ScientificName.get(newId)
+		
+		if(!oldName || !newName){
+			log.debug "Null id is given for the names  old id " + oldId + " new name " + newName
+			return false
+		}
+		
+		
+		if(oldName.status != newName.status){
+			log.debug "Status is not same for  the name " + oldName.status + " new name " + newName.status
+			return false
+		}
+		
+		if(oldName.status == NamesMetadata.NameStatus.SYNONYM){
+			return mergeSynonym(oldName, newName)
+		}
+		
+		//status is accepted 
+		return mergeAccepted(oldName, newName)
+		
+	}
+	
+	
+	private void updateStatusAndClass(ScientificName sciName, NameStatus status) {
+		Map m = [id:sciName.id]
+		m['class'] = (status == NameStatus.SYNONYM) ? SynonymsMerged.class.canonicalName: TaxonomyDefinition.class.canonicalName
+		m['relationship'] = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
+		m['status'] = status.toString()
+		String query = "update taxonomy_definition set (class, status, relationship) = (:class, :status, :relationship) where id = :id";
+		Sql sql = sessionFactory.getCurrentSession().createSQLQuery(query)
+		sql.setProperties(m).executeUpdate()
+	}
+	
+	private boolean mergeAccepted(oldName, newName){
+		if(oldName.rank != newName.rank){
+			log.debug "Rank is not same... Aborting merge " + oldName.rank + "  new name " + newName.rank
+			return false
+		 }
+		
+		
+		if(oldName.fetchRootId() != newName.fetchRootId()){
+			log.debug "Kingdom is not same... Aborting merge " + oldName.fetchRootId() + "  new name " + newName.fetchRootId()
+			return false
+		 }
+		
+		log.debug "All validation passed Merging names..." + oldName + " new name " + newName
+		
+		return _mergeAccepted(oldName, newName)
+	}
+
+	private boolean _mergeAccepted(oldName, newName, boolean flagAsDelete = true) {
+		//moving synonym, common names and document sci name
+		moveOtherNamesReference(oldName, newName)
+
+		//move recommendation and observation
+		moveRecoAndObv(oldName, newName)
+
+		//move species content and resources
+		moveSpeciesContent(oldName, newName)
+
+
+		//flag the name as deleted
+		if(flagAsDelete){
+			oldName.isDeleted = true
+			log.debug"======= for delete " + oldName
+			if(!oldName.save(flush:true)){
+				oldName.errors.allErrors.each { log.error it }
+				return false
+			}
+		}
+
+		//moving existing taxon reg and deleteing ibp hir
+		moveTaxonReg(oldName, newName)
+
+		utilsService.clearCache("defaultCache")
+
+		return true
+	}
+	
+	
+	
+	private boolean mergeSynonym(oldName, newName){
 		//moving synonym
 		def oldEntries = AcceptedSynonym.findAllBySynonym(oldName);
 		oldEntries.each { e ->
 			TaxonomyDefinition acName = e.accepted
 			acName.removeSynonym(oldName)
-			acName.addSynonym(newName)
-		}
-		
-		if(fullDelete){
-			println "========= old name " + oldName
-			if(oldName)
-				oldName.delete(flush:true)
-		}else{
-			oldName.isDeleted = true
-			println "======= for delete " + oldName
-			if(!oldName.save(flush:true)){
-				oldName.errors.allErrors.each { log.error it }
+			if(newName){
+				acName.addSynonym(newName)
 			}
 		}
+		
+		moveSpeciesContent(oldName, newName)
+		oldName.isDeleted = true
+		println "======= for delete " + oldName
+		if(!oldName.save(flush:true)){
+			oldName.errors.allErrors.each { log.error it }
+			return false
+		}
+		
+		return true
 	}
-	
-	
-	public mergeAcceptedName(long oldId, long newId, boolean fullDelete = false){
-		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
-		TaxonomyDefinition newName = TaxonomyDefinition.get(newId)
-		
-		
-		if(!oldName ||  !newName){
-			log.debug "One of name is not exist in the system " + oldId + "  " +  newId
+
+
+	private moveSpeciesContent(oldName, newName){
+		Species oldSpecies = Species.get(oldName.findSpeciesId())
+		if(!oldSpecies){
+			log.debug "Species page is not there... nothing to move " + oldName
 			return
 		}
 		
-		
-		
-		def oldTrList = TaxonomyRegistry.findAllByTaxonDefinition(oldName)
-		println "=== findbytaxondef " + oldTrList
-		
-		//update all paths for this taxon defintion
-		List trList = TaxonomyRegistry.findAllByPathLike('%_' + oldId + '_%')
-		trList.addAll(TaxonomyRegistry.findAllByPathLike(oldId + '_%'))
-		trList.addAll(TaxonomyRegistry.findAllByPath(oldId))
-		trList.addAll(oldTrList)
-		trList.unique()
-		
-		println " complete tr list ------------ " + trList
-		
-		List oldTrToBeDeleted = []
-		List updateTrList = []
-		
-		Map updateTrMap = [:]
-		Map deleteToParentTaxonMap = [:]
-		Species.withTransaction {
-		println "================ starting things now "
-		trList.each { TaxonomyRegistry tr ->
-			String newPath = tr.path
-			newPath = newPath.replaceAll('_' + oldId + '_', '_' + newId + '_')
-			
-			if(newPath.startsWith(oldId + '_'))
-				newPath.replaceFirst(oldId + '_', newId + '_')
-			
-			if(newPath == ('' + oldId) )
-				newPath = '' + newId
-			
-			if(newPath.endsWith('_' + oldId))
-				newPath = newPath.substring(0, newPath.lastIndexOf('_') + 1) +  newId
-				
-			if(isDuplicateTr(tr, newPath, newName, deleteToParentTaxonMap)){
-				oldTrToBeDeleted << tr
-			}else{
-				updateTrMap.put(tr, newPath)
-			}
+		//old species page is there but new name is not given which means want to delete species content
+		if(!newName){
+			oldSpecies.deleteSpecies(null)
+			return
 		}
 		
-		trList.clear()
-		updateTrMap.each { k, v ->
-			k.path = v
-			updateTrList << k
-		}
-		updateTrMap.clear()
-		
-		oldTrList.removeAll(oldTrToBeDeleted)
-		//trList.removeAll(oldTrToBeDeleted)
-		
-		println "------------ updateTrList " + updateTrList
-		updateTrList.each {TaxonomyRegistry tr ->
-			println "================ updating tr " + tr
-			if(tr.parentTaxonDefinition == oldName){
-				tr.parentTaxonDefinition = newName
-			}
-			if(!tr.save(flush:true)){
-				tr.errors.allErrors.each { log.error it }
-			}
-		}
-		println "------------ oldTrToBeDeleted " + oldTrToBeDeleted
-		oldTrToBeDeleted.each {TaxonomyRegistry tr ->
-			println "================ deleting tr " + tr
-			TaxonomyRegistry tmpTr = deleteToParentTaxonMap.get(tr)
-			TaxonomyRegistry.findAllByParentTaxon(tr).each{
-				it.parentTaxon = tmpTr
-				it.parentTaxonDefinition = tmpTr.taxonDefinition
-				if(!tmpTr.save(flush:true)){
-					tmpTr.errors.allErrors.each { log.error it }
-				}
-			}
-			tr.delete(flush:true)
-		}
-		
-		
-		println "------------ oldTrList " + oldTrList
-		//updating taxon def so that new hirarchy should be shown
-		oldTrList.each {TaxonomyRegistry tr ->
-			println "================ taxon def for tr " + tr
-			tr.taxonDefinition = newName
-			
-		}
-		
-		
-		
-		//moving synonym
-		oldName.fetchSynonyms().each {
-			println "================ synonym move " + it
-			newName.addSynonym(it)
-			oldName.removeSynonym(it)
-		}
-		
-		//moving common names
-		List cns = CommonNames.findAllByTaxonConcept(oldName)
-		cns.each { cn ->
-			println "================ common name update " + cn
-			cn.taxonConcept = newName
-			if(!cn.save(flush:true)){
-				cn.errors.allErrors.each { log.error it }
-			}else{
-				cn.delete(flush:true)
-			}
-		}
-		
-		//moving docsciname
-		List dcs = DocSciName.findAllByTaxonConcept(oldName)
-		dcs.each {DocSciName  cn ->
-			cn.taxonConcept = newName
-			if(!cn.save(flush:true)){
-				cn.errors.allErrors.each { log.error it }
-			}else{
-				cn.delete(flush:true)
-			}
-		}
-		
-		Species oldSpecies = Species.get(oldName.findSpeciesId())
 		Species newSpecies = Species.get(newName.findSpeciesId())
 		
 		//updating species for names
@@ -581,7 +619,6 @@ class NamelistUtilService {
 			}
 			
 			//add hyper link for redirect
-			log.debug "================= old species id " + oldSpecies + " ............ " + newSpecies
 			ResourceRedirect.addLink(oldSpecies, newSpecies)
 			
 			//saving new species
@@ -590,60 +627,124 @@ class NamelistUtilService {
 			}
 			
 			//deleting speices
-			//oldSpecies.taxonConcept = null
-			oldSpecies.deleteSpecies(SUser.read(1))
+			oldSpecies.deleteSpecies(null)
 		}
-		
-		//setting delete flag true on name
-		if(fullDelete){
-			def newReco = Recommendation.findByTaxonConcept(newName)
-			def reco = Recommendation.findByTaxonConcept(oldName)
-			if(reco){
-				RecommendationVote.findAllByRecommendationOrCommonNameReco(reco, reco).each { r ->
-					println " saving reco vote  " + r
-					if(r.recommendation == reco){
-						r.recommendation = newReco
-					}
-					if(r.commonNameReco == reco){
-						r.commonNameReco = newReco
-					}
-					if(!r.save(flush:true)){
-						r.errors.allErrors.each { log.error it }
-					}
-				}
-				Observation.findAllByMaxVotedReco(reco).each { obv ->
-					obv.maxVotedReco = newReco
-					if(!obv.save(flush:true)){
-						obv.errors.allErrors.each { log.error it }
-					}
-					
-				}
-				
-				println "========= deleting reco " + reco
-				reco.delete(flush:true)
-			}
-			//XXX: remove entry from old synonym table after table drop remove this code
-			Synonyms.findAllByTaxonConcept(oldName).each {s ->
-			   		s.delete(flush:true)
-		    }
-			SpeciesPermission.findAllByTaxonConcept(oldName).each { sp ->
-				sp.delete(flush:true)
-			}
-			println "========= old name " + oldName
-			if(oldName)
-				oldName.delete(flush:true)
-		}else{
-			oldName.isDeleted = true
-			println "======= for delete " + oldName
-			if(!oldName.save(flush:true)){
-				oldName.errors.allErrors.each { log.error it }
-			}
-		}
-		}
-		
 	}
 	
 	
+	private moveRecoAndObv(oldName, newName){
+		def newReco = Recommendation.findByTaxonConcept(newName)
+		def reco = Recommendation.findByTaxonConcept(oldName)
+		if(reco){
+			RecommendationVote.findAllByRecommendationOrCommonNameReco(reco, reco).each { r ->
+				println " saving reco vote  " + r
+				if(r.recommendation == reco){
+					r.recommendation = newReco
+				}
+				if(r.commonNameReco == reco){
+					r.commonNameReco = newReco
+				}
+				if(!r.save(flush:true)){
+					r.errors.allErrors.each { log.error it }
+				}
+			}
+			Observation.findAllByMaxVotedReco(reco).each { obv ->
+				obv.maxVotedReco = newReco
+				if(!obv.save(flush:true)){
+					obv.errors.allErrors.each { log.error it }
+				}
+				
+			}
+			println "========= deleting reco " + reco
+			reco.delete(flush:true)
+		}
+	}
+	
+	private moveOtherNamesReference(oldName, newName){
+		//moving synonym
+		oldName.fetchSynonyms().each {
+			log.debug "================ synonym move " + it
+			oldName.removeSynonym(it)
+			if(newName) newName.addSynonym(it)
+			
+		}
+		
+		//moving common names
+		List cns = CommonNames.findAllByTaxonConcept(oldName)
+		cns.each { CommonNames cn ->
+			log.debug "================ common name update " + cn
+			if(newName)
+				cn.taxonConcept = newName
+			else
+				cn.isDeleted = true
+				
+			if(!cn.save(flush:true)){
+				cn.errors.allErrors.each { log.error it }
+			}else{
+				cn.delete(flush:true)
+			}
+		}
+		
+		//moving docsciname
+		List dcs = DocSciName.findAllByTaxonConcept(oldName)
+		dcs.each {DocSciName  cn ->
+			log.debug "================ Doc sci name " + cn
+			if(newName)
+				cn.taxonConcept = newName
+			else
+				cn.isDeleted = true
+				
+			if(!cn.save(flush:true)){
+				cn.errors.allErrors.each { log.error it }
+			}else{
+				cn.delete(flush:true)
+			}
+		}
+	}
+	
+	//moving children and deleting ibp hir
+	private moveTaxonReg(oldName, newName){
+		Classification ibpClassification = Classification.fetchIBPClassification()
+		TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(oldName, ibpClassification)
+		if(!tr){
+			log.debug "Does not have ibp hir so not moving any thing " + oldName
+			return
+		}
+		//updating new parent of all the children of old name
+		if(newName){
+			TaxonomyRegistry ntr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(newName, ibpClassification)
+			TaxonomyRegistry.executeUpdate( "update TaxonomyRegistry set parentTaxon = :newParentTaxon, parentTaxonDefinition = :newParentTaxonDef where parentTaxon = :oldParentTaxon", [newParentTaxon:ntr, newParentTaxonDef :newName, oldParentTaxon:tr])
+//			TaxonomyRegistry.findAllByParentTaxon(tr).each { TaxonomyRegistry t ->
+//				t.parentTaxon = ntr
+//				t.parentTaxonDefinition = newName
+//				if(!t.save(flush:true)){
+//					t.errors.allErrors.each { log.error it }
+//			   }
+//			}
+		}
+		
+		//deleteing ibp hir of old name
+		if(!tr.delete(flush:true)){
+			tr.errors.allErrors.each { log.error it }
+		}
+		
+		//moving all children to new ibp path
+		if(newName){
+			List sqlStrings = newName.fetchUpdateTaxonRegSql(oldName.id)
+			Sql sql = new Sql(dataSource)
+			sqlStrings.each { String s ->
+			log.debug " Path update query " + s
+				try{
+					int updateCount = sql.executeUpdate(s);
+					log.debug " updated path count  " + 	updateCount
+				}catch(e){
+					e.printStackTrace()
+				}
+			}
+		}
+	}
+		
+		
 	private boolean isDuplicateTr(tr, newPath, newName, deleteToParentTaxonMap ){
 		//update all paths for this taxon defintion
 		def id = newName.id
