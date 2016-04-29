@@ -277,6 +277,8 @@ $(".applyAll").click(function(){
         //$(value).find(".placeName").trigger("click");
     });
     $(".togglePropagateDiv").trigger("click");
+    $(".address").trigger("click");
+    $(".map_canvas").hide();
 });
 
 function initializers(){
