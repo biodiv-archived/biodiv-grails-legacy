@@ -76,10 +76,10 @@ function initTaxonGrid(ele) {
     //{id: "taxonid", name: "Id", field: "taxonid", maxWidth:80, resizble:false, sortable:true},
     //{id: "isflagged", name: "Flagged", field: "isflagged", width: 40, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, resizable:false}
     var taxonGridColumns = [
-    {id: "name", name: "Taxon", field: "name", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
     {id: "rank", name: "Rank", field: "rank", width:60, resizable:false, formatter:taxonRankFormatter, sortable:false},
-    {id: "position", name: "Position", field: "position", width:80, resizable:false, sortable:false},
+    {id: "name", name: "Taxon", field: "name", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
     {id: "status", name: "Status", field: "status", width:80, resizable:false, sortable:false},
+    {id: "position", name: "Position", field: "position", width:80, resizable:false, sortable:false},
     ];
     var taxonGridOptions = {
         enableCellNavigation: true,
@@ -145,7 +145,7 @@ function initTaxonGrid(ele) {
 }
 
 function getSelectedStatus() {
-    var selectedOptions = $('#taxonStatusSelect option:selected');
+    var selectedOptions = $('.filter input[name="taxonStatus"]:checked');
 
     statusFilter = [];
     for (var i=0; i< selectedOptions.size(); i++) {
@@ -155,7 +155,7 @@ function getSelectedStatus() {
 }
 
 function getSelectedPosition() {
-    var selectedOptions = $('#taxonPositionSelect option:selected');
+    var selectedOptions = $('.filter input[name="taxonPosition"]:checked');
 
     var positions = [];
     for (var i=0; i< selectedOptions.size(); i++) {
@@ -166,7 +166,7 @@ function getSelectedPosition() {
 
 
 function getSelectedRanks() {
-    var ranksToFetch = $('#taxonRankId option:selected');
+    var ranksToFetch = $('.filter input[name="taxonRank"]:checked ');
     var ranks = [];
     for(var i=0; i < ranksToFetch.length; i++) {
         for (var key=0; key < taxonRanks.length; key++) {
@@ -211,51 +211,26 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
         success: function(data) {
             if(data.success) {
                 data = data.model;
-                $("#taxonStatusSelect option").each(function(){
-                    var s = false;
+                $(".filter input").each(function(){
                     for(var i=0; i< data.statusToFetch.length; i++) {
                         if($(this).val() == data.statusToFetch[i]) {
-                            $(this).attr('selected', 'selected');
-                            s = true;
+                            $(this).attr('checked', 'checked');
                         } 
                     }
-                    if(!s) {
-                        $(this).removeAttr('selected');
-                    }
-                });
-                $("#taxonStatusSelect").multiselect('refresh');
- 
-                $("#taxonPositionSelect option").each(function(){
-                    var s = false;
                     for(var i=0; i< data.positionsToFetch.length; i++) {
                         if($(this).val() == data.positionsToFetch[i]) {
-                            $(this).attr('selected', 'selected');
-                            s = true;
+                            $(this).attr('checked', 'checked');
                         } 
                     }
-                    if(!s) {
-                        $(this).removeAttr('selected');
-                    }
-                });
-                $("#taxonPositionSelect").multiselect('refresh');
- 
-
-                $("#taxonRankId option").each(function(){
-                    var s = false;
                     for(var i=0; i< data.ranksToFetch.length; i++) {
                         if($(this).data('ordinal') == taxonRanks[data.ranksToFetch[i]].value) {
-                            $(this).attr('selected', 'selected');
-                            s = true;
+                            $(this).attr('checked', 'checked');
                         } 
                     }
-                    if(!s) {
-                        $(this).removeAttr('selected');
-                    }
                 });
-                $("#taxonRankId").multiselect('refresh');
-                $("#taxonRankId option").each(function(){
+                $(".filter input[name='taxonRank']").each(function(){
                     if($(this).data('ordinal') <= $(ele).data('rank')) {
-                        var input = $('#inlineFilterPanel input[value="' + $(this).val() + '"]');
+                        var input = $(this);//$('#inlineFilterPanel input[value="' + $(this).val() + '"]');
                         input.prop('disabled', true);
                         input.parent('li').addClass('disabled');
                     }
@@ -266,12 +241,12 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
                 //DIRTY LIST 
                 $('.dl_content ul').remove();
                 $('#listCounts #instanceCount').html('<b>Total</b> : ' + data.instanceTotal);
-                $('#listCounts #dirtyListCount').html('<b>Raw List</b> : ' + data.dirtyListCount);
-                $('#listCounts #workingListCount').html('&nbsp;<b>Working List</b> : ' + data.workingListCount);
-                $('#listCounts #cleanListCount').html('&nbsp;<b>Clean List</b> : ' + data.cleanListCount);
-                $('#listCounts #acceptedCount').html('&nbsp;<b>Accepted</b> : ' + data.acceptedCount);
-                $('#listCounts #synonymCount').html('&nbsp;<b>Synonyms</b> : ' + data.synonymCount);
-                //*************************************************************8
+                $('#acceptedCount').html('&nbsp;<b>Accepted</b> : ' + data.acceptedCount);
+                $('#synonymCount').html('&nbsp;<b>Synonyms</b> : ' + data.synonymCount);
+                $('#listCounts #dirtyListCount').html('<b>Raw</b> : ' + data.dirtyListCount);
+                $('#listCounts #workingListCount').html('&nbsp;<b>Working</b> : ' + data.workingListCount);
+                $('#listCounts #cleanListCount').html('&nbsp;<b>Clean</b> : ' + data.cleanListCount);
+               //*************************************************************8
                 var taxonGridDataView = taxonGrid.getData();
 
                 var taxonData = data.namesList//.accDL.concat(data.dirtyList.synDL);
@@ -388,6 +363,9 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
 
 
     $("#externalDbResults").modal('hide');
+    $('html, body').animate({
+        scrollTop: $(".metadataDetails").offset().top
+    }, 1000);
     processingStart();
     $(ele).parent("ul").find("a").css('background-color','inherit');
     $('.nameDetails').removeClass('taxon-highlight');
@@ -436,12 +414,12 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                 if(ele == undefined) {
                     return;
                 }
-                if($(ele).parents(".dl_content").length) {
+                /*if($(ele).parents(".dl_content").length) {
                     $(".dialogMsgText").html("Auto-querying CoL for up-to-date name attributes.");
                     $("#dialogMsg").modal('show');
                     $('.queryDatabase option[value="col"]').attr("selected", "selected");
                     $('.queryString').trigger("click");
-                }
+                }*/
                 oldStatus = $("#statusDropDown").val();
                 oldName = $("."+$("#rankDropDown").val()).val();
                 oldRank = $("#rankDropDown").val();
@@ -1797,16 +1775,21 @@ $(document).ready(function() {
 
     taxonGrid = initTaxonGrid($('#taxonGrid'));
 //    $("#inlineFilterPanel").appendTo(taxonGrid.getTopPanel()).show();
-    $("#inlineFilterPanel").on('keyup', '#txtSearch', function (e) {
+    /*$("#inlineFilterPanel").on('keyup', '#txtSearch', function (e) {
         Slick.GlobalEditorLock.cancelCurrentEdit();
         if (e.which == 27) {
             this.value = "";
         }
         searchString = this.value;
         updateFilter();
+    });*/
+
+    $('.filter input').change ( function() {
+        var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
+        getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
     });
 
-    $('#taxonStatusSelect').multiselect({
+    /*$('#taxonStatusSelect').multiselect({
         nonSelectedText: 'Choose Status',
         numberDisplayed: 2,
         nSelectedText:' status selected',
@@ -1839,5 +1822,12 @@ $(document).ready(function() {
             var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
             getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
         }
+    });*/
+
+    $('.selectAll').click(function() {
+       $(this).parent().next().find('input:checkbox:not([disabled])').prop('checked', 'checked').trigger('change');
+    });
+    $('.selectNone').click(function() {
+       $(this).parent().next().find('input:checkbox:not([disabled])').removeProp('checked').trigger('change');
     });
 });

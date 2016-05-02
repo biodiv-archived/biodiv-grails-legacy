@@ -1221,7 +1221,7 @@ input,button,select,textarea {
 
 #taxonHierarchy {
     overflow:auto;
-    max-height:300px;
+    height:300px;
 }
 
 .jstree-default .jstree-search.search-highlight {
@@ -3493,3 +3493,12 @@ li.group_option span{
 #recoSummary .users{float:none; }
 #recoSummary .btnagree{float:right;}
 #recoSummary .reco_block{line-height:18px;margin:2px 0px !important;}
+.filter legend{
+    margin-bottom:0px;
+    font-size:14px;
+    font-weight:bold;
+}
+.well {
+padding:5px;
+margin-bottom:5px;
+}

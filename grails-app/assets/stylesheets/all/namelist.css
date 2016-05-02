@@ -17,8 +17,9 @@ a.not_in_use {
 
 .metadataDetails .tab-content{
     min-height : 24px !important;
-    height : 24px;
+    height : 200px;
     margin-bottom:5px;
+    overflow-x: hidden !important;
 }
 
 .languageDropDown {
@@ -42,37 +43,37 @@ a.not_in_use {
     border: 2px solid #3D6798 !important;
     border-bottom-color: transparent !important;
 }
- .metadataDetails .tab-content{
-/*    overflow-y: scroll;*/
-    height: 157px;
-    overflow-x: hidden !important;
-}   
+
 .listarea{
  /*   width:25% !important;*/
     border:1px solid #ccc;
-    height:288px;
+ /*   height:460px;*/
  /*   margin:0px !important;*/
     overflow: auto;
     background-color:white;
 }
 
-.metadataDetails .listarea { 
-    height : 460px;
-    overflow:visible;
+.metadataDetails.namelist_wrapper {
+    height:570px;
 }
 
-.namelist_wrapper .taxon_selector_wrapper{
-    //width:285px!important;
-    overflow:visible;
+.metadataDetails .listarea { 
+    /*overflow:visible;*/
 }
-#taxaHierarchy #taxonHierarchy {
+
+.namelist_wrapper {
+    /*width:285px!important;
+    overflow:visible;*/
+    height:500px;
+}
+.listarea.taxon_selector_wrapper #taxaHierarchy #taxonHierarchy {
     overflow: auto;
-    height: 200px;
+    height: 376px;
 }
 
 .row-fluid .taxon_selector_wrapper_span{
     font-weight: bold;
-    text-align: center;
+    /*text-align: center;*/
     vertical-align: middle;
     border-style: outset;
     border-width: thin;
@@ -140,14 +141,14 @@ a.not_in_use {
 }
 .connection_wrapper_row1{
     color:white;
-    height:23px;
+    height:35px;
     background-color:darkcyan;
 }
 .connection_wrapper_row2{		
     background-color: beige;
     text-align: center;
     padding: 2.4px;
-    height:19px;
+    height:35px;
 }
 .taxonomyRanks {
     border: 1px solid #ccc;
@@ -194,7 +195,7 @@ a.not_in_use {
     margin-bottom:3px;
 }*/
 
-.canBeDisabled .rankStrings, .listarea label {
+.canBeDisabled .rankStrings { /*, .listarea label {*/
     padding-left:4px;
     font-weight:bold;
 }
@@ -202,4 +203,34 @@ a.not_in_use {
     padding-right:4px;
 }
 
+.filters .filter {
+    border:1px solid whitesmoke;
+}
 
+.filters .filter .filterValues {
+    background-color:white;
+    clear:both;
+    height:75px;
+    overflow:auto;
+}
+#inlineFilterPanel {
+    height:115px;
+}
+
+.attributesBlock .control-group {
+    float:left;
+    width:50%;
+    margin-left:0px;
+    margin-bottom:20px;
+}
+.attributesBlock .control-group .control-label {
+    width:130px;
+}
+.tableBlock .taxon {
+    margin-left:0px;
+    margin-bottom:0px;
+}
+
+.tableBlock td {
+    padding:7px;
+}
