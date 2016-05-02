@@ -254,24 +254,44 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
                 taxonGrid.invalidateAllRows();
                 taxonGrid.render();
                 var resultCount = data.instanceTotal;
-                $('#taxonPager').html('Showing '+((data.limit <= data.acceptedCount)? data.offset+'-'+(data.offset+data.limit<data.acceptedCount?data.offset+data.limit:data.acceptedCount) +'/':'')+data.acceptedCount+' accepted names and their synonyms').append('(<a id="fetchPrev" class="btn btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'">Prev</a>').append(',<a id="fetchNext" class="btn btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'">Next</a>)');
+                $('#taxonPager').html('Showing '+((data.limit <= data.acceptedCount)? data.offset+'-'+(data.offset+data.limit<data.acceptedCount?data.offset+data.limit:data.acceptedCount) +'/':'')+data.acceptedCount+' accepted names and their synonyms').append('(<a id="fetchFirst" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-backward"></i></a>').append('<a id="fetchPrev" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-chevron-left"></i></a>').append('<a id="fetchNext" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-chevron-right"></i></a>').append('<a id="fetchLast" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-forward"></i></a>)');
+
+                if(data.offset == 0) { 
+                    $("#fetchPrev").addClass('disabled').children().first().removeClass().addClass('icon-chevron-left-gray');
+                    $("#fetchFirst").addClass('disabled').children().first().removeClass().addClass('icon-backward-gray');
+                }
+                if(data.offset+data.limit > data.acceptedCount) {
+                    $("#fetchNext").addClass('disabled').children().first().removeClass().addClass('icon-chevron-right-gray');
+                    $("#fetchLast").addClass('disabled').children().first().removeClass().addClass('icon-forward-gray');
+                }
+
+                $('#fetchFirst').click(function() {
+                    getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, 0);
+                });
+
 
                 $('#fetchPrev').click(function() {
                     if(data.offset - data.limit < 0) {
-                        $(this).addClass('disabled')
+                        $(this).addClass('disabled').children().first().removeClass().addClass('icon-chevron-left-gray');
                         return;
                     }
+                    $(this).removeClass('disabled').children().first().removeClass().addClass('icon-chevron-left');
                     getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, data.offset - data.limit);
                 });
 
                 $('#fetchNext').click(function() {
                     if(data.offset + data.limit > data.acceptedCount) {
-                        $(this).addClass('disabled')
+                        $(this).addClass('disabled').children().first().removeClass().addClass('icon-chevron-right-gray');
                         return;
                     }
+                    $(this).removeClass('disabled').children().first().removeClass().addClass('icon-chevron-right');
                     getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, data.offset + data.limit);
                });
 
+                $('#fetchLast').click(function() {
+                    $(this).addClass('disabled').children().first().removeClass().addClass('icon-forward-gray');
+                    getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, Math.floor(data.acceptedCount/data.limit)*data.limit);
+               });
 
                 // if you don't want the items that are not visible (due to being filtered out
                 // or being on a different page) to stay selected, pass 'false' to the second arg

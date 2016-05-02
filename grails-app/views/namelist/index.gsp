@@ -108,7 +108,7 @@
 
  
                 <div class="pull-right">
-                    <div id="taxonPager" style="height:27px;display:inline-block"></div>
+                    <div id="taxonPager" class="paginateButtons" style="height:27px;padding:0px;display:inline-block"></div>
                     <obv:download  model="['source':'TaxonomyDefinition', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], downloadObjectId:params.taxon, 'exportFields':TaxonomyDefinition.fetchExportableFields()]" />
                 </div>
             </div>   
@@ -182,15 +182,16 @@
         <div class="row-fluid metadataDetails namelist_wrapper">
             <div class="span12">
 
-
-            <div class="span3 listarea taxon_selector_wrapper" >
+            
+                <div class="span3 taxon_selector_wrapper" >
+            <div class="listarea">
                 <div class="taxon_selector_span taxon_selector_wrapper_span">
                     Query 
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.query.info')}"></i>
                 </div>
 
 
-                <div class="row-fluid" style="margin-bottom:20px;">
+                <div class="row-fluid">
                     <div>
                         <select id="queryDatabase" class="queryDatabase span12" style="margin-bottom: 6px;">
                             <option value="databaseName">Database name</option>
@@ -205,8 +206,8 @@
                         <button class="btn btn-primary queryString span12" style="margin:0px; margin-bottom: 6px;" onClick='searchDatabase(false)'>Search <i class="icon-search icon-white" style="margin-left: 10px;"></i></button>
                     </div>
                 </div>
-
-                <div class="row-fluid"style=" background: #009933; ">
+            </div>
+                <div class="listarea">
                     <div class="connection_wrapper taxon_selector_span taxon_selector_wrapper_span" style="padding: 5px 0px;font-weight: bold;">Connections
                     
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.connections.info')}"></i>
@@ -244,14 +245,14 @@
                  <div>
                    <div class="span8 attributesBlock form-horizontal" style="margin-left:0px;">
                     <div class="control-group" style="width:100%">
-                        <label class="control-label" style="width:126px; text-align:right;display:inline-block;">Name
+                        <label class="control-label" style="width:100px; text-align:right;display:inline-block;">Name
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.name.info')}"></i>
                         </label>
-                        <input type="text" placeholder="Name" class="name" style="width:78.6%;display: inline-block;margin-bottom: 0;vertical-align: middle;"/>
+                        <input type="text" placeholder="Name" class="name" style="width:81.6%;display: inline-block;margin-bottom: 0;vertical-align: middle;"/>
                     </div>
  
                     <div class="control-group">
-                        <label class="control-label">Canonical Name
+                        <label class="control-label">Canonical
                         
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.canonicalname.info')}"></i>
                         </label> 
@@ -327,7 +328,7 @@
                             </g:each>
                         </select>
                     </div>
-                    <div class="rt_family control-group" style="background:slategrey;width:100%;">
+                    <div class="rt_family" style="background:slategrey;width:100%;clear:both;">
 
 
                         <ul class="nav nav-tabs" id="" style="margin:0px;">
@@ -415,7 +416,7 @@
 
                 </div> 
                 <div class="span4 tableBlock" style="overflow:hidden">
-                    <table class='table table-striped table-bordered'>
+                    <table class='table-striped table-bordered'>
                         <g:each in="${TaxonomyRank.list()}" var="taxon">
                         <tr>
                             <td class='rankStrings'>${taxon.value()}</td>
@@ -423,12 +424,13 @@
                         </tr>
                         </g:each>
                     </table>
+                    <div>
+                        <button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary input-block-level pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:2px;">Save </button> 
+                    </div>
+
+
                 </div>
                 
-                <div class="pull-right; clear:both;">
-                    <button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:2px;">Save </button> 
-                </div>
-
                 </div>
                 
                 <div class="row-fluid">

@@ -17,7 +17,7 @@ a.not_in_use {
 
 .metadataDetails .tab-content{
     min-height : 24px !important;
-    height : 200px;
+    height : 207px;
     margin-bottom:5px;
     overflow-x: hidden !important;
 }
@@ -49,6 +49,7 @@ a.not_in_use {
     border:1px solid #ccc;
  /*   height:460px;*/
  /*   margin:0px !important;*/
+    margin-bottom:10px;
     overflow: auto;
     background-color:white;
 }
@@ -64,7 +65,7 @@ a.not_in_use {
 .namelist_wrapper {
     /*width:285px!important;
     overflow:visible;*/
-    height:500px;
+    height:450px;
 }
 .listarea.taxon_selector_wrapper #taxaHierarchy #taxonHierarchy {
     overflow: auto;
@@ -197,7 +198,8 @@ a.not_in_use {
 
 .canBeDisabled .rankStrings { /*, .listarea label {*/
     padding-left:4px;
-    font-weight:bold;
+    vertical-align:middle;
+    vertical-align:middle;
 }
 .canBeDisabled .rankValues {
     padding-right:4px;
@@ -205,16 +207,18 @@ a.not_in_use {
 
 .filters .filter {
     border:1px solid whitesmoke;
+    height:115px;
 }
 
 .filters .filter .filterValues {
     background-color:white;
     clear:both;
-    height:75px;
     overflow:auto;
+    height:75px;
 }
 #inlineFilterPanel {
-    height:115px;
+    height:116px;
+    border-bottom:solid;
 }
 
 .attributesBlock .control-group {
@@ -224,13 +228,15 @@ a.not_in_use {
     margin-bottom:20px;
 }
 .attributesBlock .control-group .control-label {
-    width:130px;
+    width:100px;
 }
 .tableBlock .taxon {
-    margin-left:0px;
-    margin-bottom:0px;
+    margin:0px;
+    width:184px;
 }
-
+.tableBlock table{
+    margin-bottom:10px;
+}
 .tableBlock td {
-    padding:7px;
+    padding:5px;
 }
