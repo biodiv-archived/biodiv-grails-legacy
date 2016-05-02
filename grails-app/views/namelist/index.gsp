@@ -96,19 +96,19 @@
                     </div>
                </div>
 
-               <div id="taxonGrid" class="dl_content" style="width:100%;height:250px"></div>
-               <div id="listCounts" class="info-message span12">
+               <div id="taxonGrid" class="dl_content" style="height:298px"></div>
+               <div id="listCounts" class="pull-left info-message" style="padding:0px;margin-left:0px;">
                    <span id="instanceCount"></span>
-                   <span id="acceptedCount"></span>
+                   <!--span id="acceptedCount"></span>
                    <span id="synonymCount"></span>
                    <span id="dirtyListCount" class="RAW"></span>
                    <span id="workingListCount" class="WORKING"></span>
-                   <span id="cleanListCount" class="CLEAN"></span>
+                   <span id="cleanListCount" class="CLEAN"></span-->
               </div>
 
  
                 <div class="pull-right">
-                    <div id="taxonPager" class="paginateButtons" style="height:27px;padding:0px;display:inline-block"></div>
+                    <div id="taxonPager" class="pull-right paginateButtons" style="padding:0px;"></div>
                     <obv:download  model="['source':'TaxonomyDefinition', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], downloadObjectId:params.taxon, 'exportFields':TaxonomyDefinition.fetchExportableFields()]" />
                 </div>
             </div>   
@@ -482,25 +482,23 @@
             </script>
             <asset:script>
             $(document).ready(function() {
-                    //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
-                    var taxonBrowserOptions = {
-expandAll:false,
-controller:"${params.controller?:'namelist'}",
-action:"${params.action?:'index'}",
-expandTaxon:"${params.taxon?true:false}"
-}
-if(${params.taxon?:false}){
-taxonBrowserOptions['taxonId'] = "${params.taxon}";
-}
-if(${params.classSystem?:false}){
-taxonBrowserOptions['classSystem'] = "${params.classSystem}";
-}
+                //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
+                var taxonBrowserOptions = {
+                    expandAll:false,
+                    controller:"${params.controller?:'namelist'}",
+                    action:"${params.action?:'index'}",
+                    expandTaxon:"${params.taxon?true:false}"
+                }
+                if(${params.taxon?:false}){
+                    taxonBrowserOptions['taxonId'] = "${params.taxon}";
+                }
+                if(${params.classSystem?:false}){
+                    taxonBrowserOptions['classSystem'] = "${params.classSystem}";
+                }
 
-var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
-
-$('.icon-question-sign').tooltip();
-
-});
+                var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+                $('.icon-question-sign').tooltip();
+            });
 </asset:script>
 </body>
 </html>

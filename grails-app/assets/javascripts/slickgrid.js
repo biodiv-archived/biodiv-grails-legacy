@@ -9,6 +9,7 @@
 //= require SlickGrid/plugins/slick.cellrangedecorator.js
 //= require SlickGrid/plugins/slick.cellrangeselector.js
 //= require SlickGrid/plugins/slick.cellselectionmodel.js
+//= require SlickGrid/plugins/slick.checkboxselectcolumn.js
 //= require SlickGrid/plugins/slick.rowselectionmodel.js
 //= require SlickGrid/controls/slick.pager.js
 //= require SlickGrid/controls/slick.columnpicker.js

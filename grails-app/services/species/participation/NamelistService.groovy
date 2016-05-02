@@ -2001,7 +2001,7 @@ class NamelistService extends AbstractObjectService {
         List ranksToFetch = params.ranksToFetch ? (parentTaxon.rank+','+params.ranksToFetch).split(','):[parentTaxon.rank, nextPrimaryRank];
         List statusToFetch = params.statusToFetch ? (params.statusToFetch).split(','):[NameStatus.ACCEPTED.value().toUpperCase(), NameStatus.SYNONYM.value().toUpperCase()];
         List positionsToFetch = params.positionsToFetch ? (params.positionsToFetch).split(','):[NamePosition.RAW.value().toUpperCase(), NamePosition.WORKING.value().toUpperCase(), NamePosition.CLEAN.value().toUpperCase()];
-        String exportFields = "t.id as id, t.id as taxonid, t.rank as rank, t.name as name, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, t.position as position, t.status as status, ${classSystem} as classificationid ";
+        String exportFields = "t.id as id, t.id as taxonid, t.rank as rank, t.name as name, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, t.position as position, t.status as status, ${classSystem} as classificationid";
         String synExportFields = "";
         
         List reqExportFields = params.exportFields
@@ -2016,7 +2016,8 @@ class NamelistService extends AbstractObjectService {
             exportFields = exportFields[0..-3];
             synExportFields = exportFields;
         } else {
-            synExportFields = exportFields + ", concat(acsy.id, '_', t.id) as id ";
+            synExportFields = exportFields.replace('t.id as id,', '');
+            synExportFields += ", concat(acsy.id, '_', t.id) as id ";
             exportFields += ", s.path as path  ";
         }
 
@@ -2053,13 +2054,13 @@ class NamelistService extends AbstractObjectService {
         try {
             if(!parentId) {
                  sqlStr = "select "+exportFields+
-                    "from taxonomy_registry s, \
+                     "from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
                     "t.status = '" +NameStatus.ACCEPTED+"' and "+
-                    "t.rank = 0 order by t.rank, t.name";
+                    "t.rank = 0 order by s.path, t.name";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields
@@ -2076,7 +2077,7 @@ class NamelistService extends AbstractObjectService {
                     "t.status = '" +NameStatus.ACCEPTED+"' and "+
                     "t.rank in ("+ranksToFetch.join(',')+ ") and "+
                     "t.position in ('"+positionsToFetch.join("','")+ "') "+
-                    " order by t.rank asc, t.name asc limit :limit offset :offset";
+                    " order by s.path, t.name asc limit :limit offset :offset";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields

@@ -72,15 +72,22 @@ function initTaxonGrid(ele) {
     var taxonRankFormatter = function(row, cell, value, columnDef, dataContext) {
         return taxonRanks[value].text;
     }
- 
+
+/*    var checkboxSelector = new Slick.CheckboxSelectColumn({
+        cssClass: "slick-cell-checkboxsel"
+    });
+*/
     //{id: "taxonid", name: "Id", field: "taxonid", maxWidth:80, resizble:false, sortable:true},
     //{id: "isflagged", name: "Flagged", field: "isflagged", width: 40, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, resizable:false}
-    var taxonGridColumns = [
+    var taxonGridColumns = [];
+//    taxonGridColumns.push(checkboxSelector.getColumnDefinition());
+
+    taxonGridColumns.push(
     {id: "rank", name: "Rank", field: "rank", width:60, resizable:false, formatter:taxonRankFormatter, sortable:false},
     {id: "name", name: "Taxon", field: "name", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
     {id: "status", name: "Status", field: "status", width:80, resizable:false, sortable:false},
-    {id: "position", name: "Position", field: "position", width:80, resizable:false, sortable:false},
-    ];
+    {id: "position", name: "Position", field: "position", width:80, resizable:false, sortable:false}
+    );
     var taxonGridOptions = {
         enableCellNavigation: true,
         editable: false,
@@ -140,6 +147,8 @@ function initTaxonGrid(ele) {
 
     taxonGridDataView.setFilter(nameFilter);
 //    taxonGrid.showTopPanel();
+
+//    taxonGrid.registerPlugin(checkboxSelector);
     taxonGrid.init();
     return taxonGrid;
 }
@@ -229,10 +238,11 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
                     }
                 });
                 $(".filter input[name='taxonRank']").each(function(){
+                    var input = $(this);//$('#inlineFilterPanel input[value="' + $(this).val() + '"]');
                     if($(this).data('ordinal') <= $(ele).data('rank')) {
-                        var input = $(this);//$('#inlineFilterPanel input[value="' + $(this).val() + '"]');
                         input.prop('disabled', true);
-                        input.parent('li').addClass('disabled');
+                    } else {
+                        input.removeProp('disabled');
                     }
                 });
 
@@ -241,22 +251,25 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
                 //DIRTY LIST 
                 $('.dl_content ul').remove();
                 $('#listCounts #instanceCount').html('<b>Total</b> : ' + data.instanceTotal);
-                $('#acceptedCount').html('&nbsp;<b>Accepted</b> : ' + data.acceptedCount);
+                /*$('#acceptedCount').html('&nbsp;<b>Accepted</b> : ' + data.acceptedCount);
                 $('#synonymCount').html('&nbsp;<b>Synonyms</b> : ' + data.synonymCount);
                 $('#listCounts #dirtyListCount').html('<b>Raw</b> : ' + data.dirtyListCount);
                 $('#listCounts #workingListCount').html('&nbsp;<b>Working</b> : ' + data.workingListCount);
                 $('#listCounts #cleanListCount').html('&nbsp;<b>Clean</b> : ' + data.cleanListCount);
+                */
                //*************************************************************8
                 var taxonGridDataView = taxonGrid.getData();
 
                 var taxonData = data.namesList//.accDL.concat(data.dirtyList.synDL);
+
                 taxonGridDataView.setItems(taxonData, 'id');
                 taxonGrid.invalidateAllRows();
                 taxonGrid.updateRowCount();
                 taxonGrid.gotoCell(0,0);
                 taxonGrid.render();
+
                 var resultCount = data.instanceTotal;
-                $('#taxonPager').html('Showing '+((data.limit <= data.acceptedCount)? data.offset+'-'+(data.offset+data.limit<data.acceptedCount?data.offset+data.limit:data.acceptedCount) +'/':'')+data.acceptedCount+' accepted names and their synonyms').append('(<a id="fetchFirst" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-backward"></i></a>').append('<a id="fetchPrev" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-chevron-left"></i></a>').append('<a id="fetchNext" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-chevron-right"></i></a>').append('<a id="fetchLast" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-forward"></i></a>)');
+                $('#taxonPager').html('Showing '+((data.limit <= data.acceptedCount)? data.offset+'-'+(data.offset+data.limit < data.acceptedCount?data.offset+data.limit:data.acceptedCount) +'/':'')+data.acceptedCount+' accepted names and their synonyms').append('<div class="pull-right">(<a id="fetchFirst" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-backward"></i></a><a id="fetchPrev" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-chevron-left"></i></a><a id="fetchNext" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-chevron-right"></i></a><a id="fetchLast" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-forward"></i></a>)');
 
                 if(data.offset == 0) { 
                     $("#fetchPrev").addClass('disabled').children().first().removeClass().addClass('icon-chevron-left-gray');
@@ -1432,10 +1445,11 @@ function showNewNamePopup() {
 
 function reinitializeRows($context) {
     var numRows = $context.find(".tab_div").length;
+    console.log(numRows);
     for(var i = 0; i< 4; i++) {
         $context.find(".add_new_row").trigger("click");
     }
-    $context.find(".tab_div:lt("+(numRows-1)+")").remove();
+//    $context.find(".tab_div:lt("+(numRows-1)+")").remove();
 }
 
 function showProperTabs() {
@@ -1689,7 +1703,7 @@ $(document).ready(function() {
             case 'document' : url = window.params.document.listUrl; break;
             default : console.log("no url");
         }
-        var taxon = 94899;//$("input#filterByTaxon").val();
+        var taxon = $("input#filterByTaxon").val();
         var params = {};
         params['taxon'] = taxon;
         params['max'] = $(this).data('max');

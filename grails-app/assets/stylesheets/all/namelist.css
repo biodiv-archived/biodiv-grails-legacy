@@ -17,8 +17,7 @@ a.not_in_use {
 
 .metadataDetails .tab-content{
     min-height : 24px !important;
-    height : 207px;
-    margin-bottom:5px;
+    height : 210px;
     overflow-x: hidden !important;
 }
 
@@ -142,8 +141,9 @@ a.not_in_use {
 }
 .connection_wrapper_row1{
     color:white;
-    height:35px;
+    line-height:35px;
     background-color:darkcyan;
+    vertical-align:middle;
 }
 .connection_wrapper_row2{		
     background-color: beige;
