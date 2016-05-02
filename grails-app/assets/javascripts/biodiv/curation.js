@@ -252,6 +252,8 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
                 var taxonData = data.namesList//.accDL.concat(data.dirtyList.synDL);
                 taxonGridDataView.setItems(taxonData, 'id');
                 taxonGrid.invalidateAllRows();
+                taxonGrid.updateRowCount();
+                taxonGrid.gotoCell(0,0);
                 taxonGrid.render();
                 var resultCount = data.instanceTotal;
                 $('#taxonPager').html('Showing '+((data.limit <= data.acceptedCount)? data.offset+'-'+(data.offset+data.limit<data.acceptedCount?data.offset+data.limit:data.acceptedCount) +'/':'')+data.acceptedCount+' accepted names and their synonyms').append('(<a id="fetchFirst" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-backward"></i></a>').append('<a id="fetchPrev" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-chevron-left"></i></a>').append('<a id="fetchNext" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-chevron-right"></i></a>').append('<a id="fetchLast" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-forward"></i></a>)');
