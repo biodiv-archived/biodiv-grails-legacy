@@ -72,7 +72,7 @@ h6 {
 }
 
 .paginateButtons a {
-	background: #fff;
+	background: #e5e5e5;
 	border: 0px solid #ccc;
 	border-color: #ccc #aaa #aaa #ccc;
 	margin: 0 3px;
@@ -1044,7 +1044,6 @@ ul#recoSummary {
 
 .observations_list {
 	position: relative;
-	top: -40px;
 	/* box-shadow: 8px 0 6px -6px #5e5e5e; */
 	/* background-color: rgba(106, 201, 162, 0.1); */
 }
@@ -1222,18 +1221,18 @@ input,button,select,textarea {
 
 #taxonHierarchy {
     overflow:auto;
-    max-height:300px;
+    height:300px;
 }
 
 .jstree-default .jstree-search.search-highlight {
     background-color:#88EAFB !important
 }
 
-.taxon-highlight {
-	font-weight: bold;
+.taxon-highlight, .taxon-highlight a {
+    font-weight: bold;
     border: 1px solid #fad42e;
-      background: #fbec88 !important;
-        color: #363636;
+    background: #0063CC !important;
+    color: #ffffff !important;
 }
 
 
@@ -1678,7 +1677,7 @@ span.cke_skin_kama {
 }
 
 .sci_name {
-	font-style: italic !important;
+	/*font-style: italic !important;*/
 }
 
 h1,.main_heading .species_title .sci_name {
@@ -2047,6 +2046,7 @@ li#userOrEmail-new {
 
 .nameContainer {
 	position: relative;
+    overflow:visible;
 }
 
 #nameSuggestions {
@@ -3108,10 +3108,15 @@ small {
 	padding-right: 20px;
 }
 
-.RAW {
+.RAW, .RAW a{
     color:red !important;
 }
 .WORKING {
+}
+
+.SYNONYM {
+    list-style:none;
+    padding-left:10px;
 }
 
 .breadcrumb {
@@ -3121,27 +3126,63 @@ small {
 }
 
 .input-append.input-block-level {
-      display: table; 
-  }
-  .input-append.input-block-level .add-on {
-        display: table-cell;
-    }
-    .input-append.input-block-level > input {
-          width: 100%;
-      }
+    display: table; 
+}
+.input-append.input-block-level .add-on {
+    display: table-cell;
+}
+.input-append.input-block-level > input {
+    width: 100%;
+}
 
-.taxon10 {
+.taxon0 {
+    margin-left:0px;
+}
+
+.taxon1 {
+    margin-left:10px;
+}
+
+.taxon2 {
     margin-left:20px;
 }
 
+.taxon3 {
+    margin-left:30px;
+}
+
+.taxon4 {
+    margin-left:40px;
+}
+.taxon5 {
+    margin-left:50px;
+}
+
+.taxon6 {
+    margin-left:60px;
+}
+
+.taxon7 {
+    margin-left:70px;
+}
+.taxon8 {
+    margin-left:80px;
+}
+.taxon9 {
+    margin-left:90px;
+}
+.taxon10 {
+    margin-left:100px;
+}
+
 .nameSuggestions{
-	font-size: 14px;
+    font-size: 14px;
 }
 
 /*Added */
 
 .dirty_list{
-	 background-color:lightgrey; //#C0504D;
+    background-color:lightgrey; //#C0504D;
 }
 
 .working_list{
@@ -3453,3 +3494,12 @@ li.group_option span{
 #recoSummary .users{float:none; }
 #recoSummary .btnagree{float:right;}
 #recoSummary .reco_block{line-height:18px;margin:2px 0px !important;}
+.filter legend{
+    margin-bottom:0px;
+    font-size:14px;
+    font-weight:bold;
+}
+.well {
+padding:5px;
+margin-bottom:5px;
+}

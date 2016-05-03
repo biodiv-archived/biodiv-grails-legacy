@@ -625,3 +625,23 @@ update field set sub_category ='Local Distribution Geographic Entity' where id=6
 #22ndApr2016
 alter table doc_sci_name add column primary_name integer not null default 0;
 alter table doc_sci_name add column is_deleted boolean not null default 'false';
+
+#02May2016
+create view ibp_taxonomy_registry as
+with recursive cte as
+(   
+    select
+    *,
+    cast(0 as text) as level
+    from taxonomy_registry
+    where parent_taxon_id is null and classification_id=265799
+    union all
+    select
+    t.*,
+    level || '.' || t.parent_taxon_definition_id AS level
+    from taxonomy_registry t 
+    inner join cte i on i.id = t.parent_taxon_id
+    where t.classification_id = 265799
+)
+select * from cte;
+

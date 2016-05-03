@@ -69,17 +69,6 @@
 //= require biodiv/chooseLanguage.js
 
 ////= require slickgrid
-//= require SlickGrid-2.0.2/lib/jquery.event.drag-2.0.min.js
-//= require SlickGrid-2.0.2/slick.core.js
-//= require SlickGrid-2.0.2/slick.formatters.js
-//= require SlickGrid-2.0.2/slick.editors.js
-//= require SlickGrid-2.0.2/slick.grid.js
-//= require SlickGrid-2.0.2/plugins/slick.headerbuttons.js
-//= require SlickGrid-2.0.2/plugins/slick.headermenu.js
-//= require SlickGrid-2.0.2/plugins/slick.cellrangedecorator.js
-//= require SlickGrid-2.0.2/plugins/slick.cellrangeselector.js
-//= require SlickGrid-2.0.2/plugins/slick.cellselectionmodel.js
-
 ////= require create
 //= require jquery.plugins/filepicker.js
 //= require jquery.plugins/jquery.exif.js
@@ -109,7 +98,7 @@
 ////= require curation
 //= require biodiv/taxonhierarchy.js
 //= require biodiv/speciesPermission.js
-//= require biodiv/curation.js
+////= require biodiv/curation.js
 
 ////= require maps
 ////= require OpenLayers-2.10/OpenLayers.js

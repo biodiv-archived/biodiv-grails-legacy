@@ -22,7 +22,7 @@ class SynonymsMerged extends TaxonomyDefinition {
     }
 
     Map fetchGeneralInfo() {
-         return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+         return [name:name, canonicalForm:canonicalForm, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
     }
 
     Map fetchLimitInfo(){

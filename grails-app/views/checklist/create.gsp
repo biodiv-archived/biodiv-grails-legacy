@@ -21,7 +21,7 @@
                 display:inline-block;
             }
         </style>
-
+        <asset:javascript src="slickgrid.js"/>
     </head>
     <body>
         <div class="observation_create">
