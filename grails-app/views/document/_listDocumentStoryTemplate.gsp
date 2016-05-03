@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <%@ page import="content.eml.Document"%>
         <%
         // To overcome hibernate fileassist issue - http://www.intelligrape.com/blog/2012/09/21/extract-correct-class-from-hibernate-object-wrapped-with-javassist/
@@ -25,8 +26,8 @@
                 <div class="prop">
                 <span class="name"><i class=" icon-comment"></i><g:message code="default.description.label" /></span>
 
-                <div style="display:${styleVar}" class=" value twoellipse">
-                    ${raw(documentInstance?.notes)}
+                <div style="display:${styleVar}" class=" value ellipsis">
+                    ${Utils.stripHTML(documentInstance?.notes.replaceAll('&nbsp;', ''))}  
                 </div>
                 </div>
             </g:if>    
