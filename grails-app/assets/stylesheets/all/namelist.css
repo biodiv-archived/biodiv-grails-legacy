@@ -17,8 +17,8 @@ a.not_in_use {
 
 .metadataDetails .tab-content{
     min-height : 24px !important;
-    height : 24px;
-    margin-bottom:5px;
+    height : 210px;
+    overflow-x: hidden !important;
 }
 
 .languageDropDown {
@@ -42,37 +42,38 @@ a.not_in_use {
     border: 2px solid #3D6798 !important;
     border-bottom-color: transparent !important;
 }
- .metadataDetails .tab-content{
-/*    overflow-y: scroll;*/
-    height: 157px;
-    overflow-x: hidden !important;
-}   
+
 .listarea{
  /*   width:25% !important;*/
     border:1px solid #ccc;
-    height:288px;
+ /*   height:460px;*/
  /*   margin:0px !important;*/
+    margin-bottom:10px;
     overflow: auto;
     background-color:white;
 }
 
-.metadataDetails .listarea { 
-    height : 375px;
-    overflow:visible;
+.metadataDetails.namelist_wrapper {
+    height:570px;
 }
 
-.taxon_selector_wrapper{
-    //width:285px!important;
-    overflow:hidden;
+.metadataDetails .listarea { 
+    /*overflow:visible;*/
 }
-#taxaHierarchy #taxonHierarchy {
+
+.namelist_wrapper {
+    /*width:285px!important;
+    overflow:visible;*/
+    height:450px;
+}
+.listarea.taxon_selector_wrapper #taxaHierarchy #taxonHierarchy {
     overflow: auto;
-    height: 200px;
+    height: 376px;
 }
 
 .row-fluid .taxon_selector_wrapper_span{
     font-weight: bold;
-    text-align: center;
+    /*text-align: center;*/
     vertical-align: middle;
     border-style: outset;
     border-width: thin;
@@ -80,13 +81,13 @@ a.not_in_use {
     min-height:24px;
 }
 
-.row-fluid .taxon_selector_wrapper_span.dirty_list{
+.row-fluid .taxon_selector_wrapper_span.dirty_list, .dl_content li.RAW, .filterValues .RAW {
     background-color:lightgrey; //#C0504D;
 }
-.row-fluid .taxon_selector_wrapper_span.working_list{
+.row-fluid .taxon_selector_wrapper_span.working_list, .dl_content li.WORKING, .filterValues .WORKING {
     background-color:khaki; //#FF9900;
 }
-.row-fluid .taxon_selector_wrapper_span.clean_list{
+.row-fluid .taxon_selector_wrapper_span.clean_list,  .dl_content li.CLEAN, .filterValues .CLEAN {
     background-color:mediumaquamarine; //#009933;
 }
 .row-fluid .taxon_selector_wrapper_span.taxon_selector_span{
@@ -140,14 +141,15 @@ a.not_in_use {
 }
 .connection_wrapper_row1{
     color:white;
-    height:23px;
+    line-height:35px;
     background-color:darkcyan;
+    vertical-align:middle;
 }
 .connection_wrapper_row2{		
     background-color: beige;
     text-align: center;
     padding: 2.4px;
-    height:19px;
+    height:35px;
 }
 .taxonomyRanks {
     border: 1px solid #ccc;
@@ -194,13 +196,55 @@ a.not_in_use {
     margin-bottom:3px;
 }*/
 
-.canBeDisabled .rankStrings, .listarea label {
+.canBeDisabled .rankStrings { /*, .listarea label {*/
     padding-left:4px;
-    color:white;
-    font-weight:bold;
+    vertical-align:middle;
+    vertical-align:middle;
 }
 .canBeDisabled .rankValues {
     padding-right:4px;
 }
 
+.filters .filter {
+    border:1px solid whitesmoke;
+    height:115px;
+}
 
+.filters .filter .filterValues {
+    background-color:white;
+    clear:both;
+    overflow:auto;
+    height:75px;
+}
+#inlineFilterPanel {
+    height:116px;
+    border-bottom:solid;
+}
+
+.attributesBlock .control-group {
+    float:left;
+    width:50%;
+    margin-left:0px;
+    margin-bottom:20px;
+}
+.attributesBlock .control-group .control-label {
+    width:100px;
+}
+.tableBlock .taxon {
+    margin:0px;
+    width:184px;
+}
+.tableBlock table{
+    margin-bottom:10px;
+}
+.tableBlock td {
+    padding:5px;
+}
+
+.SYNONYM .icon-pause {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}

@@ -165,6 +165,12 @@ class TaxonomyDefinition extends ScientificName {
         */
     }
 	
+	String fetchRootId(){
+		def hir = fetchDefaultHierarchy()
+		if(hir)
+			return hir[0].id
+	}
+	
 	String fetchRootName(){
 		def hir = fetchDefaultHierarchy()
 		if(hir)
@@ -274,53 +280,57 @@ class TaxonomyDefinition extends ScientificName {
 			   
    }
    
-   // update the path of children in ibp classification when node moves to clean state.
-   private void moveChildren(List sqlStrings){
-	   	//not moving children for name at level kingdom, phylum and class
-   		if(rank <= 2){
-   			return
-   		}
+   public List fetchUpdateTaxonRegSql(id){
+	   List sqlStrings = []
+	   //not moving children for name at level kingdom, phylum and class
+	   if(rank <= 2){
+		   return sqlStrings
+	   }
 
-   		Classification ibpClassification = Classification.fetchIBPClassification()
+		Classification ibpClassification = Classification.fetchIBPClassification()
 		TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, ibpClassification)
 		if(!tr){
-			return
+			return sqlStrings
 		}
-
-		//println "============ child count " + TaxonomyRegistry.countByParentTaxonAndClassification(tr, ibpClassification)
-		//println "=================== moving children for taxon " + this 
-   		
 		
-		//have to look if this node exist in mid or in start. Note end is not required because we are moviing chlidren 
-		//code here handles both start and mid condition	
+		//have to look if this node exist in mid or in start. Note end is not required because we are moviing chlidren
+		//code here handles both start and mid condition
 		String newPathPrefix = "'" + tr.path + "_'"
 		String splitter = "'_" + id + "_'"
 		String startOffset =  ("" + id).length() + 1 // if id is 12345 then subsitute is 12345_ so length + 1
-
+	
 		String startSql = "update taxonomy_registry set path =  (" + newPathPrefix + " ||  right(path, char_length(path) - " + startOffset + "))" ;
-		//String midSql = "update taxonomy_registry set path =  (" + newPathPrefix + " ||  split_part( path, " + splitter + ", 2))" ;
 		String midSql = "update taxonomy_registry set path =  (" + newPathPrefix + " ||  right(path, char_length(path)- strpos(path, " + splitter + ") - " + startOffset + "))" ;
-
-		String whereClause = " where classification_id = " + ibpClassification.id  
+	
+		String whereClause = " where classification_id = " + ibpClassification.id
 		String startCond = " and path like '" + id + "\\_%';"
 		String midCond = " and path like '%\\_" + id + "\\_%';"
 		
 		String startQuery = startSql + whereClause + startCond
 		String midQuery = midSql + whereClause + midCond
 		
-		//println "-------- startQuery " + startQuery
-		//println "-------- midQuery " + midQuery
-
 		sqlStrings.add(startQuery)
 		sqlStrings.add(midQuery)
+		
+		return sqlStrings
+   }
+   
+   
+   // update the path of children in ibp classification when node moves to clean state.
+   private void moveChildren(List sqlStrings){
+	   //not moving children for name at level kingdom, phylum and class
+	   if(rank <= 2){
+		   return 
+	   }
 
-		/*
-		sqlObj.executeUpdate(startQuery)
-		println " finished start qeery "
-		sqlObj.executeUpdate(midQuery)
-		println " finished end query"
-		*/
+		Classification ibpClassification = Classification.fetchIBPClassification()
+		TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, ibpClassification)
+		if(!tr){
+			return 
+		}
 
+		sqlStrings.addAll(fetchUpdateTaxonRegSql(id))
+		
 		if(tr.parentTaxonDefinition){
    			tr.parentTaxonDefinition.moveChildren(sqlStrings)
    		}
@@ -379,7 +389,7 @@ class TaxonomyDefinition extends ScientificName {
    }
    
    Map fetchGeneralInfo(){
-	   return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId, nameSourceId:nameSourceId]
+	   return [name:name, canonicalForm:canonicalForm, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId , nameSourceId:nameSourceId]
    }
 
     def addSynonym(SynonymsMerged syn) {
@@ -675,24 +685,8 @@ class TaxonomyDefinition extends ScientificName {
 	
 	
 	def updateNameStatus(String str){
-		NameStatus newStatus = NameStatus.getEnum(str)
-		if(!newStatus)
-			return
-		
-		//println "=================== came for updatestatus " + newStatus + " odl status " + status
-		if(newStatus == NameStatus.ACCEPTED)
-			changeToAcceptedName()
-		else{
-			//changeToSynonym()
-			log.errors "Not supported for taxon " + this + " and status " + newStatus
-		}	
+		log.error "Not doing any thing.. this method should be called from namelistservice api"
 	}
-	
-	boolean changeToAcceptedName(){
-		//placeHolder method actual method is in subclass of synonym merged
-		return true
-	}
-	
 	
 	def updateContributors(List<SUser> users){
 		if(!users) return
@@ -733,4 +727,11 @@ class TaxonomyDefinition extends ScientificName {
 		return null
 	}
 
+	def fetchList(params) {
+		return namelistService.getNamesFromTaxon(params);
+	}
+
+    static List fetchExportableFields(def grailsApplication=null) {
+        return [['field':'id', 'name':'TaxonId', 'default':true, 'dbField':'id'], [ 'field' : 'name', 'name':'Name', 'default':true, 'dbField':'name'], ['field':'canonicalForm', 'name':'Canonical Form', 'default':false, 'dbField':'canonical_form'], ['field':'authorYear', 'name':'Author & Year', 'default':true, 'dbField':'author_year'], ['field': 'rank', 'name':'Rank', 'default':true, 'dbField':'rank'], ['field':'status', 'name':'Status', 'default':true, 'dbField':'status'], ['field':'position', 'name':'Position', 'default':true, 'dbField':'position'], ['field':'matchDatabaseName', 'name':'Source', 'default':true, 'dbField':'match_database_name'], ['field':'matchId', 'name':'Match Id', 'default':true, 'dbField':'match_id'], ['field':'viaDatasource', 'name':'Via Database', 'default':true, 'dbField':'via_datasource'], ['field': 'defaultHierarchy', 'name' : grailsApplication?grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY:'Taxonomy Hierarchy', 'default':true, 'dbField':'default_hierarchy'], ['field' : 'group', 'name':'Species Group', 'default':true, 'dbField':'group_id'], ['field':'speciesId', 'name':'Species Id', 'default':false, 'dbField':'species_id'], ['field':'isFlagged', 'name':'Is Flagged', 'default':false, 'dbField':'is_flagged']]; 
+    }
 }

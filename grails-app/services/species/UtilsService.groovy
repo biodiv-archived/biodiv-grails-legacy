@@ -43,6 +43,7 @@ import grails.converters.JSON;
 import species.auth.Role;
 import species.auth.SUser;
 import species.auth.SUserRole;
+import au.com.bytecode.opencsv.CSVWriter;
 
 
 class UtilsService {
@@ -1204,6 +1205,15 @@ class UtilsService {
         if(!cache) return null;
         log.debug "Clearing Cache ${cache.name}"
         return cache.clear();
+    }
+
+    def CSVWriter getCSVWriter(def directory, def fileName) {
+        //char separator = '\t'
+        File dir =  new File(directory)
+        if(!dir.exists()){
+            dir.mkdirs()
+        }
+        return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
     }
 
 }

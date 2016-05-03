@@ -43,7 +43,6 @@ class TaxonController {
     /**
      * 
      */
-    @Cacheable('taxon')
     def listHierarchy() {
         //cache "taxonomy_results"
         includeOriginHeader();
@@ -56,7 +55,7 @@ class TaxonController {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-        
+       println expandTaxon 
         return _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
     }
 
@@ -75,9 +74,17 @@ class TaxonController {
             def taxonIds = [];
             def tillLevel = level+3;
              if(expandTaxon) {
+                 println "expandTaxon"
                 def taxon = TaxonomyDefinition.read(taxonId);
+                if(taxon instanceof species.SynonymsMerged) {
+                //    taxon = taxon.accepted
+                    //TODO
+                }
+                println taxon
                 tillLevel = taxon.rank;
+                println tillLevel
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
+                println taxonIds
             }
             //def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
