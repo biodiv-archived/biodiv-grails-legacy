@@ -2001,7 +2001,7 @@ class NamelistService extends AbstractObjectService {
         List ranksToFetch = params.ranksToFetch ? (parentTaxon.rank+','+params.ranksToFetch).split(','):[parentTaxon.rank, nextPrimaryRank];
         List statusToFetch = params.statusToFetch ? (params.statusToFetch).split(','):[NameStatus.ACCEPTED.value().toUpperCase(), NameStatus.SYNONYM.value().toUpperCase()];
         List positionsToFetch = params.positionsToFetch ? (params.positionsToFetch).split(','):[NamePosition.RAW.value().toUpperCase(), NamePosition.WORKING.value().toUpperCase(), NamePosition.CLEAN.value().toUpperCase()];
-        String exportFields = "t.id as id, t.id as taxonid, t.rank as rank, t.name as name, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, t.position as position, t.status as status, ${classSystem} as classificationid";
+        String exportFields = "t.id as id, t.id as taxonid, t.rank as rank, t.name as name, t.italicised_form as italicisedform, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, t.position as position, t.status as status, ${classSystem} as classificationid";
         String synExportFields = "";
         
         List reqExportFields = params.exportFields

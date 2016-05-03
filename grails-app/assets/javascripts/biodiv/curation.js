@@ -61,7 +61,7 @@ function initTaxonGrid(ele) {
         if(selectedName && value.name.toLowerCase() == selectedName) {
             klass = 'taxon-highlight';
         }
-        listContent += "<li class='nameDetails "+value.position+" taxon"+value.rank+" "+klass+" "+value.status+"' onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",&quot;"+value.status+"&quot;, this,false)'><a>" +value.name +"</a>";
+        listContent += "<li class='nameDetails "+value.position+" taxon"+value.rank+" "+klass+" "+value.status+"' onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",&quot;"+value.status+"&quot;, this,false)'><a>" +(value.status=='SYNONYM' ? '<i class="icon-pause"></i>':'')+value.italicisedform +"</a>";
         if(value.id)
             listContent += "<input type='hidden' value='"+value.id+"'>"+x+"</li>";
 
@@ -84,7 +84,7 @@ function initTaxonGrid(ele) {
 
     taxonGridColumns.push(
     {id: "rank", name: "Rank", field: "rank", width:60, resizable:false, formatter:taxonRankFormatter, sortable:false},
-    {id: "name", name: "Taxon", field: "name", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
+    {id: "name", name: "Taxon", field: "italicisedform", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
     {id: "status", name: "Status", field: "status", width:80, resizable:false, sortable:false},
     {id: "position", name: "Position", field: "position", width:80, resizable:false, sortable:false}
     );
