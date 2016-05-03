@@ -15,14 +15,17 @@
             <div class="modal-body">
                 <div><div class="alert alert-info"><g:message code="msg.link.available" /></div></div>
                 <g:if test="${exportFields}">
-                <h4>${g.message(code:'download.export.fields')}</h4>
-                <g:each in="${exportFields}" var="exportField">
-                    <span class="checkbox inline">
+                <div>
+                    <h4>${g.message(code:'download.export.fields')}</h4>
+                    <g:each in="${exportFields}" var="exportField">
+                    <span class="checkbox inline no_indent">
                         <input type="checkbox" name="exportFields" value="${exportField.field}" ${exportField.default?'checked="checked"':''} >
                         ${exportField.name}</input>
                     </span>
-                </g:each>
+                    </g:each>
+                </div>
                 </g:if>
+                <div style="clear:both">
                 <h4>${g.message(code:'download.export')}</h4>
                 <g:each in="${downloadTypes}" var="downloadType" status="i">
                 <span class="radio inline">
@@ -36,6 +39,7 @@
                     </g:else>
                 </span>
                 </g:each>
+                </div>
                 <br />
                 <input type="hidden" name="downloadFrom" value="${downloadFrom}"/>
                 <input type="hidden" name="source" value="${source}"/>
