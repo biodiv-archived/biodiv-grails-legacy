@@ -50,7 +50,7 @@ class DocumentTokelUrlJob {
                     docSciNameInstance.displayOrder = mapSize
                     mapSize--;
                     if(docSciNameInstance.canonicalForm) {
-                        docSciNameInstance.taxonConcept = TaxonomyDefinition.findByCanonicalForm(docSciNameInstance.canonicalForm);
+                        docSciNameInstance.taxonConcept = TaxonomyDefinition.findByCanonicalFormAndIsDeleted(docSciNameInstance.canonicalForm, false);
                     }
                    // println docSciNameInstance
                    // println "mapsize----in loop--- "+ mapSize

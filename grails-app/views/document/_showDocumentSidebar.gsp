@@ -48,7 +48,7 @@ String status = docId?.status
                         </sUser:permToReorderDocNames>
                     <td>
                         <%
-                        def taxaObj = nameParseValues[sciName.key]?TaxonomyDefinition.findByCanonicalForm(nameParseValues[sciName.key]):null
+                        def taxaObj = nameParseValues[sciName.key]?TaxonomyDefinition.findByCanonicalFormAndIsDeleted(nameParseValues[sciName.key], false):null
                         def speciesObjId = taxaObj?taxaObj.findSpeciesId():null;
                         def link = ""
                         if(speciesObjId) {

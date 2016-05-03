@@ -54,7 +54,7 @@
                                   <label for="taxonConcept"><g:message code="commonNames.taxonConcept.label" default="Taxon Concept" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: commonNamesInstance, field: 'taxonConcept', 'errors')}">
-                                    <g:select name="taxonConcept.id" from="${species.TaxonomyDefinition.list()}" optionKey="id" value="${commonNamesInstance?.taxonConcept?.id}"  />
+                                    <g:select name="taxonConcept.id" from="${species.TaxonomyDefinition.findAllBy(isDeleted:false)}" optionKey="id" value="${commonNamesInstance?.taxonConcept?.id}"  />
                                 </td>
                             </tr>
                         

@@ -647,7 +647,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode, List synonyms) {
-        log.debug "Creating species field from node : "+fieldNode;
+        log.debug "Creating species field from node : =========== "+fieldNode;
         List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
         Field field = getField(fieldNode, false);
         if(field == null) {
@@ -684,8 +684,10 @@ class XMLConverter extends SourceConverter {
             SpeciesField speciesField;
 
             def temp = []
+			
+			String dt = data.replaceAll("\n","<br />");
             //TODO:HACK just for keystone
-            String dt = data.replaceAll("</?p>","");
+            dt = data.replaceAll("</?p>","");
             for (sField in sFields) {
                 if(isDuplicateSpeciesField(sField, contributors, attributors,  dt)) {
                     log.debug "Found already existing species fields for field ${field} ${sField}"
@@ -1542,6 +1544,7 @@ class XMLConverter extends SourceConverter {
                 lang ? eq("language", lang): isNull("language");
                 ilike("name", cleanName);
                 eq("taxonConcept", taxonConcept);
+				eq('isDeleted', false)
             }
 
             if(!sfield) {
@@ -1848,6 +1851,7 @@ class XMLConverter extends SourceConverter {
                         TaxonomyDefinition taxon = taxonCriteria.get {
                             eq("rank", rank);
                             ilike("canonicalForm", parsedName.canonicalForm);
+							eq('isDeleted', false)
                         }
 
                         if(!taxon && saveTaxonHierarchy) {

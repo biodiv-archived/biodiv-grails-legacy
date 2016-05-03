@@ -1099,7 +1099,7 @@ class SpeciesService extends AbstractObjectService  {
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
+                content = CommonNames.findAllByTaxonConceptAndIsDeleted(taxonConcept, false) ;
                 String activityType, mailType, description;
                 if(oldCommonname) {                    
                     description = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
@@ -1376,7 +1376,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
 
                 msg = messageSource.getMessage("info.success.remove.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
+                content = CommonNames.findAllByTaxonConceptAndIsDeleted(taxonConcept, false) ;
                 if(speciesInstance) {
                     return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance,activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED, activityDesc:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
                 } else {

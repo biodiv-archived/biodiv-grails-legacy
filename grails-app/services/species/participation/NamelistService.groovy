@@ -103,6 +103,7 @@ class NamelistService {
 			normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
 			res = clazz.withCriteria(){
 				and{
+					eq('isDeleted', false)
 					eq('normalizedForm', normalizedForm)
 					if(status) eq('status', status)
 					if(rank >= 0)
@@ -120,6 +121,7 @@ class NamelistService {
 		//println  "No result in Normalized form using canonical form now"
         res = clazz.withCriteria(){
 			and{
+				eq('isDeleted', false)
 				eq('canonicalForm', canonicalForm)
 				if(status) eq('status', status)
 				if(rank >= 0)
@@ -1120,7 +1122,7 @@ class NamelistService {
     }
 
     def getAcceptedNamesOfCommonNames(String comName) {
-        def r = CommonNames.findAllByName(comName);
+        def r = CommonNames.findAllByNameAndIsDeleted(comName, false);
         def res = []
         r.each {
             res.add(it.taxonConcept);
@@ -1145,7 +1147,7 @@ class NamelistService {
     }
 
     def getCommonNamesOfTaxon(TaxonomyDefinition taxonConcept) {
-        def res = CommonNames.findAllByTaxonConcept(taxonConcept);
+        def res = CommonNames.findAllByTaxonConceptAndIsDeleted(taxonConcept, false);
         def result = []
         res.each {
             def temp = [:]
