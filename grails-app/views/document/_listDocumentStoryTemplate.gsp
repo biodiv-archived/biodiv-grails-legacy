@@ -42,11 +42,13 @@
                 </div>
                 </div>
             </g:if>
+
+            <div style=" bottom: 3px;position: absolute;width: 100%;">
             <div style="float:right;">
             <sUser:showUserTemplate
             model="['userInstance':documentInstance.author, 'userGroup':userGroup]" />
             </div>
-            <div style="float:left;margin-top:5px;margin-left:28px;">
+            <div style="float:left;margin-left:30px;">
                 <g:if test="${documentInstance?.speciesGroups}">
                 <g:each
                 in="${documentInstance.speciesGroups}"
@@ -81,4 +83,6 @@
                 value="267835}" title="${speciesGroup?.name}"></button>
                 </g:else>
             </div>
+
+        </div>
 </div>
