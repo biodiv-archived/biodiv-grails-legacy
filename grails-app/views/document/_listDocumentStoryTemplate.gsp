@@ -1,3 +1,4 @@
+<%@page import="species.utils.Utils"%>
 <%@ page import="content.eml.Document"%>
         <%
         // To overcome hibernate fileassist issue - http://www.intelligrape.com/blog/2012/09/21/extract-correct-class-from-hibernate-object-wrapped-with-javassist/
@@ -25,8 +26,8 @@
                 <div class="prop">
                 <span class="name"><i class=" icon-comment"></i><g:message code="default.description.label" /></span>
 
-                <div style="display:${styleVar}" class=" value twoellipse">
-                    ${raw(documentInstance?.notes)}
+                <div style="display:${styleVar}" class=" value ellipsis">
+                    ${Utils.stripHTML(documentInstance?.notes.replaceAll('&nbsp;', ''))}  
                 </div>
                 </div>
             </g:if>    
@@ -42,11 +43,13 @@
                 </div>
                 </div>
             </g:if>
+
+            <div style=" bottom: 3px;position: absolute;width: 100%;">
             <div style="float:right;">
             <sUser:showUserTemplate
             model="['userInstance':documentInstance.author, 'userGroup':userGroup]" />
             </div>
-            <div style="float:left;margin-top:5px;margin-left:28px;">
+            <div style="float:left;margin-left:30px;">
                 <g:if test="${documentInstance?.speciesGroups}">
                 <g:each
                 in="${documentInstance.speciesGroups}"
@@ -81,4 +84,6 @@
                 value="267835}" title="${speciesGroup?.name}"></button>
                 </g:else>
             </div>
+
+        </div>
 </div>

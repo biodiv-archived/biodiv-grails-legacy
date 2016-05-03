@@ -387,7 +387,7 @@ class DocumentService extends AbstractMetadataService {
 	 * @return
 	 */
 	def getDocumentsFilterQuery(params) {
-		def query = "select document from Document document "
+		def query = "select distinct(document) from Document document "
 		def queryParams = [:]
 		def activeFilters = [:]
 		def filterQuery = "where document.id is not NULL "  //Dummy stmt
