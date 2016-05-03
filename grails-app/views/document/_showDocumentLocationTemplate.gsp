@@ -1,8 +1,8 @@
 <%@ page import="species.utils.Utils"%>
 <div class="sidebar_section">
-    <h5><g:message code="default.species.distribution.label" /></h5>
-    <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
     <h5><g:message code="default.location.info.label" /></h5>
+    <obv:showObservationsLocation model="['userGroup':userGroup]"></obv:showObservationsLocation>
+    
     <table class="table table-bordered table-condensed table-striped">
         <tr>
             <td colspan="2">
