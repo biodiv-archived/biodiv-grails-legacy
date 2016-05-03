@@ -220,21 +220,32 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
         success: function(data) {
             if(data.success) {
                 data = data.model;
+                params['ranksToFetch'] = data.ranksToFetch.join(',');
+                params['statusToFetch'] = data.statusToFetch.join(',');
+                params['positionsToFetch'] = data.positionsToFetch.join(',');
+                History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
                 $(".filter input").each(function(){
+                    var isChecked = false;
                     for(var i=0; i< data.statusToFetch.length; i++) {
                         if($(this).val() == data.statusToFetch[i]) {
+                            isChecked = true;
                             $(this).attr('checked', 'checked');
                         } 
                     }
                     for(var i=0; i< data.positionsToFetch.length; i++) {
                         if($(this).val() == data.positionsToFetch[i]) {
+                            isChecked = true
                             $(this).attr('checked', 'checked');
                         } 
                     }
                     for(var i=0; i< data.ranksToFetch.length; i++) {
                         if($(this).data('ordinal') == taxonRanks[data.ranksToFetch[i]].value) {
+                            isChecked = true;
                             $(this).attr('checked', 'checked');
-                        } 
+                        }
+                    }
+                    if(!isChecked) {        
+                        $(this).removeAttr('checked');
                     }
                 });
                 $(".filter input[name='taxonRank']").each(function(){
@@ -416,9 +427,10 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
         $('.isOrphanName').val(false);
         var url = window.params.curation.getNameDetailsUrl;
         var choosenName = ''
+            if(ele) {
             //if(nameType.toLowerCase() == 'synonym' || nameType.toLowerCase() == 'common') {
                 choosenName = $(ele).text();
-            //}
+            }
         $.ajax({
             url: url,
             dataType: "json",

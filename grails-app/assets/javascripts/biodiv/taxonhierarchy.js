@@ -189,6 +189,7 @@
             };
 
             function scrollIntoView(ele) {
+                console.log('scrollIntoView');
                 var scrollTo = $(ele);
                 if(scrollTo && scrollTo.offset()) {
                     var myContainer = $('#taxonHierarchy');
@@ -270,11 +271,15 @@
                 
                 if (me.options.controller == 'namelist') {
                     var anchor = $('a.jstree-anchor.taxon-highlight');
+                    
                     if(anchor.length > 0) {
                         var parentId = anchor.parent().attr('id');
                         $(this).jstree(true).open_node('#'+parentId);
                         getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                         scrollIntoView(anchor);
+                    } else {
+                        console.log("No node in the tree with this id");
+                        getNameDetails(me.options.taxonId, me.options.postData.classSystem, 'synonym', undefined, false)
                     }
                 }
                $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');

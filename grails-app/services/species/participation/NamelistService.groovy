@@ -1998,12 +1998,11 @@ class NamelistService extends AbstractObjectService {
         def offset = params.offset ? params.offset.toLong() : 0
         def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
         def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
-        List ranksToFetch = params.ranksToFetch ? (parentTaxon.rank+','+params.ranksToFetch).split(','):[parentTaxon.rank, nextPrimaryRank];
+        List ranksToFetch = params.ranksToFetch ? getRanksToFetch(parentTaxon.rank, params.ranksToFetch.split(',')):[parentTaxon.rank, nextPrimaryRank];
         List statusToFetch = params.statusToFetch ? (params.statusToFetch).split(','):[NameStatus.ACCEPTED.value().toUpperCase(), NameStatus.SYNONYM.value().toUpperCase()];
         List positionsToFetch = params.positionsToFetch ? (params.positionsToFetch).split(','):[NamePosition.RAW.value().toUpperCase(), NamePosition.WORKING.value().toUpperCase(), NamePosition.CLEAN.value().toUpperCase()];
         String exportFields = "t.id as id, t.id as taxonid, t.rank as rank, t.name as name, t.italicised_form as italicisedform, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, t.position as position, t.status as status, ${classSystem} as classificationid";
         String synExportFields = "";
-        
         List reqExportFields = params.exportFields
         if(reqExportFields) {
             exportFields = "";
@@ -2020,7 +2019,6 @@ class NamelistService extends AbstractObjectService {
             synExportFields += ", concat(acsy.id, '_', t.id) as id ";
             exportFields += ", s.path as path  ";
         }
-
         List namesList = []
         //Map dirtyList = [:]
         //Map workingList = [:]
@@ -2034,7 +2032,6 @@ class NamelistService extends AbstractObjectService {
         //List comDL = [], comWL = [], comCL = []
         //List speciesDL = [], speciesWL = [], speciesCL = []
         String countSqlStr='', synCountSqlStr='';
-
         //CHK: does this query handle synonyms also ... do synonyms have hierarchy? or shd we put status=accepted condition in this query?
         countSqlStr = "select t.position, t.status, count(*) as count \
                     from taxonomy_registry s, \
@@ -2166,6 +2163,20 @@ class NamelistService extends AbstractObjectService {
         }
     }
 
+    private List getRanksToFetch(def parentRank, def rF) {
+        println "parentRank"+parentRank
+        println rF
+        List ranksToFetch = [parentRank];
+        
+        rF.each {
+            int rank = Integer.parseInt(it);
+            println rank
+            if(rank > parentRank) ranksToFetch << rank;
+        }
+        println ranksToFetch
+        return ranksToFetch;
+    }
+
 	public def getNameDetails(params){
         def taxon = TaxonomyDefinition.read(params.taxonId.toLong());
         NameStatus nameType = taxon.status;
@@ -2198,7 +2209,7 @@ class NamelistService extends AbstractObjectService {
             return result;
             case NameStatus.SYNONYM:
             println "----------------------____"
-            if(params.choosenName && params.choosenName != '') {
+            //if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of synonyms table
                 def syn = SynonymsMerged.read(params.taxonId.toLong());
                 result = syn.fetchGeneralInfo();
@@ -2217,9 +2228,9 @@ class NamelistService extends AbstractObjectService {
                 }
 
                 return result
-            }
+            //}
             case NameStatus.COMMON :
-            if(params.choosenName && params.choosenName != '') {
+            //if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of common names table
                 def com = CommonNames.read(params.taxonId.toLong());
                 result = com.fetchGeneralInfo()
@@ -2228,7 +2239,7 @@ class NamelistService extends AbstractObjectService {
                 result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
                 println "========SYNONYMS NAME DETAILS ===== " + result
                 return result
-            }
+            //}
         }
 	}
 
@@ -2304,7 +2315,6 @@ class NamelistService extends AbstractObjectService {
                             header.add(entry.getKey())
                         }
                         TaxonomyRank.list().each {
-                            println it.value()
                             header.add(it.value());
                         }
                         writer.writeNext(header.toArray(new String[0]))
