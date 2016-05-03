@@ -38,9 +38,13 @@ import species.namelist.NameInfo
 import species.namelist.Utils;
 import species.utils.Utils as UtilsUtils;
 import species.AcceptedSynonym
+import species.ResourceFetcher;
+import species.AbstractObjectService;
+import species.SpeciesPermission;
 
-class NamelistService {
-   
+class NamelistService extends AbstractObjectService {
+  
+    static transactional = false;
     private static final String COL_SITE = 'http://www.catalogueoflife.org'
 	private static final String COL_URI = '/annual-checklist/2015/webservice'
     
@@ -67,6 +71,8 @@ class NamelistService {
 	private static final String AMBI_SYN_NAME = "ambiguous synonym"
 	private static final String MIS_APP_NAME = "misapplied name"
 
+	private final static int EXPORT_BATCH_SIZE = 10000;
+	
  	//XXX: this map is used to store new name created by session for bulk and name upload. This is needed because
 	//if a user want to create new name by saying 'new' in spreadsheet then same name may be created multiple times
 	//it that name appears multiple time in hir sheet 
@@ -83,62 +89,62 @@ class NamelistService {
 	def sessionFactory;
     def activityFeedService;
 	//def speciesUploadService;
-	
- 
-
+    def speciesPermissionService;
+    
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
     public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
         //println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
-		
+
         def clazz
         if(status == NameStatus.ACCEPTED || !status) {
             clazz = TaxonomyDefinition.class;
         } else {
             clazz = SynonymsMerged.class; 
         }
-        
-		if(normalizedForm || authorYear){
-			String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
-			normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
-			res = clazz.withCriteria(){
-				and{
-					eq('normalizedForm', normalizedForm)
-					if(status) eq('status', status)
-					if(rank >= 0)
-						eq('rank', rank)
-					if(!searchInNull){
-						isNotNull('position')
-					}
-				}
-			}
-		}
-		
-		if(res)
-			return res
-		
-		//println  "No result in Normalized form using canonical form now"
-        res = clazz.withCriteria(){
-			and{
-				eq('canonicalForm', canonicalForm)
-				if(status) eq('status', status)
-				if(rank >= 0)
-					eq('rank', rank)
-				if(!searchInNull){
-					isNotNull('position')
-				}
-				//XXX in curation while taking col hir. we want author year column to be used forcefully 
-				// in other cases we will not use untill gets multiple matches 
-				if(useAuthorYear && authorYear){
-					eq('authorYear', authorYear)
-				}
-			}
+
+        if(normalizedForm || authorYear){
+            String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
+            normalizedForm = normalizedForm ?:(canonicalForm + authorYearSuffix)
+            res = clazz.withCriteria(){
+                and{
+                    eq('normalizedForm', normalizedForm)
+                    if(status) eq('status', status)
+                        if(rank >= 0)
+                            eq('rank', rank)
+                            if(!searchInNull){
+                                isNotNull('position')
+                            }
+                }
+            }
         }
-			
-		//println "== FINAL SEARCH RESULT " + res
-		return res;
+
+        if(res)
+            return res
+
+            //println  "No result in Normalized form using canonical form now"
+            res = clazz.withCriteria(){
+                and{
+                    eq('canonicalForm', canonicalForm)
+                    if(status) eq('status', status)
+                        if(rank >= 0)
+                            eq('rank', rank)
+                            if(!searchInNull){
+                                isNotNull('position')
+                            }
+                    //XXX in curation while taking col hir. we want author year column to be used forcefully 
+                    // in other cases we will not use untill gets multiple matches 
+                    if(useAuthorYear && authorYear){
+                        eq('authorYear', authorYear)
+                    }
+                }
+            }
+
+        //println "== FINAL SEARCH RESULT " + res
+        return res;
     }
-    
+ 
+   
     List searchIBPResults(String canonicalForm, String authorYear, NameStatus status, rank) {
         def res = searchIBP(canonicalForm, authorYear, status, rank) //TaxonomyDefinition.findAllByCanonicalForm(canonicalForm);
         def finalResult = []
@@ -595,7 +601,8 @@ class NamelistService {
    
     public def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
         println "+++++++++++++++++++++++++++++++++++"
-        println sciName.class
+        println sciName
+        println acceptedMatch
         println "+++++++++++++++++++++++++++++++++++"
 
         Map result = [:];
@@ -625,13 +632,16 @@ class NamelistService {
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
             tempResult = updateAttributes(sciName, acceptedMatch);
+           println sciName.name 
             result.errors << tempResult.errors;
             
             println "======= RESULT FROM UpdateAttributes ${tempResult}";
 
             //adds IBP Hierarchy as well
             tempResult = updateStatus(sciName, acceptedMatch);
+           println sciName.name 
             sciName = TaxonomyDefinition.get(sciName.id);
+           println sciName.name 
             result.errors << tempResult.errors;
             println "======= RESULT FROM UpdateStatus ${tempResult}";
             /*if(r)
@@ -657,13 +667,16 @@ class NamelistService {
             if(moveToWKG) position = NamesMetadata.NamePosition.WORKING;
             if(moveToRaw) position = NamesMetadata.NamePosition.RAW;
 
-            updatePosition(sciName, position); 
+            tempResult = updatePosition(sciName, position); 
+           println sciName.name 
+            println "======= RESULT FROM UpdatePosition ${tempResult}";
+            result.errors << tempResult.errors;
             //taxonService.moveToWKG([taxonReg]);
 
 
             println "=====SCI NAME ==== " + sciName
             println "=====SCI NAME CLASS ==== " + sciName.class
-            
+           println sciName.name 
             log.debug "Saving sciname ${sciName}"        
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
                 log.debug "Saved sciname ${sciName}" 
@@ -898,7 +911,7 @@ class NamelistService {
     private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
-        //println "Adding IBP hierarchy from ${colAcceptedNameData}"
+        println "Adding IBP hierarchy from ${colAcceptedNameData}"
         log.debug "------------------------------------------------------------------"
         log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
@@ -920,6 +933,7 @@ class NamelistService {
         }
 
         log.debug "Adding ${classification} ${taxonRegistryNames}"
+        println "Adding ${classification} ${taxonRegistryNames}"
         SUser contributor = springSecurityService.currentUser?:SUser.read(1L) //findByName('admin');
         //to match the input format
         //getTaxonHierarchy() XMLConverter
@@ -938,6 +952,8 @@ class NamelistService {
             if('COL'.equalsIgnoreCase(metadata1['source']) || 'CatalogueOfLife'.equalsIgnoreCase(metadata1['source']) ||  'Catalogue Of Life'.equalsIgnoreCase(metadata1['source'])) {
                 fromCOL = true; 
             }
+            println "===============++"
+            println colAcceptedNameData
             result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, fromCOL, colAcceptedNameData);
         //}
 
@@ -1455,13 +1471,15 @@ class NamelistService {
     }
 
     private Map updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
-        //println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
+        println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
         boolean success = false;
         def errors = [];
         try {
             NamesParser namesParser = new NamesParser();
             if(!colMatch.canonicalForm) colMatch.canonicalForm = colMatch.name;
-            def name = colMatch.canonicalForm + " " + colMatch.authorString
+            def name = colMatch.canonicalForm
+            if(colMatch.authorString)
+                name = name + " " + colMatch.authorString
             if(!doNotSearch){
                 def res1 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.ACCEPTED , sciName.rank);
                 def res2 = searchIBP(colMatch.canonicalForm, colMatch.authorString, NameStatus.SYNONYM , sciName.rank);
@@ -1498,6 +1516,8 @@ class NamelistService {
                 sciName.normalizedForm = pn.normalizedForm
                 sciName.italicisedForm = pn.italicisedForm
                 sciName.name = pn.name
+                println sciName.name
+                println sciName.canonicalForm
             }
             sciName.authorYear = colMatch.authorString;
             if(sciName.colNameStatus) {
@@ -1515,7 +1535,7 @@ class NamelistService {
             if(!sciName.save(flush:true)) {
                 success = false;
                 errors = sciName.errors.allErrors;
-                sciName.errors.allErrors.each { log.error it }
+                sciName.errors.allErrors.each { println it; log.error it }
             } else {
                 success = true;
             }
@@ -1977,175 +1997,198 @@ class NamelistService {
         def sql = new Sql(dataSource)
         def sqlStr, rs
         def classSystem = params.classificationId.toLong()
-        def parentId = params.parentId
+        def parentId = params.parentId;
         def limit = params.limit ? params.limit.toInteger() : 100
-        def offset = params.offset ? params.limit.toLong() : 0
+        def offset = params.offset ? params.offset.toLong() : 0
         def parentTaxon = TaxonomyDefinition.read(parentId.tokenize('_')[-1].toLong());
         def nextPrimaryRank = TaxonomyRank.nextPrimaryRank(parentTaxon.rank)
+        List ranksToFetch = params.ranksToFetch ? getRanksToFetch(parentTaxon.rank, params.ranksToFetch.split(',')):[parentTaxon.rank, nextPrimaryRank];
+        List statusToFetch = params.statusToFetch ? (params.statusToFetch).split(','):[NameStatus.ACCEPTED.value().toUpperCase(), NameStatus.SYNONYM.value().toUpperCase()];
+        List positionsToFetch = params.positionsToFetch ? (params.positionsToFetch).split(','):[NamePosition.RAW.value().toUpperCase(), NamePosition.WORKING.value().toUpperCase(), NamePosition.CLEAN.value().toUpperCase()];
+        String exportFields = "t.id as id, t.id as taxonid, t.rank as rank, t.name as name, t.italicised_form as italicisedform, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, t.position as position, t.status as status, ${classSystem} as classificationid";
+        String synExportFields = "";
+        List reqExportFields = params.exportFields
+        if(reqExportFields) {
+            exportFields = "";
+            TaxonomyDefinition.fetchExportableFields(grailsApplication).each {
+                if(reqExportFields.contains(it.field)) {
+                    if(it.dbField) 
+                        exportFields += "t."+it.dbField +' as "'+it.name+'", ';
+                }
+            }
+            exportFields = exportFields[0..-3];
+            synExportFields = exportFields;
+        } else {
+            synExportFields = exportFields.replace('t.id as id,', '');
+            synExportFields += ", concat(acsy.id, '_', t.id) as id ";
+            exportFields += ", s.path as path  ";
+        }
+        List namesList = []
+        //Map dirtyList = [:]
+        //Map workingList = [:]
+        //Map cleanList = [:]
 
-
-
-        def dirtyList = [:]
-        def workingList = [:]
-        def cleanList = [:]
-
-        def accDL = [], accWL = [], accCL = []
-        def synDL = [], synWL = [], synCL = []
-        def comDL = [], comWL = [], comCL = []
-        def speciesDL = [], speciesWL = [], speciesCL = []
-
-        try {
-
-            if(!parentId) {
-                sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name, s.path as path, t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status \
+        int instanceTotal = 0;
+        int dirtyListCount = 0, workingListCount = 0, cleanListCount=0;
+        int acceptedCount = 0, synonymCount = 0, commonNameCount=0;
+        //List accDL = [], accWL = [], accCL = []
+        //List synDL = [], synWL = [], synCL = []
+        //List comDL = [], comWL = [], comCL = []
+        //List speciesDL = [], speciesWL = [], speciesCL = []
+        String countSqlStr='', synCountSqlStr='';
+        //CHK: does this query handle synonyms also ... do synonyms have hierarchy? or shd we put status=accepted condition in this query?
+        countSqlStr = "select t.position, t.status, count(*) as count \
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
-                    "t.rank = 0 order by t.name";
+                    "s.path like '"+parentId+"%' and "+
+                    "t.status = '" +NameStatus.ACCEPTED+"' and "+
+                    "t.rank in ("+ranksToFetch.join(',')+ ") and "+
+                    "t.position in ('"+positionsToFetch.join("','")+ "') "+
+                    "group by t.position, t.status ";
+
+        synCountSqlStr = "select s.position, s.status, count(*) as count from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id in ( select t.id from taxonomy_registry s, taxonomy_definition t where s.taxon_definition_id = t.id and "+ (classSystem?"s.classification_id = :classSystem and ":"") + "s.path like '"+parentId+"%' and " + "t.rank in ("+ranksToFetch.join(',') + ")) and "+"s.rank in ("+ranksToFetch.join(',') + ") and s.position in ('"+positionsToFetch.join("','") + "') group by s.position, s.status";
+
+
+        try {
+            if(!parentId) {
+                 sqlStr = "select "+exportFields+
+                     "from taxonomy_registry s, \
+                    taxonomy_definition t \
+                    where \
+                    s.taxon_definition_id = t.id and "+
+                    (classSystem?"s.classification_id = :classSystem and ":"")+
+                    "t.status = '" +NameStatus.ACCEPTED+"' and "+
+                    "t.rank = 0 order by s.path, t.name";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields
                 //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-
-                rs = sql.rows(sqlStr, [classSystem:classSystem])
-                /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                def cl = Classification.read(classSystem.toLong());
-                if(cl == classification) {
-                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id]));
-                }*/
+                 rs = sql.rows(sqlStr, [classSystem:classSystem])
             } else {
-                sqlStr = "select t.id as taxonid, t.rank as rank, t.name as name,  s.path as path ,t.is_flagged as isflagged, t.flagging_reason as flaggingreason, ${classSystem} as classificationid, position as position, status as status\
-                    from taxonomy_registry s, \
+                 sqlStr = "select "+exportFields+
+                    "from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
                     "s.path like '"+parentId+"%' and " +
-                    "t.rank <= " + nextPrimaryRank +
-                    " order by t.rank, t.name asc limit :limit offset :offset";
+                    "t.status = '" +NameStatus.ACCEPTED+"' and "+
+                    "t.rank in ("+ranksToFetch.join(',')+ ") and "+
+                    "t.position in ('"+positionsToFetch.join("','")+ "') "+
+                    " order by s.path, t.name asc limit :limit offset :offset";
 
                 //ALways fetch from IBP Taxonomy Hierarchy
                 //def fieldsConfig = grailsApplication.config.speciesPortal.fields
                 //def IBPclassification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                println "======================+++++++"
-                println sqlStr;
-                rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset])
+                log.debug "======================+++++++"
+                log.debug sqlStr;
+                log.debug "parentId ${parentId}, classSystem ${classSystem} ranksToFetch ${ranksToFetch} statusToFetch ${statusToFetch} positionsToFetch ${positionsToFetch} limit ${limit} offset ${offset}"
 
-                /*def fieldsConfig = grailsApplication.config.speciesPortal.fields
-                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                def cl = Classification.read(classSystem.toLong());
-                if(cl == classification) {
-                def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-                rs.addAll(sql.rows(sqlStr, [classSystem:authorClass.id, limit:limit, offset:offset]));
-                }*/
+                rs = sql.rows(sqlStr, [classSystem:classSystem, limit:limit, offset:offset]);
+           }
 
-                def s3 = "select s.id as taxonid, s.rank as rank, s.name as name, s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, s.status as status from taxonomy_definition s left outer join  taxonomy_registry reg on s.id = reg.taxon_definition_id and reg.classification_id = :classSystem where s.rank >= :speciesRank and s.status = :acceptedStatus and (reg.path like '%!_"+parentId+"!_%' escape '!'  or reg.path like '"+parentId+"!_%'  escape '!' or reg.path like '%!_"+parentId+"'  escape '!') order by s.name";
+            log.debug "total result size === " + rs.size()
 
+            def countRs = sql.rows(countSqlStr, [classSystem:classSystem])
+            countRs.each {
+                instanceTotal += it.count;
+                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
+                    dirtyListCount += it.count;
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                    workingListCount += it.count;
+                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.CLEAN.value())){
+                    cleanListCount += it.count;
+                }
 
-                def sql1 = new Sql(dataSource)
+                switch(it.status.toLowerCase()) {
+                    case NameStatus.ACCEPTED.value().toLowerCase() : acceptedCount += it.count; break;
+                    case NameStatus.SYNONYM.value().toLowerCase() : synonymCount += it.count; break;
+                }
+            }
 
-                def queryParams = ['speciesRank':TaxonomyRank.SPECIES.ordinal(), 'acceptedStatus':NameStatus.ACCEPTED.toString(), 'classSystem':classSystem]
-                def q3 = sql1.rows(s3, queryParams)
-                q3.each {
+            if(statusToFetch.contains(NameStatus.SYNONYM.value().toUpperCase())) {
+                def synCountRs = sql.rows(synCountSqlStr, [classSystem:classSystem])
+                synCountRs.each {
+                    instanceTotal += it.count;
                     if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                        speciesDL << it
-                    } else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                        speciesWL << it
-                    } else{
-                        speciesCL << it
+                        dirtyListCount += it.count;
+                    }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
+                        workingListCount += it.count;
+                    }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.CLEAN.value())){
+                        cleanListCount += it.count;
+                    }
+
+                    switch(it.status.toLowerCase()) {
+                        case NameStatus.ACCEPTED.value().toLowerCase() : acceptedCount += it.count; break;
+                        case NameStatus.SYNONYM.value().toLowerCase() : synonymCount += it.count; break;
                     }
                 }
             }
 
-            println "total result size === " + rs.size()
-
             ///////////////////////////////
             rs.each {
+                if(statusToFetch.contains(NameStatus.ACCEPTED.value().toUpperCase())) {
+                    namesList << it;
+                }
                 //NOT SENDING PATH
                 //SENDING IDS as taxonid for synonyms and common names
-                //def s1 = "select s.id as taxonid, ${it.rank} as rank, s.name as name , ${classSystem} as classificationid, s.position as position \
-                //from synonyms s where s.taxon_concept_id = :taxonId";
+                if(statusToFetch.contains(NameStatus.SYNONYM.value().toUpperCase())) {
+                    println "GETTING SYNONYMS FOR TAXON ${it.taxonid}"
+                    sql = new Sql(dataSource)
+                    //FIX:limit is not applied on synonyms query
 
-                sql = new Sql(dataSource)
-                def s1 = "select s.id as taxonid, s.rank as rank, s.name as name ,s.is_flagged as isflagged, s.flagging_reason as flaggingreason, ${classSystem} as classificationid, s.position as position, status as status\
-                from taxonomy_definition s, accepted_synonym acsy where s.id = acsy.synonym_id and acsy.accepted_id = :taxonId order by s.name";
-
-                def q1 = sql.rows(s1, [taxonId:it.taxonid])
-                q1.each {
-                    println "==========TAXA IDS======= " + it.taxonid
-                    if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                        synDL << it
-                    }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                        synWL << it
-                    }else{
-                        synCL << it
+                    def s1 = "select "+synExportFields+" from taxonomy_definition t, accepted_synonym acsy where t.id = acsy.synonym_id and acsy.accepted_id = :taxonId and " + "t.rank in ("+ranksToFetch.join(',') + ") and  t.position in ('"+positionsToFetch.join("','") + "') order by t.name";
+                    println s1
+                    def q1 = sql.rows(s1, [taxonId:it.taxonid])
+                    q1.each {
+                        println "==========TAXA IDS======= " + it.taxonid
+                        namesList << it
                     }
                 }
 
-                sql = new Sql(dataSource)
-                def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
-                from common_names c where c.taxon_concept_id = :taxonId order by c.name";
+                /*if(statusToFetch.contains(NameStatus.COMMON.value())) {
+                    sql = new Sql(dataSource)
+                    def s2 = "select c.id as taxonid, ${it.rank} as rank, c.name as name , ${classSystem} as classificationid, position as position, status as status\
+                    from common_names c where c.taxon_concept_id = :taxonId order by c.name";
 
-                def q2 = sql.rows(s2, [taxonId:it.taxonid])
-                /*q2.each {
-                  if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                  comDL << it
-                  }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                  comWL << it
-                  }else{
-                  comCL << it
-                  }
-                  }*/
-
+                    def q2 = sql.rows(s2, [taxonId:it.taxonid])
+                    q2.each {
+                    }
+                }*/
 
             }
 
-            println "==========SYN DL============= " + synDL
-            println "==========COM DL============= " + comDL
-            ///////////////////////////////
-
-            rs.each {
-                if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.RAW.value())){
-                    accDL << it
-                }else if(it.position.equalsIgnoreCase(NamesMetadata.NamePosition.WORKING.value())){
-                    accWL << it
-                }else{
-                    accCL << it
-                }
-            }
-            dirtyList['accDL'] = accDL
-            dirtyList['synDL'] = synDL
-            dirtyList['comDL'] = comDL
-            dirtyList['speciesDL'] = speciesDL
-            workingList['accWL'] = accWL
-            workingList['synWL'] = synWL
-            workingList['comWL'] = comWL
-            workingList['speciesWL'] = speciesWL
-            cleanList['accCL'] = accCL
-            cleanList['synCL'] = synCL
-            cleanList['comCL'] = comCL
-            cleanList['speciesCL'] = speciesCL
-        
-            return [dirtyList:dirtyList, workingList:workingList, cleanList:cleanList]
+            return [namesList:namesList, statusToFetch:statusToFetch, positionsToFetch:positionsToFetch, ranksToFetch:ranksToFetch, instanceTotal:instanceTotal, dirtyListCount:dirtyListCount, workingListCount:workingListCount, cleanListCount:cleanListCount, acceptedCount:acceptedCount, synonymCount:synonymCount, limit:limit, offset:offset]
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
+    private List getRanksToFetch(def parentRank, def rF) {
+        List ranksToFetch = [parentRank];
+        
+        rF.each {
+            int rank = Integer.parseInt(it);
+            if(rank > parentRank) ranksToFetch << rank;
+        }
+        return ranksToFetch;
+    }
+
 	public def getNameDetails(params){
         def taxon = TaxonomyDefinition.read(params.taxonId.toLong());
         NameStatus nameType = taxon.status;
-
+        boolean isTaxonEditor = speciesPermissionService.isTaxonContributor(taxon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR]);
+        def result;
         switch(nameType) {
             case NameStatus.ACCEPTED:
             def taxonDef = taxon;
             def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), taxonDef);
-            def result = taxonDef.fetchGeneralInfo()
+            result = taxonDef.fetchGeneralInfo()
             result['taxonId'] = params.taxonId;
+            result['isTaxonEditor'] = isTaxonEditor;
 
             if(taxonReg) {
                 result['taxonRegId'] = taxonReg.id?.toString()
@@ -2166,12 +2209,13 @@ class NamelistService {
             return result;
             case NameStatus.SYNONYM:
             println "----------------------____"
-            if(params.choosenName && params.choosenName != '') {
+            //if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of synonyms table
                 def syn = SynonymsMerged.read(params.taxonId.toLong());
-                def result = syn.fetchGeneralInfo();
+                result = syn.fetchGeneralInfo();
                 result[result['rank']] = params.choosenName;
                 result['acceptedNamesList'] = getAcceptedNamesOfSynonym(syn);
+                result['isTaxonEditor'] = isTaxonEditor;
                 println "========SYNONYMS NAME DETAILS ===== " + result
 
                 def taxonReg = TaxonomyRegistry.findByClassificationAndTaxonDefinition(Classification.read(params.classificationId.toLong()), syn);
@@ -2184,17 +2228,18 @@ class NamelistService {
                 }
 
                 return result
-            }
+            //}
             case NameStatus.COMMON :
-            if(params.choosenName && params.choosenName != '') {
+            //if(params.choosenName && params.choosenName != '') {
                 //taxonId here is id of common names table
                 def com = CommonNames.read(params.taxonId.toLong());
-                def result = com.fetchGeneralInfo()
+                result = com.fetchGeneralInfo()
                 result[result['rank']] = params.choosenName;
+                result['isTaxonEditor'] = isTaxonEditor;
                 result['acceptedNamesList'] = getAcceptedNamesOfCommonNames(params.choosenName);
                 println "========SYNONYMS NAME DETAILS ===== " + result
                 return result
-            }
+            //}
         }
 	}
 
@@ -2577,6 +2622,80 @@ class NamelistService {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+
+    def export(params, dl){
+        if(!dl)
+            return null
+
+            File downloadDir = new File(grailsApplication.config.speciesPortal.namelist.downloadDir)
+            if(!downloadDir.exists()){
+                downloadDir.mkdirs()
+            }
+        log.debug "export type " + dl.type 
+        if(dl.type == DownloadLog.DownloadType.CSV) {
+            return exportAsCSV(downloadDir, dl, params.webaddress)
+        } /*else if(dl.type == DownloadLog.DownloadType.KML) {
+        return exportAsKML(downloadDir, dl, userGroupWebaddress)
+        } else {
+        return exportAsDW(downloadDir, dl, userGroupWebaddress)
+        }*/
+
+    }
+
+    private File exportAsCSV(File downloadDir, DownloadLog dl, String userGroupWebaddress){
+        String folderName = "taxon_"+ + new Date().getTime()
+        String parent_dir = downloadDir.getAbsolutePath() + File.separator + folderName+File.separator + folderName
+        File csvFile = new File(parent_dir, "taxon_" + new Date().getTime() + ".csv")
+
+        def writer = utilsService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+
+        boolean headerAdded = false
+        ResourceFetcher rf = new ResourceFetcher(TaxonomyDefinition.class.canonicalName, dl, userGroupWebaddress, dl.offsetParam.intValue());
+        try {
+            int total = 0;
+            while (total < EXPORT_BATCH_SIZE && rf.hasNext()) {
+                def obvList = rf.next();
+                total += obvList.size();
+                obvList.each { obv ->
+                    log.debug "Writting " + obv
+                    Map m = obv//.fetchExportableValue(dl.author)
+                    if(!headerAdded){
+                        def header = []
+                        for(entry in m){
+                            header.add(entry.getKey())
+                        }
+                        TaxonomyRank.list().each {
+                            header.add(it.value());
+                        }
+                        writer.writeNext(header.toArray(new String[0]))
+                        headerAdded = true
+                    }
+                    String[] array = new String[m.values().size()+TaxonomyRank.list().size()];
+                    int index = 0;
+                    int taxonIndex = m.values().size();
+                    for (entry in m) {
+                        if(entry.getKey().equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY)) {
+                            JSON.parse(entry.getValue()). each {
+                                array[taxonIndex + it.rank] = it.name;
+                            }
+                        } else {
+                            array[index] = getExportableValue(entry.getKey(), (String) entry.getValue());
+                        }
+                        index++;
+                    }
+                    
+                    writer.writeNext(array)
+                }
+            }
+        } catch(e) {
+            e.printStackTrace();
+        }
+        writer.flush()
+        writer.close()
+
+        return csvFile; //archive(downloadDir.getAbsolutePath(), folderName, csvFile, f )
+        //return csvFile
+    }
 
 }

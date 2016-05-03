@@ -11,11 +11,13 @@ class ExportJob {
 	private final static String CHECKLIST = "Checklist"
 	private final static String SPECIES = "Species"
 	private final static String UNIQUE_SPECIES = "Unique Species"
+	private final static String TAXONOMY_DEFINITION = "TaxonomyDefinition"
 	
 	def obvUtilService
     def utilsService;
 	def checklistService
 	def speciesService
+    def namelistService;
 	
     static triggers = {
       simple startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
@@ -44,6 +46,9 @@ class ExportJob {
 						log.info "Initiating Species export."
 						f = speciesService.export(dl.fetchMapFromText(), dl)
                         break;
+                    case TAXONOMY_DEFINITION:
+                        log.info "Initiating taxon definition names list export."
+                        f = namelistService.export(dl.fetchMapFromText(), dl);
 					default:
 						log.debug "Invalid source Type $dl.sourceType"
 				}

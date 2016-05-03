@@ -225,8 +225,8 @@ def messageSource;
 	private getHyperLinkForUser(userId, Date startDate, count, request, speciesGroup=null){
 		def fitlerParams = [:]
 		if(startDate){
-			fitlerParams.daterangepicker_start = new SimpleDateFormat("dd/MM/yyyy").format(startDate)
-			fitlerParams.daterangepicker_end = new SimpleDateFormat("dd/MM/yyyy").format(new Date())
+			//fitlerParams.daterangepicker_start = new SimpleDateFormat("dd/MM/yyyy").format(startDate)
+			//fitlerParams.daterangepicker_end = new SimpleDateFormat("dd/MM/yyyy").format(new Date())
 		}
 		if(speciesGroup){
 			fitlerParams.sGroup = speciesGroup.id
@@ -319,7 +319,7 @@ def messageSource;
 				eq('isShowable', true)
 				eq('isChecklist', false)
 				
-				ge('createdOn', startDate)
+				//ge('createdOn', startDate)
 
 				//filter by usergroup
 				if(userGroupInstance){
@@ -666,7 +666,7 @@ def messageSource;
                 eq('isShowable', true)
                 eq('isChecklist', false)
 
-                ge('createdOn', startDate)
+                //ge('createdOn', startDate)
 
 
                 //filter by usergroup

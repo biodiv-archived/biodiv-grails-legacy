@@ -794,7 +794,7 @@ class TaxonService {
         }
         
         XMLConverter converter = new XMLConverter();
-        //println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
+        println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributors, language, taxonHirMatch);
         
         def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
