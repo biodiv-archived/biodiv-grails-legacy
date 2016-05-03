@@ -45,7 +45,7 @@
             </div>
             
             
-            <div class="span9 listarea">
+            <div class="span9 listarea" style="height:460px;">
                 <div id="inlineFilterPanel" class="filters">
                     <%--Filter names with text <input type="text" id="txtSearch" style="margin:3px 0px 3px 0px">
                     and with --%>
@@ -89,14 +89,17 @@
                         <div class="filterValues well">
                             <g:each in ="${NamePosition.list()}" var="position">
                             <label class="checkbox ${position}">
-                                <input type="checkbox" name="taxonPosition" value="${position}" ${params.positionsToFetch?.contains(position.value.toUpperCase())? "checked='checked'":''}><span>${position.label()}</span>
+                                <input type="checkbox" name="taxonPosition" value="${position}" ${params.positionsToFetch?.contains(position.value.toUpperCase())? "checked='checked'":''}><span>${position.label()}
+                                    <%def code = g.message(code:"namelist.${position.label().toLowerCase()}list.info")%>
+                                    <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${code}"></i>
+                                </span>
                             </label>
                             </g:each>
                         </div>
                     </div>
                </div>
 
-               <div id="taxonGrid" class="dl_content" style="height:298px"></div>
+               <div id="taxonGrid" class="dl_content" style="height:318px"></div>
                <div id="listCounts" class="pull-left info-message" style="padding:0px;margin-left:0px;">
                    <span id="instanceCount"></span>
                    <!--span id="acceptedCount"></span>

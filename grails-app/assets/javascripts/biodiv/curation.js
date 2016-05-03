@@ -84,7 +84,7 @@ function initTaxonGrid(ele) {
 
     taxonGridColumns.push(
     {id: "rank", name: "Rank", field: "rank", width:60, resizable:false, formatter:taxonRankFormatter, sortable:false},
-    {id: "name", name: "Taxon", field: "italicisedform", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
+    {id: "name", name: "Name", field: "italicisedform", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
     {id: "status", name: "Status", field: "status", width:80, resizable:false, sortable:false},
     {id: "position", name: "Position", field: "position", width:80, resizable:false, sortable:false}
     );

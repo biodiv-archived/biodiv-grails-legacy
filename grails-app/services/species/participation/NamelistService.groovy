@@ -2164,16 +2164,12 @@ class NamelistService extends AbstractObjectService {
     }
 
     private List getRanksToFetch(def parentRank, def rF) {
-        println "parentRank"+parentRank
-        println rF
         List ranksToFetch = [parentRank];
         
         rF.each {
             int rank = Integer.parseInt(it);
-            println rank
             if(rank > parentRank) ranksToFetch << rank;
         }
-        println ranksToFetch
         return ranksToFetch;
     }
 
