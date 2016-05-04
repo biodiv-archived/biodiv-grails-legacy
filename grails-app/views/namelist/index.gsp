@@ -110,7 +110,7 @@
               </div>
 
  
-                <div class="pull-right">
+                <div>
                     <div id="taxonPager" class="pull-right paginateButtons" style="padding:0px;"></div>
                     <obv:download  model="['source':'TaxonomyDefinition', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], downloadObjectId:params.taxon, 'exportFields':TaxonomyDefinition.fetchExportableFields()]" />
                 </div>
