@@ -616,7 +616,7 @@ class ObvUtilService {
         utilsService.benchmark ('uploadObv') {
             utilsService.benchmark ('uploadImage') {
                 if(m[IMAGE_FILE_NAMES]) {
-                    obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
+                    obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase(), SUser.findByEmail(m[AUTHOR_EMAIL].trim()))
                 }
             }
 
@@ -870,7 +870,7 @@ class ObvUtilService {
 			
 	}
 
-	private uploadImageFiles(imageDir, imagePaths, license){
+	private uploadImageFiles(imageDir, imagePaths, license, author){
 		def resourcesInfo = [:];
 		def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 		File obvDir
@@ -900,6 +900,7 @@ class ObvUtilService {
 					resourcesInfo.put("file_" + index, file.getAbsolutePath().replace(rootDir, ""))
 					resourcesInfo.put("license_" + index, license)
 					resourcesInfo.put("type_" + index, "image")
+					resourcesInfo.put("contributor_" + index, author.username)
 					index++
 				}
 			}

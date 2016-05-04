@@ -645,3 +645,10 @@ with recursive cte as
 )
 select * from cte;
 
+#4th may
+#alter table common_names add column is_deleted boolean not null default 'false';
+ALTER TABLE common_names DROP constraint common_names_taxon_concept_id_key ;
+ALTER TABLE common_names ADD CONSTRAINT common_names_taxon_concept_id_key UNIQUE (taxon_concept_id, language_id, name, is_deleted);
+
+create index on common_names(is_deleted);
+create index on taxonomy_definition(is_deleted);
