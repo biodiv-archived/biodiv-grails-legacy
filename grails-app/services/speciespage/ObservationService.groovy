@@ -173,9 +173,10 @@ class ObservationService extends AbstractMetadataService {
 
             if(params.action == "save" || params.action == "bulkSave") {
                 observationInstance = create(params);
-                if(params.action == 'bulkSave')
+                if(params.action == 'bulkSave'){
                     observationInstance.protocol = Observation.ProtocolType.MULTI_OBSERVATION
-                else if(params.action == 'save') {
+					observationInstance.habitat = observationInstance.habitat?:Habitat.findByName(Habitat.HabitatType.ALL.value())
+                }else if(params.action == 'save') {
                     observationInstance.protocol = params.protocol? Observation.ProtocolType.getEnum(params.protocol) : Observation.ProtocolType.SINGLE_OBSERVATION
                     if(!observationInstance.protocol) {
                         observationInstance.protocol = Observation.SINGLE_OBSERVATION;

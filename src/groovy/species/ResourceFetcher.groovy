@@ -50,7 +50,7 @@ class ResourceFetcher {
 		this.filterUrl = new URL(dl.filterUrl)
 		this.userGroupWebAddress = userGroupWebAddress
         this.paramsMap = dl.fetchMapFromText(); 
-		init(offset)
+        init(offset)
 	}
 
 	public hasNext(){
@@ -85,7 +85,8 @@ class ResourceFetcher {
 		paramsMap["webaddress"] = this.userGroupWebAddress?:paramsMap["webaddress"]
         String[] parts = filterUrl.getPath().split("/");
 		String action = parts.length >=3 ? parts[2]:'index';
-	    paramsMap.putAll(this.paramsMap);
+		if(this.paramsMap)
+	    	paramsMap.putAll(this.paramsMap);
 
 		//XXX:withnewtransaction creates new jdbc connection everytime. this is done to avoid connection time out problem for log running job.
 		Observation.withNewTransaction {  status ->

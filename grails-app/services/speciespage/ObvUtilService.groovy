@@ -113,7 +113,7 @@ class ObvUtilService {
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	
-	private final static int EXPORT_BATCH_SIZE = 10000;
+	private final static int EXPORT_BATCH_SIZE = 5000;
 	private final static int MAX_BATCHES = 1;
 	
 	
