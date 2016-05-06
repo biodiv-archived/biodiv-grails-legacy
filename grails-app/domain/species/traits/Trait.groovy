@@ -75,13 +75,11 @@ class Trait {
 
     String name;
     Field field;
-    List<TaxonomyDefinition> taxon;
-    List<ValueConstraint> valueContraints;
     String ontologyUrl;
     String description;
-
     Date createdOn = new Date();
-	Date lastRevised = createdOn;
+	  Date lastRevised = createdOn;
+    static hasMany = [taxonomyDefinition: TaxonomyDefinition,valueContraints:ValueConstraint]
 
     static constraints = {
         name nullable:false, blank:false, unique:true

@@ -1846,4 +1846,8 @@ render speciesInstanceList;
         }
 
     }
+    def testTrait(){
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        speciesTraitsService.loadTraitDefinitions('/home/ifp/git/biodiv/app-conf/TraitsDefinition.tsv',languageInstance);
+    }
 }

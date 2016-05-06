@@ -636,20 +636,21 @@ class SpeciesTraitsService {
         return parentTaxon.intersect(trait.taxon).size() > 0
     }
 
-    void loadTraitDefinitions(String file, def languageInstance=null) {
+    void loadTraitDefinitions(String file, def languageInstance) {
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
 
         String[] row = reader.readNext();
+
         while(row) {
             Trait trait = new Trait();
             headers.eachWithIndex { header, index ->
                 switch(header.toLowerCase()) {
                     case 'name' : trait.name = row[index].trim(); break;
                     case 'field' : trait.field = getField(row[index], languageInstance); break;
-                    case 'taxon' : trait.addToTaxon(getTaxon(row[index])); break;
-                    case 'valueConstraits' : trait.addToValueConstraints(getValueContraints(row[index])); break;
-                    case 'ontologyUrl' : trait.ontologyUrl = row[index].trim(); break;
+                    case 'taxon' : row[index].tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}; break;
+                    case 'valuecontraints' : row[index].tokenize(",").each {trait.addToValueContraints(ValueConstraint.getEnum(it.trim()))};break;
+                    case 'ontologyurl' : trait.ontologyUrl = row[index].trim(); break;
                     case 'description' : trait.description = row[index].trim(); break;
                 }
             }
@@ -661,23 +662,24 @@ class SpeciesTraitsService {
     }
     
     private Field getField(String string, languageInstance) {
-        String f[] = string.split('|');
+        def f = string.tokenize("|");
+      
         Field field;
         if(f.size() == 1) {
             f = Field.findByLanguageAndConcept(languageInstance, f[0].trim());
         } else if (f.size() == 2) {
             f = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
         } else  if (f.size() == 3) {
-            f = Field.findAByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
+            f = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
         } 
     }
 
-    private List<TaxonomyDefinition> getTaxon(String taxonList) {
-        List t = [];
-        taxonList.split(',').each {
+    private List<ValueConstraint>  getTaxon(String taxonList) {
+        def t
+        taxonList.tokenize(",").each {
             def x = TaxonomyDefinition.read(Long.parseLong(it.trim()));
-            if(x)
-                t << x;
+            if(x) t << x;
+
         }
         return t;
     }
