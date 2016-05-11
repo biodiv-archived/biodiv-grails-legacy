@@ -73,14 +73,14 @@ function initTaxonGrid(ele) {
         return taxonRanks[value].text;
     }
 
-/*    var checkboxSelector = new Slick.CheckboxSelectColumn({
+    var checkboxSelector = new Slick.CheckboxSelectColumn({
         cssClass: "slick-cell-checkboxsel"
     });
-*/
+
     //{id: "taxonid", name: "Id", field: "taxonid", maxWidth:80, resizble:false, sortable:true},
     //{id: "isflagged", name: "Flagged", field: "isflagged", width: 40, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, resizable:false}
     var taxonGridColumns = [];
-//    taxonGridColumns.push(checkboxSelector.getColumnDefinition());
+    taxonGridColumns.push(checkboxSelector.getColumnDefinition());
 
     taxonGridColumns.push(
     {id: "rank", name: "Rank", field: "rank", width:60, resizable:false, formatter:taxonRankFormatter, sortable:false},
@@ -148,7 +148,7 @@ function initTaxonGrid(ele) {
     taxonGridDataView.setFilter(nameFilter);
 //    taxonGrid.showTopPanel();
 
-//    taxonGrid.registerPlugin(checkboxSelector);
+    taxonGrid.registerPlugin(checkboxSelector);
     taxonGrid.init();
     return taxonGrid;
 }
