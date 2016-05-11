@@ -43,6 +43,7 @@ import grails.converters.JSON;
 import species.auth.Role;
 import species.auth.SUser;
 import species.auth.SUserRole;
+import au.com.bytecode.opencsv.CSVWriter;
 
 
 class UtilsService {
@@ -757,7 +758,7 @@ class UtilsService {
         }
         if(obv.instanceOf(Species) && obv.id) {
             templateMap["obvSName"] = obv.taxonConcept.normalizedForm 
-            templateMap["obvCName"] = CommonNames.findByTaxonConceptAndLanguage(obv.taxonConcept, Language.findByThreeLetterCode('eng'))?.name    
+            templateMap["obvCName"] = CommonNames.findWhere(taxonConcept:obv.taxonConcept, language:Language.findByThreeLetterCode('eng'), isDeleted:false)?.name    
             def imagePath = ''; 
             def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL) 
             def mainImage = obv.mainImage(); 
@@ -1204,6 +1205,15 @@ class UtilsService {
         if(!cache) return null;
         log.debug "Clearing Cache ${cache.name}"
         return cache.clear();
+    }
+
+    def CSVWriter getCSVWriter(def directory, def fileName) {
+        //char separator = '\t'
+        File dir =  new File(directory)
+        if(!dir.exists()){
+            dir.mkdirs()
+        }
+        return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
     }
 
 }

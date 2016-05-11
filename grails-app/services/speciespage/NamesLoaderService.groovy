@@ -66,15 +66,16 @@ class NamesLoaderService {
         def tmpTableName = "tmp_taxon_concept"
 		def viewQuery = """
 			SELECT t.name AS name,
-			       t.canonical_Form AS canonicalForm,
-			       t.normalized_Form AS normalizedForm,
-			       t.binomial_Form AS binomialForm,
+			       t.canonical_form AS canonicalForm,
+			       t.normalized_form AS normalizedForm,
+			       t.binomial_form AS binomialForm,
 			       t.id AS id
 			FROM Taxonomy_Definition AS t
 			LEFT OUTER JOIN recommendation r ON t.id = r.taxon_concept_id
 			AND t.lowercase_match_name = r.lowercase_name
 			WHERE r.lowercase_name IS NULL
 			  AND t.status = 'ACCEPTED'
+			  AND t.is_deleted = false
 			ORDER BY t.id;
 		"""
         try {
@@ -136,6 +137,7 @@ class NamesLoaderService {
 			WHERE r.lowercase_name = t.lowercase_match_name
 			  AND r.taxon_concept_id IS NULL
 			  AND r.is_scientific_name = TRUE
+			  AND t.is_deleted = false
 			  AND t.status = 'ACCEPTED' """
 		
 		String synonymQuery = """
@@ -149,6 +151,7 @@ class NamesLoaderService {
 			  AND r.lowercase_name = t.lowercase_match_name
 			  AND r.taxon_concept_id IS NULL
 			  AND r.is_scientific_name = TRUE
+			  AND t.is_deleted = false
 			  AND t.status = 'SYNONYM'
 			  AND asyn.synonym_id IN
 			    (SELECT synonym_id
@@ -173,6 +176,8 @@ class NamesLoaderService {
 			  AND r.is_scientific_name = FALSE
 			  AND t.id = c.taxon_concept_id
 			  AND t.status = 'ACCEPTED'
+			  AND t.is_deleted = false
+			  AND c.is_deleted = false
 		"""
 		
 		String commnonNameQuerySyn = """
@@ -194,6 +199,8 @@ class NamesLoaderService {
 			  AND r.is_scientific_name = FALSE
 			  AND t.id = c.taxon_concept_id
 			  AND t.status = 'SYNONYM'
+			  AND t.is_deleted = false
+			  AND c.is_deleted = false
 			  AND asyn.synonym_id IN
 			    (SELECT synonym_id
 			     FROM accepted_synonym
@@ -286,6 +293,7 @@ class NamesLoaderService {
 			     taxonomy_definition AS t
 			WHERE t.id = asyn.synonym_id
 			  AND t.status = 'SYNONYM';
+			  AND t.is_deleted = false
 		"""
 		
 		def query2 = """
@@ -374,6 +382,8 @@ class NamesLoaderService {
 			         AND r.language_id = n.language_id))
 			WHERE r.name IS NULL
 			  AND r.is_scientific_name = FALSE
+			  AND n.is_deleted = false
+
 			GROUP BY n.name,
 			         n.taxon_concept_id,
 			         n.language_id,

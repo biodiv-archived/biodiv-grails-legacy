@@ -113,7 +113,7 @@ class ObvUtilService {
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	
-	private final static int EXPORT_BATCH_SIZE = 10000;
+	private final static int EXPORT_BATCH_SIZE = 5000;
 	private final static int MAX_BATCHES = 1;
 	
 	
@@ -370,12 +370,7 @@ class ObvUtilService {
     }
 
     def CSVWriter getCSVWriter(def directory, def fileName) {
-        //char separator = '\t'
-        File dir =  new File(directory)
-        if(!dir.exists()){
-            dir.mkdirs()
-        }
-        return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
+        return utilsService.getCSVWriter(directory, fileName);
     }
 
 /*    def exportAsDW__specie(downloadDir, obvList, reqUser, dl_id, params_filterUrl){
@@ -621,7 +616,7 @@ class ObvUtilService {
         utilsService.benchmark ('uploadObv') {
             utilsService.benchmark ('uploadImage') {
                 if(m[IMAGE_FILE_NAMES]) {
-                    obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
+                    obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase(), SUser.findByEmail(m[AUTHOR_EMAIL].trim()))
                 }
             }
 
@@ -763,8 +758,8 @@ class ObvUtilService {
                 success=true;
 
 				params.obvId = observationInstance.id
-                activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                
+				params.author = observationInstance.author
+				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
@@ -838,7 +833,7 @@ class ObvUtilService {
             utilsService.benchmark('RecommendationVote.findByAuthorAndObservation') {
 		        recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
             }
-            if(!recommendationVoteInstance) {
+		    if(!recommendationVoteInstance) {
 			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
             } else {
                 recommendationVoteInstance.givenSciName = params.recoName;
@@ -875,7 +870,7 @@ class ObvUtilService {
 			
 	}
 
-	private uploadImageFiles(imageDir, imagePaths, license){
+	private uploadImageFiles(imageDir, imagePaths, license, author){
 		def resourcesInfo = [:];
 		def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 		File obvDir
@@ -905,6 +900,7 @@ class ObvUtilService {
 					resourcesInfo.put("file_" + index, file.getAbsolutePath().replace(rootDir, ""))
 					resourcesInfo.put("license_" + index, license)
 					resourcesInfo.put("type_" + index, "image")
+					resourcesInfo.put("contributor_" + index, author.username)
 					index++
 				}
 			}

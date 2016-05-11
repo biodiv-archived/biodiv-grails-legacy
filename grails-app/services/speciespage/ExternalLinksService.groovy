@@ -29,7 +29,7 @@ class ExternalLinksService {
 		while(true) {
 
 
-			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank  order by taxonomyDefinition.id",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()],[max:limit, offset:offset]);
+			def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and taxonomyDefinition.isDeleted = :isDeleted order by taxonomyDefinition.id",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal(), isDeleted:false],[max:limit, offset:offset]);
 
 			if(!taxonConcepts) break;
 			//TaxonomyDefinition.withNewSession { session ->

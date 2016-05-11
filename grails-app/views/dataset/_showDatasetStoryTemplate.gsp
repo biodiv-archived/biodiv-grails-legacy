@@ -41,21 +41,36 @@
     </div>
     </g:if>
     <g:else>
+    <%long noOfObservations = Observation.countByDatasetAndIsDeleted(datasetInstance, false)%>
+    <g:if test="${noOfObservations || datasetInstance.id == 3}">
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-                <div class="prop">
+        <div class="prop">
             <g:if test="${showDetails}">
             <span class="name"><i class="icon-share-alt"></i><g:message code="showdataset.observationCount" /></span>
             </g:if>
             <g:else>
             <i class="pull-left icon-share-alt"></i>
             </g:else>
-                <div class="value">
-                    <span class="stats_number" title="No of Observations">${Observation.countByDatasetAndIsDeleted(datasetInstance, false)}</span>
-                    <div><g:link class="btn btn-small btn-primary" url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
+            <div class="value">
+                <g:if test="${datasetInstance.id != 3}">
+                <span class="stats_number" title="No of Observations">${noOfObservations}</span>
+                </g:if>
+
+                <div>
+                    <%
+                    String url = uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false);
+                    if(datasetInstance.id == 3) {
+                        url = '/map?layers=lyr_410_butterflyspeciesdistribution&title=Butterfly';
+                    }
+                    %> 
+                    <g:link class="btn btn-small btn-primary" url="${url}" name="l${pos}">
                     View All
-                    </g:link></div>
+                    </g:link>
                 </div>
-            </div> 
+            </div>
+        </div> 
+            </g:if>
+            
             <g:if test="${datasetInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">

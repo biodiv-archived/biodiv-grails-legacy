@@ -110,6 +110,7 @@
 
                             if (me.options.action != 'show' && me.options.action != 'taxonBrowser') {
                                 $(tmp).data('taxonid', nodeData.original.taxonid);
+                                $(tmp).data('rank', nodeData.original.rank);
                                 $(tmp).attr('title', 'Show all '+me.options.controller+'s for this taxon');
                             }
 
@@ -149,7 +150,7 @@
                 switch (me.options.controller) {
                     case 'namelist':
                         $("input#taxon").val(selectedTaxonId);
-                        getNamesFromTaxon($me, $me.attr('id').replace('_anchor',''));
+                        getNamesFromTaxon($me, $me.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                         break;
                     default:
                         if ($me.hasClass('taxon-highlight')) {
@@ -188,6 +189,7 @@
             };
 
             function scrollIntoView(ele) {
+                console.log('scrollIntoView');
                 var scrollTo = $(ele);
                 if(scrollTo && scrollTo.offset()) {
                     var myContainer = $('#taxonHierarchy');
@@ -261,7 +263,12 @@
                     me.initEditables(me.editSelector, me.addSelector);
                 }
                 //$("span.rank.btn-info-nocolor").parent().closest('tr').addClass('taxon-highlight');
-                $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
+                if(postData.taxonid) {
+                    $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
+                } else {
+                    $("#taxonHierarchy a.jstree-anchor").first().addClass('taxon-highlight');
+                    $("input#taxon").val($("#taxonHierarchy a.jstree-anchor").first().data('taxonid'));
+                }
 
                 if (me.options.action == 'taxonBrowser') {
                     $(this).jstree(true).show_checkboxes();
@@ -269,11 +276,15 @@
                 
                 if (me.options.controller == 'namelist') {
                     var anchor = $('a.jstree-anchor.taxon-highlight');
+                    
                     if(anchor.length > 0) {
                         var parentId = anchor.parent().attr('id');
                         $(this).jstree(true).open_node('#'+parentId);
-                        getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''));
+                        getNamesFromTaxon(anchor, anchor.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                         scrollIntoView(anchor);
+                    } else if(me.options.taxonId) {
+                        console.log("No node in the tree with this id");
+                        getNameDetails(me.options.taxonId, me.options.postData.classSystem, 'synonym', undefined, false)
                     }
                 }
                $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');

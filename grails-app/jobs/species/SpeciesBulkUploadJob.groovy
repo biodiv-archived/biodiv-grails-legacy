@@ -76,21 +76,22 @@ class SpeciesBulkUploadJob {
 	}
 
 	private void excuteSql(){
-		println "Called for execute sql    >>>>>>>>>>>>>>>>>>>>> "
 		if(!TaxonomyDefinition.UPDATE_SQL_LIST)
 			return
-		//sqlStrings = sqlStrings.reverse()
-		//println "------------ sqlStrings " + TaxonomyDefinition.UPDATE_SQL_LIST
+
 		Sql sql = new Sql(dataSource)
 		TaxonomyDefinition.UPDATE_SQL_LIST.each { String s ->
-			println "==== query " + s
+			log.debug " Path update query " + s
 			try{
 				int updateCount = sql.executeUpdate(s);
-				println "============ row updated  " + 	updateCount
+				log.debug " updated path count  " + 	updateCount
 				}catch(e){
 					e.printStackTrace()
 				}
 		}
 		TaxonomyDefinition.UPDATE_SQL_LIST.clear();
+		String defHirUpdateSql = """ update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 265799 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id; """
+		int hirupdateCount = sql.executeUpdate(defHirUpdateSql);
+		log.debug " Default hir update count " + hirupdateCount
 	}
 }

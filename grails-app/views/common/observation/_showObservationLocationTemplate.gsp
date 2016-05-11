@@ -8,24 +8,24 @@
         <tr>
             <td colspan="2">
             <g:if test="${observationInstance.geoPrivacy}">
-            	<g:message code="default.geoprivacy.enabled.label" />
+                <g:message code="default.geoprivacy.enabled.label" />
             </g:if>
             <g:else>
                 <g:if test="${observationInstance.placeName != ''}">
-                	<g:set var="location" value="${observationInstance.placeName}"/>
+                    <g:set var="location" value="${observationInstance.placeName}"/>
                 </g:if>
                 <g:else>
-                	<g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
+                    <g:set var="location" value="${observationInstance.reverseGeocodedName}"/>
                 </g:else>
                 <div class="value ellipsis multiline" title="${location}">
-                	${location}
-            	</div>
+                    ${location}
+                </div>
             </g:else>
             </td>
         </tr>
         <tr>
-        	<td colspan="2">
-        		<div title="${observationInstance.locationScale.value()}"> ${observationInstance.locationScale.value()} </div>
+            <td colspan="2">
+                <div title="${observationInstance.locationScale?.value()}"> ${observationInstance.locationScale?.value()} </div>
         </tr>    
         <tr>
             <td colspan="2">
@@ -33,6 +33,7 @@
                 def latitude='',longitude='',areas='';
                 def geoPrivacyAdjustment = observationInstance.fetchGeoPrivacyAdjustment()
                 def checklistObvPoints
+
                 if(observationInstance.isChecklist) {
                     checklistObvPoints = observationInstance.fetchObservationsLatLongs()
                 }
@@ -40,12 +41,12 @@
                 longitude = observationInstance.longitude + geoPrivacyAdjustment
 
                 if(observationInstance?.topology){ 
-					if(observationInstance.isChecklist)
-	                    areas = Utils.GeometryAsWKT(observationInstance?.topology)
+                    if(observationInstance.isChecklist)
+                        areas = Utils.GeometryAsWKT(observationInstance?.topology)
                     else
-						areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
-			    } else if(params.areas) {
-                	areas = params.areas
+                        areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
+                } else if(params.areas) {
+                    areas = params.areas
                 }
 
                 if(!latitude && params.latitude) latitude = params.latitude
@@ -54,7 +55,7 @@
                 %>
                 ${(geoPrivacyAdjustment != 0) ? 'Geoprivacy enabled' : latitude.toFloat() + ',' + longitude.toFloat()}
 
-				<input id='areas' type='hidden' name='areas' value='${areas}'/>
+                <input id='areas' type='hidden' name='areas' value='${areas}'/>
 
                 <input class="degree_field" id="latitude_field" type="hidden" name="latitude" value="${latitude}"/>
                 <input class="degree_field" id="longitude_field" type="hidden" name="longitude" style="width:193px;" value="${longitude}"/>
@@ -68,7 +69,7 @@
         </tr>
         </g:each>
     </table>
-</div>	
+</div>  
 
 <g:if test="${!observationInstance.isChecklist && observationInstance.maxVotedReco}">
     <div class="sidebar_section tile temporalDist">

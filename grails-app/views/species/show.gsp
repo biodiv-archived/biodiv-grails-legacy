@@ -202,7 +202,7 @@
         </s:isSpeciesContributor>
         
         <div class="span12">
-            <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor, speciesInstance:speciesInstance]"/>
+            <s:showSubmenuTemplate model="['entityName':speciesInstance.taxonConcept.italicisedForm , 'subHeading':CommonNames.findWhere(taxonConcept:speciesInstance.taxonConcept, language:Language.findByThreeLetterCode('eng'), isDeleted:false)?.name, 'headingClass':'sci_name', 'isSpeciesContributor':isSpeciesContributor, speciesInstance:speciesInstance]"/>
 
                 <g:if test="${!speciesInstance.percentOfInfo}">
                 <div class="poor_species_content alert">

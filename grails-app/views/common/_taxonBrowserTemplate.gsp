@@ -27,13 +27,13 @@
 
     </div>
 </div>
-<div id="taxonHierarchy" class="emptyField"></div>
+<div id="taxonHierarchy" class="emptyField" ${height?"style='height:"+height+"'":''}></div>
 <div class="nameContainer">
-    <div id="searchTaxonBox" class="input-append input-block-level">
-        <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="Search for taxon" />
+    <div id="searchTaxonBox" class="input-append input-block-level" style="margin-bottom:0px;">
+        <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="${g.message(code:'species.taxondefinition.search.placeholder')}" />
         <span id="searchTaxonPrev" class="add-on btn searchTaxonPaginate">&lt;</span>
         <span id="searchTaxonNext" class="add-on btn searchTaxonPaginate">&gt;</span>
-        <span id="searchTaxonButton" class="add-on btn">Search</span>
+        <span id="searchTaxonButton" class="add-on btn">${g.message(code:'species.taxondefinition.search')}</span>
     </div>
     <div class="nameSuggestions" style="display: block;"></div>
 </div>
@@ -42,10 +42,10 @@
 <g:else>
 <div id="taxonHierarchy" class="emptyField" style="width: 938px;"></div>
  <div id="searchTaxonBox" class="input-append input-block-level">
-    <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="Search for taxon" />
+    <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="${g.message(code:'species.taxondefinition.search.placeholder')}" />
     <span id="searchTaxonPrev" class="add-on btn searchTaxonPaginate">&lt;</span>
     <span id="searchTaxonNext" class="add-on btn searchTaxonPaginate">&gt;</span>
-    <span id="searchTaxonButton" class="add-on btn">Search</span>
+    <span id="searchTaxonButton" class="add-on btn">${g.message(code:'species.taxondefinition.search')}</span>
  </div>
     <div id="searchTaxonResultCount" class="hide"></div>
 </g:else>

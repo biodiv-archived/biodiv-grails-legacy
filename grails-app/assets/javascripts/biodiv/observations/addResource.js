@@ -46,6 +46,7 @@ function attachThumbnailAndProcess(me , images) {
             rate($ratingContainer);
         });
     }
+    rate(metadataEle.find('.star_obvcreate'));
     me.$ele.find(".imagesList li:first" ).after (metadataEle);
     me.$ele.find(".add_file" ).fadeIn(3000);
     me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");

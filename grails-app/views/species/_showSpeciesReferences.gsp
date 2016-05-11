@@ -4,11 +4,8 @@
 def fieldInstance = Field.findByCategory(fieldFromName.references);
 def results = [];
 def sfInstance 	  = category.value.get('speciesFieldInstance');
-
+def references = [];
 if(sfInstance) {
-   // fieldInstance = sfInstance[0]?.field;
-    //references = refs.values();
-    //printing only if references are not available.. using description
 
 if(sfInstance.size() >0 ){
 for (int i = 0; i < sfInstance.size(); i++) {
@@ -22,63 +19,76 @@ for (int i = 0; i < sfInstance.size(); i++) {
   }
 }
 
-    def criteria = SpeciesField.createCriteria();
-    results = criteria.list {
-        groupProperty('field')
-        eq('species', speciesInstance)
-        eq('language', userLanguage)
-        order("field", "asc")
-    }
+def criteria = SpeciesField.createCriteria();
+results = criteria.list {
+    groupProperty('field')
+    eq('species', speciesInstance)
+    //eq('language', userLanguage)
+    order("field", "asc")
 }
-def references = [];
 
-  results.each{result->  	
-  	references	<< result.references
+}
+
+
+def sortedRef = [:]
+def conRef = []
+def titleRef = []
+  results.each{result->
+  if(result.references){
+  		result.references.each{ r ->
+			//println r.speciesField.field?.connection
+			def con = r.speciesField.field?.connection
+			def fL = r.speciesField.field.toString()
+			if(r.speciesField.field.language == userLanguage){
+				titleRef[con] = r.speciesField.field.toString()
+			}
+			if(conRef.contains(con)){			
+	  			sortedRef[con] << r
+	  		}else{
+	  			sortedRef[con] = [r]
+	  			conRef << con
+	  		}
+  		}	
+  		references	<< result.references
+  	}
   }
-
-def check_repeat_heading = [];
-
 %>
 
-<ol class="references" style="list-style:disc;list-style-type:decimal">
-<g:if test="${references}">
-    <g:each in="${references}" var="ref">
-    	<% if(!check_repeat_heading.contains(ref.speciesField.field[0])){
-    		check_repeat_heading << ref.speciesField.field[0];    		
-    	%>
-      <h6 style="margin-left: -35px;">
-      	<span style="color: #413D3D;text-decoration: none;"> 
-			<% def species_field_block = ref.speciesField.field[0]; %>
-			${species_field_block}
-	  	</span>
-	  </h6>
-	  <% } %>
-      <g:each in="${ref}" var="r">
-    <li class="linktext">
+<g:if test="${sortedRef}">
+	<g:each in="${sortedRef}" status="i" var="title">
+		<h6>
+      		<span style="color: #413D3D;text-decoration: none;">${titleRef[title.key]}</span>
+	  	</h6>
+	  	<ol class="references references_${i}" style="list-style:disc;list-style-type:decimal">
+	  	<g:each in="${title.value}" var="r">
+			
+	  		<li class="linktext">
    
-<span class="ref_val" data-species-id ="${speciesInstance?.id}" data-field-id="${r?.speciesField?.field?.id}" 
-	 data-refference-id="${r?.id}" data-speciesfield-id="${r?.speciesField?.id}">
-    <g:if test="${r.url}">
-     ${r.title?r.title:r.url}
-    </g:if> <g:else>
-    ${r?.title}
-    </g:else>
-</a>
-</span>
-<sUser:ifOwns model="['user':r?.speciesField?.uploader]">
-	<g:if test="${fieldInstance?.id == r?.speciesField?.field?.id }">
-	<span class="ed_de" style="display:none;">
-		<a class="btn btn-small btn-primary edit_ref_val" style="padding:0px;" ><i class="icon-edit"></i></a>
-  		<a class="btn btn-small btn-danger del_ref_val" style="padding:0px;"><i class="icon-trash"></i></a>
-  	</span>
-  	</g:if>
-</sUser:ifOwns>
+			<span class="ref_val" data-species-id ="${speciesInstance?.id}" data-field-id="${r?.speciesField?.field?.id}" 
+				 data-refference-id="${r?.id}" data-speciesfield-id="${r?.speciesField?.id}">				 
+			    <g:if test="${r.url}">
+			     ${r.title?r.title:r.url}
+			    </g:if> <g:else>
+			    ${r?.title}
+			    </g:else>
+			</span>
+			<sUser:ifOwns model="['user':r?.speciesField?.uploader]">
+				
+				<span class="ed_de" style="display:none;">
+					<a class="btn btn-small btn-primary edit_ref_val" style="padding:0px;" ><i class="icon-edit"></i></a>
+			  		<a class="btn btn-small btn-danger del_ref_val" style="padding:0px;"><i class="icon-trash"></i></a>
+			  	</span>
+			</sUser:ifOwns>
+	</li>
 
-    </li>
-    </g:each>
-    </g:each>
+
+		</g:each>
+		</ol>
+	</g:each>
+
 </g:if>
-</ol>
+
+
 <a class='addFieldButton btn btn-success pull-left add_ref' style="display:none;" ><i class="icon-plus"></i>${g.message(code:'title.value.add')}</a>
 
 <div class="new_form_add_referrence" style="display:none;">
@@ -154,6 +164,18 @@ function save_reference(that,action,speciesid,fieldId,pk,cid,text_val){
 		});
 }
 	$(document).ready(function(){
+
+		$('.references').each(function(index,value){
+			var mylist = $('.references_'+index);
+			var listitems = mylist.children('li').get();
+
+			listitems.sort(function(a, b) {
+			   return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+			})
+
+			mylist.empty().append(listitems);
+		});
+
 		$('.add_ref').click(function(){
 			$(this).hide();
 			$(this).next().show();

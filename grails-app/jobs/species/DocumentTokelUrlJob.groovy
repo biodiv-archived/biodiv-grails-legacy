@@ -18,14 +18,16 @@ class DocumentTokelUrlJob {
 
     def execute() {
         // execute job
+
         List scheduledTaskList = getDocumentTokelUrl()
+       //println "===========PROCESSING ============== " 
         if(!scheduledTaskList){
 			return
 		}
 		scheduledTaskList.each { DocumentTokenUrl tu ->
 			try{
 				log.debug "starting task $tu"
-                println "===========PROCESSING ============== " + tu
+                //println "===========PROCESSING ============== " + tu
                 Map gnrdNames = documentService.getGnrdScientificNames(tu.tokenUrl);
                 setStatus(tu,gnrdNames.status)
                 List docSciNameId = DocSciName.findAllByDocument(tu.doc)
@@ -48,12 +50,13 @@ class DocumentTokelUrlJob {
                     docSciNameInstance.displayOrder = mapSize
                     mapSize--;
                     if(docSciNameInstance.canonicalForm) {
-                        docSciNameInstance.taxonConcept = TaxonomyDefinition.findByCanonicalForm(docSciNameInstance.canonicalForm);
+                        docSciNameInstance.taxonConcept = TaxonomyDefinition.findByCanonicalFormAndIsDeleted(docSciNameInstance.canonicalForm, false);
                     }
+                   // println docSciNameInstance
                    // println "mapsize----in loop--- "+ mapSize
                 	if (!docSciNameInstance.save(flush: true)) {
    					    docSciNameInstance.errors.each {
-     					  // println "=======it========"+it
+     					   println "=======it========"+it
    					    }
 					}
                 }

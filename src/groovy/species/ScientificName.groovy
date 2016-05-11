@@ -128,6 +128,16 @@ abstract class ScientificName extends NamesMetadata {
         } catch (e) {
             //log.debug "No thread bound request"
         }
+		
+		//XXX: handling rank if name is coming from col
+		rankStr = rankStr?.toLowerCase()
+		if("superfamily".equals(rankStr)){
+			rankStr = "Super-Family"
+		}else if("subfamily".equals(rankStr)){
+			rankStr = "Sub-Family"
+		}else if("subgenus".equals(rankStr)){
+			rankStr = "Sub-Genus"
+		}
 
         for(def type : list()) {
             String message = request ? messageSource.getMessage(type.getCodes()[0], null, RCU.getLocale(request)) : type.value()
