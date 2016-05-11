@@ -15,9 +15,7 @@
 
         <title>NameList - Curation Interface</title>
 
-        <asset:javascript src="slickgrid.js"/>
-        <asset:javascript src="biodiv/curation.js"/>
-    </head>
+   </head>
     <body>
 
         <div class="row-fluid namelist_wrapper">
@@ -483,6 +481,9 @@
             taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
             </g:each>
             </script>
+            <asset:javascript src="slickgrid.js"/>
+            <asset:javascript src="biodiv/curation.js"/>
+
             <asset:script>
             $(document).ready(function() {
                 //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
