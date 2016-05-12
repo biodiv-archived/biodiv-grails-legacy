@@ -46,6 +46,7 @@ var taxonGrid;
 var positionFilter='';
 var statusFilter=[];
 var searchString='';
+var showCheckBox = false;
 
 function initTaxonGrid(ele) {
     var selectedName = $('.name').val().toLowerCase();
@@ -73,14 +74,24 @@ function initTaxonGrid(ele) {
         return taxonRanks[value].text;
     }
 
-/*    var checkboxSelector = new Slick.CheckboxSelectColumn({
+    var checkboxSelector = new Slick.CheckboxSelectColumn({
         cssClass: "slick-cell-checkboxsel"
     });
-*/
-    //{id: "taxonid", name: "Id", field: "taxonid", maxWidth:80, resizble:false, sortable:true},
+
+    var selectorColumnDef = checkboxSelector.getColumnDefinition();
+    var currentFormatter = selectorColumnDef.formatter;
+    selectorColumnDef.formatter = function(row, cell, value, columnDef, dataContext) {
+        if (window.params.isAdmin || showCheckBox) {
+            return currentFormatter(row, cell, value, columnDef, dataContext);
+        }
+        return "";
+    };
+        //{id: "taxonid", name: "Id", field: "taxonid", maxWidth:80, resizble:false, sortable:true},
     //{id: "isflagged", name: "Flagged", field: "isflagged", width: 40, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, resizable:false}
     var taxonGridColumns = [];
-//    taxonGridColumns.push(checkboxSelector.getColumnDefinition());
+    if(window.params.isAdmin) {
+        taxonGridColumns.push(selectorColumnDef);
+    }
 
     taxonGridColumns.push(
     {id: "rank", name: "Rank", field: "rank", width:60, resizable:false, formatter:taxonRankFormatter, sortable:false},
@@ -148,7 +159,7 @@ function initTaxonGrid(ele) {
     taxonGridDataView.setFilter(nameFilter);
 //    taxonGrid.showTopPanel();
 
-//    taxonGrid.registerPlugin(checkboxSelector);
+    taxonGrid.registerPlugin(checkboxSelector);
     taxonGrid.init();
     return taxonGrid;
 }
@@ -277,6 +288,7 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
                 taxonGrid.invalidateAllRows();
                 taxonGrid.updateRowCount();
                 taxonGrid.gotoCell(0,0);
+                showCheckBox = data.isAdmin;
                 taxonGrid.render();
 
                 var resultCount = data.instanceTotal;

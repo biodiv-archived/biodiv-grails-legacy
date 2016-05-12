@@ -214,7 +214,7 @@ class ChecklistService {
 		//XXX: Doing in batch to avoid connection time out
 		List obvSubLists = params.checklistData.collate(BATCH_SIZE)
 		obvSubLists.each { obvSubList ->
-			Observation.withNewTransaction(){  status ->
+			Observation.withTransaction(){  status ->
 				obvSubList.each {  Map m ->
 					def oldObvId = m.remove(OBSERVATION_COLUMN)
 					if(isValidObservation(m, oldObvId, checklistInstance)){

@@ -266,8 +266,11 @@
                 if(postData.taxonid) {
                     $("a.jstree-anchor[data-taxonid='"+postData.taxonid+"']").addClass('taxon-highlight');
                 } else {
-                    $("#taxonHierarchy a.jstree-anchor").first().addClass('taxon-highlight');
-                    $("input#taxon").val($("#taxonHierarchy a.jstree-anchor").first().data('taxonid'));
+
+                    if (me.options.controller == 'namelist') {
+                        $("#taxonHierarchy a.jstree-anchor").first().addClass('taxon-highlight');
+                        $("input#taxon").val($("#taxonHierarchy a.jstree-anchor").first().data('taxonid'));
+                    }
                 }
 
                 if (me.options.action == 'taxonBrowser') {

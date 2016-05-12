@@ -424,6 +424,34 @@ $(document).ready(function(){
         return false;
     });
 
+    $('.download-close').click(function(){
+        var me = this;
+        var download_box = $(me).parents('.download-box');
+        $(download_box).find('.downloadModal').modal('hide');
+    });
+
+    $('.download-action').click(function(){
+        var me = this;
+        console.log(me);
+        var download_box = $(me).parent('.download-box');
+        console.log(download_box);
+        $.ajax({ 
+            url:window.params.isLoggedInUrl,
+            success: function(data, statusText, xhr, form) {
+                if(data === "true"){
+                    console.log('show');
+                    $(download_box).find('.downloadModal').modal('show');
+                    return false;
+                }else{
+                    window.location.href = window.params.loginUrl+"?spring-security-redirect="+window.location.href;
+                }
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                return false;
+            } 
+        });
+    });
+
     console.log('download-form.submit');
     $('.download-form').bind('submit', function(event) {
         var downloadFrom = $(this).find('input[name="downloadFrom"]').val();

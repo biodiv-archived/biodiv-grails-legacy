@@ -38,7 +38,10 @@ class NamelistController {
         def res = namelistService.getNamesFromTaxon(params)
 		//def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
         def result;
-        if(res) result = [success:true, model:res]
+        if(res) {
+            res['isAdmin'] = utilsService.isAdmin();
+            result = [success:true, model:res]
+        }
         else result = [success:false, msg:'Error while fetching names']
         withFormat {
             json { render result as JSON }
