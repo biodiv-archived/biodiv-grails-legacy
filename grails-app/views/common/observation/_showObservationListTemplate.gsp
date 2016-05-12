@@ -16,30 +16,6 @@
 		def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
 		def styleviewcheck = ((!queryParams?.view || queryParams?.view !="grid") && !activeFilters.isChecklistOnly)?true:false;		
 	%>
-
-<g:if test="${!activeFilters.isChecklistOnly}">
-	<div class="btn-group pull-right button-bar">
-        <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small ${styleviewcheck?'active':''}">
-        	<i class="icon-th-list"></i>${g.message(code:'default.instance.list')}
-        </a>
-       <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small ${!styleviewcheck?'active':''}">
-       		<i class="icon-th"></i>${g.message(code:'default.instance.grid')}
-       </a>
-    </div>
-</g:if>
-
-        <div class="btn-group button-bar pull-right" style="z-index: 10; margin-right:3px;">
-                    <div class="controls">
-                        <g:select name="limit" class="input-mini"
-                            placeholder="${g.message(code:'showobservationlisttemp.select.show')}"
-                            from="${[12,24,36,48,60]}"
-                            value="${queryParams?.max}" />
-
-                    </div>
-
-                </div>
-
-
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
 		

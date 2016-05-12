@@ -72,6 +72,10 @@
 
 				</div>
 
+	<%
+		def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
+		def styleviewcheck = ((!queryParams?.view || queryParams?.view !="grid") && !activeFilters.isChecklistOnly)?true:false;		
+	%>
 				
 				<obv:identificationByEmail
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:g.message(code:'button.share')]" />
