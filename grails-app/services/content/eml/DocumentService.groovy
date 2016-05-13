@@ -728,7 +728,7 @@ class DocumentService extends AbstractMetadataService {
 			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
 			//println "==========User Group======================" + userGroupIds
 			userGroupIds = userGroupIds.collect { "" + it }
-			setUserGroups(documentInstance, userGroupIds);
+			setUserGroups(documentInstance, userGroupIds,false);
 		}
 		else {
 			documentInstance.errors.allErrors.each { log.error it }
