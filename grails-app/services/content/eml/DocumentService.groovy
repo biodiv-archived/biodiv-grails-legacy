@@ -384,6 +384,7 @@ println queryParts.queryParams
 		def documentInstanceList = hqlQuery.list();
 
         def countQ = sessionFactory.currentSession.createQuery(countQuery)
+        countQ.setProperties(queryParts.queryParams);
         long count = countQ.list()[0]
 		return [documentInstanceList:documentInstanceList, instanceTotal : count, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
