@@ -938,10 +938,13 @@ class SpeciesUploadService {
 			}
 		}
 		
-		sFieldToDelete.each { sf ->
-			sf.refresh()
-			log.info "Deleting ${sf}"
-			sf.delete(flush:true)
+		//delete species field only when species bulk upload object given to roll back
+		if(sbu){
+			sFieldToDelete.each { sf ->
+				sf.refresh()
+				log.info "Deleting ${sf}"
+				sf.delete(flush:true)
+			}
 		}
 		
 		sFields.removeAll(sFieldToDelete)
@@ -967,15 +970,17 @@ class SpeciesUploadService {
 		}
 	
         def tempRes = s.resources.intersect(resources);
-        tempRes.each { res ->
-            log.debug "Removing resource " + res
-            s.removeFromResources(res)
-        }
+		if(sbu){
+	        tempRes.each { res ->
+	            log.debug "Removing resource " + res
+	            s.removeFromResources(res)
+	        }
+		}
 		
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			log.debug "Deleting species ${s} "
-			deleteSpecies(s)
+			deleteSpecies(s, sbu)
 			return
 		}
 
@@ -985,7 +990,7 @@ class SpeciesUploadService {
 				
 	}
 	
-	private boolean deleteSpecies(Species s) throws Exception { 
+	private boolean deleteSpecies(Species s, SpeciesBulkUpload sbu) throws Exception { 
 		try{
 //			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
 //				reco.taxonConcept = null
@@ -1003,11 +1008,14 @@ class SpeciesUploadService {
 //			SpeciesGroupMapping.findAllByTaxonConcept(s.taxonConcept).each { sgm ->
 //				sgm.delete()
 //			}
-			SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
-				sp.delete(flush:true)
+			
+			if(sbu){
+				SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
+					sp.delete(flush:true)
+				}
 			}
 			
-			if(s.resources){
+			if(sbu && s.resources){
 				def ids = s.resources.collect { it.id}
 				ids.each { 
 					def r = Resource.get(it)
@@ -1015,11 +1023,19 @@ class SpeciesUploadService {
 				}
 			}
 			log.debug "Reverting changes of species before delete $s ===="
-			if(s.delete(flush:true)) {
-			    log.debug "Deleted ${s}"
-			    speciesSearchService.delete(s.id);
-			    return true
-            }
+			if(sbu){
+				if(s.delete(flush:true)) {
+					log.debug "Deleted ${s}"
+				}
+			}else{
+				log.debug "Flagging species as deleted"
+				s.isDeleted = true
+				if(!s.save(flush:true)){
+					s.errors.allErrors.each { log.error it }
+				}
+			}
+			speciesSearchService.delete(s.id);
+			return true
 		}catch (Exception e) {
 			log.error "Error in Delete/Reverting ${s}"
 			e.printStackTrace()

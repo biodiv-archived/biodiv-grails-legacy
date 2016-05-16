@@ -315,4 +315,34 @@ class NamelistController {
         }
         render res as JSON;
     }
+	
+	
+	/////////////////////////////// Name list API /////////////////////////////////
+	def changeAccToSyn(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.changeAccToSyn(params.oldId.toLong(), params.newId.toLong())
+		render  res as JSON;
+	}
+	
+	def changeSynToAcc(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
+		render  res as JSON;
+	}
+	
+	def deleteName(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.deleteName(params.id.toLong())
+		render  res as JSON;
+	}
+	
+	def mergeNames(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.mergeNames(params.oldId.toLong(), params.newId.toLong())
+		render  res as JSON;
+	}
 }

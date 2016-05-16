@@ -107,11 +107,11 @@ class SpeciesController extends AbstractObjectController {
 	def listXML() {
 		//cache "taxonomy_results"
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		def speciesList = Species.list(params) as XML;
+		def speciesList = Species.findAllByIsDeleted(false, params) as XML;
 		def writer = new StringWriter ();
 		def result = new MarkupBuilder(writer);
 		result.response() {
-			numspecies (Species.count())
+			numspecies (Species.countByIsDeleted(false))
 			result.mkp.yieldUnescaped (speciesList.toString() - "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 		}
 		render(contentType: "text/xml", text:writer.toString())
@@ -237,7 +237,7 @@ class SpeciesController extends AbstractObjectController {
 		//cache "content"
         params.id = params.long('id');
 		def url
-		def speciesInstance = params.id ? Species.get(params.id):null;
+		def speciesInstance = params.id ? Species.findByIsDeletedAndId(false, params.id):null;
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
             withFormat {

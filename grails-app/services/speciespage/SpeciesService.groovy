@@ -1602,6 +1602,7 @@ class SpeciesService extends AbstractObjectService  {
     */
     def _getSpeciesListQuery(params) {
         params.startsWith = params.startsWith?:"A-Z"
+		params.isDeleted = params.isDeleted ?: "false"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
         def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
         params.sGroup = params.sGroup ?: allGroup.id+""
@@ -1803,6 +1804,13 @@ class SpeciesService extends AbstractObjectService  {
             filterQuery += " and s.taxonConcept.status=:status";
             countFilterQuery += " and s.taxonConcept.status=:status";
         }
+		
+		if(params.isDeleted != null) {
+			queryParams['isDeleted'] = Boolean.parseBoolean(params.isDeleted)
+			activeFilters['isDeleted'] = queryParams['isDeleted']
+			filterQuery += " and s.isDeleted=:isDeleted ";
+			countFilterQuery += " and s.isDeleted=:isDeleted ";
+		}
 
 //		XXX: to be corrected		
 //		if(params.user){
