@@ -318,6 +318,7 @@ class NamelistController {
 	
 	
 	/////////////////////////////// Name list API /////////////////////////////////
+	@Secured(['ROLE_ADMIN'])
 	def changeAccToSyn(params){
 		log.debug params
 		def res = [:]
@@ -325,6 +326,7 @@ class NamelistController {
 		render  res as JSON;
 	}
 	
+	@Secured(['ROLE_ADMIN'])
 	def changeSynToAcc(params){
 		log.debug params
 		def res = [:]
@@ -332,6 +334,7 @@ class NamelistController {
 		render  res as JSON;
 	}
 	
+	@Secured(['ROLE_ADMIN'])
 	def deleteName(params){
 		log.debug params
 		def res = [:]
@@ -339,6 +342,7 @@ class NamelistController {
 		render  res as JSON;
 	}
 	
+	@Secured(['ROLE_ADMIN'])
 	def mergeNames(params){
 		log.debug params
 		def res = [:]
