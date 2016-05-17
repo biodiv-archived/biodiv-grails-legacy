@@ -660,5 +660,5 @@ create index on species(is_deleted);
 
 
 #17 may 
-update document set external_url =uri where external_url !='';
+update document set external_url =uri where uri !='';
 alter table document drop column uri;
