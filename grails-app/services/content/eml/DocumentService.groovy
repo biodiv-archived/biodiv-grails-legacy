@@ -582,7 +582,7 @@ println queryParts.queryParams
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
 			println "================" + m
 			
-			if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+			if(m['file path'].trim() != "" || m['externalurl'].trim() != '' ){
 
 				uploadLinkDoc(m, resultObv,params)
 				i++
@@ -623,7 +623,7 @@ println queryParts.queryParams
 			}
 		}
 		
-		document.uri = m['uri']
+		document.externalUrl = m['externalurl']
 		document.title = m['title']
 		
 		if(!document.title){
@@ -631,7 +631,7 @@ println queryParts.queryParams
 			return 
 		}
 		
-		if(!document.uFile  && !document.uri){
+		if(!document.uFile  && !document.externalUrl){
 			log.error "Either ufile or uri is null so ignoring this document"
 			return
 		}
@@ -679,7 +679,9 @@ println queryParts.queryParams
 	}
 	private uploadLinkDoc(Map m, resultObv,params){
 		Document document = new Document()
-		document.uri = m['uri']
+		println "========================================================="
+		println m
+	//	document.uri = m['uri']
 		document.title = m['title']		
 		if(!document.title){
 			log.error 'title cant be null'
@@ -716,7 +718,7 @@ println queryParts.queryParams
 		document.longitude = (m['longitude'] ?:76.658279)
 		document.latitude = (m['lattitude'] ?: 12.32112)
 		document.geoPrivacy = m["geoprivacy"]
-		document.uri=m["externalurl"]
+		document.externalUrl=m["externalurl"]
 		document.placeName=m["palce name"]
 //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 //		if(document.latitude && document.longitude) {
@@ -750,7 +752,7 @@ println queryParts.queryParams
 
 	def runCurrentDocuments(documentInstance,Map m) {
 				def tokenUrl=""
-				def url= m["externalurl"]
+				def url= m["externalUrl"]
 				def hostName = 'http://gnrd.globalnames.org' //url.getHost()
                 HTTPBuilder http = new HTTPBuilder(hostName)
                 http.request( GET, JSON ) {
@@ -908,7 +910,7 @@ println queryParts.queryParams
                       //  println url
 
                     } else {
-                        url=instance.uri;
+                        url=instance.externalUrl;
                     }
                     def hostName = 'http://gnrd.globalnames.org' //url.getHost()
                     HTTPBuilder http = new HTTPBuilder(hostName)

@@ -60,8 +60,8 @@ class DocumentMarshaller {
                 result['uFile'] = document.uFile
             }
 
-            if(document.uri) {
-                result['uri'] = document.uri;
+            if(document.externalUrl) {
+                result['uri'] = document.externalUrl;
             }
 
             return result;

@@ -653,9 +653,12 @@ ALTER TABLE common_names ADD CONSTRAINT common_names_taxon_concept_id_key UNIQUE
 create index on common_names(is_deleted);
 create index on taxonomy_definition(is_deleted);
 
-#17 may 
-update document set uri = external_url where external_url !='';
 
 #16th may
 alter table species add column is_deleted boolean not null default 'false';
 create index on species(is_deleted);
+
+
+#17 may 
+update document set external_url =uri where external_url !='';
+alter table document drop column uri;
