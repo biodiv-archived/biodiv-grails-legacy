@@ -655,3 +655,7 @@ create index on taxonomy_definition(is_deleted);
 
 #17 may 
 update document set uri = external_url where external_url !='';
+
+#16th may
+alter table species add column is_deleted boolean not null default 'false';
+create index on species(is_deleted);

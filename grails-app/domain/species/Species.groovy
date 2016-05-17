@@ -36,7 +36,8 @@ class Species implements Rateable {
 	Habitat habitat;
 	StringBuilder sLog;
     boolean hasMedia = false;
-
+	boolean isDeleted = false;
+	
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource
@@ -72,6 +73,7 @@ class Species implements Rateable {
 		updatedOn(nullable:true);
         featureCount nullable:false;
         habitat nullable:true;
+		isDeleted nullable:false;
 	}
 
 	static mapping = {
