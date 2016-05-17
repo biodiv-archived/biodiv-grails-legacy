@@ -652,3 +652,6 @@ ALTER TABLE common_names ADD CONSTRAINT common_names_taxon_concept_id_key UNIQUE
 
 create index on common_names(is_deleted);
 create index on taxonomy_definition(is_deleted);
+
+#17 may 
+update document set uri = external_url where external_url !='';

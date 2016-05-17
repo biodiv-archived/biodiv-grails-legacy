@@ -703,7 +703,7 @@ class DocumentService extends AbstractMetadataService {
 		document.longitude = (m['longitude'] ?:76.658279)
 		document.latitude = (m['lattitude'] ?: 12.32112)
 		document.geoPrivacy = m["geoprivacy"]
-		document.externalUrl=m["externalurl"]
+		document.uri=m["externalurl"]
 		document.placeName=m["palce name"]
 //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 //		if(document.latitude && document.longitude) {

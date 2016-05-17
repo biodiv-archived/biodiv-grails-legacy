@@ -125,8 +125,6 @@ class Document extends DataObject implements Comparable {
 		fromDate(nullable: true)
 		group nullable:true
 		habitat nullable:true
-		externalUrl nullable:true,blank:false
-
 	}
 	
 	static hasMany = [userGroups: UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, docSciNames:DocSciName]
