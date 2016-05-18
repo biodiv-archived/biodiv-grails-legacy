@@ -2327,6 +2327,18 @@ class NamelistService extends AbstractObjectService {
 	}
 	
 	
+	public boolean updateNamePosition(long oldId, String position, Map hirMap=null){
+		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
+		
+		if(!oldName){
+			log.debug "Null id is given for the names  old id " + oldId
+			return false
+		}
+		
+		oldName.updatePosition(position)
+		return true
+	}
+	
 	public boolean deleteName(long id){
 		ScientificName name = TaxonomyDefinition.get(id)
 		if(!name || name.isDeleted){

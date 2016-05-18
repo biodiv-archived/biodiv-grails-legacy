@@ -358,5 +358,12 @@ class NamelistController {
 		render  res as JSON;
 	}
 
+	@Secured(['ROLE_ADMIN'])
+	def updatePosition(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.updateNamePosition(params.id.toLong(), params.position, params.hirMap)
+		render  res as JSON;
+	}
 
 }
