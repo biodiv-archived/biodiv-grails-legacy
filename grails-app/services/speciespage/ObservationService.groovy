@@ -171,9 +171,10 @@ class ObservationService extends AbstractMetadataService {
 
             if(params.action == "save" || params.action == "bulkSave") {
                 observationInstance = create(params);
-                if(params.action == 'bulkSave')
+                if(params.action == 'bulkSave'){
                     observationInstance.protocol = Observation.ProtocolType.MULTI_OBSERVATION
-                else if(params.action == 'save') {
+					observationInstance.habitat = observationInstance.habitat?:Habitat.findByName(Habitat.HabitatType.ALL.value())
+                }else if(params.action == 'save') {
                     observationInstance.protocol = params.protocol? Observation.ProtocolType.getEnum(params.protocol) : Observation.ProtocolType.SINGLE_OBSERVATION
                     if(!observationInstance.protocol) {
                         observationInstance.protocol = Observation.SINGLE_OBSERVATION;
@@ -1039,7 +1040,14 @@ println resIdList
         hqlQuery.setReadOnly(true);
         //hqlQuery.setCacheable(true)
         //hqlQuery.setCacheRegion('obvList');
-        def observationInstanceList = hqlQuery.list();
+/*def qTranslator = (new org.hibernate.hql.ast.ASTQueryTranslatorFactory()).createQueryTranslator('123', query, ['limit':3,'max':2], sessionFactory);
+qTranslator.compile(queryParts.queryParams, false);
+println "******************************"
+println qTranslator;
+println qTranslator.getQueryString();
+println qTranslator.getSQLString();
+println "******************************"
+*/        def observationInstanceList = hqlQuery.list();
 
         def distinctRecoList = [];
         def speciesGroupCountList = [];

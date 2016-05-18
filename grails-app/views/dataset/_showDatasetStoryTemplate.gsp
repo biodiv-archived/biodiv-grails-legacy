@@ -42,7 +42,7 @@
     </g:if>
     <g:else>
     <%long noOfObservations = Observation.countByDatasetAndIsDeleted(datasetInstance, false)%>
-    <g:if test="${noOfObservations}">
+    <g:if test="${noOfObservations || datasetInstance.id == 3}">
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
         <div class="prop">
             <g:if test="${showDetails}">
@@ -52,13 +52,15 @@
             <i class="pull-left icon-share-alt"></i>
             </g:else>
             <div class="value">
+                <g:if test="${datasetInstance.id != 3}">
                 <span class="stats_number" title="No of Observations">${noOfObservations}</span>
+                </g:if>
 
                 <div>
                     <%
                     String url = uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false);
-                    if(dataset.id == 3) {
-                        url = '';
+                    if(datasetInstance.id == 3) {
+                        url = '/map?layers=lyr_410_butterflyspeciesdistribution&title=Butterfly';
                     }
                     %> 
                     <g:link class="btn btn-small btn-primary" url="${url}" name="l${pos}">
@@ -68,6 +70,7 @@
             </div>
         </div> 
             </g:if>
+            
             <g:if test="${datasetInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">

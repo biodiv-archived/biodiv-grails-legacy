@@ -77,7 +77,7 @@ class Document extends DataObject implements Comparable {
 	String title
 	
 	UFile uFile   //covers physical file formats
-	String uri
+	//String uri
 	
 	String notes // <=== description
 	String contributors;
@@ -108,7 +108,7 @@ class Document extends DataObject implements Comparable {
 	static constraints = {
 		title nullable:false, blank:false
 		uFile nullable:true
-		uri nullable:true
+		//uri nullable:true
 		contributors nullable:true
 		attribution  nullable:true	
 		sourceHolderId nullable:true
@@ -125,7 +125,7 @@ class Document extends DataObject implements Comparable {
 		fromDate(nullable: true)
 		group nullable:true
 		habitat nullable:true
-		externalUrl nullable:true,blank:false
+		externalUrl nullable:true, blank:false
 	}
 	
 	static hasMany = [userGroups: UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, docSciNames:DocSciName]

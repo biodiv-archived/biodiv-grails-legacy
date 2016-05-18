@@ -85,7 +85,7 @@ class SpeciesService extends AbstractObjectService  {
     def taxonService;
     def activityFeedService;
     def messageSource;
-	def namelistService;
+	//def namelistService;
 	
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
@@ -1099,7 +1099,7 @@ class SpeciesService extends AbstractObjectService  {
                 String msg = '';
                 def content;
                 msg = messageSource.getMessage("info.succes.update.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
+                content = CommonNames.findAllByTaxonConceptAndIsDeleted(taxonConcept, false) ;
                 String activityType, mailType, description;
                 if(oldCommonname) {                    
                     description = ActivityFeedService.SPECIES_COMMONNAME_UPDATED+" : "+oldCommonname.name+" changed to "+commonnames[0].name
@@ -1376,7 +1376,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
 
                 msg = messageSource.getMessage("info.success.remove.commonname", null, LCH.getLocale());
-                content = CommonNames.findAllByTaxonConcept(taxonConcept) ;
+                content = CommonNames.findAllByTaxonConceptAndIsDeleted(taxonConcept, false) ;
                 if(speciesInstance) {
                     return [success:true, id:speciesInstance.id, msg:msg, type:'commonname', content:content, speciesInstance:speciesInstance,activityType:ActivityFeedService.SPECIES_COMMONNAME_DELETED, activityDesc:ActivityFeedService.SPECIES_COMMONNAME_DELETED+" : "+oldCommonname.name, mailType:ActivityFeedService.SPECIES_COMMONNAME_DELETED]
                 } else {
@@ -1602,6 +1602,7 @@ class SpeciesService extends AbstractObjectService  {
     */
     def _getSpeciesListQuery(params) {
         params.startsWith = params.startsWith?:"A-Z"
+		params.isDeleted = params.isDeleted ?: "false"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
         def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
         params.sGroup = params.sGroup ?: allGroup.id+""
@@ -1803,6 +1804,13 @@ class SpeciesService extends AbstractObjectService  {
             filterQuery += " and s.taxonConcept.status=:status";
             countFilterQuery += " and s.taxonConcept.status=:status";
         }
+		
+		if(params.isDeleted != null) {
+			queryParams['isDeleted'] = Boolean.parseBoolean(params.isDeleted)
+			activeFilters['isDeleted'] = queryParams['isDeleted']
+			filterQuery += " and s.isDeleted=:isDeleted ";
+			countFilterQuery += " and s.isDeleted=:isDeleted ";
+		}
 
 //		XXX: to be corrected		
 //		if(params.user){
@@ -2346,7 +2354,7 @@ def checking(){
             canonicalForms << syn.canonicalForm;
         }
 
-        def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms", ['canonicalForms':canonicalForms]);
+        def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms and dsn.isDeleted=:isDeleted", ['canonicalForms':canonicalForms,'isDeleted':false]);
         return docSciNames.document.unique();
 
     }

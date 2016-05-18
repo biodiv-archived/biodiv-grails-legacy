@@ -38,7 +38,10 @@ class NamelistController {
         def res = namelistService.getNamesFromTaxon(params)
 		//def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
         def result;
-        if(res) result = [success:true, model:res]
+        if(res) {
+            res['isAdmin'] = utilsService.isAdmin();
+            result = [success:true, model:res]
+        }
         else result = [success:false, msg:'Error while fetching names']
         withFormat {
             json { render result as JSON }
@@ -257,7 +260,7 @@ class NamelistController {
             boolean moveToWKG =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.WORKING.toString()):false;
             boolean moveToClean =  acceptedMatch.position?acceptedMatch.position.equalsIgnoreCase(NamePosition.CLEAN.toString()):false;
 
-            if((moveToWKG || moveToRaw) && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
+            if((moveToWKG || moveToRaw) && !(speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR]) || utilsService.isAdmin(springSecurityService.currentUser))
             ) {
                 def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
                 res['msg'] = "Only user with Taxon curator/editor permission can edit raw names and move to working list. Please request for permission ${link}"
@@ -266,7 +269,7 @@ class NamelistController {
             }
 
             //TODO:remove from clean shd be one by user with editor rights only
-            if(moveToClean && !speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])
+            if(moveToClean && !(speciesPermissionService.isTaxonContributor(name, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])  || utilsService.isAdmin(springSecurityService.currentUser) )
             ) {
                 def link = """<a href="${uGroup.createLink(controller:'species', action:'taxonBrowser')}" class="btn btn-primary" target="_blank">${message(code:"link.request")} </a>"""
                 res['msg'] = "Only user with Taxon editor permission can edit working names and move to clean list. Please request for permission ${link}"
@@ -312,4 +315,38 @@ class NamelistController {
         }
         render res as JSON;
     }
+	
+	
+	/////////////////////////////// Name list API /////////////////////////////////
+	@Secured(['ROLE_ADMIN'])
+	def changeAccToSyn(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.changeAccToSyn(params.oldId.toLong(), params.newId.toLong())
+		render  res as JSON;
+	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def changeSynToAcc(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
+		render  res as JSON;
+	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def deleteName(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.deleteName(params.id.toLong())
+		render  res as JSON;
+	}
+	
+	@Secured(['ROLE_ADMIN'])
+	def mergeNames(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.mergeNames(params.oldId.toLong(), params.newId.toLong())
+		render  res as JSON;
+	}
 }

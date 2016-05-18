@@ -64,7 +64,7 @@ class GroupHandlerService {
 	 */
 	SpeciesGroup addGroup(String name, String parentGroupName, String taxonName, int taxonRank) {
 		SpeciesGroup parentGroup = SpeciesGroup.findByName(parentGroupName);
-		TaxonomyDefinition taxonConcept = TaxonomyDefinition.findByCanonicalFormAndRank(taxonName, taxonRank);
+		TaxonomyDefinition taxonConcept = TaxonomyDefinition.findWhere(canonicalForm:taxonName, rank:taxonRank, isDeleted:false);
 		SpeciesGroupMapping speciesGroupMapping = new SpeciesGroupMapping(taxonName:taxonName, rank:taxonRank, taxonConcept:taxonConcept);
 		return addGroup(name, parentGroup, speciesGroupMapping);
 	}

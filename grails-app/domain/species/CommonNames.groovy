@@ -14,11 +14,14 @@ class CommonNames extends NamesMetadata {
 	// added this column for optimizing case insensitive sql query
 	String lowercaseName;
 	
+	boolean isDeleted = false;
+	
     static constraints = {
 		name(blank:false, nullable:false, unique:['language','taxonConcept']);
 		language(nullable:true);
 		transliteration(nullable:true);
 		lowercaseName nullable:true;
+		isDeleted nullable:false;
     }
 
 	static mapping = {

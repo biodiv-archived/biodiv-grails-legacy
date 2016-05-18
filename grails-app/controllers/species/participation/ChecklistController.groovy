@@ -239,7 +239,7 @@ class ChecklistController {
                         r['file'] = res.fileName;
                         r['thumbnail'] = res.thumbnailUrl();
                         r['url'] = res.url;
-                        r['license'] = res.licenses.collect { it.name }.join(',');
+                        r['license'] = res.license.name;
                         r['type'] = res.type.name();
                         r['rating'] = res.rating;
                         if(res.type != ResourceType.VIDEO) {

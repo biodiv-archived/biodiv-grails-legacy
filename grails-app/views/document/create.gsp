@@ -114,13 +114,13 @@ $(document).ready(function(){
                             </div>
                             <div class="span1"><g:message code="loginformtemplate.or" /></div>
                             <div
-                                class="span6 control-group ${hasErrors(bean: documentInstance, field: 'uri', 'error')}"
+                                class="span6 control-group ${hasErrors(bean: documentInstance, field: 'externalUrl', 'error')}"
                                 style="width: 480px;">
-                                <label class="control-label" for="uri" style="width: 40px;"><g:message code="default.url.label" /></label>
+                                <label class="control-label" for="externalUrl" style="width: 40px;"><g:message code="default.url.label" /></label>
                                 <div class="controls" style="margin-left: 55px;">
-                                    <input type="text" id="link-fetch" class="input-block-level" name="uri"
+                                    <input type="text" id="link-fetch" class="input-block-level" name="externalUrl"
                                     placeholder="${g.message(code:'placeholder.document.enter.url')}"
-                                    value="${documentInstance?.uri}" />
+                                    value="${documentInstance?.externalUrl}" />
                                 </div>
                             </div>
                             <div> <input type="hidden" id="gnrd_tokenURL" name="tokenUrl" />

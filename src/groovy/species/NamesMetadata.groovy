@@ -21,9 +21,9 @@ abstract class NamesMetadata extends NamesSorucedata {
 
         static list() {
             [
-            CLEAN,
+            RAW,
             WORKING,
-            RAW
+            CLEAN
             ]
         }
 
@@ -31,10 +31,16 @@ abstract class NamesMetadata extends NamesSorucedata {
             return this.value;
         }
 
-        String toString() {
+        String label() {
+            if(this == RAW) return "Raw" 
+            if(this == WORKING) return "Working" 
+            if(this == CLEAN) return "Clean" 
+        }
+
+/*        String toString() {
             return this.value();
         }
-		
+*/		
 		static NamePosition getEnum(String str){
 			if(!str) return null
 			
@@ -180,11 +186,14 @@ abstract class NamesMetadata extends NamesSorucedata {
 	String viaDatasource
 	String nameSourceId
 	
+	boolean isDeleted = false;
+	
 	//to store reference backbone i.e col, butterfly by kunte default is col, ideally it should be enum
 	//String referenceTaxonomyBackbone = "COL"
 	
 	List<SUser> curators;
 	static hasMany = [curators: SUser]
+	
 	
 	
     static constraints = {
@@ -195,6 +204,7 @@ abstract class NamesMetadata extends NamesSorucedata {
 		matchDatabaseName nullable:true;
 		matchId nullable:true;
 		nameSourceId nullable:true;
+		isDeleted nullable:false;
 	}
 
     static mapping = {

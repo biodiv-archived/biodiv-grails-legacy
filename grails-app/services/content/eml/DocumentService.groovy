@@ -337,12 +337,15 @@ class DocumentService extends AbstractMetadataService {
 	 */
 	Map getFilteredDocuments(params, max, offset) {
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
+        println 'getFilteredDocuments'
 		if(Utils.isSearchAction(params)){
+            println '1111'
 			//returning docs from solr search
 			res.putAll(search(params))
 		}else{
+            println '2332'
 			res.putAll(getDocsFromDB(params, max, offset))
-		    res['instanceTotal'] = getDocsFromDB(params, -1, -1).documentInstanceList.size()
+		    //res['instanceTotal'] = 100;//getDocsFromDB(params, -1, -1).documentInstanceList.size()
 		}
 		return res
 	}
@@ -350,16 +353,18 @@ class DocumentService extends AbstractMetadataService {
 	private getDocsFromDB(params, max, offset){
 		def queryParts = getDocumentsFilterQuery(params)
 		String query = queryParts.query;
-
+println "sdfsdfsdf"
 
 		query += queryParts.filterQuery + queryParts.orderByClause
+		String countQuery = queryParts.countQuery + queryParts.filterQuery;
 		if(max != -1)
 			queryParts.queryParams["max"] = max
 		if(offset != -1)
 			queryParts.queryParams["offset"] = offset
 
 		log.debug "Document Query "+ query + "  params " + queryParts.queryParams
-
+        println query
+println queryParts.queryParams
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
         /*if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType, null))
@@ -377,7 +382,10 @@ class DocumentService extends AbstractMetadataService {
         hqlQuery.setProperties(queryParts.queryParams);
 		def documentInstanceList = hqlQuery.list();
 
-		return [documentInstanceList:documentInstanceList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+        def countQ = sessionFactory.currentSession.createQuery(countQuery)
+        countQ.setProperties(queryParts.queryParams);
+        long count = countQ.list()[0]
+		return [documentInstanceList:documentInstanceList, instanceTotal : count, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
 
 	/**
@@ -387,9 +395,10 @@ class DocumentService extends AbstractMetadataService {
 	 */
 	def getDocumentsFilterQuery(params) {
 		def query = "select document from Document document "
+		def countQuery = "select count(*) from Document document "
 		def queryParams = [:]
 		def activeFilters = [:]
-		def filterQuery = "where document.id is not NULL "  //Dummy stmt
+		def filterQuery = "where document.isDeleted = false "  //Dummy stmt
         def userGroup = utilsService.getUserGroup(params);
  
         if(params.featureBy == "true"){
@@ -399,6 +408,7 @@ class DocumentService extends AbstractMetadataService {
             }
              else {
                 query += ", Featured feat "
+                countQuery += ', Featured feat '
                 filterQuery += " and document.id = feat.objectId and feat.objectType =:featType and feat.userGroup.id = :userGroupId "
                 queryParams["userGroupId"] = userGroup?.id
 
@@ -418,6 +428,7 @@ class DocumentService extends AbstractMetadataService {
 
 		if(params.tag){
 			query = "select document from Document document,  TagLink tagLink "
+			countQuery = "select count(*) from Document document,  TagLink tagLink "
 			filterQuery += " and document.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Document.class)
@@ -431,6 +442,7 @@ class DocumentService extends AbstractMetadataService {
 				//queryParams['isDeleted'] = false;
 		
 				query += " join document.userGroups userGroup "
+				countQuery += " join document.userGroups userGroup "
 				filterQuery += " and userGroup=:userGroup "
 			//}
 		}
@@ -453,12 +465,13 @@ class DocumentService extends AbstractMetadataService {
  
 		
 				query += " join document.docSciNames ds join  ds.taxonConcept.hierarchies as reg "
+				countQuery += " join document.docSciNames ds join  ds.taxonConcept.hierarchies as reg "
                 filterQuery += " and reg.classification.id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 			}
 		}
 		def sortBy = params.sort ? params.sort : "lastRevised "
 		def orderByClause = " order by document." + sortBy +  " desc, document.id asc"
-		return [query:query,filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+		return [query:query, countQuery:countQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 	}
 
 	
@@ -568,7 +581,7 @@ class DocumentService extends AbstractMetadataService {
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
 			println "================" + m
 			
-			if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+			if(m['file path'].trim() != "" || m['externalurl'].trim() != '' ){
 
 				uploadLinkDoc(m, resultObv,params)
 				i++
@@ -609,7 +622,7 @@ class DocumentService extends AbstractMetadataService {
 			}
 		}
 		
-		document.uri = m['uri']
+		document.externalUrl = m['externalurl']
 		document.title = m['title']
 		
 		if(!document.title){
@@ -617,7 +630,7 @@ class DocumentService extends AbstractMetadataService {
 			return 
 		}
 		
-		if(!document.uFile  && !document.uri){
+		if(!document.uFile  && !document.externalUrl){
 			log.error "Either ufile or uri is null so ignoring this document"
 			return
 		}
@@ -665,7 +678,9 @@ class DocumentService extends AbstractMetadataService {
 	}
 	private uploadLinkDoc(Map m, resultObv,params){
 		Document document = new Document()
-		document.uri = m['uri']
+		println "========================================================="
+		println m
+	//	document.uri = m['uri']
 		document.title = m['title']		
 		if(!document.title){
 			log.error 'title cant be null'
@@ -673,7 +688,7 @@ class DocumentService extends AbstractMetadataService {
 		}
 		//other params
 		println "author=================================" + SUser.findByEmail(m['user email'])
-		document.author =SUser.findByEmail(m['user email'].trim())//SUser.findByEmail(m['user email'].trim())
+		document.author =SUser.findByEmail(m['user email']?.trim())//SUser.findByEmail(m['user email'].trim())
 		document.language=params.language
 		document.type = Document.fetchDocumentType(m['type'])
 		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
@@ -727,7 +742,7 @@ class DocumentService extends AbstractMetadataService {
 			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
 			//println "==========User Group======================" + userGroupIds
 			userGroupIds = userGroupIds.collect { "" + it }
-			setUserGroups(documentInstance, userGroupIds);
+			setUserGroups(documentInstance, userGroupIds,false);
 		}
 		else {
 			documentInstance.errors.allErrors.each { log.error it }
@@ -736,7 +751,7 @@ class DocumentService extends AbstractMetadataService {
 
 	def runCurrentDocuments(documentInstance,Map m) {
 				def tokenUrl=""
-				def url= m["externalurl"]
+				def url= m["externalUrl"]
 				def hostName = 'http://gnrd.globalnames.org' //url.getHost()
                 HTTPBuilder http = new HTTPBuilder(hostName)
                 http.request( GET, JSON ) {
@@ -894,7 +909,7 @@ class DocumentService extends AbstractMetadataService {
                       //  println url
 
                     } else {
-                        url=instance.uri;
+                        url=instance.externalUrl;
                     }
                     def hostName = 'http://gnrd.globalnames.org' //url.getHost()
                     HTTPBuilder http = new HTTPBuilder(hostName)

@@ -26,12 +26,10 @@ String status = docId?.status
             <g:if test="${status == "Executing"}">
             <b><i style="color:blue"> Please wait for a moment while we are processing your document ... </i></b>
             </g:if>
-
             <g:elseif test="${status == "Failed"}">
             <b><i style="color:red"> Failed to get the Scientific names </i></b>
             </g:elseif>
             <g:else>
-           
             <tbody >
                 <g:each in="${nameValue}" var="sciName">
                 <tr id= "docSciName_${nameId[sciName.key]}">
@@ -42,15 +40,15 @@ String status = docId?.status
                             <i class="icon-ok" id="ok_${nameId[sciName.key]}" data-val="${nameId[sciName.key]}" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'docSciNamesEdit', 'userGroupWebaddress':webaddress)}","${nameId[sciName.key]}", document.getElementById("txtSciName_${nameId[sciName.key]}").value, "${documentInstance.id}");'></i>
                          </td>
                          <g:if test="${primary==1}">
-                        <td><i class="icon-star pull-left" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'docSciNamesPrimaray', 'userGroupWebaddress':webaddress)}","${nameId[sciName.key]}", "docSciName", "${documentInstance.id}");'></i></td>
+                        <td><i class="primary icon-star pull-left" id="balckstar_${nameId[sciName.key]}" data-val="${nameId[sciName.key]}" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'docSciNamesPrimaraydelete', 'userGroupWebaddress':webaddress)}","${nameId[sciName.key]}", "docSciName", "${documentInstance.id}");'></i></td>
                         </g:if>
                         <g:else>
-                        <td><i class="icon-star-empty pull-left" id="star_${nameId[sciName.key]}" data-val="${nameId[sciName.key]}" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'docSciNamesPrimaray', 'userGroupWebaddress':webaddress)}","${nameId[sciName.key]}", "docSciName", "${documentInstance.id}");'></i></td>
+                        <td><i class="primary icon-star-empty pull-left" id="star_${nameId[sciName.key]}" data-val="${nameId[sciName.key]}" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'document', action:'docSciNamesPrimaray', 'userGroupWebaddress':webaddress)}","${nameId[sciName.key]}", "docSciName", "${documentInstance.id}");'></i></td>
                         </g:else>
                         </sUser:permToReorderDocNames>
                     <td>
                         <%
-                        def taxaObj = nameParseValues[sciName.key]?TaxonomyDefinition.findByCanonicalForm(nameParseValues[sciName.key]):null
+                        def taxaObj = nameParseValues[sciName.key]?TaxonomyDefinition.findByCanonicalFormAndIsDeleted(nameParseValues[sciName.key], false):null
                         def speciesObjId = taxaObj?taxaObj.findSpeciesId():null;
                         def link = ""
                         if(speciesObjId) {
@@ -81,9 +79,7 @@ String status = docId?.status
                     </td>
                     <td>
                         ${sciName.value}
-                        
                     </td>
-
                 </tr>
                 </g:each>
             </tbody>
@@ -117,9 +113,15 @@ $(document).ready(function() {
             var docName=$(this).data('val');
            $('#docSciName_'+docName).hide();
         });
-        $(".icon-star-empty").click(function(){
-            var docName=$(this).data('val');
-           $('#star_'+docName).attr('class', 'icon-star pull-left');
+       
+         $(".primary").click(function(){
+            var that = $(this);
+           if(that.hasClass( "icon-star" )){
+                that.removeClass('icon-star').addClass('icon-star-empty');//$("#star_"+docName).attr('class','icon-star-empty pull-left')
+           }
+           else{
+                that.removeClass('icon-star-empty').addClass('icon-star');
+           }
         });
 </asset:script>
     </div>

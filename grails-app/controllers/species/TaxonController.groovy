@@ -43,7 +43,6 @@ class TaxonController {
     /**
      * 
      */
-    @Cacheable('taxon')
     def listHierarchy() {
         //cache "taxonomy_results"
         includeOriginHeader();
@@ -56,7 +55,7 @@ class TaxonController {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-        
+       println expandTaxon 
         return _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
     }
 
@@ -75,9 +74,17 @@ class TaxonController {
             def taxonIds = [];
             def tillLevel = level+3;
              if(expandTaxon) {
+                 println "expandTaxon"
                 def taxon = TaxonomyDefinition.read(taxonId);
+                if(taxon instanceof species.SynonymsMerged) {
+                //    taxon = taxon.accepted
+                    //TODO
+                }
+                println taxon
                 tillLevel = taxon.rank;
+                println tillLevel
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
+                println taxonIds
             }
             //def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
@@ -112,7 +119,7 @@ class TaxonController {
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
-                    s.taxon_definition_id = t.id and "+
+                    s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+ 
                     (position?"t.position = :position and ": "")+
                     "t.rank = 0";
@@ -124,7 +131,7 @@ class TaxonController {
                 sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
-                    s.taxon_definition_id = t.id and "+
+                    s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (classSystem?"s.classification_id = :classSystem and ":" ")+
                     (position?"t.position = :position and ": " ")+
                     "t.rank = "+level+" and "+
@@ -135,7 +142,7 @@ class TaxonController {
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
-                    s.taxon_definition_id = t.id and "+
+                    s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (classSystem?"s.classification_id = :classSystem and ":"")+
                     (position?"t.position = :position and ": "")+
                     "s.path ~ '^"+parentId+"_[0-9]+\$' " +
@@ -148,7 +155,7 @@ class TaxonController {
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
-                    s.taxon_definition_id = t.id and "+
+                    s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (position?"t.position = :position and ": "")+
                     "t.rank = 0 group by s.path, t.id, t.name";
                 rs = sql.rows(sqlStr, [position:position])
@@ -157,7 +164,7 @@ class TaxonController {
                 sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
-                    s.taxon_definition_id = t.id and "+
+                    s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (position?"t.position = :position and ": "")+
                     "t.rank = "+level+" and \
                     s.path ~ '^"+parentId+"_[0-9]+\$' group by s.path, t.id, t.name";
@@ -167,7 +174,7 @@ class TaxonController {
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
-                    s.taxon_definition_id = t.id and "+
+                    s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (position?"t.position = :position and ": "")+
                     "s.path ~ '^"+parentId+"_[0-9]+\$' group by s.path, t.rank, t.id, t.name" +
                     " order by t.rank asc, t.name"
@@ -231,7 +238,7 @@ class TaxonController {
         from taxonomy_registry s, 
         taxonomy_definition t 
         where 
-        s.taxon_definition_id = t.id and 
+        s.taxon_definition_id = t.id and t.is_deleted = false and 
         ${(classSystem?"s.classification_id = :classSystem and ":"")}
         (s.path like '%!_"""+taxonId+"!_%' or s.path like '"+taxonId+"!_%' or s.path like '%!_"+taxonId+"'  escape '!')";
         def rs
@@ -264,7 +271,7 @@ class TaxonController {
             from taxonomy_registry s, \
             taxonomy_definition t \
             where \
-            s.taxon_definition_id = t.id and "+
+            s.taxon_definition_id = t.id and t.is_deleted = false and "+
             (classSystem?"s.classification_id = :classSystem and ":"")+
             "s.path ~ '^"+parentId+"_[0-9_]+\$' " +
             " group by t.rank \
@@ -713,7 +720,7 @@ class TaxonController {
         from taxonomy_registry s, \
         taxonomy_definition t \
         where \
-        s.taxon_definition_id = t.id and \
+        s.taxon_definition_id = t.id and t.is_deleted = false and \
         s.classification_id = :classSystem and \
         lower(t.name) like lower(:query)";
 

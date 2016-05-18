@@ -7,18 +7,24 @@ import species.participation.Digest;
 class DigestJob {
 
     def digestService
-
+	def dataSource
+	
     static triggers = {
         cron name:'cronTriggerForDigest', startDelay:600l, cronExpression: '0 0 5 * * ?'
-        //'0 55 11 * * ?'
-        //'0 0/5 * * * ?'
-        //'0 35 11 ? * *'
     }
 
     def execute() {
-        println "============SENDING DIGEST MAIL STARTED==================="
-        digestService.sendDigestAction();
-        println "============SENDING DIGEST MAIL FINISHED=================="
+		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+		dataSource.setUnreturnedConnectionTimeout(1000);
+		try{
+	        println "============SENDING DIGEST MAIL STARTED==================="
+	        digestService.sendDigestAction();
+	        println "============SENDING DIGEST MAIL FINISHED=================="
+		}catch(e){
+			e.printStackTrace()
+		}finally{
+			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+		}
     } 
 
 }

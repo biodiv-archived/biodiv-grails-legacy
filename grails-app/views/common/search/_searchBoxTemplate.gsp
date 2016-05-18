@@ -136,6 +136,10 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         'dataset':{
             'deleteUrl':"${uGroup.createLink(controller:'dataset', action:'delete')}"
         }
+        <sUser:isAdmin>
+        ,
+            'isAdmin':true
+        </sUser:isAdmin>
  
         }
 

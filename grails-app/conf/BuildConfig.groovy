@@ -202,7 +202,7 @@ grails.project.dependency.resolution = {
 //        runtime ":zipped-resources:1.0"
         compile ":grails-ant:0.1.3"
         compile "org.grails.plugins:twitter-bootstrap:2.3.2.2"
-        compile "org.grails.plugins:asset-pipeline:2.6.10"
+        compile "org.grails.plugins:asset-pipeline:2.7.4"
         //compile ":redis:1.6.6"
         compile "org.grails.plugins:app-info:1.1.1"
         compile "org.grails.plugins:app-info-hibernate:0.4.1"
