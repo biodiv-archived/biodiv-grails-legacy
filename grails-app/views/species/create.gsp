@@ -23,6 +23,7 @@
             }
         </style>
     </head>
+
     <body>
 
         <div class="observation_create">
@@ -109,9 +110,16 @@
 
             </form>
         </div>
+        <asset:javascript src="slickgrid.js"/>
+        <asset:javascript src="biodiv/curation.js"/>
+
 
     </body>
+
+
     <asset:script>
+
+    
     $(document).ready(function() {
         $("#page").autofillNames({
             'appendTo' : '#nameSuggestions',

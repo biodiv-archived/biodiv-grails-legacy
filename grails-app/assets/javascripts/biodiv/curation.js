@@ -49,7 +49,10 @@ var searchString='';
 var showCheckBox = false;
 
 function initTaxonGrid(ele) {
-    var selectedName = $('.name').val().toLowerCase();
+    var selectedName = $('.name').val();
+    if(selectedName != undefined){
+        selectedName = selectedName.toLowerCase();
+    }
     var hyperlinkSlickFormatter = function(row, cell, value, columnDef, dataContext) {
         value = dataContext;
         var listContent = '';
@@ -1832,8 +1835,8 @@ $(document).ready(function() {
         });
         taxonGridDataView.refresh();
     }
-
-    taxonGrid = initTaxonGrid($('#taxonGrid'));
+    if($("#taxonGrid").length !=0)
+        taxonGrid = initTaxonGrid($('#taxonGrid'));
 //    $("#inlineFilterPanel").appendTo(taxonGrid.getTopPanel()).show();
     /*$("#inlineFilterPanel").on('keyup', '#txtSearch', function (e) {
         Slick.GlobalEditorLock.cancelCurrentEdit();
