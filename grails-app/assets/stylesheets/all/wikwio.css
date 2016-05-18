@@ -25,10 +25,10 @@ body{
 .span12  {
         width:960px;
 }
-.span4 {
+/*.span4 {
         width:320px;
         margin-left:10px;
-}
+}*/
 /**#big_map_canvas  {
         height: 200px;
         width: 320px;
