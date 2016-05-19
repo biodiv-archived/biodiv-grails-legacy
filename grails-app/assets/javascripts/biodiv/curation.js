@@ -2019,15 +2019,15 @@ $(document).ready(function() {
         }
     });
 
-    $(document).on('change','#taxonGrid input[type="checkbox"]',function(){
-        if($('#taxonGrid input[type="checkbox"]:checked').length == 0){
-            $('.clickSelectedRowWrap').slideUp();
-        }else{
-            $('.clickSelectedRowWrap').slideDown();
-        }
-    });
 
-   
+    taxonGrid.onSelectedRowsChanged.subscribe(function(){
+     var selectedRows = taxonGrid.getSelectedRows();     
+     if (selectedRows.length === 0) {          
+        $('.clickSelectedRowWrap').slideUp();
+     }else{
+        $('.clickSelectedRowWrap').slideDown();
+     }
+    }); 
 
 });
  function mergeWithSource(me){
