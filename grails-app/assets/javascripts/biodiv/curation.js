@@ -2020,6 +2020,7 @@ $(document).ready(function() {
     });
 
 
+if(taxonGrid){
     taxonGrid.onSelectedRowsChanged.subscribe(function(){
      var selectedRows = taxonGrid.getSelectedRows();     
      if (selectedRows.length === 0) {          
@@ -2028,6 +2029,7 @@ $(document).ready(function() {
         $('.clickSelectedRowWrap').slideDown();
      }
     }); 
+}
 
 });
  function mergeWithSource(me){
