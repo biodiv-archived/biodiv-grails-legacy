@@ -14,7 +14,44 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>NameList - Curation Interface</title>
-
+<style>
+.selectedNamesWrapper {
+  min-height: 360px;
+  overflow-y: scroll;
+  overflow-x:hidden;
+  height: 360px;
+  }
+.selectedNamesWrapper  .header{
+        font-weight:bold;
+}
+.mergeWrapper{
+    border: 1px solid #ccc;
+  padding: 10px 5px;
+  margin-bottom: 5px;
+  background-color: aliceblue;
+  height:50px;
+}
+.mergeWrapper h6{
+    margin:0px;
+}
+.mergeWrapper select{
+    width: 100%;
+}
+#myModal{
+  width: 1050px;
+  left: 30%;
+}
+.rowSel{
+    border-bottom:1px solid #ccc;
+    padding-top: 5px;
+}
+.rowSelActive{
+      background-color: burlywood;
+}
+.disableSciName{
+    opacity: 0.2;
+}
+</style>
    </head>
     <body>
 
@@ -97,7 +134,7 @@
                     </div>
                </div>
 
-               <div id="taxonGrid" class="dl_content" style="height:318px"></div>
+               <div id="taxonGrid" class="dl_content" style="height:309px"></div>
                <div id="listCounts" class="pull-left info-message" style="padding:0px;margin-left:0px;">
                    <span id="instanceCount"></span>
                    <!--span id="acceptedCount"></span>
@@ -179,7 +216,9 @@
             --%>
 
         </div>
-
+        <div class="span4 offset8 clickSelectedRowWrap" style="margin-bottom: 10px;display:none;">
+            <div class="btn btn-primary btn-large clickSelectedRow">Action on selected names</div>
+        </div>
         <div class="row-fluid metadataDetails namelist_wrapper">
             <div class="span12">
 
@@ -475,6 +514,71 @@
                 <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
             </div>
         </div>
+
+
+
+
+ 
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Action on selected names</h3>
+  </div>
+  <div class="modal-body">
+    <div class="row-fluid">
+        <div class="span9">
+            <div class="selectedNamesWrapper">
+            </div>
+            <a class="btn btn-small btn-danger removeSelName disabled" href="javascript:void(0);" style="margin-top: 10px;">Remove Selected</a>
+        </div>
+        
+        <div class="span3">                     
+            <div class="mergeWrapper">
+                <h6>Move to</h6>
+                <select class="movePosition" name="movePosition">
+                    <option value="">Choose Position</option>
+                    <option value="Raw">Raw</option>
+                    <option value="Working">Working</option>
+                    <option value="Clean">Clean</option>
+                </select>
+                <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="updatePosition($(this));" style="display:none;">submit</a>
+            </div>
+            <div class="mergeWrapper">
+                <h6>Merge With</h6>
+                <select class="mergeTarget" name="mergeTarget"> 
+                    
+                </select>
+                <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="mergeWithSource($(this));" style="display:none;">submit</a>
+            </div>
+            <div class="mergeWrapper">
+                <h6>Make synonyms of</h6>
+                <select class="changeSynTarget" name="changeSynTarget">
+                    <option value="">Choose Name</option>
+                </select>
+                <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="changeAccToSyn($(this));" style="display:none;">submit</a>
+            </div>           
+            <div class="mergeWrapper">
+                <h6>Make as Accepted</h6>
+                <div class="btn btn-small span12 btn-primary" style="margin: 0px;">Make As Accepted</div>
+            </div>
+             <div class="mergeWrapper">
+                <h6>Delete</h6>
+                <div class="btn btn-small span12 btn-danger" onclick="deleteSourceName($(this));" style="margin: 0px;">Delete</div>
+            </div> 
+        </div>
+    </div>
+  </div>  
+</div>
+
+
+
+
+
+
+
+
+
         <script type="text/javascript">
             var taxonRanks = [];
             <g:each in="${TaxonomyRank.list()}" var="t">

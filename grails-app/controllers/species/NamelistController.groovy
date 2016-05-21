@@ -322,7 +322,7 @@ class NamelistController {
 	def changeAccToSyn(params){
 		log.debug params
 		def res = [:]
-		res.status = namelistService.changeAccToSyn(params.oldId.toLong(), params.newId.toLong())
+		res.status = namelistService.changeAccToSyn(params.sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
 		render  res as JSON;
 	}
 	
@@ -338,15 +338,32 @@ class NamelistController {
 	def deleteName(params){
 		log.debug params
 		def res = [:]
-		res.status = namelistService.deleteName(params.id.toLong())
-		render  res as JSON;
+		boolean isParent = TaxonomyDefinition.read(params.id.toLong()).isParent()
+        if(isParent){
+          res.msg = "Taxon name has children "
+          res.success = true
+          render  res as JSON;  
+          return
+        }else{
+		  res.status = namelistService.deleteName(params.id.toLong())
+		  render  res as JSON;
+        }
 	}
 	
 	@Secured(['ROLE_ADMIN'])
 	def mergeNames(params){
 		log.debug params
 		def res = [:]
-		res.status = namelistService.mergeNames(params.oldId.toLong(), params.newId.toLong())
+		res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
 		render  res as JSON;
 	}
+
+	@Secured(['ROLE_ADMIN'])
+	def updatePosition(params){
+		log.debug params
+		def res = [:]
+		res.status = namelistService.updateNamePosition(params.id.toLong(), params.position, params.hirMap)
+		render  res as JSON;
+	}
+
 }

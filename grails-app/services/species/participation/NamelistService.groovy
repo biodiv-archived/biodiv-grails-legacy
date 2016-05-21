@@ -1597,7 +1597,7 @@ class NamelistService extends AbstractObjectService {
                         //colAcceptedNameData.curatingTaxonId = sciName.id;
                         ScientificName acceptedName;
                         if(acceptedMatch.fromUI) {
-                            acceptedName = ScientificName.get(colAcceptedNameData.acceptedNameId)
+                            acceptedName = TaxonomyDefinition.get(colAcceptedNameData.acceptedNameId)
                         } else {
                             acceptedName = saveAcceptedName(colAcceptedNameData);
                         }
@@ -2271,8 +2271,8 @@ class NamelistService extends AbstractObjectService {
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public boolean changeAccToSyn(long oldId, long newId){
-		ScientificName oldName = ScientificName.get(oldId)
-		ScientificName newName = ScientificName.get(newId)
+		ScientificName oldName = TaxonomyDefinition.get(oldId)
+		ScientificName newName = TaxonomyDefinition.get(newId)
 		
 		if(oldName && (oldName.status == NamesMetadata.NameStatus.SYNONYM)){
 			log.debug "Name is already synonym... nothing to do... RETURNING " + oldId
@@ -2291,19 +2291,22 @@ class NamelistService extends AbstractObjectService {
 		
 		_mergeAccepted(oldName, newName, false)
 		//cache is cleared so reading name again
-		oldName.refresh()// = ScientificName.get(oldId)
+		oldName.refresh()// = TaxonomyDefinition.get(oldId)
 		
 		updateStatusAndClass(oldName,  NamesMetadata.NameStatus.SYNONYM)
-		oldName.refresh()
+		utilsService.clearCache("defaultCache")
+		utilsService.cleanUpGorm()
 		
+		newName = TaxonomyDefinition.get(newId)
+		oldName = SynonymsMerged.get(oldId)
+
 		//adding this synonym to new accepted name
-		newName.refresh()// = ScientificName.get(newId)
 		newName.addSynonym(oldName)
 		return true
 	}
 	
 	public boolean changeSynToAcc(long oldId, Map hirMap=null){
-		ScientificName oldName = ScientificName.get(oldId)
+		ScientificName oldName = TaxonomyDefinition.get(oldId)
 		
 		if(!oldName){
 			log.debug "Null id is given for the names  old id " + oldId
@@ -2324,8 +2327,20 @@ class NamelistService extends AbstractObjectService {
 	}
 	
 	
+	public boolean updateNamePosition(long oldId, String position, Map hirMap=null){
+		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
+		
+		if(!oldName){
+			log.debug "Null id is given for the names  old id " + oldId
+			return false
+		}
+		
+		oldName.updatePosition(position)
+		return true
+	}
+	
 	public boolean deleteName(long id){
-		ScientificName name = ScientificName.get(id)
+		ScientificName name = TaxonomyDefinition.get(id)
 		if(!name || name.isDeleted){
 			log.debug "Null id is given for the name or name is already deleted... ABORTING " + id
 			return false
@@ -2349,8 +2364,8 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	public boolean mergeNames(long oldId, long newId){
-		ScientificName oldName = ScientificName.get(oldId)
-		ScientificName newName = ScientificName.get(newId)
+		ScientificName oldName = TaxonomyDefinition.get(oldId)
+		ScientificName newName = TaxonomyDefinition.get(newId)
 		
 		if(!oldName || !newName){
 			log.debug "Null id is given for the names  old id " + oldId + " new name " + newName
@@ -2379,7 +2394,7 @@ class NamelistService extends AbstractObjectService {
 		m['relationship'] = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
 		m['status'] = status.toString()
 		String query = "update taxonomy_definition set (class, status, relationship) = (:class, :status, :relationship) where id = :id";
-		Sql sql = sessionFactory.getCurrentSession().createSQLQuery(query)
+		def sql = sessionFactory.getCurrentSession().createSQLQuery(query)
 		sql.setProperties(m).executeUpdate()
 	}
 	
@@ -2431,7 +2446,7 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	
-	private boolean mergeSynonym(oldName, newName){
+	private boolean mergeSynonym(SynonymsMerged oldName, SynonymsMerged newName){
 		//moving synonym
 		def oldEntries = AcceptedSynonym.findAllBySynonym(oldName);
 		oldEntries.each { e ->
@@ -2449,7 +2464,7 @@ class NamelistService extends AbstractObjectService {
 			oldName.errors.allErrors.each { log.error it }
 			return false
 		}
-		
+		utilsService.clearCache("defaultCache")
 		return true
 	}
 

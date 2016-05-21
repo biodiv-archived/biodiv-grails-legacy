@@ -298,7 +298,7 @@ class Species implements Rateable {
 				def sContributors =  this.taxonConcept.contributors
 				if(sContributors)
 	            	contributors.addAll(sContributors)
-		        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+		        this.taxonConcept.fetchSynonyms()?.each { contributors.addAll(it.contributors)}
 		        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 		        
 		        //Saving current user as contributor for the species
