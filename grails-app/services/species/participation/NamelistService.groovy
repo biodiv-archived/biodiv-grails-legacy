@@ -2691,7 +2691,7 @@ class NamelistService extends AbstractObjectService {
                     int index = 0;
                     int taxonIndex = m.values().size();
                     for (entry in m) {
-                        if(entry.getKey().equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY)) {
+                        if(entry.getKey().equalsIgnoreCase(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY) && entry.getValue()) {
                             JSON.parse(entry.getValue()). each {
                                 array[taxonIndex + it.rank] = it.name;
                             }
