@@ -265,7 +265,14 @@ class NamesIndexerService {
 			List<LookupResult> lookupResults = lookup.lookup(term.toLowerCase(), true, max, params.nameFilter);
 			result = getFormattedResult(lookupResults,  params.term)
 		} else {
-            List<LookupResult> lookupResults = TaxonomyDefinition.findAllByRankAndCanonicalFormIlike(rank, params.term+'%', [max:max, sort:'canonicalForm', offset:0]); 
+            List<LookupResult> lookupResults = TaxonomyDefinition.createCriteria().list(max:max, offset:0){
+				and{
+					eq('isDeleted', false)
+					eq('rank', rank)
+					ilike('canonicalForm', params.term+'%')
+				}
+				order("canonicalForm", "asc")
+            }; 
             lookupResults.each { taxonDefinition ->
                 result << ['value':taxonDefinition.canonicalForm, 'label':taxonDefinition.canonicalForm, 'category':TaxonomyRank.list()[rank].value()]
             }

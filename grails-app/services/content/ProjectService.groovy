@@ -70,7 +70,7 @@ class ProjectService extends AbstractObjectService {
 			deleteDocumentsFromProject(_toBeDeletedProposalFiles)
 		}
 
-		def _toBeDeletedReportFiles = project.reportFiles.findAll{it?.deleted || !it}
+		def _toBeDeletedReportFiles = project.reportFiles.findAll{it?.isDeleted || !it}
 
 		log.debug "Report Files marked for delete.." + _toBeDeletedReportFiles
 

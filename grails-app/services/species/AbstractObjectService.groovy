@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 import species.groups.UserGroup;
+import species.groups.SpeciesGroup;
 import species.Resource.ResourceType;
 import species.participation.Featured;
 import species.auth.SUser;
@@ -14,6 +15,8 @@ import species.participation.Checklists;
 import species.sourcehandler.XMLConverter;
 import species.participation.Observation;
 import species.Species;
+import species.ScientificName.TaxonomyRank;
+
 
 import org.apache.commons.logging.LogFactory;
 import grails.plugin.cache.Cacheable;
@@ -389,5 +392,14 @@ class AbstractObjectService {
      */
     Object getSpeciesGroupIds(groupId){
         return utilsService.getSpeciesGroupIds(groupId);
+    }
+
+    String getExportableValue(String key, String value) {
+        if(!value) return;
+        switch(key.toLowerCase()) {
+            case 'rank' : return TaxonomyRank.getTRFromInt(Integer.parseInt(value)); 
+            case ['group_id', 'species group'] : return SpeciesGroup.read(Long.parseLong(value))?.name;
+            default : return value;
+        }
     }
 }

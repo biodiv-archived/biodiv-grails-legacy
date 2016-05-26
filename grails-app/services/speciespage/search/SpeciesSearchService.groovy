@@ -95,7 +95,7 @@ class SpeciesSearchService extends AbstractSearchService {
 				doc.addField(searchFieldsConfig.NAME, syn.name);
 			}
 
-			def commonNames = CommonNames.findAllByTaxonConcept(s.taxonConcept);
+			def commonNames = CommonNames.findAllByTaxonConceptAndIsDeleted(s.taxonConcept, false);
 			commonNames.each { commonName ->
 				doc.addField(searchFieldsConfig.NAME, commonName.name);
 			}

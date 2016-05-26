@@ -889,7 +889,7 @@ class SpeciesUploadService {
 		List taxonReg = TaxonomyRegistry.withCriteria(){
 			and{
 				eq('taxonDefinition', s.taxonConcept)
-				eq('uploader', user)
+				if(user) eq('uploader', user)
 				if(sbu) between("uploadTime", sbu.startDate, sbu.endDate)
 			}
 		}
@@ -952,14 +952,18 @@ class SpeciesUploadService {
 		List taxonReg = TaxonomyRegistry.withCriteria(){
 			and{
 				eq('taxonDefinition', s.taxonConcept)
-				eq('uploader', user)
+				if(user) eq('uploader', user)
 				if(sbu) between("uploadTime", sbu.startDate, sbu.endDate)
 			}
 		}
-		log.debug "Taxonomy registry to be deleted as  " + taxonReg
-		taxonReg.each { tr ->
-			log.debug "Deleting  $tr"
-			tr.delete(flush:true)
+		
+		if(sbu){
+			log.debug "Deleting taxon registry because rollback is called " + sbu
+			log.debug "Taxonomy registry to be deleted as  " + taxonReg
+			taxonReg.each { tr ->
+				log.debug "Deleting  $tr"
+				tr.delete(flush:true)
+			}
 		}
 	
         def tempRes = s.resources.intersect(resources);
@@ -971,7 +975,7 @@ class SpeciesUploadService {
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			log.debug "Deleting species ${s} "
-			deleteSpecies(s, user)
+			deleteSpecies(s)
 			return
 		}
 
@@ -981,7 +985,7 @@ class SpeciesUploadService {
 				
 	}
 	
-	private boolean deleteSpecies(Species s, SUser user) throws Exception { 
+	private boolean deleteSpecies(Species s) throws Exception { 
 		try{
 //			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
 //				reco.taxonConcept = null
@@ -1011,7 +1015,6 @@ class SpeciesUploadService {
 				}
 			}
 			log.debug "Reverting changes of species before delete $s ===="
-			s = s.merge()
 			if(s.delete(flush:true)) {
 			    log.debug "Deleted ${s}"
 			    speciesSearchService.delete(s.id);

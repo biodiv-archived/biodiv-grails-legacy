@@ -113,7 +113,7 @@ class ObvUtilService {
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	
-	private final static int EXPORT_BATCH_SIZE = 10000;
+	private final static int EXPORT_BATCH_SIZE = 5000;
 	private final static int MAX_BATCHES = 1;
 	
 	
@@ -370,12 +370,7 @@ class ObvUtilService {
     }
 
     def CSVWriter getCSVWriter(def directory, def fileName) {
-        //char separator = '\t'
-        File dir =  new File(directory)
-        if(!dir.exists()){
-            dir.mkdirs()
-        }
-        return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
+        return utilsService.getCSVWriter(directory, fileName);
     }
 
 /*    def exportAsDW__specie(downloadDir, obvList, reqUser, dl_id, params_filterUrl){
@@ -588,12 +583,14 @@ class ObvUtilService {
 		int i = 0;
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
 			if(m[IMAGE_FILE_NAMES].trim() != ""){
-				uploadObservation(imageDir, m, resultObv)
-				i++
-				if(i > BATCH_SIZE){
-					publishAndGormcleanup(resultObv)
-					i = 0;
-				}
+                println "Uploading obv for image file " + m[IMAGE_FILE_NAMES].trim()
+				if(uploadObservation(imageDir, m, resultObv)){
+				    i++
+				    if(i > BATCH_SIZE){
+					   publishAndGormcleanup(resultObv)
+					   i = 0;
+				    }
+                }
 			}
 		}
 		//last batch
@@ -621,13 +618,15 @@ class ObvUtilService {
         utilsService.benchmark ('uploadObv') {
             utilsService.benchmark ('uploadImage') {
                 if(m[IMAGE_FILE_NAMES]) {
-                    obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase())
+                    obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase(), SUser.findByEmail(m[AUTHOR_EMAIL].trim()))
                 }
             }
 
-            /*if(obvParams.isEmpty()){
+            if(!obvParams){
               log.error "No image file .. aborting this obs upload with params " + m
-              } else {*/
+              return false
+            }
+
             utilsService.benchmark ('populateParams') {
                 populateParams(obvParams, m)
             }
@@ -763,8 +762,8 @@ class ObvUtilService {
                 success=true;
 
 				params.obvId = observationInstance.id
-                activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                
+				params.author = observationInstance.author
+				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
@@ -838,7 +837,7 @@ class ObvUtilService {
             utilsService.benchmark('RecommendationVote.findByAuthorAndObservation') {
 		        recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
             }
-            if(!recommendationVoteInstance) {
+		    if(!recommendationVoteInstance) {
 			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
             } else {
                 recommendationVoteInstance.givenSciName = params.recoName;
@@ -853,7 +852,7 @@ class ObvUtilService {
         utilsService.benchmark('savingRecoVote') {
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save()) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
-			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, params.identifiedBy);
+			commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment, recommendationVoteInstance.author);
 
 			observationInstance.lastRevised = dateIdentified;
             utilsService.benchmark('observationInstance.calculateMaxVotedSpeciesName') {
@@ -875,17 +874,17 @@ class ObvUtilService {
 			
 	}
 
-	private uploadImageFiles(imageDir, imagePaths, license){
+	private uploadImageFiles(imageDir, imagePaths, license, author){
 		def resourcesInfo = [:];
 		def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 		File obvDir
 		int index = 1
 		imagePaths.each{ path ->
 			File f = new File(imageDir, path.trim())
-			if(f.exists()){
+            if(f.exists()){
 				log.debug "uploading file $f"
 				if(f.length()  > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-					log.debug 'File size cannot exceed ${104857600/1024}KB'
+					log.debug  'File size cannot exceed ${104857600/1024}KB'
 				} else if(f.length() == 0) {
 					log.debug 'File cannot be empty'
 				} else {
@@ -901,15 +900,18 @@ class ObvUtilService {
 
 					File file = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(f.getName()));
 					file << f.bytes
-					ImageUtils.createScaledImages(file, obvDir);
+                    ImageUtils.createScaledImages(file, obvDir);
 					resourcesInfo.put("file_" + index, file.getAbsolutePath().replace(rootDir, ""))
 					resourcesInfo.put("license_" + index, license)
 					resourcesInfo.put("type_" + index, "image")
+					resourcesInfo.put("contributor_" + index, author.username)
 					index++
 				}
-			}
+			}else{
+                log.error " File not found please check the image folder " + f
+            }
 		}
-		log.debug resourcesInfo
+		println resourcesInfo
 		return resourcesInfo
 	}
 	

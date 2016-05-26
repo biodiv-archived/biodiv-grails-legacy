@@ -794,7 +794,7 @@ class TaxonService {
         }
         
         XMLConverter converter = new XMLConverter();
-        //println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
+        println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributors, language, taxonHirMatch);
         
         def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
@@ -1005,10 +1005,7 @@ class TaxonService {
 		int notOfStubs = 0;
 
 		//TODO: hanging when result is null
-//		def taxonConcepts = TaxonomyDefinition.findAll(
-//			"from TaxonomyDefinition as taxonomyDefinition left outer join Species as s on s.taxonConcept = taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and s.id is null",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]); 
-		//TaxonomyDefinition.executeQuery("select * from taxonomy_definition t left outer join species s on s.taxon_concept_id = t.id where s.id is null and t.rank = :speciesTaxonRank", [speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]);
-		def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and not (taxonomyDefinition.id) in (select s.taxonConcept from Species as s)",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal()]);
+		def taxonConcepts = TaxonomyDefinition.findAll("from TaxonomyDefinition as taxonomyDefinition where taxonomyDefinition.rank = :speciesTaxonRank and taxonomyDefinition.isDeleted = :isDeleted and not (taxonomyDefinition.id) in (select s.taxonConcept from Species as s)",[speciesTaxonRank:TaxonomyRank.SPECIES.ordinal(), isDeleted:false]);
 		
 		List<Species> s = [];
 		taxonConcepts.eachWithIndex { taxonConcept, index ->

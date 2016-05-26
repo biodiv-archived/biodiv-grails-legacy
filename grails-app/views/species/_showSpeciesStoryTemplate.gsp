@@ -30,7 +30,7 @@
         </div>
         </g:if>
         <g:else>
-            <%def engCommonName=CommonNames.findByTaxonConceptAndLanguage(speciesInstance.taxonConcept, Language.findByThreeLetterCode('eng'))?.name%>
+            <%def engCommonName=CommonNames.findWhere(taxonConcept:speciesInstance.taxonConcept, language:Language.findByThreeLetterCode('eng'), isDeleted:false)?.name%>
             <g:if test="${engCommonName}">
                 <div>
                     <b class="commonName"> ${engCommonName} </b>

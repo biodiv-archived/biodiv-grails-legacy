@@ -22,7 +22,7 @@ class SynonymsMerged extends TaxonomyDefinition {
     }
 
     Map fetchGeneralInfo() {
-         return [name:name, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
+         return [name:name, canonicalForm:canonicalForm, rank:TaxonomyRank.getTRFromInt(rank).value().toLowerCase(), position:position, nameStatus:status.toString().toLowerCase(), authorString:authorYear, source:matchDatabaseName, via: viaDatasource, matchId: matchId ]
     }
 
     Map fetchLimitInfo(){
@@ -56,21 +56,4 @@ class SynonymsMerged extends TaxonomyDefinition {
 		super.beforeInsert()
 	}
 	
-	boolean changeToAcceptedName(){
-		removeAsSynonym()
-		
-		this.status = NameStatus.ACCEPTED
-		this.relationship = null
-		if(!save()) {
-			this.errors.allErrors.each { log.error it }
-		}
-		
-		String query = "update taxonomy_definition set class = :newClass where id = :id";
-		def sql = sessionFactory.getCurrentSession().createSQLQuery(query)
-		sql.setProperties([id:id, newClass:TaxonomyDefinition.class.canonicalName]).executeUpdate()
-	   
-		//SynonymsMerged.executeUpdate("update TaxonomyDefinition set dirtyListReason = :newClass where id = :id ", [newClass:TaxonomyDefinition.class.canonicalName, id : id])
-		//XXX: Not giving hir to accepted name because this method is called from getTaxonHir where we create hir at the end
-		return true
-	}
 }

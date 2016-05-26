@@ -63,6 +63,9 @@
                 height:auto;
                 background-color: #a6dfc8;
             }
+            .imageHolder input[type="text"]{
+                width:133px;
+            }
             .column {
                 width:221px;
                 float: left;
@@ -147,14 +150,34 @@
                 border: 1px solid grey ;
                 background-color: lightgrey ;
                 margin-bottom:90px !important;
+                position: relative; 
+                left: 50px; 
+                top: 0; 
+                width: 150px; 
+                height: 250px; 
+                padding: 0.5em; 
+                margin: 10px;
+                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)})
             }
-            .imagesListWrapper ul {
+            .imageDr{
+                position: absolute;
+                top: 46%;
+                width: 127px;
+                margin-left: 15px;
+                font-size: 19px;
+                color: grey;
+                line-height: 23px;
+            }
+            .imagesListWrapper .imagesList {
                 width:100000px;
                 white-space:nowrap !important;
             }
-            .imagesListWrapper ul li {
-                display : inline !important;
-                z-index:1;
+            .imagesListWrapper .imagesList .addedResource {
+                display : inline !important;   
+                z-index:15;             
+            }
+            .resources .addedResource input[type="text"]{
+                float:left;
             }
             li.group_option span, li.habitat_option span {
                 padding: 0px;
@@ -177,6 +200,7 @@
             }
             .propagateLicense .license_div {
                 margin: 0 auto !important;
+                width:100%;
             }
             .propagateLicense a{
                 height:32px !important;
@@ -198,11 +222,8 @@
             .sortMediaOnExif {
                 margin-right:2px;
                 margin-top:2px;
-            }
-            .license_div{
-                width:100%;
-            }
-            .groups_super_div, .habitat_super_div{
+            }            
+            .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div{
                 width: 220px;
             }
             

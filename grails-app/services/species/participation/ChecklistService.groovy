@@ -148,10 +148,8 @@ class ChecklistService {
             }
             
             if(params.checklistData.size() == 0 && params.action != 'save') validObvPresent = true;
-
-            println "----------------------------------------------checklist lic"
-            println checklistInstance.license
-            println checklistInstance.observations
+           
+			checklistInstance.clearErrors()
 			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
@@ -177,6 +175,7 @@ class ChecklistService {
 					
 				return ['success' : true, 'msg':'Successfully saved checklist.', checklistInstance:checklistInstance]
 			} else {
+				println "####################### got errors"
 				checklistInstance.errors.allErrors.each { log.error it }
 				return ['success' : false, 'msg':checklistInstance.errors, checklistInstance:checklistInstance]
 			}
@@ -215,7 +214,7 @@ class ChecklistService {
 		//XXX: Doing in batch to avoid connection time out
 		List obvSubLists = params.checklistData.collate(BATCH_SIZE)
 		obvSubLists.each { obvSubList ->
-			Observation.withNewTransaction(){  status ->
+			Observation.withTransaction(){  status ->
 				obvSubList.each {  Map m ->
 					def oldObvId = m.remove(OBSERVATION_COLUMN)
 					if(isValidObservation(m, oldObvId, checklistInstance)){

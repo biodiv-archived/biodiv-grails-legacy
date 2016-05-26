@@ -20,11 +20,11 @@
             <li class="add_file addedResource" >
             
             <div class="add_file_container">
-                <div class="add_image"></div> 
+                <div class="add_image"><span class="add_resource_text"><g:message code="default.resource.add.image.label" /></span></div> 
                
-                <div class="add_video editable"></div>
+                <div class="add_video editable"><span class="add_resource_text"><g:message code="default.resource.add.video.label" /></span></div>
                 
-                <div class="add_audio"></div>
+                <div class="add_audio"><span class="add_resource_text"><g:message code="default.resource.add.audio.label" /></span></div>
 
             </div>
             <div class="progress">

@@ -621,3 +621,34 @@ alter table dataset alter column attribution set  not null;
 #6thApr2016
 update field set sub_category ='Local Endemicity Geographic Entity' where id=64;
 update field set sub_category ='Local Distribution Geographic Entity' where id=61;
+
+#22ndApr2016
+alter table doc_sci_name add column primary_name integer not null default 0;
+alter table doc_sci_name add column is_deleted boolean not null default 'false';
+
+#02May2016
+create view ibp_taxonomy_registry as
+with recursive cte as
+(   
+    select
+    *,
+    cast(0 as text) as level
+    from taxonomy_registry
+    where parent_taxon_id is null and classification_id=265799
+    union all
+    select
+    t.*,
+    level || '.' || t.parent_taxon_definition_id AS level
+    from taxonomy_registry t 
+    inner join cte i on i.id = t.parent_taxon_id
+    where t.classification_id = 265799
+)
+select * from cte;
+
+#4th may
+#alter table common_names add column is_deleted boolean not null default 'false';
+ALTER TABLE common_names DROP constraint common_names_taxon_concept_id_key ;
+ALTER TABLE common_names ADD CONSTRAINT common_names_taxon_concept_id_key UNIQUE (taxon_concept_id, language_id, name, is_deleted);
+
+create index on common_names(is_deleted);
+create index on taxonomy_definition(is_deleted);

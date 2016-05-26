@@ -72,12 +72,39 @@
 
 				</div>
 
+	<%
+		def observationPos = (queryParams.offset != null) ? queryParams.offset : params?.offset
+		def styleviewcheck = ((!queryParams?.view || queryParams?.view !="grid") && !activeFilters.isChecklistOnly)?true:false;		
+	%>
 				
 				<obv:identificationByEmail
 					model="['source':'observationList', 'requestObject':request, autofillUsersId:'shareUsers',title:g.message(code:'button.share')]" />
 				
 				<obv:download
 					model="['source':'Observations', 'requestObject':request, 'downloadTypes':[DownloadType.CSV, DownloadType.KML, DownloadType.DWCA], 'onlyIcon': 'false', 'downloadFrom' : 'obvList']" />
+
+                    <g:if test="${!activeFilters.isChecklistOnly}">
+                    <div class="btn-group pull-right">
+                        <a href="javascript:void(0);" id="obvList" class="btn btn-default btn-small ${styleviewcheck?'active':''}">
+                            <i class="icon-th-list"></i>List
+                        </a>
+                        <a href="javascript:void(0);" id="obvGrid" class="btn btn-default btn-small ${!styleviewcheck?'active':''}">
+                            <i class="icon-th"></i>Grid
+                        </a>
+                    </div>
+                    </g:if>
+
+                    <div class="btn-group pull-right" style="z-index: 10; margin-right:3px;">
+                        <div class="controls">
+                            <g:select name="limit" class="input-mini"
+                            placeholder="${g.message(code:'showobservationlisttemp.select.show')}"
+                            from="${[12,24,36,48,60]}"
+                            value="${queryParams?.max}" />
+
+                        </div>
+
+                    </div>
+
 
 			</div>
             <div class="span8 right-shadow-box" style="margin:0px;clear:both;">

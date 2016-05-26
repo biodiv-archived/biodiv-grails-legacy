@@ -36,6 +36,11 @@ class Document extends DataObject implements Comparable {
         Technical_Report("Technical Report"),
         Presentation("Presentation"),
         Miscellaneous("Miscellaneous"),
+        Journal_Article("Journal Article"),
+        Book("Book"),
+        Thesis("Thesis"),
+        Technical_Report("Technical Report"),
+        Presentation("Presentation"),
 
         private String value;
 
@@ -84,10 +89,12 @@ class Document extends DataObject implements Comparable {
 	String attribution;
 	
 	String doi
+	String placeName
 	
 	//source holder(i.e project, group)
 	Long sourceHolderId;
 	String sourceHolderType;
+
     //String scientificNames;
 	//XXX uncmment it before migration
 	//Coverage coverage //<== extending metadata now	//Coverage Information
@@ -98,19 +105,15 @@ class Document extends DataObject implements Comparable {
 	//boolean deleted
 	
 	boolean agreeTerms = false	
+
 	
 	//static transients = [ 'isDeleted' ]
 
 	
 	static constraints = {
 		title nullable:false, blank:false
-		uFile validator : {val, obj -> 
-			if(!(val || obj.uri))
-				return 'fileOrUrl.validator.invalid' 
-		},nullable:true
-		uri validator : {val, obj -> 
-			val || obj.uFile
-		},nullable:true
+		uFile nullable:true
+		uri nullable:true
 		contributors nullable:true
 		attribution  nullable:true	
 		sourceHolderId nullable:true
@@ -127,6 +130,8 @@ class Document extends DataObject implements Comparable {
 		fromDate(nullable: true)
 		group nullable:true
 		habitat nullable:true
+		externalUrl nullable:true,blank:false
+
 	}
 	
 	static hasMany = [userGroups: UserGroup, speciesGroups:SpeciesGroup, habitats:Habitat, docSciNames:DocSciName]
@@ -223,18 +228,21 @@ class Document extends DataObject implements Comparable {
 		Map nameValue = [:]
 		Map nameParseValues = [:]
 		Map nameId = [:]
+		Map primaryname = [:]
 		def c = DocSciName.createCriteria()
 			def results = c.list {
 			eq("document", this)
-		    order("displayOrder", "desc")
+		    order("primary_name", "desc")
 			}
 		def docSciNames = results ;//DocSciName.findAllByDocument(this)
 		docSciNames.each{ dsn ->
 		nameValue.put(dsn.scientificName,dsn.frequency)
 		nameParseValues.put(dsn.scientificName,dsn.canonicalForm)
 		nameId.put(dsn.scientificName,dsn.id)
+		primaryname.put(dsn.id,dsn.primary_name)
 		}
-		return [nameValues:nameValue, nameparseValue:nameParseValues, nameDisplayValues:nameId]
+
+		return [nameValues:nameValue, nameparseValue:nameParseValues, nameDisplayValues:nameId,primaryName:primaryname]
 
 	}
 

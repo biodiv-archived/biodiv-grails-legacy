@@ -33,7 +33,13 @@
 			</thead>
 			<tbody>
 				<g:each in="${parsedNames}" status="i" var="parsedName">
-					<%def taxonConcept = TaxonomyDefinition.findByCanonicalFormIlikeAndRank(parsedName.canonicalForm, TaxonomyRank.SPECIES.ordinal()) %>
+					<%def taxonConcept = TaxonomyDefinition.createCriteria().list(){
+						and{
+							eq('isDeleted', false)
+							eq('rank', TaxonomyRank.SPECIES.ordinal())
+							ilike('canonicalForm', parsedName.canonicalForm)
+						}
+					} %>
 					<tr
 						class="${parsedName.normalizedForm && parsedName.normalizedForm.equalsIgnoreCase(taxonConcept?.normalizedForm)?:'error'}">
 

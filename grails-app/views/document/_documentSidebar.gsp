@@ -6,10 +6,7 @@
 
 
 <div id="project-sidebar" class="span4">
-    <g:if test="${params.action == 'browser'}">
-    	<uGroup:objectPostToGroupsWrapper 
-			model="[canPullResource:canPullResource, 'objectType':Document.class.canonicalName]" />
-    </g:if>
+  
     <div id="taxonBrowser">
         <div class="taxonomyBrowser sidebar_section" style="position:relative">
             <h5><g:message code="button.taxon.browser" /></h5>	

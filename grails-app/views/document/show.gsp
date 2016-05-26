@@ -4,9 +4,14 @@
 <html>
 <head>
 <g:set var="canonicalUrl" value="${uGroup.createLink([controller:'document', action:'show', id:documentInstance.id, base:Utils.getIBPServerDomain()])}"/>
-<g:set var="title" value="${documentInstance.title}"/>
+<g:set var="title" value="${raw(documentInstance.title)}"/>
 <g:set var="description" value="${Utils.stripHTML(documentInstance.notes?:'') }" />
 <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':null]"/>
+<style>
+.sidebar_section{
+margin-bottom: 0;
+}
+</style>
 </head>
 <body>
     <div class="span12">
@@ -71,79 +76,13 @@
                     model="['instance':documentInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':false, 'hideDownload':true, 'hideFollow':false]" />
                 </div>
 
-
-
                 <div class="span8 right-shadow-box observation" style="margin:0;">
                     <g:render template="/document/showDocumentStoryTemplate" model="['documentInstance':documentInstance, showDetails:true,'userLanguage':userLanguage]"/>
+
 			<g:if
 				test="${documentInstance?.speciesGroups || documentInstance?.habitats || documentInstance?.placeName }">
-
-				<div class="sidebar_section">
-					<a class="speciesFieldHeader" href="#coverageInfo"
-						data-toggle="collapse"><h5><g:message code="link.coverage.information" /></h5></a>
-					<div id="coverageInfo" class="speciesField collapse in">
-						<table>
-
-							<g:if test="${documentInstance?.speciesGroups}">
-
-
-								<tr>
-									<td class="prop"><span class="grid_3 name"><g:message code="default.species.groups.label" /></span></td>
-									<td class="linktext"><g:each
-											in="${documentInstance.speciesGroups}"
-											var="speciesGroup">
-											<button
-												class="btn species_groups_sprites ${speciesGroup.iconClass()} active"
-												id="${"group_" + speciesGroup.id}"
-												value="${speciesGroup.id}" title="${speciesGroup.name}"></button>
-										</g:each></td>
-								</tr>
-							</g:if>
-
-
-
-							<g:if test="${documentInstance?.habitats}">
-								<tr>
-									<td class="prop"><span class="grid_3 name"><g:message code="default.habitats.label" /></span></td>
-
-									<td class="linktext"><g:each
-											in="${documentInstance.habitats}" var="habitat">
-											<button
-												class="btn habitats_sprites ${habitat.iconClass()} active"
-												id="${"habitat_" + habitat.id}" value="${habitat.id}"
-												title="${habitat.name}"
-												data-content="${message(code: 'habitat.definition.' + habitat.name)}"
-												rel="tooltip" data-original-title="A Title"></button>
-										</g:each></td>
-								</tr>
-							</g:if>
-
-							<g:if test="${documentInstance?.placeName || documentInstance?.reverseGeocodedName}">
-								<tr>
-
-                                                                    <td class="prop"><span class="grid_3 name">
-                                                                           <g:message code="default.place.label" /> </span></td>
-                                                                    <td>
-                                                                        
-                                                                        <g:if test="${documentInstance?.placeName}">
-                                                                        <g:set var="location" value="${documentInstance.placeName}"/>
-                                                                        </g:if>
-                                                                        <g:else>
-                                                                        <g:set var="location" value="${documentInstance.reverseGeocodedName}"/>
-                                                                        </g:else>
-
-                                                                        <div class="value ellipsis multiline" title="${location}">
-                                                                            ${location}
-                                                                        </div>
-										</td>
-								</tr>
-							</g:if>
-						</table>
-
-					</div>
-				</div>
-
 			</g:if>
+
 			<uGroup:objectPostToGroupsWrapper 
                            	model="['objectType':documentInstance.class.canonicalName, 'observationInstance':documentInstance]" />
 
@@ -152,6 +91,7 @@
 				<comment:showAllComments model="['commentHolder':documentInstance, commentType:'super','showCommentList':false]" />
 			</div>
 		</div>
+		
      	<g:render template="/document/showDocumentSidebar" model="['documentInstance':documentInstance, 'webaddress':params.webaddress]" />
 	</div>
         </body>

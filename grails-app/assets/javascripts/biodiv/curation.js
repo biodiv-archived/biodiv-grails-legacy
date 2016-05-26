@@ -18,7 +18,7 @@ function createListHTML(list, nameType, isOrphanList) {
         if(selectedName && value.name.toLowerCase() == selectedName) {
             klass = 'taxon-highlight';
         }
-        listContent += "<li class='nameDetails taxon"+value.rank+" "+klass+"' onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",&quot;"+value.status+"&quot;, this,"+isOrphanList+")'><a>" +value.name +"</a>";
+        listContent += "<li class='nameDetails "+value.position+" taxon"+value.rank+" "+klass+"' onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",&quot;"+value.status+"&quot;, this,"+isOrphanList+")'><a>" +value.name +"</a>";
         if(value.id)
             listContent += "<input type='hidden' value='"+value.id+"'>"+x+"</li>"
     });
@@ -42,32 +42,303 @@ function processingStop() {
     $("body").css("cursor", "default");
 }
 
-function getNamesFromTaxon(ele , parentId) {
+var taxonGrid;
+var positionFilter='';
+var statusFilter=[];
+var searchString='';
+var showCheckBox = false;
+
+function initTaxonGrid(ele) {
+    var selectedName = $('.name').val().toLowerCase();
+    var hyperlinkSlickFormatter = function(row, cell, value, columnDef, dataContext) {
+        value = dataContext;
+        var listContent = '';
+        var x = "";
+        if(value.isflagged == true){
+            var temp = value.flaggingreason + '';
+            x = "<i class='icon-flag' title='"+temp+"'></i>";
+        }
+        var klass = "";
+        if(selectedName && value.name.toLowerCase() == selectedName) {
+            klass = 'taxon-highlight';
+        }
+        listContent += "<li class='nameDetails "+value.position+" taxon"+value.rank+" "+klass+" "+value.status+"' onclick='getNameDetails("+value.taxonid +","+ value.classificationid+",&quot;"+value.status+"&quot;, this,false)'><a>" +(value.status=='SYNONYM' ? '<i class="icon-pause"></i>':'')+value.italicisedform +"</a>";
+        if(value.id)
+            listContent += "<input type='hidden' value='"+value.id+"'>"+x+"</li>";
+
+        return listContent;
+
+    }
+
+    var taxonRankFormatter = function(row, cell, value, columnDef, dataContext) {
+        return taxonRanks[value].text;
+    }
+
+    var checkboxSelector = new Slick.CheckboxSelectColumn({
+        cssClass: "slick-cell-checkboxsel"
+    });
+
+    var selectorColumnDef = checkboxSelector.getColumnDefinition();
+    var currentFormatter = selectorColumnDef.formatter;
+    selectorColumnDef.formatter = function(row, cell, value, columnDef, dataContext) {
+        if (window.params.isAdmin || showCheckBox) {
+            return currentFormatter(row, cell, value, columnDef, dataContext);
+        }
+        return "";
+    };
+        //{id: "taxonid", name: "Id", field: "taxonid", maxWidth:80, resizble:false, sortable:true},
+    //{id: "isflagged", name: "Flagged", field: "isflagged", width: 40, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, resizable:false}
+    var taxonGridColumns = [];
+    if(window.params.isAdmin) {
+        taxonGridColumns.push(selectorColumnDef);
+    }
+
+    taxonGridColumns.push(
+    {id: "rank", name: "Rank", field: "rank", width:60, resizable:false, formatter:taxonRankFormatter, sortable:false},
+    {id: "name", name: "Name", field: "italicisedform", minWidth:150, cssClass: "cell-title", formatter: hyperlinkSlickFormatter, sortable:false},
+    {id: "status", name: "Status", field: "status", width:80, resizable:false, sortable:false},
+    {id: "position", name: "Position", field: "position", width:80, resizable:false, sortable:false}
+    );
+    var taxonGridOptions = {
+        enableCellNavigation: true,
+        editable: false,
+        enableAddRow: false,
+        forceFitColumns: true,
+        explicitInitialization: true,
+        enableColumnReorder: false
+    };
+    var taxonGridDataView = new Slick.Data.DataView({inlineFilters:true});
+    taxonGrid = new Slick.Grid(ele, taxonGridDataView, taxonGridColumns, taxonGridOptions);
+    taxonGrid.setSelectionModel(new Slick.RowSelectionModel());
+
+    //var pager = new Slick.Controls.Pager(taxonGridDataView, taxonGrid, $("#taxonPager"));
+    //var columnpicker = new Slick.Controls.ColumnPicker(taxonGridColumns, taxonGrid, taxonGridOptions);
+
+
+    taxonGridDataView.onRowCountChanged.subscribe(function (e, args) {
+        taxonGrid.updateRowCount();
+        taxonGrid.render();
+    });
+
+    taxonGridDataView.onRowsChanged.subscribe(function (e, args) {
+        taxonGrid.invalidateRows(args.rows);
+        taxonGrid.render();
+    });
+
+    taxonGrid.onSort.subscribe(function (e, args) {
+         // args.multiColumnSort indicates whether or not this is a multi-column sort.
+         //   // If it is, args.sortCols will have an array of {sortCol:..., sortAsc:...} objects.
+         //     // If not, the sort column and direction will be in args.sortCol & args.sortAsc.
+         //
+        var comparer = function(a, b) {
+            return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
+        }
+        taxonGrid.getData().sort(comparer, args.sortAsc);
+    });
+    
+    
+    function nameFilter(item, args) {
+        if (args.positionFilter != '' && item["position"] != args.positionFilter) {
+            return false;
+        }
+        if (args.statusFilter.length != 0 && args.statusFilter.indexOf(item["status"]) == -1) {
+            return false;
+        }
+        if (args.searchString != "" && item["name"].indexOf(args.searchString) == -1) {
+            return false;
+        }
+        return true;
+    }
+
+    taxonGridDataView.setFilterArgs({
+        positionFilter: positionFilter,
+        statusFilter: statusFilter,
+        searchString: searchString
+    });
+
+    taxonGridDataView.setFilter(nameFilter);
+//    taxonGrid.showTopPanel();
+
+    taxonGrid.registerPlugin(checkboxSelector);
+    taxonGrid.init();
+    return taxonGrid;
+}
+
+function getSelectedStatus() {
+    var selectedOptions = $('.filter input[name="taxonStatus"]:checked');
+
+    statusFilter = [];
+    for (var i=0; i< selectedOptions.size(); i++) {
+        statusFilter[i] = $(selectedOptions[i]).val();
+    }
+    return statusFilter;
+}
+
+function getSelectedPosition() {
+    var selectedOptions = $('.filter input[name="taxonPosition"]:checked');
+
+    var positions = [];
+    for (var i=0; i< selectedOptions.size(); i++) {
+        positions[i] = $(selectedOptions[i]).val();
+    }
+    return positions;
+}
+
+
+function getSelectedRanks() {
+    var ranksToFetch = $('.filter input[name="taxonRank"]:checked ');
+    var ranks = [];
+    for(var i=0; i < ranksToFetch.length; i++) {
+        for (var key=0; key < taxonRanks.length; key++) {
+            var rank = taxonRanks[key].text.toLowerCase();
+            if($(ranksToFetch[i]).val() == rank) {
+                ranks.push(parseInt(key));
+                break;
+            }
+        }
+    }
+    return ranks; 
+}
+
+
+function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, ranksToFetch, limit, offset) {
     processingStart();
     changeEditingMode(true);
     //var taxonId = $("input#taxon").val();//$(ele).parent("span").find(".taxDefIdVal").val();
     var classificationId = $('#taxaHierarchy option:selected').val();
 
-    $('.name').val(ele.text());
-    var History = window.History;
-    History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param({'taxon':$(ele).data('taxonid'), 'classification':classificationId}))); 
+    //$('.name').val(ele.text());
+   
+    $('#txtSearch').val('');
+
 
     populateNameDetails();
     var url = window.params.curation.getNamesFromTaxonUrl;
+    var params = {'taxon':$(ele).data('taxonid'), parentId:parentId, 'classificationId':classificationId};
+    if(typeof limit != 'undefined') params['limit'] = limit;
+    if(typeof offset != 'undefined') params['offset'] = offset;
+    if(typeof ranksToFetch != 'undefined') params['ranksToFetch'] = ranksToFetch.join(',');
+    if(typeof statusToFetch != 'undefined') params['statusToFetch'] = statusToFetch.join(',');
+    if(typeof positionsToFetch != 'undefined') params['positionsToFetch'] = positionsToFetch.join(',');
+
+    var History = window.History;
+    History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
     $.ajax({
         url: url,
         dataType: "json",
         type: "POST",
-        data: {parentId:parentId, classificationId:classificationId},	
+        data: params,	
         success: function(data) {
             if(data.success) {
                 data = data.model;
-                
+                params['ranksToFetch'] = data.ranksToFetch.join(',');
+                params['statusToFetch'] = data.statusToFetch.join(',');
+                params['positionsToFetch'] = data.positionsToFetch.join(',');
+                History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
+                $(".filter input").each(function(){
+                    var isChecked = false;
+                    for(var i=0; i< data.statusToFetch.length; i++) {
+                        if($(this).val() == data.statusToFetch[i]) {
+                            isChecked = true;
+                            $(this).attr('checked', 'checked');
+                        } 
+                    }
+                    for(var i=0; i< data.positionsToFetch.length; i++) {
+                        if($(this).val() == data.positionsToFetch[i]) {
+                            isChecked = true
+                            $(this).attr('checked', 'checked');
+                        } 
+                    }
+                    for(var i=0; i< data.ranksToFetch.length; i++) {
+                        if($(this).data('ordinal') == taxonRanks[data.ranksToFetch[i]].value) {
+                            isChecked = true;
+                            $(this).attr('checked', 'checked');
+                        }
+                    }
+                    if(!isChecked) {        
+                        $(this).removeAttr('checked');
+                    }
+                });
+                $(".filter input[name='taxonRank']").each(function(){
+                    var input = $(this);//$('#inlineFilterPanel input[value="' + $(this).val() + '"]');
+                    if($(this).data('ordinal') <= $(ele).data('rank')) {
+                        input.prop('disabled', true);
+                    } else {
+                        input.removeProp('disabled');
+                    }
+                });
+
                 $('.listSelector').find('option:eq(1)').prop('selected', true);
 
                 //DIRTY LIST 
                 $('.dl_content ul').remove();
-                if(data.dirtyList.accDL){
+                $('#listCounts #instanceCount').html('<b>Total</b> : ' + data.instanceTotal);
+                /*$('#acceptedCount').html('&nbsp;<b>Accepted</b> : ' + data.acceptedCount);
+                $('#synonymCount').html('&nbsp;<b>Synonyms</b> : ' + data.synonymCount);
+                $('#listCounts #dirtyListCount').html('<b>Raw</b> : ' + data.dirtyListCount);
+                $('#listCounts #workingListCount').html('&nbsp;<b>Working</b> : ' + data.workingListCount);
+                $('#listCounts #cleanListCount').html('&nbsp;<b>Clean</b> : ' + data.cleanListCount);
+                */
+               //*************************************************************8
+                var taxonGridDataView = taxonGrid.getData();
+
+                var taxonData = data.namesList//.accDL.concat(data.dirtyList.synDL);
+
+                taxonGridDataView.setItems(taxonData, 'id');
+                taxonGrid.invalidateAllRows();
+                taxonGrid.updateRowCount();
+                taxonGrid.gotoCell(0,0);
+                showCheckBox = data.isAdmin;
+                taxonGrid.render();
+
+                var resultCount = data.instanceTotal;
+                $('#taxonPager').html('Showing '+((data.limit <= data.acceptedCount)? data.offset+'-'+(data.offset+data.limit < data.acceptedCount?data.offset+data.limit:data.acceptedCount) +'/':'')+data.acceptedCount+' accepted names and their synonyms').append('<div class="pull-right">(<a id="fetchFirst" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-backward"></i></a><a id="fetchPrev" class="btn-link '+((data.offset - data.limit < 0)?'disabled':'')+'"><i class="icon-chevron-left"></i></a><a id="fetchNext" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-chevron-right"></i></a><a id="fetchLast" class="btn-link '+((data.limit+data.offset >= data.acceptedCount)?'disabled':'')+'"><i class="icon-forward"></i></a>)');
+
+                if(data.offset == 0) { 
+                    $("#fetchPrev").addClass('disabled').children().first().removeClass().addClass('icon-chevron-left-gray');
+                    $("#fetchFirst").addClass('disabled').children().first().removeClass().addClass('icon-backward-gray');
+                }
+                if(data.offset+data.limit > data.acceptedCount) {
+                    $("#fetchNext").addClass('disabled').children().first().removeClass().addClass('icon-chevron-right-gray');
+                    $("#fetchLast").addClass('disabled').children().first().removeClass().addClass('icon-forward-gray');
+                }
+
+                $('#fetchFirst').click(function() {
+                    getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, 0);
+                });
+
+
+                $('#fetchPrev').click(function() {
+                    if(data.offset - data.limit < 0) {
+                        $(this).addClass('disabled').children().first().removeClass().addClass('icon-chevron-left-gray');
+                        return;
+                    }
+                    $(this).removeClass('disabled').children().first().removeClass().addClass('icon-chevron-left');
+                    getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, data.offset - data.limit);
+                });
+
+                $('#fetchNext').click(function() {
+                    if(data.offset + data.limit > data.acceptedCount) {
+                        $(this).addClass('disabled').children().first().removeClass().addClass('icon-chevron-right-gray');
+                        return;
+                    }
+                    $(this).removeClass('disabled').children().first().removeClass().addClass('icon-chevron-right');
+                    getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, data.offset + data.limit);
+               });
+
+                $('#fetchLast').click(function() {
+                    $(this).addClass('disabled').children().first().removeClass().addClass('icon-forward-gray');
+                    getNamesFromTaxon(ele, parentId, statusToFetch, positionsToFetch, ranksToFetch, data.limit, Math.floor(data.acceptedCount/data.limit)*data.limit);
+               });
+
+                // if you don't want the items that are not visible (due to being filtered out
+                // or being on a different page) to stay selected, pass 'false' to the second arg
+                taxonGridDataView.syncGridSelection(taxonGrid, true);
+                $("#taxonGrid").resizable();
+
+
+                //*************************************************************8
+/*                if(data.dirtyList.accDL){
                     accDLContent = createListHTML(data.dirtyList.accDL, "accDLContent", false); 
                     $(accDLContent).appendTo('.dl_content').show();
                 }
@@ -127,7 +398,7 @@ function getNamesFromTaxon(ele , parentId) {
                     selectedList.parent().prev().val(selectedList.attr('class')).trigger('change');
                     $('.nameDetails.taxon-highlight').click();
                 }
-            } else {
+*/            } else {
                 alert(data.msg);
             }
             processingStop(); 
@@ -140,7 +411,19 @@ function getNamesFromTaxon(ele , parentId) {
 }
 
 function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) {
+
+    var params = {'taxon':taxonId, 'classification':classificationId};
+    params['ranksToFetch'] = getSelectedRanks().join(',');
+    params['statusToFetch'] = getSelectedStatus().join(',');
+    params['positionsToFetch'] = getSelectedPosition().join(',');
+    var History = window.History;
+    History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
+
+
     $("#externalDbResults").modal('hide');
+    $('html, body').animate({
+        scrollTop: $(".metadataDetails").offset().top
+    }, 1000);
     processingStart();
     $(ele).parent("ul").find("a").css('background-color','inherit');
     $('.nameDetails').removeClass('taxon-highlight');
@@ -156,9 +439,10 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
         $('.isOrphanName').val(false);
         var url = window.params.curation.getNameDetailsUrl;
         var choosenName = ''
+            if(ele) {
             //if(nameType.toLowerCase() == 'synonym' || nameType.toLowerCase() == 'common') {
                 choosenName = $(ele).text();
-            //}
+            }
         $.ajax({
             url: url,
             dataType: "json",
@@ -189,12 +473,12 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                 if(ele == undefined) {
                     return;
                 }
-                if($(ele).parents(".dl_content").length) {
-                    $(".dialogMsgText").html("Existing name attributes from IBP displayed below. Catalogue of Life (CoL) is the preferred taxonomic reference for IBP, auto-querying CoL for up-to-date name attributes.");
+                /*if($(ele).parents(".dl_content").length) {
+                    $(".dialogMsgText").html("Auto-querying CoL for up-to-date name attributes.");
                     $("#dialogMsg").modal('show');
                     $('.queryDatabase option[value="col"]').attr("selected", "selected");
                     $('.queryString').trigger("click");
-                }
+                }*/
                 oldStatus = $("#statusDropDown").val();
                 oldName = $("."+$("#rankDropDown").val()).val();
                 oldRank = $("#rankDropDown").val();
@@ -324,10 +608,14 @@ function populateNameDetails(data){
 
     //if($(".source").val() == 'COL' || $(".source").val() == 'CatalogueOfLife') {
     var source = data['source']?data['source'].toLowerCase():undefined;
-    if(source == 'col' || source == 'catalogueoflife' || source == 'catalogue of life') {
+    console.log(data);
+    if(source == 'col' || source == 'catalogueoflife' || source == 'catalogue of life' || (data['position'] == 'Clean' && data['isTaxonEditor'] == false)) {
         changeEditingMode(true);
         if(!data['position'])
             $(".position").val("working");
+        if(data['position'] == 'Clean' && data['isTaxonEditor'] == false) {
+            $(".canBeDisabled select.position").prop("disabled", true);
+        }
     } else {
         $(".position").val(data["position"]);
     }
@@ -995,7 +1283,7 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
 
                 //if(moveToRaw == true || moveToWKG == true || moveToClean == true) {
                     var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
-                    getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''));
+                    getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                     //$(".clickedEle").trigger("click");
                 //}
                 updateFeeds();    
@@ -1006,11 +1294,16 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
                 $("#dialogMsg").modal('show');
                 processingStop();
             }
-        }, error: function(xhr, status, error) {
-            processingStop();
-            alert(xhr.responseText);
-        } 
-    });
+        }, error:function (xhr, ajaxOptions, thrownError){
+                //successHandler is used when ajax login succedes
+                var successHandler = this.success;
+                handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
+                    processingStop();
+                    alert(xhr.responseText);
+
+                });
+            }
+        });
 }
 
 function fetchTaxonRegistryData() {
@@ -1048,6 +1341,7 @@ function changeEditingMode(mode) {
     $(".canBeDisabled input").prop("disabled", mode); 
     $(".canBeDisabled select").prop("disabled", mode); 
     $(".canBeDisabled button").prop("disabled", mode); 
+    $(".canBeDisabled input.canonicalForm, .canBeDisabled input.authorString ").prop("disabled", true); 
     
     $('#saveNameDetails').prop('disabled', false);
     $(".canBeDisabled select.position").prop("disabled", false);
@@ -1175,10 +1469,11 @@ function showNewNamePopup() {
 
 function reinitializeRows($context) {
     var numRows = $context.find(".tab_div").length;
+    console.log(numRows);
     for(var i = 0; i< 4; i++) {
         $context.find(".add_new_row").trigger("click");
     }
-    $context.find(".tab_div:lt("+numRows+")").remove();
+//    $context.find(".tab_div:lt("+(numRows-1)+")").remove();
 }
 
 function showProperTabs() {
@@ -1255,7 +1550,7 @@ function dataToProcess(moveToRaw, moveToWKG, moveToClean) {
     }
   
     result['group'] = $('.kingdom').val();
-    result['authorString'] = $('.authorString').val();
+    //result['authorString'] = $('.authorString').val();
     result['nameStatus'] = $('#statusDropDown').val();
     result['source'] = $('.source').val();
     result['sourceDatabase'] = $('.sourceDatabase').val();
@@ -1421,7 +1716,6 @@ function saveAcceptedName(acceptedMatch) {
 
 
 $(document).ready(function() {
-
     $('#statusDropDown').change(showProperTabs);
     $(".loadConnection").click(function() { 
         var $me = $(this);
@@ -1433,7 +1727,7 @@ $(document).ready(function() {
             case 'document' : url = window.params.document.listUrl; break;
             default : console.log("no url");
         }
-        var taxon = 94899;//$("input#filterByTaxon").val();
+        var taxon = $("input#filterByTaxon").val();
         var params = {};
         params['taxon'] = taxon;
         params['max'] = $(this).data('max');
@@ -1529,4 +1823,71 @@ $(document).ready(function() {
         }*/
     });
 
+    function updateFilter() {
+        var taxonGridDataView = taxonGrid.getData()
+        taxonGridDataView.setFilterArgs({
+            positionFilter: positionFilter,
+            statusFilter: statusFilter,
+            searchString: searchString
+        });
+        taxonGridDataView.refresh();
+    }
+
+    taxonGrid = initTaxonGrid($('#taxonGrid'));
+//    $("#inlineFilterPanel").appendTo(taxonGrid.getTopPanel()).show();
+    /*$("#inlineFilterPanel").on('keyup', '#txtSearch', function (e) {
+        Slick.GlobalEditorLock.cancelCurrentEdit();
+        if (e.which == 27) {
+            this.value = "";
+        }
+        searchString = this.value;
+        updateFilter();
+    });*/
+
+    $('.filter input').change ( function() {
+        var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
+        getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
+    });
+
+    /*$('#taxonStatusSelect').multiselect({
+        nonSelectedText: 'Choose Status',
+        numberDisplayed: 2,
+        nSelectedText:' status selected',
+        allSelectedText:'All status selected',
+        onChange: function(option, checked, select) {
+            var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
+            getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
+        }
+    });
+
+    $('#taxonPositionSelect').multiselect({
+        nonSelectedText: 'Choose Position',
+        numberDisplayed: 3,
+        nSelectedText:' lists selected',
+        allSelectedText:'All lists selected',
+        onChange: function(option, checked, select) {
+            var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
+            getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
+        }
+    });
+
+    $('#inlineFilterPanel').append($('#rankDropDown').clone().prop('id', 'taxonRankId'));
+    $('#taxonRankId').removeClass('span5').addClass('input-block-level').attr('multiple', 'multiple').find("option").eq(0).remove();
+    $('#taxonRankId').multiselect({
+        nonSelectedText: 'Choose rank to show',
+        numberDisplayed: 1,
+        nSelectedText:' ranks selected',
+        allSelectedText:'All ranks selected',
+        onChange: function(option, checked, select) {
+            var $selectedTaxon = $('#taxaHierarchy .taxon-highlight'); 
+            getNamesFromTaxon($selectedTaxon, $selectedTaxon.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
+        }
+    });*/
+
+    $('.selectAll').click(function() {
+       $(this).parent().next().find('input:checkbox:not([disabled])').prop('checked', 'checked').trigger('change');
+    });
+    $('.selectNone').click(function() {
+       $(this).parent().next().find('input:checkbox:not([disabled])').removeProp('checked').trigger('change');
+    });
 });

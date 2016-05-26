@@ -46,7 +46,7 @@
         </div>
         </g:if>
         <g:else>
-            <div class="sidebar_section">
+            <div class="sidebar_section" style="border:0px;">
                 <h5> <g:message code="button.childTaxa" /> <a href="${uGroup.createLink(controller:'species', action:'list', params:['taxon':speciesInstance.taxonConcept.id])}" class="pull-right"> Show All </a></h5>
                 <s:showSpeciesList model="['instanceTotal':0]"/>
             </div>

@@ -111,7 +111,7 @@ def synonyms = speciesInstance.taxonConcept.fetchSynonyms();
 <!-- Common Names -->
 <%
 Map names = new LinkedHashMap();
-CommonNames.findAllByTaxonConcept(speciesInstance.taxonConcept).each() {
+CommonNames.findAllByTaxonConceptAndIsDeleted(speciesInstance.taxonConcept, false).each() {
 String languageName = it?.language?.name ?: "Others";
 
 /*if(it?.language?.isDirty) {
