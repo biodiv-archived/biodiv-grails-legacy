@@ -662,3 +662,7 @@ create index on species(is_deleted);
 #17 may 
 update document set external_url =uri where uri !='';
 alter table document drop column uri;
+
+#26 may
+ALTER TABLE document ALTER COLUMN latitude TYPE double precision;
+ALTER TABLE document ALTER COLUMN longitude TYPE double precision;

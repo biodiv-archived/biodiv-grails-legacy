@@ -714,9 +714,13 @@ println queryParts.queryParams
 			def h = Habitat.findByName(it.trim())
 			document.addToHabitats(h);
 		}
-		
-		document.longitude = (m['longitude'] ?:76.658279)
-		document.latitude = (m['lattitude'] ?: 12.32112)
+		def latitude;
+		def longitude;
+		if(m['latitude']){latitude=(Double.parseDouble(m['latitude']))}else{latitude=12.32112};
+		if(m['longitude']){longitude=(Double.parseDouble(m['longitude']))}else{longitude=76.658279};
+		//def logitude=(Double.parseDouble(m['longitude']))?:76.65827;
+		document.longitude = longitude
+		document.latitude = latitude
 		document.geoPrivacy = m["geoprivacy"]
 		document.externalUrl=m["externalurl"]
 		document.placeName=m["palce name"]
@@ -752,7 +756,7 @@ println queryParts.queryParams
 
 	def runCurrentDocuments(documentInstance,Map m) {
 				def tokenUrl=""
-				def url= m["externalUrl"]
+				def url= m["externalurl"]
 				def hostName = 'http://gnrd.globalnames.org' //url.getHost()
                 HTTPBuilder http = new HTTPBuilder(hostName)
                 http.request( GET, JSON ) {
