@@ -1101,7 +1101,7 @@ class SpeciesController extends AbstractObjectController {
             Language languageInstance = utilsService.getCurrentLanguage(request);
             params.locale_language = languageInstance;
             log.debug  "Choosen languauge is ${languageInstance}"
-			def res = speciesUploadService.basicUploadValidation(params)
+            def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			render(text:res as JSON, contentType:'text/html')
 		}
@@ -1788,8 +1788,7 @@ class SpeciesController extends AbstractObjectController {
             def hqlQuery = sessionFactory.currentSession.createQuery("select count(*) as count from Species s  join s.taxonConcept.hierarchies as reg  where s.id is not null  and reg.classification="+265799+" and (reg.path like '%!_123350!_%'  escape '!' or reg.path like '123350!_%'  escape '!' or reg.path like '%!_123350' escape '!') and reg.taxonDefinition.rank = 9");
             println "PppppppppppppppppppppppppppppppP"
         def speciesInstanceList = hqlQuery.list();
-
-render speciesInstanceList;
+            render speciesInstanceList;
             } catch(e) {
                 e.printStackTrace();
             }
@@ -1848,6 +1847,6 @@ render speciesInstanceList;
     }
     def testTrait(){
         Language languageInstance = utilsService.getCurrentLanguage(request);
-        speciesTraitsService.loadTraitDefinitions('/home/ifp/git/biodiv/app-conf/TraitsDefinition.tsv',languageInstance);
+        speciesTraitsService.loadTraitDefinitions('/home/ifp/git/biodiv/app-conf/parent.tsv',languageInstance);
     }
 }
