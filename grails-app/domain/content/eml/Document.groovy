@@ -30,6 +30,11 @@ class Document extends DataObject implements Comparable {
         Report("Report"),
         Poster("Poster"),
         Proposal("Proposal"),
+        Journal_Article("Journal Article"),
+        Book("Book"),
+        Thesis("Thesis"),
+        Technical_Report("Technical Report"),
+        Presentation("Presentation"),
         Miscellaneous("Miscellaneous"),
 
         private String value;
@@ -48,7 +53,12 @@ class Document extends DataObject implements Comparable {
                 Report,
                 Poster,
                 Proposal,
-                Miscellaneous
+                Miscellaneous,
+                Journal_Article,
+                Book,
+                Thesis,
+                Technical_Report,
+                Presentation
 			]
 		}
 

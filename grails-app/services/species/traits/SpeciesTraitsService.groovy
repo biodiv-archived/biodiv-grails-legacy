@@ -616,19 +616,59 @@ class SpeciesTraitsService {
     } 
     
     private boolean isValidTrait(String traitName, traitValue, Long id) {
-        log.debug "Validating trait ${traitName} with value ${traitValue} for taxon ${id}"
+        println "Validating trait ${traitName} with value ${traitValue} for taxon ${id}"
         //FIX: HACK till loading of traits and validation is inplace
-        return true;
+        //return true;
 
         Trait trait = Trait.findByName(traitName);
-        if(!trait) return false;
+        //if(!trait) return false;
         boolean isValid = false;
+        isValidType(traitName,traitValue,trait)
+        return true;
         trait.valueContraints.each { constraint ->
             isValid = isValid && constraint.validate(trait, traitValue);
         }
         return isValid && isValidPropertyAsPerTaxon(trait, id);
     }
 
+        private boolean isValidType(String traitName,traitValue,trait){
+            //Trait trait=Trait.findByName(traitName);
+            //ValueConstraint traitvalueconstraint= ValueConstraint.findAllByTraitId(trait.id.toLong())
+            boolean isValid=false;
+            println "==========Value Constarints========"+trait?.valueConstraint
+            println "======Trait========"+trait?.id
+            println "=======Trait Name========"+traitName
+            println "========Trait Value======="+traitValue
+
+           trait?.valueConstraint.each{
+             def  value = it?.toUpperCase().trim()
+               switch(value){
+                   case 'CATEGORICAL':
+                   break;
+                   case 'INTEGER':
+                   Integer.parseInt(value)
+                   break;
+                   case 'FLOAT':
+                   Double.parseDouble(value)
+                   break;
+                   case 'TEXT':
+                   break;
+                   case 'BOOLEAN':
+                   println "====Boolean====="+Boolean.parseBoolean(value)
+                   break;
+                   case 'ORDERED':
+                   break;
+                   case 'RANGE':
+                   return value.indexOf('-') != -1
+                   break;
+                   case 'DATE':
+                   return UtilsService.parseDate(value) != null
+                   
+               }
+           }
+            return true
+
+        }
     private boolean isValidPropertyAsPerTaxon(Trait trait, Long id) {
         TaxonomyDefinition taxonInstance = TaxonomyDefinition.read(id);
         if(!taxonInstance || !trait) return false;
@@ -639,28 +679,67 @@ class SpeciesTraitsService {
     void loadTraitDefinitions(String file, def languageInstance) {
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
-
         String[] row = reader.readNext();
+        int fieldIndex=Arrays.asList(headers).indexOf("Field")
+        int taxonIndex=Arrays.asList(headers).indexOf("Taxon")
+        int constraintIndex=Arrays.asList(headers).indexOf("Constraint")
+        int urlIndex=Arrays.asList(headers).indexOf("ontologyURL")
+        int descriptionIndex=Arrays.asList(headers).indexOf("description")
 
         while(row) {
             Trait trait = new Trait();
             headers.eachWithIndex { header, index ->
+
                 switch(header.toLowerCase()) {
-                    case 'name' : trait.name = row[index].trim(); break;
-                    case 'field' : trait.field = getField(row[index], languageInstance); break;
-                    case 'taxon' : row[index].tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}; break;
-                    case 'valuecontraints' : row[index].tokenize(",").each {trait.addToValueContraints(ValueConstraint.getEnum(it.trim()))};break;
-                    case 'ontologyurl' : trait.ontologyUrl = row[index].trim(); break;
-                    case 'description' : trait.description = row[index].trim(); break;
-                }
+
+                case 'parent1' : 
+                    def tname= Trait.findByName(row[index]);
+                    if(!tname){
+                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
+                    tname=""
+                        }
+                break;
+
+                case 'parent2' : 
+                    def tname= Trait.findByName(row[index]);
+                    if(!tname){
+                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
+                    tname=""
+                        }
+                break;
+
+                case 'parent3' : 
+                    def tname= Trait.findByName(row[index]);
+                    if(!tname){
+                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
+                    tname=""
+                        }
+                break;
+
+                case 'parent4' : 
+                    def tname= Trait.findByName(row[index]);
+                    if(!tname){
+                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
+                    tname=""
+                        }
+                break;
+
+                case 'parent5' : 
+                    def tname= Trait.findByName(row[index]);
+                    if(!tname){
+                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
+                    tname=""
+                        }
+                break;
+                    
+                } 
             }
-            if(!trait.hasErrors() && !trait.save()) {
-                trait.errors.allErrors.each { log.error it }
-            }
+         //  if(!trait.hasErrors() && !trait.save()) {
+           //    trait.errors.allErrors.each { log.error it }
+            //}
             row = reader.readNext();
         }
     }
-    
     private Field getField(String string, languageInstance) {
         def f = string.tokenize("|");
       
@@ -672,6 +751,22 @@ class SpeciesTraitsService {
         } else  if (f.size() == 3) {
             f = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
         } 
+    }
+
+    private void addTrait(Trait trait,String index,def fieldIndex,def taxonIndex,def urlIndex,def constraintIndex,def descriptionIndex,def languageInstance,String parentName)
+    {
+        
+        
+        trait.name =index.trim();
+        trait.field = getField(fieldIndex, languageInstance); 
+        taxonIndex.tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}; 
+        constraintIndex.tokenize(",").each {trait.addToValueConstraint(ValueConstraint.getEnum(it.trim()))};
+        trait.ontologyUrl = urlIndex.trim(); 
+        trait.description = descriptionIndex.trim();
+        def parentId=Trait.findByName(parentName)
+        trait.parentId=parentId?.id                            
+        trait.save()
+
     }
 
     private List<ValueConstraint>  getTaxon(String taxonList) {

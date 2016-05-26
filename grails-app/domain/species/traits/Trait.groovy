@@ -74,18 +74,20 @@ class Trait {
     }
 
     String name;
+    String parentId;
     Field field;
     String ontologyUrl;
     String description;
     Date createdOn = new Date();
 	  Date lastRevised = createdOn;
-    static hasMany = [taxonomyDefinition: TaxonomyDefinition,valueContraints:ValueConstraint]
+    static hasMany = [taxonomyDefinition: TaxonomyDefinition,valueConstraint:ValueConstraint]
 
     static constraints = {
         name nullable:false, blank:false, unique:true
+        parentId nullable:true,blank:true
         field nullable:false
         ontologyUrl nullable:true
-		description nullable:true
+		    description nullable:true
     }
 
     static mapping = {
