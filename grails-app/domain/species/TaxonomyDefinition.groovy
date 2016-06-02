@@ -607,7 +607,7 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	
-	def updatePosition(String pos, Map nameSourceInfo = [:], TaxonomyRegistry latestHir = null, TaxonomyDefinition parsedName){
+	def updatePosition(String pos, Map nameSourceInfo = [:], TaxonomyRegistry latestHir = null, TaxonomyDefinition parsedName = null){
 		def newPosition = NamesMetadata.NamePosition.getEnum(pos)
 		if(newPosition){
 			this.position = newPosition
