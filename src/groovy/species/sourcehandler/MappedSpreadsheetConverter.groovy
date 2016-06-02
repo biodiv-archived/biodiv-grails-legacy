@@ -67,7 +67,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	private updateMap(List<Map> content, Map targetMap, boolean useRank=false){
 		if(content){
 			content.each { Map m ->
-				if(!m['name'])
+				if(!m['name'] || ("ignore".equalsIgnoreCase(m['match found'])))
 					return
 				
 				String rankSuffix = useRank ? (m['rank'] ? ( KEY_SEP + m['rank'].trim().toLowerCase()):''):''  		

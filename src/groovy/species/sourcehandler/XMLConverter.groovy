@@ -1973,7 +1973,6 @@ class XMLConverter extends SourceConverter {
                     //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
 
                     //TODO: how to get status in each case?
-                    String parsedAuthorYear = parsedName.authorYear
                     boolean searchInNull = false;
                     boolean useAuthorYear = (otherParams?true:false)
 
@@ -2231,16 +2230,8 @@ class XMLConverter extends SourceConverter {
                     //updating name status given in sheet
                     taxon.updateNameStatus(fieldNode?.status?.text())
                     //saving taxon new position
-                    taxon.updatePosition(fieldNode?.position?.text())
-                    //updating author year if not from COL
-                    if(!fromCOL && parsedAuthorYear){
-                        taxon.authorYear = parsedAuthorYear
-                        //taxon = taxon.merge();
-                        if(!taxon.save(flush:true)) {
-                            taxon.errors.each { println it; log.error it }
-                        }
-                    }
-
+                    taxon.updatePosition(fieldNode?.position?.text(), null, null, parsedName)
+                    
                     if(addNewNameToSession){
                         NamelistService.addNewNameInSession(taxon)
                     }
