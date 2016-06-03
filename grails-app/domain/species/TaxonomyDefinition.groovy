@@ -616,7 +616,8 @@ class TaxonomyDefinition extends ScientificName {
 				//println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
 				
 				//updating name
-				if(parsedName){ 
+				if(parsedName){	
+					this.name =  parsedName.name
 					this.canonicalForm = parsedName.canonicalForm
 					this.normalizedForm =  parsedName.normalizedForm
 					this.italicisedForm = parsedName.italicisedForm

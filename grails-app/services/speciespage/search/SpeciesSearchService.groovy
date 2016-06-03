@@ -90,7 +90,7 @@ class SpeciesSearchService extends AbstractSearchService {
 			doc.addField(searchFieldsConfig.GUID, s.guid);
 			addNameToDoc(doc, s.taxonConcept);
 
-			def syns = Synonyms.findAllByTaxonConcept(s.taxonConcept)
+			def syns = s.taxonConcept.fetchSynonyms()
 			syns.each { syn ->
 				doc.addField(searchFieldsConfig.NAME, syn.name);
 			}
