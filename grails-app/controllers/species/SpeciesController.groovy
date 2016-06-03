@@ -56,6 +56,7 @@ class SpeciesController extends AbstractObjectController {
     def messageSource;
     def namelistService;
     def sessionFactory;
+    def speciesTraitsService;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -1100,7 +1101,7 @@ class SpeciesController extends AbstractObjectController {
             Language languageInstance = utilsService.getCurrentLanguage(request);
             params.locale_language = languageInstance;
             log.debug  "Choosen languauge is ${languageInstance}"
-			def res = speciesUploadService.basicUploadValidation(params)
+            def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			render(text:res as JSON, contentType:'text/html')
 		}
@@ -1787,13 +1788,65 @@ class SpeciesController extends AbstractObjectController {
             def hqlQuery = sessionFactory.currentSession.createQuery("select count(*) as count from Species s  join s.taxonConcept.hierarchies as reg  where s.id is not null  and reg.classification="+265799+" and (reg.path like '%!_123350!_%'  escape '!' or reg.path like '123350!_%'  escape '!' or reg.path like '%!_123350' escape '!') and reg.taxonDefinition.rank = 9");
             println "PppppppppppppppppppppppppppppppP"
         def speciesInstanceList = hqlQuery.list();
-
-render speciesInstanceList;
+            render speciesInstanceList;
             } catch(e) {
                 e.printStackTrace();
             }
 
         println "=====================++++"
     }
-   
+  
+    @Secured(['ROLE_ADMIN'])
+    def uploadFacts () {
+
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def saveFacts() {
+        params.locale_language = utilsService.getCurrentLanguage(request);
+        def result = speciesTraitsService.saveFacts(params)
+        if(result.success){
+            withFormat {
+                html {
+                    redirect(controller:'species', action: "facts")
+                }
+                json {
+                    render result as JSON 
+                }
+                xml {
+                    render result as XML
+                }
+            }
+
+        } else {
+            withFormat {
+                html {
+                    //flash.message = "${message(code: 'error')}";
+                    render(controller:'species', view: "uploadFacts", model: [])
+                }
+                json {
+                    result.remove('instance');
+                    render result as JSON 
+                }
+                xml {
+                    result.remove('instance');
+                    render result as XML
+                }
+            }
+        }
+
+    }
+
+    def facts() {
+        if(params.id) {
+            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(params.id.toLong(), params.trait, params.traitValue), 'traitsList':speciesTraitsService.listTraits()]);
+        } else {
+            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(null, params.trait, params.traitValue), 'traitsList':speciesTraitsService.listTraits()]);
+        }
+
+    }
+    def testTrait(){
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        speciesTraitsService.loadTraitDefinitions('/home/ifp/git/biodiv/app-conf/parent.tsv',languageInstance);
+    }
 }
