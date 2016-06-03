@@ -722,8 +722,11 @@ println queryParts.queryParams
 		document.longitude = longitude
 		document.latitude = latitude
 		document.geoPrivacy = m["geoprivacy"]
+		println "-------------Geo Privacy======================="+m["geoprivacy"]
 		document.externalUrl=m["externalurl"]
-		document.placeName=m["palce name"]
+		document.placeName=m["place_name"]
+
+		println "====================Place Name=========="+m["place_name"]
 //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 //		if(document.latitude && document.longitude) {
 //			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
