@@ -607,17 +607,28 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	
-	def updatePosition(String pos, Map nameSourceInfo = [:], TaxonomyRegistry latestHir = null){
+	def updatePosition(String pos, Map nameSourceInfo = [:], TaxonomyRegistry latestHir = null, TaxonomyDefinition parsedName = null){
 		def newPosition = NamesMetadata.NamePosition.getEnum(pos)
 		if(newPosition){
 			this.position = newPosition
 			if(this.position == NamesMetadata.NamePosition.CLEAN){
 				// name is moving to clean state.. overwrite all info from spreadsheet
 				//println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
+				
+				//updating name
+				if(parsedName){	
+					this.name =  parsedName.name
+					this.canonicalForm = parsedName.canonicalForm
+					this.normalizedForm =  parsedName.normalizedForm
+					this.italicisedForm = parsedName.italicisedForm
+					this.binomialForm = parsedName.binomialForm
+					this.authorYear = parsedName.authorYear
+				}
+				
 				def fieldsConfig = grailsApplication.config.speciesPortal.fields
-				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
-				def tmpNameSourceId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
-				def tmpViaDatasource = nameSourceInfo.get("" + fieldsConfig.VIA_SOURCE)
+				def tmpMatchDatabaseName = nameSourceInfo?.get("" + fieldsConfig.NAME_SOURCE)
+				def tmpNameSourceId = nameSourceInfo?.get("" + fieldsConfig.NAME_SOURCE_ID)
+				def tmpViaDatasource = nameSourceInfo?.get("" + fieldsConfig.VIA_SOURCE)
 				matchDatabaseName = tmpMatchDatabaseName
 				nameSourceId = tmpNameSourceId
 				viaDatasource = tmpViaDatasource
