@@ -696,7 +696,9 @@ class TaxonomyDefinition extends ScientificName {
 	
 	
 	def updateNameStatus(String str){
-		log.error "Not doing any thing.. this method should be called from namelistservice api"
+		if("accepted".equalsIgnoreCase(str)){
+			namelistService.changeSynToAcc(id)
+		}
 	}
 	
 	def updateContributors(List<SUser> users){
