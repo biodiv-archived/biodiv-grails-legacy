@@ -441,6 +441,7 @@ class XMLConverter extends SourceConverter {
 	
 	public TaxonomyDefinition convertName(Node species) {
 		if(!species) return null;
+		
 		try {
 			log.info "Creating/Updating names"
 			//Thread.dumpStack()
@@ -461,8 +462,13 @@ class XMLConverter extends SourceConverter {
 			addToSummary("<<< NAME >>> "  + speciesName + "  <<< Rank >>> " + rank)
 			
 			String nameRunningStatusText = getData(speciesNameNode.nameRunningStatus)?.trim()
+			
 			String nameMatchStatus = getData(speciesNameNode.matchStatus)
-			if((!"new".equals(nameRunningStatusText)) && ("synonym".equalsIgnoreCase(nameMatchStatus))){
+			String targetStatus = getData(speciesNameNode.status)
+			targetStatus = targetStatus ?: nameMatchStatus
+
+			
+			if("synonym".equalsIgnoreCase(targetStatus)){
 				return addNameAsSynonym(speciesNameNode)
 			}
 			
@@ -491,8 +497,9 @@ class XMLConverter extends SourceConverter {
 							th.taxonDefinition.updateNameSignature(getUserContributors(speciesNameNode.data))
 						}
 					}
-
+					
 					println " latest hir -------convertname------------ <<<<<<<<<>>>>>>>>>>>>>>> " + latestHir
+					//taxonConcept.updateNameStatus(targetStatus)
 					taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species), latestHir)
 					updateUserPrefForColCuration(taxonConcept, speciesNameNode)
 					taxonConcept.postProcess()
@@ -2220,11 +2227,7 @@ class XMLConverter extends SourceConverter {
                     //newNameSaved true becoz now this taxon cant be used in hierarchy 
                     //of a lower level as its status is not accepted 
                     newNameSaved = newNameSaved || (taxon.status != NameStatus.ACCEPTED)
-                    if(taxon.status != NameStatus.ACCEPTED) {
-                        println "TAXON SAVED WITH NULL STATUS===========================" + taxon.status + "   id " + taxon.id
-
-                    }
-
+                    
                     //updating contributors
                     taxon.updateContributors(getUserContributors(fieldNode.data))
                     //updating name status given in sheet
