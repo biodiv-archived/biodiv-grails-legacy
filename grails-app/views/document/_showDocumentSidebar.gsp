@@ -17,7 +17,7 @@ String status = docId?.status
 
 %>
 <div  class="span4">
-<g:if test="${documentInstance.longitude!=76.658279 && documentInstance.latitude!=12.32112}">
+<g:if test="${documentInstance.longitude!=76.658279 && documentInstance.latitude!=0.0}">
 <g:render template="/document/showDocumentLocationTemplate" model="['documentInstance':documentInstance]"></g:render>
 </g:if>
     <div style = "clear:both; border:1px solid #CECECE;overflow:hidden"><h5> Taxa mentioned in this document </h5></div>
