@@ -748,7 +748,9 @@ class XMLConverter extends SourceConverter {
                 speciesField.audienceTypes?.clear()
                 speciesField.attributors?.clear()
                 speciesField.resources?.clear()
-                speciesField.references?.clear()
+                if(field.connection != 81 ){ // TODO: No need for Reference fields
+                	speciesField.references?.clear()
+                }
             }
             
             if(speciesField && contributors) {
