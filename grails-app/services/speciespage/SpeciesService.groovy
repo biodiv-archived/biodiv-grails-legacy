@@ -68,7 +68,7 @@ import species.sourcehandler.exporter.DwCSpeciesExporter
 import java.io.File ;
 import species.participation.NamelistService
 import species.participation.RecommendationVote;
-
+import groovy.sql.Sql
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -2370,6 +2370,20 @@ def checking(){
 		
 		return taxonList
 	}
-	
+
+    def totalCommonNamesSuggested(user){
+
+        def sql =  Sql.newInstance(dataSource);
+        def result
+         result = sql.rows("select count(*) from common_names where uploader_id=:userId",[userId:user.id]);
+        return (long)result[0]["count"];
+    }
+	    def totalContributedSpecies(user){
+
+        def sql =  Sql.newInstance(dataSource);
+        def result
+         result = sql.rows("select count(DISTINCT species_id) from species_field where uploader_id=:userId",[userId:user.id]);
+        return (long)result[0]["count"];
+    }
 	
 }

@@ -119,7 +119,47 @@
 										</div>
 									</div>
 								</div>
+					
+						<div
+							class="control-group ${hasErrors(bean: command, field: 'sextype', 'error')}">
+							<label class="control-label" for="sex"><g:message
+									code='user.sex.label' default='${g.message(code:"default.sex.label")}' /> </label>
+							<div class="controls">
+								 <g:select name="sexType" class="input" id="sexType"
+                            placeholder="${g.message(code:'placeholder.sex.select')}"
+                            from="${species.auth.SUser$SexType?.values()}"
+                            keys="${species.auth.SUser$SexType?.values()*.value()}"
+                            value="${user.sexType}"/>
+							</div>
+                        </div>
 
+
+                        	<div
+							class="control-group ${hasErrors(bean: command, field: 'occupationtype', 'error')}">
+							<label class="control-label" for="sex"><g:message
+									code='user.occupation.label' default='${g.message(code:"default.occupationtype.label")}' /> </label>
+							<div class="controls">
+								 <g:select name="occupationType" class="input" id="occupationType"
+                            placeholder="${g.message(code:'placeholder.occupation.select')}"
+                            from="${species.auth.SUser$OccupationType?.values()}"
+                            keys="${species.auth.SUser$OccupationType?.values()*.value()}"
+                            value="${user.occupationType}"/>
+
+							</div>
+                        </div>
+                              <div
+							class="control-group ${hasErrors(bean: command, field: 'institutiontype', 'error')}">
+							<label class="control-label" for="sex"><g:message
+									code='user.institution.label' default='${g.message(code:"default.institutiontype.label")}' /> </label>
+							<div class="controls">
+								 <g:select name="institutionType" class="input" id="institutionType"
+                            placeholder="${g.message(code:'placeholder.institution.select')}"
+                            from="${species.auth.SUser$InstitutionType?.values()}"
+                            keys="${species.auth.SUser$InstitutionType?.values()*.value()}"
+                            value="{user.InstitutionType}"/>
+
+							</div>
+                        </div>
 								<div
 									class="control-group ${hasErrors(bean: user, field: 'email', 'error')}">
 									<label class="control-label" for="email"><i

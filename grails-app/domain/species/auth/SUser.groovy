@@ -20,7 +20,143 @@ import species.utils.ImageUtils;
 import species.SpeciesPermission;
 import species.Language;
 import species.auth.OAuthID;
+import org.springframework.context.MessageSourceResolvable;
 class SUser {
+
+	public enum SexType implements org.springframework.context.MessageSourceResolvable{
+        Male("Male"),
+        Female("Female"),
+        
+
+        private String value;
+
+
+        SexType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+                Male,
+                Female
+			]
+		}
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+
+
+    }
+   
+    public enum OccupationType implements org.springframework.context.MessageSourceResolvable{
+          Researcher("Researcher"),
+        Lecturer("Lecturer"),
+        Technician("Technician"),
+        Student("Student"),
+        Extensionist("Extensionist"),
+        Provider("Provider"),
+        Farmer("Farmer"),
+        Citizen("Citizen"),
+        Other("Other"),
+        
+
+        private String value;
+
+
+        OccupationType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+                 Researcher,
+                Lecturer,
+                Technician,
+                Student,
+                Extensionist,
+                Provider,
+                Farmer,
+                Citizen,
+                Other
+			]
+		}
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+
+
+    }
+
+    public enum InstitutionType implements org.springframework.context.MessageSourceResolvable{
+         International_Research_Center("International Research Center"),
+        National_Research_Center("National Research Center"),
+        University("University"),
+        Agronomical_School("Agronomical School"),
+        College("College"),
+        Extension_Services("Extension Services"),
+        NGO("NGO"),
+        Private_Sector("Private sector"),
+        Governmental_Service("Governmental service"),
+        Farm("Farm"),
+        Other("Other"),
+
+        private String value;
+        InstitutionType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+				International_Research_Center,
+				National_Research_Center,
+				University,
+				Agronomical_School,
+				College,
+				Extension_Services,
+				NGO,
+				Private_Sector,
+				Governmental_Service,
+				Farm,
+				Other
+			]
+		}
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+
+
+    } 
+
+    SexType sexType;
+    OccupationType occupationType;
+    InstitutionType institutionType;
 
 	transient springSecurityService
 	def aclUtilService
@@ -70,6 +206,10 @@ class SUser {
 		location nullable:true
 		lastLoginDate nullable:true
 		language nullable:false
+		sexType blank:true,nullable:true
+		occupationType nullable:true,blank:true
+		institutionType nullable:true,blank:true
+
 	}
 
 	static mapping = {
