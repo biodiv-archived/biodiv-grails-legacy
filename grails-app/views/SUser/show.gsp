@@ -127,9 +127,9 @@
                 <%--  <obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
                 <div>
                     <div class="row-fluid userProfileSection">
-                    
+
                         <div class="span3 activity_count">
-                           <div class="sidebar_section"> <h5><g:message code="suser.participation.score" /> </span></h5></div>
+                           
                        <g:render template="userAccordionDetailsTemplate" model="[]" />
                         </div>
                         <div class="span9 user_profile">
@@ -138,7 +138,7 @@
                                        
                             <div class="prop">
                                 <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
-                                <div class="value">
+                                <div class="value pre-scrollable" style="display:block;height:80px;">
                                             <g:if test="${user.aboutMe}">
 
                                             <%  def styleVar = 'block';

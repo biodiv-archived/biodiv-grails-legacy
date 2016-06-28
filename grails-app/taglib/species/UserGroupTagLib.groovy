@@ -493,7 +493,7 @@ class UserGroupTagLib {
 
 	def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 
-			out <<  UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()
+			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
 
 
 	}
@@ -503,7 +503,7 @@ class UserGroupTagLib {
 		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 
 
-			out <<  UserGroupMemberRole.findAllBySUserAndRole(userInstance,memberRole).size()
+			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,memberRole).size()+"</div>"
 
 
 	}
@@ -512,7 +512,7 @@ class UserGroupTagLib {
 		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
 		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
 
-			out <<  UserGroupMemberRole.findAllBySUserAndRole(userInstance,expertRole).size()
+			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,expertRole).size()+"</div>"
 
 
 	}

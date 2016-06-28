@@ -69,7 +69,10 @@
                  <span class="name"><i class="icon-user"></i><g:message code="default.institutiontype.label" /></span>
                   <div class="value">
                   			<g:if test="${userInstance.institutionType}">
-                                   ${userInstance.institutionType}  
+                  			<% String institute= userInstance.institutionType;
+                  				def institutiontype=institute.replace("_"," ");
+                  			 %>
+                  			${institutiontype}
                                    </g:if>
                                  <g:else>
                                    ${"Not Provided"}

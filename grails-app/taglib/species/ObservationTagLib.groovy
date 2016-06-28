@@ -456,19 +456,19 @@ class ObservationTagLib {
     }
     def showNoOfObservationsCreated = {attrs, body->
         def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user, attrs.model.userGroup);
-		out << "<td>"+noOfObvs+"</td>"
+		out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
     def showNoOfSuggestedUponOfUser={attrs, body->
         def noOfObvs = observationService.getAllSuggestedRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
-		out << "<td>"+noOfObvs+"</td>"
+		out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 	    def showNoOfDownloadUponOfUser={attrs, body->
         def noOfObvs = DownloadLog.findAllByAuthorAndSourceType(attrs.model.user, attrs.model.sourceType).size();
-			out << "<td>"+noOfObvs+"</td>"
+			out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 		def showNoOfCommentUponOfUser={attrs, body->
         def noOfObvs = Comment.findAllByAuthorAndCommentHolderType(attrs.model.user, attrs.model.commentHolderType).size();
-		out <<  "<td>"+noOfObvs+"</td>"
+		out <<  "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 		def showNoOfOrganizedUponOfUser={attrs, body->
 		String[] activityType=["obv locked","obv unlocked","Featured","UnFeatured","Flagged","Flag removed","Flag deleted","Checklist created"];
@@ -477,17 +477,17 @@ class ObservationTagLib {
 		def noOfOrganizedOvb=ActivityFeed.findAllByAuthorAndActivityType(attrs.model.user,it).size()
 		totalOrganizedObv=noOfOrganizedOvb+totalOrganizedObv
 		}
-		out << "<td>"+totalOrganizedObv+"</td>"
+		out << "<td class=countvalue>"+totalOrganizedObv+"</td>"
 
 	}
 	def showNoOfDiscussionCreated={attrs,body->
 		def noOfDiscussionCreated=ActivityFeed.findAllByAuthorAndActivityHolderTypeAndActivityType(attrs.model.user,attrs.model.activityHolderType,attrs.model.activityType).size()
-		out << "<td>"+noOfDiscussionCreated+"</td>"
+		out << "<td class=countvalue>"+noOfDiscussionCreated+"</td>"
 
 	}
 	def showNoOfDocsUploaded={attrs,body->
 		def noOfDocsUploaded=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
-		out << "<td>"+noOfDocsUploaded+"</td>"
+		out << "<td class=countvalue>"+noOfDocsUploaded+"</td>"
 
 	}
 	def showNoofOrganizedDocs={attrs,body->
@@ -496,13 +496,13 @@ class ObservationTagLib {
 		activityType.each{
 		def noOfDocsOraganized=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it)
 		totalDocsOrganized=noOfDocsOraganized.size()+totalDocsOrganized
-		println "========"+it+"==========="+noOfDocsOraganized.size();
+		
 	}
-	out << "<td>"+totalDocsOrganized+"</td>";
+	out << "<td class=countvalue>"+totalDocsOrganized+"</td>";
 	}
 	def showNoofCommentedDocs={attrs,body->
 		def noOfDocsCommented=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
-		out << "<td>"+noOfDocsCommented+"</td>"
+		out << "<td class=countvalue>"+noOfDocsCommented+"</td>"
 	}
 		def showNoofOrganizedDiscussion={attrs,body->
 		String[] activityType=["Posted resource","Featured","Flagged"]
@@ -510,21 +510,21 @@ class ObservationTagLib {
 		activityType.each{ 
 		def noOfDiscussionOraganized=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it)
 		totalDiscussionOrganized=noOfDiscussionOraganized.size()+totalDiscussionOrganized
-		println "========"+it+"==========="+noOfDiscussionOraganized.size();
+		
 	}
-	out << "<td>"+totalDiscussionOrganized+"</td>";
+	out << "<td class=countvalue>"+totalDiscussionOrganized+"</td>";
 	}
 		def showNoofParticipationDiscussion={attrs,body->
 		def noOfParticipationDiscussion=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
-		out << "<td>"+noOfParticipationDiscussion+"</td>"
+		out << "<td class=countvalue>"+noOfParticipationDiscussion+"</td>"
 	}
 		def showNoOfAgreedUponOfUser = {attrs, body->
         def noOfObvsSuggested = ActivityFeed.findAllByAuthorAndActivityTypeAndActivityHolderType(attrs.model.user,attrs.model.activityType,attrs.model.activityHolderType).size()
-		out << "<td>"+noOfObvsSuggested+"</td>"
+		out << "<td class=countvalue>"+noOfObvsSuggested+"</td>"
 	}
 			def showNoOfRecommendationsSuggested = {attrs, body->
         def noOfObvsSuggested = ActivityFeed.findAllByAuthorAndActivityTypeAndActivityHolderType(attrs.model.user,attrs.model.activityType,attrs.model.activityHolderType).size()
-		out << "<td>"+noOfObvsSuggested+"</td>"
+		out << "<td class=countvalue>"+noOfObvsSuggested+"</td>"
 	}
 }
 

@@ -144,6 +144,7 @@
 								</g:hasErrors>
 
 							</div>
+							</div>
 
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'sextype', 'error')}">

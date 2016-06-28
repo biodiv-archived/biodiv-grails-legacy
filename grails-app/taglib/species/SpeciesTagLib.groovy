@@ -197,7 +197,7 @@ class SpeciesTagLib {
 	def noOfContributedSpecies={attrs,body->
 		def noOfSpecies=speciesService.totalContributedSpecies(attrs.model.user)
 
-		out << "<td>"+noOfSpecies+"</td>"
+		out << "<td class=countvalue>"+noOfSpecies+"</td>"
 
 	}
 
@@ -206,10 +206,10 @@ class SpeciesTagLib {
 		def totalNoOfOrganizedSpecies=0;
 		activityType.each{
 			def noOfOrganizedSpecies=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it);
-			println "========="+it+"===================="+noOfOrganizedSpecies.size();
+			//println "========="+it+"===================="+noOfOrganizedSpecies.size();
 			totalNoOfOrganizedSpecies=noOfOrganizedSpecies.size()+totalNoOfOrganizedSpecies
 		}
-		out << "<td>"+totalNoOfOrganizedSpecies+"</td>";
+		out << "<td class=countvalue>"+totalNoOfOrganizedSpecies+"</td>";
 	}
 
 }
