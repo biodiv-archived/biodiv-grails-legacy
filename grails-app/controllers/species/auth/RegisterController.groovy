@@ -101,7 +101,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		
 		def conf = SpringSecurityUtils.securityConfig
 		if (command.hasErrors()) {
-			redirectModel.command = command
+			redirectModel.command = commandRegisterController.groovy
 			render view: 'index', model: redirectModel
 			return
 		}
@@ -605,7 +605,7 @@ class CustomRegisterCommand {
  		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
-		captcha_response blank:false, nullable:false, validator: { value, command ->
+		/*captcha_response blank:false, nullable:false, validator: { value, command ->
 			def session = RCH.requestAttributes.session
 			def request = RCH.requestAttributes.request
 			try{
@@ -618,7 +618,7 @@ class CustomRegisterCommand {
 				e.printStackTrace()
 				return 'reCaptcha.invalid.message'
 			}
-		}
+		}*/
 	}
 
 	/* (non-Javadoc)

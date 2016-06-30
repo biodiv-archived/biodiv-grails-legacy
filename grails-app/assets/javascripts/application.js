@@ -50,6 +50,7 @@
 //= require jquery.plugins/jsrender.js
 //= require bootstrap.plugins/bootstrap-combobox.js
 //= require biodiv/observations/map.js
+//= require biodiv/accordion.js
 
 
 //= require jquery.plugins/jquery.sparkline.min.js 
