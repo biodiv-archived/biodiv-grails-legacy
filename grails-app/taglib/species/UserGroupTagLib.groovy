@@ -486,5 +486,35 @@ class UserGroupTagLib {
 	def inviteExpert = {attrs, body->
 		out << render(template:"/common/userGroup/inviteExpertTemplate", model:attrs.model);
 	}
-	
+
+	def showNoOfFoundedUserGroups  = {attrs, body->
+		def userInstance = attrs.model?.userInstance;
+		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
+
+	def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+
+			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
+
+
+	}
+		def showNoOfMemberUserGroups  = {attrs, body->
+		def userInstance = attrs.model?.userInstance;
+		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
+		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+
+
+			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,memberRole).size()+"</div>"
+
+
+	}
+		def showNoOfExpertUserGroups  = {attrs, body->
+		def userInstance = attrs.model?.userInstance;
+		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
+		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+
+			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,expertRole).size()+"</div>"
+
+
+	}
+
 }

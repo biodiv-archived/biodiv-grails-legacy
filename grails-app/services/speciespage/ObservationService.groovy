@@ -2746,4 +2746,18 @@ println "******************************"
 		}
         return langToCommonName;
     }
+
+
+        long getAllSuggestedRecommendationsOfUser(SUser user , UserGroup userGroupInstance = null) {
+        //TODO: filter on usergroup if required
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        if(userGroupInstance){
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o, user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and ugo.observation_id = o.id and ugo.user_group_id =:ugId and recoVote.given_common_name!=''",  [userId:user.id, isDeleted:false, ugId:userGroupInstance.id]);
+        } else {
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and recoVote.given_common_name!=''", [userId:user.id, isDeleted:false]);
+        }
+  //      def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
+        return (long)result[0]["count"];
+    }
 }
