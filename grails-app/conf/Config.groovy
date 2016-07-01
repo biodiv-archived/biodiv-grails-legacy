@@ -170,8 +170,8 @@ else {
 
 
 speciesPortal {
-    app.siteName = "India Biodiversity Portal"
-    app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
+    app.siteName = "Bhutan Biodiversity Portal"
+    app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of Bhutan."
     app.homepageDescription = "A unique repository of information on India's biodiversity. The Portal aims to provide open and free access to biodiversity information. The portal enables widespread participation by all citizens in contributing to and accessing information on Indian biodiversity. We believe such open access benefits science and society, and contributes to sustainable future. Your participation is vital. We welcome your participation and feedback."
     app.siteCode = 'ibp'
 
@@ -184,8 +184,11 @@ speciesPortal {
     data.rootDir = "${app.rootDir}/data"
     download.rootDir = "${data.rootDir}/datarep/downloads"
 
-    app.logo = "logo/IBP.png"
-    app.favicon = "logo/favicon.png"
+    app.logo = "${appName}/images/bbp-logo.png"
+    app.favicon = "${appName}/images/favicon.ico"
+    app.govlogo = "${appName}/images/gov-logo.png"
+    app.dzongkha = "${appName}/images/accordion/dzongkha.png"
+
 
     app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]
 
@@ -195,7 +198,7 @@ speciesPortal {
     domain = "localhost"
     resources {
         rootDir = "${app.rootDir}/img"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/img"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/img"
         images {
             defaultType = "jpg"
             thumbnail {
@@ -220,13 +223,13 @@ speciesPortal {
     observations {
         rootDir = "${app.rootDir}/observations"
         observationDownloadDir = "${download.rootDir}/observations"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/observations"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
         //serverURL = "http://localhost/${appName}/observations"
         MAX_IMAGE_SIZE = 104857600
     } 
     userGroups {
         rootDir = "${app.rootDir}/userGroups"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/userGroups"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/userGroups"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -235,7 +238,7 @@ speciesPortal {
 
     datasource {
         rootDir = "${app.rootDir}/datasources"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/datasources"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/datasources"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -259,7 +262,7 @@ speciesPortal {
 
     maps {
         SRID = 4326;
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/maps"
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/maps"
     }
 
     content{
@@ -475,7 +478,7 @@ speciesPortal {
     flushImmediately = true
     usersResource {
         rootDir = "${app.rootDir}/usersRes"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/usersRes"   
+        serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
     }
 
     ibpMapDatabase {
@@ -504,7 +507,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
     development {
-        grails.serverURL = "http://localhost.indiabiodiversity.org/${appName}"
+        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
@@ -519,8 +522,8 @@ environments {
                 port = 25
             }
         }
-        ibp.domain='localhost.indiabiodiversity.org'
-        wgp.domain='thewesternghats.localhost.indiabiodiversity.org'
+        ibp.domain='indiabiodiversity.localhost.org'
+        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
         //grails.resources.debug=true
         //        grails.resources.mappers.hashandcache.excludes = ['**']
         //grails.resources.flatten = false
