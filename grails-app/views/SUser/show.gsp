@@ -39,7 +39,7 @@
         .user_profile{
           background-color: white;
           padding: 5px 0px;
-          height: 540px
+          height: 544px;
         }
         .activity_count{
           background-color: white;
@@ -92,7 +92,7 @@
             }
         .value{
             font-weight:normal;
-            color:#808080;
+            color:#000;
         }
         .prop:hover{background-color:#f2f2f2;}
         .name{margin-bottom:5px;}
@@ -136,29 +136,7 @@
                             <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
                         
                                        
-                            <div class="prop">
-                                <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
-                                <div class="value pre-scrollable" style="display:block;height:80px;">
-                                            <g:if test="${user.aboutMe}">
-
-                                            <%  def styleVar = 'block';
-                                                def clickcontentVar = '' 
-                                            %> 
-                                            <g:if test="${user?.language?.id != userLanguage?.id}">
-                                                <%  
-                                                  styleVar = "none"
-                                                  clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.threeLetterCode.toUpperCase()+'</a>';
-                                                %>
-                                            </g:if>
-
-                                            ${raw(clickcontentVar)}
-                                            <div style="display:${styleVar}">
-                                                ${raw(user.aboutMe.replace('\n', '<br/>\n'))}
-                                            </div>
-                                                
-                                            </g:if>
-                                </div>
-                            </div>
+                         
                         </div>
                         
                     </div>

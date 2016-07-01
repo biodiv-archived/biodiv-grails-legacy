@@ -124,7 +124,7 @@
                      <g:if test="${userInstance.website}">
             <div class="prop">
                 <span class="name"><i class="icon-road"></i><g:message code="text.website" /></span>
-                <div class="value">
+               <div class="value pre-scrollable" style="display:block;height:20px;overflow-y: auto;">
                     <div class="linktext pull-left">
                         ${userInstance.website}
                     </div>
@@ -157,11 +157,35 @@
 				</div>
 			</g:if>
 		</g:if>
+       <div class="prop">
+                                <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
+                                <div class="value pre-scrollable" style="display:block;height:80px;overflow-y: auto;">
+                                            <g:if test="${userInstance.aboutMe}">
 
-	</div>
+                                            <%  def styleVar = 'block';
+                                                def clickcontentVar = '' 
+                                            %> 
+                                            <g:if test="${userInstance?.language?.id != userLanguage?.id}">
+                                                <%  
+                                                  styleVar = "none"
+                                                  clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.threeLetterCode.toUpperCase()+'</a>';
+                                                %>
+                                            </g:if>
+
+                                            ${raw(clickcontentVar)}
+                                            <div style="display:${styleVar}">
+                                                ${raw(user.aboutMe.replace('\n', '<br/>\n'))}
+                                            </div>
+                                                
+                                            </g:if>
+                                </div>
+                            </div>
+
+	
         <g:if test="${!showDetails }">
             <obv:getStats model="['user':userInstance, 'userGroup':userGroupInstance]"/>
         </g:if>
+        </div>
 </div>
 
 
