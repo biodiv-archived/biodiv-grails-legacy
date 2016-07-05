@@ -58,15 +58,13 @@ class SUser {
     }
    
     public enum OccupationType implements org.springframework.context.MessageSourceResolvable{
-          Researcher("Researcher"),
-        Lecturer("Lecturer"),
-        Technician("Technician"),
-        Student("Student"),
-        Extensionist("Extensionist"),
-        Provider("Provider"),
-        Farmer("Farmer"),
-        Citizen("Citizen"),
-        Other("Other"),
+        Agriculture("Agriculture"),
+		Business("Business"),
+		Education("Education"),
+		Government("Government"),
+		Research("Research"),
+		Student("Student"),
+		Other("Other"),
         
 
         private String value;
@@ -82,15 +80,13 @@ class SUser {
 
 		static def toList() {
 			return [
-                 Researcher,
-                Lecturer,
-                Technician,
-                Student,
-                Extensionist,
-                Provider,
-                Farmer,
-                Citizen,
-                Other
+ 		Agriculture,
+ 		Business,
+ 		Education,
+ 		Government,
+ 		Research,
+ 		Student,
+ 		Other
 			]
 		}
 
@@ -106,17 +102,11 @@ class SUser {
     }
 
     public enum InstitutionType implements org.springframework.context.MessageSourceResolvable{
-         International_Research_Center("International Research Center"),
-        National_Research_Center("National Research Center"),
-        University("University"),
-        Agronomical_School("Agronomical School"),
-        College("College"),
-        Extension_Services("Extension Services"),
-        NGO("NGO"),
-        Private_Sector("Private sector"),
-        Governmental_Service("Governmental service"),
-        Farm("Farm"),
-        Other("Other"),
+ 		FirmCorporation("Firm/Corporation"),
+ 		Government("Government"),
+ 		Nongovernmental_organization("Nongovernmental organization"),
+ 		Educational_institution("Educational institution"),
+ 		Other("Other"),
 
         private String value;
         InstitutionType(String value) {
@@ -129,17 +119,11 @@ class SUser {
 
 		static def toList() {
 			return [
-				International_Research_Center,
-				National_Research_Center,
-				University,
-				Agronomical_School,
-				College,
-				Extension_Services,
-				NGO,
-				Private_Sector,
-				Governmental_Service,
-				Farm,
-				Other
+ 		FirmCorporation,
+ 		Government ,
+ 		Nongovernmental_organization,
+ 		Educational_institution,
+ 		Other
 			]
 		}
 

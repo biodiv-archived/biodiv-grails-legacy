@@ -129,7 +129,13 @@
                             placeholder="${g.message(code:'placeholder.sex.select')}"
                             from="${species.auth.SUser$SexType?.values()}"
                             keys="${species.auth.SUser$SexType?.values()*.value()}"
-                            value="${user.sexType}"/>
+                            value="${user.sexType}"
+                            noSelection="${['null':'Select One...']}"/>
+                            <div class="help-inline">
+											<g:hasErrors bean="${user}" field="sexType">
+												<g:renderErrors bean="${user}" as="list" field="sexType" />
+											</g:hasErrors>
+										</div>
 							</div>
                         </div>
 
@@ -143,8 +149,14 @@
                             placeholder="${g.message(code:'placeholder.occupation.select')}"
                             from="${species.auth.SUser$OccupationType?.values()}"
                             keys="${species.auth.SUser$OccupationType?.values()*.value()}"
-                            value="${user.occupationType}"/>
-
+                            value="${user.occupationType}"
+							noSelection="${['null':'Select One...']}"
+                            />
+                            <div class="help-inline">
+											<g:hasErrors bean="${user}" field="occupationType">
+												<g:renderErrors bean="${user}" as="list" field="occupationType" />
+											</g:hasErrors>
+										</div>
 							</div>
                         </div>
                               <div
@@ -155,9 +167,14 @@
 								 <g:select name="institutionType" class="input" id="institutionType"
                             placeholder="${g.message(code:'placeholder.institution.select')}"
                             from="${species.auth.SUser$InstitutionType?.values()}"
-                            
-                            value="{user.institutionType}"/>
-
+                            value="{user.institutionType}"
+                            noSelection="${['null':'Select One...']}"
+                            />
+                            	<div class="help-inline">
+											<g:hasErrors bean="${user}" field="institutionType">
+												<g:renderErrors bean="${user}" as="list" field="institutionType" />
+											</g:hasErrors>
+										</div>
 							</div>
                         </div>
                         

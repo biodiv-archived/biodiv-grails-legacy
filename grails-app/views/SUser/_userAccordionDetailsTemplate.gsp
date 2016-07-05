@@ -24,10 +24,10 @@ h5{background-clolor:white;}
 }
 #totalscore {
     align-self: center;
-    background-color: #b0c4de;
     font-weight: bold;
     padding: 5px;
 }
+.badge{position:relative;background-color:#3a87ad;padding-left:9px;padding-right:9px;}
 </style>
  <div id=totalscore></div>
        
@@ -175,6 +175,14 @@ h5{background-clolor:white;}
           total += countarray[i] << 0;
         }
         //var logscore=
-        $("#totalscore").html('<div class="activity_score">Activity Score '+(Math.log10(total)).toFixed(2)+'</div>');
+        $("#totalscore").html('<div class="activity_score">Activity Score <span class="pull-right badge badge-info">'+Math.floor(Math.log10(total)*10)+'</span></div>');
         });
-        </asset:script>t>
+        $('.accordion-toggle').on('click',function(e){
+    if($(this).parents('.accordion-group').children('.accordion-body').hasClass('in')){
+        e.stopPropagation();
+    }
+    // You can also add preventDefault to remove the anchor behavior that makes
+    // the page jump
+     e.preventDefault();
+    });
+        </asset:script>
