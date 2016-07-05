@@ -290,7 +290,7 @@ class SUserController extends UserController {
 			//only admin interface has roles information while editing user profile
 			if(utilsService.isAdmin(springSecurityService.currentUser)) {
 				lookupUserRoleClass().removeAll user
-				addRoles user
+				addRoles user, false
 			}
 
 			userCache.removeUserFromCache user[usernameFieldName]
@@ -670,14 +670,14 @@ class SUserController extends UserController {
         render s;
     }
 
-	protected void addRoles(user) {
+	protected void addRoles(user, boolean flush=true) {
 		String upperAuthorityFieldName = GrailsNameUtils.getClassName(
 				SpringSecurityUtils.securityConfig.authority.nameField, null)
 
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
                 log.debug "Assigning role : ${key}" 
-				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), true
+				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), flush
 			}
 		}
 	}
