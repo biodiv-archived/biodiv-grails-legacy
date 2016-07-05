@@ -5,7 +5,7 @@
 
 
 
-<div id="project-sidebar" class="span4">
+<div id="project-sidebar" class="span4" style="margin-left:0px;">
   
     <div id="taxonBrowser">
         <div class="taxonomyBrowser sidebar_section" style="position:relative">

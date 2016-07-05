@@ -296,7 +296,7 @@ function drawVisualization(rows) {
             gD[d[i][0].getMonth()] = gD[d[i][0].getMonth()] + d[i][1]
         }
 
-        $("#temporalDist").sparkline(gD, {
+  /*      $("#temporalDist").sparkline(gD, {
             type: 'bar', 
             barWidth: 24,
             height:'108px',
@@ -319,7 +319,7 @@ function drawVisualization(rows) {
                 }
             }
         });
-
+*/
 /*    if(data.getNumberOfRows() > 0) {
     var grouped_dt = google.visualization.data.group (
             data, [{column:0, modifier:getMonth, type:'number', label:'MonthNo'}],

@@ -17,7 +17,7 @@
 
 			<p>If there are any errors or mistakes on the data and information provided on this site, we would greatly appreciate if you could bring them to our notice. We hope to evolve and grow with your contribution and participation.</p>
 
-			<p>For any technical feedback, please contact Mr. Kinley Tshering at ktshering [at] moaf.gov.bt <br /><br />For any content feedback, please contact Ms. Sangay Dema at sangaydema [at] moaf.gov.bt<br /> <br />Or write to us on our <a href="https://www.facebook.com/bhutanbiodiversityportal">facebook wall</a></p>
+			<p>For any technical feedback, please contact Ms. Kezang Wangmo at kwangmo [at] moaf.gov.bt <br /><br />For any content feedback, please contact Ms. Sangay Dema at sangaydema [at] moaf.gov.bt<br /> <br />Or write to us on our <a href="https://www.facebook.com/bhutanbiodiversityportal">facebook wall</a></p>
 			<p>&nbsp;</p>
 
 			<!--Feedback Form -->

@@ -68,27 +68,27 @@
 }
 
 .accordion ul li#species a {
-	background: url(../images/accordion/species.png) repeat scroll 0%;
+	background: url(/assets/all/accordion/species.png) repeat scroll 0%;
 }
 
 .accordion ul li#observations a {
-	background: url(../images/accordion/observations.png) repeat scroll 0%;
+	background: url(/assets/all/accordion/observations.png) repeat scroll 0%;
 }
 
 .accordion ul li#maps a {
-	background: url(../images/accordion/maps.png) repeat scroll 0%;
+	background: url(/assets/all/accordion/maps.png) repeat scroll 0%;
 }
 
 .accordion ul li#documents a {
-	background: url(../images/accordion/documents.png) repeat scroll 0%;
+	background: url(/assets/all/accordion/documents.png) repeat scroll 0%;
 }
 
 .accordion ul li#groups a {
-	background: url(../images/accordion/groups.png) repeat scroll 0%;
+	background: url(/assets/all/accordion/groups.png) repeat scroll 0%;
 }
 
 .accordion ul li#about-us a{
-	background: url('../images/accordion/about-us.png') repeat scroll 0%;
+	background: url('/assets/all/accordion/about-us.png') repeat scroll 0%;
 	border-right-style: none;
 }
 
@@ -195,11 +195,6 @@ html {
 	margin: 1px 7px 7px 1px;
 	padding: 0.5px;
 }
-
-.observations_list  {
-	width: 954px !important;
-}
-
 #imagelogo {
 	height:45px;
 	width:350px;
@@ -226,7 +221,7 @@ div.navbar.navbar-static-top.btn{
 
 /* Custom CSS */
 #ibp-header{
-	background:url('../images/header-bg.jpg') no-repeat top left !important;
+	background:url('/assets/all/header-bg.jpg') no-repeat top left !important;
 	border-bottom:1px solid #829c38 !important;
 }
 #ibp-header .navbar .nav>li>a{
