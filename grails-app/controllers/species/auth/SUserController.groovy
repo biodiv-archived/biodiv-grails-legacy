@@ -49,7 +49,8 @@ class SUserController extends UserController {
     def SUserSearchService;
     def messageSource;
     def speciesPermissionService;
-    
+    def sessionFactory;
+
 	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
 
@@ -269,7 +270,6 @@ class SUserController extends UserController {
 			user.website = (params.website && params.website.trim() != "") ? params.website.trim().split(",").join(", ") : null
 
 			user.language = utilsService.getCurrentLanguage(request);
-
 			if (!user.save(flush: true)) {
                 def model = utilsService.getErrorModel("Error in updating user instance", user, OK.value())
                 withFormat {
@@ -290,8 +290,10 @@ class SUserController extends UserController {
 			//only admin interface has roles information while editing user profile
 			if(utilsService.isAdmin(springSecurityService.currentUser)) {
 				lookupUserRoleClass().removeAll user
-				addRoles user, false
-			}
+                sessionFactory.currentSession.flush();
+                sessionFactory.currentSession.clear();
+				addRoles user
+            }
 
 			userCache.removeUserFromCache user[usernameFieldName]
             log.debug "Publishing User on SOLR" + user
@@ -677,7 +679,12 @@ class SUserController extends UserController {
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
                 log.debug "Assigning role : ${key}" 
+                try {
 				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), flush
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    log.error "Error while adding role ${key} to user ${user} "
+                }
 			}
 		}
 	}
