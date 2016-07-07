@@ -1,13 +1,13 @@
 <g:if test="${uploadList.size() > 0 }">
-	<div>
-		<table class="table table-hover tablesorter span8" style="margin-left: 0px;">
+	<div class="pre-scrollable">
+		<table class="table table-striped tablesorter span8" style="margin-left: 0px;">
 			<thead>
 				<tr>
 					<th><g:message code="speciesbulkuploadtable.start.date" /> </th>
 					<th><g:message code="speciesbulkuploadtable.end.date" /></th>
 					<th><g:message code="speciesbulkuploadtable.status" /></th>
 					<sUser:ifOwns model="['user':user]">
-						<th><g:message code="speciesbulkuploadtable.data.file" /></th>
+						<th class="col-xs-2"><g:message code="speciesbulkuploadtable.data.file" /></th>
 						<th><g:message code="speciesbulkuploadtable.log.file" /></th>
 						<th><g:message code="speciesbulkuploadtable.abort" /></th>
 						<th><g:message code="speciesbulkuploadtable.rollback" /></th>
