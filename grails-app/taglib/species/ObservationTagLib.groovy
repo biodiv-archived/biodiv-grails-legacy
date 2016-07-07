@@ -523,8 +523,8 @@ class ObservationTagLib {
 		out << "<td class=countvalue>"+noOfObvsSuggested+"</td>"
 	}
 			def showNoOfRecommendationsSuggested = {attrs, body->
-        def noOfObvsSuggested = ActivityFeed.findAllByAuthorAndActivityTypeAndActivityHolderType(attrs.model.user,attrs.model.activityType,attrs.model.activityHolderType).size()
-		out << "<td class=countvalue>"+noOfObvsSuggested+"</td>"
+        def noOfObvs = observationService.getAllRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
+		out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 }
 
