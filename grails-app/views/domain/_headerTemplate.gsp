@@ -213,7 +213,7 @@
 								title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a> </li>
 							<li
 								class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
-								href="/theportal" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a></li>	
+								href="/bbp/aboutus" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a></li>	
 						</ul>
 					</li>
 				</ul>

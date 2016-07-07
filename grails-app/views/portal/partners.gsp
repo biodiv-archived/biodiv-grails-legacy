@@ -16,14 +16,14 @@
 			<p>Currently, the following national agencies are the founding members of this consortium-based initiative, with the National Biodiversity Centre as the Secretariat to the consortium. However, as we progress, we foresee and welcome involvement of many more partners to this initiative and the consortium, both national and international.</p>
 
 			<ol style="list-style-type:none;">
-				<li><a href="http://www.nbc.gov.bt"><img alt="NBC" src="/${grailsApplication.config.speciesPortal.app.siteCode}/images/partners/nbc.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; National Biodiversity Centre</li>
-															<li><a href="http://www.moaf.gov.bt"><img alt="ICS" src="/${grailsApplication.config.speciesPortal.app.siteCode}/images/partners/ics.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Information and Communication Services, Ministry of Agriculture and Forests</li>
-																<li><a href="http://www.cnr.edu.bt"><img alt="CNR" src="/${grailsApplication.config.speciesPortal.app.siteCode}/images/partners/cnr.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; College of Natural Resources, Royal University of Bhutan, Lobeysa</li>
-					<li><a href="http://www.dofps.gov.bt"><img alt="DoFPS" src="/${grailsApplication.config.speciesPortal.app.siteCode}/images/partners/dofps.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Department of Forests and Parks Services represented by:
+				<li><a href="http://www.nbc.gov.bt"><img alt="NBC" src="/assets/all/partners/nbc.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; National Biodiversity Centre</li>
+															<li><a href="http://www.moaf.gov.bt"><img alt="ICS" src="/assets/all/partners/ics.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Information and Communication Services, Ministry of Agriculture and Forests</li>
+																<li><a href="http://www.cnr.edu.bt"><img alt="CNR" src="/assets/all/partners/cnr.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; College of Natural Resources, Royal University of Bhutan, Lobeysa</li>
+					<li><a href="http://www.dofps.gov.bt"><img alt="DoFPS" src="/assets/all/partners/dofps.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Department of Forests and Parks Services represented by:
 						<ul  style="list-style-type:none;">
-								<li><a href="http://www.uwice.gov.bt/"><img alt="UWICE" src="/${grailsApplication.config.speciesPortal.app.siteCode}/images/partners/uwice.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Ugyen Wangchuck Institute of Conservation and Environment</li>
-										<li><a href="http://dofps.gov.bt/ncd/"><img alt="WCD" src="/${grailsApplication.config.speciesPortal.app.siteCode}/images/partners/dofps.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Wildlife Conservation Division</li>
-												<li><a href="http://www.rdcyusipang.gov.bt"><img alt="RDC-Yusipang" src="/${grailsApplication.config.speciesPortal.app.siteCode}/images/partners/dofps.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; RNR-Research and Development Centre, Yusipang</li>
+								<li><a href="http://www.uwice.gov.bt/"><img alt="UWICE" src="/assets/all/partners/uwice.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Ugyen Wangchuck Institute of Conservation and Environment</li>
+										<li><a href="http://dofps.gov.bt/ncd/"><img alt="WCD" src="/assets/all/partners/dofps.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; Wildlife Conservation Division</li>
+												<li><a href="http://www.rdcyusipang.gov.bt"><img alt="RDC-Yusipang" src="/assets/all/partners/dofps.png" class="donors_logo" /></a>&nbsp;&nbsp;&nbsp;&nbsp; RNR-Research and Development Centre, Yusipang</li>
 													</ul>
 														</li>
 																</ol>

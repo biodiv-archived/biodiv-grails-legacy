@@ -173,7 +173,7 @@ speciesPortal {
     app.siteName = "Bhutan Biodiversity Portal"
     app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of Bhutan."
     app.homepageDescription = "A unique repository of information on India's biodiversity. The Portal aims to provide open and free access to biodiversity information. The portal enables widespread participation by all citizens in contributing to and accessing information on Indian biodiversity. We believe such open access benefits science and society, and contributes to sustainable future. Your participation is vital. We welcome your participation and feedback."
-    app.siteCode = 'ibp'
+    app.siteCode = 'bbp'
 
     app.twitterUrl = "https://twitter.com/inbiodiversity"
     app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
@@ -184,10 +184,10 @@ speciesPortal {
     data.rootDir = "${app.rootDir}/data"
     download.rootDir = "${data.rootDir}/datarep/downloads"
 
-    app.logo = "${appName}/images/bbp-logo.png"
-    app.favicon = "${appName}/images/favicon.ico"
-    app.govlogo = "${appName}/images/gov-logo.png"
-    app.dzongkha = "${appName}/images/accordion/dzongkha.png"
+    app.logo = "/assets/all/bbp-logo.png"
+    app.favicon = "/assets/all/favicon.ico"
+    app.govlogo = "/assets/all/gov-logo.png"
+    app.dzongkha = "/assets/all/accordion/dzongkha.png"
 
 
     app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]
