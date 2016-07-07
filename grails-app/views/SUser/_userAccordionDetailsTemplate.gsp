@@ -50,7 +50,7 @@ h5{background-clolor:white;}
         </thead>
         <tbody>
             <tr><td>Uploaded</td><obv:showNoOfObservationsCreated model="['user':user, 'userGroup':userGroupInstance]" /></tr>
-            <tr><td>Observation Identified</td><obv:showNoOfRecommendationsSuggested model="['user':user, 'userGroup':userGroupInstance]" /></tr>
+            <tr><td>Identified</td><obv:showNoOfRecommendationsSuggested model="['user':user, 'userGroup':userGroupInstance]" /></tr>
             <!-- <tr><td>ID agreed upon</td><obv:showNoOfAgreedUponOfUser model="['user':user, 'activityHolderType':"species.participation.RecommendationVote", 'activityType':"Agreed on species name"]" /></tr> -->
             <tr><td>Organized</td><obv:showNoOfOrganizedUponOfUser model="['user':user,'objectType':"species.participation.Observation"]" /></tr>
             <tr><td>Downloads</td><obv:showNoOfDownloadUponOfUser model="['user':user,'sourceType':"Observations"]" /></tr>
@@ -153,9 +153,9 @@ h5{background-clolor:white;}
         <th>Count</th>
         
         </thead>
-            <tr><td>Founded</td><td><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
-            <tr><td>Moderating</td><td><uGroup:showNoOfExpertUserGroups model="['userInstance':user]"></uGroup:showNoOfExpertUserGroups></td></tr>
-            <tr><td>Member of</td><uGroup:showNoOfMemberUserGroups model="['userInstance':user]"></uGroup:showNoOfMemberUserGroups><td></td></tr>
+            <tr><td>Founded</td><td class="countvalue"><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
+            <tr><td>Moderating</td><td class="countvalue"><uGroup:showNoOfExpertUserGroups model="['userInstance':user]"></uGroup:showNoOfExpertUserGroups></td></tr>
+            <tr><td>Member of</td><td class="countvalue"><uGroup:showNoOfMemberUserGroups model="['userInstance':user]"></uGroup:showNoOfMemberUserGroups></td></tr>
         </table>
     </div>
   </div>
