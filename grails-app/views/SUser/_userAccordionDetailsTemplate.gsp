@@ -4,7 +4,7 @@ h5{background-clolor:white;}
 .table td{padding:2px;}
 .accordion-inner-obv {
     border-top: 1px solid #e5e5e5;
-    padding: 9px 15px;
+    padding: 25px 15px;
 }
 .accordion-inner {
     border-top: 1px solid #e5e5e5;
@@ -50,8 +50,8 @@ h5{background-clolor:white;}
         </thead>
         <tbody>
             <tr><td>Uploaded</td><obv:showNoOfObservationsCreated model="['user':user, 'userGroup':userGroupInstance]" /></tr>
-            <tr><td>Reco suggested</td><obv:showNoOfRecommendationsSuggested model="['user':user, 'activityHolderType':"species.participation.RecommendationVote",activityType:"Suggested species name"]" /></tr>
-            <tr><td>Reco agreed upon</td><obv:showNoOfAgreedUponOfUser model="['user':user, 'activityHolderType':"species.participation.RecommendationVote", 'activityType':"Agreed on species name"]" /></tr>
+            <tr><td>Identified</td><obv:showNoOfRecommendationsSuggested model="['user':user, 'userGroup':userGroupInstance]" /></tr>
+            <!-- <tr><td>ID agreed upon</td><obv:showNoOfAgreedUponOfUser model="['user':user, 'activityHolderType':"species.participation.RecommendationVote", 'activityType':"Agreed on species name"]" /></tr> -->
             <tr><td>Organized</td><obv:showNoOfOrganizedUponOfUser model="['user':user,'objectType':"species.participation.Observation"]" /></tr>
             <tr><td>Downloads</td><obv:showNoOfDownloadUponOfUser model="['user':user,'sourceType':"Observations"]" /></tr>
             <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'commentHolderType':"species.participation.Observation"]" /></tr>
@@ -153,9 +153,9 @@ h5{background-clolor:white;}
         <th>Count</th>
         
         </thead>
-            <tr><td>Founded</td><td><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
-            <tr><td>Moderating</td><td><uGroup:showNoOfMemberUserGroups model="['userInstance':user]"></uGroup:showNoOfMemberUserGroups></td></tr>
-            <tr><td>Member of</td><td><uGroup:showNoOfExpertUserGroups model="['userInstance':user]"></uGroup:showNoOfExpertUserGroups></td></tr>
+            <tr><td>Founded</td><td class="countvalue"><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
+            <tr><td>Moderating</td><td class="countvalue"><uGroup:showNoOfExpertUserGroups model="['userInstance':user]"></uGroup:showNoOfExpertUserGroups></td></tr>
+            <tr><td>Member of</td><td class="countvalue"><uGroup:showNoOfMemberUserGroups model="['userInstance':user]"></uGroup:showNoOfMemberUserGroups></td></tr>
         </table>
     </div>
   </div>

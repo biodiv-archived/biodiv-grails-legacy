@@ -2,7 +2,7 @@
 <%@page import="species.utils.Utils"%>
 <style>
 .profilepic{position:relative;}
-.img-thumbnail{height:250px; border:1px groove;margin-left:10px; border-color:#f2f2f2;}
+.img-thumbnail{height:250px; max-width:250px; border:1px groove;margin-left:10px; border-color:#f2f2f2;}
 </style>
 
 <div class="observation_story" style="overflow: auto;">
@@ -15,7 +15,7 @@
 		</h5>
 	</g:if>
 
-	<div class="pull-left" style="padding-bottom: 10px;width:100%;">
+	<div class="pull-left" style="padding-bottom: 0px;width:100%;">
 	<div class="profilepic pull-right">
  <a
                         href="${uGroup.createLink(action:'show', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -94,14 +94,19 @@
 			</sUser:ifOwnsOrIsPublic>
 
 		</g:if>
-		<g:if test="${userInstance.location}">
+		
 			<div class="prop">
 				<span class="name"><i class="icon-map-marker"></i><g:message code="default.location.label" /></span>
 				<div class="value">
+        <g:if test="${userInstance.location}">
 					${userInstance.location}
+          </g:if>
+            <g:else>
+            ${"Not Provided"}
+            </g:else>
 				</div>
 			</div>
-		</g:if>
+		
 
 		 <div class="prop">
                         <span class="name"><i class="icon-time"></i><g:message code="default.member.since.label" /> </span>
@@ -121,19 +126,24 @@
                             </div>
                         </div>
                     </g:if>
-                     <g:if test="${userInstance.website}">
+                    
             <div class="prop">
                 <span class="name"><i class="icon-road"></i><g:message code="text.website" /></span>
                <div class="value pre-scrollable" style="display:block;height:20px;overflow-y: auto;">
                     <div class="linktext pull-left">
+                     <g:if test="${userInstance.website}">
                         ${userInstance.website}
+                        </g:if>
+                         <g:else>
+                          ${"Not Provided"}
+                        </g:else>
                     </div>
                 </div>
             </div>
-        </g:if>
+        
                     <div class="prop">
                         <span class="name" style="width: 150px;"> <g:message code="suser.show.intrested.species" /> &amp; <g:message code="default.habitats.label" /></span>
-                        <div class="value">
+                        <div class="value" style="display:block;height:65px;">
                             <span style="float:left;"><sUser:interestedSpeciesGroups model="['userInstance':userInstance]" /></span>
                             <span style="float:left;"><sUser:interestedHabitats model="['userInstance':userInstance]" /></span>
                         </div>
@@ -159,7 +169,7 @@
 		</g:if>
        <div class="prop">
                                 <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
-                                <div class="value pre-scrollable" style="display:block;height:80px;overflow-y: auto;">
+                                <div class="value pre-scrollable" style="display:block;max-height:90px;min-height:90px;height:120px;overflow-y: auto;">
                                             <g:if test="${userInstance.aboutMe}">
 
                                             <%  def styleVar = 'block';

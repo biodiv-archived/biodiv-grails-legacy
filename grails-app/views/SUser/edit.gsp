@@ -25,7 +25,6 @@
     background-color:white;
 }
 
-
 </style>
 </head>
 
@@ -122,7 +121,8 @@
 					
 						<div
 							class="control-group ${hasErrors(bean: user, field: 'sexType', 'error')}">
-							<label class="control-label" for="sex"><g:message
+							<label class="control-label" for="sex"><iclass="icon-user"></i>
+							<g:message
 									code='user.sex.label' default='${g.message(code:"default.sex.label")}' /> </label>
 							<div class="controls">
 								 <g:select name="sexType" class="input" id="sexType"
@@ -159,18 +159,18 @@
 										</div>
 							</div>
                         </div>
-                              <div
+                             <div
 							class="control-group ${hasErrors(bean: user, field: 'institutionType', 'error')}">
 							<label class="control-label" for="sex"><g:message
-									code='user.institution.label' default='${g.message(code:"default.institutiontype.label")}' /> </label>
+									code='user.institutiontype.label' default='${g.message(code:"default.institutiontype.label")}' /> </label>
 							<div class="controls">
 								 <g:select name="institutionType" class="input" id="institutionType"
-                            placeholder="${g.message(code:'placeholder.institution.select')}"
+                            placeholder="${g.message(code:'placeholder.occupation.select')}"
                             from="${species.auth.SUser$InstitutionType?.values()}"
-                            value="{user.institutionType}"
-                            noSelection="${['null':'Select One...']}"
+                            value="${user.institutionType}"
+							noSelection="${['null':'Select One...']}"
                             />
-                            	<div class="help-inline">
+                            <div class="help-inline">
 											<g:hasErrors bean="${user}" field="institutionType">
 												<g:renderErrors bean="${user}" as="list" field="institutionType" />
 											</g:hasErrors>

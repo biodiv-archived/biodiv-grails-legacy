@@ -102,9 +102,9 @@ class SUser {
     }
 
     public enum InstitutionType implements org.springframework.context.MessageSourceResolvable{
- 		FirmCorporation("Firm/Corporation"),
+ 		Corporation("Corporation"),
  		Government("Government"),
- 		Nongovernmental_organization("Nongovernmental organization"),
+ 		Non_governmental_organization("Non governmental organization"),
  		Educational_institution("Educational institution"),
  		Other("Other"),
 
@@ -119,9 +119,9 @@ class SUser {
 
 		static def toList() {
 			return [
- 		FirmCorporation,
+ 		Corporation,
  		Government ,
- 		Nongovernmental_organization,
+ 		Non_governmental_organization,
  		Educational_institution,
  		Other
 			]

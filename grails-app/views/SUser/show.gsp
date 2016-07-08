@@ -44,7 +44,7 @@
         .activity_count{
           background-color: white;
           padding: 5px 0px;
-          height: 540px
+          height: 520px
         }
         .userProfileSection .accordion{
           margin: 5px 0px;
@@ -81,13 +81,13 @@
         }
         .user_profile {
             background-color: white;
-            height: 540px;
+            height: 520px;
             padding: 15px;
             margin-bottom:10px;
         }
          .prop {    
             border-bottom:1px groove;
-            margin-bottom:8px;
+            margin-bottom:6px;
             overflow: auto;
             }
         .value{

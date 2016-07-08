@@ -154,7 +154,8 @@
 								 <g:select name="sexType" class="input-block-level" id="sexType"
                             placeholder="${g.message(code:'placeholder.sex.select')}"
                             from="${species.auth.SUser$SexType?.values()}"
-                            keys="${species.auth.SUser$SexType?.values()*.value()}"/>
+                            keys="${species.auth.SUser$SexType?.values()*.value()}"
+                            noSelection="${['null':'Select One...']}"/>
 
 									
 
@@ -169,7 +170,8 @@
 								 <g:select name="occupationType" class="input-block-level" id="occupationType"
                             placeholder="${g.message(code:'placeholder.occupation.select')}"
                             from="${species.auth.SUser$OccupationType?.values()}"
-                            keys="${species.auth.SUser$OccupationType?.values()*.value()}"/>
+                            keys="${species.auth.SUser$OccupationType?.values()*.value()}"
+                            noSelection="${['null':'Select One...']}" />
 
 							</div>
                         </div>
@@ -181,7 +183,8 @@
 								 <g:select name="institutionType" class="input-block-level" id="institutionType"
                             placeholder="${g.message(code:'placeholder.institution.select')}"
                             from="${species.auth.SUser$InstitutionType?.values()}"
-                            keys="${species.auth.SUser$InstitutionType?.values()*.value()}"/>
+                            
+                            noSelection="${['null':'Select One...']}"/>
 
 							</div>
                         </div>
