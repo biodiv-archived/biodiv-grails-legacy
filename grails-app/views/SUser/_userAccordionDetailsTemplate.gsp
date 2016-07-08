@@ -54,7 +54,7 @@ h5{background-clolor:white;}
             <!-- <tr><td>ID agreed upon</td><obv:showNoOfAgreedUponOfUser model="['user':user, 'activityHolderType':"species.participation.RecommendationVote", 'activityType':"Agreed on species name"]" /></tr> -->
             <tr><td>Organized</td><obv:showNoOfOrganizedUponOfUser model="['user':user,'objectType':"species.participation.Observation"]" /></tr>
             <tr><td>Downloads</td><obv:showNoOfDownloadUponOfUser model="['user':user,'sourceType':"Observations"]" /></tr>
-            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'commentHolderType':"species.participation.Observation"]" /></tr>
+            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'rootHolderType':"species.participation.Observation"]" /></tr>
             </tbody>
             </table>
         </ul>     
@@ -78,7 +78,7 @@ h5{background-clolor:white;}
         </thead>
             <tr><td>Contributed</td><s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></tr>
             <tr><td>Organized</td><s:showNoOfOrganizedSpecies model="['user':user,rootHolderType:'species.Species']"/></tr>
-            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'commentHolderType':"species.Species"]" /></tr>
+            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'rootHolderType':"species.Species"]" /></tr>
         </table>
     </div>
   </div>
@@ -100,7 +100,7 @@ h5{background-clolor:white;}
         </thead>
             <tr><td>Uploaded</td><obv:showNoOfDocsUploaded model="['user':user,'rootHolderType':"content.eml.Document",'activityType':"Document created"]" /></tr>
             <tr><td>Organized</td><obv:showNoofOrganizedDocs model="['user':user,'rootHolderType':"content.eml.Document"]" /></tr>
-            <tr><td>Comments</td><obv:showNoofCommentedDocs model="['user':user,'rootHolderType':"content.eml.Document",'activityType':"Added a comment"]" /></tr>
+            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'rootHolderType':"content.eml.Document"]" /></tr>
         </table>
     </div>
   </div>
@@ -120,8 +120,8 @@ h5{background-clolor:white;}
         <th>Count</th>
         </thead>
             <tr><td>Created</td><obv:showNoOfDiscussionCreated model="['user':user,'activityHolderType':"species.participation.Discussion",'activityType':"Discussion created"]" /></tr>
-            <tr><td>Participated</td><obv:showNoofParticipationDiscussion model="['user':user,'rootHolderType':"species.participation.Discussion",'activityType':"Added a comment"]" /></tr>
-            <tr><td>Organized</td><obv:showNoofOrganizedDiscussion model="['user':user,'activityHolderType':"species.participation.Discussion"]" /></tr>
+            <tr><td>Participated</td><obv:showNoofParticipationDiscussion model="['user':user,'rootHolderType':"species.participation.Discussion"]" /></tr>
+            <tr><td>Organized</td><obv:showNoOfCommentUponOfUser model="['user':user,'activityHolderType':"species.participation.Discussion"]" /></tr>
         </table>  
     </div>
   </div>

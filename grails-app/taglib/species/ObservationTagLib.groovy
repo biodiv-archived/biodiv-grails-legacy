@@ -13,6 +13,7 @@ import java.lang.Math;
 import species.participation.UsersResource;
 import species.participation.DownloadLog;
 import species.participation.Comment;
+import species.participation.Discussion;
 import species.participation.Flag;
 import species.participation.Featured;
 import species.participation.ActivityFeed;
@@ -467,11 +468,11 @@ class ObservationTagLib {
 			out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 		def showNoOfCommentUponOfUser={attrs, body->
-        def noOfObvs = Comment.findAllByAuthorAndCommentHolderType(attrs.model.user, attrs.model.commentHolderType).size();
+        def noOfObvs = Comment.findAllByAuthorAndRootHolderType(attrs.model.user, attrs.model.commentHolderType).size();
 		out <<  "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 		def showNoOfOrganizedUponOfUser={attrs, body->
-		String[] activityType=["obv locked","obv unlocked","Featured","UnFeatured","Flagged","Flag removed","Flag deleted","Checklist created"];
+		String[] activityType=["obv locked","obv unlocked","Featured","UnFeatured","Flagged","Flag removed","Flag deleted"];
 		def totalOrganizedObv=0;
 		activityType.each{
 		def noOfOrganizedOvb=ActivityFeed.findAllByAuthorAndActivityType(attrs.model.user,it).size()
@@ -481,12 +482,12 @@ class ObservationTagLib {
 
 	}
 	def showNoOfDiscussionCreated={attrs,body->
-		def noOfDiscussionCreated=ActivityFeed.findAllByAuthorAndActivityHolderTypeAndActivityType(attrs.model.user,attrs.model.activityHolderType,attrs.model.activityType).size()
+		def noOfDiscussionCreated=Discussion.findAllByAuthor(attrs.model.user).size()
 		out << "<td class=countvalue>"+noOfDiscussionCreated+"</td>"
 
 	}
 	def showNoOfDocsUploaded={attrs,body->
-		def noOfDocsUploaded=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
+		def noOfDocsUploaded=Document.findAllByAuthor(attrs.model.user).size()
 		out << "<td class=countvalue>"+noOfDocsUploaded+"</td>"
 
 	}
@@ -500,10 +501,10 @@ class ObservationTagLib {
 	}
 	out << "<td class=countvalue>"+totalDocsOrganized+"</td>";
 	}
-	def showNoofCommentedDocs={attrs,body->
-		def noOfDocsCommented=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
-		out << "<td class=countvalue>"+noOfDocsCommented+"</td>"
-	}
+	//def showNoofCommentedDocs={attrs,body->
+	//	def noOfDocsCommented=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
+	//	out << "<td class=countvalue>"+noOfDocsCommented+"</td>"
+	//}
 		def showNoofOrganizedDiscussion={attrs,body->
 		String[] activityType=["Posted resource","Featured","Flagged"]
 		def totalDiscussionOrganized=0;

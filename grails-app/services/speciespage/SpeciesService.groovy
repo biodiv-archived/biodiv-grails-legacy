@@ -2382,7 +2382,7 @@ def checking(){
 
         def sql =  Sql.newInstance(dataSource);
         def result
-         result = sql.rows("select count(DISTINCT species_field_contributors_id) from species_field_suser where suser_id=:userId",[userId:user.id]);
+         result = sql.rows("select count(DISTINCT b.species_id) from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id=:userId",[userId:user.id]);
         return (long)result[0]["count"];
     }
 	
