@@ -468,7 +468,7 @@ class ObservationTagLib {
 			out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 		def showNoOfCommentUponOfUser={attrs, body->
-        def noOfObvs = Comment.findAllByAuthorAndRootHolderType(attrs.model.user, attrs.model.commentHolderType).size();
+        def noOfObvs = Comment.findAllByAuthorAndRootHolderType(attrs.model.user, attrs.model.rootHolderType).size();
 		out <<  "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 		def showNoOfOrganizedUponOfUser={attrs, body->
