@@ -15,6 +15,10 @@ import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.NamePosition;
 import content.eml.Document;
 import species.Species;
+import species.CommonNames;
+import species.utils.Utils
+
+
 
 class NamelistController {
     
@@ -28,15 +32,15 @@ class NamelistController {
     def documentService;
     def speciesPermissionService;
 
-	/**
-	 * input : taxon id ,classification id of ibp 
-	 * @return A map which contain keys as dirty, clean and working list. Values of this key is again a LIST of maps with key as name and id
-	 * 
-	 */
-	def getNamesFromTaxon(){
+    /**
+     * input : taxon id ,classification id of ibp 
+     * @return A map which contain keys as dirty, clean and working list. Values of this key is again a LIST of maps with key as name and id
+     * 
+     */
+    def getNamesFromTaxon(){
         //input in params.taxonId
         def res = namelistService.getNamesFromTaxon(params)
-		//def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
+        //def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
         def result;
         if(res) {
             res['isAdmin'] = utilsService.isAdmin();
@@ -47,16 +51,16 @@ class NamelistController {
             json { render result as JSON }
             xml { render result as XML } 
         }
-	}
-	
-	/**
-	 * input : taxon id, classification id of ibp
-	 * @return All detail like kingdom, order etc
-	 */
-	def getNameDetails(){
+    }
+    
+    /**
+     * input : taxon id, classification id of ibp
+     * @return All detail like kingdom, order etc
+     */
+    def getNameDetails(){
         //input in params.taxonId
-		//[name:'aa', kingdom:'kk', .....]
-		def userLanguage = utilsService.getCurrentLanguage(request);   
+        //[name:'aa', kingdom:'kk', .....]
+        def userLanguage = utilsService.getCurrentLanguage(request);   
         def instance;
 
         def res = [:];
@@ -74,8 +78,8 @@ class NamelistController {
                 //def feedCommentHtml = g.render(template:"/common/feedCommentTemplate", model:[instance: instance, userLanguage:userLanguage]);
                 res = namelistService.getNameDetails(params);
                 res['success'] = true;
-				res['rootHolderType'] = instance.class.canonicalName
-				res['rootHolderId'] = instance.id
+                res['rootHolderType'] = instance.class.canonicalName
+                res['rootHolderId'] = instance.id
                 println "====CALL HERE NAME DETAILS====== " + res
                 println "========================================="
                 //fetch registry using taxon id and classification id
@@ -118,9 +122,9 @@ class NamelistController {
         }
         render res as JSON
         return;
-	}
-	
-	/**
+    }
+    
+    /**
      * input : string name and dbName
      * @return list of map where each map represent one result
      */
@@ -315,55 +319,168 @@ class NamelistController {
         }
         render res as JSON;
     }
-	
-	
-	/////////////////////////////// Name list API /////////////////////////////////
-	@Secured(['ROLE_ADMIN'])
-	def changeAccToSyn(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.changeAccToSyn(params.sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
-		render  res as JSON;
-	}
-	
-	@Secured(['ROLE_ADMIN'])
-	def changeSynToAcc(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
-		render  res as JSON;
-	}
-	
-	@Secured(['ROLE_ADMIN'])
-	def deleteName(params){
-		log.debug params
-		def res = [:]
-		boolean isParent = TaxonomyDefinition.read(params.id.toLong()).isParent()
+
+
+    /////////////////////////////// Name list API /////////////////////////////////
+    @Secured(['ROLE_ADMIN'])
+    def changeAccToSyn(params){
+        log.debug params
+        def res = [:]
+        res.status = namelistService.changeAccToSyn(params.sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
+        render  res as JSON;
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def changeSynToAcc(params){
+        log.debug params
+        def res = [:]
+        res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
+        render  res as JSON;
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def deleteName(params){
+        log.debug params
+        def res = [:]
+        boolean isParent = TaxonomyDefinition.read(params.id.toLong()).isParent()
         if(isParent){
           res.msg = "Taxon name has children "
           res.success = true
           render  res as JSON;  
           return
         }else{
-		  res.status = namelistService.deleteName(params.id.toLong())
-		  render  res as JSON;
+          res.status = namelistService.deleteName(params.id.toLong())
+          render  res as JSON;
         }
-	}
-	
-	@Secured(['ROLE_ADMIN'])
-	def mergeNames(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
-		render  res as JSON;
-	}
+    }
 
-	@Secured(['ROLE_ADMIN'])
-	def updatePosition(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.updateNamePosition(params.id.toLong(), params.position, params.hirMap)
-		render  res as JSON;
-	}
+    @Secured(['ROLE_ADMIN'])
+    def mergeNames(params){
+        log.debug params
+        def res = [:]
+        res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
+        render  res as JSON;
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def updatePosition(params){
+        log.debug params
+        def res = [:]
+        res.status = namelistService.updateNamePosition(params.id.toLong(), params.position, params.hirMap)
+        render  res as JSON;
+    }
+
+
+    def singleNameUpdate(){
+
+        println params;
+       
+
+        List errors = [];
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];
+        
+        if(params.int('taxonId')){
+            TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
+            println td;
+            if(td){            
+            // Editing Species Name only
+            if(td.name != params.page){
+                 List<String> givenNames = [params.page]
+                 NamesParser namesParser = new NamesParser();
+                 List<TaxonomyDefinition> parsedNames = namesParser.parse(givenNames);
+
+                 if(parsedNames){
+                    td.canonicalForm = parsedNames[0].canonicalForm;
+                    td.normalizedForm = parsedNames[0].normalizedForm;
+                    td.italicisedForm = parsedNames[0].italicisedForm;
+                    td.binomialForm = parsedNames[0].binomialForm;
+                    td.authorYear = parsedNames[0].authorYear;
+                    td.name = parsedNames[0].name;
+                        if(td.save(flush:true)){
+                            println "Taxon Updated successFully !";
+                            result['msg'] +="\n Name taxon updated"
+                            Species sp = Species.findByTaxonConcept(td);
+                            if(sp){
+                                sp.title = td.italicisedForm;
+                                if(sp.save(flush:true)){
+                                    println "Species Title Updated successFully !"+sp;
+                                    result['msg'] +="\n Name updated"
+                                }
+                            }
+                        }
+                 }
+            }else{
+                println "No change in Names"
+                result['msg'] += '\n No change in Names';
+            }
+
+            // hir Change
+            if(params?.newPath){
+                def fieldsConfig = grailsApplication.config.speciesPortal.fields
+                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+                if(speciesService.updateHierarchy(params.newPath,params?.taxonId.toLong(),classification.id)){
+                    result['msg'] += '\n Hierarchy updated';
+                }else{
+                    result['msg'] += '\n No change in Hierarchy';
+                }
+            }
+
+            // Changing position              
+            if(params.position && td.position != NamesMetadata.NamePosition.getEnum(params.position)){                                          
+                if(params.position.capitalize() == NamePosition.WORKING.value() || params.position.capitalize() == NamePosition.RAW.value() || params.position.capitalize() == NamePosition.CLEAN.value()){
+                  println "Prev postion changing from "+td.position+" to "+params.position.toUpperCase()
+                  def r = namelistService.updateNamePosition(params.taxonId.toLong(), params.position, params.hirMap)
+                  result['msg'] +="\n Position changed to "+params.position
+                }             
+            }else{
+                result['msg'] +="\n No change in position"
+                println "No change in current position ="+td.position+" params position"+params.position.toUpperCase();
+            }                
+        
+            //Changing status
+            if(params.status && td.status != NamesMetadata.NameStatus.getEnum(params.status)){  
+                println "Prev status changing from "+td.status+" to "+params.status.toUpperCase()
+                   if(params.status.capitalize() == NameStatus.ACCEPTED.value() ){                        
+                        println "needed hir updates"
+                        // Needed hir check
+                        def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null); 
+                        result['msg'] +="\n Status changed to "+params.status                       
+                    }else if(params.status.capitalize() == NameStatus.SYNONYM.value() ){
+                         println "Prev status changing from "+td.id+" to "+params.status
+                         if(params.newRecoId.toLong()){
+                            def reco = Recommendation.read(params.newRecoId.toLong());
+                            if(reco){
+                                    def r = namelistService.changeAccToSyn(td.id, reco.taxonConcept.id);
+                                    println "Accepted to synonym success";
+                                    result['msg'] +="\n Status changed to "+params.status
+                                }else{
+                                    println "newRecoId is null After reading";  
+                                }
+                            
+                          }else{
+                            println "newRecoId is null while";
+                          }
+                    }                
+                }else{
+                    result['msg'] +="\n No change in status"
+                    println "No Change in Current status ="+td.status+" params status"+params.status
+                }
+
+        withFormat {
+            html { }
+            json { render result as JSON }
+            xml { render result as XML }
+        } 
+     }
+    }
+
+            
+}
+
+    def test(){
+        println speciesService.updateHierarchy("1_2_3_65090_102_307",8206,6);
+        render "Its Working"
+    }
 
 }

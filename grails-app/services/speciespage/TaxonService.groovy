@@ -1159,4 +1159,29 @@ class TaxonService {
             return false
         }
     }
+
+    def updateHierarchy(path,taxonId,classificationId){
+    	def params = [taxonId:taxonId,classificationId:classificationId];
+    	def tr = (getTaxonReg(params))?:new TaxonomyRegistry();
+    	tr.taxonDefinition = TaxonomyDefinition.read(taxonId);
+    	tr.classification = Classification.get(classificationId);
+    	tr.path = path;
+    	def pathArr = path.split('_')
+    	def parentTaxonDefinition = (pathArr.length>1)?pathArr[-2]:'';
+    	if(parentTaxonDefinition){
+    		tr.parentTaxonDefinition=TaxonomyDefinition.get(parentTaxonDefinition.toInteger());
+    		tr.parentTaxon = getTaxonReg([taxonId:parentTaxonDefinition,classificationId:classificationId])
+    	}
+    	log.debug "Updating Taxon"+ tr
+        if(!tr.save(flush:true)){
+			tr.errors.allErrors.each { log.error it }
+			return false
+	   	}else{
+	   		tr.updateContributors([springSecurityService.currentUser]);
+	   		return true
+	   	}
+
+
+    }
+    
 }

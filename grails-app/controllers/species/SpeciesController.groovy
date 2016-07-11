@@ -1566,7 +1566,9 @@ class SpeciesController extends AbstractObjectController {
     							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
                             }
                         }
-						result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
+                        def fieldsConfig = grailsApplication.config.speciesPortal.fields;
+                        def cl = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+                        result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry?:taxonRegistry[cl], page:params.page]];
 						
 	                    result['taxonRegistry'] = [:];
 						
