@@ -190,7 +190,7 @@ speciesPortal {
     app.dzongkha = "/assets/all/accordion/dzongkha.png"
 
 
-    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]
+    app.notifiers_bcc = ["moafbhutan@gmail.com", "sdema06@gmail.com"]
 
     species {
         speciesDownloadDir = "${download.rootDir}/species"
@@ -1002,8 +1002,8 @@ grails.plugin.springsecurity.facebook.domain.classname='species.auth.FacebookUse
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails.mail.default.from="notification@indiabiodiversity.org"
-emailConfirmation.from="notification@indiabiodiversity.org"
+grails.mail.default.from="notification@biodiversity.bt"
+emailConfirmation.from="notification@biodiversity.bt"
 
 grails.plugin.springsecurity.password.algorithm = 'MD5'
 grails.plugin.springsecurity.password.hash.iterations = 1
@@ -1015,7 +1015,7 @@ grails.plugin.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}
 grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
 //grails.plugin.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
+grails.plugin.springsecurity.ui.notification.emailReplyTo = "kaylzangongmo@gmail.com";
 
 grails.plugin.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url"> dsfdsa here</a> to finish the registration and activate your account.'''
 //grails.plugin.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
