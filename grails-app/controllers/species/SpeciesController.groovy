@@ -1560,11 +1560,13 @@ class SpeciesController extends AbstractObjectController {
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
                         } else {
-							species = speciesUploadService.createSpeciesStub(taxon)
-							println "============================= creating species stub now for taxon " + taxon
-							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
+                            if(rank>8){
+    							species = speciesUploadService.createSpeciesStub(taxon)
+    							println "============================= creating species stub now for taxon " + taxon
+    							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
+                            }
                         }
-						result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
+						result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
 						
 	                    result['taxonRegistry'] = [:];
 						

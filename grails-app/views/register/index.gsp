@@ -1,5 +1,5 @@
+<%@ page import="species.auth.SUser"%>
 <html>
-
 <head>
 <g:set var="title" value="${g.message(code:'title.value.register')}"/>
 <g:render template="/common/titleTemplate" model="['title':title]"/>
@@ -62,8 +62,7 @@
 								<input
 									class="input-large focused ${(command.openId)?'readonly':''} "
 									id="email" type="text" value="${command.email}" name="email"
-									placeholder="${g.message(code:'placeholder.enter.emailid')}"
-									${(command.openId)?'readonly':''}>
+									placeholder="${g.message(code:'placeholder.enter.emailid')}">
 
 								<g:hasErrors bean="${command}" field="email">
 									<div class="help-inline">
@@ -143,6 +142,49 @@
 										<g:renderErrors bean="${command}" field="location" />
 									</div>
 								</g:hasErrors>
+
+							</div>
+							</div>
+
+						<div
+							class="control-group ${hasErrors(bean: command, field: 'sextype', 'error')}">
+							<label class="control-label" for="sex"><g:message
+									code='user.sex.label' default='${g.message(code:"default.sex.label")}' /> </label>
+							<div class="controls">
+								 <g:select name="sexType" class="input-block-level" id="sexType"
+                            placeholder="${g.message(code:'placeholder.sex.select')}"
+                            from="${species.auth.SUser$SexType?.values()}"
+                            keys="${species.auth.SUser$SexType?.values()*.value()}"
+                            noSelection="${['null':'Select One...']}"/>
+
+									
+
+							</div>
+                        </div>
+
+                        	<div
+							class="control-group ${hasErrors(bean: command, field: 'occupationtype', 'error')}">
+							<label class="control-label" for="sex"><g:message
+									code='user.occupation.label' default='${g.message(code:"default.occupationtype.label")}' /> </label>
+							<div class="controls">
+								 <g:select name="occupationType" class="input-block-level" id="occupationType"
+                            placeholder="${g.message(code:'placeholder.occupation.select')}"
+                            from="${species.auth.SUser$OccupationType?.values()}"
+                            keys="${species.auth.SUser$OccupationType?.values()*.value()}"
+                            noSelection="${['null':'Select One...']}" />
+
+							</div>
+                        </div>
+                             <div
+							class="control-group ${hasErrors(bean: command, field: 'institutiontype', 'error')}">
+							<label class="control-label" for="sex"><g:message
+									code='user.institution.label' default='${g.message(code:"default.occupationtype.label")}' /> </label>
+							<div class="controls">
+								 <g:select name="institutionType" class="input-block-level" id="institutionType"
+                            placeholder="${g.message(code:'placeholder.institution.select')}"
+                            from="${species.auth.SUser$InstitutionType?.values()}"
+                            
+                            noSelection="${['null':'Select One...']}"/>
 
 							</div>
                         </div>

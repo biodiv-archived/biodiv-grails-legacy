@@ -20,7 +20,127 @@ import species.utils.ImageUtils;
 import species.SpeciesPermission;
 import species.Language;
 import species.auth.OAuthID;
+import org.springframework.context.MessageSourceResolvable;
 class SUser {
+
+	public enum SexType implements org.springframework.context.MessageSourceResolvable{
+        Male("Male"),
+        Female("Female"),
+        
+
+        private String value;
+
+
+        SexType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+                Male,
+                Female
+			]
+		}
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+
+
+    }
+   
+    public enum OccupationType implements org.springframework.context.MessageSourceResolvable{
+        Agriculture("Agriculture"),
+		Business("Business"),
+		Education("Education"),
+		Government("Government"),
+		Research("Research"),
+		Student("Student"),
+		Other("Other"),
+        
+
+        private String value;
+
+
+        OccupationType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+ 		Agriculture,
+ 		Business,
+ 		Education,
+ 		Government,
+ 		Research,
+ 		Student,
+ 		Other
+			]
+		}
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+
+
+    }
+
+    public enum InstitutionType implements org.springframework.context.MessageSourceResolvable{
+ 		Corporation("Corporation"),
+ 		Government("Government"),
+ 		Non_governmental_organization("Non governmental organization"),
+ 		Educational_institution("Educational institution"),
+ 		Other("Other"),
+
+        private String value;
+        InstitutionType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+		static def toList() {
+			return [
+ 		Corporation,
+ 		Government ,
+ 		Non_governmental_organization,
+ 		Educational_institution,
+ 		Other
+			]
+		}
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+
+
+    } 
+
+    SexType sexType;
+    OccupationType occupationType;
+    InstitutionType institutionType;
 
 	transient springSecurityService
 	def aclUtilService
@@ -70,6 +190,10 @@ class SUser {
 		location nullable:true
 		lastLoginDate nullable:true
 		language nullable:false
+		sexType blank:true,nullable:true
+		occupationType nullable:true,blank:true
+		institutionType nullable:true,blank:true
+
 	}
 
 	static mapping = {
