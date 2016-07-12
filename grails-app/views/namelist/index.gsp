@@ -621,6 +621,7 @@
     <div style="margin-left: -48px;"><g:render template="/namelist/createPositionTemplate" model="[NamePosition:NamePosition,isPopup:true]" /></div>
     <div style="margin-left: -48px;"><g:render template="/namelist/createStatusTemplate" model="[NameStatus:NameStatus,isPopup:true]" /></div>
     <input type="hidden" name="FormName" class="checkFormName" value=""/>
+    <input type="hidden" name="namelistUI" class="namelistUI" value="true"/>
     <div class="btn btn-success singleNameUpdate">Save</div>
     </form>
   </div>  
@@ -750,6 +751,7 @@
                     isSearchCol=true;
                     var params = {};
                     var that = $(this);
+                    that.parent().find('#page').addClass('currentPage');
                     that.parent().find('input').each(function(index, ele) {
                         console.log($(ele).attr('name'));
                         if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
@@ -864,15 +866,21 @@
                 });
 
                 $('.singleNameUpdate').click(function(){
-                    var params = {}
-                    params['taxonId'] = $('.taxonId').val();
-                    params['status']   =$('#taxonHierarchyModal #statusDropDown').val();
-                    if(params['status'] == 'synonym'){
-                        params['newRecoId'] = $('.synToAccWrap').find('.recoId').val();
+
+                    if(!confirm("Are you sure to update?")) {
+                        processingStop();
+                        return false;
+                    } else {                     
+                        var params = {}
+                        params['taxonId'] = $('.taxonId').val();
+                        params['status']   =$('#taxonHierarchyModal #statusDropDown').val();
+                        if(params['status'] == 'synonym'){
+                            params['newRecoId'] = $('.synToAccWrap').find('.recoId').val();
+                        }
+                        params['position'] =$('#taxonHierarchyModal #positionDropDown').val();
+                        addSpeciesPage('/namelist/singleNameUpdate',params);
+                        return false;                   
                     }
-                    params['position'] =$('#taxonHierarchyModal #positionDropDown').val();
-                    addSpeciesPage('/namelist/singleNameUpdate',params);
-                    return false;                   
                 });
             });
 </asset:script>

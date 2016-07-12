@@ -808,6 +808,15 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
 }
 
 function openSpeciesPage(taxonId, colId, name){
+     var namelist=$('#addSpeciesPage').find('.namelistUI').val();
+    //alert(namelist);
+    if(namelist && $('#page').hasClass('currentPage')){
+        $('#page.currentPage').val(name);
+        $("#externalDbResults").modal('hide');
+        processingStop();
+        return;
+    }
+    //return ;
     var sourceComp = $(".input-prepend.currentTargetName");
     if(sourceComp.length > 0){
         var inputComp = sourceComp.children("input");
@@ -822,8 +831,7 @@ function openSpeciesPage(taxonId, colId, name){
             tr[rank] = reg.name;
             newpath += reg.id+"_";
         });
-        newpath = newpath.substring(0,newpath.length-1)
-        alert(newpath);
+        newpath = newpath.substring(0,newpath.length-1);
         $('.newTaxonPath').val(newpath);
         cacheResultForPopulate.requestParams.taxonRegistry=tr;
         updateHirInput(cacheResultForPopulate);
