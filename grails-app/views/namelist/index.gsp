@@ -500,11 +500,12 @@
                         </tr>
                         </g:each>
                     </table>
+                    <sUser:isAdmin>
                     <div>
                         <div class="btn btn-primary btn-large editNameAttr">Edit Name Attributes</div>
                         <!--button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary input-block-level pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:2px;">Save </button --> 
                     </div>
-
+                    </sUser:isAdmin>
 
                 </div>
                 
