@@ -20,9 +20,6 @@
   <asset:javascript src="/biodiv/app.js" />
   <asset:javascript src="/biodiv/controllers.js" />
   <asset:javascript src="/biodiv/services.js" />
-  <asset:javascript src="/biodiv/abstracttype.js" />
-
-    <asset:javascript src="/biodiv/observations/addResource.js" />
 
 
   <style>
@@ -52,18 +49,21 @@
       margin-left: 30px;
     }
     .list-group-item1{
-        position: relative;
-        height: 150px;
-    width: 150px;
-    margin: 0.5cm;
-    display: block;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
+      position: relative;
+      height: 150px;
+      width: 150px;
+      margin: 0.5cm;
+      display: block;
+      padding: 10px 15px;
+      /*border: 1px solid #ddd;*/
 
+    }
+    .bottom2 { 
+      width: 250px;   
     }
     .imgContainer{
     float:left;
-}
+    }
     .import-btn {
       margin-right: 20px;
     }
@@ -77,8 +77,8 @@
   <br/>
     <div class="col-md-3 col-sm-3">
     <ul class="list-group">
-     <li class="list-group-item">
-          <a ng-click="selectApp('Local')">My Computer</a>
+     <li class="list-group-item" ng-click="selectApp('Local')">
+          <a >My Computer</a>
         </li>
         <li class="list-group-item" ng-click="selectApp('Google')">
           <a >Google Drive</a>
@@ -114,7 +114,7 @@
         </li>
       </ul>
     </div>
-    <div class="col-md-6 col-sm-6">
+    <div class="col-md-9 col-sm-9">
     <a class="btn btn-primary pull-left glyphicon glyphicon-chevron-left" ng-if="showBackButton" ng-click="backButton()"></a>
     <div class="row filesPane">
         <div>
@@ -143,10 +143,8 @@
               <div ng-if="items.length == 0" style="text-align: center;">
                 No Files or Folders
               </div>
-              <div >
-                <div>
                 <div class="list-group filesutraItem"  >
-                    <a class="list-group-item" ng-repeat="item in items"  ng-if="item.type != 'file'" ng-click="selectItem(item)"
+                    <a class="list-group-item" ng-class-odd="{'color1':toggleObject}" ng-repeat="item in items"  ng-if="item.type != 'file'" ng-click="selectItem(item); toggleObject = !toggleObject"
                        ng-class="itemId.indexOf(item.id) > -1 && item.type != 'folder' ? 'selectedItem' : ''">
                      <i ng-class="item.type == 'file' ? 'glyphicon glyphicon-file' : 'glyphicon glyphicon-folder-open'"></i>
                       {{item.name}}
@@ -159,17 +157,12 @@
                       <ul class="list-group" ng-click="selectItem(item); toggleObject = !toggleObject">
                         <li class="list-group-item1" ng-class-odd="{'color1':toggleObject}" ng-class="itemId.indexOf(item.id) > -1 && item.type != 'folder' ? 'selectedItem' : ''" >
 
-                          <img  src="{{item.iconurl}}" height=75px width=75px style="margin-top: 23px;">
-                       <p style="overflow: hidden;white-space: nowrap;">{{item.name}}</p>
+                          <img  src="{{item.iconurl}}" class="img-responsive img-thumbnail" style="max-height:100%">
+                       <p style="overflow: hidden;white-space: nowrap;text-align: center;">{{item.name}}</p>
                        </li>
                       </ul>
-                        <button id="singlebutton" name="singlebutton" ng-disabled="isDisabled" class="btn btn-primary" ng-show="$last && showButton" ng-click="gettingList(1)">Load More</button> 
+                        <button id="singlebutton" name="singlebutton" ng-disabled="isDisabled" class="btn btn-primary bottom2" ng-show="$last && showButton" ng-click="gettingList(1)">Load More</button> 
                   </div>
-
-                </div>
-                
-              </div>
-
             </div>
           </div>
           
