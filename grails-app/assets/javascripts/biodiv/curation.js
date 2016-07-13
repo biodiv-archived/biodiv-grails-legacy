@@ -1034,7 +1034,20 @@ function updateHirInput(data){
         var taxonValue = isTaxon ? taxonRegistry[i] : taxonRanks[i].taxonValue;
         var ibpMatch = (taxonIBPHirMatch && taxonIBPHirMatch[i])?taxonIBPHirMatch[i]:undefined;
         var colMatch = (taxonCOLHirMatch && taxonCOLHirMatch[i])?taxonCOLHirMatch[i]:undefined;
-        taxonValue = (taxonValue!= undefined)?taxonValue:'';
+        if($.type(taxonValue) === "string" || taxonValue == undefined){
+            taxonValue = (taxonValue!= undefined)?taxonValue:'';
+        }else{
+            // taxonValue with obj
+            if(taxonValue!= undefined){
+                var dRank = getSelectedRank(taxonValue.rank,'name');
+                alert(dRank);
+                if(i = dRank){
+                    taxonValue = (taxonValue!= undefined)?taxonValue.name:'';
+                }else{
+                   taxonValue=''; 
+                }
+            }
+        }
         var bClass = 'btn-success disabled';
         var bText = 'Validated';
         if(taxonRanks[i].mandatory &&  !isTaxon ){
@@ -1115,14 +1128,12 @@ function validateSpeciesSuccessHandler(data, search){
         } 
         nameRank = data.rank;
         
-        updateGenusSelector(data);
-        
-        if(data.requestParams.taxonRegistry){
-          updateHirInput(data);
-        }
-        
-        genusTaxonMsg = data.requestParams.genusTaxonMsg
-        
+        if(!data.namelist){
+            if(data.requestParams.taxonRegistry){
+              updateHirInput(data);
+            }        
+            genusTaxonMsg = data.requestParams.genusTaxonMsg
+        }    
         if(search){
             showSearchPopup(data);
         }
@@ -2152,6 +2163,7 @@ function changeAccToSyn(me){
 function updatePosition(me){
     var position  = me.parent().find('.movePosition').val();
     var id = taxonGridSelectedRow[Object.keys(taxonGridSelectedRow)[0]].taxonid;
+    //var taxonids = taxonIdsFromSelectedRow(taxonGridSelectedRow);
    // alert("id "+id+" position "+position);
     if(id != '' && position != ''){ 
         var params ={ id:id,position:position}
@@ -2192,4 +2204,12 @@ function getSelectedRank(rank,search){
         return ;
     }
     
+}
+
+function taxonIdsFromSelectedRow(taxonGridSelectedRow){
+    var taxonIds = []
+    $.each(taxonGridSelectedRow, function (index, value) {
+        taxonIds.push(value.taxonid);
+    });
+    return taxonIds;
 }
