@@ -814,6 +814,7 @@ function openSpeciesPage(taxonId, colId, name){
         $('#page.currentPage').val(name);
         $("#externalDbResults").modal('hide');
         processingStop();
+        $('#page').removeClass('currentPage');
         return;
     }
     //return ;
