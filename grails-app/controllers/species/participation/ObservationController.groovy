@@ -551,7 +551,17 @@ def grailsCacheManager;
 				if(params.resources instanceof String) {
 						params.resources = [params.resources]
 				}
-				params.resources.each { f ->					
+				params.resources.each { f ->
+
+                def parsedVal, parsedRes;
+                 if(f instanceof String) {
+                        parsedRes = JSON.parse(f);
+                        parsedVal = parsedRes.containsKey('jobId')
+                    }else{
+                        parsedVal = false
+                    }
+                 if(parsedVal == false){     
+					
                     String mimetype,filename;
                     if(f instanceof String) {
                         f = JSON.parse(f);
@@ -640,7 +650,7 @@ def grailsCacheManager;
                             def url = f.url;
                             def fp = utilsService.filePickerSecurityCodes();
                             //modifying url to give permissions.
-                            url += '?signature=' + fp.signature +'&policy='+fp.policy
+                            //url += '?signature=' + fp.signature +'&policy='+fp.policy
 						    download(url, file );						
                         } else {
 						    f.transferTo( file );
@@ -650,6 +660,7 @@ def grailsCacheManager;
 						def type
                         def pi
 						if(resourcetype == resourceTypeImage){
+                            println "==== "+file.getAbsolutePath()+" ==== "+obvDir.toString();
 								pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
                                 //ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
 								def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
@@ -669,7 +680,11 @@ def grailsCacheManager;
                         else 
 						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
 					}
-				}
+				}else{
+                    resourcesInfo.add([fileName:parsedRes.file, url:'', thumbnail:parsedRes.thumbnail ,type:parsedRes.type, jobId:parsedRes.jobId]);
+
+                  }
+                }
 				
 				if(params.videoUrl) {
 					//TODO:validate url;
