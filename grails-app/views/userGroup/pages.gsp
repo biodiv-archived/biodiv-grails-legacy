@@ -29,7 +29,7 @@
         border: none
     }
     .tab-content {
-	    overflow: none;
+	    overflow: inherit;
 	}
 </style>
 </head>
