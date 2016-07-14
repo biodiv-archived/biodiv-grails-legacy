@@ -31,7 +31,7 @@
             <h4><g:message code="heading.browse.documents" /></h4>
             <div class="row">
             <div class="document-list span8 right-shadow-box" style="margin:0;">
-                <div class="list span8 right-shadow-box" style="margin: 0px;">
+                <div class="list span8 right-shadow-box">
                     <obv:showObservationFilterMessage />
                     <g:render template="/document/documentListTemplate" model="${model}"/>
                 </div>
