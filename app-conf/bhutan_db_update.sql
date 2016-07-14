@@ -156,11 +156,14 @@ ALTER TABLE taxonomy_definition ALTER COLUMN canonical_form SET NOT NULL;
 
 //adding place for super-family rank
 
-update taxonomy_definition set rank = 9 where rank = 8 ;
-update taxonomy_definition set rank = 8 where rank = 7 ;
-update taxonomy_definition set rank = 7 where rank = 6 ;
-update taxonomy_definition set rank = 6 where rank = 5 ;
-update taxonomy_definition set rank = 5 where rank = 4 ;
+update taxonomy_definition set rank = 2 where rank = 3 ;
+update taxonomy_definition set rank = 3 where rank = 5 ;
+update taxonomy_definition set rank = 5 where rank = 7 ;
+update taxonomy_definition set rank = 6 where rank = 8 ;
+update taxonomy_definition set rank = 7 where rank = 9 ;
+update taxonomy_definition set rank = 8 where rank = 10 ;
+update taxonomy_definition set rank = 9 where rank = 11 ;
+update taxonomy_definition set rank = 10 where rank = 12 ;
 
 //add columns to common name, synonyms and taxon def
 
@@ -206,27 +209,20 @@ ALTER TABLE taxonomy_definition add column is_flagged boolean;
 update taxonomy_definition set is_flagged = false;
 
 ////////////////**SYNONYM Migration**//////////////
-
+//////////////////////////////////////////////////
 RUN-APP to create SynonymsMerged table;
 then run these sqls
+/////////////////////////////////////////////////
 
-//12th March 2015
-//Synonyms migration to new table
+
 
 ALTER TABLE taxonomy_definition ADD COLUMN class varchar(255);
 update taxonomy_definition set class = 'species.TaxonomyDefinition';
 alter table taxonomy_definition alter column class set not null;
 
-
-
-////////////////**SYNONYM Migration**//////////////
-
-/**Adding flagging reason column**/
 ALTER TABLE taxonomy_definition DROP COLUMN flagging_reason;
 ALTER TABLE taxonomy_definition ADD COLUMN flagging_reason varchar(1500);
 
-//////////////////**OBSERVATION RECOMMENDATION**///////////////////
-//added on 8th april 2015
 ALTER TABLE recommendation add column is_flagged boolean;
 update recommendation set is_flagged = false;
 ALTER TABLE recommendation ALTER COLUMN flagging_reason type varchar(1500);
@@ -240,14 +236,8 @@ update taxonomy_definition set is_deleted = false;
 alter table taxonomy_definition drop column dirty_list_reason;
 alter table taxonomy_definition add column dirty_list_reason  varchar(1000);
 
-
-
 update taxonomy_definition set no_ofcolmatches = -99;
 update taxonomy_definition set position = NULL;
-
-/**
- *  Adding optimized column for case insenstive match
- */
 
 update recommendation set lowercase_name = lower(name); 
 update common_names set lowercase_name = lower(name); 
@@ -260,8 +250,6 @@ CREATE INDEX common_names_lowercase_name ON common_names(lowercase_name);
 
 ////////////////////////////////////// ENDS NAMELIST ///////////////////////////////////////////////
 
-//All files under /apps/git/biodiv/namelist
-//All logs under /apps/git/biodiv/namelist/logs
 
 1. Add IBP and col hierarchy using addIBPTaxonHie() in namelist_wikwio.groovy.
 
@@ -334,7 +322,7 @@ delete from recommendation where id in (select r.id from recommendation r left o
 
 
 ALTER TABLE species DROP COLUMN repr_image_id ;
-ALTER TABLE species DROP constraint fk8849413c32f2eca9 ;
+ALTER TABLE species DROP constraint if exists fk8849413c32f2eca9 ;
 
 
 
@@ -478,7 +466,6 @@ alter table observation alter column basis_of_record set  not null;
 insert into license(id,name) values (828,'UNSPECIFIED');
 
 select max(id) from activity_feed;
-alter sequence hibernate_sequence restart with ;
 
 update dataset set type='OBSERVATIONS';
 alter table dataset alter column type set not null;
@@ -535,12 +522,7 @@ create view checklist_species_locations as SELECT csv.id,
                     checklists cls
                         WHERE csv.id = obs.id AND obs.id = cls.id;
 
-drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
-select max(id) from document; select max(id) from observation; select max(id) from species; select max(id) from suser;
-create sequence document_id_seq start ;
-create sequence observation_id_seq start ;
-create  sequence species_id_seq start ; 
-create sequence suser_id_seq start ;
+
 
 #1st Feb 2016
 #Please stop app before running these queries
@@ -640,8 +622,6 @@ DROP TABLE IF EXISTS  tmp;
 DROP TABLE IF EXISTS  tmp1;
 
 #4thMar datasource and dataset seq
-create sequence datasource_id_seq start 1;
-create sequence dataset_id_seq start 1;
 alter table resource alter column access_rights type varchar(2055);
 
 #8 March
@@ -709,3 +689,18 @@ ALTER TABLE document ALTER COLUMN longitude TYPE double precision;
 
 alter table common_names add column is_deleted boolean not null default 'false';
 alter table synonyms add column is_deleted boolean not null default 'false';
+
+
+//after running old sql
+ALTER TABLE taxonomy_definition DROP CONSTRAINT taxonomy_definition_rank_canonical_form_key;
+delete from taxonomy_registry where classification_id = 7;		
+alter table activity_feed alter column activity_descrption type varchar(2000);
+alter table taxonomy_definition alter column activity_description type varchar(2000);
+alter sequence hibernate_sequence restart with 40000;
+
+drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
+select max(id) from document; select max(id) from observation; select max(id) from species; select max(id) from suser;
+create sequence document_id_seq start 100;
+create sequence observation_id_seq start 12000;
+create  sequence species_id_seq start 8000; 
+create sequence suser_id_seq start 1000;

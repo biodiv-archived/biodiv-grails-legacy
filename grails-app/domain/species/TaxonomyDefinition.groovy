@@ -74,6 +74,8 @@ class TaxonomyDefinition extends ScientificName {
 		version false;
 		tablePerHierarchy true
         defaultHierarchy type:'text'
+		activityDescription type:'text'
+		
 	}
 	
 	static transients = [ "doColCuration" ]
