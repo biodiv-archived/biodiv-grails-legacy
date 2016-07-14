@@ -713,6 +713,18 @@
                 }
                 return result;
             }
+
+            function checkpositionDropdown(selVal){
+                if((selVal == 'working' || selVal == 'clean') && $('#taxonHierarchyModal .checkFormName').val() != 'synonym'){
+                    var rank = $('#taxonHierarchyModal #rank').val();
+                    if(!checkHirInput(rank)){
+                        alert("Please fill & validate the Mandatory Hierarchy");                            
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            }
             
             $(document).ready(function() {
                 //$(".outer-wrapper").removeClass("container").addClass("container-fluid");               
@@ -809,7 +821,7 @@
                         
                         $('#taxonHierarchyModal #page').val($(".attributesBlock .scientificNameInput").val());
                         $('#taxonHierarchyModal #positionDropDown').val(position).data('prev',position);
-                        $('#taxonHierarchyModal #statusDropDown').val(statusDropDown);
+                        $('#taxonHierarchyModal #statusDropDown').val(statusDropDown).data('prev',statusDropDown);
                         $('#taxonHierarchyModal #rank').val(rankValue);
                         $('#taxonHierarchyModal #canName').val(canName);
                         
@@ -835,14 +847,10 @@
                     console.log(selVal);
                     if(selVal =='choosePosition')
                         return;
-                    if((selVal == 'working' || selVal == 'clean') && $('#taxonHierarchyModal .checkFormName').val() != 'synonym'){
-                        var rank = $('#taxonHierarchyModal #rank').val();
-                        if(!checkHirInput(rank)){
-                            alert("Please fill & validate the Mandatory Hierarchy");
-                            $(this).val($(this).data('prev'));
-                            return;
-                        }
-                    }
+                    if(!checkpositionDropdown(selVal)){
+                        alert("sadfsa");
+                        $(this).val($(this).data('prev'));
+                    }                  
                 });
 
                 $('#taxonHierarchyModal #statusDropDown').change(function(){
@@ -866,19 +874,41 @@
                         console.log(that.parent());
                 });
 
+                $('.synToAccWrap #page').change(function(){
+                    $('.synToAccWrap .recoId').val('');
+                });
                 $('.singleNameUpdate').click(function(){
-
-                    if(!confirm("Are you sure to update?")) {
-                        processingStop();
-                        return false;
-                    } else {                     
-                        var params = {}
+                    // Before Submit Validation
+                    var params = {}
                         params['taxonId'] = $('.taxonId').val();
                         params['status']   =$('#taxonHierarchyModal #statusDropDown').val();
                         if(params['status'] == 'synonym'){
                             params['newRecoId'] = $('.synToAccWrap').find('.recoId').val();
                         }
                         params['position'] =$('#taxonHierarchyModal #positionDropDown').val();
+
+                    if($('#taxonHierarchyModal #positionDropDown').data('prev') != params['position']){
+                        //check hir
+                         if(!checkpositionDropdown($('#taxonHierarchyModal #positionDropDown').val())){
+                            return false;
+                         }
+                    }
+                    //alert(params['status']);
+                    if($('#taxonHierarchyModal #statusDropDown').data('prev') != params['status']){
+                        if(params['status'] == 'synonym'){
+                      //      alert(params['newRecoId']);
+                            if(!params['newRecoId']){
+                                alert("Please choose the accepted value");
+                                return false;
+                            }
+                            console.log(params);
+                        }
+                    }
+
+                    if(!confirm("Are you sure to update?")) {
+                        processingStop();
+                        return false;
+                    } else {
                         addSpeciesPage('/namelist/singleNameUpdate',params);
                         return false;                   
                     }
