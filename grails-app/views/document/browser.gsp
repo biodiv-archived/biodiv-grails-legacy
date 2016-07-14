@@ -28,10 +28,10 @@
             <g:render template="/document/documentSubMenuTemplate" model="['entityName': entityName]" />
             <uGroup:rightSidebar/>
             <obv:featured model="['controller':params.controller, 'action':'related', 'filterProperty': 'featureBy', 'filterPropertyValue': true, 'id':'featureBy', 'userGroupInstance':userGroupInstance]" />
-            <h4><g:message code="heading.browse.documents" /></h4>
-            <div class="row">
-            <div class="document-list span8 right-shadow-box" style="margin-left:38px;">
-                <div class="list span8 right-shadow-box">
+            <h4><g:message code="heading.browse.documents" /></h4>            
+            <div class="row-fluid">
+            <div class="document-list span8 right-shadow-box" style="margin:0;">
+                <div class="list right-shadow-box">
                     <obv:showObservationFilterMessage />
                     <g:render template="/document/documentListTemplate" model="${model}"/>
                 </div>
