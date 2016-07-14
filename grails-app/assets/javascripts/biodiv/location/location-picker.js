@@ -87,7 +87,7 @@ function useTitle(obj){
     MapLocationPicker.prototype = {
 
         initialize : function(options) {
-            alert("initialize map");
+           // alert("initialize map");
             console.log('initializing map');
             var G = google.maps;
             this.M= L;
