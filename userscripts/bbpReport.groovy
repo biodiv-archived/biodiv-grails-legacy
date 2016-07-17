@@ -21,18 +21,20 @@ def bbpNames(){
 	def ds = ctx.getBean("dataSource");
 	ds.setUnreturnedConnectionTimeout(1000);
 
-	def header = ['id', 'name', 'canonicalForm', 'rank', 'Hierarchy', 'hirName']
+	def header = ['id', 'name', 'canonicalForm', 'rank',  'col-match-id'  ,'Hierarchy', 'hirName']
 
 	def rowList = []
 	rowList << header
 	
 	int i = 0
 	TaxonomyDefinition.list(sort:"rank", order:"asc").each { td ->
+		if(td.id > 10184)
+			return
 
 		println "Writing " + td + "   count " + (i++)
 
 		TaxonomyRegistry.findAllByTaxonDefinition(td).each { tr ->
-			def tRow = [td.id, td.name, td.canonicalForm, td.rank, getHir(tr),  tr.classification.name ]
+			def tRow = [td.id, td.name, td.canonicalForm, td.rank, td.matchId, getHir(tr),  tr.classification.name ]
 			rowList << tRow
 		}
 
@@ -47,7 +49,6 @@ def bbpNames(){
 
 }
 
-//bbpNames()
 
 def removeBBPHirLevel(){
 	def deleteId = [10185, 6926, 10187, 10188]
@@ -138,8 +139,40 @@ def curateAllAcceptedNames(){
 }
 
 
+def addBBPHirToName(){
+	def ds = ctx.getBean("dataSource");
+	ds.setUnreturnedConnectionTimeout(105000);
+
+	long totalCount = 10184L
+	long offset = 0
+        while(true){
+            List tds = TaxonomyDefinition.createCriteria().list(max:100, offset:offset) {
+				and {
+					le("id", totalCount)
+					order("rank", "asc")	
+					order("id", "asc")	
+				}
+				
+            }
+            if(tds.isEmpty()){
+                break
+            }
+            offset += 100
+            tds.each { td ->
+            	try{
+            		td.doColCuration = false
+            		td.postProcess()
+            	}catch(e){
+            		e.printStackTrace()
+            	}
+            }
+        }
+
+}
+
+//bbpNames()
 //addIBPTaxonHie()
 //downloadXML()
-curateAllAcceptedNames()
+//curateAllAcceptedNames()
 //testCurate(997L)
-
+addBBPHirToName()

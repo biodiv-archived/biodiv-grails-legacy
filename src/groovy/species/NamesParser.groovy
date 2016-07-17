@@ -25,7 +25,7 @@ class NamesParser {
 	 * @return List of IName objects
 	 */
 	List<TaxonomyDefinition> parse(List<String> names) {
-		log.debug "Parsing names : "+names;
+		//log.debug "Parsing names : "+names;
 		def cleanNames = [];
 		List<TaxonomyDefinition> parsedNames = new ArrayList<TaxonomyDefinition>();
 		for(name in names) {
@@ -36,7 +36,7 @@ class NamesParser {
 			def parsedNamesJSON = gniNamesParser(cleanNames);
 			parsedNames.addAll(getParsedNames(parsedNamesJSON));
 			cleanNames.clear();
-			log.debug "Finished parsing rest of the names";
+			//log.debug "Finished parsing rest of the names";
 		}
 
 		return parsedNames;

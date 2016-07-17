@@ -320,7 +320,7 @@ class NamelistService extends AbstractObjectService {
 
         long offset = 0
         int i = 0
-        while(true && (offset < totalCount)){
+        while(true){
             List tds = domainClass.createCriteria().list(max:BATCH_SIZE, offset:offset) {
 				and {
 					le("id", totalCount)
@@ -337,7 +337,7 @@ class NamelistService extends AbstractObjectService {
             }
             offset += BATCH_SIZE
             tds.each {
-				if(!it.matchId)
+				if(!it.matchId && !it.dirtyListReason)
                 	curateName(it, domainSourceDir);
             }
         }
@@ -348,9 +348,10 @@ class NamelistService extends AbstractObjectService {
         File f = new File(domainSourceDir, xmlFileName)
         log.debug  "===== starting " + f
         try{
-        	List colData = processColData( f );
+        	List colData = processColData(f, sciName);
         	curateName(sciName, colData);
         }catch(e){
+        	println "============= Failed for this taxon ============= " + sciName
         	e.printStackTrace()
         }
     }
@@ -441,9 +442,9 @@ class NamelistService extends AbstractObjectService {
                 colNames[colMatchVerbatim] << colMatch;
             }
             if(!colNames[sciName.normalizedForm]) {
-                log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
+                //log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
                 int noOfMatches = 0;
-                log.debug "Comparing now with CANONICAL + RANK"
+                //log.debug "Comparing now with CANONICAL + RANK"
                 def multiMatches = [];
                 colData.each { colMatch ->
                     if(colMatch.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
@@ -453,7 +454,7 @@ class NamelistService extends AbstractObjectService {
                     }
                 }
                 if(noOfMatches != 1) {
-                    log.debug "[CANONICAL+RANK : NO SINGLE MATCH] No single match on canonical+rank... leaving name for manual curation"
+                    //log.debug "[CANONICAL+RANK : NO SINGLE MATCH] No single match on canonical+rank... leaving name for manual curation"
                     dirtyListReason = "[CANONICAL+RANK: NO SINGLE MATCH] - NO PARENT TAXON MATCH - rank >= 9"
                     acceptedMatch = null;
                     //PARENT TAXON MATCH for rank below species
@@ -465,16 +466,16 @@ class NamelistService extends AbstractObjectService {
                         } 
                     }
                 } else {
-                    log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                    //log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                 }
             }
             else if(colNames[sciName.normalizedForm].size() == 1) {
                 //generate and compare verbatim. If verbatim matches with a single match accept. 
                 acceptedMatch = colNames[sciName.normalizedForm][0]
-                log.debug "[VERBATIM : SINGLE MATCH] Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
+                //log.debug "[VERBATIM : SINGLE MATCH] Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
             } else {
                 //checking only inside all matches of verbatim
-                log.debug "[VERBATIM: MULTIPLE MATCHES] There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
+                //log.debug "[VERBATIM: MULTIPLE MATCHES] There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
                 int noOfMatches = 0;
                 def multiMatches2 = []
                 colNames[sciName.normalizedForm].each { colMatch ->
@@ -489,9 +490,9 @@ class NamelistService extends AbstractObjectService {
                 }
                 if(noOfMatches == 1) {
                     //acceptMatch
-                    log.debug "[VERBATIM+RANK : SINGLE MATCH] Verbatim ${sciName.name} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                    //log.debug "[VERBATIM+RANK : SINGLE MATCH] Verbatim ${sciName.name} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                 } else if(noOfMatches == 0) {
-                    log.debug "[VERBATIM+RANK : NO MATCH] No match on verbatim + rank"
+                    //log.debug "[VERBATIM+RANK : NO MATCH] No match on verbatim + rank"
                     acceptedMatch = null;
                     //If verbatim shows no match, and the original has no author year, compare Canonical+ rank.  If matched with single match exists accept match. 
                     if(sciName.authorYear) {
@@ -514,7 +515,7 @@ class NamelistService extends AbstractObjectService {
                         }
                         if(noOfMatches == 1) {
                             //acceptMatch
-                            log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                            //log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                         } else {
                             acceptedMatch = null;
                             dirtyListReason = "[CANONICAL+RANK: MULTIPLE MATCH] Multiple matches even on canonical + rank. NO PARENT TAXON MATCH - rank >= 9"
@@ -530,7 +531,7 @@ class NamelistService extends AbstractObjectService {
                     }
                 } else if (noOfMatches > 1) {
                     acceptedMatch = null;
-                    log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. PARENT TAXON MATCH"
+                    //log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. PARENT TAXON MATCH"
                     dirtyListReason = "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. NO PARENT TAXON MATCH - rank >= 9"
                     //PARENT TAXON MATCH for rank below species
                     if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
@@ -547,7 +548,7 @@ class NamelistService extends AbstractObjectService {
         if(acceptedMatch) {
             //println "================ACCEPTED MATCH=========================== " + acceptedMatch
             if(acceptedMatch.parsedRank != sciName.rank) {
-                log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. But REJECTED AS RANK WAS CHANGING"
+                //log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. But REJECTED AS RANK WAS CHANGING"
                 sciName.noOfCOLMatches = colDataSize;
                 sciName.position = NamesMetadata.NamePosition.RAW;
                 sciName.dirtyListReason = "REJECTED AS RANK WAS CHANGING"
@@ -560,7 +561,7 @@ class NamelistService extends AbstractObjectService {
             //log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
 			return acceptedMatch                  
         } else {
-            log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
+            //log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
             sciName.noOfCOLMatches = colDataSize;
             sciName.position = NamesMetadata.NamePosition.RAW;
             sciName.dirtyListReason = dirtyListReason;
@@ -730,7 +731,7 @@ class NamelistService extends AbstractObjectService {
             }
         }
         if(noOfMatches == 1) {
-            log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
+            //log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
             return acceptedMatch;
         } else {
             log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
@@ -927,11 +928,11 @@ class NamelistService extends AbstractObjectService {
     //A scientific name was also passed to this function but not used - so removed
 	
     private def  addColHir(Map colAcceptedNameData) {
-        log.debug "------------------------------------------------------------------"
-        log.debug "------------------------------------------------------------------"
+        //log.debug "------------------------------------------------------------------"
+        //log.debug "------------------------------------------------------------------"
         //println "Adding COL hierarchy from ${colAcceptedNameData}"
-        log.debug "------------------------------------------------------------------"
-        log.debug "------------------------------------------------------------------"
+        //log.debug "------------------------------------------------------------------"
+        //log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
         //  but its id is present - so searching COL based on ID
         //  Might happen when name changes from accepeted to synonym
@@ -1006,7 +1007,7 @@ class NamelistService extends AbstractObjectService {
 				Utils.saveFiles(new File(grailsApplication.config.speciesPortal.namelist.rootDir), [sn], [])
 			}
         }
-		return _processColData(new XmlParser().parse(f))
+		return _processColData(new XmlParser().parse(f), sn)
     }
 	
 	List processColData(String colId) {
@@ -1025,12 +1026,19 @@ class NamelistService extends AbstractObjectService {
 		return res
 	}
 		
-	private _processColData(results){
+	private _processColData(results, ScientificName sn = null){
         try{
             String errMsg = results.'@error_message'
             int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
             if(errMsg != ""){
-                log.debug "Error in col response " + errMsg
+                log.debug "11Error in col response " + errMsg
+                if(sn){
+                	sn.dirtyListReason = "COL : " + errMsg
+                	log.debug "settting error " +  sn.dirtyListReason 
+                	if(!sn.save(flush:true)){
+                		sn.errors.allErrors.each { log.error it }
+                	}
+                }
                 return
             }
 
@@ -1599,7 +1607,7 @@ class NamelistService extends AbstractObjectService {
         }
         if(acceptedMatch) {
             //println "================ACCEPTED MATCH=========================== " + acceptedMatch
-            log.debug "There is an acceptedMatch ${acceptedMatch} for recommendation ${reco.name}. Updating link"
+            //log.debug "There is an acceptedMatch ${acceptedMatch} for recommendation ${reco.name}. Updating link"
             ScientificName sciName;
             //Search on IBP that name with status
             NameStatus nameStatus = getNewNameStatus(acceptedMatch.nameStatus);

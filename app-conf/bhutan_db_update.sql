@@ -569,7 +569,6 @@ update taxonomy_definition set species_id = s.sid from (select taxon_concept_id,
 
 #adding defaultHierarchy json to taxon_definition table
 alter table taxonomy_definition alter column default_hierarchy type text;
-update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 265799 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id;
 
 #7th feb 2016
 CREATE INDEX normalized_form_idx ON taxonomy_definition(normalized_form);
@@ -704,3 +703,7 @@ create sequence document_id_seq start 100;
 create sequence observation_id_seq start 12000;
 create  sequence species_id_seq start 8000; 
 create sequence suser_id_seq start 1000;
+
+//after adding bbp hir
+update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 40000 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id;
+update taxonomy_definition set position = 'WORKING' where match_id is not null;    

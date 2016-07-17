@@ -1852,7 +1852,7 @@ class XMLConverter extends SourceConverter {
                     //              }
 
                     def parsedName = parsedNames.get(i++);
-                    log.debug "Parsed name ${parsedName?.canonicalForm}"
+                    //log.debug "Parsed name ${parsedName?.canonicalForm}"
                     if(parsedName?.canonicalForm) {
                         //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
                         //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
@@ -1895,12 +1895,12 @@ class XMLConverter extends SourceConverter {
                         }
 
                         if(registry) {
-                            log.debug "Taxon registry already exists : "+registry;
+                            //log.debug "Taxon registry already exists : "+registry;
                             if(saveTaxonHierarchy)
                                 registry.updateContributors(getUserContributors(fieldNode.data))
                                 taxonEntities.add(registry);
                         } else if(saveTaxonHierarchy) {
-                            log.debug "Saving taxon registry entity : "+ent;
+                            //log.debug "Saving taxon registry entity : "+ent;
                             if(!ent.save()) {
                                 ent.errors.each { log.error it }
                             } else {
@@ -1976,7 +1976,7 @@ class XMLConverter extends SourceConverter {
                 }
 
                 def parsedName = parsedNames.get(i++);
-                log.debug "Parsed name ${parsedName?.canonicalForm}"
+                //log.debug "Parsed name ${parsedName?.canonicalForm}"
                 if(parsedName?.canonicalForm) {
                     //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
                     //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
@@ -2259,11 +2259,11 @@ class XMLConverter extends SourceConverter {
                     ent.parentTaxonDefinition = ent.parentTaxon?.taxonDefinition
                     ent.path = path;
                     if(saveTaxonHierarchy) {
-                        log.debug "Saving Taxon registry : " +  ent;
+                        //log.debug "Saving Taxon registry : " +  ent;
                         if(!ent.save(flush:true)) {
                             ent.errors.each { log.error it }
                         } else {
-                            log.debug "Saved taxon registry entity : "+ent;
+                            //log.debug "Saved taxon registry entity : "+ent;
                             ent.updateContributors(getUserContributors(fieldNode.data))
                             taxonEntities.add(ent);
                         }
