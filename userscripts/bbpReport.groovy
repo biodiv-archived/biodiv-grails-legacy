@@ -170,9 +170,22 @@ def addBBPHirToName(){
 
 }
 
+def synRecos(){
+	def nls = ctx.getBean("namesLoaderService");
+	nls.syncNamesAndRecos(false, false)
+}
+
+
+def synNames(){
+	def nls = ctx.getBean("namesIndexerService");
+	nls.rebuild()
+}
+
 //bbpNames()
+//testCurate(997L)
 //addIBPTaxonHie()
 //downloadXML()
 //curateAllAcceptedNames()
-//testCurate(997L)
-addBBPHirToName()
+//addBBPHirToName()
+//synRecos()
+synNames()

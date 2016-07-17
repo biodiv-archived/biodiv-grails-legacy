@@ -707,3 +707,8 @@ create sequence suser_id_seq start 1000;
 //after adding bbp hir
 update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 40000 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id;
 update taxonomy_definition set position = 'WORKING' where match_id is not null;    
+drop view tmp_taxon_concept;
+drop view tmp_common_names;
+
+//syning of names
+
