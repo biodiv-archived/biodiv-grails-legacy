@@ -276,6 +276,7 @@ class ChecklistService {
 					obvSubList.each { obv ->
 						if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
 							commonObsParams.id = obv.id
+							commonObsParams.checklistAnnotations = obv.checklistAnnotations
 							observationService.saveObservation(commonObsParams, false, false)
 						}
 					}
