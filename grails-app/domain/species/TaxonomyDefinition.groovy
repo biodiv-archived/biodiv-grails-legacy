@@ -74,6 +74,8 @@ class TaxonomyDefinition extends ScientificName {
 		version false;
 		tablePerHierarchy true
         defaultHierarchy type:'text'
+		activityDescription type:'text'
+		
 	}
 	
 	static transients = [ "doColCuration" ]
@@ -249,27 +251,31 @@ class TaxonomyDefinition extends ScientificName {
    
    
    private boolean _sanpToImmediateParent(TaxonomyRegistry sourceTr,  Classification targetHir){
-	   if(!sourceTr.parentTaxonDefinition){
-		   println "No parent "
-		   return false
-	   }
-	   if(sourceTr.parentTaxonDefinition.status != NameStatus.ACCEPTED){
+	   if(sourceTr.parentTaxonDefinition && (sourceTr.parentTaxonDefinition.status != NameStatus.ACCEPTED)){
 		   println "Immediate parent has following status " + sourceTr.parentTaxonDefinition.status
 		   return false
 	   }
+	   
 	   TaxonomyRegistry targetTr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(sourceTr.parentTaxonDefinition, targetHir)
 	   if(!targetTr){
 		   	println  "Immediate parent does not have ibp hir or this is the raw name at kingdom level " + this
-	   		return false
 	   }
 	   
 	   
 	   TaxonomyRegistry ibpTr = new TaxonomyRegistry()
-	   ibpTr.properties = targetTr.properties
-	   ibpTr.parentTaxon = targetTr
-	   ibpTr.parentTaxonDefinition = targetTr.taxonDefinition
+	   	if(targetTr){
+	   		ibpTr.properties = targetTr.properties
+	   		ibpTr.parentTaxon = targetTr
+	   		ibpTr.parentTaxonDefinition = targetTr.taxonDefinition
+	   		ibpTr.path = targetTr.path + "_" + sourceTr.taxonDefinition.id
+	   	}else{
+	   		ibpTr.classification = targetHir
+	   		ibpTr.parentTaxon = null
+	   		ibpTr.parentTaxonDefinition = null
+	   		ibpTr.path = sourceTr.taxonDefinition.id
+	   	}
+
 	   ibpTr.taxonDefinition = sourceTr.taxonDefinition
-	   ibpTr.path = targetTr.path + "_" + sourceTr.taxonDefinition.id
 	   ibpTr.contributors = null
 	   
 	   if(!ibpTr.save(flush:true)){
@@ -685,7 +691,7 @@ class TaxonomyDefinition extends ScientificName {
 		s += "Via Datasource : " + viaDatasource  + lineBreak
 		s += "Match Id : " + matchId + lineBreak
 
-		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
+		s += "Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
 		//s += "Number of COL Matches : " + noOfCOLMatches + lineBreak
 		if(isFlagged) {
 			s += "IsFlagged reason : " + flaggingReason.tokenize('###')[-1];

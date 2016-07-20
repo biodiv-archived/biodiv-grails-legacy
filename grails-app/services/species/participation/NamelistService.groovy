@@ -119,9 +119,10 @@ class NamelistService extends AbstractObjectService {
 			}
 		}
 		
-		if(res)
+		if(res){
+			//println "== FINAL SEARCH RESULT " + res
 			return res
-		
+		}
 		//println  "No result in Normalized form using canonical form now"
         res = clazz.withCriteria(){
 			and{
@@ -301,17 +302,17 @@ class NamelistService extends AbstractObjectService {
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
 	
-    def populateInfoFromCol(File sourceDir){
+    def populateInfoFromCol(File sourceDir, totalCount){
         if(!sourceDir.exists()){
             log.debug "Source dir does not exist. ${sourceDir} Aborting now..." 
             return
         }
 
-        curateName(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class)
+        curateName(new File(sourceDir, TaxonomyDefinition.class.simpleName), TaxonomyDefinition.class, totalCount)
         //curateName(new File(sourceDir, Synon//TaxonomyDefinition.findAllByCanonicalForm(canonicalForm)yms.class.simpleName), Synonyms.class)
     }
 
-    void curateName(File domainSourceDir, domainClass){
+    void curateName(File domainSourceDir, domainClass, totalCount){
         if(!domainSourceDir.exists()){
             log.debug "Source dir does not exist. ${domainSourceDir} Aborting now..."
             return
@@ -319,8 +320,15 @@ class NamelistService extends AbstractObjectService {
 
         long offset = 0
         int i = 0
-        while(true && (offset == 0)){
-            List tds = domainClass.list(max: BATCH_SIZE, offset: offset, sort: "rank", order: "desc")
+        while(true){
+            List tds = domainClass.createCriteria().list(max:BATCH_SIZE, offset:offset) {
+				and {
+					le("id", totalCount)
+					order("rank", "asc")	
+					order("id", "asc")	
+				}
+				
+            }
             tds.each {
                 log.debug  it.rank +  "    " + it.id + "   " +  it.canonicalForm
             }
@@ -329,16 +337,23 @@ class NamelistService extends AbstractObjectService {
             }
             offset += BATCH_SIZE
             tds.each {
-                curateName(it, domainSourceDir);
+				if(!it.matchId && !it.dirtyListReason)
+                	curateName(it, domainSourceDir);
             }
         }
     }
 
     void curateName (ScientificName sciName, File domainSourceDir) {
-        File f = new File(domainSourceDir, "" + sciName.id + ".xml")
+		String xmlFileName = sciName.canonicalForm.replaceAll(' ', '_') + ".xml"
+        File f = new File(domainSourceDir, xmlFileName)
         log.debug  "===== starting " + f
-        List colData = processColData( f );
-        curateName(sciName, colData);
+        try{
+        	List colData = processColData(f, sciName);
+        	curateName(sciName, colData);
+        }catch(e){
+        	println "============= Failed for this taxon ============= " + sciName
+        	e.printStackTrace()
+        }
     }
 
     void curateName (ScientificName sciName) {
@@ -354,13 +369,13 @@ class NamelistService extends AbstractObjectService {
     
 	def validateColMatch(ScientificName sciName, List colData) {
         //println "================LIST OF COL DATA=========================== " + colData
-        log.debug "=========== Curating name ${sciName} with col data ${colData}"
+        log.debug "=========== Curating name ${sciName} "
         def acceptedMatch;
-        int colDataSize = colData.size();
         String dirtyListReason;
         if(!colData) return;
-
-        //check if this is a single direct match
+		
+		int colDataSize = colData.size();
+		//check if this is a single direct match
         if(colData.size() == 1 ) {
             //Reject all (IBP)scientific name -> (CoL) common name matches (leave for curation).
             if(sciName.status != NameStatus.COMMON && colData[0].nameStatus == NamesMetadata.COLNameStatus.COMMON.value()) {
@@ -427,9 +442,9 @@ class NamelistService extends AbstractObjectService {
                 colNames[colMatchVerbatim] << colMatch;
             }
             if(!colNames[sciName.normalizedForm]) {
-                log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
+                //log.debug "[VERBATIM : NO MATCH] No verbatim match for ${sciName.name}"
                 int noOfMatches = 0;
-                log.debug "Comparing now with CANONICAL + RANK"
+                //log.debug "Comparing now with CANONICAL + RANK"
                 def multiMatches = [];
                 colData.each { colMatch ->
                     if(colMatch.canonicalForm == sciName.canonicalForm && colMatch.parsedRank == sciName.rank) {
@@ -439,7 +454,7 @@ class NamelistService extends AbstractObjectService {
                     }
                 }
                 if(noOfMatches != 1) {
-                    log.debug "[CANONICAL+RANK : NO SINGLE MATCH] No single match on canonical+rank... leaving name for manual curation"
+                    //log.debug "[CANONICAL+RANK : NO SINGLE MATCH] No single match on canonical+rank... leaving name for manual curation"
                     dirtyListReason = "[CANONICAL+RANK: NO SINGLE MATCH] - NO PARENT TAXON MATCH - rank >= 9"
                     acceptedMatch = null;
                     //PARENT TAXON MATCH for rank below species
@@ -451,16 +466,16 @@ class NamelistService extends AbstractObjectService {
                         } 
                     }
                 } else {
-                    log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                    //log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                 }
             }
             else if(colNames[sciName.normalizedForm].size() == 1) {
                 //generate and compare verbatim. If verbatim matches with a single match accept. 
                 acceptedMatch = colNames[sciName.normalizedForm][0]
-                log.debug "[VERBATIM : SINGLE MATCH] Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
+                //log.debug "[VERBATIM : SINGLE MATCH] Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
             } else {
                 //checking only inside all matches of verbatim
-                log.debug "[VERBATIM: MULTIPLE MATCHES] There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
+                //log.debug "[VERBATIM: MULTIPLE MATCHES] There are multiple col matches with canonical and just verbatim .. so checking with verbatim + rank ${sciName.rank}"
                 int noOfMatches = 0;
                 def multiMatches2 = []
                 colNames[sciName.normalizedForm].each { colMatch ->
@@ -475,9 +490,9 @@ class NamelistService extends AbstractObjectService {
                 }
                 if(noOfMatches == 1) {
                     //acceptMatch
-                    log.debug "[VERBATIM+RANK : SINGLE MATCH] Verbatim ${sciName.name} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                    //log.debug "[VERBATIM+RANK : SINGLE MATCH] Verbatim ${sciName.name} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                 } else if(noOfMatches == 0) {
-                    log.debug "[VERBATIM+RANK : NO MATCH] No match on verbatim + rank"
+                    //log.debug "[VERBATIM+RANK : NO MATCH] No match on verbatim + rank"
                     acceptedMatch = null;
                     //If verbatim shows no match, and the original has no author year, compare Canonical+ rank.  If matched with single match exists accept match. 
                     if(sciName.authorYear) {
@@ -500,7 +515,7 @@ class NamelistService extends AbstractObjectService {
                         }
                         if(noOfMatches == 1) {
                             //acceptMatch
-                            log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
+                            //log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                         } else {
                             acceptedMatch = null;
                             dirtyListReason = "[CANONICAL+RANK: MULTIPLE MATCH] Multiple matches even on canonical + rank. NO PARENT TAXON MATCH - rank >= 9"
@@ -516,7 +531,7 @@ class NamelistService extends AbstractObjectService {
                     }
                 } else if (noOfMatches > 1) {
                     acceptedMatch = null;
-                    log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. PARENT TAXON MATCH"
+                    //log.debug "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. PARENT TAXON MATCH"
                     dirtyListReason = "[VERBATIM+RANK: MULTIPLE MATCHES] Multiple matches even on verbatim + rank. NO PARENT TAXON MATCH - rank >= 9"
                     //PARENT TAXON MATCH for rank below species
                     if(noOfMatches > 1 && (sciName.rank < TaxonomyRank.SPECIES.ordinal())) {
@@ -531,9 +546,9 @@ class NamelistService extends AbstractObjectService {
         }
        
         if(acceptedMatch) {
-            println "================ACCEPTED MATCH=========================== " + acceptedMatch
+            //println "================ACCEPTED MATCH=========================== " + acceptedMatch
             if(acceptedMatch.parsedRank != sciName.rank) {
-                log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. But REJECTED AS RANK WAS CHANGING"
+                //log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. But REJECTED AS RANK WAS CHANGING"
                 sciName.noOfCOLMatches = colDataSize;
                 sciName.position = NamesMetadata.NamePosition.RAW;
                 sciName.dirtyListReason = "REJECTED AS RANK WAS CHANGING"
@@ -543,10 +558,10 @@ class NamelistService extends AbstractObjectService {
                 }
                 return;
             }
-            log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
+            //log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
 			return acceptedMatch                  
         } else {
-            log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
+            //log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
             sciName.noOfCOLMatches = colDataSize;
             sciName.position = NamesMetadata.NamePosition.RAW;
             sciName.dirtyListReason = dirtyListReason;
@@ -571,9 +586,7 @@ class NamelistService extends AbstractObjectService {
             acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
         }
         updateRank(sciName, acceptedMatch.parsedRank);            
-        //WHY required here??
-        //addIBPHierarchyFromCol(sciName, acceptedMatch);
-
+        
         //already updated in update attributes
         sciName.dirtyListReason = null;
         sciName.noOfCOLMatches = colDataSize;
@@ -596,6 +609,10 @@ class NamelistService extends AbstractObjectService {
             sciName.errors.allErrors.each { log.error it }
         }
 		
+		//WHY required here??
+		//XXX: comment this once bulk migration is over
+		addColHir(acceptedMatch);
+
 		sciName.addSynonymFromCol(acceptedMatch.synList)
 		return sciName
     }
@@ -660,7 +677,7 @@ class NamelistService extends AbstractObjectService {
             
 
             //WHY required here??
-            //addIBPHierarchyFromCol(sciName, acceptedMatch);
+            //addColHir(sciName, acceptedMatch);
             //}
 
             def position;
@@ -714,7 +731,7 @@ class NamelistService extends AbstractObjectService {
             }
         }
         if(noOfMatches == 1) {
-            log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
+            //log.debug "[PARENT TAXON MATCH : SINGLE MATCH]  Accepting ${acceptedMatch}"
             return acceptedMatch;
         } else {
             log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
@@ -755,8 +772,8 @@ class NamelistService extends AbstractObjectService {
             switch(newStatus) {
                 case NameStatus.ACCEPTED :
                 result = changeSynonymToAccepted(sciName, colMatch);
-                //sciName = result.lastTaxonInIBPHierarchy;        //changeSynonymToAccepted(sciName, colMatch);
-                result.sciName = result.lastTaxonInIBPHierarchy
+                sciName = result.lastTaxonInIBPHierarchy;        //changeSynonymToAccepted(sciName, colMatch);
+                //result.sciName = result.lastTaxonInIBPHierarchy
                 /*    
                 def result = speciesService.deleteSynonym(sciName.id);
                 if(!result.success) {
@@ -787,7 +804,7 @@ class NamelistService extends AbstractObjectService {
             if(sciName.status == NameStatus.ACCEPTED) {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
-                //result = addIBPHierarchyFromCol(colMatch);
+                result = addColHir(colMatch);
                 //sciName = result.lastTaxonInIBPHierarchy; 
                 //println "======STATUS MEIN SCINAME==== " + sciName
                 result.sciName = sciName //result.lastTaxonInIBPHierarchy;
@@ -863,7 +880,7 @@ class NamelistService extends AbstractObjectService {
         //if(acceptedNameList.size() == 0) {
             //create acceptedName
             log.debug "Creating/Updating accepted name of this synonym"
-            def result = addIBPHierarchyFromCol(colAcceptedNameData);
+            def result = addColHir(colAcceptedNameData);
             acceptedName = result.lastTaxonInIBPHierarchy;
         //}
         return acceptedName;
@@ -909,12 +926,13 @@ class NamelistService extends AbstractObjectService {
     }
         
     //A scientific name was also passed to this function but not used - so removed
-    private def  addIBPHierarchyFromCol(Map colAcceptedNameData) {
-        log.debug "------------------------------------------------------------------"
-        log.debug "------------------------------------------------------------------"
-        println "Adding IBP hierarchy from ${colAcceptedNameData}"
-        log.debug "------------------------------------------------------------------"
-        log.debug "------------------------------------------------------------------"
+	
+    private def  addColHir(Map colAcceptedNameData) {
+        //log.debug "------------------------------------------------------------------"
+        //log.debug "------------------------------------------------------------------"
+        //println "Adding COL hierarchy from ${colAcceptedNameData}"
+        //log.debug "------------------------------------------------------------------"
+        //log.debug "------------------------------------------------------------------"
         //  Because - not complete details of accepted name coming
         //  but its id is present - so searching COL based on ID
         //  Might happen when name changes from accepeted to synonym
@@ -923,10 +941,10 @@ class NamelistService extends AbstractObjectService {
             println "SEARCHING COL for this accepted id"
             colAcceptedNameData = searchCOL(colAcceptedNameData.id, 'id')[0];
             colAcceptedNameData['source'] = colAcceptedNameData.matchDatabaseName;
-            println colAcceptedNameData;
+            //println colAcceptedNameData;
             colAcceptedNameData.curatingTaxonId = temp;
         }
-        def classification = Classification.fetchIBPClassification()
+        def classification = Classification.fetchCOLClassification()
         Map taxonRegistryNamesTemp = fetchTaxonRegistryData(colAcceptedNameData).taxonRegistry;
         List taxonRegistryNames = [];
         taxonRegistryNamesTemp.each { key, value ->
@@ -954,7 +972,7 @@ class NamelistService extends AbstractObjectService {
                 fromCOL = true; 
             }
             println "===============++"
-            println colAcceptedNameData
+            //println colAcceptedNameData
             result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, fromCOL, colAcceptedNameData);
         //}
 
@@ -963,7 +981,7 @@ class NamelistService extends AbstractObjectService {
         //def colClassification = Classification.findByName(fieldsConfig.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY);
         //def result1 = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, colClassification, contributor, null, false, true, colAcceptedNameData);
         //def result = taxonService.addTaxonHierarchy(colAcceptedNameData.name, taxonRegistryNames, classification, contributor, null, false, true, colAcceptedNameData);
-        println result
+        //println result
         return result;
     }
 
@@ -989,7 +1007,7 @@ class NamelistService extends AbstractObjectService {
 				Utils.saveFiles(new File(grailsApplication.config.speciesPortal.namelist.rootDir), [sn], [])
 			}
         }
-		return _processColData(new XmlParser().parse(f))
+		return _processColData(new XmlParser().parse(f), sn)
     }
 	
 	List processColData(String colId) {
@@ -1008,12 +1026,19 @@ class NamelistService extends AbstractObjectService {
 		return res
 	}
 		
-	private _processColData(results){
+	private _processColData(results, ScientificName sn = null){
         try{
             String errMsg = results.'@error_message'
             int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
             if(errMsg != ""){
-                log.debug "Error in col response " + errMsg
+                log.debug "11Error in col response " + errMsg
+                if(sn){
+                	sn.dirtyListReason = "COL : " + errMsg
+                	log.debug "settting error " +  sn.dirtyListReason 
+                	if(!sn.save(flush:true)){
+                		sn.errors.allErrors.each { log.error it }
+                	}
+                }
                 return
             }
 
@@ -1026,7 +1051,7 @@ class NamelistService extends AbstractObjectService {
             List res = responseAsMap(results, "id")
 
             log.debug "================   Response map   =================="
-            log.debug res
+            //log.debug res
             /*log.debug "=========ui map ==========="
             def newRes = fetchTaxonRegistryData(res[0])
             //newRes['nameDbInstance'] = sciName
@@ -1373,7 +1398,7 @@ class NamelistService extends AbstractObjectService {
         sciName = TaxonomyDefinition.get(sciName.id);
         //Add IBP Hierarchy to this name
         //TODO Pass on id information of last node
-        def result = addIBPHierarchyFromCol(colMatch)
+        def result = addColHir(colMatch)
         //sciName = result.lastTaxonInIBPHierarchy;
         return result;
     }
@@ -1472,7 +1497,7 @@ class NamelistService extends AbstractObjectService {
     }
 
     private Map updateAttributes(ScientificName sciName, Map colMatch, doNotSearch = false) {
-        println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
+        //println "\n UPDATING ATTRIBUTES ${sciName} with ${colMatch}"
         boolean success = false;
         def errors = [];
         try {
@@ -1581,8 +1606,8 @@ class NamelistService extends AbstractObjectService {
             }
         }
         if(acceptedMatch) {
-            println "================ACCEPTED MATCH=========================== " + acceptedMatch
-            log.debug "There is an acceptedMatch ${acceptedMatch} for recommendation ${reco.name}. Updating link"
+            //println "================ACCEPTED MATCH=========================== " + acceptedMatch
+            //log.debug "There is an acceptedMatch ${acceptedMatch} for recommendation ${reco.name}. Updating link"
             ScientificName sciName;
             //Search on IBP that name with status
             NameStatus nameStatus = getNewNameStatus(acceptedMatch.nameStatus);
@@ -2389,7 +2414,7 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	private void updateStatusAndClass(ScientificName sciName, NameStatus status) {
-		sciName.relationship = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
+		//sciName.relationship = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
 		sciName.status = status
 		if(!sciName.save(flush:true)){
 			sciName.errors.allErrors.each { log.error it }
