@@ -198,7 +198,7 @@ speciesPortal {
     domain = "localhost"
     resources {
         rootDir = "${app.rootDir}/img"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/img"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/img"
         images {
             defaultType = "jpg"
             thumbnail {
@@ -223,13 +223,13 @@ speciesPortal {
     observations {
         rootDir = "${app.rootDir}/observations"
         observationDownloadDir = "${download.rootDir}/observations"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/observations"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/observations"
         //serverURL = "http://localhost/${appName}/observations"
         MAX_IMAGE_SIZE = 104857600
     } 
     userGroups {
         rootDir = "${app.rootDir}/userGroups"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/userGroups"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/userGroups"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -238,7 +238,7 @@ speciesPortal {
 
     datasource {
         rootDir = "${app.rootDir}/datasources"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/datasources"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/datasources"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -262,7 +262,7 @@ speciesPortal {
 
     maps {
         SRID = 4326;
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/maps"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/maps"
     }
 
     content{
@@ -478,7 +478,7 @@ speciesPortal {
     flushImmediately = true
     usersResource {
         rootDir = "${app.rootDir}/usersRes"
-        serverURL = "http://indiabiodiversity.localhost.org/${appName}/usersRes"   
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/usersRes"   
     }
 
     ibpMapDatabase {
@@ -507,7 +507,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
     development {
-        grails.serverURL = "http://indiabiodiversity.localhost.org/${appName}"
+        grails.serverURL = "http://localhost.indiabiodiversity.org/${appName}"
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
@@ -522,8 +522,8 @@ environments {
                 port = 25
             }
         }
-        ibp.domain='indiabiodiversity.localhost.org'
-        wgp.domain='thewesternghats.indiabiodiversity.localhost.org'
+        ibp.domain='localhost.indiabiodiversity.org'
+        wgp.domain='thewesternghats.localhost.indiabiodiversity.org'
         //grails.resources.debug=true
         //        grails.resources.mappers.hashandcache.excludes = ['**']
         //grails.resources.flatten = false
