@@ -26,6 +26,7 @@ DocSciName.list().each { docSciNameInstance ->
 
 def runGNRDService() {
     def dataSource =  ctx.getBean("dataSource");
+    dataSource.setUnreturnedConnectionTimeout(105000);
     def sql =  Sql.newInstance(dataSource);
 
     def dS = ctx.getBean("documentService");

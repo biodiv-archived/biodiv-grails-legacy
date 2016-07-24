@@ -771,7 +771,7 @@ println queryParts.queryParams
 					//println "========reader====="+reader.token_url;
 					tokenUrl = reader.token_url;
                      }
-                    response.'404' = { status = ObvUtilService.FAILED }
+                    response.'404' = {  println 'Not found' }
                     }
                     DocumentTokenUrl.createLog(documentInstance, tokenUrl);
                  
@@ -840,7 +840,7 @@ println queryParts.queryParams
       				status = ObvUtilService.FAILED
       			}
          	}
-            response.'404' = { status = ObvUtilService.FAILED }
+            response.'404' = {  println 'Not found' }
 
         }
         return [success: (status.equals(ObvUtilService.SUCCESS)) ? true : false, status:status, names:names, offsetMap:offset, parsedNameSetMap:parsedNameSet]
@@ -930,7 +930,7 @@ println queryParts.queryParams
                             println "========reader====="+reader.token_url;
                             tokenUrl = reader.token_url;
                         }
-                        response.'404' = { status = ObvUtilService.FAILED }
+                        response.'404' = { println 'Not found' }
                     }
                     DocumentTokenUrl.createLog(instance, tokenUrl);
                 }//IF
