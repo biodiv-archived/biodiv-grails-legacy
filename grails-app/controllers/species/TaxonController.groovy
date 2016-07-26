@@ -46,7 +46,6 @@ class TaxonController {
     def listHierarchy() {
         //cache "taxonomy_results"
         includeOriginHeader();
-
         int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0
         def parentId = params.id  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
@@ -352,6 +351,7 @@ class TaxonController {
      */
     private List buildHierarchyResult(rs, classSystem) {
         List result = [];
+        boolean hasContributorPermission = false;
         rs.each { r ->
             Map map = [:]
             String parentPath = "";
@@ -364,7 +364,6 @@ class TaxonController {
             } else {
                 id = r.path;
             }
-
             map['id'] = id
             map['parent'] = parentPath?:'#'
             map['text'] = r.name.trim()
@@ -387,10 +386,16 @@ class TaxonController {
             loaded : r.loaded ?:false,
             disabled  : false  // is the node disabled
             ]
-            
+            map['haspermission']=hasPermissionSpecies(params.user?.toInteger(),r["taxonid"]);
+            if(map['haspermission']==true){
+            map['li_attr'] = ['class':"permission_hilight"]  // attributes for the generated LI node
+        }
+       
+        else{
             map['li_attr'] = []  // attributes for the generated LI node
+        }
+            
             map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
-
             result << map
         }
         return result;
@@ -807,6 +812,17 @@ class TaxonController {
             render ([success:false, msg:"", errors:[]] as JSON)                                                                                       
         }
 
+    }
+        boolean hasPermissionSpecies(user,taxon){
+            def sql =  Sql.newInstance(dataSource);
+            def result
+            result = sql.rows("select a.*,b.id as species_id from species_permission a JOIN species b on a.taxon_concept_id=b.taxon_concept_id and a.author_id=:userId and a.taxon_concept_id=:taxonId",[userId:user,taxonId:taxon]);
+                   if(result){
+                    return true;
+                   }
+                   else {
+                    return false;
+                   }  
     }
 
 }

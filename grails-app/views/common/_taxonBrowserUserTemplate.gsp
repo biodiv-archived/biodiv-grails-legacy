@@ -4,7 +4,7 @@
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <g:if test="${classifications}">
-<select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
+<select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;display:none;">
     <g:each in="${classifications}" var="classification">
     <option value="${classification[0]}" ${(classification[1].id==selectedClassification || (!selectedClassification && (grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY).equalsIgnoreCase(classification[1].name)))?'selected':''}>
     ${classification[1].name} ${classification[2]?classification[2].toString():''}
@@ -28,9 +28,8 @@
     </div>
 </div>
 <div id="taxonHierarchy" class="emptyField" ${height?"style='height:"+height+"'":''}></div>
-<div class="role_name"></div>
 <div class="nameContainer">
-    <div id="searchTaxonBox" class="input-append input-block-level" style="margin-bottom:0px;">
+    <div id="searchTaxonBox" class="input-append input-block-level" style="margin-bottom:0px;display:none;">
         <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="${g.message(code:'species.taxondefinition.search.placeholder')}" />
         <span id="searchTaxonPrev" class="add-on btn searchTaxonPaginate">&lt;</span>
         <span id="searchTaxonNext" class="add-on btn searchTaxonPaginate">&gt;</span>
