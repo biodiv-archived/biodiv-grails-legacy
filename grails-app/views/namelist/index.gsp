@@ -51,6 +51,9 @@
 .disableSciName{
     opacity: 0.2;
 }
+.span12{
+    width :100% !important;
+}
 </style>
    </head>
     <body>
