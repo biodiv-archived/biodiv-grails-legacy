@@ -36,11 +36,8 @@
 <script>
 $(document).ready(function(){
     $("#distinctRecoIdentifiedTableAction").click(loadDistinctIdentifiedRecoList);
-    //$("#distinctRecoIdentifiedTableAction").click();
     $('.list').on('updatedGallery', function() {
-          // $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);  
            updateDistinctIdentifiedRecoTable();
-           //loadSpeciesGroupCount();
         });
 
     

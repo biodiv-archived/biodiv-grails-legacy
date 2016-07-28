@@ -27,6 +27,11 @@ h5{background-clolor:white;}
     font-weight: bold;
     padding: 5px;
 }
+.content_score,.curation_score{
+    padding:0px 65px 0px 30px;
+    font-size: 12px;
+    
+}
 .badge{position:relative;background-color:#3a87ad;padding-left:9px;padding-right:9px;}
 .activity_score{padding:2px;}
 .badge{background-color:#1a941d;}
@@ -186,8 +191,8 @@ h5{background-clolor:white;}
           for (var i = 0; i < countcontributedarray.length; i++) {
           totalcontributed += countcontributedarray[i] << 0;
           }
-        $("#totalcontributedscore").html('<div class="activity_score">Content Score<span class="pull-right">'+Math.floor(Math.log10(totalcontributed)*10)+'</span></div>');
-        $("#totalactivityscore").html('<div class="activity_score">Curation Score<span class="pull-right">'+Math.floor(Math.log10(total)*10)+'</span></div>');
+        $("#totalcontributedscore").html('<div class="content_score">Content Score<span class="pull-right">'+Math.floor(Math.log10(totalcontributed)*10)+'</span></div>');
+        $("#totalactivityscore").html('<div class="curation_score">Curation Score<span class="pull-right">'+Math.floor(Math.log10(total)*10)+'</span></div>');
         $("#activityscore").html('<div class="activity_score"><strong>Activity Score</strong><span class="pull-right badge badge-success">'+(Math.floor(Math.log10(totalcontributed)*10)+Math.floor(Math.log10(total)*10))+'</span></div>');
         });
 

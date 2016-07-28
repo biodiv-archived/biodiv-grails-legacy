@@ -39,9 +39,8 @@ display:inline !important; }
 <script>
 $(document).ready(function(){
     $("#distinctRecoTableAction").click(loadDistinctRecoList);
-    //$("#distinctRecoTableAction").click();
-   // console.log("println params"+window.location.pathname+window.location.search);
-  $('.list').on('updatedGallery', function() {
+    $("#distinctRecoTableAction").click();
+    $('.list').on('updatedGallery', function() {
         updateDistinctRecoTable();
         });
 });

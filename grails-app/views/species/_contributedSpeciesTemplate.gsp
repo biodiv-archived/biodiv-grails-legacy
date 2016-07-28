@@ -23,8 +23,7 @@
         title='${relatedInstanceDetails.title.replaceAll("</i>","").replaceAll("<i>","").replaceAll(">","")}>'>
                 <g:link url="${uGroup.createLink(controller:'species', action:'show', id:obvId) }">
                 <g:if test="${imagePath}">
-                <span class="img-polaroid" style="background-image:url('${imagePath}');">
-                </span>
+                <img class="img-polaroid" style="background-image:url('${imagePath}');" />
                 </g:if>
                 <g:else>
                 <span class="img-polaroid" title="${g.message(code:'showobservationsnippet.title.contribute')}" style="background-image:url(${createLinkTo( file:"no-image.jpg", base:grailsApplication.config.speciesPortal.resources.serverURL)});">
