@@ -80,11 +80,12 @@
         .list-group-submenu {
           margin-left:20px;
         }
-        .user_profile, .activity_count{
+         .activity_count{
             height: 550px;
             margin-bottom: 20px;
         }
         .user_profile {
+             height: 565px;
             background-color: white;
             padding: 15px;
             margin-bottom:10px;
@@ -146,9 +147,9 @@
                                             </a>
                                             <ul class="dropdown-menu">
                                                 <li><a href="#observations"><i class="icon-screenshot"></i><g:message code="default.observation.label" /></a></li>
-                                                <li><a href="#observations"><i class="icon-screenshot"></i><g:message code="default.species.label" /></a></li>
-                                                <li><a href="#identifications"><i class="icon-eye-open"></i><g:message code="suser.show.identifications" /></a></li>
-                                                <li><a href="#downloads"><i class="icon-download"></i><g:message code="suser.show.Downloads" /></a></li>
+                                                <li><a href="#species"><i class="icon-screenshot"></i><g:message code="default.species.label" /></a></li>
+                                                <li><a href="#documents"><i class="icon-eye-open"></i><g:message code="suser.show.documents" /></a></li>
+                                                <li><a href="#discussions"><i class="icon-download"></i><g:message code="suser.show.discussions" /></a></li>
                                             </ul>
                                     </li>
                                     <li class="divider-vertical"></li>
@@ -293,8 +294,11 @@ def contact_me_text=g.message(code:'button.contact.me')
                                             <g:message code="default.species.label" />
                                         </h5>
                                         <div id="species" class="section" style="clear:both;margin-left:20px;">
-                                             <h6>Contributed Species</h6>               
-                                                <s:showContributedSpecies model="['user':user.id,'id':contributedspecies,'controller':species,'action':related]"/>
+                                             <h6>
+                                                 <span class="name" style="color: #b1b1b1;"> 
+                                                    <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /> </span>
+                                             <g:message code="suser.show.contributedspecies" /></h6>               
+                                                <s:showContributedSpecies model="['user':user.id]"/>
                                         </div>
                                          <g:if test="${!namesReportList.isEmpty()}">
                                         <div id="namesValidationReports" class="section" style="clear: both;overflow:auto;">
@@ -461,7 +465,6 @@ def contact_me_text=g.message(code:'button.contact.me')
         <g:each in="${TaxonomyRank.list()}" var="t">
         taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
         </g:each>
-
     </script>
         <asset:script>
     $(document).ready(function() {

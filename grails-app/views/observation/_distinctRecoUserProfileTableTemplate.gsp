@@ -1,5 +1,9 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 <%@ page import="species.participation.Recommendation"%>
+<style>
+#distinctRecoTableAction {
+display:inline !important; }
+</style>
 <div id="distinctRecoList" class="sidebar_section" style="clear:both; border:1px solid #CECECE">
      <span class='pull-right'>
             <obv:download
@@ -30,7 +34,7 @@
         </g:each>
     </tbody>
 </table>
-<button id="distinctRecoTableAction" class="btn btn-mini pull-right" data-offset='0'><g:message code="msg.load.more" /> </button>
+<button id="distinctRecoTableAction" class="btn btn-mini pull-right" data-offset='10' style="display:inline;"><g:message code="msg.load.more" /> </button>
 </div>
 <script>
 $(document).ready(function(){

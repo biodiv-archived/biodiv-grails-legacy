@@ -8,13 +8,12 @@
 .panel {
   padding: 15px;
   margin-bottom: 20px;
-  background-color: #ffffff;
+  background-color: #CFEDE1;
   border: 1px solid #dddddd;
   border-radius: 4px;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
-h5 th{font-size:30px;}
 </style>
 <div class="panel">
 <h5>Life List</h5>

@@ -19,7 +19,6 @@ function loadDistinctRecoList() {
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
     var href = url.attr('path');
-    console.log("target="+href);
     var params = getFilterParameters(url);
     params['max'] = $(this).data('max');
     params['offset'] = $(this).data('offset');

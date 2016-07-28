@@ -219,7 +219,7 @@ class SpeciesTagLib {
 		out << "<td class=countvalue>"+totalNoOfOrganizedSpecies+"</td>";
 	}
 	def showContributedSpecies={attrs,body->
-		def species=speciesService.getImageFile(attrs.model.user)
+		def species=speciesService.getuserContributionList(attrs.model.user.toInteger())
 		out << render(template:"/species/contributedSpeciesTemplate", model:['user':attrs.model,'contributedSpecies':species]);
 
 	}

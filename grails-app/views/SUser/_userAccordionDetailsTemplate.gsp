@@ -31,8 +31,9 @@ h5{background-clolor:white;}
 .activity_score{padding:2px;}
 .badge{background-color:#1a941d;}
 </style>
+<div id=activityscore></div>
+<hr style="margin: 5px 0;">
  <div id=totalcontributedscore></div>
- <hr style="margin: 5px 0;">
   <div id=totalactivityscore></div>
 <div class="accordion" id="accordion2">
 <div class="accordion-group">
@@ -185,8 +186,9 @@ h5{background-clolor:white;}
           for (var i = 0; i < countcontributedarray.length; i++) {
           totalcontributed += countcontributedarray[i] << 0;
           }
-        $("#totalcontributedscore").html('<div class="activity_score"><strong>Contribution Score</strong> <span class="pull-right badge badge-success">'+Math.floor(Math.log10(totalcontributed)*10)+'</span></div>');
-        $("#totalactivityscore").html('<div class="activity_score"><strong>Participation Score</strong> <span class="pull-right badge badge-success">'+Math.floor(Math.log10(total)*10)+'</span></div>');
+        $("#totalcontributedscore").html('<div class="activity_score">Content Score<span class="pull-right">'+Math.floor(Math.log10(totalcontributed)*10)+'</span></div>');
+        $("#totalactivityscore").html('<div class="activity_score">Curation Score<span class="pull-right">'+Math.floor(Math.log10(total)*10)+'</span></div>');
+        $("#activityscore").html('<div class="activity_score"><strong>Activity Score</strong><span class="pull-right badge badge-success">'+(Math.floor(Math.log10(totalcontributed)*10)+Math.floor(Math.log10(total)*10))+'</span></div>');
         });
 
         $('.accordion-toggle').on('click',function(e){

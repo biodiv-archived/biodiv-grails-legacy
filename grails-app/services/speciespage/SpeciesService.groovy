@@ -2404,7 +2404,7 @@ def checking(){
         return finalResult;
     }
 
-    List getuserContributionList(int user,int max,Long offset){
+    List getuserContributionList(int user){
         def sql =  Sql.newInstance(dataSource);
         def userContribution
             userContribution = sql.rows("select DISTINCT b.species_id,b.description from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id::integer=:userId",[userId:user]);

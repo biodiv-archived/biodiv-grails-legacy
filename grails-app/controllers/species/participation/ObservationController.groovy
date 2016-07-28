@@ -1641,7 +1641,6 @@ def grailsCacheManager;
             } else {
                 distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
             }
-            println "distinctRecoListResult-=-=-=-=-=-=-=-="+distinctRecoListResult
             if(distinctRecoListResult.distinctRecoList.size() > 0) {
                 result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]
                 
