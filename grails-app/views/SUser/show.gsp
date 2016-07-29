@@ -84,7 +84,7 @@
             margin-bottom: 20px;
         }
         .user_profile {
-             height: 565px;
+             height: 558px;
             background-color: white;
             padding: 15px;
             margin-bottom:10px;
@@ -290,13 +290,14 @@ def contact_me_text=g.message(code:'button.contact.me')
                                         
                                     </div>    
                                     <div id="content" class="super-section" style="clear: both;">
-                                        <h5>
+
+                                        <div id="species" class="section" style="clear:both;margin-left:20px;">
+                                         <h5>
                                             <g:message code="default.species.label" />
                                         </h5>
-                                        <div id="species" class="section" style="clear:both;margin-left:20px;">
                                              <h6>
                                                  <span class="name" style="color: #b1b1b1;"> 
-                                                   <div class="noOfContributedSpecies"> <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></div> </span>
+                                                   <div class="noOfContributedSpecies" style="display:inline;"> <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></div> </span>
                                              <g:message code="suser.show.contributedspecies" /></h6>               
                                                 <s:showContributedSpecies model="['user':user.id]"/>
                                         </div>
@@ -499,7 +500,6 @@ def contact_me_text=g.message(code:'button.contact.me')
             $('#species').hide();
         }
     });
-
     </asset:script>
         </body>
 

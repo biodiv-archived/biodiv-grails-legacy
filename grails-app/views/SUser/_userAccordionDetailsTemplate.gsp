@@ -8,7 +8,7 @@ h5{background-clolor:white;}
 }
 .accordion-inner {
     border-top: 1px solid #e5e5e5;
-    padding: 65px 15px;
+    padding: 50px 15px;
 }
 .sidebar_section{margin-bottom:0px;}
 .sidebar_section h5 {
@@ -191,8 +191,8 @@ h5{background-clolor:white;}
           for (var i = 0; i < countcontributedarray.length; i++) {
           totalcontributed += countcontributedarray[i] << 0;
           }
-        $("#totalcontributedscore").html('<div class="content_score">Content Score<span class="pull-right">'+Math.floor(Math.log10(totalcontributed)*10)+'</span></div>');
-        $("#totalactivityscore").html('<div class="curation_score">Curation Score<span class="pull-right">'+Math.floor(Math.log10(total)*10)+'</span></div>');
+        $("#totalcontributedscore").html('<div class="content_score"><span class="icon-pencil"/><strong>Content Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(totalcontributed)*10)+'</strong></span></div>');
+        $("#totalactivityscore").html('<div class="curation_score"><span class="icon-tasks" /><strong>Curation Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(total)*10)+'</strong></span></div>');
         $("#activityscore").html('<div class="activity_score"><strong>Activity Score</strong><span class="pull-right badge badge-success">'+(Math.floor(Math.log10(totalcontributed)*10)+Math.floor(Math.log10(total)*10))+'</span></div>');
         });
 
