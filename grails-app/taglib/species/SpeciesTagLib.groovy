@@ -197,6 +197,13 @@ class SpeciesTagLib {
 	def noOfContributedSpecies={attrs,body->
 		def noOfSpecies=speciesService.totalContributedSpecies(attrs.model.user)
 
+		out << "<td class=countvaluecontributed>"+noOfSpecies+"</td>"
+
+	}
+	
+		def contriutedSnippet={attrs,body->
+		def noOfSpecies=speciesService.totalContributedSpeciesSnippet(attrs.model.user)
+
 		out << "<td class=countvalue>"+noOfSpecies+"</td>"
 
 	}
@@ -210,6 +217,11 @@ class SpeciesTagLib {
 			totalNoOfOrganizedSpecies=noOfOrganizedSpecies.size()+totalNoOfOrganizedSpecies
 		}
 		out << "<td class=countvalue>"+totalNoOfOrganizedSpecies+"</td>";
+	}
+	def showContributedSpecies={attrs,body->
+		def species=speciesService.getuserContributionList(attrs.model.user.toInteger())
+		out << render(template:"/species/contributedSpeciesTemplate", model:['user':attrs.model,'contributedSpecies':species]);
+
 	}
 
 }

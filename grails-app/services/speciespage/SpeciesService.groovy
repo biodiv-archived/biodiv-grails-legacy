@@ -1879,6 +1879,14 @@ class SpeciesService extends AbstractObjectService  {
             if (c[0] >0)
                 speciesCountWithContent += c[1];
         }
+        // Added for species count in namelist
+        if(count == 0){
+            def sc = Species.findByIsDeletedAndTaxonConcept(false, TaxonomyDefinition.read(params.taxon));
+            if(sc){
+              count++;  
+            }
+        }
+
         if(params.daterangepicker_start){
             queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
         }
@@ -2378,12 +2386,41 @@ def checking(){
          result = sql.rows("select count(*) from common_names where uploader_id=:userId",[userId:user.id]);
         return (long)result[0]["count"];
     }
-	    def totalContributedSpecies(user){
-
+	def totalContributedSpecies(user){
         def sql =  Sql.newInstance(dataSource);
         def result
         result = sql.rows("select count(DISTINCT b.species_id) from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id=:userId",[userId:user.id]);
         return (long)result[0]["count"];
+    }
+    def totalContributedSpeciesSnippet(user){
+        def sql =  Sql.newInstance(dataSource);
+        def result
+         result = sql.rows("select DISTINCT b.species_id from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id=:userId",[userId:user.id]);
+        return result;
+    }
+    def getImageFile(user){
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        result = sql.rows("select DISTINCT b.species_id from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id=:userId",[userId:user]);
+        def finalResult=[]
+         for (row in result) {
+            def species=row.getProperty("species_id");
+            def imageResult;
+          imageResult = sql.rows("select a.file_name from resource a JOIN species_resource b on a.id=b.resource_id AND b.species_resources_id=:speciesID;",[speciesID:species]);
+                finalResult.add('image':imageResult[0],'species':species);
+            }
+        return finalResult;
+    }
+
+    List getuserContributionList(int user){
+        def sql =  Sql.newInstance(dataSource);
+        def userContribution
+            userContribution = sql.rows("select DISTINCT b.species_id from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id::integer=:userId",[userId:user]);
+        def finalResult = []
+            for (row in userContribution) {
+                finalResult.add(Species.findById(row.getProperty("species_id")))
+            }
+            return finalResult;
     }
 	
 }
