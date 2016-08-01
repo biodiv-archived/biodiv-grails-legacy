@@ -2778,7 +2778,7 @@ println "******************************"
         def distinctIdentifiedQuery
         def queryParts = getFilteredObservationsFilterQuery(params) 
             if(params.sGroup!=829){
-                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" group by recoVote.recommendation_id order by count(*) desc"                
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" group by recoVote.recommendation_id order by count(*) desc"
                 }
              else{
                 distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true group by recoVote.recommendation_id order by count(*) desc"

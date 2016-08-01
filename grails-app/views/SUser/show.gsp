@@ -11,7 +11,6 @@
         <%@page import="content.eml.Document"%>
         <%@page import="species.Classification"%>
         <%@ page import="species.ScientificName.TaxonomyRank"%>
-
         <html>
         <head>
 
@@ -85,7 +84,7 @@
             margin-bottom: 20px;
         }
         .user_profile {
-             height: 565px;
+             height: 558px;
             background-color: white;
             padding: 15px;
             margin-bottom:10px;
@@ -194,6 +193,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                         def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'desc'])
                         def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'desc'])
                         def namesReportList = NamesReportGenerator.findAllByAuthor(user, [sort: 'startDate', order: 'desc'])
+                        
                     %>
                             <div class="container">
                                     <div id="content" class="super-section" style="clear: both;">
@@ -290,13 +290,14 @@ def contact_me_text=g.message(code:'button.contact.me')
                                         
                                     </div>    
                                     <div id="content" class="super-section" style="clear: both;">
-                                        <h5>
+
+                                        <div id="species" class="section" style="clear:both;margin-left:20px;">
+                                         <h5>
                                             <g:message code="default.species.label" />
                                         </h5>
-                                        <div id="species" class="section" style="clear:both;margin-left:20px;">
                                              <h6>
                                                  <span class="name" style="color: #b1b1b1;"> 
-                                                    <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /> </span>
+                                                   <div class="noOfContributedSpecies" style="display:inline;"> <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></div> </span>
                                              <g:message code="suser.show.contributedspecies" /></h6>               
                                                 <s:showContributedSpecies model="['user':user.id]"/>
                                         </div>
@@ -493,8 +494,12 @@ def contact_me_text=g.message(code:'button.contact.me')
           //$(this).tab('show');
           return false;
         })
+        var noOfContributedSpecies=$('.noOfContributedSpecies').text();
+        if(noOfContributedSpecies == 0)
+        {
+            $('#species').hide();
+        }
     });
-
     </asset:script>
         </body>
 
