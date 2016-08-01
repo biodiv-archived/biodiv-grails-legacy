@@ -3513,3 +3513,7 @@ margin-bottom:5px;
 .checkbox.inline.no_indent:last-child {
     margin-right: 0;
 }
+
+.image_info .span12{
+	width: 100% !important;
+}

@@ -1,6 +1,7 @@
 //= require jquery.plugins/jquery-ui-1.10.3.custom.min
 //= require bootstrap
 //= require jquery.plugins/jquery.jcarousel.min.js 
+//= require jquery.plugins/jquery.sparkline.min.js
 //= require biodiv/carousel.js 
 //= require bootstrap.plugins/bootstrap-multiselect.js
 //= require biodiv/main.js
@@ -51,7 +52,6 @@
 //= require bootstrap.plugins/bootstrap-combobox.js
 //= require biodiv/observations/map.js
 //= require biodiv/accordion.js
-
 
 //= require jquery.plugins/jquery.history.js
 //= require jquery.plugins/jquery.url.js
