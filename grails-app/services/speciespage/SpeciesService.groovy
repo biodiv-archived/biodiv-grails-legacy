@@ -1879,6 +1879,14 @@ class SpeciesService extends AbstractObjectService  {
             if (c[0] >0)
                 speciesCountWithContent += c[1];
         }
+        // Added for species count in namelist
+        if(count == 0){
+            def sc = Species.findByIsDeletedAndTaxonConcept(false, TaxonomyDefinition.read(params.taxon));
+            if(sc){
+              count++;  
+            }
+        }
+
         if(params.daterangepicker_start){
             queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
         }
