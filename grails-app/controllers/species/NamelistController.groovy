@@ -65,12 +65,18 @@ class NamelistController {
 
         def res = [:];
         try {
-            if(params.nameType?.equalsIgnoreCase(NameStatus.ACCEPTED.value())) {
+            /*if(params.nameType?.equalsIgnoreCase(NameStatus.ACCEPTED.value())) {
                 instance = TaxonomyDefinition.read(params.taxonId.toLong())
             } else if(params.nameType?.equalsIgnoreCase(NameStatus.SYNONYM.value())) {
                 instance = SynonymsMerged.read(params.taxonId.toLong())
             } else if(params.nameType?.equalsIgnoreCase(NameStatus.COMMON.value())) {
                 //TODO
+            }*/
+            def td = TaxonomyDefinition.read(params.taxonId.toLong());
+            if(td instanceof species.TaxonomyDefinition) {
+                instance = td
+            } else if(td instanceof species.SynonymsMerged) {                
+                instance = SynonymsMerged.read(params.taxonId.toLong())
             }
 
 

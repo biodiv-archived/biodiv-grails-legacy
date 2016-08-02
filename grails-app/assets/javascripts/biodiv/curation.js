@@ -626,8 +626,13 @@ function populateNameDetails(data){
     }
 
     $('.source').val(data['source']);
-    $(".via").val(data["sourceDatabase"]);
-    $(".id").val(data["matchId"]);
+    $(".via").val(data["via"]);
+    if(data["nameSourceId"] != null && data["nameSourceId"] != ""){ 
+        $('.id').val(data["nameSourceId"]); 
+    }else{ 
+        $('.id').val(data["matchId"]); 
+    }
+    /* $(".id").val(data["matchId"]); */
 
     setOption(document.getElementById("rankDropDown"), data["rank"]);
     setOption(document.getElementById("statusDropDown"), data["nameStatus"]);

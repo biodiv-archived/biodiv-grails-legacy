@@ -2414,7 +2414,7 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	private void updateStatusAndClass(ScientificName sciName, NameStatus status) {
-		//sciName.relationship = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
+		sciName.relationship = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
 		sciName.status = status
 		if(!sciName.save(flush:true)){
 			sciName.errors.allErrors.each { log.error it }
@@ -2422,13 +2422,12 @@ class NamelistService extends AbstractObjectService {
 
 		Map m = [id:sciName.id]
 		m['class'] = (status == NameStatus.SYNONYM) ? SynonymsMerged.class.canonicalName: TaxonomyDefinition.class.canonicalName
-		//m['relationship'] = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():''
-		//m['status'] = status.toString()
+		m['relationship'] = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():''
+		m['status'] = status.toString()
 
-		String query = "update taxonomy_definition set class = :class where id = :id";
+		String query = "update taxonomy_definition set class = :class,relationship = :relationship,status = :status where id = :id";
 		def sql = sessionFactory.getCurrentSession().createSQLQuery(query)
 		sql.setProperties(m).executeUpdate()
-
 	}
 	
 	private boolean mergeAccepted(oldName, newName){
