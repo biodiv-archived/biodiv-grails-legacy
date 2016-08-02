@@ -16,13 +16,15 @@ class SpeciesBulkUpload {
 	def utilsService
 	
 	public enum Status {
+		VALIDATION("VALIDATION"),
 		SCHEDULED("SCHEDULED"),
 		RUNNING("RUNNING"),
 		ABORTED("ABORTED"),
 		FAILED("FAILED"),
 		UPLOADED("UPLOADED"),
 		ROLLBACK("ROLLBACK"),
-		SUCCESS("SUCCESS")
+		SUCCESS("SUCCESS"),
+		VALIDATION_FAILED("VALIDATION FAILED")
 		
 		private String value;
 
@@ -71,7 +73,7 @@ class SpeciesBulkUpload {
 	static transients = [ "logFile" ]
 	
 	
-	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, String uploadType=null, Status status = Status.SCHEDULED){
+	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, String uploadType=null, Status status = Status.VALIDATION){
 		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes, uploadType:uploadType)
 		if(!sbu.save(flush:true)){
 			sbu.errors.allErrors.each { println it }
@@ -104,16 +106,18 @@ class SpeciesBulkUpload {
 		stubsCreated = res.stubsCreated
 	}
 	
-	def writeLog(String content){
+	def writeLog(String content, boolean isNameValidation = false){
 		if(!logFilePath){
 			String contentRootDir = Holders.config.speciesPortal.content.rootDir
-			logFile = utilsService.createFile("logFile.csv" , "species", contentRootDir)
+			String tmpFileName = isNameValidation ? "logFile.txt" : "logFile.csv"
+			logFile = utilsService.createFile(tmpFileName , "species", contentRootDir)
 			logFilePath = logFile.getAbsolutePath();
 			if(!this.save(flush:true)){
 				this.errors.allErrors.each { log.error it }
 			}
 			println "----------------------- logFile path " + logFilePath
-			logFile << "Name|Taxon Id|Status|Position|Rank|Col Id"
+			if(!isNameValidation)
+				logFile << "Name|Taxon Id|Status|Position|Rank|Col Id|Hir Names|Synonyms|Common Names"
 		}
 		
 		def ln = System.getProperty('line.separator')
