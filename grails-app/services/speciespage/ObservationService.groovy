@@ -95,7 +95,7 @@ class ObservationService extends AbstractMetadataService {
     def userGroupService;
     def activityFeedService;
     def SUserService;
-    //def speciesService;
+    def speciesService;
     def messageSource;
     def resourcesService;
     def request;
@@ -390,6 +390,10 @@ class ObservationService extends AbstractMetadataService {
         else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
         }
+        else if(params.filterProperty == "contributedSpecies") {
+           relatedObv = speciesService.getuserContributionList(params.filterPropertyValue.toInteger(),max,offset)
+           
+        } 
         
         else{
             if(params.id) {
@@ -399,7 +403,7 @@ class ObservationService extends AbstractMetadataService {
             }
         }
 
-        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources') ){
+        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources')&&(params.filterProperty!='contributedSpecies') ){
             //def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
             //println group.webaddress
             relatedObv.observations.each { map ->
@@ -487,6 +491,7 @@ class ObservationService extends AbstractMetadataService {
         observations.each {
             result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
         }
+        println "observation result"+result
         return ["observations":result, "count":count[0]["count"]]
     }
 
@@ -2772,18 +2777,29 @@ println "******************************"
         return (long)result[0]["count"];
     }
 
-    def getDistinctIdentifiedRecoList(params, int max, int offset) {   
+    def getDistinctIdentifiedRecoList(params, int max, int offset) {  
         def sql =  Sql.newInstance(dataSource);
         def distinctIdentifiedRecoList = [];
         def distinctIdentifiedQuery
-        def queryParts = getFilteredObservationsFilterQuery(params) 
+        def queryParts = getFilteredObservationsFilterQuery(params)
+        if(params.userGroup)
+        { 
             if(params.sGroup!=829){
-                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" group by recoVote.recommendation_id order by count(*) desc"
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc"
+                }
+             else{
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc"
+                }
+        }
+         else
+        { 
+            if(params.sGroup!=829){
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+"  group by recoVote.recommendation_id order by count(*) desc"
                 }
              else{
                 distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true group by recoVote.recommendation_id order by count(*) desc"
                 }
-
+        }
                 def distinctIdentifiedRecoListResult =sql.rows(distinctIdentifiedQuery)
                 distinctIdentifiedRecoListResult.each {it->
                 def reco = Recommendation.read(it['voteid']);

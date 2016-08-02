@@ -2404,15 +2404,21 @@ def checking(){
         return finalResult;
     }
 
-    List getuserContributionList(int user){
+    Map getuserContributionList(int user,int limit,long offset){
         def sql =  Sql.newInstance(dataSource);
         def userContribution
-            userContribution = sql.rows("select DISTINCT b.species_id from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id::integer=:userId",[userId:user]);
-        def finalResult = []
-            for (row in userContribution) {
-                finalResult.add(Species.findById(row.getProperty("species_id")))
+            def count
+            count = sql.rows("select count(DISTINCT b.species_id) from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id::integer=:userId",[userId:user]);
+            userContribution = sql.rows("select DISTINCT b.species_id from species_field_suser a JOIN species_field b ON a.species_field_contributors_id=b.id AND a.suser_id::integer=:userId limit :max offset :offset",[userId:user,max:limit,offset:offset]);
+            def result = [];
+        def observations = []
+         for (row in userContribution) {
+               observations.add(Species.findById(row.getProperty("species_id")))
             }
-            return finalResult;
+        observations.each {
+            result.add(['observation':it, 'title':((it.fetchSpeciesCall()).replaceAll("<i>","")).replaceAll("</i>","")]);
+        }
+        return ["observations":result, "count":count[0]["count"]]
     }
 	
 }
