@@ -2,7 +2,7 @@
 <%@page import="species.utils.Utils"%>
 <style>
 .profilepic{position:relative;}
-.img-thumbnail{height:250px; border:1px groove;margin-left:10px; border-color:#f2f2f2;}
+.img-thumbnail{height:250px; max-width:250px; border:1px groove;margin-left:10px; border-color:#f2f2f2;}
 </style>
 
 <div class="observation_story" style="overflow: auto;">
@@ -15,7 +15,7 @@
 		</h5>
 	</g:if>
 
-	<div class="pull-left" style="padding-bottom: 10px;width:100%;">
+	<div class="pull-left" style="padding-bottom: 0px;width:100%;">
 	<div class="profilepic pull-right">
  <a
                         href="${uGroup.createLink(action:'show', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -82,7 +82,7 @@
                    
 			<sUser:ifOwnsOrIsPublic
 				model="['user':userInstance, 'isPublic':!userInstance.hideEmailId]">
-				<div class="prop">
+				<div class="prop email">
 					<span class="name"> <i class="icon-envelope"></i> <g:message
 							code="suser.email.label" /> </span>
 					<div class="value">
@@ -94,14 +94,19 @@
 			</sUser:ifOwnsOrIsPublic>
 
 		</g:if>
-		<g:if test="${userInstance.location}">
-			<div class="prop">
+		
+			<div class="prop" style="max-height:23px; overflow-y:auto;">
 				<span class="name"><i class="icon-map-marker"></i><g:message code="default.location.label" /></span>
 				<div class="value">
+        <g:if test="${userInstance.location}">
 					${userInstance.location}
+          </g:if>
+            <g:else>
+            ${"Not Provided"}
+            </g:else>
 				</div>
 			</div>
-		</g:if>
+		
 
 		 <div class="prop">
                         <span class="name"><i class="icon-time"></i><g:message code="default.member.since.label" /> </span>
@@ -121,19 +126,24 @@
                             </div>
                         </div>
                     </g:if>
-                     <g:if test="${userInstance.website}">
+                    
             <div class="prop">
                 <span class="name"><i class="icon-road"></i><g:message code="text.website" /></span>
-                <div class="value">
+               <div class="value pre-scrollable" style="display:block;height:20px;overflow-y: auto;">
                     <div class="linktext pull-left">
+                     <g:if test="${userInstance.website}">
                         ${userInstance.website}
+                        </g:if>
+                         <g:else>
+                          ${"Not Provided"}
+                        </g:else>
                     </div>
                 </div>
             </div>
-        </g:if>
+        
                     <div class="prop">
                         <span class="name" style="width: 150px;"> <g:message code="suser.show.intrested.species" /> &amp; <g:message code="default.habitats.label" /></span>
-                        <div class="value">
+                        <div class="value" style="display:block;height:65px;">
                             <span style="float:left;"><sUser:interestedSpeciesGroups model="['userInstance':userInstance]" /></span>
                             <span style="float:left;"><sUser:interestedHabitats model="['userInstance':userInstance]" /></span>
                         </div>
@@ -157,14 +167,34 @@
 				</div>
 			</g:if>
 		</g:if>
+       <div class="prop">
+                                <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
+                                <div class="value pre-scrollable" style="display:block;max-height:140px;min-height:140px;overflow-y: auto;">
+                                            <g:if test="${userInstance.aboutMe}">
 
-	</div>
+                                            <%  def styleVar = 'block';
+                                                def clickcontentVar = '' 
+                                            %> 
+                                            <g:if test="${userInstance?.language?.id != userLanguage?.id}">
+                                                <%  
+                                                  styleVar = "none"
+                                                  clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.threeLetterCode.toUpperCase()+'</a>';
+                                                %>
+                                            </g:if>
+
+                                            ${raw(clickcontentVar)}
+                                            <div style="display:${styleVar}">
+                                                ${raw(user.aboutMe.replace('\n', '<br/>\n'))}
+                                            </div>
+                                                
+                                            </g:if>
+                                </div>
+                            </div>
         <g:if test="${!showDetails }">
             <obv:getStats model="['user':userInstance, 'userGroup':userGroupInstance]"/>
         </g:if>
+        </div>
 </div>
-
-
 
 
 

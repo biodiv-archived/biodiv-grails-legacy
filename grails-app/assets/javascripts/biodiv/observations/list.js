@@ -13,6 +13,7 @@ $(document).ready(function(){
     $('.dropdown-toggle').dropdown();
 
     $('.list').trigger('updatedGallery');
+    $('.listIdentified').trigger('updatedGallery');
 
     $('#speciesNameFilter').button();
     if(window.params.speciesName == 'Unknown'){
@@ -237,6 +238,16 @@ $(document).ready(function(){
             return false;
         }
         $('#speciesGroupFilter button.active').removeClass('active');
+        $(this).addClass('active');
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+        $('#speciesIdentifiedGroupFilter button').click(function(){
+        if($(this).hasClass('active')){
+            return false;
+        }
+        $('#speciesIdentifiedGroupIdentifiedFilter button.active').removeClass('active');
         $(this).addClass('active');
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
@@ -686,7 +697,7 @@ function eatCookies() {
 
 function getSelectedGroup() {
     var grp = ''; 
-    $('#speciesGroupFilter button').each (function() {
+    $('#speciesGroupFilter button, #speciesIdentifiedGroupFilter button').each (function() {
         if($(this).hasClass('active')) {
             grp += $(this).attr('value') + ',';
         }
@@ -1109,10 +1120,6 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     } else {
         delete params['status']
     }
-
-
-
-
     return params;
 }	
 
@@ -1334,8 +1341,8 @@ function intializesSpeciesHabitatInterest(multiSelect){
     
     multiSelect = typeof multiSelect !== 'undefined' ? multiSelect : true;
 
-    $('#speciesGroupFilter button').unbind('click');
-    $('#speciesGroupFilter button').attr('data-toggle', 'buttons-checkbox').click({'button_group':$('#speciesGroupFilter'), 'multiSelect':multiSelect}, speciesHabitatInterestHandler);
+    $('#speciesGroupFilter button, #speciesIdentifiedGroupFilter button').unbind('click');
+    $('#speciesGroupFilter button, #speciesIdentifiedGroupFilter button').attr('data-toggle', 'buttons-checkbox').click({'button_group':$('#speciesGroupFilter ,#speciesIdentifiedGroupFilter'), 'multiSelect':multiSelect}, speciesHabitatInterestHandler);
 
     $('#habitatFilter button').unbind('click');
     $('#habitatFilter button').attr('data-toggle', 'buttons-checkbox').click({'button_group':$('#habitatFilter'), 'multiSelect':multiSelect}, speciesHabitatInterestHandler);

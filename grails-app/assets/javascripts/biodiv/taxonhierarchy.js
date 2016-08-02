@@ -4,7 +4,6 @@
  **/
 (function($) {
     "use strict";
-
     var TaxonHierarchy = function(div, options) {
         this.init($(div), options);
         this.show();
@@ -23,9 +22,11 @@
                 expand_all: me.options.expandAll,
                 speciesid: me.options.speciesId,
                 taxonid: me.options.taxonId,
-                classSystem: $.trim($('#taxaHierarchy option:selected').val())
-            }
+                classSystem: $.trim($('#taxaHierarchy option:selected').val()),
+                user:me.options.user
 
+            }
+                
 
             $.jstree.plugins.questionmark = function(options, parent) {
                 this.bind = function() {
@@ -42,13 +43,16 @@
                     }
                     parent.teardown.call(this);
                 };
+                
                 this.redraw_node = function(obj, deep, callback, force_draw) {
+
                     var i, j, tmp = null,
                         elm = null;
+                        
+                        
                     obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
                     if (obj) {
                         var nodeData = this.get_node(obj);
-
                         for (i = 0, j = obj.childNodes.length; i < j; i++) {
                             if (obj.childNodes[i] && obj.childNodes[i].className && obj.childNodes[i].className.indexOf("jstree-anchor") !== -1) {
                                 tmp = obj.childNodes[i];
@@ -59,10 +63,18 @@
                             var btnAction = "Show",
                                 level = nodeData.original.rank,
                                 levelTxt, title, el = document.createElement('div');
+                               
+                               if(nodeData.original.haspermission==true) {   
+                                 $(obj).children('.jstree-anchor').append("<span class='forContributor'>Contributor</span>");
+                                
+                                }
+
 
                             if(nodeData.original.speciesid && nodeData.original.speciesid != -1) {
                                 $(obj).children('.jstree-anchor').attr('href', '/species/show/'+nodeData.original.speciesid).css({'color':'#08c', 'cursor':'pointer'}).attr('target', '_blank');
+                                //$(obj).children('.jstree-anchor').attr("span")
                             }
+                            
 
                             $.each(taxonRanks, function(i, v) {
                                 if (level == v.value) {
@@ -119,8 +131,6 @@
                             } else {
                                 $("#taxonHierarchy").removeClass('editField');
                             }
-
-
                         }
                         return obj;
                     };
@@ -142,7 +152,7 @@
                 //                    $(e.target).parent('span').prev().addClass('btn-info-nocolor').closest('tr').addClass('taxon-highlight');
                 $('#taxonHierarchy').find(".taxon-highlight").removeClass('taxon-highlight');
                 $me.addClass('taxon-highlight');
-
+                
                 /*var s = $(e.target).hasClass('active');
                 $('#taxonHierarchy .taxDefIdSelect').removeClass('active');
                 s ? $(e.target).removeClass('active') : $(e.target).addClass('active');
@@ -391,6 +401,7 @@
             $("input#taxon").val('');
             //$('#taxonHierarchy').trigger("reloadGrid");
             $('#taxonHierarchy').jstree(true).refresh();
+
         },
 
         onAdd: function(e) {

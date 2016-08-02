@@ -4,11 +4,11 @@ h5{background-clolor:white;}
 .table td{padding:2px;}
 .accordion-inner-obv {
     border-top: 1px solid #e5e5e5;
-    padding: 9px 15px;
+    padding: 25px 15px;
 }
 .accordion-inner {
     border-top: 1px solid #e5e5e5;
-    padding: 65px 15px;
+    padding: 50px 15px;
 }
 .sidebar_section{margin-bottom:0px;}
 .sidebar_section h5 {
@@ -24,13 +24,22 @@ h5{background-clolor:white;}
 }
 #totalscore {
     align-self: center;
-    background-color: #b0c4de;
     font-weight: bold;
     padding: 5px;
 }
+.content_score,.curation_score{
+    padding:0px 65px 0px 30px;
+    font-size: 12px;
+    
+}
+.badge{position:relative;background-color:#3a87ad;padding-left:9px;padding-right:9px;}
+.activity_score{padding:2px;}
+.badge{background-color:#1a941d;}
 </style>
- <div id=totalscore></div>
-       
+<div id=activityscore></div>
+<hr style="margin: 5px 0;">
+ <div id=totalcontributedscore></div>
+  <div id=totalactivityscore></div>
 <div class="accordion" id="accordion2">
 <div class="accordion-group">
   <div class="accordion-heading">
@@ -50,11 +59,11 @@ h5{background-clolor:white;}
         </thead>
         <tbody>
             <tr><td>Uploaded</td><obv:showNoOfObservationsCreated model="['user':user, 'userGroup':userGroupInstance]" /></tr>
-            <tr><td>Reco suggested</td><obv:showNoOfRecommendationsSuggested model="['user':user, 'activityHolderType':"species.participation.RecommendationVote",activityType:"Suggested species name"]" /></tr>
-            <tr><td>Reco agreed upon</td><obv:showNoOfAgreedUponOfUser model="['user':user, 'activityHolderType':"species.participation.RecommendationVote", 'activityType':"Agreed on species name"]" /></tr>
+            <tr><td>Identified</td><obv:showNoOfRecommendationsSuggested model="['user':user, 'userGroup':userGroupInstance]" /></tr>
+            <!-- <tr><td>ID agreed upon</td><obv:showNoOfAgreedUponOfUser model="['user':user, 'activityHolderType':"species.participation.RecommendationVote", 'activityType':"Agreed on species name"]" /></tr> -->
             <tr><td>Organized</td><obv:showNoOfOrganizedUponOfUser model="['user':user,'objectType':"species.participation.Observation"]" /></tr>
             <tr><td>Downloads</td><obv:showNoOfDownloadUponOfUser model="['user':user,'sourceType':"Observations"]" /></tr>
-            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'commentHolderType':"species.participation.Observation"]" /></tr>
+            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'rootHolderType':"species.participation.Observation"]" /></tr>
             </tbody>
             </table>
         </ul>     
@@ -78,7 +87,7 @@ h5{background-clolor:white;}
         </thead>
             <tr><td>Contributed</td><s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></tr>
             <tr><td>Organized</td><s:showNoOfOrganizedSpecies model="['user':user,rootHolderType:'species.Species']"/></tr>
-            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'commentHolderType':"species.Species"]" /></tr>
+            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'rootHolderType':"species.Species"]" /></tr>
         </table>
     </div>
   </div>
@@ -100,7 +109,7 @@ h5{background-clolor:white;}
         </thead>
             <tr><td>Uploaded</td><obv:showNoOfDocsUploaded model="['user':user,'rootHolderType':"content.eml.Document",'activityType':"Document created"]" /></tr>
             <tr><td>Organized</td><obv:showNoofOrganizedDocs model="['user':user,'rootHolderType':"content.eml.Document"]" /></tr>
-            <tr><td>Comments</td><obv:showNoofCommentedDocs model="['user':user,'rootHolderType':"content.eml.Document",'activityType':"Added a comment"]" /></tr>
+            <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'rootHolderType':"content.eml.Document"]" /></tr>
         </table>
     </div>
   </div>
@@ -120,8 +129,8 @@ h5{background-clolor:white;}
         <th>Count</th>
         </thead>
             <tr><td>Created</td><obv:showNoOfDiscussionCreated model="['user':user,'activityHolderType':"species.participation.Discussion",'activityType':"Discussion created"]" /></tr>
-            <tr><td>Participated</td><obv:showNoofParticipationDiscussion model="['user':user,'rootHolderType':"species.participation.Discussion",'activityType':"Added a comment"]" /></tr>
-            <tr><td>Organized</td><obv:showNoofOrganizedDiscussion model="['user':user,'activityHolderType':"species.participation.Discussion"]" /></tr>
+            <tr><td>Participated</td><obv:showNoofParticipationDiscussion model="['user':user,'rootHolderType':"species.participation.Discussion"]" /></tr>
+            <tr><td>Organized</td><obv:showNoOfCommentUponOfUser model="['user':user,'activityHolderType':"species.participation.Discussion"]" /></tr>
         </table>  
     </div>
   </div>
@@ -153,9 +162,9 @@ h5{background-clolor:white;}
         <th>Count</th>
         
         </thead>
-            <tr><td>Founded</td><td><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
-            <tr><td>Moderating</td><td><uGroup:showNoOfMemberUserGroups model="['userInstance':user]"></uGroup:showNoOfMemberUserGroups></td></tr>
-            <tr><td>Member of</td><td><uGroup:showNoOfExpertUserGroups model="['userInstance':user]"></uGroup:showNoOfExpertUserGroups></td></tr>
+            <tr><td>Founded</td><td class="countvaluecontributed"><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
+            <tr><td>Moderating</td><td class="countvalue"><uGroup:showNoOfExpertUserGroups model="['userInstance':user]"></uGroup:showNoOfExpertUserGroups></td></tr>
+            <tr><td>Member of</td><td class="countvalue"><uGroup:showNoOfMemberUserGroups model="['userInstance':user]"></uGroup:showNoOfMemberUserGroups></td></tr>
         </table>
     </div>
   </div>
@@ -174,7 +183,25 @@ h5{background-clolor:white;}
         for (var i = 0; i < countarray.length; i++) {
           total += countarray[i] << 0;
         }
-        //var logscore=
-        $("#totalscore").html('<div class="activity_score">Activity Score '+(Math.log10(total)).toFixed(2)+'</div>');
+        var countcontributedarray=new Array()
+          var allcontributed = $(".countvaluecontributed").map(function() {
+                countcontributedarray.push(this.innerHTML)
+            }).get();
+            var totalcontributed = 0;
+          for (var i = 0; i < countcontributedarray.length; i++) {
+          totalcontributed += countcontributedarray[i] << 0;
+          }
+        $("#totalcontributedscore").html('<div class="content_score"><span class="icon-pencil"/><strong>Content Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(totalcontributed)*10)+'</strong></span></div>');
+        $("#totalactivityscore").html('<div class="curation_score"><span class="icon-tasks" /><strong>Curation Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(total)*10)+'</strong></span></div>');
+        $("#activityscore").html('<div class="activity_score"><strong>Activity Score</strong><span class="pull-right badge badge-success">'+(Math.floor(Math.log10(totalcontributed)*10)+Math.floor(Math.log10(total)*10))+'</span></div>');
         });
-        </asset:script>t>
+
+        $('.accordion-toggle').on('click',function(e){
+    if($(this).parents('.accordion-group').children('.accordion-body').hasClass('in')){
+        e.stopPropagation();
+    }
+    // You can also add preventDefault to remove the anchor behavior that makes
+    // the page jump
+     e.preventDefault();
+    });
+        </asset:script>

@@ -43,7 +43,7 @@ def obvId = observationInstance?.id
 <g:each in="${observationInstance.resource}" var="r">
    <g:if test="${r.type == ResourceType.IMAGE}">
         <%   
-            def resourceUrl = (r.fileName.length() >1)?r.fileName:r.url;          
+            def resourceUrl = (r.fileName)?r.fileName:r.url;          
             if(inc == 0){
                 photonames =resourceUrl;
             }else{
@@ -54,7 +54,7 @@ def obvId = observationInstance?.id
         %>
    </g:if>
 </g:each>
-<g:if test="${photonames!='' && photonames.length() >0}">
+<g:if test="${photonames.trim()!=''}">
      <a href="javascript:void(0);" class="view_bootstrap_gallery" style="${styleviewcheck?'display:block;': 'display:none;'}" rel="${observationInstance.id}" data-img="${photonames}">${g.message(code:'default.instance.viewGallery')}<i class="icon-share icon-white"></i></a>
 </g:if>     
 

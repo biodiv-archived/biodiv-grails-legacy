@@ -9,7 +9,8 @@
         <%@page import="species.participation.SpeciesBulkUpload"%>
         <%@page import="species.participation.NamesReportGenerator"%>
         <%@page import="content.eml.Document"%>
-
+        <%@page import="species.Classification"%>
+        <%@ page import="species.ScientificName.TaxonomyRank"%>
         <html>
         <head>
 
@@ -39,12 +40,11 @@
         .user_profile{
           background-color: white;
           padding: 5px 0px;
-          height: 540px
         }
         .activity_count{
           background-color: white;
           padding: 5px 0px;
-          height: 540px
+          height: 520px
         }
         .userProfileSection .accordion{
           margin: 5px 0px;
@@ -79,24 +79,34 @@
         .list-group-submenu {
           margin-left:20px;
         }
+         .activity_count{
+            height: 550px;
+            margin-bottom: 20px;
+        }
         .user_profile {
+             height: 558px;
             background-color: white;
-            height: 540px;
             padding: 15px;
             margin-bottom:10px;
         }
          .prop {    
             border-bottom:1px groove;
-            margin-bottom:8px;
+            margin-bottom:6px;
             overflow: auto;
             }
         .value{
             font-weight:normal;
-            color:#808080;
+            color:#000;
         }
         .prop:hover{background-color:#f2f2f2;}
         .name{margin-bottom:5px;}
         .value{margin-bottom:5px;}
+        .forContributor {position: relative;}
+        .forContributor { margin-left: 200px; font-weight: normal; position:relative;color:green;}
+        .jstree-icon { display: none;}
+        .permission_hilight{background-color:#b1f0e7;}
+        
+        
         </style>
         </head>
         <body>
@@ -122,7 +132,47 @@
                     </div>
                 </div>
 
+                <div id="userprofilenavbar" class="navbar">
+                            <!--data-spy="affix affix-top" data-offset-top="10px" style="z-index:10000"-->
+                            <div class="navbar-inner">
+                                <ul class="nav">
 
+                                    <li><a href="#aboutMe"><i class="icon-user"></i><g:message code="default.about.me.label" /></a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-book"></i> <g:message code="default.content.label" />
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#observations"><i class="icon-screenshot"></i><g:message code="default.observation.label" /></a></li>
+                                                <li><a href="#species"><i class="icon-screenshot"></i><g:message code="default.species.label" /></a></li>
+                                                <li><a href="#documents"><i class="icon-eye-open"></i><g:message code="suser.show.documents" /></a></li>
+                                                <li><a href="#discussions"><i class="icon-download"></i><g:message code="suser.show.discussions" /></a></li>
+                                            </ul>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#groups"><i class="icon-group"></i><g:message code="default.groups.label" /></a></li>
+                                    <li class="divider-vertical"></li>
+                                    
+                                    <g:if test="${user.hideEmailId}">
+                                        <li style="padding:5px 0px">
+                                        <% String staticMessage = '';
+                                        if(currentUser) {
+                                            staticMessage = g.message(code:'suser.message')+' <a href="'+currentUserProfile+'">'+currentUser.name+'</a>'
+                                        }
+def contact_me_text=g.message(code:'button.contact.me')                                     
+%>
+
+                                            <obv:identificationByEmail
+                                            model="['source':params.controller+params.action.capitalize(), 'requestObject':request, 'cssClass':'btn btn-mini', hideTo:true, title:contact_me_text, titleTooltip:'', mailSubject:'', staticMessage:staticMessage,  users:[user]]" />
+
+
+                                        </li>
+                                    </g:if>
+                                </ul>
+                            </div>
+                        </div>
 
                 <%--  <obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
                 <div>
@@ -134,45 +184,24 @@
                         </div>
                         <div class="span9 user_profile">
                             <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
-                        
-                                       
-                            <div class="prop">
-                                <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
-                                <div class="value pre-scrollable" style="display:block;height:80px;">
-                                            <g:if test="${user.aboutMe}">
-
-                                            <%  def styleVar = 'block';
-                                                def clickcontentVar = '' 
-                                            %> 
-                                            <g:if test="${user?.language?.id != userLanguage?.id}">
-                                                <%  
-                                                  styleVar = "none"
-                                                  clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.threeLetterCode.toUpperCase()+'</a>';
-                                                %>
-                                            </g:if>
-
-                                            ${raw(clickcontentVar)}
-                                            <div style="display:${styleVar}">
-                                                ${raw(user.aboutMe.replace('\n', '<br/>\n'))}
-                                            </div>
-                                                
-                                            </g:if>
-                                </div>
-                            </div>
                         </div>
-                        
+                        <div class="clearfix"></div> 
                     </div>
+                    <div class="clearfix"></div> 
+                        
                     <%
-                        def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'asc'])
-                        def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'asc'])
-                        def namesReportList = NamesReportGenerator.findAllByAuthor(user, [sort: 'startDate', order: 'asc'])
+                        def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'desc'])
+                        def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'desc'])
+                        def namesReportList = NamesReportGenerator.findAllByAuthor(user, [sort: 'startDate', order: 'desc'])
+                        
                     %>
-                              <div class="container">
+                            <div class="container">
                                     <div id="content" class="super-section" style="clear: both;">
                                         <h5>
                                             <g:message code="default.observation.label" />
                                         </h5>
                                         <div id="observations" class="section" style="clear:both;margin-left:20px;">
+                                         <g:render template="/observation/distinctRecoTableAccordionTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
                                             <h6>
                                                 <span class="name" style="color: #b1b1b1;"> 
                                                     <obv:showNoOfObservationsOfUser
@@ -186,6 +215,7 @@
                                             
                                             <obv:showRelatedStory
                                             model="['controller':'observation', 'action':'related', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'user', 'userGroupInstance':userGroupInstance]" />
+
                                         </div>
                                         <div id="identifications" class="section" style="clear:both;">
                                        
@@ -199,7 +229,6 @@
                                 <a class="btn btn-link"
                                     href="${uGroup.createLink(action:'list', controller:'observation', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"><i class="icon-list"></i><g:message code="heading.browse.observations" /> </a>
                             </sUser:ifOwns>
-
                                             </h6>
                                             <obv:showRelatedStory
                                             model="['controller':'user', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
@@ -218,14 +247,17 @@
 
                                         </div>
                                         </obv:showBulkUploadRes>
-
+                                       
+                                        <div>
+                                        
+                                        </div>
                                         <div class="row-fuild">
                                         <div id="observations_list_map" class="section observation span6"
                                             style="margin:0px;margin-left:20px;">
                                             <h6>
                                                  <g:message code="suser.show.observations.spread" />
                                             </h6>
-                                            <obv:showObservationsLocation
+                                          <obv:showObservationsLocation
                                             model="['observationInstanceList':totalObservationInstanceList, 'ignoreMouseOutListener':true, width:460, height:400]">
                                             </obv:showObservationsLocation>
                                             <a id="resetMap" data-toggle="dropdown"
@@ -241,8 +273,9 @@
                                         def species_group_observations="${g.message(code:'suser.heading.species.observations')}"
                                         %>
                                         
-                                        <chart:showStats model="['title':species_group_observations, columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns, width:420, height:420, 'hideTable':true]"/>
-                                    </div>                                                          
+                                        <chart:showStats model="['title':species_group_observations, columns:obvData.columns, data:obvData.data, htmlData:obvData.htmlData, htmlColumns:obvData.htmlColumns, width:420, height:420, 'hideTable':true]"/> 
+                                    </div>            
+                                                                            
                                      <g:if test="${!downloadLogList.isEmpty()}">
                                      
                                         <div id="downloads" class="section" style="clear: both;">
@@ -254,6 +287,20 @@
                                         </g:if>
          
                                     </div>      
+                                        
+                                    </div>    
+                                    <div id="content" class="super-section" style="clear: both;">
+
+                                        <div id="species" class="section" style="clear:both;margin-left:20px;">
+                                         <h5>
+                                            <g:message code="default.species.label" />
+                                        </h5>
+                                             <h6>
+                                                 <span class="name" style="color: #b1b1b1;"> 
+                                                   <div class="noOfContributedSpecies" style="display:inline;"> <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></div> </span>
+                                             <g:message code="suser.show.contributedspecies" /></h6>               
+                                                <s:showContributedSpecies model="['user':user.id]"/>
+                                        </div>
                                          <g:if test="${!namesReportList.isEmpty()}">
                                         <div id="namesValidationReports" class="section" style="clear: both;overflow:auto;">
                                             <h6>
@@ -271,8 +318,7 @@
                                             <s:rollBackTable model="[uploadList:speciesBulkUploadList]" />
                                         </div>
                                         </g:if>
-                                    </div>    
-                                    
+                                    </div>
                     <%
                         def c = Document.createCriteria()
                         def documents = c.list {
@@ -341,6 +387,19 @@
                         <uGroup:showUserUserGroups model="['userInstance':user]"></uGroup:showUserUserGroups>
 
                     </div>
+                                           <%
+                                    def classifications = [];
+                                    Classification.list().each {
+                                    classifications.add([it.id, it, null]);
+                                    }
+                                    classifications = classifications?.sort {return it[1].name}; 
+                                    %>
+                <!--    <div class="taxonomyBrowser sidebar_section" style="position:relative">
+                                <h5><g:message code="button.taxon.browser" /></h5>  
+                                <div id="taxaHierarchy">
+                    <g:render template="/common/taxonBrowserUserTemplate" model="['classifications':classifications, selectedClassification:265799, 'expandAll':false, 'user':user.id]"/>-->
+                    </div>
+                    </div>
                     <%--            </div>--%>
                     <!--<div id="activity" class="super-section" style="clear: both;">
                         <h5>
@@ -355,9 +414,6 @@
                             
                 </div>
             </div>
-
-
-
             <asset:script>
             var userRecoffset = 0;
                 $(document).ready(function() {
@@ -388,12 +444,63 @@
 
             });
         </asset:script>
+        
         <script type="text/javascript">
         $(document).ready(function(){
-            window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'user', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";
+             window.params.observation.getRecommendationVotesURL = "${uGroup.createLink(controller:'user', action:'getRecommendationVotes', id:user.id, userGroupWebaddress:params.webaddress) }";
             window.params.observation.listUrl = "${uGroup.createLink(controller:'observation', action: 'listJSON')}"
+            window.params.tagsLink = "${uGroup.createLink(controller:'species', action: 'tags')}";
+
+            // Javascript to enable link to tab
+            var url = document.location.toString();
+            if (url.match('#')) {
+            $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+            } 
+
+            // Change hash for page-reload
+            $('.nav-tabs a').on('shown', function (e) {
+                window.location.hash = e.target.hash;
+            })
         });
-        </script>
+        var taxonRanks = [];
+        <g:each in="${TaxonomyRank.list()}" var="t">
+        taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
+        </g:each>
+    </script>
+        <asset:script>
+    $(document).ready(function() {
+      $.each(params.map, function(index, val) {
+    console.log(index+":"+val);
+        });
+        <% params.user=user.id %>
+        var taxonBrowserOptions = {
+            expandAll:false,
+            controller:"${params.controller?:'species'}",
+            action:"${params.action?:'list'}",
+            expandTaxon:"${params.taxon?true:false}",
+            user:"${params.user}"
+        }
+        if(${params.taxon?:false}){
+        taxonBrowserOptions['taxonId'] = "${params.taxon}";
+        }
+        var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);   
+        $('.species-list-tabs a').click(function (e) {
+          e.preventDefault();
+          $('.nav-tabs li').removeClass('active');
+          $(this).parent().addClass('active');
+          var href = $(this).attr('href');
+          $('.tab-pane').removeClass('active');
+          $(href).addClass('active');
+          //$(this).tab('show');
+          return false;
+        })
+        var noOfContributedSpecies=$('.noOfContributedSpecies').text();
+        if(noOfContributedSpecies == 0)
+        {
+            $('#species').hide();
+        }
+    });
+    </asset:script>
         </body>
 
         </html>
