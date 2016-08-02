@@ -85,7 +85,7 @@ h5{background-clolor:white;}
         <th>Count</th>
        
         </thead>
-            <tr><td>Contributed</td><s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></tr>
+            <tr><td>Contributed</td><s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR",'userGroup':userGroupInstance]" /></tr>
             <tr><td>Organized</td><s:showNoOfOrganizedSpecies model="['user':user,rootHolderType:'species.Species']"/></tr>
             <tr><td>Comments</td><obv:showNoOfCommentUponOfUser model="['user':user,'rootHolderType':"species.Species"]" /></tr>
         </table>
@@ -191,8 +191,8 @@ h5{background-clolor:white;}
           for (var i = 0; i < countcontributedarray.length; i++) {
           totalcontributed += countcontributedarray[i] << 0;
           }
-        $("#totalcontributedscore").html('<div class="content_score"><span class="icon-pencil"/><strong>Content Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(totalcontributed)*10)+'</strong></span></div>');
-        $("#totalactivityscore").html('<div class="curation_score"><span class="icon-tasks" /><strong>Curation Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(total)*10)+'</strong></span></div>');
+        $("#totalcontributedscore").html('<div class="content_score"><span class="icon-pencil"/><strong>  Content Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(totalcontributed)*10)+'</strong></span></div>');
+        $("#totalactivityscore").html('<div class="curation_score"><span class="icon-tasks" /><strong>  Curation Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(total)*10)+'</strong></span></div>');
         $("#activityscore").html('<div class="activity_score"><strong>Activity Score</strong><span class="pull-right badge badge-success">'+(Math.floor(Math.log10(totalcontributed)*10)+Math.floor(Math.log10(total)*10))+'</span></div>');
         });
 

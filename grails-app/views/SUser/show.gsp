@@ -299,7 +299,9 @@ def contact_me_text=g.message(code:'button.contact.me')
                                                  <span class="name" style="color: #b1b1b1;"> 
                                                    <div class="noOfContributedSpecies" style="display:inline;"> <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></div> </span>
                                              <g:message code="suser.show.contributedspecies" /></h6>               
-                                                <s:showContributedSpecies model="['user':user.id]"/>
+                                              <%--  <s:showContributedSpecies model="['user':user.id]"/> --%>
+                                              <obv:showRelatedStory
+                            model="[ 'controller':'observation', 'action':'related','filterProperty': 'contributedSpecies', 'userGroupInstance':userGroupInstance,'filterPropertyValue':user.id,'hideShowAll':true]" />
                                         </div>
                                          <g:if test="${!namesReportList.isEmpty()}">
                                         <div id="namesValidationReports" class="section" style="clear: both;overflow:auto;">
