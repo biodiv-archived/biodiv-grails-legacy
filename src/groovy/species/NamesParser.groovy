@@ -167,6 +167,10 @@ class NamesParser {
                             
 						}
 
+						if((part.infraspecies instanceof List) && part.infraspecies[0]){
+							 parsedName.authorYear = part.infraspecies[0]?.authorship?.toString();
+						}
+
 						if(sciName.hybrid) {
 							//hybridName.addToNames(parsedName);
 						}
