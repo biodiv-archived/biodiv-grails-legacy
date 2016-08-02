@@ -82,7 +82,7 @@
                    
 			<sUser:ifOwnsOrIsPublic
 				model="['user':userInstance, 'isPublic':!userInstance.hideEmailId]">
-				<div class="prop">
+				<div class="prop email">
 					<span class="name"> <i class="icon-envelope"></i> <g:message
 							code="suser.email.label" /> </span>
 					<div class="value">
@@ -95,7 +95,7 @@
 
 		</g:if>
 		
-			<div class="prop">
+			<div class="prop" style="max-height:23px; overflow-y:auto;">
 				<span class="name"><i class="icon-map-marker"></i><g:message code="default.location.label" /></span>
 				<div class="value">
         <g:if test="${userInstance.location}">
@@ -169,7 +169,7 @@
 		</g:if>
        <div class="prop">
                                 <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
-                                <div class="value pre-scrollable" style="display:block;max-height:90px;min-height:90px;height:120px;overflow-y: auto;">
+                                <div class="value pre-scrollable" style="display:block;max-height:140px;min-height:140px;overflow-y: auto;">
                                             <g:if test="${userInstance.aboutMe}">
 
                                             <%  def styleVar = 'block';
@@ -190,15 +190,11 @@
                                             </g:if>
                                 </div>
                             </div>
-
-	
         <g:if test="${!showDetails }">
             <obv:getStats model="['user':userInstance, 'userGroup':userGroupInstance]"/>
         </g:if>
         </div>
 </div>
-
-
 
 
 

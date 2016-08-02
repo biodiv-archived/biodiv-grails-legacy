@@ -1799,5 +1799,45 @@ render speciesInstanceList;
 
         println "=====================++++"
     }
+    def speciesContributor(){
+
+        //println "========================= species contributor"
+         params.max = params.limit ? params.int('limit') : 10
+        params.offset = params.offset ? params.long('offset'): 0
+        def userId=params.int('filterPropertyValue');
+        def userInstance = SUser.get(params.id?:params.filterPropertyValue)
+       // println "========================= species contributor"+userInstance
+                if (userInstance) {
+            def userGroupInstance
+            if(params.webaddress) {
+                userGroupInstance = userGroupService.get(params['webaddress'])
+            }
+            def userContributionList
+            userContributionList=speciesService.getuserContributionList(userId,params.max,params.offset)
+           //println "=======+++++++userContributionList"+userContributionList
+            def species=userContributionList.collect{it}
+            def result=[];
+            species.each{
+                result.add(['species':it,'title':it.fetchSpeciesCall()]);
+            }
+            def contributionCount=speciesService.totalContributedSpeciesSnippet2(userId);
+            def contributedSpe=['species':result,count:contributionCount]
+            def model = utilsService.getSuccessModel("", null, OK.value(), contributedSpe)
+            //println "=============contributionCount==========="+model
+             withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
+            }
+            else {
+            def model = utilsService.getErrorModel(g.message(code: 'error', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value())
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+    }
+}
+
    
 }

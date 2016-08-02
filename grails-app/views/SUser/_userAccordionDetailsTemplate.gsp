@@ -8,7 +8,7 @@ h5{background-clolor:white;}
 }
 .accordion-inner {
     border-top: 1px solid #e5e5e5;
-    padding: 65px 15px;
+    padding: 50px 15px;
 }
 .sidebar_section{margin-bottom:0px;}
 .sidebar_section h5 {
@@ -27,10 +27,19 @@ h5{background-clolor:white;}
     font-weight: bold;
     padding: 5px;
 }
+.content_score,.curation_score{
+    padding:0px 65px 0px 30px;
+    font-size: 12px;
+    
+}
 .badge{position:relative;background-color:#3a87ad;padding-left:9px;padding-right:9px;}
+.activity_score{padding:2px;}
+.badge{background-color:#1a941d;}
 </style>
- <div id=totalscore></div>
-       
+<div id=activityscore></div>
+<hr style="margin: 5px 0;">
+ <div id=totalcontributedscore></div>
+  <div id=totalactivityscore></div>
 <div class="accordion" id="accordion2">
 <div class="accordion-group">
   <div class="accordion-heading">
@@ -153,7 +162,7 @@ h5{background-clolor:white;}
         <th>Count</th>
         
         </thead>
-            <tr><td>Founded</td><td class="countvalue"><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
+            <tr><td>Founded</td><td class="countvaluecontributed"><uGroup:showNoOfFoundedUserGroups model="['userInstance':user]"></uGroup:showNoOfFoundedUserGroups></td></tr>
             <tr><td>Moderating</td><td class="countvalue"><uGroup:showNoOfExpertUserGroups model="['userInstance':user]"></uGroup:showNoOfExpertUserGroups></td></tr>
             <tr><td>Member of</td><td class="countvalue"><uGroup:showNoOfMemberUserGroups model="['userInstance':user]"></uGroup:showNoOfMemberUserGroups></td></tr>
         </table>
@@ -174,9 +183,19 @@ h5{background-clolor:white;}
         for (var i = 0; i < countarray.length; i++) {
           total += countarray[i] << 0;
         }
-        //var logscore=
-        $("#totalscore").html('<div class="activity_score">Activity Score <span class="pull-right badge badge-info">'+Math.floor(Math.log10(total)*10)+'</span></div>');
+        var countcontributedarray=new Array()
+          var allcontributed = $(".countvaluecontributed").map(function() {
+                countcontributedarray.push(this.innerHTML)
+            }).get();
+            var totalcontributed = 0;
+          for (var i = 0; i < countcontributedarray.length; i++) {
+          totalcontributed += countcontributedarray[i] << 0;
+          }
+        $("#totalcontributedscore").html('<div class="content_score"><span class="icon-pencil"/><strong>Content Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(totalcontributed)*10)+'</strong></span></div>');
+        $("#totalactivityscore").html('<div class="curation_score"><span class="icon-tasks" /><strong>Curation Score</strong><span class="pull-right"><strong>'+Math.floor(Math.log10(total)*10)+'</strong></span></div>');
+        $("#activityscore").html('<div class="activity_score"><strong>Activity Score</strong><span class="pull-right badge badge-success">'+(Math.floor(Math.log10(totalcontributed)*10)+Math.floor(Math.log10(total)*10))+'</span></div>');
         });
+
         $('.accordion-toggle').on('click',function(e){
     if($(this).parents('.accordion-group').children('.accordion-body').hasClass('in')){
         e.stopPropagation();

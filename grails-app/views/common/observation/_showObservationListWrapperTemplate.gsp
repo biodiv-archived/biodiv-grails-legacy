@@ -187,6 +187,7 @@
             $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
             loadSpeciesGroupCount();
             updateDistinctRecoTable();
+            updateDistinctIdentifiedRecoTable();
         });
     });
 

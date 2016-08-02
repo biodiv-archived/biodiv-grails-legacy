@@ -395,7 +395,7 @@ class UserGroupTagLib {
 					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':g.message(code:'suser.member.label'), 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				case expertRole.id :
-                    out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Expert of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+                    out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Moderator of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				default :
 					log.error "Invalid role id for user ${userInstance} : ${it}"
@@ -493,7 +493,7 @@ class UserGroupTagLib {
 
 	def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 
-			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
+			out <<  "<div class=countvaluecontributed>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
 
 
 	}
