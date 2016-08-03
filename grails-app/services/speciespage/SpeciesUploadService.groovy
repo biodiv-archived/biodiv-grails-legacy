@@ -140,18 +140,18 @@ class SpeciesUploadService {
 			return ['msg': 'File not found !!!' ]
 		}
 		
-		if(!validateUserSheetForName(speciesDataFile)){
-			return  ['msg': 'Name validation failed !!!' ]
-		}
+		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
 		
-		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
+		if(!validateUserSheetForName(sBulkUploadEntry)){
+			return  ['msg': 'Name validation failed. Please visit your profile page to view status.!!!', 'sBulkUploadEntry': sBulkUploadEntry ]
+		}
 		
 		return ['msg': 'Bulk upload in progress. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
 		
 	}
 	
-	boolean validateUserSheetForName(File sFile){
-		return MappedSpreadsheetConverter.validateUserSheetForName(sFile)
+	boolean validateUserSheetForName(SpeciesBulkUpload sbu){
+		return MappedSpreadsheetConverter.validateUserSheetForName(sbu)
 	}
 	
 	Map upload(SpeciesBulkUpload sBulkUploadEntry){
@@ -375,12 +375,13 @@ class SpeciesUploadService {
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				sBulkUploadEntry?.writeLog(res.idSummary)
-				cleanUpGorm();
+				
 			}
 			
 			processNameCount += contentSubList.size()
 			if(processNameCount%5 == 0){
 				println "------------------- processNameCount " + processNameCount
+				cleanUpGorm();
 			}
 		}
 		
@@ -427,20 +428,18 @@ class SpeciesUploadService {
         converter.setLogAppender(fa);
 		
 		List species = []
-		StringBuilder sb = new StringBuilder()
+		//StringBuilder sb = new StringBuilder()
 		int noOfInsertions = 0;
 		try {
 			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
 				for(Node speciesElement : speciesElements) {
 					String currSpeciesName = converter.fetchSpeciesName(speciesElement)
 					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping"
-					sb.append(currSpeciesName)
 					//Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
 						if(s){
 							species.add(s)
 							noOfInsertions++;
-							sb.append("|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)
 						}
 					//}
 				}
@@ -476,7 +475,7 @@ class SpeciesUploadService {
 			converter.addToSummary(e)
 		}
 
-		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs(), 'idSummary':sb.toString()];
+		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs(), 'idSummary':converter.individualNameSumm];
 	}
 
 	/** 
@@ -938,10 +937,13 @@ class SpeciesUploadService {
 			}
 		}
 		
-		sFieldToDelete.each { sf ->
-			sf.refresh()
-			log.info "Deleting ${sf}"
-			sf.delete(flush:true)
+		//delete species field only when species bulk upload object given to roll back
+		if(sbu){
+			sFieldToDelete.each { sf ->
+				sf.refresh()
+				log.info "Deleting ${sf}"
+				sf.delete(flush:true)
+			}
 		}
 		
 		sFields.removeAll(sFieldToDelete)
@@ -967,15 +969,17 @@ class SpeciesUploadService {
 		}
 	
         def tempRes = s.resources.intersect(resources);
-        tempRes.each { res ->
-            log.debug "Removing resource " + res
-            s.removeFromResources(res)
-        }
+		if(sbu){
+	        tempRes.each { res ->
+	            log.debug "Removing resource " + res
+	            s.removeFromResources(res)
+	        }
+		}
 		
 		boolean canDelete = specificSFields.minus(sFieldToDelete).isEmpty() && TaxonomyRegistry.findAllByTaxonDefinition(s.taxonConcept).minus(taxonReg).isEmpty() ;
 		if(canDelete){
 			log.debug "Deleting species ${s} "
-			deleteSpecies(s)
+			deleteSpecies(s, sbu)
 			return
 		}
 
@@ -985,7 +989,7 @@ class SpeciesUploadService {
 				
 	}
 	
-	private boolean deleteSpecies(Species s) throws Exception { 
+	private boolean deleteSpecies(Species s, SpeciesBulkUpload sbu) throws Exception { 
 		try{
 //			Recommendation.findAllByTaxonConcept(s.taxonConcept).each { reco ->
 //				reco.taxonConcept = null
@@ -1003,11 +1007,14 @@ class SpeciesUploadService {
 //			SpeciesGroupMapping.findAllByTaxonConcept(s.taxonConcept).each { sgm ->
 //				sgm.delete()
 //			}
-			SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
-				sp.delete(flush:true)
+			
+			if(sbu){
+				SpeciesPermission.findAllByTaxonConcept(s.taxonConcept).each { sp ->
+					sp.delete(flush:true)
+				}
 			}
 			
-			if(s.resources){
+			if(sbu && s.resources){
 				def ids = s.resources.collect { it.id}
 				ids.each { 
 					def r = Resource.get(it)
@@ -1015,11 +1022,19 @@ class SpeciesUploadService {
 				}
 			}
 			log.debug "Reverting changes of species before delete $s ===="
-			if(s.delete(flush:true)) {
-			    log.debug "Deleted ${s}"
-			    speciesSearchService.delete(s.id);
-			    return true
-            }
+			if(sbu){
+				if(s.delete(flush:true)) {
+					log.debug "Deleted ${s}"
+				}
+			}else{
+				log.debug "Flagging species as deleted"
+				s.isDeleted = true
+				if(!s.save(flush:true)){
+					s.errors.allErrors.each { log.error it }
+				}
+			}
+			speciesSearchService.delete(s.id);
+			return true
 		}catch (Exception e) {
 			log.error "Error in Delete/Reverting ${s}"
 			e.printStackTrace()

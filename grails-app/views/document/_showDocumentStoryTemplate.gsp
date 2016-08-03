@@ -39,7 +39,7 @@ documentInstance = Document.read(documentInstance.id)
             <g:else>
                     <% def extension = "pdf" %>
                     <g:if test="${extension.toUpperCase() == 'PDF' && (showPDFViewer != null)?showPDFViewer:true}">
-                    <% url = documentInstance.externalUrl %>              
+                    <% url = documentInstance?.externalUrl %>              
                     <iframe id="viewer" src = "${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
             </g:if>
 
@@ -102,12 +102,12 @@ documentInstance = Document.read(documentInstance.id)
                     <div class="value">  <a href="${url}"><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>${raw(documentInstance?.title)}</a></div>
                     </div>
 
-                    <g:if test="${documentInstance.uri}">
+                    <g:if test="${documentInstance.externalUrl}">
                     <div class="prop">
                     <span class="name"><g:message code="default.url.label" /></span>
                     <div class="value">
                     <span class="linktext" style="word-wrap: break-word;">
-                    ${documentInstance.uri}
+                    ${documentInstance.externalUrl}
                     </span>
                     </div>
                     </div>

@@ -292,7 +292,7 @@ class NamesLoaderService {
 			FROM accepted_synonym AS asyn,
 			     taxonomy_definition AS t
 			WHERE t.id = asyn.synonym_id
-			  AND t.status = 'SYNONYM';
+			  AND t.status = 'SYNONYM'
 			  AND t.is_deleted = false
 		"""
 		

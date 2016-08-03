@@ -20,6 +20,7 @@
 						<th><g:message code="default.species.groups.label" /> </th>
 						<th><g:message code="default.habitats.label" /></th>
 						<th><g:message code="default.members.label" /></th>
+						<th>Type</th>
 						<th style="width:20%"><g:message code="default.join.label" /></th>
 					</tr>
 				</thead>

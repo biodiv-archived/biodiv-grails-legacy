@@ -384,6 +384,7 @@ println queryParts.queryParams
 		def documentInstanceList = hqlQuery.list();
 
         def countQ = sessionFactory.currentSession.createQuery(countQuery)
+        countQ.setProperties(queryParts.queryParams);
         long count = countQ.list()[0]
 		return [documentInstanceList:documentInstanceList, instanceTotal : count, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
 	}
@@ -581,7 +582,7 @@ println queryParts.queryParams
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
 			println "================" + m
 			
-			if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+			if(m['file path'].trim() != "" || m['externalurl'].trim() != '' ){
 
 				uploadLinkDoc(m, resultObv,params)
 				i++
@@ -622,7 +623,7 @@ println queryParts.queryParams
 			}
 		}
 		
-		document.uri = m['uri']
+		document.externalUrl = m['externalurl']
 		document.title = m['title']
 		
 		if(!document.title){
@@ -630,7 +631,7 @@ println queryParts.queryParams
 			return 
 		}
 		
-		if(!document.uFile  && !document.uri){
+		if(!document.uFile  && !document.externalUrl){
 			log.error "Either ufile or uri is null so ignoring this document"
 			return
 		}
@@ -678,7 +679,9 @@ println queryParts.queryParams
 	}
 	private uploadLinkDoc(Map m, resultObv,params){
 		Document document = new Document()
-		document.uri = m['uri']
+		println "========================================================="
+		println m
+	//	document.uri = m['uri']
 		document.title = m['title']		
 		if(!document.title){
 			log.error 'title cant be null'
@@ -711,12 +714,19 @@ println queryParts.queryParams
 			def h = Habitat.findByName(it.trim())
 			document.addToHabitats(h);
 		}
-		
-		document.longitude = (m['longitude'] ?:76.658279)
-		document.latitude = (m['lattitude'] ?: 12.32112)
+		def latitude;
+		def longitude;
+		if(m['latitude']){latitude=(Double.parseDouble(m['latitude']))}else{latitude=12.32112};
+		if(m['longitude']){longitude=(Double.parseDouble(m['longitude']))}else{longitude=76.658279};
+		//def logitude=(Double.parseDouble(m['longitude']))?:76.65827;
+		document.longitude = longitude
+		document.latitude = latitude
 		document.geoPrivacy = m["geoprivacy"]
+		println "-------------Geo Privacy======================="+m["geoprivacy"]
 		document.externalUrl=m["externalurl"]
-		document.placeName=m["palce name"]
+		document.placeName=m["place_name"]
+
+		println "====================Place Name=========="+m["place_name"]
 //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
 //		if(document.latitude && document.longitude) {
 //			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
@@ -740,7 +750,7 @@ println queryParts.queryParams
 			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
 			//println "==========User Group======================" + userGroupIds
 			userGroupIds = userGroupIds.collect { "" + it }
-			setUserGroups(documentInstance, userGroupIds);
+			setUserGroups(documentInstance, userGroupIds,false);
 		}
 		else {
 			documentInstance.errors.allErrors.each { log.error it }
@@ -907,7 +917,7 @@ println queryParts.queryParams
                       //  println url
 
                     } else {
-                        url=instance.uri;
+                        url=instance.externalUrl;
                     }
                     def hostName = 'http://gnrd.globalnames.org' //url.getHost()
                     HTTPBuilder http = new HTTPBuilder(hostName)

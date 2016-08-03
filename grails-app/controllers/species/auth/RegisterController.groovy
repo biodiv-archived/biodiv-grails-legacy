@@ -583,6 +583,9 @@ class CustomRegisterCommand {
 	String profilePic;
 	String openId;
 	boolean facebookUser;
+    String sexType;
+    String occupationType;
+    String institutionType;
     //String g_recaptcha_response;
 	//String recaptcha_response_field;
 	//String recaptcha_challenge_field;
@@ -640,7 +643,9 @@ class CustomRegisterCommand2 {
 	float timezone=0
 	String aboutMe;
 	String location;
-	
+    String sexType;
+    String occupationType;
+    String institutionType;
 	def grailsApplication
 	
 	static constraints = {

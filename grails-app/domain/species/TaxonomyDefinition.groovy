@@ -74,6 +74,8 @@ class TaxonomyDefinition extends ScientificName {
 		version false;
 		tablePerHierarchy true
         defaultHierarchy type:'text'
+		activityDescription type:'text'
+		
 	}
 	
 	static transients = [ "doColCuration" ]
@@ -249,27 +251,31 @@ class TaxonomyDefinition extends ScientificName {
    
    
    private boolean _sanpToImmediateParent(TaxonomyRegistry sourceTr,  Classification targetHir){
-	   if(!sourceTr.parentTaxonDefinition){
-		   println "No parent "
-		   return false
-	   }
-	   if(sourceTr.parentTaxonDefinition.status != NameStatus.ACCEPTED){
+	   if(sourceTr.parentTaxonDefinition && (sourceTr.parentTaxonDefinition.status != NameStatus.ACCEPTED)){
 		   println "Immediate parent has following status " + sourceTr.parentTaxonDefinition.status
 		   return false
 	   }
+	   
 	   TaxonomyRegistry targetTr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(sourceTr.parentTaxonDefinition, targetHir)
 	   if(!targetTr){
 		   	println  "Immediate parent does not have ibp hir or this is the raw name at kingdom level " + this
-	   		return false
 	   }
 	   
 	   
 	   TaxonomyRegistry ibpTr = new TaxonomyRegistry()
-	   ibpTr.properties = targetTr.properties
-	   ibpTr.parentTaxon = targetTr
-	   ibpTr.parentTaxonDefinition = targetTr.taxonDefinition
+	   	if(targetTr){
+	   		ibpTr.properties = targetTr.properties
+	   		ibpTr.parentTaxon = targetTr
+	   		ibpTr.parentTaxonDefinition = targetTr.taxonDefinition
+	   		ibpTr.path = targetTr.path + "_" + sourceTr.taxonDefinition.id
+	   	}else{
+	   		ibpTr.classification = targetHir
+	   		ibpTr.parentTaxon = null
+	   		ibpTr.parentTaxonDefinition = null
+	   		ibpTr.path = sourceTr.taxonDefinition.id
+	   	}
+
 	   ibpTr.taxonDefinition = sourceTr.taxonDefinition
-	   ibpTr.path = targetTr.path + "_" + sourceTr.taxonDefinition.id
 	   ibpTr.contributors = null
 	   
 	   if(!ibpTr.save(flush:true)){
@@ -607,17 +613,28 @@ class TaxonomyDefinition extends ScientificName {
 	}
 	
 	
-	def updatePosition(String pos, Map nameSourceInfo = [:], TaxonomyRegistry latestHir = null){
+	def updatePosition(String pos, Map nameSourceInfo = [:], TaxonomyRegistry latestHir = null, TaxonomyDefinition parsedName = null){
 		def newPosition = NamesMetadata.NamePosition.getEnum(pos)
 		if(newPosition){
 			this.position = newPosition
 			if(this.position == NamesMetadata.NamePosition.CLEAN){
 				// name is moving to clean state.. overwrite all info from spreadsheet
 				//println "-------------- >>>>>>>>>>> -------------- Name source info " + nameSourceInfo
+				
+				//updating name
+				if(parsedName){	
+					this.name =  parsedName.name
+					this.canonicalForm = parsedName.canonicalForm
+					this.normalizedForm =  parsedName.normalizedForm
+					this.italicisedForm = parsedName.italicisedForm
+					this.binomialForm = parsedName.binomialForm
+					this.authorYear = parsedName.authorYear
+				}
+				
 				def fieldsConfig = grailsApplication.config.speciesPortal.fields
-				def tmpMatchDatabaseName = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE)
-				def tmpNameSourceId = nameSourceInfo.get("" + fieldsConfig.NAME_SOURCE_ID)
-				def tmpViaDatasource = nameSourceInfo.get("" + fieldsConfig.VIA_SOURCE)
+				def tmpMatchDatabaseName = nameSourceInfo?.get("" + fieldsConfig.NAME_SOURCE)
+				def tmpNameSourceId = nameSourceInfo?.get("" + fieldsConfig.NAME_SOURCE_ID)
+				def tmpViaDatasource = nameSourceInfo?.get("" + fieldsConfig.VIA_SOURCE)
 				matchDatabaseName = tmpMatchDatabaseName
 				nameSourceId = tmpNameSourceId
 				viaDatasource = tmpViaDatasource
@@ -674,7 +691,7 @@ class TaxonomyDefinition extends ScientificName {
 		s += "Via Datasource : " + viaDatasource  + lineBreak
 		s += "Match Id : " + matchId + lineBreak
 
-		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
+		s += "Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
 		//s += "Number of COL Matches : " + noOfCOLMatches + lineBreak
 		if(isFlagged) {
 			s += "IsFlagged reason : " + flaggingReason.tokenize('###')[-1];
@@ -685,7 +702,9 @@ class TaxonomyDefinition extends ScientificName {
 	
 	
 	def updateNameStatus(String str){
-		log.error "Not doing any thing.. this method should be called from namelistservice api"
+		if("accepted".equalsIgnoreCase(str)){
+			namelistService.changeSynToAcc(id)
+		}
 	}
 	
 	def updateContributors(List<SUser> users){
@@ -734,4 +753,10 @@ class TaxonomyDefinition extends ScientificName {
     static List fetchExportableFields(def grailsApplication=null) {
         return [['field':'id', 'name':'TaxonId', 'default':true, 'dbField':'id'], [ 'field' : 'name', 'name':'Name', 'default':true, 'dbField':'name'], ['field':'canonicalForm', 'name':'Canonical Form', 'default':false, 'dbField':'canonical_form'], ['field':'authorYear', 'name':'Author & Year', 'default':true, 'dbField':'author_year'], ['field': 'rank', 'name':'Rank', 'default':true, 'dbField':'rank'], ['field':'status', 'name':'Status', 'default':true, 'dbField':'status'], ['field':'position', 'name':'Position', 'default':true, 'dbField':'position'], ['field':'matchDatabaseName', 'name':'Source', 'default':true, 'dbField':'match_database_name'], ['field':'matchId', 'name':'Match Id', 'default':true, 'dbField':'match_id'], ['field':'viaDatasource', 'name':'Via Database', 'default':true, 'dbField':'via_datasource'], ['field': 'defaultHierarchy', 'name' : grailsApplication?grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY:'Taxonomy Hierarchy', 'default':true, 'dbField':'default_hierarchy'], ['field' : 'group', 'name':'Species Group', 'default':true, 'dbField':'group_id'], ['field':'speciesId', 'name':'Species Id', 'default':false, 'dbField':'species_id'], ['field':'isFlagged', 'name':'Is Flagged', 'default':false, 'dbField':'is_flagged']]; 
     }
+	
+	public boolean isParent(){
+		Classification ibpClassification = Classification.fetchIBPClassification()
+		TaxonomyRegistry tr = TaxonomyRegistry.findByParentTaxonDefinitionAndClassification(this, ibpClassification)
+		return tr?true:false
+	}
 }

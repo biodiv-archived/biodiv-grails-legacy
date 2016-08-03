@@ -35,11 +35,8 @@
                 latitude = documentInstance.latitude + geoPrivacyAdjustment
                 longitude = documentInstance.longitude + geoPrivacyAdjustment
 
-                if(documentInstance?.topology){ 
                    areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
-                } else if(params.areas) {
-                    areas = params.areas
-                }
+               
 
                 if(!latitude && params.latitude) latitude = params.latitude
                 if(!longitude && params.longitude) longitude = params.longitude
@@ -54,7 +51,6 @@
                 
             </td>
         </tr>
-       
     </table>
 </div>  
 
@@ -69,13 +65,11 @@
         }
         var m = [];
         var data = checklistObvPoints //[['255', '17', '78', true, false]]
-        
         for(var i=0; i<data.length; i++) {
             var obv = data[i];
             var latitude = obv.lat?obv.lat:obv[1];
             var longitude = obv.lng?obv.lng:obv[2];
             var icon;
-
             if(obv.geoPrivacy){
                 latitude += obv.geoPrivacyAdjust;
                 longitude += obv.geoPrivacyAdjust;
@@ -97,7 +91,6 @@
         loadGoogleMapsAPI(function() {
             var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
             mapLocationPicker.initialize();
-
             var icon;
             
             var ptIcon = mapLocationPicker.M.AwesomeMarkers.icon({
@@ -114,11 +107,12 @@
             } else {
                 icon = ptIcon;
             }
-
+  
             mapLocationPicker.initArea(false, undefined, undefined, $("#areas").val(), {icon:icon, layer:'Current Observation' });
             //HACK
             if(mapLocationPicker.searchMarker)
                 mapLocationPicker.map.panTo(mapLocationPicker.searchMarker.getLatLng());
+                mapLocationPicker.resetMap();
 
         });
     });

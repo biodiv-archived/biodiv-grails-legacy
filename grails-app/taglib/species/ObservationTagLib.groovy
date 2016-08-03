@@ -11,6 +11,13 @@ import org.grails.rateable.RatingException;
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil; 
 import java.lang.Math;
 import species.participation.UsersResource;
+import species.participation.DownloadLog;
+import species.participation.Comment;
+import species.participation.Discussion;
+import species.participation.Flag;
+import species.participation.Featured;
+import species.participation.ActivityFeed;
+
 
 class ObservationTagLib {
 	static namespace = "obv"
@@ -67,10 +74,14 @@ class ObservationTagLib {
 
 	def showRelatedStory = {attrs, body->
         out << render(template:"/common/observation/showObservationRelatedStoryTemplate", model:attrs.model);
+
 	}
 	
 	def showGroupFilter = {attrs, body->
 			out << render(template:"/common/speciesGroupFilterTemplate", model:attrs.model);
+	}
+	def showGroupIdentifiedFilter = {attrs, body->
+			out << render(template:"/common/speciesGroupFilterIdentifiedTemplate", model:attrs.model);
 	}
 	
 	def showRating = {attrs, body->
@@ -189,6 +200,7 @@ class ObservationTagLib {
         def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user, attrs.model.userGroup);
 		out << noOfObvs
 	}
+		
 	
 	def showNoOfRecommendationsOfUser = {attrs, body->
         def noOfObvs = observationService.getAllRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
@@ -447,5 +459,77 @@ class ObservationTagLib {
             out << body()
         }
     }
+    def showNoOfObservationsCreated = {attrs, body->
+        def noOfObvs = observationService.getAllObservationsOfUser(attrs.model.user, attrs.model.userGroup);
+		out << "<td class=countvaluecontributed>"+noOfObvs+"</td>"
+	}
+    def showNoOfSuggestedUponOfUser={attrs, body->
+        def noOfObvs = observationService.getAllSuggestedRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
+		out << "<td class=countvalue>"+noOfObvs+"</td>"
+	}
+	    def showNoOfDownloadUponOfUser={attrs, body->
+        def noOfObvs = DownloadLog.findAllByAuthorAndSourceType(attrs.model.user, attrs.model.sourceType).size();
+			out << "<td class=countvalue>"+noOfObvs+"</td>"
+	}
+		def showNoOfCommentUponOfUser={attrs, body->
+        def noOfObvs = Comment.findAllByAuthorAndRootHolderType(attrs.model.user, attrs.model.rootHolderType).size();
+		out <<  "<td class=countvalue>"+noOfObvs+"</td>"
+	}
+		def showNoOfOrganizedUponOfUser={attrs, body->
+		String[] activityType=["obv locked","obv unlocked","Featured","UnFeatured","Flagged","Flag removed","Flag deleted"];
+		def totalOrganizedObv=0;
+		activityType.each{
+		def noOfOrganizedOvb=ActivityFeed.findAllByAuthorAndActivityType(attrs.model.user,it).size()
+		totalOrganizedObv=noOfOrganizedOvb+totalOrganizedObv
+		}
+		out << "<td class=countvalue>"+totalOrganizedObv+"</td>"
+
+	}
+	def showNoOfDiscussionCreated={attrs,body->
+		def noOfDiscussionCreated=Discussion.findAllByAuthor(attrs.model.user).size()
+		out << "<td class=countvaluecontributed>"+noOfDiscussionCreated+"</td>"
+
+	}
+	def showNoOfDocsUploaded={attrs,body->
+		def noOfDocsUploaded=Document.findAllByAuthor(attrs.model.user).size()
+		out << "<td class=countvaluecontributed>"+noOfDocsUploaded+"</td>"
+
+	}
+	def showNoofOrganizedDocs={attrs,body->
+		String[] activityType=["Featured","UnFeatured","Posted resource","Document updated","Flagged"]
+		def totalDocsOrganized=0;
+		activityType.each{
+		def noOfDocsOraganized=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it)
+		totalDocsOrganized=noOfDocsOraganized.size()+totalDocsOrganized
+		
+	}
+	out << "<td class=countvalue>"+totalDocsOrganized+"</td>";
+	}
+	//def showNoofCommentedDocs={attrs,body->
+	//	def noOfDocsCommented=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
+	//	out << "<td class=countvalue>"+noOfDocsCommented+"</td>"
+	//}
+		def showNoofOrganizedDiscussion={attrs,body->
+		String[] activityType=["Posted resource","Featured","Flagged"]
+		def totalDiscussionOrganized=0;
+		activityType.each{ 
+		def noOfDiscussionOraganized=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it)
+		totalDiscussionOrganized=noOfDiscussionOraganized.size()+totalDiscussionOrganized
+		
+	}
+	out << "<td class=countvalue>"+totalDiscussionOrganized+"</td>";
+	}
+		def showNoofParticipationDiscussion={attrs,body->
+		def noOfParticipationDiscussion=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
+		out << "<td class=countvalue>"+noOfParticipationDiscussion+"</td>"
+	}
+		def showNoOfAgreedUponOfUser = {attrs, body->
+        def noOfObvsSuggested = ActivityFeed.findAllByAuthorAndActivityTypeAndActivityHolderType(attrs.model.user,attrs.model.activityType,attrs.model.activityHolderType).size()
+		out << "<td class=countvalue>"+noOfObvsSuggested+"</td>"
+	}
+			def showNoOfRecommendationsSuggested = {attrs, body->
+        def noOfObvs = observationService.getAllRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
+		out << "<td class=countvalue>"+noOfObvs+"</td>"
+	}
 }
 

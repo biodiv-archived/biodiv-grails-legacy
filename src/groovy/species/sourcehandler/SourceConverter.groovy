@@ -24,6 +24,7 @@ class SourceConverter {
 	private StringBuilder shortSummary;
 
     protected fieldsMap;
+	protected String individualNameSumm
 
     protected SourceConverter() {
         licenseUrlMap = new HashMap();
@@ -37,6 +38,7 @@ class SourceConverter {
 		
 		summary = new StringBuilder()
 		shortSummary = new StringBuilder()
+		individualNameSumm = ""
     }
 
     protected Node createFieldNode(Field field) {

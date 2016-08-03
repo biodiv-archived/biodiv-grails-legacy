@@ -4,6 +4,7 @@ var comDLContent, comWLContent, comCLContent;
 var speciesDLContent, speciesWLContent, speciesCLContent;
 var oldName = '', oldRank = '' , oldStatus = '';
 var genusMatchResult, taxonRanks, nameRank, genusTaxonMsg
+var taxonGridSelectedRow = {};
 
 function createListHTML(list, nameType, isOrphanList) {
     var listContent = "<ul class='"+nameType+"'>";
@@ -49,7 +50,10 @@ var searchString='';
 var showCheckBox = false;
 
 function initTaxonGrid(ele) {
-    var selectedName = $('.name').val().toLowerCase();
+    var selectedName = $('.name').val();
+    if(selectedName != undefined){
+        selectedName = selectedName.toLowerCase();
+    }
     var hyperlinkSlickFormatter = function(row, cell, value, columnDef, dataContext) {
         value = dataContext;
         var listContent = '';
@@ -1832,8 +1836,8 @@ $(document).ready(function() {
         });
         taxonGridDataView.refresh();
     }
-
-    taxonGrid = initTaxonGrid($('#taxonGrid'));
+    if($("#taxonGrid").length !=0)
+        taxonGrid = initTaxonGrid($('#taxonGrid'));
 //    $("#inlineFilterPanel").appendTo(taxonGrid.getTopPanel()).show();
     /*$("#inlineFilterPanel").on('keyup', '#txtSearch', function (e) {
         Slick.GlobalEditorLock.cancelCurrentEdit();
@@ -1890,4 +1894,239 @@ $(document).ready(function() {
     $('.selectNone').click(function() {
        $(this).parent().next().find('input:checkbox:not([disabled])').removeProp('checked').trigger('change');
     });
+
+
+
+
+
+    function generateselectedData(selectedData){        
+        var out ='<div class="row-fluid">';
+        var selOption = "<option value=''>Choose Name</option>";
+        var selSourceAccOnly ="<option value=''>Choose Name</option>";        
+                out +="<div class='row-fluid rowSel header'>";
+                out +="<div class='span2'>Rank</div>"
+                out +="<div class='span6'>Scientific Name</div>";
+                out +="<div class='span2'>Position</div>";
+                out +="<div class='span2'>Status</div>";
+                out +="</div>";
+        $.each(selectedData, function (key,selectName) {
+                selOption +="<option value='"+selectName.taxonid+"'>"+selectName.name+"</option>";
+                if(selectName.status=='ACCEPTED'){  
+                    selSourceAccOnly +="<option value='"+selectName.taxonid+"'>"+selectName.name+"</option>";
+                }
+                out +="<div class='row-fluid rowSel rowSel_"+selectName.taxonid+"'>";
+                out +="<div class='span2'>"+taxonRanks[selectName.rank].text+"</div>"
+                out +="<div class='span6'>"+selectName.italicisedform+"</div>";
+                out +="<div class='span2'>"+selectName.position+"</div>";
+                out +="<div class='span2'>"+selectName.status+"</div>";
+                out +="</div>";
+            });
+        $('.mergeTarget').html(selOption);
+        $('.changeSynTarget').html(selSourceAccOnly);
+        out+="</div>";
+      //  alert(out);
+        return out;
+
+    }
+
+
+    function checkRankStatusFun(){
+        var result = { rankCheck:true,statusCheck:true};
+        var rankCheckArr = [];
+        var statusCheckArr =[];
+        console.log(taxonGridSelectedRow);
+
+        $.each(taxonGridSelectedRow, function (index, value) {
+            console.log("=====================================");
+            console.log(index);
+            console.log(value);
+            if(rankCheckArr.length >0 && result.rankCheck){
+                if($.inArray(value.rank,rankCheckArr) == -1){
+                    result.rankCheck=false;
+                }
+            }
+            rankCheckArr.push(value.rank);
+
+            if(statusCheckArr.length >0 && result.statusCheck){
+                if($.inArray(value.status,statusCheckArr) == -1){
+                    result.statusCheck=false;
+                }
+            }
+            statusCheckArr.push(value.status);
+        });
+        console.log(result);
+        return result
+    }
+
+    $('.clickSelectedRow').click(function(){
+       // alert(taxonGrid.getSelectedRows());
+        var selectedRow = taxonGrid.getSelectedRows();        
+        if(selectedRow.length > 0){
+            var taxonGridData = "";
+            taxonGridSelectedRow = {};
+            $.each(selectedRow, function (index, value) {
+              taxonGridData = taxonGrid.getData().getItem(value);
+              taxonGridSelectedRow[taxonGridData.taxonid] = taxonGridData;
+            });
+            $("#myModal .selectedNamesWrapper").html(generateselectedData(taxonGridSelectedRow));
+            $('#myModal').modal('show');
+        }
+    });
+
+    $(document).on('click','.rowSel',function(){
+        var that = $(this);
+        if(that.hasClass('header') ||  that.hasClass('disableSciName'))
+            return false;
+
+        if(that.hasClass('rowSelActive')){
+            that.removeClass('rowSelActive');
+        }else{
+            that.addClass('rowSelActive');
+        }  
+
+        if($('.rowSelActive').length == 0){
+            $('.removeSelName').addClass('disabled');     
+        }else{
+            $('.removeSelName').removeClass('disabled');
+        }
+    });
+
+    $(document).on('change','.mergeWrapper select',function(){
+        var that = $(this);
+
+        if(that.hasClass('mergeTarget')){
+            var checkRankStatus = checkRankStatusFun();
+            if(!checkRankStatus.rankCheck || !checkRankStatus.statusCheck){
+                var msg = '';
+                if(!checkRankStatus.rankCheck)
+                    msg += " Rank must be same level";
+                if(!checkRankStatus.statusCheck)
+                    msg += " Status must be same level";
+
+                alert(msg);
+                return false;
+            }
+        }
+
+        var value = that.val();
+        $(".mergeWrapper").css('height','50px');
+        that.parent().css('height','80px');
+        $(".rowSel").removeClass('disableSciName');
+        $(".rowSel_"+value).addClass('disableSciName').removeClass('rowSelActive');
+        $('.selSub').hide();
+        if(value != ''){            
+            that.next().show();
+        }
+    });
+
+
+if(taxonGrid){
+    taxonGrid.onSelectedRowsChanged.subscribe(function(){
+     var selectedRows = taxonGrid.getSelectedRows();     
+     if (selectedRows.length === 0) {          
+        $('.clickSelectedRowWrap').slideUp();
+     }else{
+        $('.clickSelectedRowWrap').slideDown();
+     }
+    }); 
+}
+
 });
+ function mergeWithSource(me){
+        var newSourceId  = me.parent().find('.mergeTarget').val();
+        var oldSoureceId = ''; 
+        $.each(taxonGridSelectedRow, function (index, value) {
+            if(index != newSourceId){
+               oldSoureceId = value.taxonid; 
+            }
+        });
+        //alert("newSourceId "+newSourceId+" oldSoureceId "+oldSoureceId);
+        if(newSourceId != '' && oldSoureceId != ''){ 
+           var params ={ sourceId:oldSoureceId, targetId:newSourceId} 
+            $.ajax({
+                url: '/namelist/mergeNames',
+                dataType: "json",
+                type: "POST",
+                data: params,   
+                success: function(data) {
+                    if(data.status){
+                        location.reload()
+                    }else{
+                        alert('Error Merge Names');
+                    }
+                }
+            });
+        }
+
+        return false;
+}
+
+function deleteSourceName(me){
+    var params ={ id:taxonGridSelectedRow[Object.keys(taxonGridSelectedRow)[0]].taxonid}
+        $.ajax({
+            url: '/namelist/deleteName',
+            dataType: "json",
+            type: "POST",
+            data: params,   
+            success: function(data) {
+                if(data.status){
+                    location.reload()
+                }else{
+                        alert('Error Delete Names');
+                }
+            }
+        });
+    return false;
+}
+
+function changeAccToSyn(me){
+    var newSourceId  = me.parent().find('.changeSynTarget').val();
+    var oldSoureceId = ''; 
+    $.each(taxonGridSelectedRow, function (index, value) {
+        if(index != newSourceId){
+           oldSoureceId = value.taxonid; 
+        }
+    });
+   // alert("newSourceId "+newSourceId+" oldSoureceId "+oldSoureceId);
+    if(newSourceId != '' && oldSoureceId != ''){ 
+        var params ={ sourceAcceptedId:oldSoureceId,targetAcceptedId:newSourceId}
+            $.ajax({
+                url: '/namelist/changeAccToSyn',
+                dataType: "json",
+                type: "POST",
+                data: params,   
+                success: function(data) {
+                    if(data.status){
+                        location.reload()
+                    }else{
+                        alert('Error changeAccToSyn');
+                    }
+                }
+            });
+        return false;
+    }
+}
+
+
+function updatePosition(me){
+    var position  = me.parent().find('.movePosition').val();
+    var id = taxonGridSelectedRow[Object.keys(taxonGridSelectedRow)[0]].taxonid;
+   // alert("id "+id+" position "+position);
+    if(id != '' && position != ''){ 
+        var params ={ id:id,position:position}
+            $.ajax({
+                url: '/namelist/updatePosition',
+                dataType: "json",
+                type: "POST",
+                data: params,   
+                success: function(data) {
+                    if(data.status){
+                        location.reload()
+                    }else{
+                        alert('Error changeAccToSyn');
+                    }
+                }
+            });
+        return false;
+    }
+}

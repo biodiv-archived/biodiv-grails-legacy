@@ -108,11 +108,11 @@ class SpeciesController extends AbstractObjectController {
 	def listXML() {
 		//cache "taxonomy_results"
 		params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		def speciesList = Species.list(params) as XML;
+		def speciesList = Species.findAllByIsDeleted(false, params) as XML;
 		def writer = new StringWriter ();
 		def result = new MarkupBuilder(writer);
 		result.response() {
-			numspecies (Species.count())
+			numspecies (Species.countByIsDeleted(false))
 			result.mkp.yieldUnescaped (speciesList.toString() - "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 		}
 		render(contentType: "text/xml", text:writer.toString())
@@ -238,7 +238,7 @@ class SpeciesController extends AbstractObjectController {
 		//cache "content"
         params.id = params.long('id');
 		def url
-		def speciesInstance = params.id ? Species.get(params.id):null;
+		def speciesInstance = params.id ? Species.findByIsDeletedAndId(false, params.id):null;
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
             withFormat {
@@ -1561,11 +1561,13 @@ class SpeciesController extends AbstractObjectController {
                         if(species) {
                         	msg = messageSource.getMessage("default.species.error.already", null, RCU.getLocale(request))
                         } else {
-							species = speciesUploadService.createSpeciesStub(taxon)
-							println "============================= creating species stub now for taxon " + taxon
-							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
+                            if(rank>8){
+    							species = speciesUploadService.createSpeciesStub(taxon)
+    							println "============================= creating species stub now for taxon " + taxon
+    							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
+                            }
                         }
-						result = ['success':true, 'msg':msg, id:species.id, name:species.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
+						result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
 						
 	                    result['taxonRegistry'] = [:];
 						
@@ -1845,8 +1847,49 @@ class SpeciesController extends AbstractObjectController {
         }
 
     }
+
     def testTrait(){
         Language languageInstance = utilsService.getCurrentLanguage(request);
         speciesTraitsService.loadTraitDefinitions('/home/ifp/git/biodiv/app-conf/parent.tsv',languageInstance);
     }
+
+    def speciesContributor(){
+
+        //println "========================= species contributor"
+         params.max = params.limit ? params.int('limit') : 10
+        params.offset = params.offset ? params.long('offset'): 0
+        def userId=params.int('filterPropertyValue');
+        def userInstance = SUser.get(params.id?:params.filterPropertyValue)
+       // println "========================= species contributor"+userInstance
+                if (userInstance) {
+            def userGroupInstance
+            if(params.webaddress) {
+                userGroupInstance = userGroupService.get(params['webaddress'])
+            }
+            def userContributionList
+            userContributionList=speciesService.getuserContributionList(userId,params.max,params.offset)
+           //println "=======+++++++userContributionList"+userContributionList
+            def species=userContributionList.collect{it}
+            def result=[];
+            species.each{
+                result.add(['species':it,'title':it.fetchSpeciesCall()]);
+            }
+            def contributionCount=speciesService.totalContributedSpeciesSnippet2(userId);
+            def contributedSpe=['species':result,count:contributionCount]
+            def model = utilsService.getSuccessModel("", null, OK.value(), contributedSpe)
+            //println "=============contributionCount==========="+model
+             withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
+            }
+            else {
+            def model = utilsService.getErrorModel(g.message(code: 'error', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value())
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+    }
+}
 }

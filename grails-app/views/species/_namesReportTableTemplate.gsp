@@ -1,5 +1,5 @@
 <g:if test="${uploadList.size() > 0 }">
-	<div>
+	<div class="pre-scrollable">
 		<table class="table table-hover tablesorter span8" style="margin-left: 0px;">
 			<thead>
 				<tr>

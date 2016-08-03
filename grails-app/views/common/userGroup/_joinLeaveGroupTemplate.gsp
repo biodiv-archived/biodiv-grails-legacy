@@ -2,20 +2,20 @@
 	<uGroup:isNotAMember model="['userGroupInstance':userGroupInstance]">
 	
 		<g:if test="${userGroupInstance.allowUsersToJoin}">
-			<a class="btn btn-success joinUs"
+			<a class="btn btn-success btn-small joinUs"
 				data-group-id="${userGroupInstance.id }"> <i class="icon-plus"></i>
 				<g:message code="button.join.us" /></a>
 		</g:if>
 		<g:else>
-			<a class="btn btn-success requestMembership"
+			<a class="btn btn-danger btn-small requestMembership"
 				data-group-id="${userGroupInstance.id}"> <i class="icon-plus"></i>
-				<g:message code="button.join.us" /></a>
+				<g:message code="link.request" /></a>
 		</g:else>
 	</uGroup:isNotAMember>
 </g:if>
 <g:if test="${showLeave}">
 	<uGroup:isAMember model="['userGroupInstance':userGroupInstance]">
-		<a class="btn btn-primary leaveUs"
+		<a class="btn btn-primary btn-small leaveUs"
 			data-group-id="${userGroupInstance.id }"><i class="icon-minus"></i><g:message code="button.leave" /></a>
 	</uGroup:isAMember>
 </g:if>

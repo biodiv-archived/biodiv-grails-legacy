@@ -103,7 +103,6 @@
         }
         var m = [];
         var data = checklistObvPoints //[['255', '17', '78', true, false]]
-        
         for(var i=0; i<data.length; i++) {
             var obv = data[i];
             var latitude = obv.lat?obv.lat:obv[1];
@@ -130,6 +129,7 @@
     $(document).ready(function() {
         loadGoogleMapsAPI(function() {
             var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+
             mapLocationPicker.initialize();
             <g:if test="${!observationInstance.isChecklist}">
                 showObservationMapView("${observationInstance.id}", ${observationInstance.fromDate.getTime()}, mapLocationPicker);
@@ -150,6 +150,7 @@
             });
 
             if(${observationInstance.geoPrivacy}){
+
                 icon = (${observationInstance.isChecklist})?mapLocationPicker.geoPrivacyChecklistIcon:mapLocationPicker.geoPrivacyPointIcon;
             } else {
                 icon = (${observationInstance.isChecklist})?ctIcon:ptIcon;

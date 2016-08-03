@@ -36,7 +36,8 @@ class Species implements Rateable {
 	Habitat habitat;
 	StringBuilder sLog;
     boolean hasMedia = false;
-
+	boolean isDeleted = false;
+	
 	def grailsApplication; 
 	def springSecurityService;
 	def dataSource
@@ -73,6 +74,7 @@ class Species implements Rateable {
 		updatedOn(nullable:true);
         featureCount nullable:false;
         habitat nullable:true;
+		isDeleted nullable:false;
 	}
 
 	static mapping = {
@@ -297,7 +299,7 @@ class Species implements Rateable {
 				def sContributors =  this.taxonConcept.contributors
 				if(sContributors)
 	            	contributors.addAll(sContributors)
-		        Synonyms.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
+		        this.taxonConcept.fetchSynonyms()?.each { contributors.addAll(it.contributors)}
 		        CommonNames.findAllByTaxonConcept(this.taxonConcept)?.each { contributors.addAll(it.contributors)}
 		        
 		        //Saving current user as contributor for the species

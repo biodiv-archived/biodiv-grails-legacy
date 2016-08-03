@@ -21,7 +21,13 @@ class Classification {
 	
 	public static Classification fetchIBPClassification(){
 		return Classification.findByName(Holders.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY)
+	
 	}
+	
+	public static Classification fetchCOLClassification(){
+		return Classification.findByName(Holders.config.speciesPortal.fields.CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY)
+	}
+
 
     static List<Classification> list() { 
         return Classification.createCriteria().list {

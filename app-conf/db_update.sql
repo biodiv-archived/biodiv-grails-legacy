@@ -652,3 +652,17 @@ ALTER TABLE common_names ADD CONSTRAINT common_names_taxon_concept_id_key UNIQUE
 
 create index on common_names(is_deleted);
 create index on taxonomy_definition(is_deleted);
+
+
+#16th may
+alter table species add column is_deleted boolean not null default 'false';
+create index on species(is_deleted);
+
+
+#17 may 
+update document set external_url =uri where uri !='';
+alter table document drop column uri;
+
+#26 may
+ALTER TABLE document ALTER COLUMN latitude TYPE double precision;
+ALTER TABLE document ALTER COLUMN longitude TYPE double precision;
