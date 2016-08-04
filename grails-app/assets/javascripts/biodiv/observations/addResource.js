@@ -1,4 +1,4 @@
-var resType;
+//var resType;
 
 function removeResource(event, imageId) {
     var targ;
@@ -316,7 +316,7 @@ function createResources(start, end, w, count) {
 
         filePick : function(e) {
             var me = this;
-            resType = $( "input[name='resType']" ).val();//me.$ele.find("input#resType").val()
+            //resType = $( "input[name='resType']" ).val();
 
             filesutra.importFiles(function(FPFiles) {
               console.log(FPFiles);

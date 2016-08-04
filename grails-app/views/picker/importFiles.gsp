@@ -55,6 +55,7 @@
       margin: 0.5cm;
       display: block;
       padding: 10px 15px;
+      text-align: center;
       /*border: 1px solid #ddd;*/
 
     }
@@ -157,11 +158,13 @@
                       <ul class="list-group" ng-click="selectItem(item); toggleObject = !toggleObject">
                         <li class="list-group-item1" ng-class-odd="{'color1':toggleObject}" ng-class="itemId.indexOf(item.id) > -1 && item.type != 'folder' ? 'selectedItem' : ''" >
 
-                          <img  src="{{item.iconurl}}" class="img-responsive img-thumbnail" style="max-height:100%">
+                          <img  ng-if="runningApp != 'Google'" src="{{item.iconurl}}" class="img-responsive img-thumbnail" style="max-height:100%">
+                          <img  ng-if="runningApp == 'Google'" src="{{item.thumbnail}}" class="img-responsive img-thumbnail" style="max-height:100%">
+
                        <p style="overflow: hidden;white-space: nowrap;text-align: center;">{{item.name}}</p>
                        </li>
                       </ul>
-                        <button id="singlebutton" name="singlebutton" ng-disabled="isDisabled" class="btn btn-primary bottom2" ng-show="$last && showButton" ng-click="gettingList(1)">Load More</button> 
+                        <button id="singlebutton" name="singlebutton" ng-disabled="isDisabled" class="btn btn-primary bottom2" ng-show="$last && showButton" ng-click="gettingList(1)">{{loadMoreText}}</button> 
                   </div>
             </div>
           </div>

@@ -47,9 +47,17 @@ class FilesAPIController {
                     mItem.id = it.id
                     mItem.type = "file"
                     mItem.name = it.title
-                    mItem.iconurl =it.thumbnailLink
+                    mItem.thumbnail =it.thumbnailLink
+                    mItem.iconurl =it.webContentLink
                     mItem.size = it.fileSize ? it.fileSize as long : null
                     mItem.mimetype = it.mimeType
+                    itemResponse.push(mItem)
+                }else if(it.mimeType == "application/vnd.google-apps.folder"){
+                    def mItem = new ApiResponse.Item()
+                    mItem.id = it.id
+                    mItem.type = "folder"
+                    mItem.name = it.title
+                    mItem.size = it.fileSize ? it.fileSize as long : null
                     itemResponse.push(mItem)
                 }
             }
@@ -75,7 +83,7 @@ class FilesAPIController {
                     mItem.name = it.id
                 }
                 if(it.images[5]){
-                mItem.iconurl = it.images[5]['source']
+                mItem.iconurl = it.images[0]['source']
                 typeSize = getMimeType(mItem.iconurl)
                 mItem.mimetype = typeSize[0]//getMimeType(mItem.iconurl);
                 //URL url = new URL(mItem.iconurl);
@@ -121,7 +129,7 @@ class FilesAPIController {
                     def mItem = new ApiResponse.Item();
                     mItem.id = it.id
                     mItem.type = "file"
-                    mItem.name = it.title+".jpg"
+                    mItem.name = it.title
                     mItem.iconurl = it.url_m
                     typeSize = getMimeType(mItem.iconurl)
                     mItem.size = typeSize[1]
@@ -149,7 +157,7 @@ class FilesAPIController {
             }else{
                 mItem.type = "file"
                 mItem.name = it.title.$t
-                mItem.iconurl = it.media$group.media$thumbnail[1].url
+                mItem.iconurl = it.media$group.media$content[0].url//media$group.media$thumbnail[1].url
                 mItem.size = it.gphoto$size.$t ? it.gphoto$size.$t as long : null
                 mItem.mimetype = it.media$group.media$content[0].type
             }
@@ -222,7 +230,7 @@ class FilesAPIController {
         render itemResponse as JSON
     }*/
 
-    def importGoogleFile() {
+   /* def importGoogleFile() {
         def input = request.JSON
         Access access = Access.get(session.googleAccessId)
         File file = new File(fileId: input.fileId, type: "GOOGLE", access: access,
@@ -311,7 +319,18 @@ class FilesAPIController {
                 mimetype: input.mimetype
         ]
         render fileResponse as JSON
-    }
+    }*/
+
+     /*def importFile() {
+      def input = request.JSON
+        def fileResponse = [
+                filename: input.name,
+                url: input.fileurl,
+                size: input.size,
+                mimetype: input.mimetype
+        ]
+        render fileResponse as JSON
+    }*/
 
     /*def importBoxFile() {
         def input = request.JSON

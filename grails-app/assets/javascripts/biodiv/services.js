@@ -24,11 +24,13 @@ filesutraServices.factory("fileService", ['$http', function($http) {
       });
     },
     import : function(app, item, callback) {
-      var endpoint = '/api/import/'+app.toLowerCase();
-      $http.post(endpoint, {fileId: item.id, fileName: item.name, size: item.size, mimetype: item.mimetype})
+      /*var endpoint = '/api/import/'+app.toLowerCase();
+      $http.post(endpoint, {fileId: item.id, fileName: item.name, size: item.size, mimetype: item.mimetype, fileurl: item.iconurl})
         .success(function(data) {
           callback(data);
-      });
+      });*/
+      var importedFile = {"filename": item.name,"url": item.iconurl,"size": item.size,"mimetype": item.mimetype}
+      callback(importedFile);
     }
   }
 }]);

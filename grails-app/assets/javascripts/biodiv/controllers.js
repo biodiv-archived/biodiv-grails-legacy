@@ -3,6 +3,8 @@ var filesutraControllers = angular.module("filesutraControllers", ["filesutraSer
 filesutraControllers.controller("AppCtrl", ['$scope', '$http', '$location', "fileService", "authService",
   function($scope, $http, $location, fileService, authService) {
      $scope.toggleObject = true;
+     $scope.loadMoreText = "Load More"
+
     $scope.selectApp = function(app) {
       $scope.runningApp = app;
       $location.path(app);
@@ -47,7 +49,10 @@ filesutraControllers.controller("AppCtrl", ['$scope', '$http', '$location', "fil
         return false;
       }
     }
-
+    /*$(window).blur(function() {
+       // alert('lost focus');
+         window.close();
+    });*/
 
       $scope.uploadFile = function(event){
        //$('#submitIt').submit();
@@ -199,7 +204,6 @@ filesutraControllers.controller("AppCtrl", ['$scope', '$http', '$location', "fil
 
       }
       if (chunks.length > 2) {
-        $scope.showBackButton = true;
         folderId = chunks[chunks.length - 1];
       }
       
@@ -216,6 +220,11 @@ filesutraControllers.controller("AppCtrl", ['$scope', '$http', '$location', "fil
         $scope.itemId = [];
            fileService.getItems(app, folderId, $scope.afterTokenVal, function (items) {
             //delete $scope.items;
+            if (chunks.length > 2) {
+             $scope.showBackButton = true;
+            }else{
+              $scope.showBackButton = false;
+            }
              $scope.items = [];
              $scope.afterTokenVal = items.afterval;
              if(items.listresponse.length < 25){
@@ -231,13 +240,21 @@ filesutraControllers.controller("AppCtrl", ['$scope', '$http', '$location', "fil
           });
         }
        }else{
+        $scope.loadMoreText = "Loading..."
+
         $scope.isDisabled = true;
         fileService.getItems(app, folderId, $scope.afterTokenVal, function (items) {
+          $scope.loadMoreText = "Load More"
             $scope.afterTokenVal = items.afterval;
+            if (chunks.length > 2) {
+             $scope.showBackButton = true;
+            }else{
+              $scope.showBackButton = false;
+            }
             console.log(items);
             if(items!="error"){
             if(items.listresponse.length < 25){
-                    $scope.showButton = false;
+              $scope.showButton = false;
 
              }else{
               $scope.showButton = true;
@@ -259,6 +276,12 @@ filesutraControllers.controller("AppCtrl", ['$scope', '$http', '$location', "fil
         delete $scope.items;
         $scope.items = null
            fileService.getListItems(app, folderId, function (items) {
+            if (chunks.length > 2) {
+             $scope.showBackButton = true;
+            }else{
+              $scope.showBackButton = false;
+            }
+
             $scope.items = items;
             });
          }

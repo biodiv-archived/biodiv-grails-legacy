@@ -42,7 +42,7 @@ class UrlMappings {
         "/api/files/onedrive"             (controller: "FilesAPI", action: "onedriveFiles")
         "/api/files/amazonclouddrive"     (controller: "FilesAPI", action: "amazonFiles")
 
-        "/api/import/google"                (controller: "FilesAPI", action: "importGoogleFile")
+        /*"/api/import/google"                (controller: "FilesAPI", action: "importGoogleFile")
         "/api/import/facebook"              (controller: "FilesAPI", action: "importFacebookFile")
         "/api/import/flickr"                (controller: "FilesAPI", action: "importFlickrFile")   
         "/api/import/picasa"                (controller: "FilesAPI", action: "importPicasaFile")      
@@ -51,7 +51,7 @@ class UrlMappings {
         "/api/import/onedrive"              (controller: "FilesAPI", action: "importOnedriveFile")
         "/api/import/amazonclouddrive"      (controller: "FilesAPI", action: "importAmazonFile")
 
-        "/download/$id"         (controller: "File", action: "downloadFile")
+        "/download/$id"         (controller: "File", action: "downloadFile")*/
 
         "/$controller/$action?/$id?(.$format)?" {
             constraints {
