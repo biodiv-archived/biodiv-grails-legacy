@@ -375,12 +375,13 @@ class SpeciesUploadService {
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				sBulkUploadEntry?.writeLog(res.idSummary)
-				cleanUpGorm();
+				
 			}
 			
 			processNameCount += contentSubList.size()
 			if(processNameCount%5 == 0){
 				println "------------------- processNameCount " + processNameCount
+				cleanUpGorm();
 			}
 		}
 		

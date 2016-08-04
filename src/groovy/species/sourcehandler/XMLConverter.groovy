@@ -383,9 +383,9 @@ class XMLConverter extends SourceConverter {
                         language = fieldNode.language[0].value();
 
                         if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.COMMON_NAME, 2, language))) {
-							log.debug "Cammon name added at the time of name update" 
+							//log.debug "Cammon name added at the time of name update" 
                         } else if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.SYNONYMS, 2, language))) {
-							log.debug "Synonym added at the time of name update"	
+							//log.debug "Synonym added at the time of name update"	
                         }
                         else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY, 3, language))) {
                             List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
@@ -417,7 +417,7 @@ class XMLConverter extends SourceConverter {
                             }
 
                         } else if(category && ( category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase()) ||  category.toLowerCase().startsWith("Hiérarchie Taxonomique".toLowerCase()))) {
-                            log.debug "Added Hirerachy at the time of name update" 
+                            //log.debug "Added Hirerachy at the time of name update" 
                         } else {
                             List<SpeciesField> speciesFields = createSpeciesFields(s, fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0], s.taxonConcept.fetchSynonyms());
                             speciesFields.each {
@@ -670,7 +670,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode, List synonyms) {
-        log.debug "Creating species field from node : =========== "+fieldNode;
+        //log.debug "Creating species field from node : =========== "+fieldNode;
         List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
         Field field = getField(fieldNode, false);
         if(field == null) {
@@ -2126,7 +2126,7 @@ class XMLConverter extends SourceConverter {
                         return;
                     }
                     if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
-                        println " =========== got taxon and reusing it  " + taxon
+                        //println " =========== got taxon and reusing it  " + taxon
                         //taxon = null;
                     }
                     boolean addNewNameToSession = (taxon && taxon.id)?false:true
