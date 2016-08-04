@@ -682,11 +682,6 @@ def grailsCacheManager;
 						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
                         else 
 						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
-                        
-                        if(parsedVal == true){
-                         def deleteFile = new File(f.url)
-                            deleteFile.delete()  //deleting the file from fileops folder
-                        }
                     }
                 }
 				

@@ -70,12 +70,6 @@
 
 ////= require slickgrid
 
-
-//= require biodiv/angular.min.js
-//= require biodiv/angular-route.min.js
-//= require biodiv/app.js
-//= require biodiv/controllers.js
-//= require biodiv/services.js
 //= require biodiv/filesutra.js
 
 ////= require create

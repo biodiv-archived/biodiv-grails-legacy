@@ -1,10 +1,10 @@
 
 
-var filesutraServer = "/url/path/to/the/fileOps/app";//fileOps server link
+//var filesutraServer = "/url/path/to/the/fileOps/app";//fileOps server link
 window.filesutra = {
   importFiles: function(callback, options) {
     //console.log(options)
-    //var filesutraServer = "http://localhost:5000/picker?resType="+parent.resType;
+    var filesutraServer = "http://localhost:5000/picker";
 
     if (options && options.dialogType == 'iframe') {
       var iframe = document.getElementById(options.parentId)
