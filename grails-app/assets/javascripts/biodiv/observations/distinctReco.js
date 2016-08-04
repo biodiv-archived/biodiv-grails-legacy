@@ -27,8 +27,10 @@ function loadDistinctRecoList() {
         url:window.params.observation.distinctRecoListUrl,
         dataType: "json",
         data:params,
-        success: function(data) {
-            
+        success: function(data) {   
+            if(data.success == false){
+                $me.hide();
+            }
             $('#distinctRecoList .distinctRecoHeading').html(data.model.totalRecoCount?(' (' + data.model.totalRecoCount + ')'):'');
             if(data.success == true && data.model.distinctRecoList && href.toLowerCase().indexOf("user/show") >= 0) {
                 $.each(data.model.distinctRecoList, function(index, item) {
@@ -41,8 +43,7 @@ function loadDistinctRecoList() {
                 if(!data.model.next){
                     $me.hide();
                 }
-            } 
-                if(data.success == true && data.model.distinctRecoList && href.toLowerCase().indexOf("user/show") <= 0) {
+            }else if(data.success == true && data.model.distinctRecoList && href.toLowerCase().indexOf("user/show") <= 0) {
                 $.each(data.model.distinctRecoList, function(index, item) {
                     if(item[1])
                     $distinctRecoTable.append('<tr><td><i>'+item[0]+'</i></td><td>'+item[2]+'</td></tr>');  
@@ -54,10 +55,6 @@ function loadDistinctRecoList() {
                     $me.hide();
                 }
             } 
-
-            else {
-                $me.hide();
-            }
     }
     });
 }
@@ -78,7 +75,9 @@ function loadDistinctIdentifiedRecoList() {
         dataType: "json",
         data:params,
         success: function(data) {
-            
+            if(data.success == false){
+                $me.hide();
+                }
             $('#distinctRecoIdentifiedList .distinctIdentifiedRecoHeading').html(data.model.totalRecoCount?(' (' + data.model.totalRecoCount + ')'):'');
             if(data.success == true && data.model.distinctIdentifiedRecoList) {
                 $.each(data.model.distinctIdentifiedRecoList, function(index, item) {
@@ -91,9 +90,12 @@ function loadDistinctIdentifiedRecoList() {
                 if(!data.model.next){
                     $me.hide();
                 }
-            } else {
+            }
+             else  {
+
                 $me.hide();
             }
         }
     });
 }
+
