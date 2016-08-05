@@ -119,7 +119,7 @@
             %>
             <form class="upload_resource ${hasErrors(bean: observationInstance, field: 'resource', 'errors')}" 
                 title="${g.message(code:'title.checklist.create')}"
-                method="post">
+                method="post" enctype="multipart/form-data">
 
                 <span class="msg" style="float: right"></span>
                 <input class="videoUrl" type="hidden" name='videoUrl' value="" />

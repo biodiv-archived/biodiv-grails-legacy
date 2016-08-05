@@ -241,6 +241,7 @@ def grailsCacheManager;
         result = observationService.getObservationOccurences(params)
         def model = utilsService.getSuccessModel('', null, OK.value(), result);
         withFormat {
+
             json { render model as JSON }
             xml { render model as XML }
         }
@@ -523,6 +524,7 @@ def grailsCacheManager;
 		}
 		
 		try {
+
 				def rs = [:]
                 if(ServletFileUpload.isMultipartContent(request)) {
                     MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -547,19 +549,26 @@ def grailsCacheManager;
 				if(!params.resources && !params.videoUrl) {
 					message = g.message(code: 'no.file.attached', default:'No file is attached')
 				}
-				
 				if(params.resources instanceof String) {
 						params.resources = [params.resources]
 				}
-				params.resources.each { f ->					
+				params.resources.each { f ->
+                    def parsedVal;					
                     String mimetype,filename;
                     if(f instanceof String) {
                         f = JSON.parse(f);
                         if(f.size instanceof String) {
                             f.size = Integer.parseInt(f.size)
                         }
-                        mimetype = f.mimetype
-                        filename = f.filename
+                        if(f.containsKey('contentType')){
+                            mimetype = f.contentType
+                            filename = f.originalFilename
+                            parsedVal = true;
+                        }else{
+                            mimetype = f.mimetype
+                            filename = f.filename
+                            parsedVal = false;
+                        }
                         log.debug "Saving observation file ${f.filename}"
                     } else {
                         mimetype = f.contentType
@@ -640,8 +649,12 @@ def grailsCacheManager;
                             def url = f.url;
                             def fp = utilsService.filePickerSecurityCodes();
                             //modifying url to give permissions.
-                            url += '?signature=' + fp.signature +'&policy='+fp.policy
-						    download(url, file );						
+                            //url += '?signature=' + fp.signature +'&policy='+fp.policy
+                            if(parsedVal == true){
+                                new AntBuilder().copy( file:url,tofile:file)
+                            }else{
+                                download(url, file );                       
+                            }
                         } else {
 						    f.transferTo( file );
                         }
@@ -650,6 +663,7 @@ def grailsCacheManager;
 						def type
                         def pi
 						if(resourcetype == resourceTypeImage){
+                            println "==== "+file.getAbsolutePath()+" ==== "+obvDir.toString();
 								pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
                                 //ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
 								def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
@@ -668,8 +682,13 @@ def grailsCacheManager;
 						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
                         else 
 						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
-					}
-				}
+                        
+                        if(parsedVal == true){
+                            def deleteFile = new File(f.url)
+                            deleteFile.delete()  //deleting the file from fileops folder
+                        }
+                    }
+                }
 				
 				if(params.videoUrl) {
 					//TODO:validate url;

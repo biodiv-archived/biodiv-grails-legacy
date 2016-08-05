@@ -1,3 +1,5 @@
+//var resType;
+
 function removeResource(event, imageId) {
     var targ;
     if (!event) var event = window.event;
@@ -314,7 +316,47 @@ function createResources(start, end, w, count) {
 
         filePick : function(e) {
             var me = this;
-            var onSuccess = function(FPFiles){
+            //resType = $( "input[name='resType']" ).val();
+
+            filesutra.importFiles(function(FPFiles) {
+              console.log(FPFiles);
+                $(".sortMediaOnExif").addClass("disabled");
+                var count = 0;
+                me.uploadedFiles = FPFiles;
+                console.log(me.uploadedFiles);
+                me.uploadedFilesSize = FPFiles.length;
+                me.start = 0;
+                me.w = 1;
+                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+                me.start = me.start + me.w;
+                me.$form.find("input[name='resources']").remove();
+
+                $.each(FPF, function(){
+                    console.log(JSON.stringify(this));
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'resources',
+                        value:JSON.stringify(this)
+                    }).appendTo(me.$form);
+                    count = count + 1;
+                });
+                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                    $("input[name='obvDir']").val('');
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'lastUploaded',
+                        value: count
+                    }).appendTo(me.$form);
+                }
+                me.$ele.find(".progress").css('z-index',110);
+                me.$ele.find('.progress_msg').html('Processing <br> Images...');
+                me.$ele.find(".mediaProgressBar").progressbar({
+                    value:0
+                });
+                me.$ele.find(".ui-progressbar-value").css('background','darkgoldenrod');
+                me.submitRes();
+              });
+            /*var onSuccess = function(FPFiles){
                 $(".sortMediaOnExif").addClass("disabled");
                 var count = 0;
                 me.uploadedFiles = FPFiles;
@@ -367,7 +409,7 @@ function createResources(start, end, w, count) {
             });
             } catch(e) {
                 console.log('filepicker error : '+e);
-            }
+            }*/
                                     
         },
 

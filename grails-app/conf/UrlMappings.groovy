@@ -32,7 +32,6 @@ class UrlMappings {
 			action = 'createFacebookAccount'
 		}
 
-
 		"/user/create"( controller : 'SUser', action:'create', method:'GET')
 		"/user"( controller : 'SUser', action:'index', method:'GET')
 		"/user/list"( controller : 'SUser', action:'list', method:'GET')
