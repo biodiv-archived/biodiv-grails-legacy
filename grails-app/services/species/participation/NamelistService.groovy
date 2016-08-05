@@ -41,6 +41,7 @@ import species.AcceptedSynonym
 import species.ResourceFetcher;
 import species.AbstractObjectService;
 import species.SpeciesPermission;
+import species.ScientificName.RelationShip
 
 class NamelistService extends AbstractObjectService {
   
@@ -2414,7 +2415,7 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	private void updateStatusAndClass(ScientificName sciName, NameStatus status) {
-		sciName.relationship = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
+		//sciName.relationship = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
 		sciName.status = status
 		if(!sciName.save(flush:true)){
 			sciName.errors.allErrors.each { log.error it }

@@ -24,7 +24,7 @@
   <div class="span4 tab_accept_inner"><label>Name</label></div>
   <div class="span3 tab_accept_inner"><label>Source</label></div>
   <div class="span3 tab_accept_inner"><label>Contributor</label></div>
-  <div class="span2 tab_accept_inner"><label>Action</label></div>
+  <div class="span2 tab_accept_inner" style="display:none;"><label>Action</label></div>
 </div>
 <g:set var="typeClass" value="${type}id"/>
 <g:each in="${1..3}">
@@ -36,7 +36,7 @@
   </div>
   <div class="span3" style ="padding-right:4px;"><input type="text" class="nameInputs span12" name="source"></div>
   <div class="span3" style ="padding-right:4px;"><input type="text" class="nameInputs span12" name="contributor"></div>
-  <div class="span2" style="text-align:center;">
+  <div class="span2" style="text-align:center;display:none;">aa
     <g:if test="${type == 'a'}">
         <button class="btn btn-mini btn-primary addEdit disabled" onClick='validateName(this, false);'>Validate Name</button>
     </g:if>
@@ -50,5 +50,5 @@
 </g:each>
 
 
-<button class="btn btn-success btn-mini add_new_row">Add Row</button>
+<button class="btn btn-success btn-mini add_new_row" style="display:none;">Add Row</button>
 

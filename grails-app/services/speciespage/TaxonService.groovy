@@ -1098,6 +1098,12 @@ class TaxonService {
 		long classificationId = params.classificationId.toLong()
 		return TaxonomyRegistry.findByTaxonDefinitionAndClassification(TaxonomyDefinition.read(taxonId), Classification.read(classificationId))
 	}
+
+	private TaxonomyRegistry getTaxonRegPath(params){
+		long taxonId = params.taxonId.toLong()
+		long classificationId = params.classificationId.toLong()
+		return TaxonomyRegistry.findByTaxonDefinitionAndClassificationAndPath(TaxonomyDefinition.read(taxonId), Classification.read(classificationId),params.path)
+	}
 	
 	def addLevelToTaxonReg(){
 		int i = 0
@@ -1160,28 +1166,55 @@ class TaxonService {
         }
     }
 
+    def validateParentHierarchy(tr,taxonId,classificationId,parentTaxonDefinition,path,parentPath){    	
+		    	tr.taxonDefinition = TaxonomyDefinition.read(taxonId);
+		    	tr.classification = Classification.get(classificationId);
+		    	tr.path = path;
+		    			    	
+		    	if(parentTaxonDefinition){
+		    		tr.parentTaxonDefinition=TaxonomyDefinition.get(parentTaxonDefinition.toInteger());
+		    		tr.parentTaxon = getTaxonRegPath([taxonId:parentTaxonDefinition,classificationId:classificationId,path:parentPath])
+		    	}
+
+		    	println "==============Path============"+path
+		    	println "==============parentPath============"+parentPath
+		    	println "================================"
+		    	println tr.dump()
+		    	log.debug "Updating Taxon"+ tr.dump()
+		    	//return true;
+		        if(!tr.save(flush:true)){
+					tr.errors.allErrors.each { log.error it }
+					//return false
+			   	}else{
+			   		tr.updateContributors([springSecurityService.currentUser]);
+			   		//return true
+			   	}
+    }
+
     def updateHierarchy(path,taxonId,classificationId){
     	def params = [taxonId:taxonId,classificationId:classificationId];
-    	def tr = (getTaxonReg(params))?:new TaxonomyRegistry();
-    	tr.taxonDefinition = TaxonomyDefinition.read(taxonId);
-    	tr.classification = Classification.get(classificationId);
-    	tr.path = path;
-    	def pathArr = path.split('_')
-    	def parentTaxonDefinition = (pathArr.length>1)?pathArr[-2]:'';
-    	if(parentTaxonDefinition){
-    		tr.parentTaxonDefinition=TaxonomyDefinition.get(parentTaxonDefinition.toInteger());
-    		tr.parentTaxon = getTaxonReg([taxonId:parentTaxonDefinition,classificationId:classificationId])
+    	def tr,parentTaxonDefinition
+    	List pathArr = path.split('_');    	    	
+    	for(def i=0;i<pathArr.size();i++){
+    		//println pathArr[0..i].join('_');
+    		params.taxonId = pathArr[i];    	
+    		params.path = pathArr[0..i].join('_');
+    		println params
+    		def taxonReg = getTaxonRegPath(params)
+    		println taxonReg 
+    		if(!taxonReg){
+    			println "No hierarchy path "+params.path+" for "+pathArr[i]
+		    	tr = new TaxonomyRegistry();
+		    	parentTaxonDefinition = (pathArr.size()>1)?pathArr[i-1]:'';
+		    	validateParentHierarchy(tr,pathArr[i],classificationId,parentTaxonDefinition,params.path,pathArr[0..i-1].join('_'));	    	
+		 	}
     	}
-    	log.debug "Updating Taxon"+ tr
-        if(!tr.save(flush:true)){
-			tr.errors.allErrors.each { log.error it }
-			return false
-	   	}else{
-	   		tr.updateContributors([springSecurityService.currentUser]);
-	   		return true
-	   	}
-
-
+    	params.taxonId = taxonId;
+    	tr = getTaxonReg(params);
+    	parentTaxonDefinition =  (pathArr.size()>1)?pathArr[pathArr.size()-1]:'';	 	
+	 	pathArr.add(taxonId);
+	 	path = pathArr.join('_');
+	 	validateParentHierarchy(tr,taxonId,classificationId,parentTaxonDefinition,path,pathArr[0..pathArr.size()-2].join('_'));			
     }
     
 }

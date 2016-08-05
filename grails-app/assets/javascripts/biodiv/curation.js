@@ -512,9 +512,9 @@ function populateTabDetails(data, appendData) {
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
-            if(value["source"] == 'CatalogueOfLife') {
+            //if(value["source"] == 'CatalogueOfLife') {
                 $(ele).find("input").prop("disabled", true);
-            }
+            //}
         })
     }
 
@@ -777,7 +777,7 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
     var rows = "";
     $.each(data, function(index, value) {
         if(dataFrom == "externalData") {
-            var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value["id"] + ',"' + value["externalId"] + '", "' + value["name"] + '")' : 'getExternalDbDetails(this, ' +showNameDetails+')'
+            var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value["id"] + ',"' + value["externalId"] + '", "' + value["name"] + '", "' + value["rank"] + '")' : 'getExternalDbDetails(this, ' +showNameDetails+')'
             var nameStatus = value['nameStatus'];
             var colLink = 'http://www.catalogueoflife.org/annual-checklist/2015/details/species/id/'+value['externalId']
             if(nameStatus == 'synonym') {
@@ -804,7 +804,7 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
             }   
         }
         else {
-            var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value['id'] + ',"' + value['externalId'] + '", "' + value['name'] + '")' : 'getNameDetails(' +value['taxonId'] + ',' + classificationId + ',1, undefined)' 
+            var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value['id'] + ',"' + value['externalId'] + '", "' + value['name'] + '", "' + value["rank"] + '")' : 'getNameDetails(' +value['taxonId'] + ',' + classificationId + ',1, undefined)' 
             rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus'] + "/" + value['position'] +"</td><td>"+value['group']+"</td><td>" + value['parentName'] + "</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"
         }
     });
@@ -812,7 +812,8 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
     return
 }
 
-function openSpeciesPage(taxonId, colId, name){
+function openSpeciesPage(taxonId, colId, name,rank){
+     rank = getSelectedRank(rank,'name') || nameRank;
      var namelist=$('#addSpeciesPage').find('.namelistUI').val();
     //alert(namelist);
     if(namelist && $('#page').hasClass('currentPage')){
@@ -840,7 +841,7 @@ function openSpeciesPage(taxonId, colId, name){
         newpath = newpath.substring(0,newpath.length-1);
         $('.newTaxonPath').val(newpath);
         cacheResultForPopulate.requestParams.taxonRegistry=tr;
-        updateHirInput(cacheResultForPopulate);
+        updateHirInput(cacheResultForPopulate,rank,true);
         updateHirRank(getSelectedRank($('#rankDropDown').val(),'name'));
         $("#externalDbResults").modal('hide');
         processingStop();
@@ -1013,7 +1014,9 @@ function enableValidButton(comp){
     }
 }
 
-function updateHirInput(data){
+function updateHirInput(data,rank,mode){
+    rank = rank || nameRank;
+    mode = mode || false;
     var $ul = $('<ul></ul>');
     $('#existingHierarchies').empty().append($ul);
     if (data.taxonRegistry) {
@@ -1030,10 +1033,10 @@ function updateHirInput(data){
 
     $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
     var $hier = $('#taxonHierachyInput');
-    $hier.empty()
+    if(!mode){$hier.empty();}
     var taxonRegistry = data.requestParams ? data.requestParams.taxonRegistry: undefined;
     var taxonIBPHirMatch = data.requestParams ? data.requestParams.taxonIBPHirMatch: undefined;
-    var taxonCOLHirMatch = data.requestParams ? data.requestParams.taxonCOLHirMatch: undefined;
+    var taxonCOLHirMatch = data.requestParams ? data.requestParams.taxonCOLHirMatch: undefined;    
     
     for (var i = 0; i < nameRank; i++) {
         var isTaxon = (taxonRegistry && taxonRegistry[i]);
@@ -1060,18 +1063,26 @@ function updateHirInput(data){
             bClass = 'btn-primary';
             bText = 'Validate Name';
         }
+        if(!mode){
         $(
                 '<div class="input-prepend hie_'+taxonRanks[i].value+'"><span class="add-on">'
                         + taxonRanks[i].text
                         + (taxonRanks[i].mandatory ? '*' : '')
                         + '</span><input data-provide="typeahead" data-rank ="'
                         + taxonRanks[i].value
+                        + '" data-id="' +
                         + '" data-ibpid="' + ibpMatch + '" data-colid="' + colMatch
                         + '" type="text" class="taxonRank" name="taxonRegistry.'
                         + taxonRanks[i].value + '" value="' + taxonValue
                         + '" placeholder="Add ' + taxonRanks[i].text
                         + '" onchange="enableValidButton($(this).parent());"' 
                         + '" /><div class="btn btn-mini ' + bClass + '" onclick=validateHirName($(this).parent());> ' + bText + ' </div></div>').appendTo($hier);
+        }else{
+            // Update the hierarchy
+            if(i < rank){
+                $('.hie_'+taxonRanks[i].value+' .taxonRank').val(taxonValue);
+            }
+        }
     }
     if (nameRank > 0){
         $('#taxonHierarchyInputForm').show();
@@ -1394,6 +1405,7 @@ function fetchTaxonRegistryData() {
 }
 
 function changeEditingMode(mode) {
+    mode = true;
     if(mode == false) {
         $(".fromCOL").val(mode);
     } else {
@@ -1404,8 +1416,8 @@ function changeEditingMode(mode) {
     $(".canBeDisabled button").prop("disabled", mode); 
     $(".canBeDisabled input.canonicalForm, .canBeDisabled input.authorString ").prop("disabled", true); 
     
-    $('#saveNameDetails').prop('disabled', false);
-    $(".canBeDisabled select.position").prop("disabled", false);
+   // $('#saveNameDetails').prop('disabled', false);
+   // $(".canBeDisabled select.position").prop("disabled", false);
 }
 
 /*function modifySourceOnEdit() {
@@ -1462,7 +1474,7 @@ function modifyContent(ele, type) {
             processingStop();
             return false;
         }else{
-            if(!confirm("Are you sure to delete?")) {
+            if(!confirm("Are you sure you wish to make this edit?")) {
                 processingStop();
                 return false;
             } else {
@@ -2120,7 +2132,13 @@ if(taxonGrid){
 }
 
 function deleteSourceName(me){
-    var params ={ id:taxonGridSelectedRow[Object.keys(taxonGridSelectedRow)[0]].taxonid}
+
+    if(Object.keys(taxonGridSelectedRow).length == 0)
+        return false;
+
+
+    var params ={ ids:Object.keys(taxonGridSelectedRow).toString()}
+
         $.ajax({
             url: '/namelist/deleteName',
             dataType: "json",
@@ -2128,9 +2146,10 @@ function deleteSourceName(me){
             data: params,   
             success: function(data) {
                 if(data.status){
-                    location.reload()
+                    alert(data.msg);
+                    location.reload();
                 }else{
-                        alert('Error Delete Names');
+                    alert('Error Delete Names');
                 }
             }
         });
@@ -2168,11 +2187,12 @@ function changeAccToSyn(me){
 
 function updatePosition(me){
     var position  = me.parent().find('.movePosition').val();
-    var id = taxonGridSelectedRow[Object.keys(taxonGridSelectedRow)[0]].taxonid;
+    var ids = Object.keys(taxonGridSelectedRow).toString();
+
     //var taxonids = taxonIdsFromSelectedRow(taxonGridSelectedRow);
    // alert("id "+id+" position "+position);
-    if(id != '' && position != ''){ 
-        var params ={ id:id,position:position}
+    if(ids != '' && position != ''){ 
+        var params ={ ids:ids,position:position}
             $.ajax({
                 url: '/namelist/updatePosition',
                 dataType: "json",
@@ -2180,9 +2200,10 @@ function updatePosition(me){
                 data: params,   
                 success: function(data) {
                     if(data.status){
+                        alert(data.msg);
                         location.reload()
                     }else{
-                        alert('Error changeAccToSyn');
+                        alert('Error Update Position');
                     }
                 }
             });

@@ -348,16 +348,24 @@ class NamelistController {
     def deleteName(params){
         log.debug params
         def res = [:]
-        boolean isParent = TaxonomyDefinition.read(params.id.toLong()).isParent()
-        if(isParent){
-          res.msg = "Taxon name has children "
-          res.success = true
-          render  res as JSON;  
-          return
-        }else{
-          res.status = namelistService.deleteName(params.id.toLong())
-          render  res as JSON;
+        def delIds = params?.ids.split(',');
+        println "==============delIds================"
+        println delIds
+        res.msg = ''
+        delIds.each{ id ->
+            boolean isParent = TaxonomyDefinition.read(id.toLong()).isParent()
+            if(isParent){
+              res.msg += "\n Taxon id " +id+ " has children "              
+              //render  res as JSON;  
+              //return
+            }else{
+              namelistService.deleteName(id.toLong())
+              res.msg += "\n Taxon id " +id+ " deleted"
+              res.status = true
+              //render  res as JSON;
+            }
         }
+        render  res as JSON; 
     }
 
     @Secured(['ROLE_ADMIN'])
@@ -372,24 +380,60 @@ class NamelistController {
     def updatePosition(params){
         log.debug params
         def res = [:]
-        res.status = namelistService.updateNamePosition(params.id.toLong(), params.position, params.hirMap)
+        def ids = params?.ids.split(',');
+        res.msg=''
+        ids.each{ id ->
+            namelistService.updateNamePosition(id.toLong(), params.position, params.hirMap)
+            res.msg += "\n Position for Taxon " +id+ " Updated"
+            res.status = true
+        }
         render  res as JSON;
     }
 
 
     def singleNameUpdate(){
 
-        println params;
-       
-
+        println params;  
         List errors = [];
         Language languageInstance = utilsService.getCurrentLanguage(request);
         Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];
         
+
+
         if(params.int('taxonId')){
             TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
-            println td;
-            if(td){            
+            if(td){
+                 boolean checkHir = true 
+                 def pathGen
+                // Validate Hierarchy 
+                if(params?.newPath){
+                    Map list = params.taxonRegistry?:[:];
+                    def pathGenArr = []                                                      
+                    list.each { key, value ->
+                        if(value && key < params.rank && checkHir){
+                            def taxonDef = TaxonomyDefinition.findByName(value);
+                            if(taxonDef){
+                                pathGenArr.add(taxonDef.id);
+                            }else{
+                              checkHir = false
+                              result['msg'] = "\n Not Available in Our Hierarchy "+value
+                            }
+                        }
+                    }
+                    pathGen = pathGenArr.join('_');                
+                }
+            println checkHir
+            println pathGen
+            if(!checkHir){
+                result['success']=false;
+                withFormat {
+                    html { }
+                    json { render result as JSON }
+                    xml { render result as XML }
+                } 
+            }
+
+
             // Editing Species Name only
             if(td.name != params.page){
                  List<String> givenNames = [params.page]
@@ -423,12 +467,12 @@ class NamelistController {
 
             // hir Change
             if(params?.newPath){
-                def fieldsConfig = grailsApplication.config.speciesPortal.fields
-                def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                if(speciesService.updateHierarchy(params.newPath,params?.taxonId.toLong(),classification.id)){
-                    result['msg'] += '\n Hierarchy updated';
-                }else{
-                    result['msg'] += '\n No change in Hierarchy';
+                if(checkHir){
+                    def fieldsConfig = grailsApplication.config.speciesPortal.fields
+                    def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);                  
+                    if(speciesService.updateHierarchy(pathGen,params?.taxonId.toLong(),classification.id)){
+                        result['msg'] += '\n Hierarchy updated';
+                    }                
                 }
             }
 
@@ -473,20 +517,23 @@ class NamelistController {
                     println "No Change in Current status ="+td.status+" params status"+params.status
                 }
 
+
+
+
+            
         withFormat {
             html { }
             json { render result as JSON }
             xml { render result as XML }
         } 
-     }
-    }
-
-            
+     } //if ends td
+    } // if ends taxonId            
 }
 
     def test(){
-        println speciesService.updateHierarchy("1_2_3_65090_102_307",8206,6);
-        render "Its Working"
+        println speciesService.updateHierarchy('1_2_3_28_627_628',629,6);
+        println "aaa"
+       render "Its Working"
     }
 
 }

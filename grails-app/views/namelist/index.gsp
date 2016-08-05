@@ -88,10 +88,10 @@
     height:30px;
 }
 #taxonHierarchyModal #page{
-    width: 400px;
+    width: 345px;
 }
 #taxonHierarchyModal .synToAccWrap{
-    margin-left: 254px;
+    margin-left: 34px;
 }
 #taxonHierarchyModal label{
     font-weight:bold;
@@ -856,9 +856,9 @@
                 $('#taxonHierarchyModal #statusDropDown').change(function(){
                         var that = $(this);                        
                         var status = that.val();
-                        that.parent().find(".synToAccWrap").hide();
+                        that.parent().parent().find(".synToAccWrap").hide();
                         if(status == 'synonym' && $('#taxonHierarchyModal .checkFormName').val() != 'synonym'){
-                            that.parent().find(".synToAccWrap").show();
+                            that.parent().parent().find(".synToAccWrap").show();
                         }else if(status == 'accepted'){
                             $('#taxonHierarchyModal #taxonHierarchyInputForm').show();
                         }
@@ -905,7 +905,7 @@
                         }
                     }
 
-                    if(!confirm("Are you sure to update?")) {
+                    if(!confirm("Are you sure you wish to make this edit?")) {
                         processingStop();
                         return false;
                     } else {
