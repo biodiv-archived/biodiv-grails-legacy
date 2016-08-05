@@ -169,7 +169,7 @@
 		</g:if>
        <div class="prop">
                                 <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
-                                <div class="value pre-scrollable" style="display:block;max-height:130px;min-height:130px;overflow-y: auto;">
+                                <div class="value pre-scrollable" id="aboutMe" style="display:block;max-height:130px;min-height:130px;overflow-y: auto;">
                                             <g:if test="${userInstance.aboutMe}">
 
                                             <%  def styleVar = 'block';
