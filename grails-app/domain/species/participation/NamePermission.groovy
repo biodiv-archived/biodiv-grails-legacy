@@ -74,7 +74,10 @@ class NamePermission {
 		lastUpdated nullable:true
     }
 	static mapping = {
-		version : false;
+		version : false
+		node index : 'node_index'
+		user index : 'user_index'
+		permission : 'permission_index'
     }
 	
 	static NamePermission add(SUser user, TaxonomyDefinition node, Permission permission = Permission.EDITOR){
@@ -104,7 +107,7 @@ class NamePermission {
 			np.errors.allErrors.each { log.error it }
 			return null
 		}else{
-			println "Created/updated permission ${np}"
+			log.debug "Created/updated permission ${np}"
 			return np
 		}
 	}
@@ -155,6 +158,16 @@ class NamePermission {
 		return hasPerm		
 	}
 	
+
+	static Map hasPermission(SUser user, List<TaxonomyDefinition> nodeList, Permission permission = Permission.EDITOR){
+		Map retMap = [:]
+		nodeList.each { node ->
+			retMap.put(node, hasPermission(user, node, permission))
+		}
+		return retMap
+	}
+
+	
 	static boolean isAdmin(SUser user){
 		return (NamePermission.findWhere(user:user, permission:Permission.ADMIN) != null)
 	}
@@ -168,6 +181,10 @@ class NamePermission {
 					}
 				}
 			}
+	}
+	
+	static List getAllPermissionsOfUser(SUser user){
+		return NamePermission.findAllByUser(user)
 	}
 
 	public String toString(){
@@ -209,7 +226,7 @@ class NamePermission {
 	
 	private static boolean isValidNodeState(NamePermission np, TaxonomyDefinition node){
 		//status and position can be added later
-		log.debug " NamePermission " + np + "  node " + node.id  + " rank  " + node.rank  
+		//log.debug " NamePermission " + np + "  node " + node.id  + " rank  " + node.rank  
 		return ((np.node == node) && (node.rank >= np.rank) && (np.rootNode == node.fetchRoot()))
 	}
 	

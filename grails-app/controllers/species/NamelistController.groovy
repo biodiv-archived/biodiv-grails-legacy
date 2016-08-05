@@ -396,10 +396,10 @@ class NamelistController {
 		def p = Permission.getPermissionFromStr("ADMIN")
 		def p1 = Permission.ADMIN
 		
-        def td = TaxonomyDefinition.get(5275)
-        td.rank = 9
-        td.save(flush:true)
-        println "============= " + td.rank
+//        def td = TaxonomyDefinition.get(5275)
+//        td.rank = 9
+//        td.save(flush:true)
+//        println "============= " + td.rank
         
 		Map m = ['user':'1188', 'taxon':'5275', permission:'EDITOR', 'moveToClean' : 'false']
 		

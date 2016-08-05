@@ -14,22 +14,10 @@ class NamePermissionService {
 	
 	def boolean hasPermission(params){
 		Map m = populateMap(params)
-		
-		//staring with basic permission
-		Permission perm = Permission.EDITOR
-		
-		//upgrading to CURATOR if name is moving to clean list or name is in cleanlist
-		if(m.moveToClean || (m.node.position == NamePosition.CLEAN)){
-			perm = Permission.CURATOR
-		}
-		
-		//if input permission is at admin level then checking admin permission
-		if(m.Permission == Permission.ADMIN){
-			perm = Permission.ADMIN
-		}
-		
-		log.debug "Checking permission for User ${m.user} ::: Node  ${m.node}  ::: Permission ${perm}"
-		return NamePermission.hasPermission(m.user, m.node, perm)
+		Permission perm = getRequiredPermission(m)
+		boolean retVal = NamePermission.hasPermission(m.user, m.node, perm)
+		log.debug "Checking permission for User ${m.user} ::: Node  ${m.node}  ::: Permission ${perm}   ::: RESULT >> ${retVal}"
+		return retVal
 	}
 	
 	def NamePermission addPermission(params){
@@ -48,6 +36,23 @@ class NamePermissionService {
 		return NamePermission.getAllPermissions(m.node, m.user)
 	}
 	
+	private Permission getRequiredPermission(Map m){
+		//staring with basic permission
+		Permission perm = Permission.EDITOR
+		
+		//upgrading to CURATOR if name is moving to clean list or name is in cleanlist
+		if(m.moveToClean || (m.node.position == NamePosition.CLEAN)){
+			perm = Permission.CURATOR
+		}
+		
+		//if input permission is at admin level then checking admin permission
+		if(m.Permission == Permission.ADMIN){
+			perm = Permission.ADMIN
+		}
+		
+		return perm
+	}
+	
 	private Map populateMap(params){
 		//println "========= params " + params
 		SUser u = SUser.read(params.user?.toLong())
@@ -58,9 +63,6 @@ class NamePermissionService {
 		println "============= populated map  === " + m
 		return m
 	}
-	
-	
-	
 
 }
 		
