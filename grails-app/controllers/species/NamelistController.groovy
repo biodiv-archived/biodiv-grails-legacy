@@ -31,6 +31,7 @@ class NamelistController {
     def observationService;
     def documentService;
     def speciesPermissionService;
+    def taxonService;
 
     /**
      * input : taxon id ,classification id of ibp 
@@ -332,7 +333,10 @@ class NamelistController {
     def changeAccToSyn(params){
         log.debug params
         def res = [:]
-        res.status = namelistService.changeAccToSyn(params.sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
+        def sourceAcceptedIds = params?.sourceAcceptedId.split(',');
+        sourceAcceptedIds.each{ sourceAcceptedId ->
+            res.status = namelistService.changeAccToSyn(sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
+        }
         render  res as JSON;
     }
 
@@ -397,8 +401,6 @@ class NamelistController {
         List errors = [];
         Language languageInstance = utilsService.getCurrentLanguage(request);
         Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];
-        
-
 
         if(params.int('taxonId')){
             TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
@@ -406,7 +408,7 @@ class NamelistController {
                  boolean checkHir = true 
                  def pathGen
                 // Validate Hierarchy 
-                if(params?.newPath){
+            /*    if(params?.newPath){
                     Map list = params.taxonRegistry?:[:];
                     def pathGenArr = []                                                      
                     list.each { key, value ->
@@ -431,7 +433,7 @@ class NamelistController {
                     json { render result as JSON }
                     xml { render result as XML }
                 } 
-            }
+            } */
 
 
             // Editing Species Name only
@@ -466,7 +468,7 @@ class NamelistController {
             }
 
             // hir Change
-            if(params?.newPath){
+           /* if(params?.newPath){
                 if(checkHir){
                     def fieldsConfig = grailsApplication.config.speciesPortal.fields
                     def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);                  
@@ -474,7 +476,7 @@ class NamelistController {
                         result['msg'] += '\n Hierarchy updated';
                     }                
                 }
-            }
+            }*/
 
             // Changing position              
             if(params.position && td.position != NamesMetadata.NamePosition.getEnum(params.position)){                                          
@@ -491,7 +493,7 @@ class NamelistController {
             //Changing status
             if(params.status && td.status != NamesMetadata.NameStatus.getEnum(params.status)){  
                 println "Prev status changing from "+td.status+" to "+params.status.toUpperCase()
-                   if(params.status.capitalize() == NameStatus.ACCEPTED.value() ){                        
+                   if(params.status.capitalize() == NameStatus.ACCEPTED.value()){                        
                         println "needed hir updates"
                         // Needed hir check
                         def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null); 
@@ -517,9 +519,30 @@ class NamelistController {
                     println "No Change in Current status ="+td.status+" params status"+params.status
                 }
 
+           // hir Change
+           if(params?.newPath){
+                Map list = params.taxonRegistry?:[:];
+                List hirNameList = [];
+                String speciesName;
+                int rank;
+                list.each { key, value -> 
+                    if(value) {
+                        hirNameList.putAt(Integer.parseInt(key).intValue(), value);
+                     }
+                } 
 
-
-
+                speciesName = params.page
+                rank = params.int('rank');
+                hirNameList.putAt(rank, speciesName);
+                println hirNameList;           
+                def language = utilsService.getCurrentLanguage(request);
+                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,td);
+                if(result1.success){
+                    result['msg'] = "\n "+result1['msg'];
+                }else{
+                    result['msg'] = "\n "+result1['msg'];
+                }
+            }
             
         withFormat {
             html { }

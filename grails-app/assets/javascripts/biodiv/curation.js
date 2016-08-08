@@ -2103,6 +2103,14 @@ if(taxonGrid){
 
 });
  function mergeWithSource(me){
+     if(Object.keys(taxonGridSelectedRow).length == 0)
+        return false;
+
+        if(Object.keys(taxonGridSelectedRow).length > 2){
+            alert("Merging Name will only 2 names");
+            return false;
+        }
+
         var newSourceId  = me.parent().find('.mergeTarget').val();
         var oldSoureceId = ''; 
         $.each(taxonGridSelectedRow, function (index, value) {
@@ -2158,15 +2166,15 @@ function deleteSourceName(me){
 
 function changeAccToSyn(me){
     var newSourceId  = me.parent().find('.changeSynTarget').val();
-    var oldSoureceId = ''; 
+    var oldSoureceIds = []; 
     $.each(taxonGridSelectedRow, function (index, value) {
         if(index != newSourceId){
-           oldSoureceId = value.taxonid; 
+           oldSoureceIds.push(value.taxonid); 
         }
     });
    // alert("newSourceId "+newSourceId+" oldSoureceId "+oldSoureceId);
-    if(newSourceId != '' && oldSoureceId != ''){ 
-        var params ={ sourceAcceptedId:oldSoureceId,targetAcceptedId:newSourceId}
+    if(newSourceId != '' && oldSoureceIds != ''){ 
+        var params ={ sourceAcceptedId:oldSoureceIds.toString(),targetAcceptedId:newSourceId}
             $.ajax({
                 url: '/namelist/changeAccToSyn',
                 dataType: "json",
