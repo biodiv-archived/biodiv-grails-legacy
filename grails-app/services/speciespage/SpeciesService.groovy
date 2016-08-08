@@ -1471,7 +1471,7 @@ class SpeciesService extends AbstractObjectService  {
        return result;
     }
 
-    def createName(String speciesName, int rank, List taxonRegistryNames, String colId, Language language,TaxonomyDefinition td, Map taxonHirMatch = null) {
+    def createName(String speciesName, int rank, List taxonRegistryNames, String colId, Language language,Long taxonId, Map taxonHirMatch = null) {
         Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames, taxonHirMatch:taxonHirMatch]];
 
         if(!taxonService.validateHierarchy(taxonRegistryNames)) {
@@ -1499,7 +1499,8 @@ class SpeciesService extends AbstractObjectService  {
             //save taxonomy hierarchy
             Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language, false, false, null, taxonHirMatch); 
             result.putAll(result1);
-            td.postProcess();
+            def td = TaxonomyDefinition.get(taxonId);
+            td?.postProcess();
             return result
     }
 

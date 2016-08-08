@@ -401,8 +401,7 @@ class NamelistController {
         println params;  
         List errors = [];
         Language languageInstance = utilsService.getCurrentLanguage(request);
-        Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];
-
+        Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];        
         if(params.int('taxonId')){
             TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
             if(td){
@@ -496,11 +495,11 @@ class NamelistController {
                 hirNameList.putAt(rank, speciesName);
                 println hirNameList;           
                 def language = utilsService.getCurrentLanguage(request);
-                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,td);
+                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong());
                 if(result1.success){
-                    result['msg'] = "\n "+result1['msg'];
+                    result['msg'] += "\n "+result1['msg'];
                 }else{
-                    result['msg'] = "\n "+result1['msg'];
+                    result['msg'] += "\n "+result1['msg'];
                 }
             }
             
