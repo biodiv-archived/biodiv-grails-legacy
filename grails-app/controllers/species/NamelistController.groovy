@@ -406,36 +406,6 @@ class NamelistController {
         if(params.int('taxonId')){
             TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
             if(td){
-                 boolean checkHir = true 
-                 def pathGen
-                // Validate Hierarchy 
-            /*    if(params?.newPath){
-                    Map list = params.taxonRegistry?:[:];
-                    def pathGenArr = []                                                      
-                    list.each { key, value ->
-                        if(value && key < params.rank && checkHir){
-                            def taxonDef = TaxonomyDefinition.findByName(value);
-                            if(taxonDef){
-                                pathGenArr.add(taxonDef.id);
-                            }else{
-                              checkHir = false
-                              result['msg'] = "\n Not Available in Our Hierarchy "+value
-                            }
-                        }
-                    }
-                    pathGen = pathGenArr.join('_');                
-                }
-            println checkHir
-            println pathGen
-            if(!checkHir){
-                result['success']=false;
-                withFormat {
-                    html { }
-                    json { render result as JSON }
-                    xml { render result as XML }
-                } 
-            } */
-
 
             // Editing Species Name only
             if(td.name != params.page){
@@ -466,18 +436,7 @@ class NamelistController {
             }else{
                 println "No change in Names"
                 result['msg'] += '\n No change in Names';
-            }
-
-            // hir Change
-           /* if(params?.newPath){
-                if(checkHir){
-                    def fieldsConfig = grailsApplication.config.speciesPortal.fields
-                    def classification = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);                  
-                    if(speciesService.updateHierarchy(pathGen,params?.taxonId.toLong(),classification.id)){
-                        result['msg'] += '\n Hierarchy updated';
-                    }                
-                }
-            }*/
+            }          
 
             // Changing position              
             if(params.position && td.position != NamesMetadata.NamePosition.getEnum(params.position)){                                          
