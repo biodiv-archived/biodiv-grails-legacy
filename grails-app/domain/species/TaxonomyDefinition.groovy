@@ -167,6 +167,14 @@ class TaxonomyDefinition extends ScientificName {
         */
     }
 	
+	TaxonomyDefinition fetchRoot(){
+		TaxonomyRegistry ibpClassi = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, Classification.fetchIBPClassification())
+		if(ibpClassi){
+			return TaxonomyDefinition.read(ibpClassi.path.tokenize('_')[0])
+		}
+	}
+	
+	
 	String fetchRootId(){
 		def hir = fetchDefaultHierarchy()
 		if(hir)

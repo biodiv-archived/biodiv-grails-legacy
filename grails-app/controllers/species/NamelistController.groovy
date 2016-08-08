@@ -19,6 +19,7 @@ import species.CommonNames;
 import species.utils.Utils
 
 
+import species.participation.NamePermission.Permission
 
 class NamelistController {
     
@@ -31,7 +32,7 @@ class NamelistController {
     def observationService;
     def documentService;
     def speciesPermissionService;
-    def taxonService;
+	def namePermissionService;
 
     /**
      * input : taxon id ,classification id of ibp 
@@ -327,7 +328,6 @@ class NamelistController {
         render res as JSON;
     }
 
-
     /////////////////////////////// Name list API /////////////////////////////////
     @Secured(['ROLE_ADMIN'])
     def changeAccToSyn(params){
@@ -390,6 +390,7 @@ class NamelistController {
             namelistService.updateNamePosition(id.toLong(), params.position, params.hirMap)
             res.msg += "\n Position for Taxon " +id+ " Updated"
             res.status = true
+	
         }
         render  res as JSON;
     }
@@ -559,4 +560,44 @@ class NamelistController {
        render "Its Working"
     }
 
+	
+	////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////// Names Permission///////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	
+	@Secured(['ROLE_ADMIN'])
+	def addPermission(params){
+		log.debug params
+		def res = [:]
+		res.status = namePermissionService.addPermission(params)
+		render  res as JSON;
+	}
+
+	@Secured(['ROLE_ADMIN'])
+	def removePermission(params){
+		log.debug params
+		def res = [:]
+		res.status = namePermissionService.removePermission(params)
+		render  res as JSON;
+	}
+	
+	def tt(){
+        //2998_33364_33366_3035_3542_5273_5275
+
+		def p = Permission.getPermissionFromStr("ADMIN")
+		def p1 = Permission.ADMIN
+		
+//        def td = TaxonomyDefinition.get(5275)
+//        td.rank = 9
+//        td.save(flush:true)
+//        println "============= " + td.rank
+        
+		Map m = ['user':'1188', 'taxon':'5275', permission:'EDITOR', 'moveToClean' : 'false']
+		
+		def res = namePermissionService.hasPermission(m)
+		//res = namePermissionService.addPermission(m)
+        //namePermissionService.removePermission(['user':'1188','taxon':'3035'])
+        //res = namePermissionService.getAllPermissions(m)
+		render 'done  ' + res // as JSON
+	}
 }
