@@ -92,7 +92,7 @@ class SourceConverter {
     }
 
     public List<Node> createTaxonRegistryNodes(List names, String classification, SUser contributor, Language language , Map taxonHirMap = null) {
-        return createTaxonRegistryNodes(names, classification, [contributor], language);
+        return createTaxonRegistryNodes(names, classification, [contributor], language, taxonHirMap);
     }
 
     public List<Node> createTaxonRegistryNodes(List names, String classification, List<SUser> contributors, Language language, Map taxonHirMap = null) {
@@ -115,6 +115,10 @@ class SourceConverter {
 				if(matchMap){
 					new Node(field, "ibpId", matchMap.ibpId);
 					new Node(field, "colId", matchMap.colId);
+					def nameRunningStatus = matchMap?.nameRunningStatus?.text();
+					if(nameRunningStatus){
+						new Node(field, "nameRunningStatus", nameRunningStatus);
+					}
 				}
 				//println "---------------------- node at level " + index + "   " + field
                 nodes << field;
