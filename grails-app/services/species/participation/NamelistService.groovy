@@ -2480,6 +2480,7 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	private boolean mergeSynonym(SynonymsMerged oldName, SynonymsMerged newName){
+
 		//moving synonym
 		def oldEntries = AcceptedSynonym.findAllBySynonym(oldName);
 		oldEntries.each { e ->
@@ -2489,14 +2490,12 @@ class NamelistService extends AbstractObjectService {
 				acName.addSynonym(newName)
 			}
 		}
-		
+
 		moveSpeciesContent(oldName, newName)
-		oldName.isDeleted = true
-		println "======= for delete " + oldName
-		if(!oldName.save(flush:true)){
-			oldName.errors.allErrors.each { log.error it }
-			return false
-		}
+
+		//XXX save is not updating so using hiberet call to set isdelete flag
+		SynonymsMerged.executeUpdate( "update SynonymsMerged set isDeleted = true where id = (:id) ", [id:oldName.id])
+		
 		utilsService.clearCache("defaultCache")
 		return true
 	}

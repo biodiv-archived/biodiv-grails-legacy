@@ -1475,11 +1475,6 @@ class SpeciesService extends AbstractObjectService  {
         Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames, taxonHirMatch:taxonHirMatch]];
 
         if(!taxonService.validateHierarchy(taxonRegistryNames)) {
-            if(!speciesInstance.fetchTaxonomyRegistry()) {
-                result['success'] = false;
-                result['msg'] = messageSource.getMessage("info.message.missing", null, LCH.getLocale())
-                return result
-            }
             result['success'] = false;
             result['msg'] = messageSource.getMessage("info.message.missing", null, LCH.getLocale())
             return result
@@ -1487,21 +1482,21 @@ class SpeciesService extends AbstractObjectService  {
 
         Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
           //CHK if current user has permission to add details to the species
-            if(!speciesPermissionService.isSpeciesContributor(taxonRegistryNames, springSecurityService.currentUser)) {
-                    result['success'] = false;
-                    result['status'] = 'requirePermission';
-                    result['msg'] = 'Please request for permission to contribute.'
-                    //result['errors'] = errors
-                    return result
-                //}
-            }
-        
-            //save taxonomy hierarchy
-            Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language, false, false, null, taxonHirMatch); 
-            result.putAll(result1);
-            def td = TaxonomyDefinition.get(taxonId);
-            td?.postProcess();
-            return result
+        if(!speciesPermissionService.isSpeciesContributor(taxonRegistryNames, springSecurityService.currentUser)) {
+                result['success'] = false;
+                result['status'] = 'requirePermission';
+                result['msg'] = 'Please request for permission to contribute.'
+                //result['errors'] = errors
+                return result
+            //}
+        }
+    
+        //save taxonomy hierarchy
+        Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language, false, false, null, taxonHirMatch); 
+        result.putAll(result1);
+        def td = TaxonomyDefinition.get(taxonId);
+        td?.postProcess();
+        return result
     }
 
     /**
