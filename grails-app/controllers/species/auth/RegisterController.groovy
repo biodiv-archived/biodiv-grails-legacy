@@ -108,7 +108,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 		def userLanguage = utilsService.getCurrentLanguage(request); 
 		def user = SUserService.create(command.properties, userLanguage);
-		
+	
 		if(command.openId) {
 			log.debug("Is an openId registration");
 			user.accountLocked = false;
@@ -452,6 +452,13 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		}
 	}
 
+    static locationValidator = { String location, command ->
+        String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+        if (command.location=="") {
+            return "command.location.error"
+        }
+    }
+
 	protected RegistrationCode registerAndEmail(String username, String email, request, boolean redirect=true) {
 		RegistrationCode registrationCode = SUserService.register(email)
 		if (registrationCode == null || registrationCode.hasErrors()) {
@@ -586,6 +593,8 @@ class CustomRegisterCommand {
     String sexType;
     String occupationType;
     String institutionType;
+    double latitude;
+    double longitude;
     //String g_recaptcha_response;
 	//String recaptcha_response_field;
 	//String recaptcha_challenge_field;
@@ -607,6 +616,7 @@ class CustomRegisterCommand {
 			}
  		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
+        location validator:RegisterController.locationValidator
 		password2 validator: RegisterController.password2Validator
 		captcha_response blank:false, nullable:false, validator: { value, command ->
 			def session = RCH.requestAttributes.session
@@ -646,6 +656,8 @@ class CustomRegisterCommand2 {
     String sexType;
     String occupationType;
     String institutionType;
+    double latitude;
+    double longitude;
 	def grailsApplication
 	
 	static constraints = {
@@ -661,6 +673,7 @@ class CustomRegisterCommand2 {
 		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
+        location  validator:RegisterController.locationValidator
 	}
 
 	/* (non-Javadoc)

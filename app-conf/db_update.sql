@@ -666,3 +666,7 @@ alter table document drop column uri;
 #26 may
 ALTER TABLE document ALTER COLUMN latitude TYPE double precision;
 ALTER TABLE document ALTER COLUMN longitude TYPE double precision;
+
+#8 Apr
+ALTER TABLE suser ADD COLUMN latitude double precision;
+ALTER TABLE suser ADD COLUMN longitude double precision;
