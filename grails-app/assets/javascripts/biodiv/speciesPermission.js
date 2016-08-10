@@ -111,6 +111,7 @@ $(document).ready(function() {
         var invitetype = $dialog.find('input[name="invitetype"]').val();
 
         var $autofillUsers;
+        var url = window.params.inviteFormUrl;
         if(invitetype === 'curator') {
             $autofillUsers = curators_autofillUsersComp[0]
         } else if(invitetype === 'contributor') {
@@ -122,11 +123,18 @@ $(document).ready(function() {
         }else {
             $autofillUsers = contributors_autofillUsersComp[0]
         }
-        $dialog.find('input[name="userIds"]').val($autofillUsers.getEmailAndIdsList().join(","));
+
+        if(invitetype === 'ADMIN' || invitetype === 'CURATOR' || invitetype === 'EDITOR'){
+            url = window.params.inviteAddFormUrl;
+            $autofillUsers = taxon_curators_autofillUsersComp[0];
+        }
+
+        $dialog.find('input[name="userIds"]').val($autofillUsers.getEmailAndIdsList().join(","));        
+        var userIds = $autofillUsers.getEmailAndIdsList().join(",");
 
         var data = {message:$dialog.find('.inviteMsg').val(), selectedNodes : selectedNodes}
         $dialog.find('form').ajaxSubmit({ 
-            url: window.params.inviteFormUrl,
+            url: url,
             dataType: 'json', 
             clearForm: true,
             resetForm: true,
@@ -134,9 +142,15 @@ $(document).ready(function() {
             data:data,
             success: function(data, statusText, xhr) {
                 if(data.statusComplete) {
+                    if(data.msg !== undefined){
+                        alert(data.msg);
+                    }
                     $dialog.modal('hide');
                     $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
                 } else {
+                    if(data.msg !== undefined){
+                        alert(data.msg);
+                    }
                     $dialog.find(".inviteMsg_status").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg).show();
                 }    
                 $dialog.find('form')[0].reset();

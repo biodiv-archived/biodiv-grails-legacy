@@ -22,6 +22,10 @@ import species.NamesMetadata.NamePosition;
 import grails.converters.XML;
 import grails.plugin.cache.Cacheable;
 
+
+import species.utils.ImageType
+
+
 class TaxonController {
 
     def dataSource
@@ -31,6 +35,7 @@ class TaxonController {
     def utilsService;
     def grailsApplication;
     def messageSource
+    def namePermissionService;
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
@@ -374,6 +379,15 @@ class TaxonController {
             map['rank'] = r.rank
             map['type'] = r.rank+''
             map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false
+            def getAllPermissions = namePermissionService.getAllPermissions([taxon:r["taxonid"]]);
+            def users=[]
+            getAllPermissions.each { nP ->
+                println nP.user
+                users << [id:nP.user.id,profile_pic:nP.user.profilePicture(ImageType.SMALL)];
+            }
+
+
+            map['usersList'] = users;
             if(r.containsKey('isContributor')) {
                 map['isContributor'] = r.isContributor?:false
             } else {
@@ -398,6 +412,9 @@ class TaxonController {
             map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
             result << map
         }
+
+        println "=========================================================="
+        println result
         return result;
 /*        def writer = new StringWriter ();
         def result = new MarkupBuilder(writer);
