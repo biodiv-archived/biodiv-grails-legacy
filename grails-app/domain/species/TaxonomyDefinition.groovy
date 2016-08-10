@@ -650,7 +650,7 @@ class TaxonomyDefinition extends ScientificName {
 			}
 			
 			//this one should create ibp hir and getting priority over all the hirerchies
-			if((this.position == NamesMetadata.NamePosition.CLEAN) || NamePermission.isAdmin()){ 
+			if((this.position == NamesMetadata.NamePosition.CLEAN) || NamePermission.isAdmin(springSecurityService.currentUser)){ 
 				if(latestHir && (latestHir.taxonDefinition == this)){
 					Classification ibpClassification = Classification.fetchIBPClassification()
 					createTargetHirFromTaxonReg(latestHir, ibpClassification)
@@ -676,7 +676,7 @@ class TaxonomyDefinition extends ScientificName {
 	 */
 	
 	def updateIBPHir(TaxonomyRegistry latestHir){
-		if(latestHir && (latestHir.taxonDefinition == this) && NamePermission.isAdmin()){
+		if(latestHir && (latestHir.taxonDefinition == this) && NamePermission.isAdmin(springSecurityService.currentUser)){
 			Classification ibpClassification = Classification.fetchIBPClassification()
 			createTargetHirFromTaxonReg(latestHir, ibpClassification)
 			List sqlStrings = []
