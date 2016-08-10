@@ -498,7 +498,7 @@ class NamelistController {
                 hirNameList.putAt(rank, speciesName);
                 println hirNameList;           
                 def language = utilsService.getCurrentLanguage(request);
-                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong());
+                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong(), params.taxonHirMatch);
                 if(result1.success){
                     result['msg'] += "\n "+result1['msg'];
                 }else{

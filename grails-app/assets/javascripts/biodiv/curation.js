@@ -897,6 +897,8 @@ function addSpeciesPage(url,params){
         if(ibpId || colId){
             params['taxonHirMatch.' + rank + '.ibpId'] = ibpId;
             params['taxonHirMatch.' + rank + '.colId'] = colId;
+        }else{
+        	 params['taxonHirMatch.' + rank + '.nameRunningStatus'] = 'new';
         }
     });
     
