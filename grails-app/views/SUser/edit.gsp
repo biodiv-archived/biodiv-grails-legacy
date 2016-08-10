@@ -151,7 +151,7 @@
                             from="${species.auth.SUser$SexType?.values()}"
                             keys="${species.auth.SUser$SexType?.values()*.value()}"
                             value="${user.sexType}"
-                            noSelection="${['null':'Select One...']}"/>
+                            noSelection="${['':'Select One...']}"/>
                             <div class="help-inline">
 											<g:hasErrors bean="${user}" field="sexType">
 												<g:renderErrors bean="${user}" as="list" field="sexType" />
@@ -171,7 +171,7 @@
                             from="${species.auth.SUser$OccupationType?.values()}"
                             keys="${species.auth.SUser$OccupationType?.values()*.value()}"
                             value="${user.occupationType}"
-							noSelection="${['null':'Select One...']}"
+							noSelection="${['':'Select One...']}"
                             />
                             <div class="help-inline">
 											<g:hasErrors bean="${user}" field="occupationType">
@@ -189,7 +189,7 @@
                             placeholder="${g.message(code:'placeholder.occupation.select')}"
                             from="${species.auth.SUser$InstitutionType?.values()}"
                             value="${user.institutionType}"
-							noSelection="${['null':'Select One...']}"
+							noSelection="${['':'Select One...']}"
                             />
                             <div class="help-inline">
 											<g:hasErrors bean="${user}" field="institutionType">
