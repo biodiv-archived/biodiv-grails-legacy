@@ -536,7 +536,7 @@ class NamelistController {
             taxonIds.each{ taxon -> 
                 userIds.each{ userId ->
                     Map m = [user: userId,taxon: taxon,permission:params.invitetype.toString()];
-    		      res.statusComplete = namePermissionService.addPermission(m)
+    		      res.statusComplete = namePermissionService.addPermission(namePermissionService.populateMap(m))
                   res.msg ="Successfully added!"
                 }
             }
@@ -551,7 +551,7 @@ class NamelistController {
 	def removePermission(params){
 		log.debug params
 		def res = [:]
-		res.status = namePermissionService.removePermission(params)
+		res.status = namePermissionService.removePermission(namePermissionService.populateMap(params))
 		render  res as JSON;
 	}
 	
