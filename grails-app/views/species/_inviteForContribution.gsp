@@ -43,17 +43,23 @@
 
 <sec:ifAnyGranted roles='ROLE_SPECIES_ADMIN,ROLE_ADMIN'>
 <div class="invite">
+    <div class="permission_wrapper">
+    <span> For Species Permission : </span>
         <a id="inviteCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteCuratorsDialog" role="button" data-toggle="modal" data-invitetype='curator'><i
             class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.curators" /> </a>
         <a id="inviteContributors" class="btn btn-primary  ${hide?'hide':''}" href="#inviteContributorsDialog" role="button" data-toggle="modal" data-invitetype='contributor'><i
                 class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.contributors"
             /> </a>
-
+    </div>
+    <div class="permission_wrapper">
+    <span> For Namelist Permission : </span>
         <a id="inviteTaxonCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonCuratorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_curator'><i
+            class="icon-envelope"></i> Add Permission </a>
+        <!--a id="inviteTaxonCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonCuratorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_curator'><i
             class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.taxon_curators" /> </a>
         <a id="inviteTaxonEditors" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonEditorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_editor'><i
-            class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.taxon_editors" /> </a>
-
+            class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.taxon_editors" /> </a -->
+    </div>
 
         <div class="modal hide fade" id="inviteCuratorsDialog" tabindex='-1'
             role="dialog" aria-labelledby="inviteCuratorsModalLabel"
@@ -123,7 +129,11 @@
                         style="background-color: #F2F2F2;">
                         <sUser:selectUsers model="['id':'taxon_curator']" />
                         <input type="hidden" name="userIds" />
-                        <input type="hidden" name="invitetype" value="taxon_curator" />
+                        <div style="margin: 10px 0px;">
+                            <input type="radio" name="invitetype" value="ADMIN" />ADMIN
+                            <input type="radio" name="invitetype" value="CURATOR" />CURATOR
+                            <input type="radio" name="invitetype" value="EDITOR" />EDITOR
+                        </div>
                         <textarea class="inviteMsg comment-textbox" placeholder="${g.message(code:'placeholder.invite.taxon_curator')}"></textarea>
                     </form>
                 </div>

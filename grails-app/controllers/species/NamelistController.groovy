@@ -19,7 +19,10 @@ import species.CommonNames;
 import species.utils.Utils
 
 
+
 import species.participation.NamePermission.Permission
+import species.utils.ImageType
+
 
 class NamelistController {
     
@@ -527,7 +530,20 @@ class NamelistController {
 	def addPermission(params){
 		log.debug params
 		def res = [:]
-		res.status = namePermissionService.addPermission(params)
+        def taxonIds = (params.selectedNodes)?params.selectedNodes.split(','):[];
+        def userIds  = (params.userIds)?params.userIds.split(','):[];
+        if(taxonIds.length > 0 && userIds.length > 0 && params.invitetype != ''){
+            taxonIds.each{ taxon -> 
+                userIds.each{ userId ->
+                    Map m = [user: userId,taxon: taxon,permission:params.invitetype.toString()];
+    		      res.statusComplete = namePermissionService.addPermission(m)
+                  res.msg ="Successfully added!"
+                }
+            }
+        }else{
+            res.statusComplete = false;
+            res.msg = 'User or Taxon cannot be null'
+        }
 		render  res as JSON;
 	}
 
@@ -542,20 +558,17 @@ class NamelistController {
 	def tt(){
         //2998_33364_33366_3035_3542_5273_5275
 
-		def p = Permission.getPermissionFromStr("ADMIN")
-		def p1 = Permission.ADMIN
-		
-//        def td = TaxonomyDefinition.get(5275)
-//        td.rank = 9
-//        td.save(flush:true)
-//        println "============= " + td.rank
-        
-		Map m = ['user':'1188', 'taxon':'5275', permission:'EDITOR', 'moveToClean' : 'false']
-		
-		def res = namePermissionService.hasPermission(m)
-		//res = namePermissionService.addPermission(m)
-        //namePermissionService.removePermission(['user':'1188','taxon':'3035'])
-        //res = namePermissionService.getAllPermissions(m)
-		render 'done  ' + res // as JSON
+
+        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
+        def users=[]
+            getAllPermissions.each { nP ->
+                println nP.user
+                users << [id:nP.user.id,profile_pic:nP.user.profilePicture(ImageType.SMALL)];
+            }
+            
+        render "Working" +users
+
+
+
 	}
 }
