@@ -24,7 +24,28 @@
 .super-section  {
     background-color:white;
 }
+.map_class {
+                position:relative;
+            }
+.map_canvas {
+    border-color: rgba(82,168,236,0.8) !important;
+    //position: absolute !important;
+    width: 133% !important;
+    display: block;
+    left: 0px;
+    z-index:10 !important;
+    height:360px !important;
+}
 
+            .map_search {
+                position:inherit;btn:hover,
+            }
+                        .propagateLocation .map_canvas{
+                width:99% !important;
+            }
+            .locationScale{display:none;
+            }
+            .latlng{display:none !important;} 
 </style>
 </head>
 
@@ -214,9 +235,8 @@
 									<label class="control-label" for="location"><i
 										class="icon-map-marker"></i> <g:message
 											code="default.location.label" /> </label>
-									<div class="controls">
-										<input type="text" name="location" class="input-xlarge"
-											id="location" value="${user.location}" />
+									<div class="controls" style="margin-left:0%;width:50%;">
+											<obv:showMapInput model="[userInstance:user, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
 										<div class="help-inline">
 											<g:hasErrors bean="${user}" field="location">
 												<g:renderErrors bean="${user}" as="list" field="location" />
@@ -490,6 +510,9 @@
 
 	<asset:script>
 		$(document).ready(function() {
+			    	$('.placeName').attr('name', 'location');
+    	$('.userlocation').hide();
+
 			$('#username').focus();
 
 			$("#runAsButton").button();

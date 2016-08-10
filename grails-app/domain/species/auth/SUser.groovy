@@ -169,6 +169,8 @@ class SUser {
     boolean sendDigest = true;
 	boolean hideEmailId = true;
 	boolean allowIdentifactionMail = true;
+	Double latitude=0
+	Double longitude=0
 
 	// Language
     Language language;
@@ -193,6 +195,8 @@ class SUser {
 		sexType blank:true,nullable:true
 		occupationType nullable:true,blank:true
 		institutionType nullable:true,blank:true
+		longitude nullable:true
+		latitude nullable:true
 
 	}
 

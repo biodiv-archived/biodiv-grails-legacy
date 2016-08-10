@@ -37,10 +37,6 @@
             width: 715px;
         }
 
-        .user_profile{
-          background-color: white;
-          padding: 5px 0px;
-        }
         .activity_count{
           background-color: white;
           padding: 5px 0px;
@@ -67,10 +63,7 @@
           font-size: 10px;
           font-weight: bold;
         }
-        .user_profile .prop{
-            padding:0px 5px;
-        }
-
+  
 
         .list-group.panel > .list-group-item {
           border-bottom-right-radius: 4px;
@@ -83,21 +76,12 @@
             height: 550px;
             margin-bottom: 20px;
         }
-        .user_profile {
-             height: 558px;
-            background-color: white;
-            padding: 15px;
-            margin-bottom:10px;
-        }
+
          .prop {    
             border-bottom:1px groove;
             margin-bottom:6px;
             overflow: auto;
             }
-        .value{
-            font-weight:normal;
-            color:#000;
-        }
         .prop:hover{background-color:#f2f2f2;}
         .name{margin-bottom:5px;}
         .value{margin-bottom:5px;}
@@ -106,7 +90,7 @@
         .jstree-icon { display: none;}
         .permission_hilight{background-color:#b1f0e7;}
         .uploaded-carousel{background-color:#cfede1;}
-        
+        .prop{padding-left:5px;}
         </style>
         </head>
         <body>
@@ -182,7 +166,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                            
                        <g:render template="userAccordionDetailsTemplate" model="[]" />
                         </div>
-                        <div class="span9 user_profile">
+                        <div class="span9">
                             <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
                         </div>
                         <div class="clearfix"></div> 
