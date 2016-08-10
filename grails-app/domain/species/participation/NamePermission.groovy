@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory
 class NamePermission {
 	private static log = LogFactory.getLog(this);
 	
+	def springSecurityService
 	//def grailsApplication;
 	//def utilsService
 	
@@ -168,7 +169,10 @@ class NamePermission {
 	}
 
 	
-	static boolean isAdmin(SUser user){
+	static boolean isAdmin(SUser user = springSecurityService.currentUser){
+		if(!user){
+			return false
+		}
 		return (NamePermission.findWhere(user:user, permission:Permission.ADMIN) != null)
 	}
 	
