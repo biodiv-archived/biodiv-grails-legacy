@@ -44,7 +44,9 @@
 <sec:ifAnyGranted roles='ROLE_SPECIES_ADMIN,ROLE_ADMIN'>
 <div class="invite">
     <div class="permission_wrapper">
+    <g:if test="${!hide}">
     <span> For Species Permission : </span>
+    </g:if>
         <a id="inviteCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteCuratorsDialog" role="button" data-toggle="modal" data-invitetype='curator'><i
             class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.curators" /> </a>
         <a id="inviteContributors" class="btn btn-primary  ${hide?'hide':''}" href="#inviteContributorsDialog" role="button" data-toggle="modal" data-invitetype='contributor'><i
@@ -52,9 +54,11 @@
             /> </a>
     </div>
     <div class="permission_wrapper">
+    <g:if test="${!hide}">
     <span> For Namelist Permission : </span>
+    </g:if>
         <a id="inviteTaxonCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonCuratorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_curator'><i
-            class="icon-envelope"></i> Add Permission </a>
+            class="icon-envelope"></i> <g:message code="namePermission.add.permission" /> </a>
         <!--a id="inviteTaxonCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonCuratorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_curator'><i
             class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.taxon_curators" /> </a>
         <a id="inviteTaxonEditors" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonEditorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_editor'><i
