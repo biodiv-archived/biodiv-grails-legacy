@@ -91,9 +91,10 @@ class ChecklistService {
 		//removing time component from date
 		params.fromDate = observationService.parseDate(params.fromDate)?.format("dd/MM/yyyy");
 		params.toDate =  observationService.parseDate(params.toDate)?.format("dd/MM/yyyy");
-		
+		def checklistAttributions = params.attributions
+		params.attributions = null 
 		observationService.updateObservation(params, checklist)
-		
+		params.attributions = checklistAttributions
 		checklist.title =  params.title
 		checklist.license = License.findByName(License.fetchLicenseType(params.license_0))  
 		checklist.refText =  params.refText
@@ -275,6 +276,7 @@ class ChecklistService {
 					obvSubList.each { obv ->
 						if(!updatedObv.contains(obv.id) && !(newObv.contains(obv.id))){
 							commonObsParams.id = obv.id
+							commonObsParams.checklistAnnotations = obv.checklistAnnotations
 							observationService.saveObservation(commonObsParams, false, false)
 						}
 					}

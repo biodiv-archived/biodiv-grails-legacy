@@ -40,15 +40,15 @@ class ExternalLinksService {
 					noOfFailures++;
 				}
 			}
-			log.info "Updated external links for taxonConcepts ${noOfUpdations}"
+			//log.info "Updated external links for taxonConcepts ${noOfUpdations}"
 			//}
 			//			cleanUpGorm();
 			offset += limit;
 		}
 		if(noOfUpdations) {
-			cleanUpGorm();
+			//cleanUpGorm();
 		}
-		log.info "Updated external links for taxonConcepts ${noOfUpdations} in total"
+		//log.info "Updated external links for taxonConcepts ${noOfUpdations} in total"
 		return noOfUpdations;
 	}
 
@@ -108,27 +108,27 @@ class ExternalLinksService {
 
 		switch (idType) {
 			case "eol" :
-				log.debug "Setting eol link id to : "+idVal
+				//log.debug "Setting eol link id to : "+idVal
 				taxonConcept.externalLinks.eolId = idVal;
 				break;
 			case "iucn" :
-				log.debug "Setting iucn link id to : "+idVal
+				//log.debug "Setting iucn link id to : "+idVal
 				taxonConcept.externalLinks.iucnId = idVal;
 				break;
 			case "gbif" :
-				log.debug "Setting gbif link id to : "+idVal
+				//log.debug "Setting gbif link id to : "+idVal
 				taxonConcept.externalLinks.gbifId = idVal;
 				break;
 			case "col" :
-				log.debug "Setting col link id to : "+idVal
+				//log.debug "Setting col link id to : "+idVal
 				taxonConcept.externalLinks.colId = idVal;
 				break;
 			case "itis" :
-				log.debug "Setting itis link id to : "+idVal
+				//log.debug "Setting itis link id to : "+idVal
 				taxonConcept.externalLinks.itisId = idVal;
 				break;
 			case "ncbi" :
-				log.debug "Setting ncbi link id to : "+idVal
+				//log.debug "Setting ncbi link id to : "+idVal
 				taxonConcept.externalLinks.ncbiId = idVal;
 				break;
 		}
@@ -145,14 +145,14 @@ class ExternalLinksService {
 	 * @return
 	 */
 	private boolean updateEOLId(HTTPBuilder http, TaxonomyDefinition taxonConcept) {
-		log.debug "Fetching EOL ID for taxon : "+taxonConcept
+		//log.debug "Fetching EOL ID for taxon : "+taxonConcept
 		try {
 			http.request( "http://eol.org/api/search/1.0" , Method.GET, ContentType.JSON) {
 				uri.path = taxonConcept.canonicalForm+'.json'
 				uri.query = [ exact:1 ]
 				response.success = { resp, json ->
 					if(resp.isSuccess()) {
-						log.debug "EOL search result for : "+json
+						//log.debug "EOL search result for : "+json
 						if(json.results) {
 							updateExternalLink(taxonConcept, "eol", String.valueOf(json.results[0].id), false, new Date());
 						}
@@ -175,7 +175,7 @@ class ExternalLinksService {
 	 * @return
 	 */
 	private void updateOtherIdsFromEOL(HTTPBuilder http, String eolId, TaxonomyDefinition taxonConcept) {
-		log.debug "Fetching EOL ID for taxon : "+taxonConcept
+		//log.debug "Fetching EOL ID for taxon : "+taxonConcept
 		try {
 			http.request( "http://eol.org/api/pages/1.0" , Method.GET, ContentType.JSON) {
 				uri.path = eolId + '.json'
@@ -183,7 +183,7 @@ class ExternalLinksService {
 				response.success = { resp, json ->
 					if(resp.isSuccess()) {
 						json.taxonConcepts.each { r ->
-							log.debug r;
+							//log.debug r;
 							switch(r.nameAccordingTo) {
 								case "Species 2000 & ITIS Catalogue of Life: Annual Checklist 2010":
 									updateExternalLink(taxonConcept, "col", r.sourceIdentfier, false, new Date());
@@ -200,7 +200,7 @@ class ExternalLinksService {
 									break;
 							}
 						}
-						log.debug "No of data objects  : "+json.dataObjects.size();
+						//log.debug "No of data objects  : "+json.dataObjects.size();
                         if(!taxonConcept.isAttached()) taxonConcept.attach();
 						taxonConcept.externalLinks.noOfDataObjects = json.dataObjects.size();
 					}

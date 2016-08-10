@@ -47,7 +47,7 @@
                     </g:if>
                     <g:elseif test="${params.filterProperty == 'taxonConcept'}">
                         <% def sp = Species.read(params.parentId?.toLong()) %>
-                        of <a href="${uGroup.createLink(mapping:"userGroupGeneric", action:"show", controller:"species", id:params.parentId, userGroupWebaddress:params.webaddress, absolute:true)}"> ${raw(sp.title)}</a>
+                        of <a href="${uGroup.createLink(action:"show", controller:"species", id:params.parentId, userGroupWebaddress:params.webaddress, absolute:true)}"> ${raw(sp.title)}</a>
                     </g:elseif>
                     <g:elseif test="${params.filterProperty == 'nearByRelated'}">
                         <% def obv = Observation.read(params.parentId?.toLong()) %>

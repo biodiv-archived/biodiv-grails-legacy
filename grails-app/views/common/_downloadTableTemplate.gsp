@@ -1,5 +1,5 @@
 <g:if test="${downloadLogList.size() > 0 }">
-	<div>
+	<div class="pre-scrollable">
 		<table class="table table-hover tablesorter span8" style="margin-left: 0px;">
 			<thead>
 				<tr>
@@ -17,7 +17,7 @@
 				<g:each in="${downloadLogList}" status="i"
 					var="downloadLog">
 					<tr class="mainContent">
-                        <td>${downloadLog.createdOn}</td>
+                        <td class="col-xs-2">${downloadLog.createdOn}</td>
                         <%
                         def filterUrl = downloadLog.filterUrl;
                         if(downloadLog.sourceType == 'Unique Species') {
@@ -33,6 +33,7 @@
 						<td class="ellipsis multiline" style="max-width:250px;">${downloadLog.notes}</td>
 					</tr>
 				</g:each>
+				
 			</tbody>
 		</table>
 	</div>

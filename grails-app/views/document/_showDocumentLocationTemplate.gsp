@@ -35,11 +35,8 @@
                 latitude = documentInstance.latitude + geoPrivacyAdjustment
                 longitude = documentInstance.longitude + geoPrivacyAdjustment
 
-                if(!documentInstance?.topology){ 
                    areas = 'POINT (' + longitude.toFloat() + ' ' + latitude.toFloat() +  ')'
-                } else if(params.areas) {
-                    areas = params.areas
-                }
+               
 
                 if(!latitude && params.latitude) latitude = params.latitude
                 if(!longitude && params.longitude) longitude = params.longitude

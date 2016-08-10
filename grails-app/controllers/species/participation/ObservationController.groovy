@@ -185,7 +185,7 @@ def grailsCacheManager;
 		def offset = params.offset ? params.int('offset') : 0
 		def filteredObservation = observationService.getFilteredObservations(params, max, offset, false, eagerFetchProperties)
 		def observationInstanceList = filteredObservation.observationInstanceList
-        
+        println "Instance List====="+observationInstanceList            
 //        //Because returning source Ids instead of actual obv ins
 //        if(params.filterProperty == 'speciesName') {
 //            //def fetchedCklCount = filteredObservation.checklistCount;
@@ -1641,7 +1641,6 @@ def grailsCacheManager;
             } else {
                 distinctRecoListResult = observationService.getDistinctRecoList(params, max, offset);
             }
-
             if(distinctRecoListResult.distinctRecoList.size() > 0) {
                 result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]
                 
@@ -1654,7 +1653,6 @@ def grailsCacheManager;
                 }
                 result = [msg:message]
             }
-
             def model = utilsService.getSuccessModel(result.msg, null, OK.value(), result);
             withFormat {
                 json { render model as JSON }
@@ -1928,5 +1926,41 @@ private printCacheEntries(cache) {
 
     }
 }
+   def distinctIdentifiedReco() {
+        def max = Math.min(params.max ? params.int('max') : 10, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        Map result = [:];
+        try {
+            def distinctIdentifiedRecoListResult;
+            distinctIdentifiedRecoListResult = observationService.getDistinctIdentifiedRecoList(params, max, offset);
+            if(distinctIdentifiedRecoListResult.distinctIdentifiedRecoList.size() > 0) {
+            result = [distinctIdentifiedRecoList:distinctIdentifiedRecoListResult.distinctIdentifiedRecoList, totalRecoCount:distinctIdentifiedRecoListResult.distinctIdentifiedRecoList.size(), status:'success', msg:'success', next:offset+max]               
+            } else {
+                def message = "";
+                if(params.offset  > 0) {
+                    message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
+                } else {
+                    message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
+                }
+                result = [msg:message]
+            }
+            def model = utilsService.getSuccessModel(result.msg, null, OK.value(), result);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            String msg = g.message(code: 'error', default:'Error while processing the request.');
+            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
+
 
 }

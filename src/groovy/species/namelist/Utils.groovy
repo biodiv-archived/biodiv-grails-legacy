@@ -247,7 +247,7 @@ class Utils {
            def c = domainClass.createCriteria()
             tds = c.list (max: BATCH_SIZE , offset:offset) {
                 and {
-                    gt('id', 275703L)
+                    gt('id', 0L)
                     //eq('position', NamesMetadata.NamePosition.WORKING)
                     //isNull('position')
                 }

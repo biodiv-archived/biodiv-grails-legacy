@@ -216,9 +216,11 @@
             --%>
 
         </div>
+        <sUser:isAdmin>
         <div class="span4 offset8 clickSelectedRowWrap" style="margin-bottom: 10px;display:none;">
             <div class="btn btn-primary btn-large clickSelectedRow">Action on selected names</div>
         </div>
+        </sUser:isAdmin>
         <div class="row-fluid metadataDetails namelist_wrapper">
             <div class="span12">
 

@@ -1,6 +1,9 @@
 package species
 
 import species.auth.SUser;
+import species.SpeciesPermission;
+import species.CommonNames;
+import species.participation.ActivityFeed;
 
 class SpeciesTagLib {
 	
@@ -190,4 +193,35 @@ class SpeciesTagLib {
     	def result = speciesService.updateReference(attrs.model.referenceId, attrs.model.speciesId, attrs.model.fieldId, attrs.model.speciesFieldId, attrs.model.value);
 		out << body();
 	}
+
+	def noOfContributedSpecies={attrs,body->
+		def noOfSpecies=speciesService.totalContributedSpecies(attrs.model.user)
+
+		out << "<td class=countvaluecontributed>"+noOfSpecies+"</td>"
+
+	}
+	
+		def contriutedSnippet={attrs,body->
+		def noOfSpecies=speciesService.totalContributedSpeciesSnippet(attrs.model.user)
+
+		out << "<td class=countvalue>"+noOfSpecies+"</td>"
+
+	}
+
+	def showNoOfOrganizedSpecies={attrs,body->
+		String[] activityType=["Added common name","Updated Common Name","Added hierarchy","Posted resource","Added synonym","Updated synonym","Deleted synonym","Updated species gallery","Added species field","Updated species field","Deleted species field"]
+		def totalNoOfOrganizedSpecies=0;
+		activityType.each{
+			def noOfOrganizedSpecies=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it);
+			//println "========="+it+"===================="+noOfOrganizedSpecies.size();
+			totalNoOfOrganizedSpecies=noOfOrganizedSpecies.size()+totalNoOfOrganizedSpecies
+		}
+		out << "<td class=countvalue>"+totalNoOfOrganizedSpecies+"</td>";
+	}
+	def showContributedSpecies={attrs,body->
+		def species=speciesService.getuserContributionList(attrs.model.user.toInteger())
+		out << render(template:"/species/contributedSpeciesTemplate", model:['user':attrs.model,'contributedSpecies':species]);
+
+	}
+
 }

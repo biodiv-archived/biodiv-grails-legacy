@@ -95,7 +95,7 @@ class ObservationService extends AbstractMetadataService {
     def userGroupService;
     def activityFeedService;
     def SUserService;
-    //def speciesService;
+    def speciesService;
     def messageSource;
     def resourcesService;
     def request;
@@ -390,6 +390,10 @@ class ObservationService extends AbstractMetadataService {
         else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
         }
+        else if(params.filterProperty == "contributedSpecies") {
+           relatedObv = speciesService.getuserContributionList(params.filterPropertyValue.toInteger(),max,offset)
+           
+        } 
         
         else{
             if(params.id) {
@@ -399,7 +403,7 @@ class ObservationService extends AbstractMetadataService {
             }
         }
 
-        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources') ){
+        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources')&&(params.filterProperty!='contributedSpecies') ){
             //def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
             //println group.webaddress
             relatedObv.observations.each { map ->
@@ -487,6 +491,7 @@ class ObservationService extends AbstractMetadataService {
         observations.each {
             result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
         }
+        println "observation result"+result
         return ["observations":result, "count":count[0]["count"]]
     }
 
@@ -987,7 +992,6 @@ println resIdList
     q.setParameter(:geoExp0, geom, geometryType); 
      */
     Map getFilteredObservations(def params, max, offset, isMapView = false, List eagerFetchProperties=null) {
-
         def queryParts = getFilteredObservationsFilterQuery(params, eagerFetchProperties) 
         String query = queryParts.query;
         long checklistCount = 0, allObservationCount = 0, speciesCount = 0, subSpeciesCount = 0;
@@ -1049,10 +1053,15 @@ println qTranslator;
 println qTranslator.getQueryString();
 println qTranslator.getSQLString();
 println "******************************"
-*/        def observationInstanceList = hqlQuery.list();
-
+*/      def observationInstanceList;
         def distinctRecoList = [];
         def speciesGroupCountList = [];
+        if(params.identified=="true"){
+           observationInstanceList=getObservationInstanceList(params)
+           allObservationCount = observationInstanceList.size()
+        }
+        else{
+         observationInstanceList = hqlQuery.list();
 		if(checklistCountQuery){
         	checklistCountQuery.setProperties(queryParts.queryParams)
 			checklistCount = checklistCountQuery.list()[0]
@@ -1070,7 +1079,7 @@ println "******************************"
         def acceptedSpeciesCount = speciesStatusCounts[0]
         def synonymSpeciesCount = speciesStatusCounts[1]
         */
-
+            }
         if(!params.loadMore?.toBoolean()) {
             /*distinctRecoQuery.setProperties(queryParts.queryParams)
             def distinctRecoListResult = distinctRecoQuery.list()
@@ -1106,7 +1115,7 @@ println "******************************"
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
-		params.isMediaFilter = (params.isMediaFilter) ?: 'true'
+		params.isMediaFilter = (params.isMediaFilter) ?: 'false'
         //params.userName = springSecurityService.currentUser.username;
 
         def queryParams = [:];
@@ -1186,6 +1195,12 @@ println "******************************"
                 queryParams["groupId"] = groupId
                 activeFilters["sGroup"] = groupId
             }
+        }
+                if(params.recom && params.identified!='true'){
+                 params.recom = params.recom.toLong()
+                filterQuery += " and (obv.maxVotedReco.id = :recom) "
+                queryParams["recom"] = params.recom
+                activeFilters["recom"] = params.recom
         }
 
         if(params.webaddress) {
@@ -1452,7 +1467,6 @@ println "******************************"
         def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ checklistObvCond + " and obv.maxVotedReco is not null ";
         def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
 		def checklistCountQuery =  null
-		
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
             filterQuery += " and obv.isChecklist = true "
 			checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
@@ -1559,8 +1573,8 @@ println "******************************"
             for (row in recommendationVotesList) {
                 finalResult.add(RecommendationVote.findById(row.getProperty("id")))
             }
-            //return recommendationVotesList;
             return finalResult;
+
 
             /*
             def recommendationVotesList = sql.rows("select recoVote from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, isShowable:true])
@@ -2239,7 +2253,7 @@ println "******************************"
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
 		log.debug "distinctRecoQuery  : "+queryParts.distinctRecoQuery;
         log.debug "distinctRecoCountQuery  : "+queryParts.distinctRecoCountQuery;
-
+        log.debug "queryparams"+queryParts.queryParams;
         def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
         def distinctRecoCountQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoCountQuery)
 
@@ -2262,16 +2276,14 @@ println "******************************"
             def reco = Recommendation.read(it[0]);
             if(params.downloadFrom == 'uniqueSpecies') {
                 //HACK: request not available as its from job scheduler
-                distinctRecoList << [reco.name, reco.isScientificName, it[1], getSpeciesHardLink(reco)]
+                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
             }else {
-                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, it[1]]
+                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
             }
         }
-
         def count = distinctRecoCountQuery.list()[0]
         return [distinctRecoList:distinctRecoList, totalCount:count];
     }
-
     /**
      */
     def getDistinctRecoListFromSearch(params, int max, int offset) {
@@ -2749,5 +2761,84 @@ println "******************************"
 			}
 		}
         return langToCommonName;
+    }
+
+
+        long getAllSuggestedRecommendationsOfUser(SUser user , UserGroup userGroupInstance = null) {
+        //TODO: filter on usergroup if required
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        if(userGroupInstance){
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o, user_group_observations ugo where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and ugo.observation_id = o.id and ugo.user_group_id =:ugId and recoVote.given_common_name!=''",  [userId:user.id, isDeleted:false, ugId:userGroupInstance.id]);
+        } else {
+            result = sql.rows("select count(recoVote) from recommendation_vote recoVote, observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and recoVote.given_common_name!=''", [userId:user.id, isDeleted:false]);
+        }
+  //      def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
+        return (long)result[0]["count"];
+    }
+
+    def getDistinctIdentifiedRecoList(params, int max, int offset) {  
+        def sql =  Sql.newInstance(dataSource);
+        def distinctIdentifiedRecoList = [];
+        def distinctIdentifiedQuery
+        def queryParts = getFilteredObservationsFilterQuery(params)
+        if(params.userGroup)
+        { 
+            if(params.sGroup!=829){
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc"
+                }
+             else{
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc"
+                }
+        }
+         else
+        { 
+            if(params.sGroup!=829){
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+"  group by recoVote.recommendation_id order by count(*) desc"
+                }
+             else{
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true group by recoVote.recommendation_id order by count(*) desc"
+                }
+        }
+                def distinctIdentifiedRecoListResult =sql.rows(distinctIdentifiedQuery)
+                distinctIdentifiedRecoListResult.each {it->
+                def reco = Recommendation.read(it['voteid']);
+                if(params.downloadFrom == 'uniqueSpecies') {
+                    distinctIdentifiedRecoList << [reco.name, reco.isScientificName, it['count'], getSpeciesHardLink(reco)]
+                        }
+                else {
+                    distinctIdentifiedRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getIdentifiedObservationHardLink(it['voteid'],it['count'],params.user,true)]
+                        }
+                    }
+                def count=10
+                return [distinctIdentifiedRecoList:distinctIdentifiedRecoList, totalCount:count];
+            }
+
+    private String getObservationHardLink(reco,count) {
+        if(!reco) return ;
+        def link=utilsService.generateLink("observation", "list", ["recom": reco])
+        return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
+        }
+    private String getObservationHardLink(reco,count,user) {
+        if(!reco) return ;
+        def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user])
+        return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
+        //return link 
+        }
+    private String getIdentifiedObservationHardLink(reco,count,user,identified) {
+        if(!reco) return ;
+        def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user,"identified":true])
+        return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
+        //return link 
+        }
+    def getObservationInstanceList(params){
+        def finalInstanceResult=[]
+        def sql =  Sql.newInstance(dataSource);
+        def result=sql.rows("select obv.id from recommendation_vote recoVote,observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=:rId and recoVote.author_id=:userId",[rId:(params.recom).toInteger(), userId:(params.user).toInteger()]);
+
+        for(row in result){
+            finalInstanceResult.add(Observation.findById(row.getProperty("id")))
+        }
+        return finalInstanceResult
     }
 }
