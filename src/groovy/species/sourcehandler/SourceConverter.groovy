@@ -113,9 +113,10 @@ class SourceConverter {
                 
 				Map matchMap = taxonHirMap ? taxonHirMap.get("" + index) : null
 				if(matchMap){
+                    println "=========== match map  " + matchMap
 					new Node(field, "ibpId", matchMap.ibpId);
 					new Node(field, "colId", matchMap.colId);
-					def nameRunningStatus = matchMap?.nameRunningStatus?.text();
+					def nameRunningStatus = matchMap?.nameRunningStatus;
 					if(nameRunningStatus){
 						new Node(field, "nameRunningStatus", nameRunningStatus);
 					}

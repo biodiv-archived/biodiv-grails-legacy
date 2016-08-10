@@ -12,9 +12,6 @@ import org.apache.commons.logging.LogFactory
 class NamePermission {
 	private static log = LogFactory.getLog(this);
 	
-	//def grailsApplication;
-	//def utilsService
-	
 	public enum Permission {
 		ADMIN("ADMIN"),
 		CURATOR("CURATOR"),
@@ -169,6 +166,9 @@ class NamePermission {
 
 	
 	static boolean isAdmin(SUser user){
+		if(!user){
+			return false
+		}
 		return (NamePermission.findWhere(user:user, permission:Permission.ADMIN) != null)
 	}
 	

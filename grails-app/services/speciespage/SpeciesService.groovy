@@ -1496,7 +1496,9 @@ class SpeciesService extends AbstractObjectService  {
         result.putAll(result1);
         def td = TaxonomyDefinition.get(taxonId);
         td?.postProcess();
-        return result
+		//updating ibp hir based on user given hir
+		td?.updateIBPHir(result?.reg)
+		return result
     }
 
     /**

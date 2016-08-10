@@ -557,17 +557,18 @@ class NamelistController {
 	
 	def tt(){
         //2998_33364_33366_3035_3542_5273_5275
-
-
-        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
-        def users=[]
-            getAllPermissions.each { nP ->
-                println nP.user
-                users << [id:nP.user.id,profile_pic:nP.user.profilePicture(ImageType.SMALL)];
-            }
-            
-        render "Working" +users
-
+		
+		Map m = [user:"1" ,permission:"ADMIN"];
+		namePermissionService.addPermission(m)
+//		
+//        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
+//        def users=[]
+//            getAllPermissions.each { nP ->
+//                println nP.user
+//                users << [id:nP.user.id,profile_pic:nP.user.profilePicture(ImageType.SMALL)];
+//            }
+//            
+        render "Working  "
 
 
 	}
