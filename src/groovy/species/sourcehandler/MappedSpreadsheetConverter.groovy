@@ -74,7 +74,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(!m['name'] || ("ignore".equalsIgnoreCase(m['match found'])))
 					return
 				
-				String rankSuffix = useRank ? (m['rank'] ? ( KEY_SEP + m['rank'].trim().toLowerCase()):''):''  		
+				String rankSuffix = useRank ? (m['rank'] ? ( KEY_SEP + TaxonomyRank.getTRFromInt(TaxonomyRank.getTaxonRank(m['rank'].trim())).value().toLowerCase()):''):''  		
 				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name'] + rankSuffix
 				if(targetMap.containsKey(key)){
 					addToSummary(" Multiple matching rows for given key " + key)

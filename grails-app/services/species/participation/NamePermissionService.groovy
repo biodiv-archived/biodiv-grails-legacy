@@ -21,7 +21,7 @@ class NamePermissionService {
 	}
 	
 	def NamePermission addPermission(params){
-		Map m = populateMap(params)
+		Map m = populateMap(params)		
 		return NamePermission.add(m.user, m.node, m.permission)
 	}
 	
@@ -54,10 +54,10 @@ class NamePermissionService {
 	}
 	
 	private Map populateMap(params){
-		//println "========= params " + params
-		SUser u = SUser.read(params.user?.toLong())
-		TaxonomyDefinition taxon = TaxonomyDefinition.read(params.taxon?.toLong())
-		Permission perm = Permission.getPermissionFromStr(params.permission)
+		println "========= params " + params
+		SUser u = (params.user)?SUser.read(params.user?.toLong()):null;		
+		TaxonomyDefinition taxon = (params.taxon?.toLong())? TaxonomyDefinition.read(params.taxon?.toLong()):null;
+		Permission perm = (params.permission)? Permission.getPermissionFromStr(params.permission):null;
 		boolean moveToClean = params.moveToClean ? params.moveToClean.toBoolean() : false  
 		Map m = ['user':u, 'node':taxon, 'permission':perm, 'moveToClean':moveToClean]
 		println "============= populated map  === " + m

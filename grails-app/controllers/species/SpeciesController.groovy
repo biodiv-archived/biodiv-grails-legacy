@@ -1566,7 +1566,9 @@ class SpeciesController extends AbstractObjectController {
     							msg = messageSource.getMessage("default.species.addExisting.taxon", null, RCU.getLocale(request))
                             }
                         }
-						result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry, page:params.page]];
+                        def fieldsConfig = grailsApplication.config.speciesPortal.fields;
+                        def cl = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+                        result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry?:taxonRegistry[cl], page:params.page],authorYear:r.authorYear];
 						
 	                    result['taxonRegistry'] = [:];
 						
@@ -1600,6 +1602,8 @@ class SpeciesController extends AbstractObjectController {
         NamesParser namesParser = new NamesParser();
         List<TaxonomyDefinition> names = namesParser.parse([name]);
         TaxonomyDefinition page = names[0];
+        println "=============NamesParser========page==================="
+        println page
         if(page && page.canonicalForm) {
 			if((rank == TaxonomyRank.SPECIES.ordinal() || rank == TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()) && !page.binomialForm) { //TODO:check its not uninomial
             	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))

@@ -3,7 +3,7 @@ var synDLContent, synWLContent, synCLContent;
 var comDLContent, comWLContent, comCLContent;
 var speciesDLContent, speciesWLContent, speciesCLContent;
 var oldName = '', oldRank = '' , oldStatus = '';
-var genusMatchResult, taxonRanks, nameRank, genusTaxonMsg
+var genusMatchResult, taxonRanks, nameRank, genusTaxonMsg,setRank,cacheResultForPopulate,isSearchCol = true;
 var taxonGridSelectedRow = {};
 
 function createListHTML(list, nameType, isOrphanList) {
@@ -231,7 +231,7 @@ function getNamesFromTaxon(ele , parentId, statusToFetch, positionsToFetch, rank
         url: url,
         dataType: "json",
         type: "POST",
-        data: params,	
+        data: params,   
         success: function(data) {
             if(data.success) {
                 data = data.model;
@@ -451,7 +451,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
             url: url,
             dataType: "json",
             type: "POST",
-            data: {taxonId:taxonId, nameType:nameType, classificationId:classificationId, choosenName: choosenName},	
+            data: {taxonId:taxonId, nameType:nameType, classificationId:classificationId, choosenName: choosenName},    
             success: function(data) {
                 if(!data.success) {
                     processingStop();
@@ -479,6 +479,7 @@ function getNameDetails(taxonId, classificationId, nameType, ele, isOrphanName) 
                 }
                 /*if($(ele).parents(".dl_content").length) {
                     $(".dialogMsgText").html("Auto-querying CoL for up-to-date name attributes.");
+>>>>>>> master
                     $("#dialogMsg").modal('show');
                     $('.queryDatabase option[value="col"]').attr("selected", "selected");
                     $('.queryString').trigger("click");
@@ -511,9 +512,9 @@ function populateTabDetails(data, appendData) {
             $(ele).find("input[name='value']").val(value["name"]);
             $(ele).find("input[name='source']").val(value["source"]);
             $(ele).find("input[name='contributor']").val(value["contributors"]);
-            if(value["source"] == 'CatalogueOfLife') {
+            //if(value["source"] == 'CatalogueOfLife') {
                 $(ele).find("input").prop("disabled", true);
-            }
+            //}
         })
     }
 
@@ -625,8 +626,13 @@ function populateNameDetails(data){
     }
 
     $('.source').val(data['source']);
-    $(".via").val(data["sourceDatabase"]);
-    $(".id").val(data["matchId"]);
+    $(".via").val(data["via"]);
+    if(data["nameSourceId"] != null && data["nameSourceId"] != ""){ 
+        $('.id').val(data["nameSourceId"]); 
+    }else{ 
+        $('.id').val(data["matchId"]); 
+    }
+    /* $(".id").val(data["matchId"]); */
 
     setOption(document.getElementById("rankDropDown"), data["rank"]);
     setOption(document.getElementById("statusDropDown"), data["nameStatus"]);
@@ -684,7 +690,7 @@ function searchAndPopupResult(name, dbName, addNewName, source){
         url: url,
         dataType: "json",
         type: "POST",
-        data: {name:name, dbName:dbName},	
+        data: {name:name, dbName:dbName},   
         success: function(data) {
             processingStop()
             //show the popup
@@ -694,13 +700,13 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 //TODO : for synonyms
                 $("#externalDbResults h6").html(name +"(IBP status : "+ ibpStatus +")");
                 fillPopupTable(data , $("#externalDbResults"), "externalData", true, source);
-            	$('#externalDbResults .modal-dialog').on('hidden', function(event) {
-            		$(this).unbind();
-            		if(genusTaxonMsg){
-            			alert(genusTaxonMsg);
-            			genusTaxonMsg = undefined;
-             		}
-            	});
+                $('#externalDbResults .modal-dialog').on('hidden', function(event) {
+                    $(this).unbind();
+                    if(genusTaxonMsg){
+                        alert(genusTaxonMsg);
+                        genusTaxonMsg = undefined;
+                    }
+                });
             }else {
                 var oldText = $(".dialogMsgText").html();
                 if (oldText.indexOf("Sorry") >= 0) {
@@ -718,12 +724,12 @@ function searchAndPopupResult(name, dbName, addNewName, source){
                 }
                 
                 $('#dialogMsg').on('hidden', function(event) {
-            		//$(this).unbind();
-            		if(genusTaxonMsg){
-            			alert(genusTaxonMsg);
-            			genusTaxonMsg = undefined;
-             		}
-            	});
+                    //$(this).unbind();
+                    if(genusTaxonMsg){
+                        alert(genusTaxonMsg);
+                        genusTaxonMsg = undefined;
+                    }
+                });
             }
           
         }, error: function(xhr, status, error) {
@@ -740,7 +746,7 @@ function searchIBP(name) {
         url: url,
         dataType: "json",
         type: "POST",
-        data: {name:name},	
+        data: {name:name},  
         success: function(data) {
             processingStop();
             //show the popup
@@ -770,8 +776,8 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
     $ele.find("table tr td").remove();
     var rows = "";
     $.each(data, function(index, value) {
-    	if(dataFrom == "externalData") {
-    		var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value["id"] + ',"' + value["externalId"] + '", "' + value["name"] + '")' : 'getExternalDbDetails(this, ' +showNameDetails+')'
+        if(dataFrom == "externalData") {
+            var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value["id"] + ',"' + value["externalId"] + '", "' + value["name"] + '", "' + value["rank"] + '")' : 'getExternalDbDetails(this, ' +showNameDetails+')'
             var nameStatus = value['nameStatus'];
             var colLink = 'http://www.catalogueoflife.org/annual-checklist/2015/details/species/id/'+value['externalId']
             if(nameStatus == 'synonym') {
@@ -787,17 +793,18 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
                     }
                 });
             }
-            if(value['rank'] == 'species' || value['rank'] == 'infraspecies') {
-                rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
-            }else {
-                colLink = 'http://catalogueoflife.org/annual-checklist/2015/browse/tree/id/'+value['externalId']
-                rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
-            }
-            
-            rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['parentTaxon']+"</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"        
+            if(getSelectedRank(setRank,'id').toLowerCase()==value['rank']){ 
+                if(value['rank'] == 'species' || value['rank'] == 'infraspecies') {
+                    rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
+                }else {
+                    colLink = 'http://catalogueoflife.org/annual-checklist/2015/browse/tree/id/'+value['externalId']
+                    rows+= "<tr><input type = 'hidden' value = '"+value['externalId']+"'><td><a style = 'color:blue;' target='_blank' href='"+colLink+"'>"+value['name'] +"</a></td>"
+                }                           
+                    rows += "<td>"+value['rank']+"</td><td>"+nameStatus+"</td><td>"+value['group']+"</td><td>"+value['parentTaxon']+"</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"        
+            }   
         }
         else {
-        	var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value['id'] + ',"' + value['externalId'] + '", "' + value['name'] + '")' : 'getNameDetails(' +value['taxonId'] + ',' + classificationId + ',1, undefined)' 
+            var onclickEvent = (source ==  "onlinSpeciesCreation") ? 'openSpeciesPage(' + value['id'] + ',"' + value['externalId'] + '", "' + value['name'] + '", "' + value["rank"] + '")' : 'getNameDetails(' +value['taxonId'] + ',' + classificationId + ',1, undefined)' 
             rows += "<tr><td>"+value['name'] +"</td><td>"+value['rank']+"</td><td>"+value['nameStatus'] + "/" + value['position'] +"</td><td>"+value['group']+"</td><td>" + value['parentName'] + "</td><td>"+value['sourceDatabase']+"</td><td><div class='btn' onclick='"+ onclickEvent + "'>Select this</div></td></tr>"
         }
     });
@@ -805,68 +812,94 @@ function fillPopupTable(data, $ele, dataFrom, showNameDetails, source) {
     return
 }
 
-function openSpeciesPage(taxonId, colId, name){
-	var sourceComp = $(".input-prepend.currentTargetName");
-	if(sourceComp.length > 0){
-		var inputComp = sourceComp.children("input");
-		taxonId = ((taxonId == undefined ) || (taxonId == 'undefined') || (taxonId == ''))?'': taxonId
-		colId = ((colId == undefined ) || (colId == 'undefined') || (colId == ''))?'': colId 
-		inputComp.attr('data-ibpid', taxonId);
-		inputComp.attr('data-colid', colId);
-		inputComp.val(name);
-		$("#externalDbResults").modal('hide');
-		return;
-	}
-	var url = window.params.curation.editSpeciesPageURL;
-	$("#externalDbResults").modal('hide');
-	$.ajax({
-	        url: url,
-	        dataType: "json",
-	        type: "POST",
-	        data: {taxonId:taxonId, colId:colId},	
-	        success: function(data) {
-	            processingStop();
-	            validateSpeciesSuccessHandler(data, false);
-	        }, error: function(xhr, status, error) {
-	            processingStop();
-	            alert(xhr.responseText);
-	        } 
-	    });
-	
-	return false;
+function openSpeciesPage(taxonId, colId, name,rank){
+     rank = getSelectedRank(rank,'name') || nameRank;
+     var namelist=$('#addSpeciesPage').find('.namelistUI').val();
+    //alert(namelist);
+    if(namelist && $('#page').hasClass('currentPage')){
+        $('#page.currentPage').val(name);
+        $("#externalDbResults").modal('hide');
+        processingStop();
+        $('#page').removeClass('currentPage');
+        return;
+    }
+    //return ;
+    var sourceComp = $(".input-prepend.currentTargetName");
+    if(sourceComp.length > 0){
+        var inputComp = sourceComp.children("input");
+        taxonId = ((taxonId == undefined ) || (taxonId == 'undefined') || (taxonId == ''))?'': taxonId
+        colId = ((colId == undefined ) || (colId == 'undefined') || (colId == ''))?'': colId 
+        inputComp.attr('data-ibpid', taxonId);
+        inputComp.attr('data-colid', colId);
+        inputComp.val(name);
+        var tr=[],newpath="";
+        $.each(cacheResultForPopulate.requestParams.taxonRegistry,function(i,reg){
+            var rank = parseInt(getSelectedRank(reg.rank,'name'));
+            tr[rank] = reg.name;
+            newpath += reg.id+"_";
+        });
+        newpath = newpath.substring(0,newpath.length-1);
+        $('.newTaxonPath').val(newpath);
+        cacheResultForPopulate.requestParams.taxonRegistry=tr;
+        updateHirInput(cacheResultForPopulate,rank,true);
+        updateHirRank(getSelectedRank($('#rankDropDown').val(),'name'));
+        $("#externalDbResults").modal('hide');
+        processingStop();
+        return;
+    }
+
+    var url = window.params.curation.editSpeciesPageURL;
+    $("#externalDbResults").modal('hide');
+    $.ajax({
+            url: url,
+            dataType: "json",
+            type: "POST",
+            data: {taxonId:taxonId, colId:colId},   
+            success: function(data) {
+                processingStop();
+                validateSpeciesSuccessHandler(data, false);
+            }, error: function(xhr, status, error) {
+                processingStop();
+                alert(xhr.responseText);
+            } 
+        });
+    
+    return false;
 }
 
 
-function addSpeciesPage(url){
+function addSpeciesPage(url,params){
     var allValidated = true;
-	$("#taxonHierachyInput .input-prepend").each(function(index, ele) {
-		allValidated = (allValidated && ($(ele).children('div').hasClass('disabled')));
-	});
-	
-	if(!allValidated){
-		alert("Some names are not validated in the Taxon Hierarchy. Please validated them before submit.")
-		return; 
-	}
-	
-	var params = {};
+    $("#taxonHierachyInput .input-prepend").each(function(index, ele) {
+        allValidated = (allValidated && ($(ele).children('div').hasClass('disabled')));
+    });
+    
+    if(!allValidated){
+        alert("Some names are not validated in the Taxon Hierarchy. Please validated them before submit.")
+        return; 
+    }
+    
+    var params = params || {};
     $("#addSpeciesPage input").each(function(index, ele) {
         if($(ele).val().trim())
-        	params[$(ele).attr('name')] = $(ele).val().trim();
+            params[$(ele).attr('name')] = $(ele).val().trim();
     });
     params['rank'] = $('#rank').find(":selected").val();
     
     //adding ibpid and colid if any
     $("#taxonHierachyInput .input-prepend input").each(function(index, ele) {
-    	var ibpId = $(ele).attr('data-ibpid');
-    	var colId = $(ele).attr('data-colid');
-    	var rank = $(ele).attr('data-rank');
-		ibpId = ((ibpId == undefined ) || (ibpId == 'undefined') || (ibpId == ''))?'': ibpId
-		colId = ((colId == undefined ) || (colId == 'undefined') || (colId == ''))?'': colId 
+        var ibpId = $(ele).attr('data-ibpid');
+        var colId = $(ele).attr('data-colid');
+        var rank = $(ele).attr('data-rank');
+        ibpId = ((ibpId == undefined ) || (ibpId == 'undefined') || (ibpId == ''))?'': ibpId
+        colId = ((colId == undefined ) || (colId == 'undefined') || (colId == ''))?'': colId 
 
-    	if(ibpId || colId){
-    		params['taxonHirMatch.' + rank + '.ibpId'] = ibpId;
-    		params['taxonHirMatch.' + rank + '.colId'] = colId;
-    	}
+        if(ibpId || colId){
+            params['taxonHirMatch.' + rank + '.ibpId'] = ibpId;
+            params['taxonHirMatch.' + rank + '.colId'] = colId;
+        }else{
+        	 params['taxonHirMatch.' + rank + '.nameRunningStatus'] = 'new';
+        }
     });
     
     $.ajax({
@@ -874,12 +907,16 @@ function addSpeciesPage(url){
         data:params,
         method:'POST',
         dataType:'json',
-        success:function(data) {
-        	if (data.instance.id) {
-    			window.location.href = '/species/show/' + data.instance.id + '?editMode=true'
-    			return;
-    		}
-    		$('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+        success:function(data) {            
+            if (data.instance){
+                if(data.instance.id) {
+                window.location.href = '/species/show/' + data.instance.id + '?editMode=true'
+                return;
+                }
+            }
+            $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+            alert(data.msg);
+            location.reload();
         }, error: function(xhr, status, error) {
             handleError(xhr, status, error, this.success, function() {
                 var msg = $.parseJSON(xhr.responseText);
@@ -887,74 +924,81 @@ function addSpeciesPage(url){
             });
         }
     });
-	
-	
+    
+    
 }
 
 function showSearchPopup(data){
-	// show the popup
-	var colMsg = "";
-	var tList = data.taxonList
-	if (tList && tList.length != 0) {
-		$("#dialogMsg").modal('hide');
-		$("#externalDbResults").modal('show');
-		$("#externalDbResults h6").html(name);
-		fillPopupTable(tList, $("#externalDbResults"), "IBPData", true, "onlinSpeciesCreation");
-		$('#externalDbResults .modal-dialog').on('hidden', function(event) {
-			$(this).unbind();
-			$("#dialogMsg").modal('show');
-			colMsg = colMsg + "Querying the Catalogue of Life for matches..."
-			$(".dialogMsgText").html(colMsg);
-			searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
-		});
-	} else {
-		$("#dialogMsg").modal('show');
-		colMsg = "No results found for taxon name on IBP. Querying the Catalogue of Life for matches..."
-		$(".dialogMsgText").html(colMsg);
-		searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");	
-	}
-	
+    // show the popup
+    var colMsg = "";
+    var tList = data.taxonList
+    if (tList && tList.length != 0) {
+        $("#dialogMsg").modal('hide');
+        $("#externalDbResults").modal('show');
+        $("#externalDbResults h6").html(name);
+        fillPopupTable(tList, $("#externalDbResults"), "IBPData", true, "onlinSpeciesCreation");
+        $('#externalDbResults .modal-dialog').on('hidden', function(event) {            
+            if(!isSearchCol){
+                $("#dialogMsg").modal('hide');
+                return false;
+            }
+            $(this).unbind();
+            $("#dialogMsg").modal('show');
+            colMsg = colMsg + "Querying the Catalogue of Life for matches..."
+            $(".dialogMsgText").html(colMsg);
+            searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");
+        });
+    } else {
+        $("#dialogMsg").modal('show');
+        colMsg = "No results found for taxon name on IBP. Querying the Catalogue of Life for matches..."
+        $(".dialogMsgText").html(colMsg);
+        searchAndPopupResult(data.requestParams.page, "col", false, "onlinSpeciesCreation");    
+    }
+    
 
 }
 
 function validateHirName(comp){
-	var vButton = $(comp).children('div');
-	if(vButton.hasClass('disabled'))
-		return;
-	
-	$("#taxonHierachyInput .input-prepend").each(function(index, ele) {
+    isSearchCol=false;
+    var vButton = $(comp).children('div');
+    if(vButton.hasClass('disabled'))
+        return;
+    
+    $("#taxonHierachyInput .input-prepend").each(function(index, ele) {
         $(ele).removeClass("currentTargetName");
     });
-	
-	comp.addClass("currentTargetName");
-	var inputCom = $(comp).children('input');
-	inputCom.attr('data-ibpid', "");
-	inputCom.attr('data-colid', "");
-	var rank = inputCom.attr('data-rank');
-	var page = inputCom.attr('value').trim();
-	//if not a mandatory field and name is empty text then leaving  
-	if( (rank == "4"  || rank == "6" ||rank == "8") && (page == "") ){
-		vButton.removeClass('btn-primary').addClass('btn-success disabled');
-		vButton.html('Validated');
-		return;
-	}
-	
-	var params = {'rank':rank, 'page':page};
-	
-	$.ajax({
+    
+    comp.addClass("currentTargetName");
+    var inputCom = $(comp).children('input');
+    inputCom.attr('data-ibpid', "");
+    inputCom.attr('data-colid', "");
+    var rank = inputCom.attr('data-rank');
+    var page = inputCom.attr('value').trim();
+    //if not a mandatory field and name is empty text then leaving  
+    if( (rank == "4"  || rank == "6" ||rank == "8") && (page == "") ){
+        vButton.removeClass('btn-primary').addClass('btn-success disabled');
+        vButton.html('Validated');
+        return;
+    }
+    
+    var params = {'rank':rank, 'page':page};
+    
+    $.ajax({
         url:'/species/validate',
         data:params,
         method:'POST',
         dataType:'json',
         success:function(data) {
-        	if (data.success == true) {
-        		$('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
-        		showSearchPopup(data);
-        		vButton.removeClass('btn-primary').addClass('btn-success disabled');
-        		vButton.html('Validated');
-        	}else{
-        		$("#errorMsg").html(data.msg).removeClass('alert-success').addClass('alert-error');
-        	}
+            if (data.success == true) {
+                cacheResultForPopulate = data;
+                setRank = rank;
+                $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+                showSearchPopup(data);
+                vButton.removeClass('btn-primary').addClass('btn-success disabled');
+                vButton.html('Validated');
+            }else{
+                $("#errorMsg").html(data.msg).removeClass('alert-success').addClass('alert-error');
+            }
         }, error: function(xhr, status, error) {
             handleError(xhr, status, error, this.success, function() {
                 var msg = $.parseJSON(xhr.responseText);
@@ -965,159 +1009,184 @@ function validateHirName(comp){
 }
 
 function enableValidButton(comp){
-	var vButton = $(comp).children('div');
-	if($(comp).children('input').val()){
-		vButton.addClass('btn-primary').removeClass('btn-success disabled');
-		vButton.html('Validate Name');
-	}
+    var vButton = $(comp).children('div')[0];
+    if($(comp).children('input').val()){
+        $(vButton).addClass('btn-primary').removeClass('btn-success disabled');
+        $(vButton).html('Validate Name');
+    }
 }
 
-function updateHirInput(data){
-	var $ul = $('<ul></ul>');
-	$('#existingHierarchies').empty().append($ul);
-	if (data.taxonRegistry) {
-		$.each(data.taxonRegistry, function(index, value) {
-			var $c = $('<li></li>');
-			$ul.append($c);
-			var $u = $('<ul><b>' + index + '</b></ul>');
-			$c.append($u);
-			$.each(value[0], function(i, v) {
-				$u.append('<li>' + v.rank + ' : ' + v.name + '</li>');
-			});
-		});
-	}
+function updateHirInput(data,rank,mode){
+    rank = rank || nameRank;
+    mode = mode || false;
+    var $ul = $('<ul></ul>');
+    $('#existingHierarchies').empty().append($ul);
+    if (data.taxonRegistry) {
+        $.each(data.taxonRegistry, function(index, value) {
+            var $c = $('<li></li>');
+            $ul.append($c);
+            var $u = $('<ul><b>' + index + '</b></ul>');
+            $c.append($u);
+            $.each(value[0], function(i, v) {
+                $u.append('<li>' + v.rank + ' : ' + v.name + '</li>');
+            });
+        });
+    }
 
-	$('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
-	var $hier = $('#taxonHierachyInput');
-	$hier.empty()
-	var taxonRegistry = data.requestParams ? data.requestParams.taxonRegistry: undefined;
-	var taxonIBPHirMatch = data.requestParams ? data.requestParams.taxonIBPHirMatch: undefined;
-	var taxonCOLHirMatch = data.requestParams ? data.requestParams.taxonCOLHirMatch: undefined;
-	
-	for (var i = 0; i < nameRank; i++) {
-		var isTaxon = (taxonRegistry && taxonRegistry[i]);
-		var taxonValue = isTaxon ? taxonRegistry[i] : taxonRanks[i].taxonValue;
-		var ibpMatch = (taxonIBPHirMatch && taxonIBPHirMatch[i])?taxonIBPHirMatch[i]:undefined;
-		var colMatch = (taxonCOLHirMatch && taxonCOLHirMatch[i])?taxonCOLHirMatch[i]:undefined;
-		
-		var bClass = 'btn-success disabled';
-		var bText = 'Validated';
-		if(taxonRanks[i].mandatory &&  !isTaxon ){
-			bClass = 'btn-primary';
-			bText = 'Validate Name';
-		}
-		$(
-				'<div class="input-prepend"><span class="add-on">'
-						+ taxonRanks[i].text
-						+ (taxonRanks[i].mandatory ? '*' : '')
-						+ '</span><input data-provide="typeahead" data-rank ="'
-						+ taxonRanks[i].value
-						+ '" data-ibpid="' + ibpMatch + '" data-colid="' + colMatch
-						+ '" type="text" class="taxonRank" name="taxonRegistry.'
-						+ taxonRanks[i].value + '" value="' + taxonValue
-						+ '" placeholder="Add ' + taxonRanks[i].text
-						+ '" onchange="enableValidButton($(this).parent());"' 
-						+ '" /><div class="btn btn-mini ' + bClass + '" onclick=validateHirName($(this).parent());> ' + bText + ' </div></div>').appendTo($hier);
-	}
-	if (nameRank > 0){
-		$('#taxonHierarchyInputForm').show();
-		$('html, body').animate({scrollTop:400}, 1000);
-	}
-	
-	if ($(".taxonRank:not(#page)").length > 0)
-		$(".taxonRank:not(#page)").autofillNames();
-	
+    $('#existingHierarchies').append('<div>If you have a new or a different classification please provide it below.</div>');
+    var $hier = $('#taxonHierachyInput');
+    if(!mode){$hier.empty();}
+    var taxonRegistry = data.requestParams ? data.requestParams.taxonRegistry: undefined;
+    var taxonIBPHirMatch = data.requestParams ? data.requestParams.taxonIBPHirMatch: undefined;
+    var taxonCOLHirMatch = data.requestParams ? data.requestParams.taxonCOLHirMatch: undefined;    
+    
+    for (var i = 0; i < nameRank; i++) {
+        var isTaxon = (taxonRegistry && taxonRegistry[i]);
+        var taxonValue = isTaxon ? taxonRegistry[i] : taxonRanks[i].taxonValue;
+        var ibpMatch = (taxonIBPHirMatch && taxonIBPHirMatch[i])?taxonIBPHirMatch[i]:undefined;
+        var colMatch = (taxonCOLHirMatch && taxonCOLHirMatch[i])?taxonCOLHirMatch[i]:undefined;
+        if($.type(taxonValue) === "string" || taxonValue == undefined){
+            taxonValue = (taxonValue!= undefined)?taxonValue:'';
+        }else{
+            // taxonValue with obj
+            if(taxonValue!= undefined){
+                var dRank = getSelectedRank(taxonValue.rank,'name');
+                alert(dRank);
+                if(i = dRank){
+                    taxonValue = (taxonValue!= undefined)?taxonValue.name:'';
+                }else{
+                   taxonValue=''; 
+                }
+            }
+        }
+        var bClass = 'btn-success disabled';
+        var bText = 'Validated';
+        if(taxonRanks[i].mandatory &&  !isTaxon ){
+            bClass = 'btn-primary';
+            bText = 'Validate Name';
+        }
+        if(!mode){
+        $(
+                '<div class="input-prepend hie_'+taxonRanks[i].value+'"><span class="add-on">'
+                        + taxonRanks[i].text
+                        + (taxonRanks[i].mandatory ? '*' : '')
+                        + '</span><input data-provide="typeahead" data-rank ="'
+                        + taxonRanks[i].value
+                        + '" data-id="' +
+                        + '" data-ibpid="' + ibpMatch + '" data-colid="' + colMatch
+                        + '" type="text" class="taxonRank" name="taxonRegistry.'
+                        + taxonRanks[i].value + '" value="' + taxonValue
+                        + '" placeholder="Add ' + taxonRanks[i].text
+                        + '" onchange="enableValidButton($(this).parent());"' 
+                        + '" /><div class="btn btn-mini ' + bClass + '" onclick=validateHirName($(this).parent());> ' + bText + ' </div></div>').appendTo($hier);
+        }else{
+            // Update the hierarchy
+            if(i < rank){
+                $('.hie_'+taxonRanks[i].value+' .taxonRank').val(taxonValue);
+            }
+        }
+    }
+    if (nameRank > 0){
+        $('#taxonHierarchyInputForm').show();
+        $('html, body').animate({scrollTop:400}, 1000);
+    }
+    
+    if ($(".taxonRank:not(#page)").length > 0)
+        $(".taxonRank:not(#page)").autofillNames();
+    
 }
 
 function updateGenusAutoPopulate(index){
-	var item = genusMatchResult[index];
-	var data = {'requestParams':item};
-	updateHirInput(data);
+    var item = genusMatchResult[index];
+    var data = {'requestParams':item};
+    updateHirInput(data);
 }
 
 function updateGenusSelector(data){
-	var gComp = $('.genusSelector');
-	var $gtl = $('.genusSelector .genusItemList');
-	$gtl.empty();
-	
-	genusMatchResult = data.requestParams.genusMatchResult
-	if(!genusMatchResult || genusMatchResult.length <=1){
-		gComp.hide();
-		return
-	}
-	
-	$.each(genusMatchResult, function(index, item) {
-		$(
-				'<a href="#" class="genusItem" onclick=updateGenusAutoPopulate(' + index + ')><span class="add-on">'
-				+ item.namePath 
-				+ '</span></a><br>').appendTo($gtl);
-	});
-	
-	gComp.show();
+    var gComp = $('.genusSelector');
+    var $gtl = $('.genusSelector .genusItemList');
+    $gtl.empty();
+    
+    genusMatchResult = data.requestParams.genusMatchResult
+    if(!genusMatchResult || genusMatchResult.length <=1){
+        gComp.hide();
+        return
+    }
+    
+    $.each(genusMatchResult, function(index, item) {
+        $(
+                '<a href="#" class="genusItem" onclick=updateGenusAutoPopulate(' + index + ')><span class="add-on">'
+                + item.namePath 
+                + '</span></a><br>').appendTo($gtl);
+    });
+    
+    gComp.show();
 }
 
 
 function validateSpeciesSuccessHandler(data, search){
-	if (data.success == true) {
-		//if species page id returned then open in edit mode
-		if (data.id) {
-			window.location.href = '/species/show/' + data.id + '?editMode=true'
-			return;
-		}
-		
-		$('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
-		
-		//showing parser info
-		$('#parserInfo').children('.canonicalName').html(data.canonicalForm);
-		$('#parserInfo').children('.authorYear').html(data.authorYear);
-		$('#parserInfo').show();
-		
-		if(!data.authorYear){
-			alert("Author and Year information is essential to distinguish taxon name from synonyms. Please input these details in the recommended nomenclatural format for the phylum and re-validate; eg: Cuon alpinus (Pallas,1811).");
-		}
-		
-		taxonRanks = data.taxonRanks;
-		nameRank = data.rank;
-		
-		updateGenusSelector(data);
-		
-		updateHirInput(data);
-		
-		genusTaxonMsg = data.requestParams.genusTaxonMsg
-		
-		if(search){
-			showSearchPopup(data);
-		}
-		else{
-			//updating new rank
-			 var text1 = data.rank;
-		     $('#rank option').filter(function() {
-		            return $(this).val() == text1; 
-		     }).prop('selected', true);
+    if (data.success == true) {
+        //if species page id returned then open in edit mode
+        if (data.id && !data.namelist) {
+            window.location.href = '/species/show/' + data.id + '?editMode=true'
+            return;
+        }
+        
+        $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+        
+        //showing parser info
+        $('#parserInfo').children('.canonicalName').html(data.canonicalForm);
+        $('#parserInfo').children('.authorYear').html(data.authorYear);
+        $('#parserInfo').show();
+        
+        if(!data.authorYear){
+            alert("Author and Year information is essential to distinguish taxon name from synonyms. Please input these details in the recommended nomenclatural format for the phylum and re-validate; eg: Cuon alpinus (Pallas,1811).");
+        }       
+        if(data.taxonRanks){
+          taxonRanks = data.taxonRanks;
+        } 
+        nameRank = data.rank;
+        
+        if(!data.namelist){
+            if(data.requestParams.taxonRegistry){
+              updateHirInput(data);
+            }        
+            genusTaxonMsg = data.requestParams.genusTaxonMsg
+        }    
+        if(search){
+            showSearchPopup(data);
+        }
+        else{
+            //updating new rank
+             var text1 = data.rank;
+             $('#rank option').filter(function() {
+                    return $(this).val() == text1; 
+             }).prop('selected', true);
 
-		    //updating name and colId
- 		    $("#page").val(data.requestParams.speciesName);
- 		    $( "input[name='colId']" ).val(data.requestParams.colId); 		    
- 		   
- 		}
-		
-		
-		
-		$('#addSpeciesPageSubmit').show();
+            //updating name and colId
+            $("#page").val(data.requestParams.speciesName);
+            $( "input[name='colId']" ).val(data.requestParams.colId);           
+           
+        }
+        
+        
+        
+        $('#addSpeciesPageSubmit').show();
 
-	} else {
-		if (data.status == 'requirePermission')
-			window.location.href = '/species/contribute'
-		else
-			$('#errorMsg').removeClass('alert-info hide').addClass(
-					'alert-error').text(data.msg);
-	}
+    } else {
+        if (data.status == 'requirePermission')
+            window.location.href = '/species/contribute'
+        else
+            $('#errorMsg').removeClass('alert-info hide').addClass(
+                    'alert-error').text(data.msg);
+    }
 }
 
 
 
 // takes COL id
 function getExternalDbDetails(ele, showNameDetails) {
+    alert("dfdsfdsfsd");
     var externalId = $(ele).parents('tr').find('input').val();
     var url = window.params.curation.getExternalDbDetailsUrl;
     var dbName = $("#queryDatabase").val();
@@ -1134,11 +1203,12 @@ function getExternalDbDetails(ele, showNameDetails) {
         url: url,
         dataType: "json",
         type: "POST",
-        data: {externalId:externalId, dbName:dbName},	
+        data: {externalId:externalId, dbName:dbName},   
         success: function(data) {
             //show the popup
             $("#externalDbResults").modal('hide');
             data['source'] = dbName;
+            cacheResultForPopulate=data;
             if(!showNameDetails) {
                 //create accepted match and saveAcceptedName
                 $(".fromCOL").val(true);
@@ -1210,7 +1280,7 @@ function saveNameDetails(moveToRaw, moveToWKG, moveToClean) {
             url: url,
             type: "POST",
             dataType: "json",
-            data: {taxonData: JSON.stringify(taxonRegistryData)},	
+            data: {taxonData: JSON.stringify(taxonRegistryData)},   
             success: function(data) {
                 if(data['success']) {
                     if(data["newlyCreated"]) {
@@ -1337,6 +1407,7 @@ function fetchTaxonRegistryData() {
 }
 
 function changeEditingMode(mode) {
+    mode = true;
     if(mode == false) {
         $(".fromCOL").val(mode);
     } else {
@@ -1347,8 +1418,8 @@ function changeEditingMode(mode) {
     $(".canBeDisabled button").prop("disabled", mode); 
     $(".canBeDisabled input.canonicalForm, .canBeDisabled input.authorString ").prop("disabled", true); 
     
-    $('#saveNameDetails').prop('disabled', false);
-    $(".canBeDisabled select.position").prop("disabled", false);
+   // $('#saveNameDetails').prop('disabled', false);
+   // $(".canBeDisabled select.position").prop("disabled", false);
 }
 
 /*function modifySourceOnEdit() {
@@ -1405,7 +1476,7 @@ function modifyContent(ele, type) {
             processingStop();
             return false;
         }else{
-            if(!confirm("Are you sure to delete?")) {
+            if(!confirm("Are you sure you wish to make this edit?")) {
                 processingStop();
                 return false;
             } else {
@@ -1433,7 +1504,7 @@ function modifyContent(ele, type) {
         url: url,
         type: "POST",
         dataType: "json",
-        data: {dataFromCuration: JSON.stringify(p)},	
+        data: {dataFromCuration: JSON.stringify(p)},    
         success: function(data) {
             if(data['success']) {
                 form_var.find("."+type).val(data['dataId']);
@@ -1596,7 +1667,7 @@ function getOrphanRecoNames(){
         url: url,
         dataType: "json",
         type: "POST",
-        data: {},	
+        data: {},   
         success: function(data) {
             //DIRTY LIST 
             if(data){
@@ -1631,8 +1702,9 @@ function validateName(ele, showNameDetails) {
         url: url,
         dataType: "json",
         type: "POST",
-        data: {name:name, dbName:dbName},	
-        success: function(data) {
+        data: {name:name, dbName:dbName},   
+        success: function(data) {            
+            cacheResultForPopulate=data;
             processingStop();
             //show the popup
             if(data.length != 0) {
@@ -1701,7 +1773,7 @@ function saveAcceptedName(acceptedMatch) {
         url: url,
         dataType: "json",
         type: "POST",
-        data: {acceptedMatch: JSON.stringify(acceptedMatch)},	
+        data: {acceptedMatch: JSON.stringify(acceptedMatch)},   
         success: function(data) {
             if(data.acceptedNameId != "") {
                 alert("Successfully validated name");
@@ -2033,6 +2105,14 @@ if(taxonGrid){
 
 });
  function mergeWithSource(me){
+     if(Object.keys(taxonGridSelectedRow).length == 0)
+        return false;
+
+        if(Object.keys(taxonGridSelectedRow).length > 2){
+            alert("Merging Name will only 2 names");
+            return false;
+        }
+
         var newSourceId  = me.parent().find('.mergeTarget').val();
         var oldSoureceId = ''; 
         $.each(taxonGridSelectedRow, function (index, value) {
@@ -2062,7 +2142,13 @@ if(taxonGrid){
 }
 
 function deleteSourceName(me){
-    var params ={ id:taxonGridSelectedRow[Object.keys(taxonGridSelectedRow)[0]].taxonid}
+
+    if(Object.keys(taxonGridSelectedRow).length == 0)
+        return false;
+
+
+    var params ={ ids:Object.keys(taxonGridSelectedRow).toString()}
+
         $.ajax({
             url: '/namelist/deleteName',
             dataType: "json",
@@ -2070,9 +2156,10 @@ function deleteSourceName(me){
             data: params,   
             success: function(data) {
                 if(data.status){
-                    location.reload()
+                    alert(data.msg);
+                    location.reload();
                 }else{
-                        alert('Error Delete Names');
+                    alert('Error Delete Names');
                 }
             }
         });
@@ -2081,15 +2168,15 @@ function deleteSourceName(me){
 
 function changeAccToSyn(me){
     var newSourceId  = me.parent().find('.changeSynTarget').val();
-    var oldSoureceId = ''; 
+    var oldSoureceIds = []; 
     $.each(taxonGridSelectedRow, function (index, value) {
         if(index != newSourceId){
-           oldSoureceId = value.taxonid; 
+           oldSoureceIds.push(value.taxonid); 
         }
     });
    // alert("newSourceId "+newSourceId+" oldSoureceId "+oldSoureceId);
-    if(newSourceId != '' && oldSoureceId != ''){ 
-        var params ={ sourceAcceptedId:oldSoureceId,targetAcceptedId:newSourceId}
+    if(newSourceId != '' && oldSoureceIds != ''){ 
+        var params ={ sourceAcceptedId:oldSoureceIds.toString(),targetAcceptedId:newSourceId}
             $.ajax({
                 url: '/namelist/changeAccToSyn',
                 dataType: "json",
@@ -2110,10 +2197,12 @@ function changeAccToSyn(me){
 
 function updatePosition(me){
     var position  = me.parent().find('.movePosition').val();
-    var id = taxonGridSelectedRow[Object.keys(taxonGridSelectedRow)[0]].taxonid;
+    var ids = Object.keys(taxonGridSelectedRow).toString();
+
+    //var taxonids = taxonIdsFromSelectedRow(taxonGridSelectedRow);
    // alert("id "+id+" position "+position);
-    if(id != '' && position != ''){ 
-        var params ={ id:id,position:position}
+    if(ids != '' && position != ''){ 
+        var params ={ ids:ids,position:position}
             $.ajax({
                 url: '/namelist/updatePosition',
                 dataType: "json",
@@ -2121,12 +2210,43 @@ function updatePosition(me){
                 data: params,   
                 success: function(data) {
                     if(data.status){
+                        alert(data.msg);
                         location.reload()
                     }else{
-                        alert('Error changeAccToSyn');
+                        alert('Error Update Position');
                     }
                 }
             });
         return false;
     }
+}
+
+function getSelectedRank(rank,search){
+    console.log(rank);
+    if(search == 'name'){
+        for(var i=0; i< taxonRanks.length; i++) {                    
+            console.log(taxonRanks[i].text);       
+                if(taxonRanks[i].text.toLowerCase() == rank.toLowerCase()){
+                    return taxonRanks[i].value;
+                }
+            }
+        return "";
+    }else if(search == 'id'){
+        for(var i=0; i< taxonRanks.length; i++) {                    
+            console.log(taxonRanks[i].value);       
+                if(taxonRanks[i].value == rank){
+                    return taxonRanks[i].text;
+                }
+            }
+        return ;
+    }
+    
+}
+
+function taxonIdsFromSelectedRow(taxonGridSelectedRow){
+    var taxonIds = []
+    $.each(taxonGridSelectedRow, function (index, value) {
+        taxonIds.push(value.taxonid);
+    });
+    return taxonIds;
 }
