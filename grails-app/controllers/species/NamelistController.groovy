@@ -401,7 +401,8 @@ class NamelistController {
 
     def singleNameUpdate(){
 
-        println params;  
+        println params;
+        
         List errors = [];
         Language languageInstance = utilsService.getCurrentLanguage(request);
         Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];        
@@ -498,6 +499,8 @@ class NamelistController {
                 hirNameList.putAt(rank, speciesName);
                 println hirNameList;           
                 def language = utilsService.getCurrentLanguage(request);
+                params.taxonHirMatch[params.rank+'.ibpId'] = params.taxonId;
+
                 def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong(), params.taxonHirMatch);
                 if(result1.success){
                     result['msg'] += "\n "+result1['msg'];

@@ -1441,19 +1441,20 @@ class SpeciesController extends AbstractObjectController {
 		}
 		
 		//got col result now populating things
-		colRes = colRes[0]
+		colRes = colRes[0]        
+        //println colRes.get()
 		String status = colRes.nameStatus
 		if(status.equalsIgnoreCase('accepted')){
 			List taxonRegistry = []
 			List taxonColHirMatch = []
 			result.authorYear = colRes.authorString
-			result.canonicalForm = colRes.canonicalForm
+			result.canonicalForm = colRes.canonicalForm            
 			TaxonomyRank.list().each { TaxonomyRank r ->
 				String rStr = r.value().toLowerCase()
 				int tRank = XMLConverter.getTaxonRank(rStr)
-				String tName = colRes.get(rStr)
-				taxonRegistry.putAt(tRank , tName)
-				taxonColHirMatch.putAt(tRank , colRes.get('id_details').getAt(tName))
+				String tName = colRes.get(rStr)?.trim()
+				taxonRegistry.putAt(tRank , tName)                                
+				taxonColHirMatch.putAt(tRank , colRes.get('id_details').getAt(tName+'#'+tRank))
 			}
 			result.requestParams = [taxonRegistry:taxonRegistry, taxonCOLHirMatch:taxonColHirMatch, speciesName:colRes.name, rank:XMLConverter.getTaxonRank(colRes.rank), colId: params.colId]
 			result.msg = "Data populated from COL"
@@ -1483,8 +1484,8 @@ class SpeciesController extends AbstractObjectController {
 	
 	
 	private Map getMatchResult(Map r){
-		List gTaxonList = r.genusTaxonList
-		
+		List gTaxonList = (r.genusTaxonList)?:r.taxonList
+
 		if(!gTaxonList){
 			return null
 		}
@@ -1531,16 +1532,16 @@ class SpeciesController extends AbstractObjectController {
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
 					List taxonList = r.taxonList
+                    Map matchResult = getMatchResult(r)
+                        
+                    println "----------------------------------- match result " + matchResult
+
+                    Map requestParams = [genusTaxonMsg : r.genusTaxonMsg, page:params.page]
+                    if(matchResult){
+                        requestParams.putAll(matchResult.remove("defMatch"))
+                        requestParams.put('genusMatchResult', matchResult.genusMatchResult)
+                    }
                     if(!taxon) {
-						Map matchResult = getMatchResult(r)
-						
-						//println "----------------------------------- match result " + matchResult
-						
-						Map requestParams = [genusTaxonMsg : r.genusTaxonMsg, page:params.page]
-						if(matchResult){
-							requestParams.putAll(matchResult.remove("defMatch"))
-							requestParams.put('genusMatchResult', matchResult.genusMatchResult)
-						}
 						result = [taxonRanks:getTaxonRankForUI(), 'success':true, rank:rank, taxonList:taxonList, canonicalForm:r.canonicalForm, authorYear:r.authorYear, requestParams:requestParams]
 						// no result in ibp so going ahead to create new name
 						if(!taxonList){
@@ -1568,15 +1569,15 @@ class SpeciesController extends AbstractObjectController {
                         }
                         def fieldsConfig = grailsApplication.config.speciesPortal.fields;
                         def cl = Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
-                        result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:[taxonRegistry:params.taxonRegistry?:taxonRegistry[cl], page:params.page],authorYear:r.authorYear];
+                        result = ['success':true, 'msg':msg, id:species?.id, name:species?.title, rank:taxon.rank, taxonList:r.taxonList, requestParams:requestParams,authorYear:r.authorYear];
 						
-	                    result['taxonRegistry'] = [:];
+	                    /*result['taxonRegistry'] = [:];
 						
 						taxonRegistry.each {classification, h ->
 							if(!result['taxonRegistry'][classification.name])
 								result['taxonRegistry'][classification.name] = [];
 							result['taxonRegistry'][classification.name] << h
-						}
+						}*/
                     }
                 } else {
                     result.putAll(r);

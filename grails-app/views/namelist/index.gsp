@@ -688,16 +688,6 @@
                 });
             }
 
-            function updateHirRank(selValue){
-                $.each(taxonRanks, function(index, item) {                        
-                    if(index < selValue){
-                        $('.hie_'+index).show();
-                    }else{
-                        $('.hie_'+index).hide();
-                    }
-                });
-            }
-
             function checkHirInput(rank){
                 var result = true;
                 for(var i=0; i< taxonRanks.length; i++) {                    
@@ -817,7 +807,7 @@
                         data['requestParams']= requestParams;
                         console.log(data);
                         console.log("rankValue = "+rankValue);
-                        nameRank = 11;
+                        nameRank = 10;
                         
                         $('#taxonHierarchyModal #page').val($(".attributesBlock .scientificNameInput").val());
                         $('#taxonHierarchyModal #positionDropDown').val(position).data('prev',position);
