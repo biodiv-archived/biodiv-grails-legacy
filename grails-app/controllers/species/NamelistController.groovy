@@ -437,34 +437,22 @@ class NamelistController {
 	            // Editing Species Name only
 				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
 				if((td.name != params.page) && hasPerm ){
-	                 List<String> givenNames = [params.page]
 	                 NamesParser namesParser = new NamesParser();
-	                 List<TaxonomyDefinition> parsedNames = namesParser.parse(givenNames);
-	
-	                 if(parsedNames){
-	                    td.canonicalForm = parsedNames[0].canonicalForm;
-	                    td.normalizedForm = parsedNames[0].normalizedForm;
-	                    td.italicisedForm = parsedNames[0].italicisedForm;
-	                    td.binomialForm = parsedNames[0].binomialForm;
-	                    td.authorYear = parsedNames[0].authorYear;
-	                    td.name = parsedNames[0].name;
-
-
-                        if(td.save(flush:true)){
-                            println "Taxon Updated successFully !";
-                            result['msg'] +="\n Name taxon updated"
-                            Species sp = Species.findByTaxonConcept(td);
-                            if(sp){
-                                sp.title = td.italicisedForm;
-                                if(sp.save(flush:true)){
-                                    println "Species Title Updated successFully !"+sp;
-                                    result['msg'] +="\n Name updated"
-                                }
+	                 TaxonomyDefinition pn = new NamesParser().parse([params.page])?.get(0);
+                     if(pn){
+                        Map m = [name:pn.name, canonicalForm:pn.canonicalForm, normalizedForm:pn.normalizedForm, italicisedForm:pn.normalizedForm,  binomialForm:pn.binomialForm, authorYear:pn.authorYear, id:td.id]
+                        TaxonomyDefinition.executeUpdate( "update TaxonomyDefinition set name = :name, canonicalForm = :canonicalForm, normalizedForm = :normalizedForm,  italicisedForm = :italicisedForm, binomialForm = :binomialForm, authorYear = :authorYear where id = :id", m)
+                        println "Taxon Updated successFully !";
+                        result['msg'] +="\n Name taxon updated"
+                        Species sp = Species.findByTaxonConcept(td);
+                        if(sp){
+                            sp.title = td.italicisedForm;
+                            if(sp.save(flush:true)){
+                                println "Species Title Updated successFully "+ sp;
+                                result['msg'] +="\n Name updated"
                             }
-
-                            println "  === " + td.name
                         }
-	                 }
+                    }    
 	            }else{
 	                log.debug "No change in Names"
 					if(!hasPerm)

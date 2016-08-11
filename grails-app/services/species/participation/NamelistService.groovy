@@ -2355,13 +2355,14 @@ class NamelistService extends AbstractObjectService {
 	
 	public boolean updateNamePosition(long oldId, String position, Map hirMap=null){
 		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
+		NamesMetadata.NamePosition newPosition = NamesMetadata.NamePosition.getEnum(position)
 		
-		if(!oldName){
-			log.debug "Null id is given for the names  old id " + oldId
+		if(!oldName || !newPosition){
+			log.debug "Null id is given for the names  old id " + oldId + " Or position is wrong " + position
 			return false
 		}
-		
-		oldName.updatePosition(position)
+
+		TaxonomyDefinition.executeUpdate( "update TaxonomyDefinition set position = :newPosition where id = :id",[newPosition:newPosition, id:oldName.id])
 		return true
 	}
 	
