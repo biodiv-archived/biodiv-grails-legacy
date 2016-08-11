@@ -588,7 +588,11 @@ function populateNameDetails(data){
         var rank = taxonRanks[key].text.toLowerCase();
         var taxonValue = data[rank];
         if(taxonValue) {
-            $(".taxon"+key).val(taxonValue[1]).attr('data-ibpId',taxonValue[0]);
+            if($.type(taxonValue) === "string") {
+                $(".taxon"+key).val(taxonValue);
+            }else{
+                $(".taxon"+key).val(taxonValue[1]).attr('data-ibpId',taxonValue[0]);
+            }
         }
         if(data['rank'] == rank) {
             taxonRank = parseInt(key);
@@ -979,6 +983,7 @@ function validateHirName(comp){
     inputCom.attr('data-colid', "");
     var rank = inputCom.attr('data-rank');
     var page = inputCom.attr('value').trim();
+    $('.newTaxonPath').val(true);
     //if not a mandatory field and name is empty text then leaving  
     if( (rank == "4"  || rank == "6" ||rank == "8") && (page == "") ){
         vButton.removeClass('btn-primary').addClass('btn-success disabled');
