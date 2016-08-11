@@ -343,7 +343,7 @@ class NamelistController {
 			if(namePermissionService.hasPermissionOnAll(m)){
 				res.status = namelistService.changeAccToSyn(sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
 			}else{
-				res.msg = "\n Not authorized for chaning Accpeted name " +  sourceAcceptedId + " to Synonym " + params.targetAcceptedId
+				res.msg += "\n Not authorized for chaning Accpeted name " +  sourceAcceptedId + " to Synonym " + params.targetAcceptedId
 			}
         }
         render  res as JSON;
@@ -373,7 +373,8 @@ class NamelistController {
         delIds.each{ id ->
 			boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":id, "moveToClean":'false']))
 			if(!hasPerm){
-				res.msg = "\n Not authorized for deleting name " + id
+                res.msg += "\n Not authorized for deleting name " + id
+                res.status = false
 				return
 			}
             boolean isParent = TaxonomyDefinition.read(id.toLong()).isParent()
@@ -395,6 +396,7 @@ class NamelistController {
 		def m = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":params.sourceId + "," + params.targetId, "moveToClean":'false']))
 		if(namePermissionService.hasPermissionOnAll(m)){
 			res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
+            res.msg = "Successfully merged"
 		}else{
 			res.status = false
 			res.msg = "\n Not authorized for merging names " +  params.sourceId + " and " + params.targetId
@@ -446,6 +448,8 @@ class NamelistController {
 	                    td.binomialForm = parsedNames[0].binomialForm;
 	                    td.authorYear = parsedNames[0].authorYear;
 	                    td.name = parsedNames[0].name;
+
+
                         if(td.save(flush:true)){
                             println "Taxon Updated successFully !";
                             result['msg'] +="\n Name taxon updated"
@@ -457,6 +461,8 @@ class NamelistController {
                                     result['msg'] +="\n Name updated"
                                 }
                             }
+
+                            println "  === " + td.name
                         }
 	                 }
 	            }else{
@@ -598,8 +604,8 @@ class NamelistController {
 	def tt(){
         //2998_33364_33366_3035_3542_5273_5275
 		
-		Map m = [user:"1426" ,permission:"ADMIN"];
-		namePermissionService.addPermission(m)
+		Map m = [user:"1" ,permission:"ADMIN"];
+		namePermissionService.addPermission(namePermissionService.populateMap(m))
 //		
 //        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
 //        def users=[]
