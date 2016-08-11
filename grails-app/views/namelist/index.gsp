@@ -793,8 +793,12 @@
                         var data = {}
                         data['taxonRanks']=taxonRanks;
                         var taxonRegistry = [];
+                        var taxonIBPHirMatch=[];
+                        var tR,tRid;
                         for(var i=0;i<11;i++){
-                            var tR = $('.taxonomyRankTable .taxon'+i).val();
+                            tR = $('.taxonomyRankTable .taxon'+i).val();
+                            tRid = $('.taxonomyRankTable .taxon'+i).attr('data-ibpId');
+                            taxonIBPHirMatch[i]= (tRid)?tRid:null;
                             //alert(tR);
                             taxonRegistry[i]= (tR)?tR:"";
                         }
@@ -802,7 +806,7 @@
                         var rankValue = getSelectedRank($('.attributesBlock #rankDropDown').val(),'name');
                         var canName   = $('.attributesBlock .canonicalForm').val();
                         var authorName =  $('.attributesBlock .authorString').val();
-                        var requestParams = {"taxonRegistry":taxonRegistry};
+                        var requestParams = {"taxonRegistry":taxonRegistry , "taxonIBPHirMatch":taxonIBPHirMatch};
                         var position = $(".attributesBlock #positionDropDown").val();
                         data['requestParams']= requestParams;
                         console.log(data);

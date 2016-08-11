@@ -2221,7 +2221,7 @@ class NamelistService extends AbstractObjectService {
                 result['taxonRegId'] = taxonReg.id?.toString()
                 taxonReg.path.tokenize('_').each { taxonDefinitionId ->
                     def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), [td.id,td.name]);
                 }
             }
             result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
@@ -2250,7 +2250,7 @@ class NamelistService extends AbstractObjectService {
                     result['taxonRegId'] = taxonReg.id?.toString()
                     taxonReg.path.tokenize('_').each { taxonDefinitionId ->
                         def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                        result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                        result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), [td.id,td.name]);
                     }
                 }
 
