@@ -588,7 +588,7 @@ function populateNameDetails(data){
         var rank = taxonRanks[key].text.toLowerCase();
         var taxonValue = data[rank];
         if(taxonValue) {
-            $(".taxon"+key).val(taxonValue);
+            $(".taxon"+key).val(taxonValue[1]).attr('data-ibpId',taxonValue[0]);
         }
         if(data['rank'] == rank) {
             taxonRank = parseInt(key);
