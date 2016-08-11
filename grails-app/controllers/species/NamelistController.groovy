@@ -425,25 +425,27 @@ class NamelistController {
     def singleNameUpdate(){
         log.debug params;
         List errors = [];
+		def user = springSecurityService.currentUser
         Language languageInstance = utilsService.getCurrentLanguage(request);
-        Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];        
+        Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];  
+		boolean hasPerm = false
         if(params.int('taxonId')){
             TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
             if(td){
-
-            // Editing Species Name only
-            if(td.name != params.page){
-                 List<String> givenNames = [params.page]
-                 NamesParser namesParser = new NamesParser();
-                 List<TaxonomyDefinition> parsedNames = namesParser.parse(givenNames);
-
-                 if(parsedNames){
-                    td.canonicalForm = parsedNames[0].canonicalForm;
-                    td.normalizedForm = parsedNames[0].normalizedForm;
-                    td.italicisedForm = parsedNames[0].italicisedForm;
-                    td.binomialForm = parsedNames[0].binomialForm;
-                    td.authorYear = parsedNames[0].authorYear;
-                    td.name = parsedNames[0].name;
+	            // Editing Species Name only
+				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
+				if((td.name != params.page) && hasPerm ){
+	                 List<String> givenNames = [params.page]
+	                 NamesParser namesParser = new NamesParser();
+	                 List<TaxonomyDefinition> parsedNames = namesParser.parse(givenNames);
+	
+	                 if(parsedNames){
+	                    td.canonicalForm = parsedNames[0].canonicalForm;
+	                    td.normalizedForm = parsedNames[0].normalizedForm;
+	                    td.italicisedForm = parsedNames[0].italicisedForm;
+	                    td.binomialForm = parsedNames[0].binomialForm;
+	                    td.authorYear = parsedNames[0].authorYear;
+	                    td.name = parsedNames[0].name;
                         if(td.save(flush:true)){
                             println "Taxon Updated successFully !";
                             result['msg'] +="\n Name taxon updated"
@@ -456,88 +458,101 @@ class NamelistController {
                                 }
                             }
                         }
-                 }
-            }else{
-                println "No change in Names"
-                result['msg'] += '\n No change in Names';
-            }          
-
-            // Changing position              
-            if(params.position && td.position != NamesMetadata.NamePosition.getEnum(params.position)){                                          
-                if(params.position.capitalize() == NamePosition.WORKING.value() || params.position.capitalize() == NamePosition.RAW.value() || params.position.capitalize() == NamePosition.CLEAN.value()){
-                  println "Prev postion changing from "+td.position+" to "+params.position.toUpperCase()
-                  def r = namelistService.updateNamePosition(params.taxonId.toLong(), params.position, params.hirMap)
-                  result['msg'] +="\n Position changed to "+params.position
-                }             
-            }else{
-                result['msg'] +="\n No change in position"
-                println "No change in current position ="+td.position+" params position"+params.position.toUpperCase();
-            }                
-        
-            //Changing status
-            if(params.status && td.status != NamesMetadata.NameStatus.getEnum(params.status)){  
-                println "Prev status changing from "+td.status+" to "+params.status.toUpperCase()
-                   if(params.status.capitalize() == NameStatus.ACCEPTED.value()){                        
-                        println "needed hir updates"
+	                 }
+	            }else{
+	                log.debug "No change in Names"
+					if(!hasPerm)
+	                	result['msg'] += '\n Not authorized for changing name attributes ' + td.name;
+					else
+						result['msg'] += '\n No change in name' + td.name;
+	            }          
+	
+	            // Changing position
+				def tmpPos = NamesMetadata.NamePosition.getEnum(params.position)
+				boolean moveToClean = (tmpPos == NamesMetadata.NamePosition.CLEAN)
+				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":''+moveToClean]))
+				if(params.position && (td.position != tmpPos) && hasPerm){                                          
+	                  println "Prev postion changing from "+td.position+" to "+params.position.toUpperCase()
+	                  def r = namelistService.updateNamePosition(params.taxonId.toLong(), params.position, params.hirMap)
+	                  result['msg'] +="\n Position changed to "+params.position
+	            }else{
+					if(!hasPerm)
+						result['msg'] += '\n Not authorized for changing name position ' + td.name  + ' to ' + params.position
+					else
+	                	result['msg'] +="\n No change in position"
+						
+	                log.debug "No change in current position ="+td.position+" params position"+params.position.toUpperCase();
+	            }                
+	        
+	            //Changing status
+				if(params.status && (td.status != NamesMetadata.NameStatus.getEnum(params.status))){  
+					log.debug "Prev status changing from "+td.status+" to "+params.status.toUpperCase()
+					hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":false]))
+					if(hasPerm && (params.status.capitalize() == NameStatus.ACCEPTED.value())){                        
+						println "needed hir updates"
                         // Needed hir check
-                        def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null); 
+						def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null); 
                         result['msg'] +="\n Status changed to "+params.status                       
-                    }else if(params.status.capitalize() == NameStatus.SYNONYM.value() ){
+					}else if(hasPerm && (params.status.capitalize() == NameStatus.SYNONYM.value())){
                          println "Prev status changing from "+td.id+" to "+params.status
                          if(params.newRecoId.toLong()){
-                            def reco = Recommendation.read(params.newRecoId.toLong());
-                            if(reco){
-                                    def r = namelistService.changeAccToSyn(td.id, reco.taxonConcept.id);
-                                    println "Accepted to synonym success";
-                                    result['msg'] +="\n Status changed to "+params.status
-                                }else{
-                                    println "newRecoId is null After reading";  
-                                }
-                            
-                          }else{
+							 def reco = Recommendation.read(params.newRecoId.toLong());
+							 if(reco){
+								 def r = namelistService.changeAccToSyn(td.id, reco.taxonConcept.id);
+								 println "Accepted to synonym success";
+								 result['msg'] +="\n Status changed to "+params.status
+							 }else{
+							 	println "newRecoId is null After reading";  
+							 }
+						 }else{
                             println "newRecoId is null while";
-                          }
+                         }
                     }                
-                }else{
-                    result['msg'] +="\n No change in status"
-                    println "No Change in Current status ="+td.status+" params status"+params.status
-                }
-
-           // hir Change
-           if(params?.newPath){
-                Map list = params.taxonRegistry?:[:];
-                List hirNameList = [];
-                String speciesName;
-                int rank;
-                list.each { key, value -> 
-                    if(value) {
-                        hirNameList.putAt(Integer.parseInt(key).intValue(), value);
-                     }
-                } 
-
-                speciesName = params.page
-                rank = params.int('rank');
-                hirNameList.putAt(rank, speciesName);
-                println hirNameList;           
-                def language = utilsService.getCurrentLanguage(request);
-                params.taxonHirMatch[params.rank+'.ibpId'] = params.taxonId;
-
-                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong(), params.taxonHirMatch);
-                if(result1.success){
-                    result['msg'] += "\n "+result1['msg'];
-                }else{
-                    result['msg'] += "\n "+result1['msg'];
-                }
-            }
-            
-        withFormat {
-            html { }
-            json { render result as JSON }
-            xml { render result as XML }
-        } 
-     } //if ends td
-    } // if ends taxonId            
-}
+	            }else{
+					if(!hasPerm)
+						result['msg'] += '\n Not authorized for changing name status ' + td.name;
+					else{
+						result['msg'] +="\n No change in status"
+						println "No Change in Current status ="+td.status+" params status"+params.status
+					}
+				}
+	
+	           // hir Change
+				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":false]))
+				if(hasPerm && (params.newPath)){
+	                Map list = params.taxonRegistry?:[:];
+	                List hirNameList = [];
+	                String speciesName;
+	                int rank;
+	                list.each { key, value -> 
+	                    if(value) {
+	                        hirNameList.putAt(Integer.parseInt(key).intValue(), value);
+	                     }
+	                } 
+	
+	                speciesName = params.page
+	                rank = params.int('rank');
+	                hirNameList.putAt(rank, speciesName);
+	                println hirNameList;           
+	                def language = utilsService.getCurrentLanguage(request);
+	                params.taxonHirMatch[params.rank+'.ibpId'] = params.taxonId;
+	
+	                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong(), params.taxonHirMatch);
+	                if(result1.success){
+	                    result['msg'] += "\n "+result1['msg'];
+	                }else{
+	                    result['msg'] += "\n "+result1['msg'];
+	                }
+	            }
+	            
+		        withFormat {
+		            html { }
+		            json { render result as JSON }
+		            xml { render result as XML }
+		        } 
+			} //if ends td
+		} // if ends taxonId            
+	}
 
 //    def test(){
 //        println speciesService.updateHierarchy('1_2_3_28_627_628',629,6);
