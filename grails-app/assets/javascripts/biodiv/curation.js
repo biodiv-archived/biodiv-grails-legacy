@@ -2148,10 +2148,9 @@ if(taxonGrid){
                 data: params,   
                 success: function(data) {
                     if(data.status){
-                        location.reload()
-                    }else{
-                        alert('Error Merge Names');
+                        location.reload();
                     }
+                    alert(data.msg);
                 }
             });
         }
@@ -2173,12 +2172,10 @@ function deleteSourceName(me){
             type: "POST",
             data: params,   
             success: function(data) {
-                if(data.status){
-                    alert(data.msg);
+                if(data.status){                    
                     location.reload();
-                }else{
-                    alert('Error Delete Names');
                 }
+                alert(data.msg);
             }
         });
     return false;
@@ -2201,11 +2198,10 @@ function changeAccToSyn(me){
                 type: "POST",
                 data: params,   
                 success: function(data) {
-                    if(data.status){
-                        location.reload()
-                    }else{
-                        alert('Error changeAccToSyn');
+                    if(data.status){                    
+                        location.reload();
                     }
+                    alert(data.msg);
                 }
             });
         return false;
@@ -2227,12 +2223,10 @@ function updatePosition(me){
                 type: "POST",
                 data: params,   
                 success: function(data) {
-                    if(data.status){
-                        alert(data.msg);
-                        location.reload()
-                    }else{
-                        alert('Error Update Position');
+                    if(data.status){                    
+                        location.reload();
                     }
+                    alert(data.msg);
                 }
             });
         return false;
