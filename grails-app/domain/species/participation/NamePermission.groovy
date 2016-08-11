@@ -4,6 +4,7 @@ import java.util.Date;
 
 import species.Species;
 import species.Classification;
+import species.SynonymsMerged
 import species.TaxonomyDefinition
 import species.auth.SUser;
 
@@ -129,8 +130,17 @@ class NamePermission {
 	
 	
 	static boolean hasPermission(SUser user, TaxonomyDefinition node, Permission permission = Permission.EDITOR){
+		if(!node){
+			log.error "Node is null so not giving any permission"
+			return false
+		}
+		
 		if(isAdmin(user)){
 			return true
+		}
+		
+		if(node instanceof SynonymsMerged){
+			return hasPermissionOnSynonym(user, node, permission)
 		}
 		
 		Classification defClassi = Classification.fetchIBPClassification()
@@ -185,6 +195,15 @@ class NamePermission {
 	
 	static List getAllPermissionsOfUser(SUser user){
 		return NamePermission.findAllByUser(user)
+	}
+	
+	private static boolean hasPermissionOnSynonym(SUser user, SynonymsMerged node, Permission permission){
+		List nodes = node.fetchAcceptedNames()
+		for(n in nodes){
+			if(hasPermission(user, n, permission))
+				return true
+		}
+		return false
 	}
 
 	public String toString(){

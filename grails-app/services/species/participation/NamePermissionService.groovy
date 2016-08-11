@@ -47,6 +47,18 @@ class NamePermissionService {
 		return NamePermission.getAllPermissions(m.user)
 	}
 	
+	def boolean hasPermissionOnAll(m){
+		if(m instanceof Map){
+			boolean retVal = true
+			m.values().each { boolean v ->
+				retVal = (retVal && v)
+			}
+			return retVal
+		}
+		
+		return m
+	}
+	
 	public Map populateMap(params){
 		log.debug "========= params " + params
 		SUser u = (params.user)?SUser.read(params.user?.toLong()):null;

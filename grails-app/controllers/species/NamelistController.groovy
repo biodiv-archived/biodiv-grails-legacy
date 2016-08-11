@@ -332,77 +332,98 @@ class NamelistController {
     }
 
     /////////////////////////////// Name list API /////////////////////////////////
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
     def changeAccToSyn(params){
         log.debug params
-        def res = [:]
-        def sourceAcceptedIds = params?.sourceAcceptedId.split(',');
+        def res = ['msg':'']
+		def sourceAcceptedIds = params?.sourceAcceptedId.split(',');
+		def user = springSecurityService.currentUser
         sourceAcceptedIds.each{ sourceAcceptedId ->
-            res.status = namelistService.changeAccToSyn(sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
+			def m = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":sourceAcceptedId + "," + params.targetAcceptedId, "moveToClean":'false']))
+			if(namePermissionService.hasPermissionOnAll(m)){
+				res.status = namelistService.changeAccToSyn(sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
+			}else{
+				res.msg = "\n Not authorized for chaning Accpeted name " +  sourceAcceptedId + " to Synonym " + params.targetAcceptedId
+			}
         }
         render  res as JSON;
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
     def changeSynToAcc(params){
         log.debug params
-        def res = [:]
-        res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
+		def res = ['msg':'']
+		def user = springSecurityService.currentUser
+		boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":params.oldId, "moveToClean":'false']))
+		if(hasPerm){
+			res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
+		}else{
+			res.status = false
+			res.msg = "\n Not authorized for changing given Synonym " +  params.oldId + " to Accpeted "
+		}
         render  res as JSON;
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
     def deleteName(params){
         log.debug params
-        def res = [:]
+		def res = ['msg':'']
+		def user = springSecurityService.currentUser
         def delIds = params?.ids.split(',');
-        println "==============delIds================"
-        println delIds
-        res.msg = ''
         delIds.each{ id ->
+			boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":id, "moveToClean":'false']))
+			if(!hasPerm){
+				res.msg = "\n Not authorized for deleting name " + id
+				return
+			}
             boolean isParent = TaxonomyDefinition.read(id.toLong()).isParent()
-            if(isParent){
-              res.msg += "\n Taxon id " +id+ " has children "              
-              //render  res as JSON;  
-              //return
+			if(isParent){
+              res.msg += "\n Taxon id " +id+ " has children"
             }else{
-              namelistService.deleteName(id.toLong())
+              res.status = namelistService.deleteName(id.toLong())
               res.msg += "\n Taxon id " +id+ " deleted"
-              res.status = true
-              //render  res as JSON;
             }
         }
-        render  res as JSON; 
+        render res as JSON; 
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
     def mergeNames(params){
         log.debug params
-        def res = [:]
-        res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
+        def res = ['msg':'']
+		def user = springSecurityService.currentUser
+		def m = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":params.sourceId + "," + params.targetId, "moveToClean":'false']))
+		if(namePermissionService.hasPermissionOnAll(m)){
+			res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
+		}else{
+			res.status = false
+			res.msg = "\n Not authorized for merging names " +  params.sourceId + " and " + params.targetId
+		}
         render  res as JSON;
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
     def updatePosition(params){
         log.debug params
-        def res = [:]
-        def ids = params?.ids.split(',');
-        res.msg=''
+		def res = ['msg':'']
+		def user = springSecurityService.currentUser
+		def ids = params?.ids.split(',');
+		boolean moveToClean = (NamesMetadata.NamePosition.getEnum(params.position) == NamesMetadata.NamePosition.CLEAN)
         ids.each{ id ->
-            namelistService.updateNamePosition(id.toLong(), params.position, params.hirMap)
-            res.msg += "\n Position for Taxon " +id+ " Updated"
-            res.status = true
-	
+			boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":id, "moveToClean":'' + moveToClean]))
+			if(hasPerm){
+				res.msg += "\n Position for Taxon " +id+ " Updated"
+				res.status = namelistService.updateNamePosition(id.toLong(), params.position, params.hirMap)
+			}else{
+				res.msg += "\n Not authorized for changing position of name " +id
+			}
         }
         render  res as JSON;
     }
 
-
+	@Secured(['ROLE_USER'])
     def singleNameUpdate(){
-
-        println params;
-        
+        log.debug params;
         List errors = [];
         Language languageInstance = utilsService.getCurrentLanguage(request);
         Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];        
@@ -518,11 +539,11 @@ class NamelistController {
     } // if ends taxonId            
 }
 
-    def test(){
-        println speciesService.updateHierarchy('1_2_3_28_627_628',629,6);
-        println "aaa"
-       render "Its Working"
-    }
+//    def test(){
+//        println speciesService.updateHierarchy('1_2_3_28_627_628',629,6);
+//        println "aaa"
+//       render "Its Working"
+//    }
 
 	
 	////////////////////////////////////////////////////////////////////////////////
@@ -558,10 +579,11 @@ class NamelistController {
 		render  res as JSON;
 	}
 	
+	@Secured(['ROLE_ADMIN'])
 	def tt(){
         //2998_33364_33366_3035_3542_5273_5275
 		
-		Map m = [user:"1" ,permission:"ADMIN"];
+		Map m = [user:"1426" ,permission:"ADMIN"];
 		namePermissionService.addPermission(m)
 //		
 //        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
