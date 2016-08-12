@@ -534,6 +534,7 @@ class NamelistController {
 	                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong(), params.taxonHirMatch);
 	                if(result1.success){
 	                    result['msg'] += "\n "+result1['msg'];
+                        result['msg'] += "\n \n Note: Changes will not reflect in IBP Taxonomy Hierarchy unless executed by an Admin. \n Please contact admin at support@indiabiodiversity.org with details"
 	                }else{
 	                    result['msg'] += "\n "+result1['msg'];
 	                }

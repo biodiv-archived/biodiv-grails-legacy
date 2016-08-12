@@ -916,7 +916,8 @@ function addSpeciesPage(url,params){
         data:params,
         method:'POST',
         dataType:'json',
-        success:function(data) {            
+        success:function(data) {
+        console.log(data);            
             if (data.instance){
                 if(data.instance.id) {
                 window.location.href = '/species/show/' + data.instance.id + '?editMode=true'
@@ -1166,9 +1167,9 @@ function validateSpeciesSuccessHandler(data, search){
         nameRank = data.rank;
         
         if(!data.namelist){
-            if(data.requestParams.taxonRegistry){                
+            //if(data.requestParams.taxonRegistry){                
               updateHirInput(data,data.rank);
-            }        
+            //}        
             genusTaxonMsg = data.requestParams.genusTaxonMsg
         }
 
