@@ -135,6 +135,8 @@ class NamePermission {
 	}
 	
 	static boolean hasPermission(SUser user, TaxonomyDefinition node, Permission permission = Permission.EDITOR){
+		Thread.dumpStack()
+		
 		if(!node){
 			log.error "Node is null so not giving any permission"
 			return false

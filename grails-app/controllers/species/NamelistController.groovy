@@ -501,11 +501,10 @@ class NamelistController {
 						 }else{
                             println "newRecoId is null while";
                          }
-                    }                
-	            }else{
-					if(!hasPerm)
+                    }else if(!hasPerm){
 						result['msg'] += '\n You do not have permission to change the status of name ' + td.name + "(" + td.id + ")";
-					else{
+					}                
+	            }else{
 						result['msg'] +="\n No change in status"
 						println "No Change in Current status ="+td.status+" params status"+params.status
 					}
