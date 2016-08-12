@@ -336,7 +336,7 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
                 </li-->
             </ul>
         </div>
-        <div class="links_box_column">
+        <!--div class="links_box_column">
             <ul>
                 <li class="nav-header bold"  style="padding-left: 0px;"><a href='/page/48'><g:message code="link.the.portal" /></a></li>               
                 <li><a href="#"><g:message code="link.biodiversity.india" /></a>
@@ -346,26 +346,26 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
                 <li><a href="${ '/page/43'}"><g:message code="link.faq" /></a></li>
 
             </ul>
-        </div>
+        </div-->
         <div class="links_box_column">
             <ul>
-                <li class="nav-header bold"  style="padding-left: 0px;"><a href='#'><g:message code="link.people" /></a></li>
-                <li><a href="${ '/page/47'}"><g:message code="link.partners" /></a></li>
-                <li><a href="#"><g:message code="link.donors" /></a></li>
-                <li><a href="#"><g:message code="link.fraternity" /></a></li>
-                <li><a href="#"><g:message code="link.team" /></a></li>
+                <li class="nav-header bold"  style="padding-left: 0px;"><g:message code="link.people" /></li>
+                <li><a href="${'/wikwio/partners'}"><g:message code="link.partners" /></a></li>
+                <li><a href="${'/wikwio/donors'}"><g:message code="link.donors" /></a></li>
+                <!--li><a href="#"><g:message code="link.fraternity" /></a></li-->
+                <li><a href="${'/wikwio/team'}"><g:message code="link.team" /></a></li>
             </ul>
         </div>
 
         <div class="links_box_column">
             <ul>
-                <li class="nav-header bold"  style="padding-left: 0px;"><a href='#'><g:message code="link.policy" /></a>
+                <li class="nav-header bold"  style="padding-left: 0px;"><g:message code="link.policy" />
                 </li>
-                <li><a href="#"><g:message code="link.data.sharing" /></a>
+                <li><a href="${ '/wikwio/datasharing'}"><g:message code="link.data.sharing" /></a>
                 </li>
-                <li><a href="#"><g:message code="default.licenses.label" /></a>
+                <li><a href="${ '/wikwio/licenses'}"><g:message code="default.licenses.label" /></a>
                 </li>
-                <li><a href="#"><g:message code="link.terms.conditions" /></a>
+                <li><a href="${ '/wikwio/terms'}"><g:message code="link.terms.conditions" /></a>
                 </li>
 
             </ul>
@@ -373,15 +373,15 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
         <div class="links_box_column">
             <ul>
                 <li class="nav-header bold" style="color:#111; padding-left: 0px;"><g:message code="default.others.label" /></li>
-                <li><a href="http://blog.indiabiodiversity.org/"><g:message code="link.blog" /></a></li>
-                <li><a href="#"><g:message code="link.sitemap" /></a>
-                </li>
+                <li><a href="${ '/wikwio/citation'}"><g:message code="link.blog" /></a></li>
+                <!--li><a href="#"><g:message code="link.sitemap" /></a>
+                </li-->
                 <!--li><a href="#"><g:message code="link.apidocs" /></a>
                 </li-->
 
-                <li><a href="#"><g:message code="link.feedbak" /></a>
+                <li><a href="${ '/wikwio/feedback'}"><g:message code="link.feedbak" /></a>
                 </li>
-                <li><a href="#"><g:message code="link.contact.us" /></a>
+                <li><a href="${ '/wikwio/contact'}"><g:message code="link.contact.us" /></a>
                 </li>
 
             </ul>
