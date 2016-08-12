@@ -18,6 +18,9 @@
             if(userInstance){
                 lastPlaceName=userInstance.location
             }
+            else if(commandInstance){
+                lastPlaceName=commandInstance.location
+            }
             else{
                 lastPlaceName = (observationInstance?.placeName)?observationInstance?.placeName:obvInfoFeeder?.placeName;
             }
