@@ -593,12 +593,12 @@ class NamelistController {
 		Map m = [user:"1" ,permission:"ADMIN"];
 		namePermissionService.addPermission(namePermissionService.populateMap(m))
 		
-		m = [user:"1426" ,permission:"ADMIN"];
-		namePermissionService.addPermission(namePermissionService.populateMap(m))
-		
-		m = [user:"1117" ,permission:"ADMIN"];
-		namePermissionService.addPermission(namePermissionService.populateMap(m))
-
+//		m = [user:"1426" ,permission:"ADMIN"];
+//		namePermissionService.addPermission(namePermissionService.populateMap(m))
+//		
+//		m = [user:"1117" ,permission:"ADMIN"];
+//		namePermissionService.addPermission(namePermissionService.populateMap(m))
+//
 
 //		
 //        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
