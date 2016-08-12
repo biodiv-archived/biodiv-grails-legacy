@@ -2221,7 +2221,7 @@ class NamelistService extends AbstractObjectService {
                 result['taxonRegId'] = taxonReg.id?.toString()
                 taxonReg.path.tokenize('_').each { taxonDefinitionId ->
                     def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), [td.id,td.name]);
                 }
             }
             result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
@@ -2250,7 +2250,7 @@ class NamelistService extends AbstractObjectService {
                     result['taxonRegId'] = taxonReg.id?.toString()
                     taxonReg.path.tokenize('_').each { taxonDefinitionId ->
                         def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                        result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                        result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), [td.id,td.name]);
                     }
                 }
 
@@ -2355,13 +2355,14 @@ class NamelistService extends AbstractObjectService {
 	
 	public boolean updateNamePosition(long oldId, String position, Map hirMap=null){
 		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
+		NamesMetadata.NamePosition newPosition = NamesMetadata.NamePosition.getEnum(position)
 		
-		if(!oldName){
-			log.debug "Null id is given for the names  old id " + oldId
+		if(!oldName || !newPosition){
+			log.debug "Null id is given for the names  old id " + oldId + " Or position is wrong " + position
 			return false
 		}
-		
-		oldName.updatePosition(position)
+
+		TaxonomyDefinition.executeUpdate( "update TaxonomyDefinition set position = :newPosition where id = :id",[newPosition:newPosition, id:oldName.id])
 		return true
 	}
 	

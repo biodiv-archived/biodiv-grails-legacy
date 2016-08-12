@@ -588,7 +588,11 @@ function populateNameDetails(data){
         var rank = taxonRanks[key].text.toLowerCase();
         var taxonValue = data[rank];
         if(taxonValue) {
-            $(".taxon"+key).val(taxonValue);
+            if($.type(taxonValue) === "string") {
+                $(".taxon"+key).val(taxonValue);
+            }else{
+                $(".taxon"+key).val(taxonValue[1]).attr('data-ibpId',taxonValue[0]);
+            }
         }
         if(data['rank'] == rank) {
             taxonRank = parseInt(key);
@@ -825,24 +829,27 @@ function openSpeciesPage(taxonId, colId, name,rank){
     }
     //return ;
     var sourceComp = $(".input-prepend.currentTargetName");
-    if(sourceComp.length > 0){
+    if(sourceComp.length > 0 && colId == 'undefined'){
         var inputComp = sourceComp.children("input");
         taxonId = ((taxonId == undefined ) || (taxonId == 'undefined') || (taxonId == ''))?'': taxonId
         colId = ((colId == undefined ) || (colId == 'undefined') || (colId == ''))?'': colId 
         inputComp.attr('data-ibpid', taxonId);
         inputComp.attr('data-colid', colId);
         inputComp.val(name);
-        var tr=[],newpath="";
+        /*var tr=[],newpath="";
         $.each(cacheResultForPopulate.requestParams.taxonRegistry,function(i,reg){
             var rank = parseInt(getSelectedRank(reg.rank,'name'));
             tr[rank] = reg.name;
             newpath += reg.id+"_";
-        });
-        newpath = newpath.substring(0,newpath.length-1);
-        $('.newTaxonPath').val(newpath);
-        cacheResultForPopulate.requestParams.taxonRegistry=tr;
+        }); 
+        newpath = newpath.substring(0,newpath.length-1);*/
+        
+        //cacheResultForPopulate.requestParams.taxonRegistry=tr;
         updateHirInput(cacheResultForPopulate,rank,true);
+    if(namelist){
         updateHirRank(getSelectedRank($('#rankDropDown').val(),'name'));
+        $('.newTaxonPath').val(true);
+    }
         $("#externalDbResults").modal('hide');
         processingStop();
         return;
@@ -888,17 +895,19 @@ function addSpeciesPage(url,params){
     
     //adding ibpid and colid if any
     $("#taxonHierachyInput .input-prepend input").each(function(index, ele) {
-        var ibpId = $(ele).attr('data-ibpid');
-        var colId = $(ele).attr('data-colid');
-        var rank = $(ele).attr('data-rank');
-        ibpId = ((ibpId == undefined ) || (ibpId == 'undefined') || (ibpId == ''))?'': ibpId
-        colId = ((colId == undefined ) || (colId == 'undefined') || (colId == ''))?'': colId 
+        if($(ele).val() != '' && index != params['rank']){
+            var ibpId = $(ele).attr('data-ibpid');
+            var colId = $(ele).attr('data-colid');
+            var rank = $(ele).attr('data-rank');
+            ibpId = ((ibpId == undefined ) || (ibpId == 'undefined') || (ibpId == ''))?'': ibpId
+            colId = ((colId == undefined ) || (colId == 'undefined') || (colId == ''))?'': colId 
 
-        if(ibpId || colId){
-            params['taxonHirMatch.' + rank + '.ibpId'] = ibpId;
-            params['taxonHirMatch.' + rank + '.colId'] = colId;
-        }else{
-        	 params['taxonHirMatch.' + rank + '.nameRunningStatus'] = 'new';
+            if(ibpId || colId){
+                params['taxonHirMatch.' + rank + '.ibpId'] = ibpId;
+                params['taxonHirMatch.' + rank + '.colId'] = colId;
+            }else{
+            	 params['taxonHirMatch.' + rank + '.nameRunningStatus'] = 'new';
+            }
         }
     });
     
@@ -907,7 +916,8 @@ function addSpeciesPage(url,params){
         data:params,
         method:'POST',
         dataType:'json',
-        success:function(data) {            
+        success:function(data) {
+        console.log(data);            
             if (data.instance){
                 if(data.instance.id) {
                 window.location.href = '/species/show/' + data.instance.id + '?editMode=true'
@@ -974,6 +984,7 @@ function validateHirName(comp){
     inputCom.attr('data-colid', "");
     var rank = inputCom.attr('data-rank');
     var page = inputCom.attr('value').trim();
+    $('.newTaxonPath').val(true);
     //if not a mandatory field and name is empty text then leaving  
     if( (rank == "4"  || rank == "6" ||rank == "8") && (page == "") ){
         vButton.removeClass('btn-primary').addClass('btn-success disabled');
@@ -1019,6 +1030,7 @@ function enableValidButton(comp){
 function updateHirInput(data,rank,mode){
     rank = rank || nameRank;
     mode = mode || false;
+    mode = ($(".input-prepend.currentTargetName").length>0)?true:false;
     var $ul = $('<ul></ul>');
     $('#existingHierarchies').empty().append($ul);
     if (data.taxonRegistry) {
@@ -1039,7 +1051,9 @@ function updateHirInput(data,rank,mode){
     var taxonRegistry = data.requestParams ? data.requestParams.taxonRegistry: undefined;
     var taxonIBPHirMatch = data.requestParams ? data.requestParams.taxonIBPHirMatch: undefined;
     var taxonCOLHirMatch = data.requestParams ? data.requestParams.taxonCOLHirMatch: undefined;    
-    
+    if($(".input-prepend.currentTargetName").length>0){
+        nameRank = nameRank+1;
+    }
     for (var i = 0; i < nameRank; i++) {
         var isTaxon = (taxonRegistry && taxonRegistry[i]);
         var taxonValue = isTaxon ? taxonRegistry[i] : taxonRanks[i].taxonValue;
@@ -1072,7 +1086,6 @@ function updateHirInput(data,rank,mode){
                         + (taxonRanks[i].mandatory ? '*' : '')
                         + '</span><input data-provide="typeahead" data-rank ="'
                         + taxonRanks[i].value
-                        + '" data-id="' +
                         + '" data-ibpid="' + ibpMatch + '" data-colid="' + colMatch
                         + '" type="text" class="taxonRank" name="taxonRegistry.'
                         + taxonRanks[i].value + '" value="' + taxonValue
@@ -1081,8 +1094,10 @@ function updateHirInput(data,rank,mode){
                         + '" /><div class="btn btn-mini ' + bClass + '" onclick=validateHirName($(this).parent());> ' + bText + ' </div></div>').appendTo($hier);
         }else{
             // Update the hierarchy
-            if(i < rank){
-                $('.hie_'+taxonRanks[i].value+' .taxonRank').val(taxonValue);
+            console.log("=============================")
+            console.log(taxonRanks[i].value +"==="+taxonValue+"==="+ibpMatch+"==="+colMatch); 
+            if(i <= rank){
+                $('.hie_'+taxonRanks[i].value+' .taxonRank').val(taxonValue).attr('data-ibpid',ibpMatch+'').attr('data-colid',colMatch+'');
             }
         }
     }
@@ -1127,46 +1142,51 @@ function updateGenusSelector(data){
 function validateSpeciesSuccessHandler(data, search){
     if (data.success == true) {
         //if species page id returned then open in edit mode
-        if (data.id && !data.namelist) {
-            window.location.href = '/species/show/' + data.id + '?editMode=true'
-            return;
-        }
-        
-        $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
-        
-        //showing parser info
-        $('#parserInfo').children('.canonicalName').html(data.canonicalForm);
-        $('#parserInfo').children('.authorYear').html(data.authorYear);
-        $('#parserInfo').show();
-        
-        if(!data.authorYear){
-            alert("Author and Year information is essential to distinguish taxon name from synonyms. Please input these details in the recommended nomenclatural format for the phylum and re-validate; eg: Cuon alpinus (Pallas,1811).");
-        }       
+        if(data.rank >= 9){
+           // if species page means goes here 
+            if (data.id && !data.namelist) {
+                window.location.href = '/species/show/' + data.id + '?editMode=true'
+                return;
+            }
+            
+            $('#errorMsg').removeClass('alert-error hide').addClass('alert-info').html(data.msg);
+            
+            //showing parser info
+            $('#parserInfo').children('.canonicalName').html(data.canonicalForm);
+            $('#parserInfo').children('.authorYear').html(data.authorYear);
+            $('#parserInfo').show();
+            
+            if(!data.authorYear && data.rank >= 9){
+                alert("Author and Year information is essential to distinguish taxon name from synonyms. Please input these details in the recommended nomenclatural format for the phylum and re-validate; eg: Cuon alpinus (Pallas,1811).");
+            }   
+        }    
         if(data.taxonRanks){
           taxonRanks = data.taxonRanks;
         } 
+        
         nameRank = data.rank;
         
         if(!data.namelist){
-            if(data.requestParams.taxonRegistry){
-              updateHirInput(data);
-            }        
+            //if(data.requestParams.taxonRegistry){                
+              updateHirInput(data,data.rank);
+            //}        
             genusTaxonMsg = data.requestParams.genusTaxonMsg
-        }    
-        if(search){
-            showSearchPopup(data);
         }
-        else{
-            //updating new rank
-             var text1 = data.rank;
-             $('#rank option').filter(function() {
-                    return $(this).val() == text1; 
-             }).prop('selected', true);
 
-            //updating name and colId
-            $("#page").val(data.requestParams.speciesName);
-            $( "input[name='colId']" ).val(data.requestParams.colId);           
-           
+        if(data.rank >= 9){    
+            if(search){
+                showSearchPopup(data);
+            }else{
+                //updating new rank
+                 var text1 = data.rank;
+                 $('#rank option').filter(function() {
+                        return $(this).val() == text1; 
+                 }).prop('selected', true);
+
+                //updating name and colId
+                $("#page").val(data.requestParams.speciesName);
+                $( "input[name='colId']" ).val(data.requestParams.colId); 
+            }
         }
         
         
@@ -1186,7 +1206,6 @@ function validateSpeciesSuccessHandler(data, search){
 
 // takes COL id
 function getExternalDbDetails(ele, showNameDetails) {
-    alert("dfdsfdsfsd");
     var externalId = $(ele).parents('tr').find('input').val();
     var url = window.params.curation.getExternalDbDetailsUrl;
     var dbName = $("#queryDatabase").val();
@@ -2130,10 +2149,9 @@ if(taxonGrid){
                 data: params,   
                 success: function(data) {
                     if(data.status){
-                        location.reload()
-                    }else{
-                        alert('Error Merge Names');
+                        location.reload();
                     }
+                    alert(data.msg);
                 }
             });
         }
@@ -2155,12 +2173,10 @@ function deleteSourceName(me){
             type: "POST",
             data: params,   
             success: function(data) {
-                if(data.status){
-                    alert(data.msg);
+                if(data.status){                    
                     location.reload();
-                }else{
-                    alert('Error Delete Names');
                 }
+                alert(data.msg);
             }
         });
     return false;
@@ -2183,11 +2199,10 @@ function changeAccToSyn(me){
                 type: "POST",
                 data: params,   
                 success: function(data) {
-                    if(data.status){
-                        location.reload()
-                    }else{
-                        alert('Error changeAccToSyn');
+                    if(data.status){                    
+                        location.reload();
                     }
+                    alert(data.msg);
                 }
             });
         return false;
@@ -2209,12 +2224,10 @@ function updatePosition(me){
                 type: "POST",
                 data: params,   
                 success: function(data) {
-                    if(data.status){
-                        alert(data.msg);
-                        location.reload()
-                    }else{
-                        alert('Error Update Position');
+                    if(data.status){                    
+                        location.reload();
                     }
+                    alert(data.msg);
                 }
             });
         return false;
@@ -2249,4 +2262,15 @@ function taxonIdsFromSelectedRow(taxonGridSelectedRow){
         taxonIds.push(value.taxonid);
     });
     return taxonIds;
+}
+
+
+function updateHirRank(selValue){
+    $.each(taxonRanks, function(index, item) {                        
+        if(index < selValue){
+            $('.hie_'+index).show();
+        }else{
+            $('.hie_'+index).hide();
+        }
+    });
 }

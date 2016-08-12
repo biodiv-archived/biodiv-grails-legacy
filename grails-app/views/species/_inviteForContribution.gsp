@@ -59,10 +59,6 @@
     </g:if>
         <a id="inviteTaxonCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonCuratorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_curator'><i
             class="icon-envelope"></i> <g:message code="namePermission.add.permission" /> </a>
-        <!--a id="inviteTaxonCurators" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonCuratorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_curator'><i
-            class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.taxon_curators" /> </a>
-        <a id="inviteTaxonEditors" class="btn btn-primary ${hide?'hide':''}" href="#inviteTaxonEditorsDialog" role="button" data-toggle="modal" data-invitetype='taxon_editor'><i
-            class="icon-envelope"></i> <g:message code="inviteforcontribut.invite.taxon_editors" /> </a -->
     </div>
 
         <div class="modal hide fade" id="inviteCuratorsDialog" tabindex='-1'
