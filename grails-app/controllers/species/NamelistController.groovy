@@ -507,7 +507,6 @@ class NamelistController {
 	            }else{
 						result['msg'] +="\n No change in status"
 						println "No Change in Current status ="+td.status+" params status"+params.status
-					}
 				}
 	
 	           // hir Change
