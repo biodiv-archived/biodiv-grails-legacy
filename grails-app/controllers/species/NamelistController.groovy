@@ -481,7 +481,7 @@ class NamelistController {
 	            //Changing status
 				if(params.status && (td.status != NamesMetadata.NameStatus.getEnum(params.status))){  
 					log.debug "Prev status changing from "+td.status+" to "+params.status.toUpperCase()
-					hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":false]))
+					hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
 					if(hasPerm && (params.status.capitalize() == NameStatus.ACCEPTED.value())){                        
 						println "needed hir updates"
                         // Needed hir check
@@ -510,7 +510,7 @@ class NamelistController {
 				}
 	
 	           // hir Change
-				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":false]))
+				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
 				if(hasPerm && (params.newPath)){
 	                Map list = params.taxonRegistry?:[:];
 	                List hirNameList = [];
