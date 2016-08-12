@@ -162,7 +162,7 @@
 							<label class="control-label" for="location"><g:message
 									code='user.location.label' default='Location *' /> </label>
 							<div class="controls location" style="margin-left:auto;">
-								 <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+								 <obv:showMapInput model="[commandInstance:command,observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
 								<g:hasErrors bean="${command}" field="location">
 									<div class="help-inline">
 										<g:renderErrors bean="${command}" field="location" />
@@ -181,7 +181,7 @@
                             placeholder="${g.message(code:'placeholder.sex.select')}"
                             from="${species.auth.SUser$SexType?.values()}"
                             keys="${species.auth.SUser$SexType?.values()*.value()}"
-                            noSelection="${['null':'Select One...']}"/>
+                            noSelection="${['':'Select One...']}"/>
 
 									
 
@@ -197,20 +197,20 @@
                             placeholder="${g.message(code:'placeholder.occupation.select')}"
                             from="${species.auth.SUser$OccupationType?.values()}"
                             keys="${species.auth.SUser$OccupationType?.values()*.value()}"
-                            noSelection="${['null':'Select One...']}" />
+                            noSelection="${['':'Select One...']}" />
 
 							</div>
                         </div>
                              <div
 							class="control-group ${hasErrors(bean: command, field: 'institutiontype', 'error')}">
 							<label class="control-label" for="sex"><g:message
-									code='user.institution.label' default='${g.message(code:"default.institution.label")}' /> </label>
+									code='user.institution.label' default='${g.message(code:"user.institution.label")}' /> </label>
 							<div class="controls">
 								 <g:select name="institutionType" class="input-block-level" id="institutionType"
                             placeholder="${g.message(code:'placeholder.institution.select')}"
                             from="${species.auth.SUser$InstitutionType?.values()}"
                             
-                            noSelection="${['null':'Select One...']}"/>
+                            noSelection="${['':'Select One...']}"/>
 
 							</div>
                         </div>
