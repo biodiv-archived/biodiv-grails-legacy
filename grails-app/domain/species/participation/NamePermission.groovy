@@ -128,6 +128,11 @@ class NamePermission {
 		}
 	}
 	
+	static boolean removeAll(List<NamePermission> npList){
+		npList.each { np ->
+			np.delete(flush: true)
+		}
+	}
 	
 	static boolean hasPermission(SUser user, TaxonomyDefinition node, Permission permission = Permission.EDITOR){
 		if(!node){

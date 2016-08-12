@@ -343,7 +343,7 @@ class NamelistController {
 			if(namePermissionService.hasPermissionOnAll(m)){
 				res.status = namelistService.changeAccToSyn(sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
 			}else{
-				res.msg += "\n Not authorized for chaning Accpeted name " +  sourceAcceptedId + " to Synonym " + params.targetAcceptedId
+				res.msg += "\n You do not have permission to change accepted name: " + TaxonomyDefinition.read(sourceAcceptedId.toLong())?.name + "(" + sourceAcceptedId + ") to Synonym of: " + TaxonomyDefinition.read(params.targetAcceptedId.toLong())?.name + "(" + params.targetAcceptedId + ")" 
 			}
         }
         render  res as JSON;
@@ -359,7 +359,7 @@ class NamelistController {
 			res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
 		}else{
 			res.status = false
-			res.msg = "\n Not authorized for changing given Synonym " +  params.oldId + " to Accpeted "
+			res.msg = "\n You do not have permission to change Synonym: " + TaxonomyDefinition.read(params.oldId.toLong())?.name + "(" + params.oldId + ") to Accepted name"
 		}
         render  res as JSON;
     }
@@ -373,16 +373,16 @@ class NamelistController {
         delIds.each{ id ->
 			boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":id, "moveToClean":'false']))
 			if(!hasPerm){
-                res.msg += "\n Not authorized for deleting name " + id
+                res.msg += "\n You do not have permission to delete name: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")"
                 res.status = false
 				return
 			}
             boolean isParent = TaxonomyDefinition.read(id.toLong()).isParent()
 			if(isParent){
-              res.msg += "\n Taxon id " +id+ " has children"
+              res.msg += "\n Name id: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")" + " has child taxa. Please delete child first"
             }else{
               res.status = namelistService.deleteName(id.toLong())
-              res.msg += "\n Taxon id " +id+ " deleted"
+              res.msg += "\n Name id: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")" + " deleted"
             }
         }
         render res as JSON; 
@@ -399,7 +399,7 @@ class NamelistController {
             res.msg = "Successfully merged"
 		}else{
 			res.status = false
-			res.msg = "\n Not authorized for merging names " +  params.sourceId + " and " + params.targetId
+			res.msg = "\n You do not have permission to merge name: " + TaxonomyDefinition.read(params.sourceId.toLong())?.name + "(" + params.sourceId + ") to target name: " +  TaxonomyDefinition.read(params.targetId.toLong())?.name + "(" + params.targetId + ")"
 		}
         render  res as JSON;
     }
@@ -414,10 +414,10 @@ class NamelistController {
         ids.each{ id ->
 			boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":id, "moveToClean":'' + moveToClean]))
 			if(hasPerm){
-				res.msg += "\n Position for Taxon " +id+ " Updated"
+				res.msg += "\n Position for name: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")"+id+ " Updated"
 				res.status = namelistService.updateNamePosition(id.toLong(), params.position, params.hirMap)
 			}else{
-				res.msg += "\n Not authorized for changing position of name " +id
+				res.msg += "\n You do not have permission to update position for name: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")"
 			}
         }
         render  res as JSON;
@@ -456,9 +456,9 @@ class NamelistController {
 	            }else{
 	                log.debug "No change in Names"
 					if(!hasPerm)
-	                	result['msg'] += '\n Not authorized for changing name attributes ' + td.name;
+	                	result['msg'] += '\n You do not have permission to change the name attributes for ' + td.name + "(" + td.id + ")";
 					else
-						result['msg'] += '\n No change in name' + td.name;
+						result['msg'] += '\n No change in name' + td.name + "(" + td.id + ")";
 	            }          
 	
 	            // Changing position
@@ -471,7 +471,7 @@ class NamelistController {
 	                  result['msg'] +="\n Position changed to "+params.position
 	            }else{
 					if(!hasPerm)
-						result['msg'] += '\n Not authorized for changing name position ' + td.name  + ' to ' + params.position
+						result['msg'] += '\n You do not have permission to change the position for ' + td.name + "(" + td.id + ")"  + ' to ' + params.position
 					else
 	                	result['msg'] +="\n No change in position"
 						
@@ -504,7 +504,7 @@ class NamelistController {
                     }                
 	            }else{
 					if(!hasPerm)
-						result['msg'] += '\n Not authorized for changing name status ' + td.name;
+						result['msg'] += '\n You do not have permission to change the status of name ' + td.name + "(" + td.id + ")";
 					else{
 						result['msg'] +="\n No change in status"
 						println "No Change in Current status ="+td.status+" params status"+params.status
@@ -594,6 +594,14 @@ class NamelistController {
 		
 		Map m = [user:"1" ,permission:"ADMIN"];
 		namePermissionService.addPermission(namePermissionService.populateMap(m))
+		
+		m = [user:"1426" ,permission:"ADMIN"];
+		namePermissionService.addPermission(namePermissionService.populateMap(m))
+		
+		m = [user:"1117" ,permission:"ADMIN"];
+		namePermissionService.addPermission(namePermissionService.populateMap(m))
+
+
 //		
 //        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
 //        def users=[]

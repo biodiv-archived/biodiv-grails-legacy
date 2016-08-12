@@ -37,6 +37,10 @@ class NamePermissionService {
 		return NamePermission.remove(m.user, m.node, m.permission)
 	}
 	
+	def boolean removeAllPermission(List<NamePermission> nps){
+		return NamePermission.removeAll(nps)
+	}
+	
 	def List getAllPermissions(Map m){
 		//Map m = populateMap(params)
 		return NamePermission.getAllPermissions(m.node, m.user)
