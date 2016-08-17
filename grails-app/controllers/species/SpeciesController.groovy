@@ -67,6 +67,7 @@ class SpeciesController extends AbstractObjectController {
 	}
 
 	def list() {
+        params['hasMedia']=(params?.hasMedia)?:true;
 		def model = speciesService.getSpeciesList(params, 'list');
 		model.canPullResource = userGroupService.getResourcePullPermission(params)
 		params.controller="species"
