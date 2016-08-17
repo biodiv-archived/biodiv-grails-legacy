@@ -108,13 +108,13 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 		def userLanguage = utilsService.getCurrentLanguage(request); 
 		def user = SUserService.create(command.properties, userLanguage);
-	
+	       user.email=((command.email)?.toLowerCase()).trim()
 		if(command.openId) {
 			log.debug("Is an openId registration");
 			user.accountLocked = false;
 			user.addToOpenIds(url: command.openId);
 			user.password = "openIdPassword"
-			
+
 			SUserService.save(user);
 			
 			if(command.facebookUser) {
@@ -320,7 +320,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             }
             return
 		}
-		
+		username=username?.toLowerCase().trim()
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		def user = lookupUserClass().findWhere((usernameFieldName): username)
 		if (!user) {
@@ -610,7 +610,7 @@ class CustomRegisterCommand {
 			if (value) {
 				def User = command.grailsApplication.getDomainClass(
 						SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
-				if (User.findByEmail(value)) {
+				if (User.findByEmail((value.toLowerCase()).trim())) {
 					return 'registerCommand.email.unique'
 				}
 			}
