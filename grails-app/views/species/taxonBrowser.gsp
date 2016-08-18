@@ -11,9 +11,9 @@
 <title><g:message code="taxonbrowser.taxonomy.browser" /></title>
 
 <style type="text/css">
-.userList{
+/*.userList{
     margin-left:20px;    
-}
+}*/
 .userList img{
     width:20px;
     height:20px;

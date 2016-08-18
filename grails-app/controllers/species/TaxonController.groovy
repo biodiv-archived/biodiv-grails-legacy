@@ -379,15 +379,12 @@ class TaxonController {
             map['rank'] = r.rank
             map['type'] = r.rank+''
             map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false
-            /*def getAllPermissions = namePermissionService.getAllPermissions(namePermissionService.populateMap([taxon:r["taxonid"]]));
+            def getAllPermissions = namePermissionService.getAllPermissions(namePermissionService.populateMap([taxon:"" +r["taxonid"]]));
             def users=[]
             getAllPermissions.each { nP ->
-                println nP.user
-                users << [id:nP.user.id,profile_pic:nP.user.profilePicture(ImageType.SMALL)];
+                users << [id:nP.user.id,name:nP.user.name,perm:nP.permission.value(),profile_pic:nP.user.profilePicture(ImageType.SMALL)];
             }
-
-
-            map['usersList'] = users;*/
+            map['usersList'] = users;
             if(r.containsKey('isContributor')) {
                 map['isContributor'] = r.isContributor?:false
             } else {

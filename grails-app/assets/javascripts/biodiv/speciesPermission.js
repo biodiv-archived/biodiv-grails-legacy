@@ -105,7 +105,21 @@ $(document).ready(function() {
 
     $(".inviteButton").click(function(){
         var $dialog = $(this).parent().parent();
-        var selectedNodes = $.map($('#taxonHierarchy').jstree(true).get_checked(true), function(val) { return val.original.taxonid; }).join()
+        var selectedNodes = $.map($('#taxonHierarchy').jstree(true).get_checked(true), function(val) { return val.original.taxonid; })        
+        if(selectedNodes.length === 0){
+            alert("Please select atleast one node!");
+            return false;
+        }
+        var selectedNodesIds = $.map($('#taxonHierarchy').jstree(true).get_checked(true), function(val) { return val.id; })        
+        $.each(selectedNodesIds,function(i,val){
+            var t= $('#taxonHierarchy').jstree(true).get_parent(val);
+              if(jQuery.inArray(t, selectedNodesIds) !== -1){
+                delete selectedNodes[i];
+                delete selectedNodesIds[i];
+              }
+            });
+
+        selectedNodes = selectedNodes.filter(function(n){ return n != undefined });
         console.log(selectedNodes);
         //$(".taxDefIdCheck:checked").map(function() {return $(this).parent("span").find(".taxDefIdVal").val();}).get().join();
         var invitetype = $dialog.find('input[name="invitetype"]').val();
@@ -132,7 +146,8 @@ $(document).ready(function() {
         $dialog.find('input[name="userIds"]').val($autofillUsers.getEmailAndIdsList().join(","));        
         var userIds = $autofillUsers.getEmailAndIdsList().join(",");
 
-        var data = {message:$dialog.find('.inviteMsg').val(), selectedNodes : selectedNodes}
+        var data = {message:$dialog.find('.inviteMsg').val(), selectedNodes : selectedNodes.join()}
+
         $dialog.find('form').ajaxSubmit({ 
             url: url,
             dataType: 'json', 

@@ -119,10 +119,9 @@
             aria-hidden="true">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="inviteTaxonCuratorsModalLabel"><g:message code="inviteforcontribut.invite.taxon_curators" /></h3>
+                <h3 id="inviteTaxonCuratorsModalLabel"><g:message code="add.taxonomy.permission" /></h3>
             </div>
-            <div class="modal-body">
-                <p><g:message code="inviteforcontribut.send.invitation.taxon_curators" /></p>
+            <div class="modal-body">                
                 <div>
                     <div class="inviteMsg_status"></div>
                     <form method="post"
@@ -134,13 +133,12 @@
                             <input type="radio" name="invitetype" value="CURATOR" />CURATOR
                             <input type="radio" name="invitetype" value="EDITOR" />EDITOR
                         </div>
-                        <textarea class="inviteMsg comment-textbox" placeholder="${g.message(code:'placeholder.invite.taxon_curator')}"></textarea>
                     </form>
                 </div>
             </div>
             <div class="modal-footer">
                 <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="button.close" /></a>
-                <a href="#" class="inviteButton btn btn-primary"><g:message code="button.invite" /></a>
+                <a href="#" class="inviteButton btn btn-primary"><g:message code="add.taxonomyForm" /></a>
             </div>
         </div>
 
