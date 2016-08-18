@@ -23,8 +23,8 @@
                 speciesid: me.options.speciesId,
                 taxonid: me.options.taxonId,
                 classSystem: $.trim($('#taxaHierarchy option:selected').val()),
-                user:me.options.user
-
+                user:me.options.user,
+                variant:me.options.variant
             }
                 
 
@@ -222,8 +222,8 @@
                 'core': {
                     "themes": {
                         'dots': true,
-                        'stripes': true/*,
-                        //"variant" : "large"*/
+                        'stripes': true,
+                        "variant" : me.options.postData.variant
                     },
                     'data': {
                         'url': window.params.taxon.classification.listUrl,

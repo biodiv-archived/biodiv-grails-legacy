@@ -2,6 +2,7 @@ var curators_autofillUsersComp;
 var contributors_autofillUsersComp;
 var taxon_curators_autofillUsersComp;
 var taxon_editors_autofillUsersComp;
+var namePermisssionAdmins;
 
 function onSpeciesImageUploadSuccess(type){
     $("body").css("cursor", "progress");

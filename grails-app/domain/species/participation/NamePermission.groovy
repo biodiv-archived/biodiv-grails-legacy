@@ -198,6 +198,11 @@ class NamePermission {
 			}
 	}
 	
+	static List getAllAdmins(){
+		return NamePermission.createCriteria().list{						
+					eq("rank", -1)						
+				}
+	}
 	static List getAllPermissionsOfUser(SUser user){
 		return NamePermission.findAllByUser(user)
 	}

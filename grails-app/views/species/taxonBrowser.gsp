@@ -113,8 +113,8 @@
             var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy({
                 expandAll:false,
                 controller:"${params.controller?:'namelist'}",
-                action:"${params.action?:'index'}"
-
+                action:"${params.action?:'index'}",
+                variant:"large"
             });	
             /*$("#searchPermission").autofillNames({
                 'appendTo' : '#nameSuggestions',
