@@ -36,7 +36,7 @@ class NamelistController {
     def documentService;
     def speciesPermissionService;
 	def namePermissionService;
-
+    def activityFeedService;
     /**
      * input : taxon id ,classification id of ibp 
      * @return A map which contain keys as dirty, clean and working list. Values of this key is again a LIST of maps with key as name and id
@@ -435,15 +435,20 @@ class NamelistController {
             TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
             if(td){
 	            // Editing Species Name only
+                def chkStatus =false;
+                def activityMsg = '';
 				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
 				if((td.name != params.page) && hasPerm ){
 	                 NamesParser namesParser = new NamesParser();
 	                 TaxonomyDefinition pn = new NamesParser().parse([params.page])?.get(0);
                      if(pn){
+                        activityMsg +='Taxon name updated : '+td.name 
                         Map m = [name:pn.name, canonicalForm:pn.canonicalForm, normalizedForm:pn.normalizedForm, italicisedForm:pn.normalizedForm,  binomialForm:pn.binomialForm, authorYear:pn.authorYear, id:td.id]
                         TaxonomyDefinition.executeUpdate( "update TaxonomyDefinition set name = :name, canonicalForm = :canonicalForm, normalizedForm = :normalizedForm,  italicisedForm = :italicisedForm, binomialForm = :binomialForm, authorYear = :authorYear where id = :id", m)
                         println "Taxon Updated successFully !";
-                        result['msg'] +="\n Name taxon updated"
+                        chkStatus = true;
+                        activityMsg +=' to '+pn.name;
+                        result['msg'] +="\n Name taxon updated";
                         Species sp = Species.findByTaxonConcept(td);
                         if(sp){
                             sp.title = td.italicisedForm;
@@ -467,6 +472,8 @@ class NamelistController {
 				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":''+moveToClean]))
 				if(params.position && (td.position != tmpPos) && hasPerm){                                          
 	                  println "Prev postion changing from "+td.position+" to "+params.position.toUpperCase()
+                      activityMsg +='| Taxon position updated : '+td.position +" to "+ params.position.toUpperCase()
+                      chkStatus = true;
 	                  def r = namelistService.updateNamePosition(params.taxonId.toLong(), params.position, params.hirMap)
 	                  result['msg'] +="\n Position changed to "+params.position
 	            }else{
@@ -485,7 +492,9 @@ class NamelistController {
 					if(hasPerm && (params.status.capitalize() == NameStatus.ACCEPTED.value())){                        
 						println "needed hir updates"
                         // Needed hir check
-						def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null); 
+						def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null);
+                        activityMsg +='| Taxon status updated : '+td.status.capitalize() +" to "+ params.status.capitalize()
+                        chkStatus = true;
                         result['msg'] +="\n Status changed to "+params.status                       
 					}else if(hasPerm && (params.status.capitalize() == NameStatus.SYNONYM.value())){
                          println "Prev status changing from "+td.id+" to "+params.status
@@ -493,6 +502,8 @@ class NamelistController {
 							 def reco = Recommendation.read(params.newRecoId.toLong());
 							 if(reco){
 								 def r = namelistService.changeAccToSyn(td.id, reco.taxonConcept.id);
+                                 activityMsg +='| Taxon status updated : '+td.status.capitalize() +" to "+ params.status.capitalize()
+                                 chkStatus = true;
 								 println "Accepted to synonym success";
 								 result['msg'] +="\n Status changed to "+params.status
 							 }else{
@@ -531,12 +542,22 @@ class NamelistController {
 	
 	                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong(), params.taxonHirMatch);
 	                if(result1.success){
+                        activityMsg +='| Taxon Hierarchy updated : '
+                        chkStatus = true;
 	                    result['msg'] += "\n "+result1['msg'];
                         result['msg'] += "\n \n Note: Changes will not reflect in IBP Taxonomy Hierarchy unless executed by an Admin. \n Please contact admin at support@indiabiodiversity.org with details"
 	                }else{
 	                    result['msg'] += "\n "+result1['msg'];
 	                }
 	            }
+
+                if(chkStatus){
+                    def domainObject = activityFeedService.getDomainObject('species.TaxonomyDefinition', td.id)
+                    println "========================"
+                    domainObject
+                    activityFeedService.addActivityFeed(domainObject, td, user, activityFeedService.TAXON_NAME_UPDATED,activityMsg)
+        
+                }
 	            
 		        withFormat {
 		            html { }
@@ -590,9 +611,13 @@ class NamelistController {
 	@Secured(['ROLE_ADMIN'])
 	def tt(){
         //2998_33364_33366_3035_3542_5273_5275
-		
+		/*
 		Map m = [user:"1" ,permission:"ADMIN"];
-		namePermissionService.addPermission(namePermissionService.populateMap(m))
+		namePermissionService.addPermission(namePermissionService.populateMap(m)) */
+        def td = TaxonomyDefinition.get(126L);
+        def user = springSecurityService.currentUser
+        def domainObject = activityFeedService.getDomainObject('species.TaxonomyDefinition', td.id)
+        activityFeedService.addActivityFeed(domainObject, td, user, activityFeedService.TAXON_NAME_UPDATED,"This is test description")
 		
 //		m = [user:"1426" ,permission:"ADMIN"];
 //		namePermissionService.addPermission(namePermissionService.populateMap(m))
