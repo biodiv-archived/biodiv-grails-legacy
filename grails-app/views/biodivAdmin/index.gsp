@@ -69,7 +69,7 @@
         </div>
         <div class="banner_editor">
         <form class="form-horizontal" id="frmcontent" class="frmcontent" method="post" action="${uGroup.createLink(controller:'biodivAdmin', action:'contentupdate')}"> 
-        <input type="hidden" name="groupName" value="${getGroup+" - "}"/>
+        <input type="hidden" name="groupName" value="${getGroup}"/>
             <textarea name="content" class="content">
                    ${getMessage}
             </textarea>
