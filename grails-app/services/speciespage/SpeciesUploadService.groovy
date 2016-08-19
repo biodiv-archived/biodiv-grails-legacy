@@ -140,18 +140,18 @@ class SpeciesUploadService {
 			return ['msg': 'File not found !!!' ]
 		}
 		
-		if(!validateUserSheetForName(speciesDataFile)){
-			return  ['msg': 'Name validation failed !!!' ]
-		}
+		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
 		
-		def sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
+		if(!validateUserSheetForName(sBulkUploadEntry)){
+			return  ['msg': 'Name validation failed. Please visit your profile page to view status.!!!', 'sBulkUploadEntry': sBulkUploadEntry ]
+		}
 		
 		return ['msg': 'Bulk upload in progress. Please visit your profile page to view status.', 'sBulkUploadEntry': sBulkUploadEntry]
 		
 	}
 	
-	boolean validateUserSheetForName(File sFile){
-		return MappedSpreadsheetConverter.validateUserSheetForName(sFile)
+	boolean validateUserSheetForName(SpeciesBulkUpload sbu){
+		return MappedSpreadsheetConverter.validateUserSheetForName(sbu)
 	}
 	
 	Map upload(SpeciesBulkUpload sBulkUploadEntry){
@@ -375,12 +375,13 @@ class SpeciesUploadService {
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				sBulkUploadEntry?.writeLog(res.idSummary)
-				cleanUpGorm();
+				
 			}
 			
 			processNameCount += contentSubList.size()
 			if(processNameCount%5 == 0){
 				println "------------------- processNameCount " + processNameCount
+				cleanUpGorm();
 			}
 		}
 		
@@ -427,20 +428,18 @@ class SpeciesUploadService {
         converter.setLogAppender(fa);
 		
 		List species = []
-		StringBuilder sb = new StringBuilder()
+		//StringBuilder sb = new StringBuilder()
 		int noOfInsertions = 0;
 		try {
 			if(sBulkUploadEntry && (sBulkUploadEntry.uploadType == "namesUpload")){
 				for(Node speciesElement : speciesElements) {
 					String currSpeciesName = converter.fetchSpeciesName(speciesElement)
 					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping"
-					sb.append(currSpeciesName)
 					//Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
 						if(s){
 							species.add(s)
 							noOfInsertions++;
-							sb.append("|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)
 						}
 					//}
 				}
@@ -476,7 +475,7 @@ class SpeciesUploadService {
 			converter.addToSummary(e)
 		}
 
-		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs(), 'idSummary':sb.toString()];
+		return ['noOfInsertions':noOfInsertions, 'species':species, 'summary': converter.getSummary(), 'log':converter.getLogs(), 'idSummary':converter.individualNameSumm];
 	}
 
 	/** 

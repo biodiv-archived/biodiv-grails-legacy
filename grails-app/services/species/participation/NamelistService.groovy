@@ -41,6 +41,7 @@ import species.AcceptedSynonym
 import species.ResourceFetcher;
 import species.AbstractObjectService;
 import species.SpeciesPermission;
+import species.ScientificName.RelationShip
 
 class NamelistService extends AbstractObjectService {
   
@@ -2220,7 +2221,7 @@ class NamelistService extends AbstractObjectService {
                 result['taxonRegId'] = taxonReg.id?.toString()
                 taxonReg.path.tokenize('_').each { taxonDefinitionId ->
                     def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                    result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), [td.id,td.name]);
                 }
             }
             result['synonymsList'] = getSynonymsOfTaxon(taxonDef);
@@ -2249,7 +2250,7 @@ class NamelistService extends AbstractObjectService {
                     result['taxonRegId'] = taxonReg.id?.toString()
                     taxonReg.path.tokenize('_').each { taxonDefinitionId ->
                         def td = TaxonomyDefinition.get(Long.parseLong(taxonDefinitionId));
-                        result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), td.name);
+                        result.put(TaxonomyRank.getTRFromInt(td.rank).value().toLowerCase(), [td.id,td.name]);
                     }
                 }
 
@@ -2354,13 +2355,14 @@ class NamelistService extends AbstractObjectService {
 	
 	public boolean updateNamePosition(long oldId, String position, Map hirMap=null){
 		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
+		NamesMetadata.NamePosition newPosition = NamesMetadata.NamePosition.getEnum(position)
 		
-		if(!oldName){
-			log.debug "Null id is given for the names  old id " + oldId
+		if(!oldName || !newPosition){
+			log.debug "Null id is given for the names  old id " + oldId + " Or position is wrong " + position
 			return false
 		}
-		
-		oldName.updatePosition(position)
+
+		TaxonomyDefinition.executeUpdate( "update TaxonomyDefinition set position = :newPosition where id = :id",[newPosition:newPosition, id:oldName.id])
 		return true
 	}
 	
@@ -2422,13 +2424,12 @@ class NamelistService extends AbstractObjectService {
 
 		Map m = [id:sciName.id]
 		m['class'] = (status == NameStatus.SYNONYM) ? SynonymsMerged.class.canonicalName: TaxonomyDefinition.class.canonicalName
-		//m['relationship'] = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():''
-		//m['status'] = status.toString()
+		m['relationship'] = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():''
+		m['status'] = status.toString()
 
-		String query = "update taxonomy_definition set class = :class where id = :id";
+		String query = "update taxonomy_definition set class = :class,relationship = :relationship,status = :status where id = :id";
 		def sql = sessionFactory.getCurrentSession().createSQLQuery(query)
 		sql.setProperties(m).executeUpdate()
-
 	}
 	
 	private boolean mergeAccepted(oldName, newName){
@@ -2480,6 +2481,7 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	private boolean mergeSynonym(SynonymsMerged oldName, SynonymsMerged newName){
+
 		//moving synonym
 		def oldEntries = AcceptedSynonym.findAllBySynonym(oldName);
 		oldEntries.each { e ->
@@ -2489,14 +2491,12 @@ class NamelistService extends AbstractObjectService {
 				acName.addSynonym(newName)
 			}
 		}
-		
+
 		moveSpeciesContent(oldName, newName)
-		oldName.isDeleted = true
-		println "======= for delete " + oldName
-		if(!oldName.save(flush:true)){
-			oldName.errors.allErrors.each { log.error it }
-			return false
-		}
+
+		//XXX save is not updating so using hiberet call to set isdelete flag
+		SynonymsMerged.executeUpdate( "update SynonymsMerged set isDeleted = true where id = (:id) ", [id:oldName.id])
+		
 		utilsService.clearCache("defaultCache")
 		return true
 	}

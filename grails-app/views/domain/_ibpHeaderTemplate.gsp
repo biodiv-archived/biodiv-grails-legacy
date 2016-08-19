@@ -80,8 +80,8 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	</g:if>
 
 	<% 
-	String bannerMessage = utilsService.getBannerMessage(cgroup);
-	String ibpBannerMessage = utilsService.getIbpBannerMessage();
+	String bannerMessage = utilsService.getBannerMessage(cgroup,request);
+	String ibpBannerMessage = utilsService.getIbpBannerMessage(request);
 	 %>
      <g:if test="${cgroup && bannerMessage}">
      <div class="alertMsg alert alert-info"
@@ -93,6 +93,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
      <div class="alertMsg alert alert-info"
          style="clear: both; margin: 0px; text-align: center;">
          ${raw(ibpBannerMessage)}
+
 	</g:if>
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">

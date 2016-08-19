@@ -65,9 +65,9 @@ class NameInfo {
 	
 	public String toString(){
 		String str = '\n----------------------'
-		str += "\nSoruceName :" + sourceName
-		str += "\nsourceIndex :" + sourceIndex
 		str += "\nName :" + name
+		str += "\nsourceIndex :" + sourceIndex
+		str += "\nSoruceName :" + sourceName
 		str += "\nRank :" + rank
 		return str
 	}

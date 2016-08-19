@@ -37,7 +37,8 @@
 .mergeWrapper select{
     width: 100%;
 }
-#myModal{
+
+.popupModal{
   width: 1050px;
   left: 30%;
 }
@@ -50,6 +51,60 @@
 }
 .disableSciName{
     opacity: 0.2;
+}
+#taxonHierachyInput{
+    width:400px;
+}
+#taxonHierarchyModal{
+  width: 700px;
+  left: 45%;
+}
+#taxonHierarchyModal, #taxonHierarchyModal .modal-body{    
+    max-height:100%;
+}
+
+#dialogMsg,#externalDbResults,#newNamePopup{
+    z-index: 99999999;
+}
+.ui-menu .ui-menu-item {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  list-style-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
+}
+.editNameAttr{
+    margin-left: 60px;
+}
+#taxonHierarchyModal .control-label{
+    text-align:right;
+}
+#taxonHierarchyModal #positionDropDown{
+    margin-left:15px;
+}
+#taxonHierarchyModal #statusDropDown{
+    margin-left:15px;
+}
+#taxonHierarchyModal #rank{
+    height:30px;
+}
+#taxonHierarchyModal #page{
+    width: 345px;
+}
+#taxonHierarchyModal .synToAccWrap{
+    margin-left: 34px;
+}
+#taxonHierarchyModal label{
+    font-weight:bold;
+}
+#parserInfo{
+    margin-left: 36px;
+}
+.ui-autocomplete{
+    font-size:14px;
+}
+.singleNameUpdate{
+    float: right;
+    margin-right: 55px;
 }
 </style>
    </head>
@@ -290,7 +345,9 @@
                         <label class="control-label" style="width:100px; text-align:right;display:inline-block;">Name
                             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.name.info')}"></i>
                         </label>
-                        <input type="text" placeholder="Name" class="name" style="width:81.6%;display: inline-block;margin-bottom: 0;vertical-align: middle;"/>
+                        <input type="text" placeholder="Name" class="name scientificNameInput" style="width:81.6%;display: inline-block;margin-bottom: 0;vertical-align: middle;" disabled/>
+                        <!-- div class="btn btn-success btn-small nl_edit_name" style="position: relative;float: right;top: -28px;right: 4px;">Edit</div>
+                        <div class="btn btn-primary btn-small nl_edit_name_validate" style="position: relative;float: right;top: -28px;right: 4px;display:none;">Validate Name</div -->
                     </div>
  
                     <div class="control-group">
@@ -307,20 +364,7 @@
                         </label>
                         <input type="text" placeholder="Author" class="authorString" disabled/>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label">Status
-                        
-                    <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.status.info')}"></i>
-                        </label>
-                        <select id="statusDropDown" class="status">
-                            <option value="chooseNameStatus">Choose Name Status</option>
-                            <g:each in="${NameStatus.list()}" var="ns">
-                            <g:if test="${ns != NameStatus.PROV_ACCEPTED && ns != NameStatus.COMMON}">
-                            <option value="${ns.toString().toLowerCase()}">${ns.value()}</option>
-                            </g:if>
-                            </g:each>
-                        </select>
-                    </div>
+                    <g:render template="/namelist/createStatusTemplate" model="[requestParams:requestParams,NameStatus:NameStatus]" />
                     
                     <div class="control-group">
                         <label class="control-label">Rank
@@ -341,7 +385,7 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.source.info')}"></i>
                         </label> 
                         <input type="text" placeholder="Source" class="source"/>
-                    </div>															
+                    </div>                                                          
                     <div class="control-group">
                         <label class="control-label">via
                         
@@ -356,20 +400,10 @@
                     <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.id.info')}"></i>
                         </label>  
                         <input type="text" placeholder="Id" class="id"/>
-                    </div>			
+                    </div>          
 
-                    <div class="control-group">
-                        <label class="control-label">Position
-                        
-                    <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${g.message(code:'namelist.position.info')}"></i>
-                        </label>
-                        <select id="positionDropDown" class="position">
-                            <option value="choosePosition">Choose Position</option>
-                            <g:each in="${NamePosition.list()}" var="t">
-                            <option value="${t.toString().toLowerCase()}">${t}</option>
-                            </g:each>
-                        </select>
-                    </div>
+                    <g:render template="/namelist/createPositionTemplate" model="[NamePosition:NamePosition]" />
+
                     <div class="rt_family" style="background:slategrey;width:100%;clear:both;">
 
 
@@ -457,7 +491,7 @@
                     </div>
 
                 </div> 
-                <div class="span4 tableBlock" style="overflow:hidden">
+                <div class="span4 tableBlock taxonomyRankTable" style="overflow:hidden">
                     <table class='table-striped table-bordered'>
                         <g:each in="${TaxonomyRank.list()}" var="taxon">
                         <tr>
@@ -466,10 +500,12 @@
                         </tr>
                         </g:each>
                     </table>
+                    <sUser:isAdmin>
                     <div>
-                        <button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary input-block-level pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:2px;">Save </button> 
+                        <div class="btn btn-primary btn-large editNameAttr">Edit Name Attributes</div>
+                        <!--button id="saveNameDetails" type="button" class="canBeDisabled btn btn-primary input-block-level pull-right" onClick='saveNameDetails(false, false, false)' style="margin-right:2px;">Save </button --> 
                     </div>
-
+                    </sUser:isAdmin>
 
                 </div>
                 
@@ -491,7 +527,7 @@
                         </ul>
                     </div-->
                 </div>
-                <div class="row-fluid">	
+                <div class="row-fluid"> 
                    
                 </div>
                       
@@ -511,8 +547,8 @@
         </div>
 
         <div class='row-fluid' style="margin-top:10px">
-        	<div class="union-comment">
-             	<feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
+            <div class="union-comment">
+                <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                 <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false]" />
             </div>
         </div>
@@ -522,60 +558,75 @@
 
  
 <!-- Modal -->
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="myModal" class="modal popupModal hide fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="myModalLabel">Action on selected names</h3>
   </div>
   <div class="modal-body">
-    <div class="row-fluid">
-        <div class="span9">
-            <div class="selectedNamesWrapper">
-            </div>
-            <a class="btn btn-small btn-danger removeSelName disabled" href="javascript:void(0);" style="margin-top: 10px;">Remove Selected</a>
+  <div class="row-fluid">
+    <div class="span9">
+        <div class="selectedNamesWrapper">
         </div>
-        
-        <div class="span3">                     
-            <div class="mergeWrapper">
-                <h6>Move to</h6>
-                <select class="movePosition" name="movePosition">
-                    <option value="">Choose Position</option>
-                    <option value="Raw">Raw</option>
-                    <option value="Working">Working</option>
-                    <option value="Clean">Clean</option>
-                </select>
-                <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="updatePosition($(this));" style="display:none;">submit</a>
-            </div>
-            <div class="mergeWrapper">
-                <h6>Merge With</h6>
-                <select class="mergeTarget" name="mergeTarget"> 
-                    
-                </select>
-                <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="mergeWithSource($(this));" style="display:none;">submit</a>
-            </div>
-            <div class="mergeWrapper">
-                <h6>Make synonyms of</h6>
-                <select class="changeSynTarget" name="changeSynTarget">
-                    <option value="">Choose Name</option>
-                </select>
-                <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="changeAccToSyn($(this));" style="display:none;">submit</a>
-            </div>           
-            <div class="mergeWrapper">
-                <h6>Make as Accepted</h6>
-                <div class="btn btn-small span12 btn-primary" style="margin: 0px;">Make As Accepted</div>
-            </div>
-             <div class="mergeWrapper">
-                <h6>Delete</h6>
-                <div class="btn btn-small span12 btn-danger" onclick="deleteSourceName($(this));" style="margin: 0px;">Delete</div>
-            </div> 
-        </div>
+        <a class="btn btn-small btn-danger removeSelName disabled" href="javascript:void(0);" style="margin-top: 10px;">Remove Selected</a>
     </div>
+    
+    <div class="span3">                     
+        <div class="mergeWrapper">
+            <h6>Move to</h6>
+            <select class="movePosition" name="movePosition">
+                <option value="">Choose Position</option>
+                <option value="Raw">Raw</option>
+                <option value="Working">Working</option>
+                <option value="Clean">Clean</option>
+            </select>
+            <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="updatePosition($(this));" style="display:none;">submit</a>
+        </div>
+        <div class="mergeWrapper">
+            <h6>Merge With</h6>
+            <select class="mergeTarget" name="mergeTarget"> 
+                
+            </select>
+            <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="mergeWithSource($(this));" style="display:none;">submit</a>
+        </div>
+        <div class="mergeWrapper">
+            <h6>Make synonyms of</h6>
+            <select class="changeSynTarget" name="changeSynTarget">
+                <option value="">Choose Name</option>
+            </select>
+            <a href="javascript:void(0);" class="btn btn-small btn-success selSub pull-right" onclick="changeAccToSyn($(this));" style="display:none;">submit</a>
+        </div>           
+        <!-- div class="mergeWrapper">
+            <h6>Make as Accepted</h6>
+            <div class="btn btn-small span12 btn-primary" style="margin: 0px;">Make As Accepted</div>
+        </div -->
+         <div class="mergeWrapper">
+            <h6>Delete</h6>
+            <div class="btn btn-small span12 btn-danger" onclick="deleteSourceName($(this));" style="margin: 0px;">Delete</div>
+        </div> 
+    </div>
+</div>    
+   
   </div>  
 </div>
 
 
 
-
+<!-- Modal -->
+<div id="taxonHierarchyModal" class="modal popupModal hide fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true">  
+  <div class="modal-body">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <form id="addSpeciesPage" class="form-horizontal">
+    <g:render template="/species/createSpeciesTaxonTemplate" model="[TaxonomyRank:TaxonomyRank,requestParams:requestParams,isPopup:true, validate:true, errors:errors]" />
+    <input type="hidden" name="newPath" class="newTaxonPath" value="" /> 
+    <div style="margin-left: -48px;"><g:render template="/namelist/createPositionTemplate" model="[NamePosition:NamePosition,isPopup:true]" /></div>
+    <div style="margin-left: -48px;"><g:render template="/namelist/createStatusTemplate" model="[NameStatus:NameStatus,isPopup:true]" /></div>
+    <input type="hidden" name="FormName" class="checkFormName" value=""/>
+    <input type="hidden" name="namelistUI" class="namelistUI" value="true"/>
+    <div class="btn btn-success singleNameUpdate">Save</div>
+    </form>
+  </div>  
+</div>
 
 
 
@@ -591,8 +642,84 @@
             <asset:javascript src="biodiv/curation.js"/>
 
             <asset:script>
+
+            function attachAutofill(){
+                $("#taxonHierarchyModal #page").autofillNames({
+                    'appendTo' : '#nameSuggestions',
+                    'nameFilter':'scientificNames',
+                    focus: function( event, ui ) {
+                        $("#canName").val("");                        
+                        $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+                        $("#nameSuggestions li a").css('border', 0);
+                        return false;
+                    },
+                    select: function( event, ui ) {
+                        $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+                        $(this).parent().find('.recoId').val(ui.item.recoId);
+                        console.log(ui);
+                        return false;
+                    },open: function(event, ui) {
+                        //$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+                    }
+                });
+               // alert($("#taxonHierachyInput input[type=text]").length);
+               // alert("passed");
+                $("#taxonHierachyInput input[type=text]").each(function(){                 
+                    $(this).autofillNames({
+                        'appendTo' : '#nameSuggestions',
+                        'nameFilter':'scientificNames',
+                        focus: function( event, ui ) {
+                            //alert("sdsds");
+                            return false;
+                        },
+                        select: function( event, ui ) {
+                            $(this).val( ui.item.label.replace(/<.*?>/g,"") );
+                            $(this).parent().find('.recoId').val(ui.item.recoId);
+                            console.log(ui); 
+                            console.log(event);
+                            enableValidButton($(this).parent());
+                            //alert(ui); 
+                            return false;
+                        },open: function(event, ui) {
+                            //alert("Test");
+                            //$("#nameSuggestions ul").removeAttr('style').css({'display': 'block','width':'300px'}); 
+                        }
+                    });
+                });
+            }
+
+            function checkHirInput(rank){
+                var result = true;
+                for(var i=0; i< taxonRanks.length; i++) {                    
+                    var tRank = parseInt(taxonRanks[i].value);                    
+                    if(tRank < parseInt(rank)){ 
+                        console.log(result);                       
+                        if(($('.hie_'+tRank+' .taxonRank').val() == "") && ($.inArray(tRank,[4,6,8]) == -1)){
+                            result = false;                            
+                        }
+                    }
+                    if(!result)
+                        break;
+                }
+                return result;
+            }
+
+            function checkpositionDropdown(selVal){
+                if((selVal == 'working' || selVal == 'clean') && $('#taxonHierarchyModal .checkFormName').val() != 'synonym'){
+                    var rank = $('#taxonHierarchyModal #rank').val();
+                    if(!checkHirInput(rank)){
+                        alert("Please fill & validate the Mandatory Hierarchy");                            
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            }
+            
             $(document).ready(function() {
-                //$(".outer-wrapper").removeClass("container").addClass("container-fluid");
+                //$(".outer-wrapper").removeClass("container").addClass("container-fluid");               
+
+
                 var taxonBrowserOptions = {
                     expandAll:false,
                     controller:"${params.controller?:'namelist'}",
@@ -606,8 +733,180 @@
                     taxonBrowserOptions['classSystem'] = "${params.classSystem}";
                 }
 
-                var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+                var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);   
                 $('.icon-question-sign').tooltip();
+
+                $('.nl_edit_name').click(function(){
+                    //enableValidButton($(this).parent());
+                    $(this).hide();
+                    $(this).parent().find('.scientificNameInput').attr('disabled',false);
+                    var vButton = $(this).next();
+                    vButton.removeClass('btn-primary').addClass('btn-success disabled');
+                    vButton.html('Validated').show();
+                    //$(this).next().show();
+                });
+
+                $('.removeSelName').click(function(){
+                        // TODO Remove selected 
+                });
+
+                $('#validateSpeciesSubmit').click(function() {
+                    isSearchCol=true;
+                    var params = {};
+                    var that = $(this);
+                    that.parent().find('#page').addClass('currentPage');
+                    that.parent().find('input').each(function(index, ele) {
+                        console.log($(ele).attr('name'));
+                        if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
+                    });
+                    params['rank'] = that.parent().find('#rank').find(":selected").val();                  
+                    params['namelist'] = true;
+                    //Did u mean species 
+                    $.ajax({
+                        url:'/species/validate',
+                        data:params,
+                        method:'POST',
+                        dataType:'json',
+                        success:function(data) {
+                            if (data.id){
+                                data['namelist'] = true;
+                                //alert(namelistDefault);
+                                namelistDefault=true;
+                                }
+                            console.log("Passed");
+                            console.log(data);
+                            setRank = data.rank;
+                            validateSpeciesSuccessHandler(data, true);
+                        }, error: function(xhr, status, error) {
+                            handleError(xhr, status, error, this.success, function() {
+                                var msg = $.parseJSON(xhr.responseText);
+                                $(".alertMsg").html(msg.msg).removeClass('alert-success').addClass('alert-error');
+                            });
+                        }
+                    });
+                    //get COL hierarchy 
+                    // get and autofill author contrib hierarchy
+        
+                });
+
+                $('.editNameAttr').click(function(){
+                        var data = {}
+                        data['taxonRanks']=taxonRanks;
+                        var taxonRegistry = [];
+                        var taxonIBPHirMatch=[];
+                        var tR,tRid;
+                        for(var i=0;i<11;i++){
+                            tR = $('.taxonomyRankTable .taxon'+i).val();
+                            tRid = $('.taxonomyRankTable .taxon'+i).attr('data-ibpId');
+                            taxonIBPHirMatch[i]= (tRid)?tRid:null;
+                            //alert(tR);
+                            taxonRegistry[i]= (tR)?tR:"";
+                        }
+                        var statusDropDown = $(".attributesBlock #statusDropDown").val();
+                        var rankValue = getSelectedRank($('.attributesBlock #rankDropDown').val(),'name');
+                        var canName   = $('.attributesBlock .canonicalForm').val();
+                        var authorName =  $('.attributesBlock .authorString').val();
+                        var requestParams = {"taxonRegistry":taxonRegistry , "taxonIBPHirMatch":taxonIBPHirMatch};
+                        var position = $(".attributesBlock #positionDropDown").val();
+                        data['requestParams']= requestParams;
+                        console.log(data);
+                        console.log("rankValue = "+rankValue);
+                        nameRank = 10;
+                        
+                        $('#taxonHierarchyModal #page').val($(".attributesBlock .scientificNameInput").val());
+                        $('#taxonHierarchyModal #positionDropDown').val(position).data('prev',position);
+                        $('#taxonHierarchyModal #statusDropDown').val(statusDropDown).data('prev',statusDropDown);
+                        $('#taxonHierarchyModal #rank').val(rankValue);
+                        $('#taxonHierarchyModal #canName').val(canName);
+                        
+                        $('#taxonHierarchyModal #parserInfo .canonicalName').html(canName);
+                        $('#taxonHierarchyModal #parserInfo .authorYear').html(authorName);
+                        updateHirInput(data);
+                        updateHirRank(rankValue);
+                        attachAutofill();
+                        $('#taxonHierarchyModal .checkFormName').val(statusDropDown);
+                        if(statusDropDown == 'synonym'){
+                            $('#taxonHierarchyModal #taxonHierarchyInputForm').hide();                                                      
+                            $('#taxonHierarchyModal #rank').attr('disabled',false);
+                        }else{
+                            $('#taxonHierarchyModal #rank').attr('disabled',true);
+                            $('#taxonHierarchyModal #taxonHierarchyInputForm').show();
+                        }
+                        $('#taxonHierarchyModal').modal('show');                        
+                                                
+                });
+
+                $('#taxonHierarchyModal #positionDropDown').change(function(){
+                    var selVal = $(this).val();
+                    console.log(selVal);
+                    if(selVal =='choosePosition')
+                        return;
+                    if(!checkpositionDropdown(selVal)){
+                        alert("sadfsa");
+                        $(this).val($(this).data('prev'));
+                    }                  
+                });
+
+                $('#taxonHierarchyModal #statusDropDown').change(function(){
+                        var that = $(this);                        
+                        var status = that.val();
+                        that.parent().parent().find(".synToAccWrap").hide();
+                        if(status == 'synonym' && $('#taxonHierarchyModal .checkFormName').val() != 'synonym'){
+                            that.parent().parent().find(".synToAccWrap").show();
+                        }else if(status == 'accepted'){
+                            $('#taxonHierarchyModal #taxonHierarchyInputForm').show();
+                        }
+                });
+
+                $('#taxonHierarchyModal #rank').change(function(){
+                    var selValue = $(this).val();
+                    updateHirRank(selValue);
+                });
+
+                $('.taxonRank').click(function(){
+                        var that = $(this);
+                        console.log(that.parent());
+                });
+
+                $('.synToAccWrap #page').change(function(){
+                    $('.synToAccWrap .recoId').val('');
+                });
+                $('.singleNameUpdate').click(function(){
+                    // Before Submit Validation
+                    var params = {}
+                        params['taxonId'] = $('.taxonId').val();
+                        params['status']   =$('#taxonHierarchyModal #statusDropDown').val();
+                        if(params['status'] == 'synonym'){
+                            params['newRecoId'] = $('.synToAccWrap').find('.recoId').val();
+                        }
+                        params['position'] =$('#taxonHierarchyModal #positionDropDown').val();
+
+                    if($('#taxonHierarchyModal #positionDropDown').data('prev') != params['position']){
+                        //check hir
+                         if(!checkpositionDropdown($('#taxonHierarchyModal #positionDropDown').val())){
+                            return false;
+                         }
+                    }
+                    //alert(params['status']);
+                    if($('#taxonHierarchyModal #statusDropDown').data('prev') != params['status']){
+                        if(params['status'] == 'synonym'){
+                      //      alert(params['newRecoId']);
+                            if(!params['newRecoId']){
+                                alert("Please choose the accepted value");
+                                return false;
+                            }
+                            console.log(params);
+                        }
+                    }
+
+                    if(!confirm("Are you sure you wish to make this edit?")) {
+                        processingStop();
+                        return false;
+                    } else {
+                        addSpeciesPage('/namelist/singleNameUpdate',params);
+                        return false;                   
+                    }
+                });
             });
 </asset:script>
 </body>

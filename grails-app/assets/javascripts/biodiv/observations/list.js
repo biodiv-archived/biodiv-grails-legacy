@@ -533,6 +533,7 @@ $(document).ready(function(){
         $(this).parent().hide();
         $(this).parent().parent().find('.propagateGrpHab').show();
         $('label.label_group').hide();
+        initializeSpeciesGroupHabitatDropdowns();
         /*var obvId = $(this).attr('id');           
         $('#group_icon_show_wrap_'+obvId).hide();
         //habitat_icon.hide();

@@ -23,8 +23,8 @@
                 speciesid: me.options.speciesId,
                 taxonid: me.options.taxonId,
                 classSystem: $.trim($('#taxaHierarchy option:selected').val()),
-                user:me.options.user
-
+                user:me.options.user,
+                variant:me.options.variant
             }
                 
 
@@ -74,7 +74,7 @@
                                 $(obj).children('.jstree-anchor').attr('href', '/species/show/'+nodeData.original.speciesid).css({'color':'#08c', 'cursor':'pointer'}).attr('target', '_blank');
                                 //$(obj).children('.jstree-anchor').attr("span")
                             }
-                            
+
 
                             $.each(taxonRanks, function(i, v) {
                                 if (level == v.value) {
@@ -109,8 +109,7 @@
                                 btnAction = 'Show';
                             }
 
-                            if(me.options.controller == 'species' && (me.options.action == 'list' || me.options.action == 'taxonBrowser')) {
-                                console.log(nodeData);
+                            if(me.options.controller == 'species' && (me.options.action == 'list' || me.options.action == 'taxonBrowser')) {                                
                                 /*if(!nodeData.original.speciesid || nodeData.original.speciesid == -1) {
                                     var btn = "<button style='line-height:14px;' class='createPage" + ((btnAction == 'Show') ? '' : 'active') + "' data-controller='species' data-action='create' data-taxonid='"+nodeData.original.taxonid+"' title='Create page for this taxon'>Create page</button>";
                                     el.innerHTML = btn;
@@ -130,6 +129,15 @@
                                 $("#taxonHierarchy").addClass('editField');
                             } else {
                                 $("#taxonHierarchy").removeClass('editField');
+                            }
+
+                            if(me.options.action == 'taxonBrowser') {
+                                if(nodeData.original.usersList.length > 0){
+                                    for(var i=0;i<nodeData.original.usersList.length;i++){
+                                        var userData = nodeData.original.usersList[i];
+                                        $(obj).append('<span class="userList"><a title="'+userData['name']+'" href="/user/show/'+userData['id']+'" target="_blank"><img class="'+userData['perm']+'" src="'+userData['profile_pic']+'" /></a></span>');
+                                    }
+                                }
                             }
                         }
                         return obj;
@@ -214,7 +222,8 @@
                 'core': {
                     "themes": {
                         'dots': true,
-                        'stripes': true
+                        'stripes': true,
+                        "variant" : me.options.postData.variant
                     },
                     'data': {
                         'url': window.params.taxon.classification.listUrl,

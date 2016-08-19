@@ -15,6 +15,7 @@ import org.apache.log4j.FileAppender;
 import species.utils.Utils;
 import species.Language;
 import species.namelist.NameInfo;
+import species.participation.SpeciesBulkUpload
 import species.ScientificName.TaxonomyRank
 
 
@@ -46,12 +47,15 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
 	public initCurationInfo(String file){
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, NameInfo.TAXON_NAMES_SHEET, 0);
+		addToSummary("Checking TAXON_NAMES_SHEET for duplicates")
 		println "Checking TAXON_NAMES_SHEET for duplicates"
 		updateMap(content, speciesNameMap)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.HIR_SHEET, 0);
+		addToSummary("Checking HIR_SHEET for duplicates")
 		println "Checking HIR_SHEET for duplicates"
 		updateMap(content, taxonHirMap, true)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.SYNONYMS_SHEET, 0);
+		addToSummary("Checking SYNONYM for duplicates\n")
 		println "Checking SYNONYM for duplicates"
 		updateMap(content, synonymMap)
 		
@@ -70,9 +74,10 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(!m['name'] || ("ignore".equalsIgnoreCase(m['match found'])))
 					return
 				
-				String rankSuffix = useRank ? (m['rank'] ? ( KEY_SEP + m['rank'].trim().toLowerCase()):''):''  		
+				String rankSuffix = useRank ? (m['rank'] ? ( KEY_SEP + TaxonomyRank.getTRFromInt(TaxonomyRank.getTaxonRank(m['rank'].trim())).value().toLowerCase()):''):''  		
 				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name'] + rankSuffix
 				if(targetMap.containsKey(key)){
+					addToSummary(" Multiple matching rows for given key " + key)
 					println " Multiple matching rows for given key " + key
 					multipleMatchingRow = true
 				}
@@ -83,13 +88,22 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 	
 	protected boolean validate(List<NameInfo> nList){
+		def ln = System.getProperty('line.separator')
+		def nameSeparator = ln + "===================== ROW INDEX ============================ "
+		
+		addToSummary("::::::::::::::: No Duplicates ::::::::::::::::::::::" + ln)
+		addToSummary("::::::::::::::: Validating for Key presense :::::::::::::::::::::::")
 		
 		boolean isValid = true
+		String tmpSummary
 		
-		nList.each { NameInfo sc -> 
+		nList.each { NameInfo sc ->
+			addToSummary(nameSeparator + sc.sourceIndex)
 			String key = sc.sourceIndex +  KEY_SEP + sc.sourceName +  KEY_SEP + sc.name
 			if(!speciesNameMap.containsKey(key) || !speciesNameMap.get(key)['match found']){
-				println "--- sm --- ??????????? key not present  or match colum is empty  key " +  key + "  ndoe "  + sc
+				tmpSummary = "$ln" + "TAXON NAMES SHEET ::: key not present  or match column is empty -- key " +  key + sc
+				addToSummary(tmpSummary)
+				println tmpSummary
 				//println " map " + speciesNameMap
 				isValid = false
 				//return
@@ -99,8 +113,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			sc.taxonHir.each { NameInfo ti ->
 				key = ti.sourceIndex +  KEY_SEP + ti.sourceName +  KEY_SEP + ti.name + KEY_SEP + TaxonomyRank.getTRFromInt(ti.rank).value().toLowerCase()
 				if(!taxonHirMap.containsKey(key) || !taxonHirMap.get(key)['match found']){
-					println "------- tm---- ??????????? key not presen  or match colum is empty  key " +  key + "  ndoe " + ti
-					//println " map keys " + taxonHirMap.keySet()
+					tmpSummary = "$ln" + "HIR NAMES SHEET ::: key not present  or match column is empty --  key " +  key +  ti
+					addToSummary(tmpSummary)
+					println tmpSummary
 					isValid = false
 					return
 				}
@@ -110,8 +125,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 			sc.synonyms.each { NameInfo ti ->
 				key = ti.sourceIndex +  KEY_SEP + ti.sourceName +  KEY_SEP + ti.name
 				if(!synonymMap.containsKey(key)|| !synonymMap.get(key)['match found']){
-					println "----- syn ---- ??????????? key not present  or match colum is empty  key " +  key + "  ndoe " + ti
-					//println " map " + synonymMap
+					tmpSummary = "$ln" + "SYNONYMS NAMES SHEET ::: key not present  or match column is empty -- key " +  key + ti
+					addToSummary(tmpSummary)
+					println tmpSummary
 					isValid = false
 					return
 				}
@@ -159,7 +175,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		int i=0;
 		
 			//log.debug speciesContent;
-			addToSummary("Creating XML for species row " + currentRowIndex++)
+			currentRowIndex++
+			//addToSummary("Creating XML for species row " + currentRowIndex)
 			Node speciesElement = new Node(null, "species", ['rowIndex':currentRowIndex]);
 			for(Map mappedField : mappingConfig) {
 				String fieldName = mappedField.get("field name(s)")
@@ -594,10 +611,10 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	/////////////////////////////////////////// Name validation related //////////////////////////
 	
 	
-	public static boolean validateUserSheetForName(File f){
+	public static boolean validateUserSheetForName(SpeciesBulkUpload sbu){
 		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
-		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(f.getAbsolutePath(), 2, 0);
-		List<Map> content = SpreadsheetReader.readSpreadSheet(f.getAbsolutePath(), 0, 0);
+		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(sbu.filePath, 2, 0);
+		List<Map> content = SpreadsheetReader.readSpreadSheet(sbu.filePath, 0, 0);
 		
 		List sNodeList = []
 		content.each { m ->
@@ -616,13 +633,16 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		log.debug "Nameinfo list size " + nameInfoList.size()
 		
 		//taking info from the matched sheet generate system (taxonname, hier, synonyms)
-		converter.initCurationInfo(f.getAbsolutePath())
-		if(converter.multipleMatchingRow){
-			return false
+		converter.initCurationInfo(sbu.filePath)
+		if(!converter.multipleMatchingRow && converter.validate(nameInfoList)){
+			sbu.updateStatus(SpeciesBulkUpload.Status.SCHEDULED)
+			return true
 		}
 		
-		//now validating for unique entry for each name
-		return converter.validate(nameInfoList);
+		sbu.writeLog(converter.getLogs(), true)
+		sbu.updateStatus(SpeciesBulkUpload.Status.VALIDATION_FAILED)
+		
+		return false	
 	}
 	
 	public static List getNames(String contentFile, String mappingFile){

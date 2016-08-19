@@ -16,6 +16,35 @@
 .openid-loginbox .form-horizontal .controls input {
 	width: 290px;
 }
+.map_class {
+                position:relative;
+            }
+.map_canvas {
+    border-color: rgba(82,168,236,0.8) !important;
+    //position: absolute !important;
+    width: 103% !important;
+    display: block;
+    left: 0px;
+    z-index:10 !important;
+    height:360px !important;
+}
+
+            .map_search {
+                position:inherit;btn:hover;
+                background-color: #cfede1;
+            }
+                        .propagateLocation .map_canvas{
+                width:99% !important;
+            }
+            .locationScale{display:none;
+            }
+            .latlng{display:none !important;} 
+        
+            select{width:100%  !important;}
+            .add-on{position:relative !important;margin-left:-28px !important;}
+            .location .help-inline ul {
+    				margin-left: 165px;
+				}
 </style>
 </head>
 
@@ -50,7 +79,7 @@
 					</div>
 					<form
 						action="${uGroup.createLink(controller:'register', action:'register', userGroupWebaddress:params.webaddress)}"
-						name='registerForm' method="POST" class="form-horizontal">
+						name='registerForm' id='registerForm' method="POST" class="form-horizontal">
 						<div class="control-group"
 							style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;"><g:message code="loginformtemplate.or" />,
 							<g:message code="default.register.here.label" /> </div>
@@ -131,12 +160,9 @@
 						<div
 							class="control-group ${hasErrors(bean: command, field: 'location', 'error')}">
 							<label class="control-label" for="location"><g:message
-									code='user.location.label' default='${g.message(code:"default.location.label")}' /> </label>
-							<div class="controls">
-								<input class="input-large" id="location" type="text"
-									value="${command.location}" name="location"
-									placeholder="${g.message(code:'register.placeholder.enter.location')}">
-
+									code='user.location.label' default='Location *' /> </label>
+							<div class="controls location" style="margin-left:auto;">
+								 <obv:showMapInput model="[commandInstance:command,observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
 								<g:hasErrors bean="${command}" field="location">
 									<div class="help-inline">
 										<g:renderErrors bean="${command}" field="location" />
@@ -155,7 +181,7 @@
                             placeholder="${g.message(code:'placeholder.sex.select')}"
                             from="${species.auth.SUser$SexType?.values()}"
                             keys="${species.auth.SUser$SexType?.values()*.value()}"
-                            noSelection="${['null':'Select One...']}"/>
+                            noSelection="${['':'Select One...']}"/>
 
 									
 
@@ -171,20 +197,20 @@
                             placeholder="${g.message(code:'placeholder.occupation.select')}"
                             from="${species.auth.SUser$OccupationType?.values()}"
                             keys="${species.auth.SUser$OccupationType?.values()*.value()}"
-                            noSelection="${['null':'Select One...']}" />
+                            noSelection="${['':'Select One...']}" />
 
 							</div>
                         </div>
                              <div
 							class="control-group ${hasErrors(bean: command, field: 'institutiontype', 'error')}">
 							<label class="control-label" for="sex"><g:message
-									code='user.institution.label' default='${g.message(code:"default.occupationtype.label")}' /> </label>
+									code='user.institution.label' default='${g.message(code:"user.institution.label")}' /> </label>
 							<div class="controls">
 								 <g:select name="institutionType" class="input-block-level" id="institutionType"
                             placeholder="${g.message(code:'placeholder.institution.select')}"
                             from="${species.auth.SUser$InstitutionType?.values()}"
                             
-                            noSelection="${['null':'Select One...']}"/>
+                            noSelection="${['':'Select One...']}"/>
 
 							</div>
                         </div>
@@ -290,6 +316,10 @@
 		</div>
 	</div>
     <script type="text/javascript">
+    $(document).ready(function(){
+    	$('.placeName').attr('name', 'location');
+    	$('.userlocation').hide();
+    	});
 /*
     var onRecaptchaSuccess = function(g_recaptcha_response) {
     $('#g_recaptcha_response').val(g_recaptcha_response);
