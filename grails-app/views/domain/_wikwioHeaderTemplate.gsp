@@ -1,4 +1,10 @@
 <%@page import="species.utils.Utils"%>
+<%@page import="species.participation.Stats"%>
+<%@page import="species.UtilsService"%>
+<%@page import="org.springframework.web.servlet.support.RequestContextUtils" %>
+<%@page contentType="text/html"%>
+
+<g:set var="utilsService" bean="utilsService"/>
 <div id="ibp-header" class="gradient-bg">
 	<div id="ibp-header-bar" class="navbar navbar-static-top" style="margin-bottom: 0px;border-bottom:0px;">
 		<div class="navbar-inner"
@@ -22,6 +28,7 @@
 	<domain:showHeader model="['userGroupInstance':userGroupInstance]" />
          <div class="">
 <%
+String cgroup=params.webaddress;
 String supportEmail = "";
 String domain = Utils.getDomain(request);
 if(domain.equals(grailsApplication.config.wgp.domain)) {
@@ -73,10 +80,23 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		</div>
 	</g:if>
 
-<%--	<div class="alertMsg alert alert-info"--%>
-<%--		style="clear: both; margin: 0px; text-align: center;">--%>
-<%--		Due to unavoidable infrastructure maintenance, disruption of the portal services is likely on Sunday (8th December 2013).--%>
-<%--	</div>--%>
+<% 	
+	def cuRLocale = RequestContextUtils.getLocale(request);
+	String bannerMessage = utilsService.getBannerMessage(cgroup,request,cuRLocale);
+	String ibpBannerMessage = utilsService.getIbpBannerMessage(request,cuRLocale);
+	 %>	 
+     <g:if test="${cgroup && bannerMessage}">
+     <div class="alertMsg alert alert-info"
+         style="clear: both; margin: 0px; text-align: center;">
+         ${raw(bannerMessage)}
+     </div>
+     </g:if>
+     <g:if test="${ibpBannerMessage}">
+     <div class="alertMsg alert alert-info"
+         style="clear: both; margin: 0px; text-align: center;">
+         ${raw(ibpBannerMessage)}
+     </div>
+	</g:if>
 
 	<div class="alertMsg ${(flash.message)?'alert':'' }"
 		style="clear: both; margin: 0px">
