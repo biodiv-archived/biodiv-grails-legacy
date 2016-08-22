@@ -101,7 +101,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		
 		def conf = SpringSecurityUtils.securityConfig
 		if (command.hasErrors()) {
-			redirectModel.command = commandRegisterController.groovy
+			redirectModel.command = command
 			render view: 'index', model: redirectModel
 			return
 		}
