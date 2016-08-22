@@ -1158,12 +1158,13 @@ class UtilsService {
         return bannerMessageMap;
     }
 
-    String getBannerMessage(String userGroupWebaddress) {  
-        return bannerMessageMap ? bannerMessageMap[userGroupWebaddress]:'';
+    String getBannerMessage(String userGroupWebaddress,request=null) {  
+        //def request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+        return bannerMessageMap ? bannerMessageMap[userGroupWebaddress+"_"+getCurrentLanguage(request).threeLetterCode]:'';
     }
 
-    String getIbpBannerMessage() {   
-        return bannerMessageMap ? bannerMessageMap["ibp"]:'';
+    String getIbpBannerMessage(request=null) {   
+        return bannerMessageMap ? bannerMessageMap["ibp"+"_"+getCurrentLanguage(request).threeLetterCode]:'';
     }
 
     void loadBannerMessageMap() {  

@@ -9,6 +9,7 @@
 					<sUser:ifOwns model="['user':user]">
 						<th class="col-xs-2"><g:message code="speciesbulkuploadtable.data.file" /></th>
 						<th><g:message code="speciesbulkuploadtable.log.file" /></th>
+						<th><g:message code="speciesbulkuploadtable.devlog.file" /></th>
 						<th><g:message code="speciesbulkuploadtable.abort" /></th>
 						<th><g:message code="speciesbulkuploadtable.rollback" /></th>
 					</sUser:ifOwns>
@@ -24,6 +25,7 @@
 						<sUser:ifOwns model="['user':user]">
 							<td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:uploadLog.filePath])}"><g:message code="button.download" /></a></td>
 							<td><g:if test="${uploadLog.logFilePath}"><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:uploadLog.logFilePath])}"><g:message code="button.download" /></a></g:if></td>
+							<td><g:if test="${uploadLog.errorFilePath}"><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:uploadLog.errorFilePath])}"><g:message code="button.download" /></a></g:if></td>
 							<td><g:if test="${uploadLog.status.value() == 'RUNNING'}"><a class="btn btn-mini btn-danger" href="#" onclick="updateBulkUploadStatus($(this), '${uGroup.createLink(action:'abortBulkUpload', controller:'species', id:uploadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', 'Abort')"><g:message code="speciesbulkuploadtable.abort" /></a></g:if></td>
 							<td><g:if test="${(uploadLog.status.value() != 'RUNNING') && (uploadLog.status.value() != 'ROLLBACK')}"><a class="btn btn-mini  btn-danger" href="#" onclick="updateBulkUploadStatus($(this), '${uGroup.createLink(action:'rollBackUpload', controller:'species', id:uploadLog.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}', 'Rollback')"><g:message code="speciesbulkuploadtable.rollback" /></a></g:if></td>
 						</sUser:ifOwns>

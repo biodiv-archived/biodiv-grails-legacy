@@ -37,10 +37,6 @@
             width: 715px;
         }
 
-        .user_profile{
-          background-color: white;
-          padding: 5px 0px;
-        }
         .activity_count{
           background-color: white;
           padding: 5px 0px;
@@ -67,10 +63,7 @@
           font-size: 10px;
           font-weight: bold;
         }
-        .user_profile .prop{
-            padding:0px 5px;
-        }
-
+  
 
         .list-group.panel > .list-group-item {
           border-bottom-right-radius: 4px;
@@ -83,21 +76,12 @@
             height: 550px;
             margin-bottom: 20px;
         }
-        .user_profile {
-             height: 558px;
-            background-color: white;
-            padding: 15px;
-            margin-bottom:10px;
-        }
+
          .prop {    
             border-bottom:1px groove;
             margin-bottom:6px;
             overflow: auto;
             }
-        .value{
-            font-weight:normal;
-            color:#000;
-        }
         .prop:hover{background-color:#f2f2f2;}
         .name{margin-bottom:5px;}
         .value{margin-bottom:5px;}
@@ -105,8 +89,8 @@
         .forContributor { margin-left: 200px; font-weight: normal; position:relative;color:green;}
         .jstree-icon { display: none;}
         .permission_hilight{background-color:#b1f0e7;}
-        
-        
+        .uploaded-carousel{background-color:#cfede1;}
+        .prop{padding-left:5px;}
         </style>
         </head>
         <body>
@@ -146,9 +130,9 @@
                                             </a>
                                             <ul class="dropdown-menu">
                                                 <li><a href="#observations"><i class="icon-screenshot"></i><g:message code="default.observation.label" /></a></li>
-                                                <li><a href="#species"><i class="icon-screenshot"></i><g:message code="default.species.label" /></a></li>
-                                                <li><a href="#documents"><i class="icon-eye-open"></i><g:message code="suser.show.documents" /></a></li>
-                                                <li><a href="#discussions"><i class="icon-download"></i><g:message code="suser.show.discussions" /></a></li>
+                                                <li><a href="#species"><i class=" icon-leaf"></i><g:message code="default.species.label" /></a></li>
+                                                <li><a href="#documents"><i class="icon-list-alt"></i><g:message code="suser.show.documents" /></a></li>
+                                                <li><a href="#discussions"><i class="icon-user"></i><g:message code="suser.show.discussions" /></a></li>
                                             </ul>
                                     </li>
                                     <li class="divider-vertical"></li>
@@ -182,7 +166,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                            
                        <g:render template="userAccordionDetailsTemplate" model="[]" />
                         </div>
-                        <div class="span9 user_profile">
+                        <div class="span9">
                             <sUser:showUserStory model="['userInstance':user, 'showDetails':true]"></sUser:showUserStory>
                         </div>
                         <div class="clearfix"></div> 
@@ -202,6 +186,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                                         </h5>
                                         <div id="observations" class="section" style="clear:both;margin-left:20px;">
                                          <g:render template="/observation/distinctRecoTableAccordionTemplate" model="[distinctRecoList:distinctRecoList, totalCount:totalCount]"/>
+                                         <div class="panel" style="padding-bottom:45px;padding-top:0px;">
                                             <h6>
                                                 <span class="name" style="color: #b1b1b1;"> 
                                                     <obv:showNoOfObservationsOfUser
@@ -218,9 +203,11 @@ def contact_me_text=g.message(code:'button.contact.me')
 
                                         </div>
                                         <div id="identifications" class="section" style="clear:both;">
-                                       
-                                        </div>
+                                       </div>
+                                        
                                         <div id="identifications" class="section" style="clear:both;">
+                                        </div>
+                                        <div class="panel" style="padding-bottom:45px;padding-top:0px;">
                                             <h6>
                                                 <span class="name" style="color: #b1b1b1;"> 
                                                     <obv:showNoOfRecommendationsOfUser model="['user':user, 'userGroup':userGroupInstance]" /> </span>
@@ -234,7 +221,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                                             model="['controller':'user', 'resultController':'observation', 'action':'getRecommendationVotes', 'filterProperty': 'user', 'filterPropertyValue':user.id, 'id':'userIds', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
 
                                         </div>
-                                        
+                                        </div>
                                         <obv:showBulkUploadRes model="['user':user]">
                                          <div id="bulkUploadResources" class="section" style="clear:both;">
                                             <h6>
@@ -246,8 +233,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                                             model="['controller':'observation', 'action':'related', 'filterProperty': 'bulkUploadResources', 'filterPropertyValue':user.id, 'id':'bulkUploadResources', 'userGroupInstance':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'hideShowAll':true]" />
 
                                         </div>
-                                        </obv:showBulkUploadRes>
-                                       
+                                        </obv:showBulkUploadRes>                                       
                                         <div>
                                         
                                         </div>
@@ -295,11 +281,15 @@ def contact_me_text=g.message(code:'button.contact.me')
                                          <h5>
                                             <g:message code="default.species.label" />
                                         </h5>
+                                        <div class="panel" style="padding-bottom:45px;padding-top:0px;">
                                              <h6>
                                                  <span class="name" style="color: #b1b1b1;"> 
                                                    <div class="noOfContributedSpecies" style="display:inline;"> <s:noOfContributedSpecies model="['user':user, 'permissionType':"ROLE_CONTRIBUTOR"]" /></div> </span>
                                              <g:message code="suser.show.contributedspecies" /></h6>               
-                                                <s:showContributedSpecies model="['user':user.id]"/>
+                                              <%--  <s:showContributedSpecies model="['user':user.id]"/> --%>
+                                              <obv:showRelatedStory
+                            model="[ 'controller':'observation', 'action':'related','filterProperty': 'contributedSpecies', 'userGroupInstance':userGroupInstance,'filterPropertyValue':user.id,'hideShowAll':true]" />
+                                        </div>
                                         </div>
                                          <g:if test="${!namesReportList.isEmpty()}">
                                         <div id="namesValidationReports" class="section" style="clear: both;overflow:auto;">
