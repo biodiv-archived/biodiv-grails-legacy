@@ -158,7 +158,7 @@
 						</div>
 
 						<div
-							class="control-group ${hasErrors(bean: command, field: 'location', 'error')}">
+							class="control-group ${hasErrors(bean: command, field: 'longitude', 'error')} ${hasErrors(bean: command, field: 'latitude', 'error')} ${hasErrors(bean: command, field: 'location', 'error')}">
 							<label class="control-label" for="location"><g:message
 									code='user.location.label' default='Location *' /> </label>
 							<div class="controls location" style="margin-left:auto;">
