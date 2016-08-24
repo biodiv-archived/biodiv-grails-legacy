@@ -1,6 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.participation.Stats"%>
 <%@page import="species.UtilsService"%>
+<%@page import="org.springframework.web.servlet.support.RequestContextUtils" %>
 <%@page contentType="text/html"%>
 
 <g:set var="utilsService" bean="utilsService"/>
@@ -80,8 +81,9 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	</g:if>
 
 	<% 
-	String bannerMessage = utilsService.getBannerMessage(cgroup,request);
-	String ibpBannerMessage = utilsService.getIbpBannerMessage(request);
+    def cuRLocale = RequestContextUtils.getLocale(request);
+	String bannerMessage = utilsService.getBannerMessage(cgroup,request,cuRLocale);
+	String ibpBannerMessage = utilsService.getIbpBannerMessage(request,cuRLocale);
 	 %>
      <g:if test="${cgroup && bannerMessage}">
      <div class="alertMsg alert alert-info"
