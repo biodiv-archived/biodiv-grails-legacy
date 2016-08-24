@@ -600,6 +600,7 @@ class NamelistService extends AbstractObjectService {
         //println "=======SCI NAME POSITION ========== " + sciName.position
         //println "=====SCI NAME ==== " + sciName
         //sciName = sciName.merge();
+        sciName.position =  NamesMetadata.NamePosition.WORKING
         if(!sciName.hasErrors() && sciName.save(flush:true)) {
             println sciName.position
             log.debug "Saved sciname ${sciName}"
