@@ -10,7 +10,7 @@
 	<li>  <a href="/bbp/datasharing">  Data Sharing Policy </a></li>
 	<li>  <a href="/bbp/license">  Licenses </a></li>
 	<li>  <a href="/bbp/feedback">  Feedback </a></li>
-	<li>  <a href="/bbp/faq">  FAQ </a></li>
+	<li>  <a href="http://biodiversity.bt/page/170801">  FAQ </a></li>
 	<li>  <a href="/bbp/contactus">  Contact Us </a></li>
 <ul>
 </div>

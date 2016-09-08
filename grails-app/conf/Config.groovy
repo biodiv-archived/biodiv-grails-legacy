@@ -190,7 +190,7 @@ speciesPortal {
     app.dzongkha = "/assets/all/accordion/dzongkha.png"
 
 
-    app.notifiers_bcc = ["moafbhutan@gmail.com", "sdema06@gmail.com"]
+    app.notifiers_bcc = ["moafbhutan@gmail.com", "sdema06@gmail.com","prabha.prabhakar@gmail.com"]
 
     species {
         speciesDownloadDir = "${download.rootDir}/species"

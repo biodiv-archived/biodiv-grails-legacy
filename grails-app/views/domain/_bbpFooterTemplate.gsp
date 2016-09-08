@@ -28,7 +28,7 @@
                 <li style="width:200px;"><a href="${ '/bbp/theportal'}" >Biodiversity Of Bhutan</a>
                 </li>
                 <li><a href="${ '/bbp/technology'}">Technology</a></li>
-                <li><a href="${ '/bbp/faq'}">FAQ</a></li>
+                <li><a href="http://biodiversity.bt/page/170801">FAQ</a></li>
 
             </ul>
         </div>

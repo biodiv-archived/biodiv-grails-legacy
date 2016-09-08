@@ -13,7 +13,7 @@
     <body>
         <table style="width:621px; border:1px solid #a1a376;">
             <tr>
-                <td id="header" class="w640" align="left" bgcolor="#ffffff"><a href="${serverURL}/"><img src="${resource(dir:'images', file:'whatsnewbanner_3.gif',absolute:'true' )}" alt="${siteName}" style="border: 0px solid ;width: 627px; height: 53px;"></a></td>
+                <td id="header" class="w640" align="left" bgcolor="#ffffff"><a href="${serverURL}/"><img src="${assetPath(src:'/all/'+'bhutan.gif',absolute:'true')}" alt="${siteName}" style="border: 0px solid ;width: 627px; height: 53px;"></a></td>
             </tr>
             <tr>
                 <td class="w580" style="height: 10px; background-color: white;"></td>
