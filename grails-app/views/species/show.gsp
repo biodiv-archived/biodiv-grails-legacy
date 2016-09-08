@@ -98,6 +98,7 @@
                 margin-left:-15px;
             }           
             .citation{background-color:white;padding:15px;} 
+            .reco-comment-table{ right: inherit; }
         </style>
 
         <!--[if lt IE 8]><style>
