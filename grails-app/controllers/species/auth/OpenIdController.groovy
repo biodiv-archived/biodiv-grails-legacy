@@ -130,7 +130,7 @@ class OpenIdController {
 		log.debug "Processing OpenId authentication in createAccount/merge"
 		String email
         if(openId) {
-            emailAttribute = attributes.find { l ->
+           emailAttribute = attributes.find { l ->
                 if(l.name == 'email') {
                     email = l.values[0]
                 }

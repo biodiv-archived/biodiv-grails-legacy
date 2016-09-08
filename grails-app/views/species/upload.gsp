@@ -10,6 +10,11 @@
         <g:render template="/common/titleTemplate" model="['title':title]"/>
 
         <asset:javascript src="slickgrid.js"/>
+        <style type="text/css">
+        .ui-autocomplete{
+            width : 400px !important;
+        }
+        </style>
     </head>
     <body>
         <div id="uploadSpeciesDiv">
