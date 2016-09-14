@@ -1848,11 +1848,18 @@ class SpeciesController extends AbstractObjectController {
 
     }
 
-    def testTrait(){
+    def testTraitDefinition(){
         Language languageInstance = utilsService.getCurrentLanguage(request);
         speciesTraitsService.loadTraitDefinitions('/home/ifp/git/biodiv/app-conf/parent.tsv',languageInstance);
     }
-
+    def testTraitValue(){
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        speciesTraitsService.loadTraitValues('/home/ifp/git/biodiv/app-conf/traitvalue.tsv',languageInstance);
+    }
+        def testTraitFacts(){
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        speciesTraitsService.loadTraitFacts('/home/ifp/git/biodiv/app-conf/traitfacts.xlsx',languageInstance);
+    }
     def speciesContributor(){
 
         //println "========================= species contributor"
@@ -1891,5 +1898,16 @@ class SpeciesController extends AbstractObjectController {
                 xml { render model as XML }
             }
     }
+}
+
+def traitList(){
+    //speciesTraitsService.saveFacts(params)
+    render (view:'traitList', model:['traitList' : speciesTraitsService.listTraits(params)]);
+    
+    
+}
+def showTrait(){
+    println "params"+params.id
+    render(view:'showTraits', model:speciesTraitsService.showTrait(params.id))
 }
 }

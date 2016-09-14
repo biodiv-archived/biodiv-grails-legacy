@@ -36,11 +36,7 @@ class Document extends DataObject implements Comparable {
         Technical_Report("Technical Report"),
         Presentation("Presentation"),
         Miscellaneous("Miscellaneous"),
-        Journal_Article("Journal Article"),
-        Book("Book"),
-        Thesis("Thesis"),
-        Technical_Report("Technical Report"),
-        Presentation("Presentation"),
+        
 
         private String value;
 

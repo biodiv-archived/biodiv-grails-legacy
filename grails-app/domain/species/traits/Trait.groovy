@@ -6,91 +6,162 @@ import species.UtilsService;
 
 class Trait {
 
-    public enum ValueConstraint {
-       CATEGORICAL,
-       INTEGER,
-       FLOAT,
-       TEXT,
+    public enum TraitTypes {
+       SINGLE_CATEGORICAL,
+       MULTIPLE_CATEGORICAL,
        BOOLEAN,
-       ORDERED,
        RANGE,
        DATE
 
-       static boolean validate(Trait trait, def value) {
+/*       static boolean validate(Trait trait, def value) {
            if(!value) return false;
            try {
                switch(this) {
-                   case CATEGORICAL : //TODO:CHK in trait values table. value should be one of the value
+                   case SINGLE_CATEGORICAL : //TODO:CHK in trait values table. value should be one of the value
                    break;
-                   case INTEGER : Integer.parseInt(value) 
+                   case MULTIPLE_CATEGORICAL : //TODO:CHK in trait values table. value should be one of the value
                    break;
-                   case FLOAT : Double.parseDouble(value) 
+                   case CATEGORICAL_ORDERED : Integer.parseInt(value) 
                    break;
-                   case TEXT : 
+                   case NUMERIC_SINGLE_DECIMAL : Double.parseDouble(value) 
+                   break;
+                   case NUMERIC_SINGLE_INTEGER : Double.parseDouble(value) 
+                   break;
+                   case NUMERIC_RANGE_DECIMAL : 
+                   break;
+                   case NUMERIC_RANGE_INTEGER : 
                    break;
                    case BOOLEAN : Boolean.parseBoolean(value)
                    break;
-                   case ORDERED :
+                   case DATE :
                    break;
-                   case RANGE : return value.indexOf('-') != -1
+                   case DATE_RANGE : return value.indexOf('-') != -1
                    break;
-                   case DATE : return UtilsService.parseDate(value) != null
-                   break;
+                   //case DATE : return UtilsService.parseDate(value) != null
+                   //break;
                }
            } catch(Exception e) {
                return false;
            }
            return true;
        }
-
-       static ValueConstraint getEnum(value){
+*/
+       static TraitTypes getEnum(value){
            if(!value) return null;
 
-           if(value instanceof ValueConstraint)
+           if(value instanceof TraitTypes)
                return value
 
                value = value.toUpperCase().trim()
                switch(value){
-                   case 'CATEGORICAL':
-                   return ValueConstraint.CATEGORICAL
-                   case 'INTEGER':
-                   return ValueConstraint.INTEGER
-                   case 'FLOAT':
-                   return ValueConstraint.FLOAT
-                   case 'TEXT':
-                   return ValueConstraint.TEXT
+                   case 'SINGLE_CATEGORICAL':
+                   return TraitTypes.SINGLE_CATEGORICAL
+                   case 'MULTIPLE_CATEGORICAL':
+                   return TraitTypes.MULTIPLE_CATEGORICAL
                    case 'BOOLEAN':
-                   return ValueConstraint.BOOLEAN
-                   case 'ORDERED':
-                   return ValueConstraint.ORDERED
-                   case 'RANGE':
-                   return ValueConstraint.RANGE
+                   return TraitTypes.BOOLEAN
                    case 'DATE':
-                   return ValueConstraint.DATE
+                   return TraitTypes.DATE
+                   case 'RANGE':
+                   return TraitTypes.RANGE
                    default:
                    return null;	
                }
        }
     }
+    public enum DataTypes {
+       STRING,
+       DATE,
+       NUMERIC,
+       BOOLEAN
 
+
+       static DataTypes getEnum(value){
+           if(!value) return null;
+
+           if(value instanceof DataTypes)
+               return value
+
+               value = value.toUpperCase().trim()
+               switch(value){
+                   case 'STRING':
+                   return DataTypes.STRING
+                   case 'DATE':
+                   return DataTypes.DATE
+                   case 'BOOLEAN':
+                   return DataTypes.BOOLEAN
+                   case 'NUMERIC':
+                   return DataTypes.NUMERIC
+                   default:
+                   return null; 
+               }
+       }
+    }
+ public enum Units implements org.springframework.context.MessageSourceResolvable{
+        CM("cm"),
+        M3("m³"),
+        private String value;
+        Units(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+    static def toList() {
+      return [
+                CM,
+                M3
+      ]
+    }
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+
+            ["${getClass().name}.${name()}"] as String[]
+        }   
+        String getDefaultMessage() { value() }
+    }
+
+    Units units
+    TraitTypes traitTypes
+    DataTypes dataTypes
     String name;
-    String parentId;
+    String values;
+    String source
+    String icon
     Field field;
     String ontologyUrl;
     String description;
     Date createdOn = new Date();
 	  Date lastRevised = createdOn;
-    static hasMany = [taxonomyDefinition: TaxonomyDefinition,valueConstraint:ValueConstraint]
+    static hasMany = [taxonomyDefinition: TaxonomyDefinition]
 
     static constraints = {
         name nullable:false, blank:false, unique:true
-        parentId nullable:true,blank:true
+        values nullable:true,blank:true
+        source nullable:true
+        icon nullable:true
         field nullable:false
         ontologyUrl nullable:true
 		    description nullable:true
+        units nullable:true
+        traitTypes nullable:true
+        dataTypes nullable:true
     }
 
     static mapping = {
         description type:"text"
     }
+    static Units fetchUnits(def units){
+    if(!units) return null;
+    for(Units unit : Units) {
+      if(unit.value().equals(units)) {
+        return unit
+      }
+    }
+    return null;
+  }
 }

@@ -1,20 +1,20 @@
 package species.traits
 
-import com.hp.hpl.jena.tdb.TDBFactory;
-import com.hp.hpl.jena.tdb.TDB;
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.ReadWrite;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.*;
-import org.apache.jena.atlas.lib.StrUtils;
+//import com.hp.hpl.jena.tdb.TDBFactory;
+//import com.hp.hpl.jena.tdb.TDB;
+//import com.hp.hpl.jena.query.*;
+//import com.hp.hpl.jena.query.Dataset;
+//import com.hp.hpl.jena.query.ReadWrite;
+//import com.hp.hpl.jena.rdf.model.*;
+//import com.hp.hpl.jena.vocabulary.*;
+//import org.apache.jena.atlas.lib.StrUtils;
 import species.participation.DownloadLog;
 import content.eml.UFile;
 import species.sourcehandler.importer.AbstractImporter;
 import species.sourcehandler.importer.CSVTraitsImporter;
 import org.apache.commons.io.FilenameUtils;
 import java.util.Date;
-
+import species.auth.SUser;
 import species.sourcehandler.XMLConverter;
 import species.TaxonomyDefinition;
 import species.ScientificName.TaxonomyRank
@@ -24,7 +24,12 @@ import au.com.bytecode.opencsv.CSVWriter;
 import species.traits.Trait;
 import species.Species;
 import species.Field;
-import species.traits.Trait.ValueConstraint;
+import species.traits.Trait.DataTypes;
+import species.traits.Trait.TraitTypes;
+import species.traits.Trait.Units;
+import species.formatReader.SpreadsheetReader;
+import groovy.sql.Sql
+
 
 class SpeciesTraitsService {
 
@@ -33,13 +38,14 @@ class SpeciesTraitsService {
     static final BIODIV_NAMESPACE = "http://indiabiodiversity.org/schema/terms/";
     public static final int IMPORT_BATCH_SIZE = 10;
 
-    protected Dataset dataset;
+    //protected Dataset dataset;
     private String resourceURI = "http://localhost.indiabiodiversity.org/species/show/" 
 
     private static Map propertyValueIcons;
     def springSecurityService;
     def utilsService;
     def grailsApplication;
+    def dataSource;
 
     void init() {
         // Make a TDB-backed dataset
@@ -48,8 +54,8 @@ class SpeciesTraitsService {
             traitsDir.mkdir();
          }
         String directory = grailsApplication.config.speciesPortal.traits.databaseDir;
-        dataset = getDataset(directory);
-        TDB.getContext().set(TDB.symUnionDefaultGraph, true) ;
+       // dataset = getDataset(directory);
+       // TDB.getContext().set(TDB.symUnionDefaultGraph, true) ;
 
         //TODO: populating icons from file
         //TOBE removed
@@ -94,6 +100,7 @@ class SpeciesTraitsService {
      * @param directory
      * @return
      */
+     /*
     protected Dataset getDataset(String directory) {
         // Make a TDB-backed dataset
         dataset = TDBFactory.createDataset(directory);
@@ -115,7 +122,7 @@ class SpeciesTraitsService {
     /**
      * save the given model
      * @param model
-     */
+     
     protected void saveModel(Model model, boolean closeModel = true) {
         if (model != null && dataset != null) {
             model.commit();
@@ -124,9 +131,9 @@ class SpeciesTraitsService {
                 model.close();
             //dataset.close();
         }
-    }
+    }*/
 
-    protected Map uploadFactsFile(Map params) {
+    /*protected Map uploadFactsFile(Map params) {
         def resultModel = [:]
         String file = params.path?:params.uFile?.path;
         def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
@@ -137,7 +144,7 @@ class SpeciesTraitsService {
         /*new File(f.getParentFile(),  f.getName())
         if(!destDir.exists()) {
         destDir.mkdir()
-        }*/
+        }
         boolean isDwC = false;
         File directory = f.getParentFile();
         File metadataFile;
@@ -179,7 +186,7 @@ class SpeciesTraitsService {
                 params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
                 params['language'] = datasetMetadata.dataset.language.text();
                 params['publicationDate'] = utilsService.parseDate(datasetMetadata.dataset.pubDate.text());
-                 */
+                 
             } else {
                 //params['externalUrl'] = params.externalUrl ?: params['datasource']?.website;
             }
@@ -203,9 +210,9 @@ class SpeciesTraitsService {
         }
         uploadLog <<  "\nUpload facts file result ${resultModel}";
         return resultModel
-    }
+    }*/
 
-    Map saveFacts(params, File uploadLog = null) {
+   /* Map saveFacts(params, File uploadLog = null) {
         if(!dataset) {
             init();
         }
@@ -405,14 +412,14 @@ class SpeciesTraitsService {
         log.debug "Creating statement ${subject} -> ${property} -> ${val}";
         return model.createStatement(subject, property, val);
     }
-
+*/
     private Long findTaxonIdFromName(String name) {
         XMLConverter converter = new XMLConverter();
         TaxonomyDefinition taxon = converter.getTaxonConceptFromName(name, TaxonomyRank.SPECIES.ordinal(), false, null);
         return taxon ? taxon.id : null;
     }
 
-    Map listFacts(Long id=null, String trait = null, String traitValue = null) {
+/*    Map listFacts(Long id=null, String trait = null, String traitValue = null) {
         if(!dataset) {
             init();
         }
@@ -537,8 +544,8 @@ class SpeciesTraitsService {
         }
         return ['factsList':result, 'count':count];
     } 
-
-    private List getResourceAsList(Resource resource) {
+*/
+    /*private List getResourceAsList(Resource resource) {
         List result = []
         StmtIterator iter = resource.listProperties();
         while (iter.hasNext()) {
@@ -606,14 +613,14 @@ class SpeciesTraitsService {
                 }
                 println "-------------------------------------______"
                 println row
-                */
+               
                 result << soln.get('trait').getLocalName().replace('_', ' ');
             }
         } finally {
             dataset.end();
         }
         return result;
-    } 
+    } */
     
     private boolean isValidTrait(String traitName, traitValue, Long id) {
         println "Validating trait ${traitName} with value ${traitValue} for taxon ${id}"
@@ -677,66 +684,69 @@ class SpeciesTraitsService {
     }
 
     void loadTraitDefinitions(String file, def languageInstance) {
+
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
-        int fieldIndex=Arrays.asList(headers).indexOf("Field")
+        /*int fieldIndex=Arrays.asList(headers).indexOf("Field")
         int taxonIndex=Arrays.asList(headers).indexOf("Taxon")
         int constraintIndex=Arrays.asList(headers).indexOf("Constraint")
         int urlIndex=Arrays.asList(headers).indexOf("ontologyURL")
-        int descriptionIndex=Arrays.asList(headers).indexOf("description")
-
+        int descriptionIndex=Arrays.asList(headers).indexOf("description")*/
+        println "loadTraitDefinitions====================="+headers
         while(row) {
             Trait trait = new Trait();
             headers.eachWithIndex { header, index ->
 
                 switch(header.toLowerCase()) {
 
-                case 'parent1' : 
-                    def tname= Trait.findByName(row[index]);
-                    if(!tname){
-                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
-                    tname=""
-                        }
+                case 'trait' :
+                        println "row index"+row[index]
+                        trait.name=row[index].toLowerCase().trim();
                 break;
 
-                case 'parent2' : 
-                    def tname= Trait.findByName(row[index]);
-                    if(!tname){
-                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
-                    tname=""
-                        }
+                case 'values' : 
+                    trait.values=row[index].trim()
                 break;
 
-                case 'parent3' : 
-                    def tname= Trait.findByName(row[index]);
-                    if(!tname){
-                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
-                    tname=""
-                        }
+                case 'datatype' : 
+                    trait.dataTypes=row[index].trim()
                 break;
 
-                case 'parent4' : 
-                    def tname= Trait.findByName(row[index]);
-                    if(!tname){
-                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
-                    tname=""
-                        }
+                case 'traittype' : 
+                    trait.traitTypes=row[index].trim()
+                break;
+                
+                case 'units' : 
+                    trait.units=row[index].trim()
                 break;
 
-                case 'parent5' : 
-                    def tname= Trait.findByName(row[index]);
-                    if(!tname){
-                    addTrait(trait,row[index],row[fieldIndex],row[taxonIndex],row[urlIndex],row[constraintIndex],row[descriptionIndex],languageInstance,row[index-1])
-                    tname=""
-                        }
+                case 'source' : 
+                   trait.source=row[index].trim()
                 break;
-                    
+
+                case 'icon' : 
+                    trait.icon=row[index].trim()
+                break;
+
+                case 'taxonid':
+                row[index].tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))};
+                break;
+
+                case 'definition':
+                trait.description=row[index].trim()
+                break;
+
+                case 'field':
+                trait.field = getField(row[index], languageInstance); 
+                break;
+
                 } 
             }
-         //  if(!trait.hasErrors() && !trait.save()) {
-           //    trait.errors.allErrors.each { log.error it }
-            //}
+             if(!trait.hasErrors() && !trait.save()) {
+             trait.errors.allErrors.each { log.error it }
+            }
+
             row = reader.readNext();
         }
     }
@@ -753,38 +763,165 @@ class SpeciesTraitsService {
         } 
     }
 
-    private void addTrait(Trait trait,String index,def fieldIndex,def taxonIndex,def urlIndex,def constraintIndex,def descriptionIndex,def languageInstance,String parentName)
-    {
-        
-        
-        trait.name =index.trim();
-        trait.field = getField(fieldIndex, languageInstance); 
-        taxonIndex.tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}; 
-        constraintIndex.tokenize(",").each {trait.addToValueConstraint(ValueConstraint.getEnum(it.trim()))};
-        trait.ontologyUrl = urlIndex.trim(); 
-        trait.description = descriptionIndex.trim();
-        def parentId=Trait.findByName(parentName)
-        trait.parentId=parentId?.id                            
-        trait.save()
-
+    private  getTaxon(String taxonList) {
+            def x = TaxonomyDefinition.read(Long.parseLong(taxonList.trim()));
+            if(x) {
+               return x;
+            }
     }
 
-    private List<ValueConstraint>  getTaxon(String taxonList) {
-        def t
-        taxonList.tokenize(",").each {
-            def x = TaxonomyDefinition.read(Long.parseLong(it.trim()));
-            if(x) t << x;
-
-        }
-        return t;
-    }
-
-    private List<ValueConstraint> getValueContraints(String valueConstraitsList) {
+/*    private List<ValueConstraint> getValueContraints(String valueConstraitsList) {
         List t = [];
         valueContraints.split(',').each {
             def x = ValueConstraint.getEnum(it.trim())
             if(x) t << x;
         }
         return t;
-    }
+    }*/
+       void loadTraitValues(String file, def languageInstance) {
+
+        CSVReader reader = getCSVReader(new File(file))
+        String[] headers = reader.readNext();//headers
+        String[] row = reader.readNext();
+        while(row) {
+            TraitValue traitValue = new TraitValue();
+            headers.eachWithIndex { header, index ->
+                switch(header.toLowerCase()) {
+                case 'trait' : 
+                    def trait=Trait.findByName(row[index].trim())
+                    traitValue.trait=trait?.id
+                break;
+                case 'value' :
+                        traitValue.value=row[index].trim();
+                break;
+                case 'source' : 
+                   traitValue.source=row[index].trim()
+                break;
+                case 'icon' : 
+                    traitValue.icon=row[index].trim()
+                break;
+                case 'definition' : 
+                    traitValue.description=row[index].trim()
+                break;
+
+                } 
+            }
+        if(validateTrait(traitValue.trait,traitValue.value)){
+             if(!traitValue.hasErrors() && !traitValue.save()) {
+             traitValue.errors.allErrors.each { log.error it }
+            }
+        }
+            row = reader.readNext();
+        }
 }
+
+    private Boolean  validateTrait(String trait,def value){
+        def traitObj=Trait.findById(trait);
+        def rValue
+        traitObj.traitTypes.each{
+        switch(it) {
+            case "SINGLE_CATEGORICAL":
+                def f = traitObj.values.tokenize("|");
+                rValue=f.contains(value);
+            break;
+            case "MULTIPLE_CATEGORICAL":
+                def f = traitObj.values.tokenize("|");
+                rValue=f.contains(value);
+            break
+            case "BOOLEAN":
+                println "value"+value
+                def f = traitObj.values.tokenize("|");
+                rValue=f.contains(value);
+/*                if(value.toLowerCase()=='true' || value.toLowerCase()=='false'){
+                    rValue=true
+                }
+                else{
+                    rValue=false
+                }*/
+            break
+            case "RANGE":
+                def f = traitObj.values.tokenize("|");
+                rValue=f.contains(value);
+               /* def f = traitObj.values.tokenize("|");
+                if(value.indexOf('>')>=0 || value.indexOf('<')>=0){
+                    rValue=true
+                }
+                else{
+                    rValue=false
+                }*/
+            break
+            case "DATE":
+                def f = traitObj.values.tokenize("|");
+                rValue=f.contains(value);
+              /*return UtilsService.parseDate(value) != null*/
+            break
+        }
+        }
+        println "rValue="+rValue
+        return rValue
+    }
+        void loadTraitFacts(String file, def languageInstance) {
+
+        CSVReader reader = getCSVReader(new File(file))
+        String[] headers = reader.readNext();//headers
+        File spreadSheet = new File(file)
+        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
+            def attribution=m['attribution']
+            def contributor=SUser.findByEmail(m['contributor'].trim())
+            def licence=m['licence']
+            def taxonid=TaxonomyDefinition.findById(m['taxonid'].trim())
+            m.each{key,value->
+                TraitFacts traitFacts=new TraitFacts();
+                def trait=Trait.findByName(key.toLowerCase().trim())
+                println "key======>"+key
+                println "trait"+trait     
+                traitFacts.trait=trait
+                traitFacts.traitValue=value
+                traitFacts.taxon=taxonid
+                traitFacts.attribution=attribution
+                traitFacts.contributor=contributor
+                traitFacts.license=licence
+                if(traitFacts.trait && traitFacts.traitValue){
+                    if(!traitFacts.hasErrors() && !traitFacts.save()) {                        
+                        traitFacts.errors.allErrors.each { log.error it }
+                    }
+                }
+            
+        }
+            println "=========================================================================="
+        }
+}
+
+    def listTraits(def params){
+        println "params"+params
+        def sql =  Sql.newInstance(dataSource);
+        def query=sql.rows("select trait_taxonomy_definition_id from trait_taxonomy_definition where taxonomy_definition_id=:taxonId",[taxonId:params.taxon?.toInteger()]);
+        println "================="+query
+        def traitList = []
+         for (row in query) {
+               traitList.add(Trait.findById(row.getProperty("trait_taxonomy_definition_id")))
+            }
+       println "=================="+traitList.id
+        //def traitList=Trait.findAllByTaxonomyDefinition(TaxonomyDefinition.get(params.taxon?.toLong()))
+        //def traitList=TaxonomyDefinition.findById(params.taxon?.toLong())
+        //println "+++++++++++++++++"+traitList.traitTaxonomyDefinition
+
+        return traitList
+    }
+
+    def showTrait(def id){
+        def trait=Trait.findById(id)
+        def coverage=trait.taxonomyDefinition
+        def taxons=[:]
+        def field
+        taxons=TraitFacts.findAllByTrait(trait)
+        field=Field.findById(trait.fieldId)
+        println "field"+field.concept
+        println "taxons"+taxons.taxon.name
+        println "coverage"+coverage.name
+        return [trait:trait,coverage:coverage.name,species:taxons.taxon.name,field:field.concept]
+    }
+
+}
+
+
