@@ -491,7 +491,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
-    bannerFilePath = "${app.rootDir}/bannerMessage.txt"  
+    bannerFilePath = "${app.rootDir}/bannerMessage.txt" 
+    filterFilePath = "${app.rootDir}/filters.txt" 
 }
 
 speciesPortal.validCrossDomainOrigins = [

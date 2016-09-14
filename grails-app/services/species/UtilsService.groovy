@@ -87,6 +87,7 @@ class UtilsService {
     static final String[] DATE_PATTERNS = ['dd/MM/yyyy', 'MM/dd/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
 
     private Map bannerMessageMap;
+    private Map filterMap;
 
     public void cleanUpGorm() {
         cleanUpGorm(true)
@@ -1191,6 +1192,32 @@ class UtilsService {
             }
         }
         return rvalue;*/
+    }
+
+
+    Map getFilters() {  
+        return filterMap;
+    }
+
+    void loadFilterMap() {  
+        log.debug "Loading bannerMessageMap from ${grailsApplication.config.speciesPortal.filterFilePath}"
+        File filterFile = new File(grailsApplication.config.speciesPortal.filterFilePath);        
+        filterMap = [:];
+        if(filterFile.exists()) {
+            filterFile.eachLine { line ->
+                println line;
+                def (level,filter) = line.tokenize('-');
+                level = level?.replaceAll("<(.|\n)*?>", '').trim();
+                filter = (filter?.replaceAll("</?p>", ''))?.trim();
+                if(level && filter) {
+                    if(filterMap[level]){
+                        filterMap[level].push(filter);   
+                    }else{
+                         filterMap[level]=[filter]
+                    }
+                }
+            }
+        }
     }
 
     def evictInCache(String cacheName, String cacheKey) {

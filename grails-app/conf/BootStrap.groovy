@@ -55,7 +55,8 @@ class BootStrap {
         initJSONMarshallers();
         initCaches();
         initBannerMessageMap();
-        speciesTraitsService.init();
+        initFiltersMap();
+        //speciesTraitsService.init();
        
   	}
 
@@ -210,6 +211,10 @@ class BootStrap {
 
 	def initBannerMessageMap() {
 		utilsService.loadBannerMessageMap();
+	}
+
+	def initFiltersMap(){
+		utilsService.loadFilterMap();
 	}
 	/**
 	 * 
