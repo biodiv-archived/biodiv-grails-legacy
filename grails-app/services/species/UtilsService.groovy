@@ -1194,6 +1194,12 @@ class UtilsService {
         return rvalue;*/
     }
 
+    def getModuleFilters(mod){        
+        if(mod && filterMap.size() >0){
+            return filterMap[mod];
+        }
+        return [];
+    }
 
     Map getFilters() {  
         return filterMap;

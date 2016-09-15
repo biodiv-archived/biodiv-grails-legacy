@@ -2,7 +2,6 @@
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
-
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -18,6 +17,8 @@ $(document).ready(function(){
 });
 
 </script>
+<g:each in="${filters}" var="filter" >
+<g:if test="${filter == 'species_group'}">
 <div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
@@ -32,9 +33,9 @@ $(document).ready(function(){
 		id="${"group_" + othersGroup.id}" value="${othersGroup.id}"
 		title="${othersGroup.name}"></button>
 </div>
+</g:if>
 
-
-<g:if test="${(params.controller != 'species') && !hideHabitatFilter}">
+<g:if test="${filter == 'habitat'}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
@@ -53,7 +54,7 @@ $(document).ready(function(){
 			rel="tooltip"></button>
 	</div>
 </g:if>
-
+</g:each>
 <g:if test="${forObservations}">
 <%--	<div id="observationAllChecklistFilter" class="btn-group"--%>
 <%--		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">--%>
