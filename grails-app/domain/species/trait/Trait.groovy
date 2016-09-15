@@ -6,103 +6,84 @@ import species.UtilsService;
 
 class Trait {
 
-    public enum TraitTypes {
-        SINGLE_CATEGORICAL,
-        MULTIPLE_CATEGORICAL,
-        BOOLEAN,
-        RANGE,
-        DATE
 
-        /*       static boolean validate(Trait trait, def value) {
-                 if(!value) return false;
-                 try {
-                 switch(this) {
-                 case SINGLE_CATEGORICAL : //TODO:CHK in trait values table. value should be one of the value
-                 break;
-                 case MULTIPLE_CATEGORICAL : //TODO:CHK in trait values table. value should be one of the value
-                 break;
-                 case CATEGORICAL_ORDERED : Integer.parseInt(value) 
-                 break;
-                 case NUMERIC_SINGLE_DECIMAL : Double.parseDouble(value) 
-                 break;
-                 case NUMERIC_SINGLE_INTEGER : Double.parseDouble(value) 
-                 break;
-                 case NUMERIC_RANGE_DECIMAL : 
-                 break;
-                 case NUMERIC_RANGE_INTEGER : 
-                 break;
-                 case BOOLEAN : Boolean.parseBoolean(value)
-                 break;
-                 case DATE :
-                 break;
-                 case DATE_RANGE : return value.indexOf('-') != -1
-                 break;
-            //case DATE : return UtilsService.parseDate(value) != null
-            //break;
-                 }
-                 } catch(Exception e) {
-                 return false;
-                 }
-                 return true;
-        }
-         */
-        static TraitTypes getEnum(value){
-            if(!value) return null;
+        public enum TraitTypes implements org.springframework.context.MessageSourceResolvable{
+            SINGLE_CATEGORICAL("Single Categorical"),
+            MULTIPLE_CATEGORICAL("Multiple Categorical"),
+            BOOLEAN("Boolean"),
+            RANGE("Range"),
+            DATE("Date"),
 
-            if(value instanceof TraitTypes)
-                return value
+            private String value;
 
-                value = value.toUpperCase().trim()
-                switch(value){
-                    case 'SINGLE_CATEGORICAL':
-                    return TraitTypes.SINGLE_CATEGORICAL
-                    case 'MULTIPLE_CATEGORICAL':
-                    return TraitTypes.MULTIPLE_CATEGORICAL
-                    case 'BOOLEAN':
-                    return TraitTypes.BOOLEAN
-                    case 'DATE':
-                    return TraitTypes.DATE
-                    case 'RANGE':
-                    return TraitTypes.RANGE
-                    default:
-                    return null;	
+
+            TraitTypes(String value) {
+                this.value = value;
+            }
+
+            public String value() {
+                return this.value;
                 }
+
+            static def toList() {
+                return [
+                    SINGLE_CATEGORICAL,
+                    MULTIPLE_CATEGORICAL,
+                    BOOLEAN,
+                    RANGE,
+                    DATE
+                ]
+            }
+
+            Object[] getArguments() { [] as Object[] }
+
+            String[] getCodes() {
+            ["${getClass().name}.${name()}"] as String[]
+            }   
+
+            String getDefaultMessage() { value() }
         }
-    }
 
-    public enum DataTypes {
-        STRING,
-        DATE,
-        NUMERIC,
-        BOOLEAN
-
-        static DataTypes getEnum(value){
-            if(!value) return null;
-
-            if(value instanceof DataTypes)
-                return value
-
-                value = value.toUpperCase().trim()
-                switch(value){
-                    case 'STRING':
-                    return DataTypes.STRING
-                    case 'DATE':
-                    return DataTypes.DATE
-                    case 'BOOLEAN':
-                    return DataTypes.BOOLEAN
-                    case 'NUMERIC':
-                    return DataTypes.NUMERIC
-                    default:
-                    return null; 
-                }
-        }
-    }
-
-    public enum Units implements org.springframework.context.MessageSourceResolvable{
-        CM("cm"),
-        M3("m³"),
+        public enum DataTypes implements org.springframework.context.MessageSourceResolvable{
+            STRING("String"),
+            DATE("Date"),
+            NUMERIC("Numeric"),
+            BOOLEAN("Boolean"),
 
         private String value;
+
+        DataTypes(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return this.value;
+        }
+
+        static def toList() {
+            return [
+                STRING,
+                DATE,
+                NUMERIC,
+                BOOLEAN
+            ]
+        }
+
+        Object[] getArguments() { [] as Object[] }
+
+        String[] getCodes() {
+            ["${getClass().name}.${name()}"] as String[]
+        }
+
+        String getDefaultMessage() { value() }
+    }
+
+        public enum Units implements org.springframework.context.MessageSourceResolvable{
+            CM("cm"),
+            M3("m³"),
+
+        private String value;
+
 
         Units(String value) {
             this.value = value;
@@ -114,8 +95,8 @@ class Trait {
 
         static def toList() {
             return [
-            CM,
-            M3
+                CM,
+                M3,
             ]
         }
 
@@ -127,6 +108,7 @@ class Trait {
         }   
         String getDefaultMessage() { value() }
     }
+
 
     Units units;
     TraitTypes traitTypes;
@@ -160,13 +142,34 @@ class Trait {
         description type:"text"
     }
 
-    static Units fetchUnits (def units) {
-        if(!units) return null;
-        for(Units unit : Units) {
-            if(unit.value().equals(units)) {
-                return unit
+    static TraitTypes fetchTraitTypes(String traitTypes){
+        if(!traitTypes) return null;
+        for(TraitTypes type : TraitTypes) {
+            if(type.name().equals(traitTypes)) {
+                return type;
             }
         }
         return null;
     }
+
+    static DataTypes fetchDataTypes(String dataTypes){
+        if(!dataTypes) return null;
+        for(DataTypes type : DataTypes) {
+            if(type.name().equals(dataTypes)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    static Units fetchUnits(String units){
+        if(!units) return null;
+        for(Units type : Units) {
+            if(type.name().equals(units)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
 }
