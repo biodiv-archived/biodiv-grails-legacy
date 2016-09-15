@@ -120,6 +120,7 @@ class ObservationController extends AbstractObjectController {
                         .getEntries();
 */
         model.userLanguage = utilsService.getCurrentLanguage(request);
+        model.filters = utilsService.getModuleFilters('observation');
         model.queryParams.view = (params?.view && params?.view=='grid')?'grid':'list';
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.recoVotes = observationService.getRecommendationVotes(model.observationInstanceList, 3, 0);
