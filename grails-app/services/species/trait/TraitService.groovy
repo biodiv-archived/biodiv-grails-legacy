@@ -22,6 +22,7 @@ import species.trait.Trait.Units;
 import species.formatReader.SpreadsheetReader;
 import groovy.sql.Sql
 import species.Language;
+import species.License;
 
 
 class TraitService {
@@ -251,10 +252,11 @@ class TraitService {
         String[] row = reader.readNext();
         while(row) {
             TraitValue traitValue = new TraitValue();
+            Trait trait
             headers.eachWithIndex { header, index ->
                 switch(header.toLowerCase()) {
                     case 'trait' : 
-                    def trait = Trait.findByName(row[index].trim())
+                    trait = Trait.findByName(row[index].trim().toLowerCase())
                     traitValue.trait = trait?.id
                     break;
                     case 'value' :
@@ -272,7 +274,7 @@ class TraitService {
 
                 } 
             }
-            if(validateTrait(traitValue.trait,traitValue.value)){
+            if(validateTrait(trait,traitValue.value)){
                 if(!traitValue.hasErrors() && !traitValue.save()) {
                     traitValue.errors.allErrors.each { log.error it }
                 }
@@ -281,22 +283,22 @@ class TraitService {
         }
     }
 
-    private boolean validateTrait(String trait, def value){
-        Trait traitObj = Trait.findById(trait);
+    private boolean validateTrait(Trait trait, String value){
+       // Trait traitObj = Trait.findById(trait);
         def rValue
-        traitObj.traitTypes.each{
+        trait.traitTypes.each{
             switch(it) {
                 case "SINGLE_CATEGORICAL":
-                def f = traitObj.values.tokenize("|");
+                def f = trait.values.tokenize("|");
                 rValue=f.contains(value);
                 break;
                 case "MULTIPLE_CATEGORICAL":
-                def f = traitObj.values.tokenize("|");
+                def f = trait.values.tokenize("|");
                 rValue=f.contains(value);
                 break;
                 case "BOOLEAN":
                 println "value"+value
-                def f = traitObj.values.tokenize("|");
+                def f = trait.values.tokenize("|");
                 rValue=f.contains(value);
                 /*                if(value.toLowerCase()=='true' || value.toLowerCase()=='false'){
                                   rValue=true
@@ -306,7 +308,7 @@ class TraitService {
                 }*/
                 break;
                 case "RANGE":
-                def f = traitObj.values.tokenize("|");
+                def f = trait.values.tokenize("|");
                 rValue=f.contains(value);
                 /* def f = traitObj.values.tokenize("|");
                 if(value.indexOf('>')>=0 || value.indexOf('<')>=0){
@@ -317,7 +319,7 @@ class TraitService {
                 }*/
                 break;
                 case "DATE":
-                def f = traitObj.values.tokenize("|");
+                def f = trait.values.tokenize("|");
                 rValue=f.contains(value);
                 /*return UtilsService.parseDate(value) != null*/
                 break;
@@ -334,7 +336,8 @@ class TraitService {
         SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
             def attribution = m['attribution']
             SUser contributor = SUser.findByEmail(m['contributor'].trim())
-            def licence = m['licence']
+            def license =License.findByName(License.fetchLicenseType(("cc " + m['licence']).toUpperCase()))
+                         
             TaxonomyDefinition taxon = TaxonomyDefinition.findById(m['taxonid'].trim())
             m.each{key,value->
                 Fact fact = new Fact();
@@ -346,7 +349,7 @@ class TraitService {
                 fact.taxon = taxon
                 fact.attribution = attribution
                 fact.contributor = contributor
-                fact.license = licence
+                fact.license = license
                 if(fact.trait && fact.traitValue){
                     if(!fact.hasErrors() && !fact.save()) {                        
                         fact.errors.allErrors.each { log.error it }
