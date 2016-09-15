@@ -257,7 +257,7 @@ class TraitService {
                 switch(header.toLowerCase()) {
                     case 'trait' : 
                     trait = Trait.findByName(row[index].trim().toLowerCase())
-                    traitValue.trait = trait?.id
+                    traitValue.trait= trait
                     break;
                     case 'value' :
                     traitValue.value=row[index].trim();
@@ -337,7 +337,7 @@ class TraitService {
             def attribution = m['attribution']
             SUser contributor = SUser.findByEmail(m['contributor'].trim())
             def license =License.findByName(License.fetchLicenseType(("cc " + m['licence']).toUpperCase()))
-                         
+
             TaxonomyDefinition taxon = TaxonomyDefinition.findById(m['taxonid'].trim())
             m.each{key,value->
                 Fact fact = new Fact();

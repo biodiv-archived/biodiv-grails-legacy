@@ -6,7 +6,7 @@ import species.UtilsService;
 
 class TraitValue {
 
-    String trait;
+    Trait trait;
     String value;
     String description;
     String icon;
