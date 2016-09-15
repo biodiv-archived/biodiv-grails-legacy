@@ -1782,100 +1782,38 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def test() {
-            def hibSession = sessionFactory?.getCurrentSession();
-            String taxonId=221859;
-            //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
-//            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
-            try {
+        def hibSession = sessionFactory?.getCurrentSession();
+        String taxonId=221859;
+        //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
+        //            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
+        try {
             def hqlQuery = sessionFactory.currentSession.createQuery("select count(*) as count from Species s  join s.taxonConcept.hierarchies as reg  where s.id is not null  and reg.classification="+265799+" and (reg.path like '%!_123350!_%'  escape '!' or reg.path like '123350!_%'  escape '!' or reg.path like '%!_123350' escape '!') and reg.taxonDefinition.rank = 9");
             println "PppppppppppppppppppppppppppppppP"
-        def speciesInstanceList = hqlQuery.list();
+            def speciesInstanceList = hqlQuery.list();
             render speciesInstanceList;
-            } catch(e) {
-                e.printStackTrace();
-            }
+        } catch(e) {
+            e.printStackTrace();
+        }
 
         println "=====================++++"
     }
-  
-    @Secured(['ROLE_ADMIN'])
-    def uploadFacts () {
 
-    }
-
-    @Secured(['ROLE_ADMIN'])
-    def saveFacts() {
-        params.locale_language = utilsService.getCurrentLanguage(request);
-        def result = speciesTraitsService.saveFacts(params)
-        if(result.success){
-            withFormat {
-                html {
-                    redirect(controller:'species', action: "facts")
-                }
-                json {
-                    render result as JSON 
-                }
-                xml {
-                    render result as XML
-                }
-            }
-
-        } else {
-            withFormat {
-                html {
-                    //flash.message = "${message(code: 'error')}";
-                    render(controller:'species', view: "uploadFacts", model: [])
-                }
-                json {
-                    result.remove('instance');
-                    render result as JSON 
-                }
-                xml {
-                    result.remove('instance');
-                    render result as XML
-                }
-            }
-        }
-
-    }
-
-    def facts() {
-        if(params.id) {
-            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(params.id.toLong(), params.trait, params.traitValue), 'traitsList':speciesTraitsService.listTraits()]);
-        } else {
-            render (view:'facts', model:['factsList' : speciesTraitsService.listFacts(null, params.trait, params.traitValue), 'traitsList':speciesTraitsService.listTraits()]);
-        }
-
-    }
-
-    def testTraitDefinition(){
-        Language languageInstance = utilsService.getCurrentLanguage(request);
-        speciesTraitsService.loadTraitDefinitions('/home/ifp/git/biodiv/app-conf/parent.tsv',languageInstance);
-    }
-    def testTraitValue(){
-        Language languageInstance = utilsService.getCurrentLanguage(request);
-        speciesTraitsService.loadTraitValues('/home/ifp/git/biodiv/app-conf/traitvalue.tsv',languageInstance);
-    }
-        def testTraitFacts(){
-        Language languageInstance = utilsService.getCurrentLanguage(request);
-        speciesTraitsService.loadTraitFacts('/home/ifp/git/biodiv/app-conf/traitfacts.xlsx',languageInstance);
-    }
-    def speciesContributor(){
+    def speciesContributor() {
 
         //println "========================= species contributor"
-         params.max = params.limit ? params.int('limit') : 10
+        params.max = params.limit ? params.int('limit') : 10
         params.offset = params.offset ? params.long('offset'): 0
         def userId=params.int('filterPropertyValue');
         def userInstance = SUser.get(params.id?:params.filterPropertyValue)
-       // println "========================= species contributor"+userInstance
-                if (userInstance) {
+        // println "========================= species contributor"+userInstance
+        if (userInstance) {
             def userGroupInstance
             if(params.webaddress) {
                 userGroupInstance = userGroupService.get(params['webaddress'])
             }
             def userContributionList
             userContributionList=speciesService.getuserContributionList(userId,params.max,params.offset)
-           //println "=======+++++++userContributionList"+userContributionList
+            //println "=======+++++++userContributionList"+userContributionList
             def species=userContributionList.collect{it}
             def result=[];
             species.each{
@@ -1885,29 +1823,19 @@ class SpeciesController extends AbstractObjectController {
             def contributedSpe=['species':result,count:contributionCount]
             def model = utilsService.getSuccessModel("", null, OK.value(), contributedSpe)
             //println "=============contributionCount==========="+model
-             withFormat {
+            withFormat {
                 json { render model as JSON }
                 xml { render model as XML }
             }
 
-            }
-            else {
+        }
+        else {
             def model = utilsService.getErrorModel(g.message(code: 'error', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value())
             withFormat {
                 json { render model as JSON }
                 xml { render model as XML }
             }
+        }
     }
-}
 
-def traitList(){
-    //speciesTraitsService.saveFacts(params)
-    render (view:'traitList', model:['traitList' : speciesTraitsService.listTraits(params)]);
-    
-    
-}
-def showTrait(){
-    println "params"+params.id
-    render(view:'showTraits', model:speciesTraitsService.showTrait(params.id))
-}
 }

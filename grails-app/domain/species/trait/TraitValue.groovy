@@ -1,4 +1,4 @@
-package species.traits;
+package species.trait;
 
 import species.TaxonomyDefinition;
 import species.Field;

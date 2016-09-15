@@ -73,7 +73,8 @@ class ObservationController extends AbstractObjectController {
     def speciesPermissionService;
 
     def sessionFactory;
-def grailsCacheManager;
+    def grailsCacheManager;
+
 	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
