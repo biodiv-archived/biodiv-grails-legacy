@@ -150,7 +150,7 @@ class TraitService {
     }
 
     void loadTraitDefinitions(String file, Language languageInstance) {
-
+        println "loadTraitDefinitions"
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
@@ -171,15 +171,17 @@ class TraitService {
                     break;
 
                     case 'datatype' : 
-                    trait.dataTypes=row[index].trim()
+                    //trait.dataTypes=row[index].trim()
+                    trait.dataTypes=Trait.fetchDataTypes(row[index].trim())
                     break;
 
                     case 'traittype' : 
-                    trait.traitTypes=row[index].trim()
+                    //trait.traitTypes=row[index].trim()
+                    trait.traitTypes=Trait.fetchTraitTypes(row[index].trim())
                     break;
 
                     case 'units' : 
-                    trait.units=row[index].trim()
+                    trait.units=Trait.fetchUnits(row[index].trim())
                     break;
 
                     case 'source' : 
