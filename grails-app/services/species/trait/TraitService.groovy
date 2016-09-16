@@ -151,11 +151,10 @@ class TraitService {
     }
 
     void loadTraitDefinitions(String file, Language languageInstance) {
-        println "loadTraitDefinitions"
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
-        println "loadTraitDefinitions====================="+headers
+        Trait traitInstance
         while(row) {
             Trait trait = new Trait();
             headers.eachWithIndex { header, index ->
@@ -163,53 +162,64 @@ class TraitService {
                 switch(header.toLowerCase()) {
 
                     case 'trait' :
-                    println "row index"+row[index]
-                    trait.name=row[index].toLowerCase().trim();
+                    trait.name = row[index].toLowerCase().trim();
+                    traitInstance = Trait.findByName(trait.name)
                     break;
 
                     case 'values' : 
-                    trait.values=row[index].trim()
+                    if(!traitInstance){trait.values = row[index].trim()}
+                    else{traitInstance.values = row[index].trim()}
                     break;
 
                     case 'datatype' : 
-                    //trait.dataTypes=row[index].trim()
-                    trait.dataTypes=Trait.fetchDataTypes(row[index].trim())
+                    if(!traitInstance){trait.dataTypes = Trait.fetchDataTypes(row[index].trim())}
+                    else{traitInstance.dataTypes = Trait.fetchDataTypes(row[index].trim())}
                     break;
 
-                    case 'traittype' : 
-                    //trait.traitTypes=row[index].trim()
-                    trait.traitTypes=Trait.fetchTraitTypes(row[index].trim())
+                    case 'traittype' :
+                    if(!traitInstance){trait.traitTypes = Trait.fetchTraitTypes(row[index].trim())}
+                    else{traitInstance.traitTypes = Trait.fetchTraitTypes(row[index].trim())}
                     break;
 
                     case 'units' : 
-                    trait.units=Trait.fetchUnits(row[index].trim())
+                    if(!traitInstance){trait.units = Trait.fetchUnits(row[index].trim())}
+                    else{traitInstance.units = Trait.fetchUnits(row[index].trim())}
                     break;
 
                     case 'source' : 
-                    trait.source=row[index].trim()
+                    if(!traitInstance){trait.source = row[index].trim()}
+                    else{traitInstance.source = row[index].trim()}
                     break;
 
                     case 'icon' : 
-                    trait.icon=row[index].trim()
+                    if(!traitInstance){trait.icon = row[index].trim()}
+                    else{traitInstance.icon = row[index].trim()}
                     break;
 
                     case 'taxonid':
                     //TODO: if taxon id is wrong catch exception/trow exception
-                    row[index].tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))};
+                    if(!traitInstance){row[index].tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}}
+                    else{row[index].tokenize(",").each {traitInstance.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}}
                     break;
 
                     case 'definition':
-                    trait.description=row[index].trim()
+                    if(!traitInstance){trait.description = row[index].trim()}
+                    else{traitInstance.description = row[index].trim()}
                     break;
 
                     case 'field':
-                    trait.field = getField(row[index], languageInstance); 
+                    if(!traitInstance){trait.field = getField(row[index], languageInstance);}
+                    else{traitInstance.field = getField(row[index], languageInstance);}
                     break;
 
                 } 
             }
-            if(!trait.hasErrors() && !trait.save()) {
+            //println traitInstance.values
+            if(!trait.hasErrors() && !trait.save() && !traitInstance) {
                 trait.errors.allErrors.each { log.error it }
+            }
+            else if(!traitInstance?.save(flush:true)){
+                traitInstance.errors.allErrors.each { log.error it }
             }
 
             row = reader.readNext();
@@ -236,14 +246,7 @@ class TraitService {
         }
     }
 
-    /*private List<ValueConstraint> getValueContraints(String valueConstraitsList) {
-      List t = [];
-      valueContraints.split(',').each {
-      def x = ValueConstraint.getEnum(it.trim())
-      if(x) t << x;
-      }
-      return t;
-      }*/
+
 
     void loadTraitValues(String file, Language languageInstance) {
 
