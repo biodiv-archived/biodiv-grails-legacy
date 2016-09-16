@@ -162,8 +162,9 @@ class TraitService {
                 switch(header.toLowerCase()) {
 
                     case 'trait' :
-                    trait.name = row[index].toLowerCase().trim();
-                    traitInstance = Trait.findByName(trait.name)
+                    traitInstance = Trait.findByName(row[index].toLowerCase().trim())
+                    if(!traitInstance){trait.name = row[index].toLowerCase().trim();}
+                    else{traitInstance.name = row[index].toLowerCase().trim();}
                     break;
 
                     case 'values' : 
@@ -215,12 +216,14 @@ class TraitService {
                 } 
             }
             //println traitInstance.values
-            if(!trait.hasErrors() && !trait.save() && !traitInstance) {
+            if(!trait.hasErrors() && !trait.save(flush:true) && !traitInstance) {
                 trait.errors.allErrors.each { log.error it }
             }
-            else if(!traitInstance?.save(flush:true)){
+            else if(traitInstance) {
+            if(!traitInstance?.save(flush:true)){
                 traitInstance.errors.allErrors.each { log.error it }
             }
+        }
 
             row = reader.readNext();
         }
