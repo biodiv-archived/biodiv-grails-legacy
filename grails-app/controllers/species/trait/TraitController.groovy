@@ -7,9 +7,11 @@ import species.Language;
 import species.AbstractObjectController;
 import grails.plugin.springsecurity.annotation.Secured
 
+
 class TraitController extends AbstractObjectController {
 
     def traitService;
+    
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -93,5 +95,4 @@ class TraitController extends AbstractObjectController {
         Language languageInstance = utilsService.getCurrentLanguage(request);
         traitService.loadFacts("${grailsApplication.config.speciesPortal.app.rootDir}/traitfacts.xlsx", languageInstance);
     }
-
 }

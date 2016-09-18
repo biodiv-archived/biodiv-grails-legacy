@@ -13,7 +13,7 @@ class TraitValue {
     String source;
 
     static constraints = {
-        trait nullable:false, blank:false, unique:true
+        trait nullable:false, blank:false
         value nullable:false, unique:true 
 		description nullable:true
         icon nullable:true

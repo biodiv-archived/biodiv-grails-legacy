@@ -1213,7 +1213,7 @@ class UtilsService {
             filterFile.eachLine { line ->
                 println line;
                 def (level,filter) = line.tokenize('-');
-                level = level?.replaceAll("<(.|\n)*?>", '').trim();
+                level = level?.replaceAll("<(.|\n)*?>", '')?.trim();
                 filter = (filter?.replaceAll("</?p>", ''))?.trim();
                 if(level && filter) {
                     if(filterMap[level]){

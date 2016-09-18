@@ -73,7 +73,7 @@ class SpeciesController extends AbstractObjectController {
 		params.controller="species"
 		params.action="list"
         model.userLanguage = utilsService.getCurrentLanguage(request);
-        model.filters = utilsService.getModuleFilters('species');
+        model.filters = traitService.getAllFilter(utilsService.getModuleFilters('species'));
         model.queryParams.remove('ranks');
         model.queryParams.remove('statuses');
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {

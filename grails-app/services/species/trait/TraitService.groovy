@@ -215,7 +215,6 @@ class TraitService {
 
                 } 
             }
-            //println traitInstance.values
             if(!trait.hasErrors() && !trait.save(flush:true) && !traitInstance) {
                 trait.errors.allErrors.each { log.error it }
             }
@@ -394,6 +393,18 @@ class TraitService {
         println "taxons"+taxons.taxon.name
         println "coverage"+coverage.name
         return [trait:trait, coverage:coverage.name, species:taxons.taxon.name, field:field.concept];
+    }
+
+    def getAllFilter(filters){
+        def trait,traitValue,traitFilter=[:];
+        filters.each{ f -> 
+            trait = Trait.findByName(f);
+            if(trait){
+                traitValue = TraitValue.findAllByTrait(trait);
+                traitFilter[""+trait.name]=traitValue          
+            }
+        }
+        return traitFilter
     }
 
 }

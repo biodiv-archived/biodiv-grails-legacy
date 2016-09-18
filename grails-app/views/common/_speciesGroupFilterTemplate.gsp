@@ -13,12 +13,24 @@ $(document).ready(function(){
 	$("#habitatFilter").button();
 	$('#habitatFilter button[value="${params.habitat}"]').addClass('active');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
-		
+
 });
 
 </script>
+
+
 <g:each in="${filters}" var="filter" >
-<g:if test="${filter == 'species_group'}">
+<div class="traitFilter" data-name="${filter.key.replace(' ','_').toLowerCase()}" data-toggle="buttons-radio">
+<label></label>
+	<span>
+	<g:each in="${filter.value}" var="tv" >
+		<button value='${tv.id}'>${tv.value}</button>
+	</g:each>
+	</span>
+</div>
+</g:each>
+
+
 <div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
@@ -33,8 +45,6 @@ $(document).ready(function(){
 		id="${"group_" + othersGroup.id}" value="${othersGroup.id}"
 		title="${othersGroup.name}"></button>
 </div>
-</g:if>
-
 <g:if test="${filter == 'habitat'}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
@@ -54,7 +64,6 @@ $(document).ready(function(){
 			rel="tooltip"></button>
 	</div>
 </g:if>
-</g:each>
 <g:if test="${forObservations}">
 <%--	<div id="observationAllChecklistFilter" class="btn-group"--%>
 <%--		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">--%>

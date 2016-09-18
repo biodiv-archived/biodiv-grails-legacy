@@ -9,7 +9,7 @@ import species.License;
 class Fact {
 
     Trait trait;
-    String traitValue;
+    TraitValue traitValue;
     String attribution;
     SUser contributor;
     License license;

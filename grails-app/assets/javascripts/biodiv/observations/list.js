@@ -243,7 +243,18 @@ $(document).ready(function(){
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
     });
-        $('#speciesIdentifiedGroupFilter button').click(function(){
+
+    $('.traitFilter button').click(function(){
+        if($(this).hasClass('active')){
+            return false;
+        }
+        $(this).parent().find('button.active').removeClass('active').attr('disabled':false);
+        $(this).addClass('active').attr('disabled',true);
+
+        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+        return false;
+    });
+    $('#speciesIdentifiedGroupFilter button').click(function(){
         if($(this).hasClass('active')){
             return false;
         }
@@ -718,6 +729,17 @@ function getSelectedHabitat() {
     return hbt;	
 } 
 
+function getSelectedTrait() {
+    var hbt = '',trait='',selTrait={}; 
+    $('.traitFilter button').each(function(){
+        if($(this).hasClass('active')) {
+            trait = $(this).parent().parent().attr('data-name');
+            selTrait[trait] = $(this).val();
+        }
+    });
+    return selTrait;
+}
+
 function selectTickUserGroupsSignature(parentGroupId) {
     $(".userGroups button").click(function(e){
         var ug = this;
@@ -932,6 +954,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['habitat'] = habitat;
     }
 
+    var trait = getSelectedTrait();
+    for(var key in trait) { 
+        params['trait.'+key]=trait[key];
+    }
+    
 
     var tag = getSelectedTag();
     if(tag){
