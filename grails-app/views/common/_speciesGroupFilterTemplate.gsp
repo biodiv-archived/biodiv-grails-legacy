@@ -14,6 +14,14 @@ $(document).ready(function(){
 	$('#habitatFilter button[value="${params.habitat}"]').addClass('active');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 
+	$(".traitFilter").button();
+	var traits = ${(params.trait)?params.trait?.collect{ it.value}:null;}
+	$.each(traits,function(k,v){
+		alert(k+" "+v);
+		$('.traitFilter button[value="${v}"]').addClass('active').attr('disabled',true);
+	})	
+	
+	
 });
 
 </script>
@@ -30,7 +38,7 @@ $(document).ready(function(){
 </div>
 </g:each>
 
-
+<g:if test="${filter == 'species_group'}">
 <div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
@@ -45,6 +53,7 @@ $(document).ready(function(){
 		id="${"group_" + othersGroup.id}" value="${othersGroup.id}"
 		title="${othersGroup.name}"></button>
 </div>
+</g:if>
 <g:if test="${filter == 'habitat'}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>

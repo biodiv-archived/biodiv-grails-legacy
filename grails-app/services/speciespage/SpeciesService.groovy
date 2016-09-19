@@ -1698,6 +1698,23 @@ class SpeciesService extends AbstractObjectService  {
             queryParams['groupId']  = groupIds[0]
         }
 
+        if(params?.trait){
+            def traitValues = params?.trait?.collect{ it.value}.join(", ")           
+            speciesCountQuery += ",Fact f";
+            speciesStatusCountQuery += ",Fact f";
+            if(params.startsWith == "A-Z") {
+                query += ", Fact f ";
+                countQuery += ", Fact f";
+                countFilterQuery += "and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
+                filterQuery = "where f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
+
+            } else {
+                query += ",Fact f ";
+                filterQuery += " and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
+                countQuery += " ,Fact f ";
+                countFilterQuery += " and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
+            }
+        }
         if(params.featureBy == "true" ) {
             params.userGroup = utilsService.getUserGroup(params)
             // def featureQuery = ", Featured feat "

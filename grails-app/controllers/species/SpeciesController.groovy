@@ -57,6 +57,7 @@ class SpeciesController extends AbstractObjectController {
     def namelistService;
     def sessionFactory;
     def speciesTraitsService;
+    def traitService;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
