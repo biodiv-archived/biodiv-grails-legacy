@@ -304,8 +304,8 @@ class TraitService {
 
     Map loadTraitValues(String file, Language languageInstance) {
         int noOfValuesLoaded=0;
-        String<List> logMsgs=[];
-
+        List<String> logMsgs = [];
+        
         log.info "Loading trait values from ${file}";
         logMsgs << "Loading trait values from ${file}";
 
