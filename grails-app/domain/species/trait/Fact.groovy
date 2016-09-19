@@ -13,13 +13,15 @@ class Fact {
     String attribution;
     SUser contributor;
     License license;
-    TaxonomyDefinition taxon;
+    //TaxonomyDefinition taxon;
+    Long objectId;
 
     static constraints = {
-      traitValue nullable:true
-      attribution nullable:true
-      contributor nullable:true
-      license nullable:true
+      trait nullable:false, unique:['traitValue', 'objectId']
+      //attribution nullable:true
+      //contributor nullable:true
+      //license nullable:true
+      objectId nullable:false
     }
 
     static mapping = {

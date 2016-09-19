@@ -150,82 +150,136 @@ class TraitService {
         return parentTaxon.intersect(trait.taxon).size() > 0
     }
 
-    void loadTraitDefinitions(String file, Language languageInstance) {
+    Map loadTraitDefinitions(String file, Language languageInstance) {
+        int noOfTraitsLoaded = 0;
+        List<String> logMsgs = [];
+
+        log.info "Loading trait definitions from ${file}";
+        logMsgs << "Loading trait definitions from ${file}";
+
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
-        Trait traitInstance
-        while(row) {
-            Trait trait = new Trait();
-            headers.eachWithIndex { header, index ->
 
-                switch(header.toLowerCase()) {
-
-                    case 'trait' :
-                    traitInstance = Trait.findByName(row[index].toLowerCase().trim())
-                    if(!traitInstance){trait.name = row[index].toLowerCase().trim();}
-                    else{traitInstance.name = row[index].toLowerCase().trim();}
-                    break;
-
-                    case 'values' : 
-                    if(!traitInstance){trait.values = row[index].trim()}
-                    else{traitInstance.values = row[index].trim()}
-                    break;
-
-                    case 'datatype' : 
-                    if(!traitInstance){trait.dataTypes = Trait.fetchDataTypes(row[index].trim())}
-                    else{traitInstance.dataTypes = Trait.fetchDataTypes(row[index].trim())}
-                    break;
-
-                    case 'traittype' :
-                    if(!traitInstance){trait.traitTypes = Trait.fetchTraitTypes(row[index].trim())}
-                    else{traitInstance.traitTypes = Trait.fetchTraitTypes(row[index].trim())}
-                    break;
-
-                    case 'units' : 
-                    if(!traitInstance){trait.units = Trait.fetchUnits(row[index].trim())}
-                    else{traitInstance.units = Trait.fetchUnits(row[index].trim())}
-                    break;
-
-                    case 'source' : 
-                    if(!traitInstance){trait.source = row[index].trim()}
-                    else{traitInstance.source = row[index].trim()}
-                    break;
-
-                    case 'icon' : 
-                    if(!traitInstance){trait.icon = row[index].trim()}
-                    else{traitInstance.icon = row[index].trim()}
-                    break;
-
-                    case 'taxonid':
-                    //TODO: if taxon id is wrong catch exception/trow exception
-                    if(!traitInstance){row[index].tokenize(",").each {trait.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}}
-                    else{row[index].tokenize(",").each {traitInstance.addToTaxonomyDefinition(TaxonomyDefinition.read(Long.parseLong(it.trim())))}}
-                    break;
-
-                    case 'definition':
-                    if(!traitInstance){trait.description = row[index].trim()}
-                    else{traitInstance.description = row[index].trim()}
-                    break;
-
-                    case 'field':
-                    if(!traitInstance){trait.field = getField(row[index], languageInstance);}
-                    else{traitInstance.field = getField(row[index], languageInstance);}
-                    break;
-
-                } 
+        int traitNameHeaderIndex = -1;
+        int taxonIdHeaderIndex = -1;
+        for(int i=0; i<headers.size(); i++) {
+            if(headers[i].equalsIgnoreCase('trait')) {
+                traitNameHeaderIndex = i;
             }
-            if(!trait.hasErrors() && !trait.save(flush:true) && !traitInstance) {
-                trait.errors.allErrors.each { log.error it }
-            }
-            else if(traitInstance) {
-            if(!traitInstance?.save(flush:true)){
-                traitInstance.errors.allErrors.each { log.error it }
+            if(headers[i].equalsIgnoreCase('taxonid')) {
+                taxonIdHeaderIndex = i;
             }
         }
 
+        if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1) {
+            log.error "Trait name column and/or taxonId column is not defined";
+            logMsgs << "Trait name column and/or taxonId column is not defined";
+            return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':logMsgs];
+        }
+
+        while(row) {
+            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[taxonIdHeaderIndex] == null || row[taxonIdHeaderIndex] == '') {
+                log.error "Ignoring row ${row}";
+                logMsgs << "Ignoring row " + row;
+                continue;
+            }
+
+            List taxons_scope = [];
+            row[taxonIdHeaderIndex].tokenize(",").each { taxonId ->
+                try {
+                    TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(taxonId?.trim()));
+                    if(t) taxons_scope << t;
+                    else {
+                        log.error "Cannot find taxon ${taxonId}";
+                        logMsgs << "Cannot find taxon " + taxonId;
+                    }
+                } catch(e) {
+                    log.error "Error getting taxon from ${taxonId} : ${e.getMessage()}";
+                    logMsgs << "Error getting taxon from ${taxonId} : ${e.getMessage()}";
+                    e.printStackTrace();
+                }
+            }
+
+            taxons_scope.each { taxon_scope ->
+
+                Trait trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex], taxon_scope);
+                if(!trait) {
+                    log.debug "Creating new trait for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
+                    logMsgs << "Creating new trait for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
+                    trait = new Trait();
+                } else {
+                    log.debug "Updating trait ${trait} for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
+                    logMsgs << "Updating trait ${trait} for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
+                }
+
+                headers.eachWithIndex { header, index ->
+
+                    switch(header.toLowerCase()) {
+
+                        case 'trait' :
+                        //traitInstance = Trait.findByName(row[index].toLowerCase().trim())
+                        //if(!traitInstance){trait.name = row[index].toLowerCase().trim();}
+                        //else{i
+                        if(!trait.name) trait.name = row[index].trim();
+                        //}
+                        break;
+
+                        /*case 'values' : 
+                        if(!traitInstance){trait.values = row[index].trim()}
+                        else{traitInstance.values = row[index].trim()}
+                        break;
+                         */
+                        case 'datatype' : 
+                        trait.dataTypes = Trait.fetchDataTypes(row[index].trim());
+                        break;
+
+                        case 'traittype' :
+                        trait.traitTypes = Trait.fetchTraitTypes(row[index].trim());
+                        break;
+
+                        case 'units' : 
+                        trait.units = Trait.fetchUnits(row[index].trim());
+                        break;
+
+                        case 'source' : 
+                        trait.source = row[index].trim();
+                        break;
+
+                        case 'icon' : 
+                        trait.icon = row[index].trim();
+                        break;
+
+                        case 'taxonid':
+                        //TODO: if taxon id is wrong catch exception/trow exception
+                        trait.taxon = taxon_scope;
+                        break;
+
+                        case 'definition':
+                        trait.description = row[index].trim();
+                        break;
+
+                        case 'field':
+                        trait.field = getField(row[index], languageInstance);
+                        break;
+
+                    } 
+                }
+                if(!trait.hasErrors() && !trait.save(flush:true)) {
+                    log.error "Failed to save trait";
+                    logMsgs <<  "Failed to save trait";
+                    trait.errors.allErrors.each { 
+                        log.error it 
+                        logMsgs <<  it 
+                    }
+                } else {
+                    log.debug "Successfully inserted/updated trait ${trait.name} : ${trait.taxon}";
+                    noOfTraitsLoaded++;
+                }
+            }
             row = reader.readNext();
         }
+        return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':logMsgs];
     }
 
     private Field getField(String string, Language languageInstance) {
@@ -247,8 +301,6 @@ class TraitService {
             return x;
         }
     }
-
-
 
     void loadTraitValues(String file, Language languageInstance) {
 

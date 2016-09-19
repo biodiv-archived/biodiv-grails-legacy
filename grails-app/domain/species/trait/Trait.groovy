@@ -114,7 +114,7 @@ class Trait {
     TraitTypes traitTypes;
     DataTypes dataTypes;
     String name;
-    String values;
+    //String values;
     String source
     String icon;
     Field field;
@@ -122,15 +122,16 @@ class Trait {
     String description;
     Date createdOn = new Date();
     Date lastRevised = createdOn;
+    TaxonomyDefinition taxon;
 
-    static hasMany = [taxonomyDefinition: TaxonomyDefinition]
 
     static constraints = {
-        name nullable:false, blank:false, unique:true
-        values nullable:true,blank:true
+        name nullable:false, blank:false, unique:['taxon']
+        //values nullable:true,blank:true
         source nullable:true
         icon nullable:true
         field nullable:false
+        taxon nullable:false
         ontologyUrl nullable:true
         description nullable:true
         units nullable:true
