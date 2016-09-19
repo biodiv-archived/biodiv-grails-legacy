@@ -248,7 +248,7 @@ $(document).ready(function(){
         if($(this).hasClass('active')){
             return false;
         }
-        $(this).parent().find('button.active').removeClass('active').attr('disabled':false);
+        $(this).parent().find('button.active').removeClass('active').attr('disabled',false);
         $(this).addClass('active').attr('disabled',true);
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
