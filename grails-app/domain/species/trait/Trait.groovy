@@ -146,7 +146,7 @@ class Trait {
     static TraitTypes fetchTraitTypes(String traitTypes){
         if(!traitTypes) return null;
         for(TraitTypes type : TraitTypes) {
-            if(type.name().equals(traitTypes)) {
+            if(type.value().equalsIgnoreCase(traitTypes)) {
                 return type;
             }
         }
@@ -156,7 +156,7 @@ class Trait {
     static DataTypes fetchDataTypes(String dataTypes){
         if(!dataTypes) return null;
         for(DataTypes type : DataTypes) {
-            if(type.name().equals(dataTypes)) {
+            if(type.value().equalsIgnoreCase(dataTypes)) {
                 return type;
             }
         }
@@ -173,4 +173,27 @@ class Trait {
         return null;
     }
 
+    static Trait getValidTrait(String traitName, TaxonomyDefinition taxon) {
+        List<Trait> traits = Trait.findAllByName(traitName);
+        if(!traits) {
+            println "No trait with name ${traitName}";
+            return null;
+        }
+
+        List<Trait> validTraits = [];
+        List parentTaxon = taxon.fetchDefaultHierarchy();
+        
+        parentTaxon.each { t ->
+            traits.each { trait ->
+                if(trait.taxon.id == t)
+                    validTraits << trait;
+            }
+        }
+        if(validTraits) {
+            return validTraits;
+        } else {
+            println "No trait defined with name ${traitName} at taxonscope ${parentTaxon}";
+            return null;
+        }
+    }
 }
