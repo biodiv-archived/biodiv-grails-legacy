@@ -665,7 +665,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             conn.executeUpdate("update " + tmpNewBaseDataTable + " as g set recommendation_id = t1.recommendation_id, group_id=t2.group_id, habitat_id=:defaultHabitatId from "+tmpBaseDataTable_parsedNamess+" t1 join taxonomy_definition t2 on t1.taxonid is not null and t1.taxonid = t2.id where t1.key=g.key",  [defaultHabitatId:Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]) ;
 
             //handling taxonid null case
-            conn.executeUpdate("update " + tmpNewBaseDataTable +"  as g set recommendation_id = t1.recommendation_id, group_id=:defaultSpeciesGroupId,habitat_id=:defaultHabitatId from gbifdata_parsed_names  t1 where g.key=t1.key and t1.taxonid is null and t1.recommendation_id is not null and g.scientificname is not null",  ['defaultSpeciesGroupId':SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id, 'defaultHabitatId':Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]);
+            conn.executeUpdate("update " + tmpNewBaseDataTable +"  as g set recommendation_id = t1.recommendation_id, group_id=:defaultSpeciesGroupId,habitat_id=:defaultHabitatId from gbifdata_parsed_names  t1 where g.key=t1.key and t1.taxonid is null and t1.recommendation_id is not null and g.scientificname is not null",  ['defaultSpeciesGroupId':SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).id, 'defaultHabitatId':Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]);
 
             conn.executeUpdate("update " + tmpNewBaseDataTable + " set commonname_reco_id = t1.id from recommendation t1 where t1.name = vernacularname;") ;
         } finally {

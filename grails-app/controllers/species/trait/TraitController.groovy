@@ -81,20 +81,20 @@ class TraitController extends AbstractObjectController {
     @Secured(['ROLE_ADMIN'])
     def testTraitDefinition() {
         Language languageInstance = utilsService.getCurrentLanguage(request);
-        Map result = traitService.loadTraitDefinitions("${grailsApplication.config.speciesPortal.app.rootDir}/TraitdefinitiontableMODPrabhakar Aug2016.xlsx", languageInstance);
+        Map result = traitService.loadTraitDefinitions("${grailsApplication.config.speciesPortal.app.rootDir}/trait_definition_table_sept2016.csv", languageInstance);
         render result as JSON;
     }
 
     @Secured(['ROLE_ADMIN'])
     def testTraitValue(){
         Language languageInstance = utilsService.getCurrentLanguage(request);
-        def result = traitService.loadTraitValues("${grailsApplication.config.speciesPortal.app.rootDir}/TraitdefinitiontableMODPrabhakar Aug2016.xlsx", languageInstance);
+        def result = traitService.loadTraitValues("${grailsApplication.config.speciesPortal.app.rootDir}/value_definition_table_sept2016.csv", languageInstance);
         render result as JSON
     }
 
     @Secured(['ROLE_ADMIN'])
     def testFacts() {
         Language languageInstance = utilsService.getCurrentLanguage(request);
-        traitService.loadFacts("${grailsApplication.config.speciesPortal.app.rootDir}/Biotik_facts_table-Aug2016.xlsx", languageInstance);
+        traitService.loadFacts("${grailsApplication.config.speciesPortal.app.rootDir}/biotik_facts_table_sept2016.xlsx", languageInstance);
     }
 }

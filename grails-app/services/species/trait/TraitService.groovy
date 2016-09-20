@@ -160,14 +160,14 @@ class TraitService {
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
-
+println headers;
         int traitNameHeaderIndex = -1;
         int taxonIdHeaderIndex = -1;
         for(int i=0; i<headers.size(); i++) {
             if(headers[i].equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
             }
-            if(headers[i].equalsIgnoreCase('taxonid')) {
+            if(headers[i].equalsIgnoreCase('taxon id')) {
                 taxonIdHeaderIndex = i;
             }
         }
@@ -182,6 +182,7 @@ class TraitService {
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[taxonIdHeaderIndex] == null || row[taxonIdHeaderIndex] == '') {
                 log.error "Ignoring row ${row}";
                 logMsgs << "Ignoring row " + row;
+                row = reader.readNext();
                 continue;
             }
 
@@ -220,7 +221,7 @@ class TraitService {
                         case 'trait' :
                         //traitInstance = Trait.findByName(row[index].toLowerCase().trim())
                         //if(!traitInstance){trait.name = row[index].toLowerCase().trim();}
-                        //else{i
+                        //else{i 
                         if(!trait.name) trait.name = row[index].trim();
                         //}
                         break;
@@ -242,29 +243,30 @@ class TraitService {
                         trait.units = Trait.fetchUnits(row[index].trim());
                         break;
 
-                        case 'source' : 
+                        case 'trait source' : 
                         trait.source = row[index].trim();
                         break;
 
-                        case 'icon' : 
+                        case 'trait icon' : 
                         trait.icon = row[index].trim();
                         break;
 
-                        case 'taxonid':
+                        case 'taxon id':
                         //TODO: if taxon id is wrong catch exception/trow exception
                         trait.taxon = taxon_scope;
                         break;
 
-                        case 'definition':
+                        case 'trait definition':
                         trait.description = row[index].trim();
                         break;
 
-                        case 'field':
+                        case 'spm':
                         trait.field = getField(row[index], languageInstance);
                         break;
 
                     } 
                 }
+
                 if(!trait.hasErrors() && !trait.save(flush:true)) {
                     log.error "Failed to save trait";
                     logMsgs <<  "Failed to save trait";
@@ -305,7 +307,7 @@ class TraitService {
     Map loadTraitValues(String file, Language languageInstance) {
         int noOfValuesLoaded=0;
         List<String> logMsgs = [];
-        
+
         log.info "Loading trait values from ${file}";
         logMsgs << "Loading trait values from ${file}";
 
@@ -324,40 +326,53 @@ class TraitService {
             if(headers[i].equalsIgnoreCase('value')) {
                 valueHeaderIndex = i;
             }
-            if(headers[i].equalsIgnoreCase('taxonid')) {
+            if(headers[i].equalsIgnoreCase('taxon id')) {
                 taxonIdHeaderIndex = i;
             }
         }
-
-        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1) {
-            log.error "Trait name column and/or value column is not defined";
-            logMsgs << "Trait name column and/or value column is not defined";
+        println headers
+        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || taxonIdHeaderIndex == -1) {
+            log.error "Some of trait name, value and taxonid columns are not defined";
+            logMsgs << "Some of trait name, value and taxonid columns are not defined";
             return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':logMsgs];
         }
 
         while(row) {
 
-            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
+            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '' || row[taxonIdHeaderIndex] == null || row[taxonIdHeaderIndex] == '') {
                 log.error "Ignoring row ${row}";
                 logMsgs << "Ignoring row " + row;
+                row = reader.readNext();
                 continue;
             }
 
-                TaxonomyDefinition taxon
-                try {
-                    taxon = TaxonomyDefinition.read(Long.parseLong(row[taxonIdHeaderIndex].trim()));
-                    if(!taxon){
-                        log.error "Cannot find taxon ${row[taxonIdHeaderIndex]}";
-                        logMsgs << "Cannot find taxon " + row[taxonIdHeaderIndex];
-                        }
-                } catch(e) {
-                    log.error "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
-                    logMsgs << "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
-                    e.printStackTrace();
+            TaxonomyDefinition taxon;
+            try {
+                taxon = TaxonomyDefinition.read(Long.parseLong(row[taxonIdHeaderIndex].trim()));
+                if(!taxon){
+                    log.error "Cannot find taxon ${row[taxonIdHeaderIndex]}";
+                    logMsgs << "Cannot find taxon " + row[taxonIdHeaderIndex];
                 }
+            } catch(e) {
+                log.error "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                logMsgs << "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                e.printStackTrace();
+            }
 
-            Trait trait=Trait.findByNameAndTaxon(row[traitNameHeaderIndex],taxon);
-            TraitValue traitValue = TraitValue.findByValueAndTraitAndTaxon(row[valueHeaderIndex], trait, taxon);
+            Trait trait;
+            try {
+                trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex], taxon);
+                if(!trait){
+                    log.error "Cannot find trait ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]}";
+                    logMsgs << "Cannot find trait ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]}";
+                }
+            } catch(e) {
+                log.error "Error getting trait from ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                logMsgs << "Error getting trait from ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                e.printStackTrace();
+            }
+
+            TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex], trait);
 
             if(!traitValue) {
                 log.debug "Creating new trait value for ${row[traitNameHeaderIndex]} and taxon ${row[taxonIdHeaderIndex]}";
@@ -371,34 +386,35 @@ class TraitService {
             headers.eachWithIndex { header, index ->
                 switch(header.toLowerCase()) {
                     case 'trait' :
-                    traitValue.trait= trait
+                    traitValue.trait = trait;
                     break;
                     case 'value' :
                     traitValue.value=row[index].trim();
                     break;
-                    case 'source' : 
+                    case 'value source' : 
                     traitValue.source=row[index].trim()
                     break;
-                    case 'icon' : 
+                    case 'value icon' : 
                     traitValue.icon=row[index].trim()
                     break;
-                    case 'definition' : 
+                    case 'value definition' : 
                     traitValue.description=row[index].trim()
                     break;
-                    case 'taxonid' : 
-                    traitValue.taxon=taxon
+                    case 'taxon id' : 
+                    traitValue.taxon = taxon
                     break;
 
                 } 
             }
-                if(!traitValue.hasErrors() && !traitValue.save()) {
-                    log.error "Failed to save vlaue";
-                    logMsgs <<  "Failed to save value";
-                    traitValue.errors.allErrors.each { log.error it }
-                }else{
-                    log.debug "Successfully inserted/updated value ${traitValue.value} : ${traitValue.taxon}";
-                    noOfValuesLoaded++;
-                }
+
+            if(!traitValue.hasErrors() && !traitValue.save(flush:true)) {
+                log.error "Failed to save trait vlaue";
+                logMsgs <<  "Failed to save trait value";
+                traitValue.errors.allErrors.each { log.error it; logMsgs << it; }
+            }else{
+                log.debug "Successfully inserted/updated value ${traitValue.value} : ${traitValue.taxon}";
+                noOfValuesLoaded++;
+            }
 
             row = reader.readNext();
         }
