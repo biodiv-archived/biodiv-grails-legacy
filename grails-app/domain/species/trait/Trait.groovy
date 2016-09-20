@@ -173,4 +173,27 @@ class Trait {
         return null;
     }
 
+    static Trait getValidTrait(String traitName, TaxonomyDefinition taxon) {
+        List<Trait> traits = Trait.findAllByName(traitName);
+        if(!traits) {
+            log.error "No trait with name ${traitName}";
+            return null;
+        }
+
+        List<Trait> validTraits = [];
+        List parentTaxon = taxon.fetchDefaultHierarchy();
+        
+        parentTaxon.each { t ->
+            traits.each { trait ->
+                if(trait.taxon.id == t)
+                    validTraits << trait;
+            }
+        }
+        if(validTraits) {
+            return validTraits;
+        } else {
+            log.error "No trait defined with name ${traitName} at taxonscope ${parentTaxon}";
+            return null;
+        }
+    }
 }

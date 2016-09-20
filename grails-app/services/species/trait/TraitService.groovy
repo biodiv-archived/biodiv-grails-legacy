@@ -386,35 +386,143 @@ class TraitService {
         return rValue;
     }
 
-    void loadFacts(String file, Language languageInstance) {
-        CSVReader reader = getCSVReader(new File(file))
-        String[] headers = reader.readNext();//headers
-        File spreadSheet = new File(file);
-        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
-            def attribution = m['attribution']
-            SUser contributor = SUser.findByEmail(m['contributor'].trim())
-            def license =License.findByName(License.fetchLicenseType(("cc " + m['licence']).toUpperCase()))
+    Map loadFacts(String file, Language languageInstance) {
+        int noOfFactsLoaded = 0;
+        List<String> logMsgs = [];
 
-            TaxonomyDefinition taxon = TaxonomyDefinition.findById(m['taxonid'].trim())
-            m.each{key,value->
-                Fact fact = new Fact();
-                Trait trait = Trait.findByName(key.toLowerCase().trim())
-                println "key======>"+key
-                println "trait"+trait     
-                fact.trait = trait
-                fact.traitValue = value
-                fact.taxon = taxon
-                fact.attribution = attribution
-                fact.contributor = contributor
-                fact.license = license
-                if(fact.trait && fact.traitValue){
-                    if(!fact.hasErrors() && !fact.save()) {                        
-                        fact.errors.allErrors.each { log.error it }
+        log.info "Loading facts from ${file}";
+        logMsgs << "Loading facts from ${file}";
+
+        //CSVReader reader = getCSVReader(new File(file))
+        //String[] headers = reader.readNext();//headers
+
+        File spreadSheet = new File(file);
+        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each { m ->
+            String attribution = m['attribution'];
+            String speciesName = m['name'];
+            SUser contributor = SUser.findByEmail(m['contributor'].trim());
+            License license = License.findByName(License.fetchLicenseType("cc " + m['license']));
+            
+            if(m['taxonid']) {
+               m['taxonid'] = findSpeciesIdFromName(m['name'])?.taxonConcept.id;
+            }
+
+            TaxonomyDefinition pageTaxon = TaxonomyDefinition.findById(m['taxonid'].trim())
+            if(!pageTaxon) {
+                log.error "Not a valid taxon";
+                logMsgs << "Not a valid taxon";
+                return;
+            }
+            Species species = pageTaxon.createSpeciesStub();
+            
+            log.debug "Loading traits for taxon ${pageTaxon} and page ${species}";
+            logMsgs << "Loading traits for taxon ${pageTaxon} and page ${species}";
+            m.each { key, value ->
+                if(!value) {
+                    return;
+                }
+                log.debug "Loading trait ${key} : ${value}";
+                logMsgs <<  "Loading trait ${key} : ${value}";
+
+                switch(key) {
+                    case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
+                    default : 
+                    //TODO: validate if this trait can be given to this pageTaxon as per traits taxon scope
+                    Trait trait = Trait.getValidTrait(key, pageTaxon);
+                    println "Got trait ${trait}";
+
+                    if(!trait) {
+                        log.error "Cannot find trait ${key} for taxon scope ${pageTaxon}";
+                        logMsgs << "Cannot find trait ${key} for taxon scope ${pageTaxon}";
+                        log.warn "Ignoring fact ${m}"
+                        logMsgs << "Ignoring fact ${m}"
+                    } else {
+                        List<Fact> facts = SpeciesFact.findAllByTraitAndPageTaxonAndObjectId(trait, pageTaxon, species.id);
+                        println "GOt facts ===================="
+                        println facts;
+
+                        List<TraitValue> traitValues = [];
+                        value.split(',').each { v ->
+                            traitValues << TraitValue.findByTraitAndIlikeValue(trait, v);
+                        }
+                        println "Got traitValues ====================="
+                        println traitValues;
+
+                        if(!facts) {
+                            log.debug "Creating new fact";
+                            Fact fact = new SpeciesFact();
+                            fact.trait = trait;
+                            fact.taxon = pageTaxon;
+                            fact.objectId = species.id;
+                            facts << fact;
+                        } 
+
+                        //fact = facts[0];
+
+                        switch(trait.traitTypes) {
+                            case Trait.TraitTypes.MULTIPLE_CATEGORICAL : 
+                            boolean isExistingValue = false;
+                            traitValues.each { tV ->
+                                isExistingValue = false;
+                                facts.each { f ->
+                                    if(tV.equalsIgnoreCase(f.traitValue)) {
+                                        isExistingValue = true;
+                                    }
+                                }
+                                if(!isExistingValue) {
+                                    Fact fact = new SpeciesFact();
+                                    fact.trait = trait;
+                                    fact.taxon = pageTaxon;
+                                    fact.objectId = species.id;
+                                    fact.traitValue = tV;
+                                    facts << fact;
+                                }
+                            }
+                            break;
+                            case Trait.TraitTypes.SINGLE_CATEGORICAL : 
+                            facts[0].traitValue = traitValues[0]; 
+                            break;
+                            case Trait.TraitTypes.BOOLEAN : 
+                            facts[0].traitValue = traitValues[0]; 
+                            break;
+                            case Trait.TraitTypes.RANGE : 
+                            facts[0].traitValue = traitValues[0]; 
+                            break;
+                            case Trait.TraitTypes.DATE : 
+                            facts[0].traitValue = traitValues[0]; 
+                            break;
+
+                            default : log.error "Invalid trait type ${trait.traitTypes}"
+                        }
+                    }
+
+                    facts.each { fact ->
+                        if(fact.id) {
+                            log.debug "Updating fact ${fact}";
+                        } else {
+                            log.debug "Creating new fact ${fact}";
+                        }
+                        fact.attribution = attribution;
+                        fact.contributor = contributor;
+                        fact.license = license;
+                        if(!fact.hasErrors() && !fact.save(flush:true)) { 
+                            log.error "Error saving fact ${fact.id} ${fact.trait.name} ${fact.taxonValue.name} ${fact.pageTaxon.id}"
+                            logMsgs << "Error saving fact ${fact.id} ${fact.trait.name} ${fact.taxonValue.name} ${fact.pageTaxon.id}"
+                            fact.errors.allErrors.each { log.error it }
+                        } else {
+                            log.debug "Successfully added fact"
+                        }
                     }
                 }
             }
             println "=========================================================================="
         }
+    }
+
+    private Long findSpeciesIdFromName(String name) {
+        XMLConverter converter = new XMLConverter();
+        TaxonomyDefinition taxon = converter.getTaxonConceptFromName(name, TaxonomyRank.SPECIES.ordinal(), false, null);
+        return taxon ? taxon.findSpeciesId() : null;
     }
 
     List listTraits(def params){
