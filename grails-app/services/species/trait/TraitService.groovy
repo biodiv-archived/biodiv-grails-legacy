@@ -302,18 +302,75 @@ class TraitService {
         }
     }
 
-    void loadTraitValues(String file, Language languageInstance) {
+    Map loadTraitValues(String file, Language languageInstance) {
+        int noOfValuesLoaded=0;
+        List<String> logMsgs = [];
+        
+        log.info "Loading trait values from ${file}";
+        logMsgs << "Loading trait values from ${file}";
 
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
+
+        int traitNameHeaderIndex = -1;
+        int valueHeaderIndex = -1;
+        int taxonIdHeaderIndex=-1;
+
+        for(int i=0; i<headers.size(); i++) {
+            if(headers[i].equalsIgnoreCase('trait')) {
+                traitNameHeaderIndex = i;
+            }
+            if(headers[i].equalsIgnoreCase('value')) {
+                valueHeaderIndex = i;
+            }
+            if(headers[i].equalsIgnoreCase('taxonid')) {
+                taxonIdHeaderIndex = i;
+            }
+        }
+
+        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1) {
+            log.error "Trait name column and/or value column is not defined";
+            logMsgs << "Trait name column and/or value column is not defined";
+            return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':logMsgs];
+        }
+
         while(row) {
-            TraitValue traitValue = new TraitValue();
-            Trait trait
+
+            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
+                log.error "Ignoring row ${row}";
+                logMsgs << "Ignoring row " + row;
+                continue;
+            }
+
+                TaxonomyDefinition taxon
+                try {
+                    taxon = TaxonomyDefinition.read(Long.parseLong(row[taxonIdHeaderIndex].trim()));
+                    if(!taxon){
+                        log.error "Cannot find taxon ${row[taxonIdHeaderIndex]}";
+                        logMsgs << "Cannot find taxon " + row[taxonIdHeaderIndex];
+                        }
+                } catch(e) {
+                    log.error "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                    logMsgs << "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                    e.printStackTrace();
+                }
+
+            Trait trait=Trait.findByNameAndTaxon(row[traitNameHeaderIndex],taxon);
+            TraitValue traitValue = TraitValue.findByValueAndTraitAndTaxon(row[valueHeaderIndex], trait, taxon);
+
+            if(!traitValue) {
+                log.debug "Creating new trait value for ${row[traitNameHeaderIndex]} and taxon ${row[taxonIdHeaderIndex]}";
+                logMsgs << "Creating new trait value for ${row[traitNameHeaderIndex]} and taxon ${row[taxonIdHeaderIndex]}";
+                traitValue = new TraitValue();
+            } else {
+                log.debug "Updating trait value ${traitValue} for ${row[traitNameHeaderIndex]} and taxon ${taxon}";
+                logMsgs << "Updating trait value ${traitValue} for ${row[traitNameHeaderIndex]} and taxon ${taxon}";
+            }
+
             headers.eachWithIndex { header, index ->
                 switch(header.toLowerCase()) {
-                    case 'trait' : 
-                    trait = Trait.findByName(row[index].trim().toLowerCase())
+                    case 'trait' :
                     traitValue.trait= trait
                     break;
                     case 'value' :
@@ -328,16 +385,24 @@ class TraitService {
                     case 'definition' : 
                     traitValue.description=row[index].trim()
                     break;
+                    case 'taxonid' : 
+                    traitValue.taxon=taxon
+                    break;
 
                 } 
             }
-            if(validateTrait(trait,traitValue.value)){
                 if(!traitValue.hasErrors() && !traitValue.save()) {
+                    log.error "Failed to save vlaue";
+                    logMsgs <<  "Failed to save value";
                     traitValue.errors.allErrors.each { log.error it }
+                }else{
+                    log.debug "Successfully inserted/updated value ${traitValue.value} : ${traitValue.taxon}";
+                    noOfValuesLoaded++;
                 }
-            }
+
             row = reader.readNext();
         }
+        return ['noOfValuesLoaded':noOfValuesLoaded, 'msg':logMsgs];
     }
 
     private boolean validateTrait(Trait trait, String value){
@@ -346,16 +411,16 @@ class TraitService {
         trait.traitTypes.each{
             switch(it) {
                 case "SINGLE_CATEGORICAL":
-                def f = trait.values.tokenize("|");
+                def f = trait.value.tokenize("|");
                 rValue=f.contains(value);
                 break;
                 case "MULTIPLE_CATEGORICAL":
-                def f = trait.values.tokenize("|");
+                def f = trait.value.tokenize("|");
                 rValue=f.contains(value);
                 break;
                 case "BOOLEAN":
                 println "value"+value
-                def f = trait.values.tokenize("|");
+                def f = trait.value.tokenize("|");
                 rValue=f.contains(value);
                 /*                if(value.toLowerCase()=='true' || value.toLowerCase()=='false'){
                                   rValue=true
@@ -365,7 +430,7 @@ class TraitService {
                 }*/
                 break;
                 case "RANGE":
-                def f = trait.values.tokenize("|");
+                def f = trait.value.tokenize("|");
                 rValue=f.contains(value);
                 /* def f = traitObj.values.tokenize("|");
                 if(value.indexOf('>')>=0 || value.indexOf('<')>=0){
@@ -376,7 +441,7 @@ class TraitService {
                 }*/
                 break;
                 case "DATE":
-                def f = trait.values.tokenize("|");
+                def f = trait.value.tokenize("|");
                 rValue=f.contains(value);
                 /*return UtilsService.parseDate(value) != null*/
                 break;

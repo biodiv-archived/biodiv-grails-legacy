@@ -135,8 +135,8 @@ class Trait {
         ontologyUrl nullable:true
         description nullable:true
         units nullable:true
-        traitTypes nullable:true
-        dataTypes nullable:true
+        traitTypes nullable:false
+        dataTypes nullable:false
     }
 
     static mapping = {
