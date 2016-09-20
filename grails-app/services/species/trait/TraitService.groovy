@@ -423,47 +423,22 @@ println headers;
 
     private boolean validateTrait(Trait trait, String value){
        // Trait traitObj = Trait.findById(trait);
-        def rValue
-        trait.traitTypes.each{
+        boolean rValue
+        trait.dataTypes.each{
             switch(it) {
-                case "SINGLE_CATEGORICAL":
-                def f = trait.value.tokenize("|");
-                rValue=f.contains(value);
-                break;
-                case "MULTIPLE_CATEGORICAL":
-                def f = trait.value.tokenize("|");
-                rValue=f.contains(value);
-                break;
+
                 case "BOOLEAN":
-                println "value"+value
-                def f = trait.value.tokenize("|");
-                rValue=f.contains(value);
-                /*                if(value.toLowerCase()=='true' || value.toLowerCase()=='false'){
-                                  rValue=true
+                if(Boolean.parseBoolean(value)){
+                    rValue=true;
                 }
-                else{
-                rValue=false
-                }*/
                 break;
-                case "RANGE":
-                def f = trait.value.tokenize("|");
-                rValue=f.contains(value);
-                /* def f = traitObj.values.tokenize("|");
-                if(value.indexOf('>')>=0 || value.indexOf('<')>=0){
-                rValue=true
+
+                case "NUMERIC":
+                if(Integer.parseInt(value)){
+                    rValue=true;
                 }
-                else{
-                rValue=false
-                }*/
-                break;
-                case "DATE":
-                def f = trait.value.tokenize("|");
-                rValue=f.contains(value);
-                /*return UtilsService.parseDate(value) != null*/
-                break;
             }
         }
-        println "rValue="+rValue;
         return rValue;
     }
 
