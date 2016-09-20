@@ -483,121 +483,144 @@ println headers;
             String speciesName = m['name'];
             SUser contributor = SUser.findByEmail(m['contributor'].trim());
             License license = License.findByName(License.fetchLicenseType("cc " + m['license']));
-            
-            if(m['taxonid']) {
-               m['taxonid'] = findSpeciesIdFromName(m['name'])?.taxonConcept.id;
-            }
 
-            TaxonomyDefinition pageTaxon = TaxonomyDefinition.findById(m['taxonid'].trim())
+            if(!m['taxonid']) {
+                log.debug "Finding species from species name ${m['name']}";
+                logMsgs << "Finding species from species name ${m['name']}";
+                m['taxonid'] = findSpeciesIdFromName(m['name'])?.taxonConcept?.id + '';
+            }
+            TaxonomyDefinition pageTaxon = m['taxonid'] ? TaxonomyDefinition.findById(Long.parseLong(m['taxonid'].trim())) : null;
             if(!pageTaxon) {
-                log.error "Not a valid taxon";
-                logMsgs << "Not a valid taxon";
+                log.error "Not a valid taxon ${m['taxonid']}";
+                logMsgs << "Not a valid taxon ${m['taxonid']}";
                 return;
             }
             Species species = pageTaxon.createSpeciesStub();
-            
-            log.debug "Loading traits for taxon ${pageTaxon} and page ${species}";
-            logMsgs << "Loading traits for taxon ${pageTaxon} and page ${species}";
+
+            log.debug "Loading facts for taxon ${pageTaxon} and page ${species}";
+            logMsgs << "Loading facts for taxon ${pageTaxon} and page ${species}";
             m.each { key, value ->
-                if(!value) {
-                    return;
-                }
-                log.debug "Loading trait ${key} : ${value}";
-                logMsgs <<  "Loading trait ${key} : ${value}";
+                try {
+                    if(!value) {
+                        return;
+                    }
+                    switch(key) {
+                        case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
+                        default : 
+                        log.debug "Loading trait ${key} : ${value}";
+                        logMsgs <<  "Loading trait ${key} : ${value}";
 
-                switch(key) {
-                    case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
-                    default : 
-                    //TODO: validate if this trait can be given to this pageTaxon as per traits taxon scope
-                    Trait trait = Trait.getValidTrait(key, pageTaxon);
-                    println "Got trait ${trait}";
+                        //TODO: validate if this trait can be given to this pageTaxon as per traits taxon scope
+                        Trait trait = Trait.getValidTrait(key, pageTaxon);
+                        println "Got trait ${trait}";
 
-                    if(!trait) {
-                        log.error "Cannot find trait ${key} for taxon scope ${pageTaxon}";
-                        logMsgs << "Cannot find trait ${key} for taxon scope ${pageTaxon}";
-                        log.warn "Ignoring fact ${m}"
-                        logMsgs << "Ignoring fact ${m}"
-                    } else {
-                        List<Fact> facts = SpeciesFact.findAllByTraitAndPageTaxonAndObjectId(trait, pageTaxon, species.id);
-                        println "GOt facts ===================="
-                        println facts;
+                        if(!trait) {
+                            log.error "Cannot find trait ${key} for taxon scope ${pageTaxon}";
+                            logMsgs << "Cannot find trait ${key} for taxon scope ${pageTaxon}";
+                            //log.warn "Ignoring fact ${key}:${value} for ${pageTaxon}";
+                            //logMsgs << "Ignoring fact ${key}:${value} for ${pageTaxon}";
+                        } else {
+                            List<Fact> facts = SpeciesFact.findAllByTraitAndPageTaxonAndObjectId(trait, pageTaxon, species.id);
+                            println "GOt existing facts ===================="
+                            println facts;
+                            println "Value"
+                            println value;
 
-                        List<TraitValue> traitValues = [];
-                        value.split(',').each { v ->
-                            traitValues << TraitValue.findByTraitAndIlikeValue(trait, v);
-                        }
-                        println "Got traitValues ====================="
-                        println traitValues;
+                            List<TraitValue> traitValues = [];
+                            value.split(',').each { v ->
+                                println v
+                                traitValues << TraitValue.findByTraitAndValueIlike(trait, v);
+                            }
+                            println "Got traitValues ====================="
+                            println traitValues;
 
-                        if(!facts) {
-                            log.debug "Creating new fact";
-                            Fact fact = new SpeciesFact();
-                            fact.trait = trait;
-                            fact.taxon = pageTaxon;
-                            fact.objectId = species.id;
-                            facts << fact;
-                        } 
+                            if(!facts) {
+                                log.debug "Creating new fact";
+                                logMsgs << "Creating new fact";
+                                Fact fact = new SpeciesFact();
+                                fact.trait = trait;
+                                fact.pageTaxon = pageTaxon;
+                                fact.objectId = species.id;
+                                fact.traitValue = traitValues[0];
+                                facts << fact;
+                            } 
 
-                        //fact = facts[0];
+                            //fact = facts[0];
 
-                        switch(trait.traitTypes) {
-                            case Trait.TraitTypes.MULTIPLE_CATEGORICAL : 
-                            boolean isExistingValue = false;
-                            traitValues.each { tV ->
-                                isExistingValue = false;
-                                facts.each { f ->
-                                    if(tV.equalsIgnoreCase(f.traitValue)) {
-                                        isExistingValue = true;
+                            switch(trait.traitTypes) {
+                                case Trait.TraitTypes.MULTIPLE_CATEGORICAL : 
+                                boolean isExistingValue = false;
+                                traitValues.each { tV ->
+                                    if(tV) {
+                                        isExistingValue = false;
+                                        println "tv -> ${tV}"
+                                        facts.each { f ->
+                                            println "f -> ${f}"
+                                            if(tV.value.equalsIgnoreCase(f.traitValue.value)) {
+                                                isExistingValue = true;
+                                            }
+                                        }
+                                        if(!isExistingValue) {
+                                            Fact fact = new SpeciesFact();
+                                            fact.trait = trait;
+                                            fact.taxon = pageTaxon;
+                                            fact.objectId = species.id;
+                                            fact.traitValue = tV;
+                                            facts << fact;
+                                        }
                                     }
                                 }
-                                if(!isExistingValue) {
-                                    Fact fact = new SpeciesFact();
-                                    fact.trait = trait;
-                                    fact.taxon = pageTaxon;
-                                    fact.objectId = species.id;
-                                    fact.traitValue = tV;
-                                    facts << fact;
+                                break;
+
+                                case Trait.TraitTypes.SINGLE_CATEGORICAL : 
+                                facts[0].traitValue = traitValues[0]; 
+                                break;
+                                case Trait.TraitTypes.BOOLEAN : 
+                                facts[0].traitValue = traitValues[0]; 
+                                break;
+                                case Trait.TraitTypes.RANGE : 
+                                facts[0].traitValue = traitValues[0]; 
+                                break;
+                                case Trait.TraitTypes.DATE : 
+                                facts[0].traitValue = traitValues[0]; 
+                                break;
+
+                                default : log.error "Invalid trait type ${trait.traitTypes}"
+                            }
+
+                            facts.each { fact ->
+                                if(fact.id) {
+                                    log.debug "Updating fact ${fact}";
+                                    logMsgs << "Updating fact ${fact}";
+                                } else {
+                                    log.debug "Creating new fact ${fact}";
+                                    logMsgs << "Creating new fact ${fact}";
+                                }
+                                fact.attribution = attribution;
+                                fact.contributor = contributor;
+                                fact.license = license;
+                                if(!fact.hasErrors() && !fact.save(flush:true)) { 
+                                    log.error "Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}"
+                                    logMsgs << "Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}"
+                                    fact.errors.allErrors.each { log.error it; logMsgs << it; }
+                                } else {
+                                    noOfFactsLoaded++;
+                                    log.debug "Successfully added fact";
+                                    logMsgs << "Successfully added fact";
                                 }
                             }
-                            break;
-                            case Trait.TraitTypes.SINGLE_CATEGORICAL : 
-                            facts[0].traitValue = traitValues[0]; 
-                            break;
-                            case Trait.TraitTypes.BOOLEAN : 
-                            facts[0].traitValue = traitValues[0]; 
-                            break;
-                            case Trait.TraitTypes.RANGE : 
-                            facts[0].traitValue = traitValues[0]; 
-                            break;
-                            case Trait.TraitTypes.DATE : 
-                            facts[0].traitValue = traitValues[0]; 
-                            break;
-
-                            default : log.error "Invalid trait type ${trait.traitTypes}"
                         }
                     }
+                } catch(Exception e) {
+                    e.printStackTrace();
+                    log.error "Error saving fact ${key} : ${value} for ${pageTaxon}"
+                    logMsgs << "Error saving fact ${key} : ${value} for ${pageTaxon}"
 
-                    facts.each { fact ->
-                        if(fact.id) {
-                            log.debug "Updating fact ${fact}";
-                        } else {
-                            log.debug "Creating new fact ${fact}";
-                        }
-                        fact.attribution = attribution;
-                        fact.contributor = contributor;
-                        fact.license = license;
-                        if(!fact.hasErrors() && !fact.save(flush:true)) { 
-                            log.error "Error saving fact ${fact.id} ${fact.trait.name} ${fact.taxonValue.name} ${fact.pageTaxon.id}"
-                            logMsgs << "Error saving fact ${fact.id} ${fact.trait.name} ${fact.taxonValue.name} ${fact.pageTaxon.id}"
-                            fact.errors.allErrors.each { log.error it }
-                        } else {
-                            log.debug "Successfully added fact"
-                        }
-                    }
                 }
-            }
-            println "=========================================================================="
+
+            }            println "=========================================================================="
         }
+        return ['noOfFactsLoaded':noOfFactsLoaded, 'msg':logMsgs];
     }
 
     private Long findSpeciesIdFromName(String name) {

@@ -174,7 +174,7 @@ class Trait {
     }
 
     static Trait getValidTrait(String traitName, TaxonomyDefinition taxon) {
-        List<Trait> traits = Trait.findAllByName(traitName);
+        List<Trait> traits = Trait.findAllByNameIlike(traitName);
         if(!traits) {
             println "No trait with name ${traitName}";
             return null;
@@ -185,12 +185,13 @@ class Trait {
         
         parentTaxon.each { t ->
             traits.each { trait ->
-                if(trait.taxon.id == t)
+                if(trait.taxon.id == t.id)
                     validTraits << trait;
             }
         }
+
         if(validTraits) {
-            return validTraits;
+            return validTraits[0];
         } else {
             println "No trait defined with name ${traitName} at taxonscope ${parentTaxon}";
             return null;
