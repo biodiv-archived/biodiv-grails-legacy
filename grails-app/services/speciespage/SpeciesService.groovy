@@ -1705,14 +1705,14 @@ class SpeciesService extends AbstractObjectService  {
             if(params.startsWith == "A-Z") {
                 query += ", Fact f ";
                 countQuery += ", Fact f";
-                countFilterQuery += "and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
-                filterQuery = "where f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
+                countFilterQuery += "and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.pageTaxon";
+                filterQuery = "where f.traitValue IN ("+traitValues+") and s.taxonConcept=f.pageTaxon";
 
             } else {
                 query += ",Fact f ";
-                filterQuery += " and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
+                filterQuery += " and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.pageTaxon";
                 countQuery += " ,Fact f ";
-                countFilterQuery += " and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.taxon";
+                countFilterQuery += " and f.traitValue IN ("+traitValues+") and s.taxonConcept=f.pageTaxon";
             }
         }
         if(params.featureBy == "true" ) {
