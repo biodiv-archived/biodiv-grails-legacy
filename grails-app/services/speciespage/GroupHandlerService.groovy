@@ -26,7 +26,7 @@ class GroupHandlerService {
 
     def dataSource
 
-	static int BATCH_SIZE = 50;
+	static int BATCH_SIZE = 25;
 
 	def speciesGroupMappings;
 
@@ -115,7 +115,7 @@ class GroupHandlerService {
         int count = 0;
 
         int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        dataSource.setUnreturnedConnectionTimeout(500);
+        dataSource.setUnreturnedConnectionTimeout(10000);
 
         def conn;
         while(true) {
@@ -139,12 +139,12 @@ class GroupHandlerService {
                     }
 
 
-                    if(count && count == BATCH_SIZE) {
+                    //if(count && count == BATCH_SIZE) {
                         cleanUpGorm();
                         noOfUpdations += count;
                         count = 0;
                         log.info "Updated group for taxonConcepts ${noOfUpdations}"
-                    }
+                    //}
                 //}
 
             } catch(Exception e) {
