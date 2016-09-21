@@ -74,6 +74,7 @@ class ObservationController extends AbstractObjectController {
 
     def sessionFactory;
     def grailsCacheManager;
+    def traitService;
 
 	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -120,7 +121,7 @@ class ObservationController extends AbstractObjectController {
                         .getEntries();
 */
         model.userLanguage = utilsService.getCurrentLanguage(request);
-        model.filters = utilsService.getModuleFilters('observation');
+        model.filters = traitService.getAllFilter(utilsService.getModuleFilters('observation'));
         model.queryParams.view = (params?.view && params?.view=='grid')?'grid':'list';
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.recoVotes = observationService.getRecommendationVotes(model.observationInstanceList, 3, 0);
