@@ -15,13 +15,14 @@ $(document).ready(function(){
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 
 	$(".traitFilter").button();
-	var traits = ${(params.trait)?params.trait?.collect{ it.value}:null;}
-	$.each(traits,function(k,v){
-		alert(k+" "+v);
-		$('.traitFilter button[value="${v}"]').addClass('active').attr('disabled',true);
-	})	
-	
-	
+	var traits =""
+    <% if(params.trait){ %>
+    	var traits = ${params.trait?.collect{ it.value}}
+    <% } %>
+		$.each(traits,function(k,v){
+			alert(k+" "+v);
+			$('.traitFilter button[value="${v}"]').addClass('active').attr('disabled',true);
+		});
 });
 
 </script>
