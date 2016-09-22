@@ -21,7 +21,25 @@ class TraitController extends AbstractObjectController {
 	}
 
     def list() {
-        render (view:'list', model:['traitList' : traitService.listTraits(params)]);
+        //render (view:'list', model:['traitList' : traitService.listTraits(params)]);
+        def model = [:];
+        model['traitInstanceList'] = traitService.listTraits(params);
+        println "model============"+model
+        model['obvListHtml'] = g.render(template:"/trait/traitListTemplate", model:model);
+        model = utilsService.getSuccessModel('', null, 200, model);
+        
+                   withFormat {
+                html {
+                   render(view:"list", model:model.model);
+
+                }
+                json {
+                    render model as JSON 
+                }
+                xml {
+                    render model as XML
+                }
+            }
     }
 
     def show() {
@@ -95,7 +113,8 @@ class TraitController extends AbstractObjectController {
     @Secured(['ROLE_ADMIN'])
     def testFacts() {
         Language languageInstance = utilsService.getCurrentLanguage(request);
-        def result = traitService.loadFacts("${grailsApplication.config.speciesPortal.app.rootDir}/biotik_facts_table_sept2016.1.xlsx", languageInstance);
+        def result = traitService.loadFacts("${grailsApplication.config.speciesPortal.app.rootDir}/biotik_facts_table_sept2016.xlsx", languageInstance);
         render result as JSON;
     }
+
 }

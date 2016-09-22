@@ -80,8 +80,7 @@ class TaxonController {
                     //TODO
                 }
                 println taxon
-                tillLevel = taxon?.rank;
-                println tillLevel
+                tillLevel = taxon.rank;
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
                 println taxonIds
             }

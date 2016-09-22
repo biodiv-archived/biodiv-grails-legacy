@@ -173,6 +173,10 @@
                         $("input#taxon").val(selectedTaxonId);
                         getNamesFromTaxon($me, $me.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                         break;
+                    case 'trait':
+                        $("input#taxon").val(selectedTaxonId);
+                        updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);                    
+                    break; 
                     default:
                         if ($me.hasClass('taxon-highlight')) {
                             var classificationId = $('#taxaHierarchy option:selected').val();
