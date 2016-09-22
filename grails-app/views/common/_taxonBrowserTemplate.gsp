@@ -3,6 +3,17 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.ScientificName.TaxonomyRank"%>
+<style type="text/css">
+.userList .ADMIN{
+    background: black;
+}
+.userList .CURATOR{
+    background: yellow;
+}
+.userList .EDITOR{
+    background: rgb(211, 67, 83);
+}
+</style>
 <g:if test="${classifications}">
 <select name="taxaHierarchy" class="value ui-corner-all" style="margin-bottom:0px;width:100%;background-color:whitesmoke;">
     <g:each in="${classifications}" var="classification">

@@ -277,11 +277,11 @@ class UtilsService {
         return null;
     }
 
-    Language getCurrentLanguage(request = null){
+    Language getCurrentLanguage(request = null,cuRLocale = null){
        // println "====================================="+request
         
         if(!defaultLanguage) defaultLanguage = Language.getLanguage(Language.DEFAULT_LANGUAGE);
-        String langStr = LCH.getLocale()
+        String langStr = (cuRLocale)?:LCH.getLocale()
         def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
         def languageInstance = Language.findByTwoLetterCode(twoLetterCode);
         return languageInstance ? languageInstance : defaultLanguage;
@@ -1159,12 +1159,13 @@ class UtilsService {
         return bannerMessageMap;
     }
 
-    String getBannerMessage(String userGroupWebaddress) {  
-        return bannerMessageMap ? bannerMessageMap[userGroupWebaddress]:'';
+    String getBannerMessage(String userGroupWebaddress,request=null,cuRLocale=null) {  
+        //def request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+        return bannerMessageMap ? bannerMessageMap[userGroupWebaddress+"_"+getCurrentLanguage(request,cuRLocale).threeLetterCode]:'';
     }
 
-    String getIbpBannerMessage() {   
-        return bannerMessageMap ? bannerMessageMap["ibp"]:'';
+    String getIbpBannerMessage(request=null,cuRLocale=null) {   
+        return bannerMessageMap ? bannerMessageMap["ibp"+"_"+getCurrentLanguage(request,cuRLocale).threeLetterCode]:'';
     }
 
     void loadBannerMessageMap() {  

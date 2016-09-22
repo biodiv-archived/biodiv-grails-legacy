@@ -37,7 +37,7 @@
             field="resource" />
         </div>
         <g:if test="${resourceListType == 'fromRelatedObv'}" >
-            <a class="btn" style="margin-right: 5px;position=relative;float:left;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}", this )'><g:message code="msg.load.more" /></a>
+            <a class="btn" style="margin-right: 5px;position=relative;float:left;z-index: 9;position: relative;bottom: -20px;" id="relatedObvLoadMore" onclick='getNextRelatedObvImages("${observationInstance.id}", "${createLink(controller:'species',  action:'getRelatedObvForSpecies')}", "${resourceListType}", this )'><g:message code="msg.load.more" /></a>
             </g:if>
     </div>
 </div>
