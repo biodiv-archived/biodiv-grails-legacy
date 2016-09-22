@@ -3,6 +3,7 @@
 <style>
 .profilepic{position:relative;}
 .img-thumbnail{height:250px; max-width:250px; border:1px groove;margin-left:10px; border-color:#f2f2f2;}
+.observation_story{height:554px;}
 </style>
 
 <div class="observation_story" style="overflow: auto;">
@@ -95,7 +96,7 @@
 
 		</g:if>
 		
-			<div class="prop" style="max-height:23px; overflow-y:auto;">
+			<div class="prop" style="max-height:80px; min-height:26px; overflow-y:auto;">
 				<span class="name"><i class="icon-map-marker"></i><g:message code="default.location.label" /></span>
 				<div class="value">
         <g:if test="${userInstance.location}">
@@ -169,7 +170,7 @@
 		</g:if>
        <div class="prop">
                                 <span class="name"><i class="icon-user"></i><g:message code="default.about.me.label" /></span>
-                                <div class="value pre-scrollable" style="display:block;max-height:130px;min-height:130px;overflow-y: auto;">
+                                <div class="value pre-scrollable" id="aboutMe" style="display:block;max-height:78px;min-height:78px;overflow-y: auto;">
                                             <g:if test="${userInstance.aboutMe}">
 
                                             <%  def styleVar = 'block';

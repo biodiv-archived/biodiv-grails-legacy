@@ -113,7 +113,8 @@ def obvId = observationInstance?.id
         </div>
         <div style="float:right">
             <div style="float: left;">
-                <span class="habitat_icon_show group_icon habitats_sprites active urban_gall_th" title="Urban"></span>
+                <span class="habitat_icon_show group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}" title="${observationInstance.habitat}"></span>
+
             </div>
             <div class="group_icon_show_wrap">
                 <span class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left" title="Plants"></span>

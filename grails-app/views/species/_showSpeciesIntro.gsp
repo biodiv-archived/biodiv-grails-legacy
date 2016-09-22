@@ -76,9 +76,7 @@
                         title="${r?.description}" />
                         </g:each>
                     </div>
-                    <div class="readmore sidebar_section notes_view">
-                        ${raw(speciesInstance.notes(userLanguage))}
-                    </div>
+                    
                 </div>
             </div>
 
