@@ -20,7 +20,6 @@ $(document).ready(function(){
     	var traits = ${params.trait?.collect{ it.value}}
     <% } %>
 		$.each(traits,function(k,v){
-			alert(k+" "+v);
 			$('.traitFilter button[value="${v}"]').addClass('active').attr('disabled',true);
 		});
 });
