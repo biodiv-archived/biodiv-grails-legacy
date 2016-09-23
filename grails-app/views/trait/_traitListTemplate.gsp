@@ -22,7 +22,7 @@
     	<h6>${traits.key.name}</h6>
 
 	    <div class="traitValue">
-	    	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':traits.value]"/>
+	    	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':traits.value,'rows':4,'traitName':traits.key.name]"/>
 	    </div>
     </div>
     </g:each>

@@ -2,6 +2,23 @@
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
+<style type="text/css">
+.div_fir{
+    margin: 5px 0px 0px 0px;
+}
+.trait_btn{
+
+    margin: 0;
+    padding: 0;
+    height: 40px;
+
+}
+.svg_wrap{
+    width: 50px;
+    float: left;
+}
+.trait_label{ margin-left:50px;position:absolute;margin-top:10px; word-wrap: break-word;float:left;}
+</style>
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -27,18 +44,14 @@ $(document).ready(function(){
 </script>
 
 
+
 <g:each in="${filters}" var="filter" >
-<div class="traitFilter" data-name="${filter.key.replace(' ','_').toLowerCase()}" data-toggle="buttons-radio">
-<label></label>
-	<span>
-	<g:each in="${filter.value}" var="tv" >
-		<button value='${tv.id}'>${tv.value}</button>
-	</g:each>
-	</span>
+<div class="traitFilter" data-toggle="buttons-radio">
+	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key.replace(' ','_').toLowerCase()]"/>
 </div>
 </g:each>
 
-<g:if test="${filter == 'species_group'}">
+<g:if test="${!filters}">
 <div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
@@ -54,7 +67,7 @@ $(document).ready(function(){
 		title="${othersGroup.name}"></button>
 </div>
 </g:if>
-<g:if test="${filter == 'habitat'}">
+<g:if test="${!filters}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">

@@ -244,12 +244,12 @@ $(document).ready(function(){
         return false;
     });
 
-    $('.traitFilter button').click(function(){
+    $('.traitFilter .trait_btn').click(function(){
         if($(this).hasClass('active')){
             return false;
         }
-        $(this).parent().find('button.active').removeClass('active').attr('disabled',false);
-        $(this).addClass('active').attr('disabled',true);
+        $(this).parent().parent().find('.trait_btn').removeClass('active');
+        $(this).addClass('active');
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
@@ -732,10 +732,10 @@ function getSelectedHabitat() {
 
 function getSelectedTrait() {
     var hbt = '',trait='',selTrait={}; 
-    $('.traitFilter button').each(function(){
+    $('.traitFilter .trait_btn').each(function(){
         if($(this).hasClass('active')) {
-            trait = $(this).parent().parent().attr('data-name');
-            selTrait[trait] = $(this).val();
+            trait = $(this).attr('data-name');
+            selTrait[trait] = $(this).attr('data-id');
         }
     });
     return selTrait;
