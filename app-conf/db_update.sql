@@ -670,3 +670,17 @@ ALTER TABLE document ALTER COLUMN longitude TYPE double precision;
 #8 Apr
 ALTER TABLE suser ADD COLUMN latitude double precision;
 ALTER TABLE suser ADD COLUMN longitude double precision;
+
+#21Sep2016
+CREATE AGGREGATE array_agg_custom(anyarray)
+(
+        SFUNC = array_cat,
+            STYPE = anyarray
+        );
+
+alter table species add column traits text[][];
+update species set traits = g.item from (
+         select x.object_id, array_agg_custom(ARRAY[ARRAY[lower(x.name), x.id]]) as item from (select f.object_id, t.name, tv.id::varchar, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.object_id
+) g where g.object_id=id;
+
+
