@@ -652,21 +652,21 @@ println headers;
         return taxon ? taxon.findSpeciesId() : null;
     }
 
-    List listTraits(def params){
-        println "params"+params
-        def sql =  Sql.newInstance(dataSource);
-        def query = sql.rows("select trait_taxonomy_definition_id from trait_taxonomy_definition where taxonomy_definition_id=:taxonId",[taxonId:params.taxon?.toLong()]);
-        println "================="+query
-        List<Trait> traitList = []
-        for (row in query) {
-            traitList.add(Trait.findById(row.getProperty("trait_taxonomy_definition_id")))
+    Map listTraits(def params){     
+        TaxonomyDefinition taxon=TaxonomyDefinition.findById(params.taxon)
+        def traitInstanceList = [:]
+        def traitValueInstanceList = []
+        def tValue ;
+        def traitList=Trait.findAllByTaxon(taxon)
+        traitList.each{
+            traitValueInstanceList = []
+            tValue = TraitValue.findAllByTrait(it);
+            tValue.each{
+              traitValueInstanceList << it  
+            }
+            traitInstanceList[it] = traitValueInstanceList
         }
-        println "=================="+traitList.id
-        //def traitList=Trait.findAllByTaxonomyDefinition(TaxonomyDefinition.get(params.taxon?.toLong()))
-        //def traitList=TaxonomyDefinition.findById(params.taxon?.toLong())
-        //println "+++++++++++++++++"+traitList.traitTaxonomyDefinition
-
-        return traitList
+        return traitInstanceList
     }
 
     Map showTrait(Long id) {

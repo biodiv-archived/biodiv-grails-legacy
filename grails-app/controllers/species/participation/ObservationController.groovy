@@ -1937,7 +1937,7 @@ private printCacheEntries(cache) {
             def distinctIdentifiedRecoListResult;
             distinctIdentifiedRecoListResult = observationService.getDistinctIdentifiedRecoList(params, max, offset);
             if(distinctIdentifiedRecoListResult.distinctIdentifiedRecoList.size() > 0) {
-            result = [distinctIdentifiedRecoList:distinctIdentifiedRecoListResult.distinctIdentifiedRecoList, totalRecoCount:distinctIdentifiedRecoListResult.distinctIdentifiedRecoList.size(), status:'success', msg:'success', next:offset+max]               
+            result = [distinctIdentifiedRecoList:distinctIdentifiedRecoListResult.distinctIdentifiedRecoList, totalRecoCount:distinctIdentifiedRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]               
             } else {
                 def message = "";
                 if(params.offset  > 0) {

@@ -15,6 +15,14 @@ import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.NamePosition;
 import content.eml.Document;
 import species.Species;
+import species.CommonNames;
+import species.utils.Utils
+
+
+
+import species.participation.NamePermission.Permission
+import species.utils.ImageType
+
 
 class NamelistController {
     
@@ -27,16 +35,17 @@ class NamelistController {
     def observationService;
     def documentService;
     def speciesPermissionService;
-
-	/**
-	 * input : taxon id ,classification id of ibp 
-	 * @return A map which contain keys as dirty, clean and working list. Values of this key is again a LIST of maps with key as name and id
-	 * 
-	 */
-	def getNamesFromTaxon(){
+	def namePermissionService;
+    def activityFeedService;
+    /**
+     * input : taxon id ,classification id of ibp 
+     * @return A map which contain keys as dirty, clean and working list. Values of this key is again a LIST of maps with key as name and id
+     * 
+     */
+    def getNamesFromTaxon(){
         //input in params.taxonId
         def res = namelistService.getNamesFromTaxon(params)
-		//def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
+        //def res = [dirtyList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:29585, classificationId:params.classificationId]], workingList:[[name:'aa', id:11, classificationId:params.classificationId], [name:'bb', id:22, classificationId:params.classificationId]]]
         def result;
         if(res) {
             res['isAdmin'] = utilsService.isAdmin();
@@ -47,26 +56,32 @@ class NamelistController {
             json { render result as JSON }
             xml { render result as XML } 
         }
-	}
-	
-	/**
-	 * input : taxon id, classification id of ibp
-	 * @return All detail like kingdom, order etc
-	 */
-	def getNameDetails(){
+    }
+    
+    /**
+     * input : taxon id, classification id of ibp
+     * @return All detail like kingdom, order etc
+     */
+    def getNameDetails(){
         //input in params.taxonId
-		//[name:'aa', kingdom:'kk', .....]
-		def userLanguage = utilsService.getCurrentLanguage(request);   
+        //[name:'aa', kingdom:'kk', .....]
+        def userLanguage = utilsService.getCurrentLanguage(request);   
         def instance;
 
         def res = [:];
         try {
-            if(params.nameType?.equalsIgnoreCase(NameStatus.ACCEPTED.value())) {
+            /*if(params.nameType?.equalsIgnoreCase(NameStatus.ACCEPTED.value())) {
                 instance = TaxonomyDefinition.read(params.taxonId.toLong())
             } else if(params.nameType?.equalsIgnoreCase(NameStatus.SYNONYM.value())) {
                 instance = SynonymsMerged.read(params.taxonId.toLong())
             } else if(params.nameType?.equalsIgnoreCase(NameStatus.COMMON.value())) {
                 //TODO
+            }*/
+            def td = TaxonomyDefinition.read(params.taxonId.toLong());
+            if(td instanceof species.TaxonomyDefinition) {
+                instance = td
+            } else if(td instanceof species.SynonymsMerged) {                
+                instance = SynonymsMerged.read(params.taxonId.toLong())
             }
 
 
@@ -74,8 +89,8 @@ class NamelistController {
                 //def feedCommentHtml = g.render(template:"/common/feedCommentTemplate", model:[instance: instance, userLanguage:userLanguage]);
                 res = namelistService.getNameDetails(params);
                 res['success'] = true;
-				res['rootHolderType'] = instance.class.canonicalName
-				res['rootHolderId'] = instance.id
+                res['rootHolderType'] = instance.class.canonicalName
+                res['rootHolderId'] = instance.id
                 println "====CALL HERE NAME DETAILS====== " + res
                 println "========================================="
                 //fetch registry using taxon id and classification id
@@ -118,9 +133,9 @@ class NamelistController {
         }
         render res as JSON
         return;
-	}
-	
-	/**
+    }
+    
+    /**
      * input : string name and dbName
      * @return list of map where each map represent one result
      */
@@ -315,55 +330,312 @@ class NamelistController {
         }
         render res as JSON;
     }
-	
-	
-	/////////////////////////////// Name list API /////////////////////////////////
-	@Secured(['ROLE_ADMIN'])
-	def changeAccToSyn(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.changeAccToSyn(params.sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
-		render  res as JSON;
-	}
-	
-	@Secured(['ROLE_ADMIN'])
-	def changeSynToAcc(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
-		render  res as JSON;
-	}
-	
-	@Secured(['ROLE_ADMIN'])
-	def deleteName(params){
-		log.debug params
-		def res = [:]
-		boolean isParent = TaxonomyDefinition.read(params.id.toLong()).isParent()
-        if(isParent){
-          res.msg = "Taxon name has children "
-          res.success = true
-          render  res as JSON;  
-          return
-        }else{
-		  res.status = namelistService.deleteName(params.id.toLong())
-		  render  res as JSON;
+
+    /////////////////////////////// Name list API /////////////////////////////////
+    @Secured(['ROLE_USER'])
+    def changeAccToSyn(params){
+        log.debug params
+        def res = ['msg':'']
+		def sourceAcceptedIds = params?.sourceAcceptedId.split(',');
+		def user = springSecurityService.currentUser
+        sourceAcceptedIds.each{ sourceAcceptedId ->
+			def m = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":sourceAcceptedId + "," + params.targetAcceptedId, "moveToClean":'false']))
+			if(namePermissionService.hasPermissionOnAll(m)){
+				res.status = namelistService.changeAccToSyn(sourceAcceptedId.toLong(), params.targetAcceptedId.toLong())
+			}else{
+				res.msg += "\n You do not have permission to change accepted name: " + TaxonomyDefinition.read(sourceAcceptedId.toLong())?.name + "(" + sourceAcceptedId + ") to Synonym of: " + TaxonomyDefinition.read(params.targetAcceptedId.toLong())?.name + "(" + params.targetAcceptedId + ")" 
+			}
         }
+        render  res as JSON;
+    }
+
+    @Secured(['ROLE_USER'])
+    def changeSynToAcc(params){
+        log.debug params
+		def res = ['msg':'']
+		def user = springSecurityService.currentUser
+		boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":params.oldId, "moveToClean":'false']))
+		if(hasPerm){
+			res.status = namelistService.changeSynToAcc(params.oldId.toLong(), null)
+		}else{
+			res.status = false
+			res.msg = "\n You do not have permission to change Synonym: " + TaxonomyDefinition.read(params.oldId.toLong())?.name + "(" + params.oldId + ") to Accepted name"
+		}
+        render  res as JSON;
+    }
+
+    @Secured(['ROLE_USER'])
+    def deleteName(params){
+        log.debug params
+		def res = ['msg':'']
+		def user = springSecurityService.currentUser
+        def delIds = params?.ids.split(',');
+        delIds.each{ id ->
+			boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":id, "moveToClean":'false']))
+			if(!hasPerm){
+                res.msg += "\n You do not have permission to delete name: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")"
+                res.status = false
+				return
+			}
+            boolean isParent = TaxonomyDefinition.read(id.toLong()).isParent()
+			if(isParent){
+              res.msg += "\n Name id: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")" + " has child taxa. Please delete child first"
+            }else{
+              res.status = namelistService.deleteName(id.toLong())
+              res.msg += "\n Name id: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")" + " deleted"
+            }
+        }
+        render res as JSON; 
+    }
+
+    @Secured(['ROLE_USER'])
+    def mergeNames(params){
+        log.debug params
+        def res = ['msg':'']
+		def user = springSecurityService.currentUser
+		def m = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":params.sourceId + "," + params.targetId, "moveToClean":'false']))
+		if(namePermissionService.hasPermissionOnAll(m)){
+			res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
+            res.msg = "Successfully merged"
+		}else{
+			res.status = false
+			res.msg = "\n You do not have permission to merge name: " + TaxonomyDefinition.read(params.sourceId.toLong())?.name + "(" + params.sourceId + ") to target name: " +  TaxonomyDefinition.read(params.targetId.toLong())?.name + "(" + params.targetId + ")"
+		}
+        render  res as JSON;
+    }
+
+    @Secured(['ROLE_USER'])
+    def updatePosition(params){
+        log.debug params
+		def res = ['msg':'']
+		def user = springSecurityService.currentUser
+		def ids = params?.ids.split(',');
+		boolean moveToClean = (NamesMetadata.NamePosition.getEnum(params.position) == NamesMetadata.NamePosition.CLEAN)
+        ids.each{ id ->
+			boolean hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":id, "moveToClean":'' + moveToClean]))
+			if(hasPerm){
+				res.msg += "\n Position for name: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")"+id+ " Updated"
+				res.status = namelistService.updateNamePosition(id.toLong(), params.position, params.hirMap)
+			}else{
+				res.msg += "\n You do not have permission to update position for name: " + TaxonomyDefinition.read(id.toLong())?.name + "(" + id + ")"
+			}
+        }
+        render  res as JSON;
+    }
+
+	@Secured(['ROLE_USER'])
+    def singleNameUpdate(){
+        log.debug params;
+        List errors = [];
+		def user = springSecurityService.currentUser
+        Language languageInstance = utilsService.getCurrentLanguage(request);
+        Map result = [success: true,msg: "",userLanguage:languageInstance, errors:errors];  
+		boolean hasPerm = false
+        if(params.int('taxonId')){
+            TaxonomyDefinition td = TaxonomyDefinition.get(params.int('taxonId'));
+            if(td){
+	            // Editing Species Name only
+                def chkStatus =false;
+                def activityMsg = '';
+				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
+				if((td.name != params.page) && hasPerm ){
+	                 NamesParser namesParser = new NamesParser();
+	                 TaxonomyDefinition pn = new NamesParser().parse([params.page])?.get(0);
+                     if(pn){
+                        activityMsg +='Taxon name updated : '+td.name 
+                        Map m = [name:pn.name, canonicalForm:pn.canonicalForm, normalizedForm:pn.normalizedForm, italicisedForm:pn.normalizedForm,  binomialForm:pn.binomialForm, authorYear:pn.authorYear, id:td.id]
+                        TaxonomyDefinition.executeUpdate( "update TaxonomyDefinition set name = :name, canonicalForm = :canonicalForm, normalizedForm = :normalizedForm,  italicisedForm = :italicisedForm, binomialForm = :binomialForm, authorYear = :authorYear where id = :id", m)
+                        println "Taxon Updated successFully !";
+                        chkStatus = true;
+                        activityMsg +=' to '+pn.name;
+                        result['msg'] +="\n Name taxon updated";
+                        Species sp = Species.findByTaxonConcept(td);
+                        if(sp){
+                            sp.title = td.italicisedForm;
+                            if(sp.save(flush:true)){
+                                println "Species Title Updated successFully "+ sp;
+                                result['msg'] +="\n Name updated"
+                            }
+                        }
+                    }    
+	            }else{
+	                log.debug "No change in Names"
+					if(!hasPerm)
+	                	result['msg'] += '\n You do not have permission to change the name attributes for ' + td.name + "(" + td.id + ")";
+					else
+						result['msg'] += '\n No change in name' + td.name + "(" + td.id + ")";
+	            }          
+	
+	            // Changing position
+				def tmpPos = NamesMetadata.NamePosition.getEnum(params.position)
+				boolean moveToClean = (tmpPos == NamesMetadata.NamePosition.CLEAN)
+				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":''+moveToClean]))
+				if(params.position && (td.position != tmpPos) && hasPerm){                                          
+	                  println "Prev postion changing from "+td.position+" to "+params.position.toUpperCase()
+                      activityMsg +='| Taxon position updated : '+td.position +" to "+ params.position.toUpperCase()
+                      chkStatus = true;
+	                  def r = namelistService.updateNamePosition(params.taxonId.toLong(), params.position, params.hirMap)
+	                  result['msg'] +="\n Position changed to "+params.position
+	            }else{
+					if(!hasPerm)
+						result['msg'] += '\n You do not have permission to change the position for ' + td.name + "(" + td.id + ")"  + ' to ' + params.position
+					else
+	                	result['msg'] +="\n No change in position"
+						
+	                log.debug "No change in current position ="+td.position+" params position"+params.position.toUpperCase();
+	            }                
+	        
+	            //Changing status
+				if(params.status && (td.status != NamesMetadata.NameStatus.getEnum(params.status))){  
+					log.debug "Prev status changing from "+td.status+" to "+params.status.toUpperCase()
+					hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
+					if(hasPerm && (params.status.capitalize() == NameStatus.ACCEPTED.value())){                        
+						println "needed hir updates"
+                        // Needed hir check
+						def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null);
+                        activityMsg +='| Taxon status updated : '+td.status.capitalize() +" to "+ params.status.capitalize()
+                        chkStatus = true;
+                        result['msg'] +="\n Status changed to "+params.status                       
+					}else if(hasPerm && (params.status.capitalize() == NameStatus.SYNONYM.value())){
+                         println "Prev status changing from "+td.id+" to "+params.status
+                         if(params.newRecoId.toLong()){
+							 def reco = Recommendation.read(params.newRecoId.toLong());
+							 if(reco){
+								 def r = namelistService.changeAccToSyn(td.id, reco.taxonConcept.id);
+                                 activityMsg +='| Taxon status updated : '+td.status.capitalize() +" to "+ params.status.capitalize()
+                                 chkStatus = true;
+								 println "Accepted to synonym success";
+								 result['msg'] +="\n Status changed to "+params.status
+							 }else{
+							 	println "newRecoId is null After reading";  
+							 }
+						 }else{
+                            println "newRecoId is null while";
+                         }
+                    }else if(!hasPerm){
+						result['msg'] += '\n You do not have permission to change the status of name ' + td.name + "(" + td.id + ")";
+					}                
+	            }else{
+						result['msg'] +="\n No change in status"
+						println "No Change in Current status ="+td.status+" params status"+params.status
+				}
+	
+	           // hir Change
+				hasPerm = namePermissionService.hasPermission(namePermissionService.populateMap(["user":'' + user.id, "taxon":'' + td.id, "moveToClean":'false']))
+				if(hasPerm && (params.newPath)){
+	                Map list = params.taxonRegistry?:[:];
+	                List hirNameList = [];
+	                String speciesName;
+	                int rank;
+	                list.each { key, value -> 
+	                    if(value) {
+	                        hirNameList.putAt(Integer.parseInt(key).intValue(), value);
+	                     }
+	                } 
+	
+	                speciesName = params.page
+	                rank = params.int('rank');
+	                hirNameList.putAt(rank, speciesName);
+	                println hirNameList;           
+	                def language = utilsService.getCurrentLanguage(request);
+	                params.taxonHirMatch[params.rank+'.ibpId'] = params.taxonId;
+	
+	                def result1 = speciesService.createName(speciesName,rank,hirNameList,null,language,params.taxonId.toLong(), params.taxonHirMatch);
+	                if(result1.success){
+                        activityMsg +='| Taxon Hierarchy updated : '
+                        chkStatus = true;
+	                    result['msg'] += "\n "+result1['msg'];
+                        result['msg'] += "\n \n Note: Changes will not reflect in IBP Taxonomy Hierarchy unless executed by an Admin. \n Please contact admin at support@indiabiodiversity.org with details"
+	                }else{
+	                    result['msg'] += "\n "+result1['msg'];
+	                }
+	            }
+
+                if(chkStatus){
+                    def domainObject = activityFeedService.getDomainObject('species.TaxonomyDefinition', td.id)
+                    println "========================"
+                    domainObject
+                    activityFeedService.addActivityFeed(domainObject, td, user, activityFeedService.TAXON_NAME_UPDATED,activityMsg)
+        
+                }
+	            
+		        withFormat {
+		            html { }
+		            json { render result as JSON }
+		            xml { render result as XML }
+		        } 
+			} //if ends td
+		} // if ends taxonId            
+	}
+
+//    def test(){
+//        println speciesService.updateHierarchy('1_2_3_28_627_628',629,6);
+//        println "aaa"
+//       render "Its Working"
+//    }
+
+	
+	////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////// Names Permission///////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	
+	@Secured(['ROLE_ADMIN'])
+	def addPermission(params){
+		log.debug params
+		def res = [:]
+        def taxonIds = (params.selectedNodes)?params.selectedNodes.split(','):[];
+        def userIds  = (params.userIds)?params.userIds.split(','):[];
+        if(taxonIds.length > 0 && userIds.length > 0 && params.invitetype != ''){
+            taxonIds.each{ taxon -> 
+                userIds.each{ userId ->
+                    Map m = [user: userId,taxon: taxon,permission:params.invitetype.toString()];
+    		      res.statusComplete = namePermissionService.addPermission(namePermissionService.populateMap(m))
+                  res.msg ="Successfully added!"
+                }
+            }
+        }else{
+            res.statusComplete = false;
+            res.msg = 'User or Taxon cannot be null'
+        }
+		render  res as JSON;
+	}
+
+	@Secured(['ROLE_ADMIN'])
+	def removePermission(params){
+		log.debug params
+		def res = [:]
+		res.status = namePermissionService.removePermission(namePermissionService.populateMap(params))
+		render  res as JSON;
 	}
 	
 	@Secured(['ROLE_ADMIN'])
-	def mergeNames(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.mergeNames(params.sourceId.toLong(), params.targetId.toLong())
-		render  res as JSON;
-	}
+	def tt(){
+        //2998_33364_33366_3035_3542_5273_5275
+		/*
+		Map m = [user:"1" ,permission:"ADMIN"];
+		namePermissionService.addPermission(namePermissionService.populateMap(m)) */
+        def td = TaxonomyDefinition.get(126L);
+        def user = springSecurityService.currentUser
+        def domainObject = activityFeedService.getDomainObject('species.TaxonomyDefinition', td.id)
+        activityFeedService.addActivityFeed(domainObject, td, user, activityFeedService.TAXON_NAME_UPDATED,"This is test description")
+		
+//		m = [user:"1426" ,permission:"ADMIN"];
+//		namePermissionService.addPermission(namePermissionService.populateMap(m))
+//		
+//		m = [user:"1117" ,permission:"ADMIN"];
+//		namePermissionService.addPermission(namePermissionService.populateMap(m))
+//
 
-	@Secured(['ROLE_ADMIN'])
-	def updatePosition(params){
-		log.debug params
-		def res = [:]
-		res.status = namelistService.updateNamePosition(params.id.toLong(), params.position, params.hirMap)
-		render  res as JSON;
-	}
+//		
+//        def getAllPermissions= namePermissionService.getAllPermissions([taxon:393]);
+//        def users=[]
+//            getAllPermissions.each { nP ->
+//                println nP.user
+//                users << [id:nP.user.id,profile_pic:nP.user.profilePicture(ImageType.SMALL)];
+//            }
+//            
+        render "Working  "
 
+
+	}
 }

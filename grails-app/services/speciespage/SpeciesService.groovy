@@ -1471,6 +1471,36 @@ class SpeciesService extends AbstractObjectService  {
        return result;
     }
 
+    def createName(String speciesName, int rank, List taxonRegistryNames, String colId, Language language,Long taxonId, Map taxonHirMatch = null) {
+        Map result = [requestParams:[speciesName:speciesName, rank:rank, taxonRegistryNames:taxonRegistryNames, taxonHirMatch:taxonHirMatch]];
+
+        if(!taxonService.validateHierarchy(taxonRegistryNames)) {
+            result['success'] = false;
+            result['msg'] = messageSource.getMessage("info.message.missing", null, LCH.getLocale())
+            return result
+        }
+
+        Classification classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+          //CHK if current user has permission to add details to the species
+        if(!speciesPermissionService.isSpeciesContributor(taxonRegistryNames, springSecurityService.currentUser)) {
+                result['success'] = false;
+                result['status'] = 'requirePermission';
+                result['msg'] = 'Please request for permission to contribute.'
+                //result['errors'] = errors
+                return result
+            //}
+        }
+    
+        //save taxonomy hierarchy
+        Map result1 = taxonService.addTaxonHierarchy(speciesName, taxonRegistryNames, classification, springSecurityService.currentUser, language, false, false, null, taxonHirMatch); 
+        result.putAll(result1);
+        def td = TaxonomyDefinition.get(taxonId);
+        td?.postProcess();
+		//updating ibp hir based on user given hir
+		td?.updateIBPHir(result?.reg)
+		return result
+    }
+
     /**
     * Create resources XML
     */
@@ -2386,7 +2416,7 @@ def checking(){
         }
 
         def docSciNames = DocSciName.executeQuery("from DocSciName dsn where  dsn.scientificName in :canonicalForms and dsn.isDeleted=:isDeleted", ['canonicalForms':canonicalForms,'isDeleted':false]);
-        return docSciNames.document.unique();
+        return docSciNames.document.unique().sort{docSciNames.document.createdOn}.reverse();
 
     }
 	

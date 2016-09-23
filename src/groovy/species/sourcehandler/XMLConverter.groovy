@@ -1993,6 +1993,7 @@ class XMLConverter extends SourceConverter {
                 }
 
                 def parsedName = parsedNames.get(i++);
+                def authorYear = parsedName.authorYear;
                 //log.debug "Parsed name ${parsedName?.canonicalForm}"
                 if(parsedName?.canonicalForm) {
                     //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
@@ -2253,6 +2254,15 @@ class XMLConverter extends SourceConverter {
                     taxon.updateNameStatus(fieldNode?.status?.text())
                     //saving taxon new position
                     taxon.updatePosition(fieldNode?.position?.text(), null, null, parsedName)
+
+                    def nameRunningStatus = fieldNode?.nameRunningStatus?.text();
+                     
+                    if("new".equalsIgnoreCase(nameRunningStatus)){                     
+                       taxon.authorYear=authorYear;
+                       if(!taxon.save(flush:true)) {
+                            taxon.errors.each { println it; log.error it }
+                        }
+                    }
                     
                     if(addNewNameToSession){
                         NamelistService.addNewNameInSession(taxon)

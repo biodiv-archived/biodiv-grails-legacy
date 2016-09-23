@@ -796,7 +796,8 @@ class TaxonService {
         XMLConverter converter = new XMLConverter();
         println "==========TAXON REGISTRY NAMES====== " + taxonRegistryNames
         def taxonRegistryNodes = converter.createTaxonRegistryNodes(taxonRegistryNames, classification.name, contributors, language, taxonHirMatch);
-        
+		println "==========TAXON REGISTRY NODES  ====== " + taxonRegistryNodes
+		
         def getClassifictaionsRes = converter.getClassifications(taxonRegistryNodes, speciesName, true, abortOnNewName, fromCOL, otherParams)
         List<TaxonomyRegistry> taxonRegistry = getClassifictaionsRes.taxonRegistry;
 /*        //check if user has permission to contribute to the taxon hierarchy
@@ -1097,6 +1098,12 @@ class TaxonService {
 		long taxonId = params.taxonId.toLong()
 		long classificationId = params.classificationId.toLong()
 		return TaxonomyRegistry.findByTaxonDefinitionAndClassification(TaxonomyDefinition.read(taxonId), Classification.read(classificationId))
+	}
+
+	private TaxonomyRegistry getTaxonRegPath(params){
+		long taxonId = params.taxonId.toLong()
+		long classificationId = params.classificationId.toLong()
+		return TaxonomyRegistry.findByTaxonDefinitionAndClassificationAndPath(TaxonomyDefinition.read(taxonId), Classification.read(classificationId),params.path)
 	}
 	
 	def addLevelToTaxonReg(){

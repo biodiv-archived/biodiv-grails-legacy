@@ -14,7 +14,16 @@
 			def isCountryChecked = (defaultAccuracy == "country")? "checked" : ""
 			
 			def isGeoPrivacyChecked = (observationInstance?.geoPrivacy) ? "checked" : ""
-            def lastPlaceName = (observationInstance?.placeName)?observationInstance?.placeName:obvInfoFeeder?.placeName;
+            def lastPlaceName;
+            if(userInstance){
+                lastPlaceName=userInstance.location
+            }
+            else if(commandInstance){
+                lastPlaceName=commandInstance.location
+            }
+            else{
+                lastPlaceName = (observationInstance?.placeName)?observationInstance?.placeName:obvInfoFeeder?.placeName;
+            }
             def lastTopology = (observationInstance?.topology)?:obvInfoFeeder?.topology;
          %>
 		<g:if test="${sourceType == 'observation'  || ((params.action == 'edit') && (sourceType == 'checklist-obv'))}">
@@ -45,7 +54,7 @@
 
 <div class="control-group map_class">
 
-    <label for="topology" class="control-label">
+    <label for="topology" class="control-label userlocation">
         <i class="icon-map-marker"></i>
         <g:message
         code="observation.topology.label" default="${g.message(code:'default.label.at')}" /> <span class="req">*</span></label>

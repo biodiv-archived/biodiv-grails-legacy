@@ -23,20 +23,15 @@
         <div class="taxonomyBrowser sidebar_section" style="position:relative">
                                 <h5><g:message code="button.taxon.browser" /></h5>  
                                 <div id="taxaHierarchy">
-                    <g:render template="/common/taxonBrowserUserTemplate" model="['classifications':classifications, selectedClassification:265799, 'expandAll':false]"/>
+                    <g:render template="/common/taxonBrowserTemplate" model="['classifications':classifications, selectedClassification:265799, 'expandAll':false]"/>
                     </div>
                     </div>
                     </div>
                     <div class="span8">
-                    <div class="trait_list">
-    <g:each in="${traitList}" var="traits" status="i">
-    <h6><div class="traitName">${traits.name}</div>-<div class="traitValue">${traits.values}</div></h6>
-    </g:each>
+                    
+                    <g:render template="/trait/traitListTemplate" model="['traitInstanceList':traitInstanceList]"/>
+   
     </div>
-    </div>
-
-
-
 
         <script type="text/javascript">
         var taxonRanks = [];
@@ -52,6 +47,9 @@
             action:"${params.action?:'list'}",
             expandTaxon:"${params.taxon?true:false}"
 
+        }
+        if(${params.taxon?:false}){
+            taxonBrowserOptions['taxonId'] = "${params.taxon}";
         }
         var taxonBrowser = $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);   
     });

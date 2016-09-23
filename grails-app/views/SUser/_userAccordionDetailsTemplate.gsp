@@ -28,7 +28,7 @@ h5{background-clolor:white;}
     padding: 5px;
 }
 .content_score,.curation_score{
-    padding:0px 65px 0px 30px;
+    padding:0px 30px 0px 30px;
     font-size: 12px;
     
 }
@@ -38,6 +38,7 @@ h5{background-clolor:white;}
 </style>
 <div id=activityscore></div>
 <hr style="margin: 5px 0;">
+
  <div id=totalcontributedscore></div>
   <div id=totalactivityscore></div>
 <div class="accordion" id="accordion2">
