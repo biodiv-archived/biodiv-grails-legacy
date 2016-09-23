@@ -1,6 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <div id="ibp-footer" class="gradient-bg-reverse navbar">
-	<table border="0" width="940" align="center">
+	<!--table border="0" width="940" align="center">
       <tbody><tr>
       <td align="center">
       
@@ -28,7 +28,7 @@
       <a href="http://www.acp.int/" target="_blank"><asset:image src="/all/partnerlogo/ACP.jpg" absolute="true" class="partner_lg"/></a>
       </td>
       </tr>
-      </tbody></table>
+      </tbody></table-->
 	<!--div class="container outer-wrapper" style="width:940px">
 		<div class="links_box_column">
 			<ul>
@@ -93,11 +93,11 @@
 
 
             </div-->
-<div class="powered" style="text-align:center;">
+<!--div class="powered" style="text-align:center;">
 	<p> 
 ${g.message(code:'text.supported.on')}<br />
  ${g.message(code:'text.powered.by')}<a href="https://github.com/strandls/biodiv" target="_blank"> ${g.message(code:'link.informatics.platform')}</a> ${g.message(code:'text.technology.partner')} <a href="http://www.strandls.com/strand-foundation/biodiversity" target="_blank" > ${g.message(code:'technology.partner.strandlifesciences')} </p>
-	</div>
+	</div-->
 </div>
 <asset:script>
 $(document).ready(function(){
@@ -312,4 +312,110 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
   ga('send', 'pageview');
 </asset:script>
 
+<div id="ibp-foooter" class="gradient-bg-down navbar">
+
+    <div class="container outer-wrapper" style="width:940px;margin-left:22%;">
+        <div class="links_box_column">
+            <ul>
+                <li
+                    class=" nav-header bold${(params.controller == 'species')?' active':''}"><a
+                    href="${uGroup.createLink(controller:'species', action:'list')}"
+                    title="Species"><g:message code="link.all.species" /></a>
+                </li>
+                <li
+                    class="nav-header bold ${(request.getHeader('referer')?.contains('/map'))?' active':''}"><a
+                    href="${ '/map'}" title="Maps"><g:message code="link.all.maps" /></a></li>
+                <li
+                    class=" nav-header bold${(params.controller == 'checklist')?' active':''}"><a
+                    href="${uGroup.createLink(controller:'checklist', action:'list')}" title="Checklists"><g:message code="link.all.checklists" /> </a></li>
+                <!-- li
+                    class="nav-header bold ${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
+                    href="${ uGroup.createLink(controller:"userGroup", "action":"list")}"
+                    title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All
+                        Groups<sup>Beta</sup> </a>
+                </li-->
+            </ul>
+        </div>
+        <!--div class="links_box_column">
+            <ul>
+                <li class="nav-header bold"  style="padding-left: 0px;"><a href='/page/48'><g:message code="link.the.portal" /></a></li>               
+                <li><a href="#"><g:message code="link.biodiversity.india" /></a>
+                </li>
+                <li><a href="${ '/about/49'}"><g:message code="link.what.new" /></a></li>
+                <li><a href="#"><g:message code="link.technology" /></a></li>
+                <li><a href="${ '/page/43'}"><g:message code="link.faq" /></a></li>
+
+            </ul>
+        </div-->
+        <div class="links_box_column">
+            <ul>
+                <li class="nav-header bold"  style="padding-left: 0px;"><g:message code="link.people" /></li>
+                <li><a href="${'/wikwio/partners'}"><g:message code="link.partners" /></a></li>
+                <li><a href="${'/wikwio/donors'}"><g:message code="link.donors" /></a></li>
+                <!--li><a href="#"><g:message code="link.fraternity" /></a></li-->
+                <li><a href="${'/wikwio/team'}"><g:message code="link.team" /></a></li>
+            </ul>
+        </div>
+
+        <div class="links_box_column">
+            <ul>
+                <li class="nav-header bold"  style="padding-left: 0px;"><g:message code="link.policy" />
+                </li>
+                <li><a href="${ '/wikwio/datasharing'}"><g:message code="link.data.sharing" /></a>
+                </li>
+                <li><a href="${ '/wikwio/licenses'}"><g:message code="default.licenses.label" /></a>
+                </li>
+                <li><a href="${ '/wikwio/terms'}"><g:message code="link.terms.conditions" /></a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="links_box_column">
+            <ul>
+                <li class="nav-header bold" style="color:#111; padding-left: 0px;"><g:message code="default.others.label" /></li>
+                <li><a href="${ '/wikwio/citation'}"><g:message code="link.blog" /></a></li>
+                <!--li><a href="#"><g:message code="link.sitemap" /></a>
+                </li-->
+                <!--li><a href="#"><g:message code="link.apidocs" /></a>
+                </li-->
+
+                <li><a href="${ '/wikwio/feedback'}"><g:message code="link.feedbak" /></a>
+                </li>
+                <li><a href="${ '/wikwio/contact'}"><g:message code="link.contact.us" /></a>
+                </li>
+
+            </ul>
+        </div>
+
+
+
+            </div>
+    <div class="powered" style="text-align:center;">
+        <p >
+            <a href="https://play.google.com/store/apps/details?id=com.ifp.wikwio">
+                <asset:image src="/all/googleplayicon1.png" class="mobile_app_icon" title="WIKWIO Portal Mobile App" absolute="true"/>
+            </a>
+            <a href="https://itunes.apple.com/us/app/wikwio-citizen-science/id1028388728?mt=8">
+                <asset:image src="/all/apple_store1.png" class="mobile_app_icon" title="WIKWIO Portal Mobile App" absolute="true"/>
+            </a> |
+            <a href="https://play.google.com/store/apps/details?id=com.wikwio&hl=en">
+                <asset:image src="/all/googleplayicon1.png" class="mobile_app_icon" title="WIKWIO IDAO Mobile App"absolute="true"/>
+            </a>
+            <a href="https://itunes.apple.com/us/app/wikwio-idao/id997358932?ls=1&mt=8">
+                <asset:image src="/all/apple_store1.png" class="mobile_app_icon" title="WIKWIO IDAO Mobile App" absolute="true"/>
+            </a>
+        </p>
+        <p> <!--a target="_blank" href="${grailsApplication.config.speciesPortal.app.facebookUrl}">
+            <asset:image src="/all/facebook.png" absolute="true"/>
+        </a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}">
+            <asset:image src="/all/twitter.png" absolute="true"/>
+        </a>| <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}">
+            <asset:image src="/all/google_plus.png" absolute="true"/>
+        </a--><br />
+<g:message code="text.supported.on" /><br />
+<g:message code="text.powered.by" /> <a href="https://github.com/strandls/biodiv" target="_blank"><g:message code="link.informatics.platform" /></a>
+<g:message code="text.technology.partner" /> <a href="http://www.strandlifefoundation.org/" target="_blank"><g:message code="technology.partner.strandlifesciences" /></a>
+</p>
+    </div>
+</div>
 

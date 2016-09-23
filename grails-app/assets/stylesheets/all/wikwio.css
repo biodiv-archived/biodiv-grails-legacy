@@ -234,11 +234,11 @@ div.navbar.navbar-static-top.btn{
 #ibp-header .navbar .nav>li>a, #ibp-header .navbar .nav>li>a:hover{
 }
 
-#ibp-footer, .gradient-bg-reverse{
+#ibp-foooter, .gradient-bg-down{
 	background:#8ca643;
 }
 .links_box_column li, .links_box_column li a{
-	color:#fff;
+	color:#111;
 }
 .powered{
 	/*background:#fff;*/
@@ -340,3 +340,55 @@ background-image: url(/assets/all/IDAO.png);
 	border:0px;
 }
 
+.partner_page {
+	height:100px;
+	width:200px;
+}
+hr{
+	height: 1px; 
+	border: 1px solid gray;
+}
+#contentDiv h2 {
+    color: #555555;
+    border-bottom: 1px solid #e5e5e5;
+}
+.resizable-textarea .grippie {
+    height: 9px;
+    overflow: hidden;
+    background: #eee url(/misc/grippie.png) no-repeat center 2px;
+    border: 1px solid #ddd;
+    border-top-width: 0;
+    cursor: s-resize;
+}
+.resizable-textarea textarea {
+    margin-bottom: 0;
+    width: 100%;
+    display: block;
+}
+.description {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.form-item .description {
+    font-size: 0.85em;
+}
+.form-item {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 10px;
+}
+.form-item label {
+    display: block;
+    font-weight: bold;
+}
+label {
+    margin-bottom: 5px;
+    line-height: 20px;
+    font-size: 14px;
+}
+.form-text {
+    width: 230px;
+}
+.marker, .form-required {
+    color: #f00;
+}

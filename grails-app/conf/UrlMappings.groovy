@@ -1,5 +1,8 @@
 import org.gualdi.grails.plugins.ckeditor.CkeditorConfig
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
+
 
 class UrlMappings {
 
@@ -266,6 +269,25 @@ class UrlMappings {
 
     "/admin/manage/$action?"(controller: "adminManage")
     "/adminManage/$action?"(controller: "errors", action: "urlMapping")
+
+   
+    "/wikwio/partners" (view:'/portal/en/partners')
+    "/wikwio/donors" (view:'/portal/en/donors')
+    "/wikwio/team" (view:'/portal/en/team')
+    "/wikwio/datasharing" (view:'/portal/en/datasharing')
+    "/wikwio/licenses" (view:'/portal/en/licenses')
+    "/wikwio/terms" (view:'/portal/en/terms')
+    "/wikwio/citation" (view:'/portal/en/citation')
+    "/wikwio/feedback" (view:'/portal/en/feedback')
+    "/wikwio/contact" (view:'/portal/en/contact')
+ 
+
+
+
+
+
+
+
      
     }
 
