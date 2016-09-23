@@ -314,7 +314,7 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po
 
 <div id="ibp-foooter" class="gradient-bg-down navbar">
 
-    <div class="container outer-wrapper" style="width:940px">
+    <div class="container outer-wrapper" style="width:940px;margin-left:22%;">
         <div class="links_box_column">
             <ul>
                 <li
