@@ -1737,17 +1737,25 @@ class SpeciesService extends AbstractObjectService  {
             queryParams['sGroup']  = groupIds
             queryParams['groupId']  = groupIds[0]
         }
-
+        
         if(params.trait){
-            String traitQuery = " and s.traits @> ARRAY["
-            params.trait?.each { traitName, traitValueId ->
-                traitName = traitName.toLowerCase().replaceAll('_', ' ');
-                traitQuery += "['${traitName}','${traitValueId}'],";
+            def traitLT =[:]
+            params.trait?.each{ it ->
+                if(it.value !='all'){
+                    traitLT[it.key] = it.value
+                }
             }
-            traitQuery = traitQuery[0..-2] + "]";
+            if (traitLT.size()>0){
+                String traitQuery = " and s.traits @> ARRAY["
+                traitLT?.each { traitName, traitValueId ->
+                    traitName = traitName.toLowerCase().replaceAll('_', ' ');
+                    traitQuery += "['${traitName}','${traitValueId}'],";
+                }
+                traitQuery = traitQuery[0..-2] + "]";
 
-            filterQuery += traitQuery;
-            countFilterQuery += traitQuery;
+                filterQuery += traitQuery;
+                countFilterQuery += traitQuery;
+            }
         }
 
         if(params.featureBy == "true" ) {

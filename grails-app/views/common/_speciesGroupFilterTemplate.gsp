@@ -32,13 +32,9 @@ $(document).ready(function(){
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 
 	$(".traitFilter").button();
-	var traits =""
-    <% if(params.trait){ %>
-    	var traits = ${params.trait?.collect{ it.value}}
-    <% } %>
-		$.each(traits,function(k,v){
-			$('.traitFilter button[value="${v}"]').addClass('active').attr('disabled',true);
-		});
+    	<g:each in="${params.trait}" var="t">
+        	$('.trait_btn[data-id="${t.value}"][data-name="${t.key}"]').addClass('active');
+		</g:each>
 });
 
 </script>
@@ -47,7 +43,7 @@ $(document).ready(function(){
 
 <g:each in="${filters}" var="filter" >
 <div class="traitFilter" data-toggle="buttons-radio">
-	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key.replace(' ','_').toLowerCase()]"/>
+	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key.replace(' ','_').toLowerCase(),'hideIcon':true]"/>
 </div>
 </g:each>
 
