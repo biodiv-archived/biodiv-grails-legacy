@@ -1746,7 +1746,7 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
             if (traitLT.size()>0){
-                String traitQuery = " and s.traits @> ARRAY["
+                String traitQuery = " and t.traits @> ARRAY["
                 traitLT?.each { traitName, traitValueId ->
                     traitName = traitName.toLowerCase().replaceAll('_', ' ');
                     traitQuery += "['${traitName}','${traitValueId}'],";
