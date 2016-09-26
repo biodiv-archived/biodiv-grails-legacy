@@ -152,7 +152,7 @@ grails.project.dependency.resolution = {
         //build ":tomcat8:8.0.5"
         //build ':jetty:2.0.3'
 
-        compile ":scaffolding:2.0.1"
+        //compile ":scaffolding:2.0.1"
         //TODO enable this plugin
         compile (':cache:1.1.8') {
                 excludes "servlet-api" 

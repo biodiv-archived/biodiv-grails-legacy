@@ -683,4 +683,9 @@ update species set traits = g.item from (
          select x.object_id, array_agg_custom(ARRAY[ARRAY[lower(x.name), x.id]]) as item from (select f.object_id, t.name, tv.id::varchar, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.object_id
 ) g where g.object_id=id;
 
+alter table taxonomy_definition add column traits text[][];
+update taxonomy_definition set traits = g.item from (
+             select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[lower(x.name), x.id]]) as item from (select f.page_taxon_id, t.name, tv.id::varchar, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
+) g where g.page_taxon_id=id;
 
+CREATE INDEX taxonomy_definition_traits ON taxonomy_definition using gin(traits);
