@@ -12,16 +12,19 @@
 </div>
 </g:if>
 <div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='${traitValue.id}' data-name='${traitName}'>
-<g:if test="${!hideIcon}"> 
+ 
 <div class="svg_wrap">
 <g:if test="${traitValue.icon}">
-<img src="test.jpg"  width="20" height="20" />
+<%  def svgFile=new File('${grailsApplication.config.speciesPortal.app.rootDir}/img/traitIcons/'+traitValue.icon) %>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" viewBox="0 0 200 200" width="40" height="40">
+<%= svgFile.getText()%>
+</svg>
 </g:if>
 <g:else>
 <img src="test.jpg"  width="20" height="20" />
 </g:else>
 </div>
-</g:if>
+
 <div class="trait_label" title="${traitValue.value}">${traitValue.value}</div>
 </div>
 
