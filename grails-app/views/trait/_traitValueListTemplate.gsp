@@ -14,14 +14,14 @@
 <div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='${traitValue.id}' data-name='${traitName}'>
  
 <div class="svg_wrap">
-<g:if test="${traitValue.icon}">
-<%  def svgFile=new File('${grailsApplication.config.speciesPortal.app.rootDir}/img/traitIcons/'+traitValue.icon) %>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" viewBox="0 0 200 200" width="40" height="40">
-<%= svgFile.getText()%>
-</svg>
+<g:if test="${(new File(grailsApplication.config.speciesPortal.resources.serverURL+'/traitsIcons/'+traitValue.icon.toLowerCase())).exists()}">
+<%  def svgFile=new File(grailsApplication.config.speciesPortal.resources.serverURL+'/traitsIcons/'+traitValue.icon) %>
+	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" viewBox="0 0 200 200" width="40" height="40">
+	<%= svgFile.getText()%>
+	</svg>
 </g:if>
 <g:else>
-<img src="test.jpg"  width="20" height="20" />
+<img src="${grailsApplication.config.speciesPortal.resources.serverURL}/nimage.png"  width="40" height="40" />
 </g:else>
 </div>
 
