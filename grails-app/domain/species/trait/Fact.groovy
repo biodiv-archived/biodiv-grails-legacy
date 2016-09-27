@@ -18,7 +18,7 @@ class Fact {
     Long objectId;
 
     static constraints = {
-      trait nullable:false, unique:['pageTaxon', 'objectId']
+      trait nullable:false, unique:['pageTaxon', 'objectId','traitValue']
       //attribution nullable:true
       //contributor nullable:true
       //license nullable:true
@@ -29,5 +29,10 @@ class Fact {
     static mapping = {
         description type:"text"
         attribution type:"text"
+    }
+
+    @Override
+    String toString() {
+        return "<${this.class} : ${id} - (${pageTaxon.name}, ${trait.name}, ${traitValue.value})>";
     }
 }

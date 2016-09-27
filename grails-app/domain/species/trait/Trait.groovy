@@ -197,4 +197,5 @@ class Trait {
             return null;
         }
     }
+
 }

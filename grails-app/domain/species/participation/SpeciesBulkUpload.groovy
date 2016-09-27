@@ -10,61 +10,19 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
 
 
-class SpeciesBulkUpload {
-	private static log = LogFactory.getLog(this);
-	
-	def utilsService
-	
-	public enum Status {
-		VALIDATION("VALIDATION"),
-		SCHEDULED("SCHEDULED"),
-		RUNNING("RUNNING"),
-		ABORTED("ABORTED"),
-		FAILED("FAILED"),
-		UPLOADED("UPLOADED"),
-		ROLLBACK("ROLLBACK"),
-		SUCCESS("SUCCESS"),
-		VALIDATION_FAILED("VALIDATION FAILED")
-		
-		private String value;
+class SpeciesBulkUpload extends UploadLog {
 
-		Status(String value) {
-			this.value = value;
-		}
-		
-		String value() {
-			return this.value;
-		}
-	}
-	
-	Date startDate;
-	Date endDate;
-	String notes;
-	Status status;
-	String filePath;
-	String errorFilePath;
 	String imagesDir;
-	String uploadType;
-	String logFilePath;
-	
-	File logFile
-	
 	int speciesCreated = 0;
 	int speciesUpdated = 0
 	int stubsCreated = 0;
 	
-	
-	static belongsTo = [author:SUser];
-	
     static constraints = {
-		filePath nullable:true
-		errorFilePath nullable:true
-		logFilePath nullable:true
+        importFrom UploadLog
+
 		imagesDir nullable:true
-		endDate nullable:true
-		uploadType nullable:true
-		notes nullable:true, blank: true, size:0..400
     }
+
 	static mapping = {
 		version : false;
 		notes type:'text';
@@ -83,7 +41,8 @@ class SpeciesBulkUpload {
 			return sbu
 		}
 	}
-	
+
+    @Override
 	def updateStatus(Status status){
 		refresh()
 		

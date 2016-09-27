@@ -44,8 +44,6 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.ScientificName.TaxonomyRank;
 import species.participation.ActivityFeedService;
 import static org.springframework.http.HttpStatus.*;
-import species.sourcehandler.exporter.DwCObservationExporter; 
-import species.sourcehandler.exporter.DwCSpeciesExporter; 
 import java.math.BigDecimal
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;

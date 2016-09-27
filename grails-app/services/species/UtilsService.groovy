@@ -71,6 +71,7 @@ class UtilsService {
     static final String OBSERVATION_DELETED = "observationDeleted";
     static final String CHECKLIST_DELETED= "checklistDeleted";
     static final String DOWNLOAD_REQUEST = "downloadRequest";
+    static final String IMPORT_REQUEST = "importRequest";
     //static final int MAX_EXPORT_SIZE = -1;
     static final String REMOVE_USERS_RESOURCE = "deleteUsersResource";
     static final String NEW_SPECIES_PERMISSION = "New permission on species"
