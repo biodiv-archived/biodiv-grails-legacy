@@ -7,7 +7,7 @@ import species.Resource.ResourceType;
 import grails.converters.JSON;
 import java.io.InputStream;
 
-abstract class AbstractObservationImporter {
+abstract class AbstractObservationImporter extends AbstractImporter {
 
     public static String ANNOTATION_HEADER = 'Annotations';
     public static String MEDIA_ANNOTATION_HEADER = 'media_annotations';
@@ -33,35 +33,19 @@ abstract class AbstractObservationImporter {
         }
 
         log.debug "Initializing readers to observation and multimedi files"
-        observationReader = getCSVReader(observationsFile);//targetDir, 'occurrence.txt')
+        observationReader = initReader(observationsFile);
         if(multimediaFile)
-            mediaReader = getCSVReader(multimediaFile);//, 'multimedia.txt')
+            mediaReader = initReader(multimediaFile);//, 'multimedia.txt')
     }
 
     void closeReaders() {
         log.debug "Closing readers to observation and multimedi files"
-        observationReader.close()
-        mediaReader?.close()
+        closeReader(observationReader)
+        closeReader(mediaReader)
     }
-
-    public CSVReader getCSVReader(String directory, String fileName) {
-        char separator = '\t'
-        File f = new File("$directory/$fileName");
-        return getCSVReader(f);
-    }
-
-    public CSVReader getCSVReader(File file) {
-        char separator = '\t'
-        if(file.exists()) {
-            CSVReader reader = new CSVReader(new FileReader(file), separator, CSVWriter.NO_QUOTE_CHARACTER);
-            return reader
-        }
-        return null;
-    }
-
 
     //dwcObvMapping[url for the field from standard] = [field:IBP field name, order: display order for the field on obv show]
-    protected void readHeaders(File uploadLog=null) {
+    protected String[] readHeaders(File uploadLog=null) {
         //read dwcObvMapping
         InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
         dwcObvMapping = [:];

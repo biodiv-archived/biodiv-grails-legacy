@@ -2,7 +2,23 @@
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.groups.SpeciesGroup"%>
 <%@ page import="species.Habitat"%>
+<style type="text/css">
+.div_fir{
+    margin: 5px 0px 0px 0px;
+}
+.trait_btn{
 
+    margin: 0;
+    padding: 0;
+    height: 40px;
+
+}
+.svg_wrap{
+    width: 50px;
+    float: left;
+}
+.trait_label{ margin-left:50px;position:absolute;margin-top:10px; word-wrap: break-word;float:left;}
+</style>
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -14,10 +30,24 @@ $(document).ready(function(){
 	$("#habitatFilter").button();
 	$('#habitatFilter button[value="${params.habitat}"]').addClass('active');
 	$('#habitatFilter button').tooltip({placement:'bottom'});
-		
+
+	$(".traitFilter").button();
+    	<g:each in="${params.trait}" var="t">
+        	$('.trait_btn[data-id="${t.value}"][data-name="${t.key}"]').addClass('active');
+		</g:each>
 });
 
 </script>
+
+
+
+<g:each in="${filters}" var="filter" >
+<div class="traitFilter" data-toggle="buttons-radio">
+	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key.replace(' ','_').toLowerCase(),'hideIcon':true]"/>
+</div>
+</g:each>
+
+<g:if test="${!filters}">
 <div id="speciesGroupFilter" data-toggle="buttons-radio">
 	<%def othersGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS)%>
 	<g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
@@ -32,9 +62,8 @@ $(document).ready(function(){
 		id="${"group_" + othersGroup.id}" value="${othersGroup.id}"
 		title="${othersGroup.name}"></button>
 </div>
-
-
-<g:if test="${(params.controller != 'species') && !hideHabitatFilter}">
+</g:if>
+<g:if test="${!filters}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
@@ -53,7 +82,6 @@ $(document).ready(function(){
 			rel="tooltip"></button>
 	</div>
 </g:if>
-
 <g:if test="${forObservations}">
 <%--	<div id="observationAllChecklistFilter" class="btn-group"--%>
 <%--		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -5px; right: 250px;">--%>

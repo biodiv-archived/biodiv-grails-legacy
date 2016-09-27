@@ -524,5 +524,4 @@ class Species implements Rateable {
         this.reprImage = res;
     }
 
-
 }

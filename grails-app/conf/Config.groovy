@@ -274,6 +274,10 @@ speciesPortal {
         rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
         downloadDir = "${download.rootDir}/namelist"
     }	
+    traits{
+            databaseDir = "${app.rootDir}/traits"
+            traitValueFile="${app.rootDir}/icons.csv"
+    }
 
     names.parser.serverURL = "127.0.0.1"
     names.parser.port = 4334
@@ -489,7 +493,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
-    bannerFilePath = "${app.rootDir}/bannerMessage.txt"  
+    bannerFilePath = "${app.rootDir}/bannerMessage.txt" 
+    filterFilePath = "${app.rootDir}/filters.txt" 
 }
 
 speciesPortal.validCrossDomainOrigins = [
