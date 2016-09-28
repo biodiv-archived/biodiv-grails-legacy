@@ -61,7 +61,7 @@ $(document).ready(function(){
 
 <g:each in="${filters}" var="filter" >
 <div class="traitFilter" data-toggle="buttons-radio">
-	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key,'hideIcon':true]"/>
+	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key,'hideIcon':true,'hasLabel':true]"/>
 </div>
 </g:each>
 

@@ -39,7 +39,7 @@
     	<h6><a href="${uGroup.createLink(action:'show', controller:'trait', id:traits.key.id)}">${traits.key.name}</a></h6>
 
 	    <div class="traitValue">
-	    	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':traits.value,'rows':4,'traitName':traits.key.name]"/>
+	    	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':traits.value,'rows':4,'traitName':traits.key.name,'hasLabel':false]"/>
 	    </div>
     </div>
     </g:each>
