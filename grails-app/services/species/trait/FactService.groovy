@@ -106,6 +106,7 @@ class FactService extends AbstractObjectService {
                                 if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
                                     value.split(',').each { v ->
                                         println v;
+                                        dl.writeLog("Loading trait ${trait} with value ${v.trim()}");
                                         def x = TraitValue.findByTraitAndValueIlike(trait, v.trim());
                                         if(x) traitValues << x;
                                     }
@@ -122,7 +123,7 @@ class FactService extends AbstractObjectService {
                                 }
 
                                 if(!facts) {
-                                    dl.writeLog("Creating new fact", Level.ERROR);
+//                                    dl.writeLog("Creating new fact");
                                     Fact fact = new SpeciesFact();
                                     fact.trait = trait;
                                     fact.pageTaxon = pageTaxon;

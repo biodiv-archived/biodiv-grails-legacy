@@ -271,7 +271,7 @@ println headers;
                 dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name} and taxon ${taxon}");
                 traitValue = new TraitValue();
             } else {
-                dl.writeLog("Updating trait value ${traitValue} for trait ${trait.name} and taxon ${taxon}");
+                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name} and taxon ${taxon}");
             }
 
             headers.eachWithIndex { header, index ->
