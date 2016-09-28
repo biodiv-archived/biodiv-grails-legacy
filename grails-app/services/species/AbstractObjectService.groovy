@@ -2,6 +2,7 @@ package species;
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,8 @@ import species.sourcehandler.XMLConverter;
 import species.participation.Observation;
 import species.Species;
 import species.ScientificName.TaxonomyRank;
-
+import species.participation.DownloadLog;
+import species.participation.UploadLog;
 
 import org.apache.commons.logging.LogFactory;
 import grails.plugin.cache.Cacheable;
@@ -28,6 +30,7 @@ class AbstractObjectService {
 	def springSecurityService;
 	def sessionFactory;
     def utilsService;
+    def messageSource;
 
 	protected static final log = LogFactory.getLog(this);
     
@@ -401,5 +404,28 @@ class AbstractObjectService {
             case ['group_id', 'species group'] : return SpeciesGroup.read(Long.parseLong(value))?.name;
             default : return value;
         }
+    }
+	
+	def upload(params) {
+        log.debug "creating upload request"
+        UploadLog dl = UploadLog.create(springSecurityService.currentUser, new Date(), null, params.file, params.notes, params.uploadType?:params.controller, params);
+        def r = [:];
+        if(dl) {
+            if(!dl.hasErrors()) {
+                r['success'] = true;
+                r['msg']= messageSource.getMessage('observation.import.requsted',null,'Processing... You will be notified by email when it is completed. Login and check your user profile for import link.', LCH.getLocale())
+            } else {
+                r['success'] = false;
+                r['msg'] = 'Error in creating upload log.' 
+                def errors = [];
+                dl.errors.allErrors.each {
+                    def formattedMessage = messageSource.getMessage(it, LCH.getLocale());
+                    errors << ['field': it.field, 'message': formattedMessage]
+                }
+                r['errors'] = errors 
+                println dl.errors.allErrors
+            }
+        }
+        return r;
     }
 }

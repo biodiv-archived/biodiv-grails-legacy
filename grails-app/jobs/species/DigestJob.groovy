@@ -10,6 +10,7 @@ class DigestJob {
 	def dataSource
 	
     static triggers = {
+        println "==========================Setting trigger for DigestJob";
         cron name:'cronTriggerForDigest', startDelay:600l, cronExpression: '0 0 5 * * ?'
     }
 

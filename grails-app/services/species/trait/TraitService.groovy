@@ -2,6 +2,7 @@ package species.trait
 
 import species.participation.DownloadLog;
 import content.eml.UFile;
+import groovy.sql.Sql
 import species.sourcehandler.importer.AbstractImporter;
 import species.sourcehandler.importer.CSVTraitsImporter;
 import org.apache.commons.io.FilenameUtils;
@@ -20,59 +21,30 @@ import species.trait.Trait.DataTypes;
 import species.trait.Trait.TraitTypes;
 import species.trait.Trait.Units;
 import species.formatReader.SpreadsheetReader;
-import groovy.sql.Sql
 import species.Language;
 import species.License;
 import org.hibernate.FlushMode;
+import species.AbstractObjectService;
+import org.codehaus.groovy.grails.web.util.WebUtils;
+import species.AbstractObjectService;
+import species.participation.UploadLog;
+import grails.converters.JSON;
+import org.apache.log4j.Level;
 
-class TraitService {
+
+
+class TraitService extends AbstractObjectService {
 
     static transactional=false;
 
-    //    static final BIODIV_NAMESPACE = "http://indiabiodiversity.org/schema/terms/";
-    public static final int IMPORT_BATCH_SIZE = 10;
-
-    //protected Dataset dataset;
-    //    private String resourceURI = "http://localhost.indiabiodiversity.org/species/show/" 
-
-    private static Map propertyValueIcons;
-    def springSecurityService;
-    def utilsService;
-    def grailsApplication;
-    def dataSource;
-    def sessionFactory;
-
-    void init() {
-        // Make a TDB-backed dataset
-        def traitsDir = new File(grailsApplication.config.speciesPortal.traits.databaseDir);
-        if(!traitsDir.exists()) {
-            traitsDir.mkdir();
-        }
-        String directory = grailsApplication.config.speciesPortal.traits.databaseDir;
-        // dataset = getDataset(directory);
-        // TDB.getContext().set(TDB.symUnionDefaultGraph, true) ;
-
-        //TODO: populating icons from file
-        //TOBE removed
-        CSVReader reader = getCSVReader(new File("${grailsApplication.config.speciesPortal.traits.traitValueFile}"))
-        reader.readNext();//headers
-
-        propertyValueIcons = [:];
-        String[] row = reader.readNext();
-        while(row) {
-            for(int i=0; i<1; i++) {
-                if(row[i]) {
-                    row[i] = row[i].trim().toLowerCase().replaceAll('\\s+', '_');
-                }
-            }
-            if(row[0] && row[1] && row[2]) {
-                if(!propertyValueIcons.get(row[0])) {
-                    propertyValueIcons[row[0]]= [:];
-                }
-                propertyValueIcons[row[0]][row[1].trim().toLowerCase().replaceAll('\\s+', '_')] = row[2];
-            }
-            row = reader.readNext();
-        }
+    Map upload(String file, Map params, UploadLog dl) {
+        //def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
+        Language languageInstance = utilsService.getCurrentLanguage();
+        println languageInstance;
+println "------------------------____"
+        Map result = uploadTraitDefinitions(file, dl, languageInstance);
+        uploadTraitValues(params.tvFile, dl, languageInstance);
+        return result;
     }
 
     //TO BE DELETED AND MOVED TO UTILSSERVICE
@@ -85,78 +57,9 @@ class TraitService {
         return null;
     }
 
-    private Long findTaxonIdFromName(String name) {
-        XMLConverter converter = new XMLConverter();
-        TaxonomyDefinition taxon = converter.getTaxonConceptFromName(name, TaxonomyRank.SPECIES.ordinal(), false, null);
-        return taxon ? taxon.id : null;
-    }
-
-    private boolean isValidTrait(String traitName, traitValue, Long id) {
-        println "Validating trait ${traitName} with value ${traitValue} for taxon ${id}"
-        //FIX: HACK till loading of traits and validation is inplace
-        //return true;
-
-        Trait trait = Trait.findByName(traitName);
-        //if(!trait) return false;
-        boolean isValid = false;
-        isValidType(traitName,traitValue,trait)
-        return true;
-        trait.valueContraints.each { constraint ->
-            isValid = isValid && constraint.validate(trait, traitValue);
-        }
-        return isValid && isValidPropertyAsPerTaxon(trait, id);
-    }
-
-    private boolean isValidType (String traitName, TraitValue traitValue, Trait trait){
-        //Trait trait=Trait.findByName(traitName);
-        //ValueConstraint traitvalueconstraint= ValueConstraint.findAllByTraitId(trait.id.toLong())
-        boolean isValid = false;
-        println "==========Value Constarints========"+trait?.valueConstraint
-        println "======Trait========"+trait?.id
-        println "=======Trait Name========"+traitName
-        println "========Trait Value======="+traitValue
-
-        trait?.valueConstraint.each {
-            def value = it?.toUpperCase().trim()
-            switch(value){
-                case 'CATEGORICAL':
-                break;
-                case 'INTEGER':
-                Integer.parseInt(value)
-                break;
-                case 'FLOAT':
-                Double.parseDouble(value)
-                break;
-                case 'TEXT':
-                break;
-                case 'BOOLEAN':
-                println "====Boolean====="+Boolean.parseBoolean(value)
-                break;
-                case 'ORDERED':
-                break;
-                case 'RANGE':
-                return value.indexOf('-') != -1
-                break;
-                case 'DATE':
-                return UtilsService.parseDate(value) != null
-            }
-        }
-        return true
-    }
-
-    private boolean isValidPropertyAsPerTaxon(Trait trait, Long id) {
-        TaxonomyDefinition taxonInstance = TaxonomyDefinition.read(id);
-        if(!taxonInstance || !trait) return false;
-        List<TaxonomyDefinition> parentTaxon = taxonInstance.parentTaxon();
-        return parentTaxon.intersect(trait.taxon).size() > 0
-    }
-
-    Map loadTraitDefinitions(String file, Language languageInstance) {
+    Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance) {
         int noOfTraitsLoaded = 0;
-        List<String> logMsgs = [];
-
-        log.info "Loading trait definitions from ${file}";
-        logMsgs << "Loading trait definitions from ${file}";
+        dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
 
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
@@ -165,24 +68,22 @@ println headers;
         int traitNameHeaderIndex = -1;
         int taxonIdHeaderIndex = -1;
         for(int i=0; i<headers.size(); i++) {
-            if(headers[i].equalsIgnoreCase('trait')) {
+            if(headers[i].trim().equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
             }
-            if(headers[i].equalsIgnoreCase('taxon id')) {
+            if(headers[i].trim().equalsIgnoreCase('taxon id')) {
                 taxonIdHeaderIndex = i;
             }
         }
 
         if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1) {
-            log.error "Trait name column and/or taxonId column is not defined";
-            logMsgs << "Trait name column and/or taxonId column is not defined";
+            dl.writeLog("Trait name column and/or taxonId column is not defined", Level.ERROR);
             return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':logMsgs];
         }
 
         while(row) {
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[taxonIdHeaderIndex] == null || row[taxonIdHeaderIndex] == '') {
-                log.error "Ignoring row ${row}";
-                logMsgs << "Ignoring row " + row;
+                dl.writeLog("Ignoring row " + row, Level.WARN);
                 row = reader.readNext();
                 continue;
             }
@@ -193,12 +94,10 @@ println headers;
                     TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(taxonId?.trim()));
                     if(t) taxons_scope << t;
                     else {
-                        log.error "Cannot find taxon ${taxonId}";
-                        logMsgs << "Cannot find taxon " + taxonId;
+                        dl.writeLog("Cannot find taxon " + taxonId, Level.ERROR);
                     }
                 } catch(e) {
-                    log.error "Error getting taxon from ${taxonId} : ${e.getMessage()}";
-                    logMsgs << "Error getting taxon from ${taxonId} : ${e.getMessage()}";
+                    dl.writeLog("Error getting taxon from ${taxonId} : ${e.getMessage()}", Level.ERROR);
                     e.printStackTrace();
                 }
             }
@@ -207,12 +106,10 @@ println headers;
 
                 Trait trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex], taxon_scope);
                 if(!trait) {
-                    log.debug "Creating new trait for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
-                    logMsgs << "Creating new trait for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
+                    dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
                     trait = new Trait();
                 } else {
-                    log.debug "Updating trait ${trait} for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
-                    logMsgs << "Updating trait ${trait} for ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}";
+                    dl.writeLog("Updating trait ${trait} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
                 }
 
                 headers.eachWithIndex { header, index ->
@@ -268,21 +165,22 @@ println headers;
                     } 
                 }
 
-                if(!trait.hasErrors() && !trait.save(flush:true)) {
-                    log.error "Failed to save trait";
-                    logMsgs <<  "Failed to save trait";
-                    trait.errors.allErrors.each { 
-                        log.error it 
-                        logMsgs <<  it 
-                    }
-                } else {
-                    log.debug "Successfully inserted/updated trait ${trait.name} : ${trait.taxon}";
+                if(!trait.hasErrors() && trait.save(flush:true)) {
+                    dl.writeLog("Successfully inserted/updated trait");
                     noOfTraitsLoaded++;
+                } else {
+                    dl.writeLog("Failed to save trait", Level.ERROR);
+                    trait.errors.allErrors.each { 
+                        dl.writeLog(it.toString(), Level.ERROR); 
+                    }
+
                 }
             }
             row = reader.readNext();
         }
-        return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':logMsgs];
+        
+        dl.writeLog("\n====================================\nSuccessfully added ${noOfTraitsLoaded} traits\n====================================\n");
+        return ['success':true, 'msg':"Loaded ${noOfTraitsLoaded} traits."];
     }
 
     private Field getField(String string, Language languageInstance) {
@@ -305,12 +203,10 @@ println headers;
         }
     }
 
-    Map loadTraitValues(String file, Language languageInstance) {
+    Map uploadTraitValues(String file, UploadLog dl, Language languageInstance) {
         int noOfValuesLoaded=0;
-        List<String> logMsgs = [];
 
-        log.info "Loading trait values from ${file}";
-        logMsgs << "Loading trait values from ${file}";
+        dl.writeLog("Loading trait values from ${file}", Level.INFO);
 
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
@@ -333,16 +229,14 @@ println headers;
         }
         println headers
         if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || taxonIdHeaderIndex == -1) {
-            log.error "Some of trait name, value and taxonid columns are not defined";
-            logMsgs << "Some of trait name, value and taxonid columns are not defined";
+            dl.writeLog("Some of trait name, value and taxonid columns are not defined", Level.ERROR);
             return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':logMsgs];
         }
 
         while(row) {
 
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '' || row[taxonIdHeaderIndex] == null || row[taxonIdHeaderIndex] == '') {
-                log.error "Ignoring row ${row}";
-                logMsgs << "Ignoring row " + row;
+                dl.writeLog("Ignoring row " + row, Level.WARN);
                 row = reader.readNext();
                 continue;
             }
@@ -351,37 +245,31 @@ println headers;
             try {
                 taxon = TaxonomyDefinition.read(Long.parseLong(row[taxonIdHeaderIndex].trim()));
                 if(!taxon){
-                    log.error "Cannot find taxon ${row[taxonIdHeaderIndex]}";
-                    logMsgs << "Cannot find taxon " + row[taxonIdHeaderIndex];
+                    dl.writeLog("Cannot find taxon " + row[taxonIdHeaderIndex].trim(), Level.ERROR);
                 }
             } catch(e) {
-                log.error "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
-                logMsgs << "Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                dl.writeLog("Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}", Level.ERROR);
                 e.printStackTrace();
             }
 
             Trait trait;
             try {
-                trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex], taxon);
+                trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex].trim(), taxon);
                 if(!trait){
-                    log.error "Cannot find trait ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]}";
-                    logMsgs << "Cannot find trait ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]}";
+                    dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]}", Level.ERROR);
                 }
             } catch(e) {
-                log.error "Error getting trait from ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
-                logMsgs << "Error getting trait from ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${e.getMessage()}";
+                dl.writeLog("Error getting trait from ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${e.getMessage()}", Level.ERROR);
                 e.printStackTrace();
             }
 
-            TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex], trait);
+            TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), trait);
 
             if(!traitValue) {
-                log.debug "Creating new trait value for ${row[traitNameHeaderIndex]} and taxon ${row[taxonIdHeaderIndex]}";
-                logMsgs << "Creating new trait value for ${row[traitNameHeaderIndex]} and taxon ${row[taxonIdHeaderIndex]}";
+                dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name} and taxon ${taxon}");
                 traitValue = new TraitValue();
             } else {
-                log.debug "Updating trait value ${traitValue} for ${row[traitNameHeaderIndex]} and taxon ${taxon}";
-                logMsgs << "Updating trait value ${traitValue} for ${row[traitNameHeaderIndex]} and taxon ${taxon}";
+                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name} and taxon ${taxon}");
             }
 
             headers.eachWithIndex { header, index ->
@@ -404,22 +292,25 @@ println headers;
                     case 'taxon id' : 
                     traitValue.taxon = taxon
                     break;
-
                 } 
             }
 
-            if(!traitValue.hasErrors() && !traitValue.save(flush:true)) {
-                log.error "Failed to save trait vlaue";
-                logMsgs <<  "Failed to save trait value";
-                traitValue.errors.allErrors.each { log.error it; logMsgs << it; }
-            }else{
-                log.debug "Successfully inserted/updated value ${traitValue.value} : ${traitValue.taxon}";
+            if(!traitValue.hasErrors() && traitValue.save(flush:true)) {
+                dl.writeLog("Successfully inserted/updated trait value");
                 noOfValuesLoaded++;
             }
-
+            else {
+                dl.writeLog("Failed to save trait value", Level.ERROR);
+                traitValue.errors.allErrors.each { 
+                    dl.writeLog(it.toString(), Level.ERROR); 
+                }
+            }
+                
             row = reader.readNext();
         }
-        return ['noOfValuesLoaded':noOfValuesLoaded, 'msg':logMsgs];
+
+        dl.writeLog("\n====================================\nSuccessfully added ${noOfValuesLoaded} trait values\n====================================\n");
+        return ['success':true, 'msg':"Loaded ${noOfValuesLoaded} trait values."];
     }
 
     private boolean validateTrait(Trait trait, String value){
@@ -441,215 +332,6 @@ println headers;
             }
         }
         return rValue;
-    }
-
-    Map loadFacts(String file, Language languageInstance) {
-        int noOfFactsLoaded = 0;
-        List<String> logMsgs = [];
-
-        log.info "Loading facts from ${file}";
-        logMsgs << "Loading facts from ${file}";
-
-        //CSVReader reader = getCSVReader(new File(file))
-        //String[] headers = reader.readNext();//headers
-
-        File spreadSheet = new File(file);
-        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each { m ->
-            Trait.withSession { session ->
-                //def session =  sessionFactory.currentSession;
-                session.setFlushMode(FlushMode.MANUAL);
-
-                log.error "Loading facts ${m}";
-                logMsgs << "Loading facts ${m}";
-
-                String attribution = m['attribution'];
-                String speciesName = m['name']?.trim();
-                SUser contributor = m['contributor'] ? SUser.findByEmail(m['contributor']?.trim()) : null;
-                if(!contributor) {
-                    log.error "Not a valid contributor email address ${m['contributor']}";
-                    logMsgs << "Not a valid contributor email address ${m['contributor']}";
-                    return;
-                }
-
-                License license = m['license'] ? License.findByName(License.fetchLicenseType("cc " + m['license'].trim())) : null;
-                if(!license) {
-                    log.error "Not a valid license ${m['license']}";
-                    logMsgs << "Not a valid license ${m['license']}";
-                    return;
-                }
-
-                if(!m['taxonid']) {
-                    log.debug "Finding species from species name ${m['name']}";
-                    logMsgs << "Finding species from species name ${m['name']}";
-                    m['taxonid'] = findSpeciesIdFromName(m['name'])?.taxonConcept?.id;
-                }
-
-                TaxonomyDefinition pageTaxon = m['taxonid'] ? TaxonomyDefinition.findById(Long.parseLong(m['taxonid'].trim())) : null;
-                if(!pageTaxon) {
-                    log.error "Not a valid taxon ${m['taxonid']}";
-                    logMsgs << "Not a valid taxon ${m['taxonid']}";
-                    return;
-                }
-
-                Species species = pageTaxon.createSpeciesStub();
-
-                log.debug "Loading facts for taxon ${pageTaxon} and page ${species}";
-                logMsgs << "Loading facts for taxon ${pageTaxon} and page ${species}";
-                m.each { key, value ->
-                    try {
-                        if(!value) {
-                            return;
-                        }
-                        key = key.trim();
-                        value = value ? value.trim() : null ;
-
-                        switch(key) {
-                            case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
-                            default : 
-                            log.debug "Loading trait ${key} : ${value}";
-                            logMsgs <<  "Loading trait ${key} : ${value}";
-
-                            //TODO: validate if this trait can be given to this pageTaxon as per traits taxon scope
-                            Trait trait = Trait.getValidTrait(key, pageTaxon);
-                            println "Got trait ${trait}";
-
-                            if(!trait) {
-                                log.error "Cannot find trait ${key} for taxon scope ${pageTaxon}";
-                                logMsgs << "Cannot find trait ${key} for taxon scope ${pageTaxon}";
-                                //log.warn "Ignoring fact ${key}:${value} for ${pageTaxon}";
-                                //logMsgs << "Ignoring fact ${key}:${value} for ${pageTaxon}";
-                            } else {
-                                List<Fact> facts = SpeciesFact.findAllByTraitAndPageTaxonAndObjectId(trait, pageTaxon, species.id);
-                                println "GOt existing facts ===================="
-                                println facts;
-                                println "Value"
-                                println value;
-
-                                List<TraitValue> traitValues = [];
-                                if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
-                                    value.split(',').each { v ->
-                                        println v;
-                                        def x = TraitValue.findByTraitAndValueIlike(trait, v);
-                                        if(x) traitValues << x;
-                                    }
-                                } else {
-                                    def x = TraitValue.findByTraitAndValueIlike(trait, value);
-                                    if(x) traitValues << x;
-                                }
-                                println "Got traitValues ====================="
-                                println traitValues;
-
-                                if(!traitValues) {
-                                    log.error "Cannot find [trait:value] [${trait} : ${value}]";
-                                    logMsgs << "Cannot find [trait:value] [${trait} : ${value}]";
-                                    return;
-                                }
-
-                                if(!facts) {
-                                    log.debug "Creating new fact";
-                                    logMsgs << "Creating new fact";
-                                    Fact fact = new SpeciesFact();
-                                    fact.trait = trait;
-                                    fact.pageTaxon = pageTaxon;
-                                    fact.objectId = species.id;
-                                    fact.traitValue = traitValues[0];
-                                    facts << fact;
-                                } 
-
-                                //fact = facts[0];
-
-                                switch(trait.traitTypes) {
-                                    case Trait.TraitTypes.MULTIPLE_CATEGORICAL : 
-                                    boolean isExistingValue = false;
-                                    traitValues.each { tV ->
-                                        if(tV) {
-                                            isExistingValue = false;
-                                            println "tv -> ${tV}"
-                                            facts.each { f ->
-                                                println "f -> ${f}"
-                                                if(tV.value.equalsIgnoreCase(f.traitValue.value)) {
-                                                    isExistingValue = true;
-                                                }
-                                            }
-                                            if(!isExistingValue) {
-                                                Fact fact = new SpeciesFact();
-                                                fact.trait = trait;
-                                                fact.taxon = pageTaxon;
-                                                fact.objectId = species.id;
-                                                fact.traitValue = tV;
-                                                facts << fact;
-                                            }
-                                        }
-                                    }
-                                    break;
-
-                                    case Trait.TraitTypes.SINGLE_CATEGORICAL : 
-                                    facts[0].traitValue = traitValues[0]; 
-                                    break;
-                                    case Trait.TraitTypes.BOOLEAN : 
-                                    facts[0].traitValue = traitValues[0]; 
-                                    break;
-                                    case Trait.TraitTypes.RANGE : 
-
-                                    facts[0].traitValue = traitValues[0]; 
-                                    break;
-                                    case Trait.TraitTypes.DATE : 
-                                    facts[0].traitValue = traitValues[0]; 
-                                    break;
-
-                                    default : log.error "Invalid trait type ${trait.traitTypes}"
-                                }
-
-                                facts.each { fact ->
-                                    if(fact.id) {
-                                        log.debug "Updating fact ${fact}";
-                                        logMsgs << "Updating fact ${fact}";
-                                    } else {
-                                        log.debug "Creating new fact ${fact}";
-                                        logMsgs << "Creating new fact ${fact}";
-                                    }
-                                    fact.attribution = attribution;
-                                    fact.contributor = contributor;
-                                    fact.license = license;
-                                    if(!fact.hasErrors() && !fact.save()) { 
-                                        log.error "Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}"
-                                        logMsgs << "Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}"
-                                        fact.errors.allErrors.each { log.error it; logMsgs << it; }
-                                    } else {
-                                        noOfFactsLoaded++;
-                                        log.debug "Successfully added fact";
-                                        logMsgs << "Successfully added fact";
-                                    }
-                                }
-                            }
-                        }
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                        log.error "Error saving fact ${key} : ${value} for ${pageTaxon}"
-                        logMsgs << "Error saving fact ${key} : ${value} for ${pageTaxon}"
-                    }
-                } 
-                println "=========================================================================="
-                session.flush();
-                session.clear();
-                // we need to disconnect and get a new DB connection here
-                def connection = session.disconnect();
-                if(connection) {
-                    println "---------------------------------";
-                    connection.close();
-                }
-
-                session.reconnect(dataSource.connection);
-            }
-        }
-        return ['noOfFactsLoaded':noOfFactsLoaded, 'msg':logMsgs];
-    }
-
-    private Long findSpeciesIdFromName(String name) {
-        XMLConverter converter = new XMLConverter();
-        TaxonomyDefinition taxon = converter.getTaxonConceptFromName(name, TaxonomyRank.SPECIES.ordinal(), false, null);
-        println taxon
-        return taxon ? taxon.findSpeciesId() : null;
     }
 
     Map listTraits(def params){     
@@ -695,5 +377,3 @@ println headers;
     }
 
 }
-
-

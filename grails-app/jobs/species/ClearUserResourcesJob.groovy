@@ -10,6 +10,7 @@ class ClearUserResourcesJob {
     def resourcesService
 
     static triggers = {
+        println "==========================Setting trigger for ClearUserResourcesJob";
         cron name:'cronTriggerForClearRes', startDelay:600l, cronExpression: '0 0 2 ? * *'
     }
 
