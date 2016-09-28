@@ -98,7 +98,7 @@ class FactController extends AbstractObjectController {
         
         params.file = contentRootDir.getAbsolutePath()+File.separator+params.file;
         def r = factService.upload(params);
-        redirect(action: "list", params: params)
+        redirect(action: "list")
     }
 
 }

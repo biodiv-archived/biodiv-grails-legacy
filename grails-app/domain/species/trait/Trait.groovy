@@ -3,6 +3,9 @@ package species.trait;
 import species.TaxonomyDefinition;
 import species.Field;
 import species.UtilsService;
+import species.Classification;
+import species.SynonymsMerged;
+import grails.util.Holders;
 
 class Trait {
 
@@ -173,7 +176,7 @@ class Trait {
         return null;
     }
 
-    static Trait getValidTrait(String traitName, TaxonomyDefinition taxon) {
+    static Trait getValidTrait(String traitName, TaxonomyDefinition taxonConcept) {
         List<Trait> traits = Trait.findAllByNameIlike(traitName);
         if(!traits) {
             println "No trait with name ${traitName}";
@@ -181,19 +184,35 @@ class Trait {
         }
 
         List<Trait> validTraits = [];
-        List parentTaxon = taxon.fetchDefaultHierarchy();
-        
-        parentTaxon.each { t ->
-            traits.each { trait ->
-                if(trait.taxon.id == t.id)
-                    validTraits << trait;
+
+        String ibpClassificationName = Holders.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY;
+        def classification = Classification.findByName(ibpClassificationName);
+        def ibpParentTaxon;
+        if(taxonConcept instanceof SynonymsMerged) {
+            def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
+            if(acceptedTaxonConcept) {
+                ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
             }
+        } else {
+            ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
         }
+
+        if(ibpParentTaxon) {
+            ibpParentTaxon.each { t ->
+                traits.each { trait ->
+                    if(trait.taxon.id == t.id)
+                        validTraits << trait;
+                }
+            }
+        } else {
+            println "No IBP parent taxon for  ${taxonConcept}"
+        }
+
 
         if(validTraits) {
             return validTraits[0];
         } else {
-            println "No trait defined with name ${traitName} at taxonscope ${parentTaxon}";
+            println "No trait defined with name ${traitName} at taxonscope ${ibpParentTaxon}";
             return null;
         }
     }
