@@ -4,11 +4,11 @@
 <div class="row-fluid">
 <g:each in="${traitValueInstanceList}" var="traitValue" status="i">
 <g:if test="${i%(rows-1)==0}">
-	</div><div class="row-fluid"  style="margin-top:5px;">
+	</div><div class="row-fluid" style="margin-top:2px;">
 </g:if>
 <g:if test="${i==0}">
 <div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='all' data-name='${traitName}'>
-	<div class="trait_label" title="All/Any">All</div>
+	<div class="trait_label" title="All/Any">Any</div>
 </div>
 </g:if>
 <div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='${traitValue.id}' data-name='${traitName}'>
@@ -21,11 +21,11 @@
 	</svg>
 </g:if>
 <g:else>
-<img src="${grailsApplication.config.speciesPortal.resources.serverURL}/nimage.png"  width="40" height="40" />
+<img src="http://pamba.strandls.com/biodiv/img/nimage.png"  width="32" height="32" />
 </g:else>
 </div>
 
-<div class="trait_label" title="${traitValue.value}">${traitValue.value}</div>
+<div class="trait_label ellipsis_trait" title="${traitValue.value}">${traitValue.value}</div>
 </div>
 
 </g:each>
