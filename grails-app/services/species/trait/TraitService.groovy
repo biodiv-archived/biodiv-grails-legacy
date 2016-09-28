@@ -30,6 +30,8 @@ import species.AbstractObjectService;
 import species.participation.UploadLog;
 import grails.converters.JSON;
 import org.apache.log4j.Level;
+import species.trait.Fact;
+import species.trait.TraitValue;
 
 
 
@@ -351,17 +353,17 @@ println headers;
         return traitInstanceList
     }
 
-    Map showTrait(Long id) {
-        Trait trait = Trait.findById(id)
-        TaxonomyDefinition coverage = trait.taxonomyDefinition
-        def taxons = [:];
+    Map showTrait(def params) {
+        Trait trait = Trait.findById(params.id)
+        def coverage = trait.taxon
+        def factList = [:];
+        def traitValue=[];
         Field field;
-        taxons = TraitFacts.findAllByTrait(trait);
+        traitValue=TraitValue.findAllByTrait(trait);
+        factList = Fact.findAllByTrait(trait);
         field = Field.findById(trait.fieldId);
-        println "field"+field.concept
-        println "taxons"+taxons.taxon.name
-        println "coverage"+coverage.name
-        return [trait:trait, coverage:coverage.name, species:taxons.taxon.name, field:field.concept];
+        println "TraitValue"+traitValue
+        return [trait:trait, coverage:coverage.name, traitValue:traitValue.value , species:factList, field:field.concept];
     }
 
     def getAllFilter(filters){
