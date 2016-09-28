@@ -7,22 +7,22 @@
 	</div><div class="row-fluid" style="margin-top:2px;">
 </g:if>
 <g:if test="${i==0}">
-<div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='all' data-name='${traitName}'>
+<div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='all' data-name='${traitName.replaceAll(' ','_').toLowerCase()}'>
 	<div class="trait_label" title="All/Any">Any</div>
 </div>
 </g:if>
-<div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='${traitValue.id}' data-name='${traitName}'>
- 
+<div class="${(rows == 6)?'span2':'span3'} btn trait_btn btn-small" data-id='${traitValue.id}' data-name='${traitName.replaceAll(' ','_').toLowerCase()}'>
+<%traitValue.icon = traitValue.icon.replaceAll('.svg','.png')%> 
 <div class="svg_wrap">
-<g:if test="${(new File(grailsApplication.config.speciesPortal.resources.serverURL+'/traitsIcons/'+traitValue.icon.toLowerCase())).exists()}">
-<%  def svgFile=new File(grailsApplication.config.speciesPortal.resources.serverURL+'/traitsIcons/'+traitValue.icon) %>
-	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" viewBox="0 0 200 200" width="40" height="40">
-	<%= svgFile.getText()%>
-	</svg>
+
+<%  def iconFile %>
+<g:if test="${(new File(grailsApplication.config.speciesPortal.app.rootDir+'/traitsIcons/32/32_'+traitValue.icon)).exists()}">
+<% iconFile=grailsApplication.config.speciesPortal.resources.serverURL+'/traitsIcons/32/32_'+traitValue.icon %>
 </g:if>
 <g:else>
-<img src="http://pamba.strandls.com/biodiv/img/nimage.png"  width="32" height="32" />
+<% iconFile=grailsApplication.config.speciesPortal.resources.serverURL+"/nimage.png"; %>
 </g:else>
+<img src="${iconFile}" width="32" height="32" />
 </div>
 
 <div class="trait_label ellipsis_trait" title="${traitValue.value}">${traitValue.value}</div>
