@@ -7,8 +7,9 @@
         <g:render template="/common/titleTemplate" model="['title':title]"/>
     </head>
     <body>
-        <div class="span12">
-            <div class="page-header clearfix">
+
+    <div class="row-fuild">
+            <div class="page-header clearfix" style="margin: 0px;padding: 0px;">
                 <div style="width:100%;">
                     <div class="main_heading" style="margin-left:0px;">
                         <h1><g:message code="traits.label" /></h1>

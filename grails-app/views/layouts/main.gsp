@@ -46,7 +46,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         </div>
         <div id="species_main_wrapper" style="clear: both;">
             <domain:showSiteHeader model="['userGroupInstance':userGroupInstance]" />
-            <g:if test ="${params.controller == 'namelist'}">
+            <g:if test ="${params.controller == 'namelist'||params.controller == 'trait'}">
             <div class="container-fluid outer-wrapper">
             </g:if>
             <g:else>
