@@ -6,24 +6,15 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 <%@ page import="species.Classification"%>
 <%@ page import="species.ScientificName.TaxonomyRank"%>
-<div class="">
+<div class="row-fluid">
 
 	<!-- main_content -->
-	<div class="list" style="margin-left:0px;clear:both">
+	<div class="list span12 namelist_wrapper" style="margin-left:0px;clear:both">
 		<div class="observation thumbwrap">
-			<div class="observation">
-				<div>
-					<obv:showObservationFilterMessage
+			<obv:showObservationFilterMessage
 						model="['observationInstanceList':instanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'trait']" />
-				</div>
-			</div>
 
-            <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
-                <div class="filters" style="position: relative;">
-                    <g:render template="showTraitListTemplate"/>
-                </div>
-            </div>
-            <div class="span4" style="position:relative;top:20px">
+           <div class="span3" style="position:relative;margin-left:0px;">
                <div id="taxonBrowser">
                     <div class="taxonomyBrowser sidebar_section" style="position:relative">
                         <h5><g:message code="button.taxon.browser" /></h5> 
@@ -41,12 +32,20 @@
                         </div>
                     </div>
                 </div>
-                <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>
             </div>
+            <div class="span9 right-shadow-box">
+                <div class="sidebar_section">
+                    <h5>Traits</h5>
+                    <div class="filters" style="position: relative;height:360px;overflow:auto;">
+                        <g:render template="showTraitListTemplate"/>
+                    </div>
+                </div>
+                </div>
         </div>
     </div>
-
-	<!-- main_content end -->
+</div>
+<div class="row-fluid">
+    <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>
 </div>
 <script>
     var taxonRanks = [];
