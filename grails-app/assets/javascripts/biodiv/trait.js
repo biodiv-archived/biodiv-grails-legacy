@@ -8,19 +8,26 @@ function updateMatchingSpeciesTable() {
 
 function loadMatchingSpeciesList() {
     var $me = $(this);
-//    var target = window.location.pathname + window.location.search;
-//    var a = $('<a href="'+target+'"></a>');
-//    var url = a.url();
-//    var href = url.attr('path');
-//    var params = getFilterParameters(url);
-    var params = {};
-    $('.trait button').each(function(){
+    var target = window.location.pathname + window.location.search;
+    var a = $('<a href="'+target+'"></a>');
+    var url = a.url();
+    var href = url.attr('path');
+    var params = getFilterParameters(url);
+    for(var key in params) {
+        if(key.match('trait.')) {
+            delete params[key];
+        }
+    }
+    var History = window.History;
+    $('.trait button').each(function() {
         if($(this).hasClass('active')) {
             params['trait.'+$(this).attr('data-tid')] = $(this).attr('data-tvid');
         }
     });
     params['max'] = $(this).data('max');
     params['offset'] = $(this).data('offset');
+
+    History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
     var $matchingSpeciesTable = $('#matchingSpeciesTable');
     $.ajax({
         url:window.params.trait.matchingSpeciesListUrl,

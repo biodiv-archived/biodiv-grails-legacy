@@ -3,12 +3,10 @@
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
 			<ul class="grid_view thumbnails obvListwrapper">
-				<g:each in="${instanceList}" status="i"
-					var="instance">
+				<g:each in="${instanceList}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
                     <g:render template="showTraitTemplate" model="['trait':instance]"/>
 					</li>
-
 				</g:each>
 			</ul>			
 		</div>

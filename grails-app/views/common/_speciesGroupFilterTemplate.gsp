@@ -18,6 +18,24 @@
     float: left;
 }
 .trait_label{ margin-left:50px;position:absolute;margin-top:10px; word-wrap: break-word;float:left;}
+
+.traitFilter{  
+	border: 1px solid #ccc;
+  	padding: 5px;
+ }
+ .traitFilter h6{
+ 	margin:0px;
+ 	line-height: 12px;
+ }
+ .traitFilter .span2{
+ 	height:36px;
+ }
+ .ellipsis_trait {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
 </style>
 <script type="text/javascript">
 
@@ -92,9 +110,10 @@ $(document).ready(function(){
 <%--			data-original-title="${g.message(code:'speciesgroupfilter.title.show.only')}"><g:message code="default.checklist.label" /></button>--%>
 <%--	</div>--%>
 
+	<div class="traitFilter" style="height:30px;">
 	<g:if test="${!params.isChecklistOnly}">
 		<div id="observationMediaFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">
+			style="float: right;">
 			<input type="text" id="observationMediaFilter"
 				value="${params.isMediaFilter}" style="display: none" />
 			<button id="observationMediaAllFilterButton" class="btn"
@@ -104,7 +123,7 @@ $(document).ready(function(){
 		</div>
 
 		<div id="speciesNameFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
+			style="float: right;">
 			<input type="text" id="speciesNameFilter"
 				value="${params.speciesName}" style="display: none" />
 			<button id="speciesNameAllButton" class="btn" rel="tooltip"
@@ -114,7 +133,7 @@ $(document).ready(function(){
 		</div>
 		
 		<div id="observationFlagFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -30px; right: 0;">
+			style="float: right;">
 			<input type="text" id="observationFlagFilter"
 				value="${params.isFlagged}" style="display: none" />
 			<button id="observationWithNoFlagFilterButton" class="btn"
@@ -125,7 +144,7 @@ $(document).ready(function(){
 	</g:if>
 	<g:else>
 		<div id="areaFilter" class="btn-group"
-			style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 0;">
+			style="float: right;">
 			<input type="text" id="areaFilter"
 				value="${params.areaFilter}" style="display: none" />
 			<button id="allAreaButton" class="btn" rel="tooltip"
@@ -140,5 +159,6 @@ $(document).ready(function(){
 	
 	
 	</g:else>
+	</div>
 </g:if>
 

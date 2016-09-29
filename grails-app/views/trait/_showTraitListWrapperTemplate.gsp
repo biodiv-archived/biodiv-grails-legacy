@@ -67,11 +67,20 @@
             taxonBrowserOptions['taxonId'] = "${params.taxon}";
         }
 
-      
-
-
         $('.list').on('updatedGallery', function() {
             $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+
+            $('.trait button, .trait .all').on('click', function(){
+                console.log($(this));
+                if($(this).hasClass('active')){
+                return false;
+                }
+                $(this).parent().parent().find('button, .all').removeClass('active btn-success');
+                $(this).addClass('active btn-success');
+
+                updateMatchingSpeciesTable();
+                return false;
+            });
             updateMatchingSpeciesTable();
         });
     });
@@ -83,17 +92,6 @@ $(document).ready(function() {
     <g:each in="${params.trait}" var="t">
         $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
     </g:each>
-
-    $('.trait button').on('click', function(){
-                console.log($(this));
-                if($(this).hasClass('active')){
-                    return false;
-                }
-                $(this).parent().parent().find('button').removeClass('active btn-success');
-                $(this).addClass('active btn-success');
-
-                updateMatchingSpeciesTable();
-                return false;
-    });
+   
 });
 </asset:script>

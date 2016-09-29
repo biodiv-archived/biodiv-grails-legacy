@@ -31,7 +31,8 @@ import species.participation.UploadLog;
 import grails.converters.JSON;
 import org.apache.log4j.Level;
 import species.Classification;
-
+import species.trait.Fact;
+import species.trait.TraitValue;
 
 class TraitService extends AbstractObjectService {
 
@@ -334,23 +335,6 @@ println headers;
         return rValue;
     }
 
-    Map listTraits(def params) { 
-        TaxonomyDefinition taxon=TaxonomyDefinition.findById(params.taxon)
-        def traitInstanceList = [:]
-        def traitValueInstanceList = []
-        def tValue ;
-        def traitList=Trait.findAllByTaxon(taxon)
-        traitList.each{
-            traitValueInstanceList = []
-            tValue = TraitValue.findAllByTrait(it);
-            tValue.each{
-              traitValueInstanceList << it  
-            }
-            traitInstanceList[it] = traitValueInstanceList
-        }
-        return traitInstanceList
-    }
-
     Map getFilteredList(def params, int max, int offset) {
 
         def queryParts = getFilterQuery(params) 
@@ -382,6 +366,8 @@ println headers;
 
         allInstanceCountQuery.setProperties(queryParts.queryParams)
         allInstanceCount = allInstanceCountQuery.list()[0]
+
+        queryParts.queryParams.trait = params.trait;
 
         return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
     }
@@ -477,17 +463,17 @@ println headers;
 
     }
 
-    Map showTrait(Long id) {
-        Trait trait = Trait.findById(id)
-        TaxonomyDefinition coverage = trait.taxonomyDefinition
-        def taxons = [:];
+    Map showTrait(def params) {
+        Trait trait = Trait.findById(params.id)
+        def coverage = trait.taxon
+        def factList = [:];
+        def traitValue=[];
         Field field;
-        taxons = TraitFacts.findAllByTrait(trait);
+        traitValue=TraitValue.findAllByTrait(trait);
+        factList = Fact.findAllByTrait(trait);
         field = Field.findById(trait.fieldId);
-        println "field"+field.concept
-        println "taxons"+taxons.taxon.name
-        println "coverage"+coverage.name
-        return [trait:trait, coverage:coverage.name, species:taxons.taxon.name, field:field.concept];
+        println "TraitValue"+traitValue
+        return [trait:trait, coverage:coverage.name, traitValue:traitValue.value , species:factList, field:field.concept];
     }
 
     def getAllFilter(filters){

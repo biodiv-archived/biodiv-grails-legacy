@@ -244,11 +244,11 @@ $(document).ready(function(){
         return false;
     });
 
-    $('.traitFilter button').click(function(){
+    $('.traitFilter .all, .traitFilter button').click(function(){
         if($(this).hasClass('active')){
             return false;
         }
-        $(this).parent().parent().find('button').removeClass('active btn-success');
+        $(this).parent().parent().find('button, .all').removeClass('active btn-success');
         $(this).addClass('active btn-success');
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
@@ -955,6 +955,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['habitat'] = habitat;
     }
 
+    for(var key in params) {
+        if(key.match('trait.')) {
+            delete params[key];
+        }
+    }
     var trait = getSelectedTrait();
     for(var key in trait) { 
         params['trait.'+key]=trait[key];

@@ -95,7 +95,7 @@ class TraitController extends AbstractObjectController {
     }
 
     def show() {
-        render(view:'show', model:traitService.showTrait(params.id))
+        render(view:'show', model:traitService.showTrait(params))
     }
 
     @Secured(['ROLE_USER'])
