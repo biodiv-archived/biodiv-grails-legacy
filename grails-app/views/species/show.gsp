@@ -220,9 +220,11 @@
                 </div>
 
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
-                <g:render template="/species/showSpeciesTraits" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
+                
                 <div class="span12" style="margin-left:0px">
-
+                    <div class="sidebar_section">
+                    <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList]" />
+                    </div>
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
                     
                     <g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>

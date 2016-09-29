@@ -5,7 +5,7 @@
 			<ul class="grid_view thumbnails obvListwrapper">
 				<g:each in="${instanceList}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="showTraitTemplate" model="['trait':instance]"/>
+                    <g:render template="/trait/showTraitTemplate" model="['trait':instance]"/>
 					</li>
 				</g:each>
 			</ul>			
