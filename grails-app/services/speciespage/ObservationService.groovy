@@ -1497,12 +1497,12 @@ println resIdList
                 }
             }
             if (traitLT.size()>0) {
-                traitQuery = " and t.traits @> ARRAY["
+                traitQuery = " and t.traits @> cast(ARRAY["
                 traitLT?.each { traitId, traitValueId ->
                     //traitName = traitName.toLowerCase().replaceAll('_', ' ');
-                    traitQuery += "['${traitId}','${traitValueId}'],";
+                    traitQuery += "[${traitId}, ${traitValueId}],";
                 }
-                traitQuery = traitQuery[0..-2] + "]";
+                traitQuery = traitQuery[0..-2] + "] as bigint[])";
                 if(!taxonQuery) {
                     taxonQuery = recoQuery+" join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id ";
                     query += taxonQuery;
