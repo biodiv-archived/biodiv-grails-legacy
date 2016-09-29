@@ -20,7 +20,6 @@
                     </g:else>
             </div>
 
-                <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:100px'};"
-                    title="${traitValue.value}"> ${traitValue.value} </span> 
+            <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:100px'};" title="${traitValue.value}"> ${traitValue.value} </span> 
    </div>
 </div>
