@@ -50,18 +50,18 @@ $(document).ready(function(){
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 
 	$(".traitFilter").button();
-    	<g:each in="${params.trait}" var="t">
-        	$('.trait_btn[data-id="${t.value}"][data-name="${t.key}"]').addClass('active');
-		</g:each>
+	$(".traitFilter button").tooltip({placement:'bottom'});
+    <g:each in="${params.trait}" var="t">
+        $('.traitFilter button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
+    </g:each>
 });
 
 </script>
 
-
-
 <g:each in="${filters}" var="filter" >
 <div class="traitFilter" data-toggle="buttons-radio">
-	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key,'hideIcon':true]"/>
+	<h6>${filter.key}</h6>
+	<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':filter.value]"/>
 </div>
 </g:each>
 
@@ -81,7 +81,7 @@ $(document).ready(function(){
 		title="${othersGroup.name}"></button>
 </div>
 </g:if>
-<g:if test="${!filters}">
+<g:if test="${!filters && (params.controller != 'species') && !hideHabitatFilter}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
@@ -111,7 +111,7 @@ $(document).ready(function(){
 <%--			data-original-title="${g.message(code:'speciesgroupfilter.title.show.only')}"><g:message code="default.checklist.label" /></button>--%>
 <%--	</div>--%>
 
-	<div class="traitFilter" style="height:30px;">
+	<div style="height:30px;">
 	<g:if test="${!params.isChecklistOnly}">
 		<div id="observationMediaFilter" class="btn-group"
 			style="float: right;">

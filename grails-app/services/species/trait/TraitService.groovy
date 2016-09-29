@@ -30,8 +30,9 @@ import species.AbstractObjectService;
 import species.participation.UploadLog;
 import grails.converters.JSON;
 import org.apache.log4j.Level;
-
-
+import species.Classification;
+import species.trait.Fact;
+import species.trait.TraitValue;
 
 class TraitService extends AbstractObjectService {
 
@@ -334,34 +335,145 @@ println headers;
         return rValue;
     }
 
-    Map listTraits(def params){     
-        TaxonomyDefinition taxon=TaxonomyDefinition.findById(params.taxon)
-        def traitInstanceList = [:]
-        def traitValueInstanceList = []
-        def tValue ;
-        def traitList=Trait.findAllByTaxon(taxon)
-        traitList.each{
-            traitValueInstanceList = []
-            tValue = TraitValue.findAllByTrait(it);
-            tValue.each{
-              traitValueInstanceList << it  
-            }
-            traitInstanceList[it] = traitValueInstanceList
+    Map getFilteredList(def params, int max, int offset) {
+
+        def queryParts = getFilterQuery(params) 
+        String query = queryParts.query;
+        long allInstanceCount = 0;
+
+        query += queryParts.filterQuery + queryParts.orderByClause
+        
+        log.debug "query : "+query;
+        log.debug "allInstanceCountQuery : "+queryParts.allInstanceCountQuery;
+
+        log.debug query;
+        log.debug queryParts.queryParams;
+        def allInstanceCountQuery = sessionFactory.currentSession.createQuery(queryParts.allInstanceCountQuery)
+
+        def hqlQuery = sessionFactory.currentSession.createQuery(query)
+
+        if(max > -1){
+            hqlQuery.setMaxResults(max);
+            queryParts.queryParams["max"] = max
         }
-        return traitInstanceList
+        if(offset > -1) {
+            hqlQuery.setFirstResult(offset);
+            queryParts.queryParams["offset"] = offset
+        }
+        
+        hqlQuery.setProperties(queryParts.queryParams);
+        def instanceList = hqlQuery.list();
+
+        allInstanceCountQuery.setProperties(queryParts.queryParams)
+        allInstanceCount = allInstanceCountQuery.list()[0]
+
+        queryParts.queryParams.trait = params.trait;
+
+        return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+    }
+    
+    def getFilterQuery(params) {
+
+        Map queryParams = [isDeleted : false]
+        Map activeFilters = [:]
+
+        String query = "select "
+        String taxonQuery = '';
+
+        def orderByClause = params.sort ? "  obv." + params.sort +  " desc, obv.id asc": " obv.id asc"
+
+        if(params.fetchField) {
+            query += " obv.id as id,"
+            params.fetchField.split(",").each { fetchField ->
+                if(!fetchField.equalsIgnoreCase('id'))
+                    query += " obv."+fetchField+" as "+fetchField+","
+            }
+            query = query [0..-2];
+            queryParams['fetchField'] = params.fetchField
+        }else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
+            query += " g2 "
+        } 
+        else {
+            query += " obv "
+        }
+        query += " from Trait obv "
+
+        def filterQuery = " where obv.isDeleted = :isDeleted "
+        
+        //TODO: check logic
+        if(params.featureBy == "false") {
+            featureQuery = ", Featured feat "
+            query += featureQuery;
+            filterQuery += " and obv.id != feat.objectId and feat.objectType = :featType "
+            queryParams["featureBy"] = params.featureBy
+            queryParams["featType"] = Dataset.class.getCanonicalName();
+        }
+
+        if(params.tag) {
+            tagQuery = ",  TagLink tagLink "
+            query += tagQuery;
+            //mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
+            filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
+
+            queryParams["tag"] = params.tag
+            queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
+            activeFilters["tag"] = params.tag
+        }
+
+        /*if(params.user) {
+            filterQuery += " and obv.author.id = :user "
+            queryParams["user"] = params.user.toLong()
+            activeFilters["user"] = params.user.toLong()
+        }*/
+
+        if(params.isFlagged && params.isFlagged.toBoolean()){
+            filterQuery += " and obv.flagCount > 0 "
+            activeFilters["isFlagged"] = params.isFlagged.toBoolean()
+        }
+
+        if(params.taxon) {
+            def taxon = TaxonomyDefinition.read(params.taxon.toLong());
+            if(taxon) {
+                queryParams['taxon'] = taxon.id;
+                activeFilters['taxon'] = taxon.id;
+                //taxonQuery = " join obv.taxon.hierarchies reg ";
+                //query += taxonQuery;
+
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                List parentTaxon = taxon.parentTaxonRegistry(classification).get(classification).collect {it.id};
+                queryParams['classification'] = classification.id 
+                queryParams['parentTaxon'] = parentTaxon 
+                activeFilters['classification'] = classification.id
+    
+                filterQuery += " and obv.taxon.id in (:parentTaxon) ";
+
+            }
+        }
+        
+		def allInstanceCountQuery = "select count(*) from Trait obv " +taxonQuery+" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+	
+        orderByClause = " order by " + orderByClause;
+
+        return [query:query, allInstanceCountQuery:allInstanceCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+
     }
 
-    Map showTrait(Long id) {
-        Trait trait = Trait.findById(id)
-        TaxonomyDefinition coverage = trait.taxonomyDefinition
-        def taxons = [:];
+    Map showTrait(def params) {
+        Trait trait = Trait.findById(params.id)
+        def coverage = trait.taxon
+        def factList = [:];
+        def traitValue=[];
         Field field;
-        taxons = TraitFacts.findAllByTrait(trait);
+        traitValue=TraitValue.findAllByTrait(trait);
+        factList = Fact.findAllByTrait(trait);
         field = Field.findById(trait.fieldId);
-        println "field"+field.concept
-        println "taxons"+taxons.taxon.name
-        println "coverage"+coverage.name
-        return [trait:trait, coverage:coverage.name, species:taxons.taxon.name, field:field.concept];
+        println "TraitValue"+traitValue
+        return [trait:trait, coverage:coverage.name, traitValue:traitValue , species:factList, field:field.concept];
     }
 
     def getAllFilter(filters){

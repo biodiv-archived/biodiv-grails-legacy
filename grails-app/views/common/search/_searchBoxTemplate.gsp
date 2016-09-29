@@ -137,6 +137,9 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         },
         'dataset':{
             'deleteUrl':"${uGroup.createLink(controller:'dataset', action:'delete')}"
+        },
+        'trait' : {
+            matchingSpeciesListUrl:"${uGroup.createLink(controller:'trait', action: 'matchingSpecies', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}"
         }
         <sUser:isAdmin>
         ,

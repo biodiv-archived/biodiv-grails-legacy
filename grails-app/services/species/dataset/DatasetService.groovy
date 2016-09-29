@@ -866,8 +866,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             query += featureQuery;
             filterQuery += " and obv.id != feat.objectId and feat.objectType = :featType "
             queryParams["featureBy"] = params.featureBy
-            queryParams["featType"] = Observation.class.getCanonicalName();
-
+            queryParams["featType"] = Dataset.class.getCanonicalName();
         }
 
         if(params.tag){

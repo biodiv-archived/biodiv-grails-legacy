@@ -1743,15 +1743,16 @@ class SpeciesService extends AbstractObjectService  {
             params.trait?.each{ it ->
                 if(it.value !='all'){
                     traitLT[it.key] = it.value
+                    queryParams['trait.'+it.key] = it.value
                 }
             }
             if (traitLT.size()>0){
-                String traitQuery = " and t.traits @> ARRAY["
-                traitLT?.each { traitName, traitValueId ->
-                    traitName = traitName.toLowerCase().replaceAll('_', ' ');
-                    traitQuery += "['${traitName}','${traitValueId}'],";
+                String traitQuery = " and t.traits @> cast(ARRAY["
+                traitLT?.each { traitId, traitValueId ->
+                    //traitName = traitName.toLowerCase().replaceAll('_', ' ');
+                    traitQuery += "[${traitId}, ${traitValueId}],";
                 }
-                traitQuery = traitQuery[0..-2] + "]";
+                traitQuery = traitQuery[0..-2] + "] as bigint[])";
 
                 filterQuery += traitQuery;
                 countFilterQuery += traitQuery;
@@ -1976,7 +1977,7 @@ class SpeciesService extends AbstractObjectService  {
             else if(NameStatus.SYNONYM.toString().equals(s[1])) synonymSpeciesCount = s[1]
         }
 
-
+        //queryParams.trait = params.trait;
 
         return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, speciesCount:speciesCount, subSpeciesCount:subSpeciesCount, acceptedSpeciesCount:acceptedSpeciesCount, synonymSpeciesCount:synonymSpeciesCount, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
         //else {
@@ -2490,4 +2491,18 @@ def checking(){
         return ["observations":result, "count":count[0]["count"]]
     }
 	
+    def getMatchingSpeciesList(params) {
+        def result = _getSpeciesList(params);
+        def matchingSpeciesList = [];
+        result.speciesInstanceList.each {it->
+            def link = utilsService.createHardLink("species", "show", it.id);
+            if(params.downloadFrom == 'matchingSpecies') {
+                //HACK: request not available as its from job scheduler
+                matchingSpeciesList << [it.title, true, 0, link, link]
+            } else {
+                matchingSpeciesList << [it.title, true, 0, link, link, params.user]
+            }
+        }
+        return [matchingSpeciesList:matchingSpeciesList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
+    }
 }

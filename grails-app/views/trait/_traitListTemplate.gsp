@@ -35,9 +35,11 @@
 </style>
      <div class="observations_list pre-scrollable" style="clear: both;overflow-x:hidden;">
      <g:each in="${traitInstanceList}" var="traits" status="i">
-    <div class="traitName row-fluid">    	
-	    <div class="traitFilter">
-	    	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':traits.value,'rows':4,'traitName':traits.key.name]"/>
+    <div class="traitName row-fluid">
+    	<h6><a href="${uGroup.createLink(action:'show', controller:'trait', id:traits.key.id)}">${traits.key.name}</a></h6>
+
+	    <div class="traitValue">
+	    	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':traits.value,'rows':4,'traitName':traits.key.name,'hasLabel':false]"/>
 	    </div>
     </div>
     </g:each>

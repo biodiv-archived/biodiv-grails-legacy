@@ -39,6 +39,7 @@ import static org.springframework.http.HttpStatus.*;
 import species.participation.NamelistService
 import species.NamesMetadata
 import species.participation.SpeciesBulkUpload
+import species.trait.Fact;
 
 class SpeciesController extends AbstractObjectController {
 
@@ -240,6 +241,8 @@ class SpeciesController extends AbstractObjectController {
         params.id = params.long('id');
 		def url
 		def speciesInstance = params.id ? Species.findByIsDeletedAndId(false, params.id):null;
+        def traitList=Fact.findAllByPageTaxon(speciesInstance.taxonConcept)
+        println "traitList======="+traitList.traitValue
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
             withFormat {
@@ -325,7 +328,7 @@ class SpeciesController extends AbstractObjectController {
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
 
                     def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
+                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList]
 
                     if(springSecurityService.currentUser) {
                         SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');

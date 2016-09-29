@@ -244,12 +244,12 @@ $(document).ready(function(){
         return false;
     });
 
-    $('.traitFilter .trait_btn').click(function(){
+    $('.traitFilter .all, .traitFilter button').click(function(){
         if($(this).hasClass('active')){
             return false;
         }
-        $(this).parent().parent().find('.trait_btn').removeClass('active');
-        $(this).addClass('active');
+        $(this).parent().parent().find('button, .all').removeClass('active btn-success');
+        $(this).addClass('active btn-success');
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
@@ -732,10 +732,10 @@ function getSelectedHabitat() {
 
 function getSelectedTrait() {
     var hbt = '',trait='',selTrait={}; 
-    $('.traitFilter .trait_btn').each(function(){
+    $('.traitFilter button').each(function(){
         if($(this).hasClass('active')) {
-            trait = $(this).attr('data-name');
-            selTrait[trait] = $(this).attr('data-id');
+            trait = $(this).attr('data-tid');
+            selTrait[trait] = $(this).attr('data-tvid');
         }
     });
     return selTrait;
@@ -955,6 +955,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['habitat'] = habitat;
     }
 
+    for(var key in params) {
+        if(key.match('trait.')) {
+            delete params[key];
+        }
+    }
     var trait = getSelectedTrait();
     for(var key in trait) { 
         params['trait.'+key]=trait[key];

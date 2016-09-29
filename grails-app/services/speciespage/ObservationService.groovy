@@ -1492,15 +1492,16 @@ println resIdList
             params.trait?.each{ it ->
                 if(it.value !='all') {
                     traitLT[it.key] = it.value;
+                    activeFilters["trait."+it.key] = it.value;
                 }
             }
             if (traitLT.size()>0) {
-                traitQuery = " and t.traits @> ARRAY["
-                traitLT?.each { traitName, traitValueId ->
-                    traitName = traitName.toLowerCase().replaceAll('_', ' ');
-                    traitQuery += "['${traitName}','${traitValueId}'],";
+                traitQuery = " and t.traits @> cast(ARRAY["
+                traitLT?.each { traitId, traitValueId ->
+                    //traitName = traitName.toLowerCase().replaceAll('_', ' ');
+                    traitQuery += "[${traitId}, ${traitValueId}],";
                 }
-                traitQuery = traitQuery[0..-2] + "]";
+                traitQuery = traitQuery[0..-2] + "] as bigint[])";
                 if(!taxonQuery) {
                     taxonQuery = recoQuery+" join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id ";
                     query += taxonQuery;

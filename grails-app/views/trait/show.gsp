@@ -17,17 +17,12 @@
 		    	<tr><td><h6>Description</h6></td>
 		    	<td>${trait.description}</td></tr>
 		    	</g:if>
-	    	<tr>
-	    		<tr><td><h6>Values</h6></td>
-	    		<td>
-		    		<ul>
-		    		<% traitValue=trait.values?.tokenize("|")%>
-		    			<g:each in='${traitValue}' var="values">
-		        		<li> ${values}</li>
-		        		</g:each>
-		        	</ul>
-		    		</td>
-		    		</tr>
+		    	<tr><td><h6>Values</h6></td>
+		    	<td>
+		    	<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue, 'displayAny':'true']" />
+		    	</td>
+		    	</tr>
+
 		    	<g:if test="${trait.icon}">
 		    	<tr><td><h6>Icon</h6></td>
 		    	<td>${trait.icon}</td></tr>
@@ -36,7 +31,7 @@
 		    	
 		    	<g:if test="${trait.traitTypes}">
 		    	<tr><td><h6>Trait Type</h6></td>
-		    	<td>${trait.traitTypes}</td></tr>
+		    	<td>${trait?.traitTypes.toString().replaceAll('_',' ')}</td></tr>
 		    	</g:if>
 
 		    	<g:if test="${trait.dataTypes}">
@@ -49,24 +44,30 @@
 		    	<td>${field}</td></tr>
 		    	</g:if>
 
-		    	<g:if test="${trait.taxonomyDefinition}">
+		    	<g:if test="${trait.taxon}">
 		    	<tr><td><h6>Coverage</h6></td>
 		    	<td>${coverage}</td></tr>
 		    	</g:if>
 
 		    	<tr>
-		    	<td>Species</td>
-		    	<td>
-		    	<ul>
-		    	<g:each var="it" in="${species}" >
-		    	<li>
-		    	${it}
-		    	</li>
+		    	
+		    	<td colspan="2">
+		    	<div class="pre-scrollable" style="max-height:300px;clear: both;overflow-x:hidden;">
+		    	<table width="100%">
+		    	<tr>
+		    	<th>Species Name</th>
+		    	<th>Trait Values</th>
+		    	</tr>
+		       	<g:each var="it" in="${species}" status='i' >
+		       	<tr>
+		    		<td><a href="/species/show/${it.objectId}" >${it.pageTaxon.name}</a></td>
+		    		<td>${it.traitValue.value}</td>
+		    		</tr>
 		    	</g:each>
-				</ul>
+		    	</table>
+		    	</div>
 		    	</td>
 		    	</tr>
-
 		    	</table>
     </div>
     </div>	
