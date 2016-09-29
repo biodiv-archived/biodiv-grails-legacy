@@ -21,7 +21,10 @@
 		    	<tr><td><h6>Values</h6></td>
 		    	<td>
 		    	<g:each var="it" in="${traitValue}" status='i' >
-		    		${it}</br>
+		    		<div>${it.value} <img
+                    class="${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
+                    src="${it.mainImage()?.fileName}" title="${it.value}"
+                    alt="${it.value}" />
 		    	</g:each>
 		    	</td>
 		    	</tr>
@@ -53,12 +56,21 @@
 		    	</g:if>
 
 		    	<tr>
-		    	<td><h6>Species</h6></td>
-		    	<td>
+		    	
+		    	<td colspan="2">
 		    	<div class="pre-scrollable" style="max-height:300px;clear: both;overflow-x:hidden;">
+		    	<table>
+		    	<tr>
+		    	<th>Species Name</th>
+		    	<th>Trait Values</th>
+		    	</tr>
 		       	<g:each var="it" in="${species}" status='i' >
-		    		<li><a href="/species/show/${it.objectId}" >${it.pageTaxon.name}</a></li>		    	
+		       	<tr>
+		    		<td><a href="/species/show/${it.objectId}" >${it.pageTaxon.name}</a></td>
+		    		<td>${it.traitValue.value}</td>
+		    		</tr>
 		    	</g:each>
+		    	</table>
 		    	</div>
 		    	</td>
 		    	</tr>

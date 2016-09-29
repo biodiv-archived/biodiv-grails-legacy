@@ -2,7 +2,7 @@
             <div data-tvid='all' data-tid='${traitValues[0].trait.id}'
                 class="btn all ${queryParams.trait && traitValues && queryParams.trait[traitValues[0].trait.id+'']?:'active btn-success'}"
                 value="all"
-                style="padding: 0px; height: 42px; border-radius: 6px; margin:5px;width:${showDetails?'auto':'165px;'} max-width:${showDetails?'auto':'165px;'}; line-height:40px;">
+                style="padding: 0px; height: 42px; border-radius: 6px; margin:5px;width:${showDetails?'auto':'165px;'} max-width:${showDetails?'auto':'165px;'}; line-height:40px;display:${displayAny};">
                 Any
             </div> 
 
