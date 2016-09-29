@@ -1494,6 +1494,7 @@ println resIdList
             params.trait?.each{ it ->
                 if(it.value !='all') {
                     traitLT[it.key] = it.value;
+                    activeFilters["trait."+it.key] = it.value;
                 }
             }
             if (traitLT.size()>0) {

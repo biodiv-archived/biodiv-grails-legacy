@@ -80,7 +80,7 @@ $(document).ready(function(){
 		title="${othersGroup.name}"></button>
 </div>
 </g:if>
-<g:if test="${!filters}">
+<g:if test="${!filters && (params.controller != 'species') && !hideHabitatFilter}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">
