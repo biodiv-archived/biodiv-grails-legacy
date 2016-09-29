@@ -224,9 +224,11 @@
                 <div class="span12" style="margin-left:0px">
                     <g:if  test="${traitInstanceList}">
                     <div class="sidebar_section">
-                    <a class="speciesFieldHeader" data-toggle="collapse" href="#synonyms"> 
-                    <h5>Traits</h5>
-                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitInstanceList.traitValue, 'displayAny':"none"]" />
+                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"> 
+                    <h5>Traits</h5></a>
+                    <div id="traits">
+                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitInstanceList.traitValue, 'displayAny':'none', 'fromSpeciesShow':'true']" />
+                    </div>
                     </div>
                     </g:if>
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    

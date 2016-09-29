@@ -17,15 +17,9 @@
 		    	<tr><td><h6>Description</h6></td>
 		    	<td>${trait.description}</td></tr>
 		    	</g:if>
-
 		    	<tr><td><h6>Values</h6></td>
 		    	<td>
-		    	<g:each var="it" in="${traitValue}" status='i' >
-		    		<div>${it.value} <img
-                    class="${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
-                    src="${it.mainImage()?.fileName}" title="${it.value}"
-                    alt="${it.value}" />
-		    	</g:each>
+		    	<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue, 'displayAny':'true']" />
 		    	</td>
 		    	</tr>
 
@@ -59,7 +53,7 @@
 		    	
 		    	<td colspan="2">
 		    	<div class="pre-scrollable" style="max-height:300px;clear: both;overflow-x:hidden;">
-		    	<table>
+		    	<table width="100%">
 		    	<tr>
 		    	<th>Species Name</th>
 		    	<th>Trait Values</th>
