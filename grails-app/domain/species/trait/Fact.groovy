@@ -16,6 +16,8 @@ class Fact {
     License license;
     TaxonomyDefinition pageTaxon;
     Long objectId;
+    
+    boolean isDeleted = false;
 
     static constraints = {
       trait nullable:false, unique:['pageTaxon', 'objectId','traitValue']

@@ -8,6 +8,7 @@ import species.AbstractObjectController;
 import grails.plugin.springsecurity.annotation.Secured
 import species.participation.UploadLog;
 import grails.util.Holders;
+import static org.springframework.http.HttpStatus.*;
 
 class FactController extends AbstractObjectController {
 

@@ -1,6 +1,5 @@
 <%@page import="species.trait.TraitService"%>
 <g:set var="traitService" bean="traitService"/>
-<h6>${traitName} </h6>
 <div class="row-fluid">
 <g:each in="${traitValueInstanceList}" var="traitValue" status="i">
 <g:if test="${i%(rows-1)==0}">

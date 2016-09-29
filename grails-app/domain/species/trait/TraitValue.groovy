@@ -3,6 +3,10 @@ package species.trait;
 import species.TaxonomyDefinition;
 import species.Field;
 import species.UtilsService;
+import species.Resource;
+import species.Resource.ResourceType;
+import species.utils.ImageType;
+import species.utils.ImageUtils;
 
 class TraitValue {
 
@@ -12,6 +16,8 @@ class TraitValue {
     String icon;
     String source;
     TaxonomyDefinition taxon;
+	
+    def grailsApplication;
 
     static constraints = {
         trait nullable:false, blank:false, unique:['value']
@@ -25,4 +31,17 @@ class TraitValue {
     static mapping = {
         description type:"text"
     }
+
+	Resource icon(ImageType type) {
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+this.icon)).exists()
+		if(!iconPresent) {
+            log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+this.icon
+			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
+		}
+		return new Resource(fileName:grailsApplication.config.speciesPortal.traits.serverURL+this.icon, type:ResourceType.ICON, title:this.value);
+	}
+
+	Resource mainImage() {
+		return icon(ImageType.NORMAL);
+	}
 }

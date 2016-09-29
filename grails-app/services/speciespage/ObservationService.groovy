@@ -1498,9 +1498,9 @@ println resIdList
             }
             if (traitLT.size()>0) {
                 traitQuery = " and t.traits @> ARRAY["
-                traitLT?.each { traitName, traitValueId ->
-                    traitName = traitName.toLowerCase().replaceAll('_', ' ');
-                    traitQuery += "['${traitName}','${traitValueId}'],";
+                traitLT?.each { traitId, traitValueId ->
+                    //traitName = traitName.toLowerCase().replaceAll('_', ' ');
+                    traitQuery += "['${traitId}','${traitValueId}'],";
                 }
                 traitQuery = traitQuery[0..-2] + "]";
                 if(!taxonQuery) {

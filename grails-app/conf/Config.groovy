@@ -273,6 +273,9 @@ speciesPortal {
         downloadDir = "${download.rootDir}/namelist"
     }	
     traits{
+        rootDir = "${app.rootDir}/traits"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/traits"
+
             databaseDir = "${app.rootDir}/traits"
             traitValueFile="${app.rootDir}/icons.csv"
     }

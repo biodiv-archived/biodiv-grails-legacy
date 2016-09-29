@@ -672,9 +672,14 @@ ALTER TABLE suser ADD COLUMN latitude double precision;
 ALTER TABLE suser ADD COLUMN longitude double precision;
 
 #21Sep2016
-alter table taxonomy_definition add column traits text[][];
-update taxonomy_definition set traits = g.item from (
-             select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[lower(x.name), x.id]]) as item from (select f.page_taxon_id, t.name, tv.id::varchar, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
+alter table taxonomy_definition add column traits bigint[][];
+alter table taxonomy_definition alter column traits  type bigint[][] using traits::bigint[][];
+                update taxonomy_definition set traits = g.item from (
+             select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
 ) g where g.page_taxon_id=id;
 
+
 CREATE INDEX taxonomy_definition_traits ON taxonomy_definition using gin(traits);
+
+alter table trait add column is_deleted boolean not null default false;
+alter table fact add column is_deleted boolean not null default false;

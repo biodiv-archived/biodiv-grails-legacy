@@ -127,6 +127,7 @@ class Trait {
     Date lastRevised = createdOn;
     TaxonomyDefinition taxon;
 
+    boolean isDeleted = false;
 
     static constraints = {
         name nullable:false, blank:false, unique:['taxon']
@@ -217,4 +218,7 @@ class Trait {
         }
     }
 
+    List values() {
+        return TraitValue.findAllByTrait(this);
+    }
 }

@@ -32,18 +32,17 @@ $(document).ready(function(){
 	$('#habitatFilter button').tooltip({placement:'bottom'});
 
 	$(".traitFilter").button();
-    	<g:each in="${params.trait}" var="t">
-        	$('.trait_btn[data-id="${t.value}"][data-name="${t.key}"]').addClass('active');
-		</g:each>
+	$(".traitFilter button").tooltip({placement:'bottom'});
+    <g:each in="${params.trait}" var="t">
+        $('.traitFilter button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
+    </g:each>
 });
 
 </script>
 
-
-
 <g:each in="${filters}" var="filter" >
 <div class="traitFilter" data-toggle="buttons-radio">
-	<g:render template="/trait/traitValueListTemplate" model="['traitValueInstanceList':filter.value,'rows':6,'traitName':filter.key.replace(' ','_').toLowerCase(),'hideIcon':true]"/>
+	<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':filter.value]"/>
 </div>
 </g:each>
 
