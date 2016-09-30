@@ -26,7 +26,6 @@
                 </div>
                 </g:else>
             </td>
-            <td>${r[2]}</td>
         </tr>
         </g:each>
     </tbody>

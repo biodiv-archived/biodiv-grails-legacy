@@ -19,7 +19,7 @@ function loadMatchingSpeciesList() {
         }
     }
     var History = window.History;
-    $('.trait button').each(function() {
+    $('.trait button, .trait .none, .trait .any').each(function() {
         if($(this).hasClass('active')) {
             params['trait.'+$(this).attr('data-tid')] = $(this).attr('data-tvid');
         }
@@ -40,7 +40,7 @@ function loadMatchingSpeciesList() {
             $('#matchingSpeciesList .matchingSpeciesHeading').html(data.model.totalCount?(' (' + data.model.totalCount + ')'):'');
             if(data.success == true && data.model.matchingSpeciesList) {
                 $.each(data.model.matchingSpeciesList, function(index, item) {
-                    $matchingSpeciesTable.append('<tr><td><a href='+item[3]+'>'+item[0]+'</a></td><td>'+item[2]+'</td></tr>');  
+                    $matchingSpeciesTable.append('<tr><td><a href='+item[3]+'>'+item[0]+'</a></td></tr>');  
                 });
                 $me.data('offset', data.model.next);
                 if(!data.model.next){
