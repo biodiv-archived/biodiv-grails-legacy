@@ -8,7 +8,8 @@
 		</center>
 	</div>
 
-
+	<obv:showGroupFilter model="['hideHabitatFilter':true]" />
+	<div class="traitFilter" style="height: 29px;">
 	<div class="btn-group pull-right" style="z-index: 10">
         <button id="selected_sort" class="btn dropdown-toggle"
 			data-toggle="dropdown" href="#" rel="tooltip"
@@ -69,8 +70,7 @@
 					value="all"> <g:message code="all.small" /> </a></li>
 		</ul>
     </div>
-	<obv:showGroupFilter model="['hideHabitatFilter':true]" />
-	
+	</div>
 </div>
 <obv:showObservationFilterMessage
 	model="['instanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'species']" />

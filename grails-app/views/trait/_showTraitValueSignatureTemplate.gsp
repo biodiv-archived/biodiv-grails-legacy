@@ -4,7 +4,7 @@
 <%@page import="species.participation.Featured"%>
 <%@page import="species.groups.UserGroup"%>
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'}"
-    style="margin-left: 0px;width:${showDetails?'auto':'165px;'} max-width:${showDetails?'auto':'165px;'}">
+    style="margin-left: 0px;width:${showDetails?'auto':'165px;'} max-width:${showDetails?'auto':'165px;'}  height: 32px;">
     <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">
 
@@ -20,6 +20,6 @@
                     </g:else>
             </div>
 
-            <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:100px'};" title="${traitValue.value}"> ${traitValue.value} </span> 
+            <span class="ellipsis  ${showDetails ? 'multiline' : ''}" style="display: block;text-align:left;${showDetails ? 'width:auto' : 'width:100px'};float:left;margin-left:6px;" title="${traitValue.value}"> ${traitValue.value} </span> 
    </div>
 </div>

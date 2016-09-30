@@ -1494,7 +1494,7 @@ println resIdList
             if(!taxonQuery) {
                 taxonQuery = recoQuery+" join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id ";
                 query += taxonQuery;
-            }
+           }
             filterQuery += traitQuery;
             
             def classification;

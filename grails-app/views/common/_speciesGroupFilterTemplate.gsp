@@ -60,6 +60,7 @@ $(document).ready(function(){
 
 <g:each in="${filters}" var="filter" >
 <div class="traitFilter" data-toggle="buttons-radio">
+	<h6>${filter.key}</h6>
 	<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':filter.value]"/>
 </div>
 </g:each>
@@ -80,7 +81,7 @@ $(document).ready(function(){
 		title="${othersGroup.name}"></button>
 </div>
 </g:if>
-<g:if test="${!filters}">
+<g:if test="${!filters && (params.controller != 'species') && !hideHabitatFilter}">
 	<div id="habitatFilter" data-toggle="buttons-radio">
 		<%def othersHabitat = species.Habitat.findByName(HabitatType.OTHERS.value())%>
 		<g:each in="${species.Habitat.list()}" var="habitat" status="i">

@@ -1965,7 +1965,7 @@ class SpeciesService extends AbstractObjectService  {
             else if(NameStatus.SYNONYM.toString().equals(s[1])) synonymSpeciesCount = s[1]
         }
 
-        queryParams.trait = params.trait;
+        //queryParams.trait = params.trait;
 
         return [speciesInstanceList: speciesInstanceList, instanceTotal: count, speciesCountWithContent:speciesCountWithContent, speciesCount:speciesCount, subSpeciesCount:subSpeciesCount, acceptedSpeciesCount:acceptedSpeciesCount, synonymSpeciesCount:synonymSpeciesCount, 'userGroupWebaddress':params.webaddress, queryParams: queryParams]
         //else {

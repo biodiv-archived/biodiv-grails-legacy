@@ -473,7 +473,7 @@ println headers;
         factList = Fact.findAllByTrait(trait);
         field = Field.findById(trait.fieldId);
         println "TraitValue"+traitValue
-        return [trait:trait, coverage:coverage.name, traitValue:traitValue.value , species:factList, field:field.concept];
+        return [trait:trait, coverage:coverage.name, traitValue:traitValue , species:factList, field:field.concept];
     }
 
     def getAllFilter(filters){

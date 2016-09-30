@@ -17,12 +17,9 @@
 		    	<tr><td><h6>Description</h6></td>
 		    	<td>${trait.description}</td></tr>
 		    	</g:if>
-
 		    	<tr><td><h6>Values</h6></td>
 		    	<td>
-		    	<g:each var="it" in="${traitValue}" status='i' >
-		    		${it}</br>
-		    	</g:each>
+		    	<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue, 'displayAny':'true']" />
 		    	</td>
 		    	</tr>
 
@@ -53,12 +50,21 @@
 		    	</g:if>
 
 		    	<tr>
-		    	<td><h6>Species</h6></td>
-		    	<td>
+		    	
+		    	<td colspan="2">
 		    	<div class="pre-scrollable" style="max-height:300px;clear: both;overflow-x:hidden;">
+		    	<table width="100%">
+		    	<tr>
+		    	<th>Species Name</th>
+		    	<th>Trait Values</th>
+		    	</tr>
 		       	<g:each var="it" in="${species}" status='i' >
-		    		<li><a href="/species/show/${it.objectId}" >${it.pageTaxon.name}</a></li>		    	
+		       	<tr>
+		    		<td><a href="/species/show/${it.objectId}" >${it.pageTaxon.name}</a></td>
+		    		<td>${it.traitValue.value}</td>
+		    		</tr>
 		    	</g:each>
+		    	</table>
 		    	</div>
 		    	</td>
 		    	</tr>
