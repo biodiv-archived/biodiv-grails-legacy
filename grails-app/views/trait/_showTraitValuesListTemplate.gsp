@@ -20,13 +20,14 @@
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
                     </button> 
         </g:each>
-
+            <g:if test="${!displayAny}">
             <div data-tvid='none' data-tid='${traitValues[0].trait.id}'
                 class="btn none ${queryParams.trait && traitValues && queryParams.trait[traitValues[0].trait.id+'']=='none'?'active btn-success':''}"
                 value="none"
                 style="padding: 0px; height: 42px; border-radius: 6px; margin:5px;width:${showDetails?'auto':'165px;'} max-width:${showDetails?'auto':'165px;'}; line-height:40px;">
                 Undefined
             </div> 
+            </g:if>
 </div>
 
 
