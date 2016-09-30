@@ -1739,24 +1739,9 @@ class SpeciesService extends AbstractObjectService  {
         }
         
         if(params.trait){
-            def traitLT =[:]
-            params.trait?.each{ it ->
-                if(it.value !='all'){
-                    traitLT[it.key] = it.value
-                    queryParams['trait.'+it.key] = it.value
-                }
-            }
-            if (traitLT.size()>0){
-                String traitQuery = " and t.traits @> cast(ARRAY["
-                traitLT?.each { traitId, traitValueId ->
-                    //traitName = traitName.toLowerCase().replaceAll('_', ' ');
-                    traitQuery += "[${traitId}, ${traitValueId}],";
-                }
-                traitQuery = traitQuery[0..-2] + "] as bigint[])";
-
-                filterQuery += traitQuery;
-                countFilterQuery += traitQuery;
-            }
+            String traitQuery = getTraitQuery(params.trait);
+            filterQuery += traitQuery;
+            countFilterQuery += traitQuery;
         }
 
         if(params.featureBy == "true" ) {
@@ -1929,7 +1914,10 @@ class SpeciesService extends AbstractObjectService  {
         hqlSpeciesStatusCountQuery.setProperties(queryParams);
         
         log.debug "Species list query :${queryParts.query} with params ${queryParams}"
-        def speciesInstanceList = hqlQuery.addEntity(Species.class).list();
+        def speciesInstanceList;// = hqlQuery.addEntity(Species.class).list();
+        utilsService.logSql {
+        speciesInstanceList = hqlQuery.addEntity(Species.class).list();
+        }
         log.debug "Species list count query :${queryParts.countQuery} with params ${queryParams}"
         def rs = hqlCountQuery.list();
 

@@ -69,12 +69,11 @@
         $('.list').on('updatedGallery', function() {
             $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
 
-            $('.trait button, .trait .all').on('click', function(){
-                console.log($(this));
+            $('.trait button, .trait .any, .trait .none').on('click', function(){
                 if($(this).hasClass('active')){
                 return false;
                 }
-                $(this).parent().parent().find('button, .all').removeClass('active btn-success');
+                $(this).parent().parent().find('button, .any, .none').removeClass('active btn-success');
                 $(this).addClass('active btn-success');
 
                 updateMatchingSpeciesTable();
