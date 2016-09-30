@@ -1492,7 +1492,7 @@ println resIdList
         if(params.trait){
             traitQuery = getTraitQuery(params.trait);
             if(!taxonQuery) {
-                taxonQuery = recoQuery+" join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id ";
+                taxonQuery = recoQuery+" left outer join taxonomy_definition t on reco.taxon_concept_id = t.id ";
                 query += taxonQuery;
            }
             filterQuery += traitQuery;
@@ -1506,7 +1506,7 @@ println resIdList
             queryParams['classification'] = classification.id;
             activeFilters['classification'] = classification.id
  
-            filterQuery += " and reg.classification_id = :classification";
+            //filterQuery += " and reg.classification_id = :classification";
 
         }
 				

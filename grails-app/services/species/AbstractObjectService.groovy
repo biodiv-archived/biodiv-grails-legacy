@@ -450,7 +450,7 @@ class AbstractObjectService {
         } 
         if(notTraitLT) {
             notTraitLT.each {
-                traitQuery += " and not t.traits[1##999][1] @> cast(ARRAY[["+it+"]] as bigint[])";
+                traitQuery += " and (not t.traits[1##999][1] @> cast(ARRAY[["+it+"]] as bigint[]) or t.traits is null)";
             }
         }
         if(anyTraitLT) {
