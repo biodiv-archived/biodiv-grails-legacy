@@ -44,7 +44,7 @@ import grails.rest.render.json.JsonRenderer;
 import org.codehaus.groovy.grails.web.mime.MimeType;
 import species.participation.Comment;
 import species.auth.RestTokenValidationFilter;
-
+import species.MyEntityInterceptor;
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
@@ -441,6 +441,7 @@ beans = {
     }
 
     webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
+    entityInterceptor(species.MyEntityInterceptor);
 }
 
 
