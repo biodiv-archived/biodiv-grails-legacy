@@ -244,11 +244,11 @@ $(document).ready(function(){
         return false;
     });
 
-    $('.traitFilter .any, .traitFilter button, .traitFilter .none').click(function(){
+    $('.traitFilter .any, .traitFilter .all, .traitFilter button, .traitFilter .none').click(function(){
         if($(this).hasClass('active')){
             return false;
         }
-        $(this).parent().parent().find('button, .any, .none').removeClass('active btn-success');
+        $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
         $(this).addClass('active btn-success');
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
@@ -366,9 +366,12 @@ $(document).ready(function(){
         } else {
             $( "#searchTextField" ).val('');	
         }
+        console.log('dfsdfd')
         if($(this).attr('data-target') == 'taxon') {
             $("input#taxon").val();
             $('#taxonHierarchy').find(".taxon-highlight").removeClass('taxon-highlight');
+        } else if($(this).attr('data-target').startsWith('trait.')) {
+            $('.traitFilter button[data-tid='+$(this).attr('data-target').replace('trait.','')+']').removeClass('active btn-success');
         }
         removeParam = $(this).attr('data-target').replace('#','');
         console.log(removeParam);
