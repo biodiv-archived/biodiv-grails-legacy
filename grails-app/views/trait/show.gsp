@@ -6,12 +6,14 @@
         <style>
         .super-section{background-color:white;}
         .super-section h5{text-transform: uppercase;}
+        td{width:50px;}
+        .userGroups{margin:0px;}
         </style>
     </head>
     <body>
     <div class="container">
     <div id="content" class="super-section">
-	   <h5>${trait.name}</h5>
+	  <div class="speciesFieldHeader"><h6>${trait.name}</h6></div>
 	    	<table class="table">
 	    		<g:if test="${trait.description}">
 		    	<tr><td><h6>Description</h6></td>
@@ -49,8 +51,7 @@
 		    	<td>${coverage}</td></tr>
 		    	</g:if>
 
-		    	<tr>
-		    	
+		    	<tr>		    	
 		    	<td colspan="2">
 		    	<div class="pre-scrollable" style="max-height:300px;clear: both;overflow-x:hidden;">
 		    	<table width="100%">
