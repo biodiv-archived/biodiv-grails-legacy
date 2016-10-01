@@ -1742,6 +1742,7 @@ class SpeciesService extends AbstractObjectService  {
             String traitQuery = getTraitQuery(params.trait);
             filterQuery += traitQuery;
             countFilterQuery += traitQuery;
+            queryParams['trait'] = params.trait;
         }
 
         if(params.featureBy == "true" ) {

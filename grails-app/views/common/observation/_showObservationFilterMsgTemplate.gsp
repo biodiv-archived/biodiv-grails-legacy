@@ -7,6 +7,8 @@
 <%@ page import="species.NamesMetadata"%>
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.dataset.Dataset"%>
+<%@ page import="species.trait.Trait"%>
+<%@ page import="species.trait.TraitValue"%>
 <script type="text/javascript">
 	function setDefaultGroup(){
 		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
@@ -63,7 +65,6 @@
 		<%
 			boolean dateRangeSet = false	
                         %>
-                
                 <g:each in="${queryParams}" var="queryParam">
                             <g:if
 				test="${queryParam.key == 'groupId' && queryParam.value instanceof Long }">
@@ -254,6 +255,18 @@
 					action:params.action, params:[(queryParam.key): queryParam.value])}">
 						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="${queryParam.key}"
 						href="#">[X]</a> </span>
+			</g:if>
+
+			<g:if test="${queryParam.key=='trait' && queryParam.value}">
+            <g:each in="${queryParam.value}" var="trait">
+                                    <span
+					class="highlight"> <a
+					href="${uGroup.createLink(controller:params.controller,
+					action:params.action, params:[('trait.'+trait.key): trait.value])}">
+						${Trait.read(trait.key).name}:${TraitValue.read(trait.value).value} 
+                        <a class="removeQueryFilter" data-target="trait.${trait.key}" href="#">[X]</a> 
+                        </span>
+                        </g:each>
 			</g:if>
 
 
