@@ -1,7 +1,7 @@
 <div class="groupsWithSharingNotAllowed btn-group userGroups" style="white-space:inherit;">
             <g:if test="${!displayAny}">
            <div data-tvid='all' data-tid='${traitValues[0].trait.id}'
-                class="btn all ${queryParams.trait && traitValues && queryParams.trait[traitValues[0].trait.id+'']?'':'active btn-success':''}"
+                class="btn all ${queryParams.trait && traitValues && queryParams.trait[traitValues[0].trait.id+'']?'':'active btn-success'}"
                 value="all"
                 style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;width:${showDetails?'auto':'165px;'} max-width:${showDetails?'auto':'165px;'}; line-height:40px;text-align:left;">
                 <img
