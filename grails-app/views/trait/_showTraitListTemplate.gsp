@@ -1,14 +1,34 @@
-<div class="observations_list observation" style="clear: both;">
-
+<% 
+def ref=[];
+def instanceFieldList=[:]
+instanceList.each{ iL ->
+    if(ref.contains(iL.field)){           
+        instanceFieldList[iL.field] << iL
+    }else{
+        ref << iL.field
+        instanceFieldList[iL.field] = [iL]
+    }
+}
+%>                   
+ <div class="observations_list observation" style="clear: both;">
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
-			<ul class="grid_view thumbnails obvListwrapper">
-				<g:each in="${instanceList}" status="i" var="instance">
+		    <div class="filters">
+            <g:each in="${instanceFieldList}" status="j" var="inst">                
+                <div class="sidebar_section">
+                    <a class="speciesFieldHeader" data-toggle="collapse" href="#trait${j}">
+                    	<h5>${inst.key}</h5>
+                    </a>
+			<ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
+				<g:each in="${inst.value}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
                     <g:render template="/trait/showTraitTemplate" model="['trait':instance]"/>
 					</li>
 				</g:each>
-			</ul>			
+			</ul>
+			</div>
+			</g:each>
+			</div>			
 		</div>
 	</div>
         
