@@ -9,6 +9,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import species.participation.UploadLog;
 import grails.util.Holders;
 import static org.springframework.http.HttpStatus.*;
+import species.Field;
 
 class TraitController extends AbstractObjectController {
 
@@ -28,6 +29,7 @@ class TraitController extends AbstractObjectController {
 
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.resultType = params.controller;
+            model.hackTohideTraits = true;
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/${params.controller}/show${params.controller.capitalize()}ListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
@@ -42,6 +44,7 @@ class TraitController extends AbstractObjectController {
                     render(template:"/${params.controller}/show${params.controller.capitalize()}ListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
+                    model.model.hackTohideTraits = true;
                     model.model['width'] = 300;
                     model.model['height'] = 200;
                     render (view:"list", model:model.model)
@@ -95,7 +98,24 @@ class TraitController extends AbstractObjectController {
     }
 
     def show() {
-        render(view:'show', model:traitService.showTrait(params))
+        def traitInstance = Trait.findById(params.id)
+        def coverage = traitInstance.taxon
+        def traitValue = [];
+        Field field;
+        traitValue = TraitValue.findAllByTrait(traitInstance);
+        field = Field.findById(traitInstance.fieldId);
+            def model = getList(params);
+             model['traitInstance'] = traitInstance
+             model['coverage'] = coverage.name
+             model['traitValue'] = traitValue
+             model['field'] = field.concept
+            withFormat {
+            html {
+                    render (view:"show", model:model)
+                 }
+        json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
+        xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
+            }
     }
 
     @Secured(['ROLE_USER'])
@@ -115,20 +135,24 @@ class TraitController extends AbstractObjectController {
     def matchingSpecies() {
         Map result = [:];
         try {
-            def matchingSpeciesListResult;
-            matchingSpeciesListResult = speciesService.getMatchingSpeciesList(params);
-            if(matchingSpeciesListResult.matchingSpeciesList.size() > 0) {
-                matchingSpeciesListResult.putAll([status:'success', msg:'success']);
-                result = matchingSpeciesListResult;
-                
-            } else {
+            result = speciesService.getMatchingSpeciesList(params);
+            result.resultType = 'species';
+            result.hideId = true;
+            result.instanceTotal = result.totalCount;//matchingSpeciesList.size();
+            //result.totalCount = result.instanceTotal;
+            params.action = 'list';
+            result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
+ 
+            if(result.matchingSpeciesList.size() > 0) {
+                result.putAll([status:'success', msg:'success']);
+           } else {
                 def message = "";
                 if(params.offset  > 0) {
                     message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
                 } else {
                     message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
                 }
-                result = [msg:message]
+                result.putAll([msg:message]);
             }
             def model = utilsService.getSuccessModel(result.msg, null, OK.value(), result);
             withFormat {

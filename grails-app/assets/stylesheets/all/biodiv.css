@@ -3202,7 +3202,7 @@ small {
 .partners .img-polaroid {
     border-radius: 6px;
     width: 110px;
-    height: 55px;
+    /*height: 55px;*/
     margin: 5px;
 }
 
@@ -3527,4 +3527,21 @@ margin-bottom:5px;
 
 .traitFilter .userGroups{
 	margin: 0px;
+}
+.traitFilter button,.trait button{
+       padding: 0px; 
+       height: 36px; 
+       border-radius: 6px !important;
+       margin: 1px !important;
+}
+.traitFilter .traitSignature,.trait .traitSignature{
+         margin-left: 0px;
+         width: 151px;
+         max-width: 151px;
+         height: 32px;
+}
+/* for Trait list*/
+.thumbnail .trait .traitSignature{
+	   width: 148px !important;
+       max-width: 148px !important;
 }

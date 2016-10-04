@@ -1,4 +1,7 @@
 <%@page import="species.utils.Utils"%>
+<%@ page import="species.groups.SpeciesGroup"%>
+<%@ page import="species.Habitat"%>
+
 
 <div id='searchToggleBox' class="input-append" style="z-index:1">
 	<form method="get"
@@ -168,7 +171,8 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
                 "re":"${g.message(code:'resubmit.form')}",
                 "sub":"${g.message(code:'resubmit.login')}",
                 "un":"${g.message(code:'service.later')}",
-                "er":"${g.message(code:'fix.errors')}"
+                "er":"${g.message(code:'fix.errors')}",
+                "type":"${g.message(code:'placeholder.name.email')}"
                 
             },
             "ajaxLogin" : {
@@ -287,7 +291,17 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
                 "mrecord" :"${g.message(code:'maps.all.records')}",
                 "moccur"  :"${g.message(code:'maps.occurence.records')}",
                 "msearch" :"${g.message(code:'default.search')}",
-                "noselect":"${g.message(code:'maps.no.selected')}"
+                "noselect":"${g.message(code:'maps.no.selected')}",
+                "nofeatureselect":"${g.message(code:'maps.no.featured.select')}",
+                "reset":"${g.message(code:'maps.reset')}",
+                "det":"${g.message(code:'maps.details')}",
+                "ln":"${g.message(code:'maps.link')}",
+                "but_1":"${g.message(code:'maps.legend.button1')}",
+                "but_2":"${g.message(code:'maps.legend.button2')}",
+                "but_3":"${g.message(code:'maps.legend.button3')}",
+                "but_4":"${g.message(code:'maps.legend.button4')}",
+                "resAll":"${g.message(code:'maps.resetall')}"
+
             }      
 
 
@@ -309,5 +323,17 @@ $(document).ready(function(){
         $(this).next().slideToggle('slow');
    });
 });
+
+	function setDefaultGroup(){
+		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
+		$(defId).click();
+	}
+	function setDefaultHabitat(){
+		var defId = "#habitat_" + "${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
+		$(defId).click();
+	}
+	$(document).ready(function() {
+			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+	});
 
 </script>

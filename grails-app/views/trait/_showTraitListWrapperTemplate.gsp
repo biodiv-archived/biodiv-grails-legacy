@@ -33,14 +33,9 @@
                     </div>
                 </div>
             </div>
-            <div class="span9 right-shadow-box">
-                <div class="sidebar_section">
-                    <h5>Traits</h5>
-                    <div class="filters" style="position: relative;height:360px;overflow:auto;">
-                        <g:render template="showTraitListTemplate"/>
-                    </div>
-                </div>
-                </div>
+            <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow:auto;">
+                <g:render template="showTraitListTemplate"/>
+            </div>
         </div>
     </div>
 </div>
@@ -65,21 +60,21 @@
         if(${params.taxon?:false}){
             taxonBrowserOptions['taxonId'] = "${params.taxon}";
         }
+        
+        $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+        
+        $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
+            if($(this).hasClass('active')){
+            return false;
+            }
+            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+            $(this).addClass('active btn-success');
+
+            updateMatchingSpeciesTable();
+            return false;
+        });
 
         $('.list').on('updatedGallery', function() {
-            $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
-
-            $('.trait button, .trait .all').on('click', function(){
-                console.log($(this));
-                if($(this).hasClass('active')){
-                return false;
-                }
-                $(this).parent().parent().find('button, .all').removeClass('active btn-success');
-                $(this).addClass('active btn-success');
-
-                updateMatchingSpeciesTable();
-                return false;
-            });
             updateMatchingSpeciesTable();
         });
     });
@@ -91,6 +86,5 @@ $(document).ready(function() {
     <g:each in="${params.trait}" var="t">
         $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
     </g:each>
-   
 });
 </asset:script>

@@ -126,8 +126,6 @@ class ObservationService extends AbstractMetadataService {
         observation = super.update(observation, params, Observation.class);
         observation.notes = params.notes;
 
-        observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
-
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
         if(params.url) {
@@ -1453,7 +1451,7 @@ println resIdList
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification))
                 if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
 
                 queryParams['classification'] = classification.id 
                 activeFilters['classification'] = classification.id
@@ -1490,26 +1488,25 @@ println resIdList
 		}
 
         if(params.trait){
-            def traitLT = [:];
-            params.trait?.each{ it ->
-                if(it.value !='all') {
-                    traitLT[it.key] = it.value;
-                    activeFilters["trait."+it.key] = it.value;
-                }
-            }
-            if (traitLT.size()>0) {
-                traitQuery = " and t.traits @> cast(ARRAY["
-                traitLT?.each { traitId, traitValueId ->
-                    //traitName = traitName.toLowerCase().replaceAll('_', ' ');
-                    traitQuery += "[${traitId}, ${traitValueId}],";
-                }
-                traitQuery = traitQuery[0..-2] + "] as bigint[])";
-                if(!taxonQuery) {
-                    taxonQuery = recoQuery+" join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id ";
-                    query += taxonQuery;
-                }
-                filterQuery += traitQuery;
-            }
+            traitQuery = getTraitQuery(params.trait);
+            if(!taxonQuery) {
+                taxonQuery = recoQuery+" left outer join taxonomy_definition t on reco.taxon_concept_id = t.id ";
+                query += taxonQuery;
+           }
+            filterQuery += traitQuery;
+            
+            def classification;
+            if(params.classification)
+                classification = Classification.read(Long.parseLong(params.classification));
+            if(!classification)
+                classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+            queryParams['classification'] = classification.id;
+            activeFilters['classification'] = classification.id
+ 
+            //filterQuery += " and reg.classification_id = :classification";
+            queryParams['trait'] = params.trait;
+
         }
 				
         String checklistObvCond = ""
@@ -2178,8 +2175,6 @@ println resIdList
         return [success:success, url:url, msg:message, errors:errors]
     }
 
-    /**
-     */
     def addAnnotation(params, Observation obv){
         def ann = new Annotation(params)
         obv.addToAnnotations(ann);

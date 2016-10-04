@@ -145,6 +145,7 @@ class Trait {
 
     static mapping = {
         description type:"text"
+        id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_id_seq"] 
     }
 
     static TraitTypes fetchTraitTypes(String traitTypes){

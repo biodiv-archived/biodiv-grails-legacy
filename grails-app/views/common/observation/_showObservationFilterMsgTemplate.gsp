@@ -7,29 +7,19 @@
 <%@ page import="species.NamesMetadata"%>
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.dataset.Dataset"%>
-<script type="text/javascript">
-	function setDefaultGroup(){
-		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
-		$(defId).click();
-	}
-	function setDefaultHabitat(){
-		var defId = "#habitat_" + "${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
-		$(defId).click();
-	}
-	$(document).ready(function() {
-			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
-	});
+<%@ page import="species.trait.Trait"%>
+<%@ page import="species.trait.TraitValue"%>
 
-</script>
-<div class="info-message" id="info-message">
+<div class="info-message" ${hideId?'':'id=info-message'}>
 		<g:if test="${speciesCountWithContent }"><span class="name" style="color: #b1b1b1;"><i
-                class="icon-search"></i></span> ${speciesCountWithContent} <g:message code="common.observation.species.pages" /> <g:if test="${speciesCountWithContent>1}"></g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}"><g:message code="text.and" /> ${instanceTotal- speciesCountWithContent} <g:message code="common.observation.species.stubs" /> </g:if> <g:message code="text.found" /><g:if test="${params.hasMedia == 'true'}"> <g:message code="with.media" /></g:if><g:if test="${params.hasMedia == 'false'}"> <g:message code="without.media" /></g:if></g:if>
+                class="icon-search"></i></span> ${speciesCountWithContent} <g:message code="common.observation.species.pages" /> <g:if test="${speciesCountWithContent>1}"></g:if> <g:if test="${instanceTotal- speciesCountWithContent>0}"><g:message code="text.and" /> ${instanceTotal- speciesCountWithContent} <g:message code="common.observation.species.stubs" /> </g:if> <g:message code="text.found1" /><g:if test="${params.hasMedia == 'true'}"> <g:message code="with.media" /></g:if><g:if test="${params.hasMedia == 'false'}"> <g:message code="without.media" /></g:if></g:if>
 		<g:else>
 			<span class="name" style="color: #b1b1b1;"><i
 				class="icon-search"></i></span>
 				<g:if test="${instanceTotal==0}"><g:message code="text.no.result" /> </g:if>
 				<g:elseif test="${resultType != 'observation' }">
-					${instanceTotal} ${resultType}<g:if test="${instanceTotal>1 && resultType != 'species'}"><g:message code="text.s" /></g:if>
+					${instanceTotal} 
+					<g:if test="${resultType != 'user'}">${resultType}</g:if><g:else><g:message code="title.user" /></g:else><g:if test="${instanceTotal>1 && resultType != 'species'}"><g:message code="text.s" /></g:if>
 				</g:elseif>
 				<g:else>
 					<g:if test="${observationCount}">
@@ -62,7 +52,6 @@
 		<%
 			boolean dateRangeSet = false	
                         %>
-                
                 <g:each in="${queryParams}" var="queryParam">
                             <g:if
 				test="${queryParam.key == 'groupId' && queryParam.value instanceof Long }">
@@ -253,6 +242,18 @@
 					action:params.action, params:[(queryParam.key): queryParam.value])}">
 						${queryParam.value.encodeAsHTML()} <a class="removeQueryFilter" data-target="${queryParam.key}"
 						href="#">[X]</a> </span>
+			</g:if>
+			<g:if test="${queryParam.key=='trait' && queryParam.value && hackTohideTraits != true}"> 
+            <g:message code="trait.for.key" />  
+            <g:each in="${queryParam.value}" var="trait">
+                                    <span
+					class="highlight"> <a
+					href="${uGroup.createLink(controller:params.controller,
+					action:params.action, params:[('trait.'+trait.key): trait.value])}">
+						${Trait.read(trait.key)?.name}:${trait.value.equalsIgnoreCase('none')?'None':TraitValue.read(trait.value)?.value} 
+                        <a class="removeQueryFilter" data-target="trait.${trait.key}=${trait.value}" href="#">[X]</a> 
+                        </span>
+                        </g:each>
 			</g:if>
 
 

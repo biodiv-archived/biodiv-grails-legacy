@@ -19,11 +19,9 @@
 		</div>
 		<div class="observation thumbwrap">
 			<div class="observation">
-				<div>
 					<obv:showObservationFilterMessage
 						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'observation']" />
 						
-				</div>
 				<div style="clear: both;"></div>
 				
 				
@@ -182,9 +180,10 @@
         if(${params.taxon?:false}){
             taxonBrowserOptions['taxonId'] = "${params.taxon}";
         }
+        
+        $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
 
         $('.list').on('updatedGallery', function() {
-            $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
             loadSpeciesGroupCount();
             updateDistinctRecoTable();
             updateDistinctIdentifiedRecoTable();
