@@ -67,31 +67,6 @@
 			    </div>
 			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
 	    			</div>
-
-<<<<<<< HEAD
-		    	<tr>		    	
-		    	<td colspan="2">
-		    	<div class="pre-scrollable" style="max-height:300px;clear: both;overflow-x:hidden;">
-		    	<table width="100%">
-		    	<tr>
-		    	<th>Species Name</th>
-		    	<th>Trait Values</th>
-		    	</tr>
-		       	<g:each var="it" in="${species}" status='i' >
-		       	<tr>
-		    		<td><a href="/species/show/${it.objectId}" >${it.pageTaxon.name}</a></td>
-		    		<td>${it.traitValue.value}</td>
-		    		</tr>
-		    	</g:each>
-		    	</table>
-		    	</div>
-		    	</td>
-		    	</tr>
-		    	</table>
-    </div>
-    </div>	
-    </body>
-=======
 	 	</div>
 	<script>
 	    $(document).ready (function() {
@@ -119,5 +94,4 @@
 		});
 		</asset:script>
 	</body>
->>>>>>> biodiv2.0
 </html>
