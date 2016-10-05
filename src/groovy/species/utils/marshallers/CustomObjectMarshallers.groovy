@@ -108,7 +108,7 @@ class CustomObjectMarshallers {
             String parentName = defaultHierarchy ? (defaultHierarchy.size()==1?null:defaultHierarchy[-2].canonicalForm) : null
             String group = defaultHierarchy ?  defaultHierarchy[0].canonicalForm : null
             List<Map> defaultHierarchyMap = defaultHierarchy//.collect { ['id':it.id, 'name':it.name, 'canonicalForm':it.canonicalForm, 'rank':it.rank, 'speciesId':it.speciesId]};
-            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'defaultHierarchy':defaultHierarchyMap, 'group':it.group, 'parentName':parentName, 'position':it.position.value(), speciesId:it.speciesId]
+            return ['id':it.id, 'name':it.name, 'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'rank':TaxonomyRank.list()[it.rank].value(), 'nameStatus' : it.status.value().toLowerCase(), 'sourceDatabase': it.viaDatasource?it.viaDatasource:'', 'defaultHierarchy':defaultHierarchyMap, 'group':it.group, 'parentName':parentName, 'position':it.position?.value(), speciesId:it.speciesId]
         }
 
         JSON.registerObjectMarshaller(Classification) {

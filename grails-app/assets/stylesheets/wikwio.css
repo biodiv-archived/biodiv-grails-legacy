@@ -37,8 +37,8 @@
 	position:relative;
 	margin:0;
 	padding: 0px;
-	width:960px;
-	height:300px;
+	/*width:960px;
+	height:300px;*/
 	overflow: hidden;
 }
 
@@ -122,7 +122,7 @@ div#species_main_wrapper {
 */
 
 a.collapsed  {
-	background-color: rgb(68, 68, 68);
+	/*background-color: rgb(68, 68, 68);*/
 	background-image: none;
 }
 
