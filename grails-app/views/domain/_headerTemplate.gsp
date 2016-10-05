@@ -181,7 +181,8 @@
 
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
 							<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.activity')}"><g:messa
+                                href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.activity')}">
+                                <g:message code="button.activity" /></a>
 	                        </li>
 							<li
 								class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
