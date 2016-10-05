@@ -3,7 +3,7 @@
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <html>
     <head>
-        <g:set var="title" value="${g.message(code:'traits.label')} ${g.message(code:'msg.beta')}"/>
+        <g:set var="title" value="${g.message(code:'facts.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
 
@@ -13,6 +13,10 @@
 	        [class*="span"] {
 	    	margin-left: 0px;
 			}
+			.table th, .table td {
+					border-top:0px;
+				    border-bottom: 1px solid #dddddd;
+				}
         </style>
     </head>
    <body>
@@ -59,28 +63,27 @@
 					    	<td>${coverage}</td></tr>
 				    	</g:if>
 				    </table>
-			    	<hr>
-			    	<h5>Filter By Value</h5>
-			    	<div class="trait" data-toggle="buttons-radio">
-			    		<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue, 'displayAny':'true']" />
-			    	</div>
 			    </div>
+			    			    	<h5>Filter by value</h5>
+			    	<div class="trait thumbnail" data-toggle="buttons-radio">
+			    		<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue]" />
+			    	</div>
 			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
 	    			</div>
 	 	</div>
 	<script>
 	    $(document).ready (function() {
-	           $('.trait button, .trait .any, .trait .none').on('click', function(){
-	                if($(this).hasClass('active')){
-	                return false;
-	                }
-	                $(this).parent().parent().find('button, .any, .none').removeClass('active btn-success');
-	                $(this).addClass('active btn-success');
+	         $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
+            if($(this).hasClass('active')){
+            return false;
+            }
+            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+            $(this).addClass('active btn-success');
 
-	                updateMatchingSpeciesTable();
-	                return false;
-	            });
-	           updateMatchingSpeciesTable();
+            updateMatchingSpeciesTable();
+            return false;
+        });
+            updateMatchingSpeciesTable();
 	    });
 	</script>
 		<asset:script type="text/javascript">
