@@ -371,10 +371,20 @@ $(document).ready(function(){
             $("input#taxon").val();
             $('#taxonHierarchy').find(".taxon-highlight").removeClass('taxon-highlight');
         } else if($(this).attr('data-target').startsWith('trait.')) {
-            $('.traitFilter button[data-tid='+$(this).attr('data-target').replace('trait.','')+']').removeClass('active btn-success');
+            var t = $(this).attr('data-target').split('=');
+            var tid = t[0].replace('trait.','');
+            var tvid = t[1];
+            if(tvid == 'none') {
+            $('.traitFilter div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+            $('.trait div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+            } else {
+            $('.traitFilter button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+            $('.trait button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+            }
+            $('.traitFilter div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
+            $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
         }
         removeParam = $(this).attr('data-target').replace('#','');
-        console.log(removeParam);
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
         return false;
     });
@@ -735,7 +745,7 @@ function getSelectedHabitat() {
 
 function getSelectedTrait() {
     var hbt = '',trait='',selTrait={}; 
-    $('.traitFilter button, .traitFilter .none, .traitFilter .any').each(function(){
+    $('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any').each(function(){
         if($(this).hasClass('active')) {
             trait = $(this).attr('data-tid');
             selTrait[trait] = $(this).attr('data-tvid');

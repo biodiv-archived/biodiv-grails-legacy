@@ -11,6 +11,7 @@ function loadMatchingSpeciesList() {
     var target = window.location.pathname + window.location.search;
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
+    console.log(url);
     var href = url.attr('path');
     var params = getFilterParameters(url);
     for(var key in params) {
@@ -38,9 +39,18 @@ function loadMatchingSpeciesList() {
                 $me.hide();
             }
             $('#matchingSpeciesList .matchingSpeciesHeading').html(data.model.totalCount?(' (' + data.model.totalCount + ')'):'');
+            $('#matchingSpeciesFilterMsg').html(data.model.obvFilterMsgHtml);
             if(data.success == true && data.model.matchingSpeciesList) {
                 $.each(data.model.matchingSpeciesList, function(index, item) {
-                    $matchingSpeciesTable.append('<tr><td><a href='+item[3]+'>'+item[0]+'</a></td></tr>');  
+                    var itemMap = {};
+                    itemMap.id = item[0];
+                    //itemMap.title = item[1];
+                    itemMap.url = item[4];
+                    itemMap.imageLink = item[5];
+                    //itemMap.notes = item[6];
+                    itemMap.type='species';
+                    var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
+                    $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'</td><td><a href='+item[4]+'>'+item[1]+'</a></td></tr>');  
                 });
                 $me.data('offset', data.model.next);
                 if(!data.model.next){

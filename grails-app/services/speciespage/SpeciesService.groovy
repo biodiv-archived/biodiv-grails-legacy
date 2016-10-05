@@ -69,6 +69,7 @@ import java.io.File ;
 import species.participation.NamelistService
 import species.participation.RecommendationVote;
 import groovy.sql.Sql
+import species.utils.ImageType;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -1916,12 +1917,10 @@ class SpeciesService extends AbstractObjectService  {
         
         log.debug "Species list query :${queryParts.query} with params ${queryParams}"
         def speciesInstanceList;// = hqlQuery.addEntity(Species.class).list();
-        utilsService.logSql {
         speciesInstanceList = hqlQuery.addEntity(Species.class).list();
-        }
         log.debug "Species list count query :${queryParts.countQuery} with params ${queryParams}"
+        println "Species list count query :${queryParts.countQuery} with params ${queryParams}"
         def rs = hqlCountQuery.list();
-
         def speciesCountWithContent = 0;
         int count = 0
         for(c in rs) {
@@ -1930,12 +1929,13 @@ class SpeciesService extends AbstractObjectService  {
                 speciesCountWithContent += c[1];
         }
         // Added for species count in namelist
-        if(count == 0){
+        /*if(count == 0){
             def sc = Species.findByIsDeletedAndTaxonConcept(false, TaxonomyDefinition.read(params.taxon));
             if(sc){
               count++;  
             }
         }
+        println count;*/
 
         if(params.daterangepicker_start){
             queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
@@ -2485,11 +2485,20 @@ def checking(){
         def matchingSpeciesList = [];
         result.speciesInstanceList.each {it->
             def link = utilsService.createHardLink("species", "show", it.id);
+            def mainImage = it.mainImage();
+            String imagePath = '';
+            def speciesGroupIcon =  it.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
+
+
             if(params.downloadFrom == 'matchingSpecies') {
                 //HACK: request not available as its from job scheduler
-                matchingSpeciesList << [it.title, true, 0, link, link]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath]
             } else {
-                matchingSpeciesList << [it.title, true, 0, link, link, params.user]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user]
             }
         }
         return [matchingSpeciesList:matchingSpeciesList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];

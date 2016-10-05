@@ -226,8 +226,8 @@
                     <div class="sidebar_section">
                     <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"> 
                     <h5>Traits</h5></a>
-                    <div id="traits">
-                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitInstanceList.traitValue, 'displayAny':'none', 'fromSpeciesShow':'true']" />
+                    <div id="traits" class="trait">
+                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitInstanceList.traitValue, 'displayAny':'none', 'fromSpeciesShow':true]" />
                     </div>
                     </div>
                     </g:if>

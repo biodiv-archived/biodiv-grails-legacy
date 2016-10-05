@@ -462,20 +462,7 @@ println headers;
         return [query:query, allInstanceCountQuery:allInstanceCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
-
-    Map showTrait(def params) {
-        Trait trait = Trait.findById(params.id)
-        def coverage = trait.taxon
-        def factList = [:];
-        def traitValue=[];
-        Field field;
-        traitValue=TraitValue.findAllByTrait(trait);
-        factList = Fact.findAllByTrait(trait);
-        field = Field.findById(trait.fieldId);
-        println "TraitValue"+traitValue
-        return [trait:trait, coverage:coverage.name, traitValue:traitValue , species:factList, field:field.concept];
-    }
-
+    
     def getAllFilter(filters){
         def trait,traitValue,traitFilter=[:];
         filters.each{ f -> 

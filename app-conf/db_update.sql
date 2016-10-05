@@ -683,3 +683,14 @@ CREATE INDEX taxonomy_definition_traits ON taxonomy_definition using gin(traits)
 
 alter table trait add column is_deleted boolean not null default false;
 alter table fact add column is_deleted boolean not null default false;
+
+
+#3rd Oct
+alter table fact drop constraint fact_object_id_page_taxon_id_trait_id_key;
+alter table fact add constraint  fact_object_id_page_taxon_id_trait_id_trait_value_id_key unique(object_id, page_taxon_id, trait_id, trait_value_id);
+delete from fact;
+delete from trait_value;
+delete from trait;
+create sequence trait_id_seq start 1;
+create sequence trait_value_id_seq start 1;
+create sequence fact_id_seq start 1;

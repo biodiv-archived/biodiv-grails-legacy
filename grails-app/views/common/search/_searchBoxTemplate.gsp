@@ -1,4 +1,7 @@
 <%@page import="species.utils.Utils"%>
+<%@ page import="species.groups.SpeciesGroup"%>
+<%@ page import="species.Habitat"%>
+
 
 <div id='searchToggleBox' class="input-append" style="z-index:1">
 	<form method="get"
@@ -320,5 +323,17 @@ $(document).ready(function(){
         $(this).next().slideToggle('slow');
    });
 });
+
+	function setDefaultGroup(){
+		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
+		$(defId).click();
+	}
+	function setDefaultHabitat(){
+		var defId = "#habitat_" + "${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
+		$(defId).click();
+	}
+	$(document).ready(function() {
+			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+	});
 
 </script>

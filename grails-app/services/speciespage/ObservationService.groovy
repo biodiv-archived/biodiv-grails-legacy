@@ -1505,6 +1505,7 @@ println resIdList
             activeFilters['classification'] = classification.id
  
             //filterQuery += " and reg.classification_id = :classification";
+            queryParams['trait'] = params.trait;
 
         }
 				
