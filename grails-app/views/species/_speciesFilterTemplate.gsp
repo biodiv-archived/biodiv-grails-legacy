@@ -9,7 +9,7 @@
 	</div>
 
 	<obv:showGroupFilter model="['hideHabitatFilter':true]" />
-	<div class="traitFilter" style="height: 29px;">
+	<div style="height: 29px; border: 1px solid #ccc;padding: 5px;">
 	<div class="btn-group pull-right" style="z-index: 10">
         <button id="selected_sort" class="btn dropdown-toggle"
 			data-toggle="dropdown" href="#" rel="tooltip"
