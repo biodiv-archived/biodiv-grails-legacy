@@ -62,3 +62,12 @@ function loadMatchingSpeciesList() {
     });
 }
 
+/* For PopOver Traits*/
+$('.traitIcon').popover({
+    'trigger':'hover',
+    'html':true,
+    'placement':'top',
+    'content':function(){
+        return "<img src='"+$(this).data('imageUrl')+"'>";
+    }
+});

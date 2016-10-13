@@ -33,7 +33,7 @@
                     </div>
                 </div>
             </div>
-            <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow-x: hidden;">
+            <div class="span9 right-shadow-box" style="position: relative;height:388px;">
                 <g:render template="showTraitListTemplate"/>
             </div>
         </div>
