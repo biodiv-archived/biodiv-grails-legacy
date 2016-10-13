@@ -63,11 +63,17 @@ function loadMatchingSpeciesList() {
 }
 
 /* For PopOver Traits*/
+$(document).ready(function(){
 $('.traitIcon').popover({
     'trigger':'hover',
     'html':true,
     'placement':'top',
+    'delay': { 
+       'show': "500", 
+       'hide': "100"
+    },
     'content':function(){
-        return "<img src='"+$(this).data('imageUrl')+"'>";
+        return "<div style='width:150px;height:150px;'><img src='"+$(this).data('imageUrl')+"' width='150' height='150' /></div>";
     }
+});
 });
