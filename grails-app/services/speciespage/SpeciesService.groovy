@@ -1058,9 +1058,9 @@ class SpeciesService extends AbstractObjectService  {
                 //return [success:false, msg:"Commonname with id ${cnId} is not found"]
             } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
-            } else if(!oldCommonname.isContributor()) {
+            } /*else if(!oldCommonname.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
-            }
+            }*/
         }
 
         Species.withTransaction { status ->
