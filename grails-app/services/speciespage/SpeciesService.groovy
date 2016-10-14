@@ -1348,7 +1348,7 @@ class SpeciesService extends AbstractObjectService  {
         }
         //Permission check only if its from species show page
         if(speciesInstance) {
-            if(!oldCommonname.isContributor()) {
+            if(!oldCommonname.isSpeciesContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
 
@@ -1360,13 +1360,13 @@ class SpeciesService extends AbstractObjectService  {
             String msg = '';
             def content;
             try{
-                if(utilsService.isAdmin(springSecurityService.currentUser)){
+               // if(utilsService.isAdmin(springSecurityService.currentUser)){
                     if(oldCommonname.contributors.size() > 0) {
                         oldCommonname.contributors.clear();
                        }
-                }else{ 
+               /* }else{ 
                     oldCommonname.removeFromContributors(springSecurityService.currentUser);
-                }
+                }*/
                 if(oldCommonname.contributors.size() == 0) {
                     oldCommonname.delete(failOnError:true)
                 } else {
