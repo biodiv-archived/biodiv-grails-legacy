@@ -95,7 +95,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(CommonNames) {
-            def commonname = ['id':it.id, 'name':it.name, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor() ];
+            def commonname = ['id':it.id, 'name':it.name, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isSpeciesContributor() ];
             if(it.language) {
                 commonname ['language'] =  it.language
             }

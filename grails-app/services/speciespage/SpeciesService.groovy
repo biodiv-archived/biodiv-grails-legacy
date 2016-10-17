@@ -1058,9 +1058,9 @@ class SpeciesService extends AbstractObjectService  {
                 //return [success:false, msg:"Commonname with id ${cnId} is not found"]
             } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
-            } else if(!oldCommonname.isContributor()) {
+            } /*else if(!oldCommonname.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
-            }
+            }*/
         }
 
         Species.withTransaction { status ->
@@ -1348,7 +1348,7 @@ class SpeciesService extends AbstractObjectService  {
         }
         //Permission check only if its from species show page
         if(speciesInstance) {
-            if(!oldCommonname.isContributor()) {
+            if(!oldCommonname.isSpeciesContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
 
@@ -1360,13 +1360,13 @@ class SpeciesService extends AbstractObjectService  {
             String msg = '';
             def content;
             try{
-                if(utilsService.isAdmin(springSecurityService.currentUser)){
+               // if(utilsService.isAdmin(springSecurityService.currentUser)){
                     if(oldCommonname.contributors.size() > 0) {
                         oldCommonname.contributors.clear();
                        }
-                }else{ 
+               /* }else{ 
                     oldCommonname.removeFromContributors(springSecurityService.currentUser);
-                }
+                }*/
                 if(oldCommonname.contributors.size() == 0) {
                     oldCommonname.delete(failOnError:true)
                 } else {

@@ -1358,7 +1358,8 @@ println resIdList
             def parMaxVotedReco = parentObv.maxVotedReco;
             if(parMaxVotedReco) {
                 if(parMaxVotedReco.taxonConcept) {
-                    filterQuery += " and (obv.max_voted_reco_id = :parMaxVotedReco  or obv.max_voted_reco_id.taxonConcept = :parMaxVotedRecoTaxonConcept)" //removed check for not equal to parentId to include it in show page 
+                    recoQuery = recoQuery+" left outer join taxonomy_definition t on reco.taxon_concept_id = t.id ";
+                    filterQuery += " and obv.max_voted_reco_id = :parMaxVotedReco" //removed check for not equal to parentId to include it in show page 
                     queryParams['parMaxVotedRecoTaxonConcept'] = parMaxVotedReco.taxonConcept
                 } else {
                     filterQuery += " and (obv.max_voted_reco_id = :parMaxVotedReco)" //removed check for not equal to parentId to include it in show page 
