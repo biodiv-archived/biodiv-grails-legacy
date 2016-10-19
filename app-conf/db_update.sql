@@ -670,3 +670,6 @@ ALTER TABLE document ALTER COLUMN longitude TYPE double precision;
 #8 Apr
 ALTER TABLE suser ADD COLUMN latitude double precision;
 ALTER TABLE suser ADD COLUMN longitude double precision;
+
+#18thOct2016
+alter table resource add column gbifID bigint;
