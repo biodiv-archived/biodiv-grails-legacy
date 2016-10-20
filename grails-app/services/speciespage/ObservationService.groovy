@@ -1326,8 +1326,8 @@ println resIdList
             def neLon = bounds[3].toFloat()
 
             def boundGeometry = getBoundGeometry(swLat, swLon, neLat, neLon)
-            filterQuery += " and within (obv.topology, :boundGeometry) = true " //) ST_Contains( :boundGeomety,  obv.topology) "
-            //filterQuery += " and 1=0 ";// and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
+            //filterQuery += " and within (obv.topology, :boundGeometry) = true " //) ST_Contains( :boundGeomety,  obv.topology) "
+            filterQuery += "and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
             queryParams['boundGeometry'] = boundGeometry
             activeFilters["bounds"] = params.bounds
         }  
@@ -2529,9 +2529,9 @@ println resIdList
         log.debug queryParts.queryParams;
         
         def hqlQuery = sessionFactory.currentSession.createSQLQuery(query)
-        if(params.bounds && boundGeometry) {
+        /* if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-        } 
+        } */
         
         hqlQuery.setMaxResults(1000);
         hqlQuery.setFirstResult(0);
