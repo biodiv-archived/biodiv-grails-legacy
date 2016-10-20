@@ -524,5 +524,8 @@ class Species implements Rateable {
         this.reprImage = res;
     }
 
-
+    @Override
+    String toString() {
+        return "<${this.class} : ${id} - ${taxonConcept.name}>"
+    }
 }

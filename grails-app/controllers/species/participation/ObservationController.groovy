@@ -44,8 +44,6 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.ScientificName.TaxonomyRank;
 import species.participation.ActivityFeedService;
 import static org.springframework.http.HttpStatus.*;
-import species.sourcehandler.exporter.DwCObservationExporter; 
-import species.sourcehandler.exporter.DwCSpeciesExporter; 
 import java.math.BigDecimal
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -73,7 +71,9 @@ class ObservationController extends AbstractObjectController {
     def speciesPermissionService;
 
     def sessionFactory;
-def grailsCacheManager;
+    def grailsCacheManager;
+    def traitService;
+
 	static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
@@ -119,6 +119,7 @@ def grailsCacheManager;
                         .getEntries();
 */
         model.userLanguage = utilsService.getCurrentLanguage(request);
+        model.filters = traitService.getAllFilter(utilsService.getModuleFilters('observation'));
         model.queryParams.view = (params?.view && params?.view=='grid')?'grid':'list';
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.recoVotes = observationService.getRecommendationVotes(model.observationInstanceList, 3, 0);

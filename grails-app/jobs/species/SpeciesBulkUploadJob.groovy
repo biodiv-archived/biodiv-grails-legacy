@@ -2,7 +2,7 @@ package species
 
 import groovy.sql.Sql
 import java.util.logging.Logger;
-import species.participation.SpeciesBulkUpload.Status
+import species.participation.UploadLog.Status
 import species.participation.SpeciesBulkUpload
 import species.participation.NamelistService
 
@@ -16,11 +16,11 @@ class SpeciesBulkUploadJob {
 	private static volatile boolean JOB_RUNNING = false
 	
     static triggers = {
-      simple startDelay: 1000l, repeatInterval: 10*1000l // starts after 1 second  and execute job once in 10 seconds 
+//      simple startDelay: 1000l, repeatInterval: 10*1000l // starts after 1 second  and execute job once in 10 seconds 
     }
 
     def execute() {
-		List scheduledTaskList = getJobs()
+/*		List scheduledTaskList = getJobs()
 		if(!scheduledTaskList){
 			return
 		}
@@ -54,10 +54,10 @@ class SpeciesBulkUploadJob {
 		dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		
 		JOB_RUNNING = false
-    }
+  */  }
 	
 	
-
+/*
 	private synchronized getJobs(){
 		if(JOB_RUNNING){
 			return null
@@ -94,4 +94,5 @@ class SpeciesBulkUploadJob {
 		int hirupdateCount = sql.executeUpdate(defHirUpdateSql);
 		log.debug " Default hir update count " + hirupdateCount
 	}
+    */
 }

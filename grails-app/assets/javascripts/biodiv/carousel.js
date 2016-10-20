@@ -210,7 +210,7 @@ var getSnippetTabletHTML = function(carousel, item) {
         item.url = window.params.obvShowPage+'/'+item.id;
 
 
-	if(carousel.options.filterProperty === "speciesName"){
+	if(carousel != undefined && carousel.options.filterProperty === "speciesName"){
 		paramsString = "?" + encodeURIComponent("species=" + carousel.options.filterPropertyValue);	
 	}
     var imageTag = '<img class=img-polaroid src="' + item.imageLink + paramsString  + '" title="' + item.title  +'" alt="" />';
@@ -225,3 +225,4 @@ var getSnippetTabletHTML = function(carousel, item) {
 	return '<div class=thumbnail><div class="'+item.type.replace(' ','_')+'_th snippet tablet'+'"><div class=figure><a href='+ item.url + paramsString + '>' + imageTag + listTemplateIcon + '</a></div><div class="'+'ellipsis multiline caption">'+(summary)+'</div></div></div>';
 
 }
+

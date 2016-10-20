@@ -29,7 +29,7 @@
 </div>
 <div id="taxonHierarchy" class="emptyField" ${height?"style='height:"+height+"'":''}></div>
 <div class="nameContainer">
-    <div id="searchTaxonBox" class="input-append input-block-level" style="margin-bottom:0px;display:none;">
+    <div id="searchTaxonBox" class="input-append input-block-level" style="margin-bottom:0px;">
         <input id="searchTaxon" class="input-block-level" type="text" value="" placeholder="${g.message(code:'species.taxondefinition.search.placeholder')}" />
         <span id="searchTaxonPrev" class="add-on btn searchTaxonPaginate">&lt;</span>
         <span id="searchTaxonNext" class="add-on btn searchTaxonPaginate">&gt;</span>

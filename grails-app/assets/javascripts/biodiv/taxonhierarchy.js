@@ -123,6 +123,8 @@
                                 $(tmp).data('taxonid', nodeData.original.taxonid);
                                 $(tmp).data('rank', nodeData.original.rank);
                                 $(tmp).attr('title', 'Show all '+me.options.controller+'s for this taxon');
+                               
+                                
                             }
 
                             if (nodeData.original.isContributor == 'true') {
@@ -155,12 +157,21 @@
                 }
                 }
                 var selectedTaxonId = $me.data('taxonid');
+                
+                
 
                 //                    $("#"+selectedTaxonId).removeClass('btn-info-nocolor').parent().closest('tr').removeClass('taxon-highlight');
                 //                    $(e.target).parent('span').prev().addClass('btn-info-nocolor').closest('tr').addClass('taxon-highlight');
                 $('#taxonHierarchy').find(".taxon-highlight").removeClass('taxon-highlight');
                 $me.addClass('taxon-highlight');
-                
+                var selectedNode = $('.jstree-anchor.taxon-highlight');
+                            var jstree = $('#taxonHierarchy').jstree(true);
+                            var node = jstree.get_node(selectedNode);
+                            var nodeData = node.original;
+                            //var children=jstree._get_children(selectedNode);
+                            //console.log(children);
+                            console.log(node);
+                            console.log(jstree);
                 /*var s = $(e.target).hasClass('active');
                 $('#taxonHierarchy .taxDefIdSelect').removeClass('active');
                 s ? $(e.target).removeClass('active') : $(e.target).addClass('active');
@@ -170,7 +181,11 @@
                         $("input#taxon").val(selectedTaxonId);
                         getNamesFromTaxon($me, $me.attr('id').replace('_anchor',''), getSelectedStatus(), getSelectedPosition(), getSelectedRanks());
                         break;
-                    default:
+                    /*case 'trait':
+                        $("input#taxon").val(selectedTaxonId);
+                        updateGallery(window.location.pathname + window.location.search, 40, 0, undefined, true);                    
+                    break; 
+                    */default:
                         if ($me.hasClass('taxon-highlight')) {
                             var classificationId = $('#taxaHierarchy option:selected').val();
                             $("input#taxon").val(selectedTaxonId);

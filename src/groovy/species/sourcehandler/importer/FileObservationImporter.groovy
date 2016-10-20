@@ -18,7 +18,7 @@ class FileObservationImporter extends AbstractObservationImporter {
         return _instance;
     }
 
-    Map importObservationData(File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File uploadLog=null) {
+    Map importData(File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File uploadLog=null) {
         log.info "Import started from ${observationsFile} ${multimediaFile} using mappingFile ${mappingFile} and multimediaMappingFile ${multimediaMappingFile}"
         if(uploadLog) uploadLog << "\nImport started from ${observationsFile} using mappingFile ${mappingFile} and multimediaMappingFile ${multimediaMappingFile}"
 

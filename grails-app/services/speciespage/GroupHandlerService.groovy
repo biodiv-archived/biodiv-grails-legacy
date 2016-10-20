@@ -165,7 +165,6 @@ class GroupHandlerService {
 		}
         log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
         dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
- 	
 		log.info "Updated group for taxonConcepts ${noOfUpdations} in total"
 		log.info "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
 		return noOfUpdations;
@@ -206,7 +205,7 @@ class GroupHandlerService {
         if(taxonConcept instanceof SynonymsMerged) {
             def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
             if(acceptedTaxonConcept) {
-			    acceptedTaxonConcept.postProcess()
+                acceptedTaxonConcept.postProcess()
                 ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
             }
         } else {

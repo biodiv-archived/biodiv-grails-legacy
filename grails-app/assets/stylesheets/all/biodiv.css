@@ -3202,7 +3202,7 @@ small {
 .partners .img-polaroid {
     border-radius: 6px;
     width: 110px;
-    height: 55px;
+    /*height: 55px;*/
     margin: 5px;
 }
 
@@ -3512,4 +3512,19 @@ margin-bottom:5px;
 }
 .checkbox.inline.no_indent:last-child {
     margin-right: 0;
+}
+
+
+.trait h6{
+      margin: 0px;
+}
+.trait .userGroups{
+    margin:0px;
+}
+.trait .small_profile_pic{
+    margin : 0px;
+}
+
+.traitFilter .userGroups{
+	margin: 0px;
 }

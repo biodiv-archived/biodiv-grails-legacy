@@ -18,7 +18,7 @@ class DwCObservationImporter extends AbstractObservationImporter {
         return _instance;
     }
 
-    Map importObservationData(String directory, File uploadLog=null) {
+    Map importData(String directory, File uploadLog=null) {
         log.info "Darwin Core import started"
         if(uploadLog) uploadLog << "\nDarwin Core import started"
 
