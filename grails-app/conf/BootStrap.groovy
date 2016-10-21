@@ -39,6 +39,7 @@ class BootStrap {
 	def emailConfirmationService
 	def userGroupService
     def utilsService
+    def speciesTraitsService;
 	/**
 	 * 
 	 */
@@ -54,6 +55,8 @@ class BootStrap {
         initJSONMarshallers();
         initCaches();
         initBannerMessageMap();
+        initFiltersMap();
+        //speciesTraitsService.init();
        
   	}
 
@@ -208,6 +211,10 @@ class BootStrap {
 
 	def initBannerMessageMap() {
 		utilsService.loadBannerMessageMap();
+	}
+
+	def initFiltersMap(){
+		utilsService.loadFilterMap();
 	}
 	/**
 	 * 

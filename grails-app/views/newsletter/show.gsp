@@ -57,7 +57,7 @@
 							<g:hiddenField name="userGroup"
 								value="${newsletterInstance?.userGroup?.webaddress}" />
 							<span class="button">
-								<input class="btn btn-primary" style="float: right; margin-right: 5px;" type="submit" value="Edit"/>
+								<input class="btn btn-primary" style="float: right; margin-right: 5px;" type="submit" value="${g.message(code:'button.edit')}"/>
 							</span> <span class="button"> <a class="btn btn-danger"
 								style="float: right; margin-right: 5px;"
 								href="${uGroup.createLink(controller:'newsletter', action:'delete', id:newsletterInstance.id)}"
@@ -77,7 +77,7 @@
 							<g:hiddenField name="userGroup"
 								value="${newsletterInstance?.userGroup?.webaddress}" />
 							<span class="button">
-								<input class="btn btn-primary" style="float: right; margin-right: 5px;" type="submit" value="Edit"/>
+								<input class="btn btn-primary" style="float: right; margin-right: 5px;" type="submit" value="${g.message(code:'button.edit')}"/>
 							</span> <span class="button"> <a class="btn btn-danger"
 								style="float: right; margin-right: 5px;"
 								href="${uGroup.createLink(controller:'newsletter', action:'delete', id:newsletterInstance.id)}"

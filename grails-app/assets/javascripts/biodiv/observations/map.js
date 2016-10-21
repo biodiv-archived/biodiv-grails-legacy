@@ -20,8 +20,8 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
             var m = [];
             for(var i=0; i<data.model.observations.length; i++) {
                 var obv = data.model.observations[i];
-                var latitude = obv.lat?obv.lat:obv[1];
-            	var longitude = obv.lng?obv.lng:obv[2];
+                var latitude = obv.lat?obv.lat:obv[2];
+            	var longitude = obv.lng?obv.lng:obv[3];
             	var icon;
                 
                 if(obv.geoPrivacy){
@@ -33,7 +33,7 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
                     clusterable: true,
                     icon:icon,
                     clickable:load_content,
-                    data:{id:(obv.id?obv.id:obv[0])}
+                    data:{id:(obv.id?obv.id:obv[1])}
                 });
                 if(marker) m.push(marker);
             }

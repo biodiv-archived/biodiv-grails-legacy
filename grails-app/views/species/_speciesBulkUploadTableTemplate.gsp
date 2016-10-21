@@ -6,6 +6,7 @@
 					<th><g:message code="speciesbulkuploadtable.start.date" /> </th>
 					<th><g:message code="speciesbulkuploadtable.end.date" /></th>
 					<th><g:message code="speciesbulkuploadtable.status" /></th>
+					<th><g:message code="default.category.label" /></th>
 					<sUser:ifOwns model="['user':user]">
 						<th class="col-xs-2"><g:message code="speciesbulkuploadtable.data.file" /></th>
 						<th><g:message code="speciesbulkuploadtable.log.file" /></th>
@@ -22,6 +23,7 @@
 						<td>${uploadLog.startDate}</td>
 						<td>${uploadLog.endDate}</td>
 						<td>${species.utils.Utils.getTitleCase(uploadLog.status.value())}</td>
+                        <td>${uploadLog.uploadType.capitalize()}</td>
 						<sUser:ifOwns model="['user':user]">
 							<td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:uploadLog.filePath])}"><g:message code="button.download" /></a></td>
 							<td><g:if test="${uploadLog.logFilePath}"><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:uploadLog.logFilePath])}"><g:message code="button.download" /></a></g:if></td>

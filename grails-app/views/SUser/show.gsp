@@ -6,6 +6,7 @@
         <%@page import="species.participation.ActivityFeedService"%>
         <%@page import="species.utils.ImageType"%>
         <%@page import="species.Resource.ResourceType"%>
+        <%@page import="species.participation.UploadLog"%>
         <%@page import="species.participation.SpeciesBulkUpload"%>
         <%@page import="species.participation.NamesReportGenerator"%>
         <%@page import="content.eml.Document"%>
@@ -175,6 +176,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                         
                     <%
                         def downloadLogList = DownloadLog.findAllByAuthorAndStatus(user, 'Success', [sort: 'createdOn', order: 'desc'])
+                        def uploadLogList = UploadLog.findAllByAuthor(user, [sort: 'startDate', order: 'desc']);
                         def speciesBulkUploadList = SpeciesBulkUpload.findAllByAuthor(user, [sort: 'startDate', order: 'desc'])
                         def namesReportList = NamesReportGenerator.findAllByAuthor(user, [sort: 'startDate', order: 'desc'])
                         
@@ -299,15 +301,15 @@ def contact_me_text=g.message(code:'button.contact.me')
                                             <s:namesReportTable model="[uploadList:namesReportList]" />
                                         </div>
                                         </g:if>
-                                        
-                                        <g:if test="${!speciesBulkUploadList.isEmpty()}">
+                                        <g:if test="${!uploadLogList.isEmpty()}">
                                         <div id="uploads" class="section" style="clear: both;overflow:auto;">
                                             <h6>
-                                                <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.species.bulk.uploads" />
+                                                <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.uploads" />
                                             </h6>
-                                            <s:rollBackTable model="[uploadList:speciesBulkUploadList]" />
+                                            <s:rollBackTable model="[uploadList:uploadLogList]" />
                                         </div>
                                         </g:if>
+ 
                                     </div>
                     <%
                         def c = Document.createCriteria()

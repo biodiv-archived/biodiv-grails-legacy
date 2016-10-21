@@ -23,6 +23,9 @@ import speciespage.search.SUserSearchService;
 import species.SpeciesPermission;
 import species.SpeciesPermission.PermissionType;
 import org.springframework.context.MessageSource;
+import au.com.bytecode.opencsv.CSVWriter
+import species.participation.Observation;
+import speciespage.ObvUtilService;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
 class SUserService extends SpringSecurityUiService implements ApplicationContextAware {
@@ -36,6 +39,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
     def messageSource;
     def request;
     def utilsService;
+    def obvUtilService
     private ApplicationTagLib g
 	ApplicationContext applicationContext
 
@@ -366,6 +370,15 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	          return true;
 	    return false;
 	}
-
+		def downloadUserDetails(){
+                File csvFile = new File('/home/ifp/git/biodiv/app-conf/traitvalue.tsv', "upload_report.csv")
+                CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+                writer.writeNext("Document Title:#user Detail:".split("#"))   
+                writer.writeNext(("${documentInstance.title}#Success").split("#"))
+                writer.writeNext("Total no of document uploaded successfully#${successCount}".split("#"))
+                writer.writeNext("Total no of document failed to upload#${failedCount}".split("#"))
+                writer.flush()
+                writer.close()
+}
 
 }

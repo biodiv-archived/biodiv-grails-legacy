@@ -4,7 +4,7 @@ import java.util.Date;
 
 import species.Species;
 import species.auth.SUser;
-import species.participation.SpeciesBulkUpload.Status
+import species.participation.UploadLog.Status
 
 import org.apache.commons.logging.LogFactory
 

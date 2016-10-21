@@ -811,4 +811,9 @@ class TaxonomyDefinition extends ScientificName {
 		TaxonomyRegistry tr = TaxonomyRegistry.findByParentTaxonDefinitionAndClassification(this, ibpClassification)
 		return tr?true:false
 	}
+
+    @Override
+    String toString() {
+        return "<${this.class} : ${id} - ${name}>"
+    }
 }

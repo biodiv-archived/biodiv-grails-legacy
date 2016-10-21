@@ -670,3 +670,35 @@ ALTER TABLE document ALTER COLUMN longitude TYPE double precision;
 #8 Apr
 ALTER TABLE suser ADD COLUMN latitude double precision;
 ALTER TABLE suser ADD COLUMN longitude double precision;
+
+#21Sep2016
+alter table taxonomy_definition add column traits bigint[][];
+alter table taxonomy_definition alter column traits  type bigint[][] using traits::bigint[][];
+                update taxonomy_definition set traits = g.item from (
+             select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
+) g where g.page_taxon_id=id;
+
+
+CREATE INDEX taxonomy_definition_traits ON taxonomy_definition using gin(traits);
+
+alter table trait add column is_deleted boolean not null default false;
+alter table fact add column is_deleted boolean not null default false;
+
+
+#3rd Oct
+alter table fact drop constraint fact_object_id_page_taxon_id_trait_id_key;
+alter table fact add constraint  fact_object_id_page_taxon_id_trait_id_trait_value_id_key unique(object_id, page_taxon_id, trait_id, trait_value_id);
+delete from fact;
+delete from trait_value;
+delete from trait;
+create sequence trait_id_seq start 1;
+create sequence trait_value_id_seq start 1;
+create sequence fact_id_seq start 1;
+
+#18thOct2016
+alter table resource add column gbifID bigint;
+
+#20th Oct 2016   for merging uploadjob and species bulk upload
+insert into upload_log(id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, class) select id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, 'species.participation.SpeciesBulkUpload' as class from species_bulk_upload ;
+
+update upload_log set upload_type = 'species bulk upload';

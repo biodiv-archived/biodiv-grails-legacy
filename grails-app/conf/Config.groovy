@@ -275,6 +275,14 @@ speciesPortal {
         rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
         downloadDir = "${download.rootDir}/namelist"
     }	
+    traits{
+        rootDir = "${app.rootDir}/traits"
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/traits"
+
+            databaseDir = "${app.rootDir}/traits"
+            traitValueFile="${app.rootDir}/icons.csv"
+    }
+    filterFilePath = "${app.rootDir}/filters.txt"
 
     names.parser.serverURL = "127.0.0.1"
     names.parser.port = 4334
@@ -490,7 +498,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
-    bannerFilePath = "${app.rootDir}/bannerMessage.txt"  
+    bannerFilePath = "${app.rootDir}/bannerMessage.txt" 
+    filterFilePath = "${app.rootDir}/filters.txt" 
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -679,7 +688,14 @@ environments {
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
-		
+            traits{
+                rootDir = "${app.rootDir}/traits"
+                serverURL = "http://${servername}/${appName}/traits"
+
+                databaseDir = "${app.rootDir}/traits"
+                traitValueFile="${app.rootDir}/icons.csv"
+            }	
+            filterFilePath = "${app.rootDir}/filters.txt"
 
             search.serverURL="http://${servername}:8080/solr"
             grails {
@@ -818,7 +834,15 @@ environments {
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
-		
+	        traits{
+                rootDir = "${app.rootDir}/traits"
+                serverURL = "http://${servername}/${appName}/traits"
+
+                databaseDir = "${app.rootDir}/traits"
+                traitValueFile="${app.rootDir}/icons.csv"
+            }	
+            filterFilePath = "${app.rootDir}/filters.txt"
+	
             search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {

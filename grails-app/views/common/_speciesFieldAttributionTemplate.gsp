@@ -10,7 +10,7 @@
                 <g:each in="${speciesFieldInstance.attributors}" var="r">
                 <g:if test="${r}">
                 <li>
-                <span class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2" data-name="attribution" data-original-title="Edit attribution" >${r.name}
+                <span class="${isSpeciesFieldContributor?'editField':''}" data-type="textarea" data-rows="2" data-name="attribution" data-original-title="${g.message(code:'species.exit.edit')}" >${r.name}
                 </span>
                 </li>
                 </g:if>
@@ -112,7 +112,7 @@
                 </g:each>
                 <g:if test="${isSpeciesFieldContributor}">
                 <!--li>
-                    <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="Add reference" data-placeholder="Add reference"></a>
+                    <a href="#" class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2"  data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="reference" data-original-title="${g.message(code:'species.add.reference')}" data-placeholder="${g.message(code:'species.add.reference')}"></a>
                 </li-->
                 </g:if>
 
@@ -125,7 +125,7 @@
         <div class="name" style="float:none;"><g:message code="default.references.label" /></div>
             <ul>
                 <li class="hidePoint">
-                <span class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2" data-name="reference" data-original-title="Add reference" data-placeholder="Add reference"></span>
+                <span class="addField"  data-pk="${speciesFieldInstance.id}" data-type="textarea" data-rows="2" data-name="reference" data-original-title="${g.message(code:'species.add.reference')}" data-placeholder="${g.message(code:'species.add.reference')}"></span>
                 </li>
             </ul>
     </div>

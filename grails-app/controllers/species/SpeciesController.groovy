@@ -39,6 +39,7 @@ import static org.springframework.http.HttpStatus.*;
 import species.participation.NamelistService
 import species.NamesMetadata
 import species.participation.SpeciesBulkUpload
+import species.trait.Fact;
 
 class SpeciesController extends AbstractObjectController {
 
@@ -56,6 +57,7 @@ class SpeciesController extends AbstractObjectController {
     def messageSource;
     def namelistService;
     def sessionFactory;
+    def traitService;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -73,7 +75,7 @@ class SpeciesController extends AbstractObjectController {
 		params.controller="species"
 		params.action="list"
         model.userLanguage = utilsService.getCurrentLanguage(request);
-
+        model.filters = traitService.getAllFilter(utilsService.getModuleFilters('species'));
         model.queryParams.remove('ranks');
         model.queryParams.remove('statuses');
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
@@ -239,6 +241,8 @@ class SpeciesController extends AbstractObjectController {
         params.id = params.long('id');
 		def url
 		def speciesInstance = params.id ? Species.findByIsDeletedAndId(false, params.id):null;
+        def traitList=Fact.findAllByPageTaxon(speciesInstance.taxonConcept)
+        println "traitList======="+traitList.traitValue
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
             withFormat {
@@ -324,7 +328,7 @@ class SpeciesController extends AbstractObjectController {
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
 
                     def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
+                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList]
 
                     if(springSecurityService.currentUser) {
                         SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
@@ -1101,7 +1105,7 @@ class SpeciesController extends AbstractObjectController {
             Language languageInstance = utilsService.getCurrentLanguage(request);
             params.locale_language = languageInstance;
             log.debug  "Choosen languauge is ${languageInstance}"
-			def res = speciesUploadService.basicUploadValidation(params)
+            def res = speciesUploadService.basicUploadValidation(params)
 			log.debug "Starting bulk upload"
 			render(text:res as JSON, contentType:'text/html')
 		}
@@ -1787,38 +1791,38 @@ class SpeciesController extends AbstractObjectController {
     }
 
     def test() {
-            def hibSession = sessionFactory?.getCurrentSession();
-            String taxonId=221859;
-            //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
-//            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
-            try {
+        def hibSession = sessionFactory?.getCurrentSession();
+        String taxonId=221859;
+        //def hqlQuery = sessionFactory.currentSession.createQuery("select s.id from species.Species as s  join s.taxonConcept.hierarchies as reg where s.id is not null and (reg.path like '%!_"+taxonId+"!_%'  escape '!' or reg.path like '"+taxonId+"!_%'  escape '!' or reg.path like '%!_"+taxonId+"' escape '!' )and reg.classification.id=265799 order by s.lastUpdated desc")
+        //            def hqlQuery = sessionFactory.currentSession.createQuery("select document from content.eml.Document document  join document.docSciNames ds join ds.taxonConcept.hierarchies as reg where document.id is not NULL  and reg.classification=265799 and (reg.path like '%!_141910!_%'  escape '!' or reg.path like '141910!_%'  escape '!' or reg.path like '%!_141910' escape '!') order by document.lastRevised  desc, document.id asc");
+        try {
             def hqlQuery = sessionFactory.currentSession.createQuery("select count(*) as count from Species s  join s.taxonConcept.hierarchies as reg  where s.id is not null  and reg.classification="+265799+" and (reg.path like '%!_123350!_%'  escape '!' or reg.path like '123350!_%'  escape '!' or reg.path like '%!_123350' escape '!') and reg.taxonDefinition.rank = 9");
             println "PppppppppppppppppppppppppppppppP"
-        def speciesInstanceList = hqlQuery.list();
-
-render speciesInstanceList;
-            } catch(e) {
-                e.printStackTrace();
-            }
+            def speciesInstanceList = hqlQuery.list();
+            render speciesInstanceList;
+        } catch(e) {
+            e.printStackTrace();
+        }
 
         println "=====================++++"
     }
-    def speciesContributor(){
+
+    def speciesContributor() {
 
         //println "========================= species contributor"
-         params.max = params.limit ? params.int('limit') : 10
+        params.max = params.limit ? params.int('limit') : 10
         params.offset = params.offset ? params.long('offset'): 0
         def userId=params.int('filterPropertyValue');
         def userInstance = SUser.get(params.id?:params.filterPropertyValue)
-       // println "========================= species contributor"+userInstance
-                if (userInstance) {
+        // println "========================= species contributor"+userInstance
+        if (userInstance) {
             def userGroupInstance
             if(params.webaddress) {
                 userGroupInstance = userGroupService.get(params['webaddress'])
             }
             def userContributionList
             userContributionList=speciesService.getuserContributionList(userId,params.max,params.offset)
-           //println "=======+++++++userContributionList"+userContributionList
+            //println "=======+++++++userContributionList"+userContributionList
             def species=userContributionList.collect{it}
             def result=[];
             species.each{
@@ -1828,20 +1832,18 @@ render speciesInstanceList;
             def contributedSpe=['species':result,count:contributionCount]
             def model = utilsService.getSuccessModel("", null, OK.value(), contributedSpe)
             //println "=============contributionCount==========="+model
-             withFormat {
+            withFormat {
                 json { render model as JSON }
                 xml { render model as XML }
             }
 
-            }
-            else {
+        }
+        else {
             def model = utilsService.getErrorModel(g.message(code: 'error', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value())
             withFormat {
                 json { render model as JSON }
                 xml { render model as XML }
             }
+        }
     }
-}
-
-   
 }

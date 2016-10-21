@@ -1,6 +1,7 @@
 package species
 
 import species.ScientificName.TaxonomyRank
+import species.auth.SUser
 
 class CommonNames extends NamesMetadata {
 
@@ -15,6 +16,7 @@ class CommonNames extends NamesMetadata {
 	String lowercaseName;
 	
 	boolean isDeleted = false;
+	def utilsService;
 	
     static constraints = {
 		name(blank:false, nullable:false, unique:['language','taxonConcept']);
@@ -46,4 +48,9 @@ class CommonNames extends NamesMetadata {
 		if(lowercaseName != name.toLowerCase())
 			lowercaseName = name.toLowerCase()
 	}
+
+	boolean isSpeciesContributor(SUser user) {
+        if(!user) user = springSecurityService.currentUser;
+        return utilsService.isSpeciesAdmin(user) || utilsService.isAdmin(user);
+    }
 }

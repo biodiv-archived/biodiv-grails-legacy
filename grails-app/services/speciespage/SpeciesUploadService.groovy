@@ -72,6 +72,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import species.participation.NamesReportGenerator
 import species.participation.NamelistService
+import species.participation.UploadLog
 
 class SpeciesUploadService {
 
@@ -157,7 +158,7 @@ class SpeciesUploadService {
 	Map upload(SpeciesBulkUpload sBulkUploadEntry){
 		def speciesDataFile = sBulkUploadEntry.filePath
 		def imagesDir = sBulkUploadEntry.imagesDir
-		sBulkUploadEntry.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		sBulkUploadEntry.updateStatus(UploadLog.Status.RUNNING)
 		
 		def res = uploadMappedSpreadsheet(speciesDataFile, speciesDataFile, 2,0,0,0, imagesDir?1:-1, imagesDir, sBulkUploadEntry)
 		
@@ -214,7 +215,7 @@ class SpeciesUploadService {
 			
 		
 		def msg = ""
-		if(sBulkUploadEntry.status == SpeciesBulkUpload.Status.UPLOADED){
+		if(sBulkUploadEntry.status == UploadLog.Status.UPLOADED){
 			msg = "Species uploaded Successfully. Please visit your profile page to view summary."
 		}else{
 			msg = "Species upload " + sBulkUploadEntry.status.value().toLowerCase() + ". Please visit your profile page to view summary."
@@ -228,13 +229,13 @@ class SpeciesUploadService {
 		
 		def speciesDataFile = nr.filePath
 		
-		nr.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		nr.updateStatus(UploadLog.Status.RUNNING)
 		List nameInfoList = MappedSpreadsheetConverter.getNames(speciesDataFile, speciesDataFile)
 		
 		println "------------------ name info list " + nameInfoList
 		File f = NameInfo.writeNamesMapperSheet(nameInfoList, new File(speciesDataFile))  
 		
-		nr.updateStatus(SpeciesBulkUpload.Status.SUCCESS)
+		nr.updateStatus(UploadLog.Status.SUCCESS)
 		
 		if(!nr.save(flush:true)){
 			nr.errors.allErrors.each { log.error it }
@@ -386,7 +387,7 @@ class SpeciesUploadService {
 		}
 		
 		//Species.withNewTransaction { status ->
-			sBulkUploadEntry.updateStatus(isAborted ? SpeciesBulkUpload.Status.ABORTED : SpeciesBulkUpload.Status.UPLOADED)
+			sBulkUploadEntry.updateStatus(isAborted ? UploadLog.Status.ABORTED : UploadLog.Status.UPLOADED)
 		//}
 		
 		log.info "================================ LOG ============================="
@@ -402,7 +403,7 @@ class SpeciesUploadService {
 	private boolean shouldAbortUpload(SpeciesBulkUpload sbu){
 		sbu.refresh()
 		log.debug "Current status " + sbu.status 
-		return (sbu.status == SpeciesBulkUpload.Status.ABORTED)
+		return (sbu.status == UploadLog.Status.ABORTED)
 	}
 	
 	private Map saveSpeciesElementsWrapper(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
@@ -776,9 +777,9 @@ class SpeciesUploadService {
 			return "Authentication failed for user. Please login."
 		}
 		
-		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
+		if(sbu.status == UploadLog.Status.RUNNING){
 			log.debug "Aborting in progress..." + sbu
-			sbu.updateStatus(SpeciesBulkUpload.Status.ABORTED)
+			sbu.updateStatus(UploadLog.Status.ABORTED)
 			return "Sent request for abort."
 		}else{
 			log.error "Already uploaded or aborted or roll backed " + sbu
@@ -794,17 +795,17 @@ class SpeciesUploadService {
 			return "Authentication failed for user. Please login."
 		}
 		
-		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+		if(sbu.status == UploadLog.Status.ROLLBACK){
 			log.error "Already roll backed " + sbu
 			return "Already rolled back." 
 		}
 		
-		if(sbu.status == SpeciesBulkUpload.Status.RUNNING){
+		if(sbu.status == UploadLog.Status.RUNNING){
 			log.error "Roll back in progress..." + sbu
 			return "Rollback in progress..."
 		}
 		
-		sbu.updateStatus(SpeciesBulkUpload.Status.RUNNING)
+		sbu.updateStatus(UploadLog.Status.RUNNING)
 		log.debug "Changed to running status"
 		
 		SUser user = sbu.author
@@ -837,7 +838,7 @@ class SpeciesUploadService {
 		}
 		if(!sFields && !tRegistries && !resourceList){
 			log.debug "Nothing to rollback"
-			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
+			sbu.updateStatus(UploadLog.Status.ROLLBACK)
 			return "Nothing to rollback."
 		}
 		
@@ -856,15 +857,15 @@ class SpeciesUploadService {
 			sList.each { s->
 				rollBackSpeciesUpdate(s, sFields, resourceList, user, sbu)
 			}
-			sbu.updateStatus(SpeciesBulkUpload.Status.ROLLBACK)
+			sbu.updateStatus(UploadLog.Status.ROLLBACK)
 		}
 
 		
-		if(sbu.status == SpeciesBulkUpload.Status.ROLLBACK){
+		if(sbu.status == UploadLog.Status.ROLLBACK){
 			log.debug "Successfully Rolled back."
 			return "Successfully Rolled back."
 		}else{
-			sbu.updateStatus(SpeciesBulkUpload.Status.FAILED)
+			sbu.updateStatus(UploadLog.Status.FAILED)
 			log.debug "Rollback failed..."
 			return "Rollback failed..."
 		}

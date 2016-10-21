@@ -26,7 +26,7 @@ class GroupHandlerService {
 
     def dataSource
 
-	static int BATCH_SIZE = 50;
+	static int BATCH_SIZE = 25;
 
 	def speciesGroupMappings;
 
@@ -114,8 +114,8 @@ class GroupHandlerService {
         long startTime = System.currentTimeMillis();
         int count = 0;
 
-        //        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        //        dataSource.setUnreturnedConnectionTimeout(500);
+        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+        dataSource.setUnreturnedConnectionTimeout(500);
 
         def conn;
         while(true) {
@@ -139,7 +139,7 @@ class GroupHandlerService {
                     }
 
 
-                    if(count && count == BATCH_SIZE) {
+                    if(count == BATCH_SIZE) {
                         cleanUpGorm();
                         noOfUpdations += count;
                         count = 0;
@@ -163,7 +163,8 @@ class GroupHandlerService {
 			cleanUpGorm();
 			noOfUpdations += count;
 		}
-		
+        log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+        dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		log.info "Updated group for taxonConcepts ${noOfUpdations} in total"
 		log.info "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
 		return noOfUpdations;
@@ -203,8 +204,10 @@ class GroupHandlerService {
         def ibpParentTaxon;
         if(taxonConcept instanceof SynonymsMerged) {
             def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
-			acceptedTaxonConcept.postProcess()
-            ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+            if(acceptedTaxonConcept) {
+                acceptedTaxonConcept.postProcess()
+                ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+            }
         } else {
 			taxonConcept.postProcess()
             ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];

@@ -2,7 +2,7 @@ package species
 
 import java.util.logging.Logger;
 import species.participation.NamesReportGenerator;
-import species.participation.SpeciesBulkUpload.Status
+import species.participation.UploadLog.Status
 
 class NameValidationJob {
 	
@@ -10,6 +10,7 @@ class NameValidationJob {
 	def utilsService
 	
     static triggers = {
+        println "==========================Setting trigger for NameValidationJob";
       simple startDelay: 1000l, repeatInterval: 5000l // starts after 1 second  and execute job once in 5 seconds 
     }
 

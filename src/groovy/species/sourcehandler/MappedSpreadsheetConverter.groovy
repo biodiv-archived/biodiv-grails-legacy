@@ -17,6 +17,7 @@ import species.Language;
 import species.namelist.NameInfo;
 import species.participation.SpeciesBulkUpload
 import species.ScientificName.TaxonomyRank
+import species.participation.UploadLog
 
 
 class MappedSpreadsheetConverter extends SourceConverter {
@@ -635,12 +636,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		//taking info from the matched sheet generate system (taxonname, hier, synonyms)
 		converter.initCurationInfo(sbu.filePath)
 		if(!converter.multipleMatchingRow && converter.validate(nameInfoList)){
-			sbu.updateStatus(SpeciesBulkUpload.Status.SCHEDULED)
+			sbu.updateStatus(UploadLog.Status.SCHEDULED)
 			return true
 		}
 		
 		sbu.writeLog(converter.getLogs(), true)
-		sbu.updateStatus(SpeciesBulkUpload.Status.VALIDATION_FAILED)
+		sbu.updateStatus(UploadLog.Status.VALIDATION_FAILED)
 		
 		return false	
 	}

@@ -63,16 +63,16 @@
 				</a>
 		</div>
 	</g:if>
-	<g:elseif test="${isListView}">
-		<g:if test="${commonName}">
-			<div class="common_name ellipsis" title="${commonName }">
-				${commonName}
-			</div>
-		</g:if>
-		<g:elseif test="${observationInstance.maxVotedReco.isScientificName}">
+	<g:elseif test="${isListView}">		
+		<g:if test="${observationInstance.maxVotedReco.isScientificName}">
 			<div class="sci_name ellipsis" title="${sNameTitle}">
 				 ${sName}
                 <g:render template="/namelist/statusTemplate" model="[position:position, status:status, taxon:taxon]"/>
+			</div>
+		</g:if>
+		<g:elseif test="${commonName}">
+			<div class="common_name ellipsis" title="${commonName }">
+				${commonName}
 			</div>
 		</g:elseif>
 		<g:else>
