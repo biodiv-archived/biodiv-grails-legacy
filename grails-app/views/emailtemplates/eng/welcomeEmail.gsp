@@ -114,7 +114,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <td class="w580" style="width: 580px; height: 10px; background-color: white;"></td>
 </tr>
 <tr align="center">
-    <td class="w640" bgcolor="#ffffff" height="30" width="640"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><img src="${assetPath(src:'/all/'+'bhutanbanner.gif',absolute:'true')}" alt="" style="border: 0px solid ; width: 600px; height: 101px;"></a></td>
+    <td class="w640" bgcolor="#ffffff" height="30" width="640"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><img src="${assetPath(src:'/all/'+'bhutanbanner.png',absolute:'true')}" alt="" style="border: 0px solid ; width: 600px; height: 101px;"></a></td>
 </tr>
 <tr id="simple-content-row">
 <td class="w640" bgcolor="#ffffff" width="640">

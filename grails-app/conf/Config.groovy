@@ -190,7 +190,7 @@ speciesPortal {
     app.dzongkha = "/assets/all/accordion/dzongkha.png"
 
 
-    app.notifiers_bcc = ["moafbhutan@gmail.com", "sdema06@gmail.com","prabha.prabhakar@gmail.com"]
+    app.notifiers_bcc = ["moafbhutan@gmail.com", "sdema06@gmail.com","prabha.prabhakar@gmail.com","kaylzangongmo@gmail.com"]
 
     species {
         speciesDownloadDir = "${download.rootDir}/species"
@@ -789,7 +789,7 @@ environments {
         //grails.resources.mappers.hashandcache.excludes = ['**']
     }
     kk {
-        servername = 'indiabiodiversity.org'
+        servername = 'biodiversity.bt'
         grails.serverURL = "http://${servername}/${appName}"
 
         speciesPortal {

@@ -115,7 +115,7 @@ class GroupHandlerService {
         int count = 0;
 
         int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        dataSource.setUnreturnedConnectionTimeout(500);
+        dataSource.setUnreturnedConnectionTimeout(0);
 
         def conn;
         while(true) {
