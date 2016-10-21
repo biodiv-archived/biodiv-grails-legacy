@@ -15,7 +15,7 @@ class TraitValue {
     String description;
     String icon;
     String source;
-    TaxonomyDefinition taxon;
+//    TaxonomyDefinition taxon;
 	
     def grailsApplication;
 
@@ -25,7 +25,7 @@ class TraitValue {
 		description nullable:true
         icon nullable:true
         source nullable:false
-        taxon nullable:false
+        //taxon nullable:false
     }
 
     static mapping = {

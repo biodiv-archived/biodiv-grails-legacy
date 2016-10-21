@@ -686,7 +686,13 @@ environments {
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
-		
+            traits{
+                rootDir = "${app.rootDir}/traits"
+                serverURL = "http://${servername}/${appName}/traits"
+
+                databaseDir = "${app.rootDir}/traits"
+                traitValueFile="${app.rootDir}/icons.csv"
+            }	
 
             search.serverURL="http://${servername}:8080/solr"
             grails {
@@ -825,7 +831,15 @@ environments {
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
-		
+	        traits{
+                rootDir = "${app.rootDir}/traits"
+                serverURL = "http://${servername}/${appName}/traits"
+
+                databaseDir = "${app.rootDir}/traits"
+                traitValueFile="${app.rootDir}/icons.csv"
+            }	
+
+	
             search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {
