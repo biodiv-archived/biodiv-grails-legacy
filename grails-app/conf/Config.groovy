@@ -279,6 +279,7 @@ speciesPortal {
             databaseDir = "${app.rootDir}/traits"
             traitValueFile="${app.rootDir}/icons.csv"
     }
+    filterFilePath = "${app.rootDir}/filters.txt"
 
     names.parser.serverURL = "127.0.0.1"
     names.parser.port = 4334
@@ -691,6 +692,7 @@ environments {
                 databaseDir = "${app.rootDir}/traits"
                 traitValueFile="${app.rootDir}/icons.csv"
             }	
+            filterFilePath = "${app.rootDir}/filters.txt"
 
             search.serverURL="http://${servername}:8080/solr"
             grails {
@@ -836,7 +838,7 @@ environments {
                 databaseDir = "${app.rootDir}/traits"
                 traitValueFile="${app.rootDir}/icons.csv"
             }	
-
+            filterFilePath = "${app.rootDir}/filters.txt"
 	
             search.serverURL="http://${servername}:8080/solr"
             grails {
