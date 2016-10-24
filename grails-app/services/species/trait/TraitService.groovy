@@ -185,6 +185,7 @@ println headers;
     }
 
     private Field getField(String string, Language languageInstance) {
+
         def f = string.tokenize("|");
 
         Field field;
@@ -475,8 +476,10 @@ println headers;
         return traitFilter
     }    
     def createTraitValue(Trait traitInstance, params){
-        def valueCount = params.value.size();
+
+        def valueCount = params.value?params.value.size():0;
         println "valueCount"+valueCount
+        println "params++++++++"+params
         for(def i=0;i<valueCount;i++){
             println "i+++++++++"+i
             TraitValue traitValueInstance=new TraitValue();
@@ -484,6 +487,7 @@ println headers;
             traitValueInstance.description=params.traitDesc[i];
             traitValueInstance.source=params.traitSource[i];
             traitValueInstance.trait=traitInstance
+            traitValueInstance.icon=getTraitIcon(params.icon[i])
             if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
               def msg = "Trait Value Added Successfully"
             }
@@ -497,4 +501,19 @@ println headers;
         }
     }
 }
+        private String getTraitIcon(String icon) {
+            println "icon+++++++++++"+icon
+        if(!icon) return;
+        def resource = null;
+        def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+
+        File iconFile = new File(rootDir , icon);
+        if(!iconFile.exists()) {
+            log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
+        }
+
+        resource = iconFile.absolutePath.replace(rootDir, "");
+        println "resource==================="+resource
+        return resource;
+    }
 }

@@ -21,7 +21,7 @@ class TraitController extends AbstractObjectController {
     def traitService;
     def speciesService;
     def messageSource    
-    Language languageInstance = utilsService?.getCurrentLanguage();
+    
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
@@ -78,7 +78,7 @@ class TraitController extends AbstractObjectController {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(action: "list")
         }  else {
-            render(view: "create", model: [traitInstance: traitInstance])
+            render(controller:"trait" , view: "create", model: [traitInstance: traitInstance])
         }
     }
 
@@ -86,6 +86,7 @@ class TraitController extends AbstractObjectController {
     def update(){
         def msg = "";
         Trait traitInstance;
+        Language languageInstance = utilsService.getCurrentLanguage();
         if(params.id){
         traitInstance=Trait.findById(params.id)
         }
@@ -105,11 +106,13 @@ class TraitController extends AbstractObjectController {
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
                 msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
                 def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
+                if(params.action=='update'){
                 traitService.createTraitValue(traitInstance,params)
+            }
                 withFormat {
                     html {
                         flash.message = msg;
-                        redirect(action: "show", id: traitInstance.id)
+                        redirect(controller:"trait" , action: "show", id: traitInstance.id)
                     }
                     json { render model as JSON }
                     xml { render model as XML }
@@ -257,7 +260,7 @@ class TraitController extends AbstractObjectController {
         traitValueInstance.description=params.description
         traitValueInstance.source=params.source
         println "params.icon+++++++++"+params.icon
-        traitValueInstance.icon=getTraitIcon(params.icon)
+        traitValueInstance.icon=traitService.getTraitIcon(params.icon)
         }
         else{
         traitValueInstance=new TraitValue();
@@ -281,21 +284,7 @@ class TraitController extends AbstractObjectController {
                     }
         }
     }
-        private String getTraitIcon(String icon) {
-            println "icon+++++++++++"+icon
-        if(!icon) return;
-        def resource = null;
-        def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
 
-        File iconFile = new File(rootDir , icon);
-        if(!iconFile.exists()) {
-            log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
-        }
-
-        resource = iconFile.absolutePath.replace(rootDir, "");
-        println "resource==================="+resource
-        return resource;
-    }
 
     @Secured(['ROLE_USER'])
     def upload_resource() {
