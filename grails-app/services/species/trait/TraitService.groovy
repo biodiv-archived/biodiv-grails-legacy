@@ -291,7 +291,7 @@ println headers;
                     traitValue.description=row[index].trim()
                     break;
                     case 'taxon id' : 
-                    traitValue.taxon = taxon
+                    //traitValue.taxon = taxon
                     break;
                 } 
             }
