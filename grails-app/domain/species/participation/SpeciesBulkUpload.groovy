@@ -8,6 +8,8 @@ import species.auth.SUser;
 
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
+import species.UploadJob;
+import species.participation.UploadLog.Status;
 
 
 class SpeciesBulkUpload extends UploadLog {
@@ -32,6 +34,7 @@ class SpeciesBulkUpload extends UploadLog {
 	
 	
 	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, String uploadType=null, Status status = Status.VALIDATION){
+        if(!uploadType) uploadType = UploadJob.SPECIES_BULK_UPLOAD; 
 		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes, uploadType:uploadType)
 		if(!sbu.save(flush:true)){
 			sbu.errors.allErrors.each { println it }

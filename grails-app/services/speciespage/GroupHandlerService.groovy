@@ -115,7 +115,7 @@ class GroupHandlerService {
         int count = 0;
 
         int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        dataSource.setUnreturnedConnectionTimeout(10000);
+        dataSource.setUnreturnedConnectionTimeout(500);
 
         def conn;
         while(true) {
@@ -139,12 +139,12 @@ class GroupHandlerService {
                     }
 
 
-                    //if(count && count == BATCH_SIZE) {
+                    if(count == BATCH_SIZE) {
                         cleanUpGorm();
                         noOfUpdations += count;
                         count = 0;
                         log.info "Updated group for taxonConcepts ${noOfUpdations}"
-                    //}
+                    }
                 //}
 
             } catch(Exception e) {
@@ -163,10 +163,8 @@ class GroupHandlerService {
 			cleanUpGorm();
 			noOfUpdations += count;
 		}
-		
         log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
         dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
-
 		log.info "Updated group for taxonConcepts ${noOfUpdations} in total"
 		log.info "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
 		return noOfUpdations;

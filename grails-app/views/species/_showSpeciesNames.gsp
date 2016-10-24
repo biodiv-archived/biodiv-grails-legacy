@@ -142,8 +142,8 @@ list.sort();
         </div> 
         <div class="span8" style="display:table;">
             <g:each in="${it.value}"  status="i" var ="n">
-                <div class="entry pull-left" style="display:table-row;"> 
-                    <span class="common_name ${isSpeciesContributor && n.isContributor() ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="${g.message(code:'title.click.edit')}">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
+                <div class="entry pull-left" style="display:table-row;">
+                    <span class="common_name ${isSpeciesContributor ?'editField':''}" data-type="text" data-pk="${speciesInstance.id}" data-cid="${n.id}" data-url="${uGroup.createLink(controller:'species', action:'update') }" data-name="commonname" data-original-title="Edit common name" title="${g.message(code:'title.click.edit')}">${n.name}</span><g:if test="${i < it.value.size()-1}">,</g:if>
                 </div>
             </g:each>
         </div>
