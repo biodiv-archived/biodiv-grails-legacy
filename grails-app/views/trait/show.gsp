@@ -22,6 +22,10 @@
 	    <div class="container">
 	    	<h1 class="sci_name">${traitInstance.name}</h1>
 	    	<div id="content" class="super-section">
+	    							<a class="btn btn-primary pull-right" title="${g.message(code:'title.document.edit')}" style="margin-right: 5px;"
+							href="${uGroup.createLink(controller:'trait', action:'edit', id:traitInstance.id)}">
+							<i class="icon-edit"></i><g:message code="button.edit" /> 
+						</a>
 			    	<table class="table">
 			    		<g:if test="${traitInstance.description}">
 					    	<tr><td><h6>Description</h6></td>
@@ -65,12 +69,13 @@
 				    </table>
 			    </div>
 			    			    	<h5>Filter by value</h5>
+			    <div class="list" style="clear: both;">
 			    	<div class="trait thumbnail" data-toggle="buttons-radio">
 			    		<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue]" />
 			    	</div>
 			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
 	    			</div>
-
+	    		</div>
 	 	</div>
 	<script>
 	    $(document).ready (function() {
@@ -85,17 +90,19 @@
             return false;
         });
             updateMatchingSpeciesTable();
+          $('.list').on('updatedGallery', function() {
+            updateMatchingSpeciesTable();
+        });
 	    });
 	</script>
 		<asset:script type="text/javascript">
-		$(document).ready(function() {
-			$(".trait button").button();
-			$(".trait button").tooltip({placement:'bottom'});
-		    <g:each in="${params.trait}" var="t">
-		        $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
-		    </g:each>
-		   
-		});
+$(document).ready(function() {
+	$(".trait button").button();
+	$(".trait button").tooltip({placement:'bottom'});
+    <g:each in="${params.trait}" var="t">
+        $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
+    </g:each>
+});
 		</asset:script>
 	</body>
 </html>

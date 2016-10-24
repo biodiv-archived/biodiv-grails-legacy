@@ -10,17 +10,29 @@ import species.participation.UploadLog;
 import grails.util.Holders;
 import static org.springframework.http.HttpStatus.*;
 import species.Field;
+import species.participation.Recommendation;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import species.utils.Utils;
+import species.utils.ImageUtils;
 
 class TraitController extends AbstractObjectController {
 
     def traitService;
-    def speciesService;    
-
-    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
+    def speciesService;
+    def messageSource    
+    Language languageInstance = utilsService?.getCurrentLanguage();
+    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
 
     def index = {
         redirect(action: "list", params: params)
+    }
+
+    def create() {
+        def traitInstance = new Trait() 
+        traitInstance.properties = params
+        render(view: "create", model: [traitInstance: traitInstance])
     }
 
     def list() {
@@ -57,6 +69,71 @@ class TraitController extends AbstractObjectController {
             json { render model as JSON }
             xml { render model as XML }
         }
+    }
+
+    def edit() {
+        println "edit============================"
+        def traitInstance = Trait.findById(params.id)
+        if (!traitInstance) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
+            redirect(action: "list")
+        }  else {
+            render(view: "create", model: [traitInstance: traitInstance])
+        }
+    }
+
+    @Secured(['ROLE_USER'])
+    def update(){
+        def msg = "";
+        Trait traitInstance;
+        if(params.id){
+        traitInstance=Trait.findById(params.id)
+        }
+        else{traitInstance=new Trait();
+            traitInstance.traitTypes=Trait.fetchTraitTypes(params.traittype);
+            traitInstance.dataTypes=Trait.fetchDataTypes(params.datatype);
+        }
+        Recommendation recommendationInstance=Recommendation.findById(params.recommendationId)
+        traitInstance.description=params.description
+        traitInstance.name=params.name
+        traitInstance.source=params.source
+        traitInstance.taxon=recommendationInstance.taxonConcept
+        def fieldInstance=traitService.getField(params.fieldid,languageInstance)
+        println "fieldInstance==========="+fieldInstance
+        traitInstance.field=fieldInstance
+
+        if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
+                msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
+                def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
+                traitService.createTraitValue(traitInstance,params)
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(action: "show", id: traitInstance.id)
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+            }
+            else {
+                    def errors = [];
+                    traitInstance.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                        println "errors+++++++++==============="+errors
+                    }
+
+                    def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
+                    withFormat {
+                        html {
+                            render(view: "create", model: [traitInstance: traitInstance])
+                        }
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                    return;
+            }
+
     }
 
     protected def getList(params) {
@@ -165,6 +242,178 @@ class TraitController extends AbstractObjectController {
             log.error e.getMessage();
             String msg = g.message(code: 'error', default:'Error while processing the request.');
             def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
+
+    def updateTraitValue(){
+        TraitValue traitValueInstance;
+        if(params.traitValueId){
+        traitValueInstance=TraitValue.findById(params.traitValueId);
+        traitValueInstance.value=params.value
+        traitValueInstance.description=params.description
+        traitValueInstance.source=params.source
+        println "params.icon+++++++++"+params.icon
+        traitValueInstance.icon=getTraitIcon(params.icon)
+        }
+        else{
+        traitValueInstance=new TraitValue();
+        traitValueInstance.value=params.value
+        traitValueInstance.description=params.description
+        traitValueInstance.source=params.source
+        Trait traitInstance=Trait.findById(params.traitInstance)
+        traitValueInstance.trait=traitInstance
+        }
+        if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+              def msg = "Trait Value Added Successfully"
+                flash.message=msg
+                return
+            }
+        else{
+                    def errors = [];
+                    traitValueInstance.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                        println "errors+++++++++==============="+errors
+                    }
+        }
+    }
+        private String getTraitIcon(String icon) {
+            println "icon+++++++++++"+icon
+        if(!icon) return;
+        def resource = null;
+        def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+
+        File iconFile = new File(rootDir , icon);
+        if(!iconFile.exists()) {
+            log.error "COULD NOT locate icon file ${iconFile.getAbsolutePath()}";
+        }
+
+        resource = iconFile.absolutePath.replace(rootDir, "");
+        println "resource==================="+resource
+        return resource;
+    }
+
+    @Secured(['ROLE_USER'])
+    def upload_resource() {
+        println "fdgfdgfdgdfgfdgfdg"
+        try {
+            if(ServletFileUpload.isMultipartContent(request)) {
+                MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                def rs = [:]
+                Utils.populateHttpServletRequestParams(request, rs);
+                def resourcesInfo = [];
+                def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+                File usersDir;
+                def message;
+
+                if(!params.resources) {
+                    message = g.message(code: 'no.file.attached', default:'No file is attached')
+                }
+
+                params.resources.each { f ->
+                    log.debug "Saving user file ${f.originalFilename}"
+
+                    // List of OK mime-types
+                    //TODO Move to config
+                    def okcontents = [
+                        'image/png',
+                        'image/jpeg',
+                        'image/pjpeg',
+                        'image/gif',
+                        'image/jpg'
+                    ]
+
+                    if (! okcontents.contains(f.contentType)) {
+                        message = g.message(code: 'resource.file.invalid.extension.message', args: [
+                            okcontents,
+                            f.originalFilename
+                        ])
+                    }
+                    else if(f.size > grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE) {
+                        message = g.message(code: 'resource.file.invalid.max.message', args: [
+                            grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024,
+                            f.originalFilename,
+                            f.size/1024
+                        ], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024}KB");
+                    }
+                    else if(f.empty) {
+                        message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+                    }
+                    else {
+                        if(!usersDir) {
+                            if(!params.dir) {
+                                usersDir = new File(rootDir);
+                                if(!usersDir.exists()) {
+                                    usersDir.mkdir();
+                                }
+                                usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
+                                usersDir.mkdirs();
+                            } else {
+                                usersDir = new File(rootDir, params.dir);
+                                usersDir.mkdir();
+                            }
+                        }
+
+                        File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
+                        f.transferTo( file );
+                        ImageUtils.createScaledImages(file, usersDir);
+                        resourcesInfo.add([fileName:file.name, size:f.size]);
+                    }
+                }
+                log.debug resourcesInfo
+                // render some XML markup to the response
+                if(usersDir && resourcesInfo) {
+                    withFormat {
+                        json { 
+                            def res = [];
+                            for(r in resourcesInfo) {
+                                res << ['fileName':r.fileName, 'size':r.size]
+                            }
+                            def model = utilsService.getSuccessModel("", null, OK.value(), [users:[dir:usersDir.absolutePath.replace(rootDir, ""), resources : res]])
+                            render model as JSON
+                        }
+ 
+                        xml { 
+                            render(contentType:'text/xml') {
+                                response {
+                                    success(true)
+                                    status(OK.value())
+                                    msg('Successfully uploaded the resource')
+                                    model {
+                                        dir(usersDir.absolutePath.replace(rootDir, ""))
+                                        resources {
+                                            for(r in resourcesInfo) {
+                                                'image'('fileName':r.fileName, 'size':r.size){}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    response.setStatus(500);
+                    def model = utilsService.getErrorModel(message, null, INTERNAL_SERVER_ERROR.value())
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                }
+            } else {
+                def model = utilsService.getErrorModel(g.message(code: 'no.file.attached', default:'No file is attached'), null, INTERNAL_SERVER_ERROR.value())
+                withFormat {
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+            }
+        } catch(e) {
+            e.printStackTrace();
+            def model = utilsService.getErrorModel(g.message(code: 'file.upload.fail', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value())
             withFormat {
                 json { render model as JSON }
                 xml { render model as XML }

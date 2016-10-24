@@ -473,6 +473,28 @@ println headers;
             }
         }
         return traitFilter
+    }    
+    def createTraitValue(Trait traitInstance, params){
+        def valueCount = params.value.size();
+        println "valueCount"+valueCount
+        for(def i=0;i<valueCount;i++){
+            println "i+++++++++"+i
+            TraitValue traitValueInstance=new TraitValue();
+            traitValueInstance.value=params.value[i];
+            traitValueInstance.description=params.traitDesc[i];
+            traitValueInstance.source=params.traitSource[i];
+            traitValueInstance.trait=traitInstance
+            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+              def msg = "Trait Value Added Successfully"
+            }
+        else{
+                    def errors = [];
+                    traitValueInstance.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                        println "errors+++++++++==============="+errors
+                    }
+        }
     }
-
+}
 }
