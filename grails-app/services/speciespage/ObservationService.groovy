@@ -1240,7 +1240,7 @@ println resIdList
             log.debug "Filtering from usergourp : ${params.userGroup}"
             userGroupQuery = " join user_group_observations  userGroup on userGroup.observation_id = obv.id "
             query += userGroupQuery
-            filterQuery += " and userGroup.id =:userGroupId "
+            filterQuery += " and userGroup.user_group_id =:userGroupId "
             queryParams['userGroupId'] = params.userGroup.id
             queryParams['userGroup'] = params.userGroup
         } 
