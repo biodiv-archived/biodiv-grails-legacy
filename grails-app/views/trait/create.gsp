@@ -113,7 +113,7 @@ display:none;
                         %>
 
                         <table class="table" id="valueTable">
-                        <g:if test="${params.action=='update'}">
+                        <g:if test="${params.action=='edit'}">
                         <a class="btn btn-primary" id="addNewValue"><i class="icon-plus icon-white"></i></a>
                         </g:if>
                         <g:else>
@@ -274,7 +274,8 @@ $('.save').live ('click', function () {
   $('#valueTable tr:last').after("<tr><td><input type='textbox' id='value_"+ rowCount +"'class ='input-block-level' /></td>"+
                                       "<td><input type='textbox' id='traitDesc_"+ rowCount +"'class ='input-block-level' /></td>"+
                                       "<td><input type='textbox' id='traitSource_"+ rowCount +"'class ='input-block-level' /></td>"+
-                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;>Open File</a></td>"+
+                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;><img id='thumbnail' class='user-icon small_profile_pic' src='' title='thumbnai' alt='Browse' /></a>"+
+                                      "<input class='icon' name='icon' id='icon_${i}' type='hidden' value='${thumbnail}' /></td>"+
                                       "<td><a class='btn btn-success addValue' id='addValue' data-id='"+ rowCount +"'><i class='icon-ok icon-white'></i></a> </td>"+
                                       "<td><a class='btn btn-danger removeRow' id='removeValue' data-id='"+rowCount+"'><i class='icon-remove icon-white'></i></a></td></tr>");
         });
@@ -283,8 +284,8 @@ $('.save').live ('click', function () {
                      $('#valueTable tr:last').after("<tr><td><input type='textbox' name='value' id='value_"+ rowCount +"'class ='input-block-level' /></td>"+
                                       "<td><input type='textbox' name='traitDesc' id='traitDesc_"+ rowCount +"'class ='input-block-level' /></td>"+
                                       "<td><input type='textbox' name='traitSource' id='traitSource_"+ rowCount +"'class ='input-block-level' /></td>"+
-                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;>Open File</a></td>"+
-                                      "<td><a class='btn btn-success addValue' id='addValue' data-id='"+ rowCount +"'><i class='icon-ok icon-white'></i></a> </td>"+
+                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;><img id='thumbnail' class='user-icon small_profile_pic' src='' title='thumbnai' alt='Browse' /></a>"+
+                                      "<input class='icon' name='icon' id='icon_${i}' type='hidden' value='${thumbnail}' /></td>"+
                                       "<td><a class='btn btn-danger removeRow' id='removeValue' data-id='"+rowCount+"'><i class='icon-remove icon-white'></i></a></td></tr>");
         });
              $('.removeRow').live ('click', function ()
