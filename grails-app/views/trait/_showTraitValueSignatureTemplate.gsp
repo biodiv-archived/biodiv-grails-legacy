@@ -4,7 +4,7 @@
 <%@page import="species.participation.Featured"%>
 <%@page import="species.groups.UserGroup"%>
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'} traitIcon"
-    data-image-url="${traitValue.mainImage()?.fileName.replaceAll('/32/32','/200/200')}"
+    data-image-url="${traitValue.mainImage()?.fileName.replaceAll('32','200')}"
     style="margin-left: 0px; height: 32px;">
     <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">

@@ -34,15 +34,19 @@ class TraitValue {
     }
 
 	Resource icon(ImageType type) {
-		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+this.icon)).exists()
+		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+getIcon(this.icon))).exists()
 		if(!iconPresent) {
-            log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+this.icon
+            log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+getIcon(this.icon)
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
-		return new Resource(fileName:grailsApplication.config.speciesPortal.traits.serverURL+this.icon, type:ResourceType.ICON, title:this.value);
+		return new Resource(fileName:grailsApplication.config.speciesPortal.traits.serverURL+'/'+getIcon(this.icon), type:ResourceType.ICON, title:this.value);
 	}
 
 	Resource mainImage() {
 		return icon(ImageType.NORMAL);
 	}
+
+    def getIcon(icon){
+        return '32_'+icon
+    }
 }

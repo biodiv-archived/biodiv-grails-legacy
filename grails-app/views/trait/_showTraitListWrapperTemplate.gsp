@@ -33,7 +33,7 @@
                     </div>
                 </div>
             </div>
-            <div class="span9 right-shadow-box" style="position: relative;height:388px;">
+            <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow-y: scroll;overflow-x: hidden;">
                 <g:render template="showTraitListTemplate"/>
             </div>
         </div>
@@ -70,10 +70,10 @@
             $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
             $(this).addClass('active btn-success');
 
+
             updateMatchingSpeciesTable();
             return false;
         });
-
         $('.list').on('updatedGallery', function() {
             updateMatchingSpeciesTable();
         });

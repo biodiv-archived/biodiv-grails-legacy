@@ -61,20 +61,21 @@
                                                 <li><h5><g:message code="default.pages.label" /></h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
 	                        <g:if test="${newsletterInstance.parentId ==0}">                        
-		                        <li id="newsletter_${newsletterInstance.id}">
+		                        <li class="newsletter_parent" id="newsletter_${newsletterInstance.id}">
 		                            <a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
-		                            	<p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:13px;margin-bottom:2px;">
+		                            	<p style="width: 300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:13px;margin-bottom:2px;">
 		                                	${fieldValue(bean: newsletterInstance, field: "title")}
 		                                </p>
 		                            	<sUser:permToReorderPages model="['userGroupInstance':userGroupInstance]"><i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}","${newsletterInstance.id}", "down", "newsletter")'></i><i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}", "${newsletterInstance.id}", "up", "newsletter")'></i>
 		                                </sUser:permToReorderPages>
 		                            </a>
-		                                <ul>
+		                            <span class="newsletter_sub_c" style="float: right;top: -25px;position: relative;right: 10px;cursor: pointer;"></span>
+		                                <ul style="margin:0px;">
 		                                <g:each in="${newsletters}" var="subnewsl" status="j">
                    	                       <g:if test="${subnewsl.parentId ==newsletterInstance.id}">                        
-			                                	<li id="newsletter_${subnewsl.id}">
+			                                	<li id="newsletter_${subnewsl.id}" style="  border: 1px solid #ccc;">
 			                                		<a data-toggle="tab" class="pageTab" href="#${subnewsl.id}">
-					                            	<p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+					                            	<p style=" width: 270px;  margin-left: 30px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
 					                                	${fieldValue(bean: subnewsl, field: "title")}
 					                                </p>
 					                                </a>
@@ -105,6 +106,18 @@
 
 	<asset:script>
 		$(document).ready(function(){
+			$('#pageTabs ul').hide();
+			$('#pageTabs ul:first').show('slow');
+			$('#pageTabs .newsletter_parent').each(function(){
+				var t = $(this).find('ul li').length;
+				if(t >0 ){ $(this).find('.newsletter_sub_c').html(t); }
+			});
+
+			$('.newsletter_sub_c').click(function(){
+				$('#pageTabs ul').hide();
+				$(this).parent().find('ul').show();
+			});
+
 			var baseURL = "${uGroup.createLink('controller':'newsletter', 'action':'show', 'userGroup':userGroupInstance) }";
 			<%if(userGroupInstance ) {%>
 				var pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
@@ -112,7 +125,7 @@
 				var pageURL = "/page";
 			<%}%>
 	        $('#pageTabs a').click(function (e) {
-  				
+  				$('#pageTabs li').removeClass('active');  				
   				var me = $(this);
   				var contentID = me.attr('href');//e.target.hash; //get anchor
   				if(contentID && contentID != '/project/list') {
