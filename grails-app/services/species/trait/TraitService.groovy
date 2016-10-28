@@ -33,6 +33,7 @@ import org.apache.log4j.Level;
 import species.Classification;
 import species.trait.Fact;
 import species.trait.TraitValue;
+import species.utils.Utils;
 
 class TraitService extends AbstractObjectService {
 
@@ -515,5 +516,62 @@ println headers;
         resource = iconFile.absolutePath.replace(rootDir, "");
         println "resource==================="+resource
         return resource;
+    }
+
+        def delete(params){
+            println "deleting trait "+params.id
+        String messageCode;
+        String url = utilsService.generateLink(params.controller, 'list', []);
+        String label = Utils.getTitleCase(params.controller?:'trait')
+        def messageArgs = [label, params.id]
+        def errors = [];
+        boolean success = false;
+        if(!params.id) {
+            messageCode = 'default.not.found.message'
+        } else {
+            try {
+                def traitInstance = Trait.get(params.id.toLong())
+                if (traitInstance) {
+                        try {
+                            traitInstance.isDeleted = true;
+ 
+                            if(!traitInstance.hasErrors() && traitInstance.save(flush: true)){
+                                messageCode = 'default.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'list', [])
+                                success = true;
+                            } else {
+                                messageCode = 'default.not.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                                traitInstance.errors.allErrors.each { log.error it }
+                                traitInstance.errors.allErrors .each {
+                                    def formattedMessage = messageSource.getMessage(it, null);
+                                    errors << [field: it.field, message: formattedMessage]
+                                }
+
+                            }
+                        }
+                        catch (org.springframework.dao.DataIntegrityViolationException e) {
+                            messageCode = 'default.not.deleted.message'
+                            url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                            e.printStackTrace();
+                            log.error e.getMessage();
+                            errors << [message:e.getMessage()];
+                        }
+                    } 
+                 else {
+                    messageCode = 'default.not.found.message'
+                    url = utilsService.generateLink(params.controller, 'list', [])
+                }
+            } catch(e) {
+                e.printStackTrace();
+                url = utilsService.generateLink(params.controller, 'list', [])
+                messageCode = 'default.not.deleted.message'
+                errors << [message:e.getMessage()];
+            }
+        }
+        
+        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
+                
+        return [success:success, url:url, msg:message, errors:errors]
     }
 }

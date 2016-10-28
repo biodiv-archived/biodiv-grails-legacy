@@ -92,13 +92,11 @@ display:none;
                 <div class="controls">
                     <div class="textbox nameContainer">
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
-                        <input type="text" name="recoName" class="recoName input-block-level" value="${species_sn_name}" rel="${g.message(code:'placeholder.suggest.species.name')}"
+                        <input type="text" name="recoName" class="recoName input-block-level" value="${traitInstance.taxon?.name}" rel="${g.message(code:'placeholder.suggest.species.name')}"
                             placeholder='${g.message(code:"editrecomendation.placeholder.scientific")}'
                             class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"/>
                         <div class='nameSuggestions' style='display: block;'></div>
-                        <input type="hidden" name="recommendationId" class="recoId" />
-                        
-
+                        <input type="hidden" name="recommendationId" class="recoId" value="${recoId}"/>
                     </div>
                 </div>
             </div>
@@ -162,6 +160,7 @@ display:none;
                          <a class="btn btn-primary edit" id="editValue" data-id="${i}"><i class="icon-edit icon-white"></i></a>
                          <a class="btn btn-success save addValue" id="addValue" data-id="${i}"><i class="icon-ok icon-white"></i></a> 
                          <a class="btn btn-danger cancel" id="removeValue" data-id="${i}"><i class="icon-remove icon-white"></i></a>
+                         <a class="btn btn-danger delete" id="deleteValue" data-val="${val.id}"><i class="icon-remove icon-white"></i></a>
                          </div>
                         </td>
                         </tr>
@@ -194,9 +193,13 @@ display:none;
                         class="control-group ${hasErrors(bean: traitInstance, field: 'fieldid', 'error')}">
                         <label class="control-label" for="value"><g:message code="trait.fieldid.label" /></label>
                         <div class="controls">
-                            <g:textField name="fieldid" id="fieldid" class="input-block-level"
-                            autocomplete="on" size="50" maxlength="255" 
-                            placeholder="${g.message(code:'placeholder.trait.enter.fieldid')}" />
+                            
+                <ul id="fieldid" class="fieldid" rel="${g.message(code:'placeholder.add.tags')}">
+                <g:each in="${traitInstance.field}" var="tag">
+                <li>${tag}</li>
+                </g:each>
+            </ul>
+
                         </div>
                     </div>
                              </div>
@@ -232,6 +235,7 @@ display:none;
     $('.edit').live ('click', function () {
     $(this).hide();
     $(this).siblings('.save, .cancel').show();
+    $(this).siblings('.delete').hide();
     var id=$(this).data("id");
     $('#valuelable_'+id).hide();
     $('#value_'+id).show();
@@ -242,6 +246,7 @@ display:none;
 });
 $('.cancel').live ('click', function () {
     $(this).siblings('.edit').show();
+    $(this).siblings('.delete').show();
     $(this).siblings('.save').hide();
     $(this).hide();
     var id=$(this).data("id");
@@ -293,6 +298,31 @@ $('.save').live ('click', function () {
                 $(this).closest ('tr').remove ();
              }
              );
+        $('.delete').live ('click', function ()
+             {
+        var test="${message(code: 'default.trait.delete.confirm.message', default: 'This Trait value will be deleted. Are you sure ?')}";
+
+        if(confirm(test)){
+            var traitValueId=$(this).data("val");
+            alert(traitValueId);
+                        $.ajax({ 
+                        url:'${uGroup.createLink(controller:'trait', action:'deleteValue')}',
+                        data:{id:traitValueId},
+                        success: function(data, statusText, xhr, form) {
+                        
+                        },
+                        error:function (xhr, ajaxOptions, thrownError){
+                            console.log('error');
+                            return false;
+                        }
+                        });
+           $(this).closest ('tr').remove ();
+
+        }
+                
+             }
+             );
+
 
     window.params.trait.updateTraitValueUrl="${uGroup.createLink(controller:'trait', action:'updateTraitValue', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}";
     $("#traitFormSubmit").click(function(){
@@ -325,7 +355,7 @@ $('.save').live ('click', function () {
 
                 });
 
-$.ajax({
+/*$.ajax({
     url:window.params.getDataColumnsDB,
                 dataType:'JSON',
                 success:function(data){
@@ -349,7 +379,18 @@ $.ajax({
 
                     });
                         }
-    });
+    });*/
+            $(".fieldid").tagit({
+            select:true, 
+            allowSpaces:true, 
+            placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
+            fieldName: 'fieldid', 
+            autocomplete:{
+                source: window.params.getDataColumnsDB
+            }, 
+            triggerKeys:['enter', 'comma', 'tab'], 
+            maxLength:30
+        });
 
 //image icon upload
 if (navigator.appName.indexOf('Microsoft') != -1) {
@@ -412,30 +453,6 @@ if (navigator.appName.indexOf('Microsoft') != -1) {
             });
         });
 
-            $('#generateAppKey').click(function() {
-                $.ajax({
-                    url:'${g.createLink(controller:'user', action:'generateAppKey')}',
-                    dataType: 'json',
-                    type: 'GET',
-                    data:{id:$(this).data('id')},
-                    
-                    success: function(response, statusText, xhr, form) {
-                        if(response.success == true) {
-                            $('#appKey').removeClass('text-error').html("Generated app key is : "+response.appKey+"<br/>"+response.msg).show();
-                        } else {
-                            $('#appKey').removeClass('text-info').addClass('text-error').html(response.msg+" "+response.errors).show();
-                        }
-                    }, error:function (xhr, ajaxOptions, thrownError){
-                        handleError(xhr, ajaxOptions, thrownError, this.success, function() {
-                            var response = $.parseJSON(xhr.responseText);
-                            if(response.status == false){
-                                $('#appKey').removeClass('text-info').addClass('text-error').html(response.msg+" "+response.errors).show();
-                            }
-
-                        });
-                    } 
-                });
-            });
     });
 </asset:script>
 </body>

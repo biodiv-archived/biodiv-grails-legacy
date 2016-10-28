@@ -702,3 +702,6 @@ alter table resource add column gbifID bigint;
 insert into upload_log(id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, class) select id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, 'species.participation.SpeciesBulkUpload' as class from species_bulk_upload ;
 
 update upload_log set upload_type = 'species bulk upload';
+
+#27thOct2016
+alter table trait_value add column is_deleted boolean not null default false;

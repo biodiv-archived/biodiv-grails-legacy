@@ -2,7 +2,7 @@ package species.trait
 
 import grails.converters.JSON;
 import grails.converters.XML;
-
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import species.Language;
 import species.AbstractObjectController;
 import grails.plugin.springsecurity.annotation.Secured
@@ -16,24 +16,20 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import species.utils.Utils;
 import species.utils.ImageUtils;
 
+
 class TraitController extends AbstractObjectController {
 
     def traitService;
     def speciesService;
     def messageSource    
     
-    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
+    static allowedMethods = [show:'GET', index:'GET', list:'GET', edit:"GET" ,  save: "POST", delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"],update:"POST",create:"GET"]
     static defaultAction = "list"
 
     def index = {
-        redirect(action: "list", params: params)
+        redirect(action: "list", params: params, namespace: null)
     }
 
-    def create() {
-        def traitInstance = new Trait() 
-        traitInstance.properties = params
-        render(view: "create", model: [traitInstance: traitInstance])
-    }
 
     def list() {
         def model = getList(params);
@@ -71,15 +67,25 @@ class TraitController extends AbstractObjectController {
         }
     }
 
+    @Secured(['ROLE_USER'])
+    def create() {
+        def traitInstance = new Trait() 
+       traitInstance.properties = params;
+        return [traitInstance: traitInstance]
+    }
+
+    @Secured(['ROLE_USER'])
     def edit() {
         println "edit============================"
-        def traitInstance = Trait.findById(params.id)
+        def traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
         if (!traitInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
-            redirect(action: "list")
+            redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
         }  else {
-            render(controller:"trait" , view: "create", model: [traitInstance: traitInstance])
+            Recommendation recommendationInstance=Recommendation.findByTaxonConcept(traitInstance.taxon)
+            render(view: "create", model: [traitInstance: traitInstance, recoId:recommendationInstance.id])
         }
+        return;
     }
 
     @Secured(['ROLE_USER'])
@@ -98,10 +104,13 @@ class TraitController extends AbstractObjectController {
         traitInstance.description=params.description
         traitInstance.name=params.name
         traitInstance.source=params.source
-        traitInstance.taxon=recommendationInstance.taxonConcept
-        def fieldInstance=traitService.getField(params.fieldid,languageInstance)
-        println "fieldInstance==========="+fieldInstance
+        def speciesField=params.fieldid.replaceAll(">", "|").trim()
+        def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
+        println "SpeciesField==="+speciesField
+         println "recommendationInstance.taxonConcept+++"+recommendationInstance.taxonConcept
+        traitInstance.taxon=recommendationInstance.taxonConcept
+
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
                 msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
@@ -112,11 +121,12 @@ class TraitController extends AbstractObjectController {
                 withFormat {
                     html {
                         flash.message = msg;
-                        redirect(controller:"trait" , action: "show", id: traitInstance.id)
+                        redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
                     }
                     json { render model as JSON }
                     xml { render model as XML }
                 }
+                return
             }
             else {
                     def errors = [];
@@ -138,6 +148,22 @@ class TraitController extends AbstractObjectController {
             }
 
     }
+
+    @Secured(['ROLE_USER'])
+    def flagDeleted() {
+        def result = traitService.delete(params)
+        result.remove('url')
+        String url = result.url;
+        withFormat {
+            html {
+                flash.message = result.message
+                redirect (url:url)
+            }
+            json { render result as JSON }
+            xml { render result as XML }
+        }
+    }
+    
 
     protected def getList(params) {
         try { 
@@ -178,11 +204,11 @@ class TraitController extends AbstractObjectController {
     }
 
     def show() {
-        def traitInstance = Trait.findById(params.id)
+        def traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
         def coverage = traitInstance.taxon
         def traitValue = [];
         Field field;
-        traitValue = TraitValue.findAllByTrait(traitInstance);
+        traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
         field = Field.findById(traitInstance.fieldId);
             def model = getList(params);
              model['traitInstance'] = traitInstance
@@ -196,6 +222,7 @@ class TraitController extends AbstractObjectController {
         json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
         xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
             }
+            return
     }
 
     @Secured(['ROLE_USER'])
@@ -281,6 +308,7 @@ class TraitController extends AbstractObjectController {
                         def formattedMessage = messageSource.getMessage(it, null);
                         errors << [field: it.field, message: formattedMessage]
                         println "errors+++++++++==============="+errors
+                        return
                     }
         }
     }
@@ -288,7 +316,6 @@ class TraitController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def upload_resource() {
-        println "fdgfdgfdgdfgfdgfdg"
         try {
             if(ServletFileUpload.isMultipartContent(request)) {
                 MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
@@ -408,5 +435,26 @@ class TraitController extends AbstractObjectController {
                 xml { render model as XML }
             }
         }
+    }
+    def deleteValue(){
+        println "deleting Trait value"+params.id
+        def traitValueInstance=TraitValue.findById(params.id);
+        println "traitValueInstance"+traitValueInstance
+        traitValueInstance.isDeleted=true
+             if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+              def msg = "Trait Value deleted Successfully"
+                flash.message=msg
+                return
+            }
+        else{
+                    def errors = [];
+                    traitValueInstance.errors.allErrors .each {
+                        def formattedMessage = messageSource.getMessage(it, null);
+                        errors << [field: it.field, message: formattedMessage]
+                        println "errors+++++++++==============="+errors
+                        return
+                    }
+        }
+
     }
 }

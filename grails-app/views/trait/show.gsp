@@ -26,6 +26,12 @@
 							href="${uGroup.createLink(controller:'trait', action:'edit', id:traitInstance.id)}">
 							<i class="icon-edit"></i><g:message code="button.edit" /> 
 						</a>
+		<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+            href="#"
+            onclick="return deleteTrait();"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+        <form action="${uGroup.createLink(controller:'trait', action:'flagDeleted')}" method='POST' name='deleteForm'>
+            <input type="hidden" name="id" value="${traitInstance.id}" />
+        </form>
 			    	<table class="table">
 			    		<g:if test="${traitInstance.description}">
 					    	<tr><td><h6>Description</h6></td>
@@ -103,6 +109,12 @@ $(document).ready(function() {
         $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
     </g:each>
 });
+    function deleteTrait(){
+        var test="${message(code: 'default.trait.delete.confirm.message', default: 'This Trait will be deleted. Are you sure ?')}";
+        if(confirm(test)){
+            document.forms.deleteForm.submit();
+        }
+    }
 		</asset:script>
 	</body>
 </html>
