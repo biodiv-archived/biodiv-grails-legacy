@@ -135,10 +135,10 @@ grails.project.dependency.resolution = {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
         compile 'com.esotericsoftware:kryo-shaded:3.0.3'
-        compile(group: 'org.apache.jena', name: 'jena-tdb', version: '1.1.2') {
+/*        compile(group: 'org.apache.jena', name: 'jena-tdb', version: '1.1.2') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
-
+*/
         //compile 'org.apache.jena:jena-csv:1.0.1'
         /*compile ('com.github.albaker:GroovySparql:0.9.0') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
