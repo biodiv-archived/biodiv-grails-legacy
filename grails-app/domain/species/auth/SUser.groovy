@@ -345,7 +345,7 @@ class SUser {
 
 	@Override
 	String toString() {
-		return username;
+		return name;
 	}
 
 	def getWebsiteLink(){
