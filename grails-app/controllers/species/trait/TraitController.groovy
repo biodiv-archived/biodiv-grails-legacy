@@ -10,6 +10,9 @@ import species.participation.UploadLog;
 import grails.util.Holders;
 import static org.springframework.http.HttpStatus.*;
 import species.Field;
+import species.utils.Utils;
+import species.utils.ImageUtils;
+import species.utils.ImageType;
 
 class TraitController extends AbstractObjectController {
 
@@ -169,6 +172,49 @@ class TraitController extends AbstractObjectController {
                 json { render model as JSON }
                 xml { render model as XML }
             }
+        }
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def migarteIcons(){
+        def rs = [:];
+        def resourcesInfo = [];
+        def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+        File usersDir;
+        def message;
+
+        def trait_values = TraitValue.list();
+        if(!usersDir) {
+            if(!params.dir) {
+                usersDir = new File(rootDir);
+                if(!usersDir.exists()) {
+                    usersDir.mkdir();
+                }
+                usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
+                usersDir.mkdirs();
+            } else {
+                usersDir = new File(rootDir, params.dir);
+                usersDir.mkdir();
+            }
+        }
+        trait_values.each { f ->
+            if(f.icon){                
+                boolean iconPresent = (new File(rootDir+'/200_'+f.icon)).exists();
+                if(!iconPresent){
+                    println "Not Inserted file ="+f.id
+                }else{
+                    File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName("200_"+f.icon));
+                    File fi = new File(rootDir+"/200_"+f.icon);
+                    (new AntBuilder()).copy(file: fi, tofile: file)
+                    //fi.transferTo( file );
+                    ImageUtils.createScaledImages(file, usersDir,true);
+                    def file_name = file.name.toString();
+                    
+                    f.icon = usersDir.absolutePath.replace(rootDir, "")+'/'+file_name;
+                    f.save(flush:true);
+                }
+                //resourcesInfo.add([fileName:file.name, size:f.size]);
+            }        
         }
     }
 }
