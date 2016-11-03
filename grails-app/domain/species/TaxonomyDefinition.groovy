@@ -26,7 +26,7 @@ class TaxonomyDefinition extends ScientificName {
     NamesMetadata.NameStatus status = NamesMetadata.NameStatus.ACCEPTED;
 	SpeciesGroup group;
 	String threatenedStatus;
-	//ExternalLinks externalLinks;
+	ExternalLinks externalLinks;
     boolean isFlagged = false;
 	String flaggingReason;
     NamesMetadata.COLNameStatus colNameStatus;
@@ -49,7 +49,6 @@ class TaxonomyDefinition extends ScientificName {
 	def activityFeedService
 	def dataSource
 
-    static hasOne = [externalLinks:ExternalLinks];
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
     static mappedBy = [hierarchies:'taxonDefinition']
 
