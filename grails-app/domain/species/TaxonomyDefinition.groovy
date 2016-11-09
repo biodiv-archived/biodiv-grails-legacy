@@ -48,7 +48,7 @@ class TaxonomyDefinition extends ScientificName {
 	def namelistUtilService
 	def activityFeedService
 	def dataSource
-	
+
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
     static mappedBy = [hierarchies:'taxonDefinition']
 

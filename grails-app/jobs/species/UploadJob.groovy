@@ -77,11 +77,13 @@ class UploadJob {
                         TaxonomyDefinition.UPDATE_SQL_LIST.clear();
                         speciesUploadService.upload(dl)
                         dl.updateStatus(Status.SUCCESS)
+                        result = ['success':true];
                         utilsService.clearCache("defaultCache")
                         excuteSql()
                     }catch (Exception e) {
                         log.debug " Error while running task $dl"
                         e.printStackTrace()
+                        result = ['success':false];
                         dl.updateStatus(Status.FAILED)
                     }finally{
                         TaxonomyDefinition.UPDATE_SQL_LIST.clear();

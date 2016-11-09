@@ -12,7 +12,7 @@ class ExternalLinks {
 	Date eolFetchDate;
 	Integer noOfDataObjects;
 	
-	static belongsTo = [taxonConcept:TaxonomyDefinition];
+	static belongsTo = TaxonomyDefinition;
 	
     static constraints = {
 		eolId(nullable:true);

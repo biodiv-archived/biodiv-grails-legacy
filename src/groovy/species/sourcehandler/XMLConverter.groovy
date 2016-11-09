@@ -692,7 +692,6 @@ class XMLConverter extends SourceConverter {
                 fetchMode 'attributors', FetchMode.JOIN
             }
         }
-
         Language language = field.language;
 
         for(Node dataNode : fieldNode.data) {
@@ -754,7 +753,12 @@ class XMLConverter extends SourceConverter {
             if(!speciesField) {
                 log.debug "Adding new field to species ${s} ===  " + "  field " + field + "  data " + data
                 //XXX giving default uploader now. At the time of actual save updating this with logged in user.
-                speciesField = sFieldClass.newInstance(field:field, description:data);
+                if(field.connection != 81){
+                	speciesField = sFieldClass.newInstance(field:field, description:data);
+                }else{
+                	speciesField =  sFieldClass.newInstance(field:field, description:"dummy");                
+                }
+
             } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
@@ -775,7 +779,13 @@ class XMLConverter extends SourceConverter {
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
-                references.each { speciesField.addToReferences(it); }
+                if(field.connection == 81 ){
+					def ref = new Reference(title:data);
+                    speciesField.addToReferences(ref);                	
+            	}else{
+					references.each { speciesField.addToReferences(it); }            		
+            	}
+            
                 speciesField.language = language;
                 speciesFields.add(speciesField);
             } else {
@@ -783,6 +793,7 @@ class XMLConverter extends SourceConverter {
                 addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
             }           
         }
+
         return speciesFields;
     } 
 
@@ -1516,6 +1527,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private List<Reference> getReferences(Node dataNode, boolean createNew, TaxonomyDefinition taxon, List synonyms) {
+    	
         List<Reference> references = new ArrayList<Reference>();
 
         NodeList refs = dataNode.reference;

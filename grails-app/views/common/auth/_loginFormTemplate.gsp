@@ -1,9 +1,8 @@
 <div>
 	<fieldset>
 		<legend>
-			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><g:message code="button.login" /></a> | 
-			<g:link controller='register'><g:message code="button.register" /></g:link>
-			 
+			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress) }"><g:message code="button.login" /></a> | 
+			<a href="${uGroup.createLink(controller:'register', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress) }"><g:message code="button.register" /></a> 
 		</legend>
 		<div class="control-group"
 			style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>
