@@ -27,7 +27,7 @@
         <g:if test="${fromSpeciesShow==true}">
             <g:each in="${traitValues}" var="traitValue" status="i">
                 <% String link="${"/trait/show/"+traitValue.trait.id+"?trait."+traitValue.trait.id+"="+traitValue.id}" %>
-                <a href='${link}'/>
+                <a href='${link}'>
                     <button type="button" data-tvid='${traitValue.id}' data-tid='${traitValue.trait.id}'
                     class="btn span2 input-prepend single-post ${queryParams?.trait?(queryParams.trait[traitValue.trait.id+'']==traitValue.id+''?'active btn-success':''):''}"
                         value="${traitValue.id}"

@@ -27,7 +27,7 @@ class ImageUtils {
 	 * @param imageFile
 	 * @param dir
 	 */
-	static void createScaledImages(  File imageFile, File dir) {
+	static void createScaledImages(  File imageFile, File dir, boolean defaultFileType=false) {
 		log.debug "Creating scaled versions of image : "+imageFile.getAbsolutePath();
 
 		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
@@ -47,17 +47,17 @@ class ImageUtils {
         ///////////////////////////////////////////////////
 
         log.debug "Creating gallery image";
-        def extension = config.gallery.suffix
+        def extension = (defaultFileType)?config.gallery.suffix.replaceAll('.'+config.defaultType,originalFileExt):config.gallery.suffix
         ImageUtils.convert(imageFile1, new File(dir, name+extension), config.gallery.width, config.gallery.height, 100);
 
         ///////////////////////////////////////////////////
         log.debug "Creating gallery thumbnail image";
-        extension = config.galleryThumbnail.suffix
+        extension = (defaultFileType)?config.galleryThumbnail.suffix.replaceAll('.'+config.defaultType,originalFileExt):config.galleryThumbnail.suffix
         ImageUtils.convert(imageFile1, new File(dir, name+extension), config.galleryThumbnail.width, config.galleryThumbnail.height, 100);
 
         ////////////////////////////////////////////////
         log.debug "Creating thumbnail image";
-        extension = config.thumbnail.suffix 
+        extension = (defaultFileType)?config.thumbnail.suffix.replaceAll('.'+config.defaultType,originalFileExt):config.thumbnail.suffix
         try{
             doResize(imageFile1, new File(dir, name+extension), config.thumbnail.width, config.thumbnail.height);
         } catch (Exception e) {
