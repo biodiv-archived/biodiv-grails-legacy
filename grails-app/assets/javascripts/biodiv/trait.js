@@ -48,20 +48,29 @@ function loadMatchingSpeciesList() {
                     itemMap.url = item[4];
                     itemMap.imageLink = item[5];
                     //itemMap.notes = item[6];
+                    itemMap.traitIcon=item[6];
                     itemMap.type='species';
+                    var imagepath=item[7];
+                    //$.each(imagepath,function(index1,item1){ alert(item1); });
+                    //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
-                    $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'</td><td><a href='+item[4]+'>'+item[1]+'</a></td></tr>');  
+                    $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
+                    $.each(imagepath,function(index1,item1){ 
+                        $('#imagediv_'+item[0]).append(showIcon(item1));
+                    });
                 });
                 $me.data('offset', data.model.next);
                 if(!data.model.next){
                     $me.hide();
                 }
             }
-           
     }
     });
 }
 
+function showIcon(url){
+    return  '<img src="'+url+'" width="32" height="32" />';
+}
 /* For PopOver Traits*/
 $(document).ready(function(){
 $('.traitIcon').popover({

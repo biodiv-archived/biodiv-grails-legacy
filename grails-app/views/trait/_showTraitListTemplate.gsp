@@ -22,7 +22,7 @@ instanceList.each{ iL ->
 			<ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
 				<g:each in="${inst.value}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance]"/>
+                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance ]"/>
 					</li>
 				</g:each>
 			</ul>
