@@ -210,13 +210,43 @@ class Trait {
             println "No IBP parent taxon for  ${taxonConcept}"
         }
 
-
         if(validTraits) {
             return validTraits[0];
         } else {
             println "No trait defined with name ${traitName} at taxonscope ${ibpParentTaxon}";
             return null;
         }
+    }
+
+    static boolean isValidTrait(Trait trait, List<TaxonomyDefinition> taxonConcepts) {
+        boolean isValid = true;
+        taxonConcepts. each {
+            isValid = isValid || isValidTrait(trait, it);
+        }
+        return isValid;
+    }
+
+    static boolean isValidTrait(Trait trait, TaxonomyDefinition taxonConcept) {
+        boolean isValid = false;
+        String ibpClassificationName = Holders.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY;
+        def classification = Classification.findByName(ibpClassificationName);
+        def ibpParentTaxon;
+        if(taxonConcept instanceof SynonymsMerged) {
+            def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
+            if(acceptedTaxonConcept) {
+                ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+            }
+        } else {
+            ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
+        }
+
+        if(ibpParentTaxon) {
+            ibpParentTaxon.each { t ->
+                if(trait.taxon.id == t.id)
+                    isValid = true;
+            }
+        }
+        return isValid;
     }
 
     List values() {

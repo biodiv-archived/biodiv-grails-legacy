@@ -130,7 +130,10 @@ class FactService extends AbstractObjectService {
                             break;
                             case 'species.participation.Observation': 
                             //TODO:validatetrait as per speciesgroup taxon list for observations
-                            trait = Trait.read(Long.parseLong(key));
+                            def t = Trait.read(Long.parseLong(key));
+                            if(Trait.isValidTrait(t, object.group.getTaxon())) {
+                                trait = t;
+                            }
                             break;
                         }
 
