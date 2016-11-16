@@ -283,34 +283,34 @@ class TraitController extends AbstractObjectController {
     def updateTraitValue(){
         TraitValue traitValueInstance;
         if(params.traitValueId){
-        traitValueInstance=TraitValue.findById(params.traitValueId);
-        traitValueInstance.value=params.value
-        traitValueInstance.description=params.description
-        traitValueInstance.source=params.source
-        println "params.icon+++++++++"+params.icon
-        traitValueInstance.icon=traitService.getTraitIcon(params.icon)
+            traitValueInstance = TraitValue.findById(params.traitValueId);
+            traitValueInstance.value = params.value
+            traitValueInstance.description = params.description
+            traitValueInstance.source = params.source
+            println "params.icon+++++++++"+params.icon
+            traitValueInstance.icon = traitService.getTraitIcon(params.icon)
         }
         else{
-        traitValueInstance=new TraitValue();
-        traitValueInstance.value=params.value
-        traitValueInstance.description=params.description
-        traitValueInstance.source=params.source
-        Trait traitInstance=Trait.findById(params.traitInstance)
-        traitValueInstance.trait=traitInstance
+            traitValueInstance = new TraitValue();
+            traitValueInstance.value = params.value
+            traitValueInstance.description = params.description
+            traitValueInstance.source = params.source
+            Trait traitInstance = Trait.findById(params.traitInstance)
+            traitValueInstance.trait = traitInstance
         }
         if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
               def msg = "Trait Value Added Successfully"
                 flash.message=msg
                 return
-            }
-        else{
+        }
+            else{
                     def errors = [];
                     traitValueInstance.errors.allErrors .each {
                         def formattedMessage = messageSource.getMessage(it, null);
                         errors << [field: it.field, message: formattedMessage]
                         println "errors+++++++++==============="+errors
                         return
-                    }
+            }
         }
     }
 
@@ -377,7 +377,7 @@ class TraitController extends AbstractObjectController {
 
                         File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
                         f.transferTo( file );
-                        ImageUtils.createScaledImages(file, usersDir);
+                        ImageUtils.createScaledImages(file, usersDir, true);
                         resourcesInfo.add([fileName:file.name, size:f.size]);
                     }
                 }
@@ -456,6 +456,7 @@ class TraitController extends AbstractObjectController {
                         return
                     }
         }
+    }
 
     @Secured(['ROLE_ADMIN'])
     def migarteIcons(){
@@ -499,4 +500,5 @@ class TraitController extends AbstractObjectController {
             }        
         }
     }
+
 }

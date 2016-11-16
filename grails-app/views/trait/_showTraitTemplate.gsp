@@ -1,11 +1,16 @@
 <div class="trait" data-toggle="buttons-radio">
-<a href="${uGroup.createLink(action:'show', controller:'trait', id:trait.id)}"><h6>${trait.name}</h6></a>
-	def traitValue;
-		<g:if test = "${fromSpeciesShow!=true}">
+<%
+	def traitValue
+	def displayAny
+		if(fromSpeciesShow){
 			traitValue = factInstance[trait]
-		</g:if>
-		<g:else>
-			traitValue = trait.values();
-		</g:else>
-<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':factInstance[trait],'displayAny':true]"/>
+			displayAny = true
+		}
+		else{
+			traitValue = trait.values()
+			displayAny = false
+		}
+ %>
+<a href="${uGroup.createLink(action:'show', controller:'trait', id:trait.id)}"><h6>${trait.name}</h6></a>
+<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue,'displayAny':displayAny]"/>
 </div>
