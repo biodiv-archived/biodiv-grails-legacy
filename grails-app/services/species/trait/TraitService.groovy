@@ -504,34 +504,32 @@ println headers;
         }
         return traitFilter
     }    
+ 
     def createTraitValue(Trait traitInstance, params){
 
-        def valueCount = params.value?params.value.size():0;
-        println "valueCount"+valueCount
-        println "params++++++++"+params
-        for(def i=0;i<valueCount;i++){
-            println "i+++++++++"+i
-            TraitValue traitValueInstance=new TraitValue();
-            traitValueInstance.value=params.value[i];
-            traitValueInstance.description=params.traitDesc[i];
-            traitValueInstance.source=params.traitSource[i];
-            traitValueInstance.trait=traitInstance
-            traitValueInstance.icon=getTraitIcon(params.icon[i])
-            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
-              def msg = "Trait Value Added Successfully"
-            }
-        else{
+        def valueCount = params.valueCount?params.valueCount:0;
+        for(def i=1;i<=valueCount;i++){
+            TraitValue traitValueInstance = new TraitValue();
+            traitValueInstance.value = params["value_"+i];
+            traitValueInstance.description = params["traitDesc_"+i];
+            traitValueInstance.source = params["traitSource_"+i];
+            traitValueInstance.trait = traitInstance
+            traitValueInstance.icon = getTraitIcon(params["icon_"+i])
+
+                if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+                  def msg = "Trait Value Added Successfully"
+                }
+                else{
                     def errors = [];
                     traitValueInstance.errors.allErrors .each {
-                        def formattedMessage = messageSource.getMessage(it, null);
-                        errors << [field: it.field, message: formattedMessage]
-                        println "errors+++++++++==============="+errors
+                    def formattedMessage = messageSource.getMessage(it, null);
+                    errors << [field: it.field, message: formattedMessage]
+                    println "errors+++++++++==============="+errors
                     }
+                }
         }
     }
-}
-        private String getTraitIcon(String icon) {
-            println "icon+++++++++++"+icon
+    private String getTraitIcon(String icon) {    
         if(!icon) return;
         def resource = null;
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir

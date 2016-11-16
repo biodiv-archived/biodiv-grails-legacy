@@ -10,6 +10,7 @@ instanceList.each{ iL ->
     }
 }
 %>                   
+
  <div class="observations_list observation" style="clear: both;">
 	<div class="mainContentList">
 		<div class="mainContent" name="p${params?.offset}">
@@ -22,7 +23,7 @@ instanceList.each{ iL ->
 			<ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
 				<g:each in="${inst.value}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance]"/>
+                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow ]"/>
 					</li>
 				</g:each>
 			</ul>

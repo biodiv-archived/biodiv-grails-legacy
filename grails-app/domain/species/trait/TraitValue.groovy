@@ -50,6 +50,10 @@ class TraitValue {
     String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null, ImageType imageType = ImageType.NORMAL) {
         String thumbnailUrl = '',isFilePresent='';
         def basePath = '';
+        if(!this.icon){
+            thumbnailUrl = grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg";
+            return thumbnailUrl;
+        }
         newBaseUrl = (newBaseUrl)?:(basePath?:grailsApplication.config.speciesPortal.traits.serverURL);
         int lastIndex = this.icon.lastIndexOf('.');
         def originalFileExt = (this.icon && lastIndex != -1) ? this.icon.substring(lastIndex, this.icon.length()):null;

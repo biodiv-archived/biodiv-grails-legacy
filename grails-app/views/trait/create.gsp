@@ -83,6 +83,7 @@ display:none;
 
                         </div>
                     </div> 
+                    <input type="hidden" id="valueCount" name="valueCount" />
                     </g:if>
 
                                    <div class="control-group sciNameDiv" style="margin-top:5px;">
@@ -228,80 +229,83 @@ display:none;
                             </div>
                             </div>
 <%def alert_msg=g.message(code:'document.error.message')%>
-	<asset:script>
 
-   
+<asset:script>   
     $(document).ready (function() {
-    $('.edit').live ('click', function () {
-    $(this).hide();
-    $(this).siblings('.save, .cancel').show();
-    $(this).siblings('.delete').hide();
-    var id=$(this).data("id");
-    $('#valuelable_'+id).hide();
-    $('#value_'+id).show();
-    $('#traitDescLable_'+id).hide();
-    $('#traitDesc_'+id).show();
-    $('#traitSourceLable_'+id).hide();
-    $('#traitSource_'+id).show();
-});
-$('.cancel').live ('click', function () {
-    $(this).siblings('.edit').show();
-    $(this).siblings('.delete').show();
-    $(this).siblings('.save').hide();
-    $(this).hide();
-    var id=$(this).data("id");
-    $('#valuelable_'+id).show();
-    $('#value_'+id).hide();
-    $('#traitDescLable_'+id).show();
-    $('#traitDesc_'+id).hide();
-    $('#traitSourceLable_'+id).show();
-    $('#traitSource_'+id).hide();
-});
-$('.save').live ('click', function () {
-    $(this).siblings('.edit').show();
-    $(this).siblings('.cancel').hide();
-    $(this).hide();
-    var id=$(this).data("id");
-    $('#valuelable_'+id).show();
-    $('#value_'+id).hide();
-    $('#traitDescLable_'+id).show();
-    $('#traitDesc_'+id).hide();
-    $('#traitSourceLable_'+id).show();
-    $('#thumbnail').show();
-    $('#traitSource_'+id).hide();
-    $('#valuelable_'+id).text($('#value_'+id).val());
-    $('#traitDescLable_'+id).text($('#traitDesc_'+id).val());
-    $('#traitSourceLable_'+id).text($('#traitSource_'+id).val());
+        $('.edit').live ('click', function () {
+        $(this).hide();
+        $(this).siblings('.save, .cancel').show();
+        $(this).siblings('.delete').hide();
+        var id=$(this).data("id");
+        $('#valuelable_'+id).hide();
+        $('#value_'+id).show();
+        $('#traitDescLable_'+id).hide();
+        $('#traitDesc_'+id).show();
+        $('#traitSourceLable_'+id).hide();
+        $('#traitSource_'+id).show();
+    });
 
-});
+        $('.cancel').live ('click', function () {
+            $(this).siblings('.edit').show();
+            $(this).siblings('.delete').show();
+            $(this).siblings('.save').hide();
+            $(this).hide();
+            var id=$(this).data("id");
+            $('#valuelable_'+id).show();
+            $('#value_'+id).hide();
+            $('#traitDescLable_'+id).show();
+            $('#traitDesc_'+id).hide();
+            $('#traitSourceLable_'+id).show();
+            $('#traitSource_'+id).hide();
+        });
+        
+        $('.save').live ('click', function () {
+            $(this).siblings('.edit').show();
+            $(this).siblings('.cancel').hide();
+            $(this).hide();
+            var id=$(this).data("id");
+            $('#valuelable_'+id).show();
+            $('#value_'+id).hide();
+            $('#traitDescLable_'+id).show();
+            $('#traitDesc_'+id).hide();
+            $('#traitSourceLable_'+id).show();
+            $('#thumbnail').show();
+            $('#traitSource_'+id).hide();
+            $('#valuelable_'+id).text($('#value_'+id).val());
+            $('#traitDescLable_'+id).text($('#traitDesc_'+id).val());
+            $('#traitSourceLable_'+id).text($('#traitSource_'+id).val());
+
+        });
+
     $('#addNewValue').click(function(){
-              var rowCount = $('#valueTable tr').length;
-  $('#valueTable tr:last').after("<tr><td><input type='textbox' id='value_"+ rowCount +"'class ='input-block-level' /></td>"+
+        var rowCount = $('#valueTable tr').length;
+            $('#valueTable tr:last').after("<tr><td><input type='textbox' id='value_"+ rowCount +"'class ='input-block-level' /></td>"+
                                       "<td><input type='textbox' id='traitDesc_"+ rowCount +"'class ='input-block-level' /></td>"+
                                       "<td><input type='textbox' id='traitSource_"+ rowCount +"'class ='input-block-level' /></td>"+
-                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;><img id='thumbnail' class='user-icon small_profile_pic' src='' title='thumbnai' alt='Browse' /></a>"+
+                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;><img id='thumbnail_"+rowCount +"' class='user-icon small_profile_pic' src='' title='thumbnai' alt='Browse' /></a>"+
                                       "<input class='icon' name='icon' id='icon_${i}' type='hidden' value='${thumbnail}' /></td>"+
                                       "<td><a class='btn btn-success addValue' id='addValue' data-id='"+ rowCount +"'><i class='icon-ok icon-white'></i></a> </td>"+
                                       "<td><a class='btn btn-danger removeRow' id='removeValue' data-id='"+rowCount+"'><i class='icon-remove icon-white'></i></a></td></tr>");
-        });
-        $('#createNewValue').click(function(){
-              var rowCount = $('#valueTable tr').length;
-                     $('#valueTable tr:last').after("<tr><td><input type='textbox' name='value' id='value_"+ rowCount +"'class ='input-block-level' /></td>"+
-                                      "<td><input type='textbox' name='traitDesc' id='traitDesc_"+ rowCount +"'class ='input-block-level' /></td>"+
-                                      "<td><input type='textbox' name='traitSource' id='traitSource_"+ rowCount +"'class ='input-block-level' /></td>"+
-                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;><img id='thumbnail' class='user-icon small_profile_pic' src='' title='thumbnai' alt='Browse' /></a>"+
-                                      "<input class='icon' name='icon' id='icon_${i}' type='hidden' value='${thumbnail}' /></td>"+
-                                      "<td><a class='btn btn-danger removeRow' id='removeValue' data-id='"+rowCount+"'><i class='icon-remove icon-white'></i></a></td></tr>");
-        });
-             $('.removeRow').live ('click', function ()
-             {
-                $(this).closest ('tr').remove ();
-             }
-             );
-        $('.delete').live ('click', function ()
-             {
-        var test="${message(code: 'default.trait.delete.confirm.message', default: 'This Trait value will be deleted. Are you sure ?')}";
+    });
 
+    $('#createNewValue').click(function(){
+        var rowCount = $('#valueTable tr').length;
+        $('#valueCount').val(rowCount);
+             $('#valueTable tr:last').after("<tr><td><input type='textbox' name='value_"+ rowCount +"' id='value_"+ rowCount +"'class ='input-block-level' /></td>"+
+                                      "<td><input type='textbox' name='traitDesc_"+ rowCount +"' id='traitDesc_"+ rowCount +"'class ='input-block-level' /></td>"+
+                                      "<td><input type='textbox' name='traitSource_"+ rowCount +"' id='traitSource_"+ rowCount +"'class ='input-block-level' /></td>"+
+                                      "<td><a onclick=$('#attachFile').select()[0].click();return false;><img id='thumbnail_"+rowCount +"' class='user-icon small_profile_pic' src='' title='thumbnai' alt='Browse' /></a>"+
+                                      "<input class='icon' name='icon_"+ rowCount +"' id='icon_${i}' type='hidden' value='${thumbnail}' /></td>"+
+                                      "<td><a class='btn btn-danger removeRow' id='removeValue' data-id='"+rowCount+"'><i class='icon-remove icon-white'></i></a></td></tr>");
+    });
+
+    $('.removeRow').live ('click', function (){
+        $(this).closest ('tr').remove ();
+        $('#valueCount').val($('#valueCount').val()-1);
+    });
+
+    $('.delete').live ('click', function (){
+        var test="${message(code: 'default.trait.delete.confirm.message', default: 'This Trait value will be deleted. Are you sure ?')}";
         if(confirm(test)){
             var traitValueId=$(this).data("val");
             alert(traitValueId);
@@ -317,11 +321,8 @@ $('.save').live ('click', function () {
                         }
                         });
            $(this).closest ('tr').remove ();
-
-        }
-                
-             }
-             );
+        }           
+    });
 
 
     window.params.trait.updateTraitValueUrl="${uGroup.createLink(controller:'trait', action:'updateTraitValue', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}";
@@ -355,13 +356,13 @@ $('.save').live ('click', function () {
 
                 });
 
-/*$.ajax({
-    url:window.params.getDataColumnsDB,
+    $.ajax({
+        url:window.params.getDataColumnsDB,
                 dataType:'JSON',
                 success:function(data){
                         $("#fieldid").tagit({
                         availableTags:data,
-                        fieldName: 'tags', 
+                        fieldName: 'fieldid', 
                         showAutocompleteOnFocus: false,
                         maxTags  : 1,
                         allowSpaces: true,
@@ -376,30 +377,30 @@ $('.save').live ('click', function () {
                                 return false;
                             }
                         }
-
                     });
-                        }
-    });*/
-            $(".fieldid").tagit({
+                  }
+    });
+       /*     $(".fieldid").tagit({
             select:true, 
             allowSpaces:true, 
             placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
             fieldName: 'fieldid', 
+            maxTags  : 1,
             autocomplete:{
                 source: window.params.getDataColumnsDB
             }, 
             triggerKeys:['enter', 'comma', 'tab'], 
             maxLength:30
         });
-
+*/
 //image icon upload
-if (navigator.appName.indexOf('Microsoft') != -1) {
+        if (navigator.appName.indexOf('Microsoft') != -1) {
             $('.upload_resource').css({'visibility':'visible'});
         } else {
             $('.upload_resource').css({'visibility':'hidden'});
         }
         
-        $('#attachFile').change(function(e){
+    $('#attachFile').change(function(e){
             $('.upload_resource').find("span.msg").html("Uploading... Please wait...");
             var onUploadResourceSuccess =  function(responseXML, statusText, xhr, form) {
                 if($(responseXML).find('success').text() == 'true') {
@@ -412,10 +413,13 @@ if (navigator.appName.indexOf('Microsoft') != -1) {
                     }
                     
                     $(responseXML).find('resources').find('image').each(function() {
+                        var rowCount = $('#valueTable tr').length;
+                        rowCount=rowCount-1;
                         var file = dir + "/" + $(this).attr('fileName');
                         var thumbnail = rootDir + file.replace(/\.[a-zA-Z]{3,4}$/, "${grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix}");
                         $(".icon").val(file);
-                        $("#thumbnail").attr("src", thumbnail);
+                    
+                        $('#thumbnail_'+rowCount).attr("src", thumbnail);
                     });
                     $("#image-resources-msg").parent(".resources").removeClass("error");
                     $("#image-resources-msg").html("");

@@ -44,6 +44,7 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.License
 import species.License.LicenseType
 
+
 class UFileController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -54,6 +55,7 @@ class UFileController {
     def speciesUploadService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def messageSource
+    def speciesService;
 	String contentRootDir = config.speciesPortal.content.rootDir
     
     static String outputCSVFile = "output.csv" 
@@ -309,6 +311,23 @@ class UFileController {
             }
         } 
     } 
+        def downloadUserFile = {
+        //println "====FILE NAME =======" + params
+        def userDetail=speciesService.downloadUserDetails();
+        flash.message="File Generated"
+        if(params.downloadFile) {
+            File f = new File(params.downloadFile);
+            if (f.exists()) {
+                //println "here here===================="
+                //log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
+                response.setContentType("application/octet-stream")
+                response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${f.name}")
+                response.outputStream << f.readBytes()
+                response.outputStream.flush()
+                //println "==YAHAN HUN == " 
+            }
+        } 
+    }
 
     protected def getUFileList(params) {
 

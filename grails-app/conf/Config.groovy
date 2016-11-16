@@ -495,7 +495,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
-    bannerFilePath = "${app.rootDir}/bannerMessage.txt" 
+    bannerFilePath = "${app.rootDir}/bannerMessage.txt"
+    userDetailsFilePath = "${app.rootDir}/userInfo.csv" 
     filterFilePath = "${app.rootDir}/filters.txt" 
 }
 

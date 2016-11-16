@@ -241,8 +241,19 @@ class SpeciesController extends AbstractObjectController {
         params.id = params.long('id');
 		def url
 		def speciesInstance = params.id ? Species.findByIsDeletedAndId(false, params.id):null;
-        def traitList=Fact.findAllByPageTaxon(speciesInstance.taxonConcept)
-        println "traitList======="+traitList.traitValue
+        def traitList=Fact.findAllByPageTaxon(speciesInstance.taxonConcept).unique()
+        def traitMap = [:]
+        def conRef = []
+        traitList.each { fact ->
+            if(conRef.contains(fact.trait)){                           
+                traitMap[fact.trait] << fact.traitValue
+            }else{
+                traitMap[fact.trait] = [fact.traitValue] 
+                conRef << fact.trait
+            }           
+
+        }
+        //traitList = testy;
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
             withFormat {
@@ -328,7 +339,7 @@ class SpeciesController extends AbstractObjectController {
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
 
                     def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList]
+                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList.trait.unique(), factInstanceList:traitMap]
 
                     if(springSecurityService.currentUser) {
                         SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
