@@ -456,6 +456,7 @@ class TraitController extends AbstractObjectController {
                         return
                     }
         }
+    }
 
     @Secured(['ROLE_ADMIN'])
     def migarteIcons(){

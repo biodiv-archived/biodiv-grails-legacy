@@ -52,9 +52,9 @@ class TraitValue {
         def basePath = '';
         newBaseUrl = (newBaseUrl)?:(basePath?:grailsApplication.config.speciesPortal.traits.serverURL);
         int lastIndex = this.icon.lastIndexOf('.');
-        def originalFileExt = this.icon.substring(lastIndex, this.icon.length())
+        def originalFileExt = (this.icon && lastIndex != -1) ? this.icon.substring(lastIndex, this.icon.length()):null;
 
-        if(!defaultFileType) defaultFileType = originalFileExt;
+        if(!defaultFileType && !originalFileExt) defaultFileType = originalFileExt;
         println "-----------------------------"+defaultFileType;
         isFilePresent = ImageUtils.getFileName(this.icon, imageType, defaultFileType)
         boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+isFilePresent)).exists()

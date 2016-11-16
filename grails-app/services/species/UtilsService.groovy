@@ -1251,5 +1251,21 @@ class UtilsService {
         return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
     }
 
+    def writeLog = { String content, Level level=Level.DEBUG -> 
+            switch(level) { 
+                case Level.INFO : 
+                log.info content;
+                break;
+                case Level.WARN :
+                log.warn content;
+                break;
+                case Level.ERROR :
+                log.error content;
+                break;
+                default : 
+                log.debug content;
+            }
+        }
+
 }
 

@@ -9,6 +9,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import species.participation.UploadLog;
 import grails.util.Holders;
 import static org.springframework.http.HttpStatus.*;
+import species.participation.Observation;
 
 class FactController extends AbstractObjectController {
 
@@ -82,14 +83,6 @@ class FactController extends AbstractObjectController {
         }
     }
 
-/*    def facts() {
-        if(params.id) {
-            render (view:'facts', model:['factsList' : factService.list(params.id.toLong(), params.trait, params.traitValue), 'traitsList':traitService.listTraits()]);
-        } else {
-            render (view:'facts', model:['factsList' : factService.list(null, params.trait, params.traitValue), 'traitsList':traitService.listTraits()]);
-        }
-    }
-*/
     @Secured(['ROLE_USER'])
     def upload() {
         File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);          

@@ -16,16 +16,19 @@ class Fact {
     License license;
     TaxonomyDefinition pageTaxon;
     Long objectId;
+    String objectType
     
     boolean isDeleted = false;
 
     static constraints = {
-      trait nullable:false, unique:['pageTaxon', 'objectId','traitValue']
+      trait nullable:false, unique:['objectType', 'objectId','traitValue']
       //attribution nullable:true
       //contributor nullable:true
       //license nullable:true
       value nullable:true
       objectId nullable:false
+      objectType nullable:false
+      pageTaxon nullable:true
     }
 
     static mapping = {
@@ -36,6 +39,6 @@ class Fact {
 
     @Override
     String toString() {
-        return "<${this.class} : ${id} - (${pageTaxon.name}, ${trait.name}, ${traitValue.value})>";
+        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue.value})>";
     }
 }

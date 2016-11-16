@@ -34,6 +34,8 @@ import species.Classification;
 import species.trait.Fact;
 import species.trait.TraitValue;
 import species.utils.Utils;
+import species.groups.SpeciesGroup;
+import species.TaxonomyDefinition;
 
 class TraitService extends AbstractObjectService {
 
@@ -431,6 +433,32 @@ println headers;
         if(params.isFlagged && params.isFlagged.toBoolean()){
             filterQuery += " and obv.flagCount > 0 "
             activeFilters["isFlagged"] = params.isFlagged.toBoolean()
+        }
+
+        if(params.sGroup) {
+            params.sGroup = params.sGroup.toLong()
+            //def groupId = getSpeciesGroupIds(params.sGroup)
+            if(!params.sGroup){
+                log.debug("No groups for id " + params.sGroup)
+            }else{
+                List<TaxonomyDefinition> taxons = SpeciesGroup.read(params.sGroup)?.getTaxon(); 
+                def classification;
+                if(params.classification)
+                    classification = Classification.read(Long.parseLong(params.classification))
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                List parentTaxon = [];
+                taxons.each {taxon ->
+                    parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                }
+                queryParams['classification'] = classification.id 
+                queryParams['sGroup'] = params.sGroup 
+                queryParams['parentTaxon'] = parentTaxon 
+                activeFilters['classification'] = classification.id
+                activeFilters['sGroup'] = params.sGroup
+    
+                filterQuery += " and obv.taxon.id in (:parentTaxon) ";
+            }
         }
 
         if(params.taxon) {

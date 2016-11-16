@@ -249,7 +249,7 @@ class GroupHandlerService {
 	/**
 	 * returns the groups if there is a match with mappings defined 
 	 */
-	private SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
+	SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
 		SpeciesGroup group;
 		if(!speciesGroupMappings) {
 			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
@@ -265,6 +265,22 @@ class GroupHandlerService {
 		}
 		return group;
 	}
+
+    List<TaxonomyDefinition> getTaxonByMapping(SpeciesGroup group) {
+ 		List taxons = [];
+		if(!speciesGroupMappings) {
+			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
+		}
+		
+		speciesGroupMappings.each { mapping ->
+            println mapping
+			if((group.id.equals(mapping.speciesGroup.id))) {
+                //TODO:optimize following by having taxonids in speciesGroupMapping
+                taxons << TaxonomyDefinition.findByCanonicalFormAndRank(mapping.taxonName, mapping.rank);
+			}
+		}
+		return taxons;
+    }
 
 	/**
 	 * returns the group for the closest ancestor.

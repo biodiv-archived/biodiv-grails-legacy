@@ -754,7 +754,16 @@ $(document).ready(function(){
         return JSON.stringify(ck);
     }
 
-    
+    function getSelectedTraitForCreate() {
+        var hbt = '',trait='',selTrait={}; 
+        $('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any').each(function(){
+            if($(this).hasClass('active')) {
+                trait = $(this).attr('data-tid');
+                selTrait[trait] = $(this).attr('value');
+            }
+        });
+        return selTrait;
+    }
 
     /**
      *
@@ -784,8 +793,17 @@ $(document).ready(function(){
                 var input = $("<input>").attr("type", "hidden").attr("name", "habitat_id").val(element);
                 $('.addObservation').append($(input));	
             })
-            
+           
+            console.log(getSelectedUserGroups());
             $(".userGroupsList").val(getSelectedUserGroups());
+
+            var traits = getSelectedTraitForCreate();
+            var traitsStr = '';
+            for(var m in traits) {
+                traitsStr += m+':'+traits[m]+';';
+            }
+            $('#traits').val(traitsStr);
+
             var locationpicker = $(".map_class").data('locationpicker'); 
             if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
                 var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();

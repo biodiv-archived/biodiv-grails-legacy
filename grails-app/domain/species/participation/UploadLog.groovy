@@ -131,18 +131,6 @@ paramsMapAsText type:'text';
 
         def ln = System.getProperty('line.separator');
         logFile << "$ln${level.toString()} : $content";
-        switch(level) { 
-            case Level.INFO : 
-            log.info content;
-            break;
-            case Level.WARN :
-            log.warn content;
-            break;
-            case Level.ERROR :
-            log.error content;
-            break;
-            default : 
-            log.debug content;
-        }
+        utilsService.writeLog(content,level);
     }
 }

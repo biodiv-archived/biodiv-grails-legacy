@@ -67,9 +67,17 @@
                         </div>
                     </div>
                 </div>
-                
+ 
                 <div class="span12 super-section"  style="clear: both">
 				 	<g:render template="customFieldsForm" model="['observationInstance':observationInstance, 'userGroupInstance':userGroupInstance]"/>
+				</div>
+                
+                <div class="span12 super-section"  style="clear: both">
+                <h3>Traits</h3>
+                <input id="traits" name="traits" type="hidden" value=""/>
+                <% def emptyTraitListInitializer = ['instanceList':[], 'count':0];
+                emptyTraitListInitializer['queryParams'] = [:];%>
+                    <g:render template="/trait/showTraitListTemplate" model="emptyTraitListInitializer"/>
 				</div>
                 
                 <div class="span12 super-section"  style="clear: both">
@@ -152,6 +160,16 @@ $(document).ready(function(){
     $(".CustomField_multiselectcombo").multiselect();
 
     intializesSpeciesHabitatInterest(false);
+
+    updateGallery('/trait/list', -1, 0, undefined, true);
+    $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
+        if($(this).hasClass('active')){
+        return false;
+        }
+        $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+        $(this).addClass('active btn-success');
+       return false;
+    });
 });
 
 function deleteObservation(){

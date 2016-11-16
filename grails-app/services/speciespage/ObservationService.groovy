@@ -103,6 +103,7 @@ class ObservationService extends AbstractMetadataService {
     def request;
     def speciesPermissionService;
 	def customFieldService;
+    def factService;
     /**
      * 
      * @param params
@@ -310,6 +311,17 @@ class ObservationService extends AbstractMetadataService {
                 }
 				
 				customFieldService.updateCustomFields(params, observationInstance.id)
+                println "--------------------";
+                println "--------------------";
+                println "--------------------";
+                println params;
+                def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
+                traitParams.putAll(getTraits(params.traits));
+                factService.updateFacts(traitParams, observationInstance);
+                println traitParams;
+                println "+++++++++++++++++++++++"
+                println "+++++++++++++++++++++++"
+                println "+++++++++++++++++++++++"
                 return utilsService.getSuccessModel('', observationInstance, OK.value())
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
@@ -2877,18 +2889,21 @@ println resIdList
         def link=utilsService.generateLink("observation", "list", ["recom": reco])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         }
+
     private String getObservationHardLink(reco,count,user) {
         if(!reco) return ;
         def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         //return link 
         }
+
     private String getIdentifiedObservationHardLink(reco,count,user,identified) {
         if(!reco) return ;
         def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user,"identified":true])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         //return link 
         }
+
     def getObservationInstanceList(params){
         def finalInstanceResult=[]
         def sql =  Sql.newInstance(dataSource);
@@ -2898,5 +2913,17 @@ println resIdList
             finalInstanceResult.add(Observation.findById(row.getProperty("id")))
         }
         return finalInstanceResult
+    }
+
+    private Map getTraits(String t) {
+        Map traits = [:];
+        t.split(';').each {
+            if(it) {
+                String[] x = it.split(':');
+                if(x.size() == 2)
+                    traits[x[0]] = x[1].trim();
+            }
+        }
+        return traits;
     }
 }

@@ -705,3 +705,12 @@ update upload_log set upload_type = 'species bulk upload';
 
 #27thOct2016
 alter table trait_value add column is_deleted boolean not null default false;
+
+#15th Nov 2016
+alter table fact add column object_type varchar(255);
+update fact set object_type = class;
+alter table fact alter column object_type set not null;
+alter table fact drop column class;
+alter table fact drop constraint fact_trait_value_id_object_id_page_taxon_id_trait_id_key;
+create index fact_trait_value_id_object_id_object_type_trait_id_key on fact (trait_value_id, object_id, object_type, trait_id);
+alter table fact alter column page_taxon_id drop not null;

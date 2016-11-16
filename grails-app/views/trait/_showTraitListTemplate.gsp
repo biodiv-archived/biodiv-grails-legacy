@@ -32,7 +32,7 @@ instanceList.each{ iL ->
 		</div>
 	</div>
         
-    <g:if test="${instanceTotal > (queryParams.max?:0)}">
+    <g:if test="${instanceTotal > (queryParams?.max?:0)}">
 		<div class="centered">
 			<div class="btn loadMore">
 				<span class="progress" style="display: none;"><g:message code="msg.loading" /></span> <span
@@ -48,6 +48,6 @@ instanceList.each{ iL ->
 	<div class="paginateButtons" style="visibility: hidden; clear: both">
 		<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'observation'}"
 			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
-			 max="${queryParams.max}" params="${activeFilters}" />
+			 max="${queryParams?.max}" params="${activeFilters}" />
 	</div>	
 </div>

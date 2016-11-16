@@ -970,19 +970,7 @@ class XMLConverter extends SourceConverter {
     License getLicenseByType(licenseType, boolean createNew) {
         if(!licenseType) return null;
 
-        LicenseType type;
-        if(licenseType instanceof LicenseType) {
-            type = licenseType
-        } else {
-            licenseType = licenseType?.toString().trim();
-            if(!licenseType.startsWith("CC") && !licenseType.equalsIgnoreCase(LicenseType.CC_PUBLIC_DOMAIN.value())) {
-                licenseType = "CC "+licenseType.trim()
-            }
-            if(licenseType.startsWith('CC-')) {
-                licenseType = licenseType.replaceFirst('CC-','CC ');
-            }
-            type = License.fetchLicenseType(licenseType)
-        }
+        LicenseType type = License.fetchLicenseType(licenseType)
 
         if(!type) return null;
 
