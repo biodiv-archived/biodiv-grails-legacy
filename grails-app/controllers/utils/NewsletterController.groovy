@@ -286,6 +286,57 @@ class NewsletterController {
 		}
 	}
 
+
+	def listPage(){
+    	
+		def userGroupInstance = findInstance(null, params.webaddress, false)
+		//if (!userGroupInstance) return;
+		println userGroupInstance
+		def currentLanguage = utilsService.getCurrentLanguage(request);
+		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order,currentLanguage);		 
+
+		def model = ['userGroupInstance':userGroupInstance, 'newsletters':newsletters]
+
+		render model as JSON
+    }
+
+
+
+	private UserGroup findInstance(id=null, String webaddress='', boolean redirectToList=true) {
+		def userGroup
+		
+		if(id) {
+			if(id instanceof String) {
+                try {
+				    id = Long.parseLong(id);
+                } catch(e) {
+                    id = null;
+                    e.printStackTrace();
+                }
+			}
+            if(id)
+			    userGroup = UserGroup.get(id)
+		} 
+		if(webaddress) {
+			userGroup = UserGroup.findByWebaddress(webaddress)
+		}
+		
+		if (!userGroup && redirectToList) {
+            def model = utilsService.getErrorModel( "${message(code: 'default.not.found.message', args: ['UserGroup', id?:webaddress])}", userGroup, NOT_FOUND.value())
+                withFormat {
+                    html {
+                        flash.message = model.msg
+                        redirect url: uGroup.createLink(controller:'userGroup', action:'list')
+                        return;
+                    }
+                    json { render model as JSON }
+                    
+                }
+                return;
+		}
+		return userGroup
+	}
+
 	def postProcessNewsletter(newsletterInstance) {
 		try {
 			newsletterSearchService.publishSearchIndex(newsletterInstance, COMMIT);
@@ -388,5 +439,7 @@ class NewsletterController {
                 def result = [success:success, msg:msg]
         render result as JSON
     }
+
+    
 
 }
