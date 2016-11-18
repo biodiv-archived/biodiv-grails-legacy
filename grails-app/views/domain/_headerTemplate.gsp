@@ -34,6 +34,7 @@
 
 .siteNav .mega-menu .usergrouplist{
 	width:250px;
+	float:initial;
 }
 
 .siteNav .mega-menu .nav-header {
@@ -291,7 +292,7 @@
           onclick="loadPages($(this).next('ul'), '${uGroup.createLink(controller:'newsletter', action:'listPage', 'userGroup':userGroupInstance)}');return false;"
                                 href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
                                 title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /><b class="caret"></b></a>
-            <ul class="dropdown-menu mega-menu pull-right" style="width:800px;">
+            <ul class="dropdown-menu mega-menu pull-right" style="width:150px;">
               
             </ul>
             <!-- dropdown-menu --> 

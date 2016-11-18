@@ -497,7 +497,7 @@ function loadSuggestedGroups(targetComp, url,offset,menuCall){
 				$(targetComp).append($(data.suggestedGroupsHtml));
 				if(menuCall != "undefined" && menuCall){
 					if($('.groupMore').length == 0){
-						$(targetComp).append('<li class="groupMore" style="float: right;margin-top: 20px;"><a href="/group/list" >More...</a></li>');
+						$(targetComp).append('<li class="groupMore usergrouplist" style="float: right;margin-top: 20px;"><a href="/group/list" >More...</a></li>');
 					}
 				}
 				$(targetComp).show();
