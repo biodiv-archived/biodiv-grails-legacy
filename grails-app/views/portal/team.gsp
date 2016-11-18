@@ -88,6 +88,15 @@
 			</td>
 		</tr>
 		<tr>
+            <td><img alt="Choki Gyeltshen" src="http://biodiversity.bt/biodiv/users//3335963d-1a0f-4d29-a056-0257ba6948e6/resources/366_th1.jpg" style="height:150px; width:150px"></td>
+                <td>
+                <p>Mr. Choki Gyeltshen</p>
+                <p>Observation Curator</p>
+                <p>National Biodiversity Center</p>
+                <p>Ministry of Agriculture and Forests</p>
+            </td>
+        </tr>
+		<tr>
 	    	<td><img alt="Sangay" src="/assets/all/people/sangaydema.jpg" style="height:150px; width:150px" /></td>
 			<td>
 		    	<p>Mrs. Sangay Dema</p>
