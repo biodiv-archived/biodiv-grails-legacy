@@ -493,12 +493,14 @@ function loadSuggestedGroups(targetComp, url,offset,menuCall){
 		data: {"offset":offset},
 		success: function(data) {			
 				$(targetComp).find('.load_more_usergroup').remove();
-				$(targetComp).find('.group_load').remove();
-				$(targetComp).append($(data.suggestedGroupsHtml));
+				$(targetComp).find('.group_load').remove();				
 				if(menuCall != "undefined" && menuCall){
+					$(targetComp).html($(data.suggestedGroupsHtml));
 					if($('.groupMore').length == 0){
 						$(targetComp).append('<li class="groupMore usergrouplist" style="float: right;margin-top: 20px;"><a href="/group/list" >More...</a></li>');
 					}
+				}else{
+					$(targetComp).append($(data.suggestedGroupsHtml));
 				}
 				$(targetComp).show();
 
