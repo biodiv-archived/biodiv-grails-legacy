@@ -16,7 +16,7 @@
 }
 
 .contributeButton{
-	margin:0 0 0 45px;
+	margin:0 0 0 45px;  
 }
 
 .siteNav .mega-menu li {
@@ -35,6 +35,7 @@
 .siteNav .mega-menu .usergrouplist{
 	width:250px;
 	float:initial;
+  margin:0px;
 }
 
 .siteNav .mega-menu .nav-header {
@@ -180,7 +181,7 @@
 			style="background-color: transparent; padding-bottom: 0px;text-align:center;height:30px;">
 			<!-- Navigation -->
       <nav class="nav-collapse collapse">
-        <ul class="nav">
+        <ul class="siteNav nav">
         <li class="dropdown ${(['species','namelist','trait'].contains(params.controller))?'active':''}">
 	        <a href="#" title="${g.message(code:'default.species.label')}" class="dropdown-toggle" data-toggle="dropdown">
 								<g:message code="default.species.label" />
@@ -191,7 +192,6 @@
             <ul class="dropdown-menu mega-menu">
               <li class="mega-menu-column">
                 <ul>
-                  <li class="nav-header"><g:message code="default.species.label" /></li>
                   <li><a href="${uGroup.createLink('controller':'species', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.speciesPage.label')}"><g:message code="default.speciesPage.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'namelist', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.taxonNamelist.label')}"><g:message code="default.taxonNamelist.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'trait', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.speciesTrait.label')}"><g:message code="default.speciesTrait.label" /></a></li>
@@ -212,7 +212,6 @@
             <ul class="dropdown-menu mega-menu">
               <li class="mega-menu-column">
                 <ul>
-                  <li class="nav-header"><g:message code="default.observation.label" /></li>
                   <li><a href="${uGroup.createLink('controller':'observation', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'checklist', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.checklist.label')}"><g:message code="default.checklist.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'datasource', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li>
@@ -239,11 +238,10 @@
                </a>
          </li>	
           <li class="dropdown" class="dropdown-toggle" data-toggle="dropdown"> 
-          		<a href="#" class="contributeButton"><g:message code="button.contribute" /> <b class="caret"></b></a>
+          		<a href="javascript:void(0);" class="contributeButton"><g:message code="button.contribute" /> <b class="caret"></b></a>
             <ul class="dropdown-menu mega-menu pull-right contributeUL" style="width:280px;">
               <li class="mega-menu-column">
                 <ul>
-                  <li class="nav-header "><g:message code="button.contribute" /></li>                  
                   <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.species.detailed.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'species', action:'contribute', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="${g.message(code:'link.contribute.to')}" title="${g.message(code:'link.contribute.to')}"> <i class="icon-plus"></i><g:message code="link.contribute.to" /></a>
@@ -296,7 +294,7 @@
           onclick="loadPages($(this).next('ul'), '${uGroup.createLink(controller:'newsletter', action:'listPage', 'userGroup':userGroupInstance)}');return false;"
                                 href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
                                 title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /><b class="caret"></b></a>
-            <ul class="dropdown-menu mega-menu pull-right" style="width:150px;">
+            <ul class="dropdown-menu mega-menu pull-right" style="width:250px;">
               
             </ul>
             <!-- dropdown-menu --> 
@@ -349,10 +347,15 @@ jQuery(document).ready(function(){
         function() { $('.dropdown-menu', this).fadeIn("fast");
         },
         function() { $('.dropdown-menu', this).fadeOut("fast");
-    }).click(
-    	function() { $('.dropdown-menu', this).fadeIn("fast");
-        },
-        function() { $('.dropdown-menu', this).fadeOut("fast");
+    });
+
+    $(".siteNav .dropdown").click(function() { 
+        var targetComp = $(this).find('.dropdown-menu');
+        if($(targetComp).parent().hasClass('open')){
+          $(targetComp).hide(); 
+        }else{
+          $(targetComp).show();
+        }
     });
 
     
@@ -360,6 +363,10 @@ jQuery(document).ready(function(){
 function loadPages(target,url,offset){	
 	//alert($(target).length);
 	if(typeof offset == "undefined"){ offset = 0; }
+  var countUGL = $('.pagelist').size();
+  if(countUGL != 0){
+    return
+  }
 	$.ajax({
  		url: url,
  		type: 'POST',
@@ -371,10 +378,10 @@ function loadPages(target,url,offset){
 			$.each(data.newsletters,function(key,parENT){
 				
 				if(parENT.parentId == 0){
-					ulLi += '<li class="mega-menu-column"><ul>';
-					ulLi += '<li class="nav-header ellipsis"><a href="/page/'+parENT.id+'" title="'+parENT.title+'" >'+parENT.title+'</li>';
+					ulLi += '<li class="mega-menu-column" style="width:250px;"><ul>';
+					ulLi += '<li class="nav-header ellipsis pagelist"><a href="/page/'+parENT.id+'" title="'+parENT.title+'" >'+parENT.title+'</li>';
 					$.each(data.newsletters,function(key,subparent){
-						if(subparent.parentId == parENT.id){							
+						if(subparent.parentId == parENT.id){					
 							ulLi += '<li class="ellipsis"><a href="/page/'+subparent.id+'" title="'+subparent.title+'" >'+subparent.title+'</a></li>';							
 						}
 					});
