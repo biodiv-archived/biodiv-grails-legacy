@@ -480,6 +480,9 @@ function loadSuggestedGroups(targetComp, url,offset,menuCall){
 	}
 	var res = $(targetComp).children('li');	
 	var countUGL = $('.usergrouplist').size();
+	if(menuCall != "undefined" && menuCall && countUGL != 0){		
+		return
+	}
 	if(typeof offset == "undefined"){ offset = 0; }else{offset = countUGL }
 	if((res.length > 0) && (offset == 0) && (countUGL != 0)){
 		return 
