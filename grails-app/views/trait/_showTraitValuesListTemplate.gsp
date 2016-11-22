@@ -1,3 +1,4 @@
+
 <div class="row-fluid btn-group" style="white-space:inherit;margin-left:20px;">
             <g:if test="${!displayAny}">
             <div data-tvid='all' data-tid='${traitValues[0]?.trait?.id}'
@@ -14,11 +15,10 @@
         
         <g:if test="${fromSpeciesShow!=true}">
             <g:each in="${traitValues}" var="traitValue" status="i">
-                    <button type="button" data-tvid='${traitValue.id}' data-tid='${traitValue?.trait.id}'
+                    <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue?.trait.id}'
                     class="btn span2 input-prepend single-post ${queryParams?.trait?(queryParams.trait[traitValue?.trait.id+'']==traitValue.id+''?'active btn-success':''):''}"
                         value="${traitValue.value}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
-
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
                     </button>
             </g:each> 
@@ -28,7 +28,7 @@
             <g:each in="${traitValues}" var="traitValue" status="i">
                 <% String link="${"/trait/show/"+traitValue.trait.id+"?trait."+traitValue.trait.id+"="+traitValue.id}" %>
                 <a href='${link}'>
-                    <button type="button" data-tvid='${traitValue.id}' data-tid='${traitValue.trait.id}'
+                    <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue.trait.id}'
                     class="btn span2 input-prepend single-post ${queryParams?.trait?(queryParams.trait[traitValue.trait.id+'']==traitValue.id+''?'active btn-success':''):''}"
                         value="${traitValue.id}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
@@ -52,5 +52,4 @@
             </div> 
             </g:if>
 </div>
-
 

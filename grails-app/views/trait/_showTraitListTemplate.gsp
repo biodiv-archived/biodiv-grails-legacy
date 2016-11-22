@@ -1,3 +1,6 @@
+<style>
+.collapse{height:opx;}
+</style>
 <% 
 def ref=[];
 def instanceFieldList=[:]
@@ -17,13 +20,13 @@ instanceList.each{ iL ->
 		    <div class="filters">
             <g:each in="${instanceFieldList}" status="j" var="inst">                
                 <div class="sidebar_section">
-                    <a class="speciesFieldHeader" data-toggle="collapse" href="#trait${j}">
+                    <a class="speciesFieldHeader collapse"  data-toggle="collapse" href="#trait${j}">
                     	<h5>${inst.key}</h5>
                     </a>
-			<ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
+			<ul id="trait${j}" class="grid_view thumbnails obvListwrapper collapse">
 				<g:each in="${inst.value}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow ]"/>
+                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'observationCreate':true]"/>
 					</li>
 				</g:each>
 			</ul>

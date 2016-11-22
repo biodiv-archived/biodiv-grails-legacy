@@ -13,6 +13,12 @@
     .latlng{
         margin-left: 285px !important;
     }
+    .sidebar_section{
+        margin-bottom:0px;
+    }
+    .collapse{
+        height:0px;
+    }
 </style>
 </head>
 <body>
@@ -77,7 +83,7 @@
                 <input id="traits" name="traits" type="hidden" value=""/>
                 <% def emptyTraitListInitializer = ['instanceList':[], 'count':0];
                 emptyTraitListInitializer['queryParams'] = [:];%>
-                    <g:render template="/trait/showTraitListTemplate" model="emptyTraitListInitializer"/>
+                    <g:render template="/trait/showTraitListTemplate" model='emptyTraitListInitializer'/>
 				</div>
                 
                 <div class="span12 super-section"  style="clear: both">
@@ -145,6 +151,7 @@
 
 
 $(document).ready(function(){
+
     var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
     uploadResource.POLICY = "${policy}";
     uploadResource.SIGNATURE = "${signature}";
@@ -161,7 +168,11 @@ $(document).ready(function(){
 
     intializesSpeciesHabitatInterest(false);
 
-    updateGallery('/trait/list', -1, 0, undefined, true);
+    $('#speciesGroupFilter button').click(function(){
+        updateGallery('/trait/list', -1, 0, undefined, true);
+    });
+        updateGallery('/trait/list', -1, 0, undefined, true);
+    
     $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
         if($(this).hasClass('active')){
         return false;
