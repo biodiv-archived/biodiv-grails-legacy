@@ -289,9 +289,16 @@
             
           </li>
           <!-- /.dropdown -->
+          <% def pageURL
+           if(userGroupInstance) {
+              pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
+             } else {
+              pageURL = "/page";
+            }
+          %>          
           <li class="dropdown ${(params.action == 'pages')?' active':''}"><a class="dropdown-toggle pageMenu" data-toggle="dropdown"
-          onmouseover="loadPages($(this).next('ul'), '${uGroup.createLink(controller:'newsletter', action:'listPage', 'userGroup':userGroupInstance)}');return false;"
-          onclick="loadPages($(this).next('ul'), '${uGroup.createLink(controller:'newsletter', action:'listPage', 'userGroup':userGroupInstance)}');return false;"
+          onmouseover="loadPages($(this).next('ul'), '${uGroup.createLink(controller:'newsletter', action:'listPage', 'userGroup':userGroupInstance)}','${pageURL}');return false;"
+          onclick="loadPages($(this).next('ul'), '${uGroup.createLink(controller:'newsletter', action:'listPage', 'userGroup':userGroupInstance)}','${pageURL}');return false;"
                                 href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
                                 title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /><b class="caret"></b></a>
             <ul class="dropdown-menu mega-menu pull-right" style="width:250px;">
@@ -343,11 +350,7 @@ $(document).ready(function(){
 <script>
 // Dropdown Menu Fade    
 jQuery(document).ready(function(){
-      <%if(userGroupInstance ) {%>
-        var pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
-      <%} else {%>
-        var pageURL = "/page";
-      <%}%>      
+           
     $(".siteNav .dropdown").hover(
         function() { $('.dropdown-menu', this).fadeIn("fast");
         },
@@ -365,7 +368,7 @@ jQuery(document).ready(function(){
 
     
 });
-function loadPages(target,url,offset){	
+function loadPages(target,url,pageURL){	
 	//alert($(target).length);
 	if(typeof offset == "undefined"){ offset = 0; }
   var countUGL = $('.pagelist').size();
