@@ -71,22 +71,27 @@ println "------------------------____"
 println headers;
         int traitNameHeaderIndex = -1;
         int taxonIdHeaderIndex = -1;
+        int traitIdHeaderIndex = -1;
+        int updateHeaderIndex = -1;
         for(int i=0; i<headers.size(); i++) {
             if(headers[i].trim().equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
-            }
-            if(headers[i].trim().equalsIgnoreCase('taxon id')) {
+            } else if(headers[i].trim().equalsIgnoreCase('taxonid')) {
                 taxonIdHeaderIndex = i;
+            } else if(headers[i].trim().equalsIgnoreCase('traitid')) {
+                traitIdHeaderIndex = i;
+            } else if(headers[i].trim().equalsIgnoreCase('new/update')) {
+                updateHeaderIndex = i;
             }
         }
 
-        if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1) {
-            dl.writeLog("Trait name column and/or taxonId column is not defined", Level.ERROR);
+        if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
+            dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
             return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':logMsgs];
         }
 
         while(row) {
-            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[taxonIdHeaderIndex] == null || row[taxonIdHeaderIndex] == '') {
+            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
                 dl.writeLog("Ignoring row " + row, Level.WARN);
                 row = reader.readNext();
                 continue;
@@ -106,16 +111,27 @@ println headers;
                 }
             }
 
-            taxons_scope.each { taxon_scope ->
-
-                Trait trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex], taxon_scope);
-                if(!trait) {
-                    dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
-                    trait = new Trait();
-                } else {
+//            taxons_scope.each { taxon_scope ->
+            Trait trait = null;
+            if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {
+                if(row[traitIdHeaderIndex]) {
+                    trait = Trait.get(Long.parseLong(row[traitIdHeaderIndex]));
                     dl.writeLog("Updating trait ${trait} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
+                } 
+                else {
+                    if(taxon_scope.size() == 1) {
+                        trait = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [row[traitNameHeaderIndex],  taxons_scope[0]]);
+                    } else {
+                        dl.writeLog("Trait id is required to update trait ${row[traitNameHeaderIndex]}", Level.ERROR);
+                    }
                 }
+            } else if( row[updateHeaderIndex]?.equalsIgnoreCase('new') ){
+                trait = new Trait();
+                dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]}");
+            }
 
+            if(trait) {
+                //trait = new Trait();
                 headers.eachWithIndex { header, index ->
 
                     switch(header.toLowerCase()) {
@@ -153,9 +169,13 @@ println headers;
                         trait.icon = row[index].trim();
                         break;
 
-                        case 'taxon id':
+                        case 'taxonid':
                         //TODO: if taxon id is wrong catch exception/trow exception
-                        trait.taxon = taxon_scope;
+                        trait.taxon?.clear();
+                        taxons_scope.each { taxon_scope ->
+                            println "*****************************"
+                            trait.addToTaxon(taxon_scope);
+                        }
                         break;
 
                         case 'trait definition':
@@ -165,6 +185,19 @@ println headers;
                         case 'spm':
                         trait.field = getField(row[index], languageInstance);
                         break;
+                        
+                        case 'isobvtrait':
+                        trait.isNotObservationTrait = !row[index]?.trim()?.toBoolean();
+                        break;
+
+                        case 'isparticipatory':
+                        trait.isParticipatory = row[index]?.trim()?.toBoolean();
+                        break;
+
+                        case 'showinobservation':
+                        trait.showInObservation = row[index]?.trim()?.toBoolean();
+                        break;
+
 
                     } 
                 }
@@ -179,7 +212,12 @@ println headers;
                     }
 
                 }
+            } else {
+                dl.writeLog("Not a valid update/new column ${row[updateHeaderIndex]}", Level.ERROR);
             }
+
+
+            //}
             row = reader.readNext();
         }
         
@@ -220,6 +258,7 @@ println headers;
         int traitNameHeaderIndex = -1;
         int valueHeaderIndex = -1;
         int taxonIdHeaderIndex=-1;
+        int traitIdHeaderIndex=-1;
 
         for(int i=0; i<headers.size(); i++) {
             if(headers[i].equalsIgnoreCase('trait')) {
@@ -228,25 +267,27 @@ println headers;
             if(headers[i].equalsIgnoreCase('value')) {
                 valueHeaderIndex = i;
             }
-            if(headers[i].equalsIgnoreCase('taxon id')) {
+            if(headers[i].equalsIgnoreCase('taxonid')) {
                 taxonIdHeaderIndex = i;
             }
+            if(headers[i].equalsIgnoreCase('traitid')) {
+                traitIdHeaderIndex = i;
+            }
         }
-        println headers
-        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || taxonIdHeaderIndex == -1) {
-            dl.writeLog("Some of trait name, value and taxonid columns are not defined", Level.ERROR);
+        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || traitIdHeaderIndex == -1) {
+            dl.writeLog("Some of trait name, value and traitid columns are not defined", Level.ERROR);
             return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':logMsgs];
         }
 
         while(row) {
 
-            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '' || row[taxonIdHeaderIndex] == null || row[taxonIdHeaderIndex] == '') {
+            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
                 dl.writeLog("Ignoring row " + row, Level.WARN);
                 row = reader.readNext();
                 continue;
             }
 
-            TaxonomyDefinition taxon;
+/*            TaxonomyDefinition taxon;
             try {
                 taxon = TaxonomyDefinition.read(Long.parseLong(row[taxonIdHeaderIndex].trim()));
                 if(!taxon){
@@ -256,25 +297,39 @@ println headers;
                 dl.writeLog("Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}", Level.ERROR);
                 e.printStackTrace();
             }
-
+*/
             Trait trait;
             try {
-                trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex].trim(), taxon);
-                if(!trait){
-                    dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]}", Level.ERROR);
+                if(row[traitIdHeaderIndex]) {
+                    tarit = Trait.read(Long.parseLong(row[traitIdHeaderIndex]));
+                } else if(row[taxonIdHeaderIndex] && row[taxonIdHeaderIndex]!= '') {
+                    List traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon.id = ?", [row[traitNameHeaderIndex], Long.parseLong(row[taxonIdHeaderIndex])]);
+                    if(traits?.size() == 1)
+                        trait = traits[0];
+                } else {
+                    List traits = Trait.executeQuery("select t from Trait t where t.name=? ", [row[traitNameHeaderIndex]]);
+                    if(traits?.size() == 1)
+                        trait = traits[0];
+                    //trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex].trim(), taxon);
                 }
             } catch(e) {
                 dl.writeLog("Error getting trait from ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${e.getMessage()}", Level.ERROR);
                 e.printStackTrace();
             }
+            if(!trait){
+                dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]}}", Level.ERROR);
+                row = reader.readNext();
+                continue;
+            }
+
 
             TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), trait);
 
             if(!traitValue) {
-                dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name} and taxon ${taxon}");
+                dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name}");
                 traitValue = new TraitValue();
             } else {
-                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name} and taxon ${taxon}");
+                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name}");
             }
 
             headers.eachWithIndex { header, index ->
@@ -294,7 +349,7 @@ println headers;
                     case 'value definition' : 
                     traitValue.description=row[index].trim()
                     break;
-                    case 'taxon id' : 
+                    //case 'taxon id' : 
                     //traitValue.taxon = taxon
                     break;
                 } 
@@ -457,7 +512,9 @@ println headers;
                 activeFilters['classification'] = classification.id
                 activeFilters['sGroup'] = params.sGroup
     
-                filterQuery += " and obv.taxon.id in (:parentTaxon) ";
+                taxonQuery = " join obv.taxon taxon ";
+                query += taxonQuery;
+                filterQuery += " and taxon.id in (:parentTaxon) ";
             }
         }
 
@@ -466,8 +523,8 @@ println headers;
             if(taxon) {
                 queryParams['taxon'] = taxon.id;
                 activeFilters['taxon'] = taxon.id;
-                //taxonQuery = " join obv.taxon.hierarchies reg ";
-                //query += taxonQuery;
+                taxonQuery = " join obv.taxon taxon ";
+                query += taxonQuery;
 
                 def classification;
                 if(params.classification)
@@ -480,11 +537,23 @@ println headers;
                 queryParams['parentTaxon'] = parentTaxon 
                 activeFilters['classification'] = classification.id
     
-                filterQuery += " and obv.taxon.id in (:parentTaxon) ";
+                filterQuery += " and taxon.id in (:parentTaxon) ";
 
             }
         }
-        
+ 
+        if(params.isObservationTrait && params.isObservationTrait.toBoolean()){
+            filterQuery += " and obv.isNotObservationTrait = :isNotObservationTrait "
+            queryParams["isNotObservationTrait"] = !params.isObservationTrait.toBoolean()
+            activeFilters["isNotObservationTrait"] = !params.isObservationTrait.toBoolean()
+        }
+
+        if(params.isParticipatory && params.isParticipatory.toBoolean()){
+            filterQuery += " and obv.isParticipatory = :isParticipatory "
+            queryParams["isParticipatory"] = params.isParticipatory.toBoolean()
+            activeFilters["isParticipatory"] = params.isParticipatory.toBoolean()
+        }
+
 		def allInstanceCountQuery = "select count(*) from Trait obv " +taxonQuery+" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 	
         orderByClause = " order by " + orderByClause;

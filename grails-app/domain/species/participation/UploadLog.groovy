@@ -104,16 +104,17 @@ paramsMapAsText type:'text';
 
     def updateStatus(Status status){
         //refresh()
+        UploadLog.withTransaction {
+            this.status = status;
 
-        this.status = status;
+            if((status == Status.ABORTED) ||(status == Status.FAILED) || (status == Status.UPLOADED)){
+                this.endDate = new Date()
+                //updateSpeciesCount()
+            }
 
-        if((status == Status.ABORTED) ||(status == Status.FAILED) || (status == Status.UPLOADED)){
-            this.endDate = new Date()
-            //updateSpeciesCount()
-        }
-
-        if(!this.save(flush:true)){
-            this.errors.allErrors.each { log.error it }
+            if(!this.save(flush:true)){
+                this.errors.allErrors.each { log.error it }
+            }
         }
     }
 

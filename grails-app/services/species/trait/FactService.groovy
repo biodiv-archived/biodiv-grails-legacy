@@ -133,6 +133,13 @@ class FactService extends AbstractObjectService {
                             def t = Trait.read(Long.parseLong(key));
                             if(Trait.isValidTrait(t, object.group.getTaxon())) {
                                 trait = t;
+                            } else {
+                                writeLog("${t} is not valid as per taxon", Level.ERROR);
+                            }
+
+                            if(t.isNotObservationTrait) {
+                                trait = null;
+                                writeLog("${t} is not observation trait", Level.ERROR);
                             }
                             break;
                         }

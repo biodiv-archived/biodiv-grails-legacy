@@ -95,7 +95,7 @@ class TraitController extends AbstractObjectController {
         Trait traitInstance;
         Language languageInstance = utilsService.getCurrentLanguage();
         if(params.id){
-        traitInstance=Trait.findById(params.id)
+            traitInstance=Trait.findById(params.id)
         }
         else{traitInstance=new Trait();
             traitInstance.traitTypes=Trait.fetchTraitTypes(params.traittype);
@@ -109,44 +109,44 @@ class TraitController extends AbstractObjectController {
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
         println "SpeciesField==="+speciesField
-         println "recommendationInstance.taxonConcept+++"+recommendationInstance.taxonConcept
+        println "recommendationInstance.taxonConcept+++"+recommendationInstance.taxonConcept
         traitInstance.taxon=recommendationInstance.taxonConcept
 
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
-                msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
-                def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
-                if(params.action=='update'){
+            msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
+            def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
+            if(params.action=='update'){
                 traitService.createTraitValue(traitInstance,params)
             }
-                withFormat {
-                    html {
-                        flash.message = msg;
-                        redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
-                    }
-                    json { render model as JSON }
-                    xml { render model as XML }
+            withFormat {
+                html {
+                    flash.message = msg;
+                    redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
                 }
-                return
+                json { render model as JSON }
+                xml { render model as XML }
             }
-            else {
-                    def errors = [];
-                    traitInstance.errors.allErrors .each {
-                        def formattedMessage = messageSource.getMessage(it, null);
-                        errors << [field: it.field, message: formattedMessage]
-                        println "errors+++++++++==============="+errors
-                    }
+            return
+        }
+        else {
+            def errors = [];
+            traitInstance.errors.allErrors .each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+                println "errors+++++++++==============="+errors
+            }
 
-                    def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
-                    withFormat {
-                        html {
-                            render(view: "create", model: [traitInstance: traitInstance])
-                        }
-                        json { render model as JSON }
-                        xml { render model as XML }
-                    }
-                    return;
+            def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
+            withFormat {
+                html {
+                    render(view: "create", model: [traitInstance: traitInstance])
+                }
+                json { render model as JSON }
+                xml { render model as XML }
             }
+            return;
+        }
 
     }
 
@@ -165,7 +165,6 @@ class TraitController extends AbstractObjectController {
         }
     }
     
-
     protected def getList(params) {
         try { 
             params.max = params.max?Integer.parseInt(params.max.toString()):100;
@@ -314,7 +313,6 @@ class TraitController extends AbstractObjectController {
         }
     }
 
-
     @Secured(['ROLE_USER'])
     def upload_resource() {
         try {
@@ -437,6 +435,7 @@ class TraitController extends AbstractObjectController {
             }
         }
     }
+
     def deleteValue(){
         println "deleting Trait value"+params.id
         def traitValueInstance=TraitValue.findById(params.id);

@@ -125,17 +125,21 @@ class Trait {
     String description;
     Date createdOn = new Date();
     Date lastRevised = createdOn;
-    TaxonomyDefinition taxon;
+    //TaxonomyDefinition taxon;
 
     boolean isDeleted = false;
+    boolean isNotObservationTrait = false;
+    boolean isParticipatory = true;
+    boolean showInObservation = false;
+
+    static hasMany = [taxon:TaxonomyDefinition]
 
     static constraints = {
-        name nullable:false, blank:false, unique:['taxon']
+        name nullable:false, blank:false
         //values nullable:true,blank:true
         source nullable:true
         icon nullable:true
         field nullable:false
-        taxon nullable:false
         ontologyUrl nullable:true
         description nullable:true
         units nullable:true
@@ -202,8 +206,10 @@ class Trait {
         if(ibpParentTaxon) {
             ibpParentTaxon.each { t ->
                 traits.each { trait ->
-                    if(trait.taxon.id == t.id)
-                        validTraits << trait;
+                    trait.taxon.each { taxon ->
+                        if(trait.taxon.id == t.id)
+                            validTraits << trait;
+                    }
                 }
             }
         } else {
@@ -242,8 +248,10 @@ class Trait {
 
         if(ibpParentTaxon) {
             ibpParentTaxon.each { t ->
-                if(trait.taxon.id == t.id)
-                    isValid = true;
+                trait.taxon.each { taxon ->
+                    if(trait.taxon.id == t.id)
+                       isValid = true;
+                }
             }
         }
         return isValid;

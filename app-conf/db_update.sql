@@ -674,7 +674,8 @@ ALTER TABLE suser ADD COLUMN longitude double precision;
 #21Sep2016
 alter table taxonomy_definition add column traits bigint[][];
 alter table taxonomy_definition alter column traits  type bigint[][] using traits::bigint[][];
-                update taxonomy_definition set traits = g.item from (
+
+update taxonomy_definition set traits = g.item from (
              select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
 ) g where g.page_taxon_id=id;
 
@@ -714,3 +715,12 @@ alter table fact drop column class;
 alter table fact drop constraint fact_trait_value_id_object_id_page_taxon_id_trait_id_key;
 create index fact_trait_value_id_object_id_object_type_trait_id_key on fact (trait_value_id, object_id, object_type, trait_id);
 alter table fact alter column page_taxon_id drop not null;
+
+#16thNov2016
+alter table trait add column is_not_observation_trait boolean default 'f';
+alter table trait add column is_participatory boolean default 't';
+
+#21stNov2016
+insert into trait_taxonomy_definition(trait_taxon_id,taxonomy_definition_id)  select id, taxon_id from trait;
+alter table trait alter column taxon_id drop not null;
+alter table trait drop column taxon_id;
