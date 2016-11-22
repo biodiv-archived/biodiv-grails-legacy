@@ -479,7 +479,7 @@ function loadSuggestedGroups(targetComp, url,offset,menuCall){
 		$(targetComp).show();
 	}
 	var res = $(targetComp).children('li');	
-	var countUGL = $('.usergrouplist').size();
+	var countUGL = $(targetComp).find('.usergrouplist').size();
 	if(menuCall != "undefined" && menuCall && countUGL != 0){		
 		return
 	}

@@ -237,8 +237,8 @@
                <span title="${g.message(code:'updated.today')}" class="statsTicker docUpdateCount"> </span>
                </a>
          </li>	
-          <li class="dropdown" class="dropdown-toggle" data-toggle="dropdown"> 
-          		<a href="javascript:void(0);" class="contributeButton"><g:message code="button.contribute" /> <b class="caret"></b></a>
+          <li class="dropdown" > 
+          		<a href="javascript:void(0);" class="dropdown-toggle contributeButton" data-toggle="dropdown" ><g:message code="button.contribute" /> <b class="caret"></b></a>
             <ul class="dropdown-menu mega-menu pull-right contributeUL" style="width:280px;">
               <li class="mega-menu-column">
                 <ul>
@@ -343,6 +343,11 @@ $(document).ready(function(){
 <script>
 // Dropdown Menu Fade    
 jQuery(document).ready(function(){
+      <%if(userGroupInstance ) {%>
+        var pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
+      <%} else {%>
+        var pageURL = "/page";
+      <%}%>      
     $(".siteNav .dropdown").hover(
         function() { $('.dropdown-menu', this).fadeIn("fast");
         },
@@ -379,10 +384,10 @@ function loadPages(target,url,offset){
 				
 				if(parENT.parentId == 0){
 					ulLi += '<li class="mega-menu-column" style="width:250px;"><ul>';
-					ulLi += '<li class="nav-header ellipsis pagelist"><a href="/page/'+parENT.id+'" title="'+parENT.title+'" >'+parENT.title+'</li>';
+					ulLi += '<li class="nav-header ellipsis pagelist"><a href="'+pageURL+'/'+parENT.id+'" title="'+parENT.title+'" >'+parENT.title+'</li>';
 					$.each(data.newsletters,function(key,subparent){
 						if(subparent.parentId == parENT.id){					
-							ulLi += '<li class="ellipsis"><a href="/page/'+subparent.id+'" title="'+subparent.title+'" >'+subparent.title+'</a></li>';							
+							ulLi += '<li class="ellipsis"><a href="'+pageURL+'/'+subparent.id+'" title="'+subparent.title+'" >'+subparent.title+'</a></li>';							
 						}
 					});
 					//ulLi +='</li>';
