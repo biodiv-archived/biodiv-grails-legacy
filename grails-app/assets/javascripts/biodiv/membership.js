@@ -469,7 +469,7 @@ function last_actions() {
     console.log('last actions done');
 }
 
-function loadSuggestedGroups(targetComp, url,offset){	
+function loadSuggestedGroups(targetComp, url,offset,menuCall){	
 	$(document).unbind('click');
 	$('.dropdown-menu').bind('scroll');
 	menuFunction();
@@ -494,8 +494,14 @@ function loadSuggestedGroups(targetComp, url,offset){
 		success: function(data) {			
 				$(targetComp).find('.load_more_usergroup').remove();
 				$(targetComp).find('.group_load').remove();
-				$(targetComp).append($(data.suggestedGroupsHtml));			
+				$(targetComp).append($(data.suggestedGroupsHtml));
+				if(menuCall != "undefined" && menuCall){
+					if($('.groupMore').length == 0){
+						$(targetComp).append('<li class="groupMore" style="float: right;margin-top: 20px;"><a href="/group/list" >More...</a></li>');
+					}
+				}
 				$(targetComp).show();
+
 				return false;
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);
