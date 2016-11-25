@@ -11,7 +11,7 @@
     RewriteEngine on
 
     RewriteRule /biodiv/datasources/.* - [L]
-    RewriteRule ^/biodiv/(datasources|observations|newsletters|group-themes|users|userGroups|img|content|group_icons|datasources)|(wgp_maps|geoserver) - [L]
+    RewriteRule ^/biodiv/(traits|datasources|observations|newsletters|group-themes|users|userGroups|img|content|group_icons|datasources)|(wgp_maps|geoserver) - [L]
     RewriteCond  %{REQUEST_URI} ^/(geoserver|biodiv/maps/thumbnails)
     RewriteRule  /(.*)$ http://pamba.strandls.com/$1 [P,L]
 
