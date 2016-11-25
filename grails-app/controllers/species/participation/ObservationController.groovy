@@ -50,6 +50,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import species.SpeciesPermission.PermissionType;
 import org.hibernate.FetchMode;
 import species.trait.Fact;
+import species.trait.TraitValue;
 
 class ObservationController extends AbstractObjectController {
 	
@@ -354,21 +355,21 @@ class ObservationController extends AbstractObjectController {
                 }
             }
 
-        def traitList=Fact.findAllByObjectId(observationInstance.id).unique()
-        def traitMap = [:]
+        def traitFactList = Fact.findAllByObjectId(observationInstance.id)
+        def traitValueList = TraitValue.getAll();
+        def traitList = (traitFactList.trait + traitValueList.trait);
+        def traitFactMap = [:]
         def conRef = []
-        traitList.each { fact ->
+        traitFactList.each { fact ->
             if(conRef.contains(fact.trait)){                           
-                traitMap[fact.trait] << fact.traitValue
-                traitMap['fact'] << fact.id
+                traitFactMap[fact.trait] << fact.traitValue
+                traitFactMap['fact'] << fact.id
             }else{
-                traitMap[fact.trait] = [fact.traitValue] 
-                traitMap['fact'] = fact.id
+                traitFactMap[fact.trait] = [fact.traitValue]
+                traitFactMap['fact'] = fact.id
                 conRef << fact.trait
             }           
-
         }
-        println "traitMap"+traitMap
         if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -404,9 +405,9 @@ class ObservationController extends AbstractObjectController {
                 withFormat {
                     html {
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList.trait.unique(), factInstanceList:traitMap]
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitFactMap]
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList.trait.unique(), factInstanceList:traitMap]
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitMap]
                         }
                     } 
                     json  { render model as JSON }
