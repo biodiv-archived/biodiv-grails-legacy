@@ -44,8 +44,6 @@ class TraitService extends AbstractObjectService {
     Map upload(String file, Map params, UploadLog dl) {
         //def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
         Language languageInstance = utilsService.getCurrentLanguage();
-        println languageInstance;
-println "------------------------____"
         Map result = uploadTraitDefinitions(file, dl, languageInstance);
         uploadTraitValues(params.tvFile, dl, languageInstance);
         return result;
@@ -68,7 +66,7 @@ println "------------------------____"
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
-println headers;
+        println headers;
         int traitNameHeaderIndex = -1;
         int taxonIdHeaderIndex = -1;
         int traitIdHeaderIndex = -1;
@@ -111,7 +109,7 @@ println headers;
                 }
             }
 
-//            taxons_scope.each { taxon_scope ->
+            //            taxons_scope.each { taxon_scope ->
             Trait trait = null;
             if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {
                 if(row[traitIdHeaderIndex]) {
@@ -185,7 +183,7 @@ println headers;
                         case 'spm':
                         trait.field = getField(row[index], languageInstance);
                         break;
-                        
+
                         case 'isobvtrait':
                         trait.isNotObservationTrait = !row[index]?.trim()?.toBoolean();
                         break;
@@ -220,7 +218,7 @@ println headers;
             //}
             row = reader.readNext();
         }
-        
+
         dl.writeLog("\n====================================\nSuccessfully added ${noOfTraitsLoaded} traits\n====================================\n");
         return ['success':true, 'msg':"Loaded ${noOfTraitsLoaded} traits."];
     }
@@ -239,7 +237,7 @@ println headers;
         } 
     }
 
-    private  getTaxon(String taxonList) {
+    private getTaxon(String taxonList) {
         def x = TaxonomyDefinition.read(Long.parseLong(taxonList.trim()));
         if(x) {
             return x;
@@ -287,17 +285,17 @@ println headers;
                 continue;
             }
 
-/*            TaxonomyDefinition taxon;
+            /*            TaxonomyDefinition taxon;
             try {
-                taxon = TaxonomyDefinition.read(Long.parseLong(row[taxonIdHeaderIndex].trim()));
-                if(!taxon){
-                    dl.writeLog("Cannot find taxon " + row[taxonIdHeaderIndex].trim(), Level.ERROR);
-                }
-            } catch(e) {
-                dl.writeLog("Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}", Level.ERROR);
-                e.printStackTrace();
+            taxon = TaxonomyDefinition.read(Long.parseLong(row[taxonIdHeaderIndex].trim()));
+            if(!taxon){
+            dl.writeLog("Cannot find taxon " + row[taxonIdHeaderIndex].trim(), Level.ERROR);
             }
-*/
+            } catch(e) {
+            dl.writeLog("Error getting taxon from ${row[taxonIdHeaderIndex]} : ${e.getMessage()}", Level.ERROR);
+            e.printStackTrace();
+            }
+             */
             Trait trait;
             try {
                 if(row[traitIdHeaderIndex]) {
@@ -365,33 +363,12 @@ println headers;
                     dl.writeLog(it.toString(), Level.ERROR); 
                 }
             }
-                
+
             row = reader.readNext();
         }
 
         dl.writeLog("\n====================================\nSuccessfully added ${noOfValuesLoaded} trait values\n====================================\n");
         return ['success':true, 'msg':"Loaded ${noOfValuesLoaded} trait values."];
-    }
-
-    private boolean validateTrait(Trait trait, String value){
-       // Trait traitObj = Trait.findById(trait);
-        boolean rValue
-        trait.dataTypes.each{
-            switch(it) {
-
-                case "BOOLEAN":
-                if(Boolean.parseBoolean(value)){
-                    rValue=true;
-                }
-                break;
-
-                case "NUMERIC":
-                if(Integer.parseInt(value)){
-                    rValue=true;
-                }
-            }
-        }
-        return rValue;
     }
 
     Map getFilteredList(def params, int max, int offset) {
@@ -401,7 +378,7 @@ println headers;
         long allInstanceCount = 0;
 
         query += queryParts.filterQuery + queryParts.orderByClause
-        
+
         log.debug "query : "+query;
         log.debug "allInstanceCountQuery : "+queryParts.allInstanceCountQuery;
 
@@ -419,7 +396,7 @@ println headers;
             hqlQuery.setFirstResult(offset);
             queryParts.queryParams["offset"] = offset
         }
-        
+
         hqlQuery.setProperties(queryParts.queryParams);
         def instanceList = hqlQuery.list();
 
@@ -430,7 +407,7 @@ println headers;
 
         return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
     }
-    
+
     def getFilterQuery(params) {
 
         Map queryParams = [isDeleted : false]
@@ -458,7 +435,7 @@ println headers;
         query += " from Trait obv "
 
         def filterQuery = " where obv.isDeleted = :isDeleted "
-        
+
         //TODO: check logic
         if(params.featureBy == "false") {
             featureQuery = ", Featured feat "
@@ -480,10 +457,10 @@ println headers;
         }
 
         /*if(params.user) {
-            filterQuery += " and obv.author.id = :user "
-            queryParams["user"] = params.user.toLong()
-            activeFilters["user"] = params.user.toLong()
-        }*/
+          filterQuery += " and obv.author.id = :user "
+          queryParams["user"] = params.user.toLong()
+          activeFilters["user"] = params.user.toLong()
+          }*/
 
         if(params.isFlagged && params.isFlagged.toBoolean()){
             filterQuery += " and obv.flagCount > 0 "
@@ -500,19 +477,19 @@ println headers;
                 def classification;
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification))
-                if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                        if(!classification)
+                            classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
                 List parentTaxon = [];
                 taxons.each {taxon ->
                     parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
                 }
                 queryParams['classification'] = classification.id 
-                queryParams['sGroup'] = params.sGroup 
-                queryParams['parentTaxon'] = parentTaxon 
-                activeFilters['classification'] = classification.id
-                activeFilters['sGroup'] = params.sGroup
-    
-                taxonQuery = " join obv.taxon taxon ";
+                    queryParams['sGroup'] = params.sGroup 
+                    queryParams['parentTaxon'] = parentTaxon 
+                    activeFilters['classification'] = classification.id
+                    activeFilters['sGroup'] = params.sGroup
+
+                    taxonQuery = " join obv.taxon taxon ";
                 query += taxonQuery;
                 filterQuery += " and taxon.id in (:parentTaxon) ";
             }
@@ -529,19 +506,19 @@ println headers;
                 def classification;
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification))
-                if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                        if(!classification)
+                            classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
                 List parentTaxon = taxon.parentTaxonRegistry(classification).get(classification).collect {it.id};
                 queryParams['classification'] = classification.id 
-                queryParams['parentTaxon'] = parentTaxon 
-                activeFilters['classification'] = classification.id
-    
-                filterQuery += " and taxon.id in (:parentTaxon) ";
+                    queryParams['parentTaxon'] = parentTaxon 
+                    activeFilters['classification'] = classification.id
+
+                    filterQuery += " and taxon.id in (:parentTaxon) ";
 
             }
         }
- 
+
         if(params.isObservationTrait && params.isObservationTrait.toBoolean()){
             filterQuery += " and obv.isNotObservationTrait = :isNotObservationTrait "
             queryParams["isNotObservationTrait"] = !params.isObservationTrait.toBoolean()
@@ -554,14 +531,14 @@ println headers;
             activeFilters["isParticipatory"] = params.isParticipatory.toBoolean()
         }
 
-		def allInstanceCountQuery = "select count(*) from Trait obv " +taxonQuery+" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
-	
+        def allInstanceCountQuery = "select count(*) from Trait obv " +taxonQuery+" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+
         orderByClause = " order by " + orderByClause;
 
         return [query:query, allInstanceCountQuery:allInstanceCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
-    
+
     def getAllFilter(filters){
         def trait,traitValue,traitFilter=[:];
         filters.each{ f -> 
@@ -573,7 +550,7 @@ println headers;
         }
         return traitFilter
     }    
- 
+
     def createTraitValue(Trait traitInstance, params){
 
         def valueCount = params.valueCount?params.valueCount:0;
@@ -585,19 +562,20 @@ println headers;
             traitValueInstance.trait = traitInstance
             traitValueInstance.icon = getTraitIcon(params["icon_"+i])
 
-                if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
-                  def msg = "Trait Value Added Successfully"
-                }
-                else{
-                    def errors = [];
-                    traitValueInstance.errors.allErrors .each {
+            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+                def msg = "Trait Value Added Successfully"
+            }
+            else{
+                def errors = [];
+                traitValueInstance.errors.allErrors .each {
                     def formattedMessage = messageSource.getMessage(it, null);
                     errors << [field: it.field, message: formattedMessage]
                     println "errors+++++++++==============="+errors
-                    }
                 }
+            }
         }
     }
+
     private String getTraitIcon(String icon) {    
         if(!icon) return;
         def resource = null;
@@ -613,8 +591,8 @@ println headers;
         return resource;
     }
 
-        def delete(params){
-            println "deleting trait "+params.id
+    def delete(params){
+        println "deleting trait "+params.id
         String messageCode;
         String url = utilsService.generateLink(params.controller, 'list', []);
         String label = Utils.getTitleCase(params.controller?:'trait')
@@ -627,33 +605,33 @@ println headers;
             try {
                 def traitInstance = Trait.get(params.id.toLong())
                 if (traitInstance) {
-                        try {
-                            traitInstance.isDeleted = true;
- 
-                            if(!traitInstance.hasErrors() && traitInstance.save(flush: true)){
-                                messageCode = 'default.deleted.message'
-                                url = utilsService.generateLink(params.controller, 'list', [])
-                                success = true;
-                            } else {
-                                messageCode = 'default.not.deleted.message'
-                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
-                                traitInstance.errors.allErrors.each { log.error it }
-                                traitInstance.errors.allErrors .each {
-                                    def formattedMessage = messageSource.getMessage(it, null);
-                                    errors << [field: it.field, message: formattedMessage]
-                                }
+                    try {
+                        traitInstance.isDeleted = true;
 
-                            }
-                        }
-                        catch (org.springframework.dao.DataIntegrityViolationException e) {
+                        if(!traitInstance.hasErrors() && traitInstance.save(flush: true)){
+                            messageCode = 'default.deleted.message'
+                            url = utilsService.generateLink(params.controller, 'list', [])
+                            success = true;
+                        } else {
                             messageCode = 'default.not.deleted.message'
                             url = utilsService.generateLink(params.controller, 'show', [id: params.id])
-                            e.printStackTrace();
-                            log.error e.getMessage();
-                            errors << [message:e.getMessage()];
+                            traitInstance.errors.allErrors.each { log.error it }
+                            traitInstance.errors.allErrors .each {
+                                def formattedMessage = messageSource.getMessage(it, null);
+                                errors << [field: it.field, message: formattedMessage]
+                            }
+
                         }
-                    } 
-                 else {
+                    }
+                    catch (org.springframework.dao.DataIntegrityViolationException e) {
+                        messageCode = 'default.not.deleted.message'
+                        url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                        e.printStackTrace();
+                        log.error e.getMessage();
+                        errors << [message:e.getMessage()];
+                    }
+                } 
+                else {
                     messageCode = 'default.not.found.message'
                     url = utilsService.generateLink(params.controller, 'list', [])
                 }
@@ -664,9 +642,9 @@ println headers;
                 errors << [message:e.getMessage()];
             }
         }
-        
+
         String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
-                
+
         return [success:success, url:url, msg:message, errors:errors]
     }
 }

@@ -221,17 +221,6 @@ class CustomFieldService {
 		updateCustomFields(m, 336296)
 	}
 	
-	def test(){
-		//test1()
-		println "============= " + fetchAllCustomFields(Observation.read(368571))
-//		addCf()
-//		createTable(UserGroup.read(2))
-//		List l = CustomField.fetchCustomFields(UserGroup.read(2))
-//		l.each {
-//			addColumn(it)
-//		}
-	}
-	
 	def List addCf(){
 		UserGroup ug = UserGroup.read(2)
 
@@ -253,7 +242,10 @@ class CustomFieldService {
 		
 		return [cf]
 	}
-	
+
+    def delCf(query, params) {
+        executeQuery(query,params);
+    }
 	
 }
 

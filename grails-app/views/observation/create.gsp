@@ -74,9 +74,7 @@
                     </div>
                 </div>
  
-                <div class="span12 super-section"  style="clear: both">
-				 	<g:render template="customFieldsForm" model="['observationInstance':observationInstance, 'userGroupInstance':userGroupInstance]"/>
-				</div>
+				<g:render template="customFieldsForm" model="['observationInstance':observationInstance, 'userGroupInstance':userGroupInstance]"/>
                 
                 <div class="span12 super-section"  style="clear: both">
                 <h3>Traits</h3>
@@ -169,9 +167,9 @@ $(document).ready(function(){
     intializesSpeciesHabitatInterest(false);
 
     $('#speciesGroupFilter button').click(function(){
-        updateGallery('/trait/list', -1, 0, undefined, true);
+        updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
     });
-        updateGallery('/trait/list', -1, 0, undefined, true);
+//        updateGallery('/trait/list', -1, 0, undefined, true);
     
     $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
         if($(this).hasClass('active')){

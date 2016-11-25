@@ -47,7 +47,6 @@ class AbstractObjectService {
 	protected static List createUrlList2(observations, String iconBasePath) {
 		List urlList = []
 		for(param in observations){
-            println param
             def obv = param['observation'];
 
 			def item, controller;
