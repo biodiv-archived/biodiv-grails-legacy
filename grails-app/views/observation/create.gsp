@@ -79,7 +79,7 @@
                 <div class="span12 super-section"  style="clear: both">
                 <h3>Traits</h3>
                 <input id="traits" name="traits" type="hidden" value=""/>
-                <% def emptyTraitListInitializer = ['instanceList':[], 'count':0];
+                <% def emptyTraitListInitializer = ['instanceList':[], 'count':0, 'fromObservationCreate':true];
                 emptyTraitListInitializer['queryParams'] = [:];%>
                     <g:render template="/trait/showTraitListTemplate" model='emptyTraitListInitializer'/>
 				</div>

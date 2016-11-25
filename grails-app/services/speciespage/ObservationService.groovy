@@ -87,6 +87,9 @@ import species.ScientificName.TaxonomyRank;
 import species.NamesMetadata.NameStatus;
 import grails.plugin.cache.Cacheable;
 
+import species.trait.Fact;
+import species.trait.Trait;
+import species.trait.TraitValue;
 class ObservationService extends AbstractMetadataService {
 
     static transactional = false
@@ -2925,5 +2928,46 @@ println resIdList
             }
         }
         return traits;
+    }
+
+    boolean factUpdate(params){
+        println "================="+params
+        def observationInstance = Observation.findById(params.observation);
+        def factInstance=Fact.findById(params.factId);
+        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
+        traitParams.putAll(getTraits(params.traits));
+        Trait trait;
+        TraitValue traitValue;
+        traitParams.each { key, value ->
+                    if(!value) {
+                        return;
+                    }
+                    key = key.trim();
+                    value = value ? value.trim() : null ;
+
+                    switch(key) {
+                        case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
+                        default :
+                        trait=Trait.findById(key);
+                        traitValue = TraitValue.findByTraitAndValueIlike(trait, value.trim());
+
+                    }
+                }
+                factInstance.trait=trait
+                factInstance.traitValue=traitValue;
+                if(!factInstance.hasErrors() && !factInstance.save()) { 
+                    println "Error in Fact upudate"
+                    fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
+                    return false;
+                } else {
+                    println "Successfully updated fact";
+                    return true;
+                }
+/*        println "observation"+observationInstance
+        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
+                traitParams.putAll(getTraits(params.traits));
+                println "traitParams"+traitParams;*/
+                // factService.updateFacts(traitParams, observationInstance);
+
     }
 }

@@ -250,7 +250,6 @@ class ObservationController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def create() {
-        println "params+++"+params
 		def observationInstance = new Observation()
 		observationInstance.properties = params;
 		observationInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
@@ -365,7 +364,7 @@ class ObservationController extends AbstractObjectController {
             }
             println factList
             if (!observationInstance) {
-                msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+               msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
                 withFormat {
                     html {
@@ -1795,6 +1794,7 @@ class ObservationController extends AbstractObjectController {
 	   		return test; // as JSON;
    		}
 
+
 	}*/ 
    
     @Secured(['ROLE_USER'])
@@ -1974,6 +1974,12 @@ private printCacheEntries(cache) {
                 xml { render model as XML }
             }
         }
+    }
+
+    boolean updateFact(){
+        println "updateFactParams--------"+params
+        def factUpdate = observationService.factUpdate(params);
+        return factUpdate;
     }
 
 
