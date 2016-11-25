@@ -2933,11 +2933,11 @@ println resIdList
     boolean factUpdate(params){
         println "================="+params
         def observationInstance = Observation.findById(params.observation);
-        def factInstance=Fact.findById(params.factId);
         def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
         traitParams.putAll(getTraits(params.traits));
         Trait trait;
         TraitValue traitValue;
+        def factInstance;
         traitParams.each { key, value ->
                     if(!value) {
                         return;
@@ -2950,14 +2950,23 @@ println resIdList
                         default :
                         trait=Trait.findById(key);
                         traitValue = TraitValue.findByTraitAndValueIlike(trait, value.trim());
-
+                        factInstance=Fact.findByIdAndTrait(params.factId,trait);
+                        
                     }
                 }
-                factInstance.trait=trait
-                factInstance.traitValue=traitValue;
+                
+                if(!factInstance){factInstance = new Fact();}
+                        factInstance.trait = trait
+                        factInstance.traitValue = traitValue;
+                        factInstance.objectId = observationInstance.id
+                        factInstance.attribution = traitParams['attribution'];
+                        factInstance.contributor = traitParams['contributor'] ? SUser.findByEmail(traitParams['contributor']?.trim()) : null;
+                        factInstance.license = traitParams['license']? License.findByName(License.fetchLicenseType(traitParams['license'].trim())) : null;
+                        factInstance.objectType = observationInstance.class.getCanonicalName(); 
+
                 if(!factInstance.hasErrors() && !factInstance.save()) { 
                     println "Error in Fact upudate"
-                    fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
+                    factInstance.errors.allErrors.each {println it }
                     return false;
                 } else {
                     println "Successfully updated fact";
