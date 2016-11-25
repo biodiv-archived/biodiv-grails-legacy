@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import species.utils.Utils;
 import species.utils.ImageUtils;
-
+import species.TaxonomyDefinition;
 import species.utils.ImageType;
 
 class TraitController extends AbstractObjectController {
@@ -23,7 +23,7 @@ class TraitController extends AbstractObjectController {
     def traitService;
     def speciesService;
     def messageSource    
-    
+
     static allowedMethods = [show:'GET', index:'GET', list:'GET', edit:"GET" ,  save: "POST", delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"],update:"POST",create:"GET"]
     static defaultAction = "list"
 
@@ -31,11 +31,11 @@ class TraitController extends AbstractObjectController {
         redirect(action: "list", params: params, namespace: null)
     }
 
-
     def list() {
         def model = getList(params);
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
+        if(params.displayAny) model.displayAny = params.displayAny;
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.resultType = params.controller;
             model.hackTohideTraits = true;
@@ -71,7 +71,7 @@ class TraitController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def create() {
         def traitInstance = new Trait() 
-       traitInstance.properties = params;
+        traitInstance.properties = params;
         return [traitInstance: traitInstance]
     }
 
@@ -83,8 +83,7 @@ class TraitController extends AbstractObjectController {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
         }  else {
-            Recommendation recommendationInstance=Recommendation.findByTaxonConcept(traitInstance.taxon)
-            render(view: "create", model: [traitInstance: traitInstance, recoId:recommendationInstance.id])
+            render(view: "create", model: [traitInstance: traitInstance])
         }
         return;
     }
@@ -164,7 +163,7 @@ class TraitController extends AbstractObjectController {
             xml { render result as XML }
         }
     }
-    
+
     protected def getList(params) {
         try { 
             params.max = params.max?Integer.parseInt(params.max.toString()):100;
@@ -204,25 +203,25 @@ class TraitController extends AbstractObjectController {
     }
 
     def show() {
-        def traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
-        def coverage = traitInstance.taxon
+        Trait traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
+        List<TaxonomyDefinition> coverage = traitInstance.taxon
         def traitValue = [];
         Field field;
         traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
         field = Field.findById(traitInstance.fieldId);
-            def model = getList(params);
-             model['traitInstance'] = traitInstance
-             model['coverage'] = coverage.name
-             model['traitValue'] = traitValue
-             model['field'] = field.concept
-            withFormat {
+        def model = getList(params);
+        model['traitInstance'] = traitInstance
+        model['coverage'] = coverage*.name
+        model['traitValue'] = traitValue
+        model['field'] = field.concept
+        withFormat {
             html {
-                    render (view:"show", model:model)
-                 }
-        json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
-        xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
+                render (view:"show", model:model)
             }
-            return
+            json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
+            xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
+        }
+        return
     }
 
     @Secured(['ROLE_USER'])
@@ -249,10 +248,10 @@ class TraitController extends AbstractObjectController {
             //result.totalCount = result.instanceTotal;
             params.action = 'list';
             result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
- 
+
             if(result.matchingSpeciesList.size() > 0) {
                 result.putAll([status:'success', msg:'success']);
-           } else {
+            } else {
                 def message = "";
                 if(params.offset  > 0) {
                     message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
@@ -298,17 +297,17 @@ class TraitController extends AbstractObjectController {
             traitValueInstance.trait = traitInstance
         }
         if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
-              def msg = "Trait Value Added Successfully"
-                flash.message=msg
-                return
+            def msg = "Trait Value Added Successfully"
+            flash.message=msg
+            return
         }
-            else{
-                    def errors = [];
-                    traitValueInstance.errors.allErrors .each {
-                        def formattedMessage = messageSource.getMessage(it, null);
-                        errors << [field: it.field, message: formattedMessage]
-                        println "errors+++++++++==============="+errors
-                        return
+        else{
+            def errors = [];
+            traitValueInstance.errors.allErrors .each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+                println "errors+++++++++==============="+errors
+                return
             }
         }
     }
@@ -335,24 +334,24 @@ class TraitController extends AbstractObjectController {
                     // List of OK mime-types
                     //TODO Move to config
                     def okcontents = [
-                        'image/png',
-                        'image/jpeg',
-                        'image/pjpeg',
-                        'image/gif',
-                        'image/jpg'
+                    'image/png',
+                    'image/jpeg',
+                    'image/pjpeg',
+                    'image/gif',
+                    'image/jpg'
                     ]
 
                     if (! okcontents.contains(f.contentType)) {
                         message = g.message(code: 'resource.file.invalid.extension.message', args: [
-                            okcontents,
-                            f.originalFilename
+                        okcontents,
+                        f.originalFilename
                         ])
                     }
                     else if(f.size > grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE) {
                         message = g.message(code: 'resource.file.invalid.max.message', args: [
-                            grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024,
-                            f.originalFilename,
-                            f.size/1024
+                        grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024,
+                        f.originalFilename,
+                        f.size/1024
                         ], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024}KB");
                     }
                     else if(f.empty) {
@@ -391,7 +390,7 @@ class TraitController extends AbstractObjectController {
                             def model = utilsService.getSuccessModel("", null, OK.value(), [users:[dir:usersDir.absolutePath.replace(rootDir, ""), resources : res]])
                             render model as JSON
                         }
- 
+
                         xml { 
                             render(contentType:'text/xml') {
                                 response {
@@ -441,19 +440,19 @@ class TraitController extends AbstractObjectController {
         def traitValueInstance=TraitValue.findById(params.id);
         println "traitValueInstance"+traitValueInstance
         traitValueInstance.isDeleted=true
-             if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
-              def msg = "Trait Value deleted Successfully"
-                flash.message=msg
+        if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+            def msg = "Trait Value deleted Successfully"
+            flash.message=msg
+            return
+        }
+        else{
+            def errors = [];
+            traitValueInstance.errors.allErrors .each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+                println "errors+++++++++==============="+errors
                 return
             }
-        else{
-                    def errors = [];
-                    traitValueInstance.errors.allErrors .each {
-                        def formattedMessage = messageSource.getMessage(it, null);
-                        errors << [field: it.field, message: formattedMessage]
-                        println "errors+++++++++==============="+errors
-                        return
-                    }
         }
     }
 
@@ -487,11 +486,11 @@ class TraitController extends AbstractObjectController {
                 }else{
                     File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName("200_"+f.icon));
                     File fi = new File(rootDir+"/200_"+f.icon);
-                    (new AntBuilder()).copy(file: fi, tofile: file)
+                       (new AntBuilder()).copy(file: fi, tofile: file)
                     //fi.transferTo( file );
                     ImageUtils.createScaledImages(file, usersDir,true);
                     def file_name = file.name.toString();
-                    
+
                     f.icon = usersDir.absolutePath.replace(rootDir, "")+'/'+file_name;
                     f.save(flush:true);
                 }

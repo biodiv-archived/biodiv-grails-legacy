@@ -128,7 +128,6 @@ class GroupHandlerService {
                 } else {
                     taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
                 }
-                println taxonConcepts
                // TaxonomyDefinition.withNewTransaction {
                     taxonConcepts.each { taxonConceptRow ->
                         def taxonConcept = TaxonomyDefinition.get(taxonConceptRow.id);
@@ -273,7 +272,6 @@ class GroupHandlerService {
 		}
 		
 		speciesGroupMappings.each { mapping ->
-            println mapping
 			if((group.id.equals(mapping.speciesGroup.id))) {
                 //TODO:optimize following by having taxonids in speciesGroupMapping
                 taxons << TaxonomyDefinition.findByCanonicalFormAndRank(mapping.taxonName, mapping.rank);

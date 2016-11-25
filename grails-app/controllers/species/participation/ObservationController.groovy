@@ -346,7 +346,7 @@ class ObservationController extends AbstractObjectController {
         params.id = params.long('id');
         def msg;
         if(params.id) {
-//			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false, [fetch:['author':'eager', 'reprImage':'eager', 'maxVotedReco':'eager', 'maxVotedReco.taxonConcept':'eager', 'recommendationVote':'join', 'resource':'join'], lazy:['recommendationVote':'false', 'resource':'false']])
+            //			def observationInstance = Observation.findByIdAndIsDeleted(params.id, false, [fetch:['author':'eager', 'reprImage':'eager', 'maxVotedReco':'eager', 'maxVotedReco.taxonConcept':'eager', 'recommendationVote':'join', 'resource':'join'], lazy:['recommendationVote':'false', 'resource':'false']])
             def observationInstance;
             observationInstance = Observation.createCriteria().get {
                 and {
@@ -354,6 +354,7 @@ class ObservationController extends AbstractObjectController {
                     eq ('isDeleted', false)
                 }
             }
+
 
         def traitFactList = Fact.findAllByObjectId(observationInstance.id)
         def traitValueList = TraitValue.getAll();
@@ -372,60 +373,78 @@ class ObservationController extends AbstractObjectController {
         }
         if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
+
+            def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
+            def traitFactMap = [:]
+            factList.each { fact ->
+                if(!traitFactMap[fact.trait]) {
+                    traitFactMap[fact.trait] = [];
+                }
+                traitFactMap[fact.trait] << fact.traitValue
+            }
+            println factList
+            if (!observationInstance) {
+               msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
                 withFormat {
                     html {
-				        flash.message = model.msg;
-				        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                        flash.message = model.msg;
+                        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
                     }
                     json { render model as JSON }
                     xml { render model as XML }
                 }
-			}
-			else {
-    			if(observationInstance.instanceOf(Checklists)){
+            }
+            else {
+                if(observationInstance.instanceOf(Checklists)){
                     msg = messageSource.getMessage("default.checklist.id", [params.id] as Object[], RCU.getLocale(request))
                     def model = utilsService.getErrorModel(msg, null, OK.value());
                     withFormat {
                         html {
-					        redirect(controller:'checklist', action:'show', params: params)
+                            redirect(controller:'checklist', action:'show', params: params)
                         } 
                         json { render model as JSON }
                         xml { render model as XML }
                     }
-					return
-				}
+                    return
+                }
 
-				observationInstance.incrementPageVisit()
-				def userLanguage = utilsService.getCurrentLanguage(request);   
+                observationInstance.incrementPageVisit()
+                def userLanguage = utilsService.getCurrentLanguage(request);   
                 int pos = params.pos?params.int('pos'):0;
-				def prevNext = getPrevNextObservations(pos, params.webaddress);
+                def prevNext = getPrevNextObservations(pos, params.webaddress);
 
                 def model = utilsService.getSuccessModel("", observationInstance, OK.value());
                 withFormat {
                     html {
                         if(prevNext) {
+<<<<<<< HEAD
                             model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitFactMap]
                         } else {
                             model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitMap]
+=======
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitFactMap.keySet(), factInstanceList:traitFactMap]
+                        } else {
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitFactMap.keySet(), factInstanceList:traitFactMap]
+>>>>>>> 83b6fa59148aed6795fcd525cc468b92c7308126
                         }
                     } 
                     json  { render model as JSON }
                     xml { render model as JSON }
                 }
-			}
-		} else {
+            }
+        } else {
             msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
             def model = utilsService.getErrorModel(msg, null, OK.value());
             withFormat {
                 html {
-			        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+                    redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
             }
         }
-	}
+    }
 
 	/**
 	 * 
