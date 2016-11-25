@@ -17,36 +17,17 @@ instanceList.each{ iL ->
 		    <div class="filters">
             <g:each in="${instanceFieldList}" status="j" var="inst">                
                 <div class="sidebar_section">
-                <g:if test="${params.action=='show' || fromList}">
-                   <a class="speciesFieldHeader"  href="#trait${j}">
+                    <a class="speciesFieldHeader collapse"  data-toggle="collapse" href="#trait${j}">
                     	<h5>${inst.key}</h5>
                     </a>
-
-                    <ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
-				<g:each in="${inst.value}" status="i" var="instance">
-					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'observationInstance':observationInstance]"/>
-		<ul id="trait${j}" class="grid_view thumbnails obvListwrapper collapse">
-				<g:each in="${inst.value}" status="i" var="instance">
-					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, traitList:inst.value, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'fromObservationCreate':fromObservationCreate, 'fromObservationShow':fromObservationShow,  'observationInstance':observationInstance,displayAny:false]"/>
-					</li>
-				</g:each>
-			</ul>
-                </g:if>
-                <g:else>
-	              <a class="speciesFieldHeader collapse"  data-toggle="collapse" href="#trait${j}">
-                    	<h5>${inst.key}</h5>
-                   </a> 
-                 <ul id="trait${j}" class="grid_view thumbnails obvListwrapper collapse">
-				<g:each in="${inst.value}" status="i" var="instance">
-					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'observationInstance':observationInstance]"/>
-					</li>
-				</g:each>
-			</ul>               
-                </g:else>
-			</div>
+                    <ul id="trait${j}" class="grid_view thumbnails obvListwrapper collapse">
+                        <g:each in="${inst.value}" status="i" var="trait">
+                            <li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
+                            <g:render template="/trait/showTraitTemplate" model="['trait':trait, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'observationCreate':true, 'displayAny':displayAny]"/>
+                            </li>
+                        </g:each>
+                    </ul>
+			    </div>
 			</g:each>
 			</div>			
 		</div>
