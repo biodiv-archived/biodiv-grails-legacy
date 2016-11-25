@@ -299,8 +299,8 @@ class TraitService extends AbstractObjectService {
             Trait trait;
             try {
                 if(row[traitIdHeaderIndex]) {
-                    tarit = Trait.read(Long.parseLong(row[traitIdHeaderIndex]));
-                } else if(row[taxonIdHeaderIndex] && row[taxonIdHeaderIndex]!= '') {
+                    trait = Trait.read(Long.parseLong(row[traitIdHeaderIndex]));
+                } else if(taxonIdHeaderIndex != -1 && row[taxonIdHeaderIndex] && row[taxonIdHeaderIndex]!= '') {
                     List traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon.id = ?", [row[traitNameHeaderIndex], Long.parseLong(row[taxonIdHeaderIndex])]);
                     if(traits?.size() == 1)
                         trait = traits[0];
@@ -315,7 +315,7 @@ class TraitService extends AbstractObjectService {
                 e.printStackTrace();
             }
             if(!trait){
-                dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]}}", Level.ERROR);
+                dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]}", Level.ERROR);
                 row = reader.readNext();
                 continue;
             }

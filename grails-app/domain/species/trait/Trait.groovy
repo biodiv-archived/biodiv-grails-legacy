@@ -204,11 +204,20 @@ class Trait {
         }
 
         if(ibpParentTaxon) {
-            ibpParentTaxon.each { t ->
-                traits.each { trait ->
+            traits.each { trait ->
+                boolean s = false;
+                ibpParentTaxon.each { t ->
                     trait.taxon.each { taxon ->
-                        if(trait.taxon.id == t.id)
+                        println taxon.id
+                        if(taxon.id == t.id)
                             validTraits << trait;
+                        s = true
+                    }
+                }
+                if(!s) {
+                    if(!trait.taxon) {
+                        //Root level traits
+                        validTraits << trait;
                     }
                 }
             }

@@ -29,15 +29,11 @@ class FactController extends AbstractObjectController {
     def list() {
         //render (view:'list', model:['traitList' : traitService.listTraits(params)]);
         def model = [:];
-        model['factInstanceList'] = factService.list(params);
-        println "model============"+model
-        model['obvListHtml'] = g.render(template:"/fact/factListTemplate", model:model);
         model = utilsService.getSuccessModel('', null, 200, model);
 
         withFormat {
             html {
-                render(view:"list", model:model.model);
-
+                render(controller:'trait',view:"list", model:model.model);
             }
             json {
                 render model as JSON 
