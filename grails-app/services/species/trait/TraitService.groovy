@@ -66,7 +66,6 @@ class TraitService extends AbstractObjectService {
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
-        println headers;
         int traitNameHeaderIndex = -1;
         int taxonIdHeaderIndex = -1;
         int traitIdHeaderIndex = -1;
@@ -171,7 +170,6 @@ class TraitService extends AbstractObjectService {
                         //TODO: if taxon id is wrong catch exception/trow exception
                         trait.taxon?.clear();
                         taxons_scope.each { taxon_scope ->
-                            println "*****************************"
                             trait.addToTaxon(taxon_scope);
                         }
                         break;
@@ -500,7 +498,7 @@ class TraitService extends AbstractObjectService {
             if(taxon) {
                 queryParams['taxon'] = taxon.id;
                 activeFilters['taxon'] = taxon.id;
-                taxonQuery = " join obv.taxon taxon ";
+                taxonQuery = " left join obv.taxon taxon ";
                 query += taxonQuery;
 
                 def classification;
@@ -514,7 +512,7 @@ class TraitService extends AbstractObjectService {
                     queryParams['parentTaxon'] = parentTaxon 
                     activeFilters['classification'] = classification.id
 
-                    filterQuery += " and taxon.id in (:parentTaxon) ";
+                    filterQuery += " and taxon.id in (:parentTaxon) or taxon.id is null";
 
             }
         }
@@ -570,7 +568,6 @@ class TraitService extends AbstractObjectService {
                 traitValueInstance.errors.allErrors .each {
                     def formattedMessage = messageSource.getMessage(it, null);
                     errors << [field: it.field, message: formattedMessage]
-                    println "errors+++++++++==============="+errors
                 }
             }
         }
@@ -587,12 +584,11 @@ class TraitService extends AbstractObjectService {
         }
 
         resource = iconFile.absolutePath.replace(rootDir, "");
-        println "resource==================="+resource
         return resource;
     }
 
     def delete(params){
-        println "deleting trait "+params.id
+        log.debug "deleting trait "+params.id
         String messageCode;
         String url = utilsService.generateLink(params.controller, 'list', []);
         String label = Utils.getTitleCase(params.controller?:'trait')

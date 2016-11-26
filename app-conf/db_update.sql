@@ -674,7 +674,11 @@ ALTER TABLE suser ADD COLUMN longitude double precision;
 #21Sep2016
 alter table taxonomy_definition add column traits bigint[][];
 alter table taxonomy_definition alter column traits  type bigint[][] using traits::bigint[][];
-
+CREATE AGGREGATE array_agg_custom(anyarray)
+(
+        SFUNC = array_cat,
+            STYPE = anyarray
+        );
 update taxonomy_definition set traits = g.item from (
              select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
 ) g where g.page_taxon_id=id;

@@ -77,7 +77,6 @@ class TraitController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def edit() {
-        println "edit============================"
         def traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
         if (!traitInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
@@ -107,8 +106,6 @@ class TraitController extends AbstractObjectController {
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
-        println "SpeciesField==="+speciesField
-        println "recommendationInstance.taxonConcept+++"+recommendationInstance.taxonConcept
         traitInstance.taxon=recommendationInstance.taxonConcept
 
 
@@ -133,7 +130,6 @@ class TraitController extends AbstractObjectController {
             traitInstance.errors.allErrors .each {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
-                println "errors+++++++++==============="+errors
             }
 
             def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
@@ -285,7 +281,6 @@ class TraitController extends AbstractObjectController {
             traitValueInstance.value = params.value
             traitValueInstance.description = params.description
             traitValueInstance.source = params.source
-            println "params.icon+++++++++"+params.icon
             traitValueInstance.icon = traitService.getTraitIcon(params.icon)
         }
         else{
@@ -306,7 +301,6 @@ class TraitController extends AbstractObjectController {
             traitValueInstance.errors.allErrors .each {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
-                println "errors+++++++++==============="+errors
                 return
             }
         }
@@ -436,9 +430,7 @@ class TraitController extends AbstractObjectController {
     }
 
     def deleteValue(){
-        println "deleting Trait value"+params.id
         def traitValueInstance=TraitValue.findById(params.id);
-        println "traitValueInstance"+traitValueInstance
         traitValueInstance.isDeleted=true
         if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
             def msg = "Trait Value deleted Successfully"
@@ -450,7 +442,6 @@ class TraitController extends AbstractObjectController {
             traitValueInstance.errors.allErrors .each {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
-                println "errors+++++++++==============="+errors
                 return
             }
         }
