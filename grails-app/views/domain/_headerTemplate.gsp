@@ -303,7 +303,7 @@
           onclick="loadPages($(this).next('ul'), '${uGroup.createLink(controller:'newsletter', action:'listPage', 'userGroup':userGroupInstance)}','${pageURL}');return false;"
                                 href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages", 'userGroup':userGroupInstance)}"
                                 title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /><b class="caret"></b></a>
-            <ul class="dropdown-menu mega-menu pull-right" style="width:250px;">
+            <ul class="dropdown-menu mega-menu pull-right pageUL" style="width:250px;">
               
             </ul>
             <!-- dropdown-menu --> 
@@ -377,6 +377,7 @@ function loadPages(target,url,pageURL){
   if(countUGL != 0){
     return
   }
+  var parCnt = 0;  
 	$.ajax({
  		url: url,
  		type: 'POST',
@@ -388,10 +389,12 @@ function loadPages(target,url,pageURL){
 			$.each(data.newsletters,function(key,parENT){
 				
 				if(parENT.parentId == 0){
+          parCnt++;
 					ulLi += '<li class="mega-menu-column" style="width:250px;"><ul>';
 					ulLi += '<li class="nav-header ellipsis pagelist"><a href="'+pageURL+'/'+parENT.id+'" title="'+parENT.title+'" >'+parENT.title+'</li>';
-					$.each(data.newsletters,function(key,subparent){
-						if(subparent.parentId == parENT.id){					
+					$.each(data.newsletters,function(key,subparent){            
+						if(subparent.parentId == parENT.id){	
+              parCnt++;				
 							ulLi += '<li class="ellipsis"><a href="'+pageURL+'/'+subparent.id+'" title="'+subparent.title+'" >'+subparent.title+'</a></li>';							
 						}
 					});
@@ -400,6 +403,12 @@ function loadPages(target,url,pageURL){
 				}
 			
 			});
+
+      if(parCnt >15 && parCnt >20){
+        $('.pageUL').width(550);
+      }else if(parCnt 30 && parCnt >40){
+        $('.pageUL').width(820);
+      }
 			
 			target.html(ulLi);
 		/*			
