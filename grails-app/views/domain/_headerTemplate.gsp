@@ -289,11 +289,13 @@
             
           </li>
           <!-- /.dropdown -->
-          <% def pageURL
+          <% def pageURL,aboutURL
            if(userGroupInstance) {
               pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
+              aboutURL = "${uGroup.createLink(mapping:'userGroup', 'action':'about', 'userGroup':userGroupInstance)}";
              } else {
               pageURL = "/page";
+              aboutURL = "/theportal";
             }
           %>          
           <li class="dropdown ${(params.action == 'pages')?' active':''}"><a class="dropdown-toggle pageMenu" data-toggle="dropdown"
@@ -322,7 +324,7 @@
 				  		<a href="${uGroup.createLink(controller:'chart', 'userGroup':userGroupInstance)}" title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a> 
 				  </li>
 				  <li class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}">
-				  		<a href="/theportal" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a>
+				  		<a href="${aboutURL}" title="${g.message(code:'button.about.us')}" > <g:message code="button.about.us" /> </a>
 				  </li>	                  
                 </ul>
               </li>              
