@@ -14,30 +14,32 @@
 				displayAny = false
 			}
 	 %>
-	<g:if test="${fromList || params.action == 'show'}">
+ <% /*<g:if test="${fromList || params.action == 'show'}"> */ %>
 	<a href="${uGroup.createLink(action:'show', controller:'trait', id:trait.id)}"><h6>${trait.name}</h6></a>
   		<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue,'displayAny':displayAny]"/>
-	</g:if>
+<% /*</g:if> */%>
 
-   	<g:else>
+<% /*   	<g:else>
 		<a class="dropdown-toggle btn" data-toggle="dropdown">${trait.name} <b class="caret"></b></a>
 		<ul class="dropdown-menu" style="width:auto;overflow-x:hidden;overflow-y:auto;">
 			<li style="text-align:center;overflow-x:hidden; overflow-y:auto;">
 				<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue,'displayAny':displayAny, fromSpeciesShow:false]"/>
 			</li>
 		</ul>	
-	</g:else>
+	</g:else> */ %>
 </div>
 	<g:if test="${fromObservationShow=='show'}">
+	<div class="edit_btn"  style="position:absolute;float: right;right: 0px;top:2px;">
+	<a class="btn btn-small btn-primary editFact" data-id="${trait.id}" id="editFact_${trait.id}" style="float:right;display: block;">Edit</a>
+			<a class="btn btn-small btn-primary cancelFact" data-id="${trait.id}" id="cancelFact_${trait.id}" style="float:right;" >Cancel</a>
+			<input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" id="submitFact_${trait.id}" style="float:right;" value="Submit" />
+			</div>
 		<div id="editFactPanel_${trait.id}" class="editFactPanel trait">
 			<input id="traits_${trait.id}" name="traits" type="hidden"/>
 			<input id="observation" name="observation" type="hidden" value="${observationInstance.id}" />
 			<input id="facts" name="facts" type="hidden" value="${factInstance['fact']}"/>
 			<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':trait.values(),'displayAny':displayAny, fromSpeciesShow:false]"/>
 		</div>
-			<a class="btn btn-small btn-primary editFact" data-id="${trait.id}" id="editFact_${trait.id}" style="float:right;display: block;">Edit</a>
-			<a class="btn btn-small btn-primary cancelFact" data-id="${trait.id}" id="cancelFact_${trait.id}" style="float:right;" >Cancel</a>
-			<input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" id="submitFact_${trait.id}" style="float:right;" value="Submit" />
 	</g:if>
 
 <asset:script>
