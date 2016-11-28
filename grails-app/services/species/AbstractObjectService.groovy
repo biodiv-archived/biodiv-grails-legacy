@@ -367,6 +367,10 @@ class AbstractObjectService {
             case SUser.class.name:
             rootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
             break;
+
+            case TraitValue.name:
+            rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+            break;
         }
         converter.setResourcesRootDir(rootDir);
 

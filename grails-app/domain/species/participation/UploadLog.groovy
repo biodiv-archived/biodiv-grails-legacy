@@ -118,7 +118,7 @@ paramsMapAsText type:'text';
         }
     }
 
-    def writeLog(String content, Level level = Level.DEBUG) {
+    def writeLog = { String content, Level level=Level.DEBUG -> 
         if(!logFilePath){
             String contentRootDir = Holders.config.speciesPortal.content.rootDir;
             String tmpFileName = (new File(filePath)).getName()+".log";

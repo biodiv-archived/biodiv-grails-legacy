@@ -314,17 +314,9 @@ class ObservationService extends AbstractMetadataService {
                 }
 				
 				customFieldService.updateCustomFields(params, observationInstance.id)
-                println "--------------------";
-                println "--------------------";
-                println "--------------------";
-                println params;
                 def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
                 traitParams.putAll(getTraits(params.traits));
                 factService.updateFacts(traitParams, observationInstance);
-                println traitParams;
-                println "+++++++++++++++++++++++"
-                println "+++++++++++++++++++++++"
-                println "+++++++++++++++++++++++"
                 return utilsService.getSuccessModel('', observationInstance, OK.value())
             } else {
                 observationInstance.errors.allErrors.each { log.error it }

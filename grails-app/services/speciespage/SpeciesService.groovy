@@ -1277,7 +1277,6 @@ class SpeciesService extends AbstractObjectService  {
     }
     
     def deleteSynonym(SynonymsMerged oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
-       println oldSynonym; 
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
             messagesourcearg[0] = oldSynonym.id;
@@ -1636,7 +1635,6 @@ class SpeciesService extends AbstractObjectService  {
     * get species list query
     */
     def _getSpeciesListQuery(params) {
-        println "getMatchingSpeciesList+++++++"+params;
         params.startsWith = params.startsWith?:"A-Z"
 		params.isDeleted = params.isDeleted ?: "false"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
@@ -1901,7 +1899,6 @@ class SpeciesService extends AbstractObjectService  {
     private _getSpeciesList(params) {
         //cache "taxonomy_results"
         def queryParts = _getSpeciesListQuery(params)
-        println queryParts
         def hqlQuery = sessionFactory.currentSession.createSQLQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.countQuery)
         def hqlSpeciesCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.speciesCountQuery)
@@ -1923,7 +1920,6 @@ class SpeciesService extends AbstractObjectService  {
         def speciesInstanceList;// = hqlQuery.addEntity(Species.class).list();
         speciesInstanceList = hqlQuery.addEntity(Species.class).list();
         log.debug "Species list count query :${queryParts.countQuery} with params ${queryParams}"
-        println "Species list count query :${queryParts.countQuery} with params ${queryParams}"
         def rs = hqlCountQuery.list();
         def speciesCountWithContent = 0;
         int count = 0
@@ -2061,8 +2057,6 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
             int index = 0;
-            println "pullImage resources"
-            println resId
             resId.each {
                 def r = Resource.get(it.toLong())
                 println r
@@ -2079,7 +2073,6 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             if(params.resourceListType == "fromRelatedObv"){
-                println resId
                 resId.each{
                     def rid = it
                     def obv = Observation.withCriteria(){
@@ -2104,10 +2097,6 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
         }
-        println "------------------------------------------"
-        println "------------------------------------------"
-        println "------------------------------------------"
-        println resources
         //species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
@@ -2120,10 +2109,6 @@ class SpeciesService extends AbstractObjectService  {
             }
             species.addToResources(resource);
         }
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println resources;
         //species.merge();
         if(resources.size() > 0) {
             if(species.instanceOf(Species)) {

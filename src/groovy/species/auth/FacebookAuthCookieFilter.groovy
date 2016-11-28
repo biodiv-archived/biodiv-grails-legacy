@@ -66,19 +66,19 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
         HttpServletResponse response = servletResponse
         String url = request.requestURI.substring(request.contextPath.length())
         logger.debug("Processing url: $url with params : ${request.getParameterMap()} with method : ${request.getMethod()}")
-        logger.debug("SecurityContext authentication : ${SecurityContextHolder.context.authentication }");
+        //logger.debug("SecurityContext authentication : ${SecurityContextHolder.context.authentication }");
         if (url != logoutUrl && SecurityContextHolder.context.authentication == null) {
-            logger.debug("Applying facebook auth filter")
+            //logger.debug("Applying facebook auth filter")
             assert facebookAuthUtils != null
             Cookie cookie = facebookAuthUtils.getAuthCookie(request)
             Cookie fbLoginCookie = facebookAuthUtils.getFBLoginCookie(request);
             if (cookie != null && fbLoginCookie != null) {
-                logger.debug("Found fbsr & fb_login cookie");
+                //logger.debug("Found fbsr & fb_login cookie");
                 FacebookAuthToken token;
                 try {
                     token = facebookAuthUtils.build(cookie.value)
                     if (token != null) {
-                        logger.debug("Got fbAuthToken $token");
+                        //logger.debug("Got fbAuthToken $token");
                         token.user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
                         Authentication authentication = null
                         authentication = authenticationManager.authenticate(token);
@@ -94,8 +94,8 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                             }
 
                             if (logger.isDebugEnabled()) {
-                                logger.debug("SecurityContextHolder populated with FacebookAuthToken: '"
-                                + SecurityContextHolder.context.authentication + "'");
+                                //logger.debug("SecurityContextHolder populated with FacebookAuthToken: '"
+                                //+ SecurityContextHolder.context.authentication + "'");
                             }
                             try {
                                 chain.doFilter(request, response);
@@ -131,10 +131,10 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                 }
             } else {
                 if(!cookie) {
-                    logger.debug("No auth cookie");
+                    //logger.debug("No auth cookie");
                 }
                 if(!fbLoginCookie) {
-                    logger.debug("No fb_login cookie");
+                    //logger.debug("No fb_login cookie");
                 }
                 //				logger.debug("Found following cookies");
                 //				request.cookies.each { logger.debug it.name+":"+it.value }

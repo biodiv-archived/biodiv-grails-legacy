@@ -42,6 +42,7 @@ class FactService extends AbstractObjectService {
 
         SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each { m ->
 
+            dl.writeLog("Loading facts ${m}");
             if(!m['taxonid']) {
                 writeLog("Finding species from species name ${m['name']}");
                 m['taxonid'] = findSpeciesIdFromName(m['name'])?.taxonConcept?.id;
@@ -49,23 +50,23 @@ class FactService extends AbstractObjectService {
 
             TaxonomyDefinition pageTaxon = m['taxonid'] ? TaxonomyDefinition.findById(Long.parseLong(m['taxonid'].trim())) : null;
             if(!pageTaxon) {
-                writeLog("Not a valid taxon ${m['taxonid']}", Level.ERROR);
+                dl.writeLog("Not a valid taxon ${m['taxonid']}", Level.ERROR);
                 return;
             }
 
             Species species = pageTaxon.createSpeciesStub();
-            if(updateFact(m, species, dl)) {
+            if(updateFacts(m, species, dl)) {
                 noOfFactsLoaded++;
             }
         }
         if(noOfFactsLoaded) {
             Sql sql = Sql.newInstance(dataSource);
             println sql.executeUpdate("""
-                update taxonomy_definition set traits = g.item from (
-             select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
-) g where g.page_taxon_id=id;
-""");
-        
+            update taxonomy_definition set traits = g.item from (
+                select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
+            ) g where g.page_taxon_id=id;
+            """);
+
         }
         dl.writeLog("Successfully added ${noOfFactsLoaded} facts");
         return ['success':true, 'msg':"Loaded ${noOfFactsLoaded} facts."];
@@ -123,8 +124,8 @@ class FactService extends AbstractObjectService {
                         switch(object.class.getCanonicalName()) {
                             case 'species.Species': 
                             pageTaxon = object.taxonConcept;
-                            //TODO: validate if this trait can be given to this pageTaxon as per traits taxon scope
                             if(pageTaxon) {
+                                writeLog("validate if this trait ${key} can be given to this pageTaxon ${pageTaxon} as per traits taxon scope");
                                 trait = Trait.getValidTrait(key, pageTaxon);
                             }
                             break;
