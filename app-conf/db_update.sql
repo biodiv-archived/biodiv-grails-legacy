@@ -729,3 +729,27 @@ alter table trait add column is_participatory boolean default 't';
 insert into trait_taxonomy_definition(trait_taxon_id,taxonomy_definition_id)  select id, taxon_id from trait;
 alter table trait alter column taxon_id drop not null;
 alter table trait drop column taxon_id;
+
+
+#27/11 custom fields migration sqls
+delete from custom_field where id not in (5,6);
+select * from custom_fields_group_18 where cf_4 is not null and cf_4 != '';
+alter table custom_fields_group_18 drop column cf_4;
+select * from custom_fields_group_13 where cf_1 is not null and cf_1 != '';
+drop table custom_fields_group_13;
+select * from custom_fields_group_30 where cf_7 is not null and cf_7 != '';
+drop table custom_fields_group_30;
+select * from custom_fields_group_33 where cf_9 is not null and cf_9 != '';
+select * from custom_fields_group_33 where cf_10 is not null and cf_10 != '';
+select * from custom_fields_group_33 where cf_11 is not null and cf_11 != '';
+drop table custom_fields_group_33;
+select * from custom_fields_group_38 where cf_8 is not null and cf_8 != '';
+drop table custom_fields_group_38;
+select * from custom_fields_group_7 where cf_2 is not null and cf_2 != '';
+select * from custom_fields_group_7 where cf_3 is not null and cf_3 != '';
+drop table custom_fields_group_7;
+
+select id from field where concept='Natural History' and category='Reproduction';
+update trait set field_id=39 where name='Sex';
+
+

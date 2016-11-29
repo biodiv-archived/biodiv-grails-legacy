@@ -3,7 +3,7 @@
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <html>
     <head>
-        <g:set var="title" value="${g.message(code:'facts.label')}"/>
+        <g:set var="title" value="${g.message(code:'traits.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
 	        .super-section{background-color:white;}

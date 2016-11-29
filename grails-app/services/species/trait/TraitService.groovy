@@ -399,7 +399,10 @@ class TraitService extends AbstractObjectService {
         }
 
         hqlQuery.setProperties(queryParts.queryParams);
-        def instanceList = hqlQuery.list();
+        def instanceList;
+        utilsService.logSql {
+        instanceList = hqlQuery.list();
+        }
 
         allInstanceCountQuery.setProperties(queryParts.queryParams)
         allInstanceCount = allInstanceCountQuery.list()[0]
@@ -416,6 +419,7 @@ class TraitService extends AbstractObjectService {
 
         String query = "select "
         String taxonQuery = '';
+        String groupByQuery = '';
 
         def orderByClause = params.sort ? "  obv." + params.sort +  " desc, obv.id asc": " obv.id asc"
 
@@ -482,17 +486,19 @@ class TraitService extends AbstractObjectService {
                             classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
                 List parentTaxon = [];
                 taxons.each {taxon ->
-                    parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                    //parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
                 }
-                queryParams['classification'] = classification.id 
-                    queryParams['sGroup'] = params.sGroup 
-                    queryParams['parentTaxon'] = parentTaxon 
-                    activeFilters['classification'] = classification.id
-                    activeFilters['sGroup'] = params.sGroup
+                queryParams['classification'] = classification.id; 
+                queryParams['sGroup'] = params.sGroup;
+                queryParams['parentTaxon'] = parentTaxon ;
+                queryParams['taxons'] = taxons;
+                activeFilters['classification'] = classification.id;
+                activeFilters['sGroup'] = params.sGroup;
 
-                    taxonQuery = " join obv.taxon taxon ";
+                taxonQuery = " join obv.taxon taxon join taxon.hierarchies as reg ";
                 query += taxonQuery;
-                filterQuery += " and taxon.id in (:parentTaxon) ";
+                filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_'||taxon.id||'!_%' escape '!' or reg.path like taxon.id||'!_%'  escape '!' or reg.path like '%!_' || taxon.id escape '!') ";
+                groupByQuery = " group by obv ";
             }
         }
 
@@ -535,8 +541,7 @@ class TraitService extends AbstractObjectService {
         def allInstanceCountQuery = "select count(*) from Trait obv " +taxonQuery+" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 
         orderByClause = " order by " + orderByClause;
-
-        return [query:query, allInstanceCountQuery:allInstanceCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+        return [query:query, allInstanceCountQuery:allInstanceCountQuery, filterQuery:filterQuery+groupByQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 

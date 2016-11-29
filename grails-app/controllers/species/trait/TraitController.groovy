@@ -200,7 +200,7 @@ class TraitController extends AbstractObjectController {
 
     def show() {
         Trait traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
-        List<TaxonomyDefinition> coverage = traitInstance.taxon
+        def coverage = traitInstance.taxon
         def traitValue = [];
         Field field;
         traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
