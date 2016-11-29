@@ -2484,12 +2484,16 @@ def checking(){
             } else
                 imagePath = mainImage?mainImage.thumbnailUrl():null;
 
+            def traitIcons = [];
+            factInstance?.traitValue.each{tv ->
+                traitIcons << tv.mainImage()?.fileName
+            }
 
             if(params.downloadFrom == 'matchingSpecies') {
                 //HACK: request not available as its from job scheduler
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath, factInstance?.traitValue?.icon]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath, traitIcons]
             } else {
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, factInstance?.traitValue?.icon]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons]
             }
         }
         println "matching species list++++++++++++++++++++++++++++++++++++"+matchingSpeciesList
