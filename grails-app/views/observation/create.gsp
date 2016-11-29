@@ -169,7 +169,8 @@ $(document).ready(function(){
     $('#speciesGroupFilter button').click(function(){
         updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
     });
-//        updateGallery('/trait/list', -1, 0, undefined, true);
+
+        updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
     
     $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
         if($(this).hasClass('active')){
