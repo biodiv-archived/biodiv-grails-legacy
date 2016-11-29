@@ -1,13 +1,16 @@
 <style>
-.collapse{height:opx;}
+.sidebar_section{margin-bottom:0px;}
 </style>
 <% 
+def ref=[];
 def instanceFieldList=[:]
 instanceList.each{ iL ->
-    if(!instanceFieldList[iL.field]) {
-        instanceFieldList[iL.field] = []
+    if(ref.contains(iL.field)){           
+        instanceFieldList[iL.field] << iL
+    }else{
+        ref << iL.field
+        instanceFieldList[iL.field] = [iL]
     }
-    instanceFieldList[iL.field] << iL
 }
 %>                   
 
@@ -17,29 +20,30 @@ instanceList.each{ iL ->
 		    <div class="filters">
             <g:each in="${instanceFieldList}" status="j" var="inst">                
                 <div class="sidebar_section">
-                    <a class="speciesFieldHeader collapse"  data-toggle="collapse" href="#trait${j}">
+	              <a class="speciesFieldHeader"  data-toggle="collapse" href="#trait${j}">
                     	<h5>${inst.key}</h5>
-                    </a>
-                    <ul id="trait${j}" class="grid_view thumbnails obvListwrapper collapse">
-                        <g:each in="${inst.value}" status="i" var="trait">
-                            <li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                            <g:render template="/trait/showTraitTemplate" model="['trait':trait, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'observationCreate':true, 'displayAny':displayAny]"/>
-                            </li>
-                        </g:each>
-                    </ul>
-			    </div>
+                   </a> 
+                 <ul id="trait${j}" class="grid_view thumbnails obvListwrapper}">
+				<g:each in="${inst.value}" status="i" var="instance">
+					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
+                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'observationInstance':observationInstance]"/>
+					</li>
+				</g:each>
+			</ul>               
+			</div>
 			</g:each>
 			</div>			
 		</div>
 	</div>
-    <g:if test="${instanceTotal > (queryParams?.max?:0)}">
+        
+<% /*    <g:if test="${instanceTotal > (queryParams?.max?:0)}">
 		<div class="centered">
 			<div class="btn loadMore">
 				<span class="progress" style="display: none;"><g:message code="msg.loading" /></span> <span
 					class="buttonTitle"><g:message code="msg.load.more" /></span>
 			</div>
 		</div>
-	</g:if>
+	</g:if>*/ %>
 	
 	<%
 		activeFilters?.loadMore = true

@@ -50,6 +50,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import species.SpeciesPermission.PermissionType;
 import org.hibernate.FetchMode;
 import species.trait.Fact;
+import species.trait.TraitValue;
 
 class ObservationController extends AbstractObjectController {
     
@@ -356,6 +357,8 @@ class ObservationController extends AbstractObjectController {
             }
 
             def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
+            def valueList = TraitValue.getAll();
+            def traitList = (factList.trait + valueList.trait)
             def traitFactMap = [:]
             factList.each { fact ->
                 if(!traitFactMap[fact.trait]) {
@@ -399,9 +402,9 @@ class ObservationController extends AbstractObjectController {
                 withFormat {
                     html {
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitFactMap.keySet(), factInstanceList:traitFactMap]
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitFactMap]
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitFactMap.keySet(), factInstanceList:traitFactMap]
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap]
                         }
                     } 
                     json  { render model as JSON }
@@ -1972,6 +1975,11 @@ private printCacheEntries(cache) {
             }
         }
     }
-
+    
+    boolean updateFact(){
+        println "updateFactParams--------"+params
+        def factUpdate = observationService.factUpdate(params);
+        return factUpdate;
+    }
 
 }
