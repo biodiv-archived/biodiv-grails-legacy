@@ -29,7 +29,7 @@
 	</g:else> */ %>
 </div>
 	<g:if test="${fromObservationShow=='show'}">
-	<div class="edit_btn"  style="position:absolute;float: right;right: 0px;top:2px;">
+	<div id="edit_btn_${trait.id}"  style="position:absolute;float: right;right: 0px;top:2px;">
 	<a class="btn btn-small btn-primary editFact" data-id="${trait.id}" id="editFact_${trait.id}" style="float:right;display: block;">Edit</a>
 			<a class="btn btn-small btn-primary cancelFact" data-id="${trait.id}" id="cancelFact_${trait.id}" style="float:right;" >Cancel</a>
 			<input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" id="submitFact_${trait.id}" style="float:right;" value="Submit" />
@@ -55,6 +55,7 @@
 	$('#submitFact_'+id).show();
 	$('#cancelFact_'+id).show();
 	$('#trait_'+id).hide();
+	$('#edit_btn_'+id).css("position","");
 	$(this).hide();
 	});
 
@@ -107,6 +108,7 @@
 		$(this).hide();
 		$('#cancelFact_'+id).hide();
 		$('#editFact_'+id).show();
+		$('#edit_btn_'+id).css("position","absolute");
 		//updateGallery();
 	});
 		$(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
