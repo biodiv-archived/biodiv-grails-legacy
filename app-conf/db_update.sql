@@ -722,6 +722,7 @@ alter table fact alter column page_taxon_id drop not null;
 
 #16thNov2016
 alter table trait add column is_not_observation_trait boolean default 'f';
+alter table trait add column show_in_observation boolean default 'f';
 alter table trait add column is_participatory boolean default 't';
 
 #21stNov2016

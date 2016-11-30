@@ -13,6 +13,7 @@
   width: auto;
   border-radius: 0;
   margin-top: 0px;
+  position: absolute;
 }
 
 .contributeButton{

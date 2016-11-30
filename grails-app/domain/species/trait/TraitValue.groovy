@@ -36,7 +36,7 @@ class TraitValue {
 
 	Resource icon(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon)).exists()
-		if(!iconPresent) {
+		if(!iconPresent && !this.icon) {
             log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
@@ -59,7 +59,7 @@ class TraitValue {
         def originalFileExt = (this.icon && lastIndex != -1) ? this.icon.substring(lastIndex, this.icon.length()):null;
 
         if(!defaultFileType && !originalFileExt) defaultFileType = originalFileExt;
-        println "-----------------------------"+defaultFileType;
+        
         isFilePresent = ImageUtils.getFileName(this.icon, imageType, defaultFileType)
         boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+isFilePresent)).exists()
         if(!iconPresent) {

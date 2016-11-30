@@ -36,6 +36,9 @@ import species.trait.TraitValue;
 import species.utils.Utils;
 import species.groups.SpeciesGroup;
 import species.TaxonomyDefinition;
+import species.utils.ImageUtils;
+import species.utils.ImageType;
+
 
 class TraitService extends AbstractObjectService {
 
@@ -163,7 +166,7 @@ class TraitService extends AbstractObjectService {
                         break;
 
                         case 'trait icon' : 
-                        trait.icon = row[index].trim();
+                        trait.icon = migarteIcons(row[index].trim());
                         break;
 
                         case 'taxonid':
@@ -649,5 +652,24 @@ class TraitService extends AbstractObjectService {
         String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
 
         return [success:success, url:url, msg:message, errors:errors]
+    }
+
+
+    def migarteIcons(icon){
+        def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+        File usersDir;
+        usersDir = new File(rootDir);
+        if(!usersDir.exists()) {
+            usersDir.mkdir();
+        }
+        usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
+        usersDir.mkdirs();
+        File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(icon));
+        File fi = new File(grailsApplication.config.speciesPortal.content.rootDir +"/trait/"+icon);
+        (new AntBuilder()).copy(file: fi, tofile: file)
+        ImageUtils.createScaledImages(file, usersDir,true);
+        def file_name = file.name.toString();
+        return usersDir.absolutePath.replace(rootDir, "")+'/'+file_name;
+
     }
 }
