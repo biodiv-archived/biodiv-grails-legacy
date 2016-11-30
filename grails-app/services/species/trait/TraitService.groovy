@@ -483,18 +483,20 @@ class TraitService extends AbstractObjectService {
                             classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
                 List parentTaxon = [];
                 taxons.each {taxon ->
-                    //parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                    if(taxon) {
+                    parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                    }
                 }
                 queryParams['classification'] = classification.id; 
                 queryParams['sGroup'] = params.sGroup;
                 queryParams['parentTaxon'] = parentTaxon ;
-                queryParams['taxons'] = taxons;
+                //queryParams['taxons'] = taxons;
                 activeFilters['classification'] = classification.id;
                 activeFilters['sGroup'] = params.sGroup;
 
-                taxonQuery = " join obv.taxon taxon join taxon.hierarchies as reg ";
+                taxonQuery = " join obv.taxon taxon join taxon.hierarchies as reg, SpeciesGroupMapping sgm ";
                 query += taxonQuery;
-                filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_'||taxon.id||'!_%' escape '!' or reg.path like taxon.id||'!_%'  escape '!' or reg.path like '%!_' || taxon.id escape '!') ";
+                filterQuery += " and reg.classification.id = :classification and (taxon.id in (:parentTaxon) or (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!')) and sgm.speciesGroup.id = :sGroup ";
                 groupByQuery = " group by obv ";
             }
         }
