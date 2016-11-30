@@ -360,12 +360,17 @@ class ObservationController extends AbstractObjectController {
             def valueList = TraitValue.getAll();
             def traitList = (factList.trait + valueList.trait)
             def traitFactMap = [:]
+            def conRef = []
             factList.each { fact ->
-                if(!traitFactMap[fact.trait]) {
-                    traitFactMap[fact.trait] = [];
-                }
+            if(conRef.contains(fact.trait)){                           
                 traitFactMap[fact.trait] << fact.traitValue
-            }
+                traitFactMap['fact'] << fact.id
+            }else{
+                traitFactMap[fact.trait] = [fact.traitValue]
+                traitFactMap['fact'] = fact.id
+                conRef << fact.trait
+            }           
+        }
             println factList
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -404,7 +409,7 @@ class ObservationController extends AbstractObjectController {
                         if(prevNext) {
                             model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitFactMap]
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap]
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitFactMap]
                         }
                     } 
                     json  { render model as JSON }

@@ -1,5 +1,7 @@
 <style>
 .dropdown-menu{position:relative;float:none;width:auto;}
+.tooltip{position:fixed; z-index:9999999999;}
+
 </style>
 <div class="trait" id="trait_${trait.id}" data-toggle="buttons-radio">
 	<%
@@ -15,7 +17,8 @@
 			}
 	 %>
  <% /*<g:if test="${fromList || params.action == 'show'}"> */ %>
-	<a href="${uGroup.createLink(action:'show', controller:'trait', id:trait.id)}"><h6>${trait.name}</h6></a>
+	<a href="${uGroup.createLink(action:'show', controller:'trait', id:trait.id)}"><h6>${trait.name}</h6>	<i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${trait.description}"></i></a>
+
   		<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue,'displayAny':displayAny]"/>
 <% /*</g:if> */%>
 
@@ -35,21 +38,27 @@
 			<input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" id="submitFact_${trait.id}" style="float:right;" value="Submit" />
 			</div>
 		<div id="editFactPanel_${trait.id}" class="editFactPanel trait">
-			<input id="traits_${trait.id}" name="traits" type="hidden"/>
+			<input id="traits_${trait.id}" name="traits" class="trait" data-id="${trait.id}" type="hidden"/>
 			<input id="observation" name="observation" type="hidden" value="${observationInstance.id}" />
 			<input id="facts" name="facts" type="hidden" value="${factInstance['fact']}"/>
-			<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':trait.values(),'displayAny':displayAny, fromSpeciesShow:false]"/>
+			<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':trait.values(),'factInstance':factInstance[trait], 'displayAny':displayAny, fromSpeciesShow:false]"/>
 		</div>
 	</g:if>
 
 <asset:script>
 	$(document).ready(function(){
-		var id;
+	$('.icon-question-sign').tooltip();
+	var id=${trait.id};
+	/*if( == $('#editFactPanel_'+id '#value_btn_'+id).attr('data-tvid'))
+	{
+		$('#value_btn_'+id).addClass('active');
+	}*/
 	$('.editFactPanel').hide();
 	$('.submitFact').hide();
 	$('.cancelFact').hide();
 
 	$('.editFact').click(function(){
+		console.log("editclicked");
 	id=$(this).data("id")
 	$('#editFactPanel_'+id).show();
 	$('#submitFact_'+id).show();
@@ -66,9 +75,10 @@
 	$('#cancelFact_'+id).hide();
 	$('#editFact_'+id).show();
 	$('#trait_'+id).show();
+	$('#edit_btn_'+id).css("position","absolute");
 	});
 
-	$('.submitFact').click(function(){
+	$('#submitFact_'+id).live ('click', function (){
 		id=$(this).data("id")
 		var hbt = '',trait='',value='', selTrait={}; 
 		var selectTrait;

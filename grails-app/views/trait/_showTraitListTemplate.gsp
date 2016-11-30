@@ -20,9 +20,11 @@ instanceList.each{ iL ->
 		    <div class="filters">
             <g:each in="${instanceFieldList}" status="j" var="inst">                
                 <div class="sidebar_section">
+                <g:if test="${fromObservationShow!='show'}">
 	              <a class="speciesFieldHeader"  data-toggle="collapse" href="#trait${j}">
                     	<h5>${inst.key}</h5>
                    </a> 
+                   </g:if>
                  <ul id="trait${j}" class="grid_view thumbnails obvListwrapper}">
 				<g:each in="${inst.value}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
