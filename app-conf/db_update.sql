@@ -752,4 +752,4 @@ drop table custom_fields_group_7;
 select id from field where concept='Natural History' and category='Reproduction';
 update trait set field_id=39 where name='Sex';
 
-
+update species_group_mapping set taxon_concept_id = g.id from (select id,name from taxonomy_definition t ) as g where  g.name = taxon_name;

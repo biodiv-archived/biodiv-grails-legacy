@@ -43,7 +43,6 @@ import species.utils.ImageType;
 class TraitService extends AbstractObjectService {
 
     static transactional=false;
-
     Map upload(String file, Map params, UploadLog dl) {
         //def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
         Language languageInstance = utilsService.getCurrentLanguage();
@@ -414,6 +413,10 @@ class TraitService extends AbstractObjectService {
 
     def getFilterQuery(params) {
 
+        def allSGroupId = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
+        def othersSGroupId = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).id
+
+
         Map queryParams = [isDeleted : false]
         Map activeFilters = [:]
 
@@ -486,18 +489,33 @@ class TraitService extends AbstractObjectService {
                             classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
                 List parentTaxon = [];
                 taxons.each {taxon ->
-                    //parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                    if(taxon) {
+                    parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                    }
                 }
                 queryParams['classification'] = classification.id; 
                 queryParams['sGroup'] = params.sGroup;
                 queryParams['parentTaxon'] = parentTaxon ;
-                queryParams['taxons'] = taxons;
+                //queryParams['taxons'] = taxons;
                 activeFilters['classification'] = classification.id;
                 activeFilters['sGroup'] = params.sGroup;
 
-                taxonQuery = " join obv.taxon taxon join taxon.hierarchies as reg ";
+                filterQuery += ' and obv.showInObservation = :showInObservation '
+                queryParams['showInObservation'] = true ;
+ 
+                taxonQuery = " left join obv.taxon taxon left join taxon.hierarchies as reg, SpeciesGroupMapping sgm ";
                 query += taxonQuery;
-                filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_'||taxon.id||'!_%' escape '!' or reg.path like taxon.id||'!_%'  escape '!' or reg.path like '%!_' || taxon.id escape '!') ";
+                String inQuery = '';
+                if(params.sGroup == othersSGroupId) {
+                    filterQuery += " and taxon is null  ";
+                } else if(params.sGroup == allSGroupId) {
+                    filterQuery += " ";// and reg.classification.id = :classification and ( ${inQuery} ) and taxon is null  ";
+                } else if(parentTaxon) {
+                    inQuery = " taxon.id in (:parentTaxon) or " 
+                    filterQuery += " and taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id = :sGroup ";
+                }
+
+
                 groupByQuery = " group by obv ";
             }
         }
