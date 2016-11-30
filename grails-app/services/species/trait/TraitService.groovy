@@ -500,6 +500,9 @@ class TraitService extends AbstractObjectService {
                 activeFilters['classification'] = classification.id;
                 activeFilters['sGroup'] = params.sGroup;
 
+                filterQuery += ' and obv.showInObservation = :showInObservation '
+                queryParams['showInObservation'] = true ;
+ 
                 taxonQuery = " left join obv.taxon taxon left join taxon.hierarchies as reg, SpeciesGroupMapping sgm ";
                 query += taxonQuery;
                 String inQuery = '';
@@ -511,7 +514,8 @@ class TraitService extends AbstractObjectService {
                     inQuery = " taxon.id in (:parentTaxon) or " 
                     filterQuery += " and taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id = :sGroup ";
                 }
- 
+
+
                 groupByQuery = " group by obv ";
             }
         }
