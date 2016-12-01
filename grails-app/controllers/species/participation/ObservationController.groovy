@@ -357,20 +357,19 @@ class ObservationController extends AbstractObjectController {
             }
 
             def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
-            def valueList = TraitValue.getAll();
-            def traitList = (factList.trait + valueList.trait)
+            def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
+            //def valueList = TraitValue.getAll();
+            //def traitList = (factList.trait + valueList.trait)
             def traitFactMap = [:]
-            def conRef = []
+            //def conRef = []
             factList.each { fact ->
-            if(conRef.contains(fact.trait)){                           
-                traitFactMap[fact.trait] << fact.traitValue
-                traitFactMap['fact'] << fact.id
-            }else{
-                traitFactMap[fact.trait] = [fact.traitValue]
-                traitFactMap['fact'] = fact.id
-                conRef << fact.trait
-            }           
-        }
+                    if(!traitFactMap[fact.trait]) {
+                        traitFactMap[fact.trait.id] = []
+                        traitFactMap['fact'] = []
+                    }
+                    traitFactMap[fact.trait.id] << fact.traitValue
+                    traitFactMap['fact'] << fact.id
+            }
             println factList
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -405,11 +404,11 @@ class ObservationController extends AbstractObjectController {
 
                 def model = utilsService.getSuccessModel("", observationInstance, OK.value());
                 withFormat {
-                    html {
+                    html { 
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitFactMap]
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap]
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList.unique(), factInstanceList:traitFactMap]
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap]
                         }
                     } 
                     json  { render model as JSON }

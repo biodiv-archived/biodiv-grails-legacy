@@ -8,7 +8,7 @@
 		def traitValue
 		def displayAny
 			if(fromSpeciesShow){
-				traitValue = factInstance[trait]
+				traitValue = factInstance[trait.id]
 				displayAny = true
 			}
 			else{
@@ -41,7 +41,7 @@
 			<input id="traits_${trait.id}" name="traits" class="trait" data-id="${trait.id}" type="hidden"/>
 			<input id="observation" name="observation" type="hidden" value="${observationInstance.id}" />
 			<input id="facts" name="facts" type="hidden" value="${factInstance['fact']}"/>
-			<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':trait.values(),'factInstance':factInstance[trait], 'displayAny':displayAny, fromSpeciesShow:false]"/>
+			<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':trait.values(),'factInstance':factInstance[trait.id], 'displayAny':displayAny, fromSpeciesShow:false]"/>
 		</div>
 	</g:if>
 
