@@ -33,7 +33,7 @@
                     </div>
                 </div>
             </div>
-            <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow-y: scroll;overflow-x: hidden;">
+            <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow-y: scroll;overflow:visible;">
                 <g:render template="showTraitListTemplate" model="['displayAny':true]"/>
             </div>
         </div>
