@@ -76,7 +76,7 @@
  
 				<g:render template="customFieldsForm" model="['observationInstance':observationInstance, 'userGroupInstance':userGroupInstance]"/>
                 
-                <div class="span12 super-section"  style="clear: both">
+                <div class="span12 super-section"  style="clear: both;height:500px;overflow-x:hidden;">
                 <h3>Traits</h3>
                 <input id="traits" name="traits" type="hidden" value=""/>
                 <% def emptyTraitListInitializer = ['instanceList':[], 'count':0, 'fromObservationCreate':true];

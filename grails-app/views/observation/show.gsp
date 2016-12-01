@@ -165,7 +165,18 @@ if(r) {
                         </div>
                         
                                             </div>
-                                                                                       
+
+                    <g:if  test="${traitInstanceList}">
+                    <div class="sidebar_section">
+                        <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
+                        <div class="sidebar_section pre-scrollable" style="height:419px;overflow-x:hidden;">
+                            <div id="traits" class="trait">
+                                <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'fromObservationShow': 'show', 'fromSpeciesShow':true, 'instance':observationInstance, displayAny:false, editable:true]"/>
+                            </div>
+                        </div>
+                        </div>
+                    </g:if>
+                                                                                      
                     <uGroup:objectPostToGroupsWrapper 
                         model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
 
@@ -180,15 +191,6 @@ if(r) {
                             </div>
                         </div>  
                         </g:if>
-
-                    <g:if  test="${traitInstanceList}">
-                        <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
-                        <div class="sidebar_section pre-scrollable" style="height:419px;overflow-x:hidden;">
-                            <div id="traits" class="trait">
-                                <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'fromObservationShow': 'show', 'fromSpeciesShow':true, 'instance':observationInstance, displayAny:false, editable:true]"/>
-                            </div>
-                        </div>
-                    </g:if>
                     
                         <div class="union-comment">
                     <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />

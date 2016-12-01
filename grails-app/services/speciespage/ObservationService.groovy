@@ -2944,7 +2944,6 @@ class ObservationService extends AbstractMetadataService {
                     return true;
                 }
                // factService.updateFacts(traitParams, observationInstance);
-
     }
 */
 }
