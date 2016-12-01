@@ -170,15 +170,20 @@ $(document).ready(function(){
         updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
     });
 
-        updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
+    updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
     
     $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
-        if($(this).hasClass('active')){
-        return false;
-        }
-        $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-        $(this).addClass('active btn-success');
-       return false;
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('active')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else {
+                $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+                $(this).addClass('active btn-success');
+            }
+      return false;
     });
 });
 

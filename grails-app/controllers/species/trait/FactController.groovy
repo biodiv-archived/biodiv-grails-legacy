@@ -48,39 +48,79 @@ class FactController extends AbstractObjectController {
         render(view:'show', model:factService.show(params.id))
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
     def save() {
-        params.locale_language = utilsService.getCurrentLanguage(request);
-        def result = factService.save(params)
-        if(result.success){
-            withFormat {
-                html {
-                    redirect(controller:'species', action: "facts")
-                }
-                json {
-                    render result as JSON 
-                }
-                xml {
-                    render result as XML
-                }
-            }
+        if(request.method == 'POST') {
+            //TODO:edit also calls here...handle that wrt other domain objects
+            saveAndRender(params, false)
         } else {
+            msg = "Method Not Allowed"
+            def model = utilsService.getErrorModel(msg, null, METHOD_NOT_ALLOWED.value());
             withFormat {
                 html {
-                    //flash.message = "${message(code: 'error')}";
-                    render(controller:'species', view: "uploadFacts", model: [])
+                    flash.message = msg;
+                    redirect (url:uGroup.createLink(action:'create', controller:"fact", 'userGroupWebaddress':params.webaddress))
                 }
-                json {
-                    result.remove('instance');
-                    render result as JSON 
-                }
-                xml {
-                    result.remove('instance');
-                    render result as XML
-                }
+                json { render model as JSON }
+                xml { render model as XML }
             }
         }
     }
+
+    @Secured(['ROLE_USER'])
+    def flagDeleted() {
+        def result = factService.delete(params)
+        result.remove('url')
+        String url = result.url;
+        withFormat {
+            html {
+                flash.message = result.message
+                redirect (url:url)
+            }
+            json { render result as JSON }
+            xml { render result as XML }
+        }
+    }
+
+    @Secured(['ROLE_USER'])
+    def update() {
+        def factInstance = Fact.get(params.id?.toLong())
+        def msg;
+        if(factInstance) {
+            saveAndRender(params, true);
+        } else {
+            msg = "${message(code: 'default.not.found.message', args: [message(code: 'fact.label', default: 'Fact'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            withFormat {
+                html {
+                    flash.message = msg;
+                    redirect (url:uGroup.createLink(action:'list', controller:"fact", 'userGroupWebaddress':params.webaddress))
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
+    
+    private saveAndRender(params, sendMail=true) {
+        println "saveAndRender==============="+params
+        params.locale_language = utilsService.getCurrentLanguage(request);
+        def result = factService.save(params, sendMail)
+        withFormat {
+            html {
+                //flash.message = "${message(code: 'error')}";
+            }
+            json {
+                result.remove('instance');
+                render result as JSON 
+            }
+            xml {
+                result.remove('instance');
+                render result as XML
+            }
+        }
+    }
+
 
     @Secured(['ROLE_USER'])
     def upload() {
