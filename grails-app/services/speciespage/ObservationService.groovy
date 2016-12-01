@@ -2967,7 +2967,7 @@ println resIdList
 /*        println "observation"+observationInstance
         def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
                 traitParams.putAll(getTraits(params.traits));
-                println "traitParams"+traitParams;*/
+                println "traitParams"+traitParams;
                 // factService.updateFacts(traitParams, observationInstance);
 
     }
