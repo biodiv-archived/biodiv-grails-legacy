@@ -35,7 +35,7 @@ class TraitController extends AbstractObjectController {
         def model = getList(params);
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
-        if(params.displayAny) model.displayAny = params.displayAny;
+        if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.resultType = params.controller;
             model.hackTohideTraits = true;

@@ -2921,7 +2921,7 @@ println resIdList
         }
         return traits;
     }
-
+/*
     boolean factUpdate(params){
         println "================="+params
         def observationInstance = Observation.findById(params.observation);
@@ -2971,4 +2971,5 @@ println resIdList
                 // factService.updateFacts(traitParams, observationInstance);
 
     }
+*/
 }

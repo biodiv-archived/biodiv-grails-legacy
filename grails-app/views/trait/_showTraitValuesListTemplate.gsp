@@ -1,5 +1,5 @@
 
-<div class="row-fluid btn-group" style="white-space:inherit;margin-left:20px;">
+<div class="row btn-group" style="white-space:inherit;margin-left:20px;">
             <g:if test="${!displayAny}">
             <div data-tvid='all' data-tid='${traitValues[0]?.trait?.id}'
                 class="btn span2 all ${queryParams.trait && traitValues && queryParams.trait[traitValues[0]?.trait?.id+'']?'':'active btn-success'}"
@@ -16,7 +16,7 @@
         <g:if test="${fromSpeciesShow!=true}">
             <g:each in="${traitValues}" var="traitValue" status="i">
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue?.trait.id}'
-                    class="btn span2 input-prepend single-post ${queryParams?.trait?(queryParams.trait[traitValue?.trait.id+'']==traitValue.id+''?'active btn-success':''):''}"
+                    class="btn span2 input-prepend single-post ${traitTypes} ${queryParams?.trait?(queryParams.trait[traitValue?.trait.id+'']==traitValue.id+''?'active btn-success':''):''}"
                         value="${traitValue.value}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>

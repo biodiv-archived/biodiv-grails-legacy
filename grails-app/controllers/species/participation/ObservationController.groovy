@@ -1979,11 +1979,11 @@ private printCacheEntries(cache) {
             }
         }
     }
-    
+/*    
     boolean updateFact(){
         println "updateFactParams--------"+params
         def factUpdate = observationService.factUpdate(params);
         return factUpdate;
     }
-
+*/
 }
