@@ -251,7 +251,6 @@ class ObservationController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def create() {
-        println "params+++"+params
         def observationInstance = new Observation()
         observationInstance.properties = params;
         observationInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
@@ -358,19 +357,20 @@ class ObservationController extends AbstractObjectController {
 
             def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
             def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
-            //def valueList = TraitValue.getAll();
-            //def traitList = (factList.trait + valueList.trait)
             def traitFactMap = [:]
+            def queryParams = ['trait':[:]];
             //def conRef = []
             factList.each { fact ->
-                    if(!traitFactMap[fact.trait]) {
+                    if(!traitFactMap[fact.trait.id]) {
                         traitFactMap[fact.trait.id] = []
+                        queryParams['trait'][fact.trait.id] = '';
                         traitFactMap['fact'] = []
                     }
                     traitFactMap[fact.trait.id] << fact.traitValue
                     traitFactMap['fact'] << fact.id
+                    queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
             }
-            println factList
+
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -406,9 +406,9 @@ class ObservationController extends AbstractObjectController {
                 withFormat {
                     html { 
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap]
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap, queryParams:queryParams, displayAny:false];
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap]
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap, queryParams:queryParams];
                         }
                     } 
                     json  { render model as JSON }
@@ -487,13 +487,31 @@ class ObservationController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def edit() {
         def observationInstance = Observation.findWhere(id:params.id?.toLong(), isDeleted:false)
+        
+        def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
+        def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
+        def traitFactMap = [:]
+        def queryParams = ['trait':[:]];
+        //def conRef = []
+        factList.each { fact ->
+                if(!traitFactMap[fact.trait.id]) {
+                    traitFactMap[fact.trait.id] = []
+                    queryParams['trait'][fact.trait.id] = '';
+                    traitFactMap['fact'] = []
+                }
+                traitFactMap[fact.trait.id] << fact.traitValue
+                traitFactMap['fact'] << fact.id
+                queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+        }
+
+
         if (!observationInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
             redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
             //redirect(action: "list")
         } else if(utilsService.ifOwns(observationInstance.author) && !observationInstance.dataset) {
             def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-            render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature ])
+            render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature , queryParams:queryParams])
         } else {
             flash.message = "${message(code: 'edit.denied.message')}"
             redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress))

@@ -20,11 +20,13 @@ function loadMatchingSpeciesList() {
         }
     }
     var History = window.History;
-    $('.trait button, .trait .none, .trait .any').each(function() {
-        if($(this).hasClass('active')) {
-            params['trait.'+$(this).attr('data-tid')] = $(this).attr('data-tvid');
-        }
-    });
+    var traits = getSelectedTrait($('.trait button, .trait .none, .trait .any'));
+    console.log('sdsdfsdfsdfsdf');
+    console.log(traits);
+    console.log(traits);
+    for(var m in traits) {
+        params['trait.'+m] = traits[m].substring(0,traits[m].length-1);
+    }
     params['max'] = $(this).data('max');
     params['offset'] = $(this).data('offset');
 

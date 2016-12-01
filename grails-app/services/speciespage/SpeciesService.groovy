@@ -1743,6 +1743,10 @@ class SpeciesService extends AbstractObjectService  {
         
         if(params.trait){
             String traitQuery = getTraitQuery(params.trait);
+            println "************************"
+            println traitQuery
+            println "************************"
+
             filterQuery += traitQuery;
             countFilterQuery += traitQuery;
             queryParams['trait'] = params.trait;
@@ -2496,7 +2500,6 @@ def checking(){
                 matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons]
             }
         }
-        println "matching species list++++++++++++++++++++++++++++++++++++"+matchingSpeciesList
         return [matchingSpeciesList:matchingSpeciesList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
     }
 

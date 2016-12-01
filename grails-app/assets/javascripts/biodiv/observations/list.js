@@ -244,13 +244,13 @@ $(document).ready(function(){
         return false;
     });
 
-    $('.traitFilter .any, .traitFilter .all, .traitFilter button, .traitFilter .none').click(function(){
-        /*if($(this).hasClass('active')){
+    $(document).on('click', '.traitFilter button, .traitFilter .none, .traitFilter .any', function(){
+        if($(this).hasClass('active')){
             return false;
-        }*/
+        }
         if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
             $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
-            if($(this).hasClass('active')) 
+            if($(this).hasClass('btn-success')) 
                 $(this).removeClass('active btn-success');
             else
                 $(this).addClass('active btn-success');
@@ -750,15 +750,28 @@ function getSelectedHabitat() {
     return hbt;	
 } 
 
-function getSelectedTrait() {
-    var hbt = '',trait='',selTrait={}; 
-    $('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any').each(function(){
-        if($(this).hasClass('active')) {
+function getSelectedTrait($traitFilter, putValue = false) {
+    if($traitFilter == undefined)
+        $traitFilter = $('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any');
+    var trait='',selTrait={}; 
+    $traitFilter.each(function(){
+        if($(this).hasClass('btn-success')) {
             trait = $(this).attr('data-tid');
-            selTrait[trait] += $(this).attr('data-tvid')+',';
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            var v = putValue==true? $(this).attr('value') : $(this).attr('data-tvid');
+            selTrait[trait] += v+',';
         }
     });
     return selTrait;
+}
+
+function getSelectedTraitStr($traitFilter, putValue = false) {
+    var traits = getSelectedTrait($traitFilter, putValue);
+    var traitsStr = '';
+    for(var m in traits) {
+        traitsStr += m+':'+traits[m].substring(0,traits[m].length-1)+';';
+    }
+    return traitsStr;
 }
 
 function selectTickUserGroupsSignature(parentGroupId) {

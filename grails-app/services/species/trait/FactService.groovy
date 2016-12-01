@@ -78,7 +78,7 @@ class FactService extends AbstractObjectService {
         return taxon ? taxon.findSpeciesId() : null;
     }
 
-    boolean updateFacts(Map m, object, UploadLog dl=null) {
+    boolean updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {
         def writeLog;
         if(dl) writeLog = dl.writeLog;
         else writeLog = utilsService.writeLog;
@@ -114,7 +114,7 @@ class FactService extends AbstractObjectService {
                     value = value ? value.trim() : null ;
 
                     switch(key) {
-                        case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
+                        case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts'] : break;
                         default : 
                         writeLog("Loading trait ${key} : ${value}");
 
@@ -150,6 +150,7 @@ class FactService extends AbstractObjectService {
                         if(!trait) {
                            writeLog("Cannot find trait ${key}", Level.ERROR);
                         } else {
+                            Fact.withTransaction {
                             def factsCriteria = Fact.createCriteria();
                             List<Fact> facts = factsCriteria.list {
                                 eq ('trait', trait)
@@ -159,8 +160,13 @@ class FactService extends AbstractObjectService {
 
                             List<TraitValue> traitValues = [];
                             if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
+                                if(replaceFacts) {
+                                    facts.each {fact ->
+                                        fact.delete(flush:true);
+                                    }
+                                    facts.clear();
+                                }
                                 value.split(',').each { v ->
-                                    println v;
                                     writeLog("Loading trait ${trait} with value ${v.trim()}");
                                     def x = TraitValue.findByTraitAndValueIlike(trait, v.trim());
                                     if(x) traitValues << x;
@@ -252,6 +258,7 @@ class FactService extends AbstractObjectService {
                                     writeLog("Successfully added fact");
                                 }
                             }
+                        }
                         }
                     }
                 } catch(Exception e) {

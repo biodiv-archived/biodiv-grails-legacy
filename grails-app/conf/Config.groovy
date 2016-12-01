@@ -581,7 +581,7 @@ environments {
             warn   'org.springframework.security'
             warn   'org.springframework.security.web'
             warn   'org.springframework.security.authentication'
-            info   'speciespage',
+            debug   'speciespage',
             'species'
             debug   'com.the6hours', 
             'grails.app.taglib.com.the6hours'

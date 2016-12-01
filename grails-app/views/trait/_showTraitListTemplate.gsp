@@ -28,7 +28,7 @@ instanceList.each{ iL ->
                  <ul id="trait${j}" class="grid_view thumbnails obvListwrapper}">
 				<g:each in="${inst.value}" status="i" var="instance">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow]"/>
+                    <g:render template="/trait/showTraitTemplate" model="['trait':instance, 'factInstance':factInstance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable]"/>
 					</li>
 				</g:each>
 			</ul>               
@@ -62,86 +62,70 @@ instanceList.each{ iL ->
 $(document).ready(function(){
 	$('.icon-question-sign').tooltip();
 	
-    $('.editFact').click(function(){
+	$(document).on('click', '.editFact', function () {
         $(this).parent().parent().find('.row:first').hide();
         $(this).hide();
         $(this).parent().find('.submitFact, .cancelFact').show();
         $(this).parent().parent().find('.editFactPanel').show();
         console.log($(this).parent().parent().find('.editFactPanel'));
-        //$(this).parent().find('.editFact').show();
+        return false;
 	});
 
-	$('.cancelFact').click(function(){
+	$(document).on('click', '.cancelFact', function () {
+
         $(this).parent().parent().find('.editFactPanel').hide();
         $(this).parent().find('.submitFact, .cancelFact').hide();
         $(this).parent().parent().find('.row:first').show();
         $(this).hide();
         $(this).parent().find('.editFact').show();
+        $(this).parent().parent().find('.alert').removeClass('alert alert-error').hide();
 	});
 
-	$(document).on('click', '.submitFact', function () {
-		var id = $(this).data("id")
-		var hbt = '',trait='',value='', selTrait={}; 
-        var selectTrait;
-        $(this).parent().parent().find('.editFactPanel:first').find('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any').each(function() {
-            console.log($(this))
-            if($(this).hasClass('active')) {
-                selectedTrait = this;
-                trait = $(this).attr('data-tid');
-                tValue = $(this).attr('data-tvid');
-                selTrait[trait] += $(this).attr('value')+',';
-                console.log($(this).attr('value'));
-            }
-        });
-		var traits = selTrait;
-		var traitsStr = '';
-		for(var m in traits) {
-		    traitsStr += m+':'+traits[m]+';';
-		}
+    function onSubmit($me) {
+    	var id = $me.data("id");
+        var traitsStr = getSelectedTraitStr($me.parent().parent().find('.trait button, .trait .none, .trait .any'), true);
         var params = {};
         params['traits'] = traitsStr;
-        params['objectId'] = "${instance.id}";
-        params['objectType'] = "${instance.class.getCanonicalName()}";
+        params['traitId'] = id;
+        params['objectId'] = "${instance?.id}";
+        params['objectType'] = "${instance?.class?.getCanonicalName()}";
 		$.ajax({ 
 			url:'${uGroup.createLink(controller:'fact', action:'update', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}',
+            method:'POST',
 			data:params,
 			success: function(data, statusText, xhr, form) {
                 //TODO:update traits panel
-                $(this).parent().parent().find('.row:first').show();
-                $(this).parent().parent().find('.editFactPanel').hide();
-                $(this).parent().find('.submitFact, .cancelFact').hide();
-                $(this).parent().parent().find('.row:first').show();
-                $(this).hide();
-                $(this).parent().find('.editFact').show();//.css("position","");
+                console.log(data);
+                if(data.success) {
+                    $me.parent().parent().find('.alert').removeClass('alert alert-error').addClass('alert alert-info').html(data.msg).show();
+                    $me.parent().parent().replaceWith(data.model.traitHtml);
+                    $me.parent().parent().find('.row:first').show();
+                    $me.parent().parent().find('.editFactPanel').hide();
+                    $me.parent().find('.submitFact, .cancelFact').hide();
+                    $me.parent().parent().find('.row:first').show();
+                    $me.hide();
+                    $me.parent().find('.editFact').show();//.css("position","");
+                } else {
+                    $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(data.msg).show();
+                }
 			},
-			error:function (xhr, ajaxOptions, thrownError){
-			    console.log('error');
-		    }
+            error:function (xhr, ajaxOptions, thrownError){
+                //successHandler is used when ajax login succedes
+                var successHandler = this.success, errorHandler = function() {
+                    //TODO:show error msg
+                    console.log(arguments);
+                    $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(arguments.msg).show();
+                }
+                handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+            } 
 		});
+    }
 
-		/*
-		$('#trait_'+id).show();
-		$('#editFactPanel_'+id).hide();
-		$(this).hide();
-		$('#cancelFact_'+id).hide();
-		$('#editFact_'+id).show();
-		$('#edit_btn_'+id).css("position","absolute");
-        */
-	});
-
-    $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
-        if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
-            $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
-            if($(this).hasClass('active')) 
-                $(this).removeClass('active btn-success');
-            else
-                $(this).addClass('active btn-success');
-        } else {
-            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-            $(this).addClass('active btn-success');
-        }
-
+	$(document).on('click', '.submitFact', function () {
+        var $me = $(this);
+        onSubmit($me);
     });
+
 });
 </asset:script>
 

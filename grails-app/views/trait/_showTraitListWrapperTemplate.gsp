@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow-y: scroll;overflow-x: hidden;">
-                <g:render template="showTraitListTemplate" model="['fromList':true]"/>
+                <g:render template="showTraitListTemplate" model="['displayAny':true]"/>
             </div>
         </div>
     </div>
@@ -67,24 +67,32 @@
             if($(this).hasClass('active')){
             return false;
             }
-            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-            $(this).addClass('active btn-success');
-
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('btn-success')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else {
+                $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+                $(this).addClass('active btn-success');
+            }
 
             updateMatchingSpeciesTable();
             return false;
         });
+
         $('.list').on('updatedGallery', function() {
             updateMatchingSpeciesTable();
         });
     });
-</script>
-<asset:script type="text/javascript">
 $(document).ready(function() {
 	$(".trait button").button();
 	$(".trait button").tooltip({placement:'bottom'});
     <g:each in="${params.trait}" var="t">
-        $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
+        <g:each in="${t.value.split(',')}" var="tv">
+            $('.trait button[data-tvid="${tv}"][data-tid="${t.key}"]').addClass('active btn-success');
+        </g:each>
     </g:each>
 });
-</asset:script>
+</script>

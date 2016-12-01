@@ -464,10 +464,24 @@ class AbstractObjectService {
         if(andTraitLT) {
             traitQuery = " and t.traits @> cast(ARRAY["
             andTraitLT.each { traitId, traitValueId ->
-                traitQuery += "[${traitId}, ${traitValueId}],";
+                traitValueId.split(',').each { tvId ->
+                    traitQuery += "[${traitId}, ${tvId}],";
+                }
             }
             traitQuery = traitQuery[0..-2] + "] as bigint[])";
         }
         return traitQuery;
+    }
+
+    Map getTraits(String t) {
+        Map traits = [:];
+        t.split(';').each {
+            if(it) {
+                String[] x = it.split(':');
+                if(x.size() == 2)
+                    traits[x[0]] = x[1].trim();
+            }
+        }
+        return traits;
     }
 }
