@@ -1,6 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
 <%@ page import="species.ScientificName.TaxonomyRank"%>
+<%@page import="species.trait.Trait.TraitTypes"%>
 <html>
     <head>
         <g:set var="title" value="${g.message(code:'traits.label')}"/>
@@ -77,7 +78,7 @@
 			    			    	<h5>Filter by value</h5>
 			    <div class="list" style="clear: both;">
 			    	<div class="trait thumbnail" data-toggle="buttons-radio">
-			    		<g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitValue]" />
+  	                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':factInstance?factInstance[trait.id]:(editable?null:traitValue), 'displayAny':displayAny, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
 			    	</div>
 			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
 	    			</div>
@@ -85,20 +86,29 @@
 	 	</div>
 	<script>
 	    $(document).ready (function() {
-	         $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
-            if($(this).hasClass('active')){
-            return false;
-            }
-            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-            $(this).addClass('active btn-success');
 
-            updateMatchingSpeciesTable();
-            return false;
-        });
-            updateMatchingSpeciesTable();
-          $('.list').on('updatedGallery', function() {
-            updateMatchingSpeciesTable();
-        });
+            $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
+                if($(this).hasClass('active')){
+                return false;
+                }
+                if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                    $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                    if($(this).hasClass('btn-success')) 
+                        $(this).removeClass('active btn-success');
+                    else
+                        $(this).addClass('active btn-success');
+                } else {
+                    $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+                    $(this).addClass('active btn-success');
+                }
+
+                updateMatchingSpeciesTable();
+                return false;
+            });
+
+            $('.list').on('updatedGallery', function() {
+                updateMatchingSpeciesTable();
+            });
 	    });
 	</script>
 		<asset:script type="text/javascript">
