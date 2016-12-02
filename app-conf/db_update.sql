@@ -724,6 +724,7 @@ alter table fact alter column page_taxon_id drop not null;
 alter table trait add column is_not_observation_trait boolean default 'f';
 alter table trait add column show_in_observation boolean default 'f';
 alter table trait add column is_participatory boolean default 't';
+update species_group_mapping set taxon_concept_id = g.id from (select id,name from taxonomy_definition t ) as g where  g.name = taxon_name;
 
 #21stNov2016
 insert into trait_taxonomy_definition(trait_taxon_id,taxonomy_definition_id)  select id, taxon_id from trait;
@@ -752,4 +753,3 @@ drop table custom_fields_group_7;
 select id from field where concept='Natural History' and category='Reproduction';
 update trait set field_id=39 where name='Sex';
 
-update species_group_mapping set taxon_concept_id = g.id from (select id,name from taxonomy_definition t ) as g where  g.name = taxon_name;

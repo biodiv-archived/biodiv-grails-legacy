@@ -89,6 +89,14 @@ class TraitService extends AbstractObjectService {
             return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':logMsgs];
         }
 
+        def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+        File traitResourceDir = new File(rootDir);
+        if(!traitResourceDir.exists()) {
+            traitResourceDir.mkdir();
+        }
+        traitResourceDir = new File(traitResourceDir, UUID.randomUUID().toString()+File.separator+"resources");
+        traitResourceDir.mkdirs();
+
         while(row) {
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
                 dl.writeLog("Ignoring row " + row, Level.WARN);
@@ -165,7 +173,7 @@ class TraitService extends AbstractObjectService {
                         break;
 
                         case 'trait icon' : 
-                        trait.icon = migarteIcons(row[index].trim());
+                        trait.icon = migrateIcons(row[index].trim(), traitResourceDir);
                         break;
 
                         case 'taxonid':
@@ -277,6 +285,15 @@ class TraitService extends AbstractObjectService {
             return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':logMsgs];
         }
 
+        def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+        File traitResourceDir = new File(rootDir);
+        if(!traitResourceDir.exists()) {
+            traitResourceDir.mkdir();
+        }
+        traitResourceDir = new File(traitResourceDir, UUID.randomUUID().toString()+File.separator+"resources");
+        traitResourceDir.mkdirs();
+
+
         while(row) {
 
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
@@ -342,7 +359,7 @@ class TraitService extends AbstractObjectService {
                     traitValue.source=row[index].trim()
                     break;
                     case 'value icon' : 
-                    traitValue.icon=row[index].trim()
+                    traitValue.icon=migrateIcons(row[index].trim(),traitResourceDir);
                     break;
                     case 'value definition' : 
                     traitValue.description=row[index].trim()
@@ -669,15 +686,9 @@ class TraitService extends AbstractObjectService {
     }
 
 
-    def migarteIcons(icon){
+    def migrateIcons(icon, usersDir){
+        if(!icon) return;
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
-        File usersDir;
-        usersDir = new File(rootDir);
-        if(!usersDir.exists()) {
-            usersDir.mkdir();
-        }
-        usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
-        usersDir.mkdirs();
         File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(icon));
         File fi = new File(grailsApplication.config.speciesPortal.content.rootDir +"/trait/"+icon);
         (new AntBuilder()).copy(file: fi, tofile: file)
