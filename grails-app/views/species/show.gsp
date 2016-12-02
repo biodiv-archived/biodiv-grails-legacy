@@ -225,7 +225,6 @@
                     <g:if  test="${traitInstanceList}">
                     <div class="sidebar_section" style="margin:10px 0px;">
                     <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
-                    <h5>Traits</h5></a>
                     <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow:visible;">
                     <div id="traits" class="trait">
                    <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'fromSpeciesShow':true]"/>
