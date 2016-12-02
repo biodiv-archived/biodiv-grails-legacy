@@ -674,7 +674,12 @@ ALTER TABLE suser ADD COLUMN longitude double precision;
 #21Sep2016
 alter table taxonomy_definition add column traits bigint[][];
 alter table taxonomy_definition alter column traits  type bigint[][] using traits::bigint[][];
-                update taxonomy_definition set traits = g.item from (
+CREATE AGGREGATE array_agg_custom(anyarray)
+(
+        SFUNC = array_cat,
+            STYPE = anyarray
+        );
+update taxonomy_definition set traits = g.item from (
              select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
 ) g where g.page_taxon_id=id;
 
@@ -702,3 +707,49 @@ alter table resource add column gbifID bigint;
 insert into upload_log(id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, class) select id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, 'species.participation.SpeciesBulkUpload' as class from species_bulk_upload ;
 
 update upload_log set upload_type = 'species bulk upload';
+
+#27thOct2016
+alter table trait_value add column is_deleted boolean not null default false;
+
+#15th Nov 2016
+alter table fact add column object_type varchar(255);
+update fact set object_type = class;
+alter table fact alter column object_type set not null;
+alter table fact drop column class;
+alter table fact drop constraint fact_trait_value_id_object_id_page_taxon_id_trait_id_key;
+create index fact_trait_value_id_object_id_object_type_trait_id_key on fact (trait_value_id, object_id, object_type, trait_id);
+alter table fact alter column page_taxon_id drop not null;
+
+#16thNov2016
+alter table trait add column is_not_observation_trait boolean default 'f';
+alter table trait add column show_in_observation boolean default 'f';
+alter table trait add column is_participatory boolean default 't';
+
+#21stNov2016
+insert into trait_taxonomy_definition(trait_taxon_id,taxonomy_definition_id)  select id, taxon_id from trait;
+alter table trait alter column taxon_id drop not null;
+alter table trait drop column taxon_id;
+
+
+#27/11 custom fields migration sqls
+delete from custom_field where id not in (5,6);
+select * from custom_fields_group_18 where cf_4 is not null and cf_4 != '';
+alter table custom_fields_group_18 drop column cf_4;
+select * from custom_fields_group_13 where cf_1 is not null and cf_1 != '';
+drop table custom_fields_group_13;
+select * from custom_fields_group_30 where cf_7 is not null and cf_7 != '';
+drop table custom_fields_group_30;
+select * from custom_fields_group_33 where cf_9 is not null and cf_9 != '';
+select * from custom_fields_group_33 where cf_10 is not null and cf_10 != '';
+select * from custom_fields_group_33 where cf_11 is not null and cf_11 != '';
+drop table custom_fields_group_33;
+select * from custom_fields_group_38 where cf_8 is not null and cf_8 != '';
+drop table custom_fields_group_38;
+select * from custom_fields_group_7 where cf_2 is not null and cf_2 != '';
+select * from custom_fields_group_7 where cf_3 is not null and cf_3 != '';
+drop table custom_fields_group_7;
+
+select id from field where concept='Natural History' and category='Reproduction';
+update trait set field_id=39 where name='Sex';
+
+update species_group_mapping set taxon_concept_id = g.id from (select id,name from taxonomy_definition t ) as g where  g.name = taxon_name;

@@ -20,7 +20,7 @@
 
             <uGroup:rightSidebar/>
 
-            <g:render template="showTraitListWrapperTemplate"/>
+            <g:render template="showTraitListWrapperTemplate" model="['observationCreate':false]"/>
 
         </div>
     </body>

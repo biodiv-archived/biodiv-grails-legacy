@@ -69,7 +69,10 @@ import java.io.File ;
 import species.participation.NamelistService
 import species.participation.RecommendationVote;
 import groovy.sql.Sql
+import au.com.bytecode.opencsv.CSVWriter
 import species.utils.ImageType;
+import species.trait.Fact;
+import speciespage.ObvUtilService;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -87,6 +90,7 @@ class SpeciesService extends AbstractObjectService  {
     def activityFeedService;
     def messageSource;
 	def namelistService;
+    def obvUtilService;
 	
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
@@ -1273,7 +1277,6 @@ class SpeciesService extends AbstractObjectService  {
     }
     
     def deleteSynonym(SynonymsMerged oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
-       println oldSynonym; 
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
             messagesourcearg[0] = oldSynonym.id;
@@ -1632,7 +1635,6 @@ class SpeciesService extends AbstractObjectService  {
     * get species list query
     */
     def _getSpeciesListQuery(params) {
-        println params;
         params.startsWith = params.startsWith?:"A-Z"
 		params.isDeleted = params.isDeleted ?: "false"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
@@ -1741,6 +1743,10 @@ class SpeciesService extends AbstractObjectService  {
         
         if(params.trait){
             String traitQuery = getTraitQuery(params.trait);
+            println "************************"
+            println traitQuery
+            println "************************"
+
             filterQuery += traitQuery;
             countFilterQuery += traitQuery;
             queryParams['trait'] = params.trait;
@@ -1897,7 +1903,6 @@ class SpeciesService extends AbstractObjectService  {
     private _getSpeciesList(params) {
         //cache "taxonomy_results"
         def queryParts = _getSpeciesListQuery(params)
-        println queryParts
         def hqlQuery = sessionFactory.currentSession.createSQLQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.countQuery)
         def hqlSpeciesCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.speciesCountQuery)
@@ -1919,7 +1924,6 @@ class SpeciesService extends AbstractObjectService  {
         def speciesInstanceList;// = hqlQuery.addEntity(Species.class).list();
         speciesInstanceList = hqlQuery.addEntity(Species.class).list();
         log.debug "Species list count query :${queryParts.countQuery} with params ${queryParams}"
-        println "Species list count query :${queryParts.countQuery} with params ${queryParams}"
         def rs = hqlCountQuery.list();
         def speciesCountWithContent = 0;
         int count = 0
@@ -2057,8 +2061,6 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
             int index = 0;
-            println "pullImage resources"
-            println resId
             resId.each {
                 def r = Resource.get(it.toLong())
                 println r
@@ -2075,7 +2077,6 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             if(params.resourceListType == "fromRelatedObv"){
-                println resId
                 resId.each{
                     def rid = it
                     def obv = Observation.withCriteria(){
@@ -2100,10 +2101,6 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
         }
-        println "------------------------------------------"
-        println "------------------------------------------"
-        println "------------------------------------------"
-        println resources
         //species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
@@ -2116,10 +2113,6 @@ class SpeciesService extends AbstractObjectService  {
             }
             species.addToResources(resource);
         }
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println resources;
         //species.merge();
         if(resources.size() > 0) {
             if(species.instanceOf(Species)) {
@@ -2487,20 +2480,53 @@ def checking(){
             def link = utilsService.createHardLink("species", "show", it.id);
             def mainImage = it.mainImage();
             String imagePath = '';
+            def factInstance=Fact.findAllByPageTaxon(it.taxonConcept);
+            //println "fact Instance"+factInstance?.traitValue?.icon
             def speciesGroupIcon =  it.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
             if(mainImage?.fileName == speciesGroupIcon.fileName) { 
                 imagePath = mainImage.thumbnailUrl(null, '.png');
             } else
                 imagePath = mainImage?mainImage.thumbnailUrl():null;
 
+            def traitIcons = [];
+            factInstance?.traitValue.each{tv ->
+                traitIcons << tv.mainImage()?.fileName
+            }
 
             if(params.downloadFrom == 'matchingSpecies') {
                 //HACK: request not available as its from job scheduler
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath, traitIcons]
             } else {
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons]
             }
         }
         return [matchingSpeciesList:matchingSpeciesList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
     }
+
+    private File downloadUserDetails(){
+                def sql = Sql.newInstance(dataSource)
+                File csvFile = new File('/home/ifp/git/biodiv/app-conf/', "userInfo.csv")
+                CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+                writer.writeNext("UserName#About Me#Date Created#Email Id#Location#Name#Institution#Occupation#Sex".split("#"))
+                def userInfo = sql.rows("select * from suser where account_expired=false")
+                def dataToWrite = []
+            userInfo.each {
+                log.debug "Writting " + it
+                def temp = []
+                temp.add("" + it[7]);
+                temp.add("" + it[8]);
+                temp.add("" + it[9]);
+                temp.add("" + it[10]);
+                temp.add("" + it[13]);
+                temp.add("" + it[14]);
+                temp.add("" + it[24]);
+                temp.add("" + it[25]);
+                temp.add("" + it[26]);
+                dataToWrite.add(temp.toArray(new String[0]))
+        }
+                writer.writeAll(dataToWrite);
+                writer.flush()
+                writer.close()
+                return csvFile
+        }
 }

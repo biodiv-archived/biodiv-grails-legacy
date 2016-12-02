@@ -47,7 +47,6 @@ class AbstractObjectService {
 	protected static List createUrlList2(observations, String iconBasePath) {
 		List urlList = []
 		for(param in observations){
-            println param
             def obv = param['observation'];
 
 			def item, controller;
@@ -368,6 +367,10 @@ class AbstractObjectService {
             case SUser.class.name:
             rootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
             break;
+
+            case TraitValue.name:
+            rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+            break;
         }
         converter.setResourcesRootDir(rootDir);
 
@@ -461,10 +464,24 @@ class AbstractObjectService {
         if(andTraitLT) {
             traitQuery = " and t.traits @> cast(ARRAY["
             andTraitLT.each { traitId, traitValueId ->
-                traitQuery += "[${traitId}, ${traitValueId}],";
+                traitValueId.split(',').each { tvId ->
+                    traitQuery += "[${traitId}, ${tvId}],";
+                }
             }
             traitQuery = traitQuery[0..-2] + "] as bigint[])";
         }
         return traitQuery;
+    }
+
+    Map getTraits(String t) {
+        Map traits = [:];
+        t.split(';').each {
+            if(it) {
+                String[] x = it.split(':');
+                if(x.size() == 2)
+                    traits[x[0]] = x[1].trim();
+            }
+        }
+        return traits;
     }
 }

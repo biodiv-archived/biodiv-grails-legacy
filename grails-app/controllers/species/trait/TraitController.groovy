@@ -2,7 +2,7 @@ package species.trait
 
 import grails.converters.JSON;
 import grails.converters.XML;
-
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import species.Language;
 import species.AbstractObjectController;
 import grails.plugin.springsecurity.annotation.Secured
@@ -10,26 +10,39 @@ import species.participation.UploadLog;
 import grails.util.Holders;
 import static org.springframework.http.HttpStatus.*;
 import species.Field;
+import species.participation.Recommendation;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import species.utils.Utils;
 import species.utils.ImageUtils;
+import species.TaxonomyDefinition;
 import species.utils.ImageType;
 
 class TraitController extends AbstractObjectController {
 
     def traitService;
-    def speciesService;    
+    def speciesService;
+    def messageSource    
 
-    static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
+    static allowedMethods = [show:'GET', index:'GET', list:'GET', edit:"GET" ,  save: "POST", delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"],update:"POST",create:"GET"]
     static defaultAction = "list"
 
     def index = {
-        redirect(action: "list", params: params)
+        redirect(action: "list", params: params, namespace: null)
     }
 
     def list() {
         def model = getList(params);
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
+        if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
+        //HACK
+        if(params.traits) {
+            model.queryParams = ['trait':[:]];
+            params.traits.each { t,v ->
+                model.queryParams.trait[Long.parseLong(t)] = v
+            }
+        }
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.resultType = params.controller;
             model.hackTohideTraits = true;
@@ -59,6 +72,98 @@ class TraitController extends AbstractObjectController {
             }
             json { render model as JSON }
             xml { render model as XML }
+        }
+    }
+
+    @Secured(['ROLE_USER'])
+    def create() {
+        def traitInstance = new Trait() 
+        traitInstance.properties = params;
+        return [traitInstance: traitInstance]
+    }
+
+    @Secured(['ROLE_USER'])
+    def edit() {
+        def traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
+        if (!traitInstance) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
+            redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
+        }  else {
+            render(view: "create", model: [traitInstance: traitInstance])
+        }
+        return;
+    }
+
+    @Secured(['ROLE_USER'])
+    def update(){
+        def msg = "";
+        Trait traitInstance;
+        Language languageInstance = utilsService.getCurrentLanguage();
+        if(params.id){
+            traitInstance=Trait.findById(params.id)
+        }
+        else{traitInstance=new Trait();
+            traitInstance.traitTypes=Trait.fetchTraitTypes(params.traittype);
+            traitInstance.dataTypes=Trait.fetchDataTypes(params.datatype);
+        }
+        Recommendation recommendationInstance=Recommendation.findById(params.recommendationId)
+        traitInstance.description=params.description
+        traitInstance.name=params.name
+        traitInstance.source=params.source
+        def speciesField=params.fieldid.replaceAll(">", "|").trim()
+        def fieldInstance=traitService.getField(speciesField,languageInstance)
+        traitInstance.field=fieldInstance
+        traitInstance.taxon=recommendationInstance.taxonConcept
+
+
+        if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
+            msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
+            def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
+            if(params.action=='update'){
+                traitService.createTraitValue(traitInstance,params)
+            }
+            withFormat {
+                html {
+                    flash.message = msg;
+                    redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return
+        }
+        else {
+            def errors = [];
+            traitInstance.errors.allErrors .each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+            }
+
+            def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
+            withFormat {
+                html {
+                    render(view: "create", model: [traitInstance: traitInstance])
+                }
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+            return;
+        }
+
+    }
+
+    @Secured(['ROLE_USER'])
+    def flagDeleted() {
+        def result = traitService.delete(params)
+        result.remove('url')
+        String url = result.url;
+        withFormat {
+            html {
+                flash.message = result.message
+                redirect (url:url)
+            }
+            json { render result as JSON }
+            xml { render result as XML }
         }
     }
 
@@ -101,24 +206,25 @@ class TraitController extends AbstractObjectController {
     }
 
     def show() {
-        def traitInstance = Trait.findById(params.id)
+        Trait traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
         def coverage = traitInstance.taxon
         def traitValue = [];
         Field field;
-        traitValue = TraitValue.findAllByTrait(traitInstance);
+        traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
         field = Field.findById(traitInstance.fieldId);
-            def model = getList(params);
-             model['traitInstance'] = traitInstance
-             model['coverage'] = coverage.name
-             model['traitValue'] = traitValue
-             model['field'] = field.concept
-            withFormat {
+        def model = getList(params);
+        model['traitInstance'] = traitInstance
+        model['coverage'] = coverage*.name
+        model['traitValue'] = traitValue
+        model['field'] = field.concept
+        withFormat {
             html {
-                    render (view:"show", model:model)
-                 }
-        json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
-        xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
+                render (view:"show", model:model)
             }
+            json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
+            xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
+        }
+        return
     }
 
     @Secured(['ROLE_USER'])
@@ -145,10 +251,10 @@ class TraitController extends AbstractObjectController {
             //result.totalCount = result.instanceTotal;
             params.action = 'list';
             result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
- 
+
             if(result.matchingSpeciesList.size() > 0) {
                 result.putAll([status:'success', msg:'success']);
-           } else {
+            } else {
                 def message = "";
                 if(params.offset  > 0) {
                     message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
@@ -171,6 +277,179 @@ class TraitController extends AbstractObjectController {
             withFormat {
                 json { render model as JSON }
                 xml { render model as XML }
+            }
+        }
+    }
+
+    def updateTraitValue(){
+        TraitValue traitValueInstance;
+        if(params.traitValueId){
+            traitValueInstance = TraitValue.findById(params.traitValueId);
+            traitValueInstance.value = params.value
+            traitValueInstance.description = params.description
+            traitValueInstance.source = params.source
+            traitValueInstance.icon = traitService.getTraitIcon(params.icon)
+        }
+        else{
+            traitValueInstance = new TraitValue();
+            traitValueInstance.value = params.value
+            traitValueInstance.description = params.description
+            traitValueInstance.source = params.source
+            Trait traitInstance = Trait.findById(params.traitInstance)
+            traitValueInstance.trait = traitInstance
+        }
+        if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+            def msg = "Trait Value Added Successfully"
+            flash.message=msg
+            return
+        }
+        else{
+            def errors = [];
+            traitValueInstance.errors.allErrors .each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+                return
+            }
+        }
+    }
+
+    @Secured(['ROLE_USER'])
+    def upload_resource() {
+        try {
+            if(ServletFileUpload.isMultipartContent(request)) {
+                MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                def rs = [:]
+                Utils.populateHttpServletRequestParams(request, rs);
+                def resourcesInfo = [];
+                def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
+                File usersDir;
+                def message;
+
+                if(!params.resources) {
+                    message = g.message(code: 'no.file.attached', default:'No file is attached')
+                }
+
+                params.resources.each { f ->
+                    log.debug "Saving user file ${f.originalFilename}"
+
+                    // List of OK mime-types
+                    //TODO Move to config
+                    def okcontents = [
+                    'image/png',
+                    'image/jpeg',
+                    'image/pjpeg',
+                    'image/gif',
+                    'image/jpg'
+                    ]
+
+                    if (! okcontents.contains(f.contentType)) {
+                        message = g.message(code: 'resource.file.invalid.extension.message', args: [
+                        okcontents,
+                        f.originalFilename
+                        ])
+                    }
+                    else if(f.size > grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE) {
+                        message = g.message(code: 'resource.file.invalid.max.message', args: [
+                        grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024,
+                        f.originalFilename,
+                        f.size/1024
+                        ], default:"File size cannot exceed ${grailsApplication.config.speciesPortal.users.logo.MAX_IMAGE_SIZE/1024}KB");
+                    }
+                    else if(f.empty) {
+                        message = g.message(code: 'file.empty.message', default:'File cannot be empty');
+                    }
+                    else {
+                        if(!usersDir) {
+                            if(!params.dir) {
+                                usersDir = new File(rootDir);
+                                if(!usersDir.exists()) {
+                                    usersDir.mkdir();
+                                }
+                                usersDir = new File(usersDir, UUID.randomUUID().toString()+File.separator+"resources");
+                                usersDir.mkdirs();
+                            } else {
+                                usersDir = new File(rootDir, params.dir);
+                                usersDir.mkdir();
+                            }
+                        }
+
+                        File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(f.originalFilename));
+                        f.transferTo( file );
+                        ImageUtils.createScaledImages(file, usersDir, true);
+                        resourcesInfo.add([fileName:file.name, size:f.size]);
+                    }
+                }
+                log.debug resourcesInfo
+                // render some XML markup to the response
+                if(usersDir && resourcesInfo) {
+                    withFormat {
+                        json { 
+                            def res = [];
+                            for(r in resourcesInfo) {
+                                res << ['fileName':r.fileName, 'size':r.size]
+                            }
+                            def model = utilsService.getSuccessModel("", null, OK.value(), [users:[dir:usersDir.absolutePath.replace(rootDir, ""), resources : res]])
+                            render model as JSON
+                        }
+
+                        xml { 
+                            render(contentType:'text/xml') {
+                                response {
+                                    success(true)
+                                    status(OK.value())
+                                    msg('Successfully uploaded the resource')
+                                    model {
+                                        dir(usersDir.absolutePath.replace(rootDir, ""))
+                                        resources {
+                                            for(r in resourcesInfo) {
+                                                'image'('fileName':r.fileName, 'size':r.size){}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    response.setStatus(500);
+                    def model = utilsService.getErrorModel(message, null, INTERNAL_SERVER_ERROR.value())
+                    withFormat {
+                        json { render model as JSON }
+                        xml { render model as XML }
+                    }
+                }
+            } else {
+                def model = utilsService.getErrorModel(g.message(code: 'no.file.attached', default:'No file is attached'), null, INTERNAL_SERVER_ERROR.value())
+                withFormat {
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+            }
+        } catch(e) {
+            e.printStackTrace();
+            def model = utilsService.getErrorModel(g.message(code: 'file.upload.fail', default:'Error while processing the request.'), null, INTERNAL_SERVER_ERROR.value())
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
+
+    def deleteValue(){
+        def traitValueInstance=TraitValue.findById(params.id);
+        traitValueInstance.isDeleted=true
+        if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+            def msg = "Trait Value deleted Successfully"
+            flash.message=msg
+            return
+        }
+        else{
+            def errors = [];
+            traitValueInstance.errors.allErrors .each {
+                def formattedMessage = messageSource.getMessage(it, null);
+                errors << [field: it.field, message: formattedMessage]
+                return
             }
         }
     }
@@ -205,11 +484,11 @@ class TraitController extends AbstractObjectController {
                 }else{
                     File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName("200_"+f.icon));
                     File fi = new File(rootDir+"/200_"+f.icon);
-                    (new AntBuilder()).copy(file: fi, tofile: file)
+                       (new AntBuilder()).copy(file: fi, tofile: file)
                     //fi.transferTo( file );
                     ImageUtils.createScaledImages(file, usersDir,true);
                     def file_name = file.name.toString();
-                    
+
                     f.icon = usersDir.absolutePath.replace(rootDir, "")+'/'+file_name;
                     f.save(flush:true);
                 }
@@ -217,4 +496,5 @@ class TraitController extends AbstractObjectController {
             }        
         }
     }
+
 }

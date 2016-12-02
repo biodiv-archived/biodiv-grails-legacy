@@ -223,11 +223,12 @@
                 
                 <div class="span12" style="margin-left:0px">
                     <g:if  test="${traitInstanceList}">
-                    <div class="sidebar_section">
-                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"> 
-                    <h5>Traits</h5></a>
+                    <div class="sidebar_section" style="margin:10px 0px;">
+                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
+                    <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow:visible;">
                     <div id="traits" class="trait">
-                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':traitInstanceList.traitValue, 'displayAny':'none', 'fromSpeciesShow':true]" />
+                   <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'fromSpeciesShow':true]"/>
+                    </div>
                     </div>
                     </div>
                     </g:if>
@@ -351,6 +352,7 @@
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
+                $('.observations_list').removeClass('observations_list');
                 window.params.queryParamsMax = 8;
                 intializesSpeciesHabitatInterest(false);
                 updateGallery('/species/list', 8, 0, undefined, true,undefined,undefined,undefined,undefined,false);

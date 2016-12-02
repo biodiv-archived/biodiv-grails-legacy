@@ -18,7 +18,8 @@ class TraitValue {
 //    TaxonomyDefinition taxon;
 	
     def grailsApplication;
-
+    boolean isDeleted = false;
+    
     static constraints = {
         trait nullable:false, blank:false, unique:['value']
         value nullable:false
@@ -35,7 +36,7 @@ class TraitValue {
 
 	Resource icon(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon)).exists()
-		if(!iconPresent) {
+		if(!iconPresent || !this.icon) {
             log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
@@ -49,12 +50,16 @@ class TraitValue {
     String thumbnailUrl(String newBaseUrl=null, String defaultFileType=null, ImageType imageType = ImageType.NORMAL) {
         String thumbnailUrl = '',isFilePresent='';
         def basePath = '';
+        if(!this.icon){
+            thumbnailUrl = grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg";
+            return thumbnailUrl;
+        }
         newBaseUrl = (newBaseUrl)?:(basePath?:grailsApplication.config.speciesPortal.traits.serverURL);
         int lastIndex = this.icon.lastIndexOf('.');
-        def originalFileExt = this.icon.substring(lastIndex, this.icon.length())
+        def originalFileExt = (this.icon && lastIndex != -1) ? this.icon.substring(lastIndex, this.icon.length()):null;
 
-        if(!defaultFileType) defaultFileType = originalFileExt;
-        println "-----------------------------"+defaultFileType;
+        if(!defaultFileType && originalFileExt) defaultFileType = originalFileExt;
+        
         isFilePresent = ImageUtils.getFileName(this.icon, imageType, defaultFileType)
         boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+isFilePresent)).exists()
         if(!iconPresent) {

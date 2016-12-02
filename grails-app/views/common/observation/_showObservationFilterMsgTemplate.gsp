@@ -246,13 +246,15 @@
 			<g:if test="${queryParam.key=='trait' && queryParam.value && hackTohideTraits != true}"> 
             <g:message code="trait.for.key" />  
             <g:each in="${queryParam.value}" var="trait">
+            <g:each in="${trait.value.split(',')}" var="tv">
                                     <span
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
-					action:params.action, params:[('trait.'+trait.key): trait.value])}">
-						${Trait.read(trait.key)?.name}:${trait.value.equalsIgnoreCase('none')?'None':TraitValue.read(trait.value)?.value} 
-                        <a class="removeQueryFilter" data-target="trait.${trait.key}=${trait.value}" href="#">[X]</a> 
+					action:params.action, params:[('trait.'+trait.key): tv])}">
+						${Trait.read(trait.key)?.name}:${tv.equalsIgnoreCase('none')?'None':TraitValue.read(tv)?.value} 
+                        <a class="removeQueryFilter" data-target="trait.${trait.key}=${tv}" href="#">[X]</a> 
                         </span>
+                        </g:each>
                         </g:each>
 			</g:if>
 

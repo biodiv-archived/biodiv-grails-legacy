@@ -125,17 +125,21 @@ class Trait {
     String description;
     Date createdOn = new Date();
     Date lastRevised = createdOn;
-    TaxonomyDefinition taxon;
+    //TaxonomyDefinition taxon;
 
     boolean isDeleted = false;
+    boolean isNotObservationTrait = false;
+    boolean isParticipatory = true;
+    boolean showInObservation = false;
+
+    static hasMany = [taxon:TaxonomyDefinition]
 
     static constraints = {
-        name nullable:false, blank:false, unique:['taxon']
+        name nullable:false, blank:false
         //values nullable:true,blank:true
         source nullable:true
         icon nullable:true
         field nullable:false
-        taxon nullable:false
         ontologyUrl nullable:true
         description nullable:true
         units nullable:true
@@ -200,16 +204,26 @@ class Trait {
         }
 
         if(ibpParentTaxon) {
-            ibpParentTaxon.each { t ->
-                traits.each { trait ->
-                    if(trait.taxon.id == t.id)
+            traits.each { trait ->
+                boolean s = false;
+                ibpParentTaxon.each { t ->
+                    trait.taxon.each { taxon ->
+                        println taxon.id
+                        if(taxon.id == t.id)
+                            validTraits << trait;
+                        s = true
+                    }
+                }
+                if(!s) {
+                    if(!trait.taxon) {
+                        //Root level traits
                         validTraits << trait;
+                    }
                 }
             }
         } else {
             println "No IBP parent taxon for  ${taxonConcept}"
         }
-
 
         if(validTraits) {
             return validTraits[0];
@@ -217,6 +231,39 @@ class Trait {
             println "No trait defined with name ${traitName} at taxonscope ${ibpParentTaxon}";
             return null;
         }
+    }
+
+    static boolean isValidTrait(Trait trait, List<TaxonomyDefinition> taxonConcepts) {
+        boolean isValid = true;
+        taxonConcepts. each {
+            isValid = isValid || isValidTrait(trait, it);
+        }
+        return isValid;
+    }
+
+    static boolean isValidTrait(Trait trait, TaxonomyDefinition taxonConcept) {
+        boolean isValid = false;
+        String ibpClassificationName = Holders.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY;
+        def classification = Classification.findByName(ibpClassificationName);
+        def ibpParentTaxon;
+        if(taxonConcept instanceof SynonymsMerged) {
+            def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
+            if(acceptedTaxonConcept) {
+                ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+            }
+        } else {
+            ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
+        }
+
+        if(ibpParentTaxon) {
+            ibpParentTaxon.each { t ->
+                trait.taxon.each { taxon ->
+                    if(trait.taxon.id == t.id)
+                       isValid = true;
+                }
+            }
+        }
+        return isValid;
     }
 
     List values() {

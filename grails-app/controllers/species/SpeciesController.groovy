@@ -239,10 +239,10 @@ class SpeciesController extends AbstractObjectController {
 	def show() {
 		//cache "content"
         params.id = params.long('id');
+        def speciesInstance = params.id ? Species.findByIsDeletedAndId(false, params.id):null;
+
 		def url
-		def speciesInstance = params.id ? Species.findByIsDeletedAndId(false, params.id):null;
-        def traitList=Fact.findAllByPageTaxon(speciesInstance.taxonConcept)
-        println "traitList======="+traitList.traitValue
+        //traitList = testy;
 		if (!params.id || !speciesInstance) {
             def model = utilsService.getErrorModel("Coudn't find species with id ${params.id}", null, OK.value());
             withFormat {
@@ -261,6 +261,25 @@ class SpeciesController extends AbstractObjectController {
             }
         }
 		else {
+
+            def factList = Fact.findAllByObjectIdAndObjectType(speciesInstance.id, speciesInstance.class.getCanonicalName())
+            def traitList = [];//factList.trait.unique();//traitService.getFilteredList([], -1, -1).instanceList;
+            def traitFactMap = [:]
+            def queryParams = ['trait':[:]];
+            //def conRef = []
+            factList.each { fact ->
+                    if(!traitFactMap[fact.trait.id]) {
+                        traitFactMap[fact.trait.id] = []
+                        queryParams['trait'][fact.trait.id] = '';
+                        traitFactMap['fact'] = []
+                        traitList << fact.trait;
+                    }
+                    traitFactMap[fact.trait.id] << fact.traitValue
+                    traitFactMap['fact'] << fact.id
+                    queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+            }
+
+
             if(params.editMode) {
                 println speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()
                 if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) && !utilsService.isAdmin()) {
@@ -328,7 +347,7 @@ class SpeciesController extends AbstractObjectController {
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
 
                     def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList]
+                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList, factInstanceList:traitFactMap, queryParams:queryParams, displayAny:false]
 
                     if(springSecurityService.currentUser) {
                         SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');
