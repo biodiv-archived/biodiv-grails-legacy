@@ -78,7 +78,7 @@
 			    			    	<h5>Filter by value</h5>
 			    <div class="list" style="clear: both;">
 			    	<div class="trait thumbnail" data-toggle="buttons-radio">
-  	                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':factInstance?factInstance[trait.id]:(editable?null:traitValue), 'displayAny':displayAny, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
+  	                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':factInstance?factInstance[trait.id]:(editable?null:traitValue), 'displayAny':true, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
 			    	</div>
 			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
 	    			</div>

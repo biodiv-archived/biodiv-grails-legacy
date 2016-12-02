@@ -172,14 +172,6 @@ $(document).ready(function(){
 
     updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
     
-    $('.list').on('updatedGallery', function() {
-            console.log('updatedGallery');
-            <g:each in="${queryParams.trait}" var="t">
-            <g:each in="${t.value.split(',')}" var="tv">
-            $('.trait button[data-tvid="${tv}"][data-tid="${t.key}"]').addClass('active btn-success');
-            </g:each>
-            </g:each>
-    });
 
     
     $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
