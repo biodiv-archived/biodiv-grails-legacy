@@ -15,7 +15,7 @@
         <g:if test="${fromSpeciesShow!=true}">
             <g:each in="${traitValues}" var="traitValue" status="i">
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue?.trait.id}'
-                    class="btn span2 input-prepend single-post ${traitTypes} ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue?.trait.id]?.contains(traitValue.id+',')?'active btn-success':''}"
+                    class="btn span2 input-prepend single-post ${traitTypes} ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue?.trait.id]?.contains(traitValue.id+'')?'active btn-success':''}"
                         value="${traitValue.value}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
@@ -28,7 +28,7 @@
                 <% String link="${"/trait/show/"+traitValue.trait.id+"?trait."+traitValue.trait.id+"="+traitValue.id}" %>
                 <a href='${link}'>
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue.trait.id}'
-                    class="btn span2 input-prepend single-post ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue.trait.id]?.contains(traitValue.id+',')?'active btn-success':''}"
+                    class="btn span2 input-prepend single-post ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue.trait.id]?.contains(traitValue.id+'')?'active btn-success':''}"
                         value="${traitValue.id}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
 

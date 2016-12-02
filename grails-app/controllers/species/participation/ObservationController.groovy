@@ -374,7 +374,6 @@ class ObservationController extends AbstractObjectController {
                 queryParams.trait[k] = v[0..-2];
             }
 
-
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
