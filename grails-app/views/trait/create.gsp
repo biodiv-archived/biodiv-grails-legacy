@@ -112,12 +112,6 @@ display:none;
                         %>
 
                         <table class="table" id="valueTable">
-                        <g:if test="${params.action=='edit'}">
-                        <a class="btn btn-primary" id="addNewValue"><i class="icon-plus icon-white"></i></a>
-                        </g:if>
-                        <g:else>
-                        <a class="btn btn-primary" id="createNewValue"><i class="icon-plus icon-white"></i></a>
-                        </g:else>
                         <tr>
                         <th>Value</th>
                         <th>Description</th>
@@ -167,6 +161,12 @@ display:none;
                         </tr>
                             </g:each>
                             </table>
+                        <g:if test="${params.action=='edit'}">
+                        <a class="btn btn-primary" id="addNewValue"><i class="icon-plus icon-white"></i></a>
+                        </g:if>
+                        <g:else>
+                        <a class="btn btn-primary" id="createNewValue"><i class="icon-plus icon-white"></i></a>
+                        </g:else>
                         </div>
                     </div>
 
@@ -176,9 +176,7 @@ display:none;
                         <label class="control-label" for="description"><g:message code="default.description.label" />
                         </label>
                         <div class="controls">
-                            <textarea id="description" name="description" style="width:705px; height:75px;">
-                                ${traitInstance?.description}
-                            </textarea>
+                            <textarea id="description" name="description" style="width:705px; height:75px;">${traitInstance?.description}</textarea>
             </div>
         </div>
                         <div
@@ -196,13 +194,34 @@ display:none;
                         <div class="controls">
                             
                 <ul id="fieldid" class="fieldid" rel="${g.message(code:'placeholder.add.tags')}">
-                <g:each in="${traitInstance.field}" var="tag">
-                <li>${tag}</li>
-                </g:each>
+                    <li><span class="tagit-label">${field}</span></li>
             </ul>
 
                         </div>
                     </div>
+                     <div
+                        class="control-group ${hasErrors(bean: traitInstance, isNotObservationTrait: 'source', 'error')}">
+                        <label class="control-label" for="value"><g:message code="trait.isNotObservationTrait.label" /></label>
+                        <div class="controls">
+                            <g:checkBox name="isNotObservationTrait" class="input-block-level" value="${traitInstance.isNotObservationTrait}"/>
+                        </div>
+                    </div>
+                   <div
+                        class="control-group ${hasErrors(bean: traitInstance, isParticipatory: 'source', 'error')}">
+                        <label class="control-label" for="value"><g:message code="trait.isParticipatory.label" /></label>
+                        <div class="controls">
+                            <g:checkBox name="isParticipatory" class="input-block-level" value="${traitInstance.isParticipatory}" />
+                        </div>
+                    </div>
+                   <div
+                        class="control-group ${hasErrors(bean: traitInstance, showInObservation: 'source', 'error')}">
+                        <label class="control-label" for="value"><g:message code="trait.showInObservation.label" /> </label>
+                        <div class="controls">                        
+                            <g:checkBox name="showInObservation" class="input-block-level" value="${traitInstance.showInObservation}" />
+                        </div>
+                    </div>
+
+
                              </div>
                                     </div>
                                     <div class="span12 submitButtons">
