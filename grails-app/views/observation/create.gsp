@@ -170,7 +170,8 @@ $(document).ready(function(){
         updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
     });
 
-    updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
+    <%def paramStr = (queryParams && queryParams.trait) ? queryParams.trait.collect { k,v -> "traits.$k=$v" }.join('&'):'' %>
+    updateGallery('/trait/list?isObservationTrait=true&displayAny=false&${raw(paramStr)}', -1, 0, undefined, true);
     
 
     

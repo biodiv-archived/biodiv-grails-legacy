@@ -989,7 +989,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     }
 
     for(var key in params) {
-        if(key.match('trait.')) {
+        if(key.match('trait\\.')) {
             delete params[key];
         }
     }

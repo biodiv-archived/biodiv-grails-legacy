@@ -399,9 +399,7 @@ class TraitService extends AbstractObjectService {
 
         hqlQuery.setProperties(queryParts.queryParams);
         def instanceList;
-        utilsService.logSql {
         instanceList = hqlQuery.list();
-        }
 
         allInstanceCountQuery.setProperties(queryParts.queryParams)
         allInstanceCount = allInstanceCountQuery.list()[0]

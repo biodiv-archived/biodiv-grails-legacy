@@ -370,6 +370,10 @@ class ObservationController extends AbstractObjectController {
                     traitFactMap['fact'] << fact.id
                     queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
             }
+            queryParams.trait.each {k,v->
+                queryParams.trait[k] = v[0..-2];
+            }
+
 
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -503,7 +507,9 @@ class ObservationController extends AbstractObjectController {
                 traitFactMap['fact'] << fact.id
                 queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
         }
-
+        queryParams.trait.each {k,v->
+            queryParams.trait[k] = v[0..-2];
+        }
 
         if (!observationInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"

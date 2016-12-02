@@ -36,6 +36,13 @@ class TraitController extends AbstractObjectController {
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
         if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
+        //HACK
+        if(params.traits) {
+            model.queryParams = ['trait':[:]];
+            params.traits.each { t,v ->
+                model.queryParams.trait[Long.parseLong(t)] = v
+            }
+        }
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model.resultType = params.controller;
             model.hackTohideTraits = true;
