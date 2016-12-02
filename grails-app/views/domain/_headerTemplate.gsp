@@ -407,7 +407,7 @@ function loadPages(target,url,pageURL){
 
       if(parCnt >15 && parCnt >20){
         $('.pageUL').width(550);
-      }else if(parCnt 30 && parCnt >40){
+      }else if(parCnt > 30 && parCnt >40){
         $('.pageUL').width(820);
       }
 			
