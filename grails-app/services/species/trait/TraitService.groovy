@@ -83,10 +83,9 @@ class TraitService extends AbstractObjectService {
                 updateHeaderIndex = i;
             }
         }
-
         if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
             dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
-            return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':logMsgs];
+            return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':"Trait name column and/or taxonId column or update column is not defined"];
         }
 
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
@@ -282,7 +281,7 @@ class TraitService extends AbstractObjectService {
         }
         if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || traitIdHeaderIndex == -1) {
             dl.writeLog("Some of trait name, value and traitid columns are not defined", Level.ERROR);
-            return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':logMsgs];
+            return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':"Some of trait name, value and traitid columns are not defined"];
         }
 
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
