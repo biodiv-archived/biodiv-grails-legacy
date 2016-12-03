@@ -750,7 +750,8 @@ function getSelectedHabitat() {
     return hbt;	
 } 
 
-function getSelectedTrait($traitFilter, putValue = false) {
+function getSelectedTrait($traitFilter, putValue) {
+    putValue = (putValue === undefined)?false:true;
     if($traitFilter == undefined)
         $traitFilter = $('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any');
     var trait='',selTrait={}; 
@@ -765,7 +766,8 @@ function getSelectedTrait($traitFilter, putValue = false) {
     return selTrait;
 }
 
-function getSelectedTraitStr($traitFilter, putValue = false) {
+function getSelectedTraitStr($traitFilter, putValue) {
+    putValue = (putValue === undefined)?false:true;
     var traits = getSelectedTrait($traitFilter, putValue);
     var traitsStr = '';
     for(var m in traits) {
