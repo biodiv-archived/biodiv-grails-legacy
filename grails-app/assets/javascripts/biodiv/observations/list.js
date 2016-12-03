@@ -942,7 +942,19 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     var params = url.param();
     console.log('url params : '+params);
     if(removeParam) {
-        delete params[removeParam]
+        console.log(removeParam);
+        if(removeParam.match('trait\\.')) {
+            var kv = removeParam.split('=');
+            var tP = params[kv[0]];
+            var tvStr = params[kv[0]].split(',');
+            params[kv[0]] = '';
+            for(var i=0; i<tvStr.length; i++) {
+                if(tvStr[i] != kv[1]) params[kv[0]] += tvStr[i]+',';
+            }
+            params[kv[0]] = params[kv[0]].substring(0,params[kv[0]].length-1);
+        } else {
+            delete params[removeParam];
+        }
     }
     removeSort = (typeof removeSort === "undefined") ? false : removeSort;
 
@@ -990,11 +1002,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['habitat'] = habitat;
     }
 
-    for(var key in params) {
+    /*for(var key in params) {
         if(key.match('trait\\.')) {
             delete params[key];
         }
-    }
+    }*/
     var trait = getSelectedTrait();
     for(var key in trait) { 
         params['trait.'+key]=trait[key];

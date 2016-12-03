@@ -38,9 +38,9 @@ class TraitController extends AbstractObjectController {
         if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
         else model.displayAny = true;
         //HACK
-        if(params.traits) {
+        if(params.trait) {
             model.queryParams = ['trait':[:]];
-            params.traits.each { t,v ->
+            params.trait.each { t,v ->
                 model.queryParams.trait[Long.parseLong(t)] = v
             }
         }

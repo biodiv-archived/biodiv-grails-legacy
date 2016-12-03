@@ -21,9 +21,6 @@ function loadMatchingSpeciesList() {
     }
     var History = window.History;
     var traits = getSelectedTrait($('.trait button, .trait .none, .trait .any'));
-    console.log('sdsdfsdfsdfsdf');
-    console.log(traits);
-    console.log(traits);
     for(var m in traits) {
         params['trait.'+m] = traits[m].substring(0,traits[m].length-1);
     }
@@ -73,18 +70,82 @@ function loadMatchingSpeciesList() {
 function showIcon(url){
     return  '<img src="'+url+'" width="32" height="32" />';
 }
+
+function onSubmitFact($me, objectId, objectType) {
+    var id = $me.data("id");
+    var traitsStr = getSelectedTraitStr($me.parent().parent().find('.trait button, .trait .none, .trait .any'), true);
+    var params = {};
+    params['traits'] = traitsStr;
+    params['traitId'] = id;
+    params['objectId'] = objectId;
+    params['objectType'] = objectType;
+    $.ajax({ 
+        url:window.params.fact.updateFactUrl,
+        method:'POST',
+        data:params,
+        success: function(data, statusText, xhr, form) {
+            //TODO:update traits panel
+            console.log(data);
+            if(data.success) {
+                $me.parent().parent().find('.alert').removeClass('alert alert-error').addClass('alert alert-info').html(data.msg).show();
+                $me.parent().parent().replaceWith(data.model.traitHtml);
+                $me.parent().parent().find('.row:first').show();
+                $me.parent().parent().find('.editFactPanel').hide();
+                $me.parent().find('.submitFact, .cancelFact').hide();
+                $me.parent().parent().find('.row:first').show();
+                $me.hide();
+                $me.parent().find('.editFact').show();//.css("position","");
+            } else {
+                $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(data.msg).show();
+            }
+        },
+        error:function (xhr, ajaxOptions, thrownError){
+            //successHandler is used when ajax login succedes
+            var successHandler = this.success, errorHandler = function() {
+                //TODO:show error msg
+                console.log(arguments);
+                $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(arguments.msg).show();
+            }
+            handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+        } 
+    });
+}
+
+
+
 /* For PopOver Traits*/
 $(document).ready(function(){
-$('.traitIcon').popover({
-    'trigger':'hover',
-    'html':true,
-    'placement':'top',
-    'delay': { 
-       'show': "500", 
-       'hide': "100"
-    },
-    'content':function(){
-        return "<div style='width:150px;height:150px;'><img src='"+$(this).data('imageUrl')+"' width='150' height='150' /></div>";
-    }
-});
+    //FIX: will not owrk after load more on any ajax load of trait list panel
+    $('.traitIcon').popover({
+        'trigger':'hover',
+        'html':true,
+        'placement':'top',
+        'delay': { 
+        'show': "500", 
+        'hide': "100"
+        },
+        'content':function(){
+            return "<div style='width:150px;height:150px;'><img src='"+$(this).data('imageUrl')+"' width='150' height='150' /></div>";
+        }
+    });
+        
+	$(document).on('click', '.editFact', function () {
+        $(this).parent().parent().find('.row:first').hide();
+        $(this).hide();
+        $(this).parent().find('.submitFact, .cancelFact').show();
+        $(this).parent().parent().find('.editFactPanel').show();
+        console.log($(this).parent().parent().find('.editFactPanel'));
+        return false;
+	});
+
+	$(document).on('click', '.cancelFact', function () {
+
+        $(this).parent().parent().find('.editFactPanel').hide();
+        $(this).parent().find('.submitFact, .cancelFact').hide();
+        $(this).parent().parent().find('.row:first').show();
+        $(this).hide();
+        $(this).parent().find('.editFact').show();
+        $(this).parent().parent().find('.alert').removeClass('alert alert-error').hide();
+	});
+
 });

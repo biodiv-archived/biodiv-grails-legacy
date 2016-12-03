@@ -143,6 +143,9 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         },
         'trait' : {
             matchingSpeciesListUrl:"${uGroup.createLink(controller:'trait', action: 'matchingSpecies', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}"
+        },
+        'fact' : {
+            'updateFactUrl' : "${uGroup.createLink(controller:'fact', action:'update', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
         }
         <sUser:isAdmin>
         ,
