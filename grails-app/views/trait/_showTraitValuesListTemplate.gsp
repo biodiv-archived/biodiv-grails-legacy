@@ -1,4 +1,3 @@
-${queryParams}
 <div class="row btn-group" style="white-space:inherit;margin-left:20px;width:100%">
             <g:if test="${displayAny}">
             <div data-tvid='all' data-tid='${traitValues?traitValues[0]?.trait?.id:''}'
