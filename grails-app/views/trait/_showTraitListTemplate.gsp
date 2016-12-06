@@ -60,7 +60,7 @@ instanceList.each{ iL ->
 
 <asset:script>
 $(document).ready(function(){
-	$('.icon-question-sign').tooltip();
+	$('.icon-question-sign').tooltip({'placement': 'top','container':'body'});
 	$(document).on('click', '.submitFact', function () {
         var $me = $(this);
         onSubmitFact($me, "${instance?.id}", "${instance?.class?.getCanonicalName()}");

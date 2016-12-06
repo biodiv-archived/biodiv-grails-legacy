@@ -88,7 +88,7 @@
     });
 $(document).ready(function() {
 	$(".trait button").button();
-	$(".trait button").tooltip({placement:'bottom'});
+	$(".trait button").tooltip({placement:'bottom', 'container':'body'});
     <g:each in="${params.trait}" var="t">
         <g:each in="${t.value.split(',')}" var="tv">
             $('.trait button[data-tvid="${tv}"][data-tid="${t.key}"]').addClass('active btn-success');

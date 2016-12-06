@@ -117,6 +117,7 @@ function onSubmitFact($me, objectId, objectType) {
 $(document).ready(function(){
     //FIX: will not owrk after load more on any ajax load of trait list panel
     $('.traitIcon').popover({
+        'container':'body',
         'trigger':'hover',
         'html':true,
         'placement':'top',
