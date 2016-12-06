@@ -115,11 +115,13 @@ class ObservationController extends AbstractObjectController {
 
     def list() {
         def model;
+        params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         model = runLastListQuery(params);
         /*Map cacheEntries = sessionFactory.getStatistics()
                 .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
                         .getEntries();
 */
+
         model.userLanguage = utilsService.getCurrentLanguage(request);
         model.filters = traitService.getAllFilter(utilsService.getModuleFilters('observation'));
         model.queryParams.view = (params?.view && params?.view=='grid')?'grid':'list';
