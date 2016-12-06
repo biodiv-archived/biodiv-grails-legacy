@@ -39,7 +39,7 @@
         </g:if>
         
             <g:if test="${displayAny}">
-            <div data-tvid='none' data-tid='${traitValues && traitValues[0]?.trait?.id}'
+            <div data-tvid='none' data-tid='${traitValues? traitValues[0]?.trait?.id:''}'
                 class="btn span2 none ${queryParams.trait && traitValues && queryParams.trait[traitValues[0].trait.id+'']=='none'?'active btn-success':''}"
                 value="none"
                 style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;line-height:30px;text-align:left;">

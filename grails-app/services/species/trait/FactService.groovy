@@ -111,11 +111,11 @@ class FactService extends AbstractObjectService {
                         return;
                     }
                     key = key.trim();
-                    value = value ? value.trim() : null ;
 
                     switch(key) {
-                        case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts'] : break;
+                        case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFirst'] : break;
                         default : 
+                        value = value ? value.trim() : null ;
                         writeLog("Loading trait ${key} : ${value}");
 
                         Trait trait;
