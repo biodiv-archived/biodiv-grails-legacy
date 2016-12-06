@@ -357,25 +357,6 @@ class ObservationController extends AbstractObjectController {
                 }
             }
 
-            def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
-            def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
-            def traitFactMap = [:]
-            def queryParams = ['trait':[:]];
-            //def conRef = []
-            factList.each { fact ->
-                    if(!traitFactMap[fact.trait.id]) {
-                        traitFactMap[fact.trait.id] = []
-                        queryParams['trait'][fact.trait.id] = '';
-                        traitFactMap['fact'] = []
-                    }
-                    traitFactMap[fact.trait.id] << fact.traitValue
-                    traitFactMap['fact'] << fact.id
-                    queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
-            }
-            queryParams.trait.each {k,v->
-                queryParams.trait[k] = v[0..-2];
-            }
-
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -408,6 +389,25 @@ class ObservationController extends AbstractObjectController {
                 def prevNext = getPrevNextObservations(pos, params.webaddress);
 
                 def model = utilsService.getSuccessModel("", observationInstance, OK.value());
+
+                def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
+                def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
+                def traitFactMap = [:]
+                def queryParams = ['trait':[:]];
+                //def conRef = []
+                factList.each { fact ->
+                        if(!traitFactMap[fact.trait.id]) {
+                            traitFactMap[fact.trait.id] = []
+                            queryParams['trait'][fact.trait.id] = '';
+                            traitFactMap['fact'] = []
+                        }
+                        traitFactMap[fact.trait.id] << fact.traitValue
+                        traitFactMap['fact'] << fact.id
+                        queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+                }
+                queryParams.trait.each {k,v->
+                    queryParams.trait[k] = v[0..-2];
+                }
                 withFormat {
                     html { 
                         if(prevNext) {
