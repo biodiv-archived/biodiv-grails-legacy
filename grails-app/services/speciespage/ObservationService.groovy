@@ -308,7 +308,7 @@ class ObservationService extends AbstractMetadataService {
                 }
 				
 				customFieldService.updateCustomFields(params, observationInstance.id)
-                def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFirst:true];
+                def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
                 traitParams.putAll(getTraits(params.traits));
                 factService.updateFacts(traitParams, observationInstance);
                 return utilsService.getSuccessModel('', observationInstance, OK.value())

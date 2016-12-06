@@ -755,14 +755,7 @@ $(document).ready(function(){
     }
 
     function getSelectedTraitForCreate() {
-        var hbt = '',trait='',selTrait={}; 
-        $('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any').each(function(){
-            if($(this).hasClass('active')) {
-                trait = $(this).attr('data-tid');
-                selTrait[trait] = $(this).attr('value');
-            }
-        });
-        return selTrait;
+        return getSelectedTraitStr(undefined , true);
     }
 
     /**
@@ -798,11 +791,7 @@ $(document).ready(function(){
             $(".userGroupsList").val(getSelectedUserGroups());
 
             var traits = getSelectedTraitForCreate();
-            var traitsStr = '';
-            for(var m in traits) {
-                traitsStr += m+':'+traits[m]+';';
-            }
-            $('#traits').val(traitsStr);
+            $('#traits').val(traits);
 
             var locationpicker = $(".map_class").data('locationpicker'); 
             if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {

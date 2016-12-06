@@ -36,10 +36,11 @@ class TraitController extends AbstractObjectController {
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
         if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
+        else model.displayAny = true;
         //HACK
-        if(params.traits) {
+        if(params.trait) {
             model.queryParams = ['trait':[:]];
-            params.traits.each { t,v ->
+            params.trait.each { t,v ->
                 model.queryParams.trait[Long.parseLong(t)] = v
             }
         }
@@ -207,22 +208,30 @@ class TraitController extends AbstractObjectController {
 
     def show() {
         Trait traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
-        def coverage = traitInstance.taxon
-        def traitValue = [];
-        Field field;
-        traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
-        field = Field.findById(traitInstance.fieldId);
-        def model = getList(params);
-        model['traitInstance'] = traitInstance
-        model['coverage'] = coverage*.name
-        model['traitValue'] = traitValue
-        model['field'] = field.concept
-        withFormat {
-            html {
-                render (view:"show", model:model)
+        if(traitInstance) {
+            def coverage = traitInstance.taxon
+            def traitValue = [];
+            Field field;
+            traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
+            field = Field.findById(traitInstance.fieldId);
+            def model = getList(params);
+            model['traitInstance'] = traitInstance
+            model['coverage'] = coverage*.name
+            model['traitValue'] = traitValue
+            model['field'] = field.concept
+            withFormat {
+                html {
+                    render (view:"show", model:model)
+                }
+                json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
+                xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
             }
-            json { render utilsService.getSuccessModel('', traitInstance, OK.value()) as JSON }
-            xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
+        } else {
+            withFormat {
+                html {
+                    render (view:"list")
+                }
+            }
         }
         return
     }

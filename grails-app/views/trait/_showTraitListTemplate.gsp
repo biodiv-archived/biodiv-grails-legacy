@@ -60,70 +60,10 @@ instanceList.each{ iL ->
 
 <asset:script>
 $(document).ready(function(){
-	$('.icon-question-sign').tooltip();
-	
-	$(document).on('click', '.editFact', function () {
-        $(this).parent().parent().find('.row:first').hide();
-        $(this).hide();
-        $(this).parent().find('.submitFact, .cancelFact').show();
-        $(this).parent().parent().find('.editFactPanel').show();
-        console.log($(this).parent().parent().find('.editFactPanel'));
-        return false;
-	});
-
-	$(document).on('click', '.cancelFact', function () {
-
-        $(this).parent().parent().find('.editFactPanel').hide();
-        $(this).parent().find('.submitFact, .cancelFact').hide();
-        $(this).parent().parent().find('.row:first').show();
-        $(this).hide();
-        $(this).parent().find('.editFact').show();
-        $(this).parent().parent().find('.alert').removeClass('alert alert-error').hide();
-	});
-
-    function onSubmit($me) {
-    	var id = $me.data("id");
-        var traitsStr = getSelectedTraitStr($me.parent().parent().find('.trait button, .trait .none, .trait .any'), true);
-        var params = {};
-        params['traits'] = traitsStr;
-        params['traitId'] = id;
-        params['objectId'] = "${instance?.id}";
-        params['objectType'] = "${instance?.class?.getCanonicalName()}";
-		$.ajax({ 
-			url:'${uGroup.createLink(controller:'fact', action:'update', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}',
-            method:'POST',
-			data:params,
-			success: function(data, statusText, xhr, form) {
-                //TODO:update traits panel
-                console.log(data);
-                if(data.success) {
-                    $me.parent().parent().find('.alert').removeClass('alert alert-error').addClass('alert alert-info').html(data.msg).show();
-                    $me.parent().parent().replaceWith(data.model.traitHtml);
-                    $me.parent().parent().find('.row:first').show();
-                    $me.parent().parent().find('.editFactPanel').hide();
-                    $me.parent().find('.submitFact, .cancelFact').hide();
-                    $me.parent().parent().find('.row:first').show();
-                    $me.hide();
-                    $me.parent().find('.editFact').show();//.css("position","");
-                } else {
-                    $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(data.msg).show();
-                }
-			},
-            error:function (xhr, ajaxOptions, thrownError){
-                //successHandler is used when ajax login succedes
-                var successHandler = this.success, errorHandler = function() {
-                    //TODO:show error msg
-                    console.log(arguments);
-                    $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(arguments.msg).show();
-                }
-                handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-            } 
-		});
-    }
-
+	$('.icon-question-sign').tooltip({'placement': 'top','container':'body'});
 	$(document).on('click', '.submitFact', function () {
         var $me = $(this);
-        onSubmit($me);
+        onSubmitFact($me, "${instance?.id}", "${instance?.class?.getCanonicalName()}");
     });
 
 });

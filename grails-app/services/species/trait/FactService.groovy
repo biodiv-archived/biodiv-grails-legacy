@@ -111,11 +111,11 @@ class FactService extends AbstractObjectService {
                         return;
                     }
                     key = key.trim();
-                    value = value ? value.trim() : null ;
 
                     switch(key) {
                         case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts'] : break;
                         default : 
+                        value = value ? value.trim() : null ;
                         writeLog("Loading trait ${key} : ${value}");
 
                         Trait trait;
@@ -240,10 +240,13 @@ class FactService extends AbstractObjectService {
                                writeLog("Invalid trait type ${trait.traitTypes}", Level.ERROR);
                             }
 
+                            boolean isUpdate = false;
                             facts.each { fact ->
                                 if(fact.id) {
+                                    isUpdate = true;
                                     writeLog("Updating fact ${fact}");
                                 } else {
+                                    isUpdate = false;
                                     writeLog("Creating new fact ${fact}");
                                 }
                                 fact.attribution = attribution;

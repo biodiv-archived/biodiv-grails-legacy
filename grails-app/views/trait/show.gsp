@@ -114,7 +114,7 @@
 		<asset:script type="text/javascript">
 $(document).ready(function() {
 	$(".trait button").button();
-	$(".trait button").tooltip({placement:'bottom'});
+	$(".trait button").tooltip({placement:'bottom', 'container':'body'});
     <g:each in="${params.trait}" var="t">
         $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
     </g:each>
