@@ -117,7 +117,13 @@ class FactController extends AbstractObjectController {
                     success = factService.updateFacts(params, object, null, true);
                     //TODO: to update this from approprite result from factService.update
                     result = [success:success, msg:success?'Successfully updated fact':'Error updating fact'];
+                    //success = r.success;
                     if(success) {
+/*                        r.facts { fact ->
+                            def activityFeed = activityFeedService.addActivityFeed(object, fact, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
+                        }
+                        //utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
+*/
                         List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
                         Map queryParams = ['trait':[:]], factInstance = [:];
                         queryParams.trait[trait.id] = '';
@@ -146,9 +152,9 @@ class FactController extends AbstractObjectController {
             e.printStackTrace();
             result['msg'] = e.getMessage();
         }
-        if(result.success)
+        if(result.success) {
             model = utilsService.getSuccessModel(result.msg, null, OK.value(), model);
-        else
+        } else
             model = utilsService.getErrorModel(result.msg, null, OK.value(), model);
 
         withFormat {

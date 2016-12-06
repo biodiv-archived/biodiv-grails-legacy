@@ -392,7 +392,7 @@ $(document).ready(function(){
             $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
         }
         removeParam = $(this).attr('data-target').replace('#','');
-        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
+        updateGallery($(this).prev().attr('href'), window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
         return false;
     });
 
