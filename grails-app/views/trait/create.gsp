@@ -170,10 +170,10 @@ display:none;
                             </g:each>
                             </table>
                         <g:if test="${params.action=='edit'}">
-                            <a class="btn btn-primary" id="addNewValue"><i class="icon-plus icon-white"></i></a>
+                        <a class="btn btn-primary" id="addNewValue"><i class="icon-plus icon-white"></i></a>
                         </g:if>
                         <g:else>
-                            <a class="btn btn-primary" id="createNewValue"><i class="icon-plus icon-white"></i></a>
+                        <a class="btn btn-primary" id="createNewValue"><i class="icon-plus icon-white"></i></a>
                         </g:else>
                         </div>
                     </div>
@@ -183,8 +183,8 @@ display:none;
                             </label>
                         <div class="controls">
                             <textarea id="description" name="description" style="width:705px; height:75px;">${traitInstance?.description}</textarea>
-                         </div>
-                    </div>
+            </div>
+        </div>
                         <div
                         class="control-group ${hasErrors(bean: traitInstance, field: 'source', 'error')}">
                         <label class="control-label" for="value"><g:message code="trait.source.label" /></label>
@@ -207,6 +207,11 @@ display:none;
                     </div>
 
                     <div
+            </ul>
+
+                        </div>
+                    </div>
+                     <div
                         class="control-group ${hasErrors(bean: traitInstance, isNotObservationTrait: 'source', 'error')}">
                         <label class="control-label" for="value"><g:message code="trait.isNotObservationTrait.label" /></label>
                         <div class="controls">

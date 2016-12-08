@@ -86,8 +86,8 @@ class TraitController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def edit() {
         def traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
-         Field field;
-         field = Field.findById(traitInstance.fieldId);
+       Field field;
+       field = Field.findById(traitInstance.fieldId);
         if (!traitInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
@@ -110,9 +110,10 @@ class TraitController extends AbstractObjectController {
             traitInstance.dataTypes=Trait.fetchDataTypes(params.datatype);
         }
         Recommendation recommendationInstance=Recommendation.findById(params.recommendationId)
-         params.isNotObservationTrait = (params.isNotObservationTrait)?true:false;
+        params.isNotObservationTrait = (params.isNotObservationTrait)?true:false;
         params.isParticipatory = (params.isParticipatory)?true:false;
-        params.showInObservation = (params.showInObservation)?true:false;        
+        params.showInObservation = (params.showInObservation)?true:false;
+        
         traitInstance.properties = params;
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
