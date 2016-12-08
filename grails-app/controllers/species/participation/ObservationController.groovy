@@ -1303,10 +1303,6 @@ class ObservationController extends AbstractObjectController {
     def tags = {
         render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
     }
-    def taxonTags = {
-        render TaxonomyDefinition.findAllByNameIlike("${params.term}%")*.name as JSON
-    }
-
         
     @Secured(['ROLE_USER'])
     def deleteRecoVoteComment() {

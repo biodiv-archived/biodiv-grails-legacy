@@ -101,7 +101,7 @@ display:none;
                         <div class='nameSuggestions' style='display: block;'></div>
                         <input type="hidden" name="taxonId[]" class="taxonId" value="${taxon?.id}"/>
                         </g:each> -->
-                        <ul id="recoName" class="recoName" rel="${g.message(code:'placeholder.add.tags')}">
+                        <ul id="taxonName" class="taxonName" rel="${g.message(code:'placeholder.add.tags')}">
                         <g:each in="${traitInstance.taxon}" var="taxon" status="i">
                             <li><span class="tagit-label">${taxon?.name+' ('+taxon?.id+'-'+(taxon?.status)+'-'+(taxon?.position)+')'}</span></li>
                         </g:each>
@@ -393,7 +393,6 @@ display:none;
                         availableTags:data,
                         fieldName: 'fieldid', 
                         showAutocompleteOnFocus: false,
-                        maxTags  : 1,
                         allowSpaces: true,
                         triggerKeys:['comma'], 
                         beforeTagAdded: function(event, ui) {
@@ -410,18 +409,18 @@ display:none;
                   }
     });
 
-            $(".recoName").tagit({
-            select:true, 
-            allowSpaces:true, 
-            availableTags:"${traitInstance.taxon.name}",
-            placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
-            fieldName: 'recoName', 
-            maxTags  : 1,
-            autocomplete:{
-                source: '/observation/taxonTags'
-            }, 
-            triggerKeys:['enter', 'comma', 'tab'], 
-            maxLength:30
+            $(".taxonName").tagit({
+                select:true, 
+                allowSpaces:true,
+                placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
+                fieldName: 'taxonName', 
+                maxTags  : 1,
+                autocomplete:{
+                    source: '/trait/taxonTags'
+                }, 
+                triggerKeys:['enter', 'comma', 'tab'], 
+                maxLength:30
+
         });
 
 //image icon upload

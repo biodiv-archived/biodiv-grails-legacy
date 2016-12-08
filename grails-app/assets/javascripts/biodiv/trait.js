@@ -50,15 +50,12 @@ function loadMatchingSpeciesList() {
                     itemMap.traitIcon=item[6];
                     itemMap.type='species';
                     var imagepath=item[7];
-                    var traitName=item[8];
                     //$.each(imagepath,function(index1,item1){ alert(item1); });
                     //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
                     $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
                     $.each(imagepath,function(index1,item1){ 
-                        $.each(traitName, function(index2,name){
-                            $('#imagediv_'+item[0]).append(showIcon(item1,name));
-                        });
+                        $('#imagediv_'+item[0]).append(showIcon(item1[0],item1[1],item1[2]));
                     });
                 });
                 $me.data('offset', data.model.next);
@@ -70,8 +67,8 @@ function loadMatchingSpeciesList() {
     });
 }
 
-function showIcon(url,name){
-    return  '<img src="'+url+'" width="32" height="32" title="'+name+'"/>';
+function showIcon(value,name,url){
+    return  '<img src="'+url+'" width="32" height="32" src="'+name+'-'+value+'" />';
 }
 
 function onSubmitFact($me, objectId, objectType) {

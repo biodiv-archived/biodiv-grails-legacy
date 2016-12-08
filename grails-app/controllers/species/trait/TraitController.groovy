@@ -109,7 +109,6 @@ class TraitController extends AbstractObjectController {
             traitInstance.traitTypes=Trait.fetchTraitTypes(params.traittype);
             traitInstance.dataTypes=Trait.fetchDataTypes(params.datatype);
         }
-        Recommendation recommendationInstance=Recommendation.findById(params.recommendationId)
         params.isNotObservationTrait = (params.isNotObservationTrait)?true:false;
         params.isParticipatory = (params.isParticipatory)?true:false;
         params.showInObservation = (params.showInObservation)?true:false;
@@ -118,8 +117,14 @@ class TraitController extends AbstractObjectController {
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
-        traitInstance.addToTaxon(recommendationInstance.taxonConcept)
-
+        def taxonId
+        params.taxonName.each{
+            taxonId=it
+            taxonId = taxonId.substring(taxonId.indexOf("(") + 1);
+            taxonId = taxonId.substring(0, taxonId.indexOf("-"));
+            TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
+            traitInstance.addToTaxon(taxon);
+        }
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
@@ -508,6 +513,14 @@ class TraitController extends AbstractObjectController {
                 //resourcesInfo.add([fileName:file.name, size:f.size]);
             }        
         }
+    }
+    def taxonTags = {
+        def taxon  = TaxonomyDefinition.findAllByNameIlike("${params.term}%")
+        def taxonList = [];
+            taxon.each {
+                taxonList << it.name+' ('+it.id+'-'+it.status+'-'+it.position+')'
+            }
+        render taxonList as JSON
     }
 
 }
