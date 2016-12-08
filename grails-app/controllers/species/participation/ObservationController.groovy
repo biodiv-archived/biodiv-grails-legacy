@@ -51,6 +51,7 @@ import species.SpeciesPermission.PermissionType;
 import org.hibernate.FetchMode;
 import species.trait.Fact;
 import species.trait.TraitValue;
+import species.TaxonomyDefinition;
 
 class ObservationController extends AbstractObjectController {
     
@@ -1301,6 +1302,9 @@ class ObservationController extends AbstractObjectController {
      */
     def tags = {
         render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
+    }
+    def taxonTags = {
+        render TaxonomyDefinition.findAllByNameIlike("${params.term}%")*.name as JSON
     }
 
         
