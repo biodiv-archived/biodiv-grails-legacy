@@ -2490,7 +2490,7 @@ def checking(){
 
             def traitIcons = [];
             factInstance?.traitValue.each{tv ->
-                traitIcons << tv.mainImage()?.fileName
+                traitIcons << [tv.value,tv.trait.name, tv.mainImage()?.fileName]
             }
 
             if(params.downloadFrom == 'matchingSpecies') {

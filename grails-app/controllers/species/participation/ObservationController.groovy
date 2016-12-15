@@ -51,6 +51,7 @@ import species.SpeciesPermission.PermissionType;
 import org.hibernate.FetchMode;
 import species.trait.Fact;
 import species.trait.TraitValue;
+import species.TaxonomyDefinition;
 
 class ObservationController extends AbstractObjectController {
     
@@ -115,11 +116,13 @@ class ObservationController extends AbstractObjectController {
 
     def list() {
         def model;
+        params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         model = runLastListQuery(params);
         /*Map cacheEntries = sessionFactory.getStatistics()
                 .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
                         .getEntries();
 */
+
         model.userLanguage = utilsService.getCurrentLanguage(request);
         model.filters = traitService.getAllFilter(utilsService.getModuleFilters('observation'));
         model.queryParams.view = (params?.view && params?.view=='grid')?'grid':'list';
@@ -356,7 +359,6 @@ class ObservationController extends AbstractObjectController {
             }
 
             Map t = observationInstance.getTraits();
-
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -389,6 +391,25 @@ class ObservationController extends AbstractObjectController {
                 def prevNext = getPrevNextObservations(pos, params.webaddress);
 
                 def model = utilsService.getSuccessModel("", observationInstance, OK.value());
+
+                def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
+                def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
+                def traitFactMap = [:]
+                def queryParams = ['trait':[:]];
+                //def conRef = []
+                factList.each { fact ->
+                        if(!traitFactMap[fact.trait.id]) {
+                            traitFactMap[fact.trait.id] = []
+                            queryParams['trait'][fact.trait.id] = '';
+                            traitFactMap['fact'] = []
+                        }
+                        traitFactMap[fact.trait.id] << fact.traitValue
+                        traitFactMap['fact'] << fact.id
+                        queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+                }
+                queryParams.trait.each {k,v->
+                    queryParams.trait[k] = v[0..-2];
+                }
                 withFormat {
                     html { 
                         if(prevNext) {
@@ -1265,7 +1286,6 @@ class ObservationController extends AbstractObjectController {
     def tags = {
         render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
     }
-
         
     @Secured(['ROLE_USER'])
     def deleteRecoVoteComment() {

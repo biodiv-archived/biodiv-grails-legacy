@@ -86,11 +86,13 @@ class TraitController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def edit() {
         def traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
+       Field field;
+       field = Field.findById(traitInstance.fieldId);
         if (!traitInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
         }  else {
-            render(view: "create", model: [traitInstance: traitInstance])
+            render(view: "create", model: [traitInstance: traitInstance , field: field.concept+'|'+field.category])
         }
         return;
     }
@@ -107,15 +109,22 @@ class TraitController extends AbstractObjectController {
             traitInstance.traitTypes=Trait.fetchTraitTypes(params.traittype);
             traitInstance.dataTypes=Trait.fetchDataTypes(params.datatype);
         }
-        Recommendation recommendationInstance=Recommendation.findById(params.recommendationId)
-        traitInstance.description=params.description
-        traitInstance.name=params.name
-        traitInstance.source=params.source
+        params.isNotObservationTrait = (params.isNotObservationTrait)?true:false;
+        params.isParticipatory = (params.isParticipatory)?true:false;
+        params.showInObservation = (params.showInObservation)?true:false;
+        
+        traitInstance.properties = params;
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
-        traitInstance.taxon=recommendationInstance.taxonConcept
-
+        def taxonId
+        params.taxonName.each{
+            taxonId=it
+            taxonId = taxonId.substring(taxonId.indexOf("(") + 1);
+            taxonId = taxonId.substring(0, taxonId.indexOf("-"));
+            TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
+            traitInstance.addToTaxon(taxon);
+        }
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
@@ -504,6 +513,14 @@ class TraitController extends AbstractObjectController {
                 //resourcesInfo.add([fileName:file.name, size:f.size]);
             }        
         }
+    }
+    def taxonTags = {
+        def taxon  = TaxonomyDefinition.findAllByNameIlike("${params.term}%")
+        def taxonList = [];
+            taxon.each {
+                taxonList << it.name+' ('+it.id+'-'+it.status+'-'+it.position+')'
+            }
+        render taxonList as JSON
     }
 
 }

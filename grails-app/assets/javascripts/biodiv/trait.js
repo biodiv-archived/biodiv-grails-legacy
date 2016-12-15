@@ -55,7 +55,7 @@ function loadMatchingSpeciesList() {
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
                     $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
                     $.each(imagepath,function(index1,item1){ 
-                        $('#imagediv_'+item[0]).append(showIcon(item1));
+                        $('#imagediv_'+item[0]).append(showIcon(item1[0],item1[1],item1[2]));
                     });
                 });
                 $me.data('offset', data.model.next);
@@ -67,8 +67,8 @@ function loadMatchingSpeciesList() {
     });
 }
 
-function showIcon(url){
-    return  '<img src="'+url+'" width="32" height="32" />';
+function showIcon(value,name,url){
+    return  '<img src="'+url+'" width="32" height="32" src="'+name+'-'+value+'" />';
 }
 
 function onSubmitFact($me, objectId, objectType) {

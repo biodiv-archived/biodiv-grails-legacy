@@ -30,11 +30,12 @@ display:none;
     def form_title = "${g.message(code:'title.create.trait')}"
     def form_button_name = "${g.message(code:'title.trait.add')}"
     def form_button_val = "Add Trait"
+
     if(params.action == 'edit' || params.action == 'update'){
-    form_action = uGroup.createLink(action:'update', controller:'trait', id:traitInstance.id)
-    form_button_name = "${g.message(code:'button.update.trait')}"
-    form_button_val = "Update Trait"
-    form_title = "${g.message(code:'link.update.trait')}"
+            form_action = uGroup.createLink(action:'update', controller:'trait', id:traitInstance.id)
+            form_button_name = "${g.message(code:'button.update.trait')}"
+            form_button_val = "Update Trait"
+            form_title = "${g.message(code:'link.update.trait')}"
     }
     %>
     <div class="span12 observation_create">
@@ -86,18 +87,25 @@ display:none;
                     <input type="hidden" id="valueCount" name="valueCount" />
                     </g:if>
 
-                                   <div class="control-group sciNameDiv" style="margin-top:5px;">
+                <div class="control-group sciNameDiv" style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
                     code="observation.recommendationVote.label" default="${g.message(code:'trait.taxon.name')}" />
                 </label>
                 <div class="controls">
                     <div class="textbox nameContainer">
                         <g:set var="species_sn_lang" value="${species_sn_lang}" />
-                        <input type="text" name="recoName" class="recoName input-block-level" value="${traitInstance.taxon?.name}" rel="${g.message(code:'placeholder.suggest.species.name')}"
+                     <!--   <g:each in="${traitInstance.taxon}" var="taxon" status="i">
+                        <input type="text" name="recoName[]" class="recoName input-block-level" value="${taxon?.name}" rel="${g.message(code:'placeholder.suggest.species.name')}"
                             placeholder='${g.message(code:"editrecomendation.placeholder.scientific")}'
-                            class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"/>
+                            class="input-block-level ${hasErrors(bean: recommendationInstance, field: 'name', 'errors')} ${hasErrors(bean: recommendationVoteInstance, field: 'recommendation', 'errors')}"/>    
                         <div class='nameSuggestions' style='display: block;'></div>
-                        <input type="hidden" name="recommendationId" class="recoId" value="${recoId}"/>
+                        <input type="hidden" name="taxonId[]" class="taxonId" value="${taxon?.id}"/>
+                        </g:each> -->
+                        <ul id="taxonName" class="taxonName" rel="${g.message(code:'placeholder.add.tags')}">
+                        <g:each in="${traitInstance.taxon}" var="taxon" status="i">
+                            <li><span class="tagit-label">${taxon?.name+' ('+taxon?.id+'-'+(taxon?.status)+'-'+(taxon?.position)+')'}</span></li>
+                        </g:each>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -112,12 +120,6 @@ display:none;
                         %>
 
                         <table class="table" id="valueTable">
-                        <g:if test="${params.action=='edit'}">
-                        <a class="btn btn-primary" id="addNewValue"><i class="icon-plus icon-white"></i></a>
-                        </g:if>
-                        <g:else>
-                        <a class="btn btn-primary" id="createNewValue"><i class="icon-plus icon-white"></i></a>
-                        </g:else>
                         <tr>
                         <th>Value</th>
                         <th>Description</th>
@@ -153,7 +155,7 @@ display:none;
                             <a onclick="$('#attachFile').select()[0].click();return false;" style="postiion:relative;">
                             <img id="thumbnail" class="user-icon small_profile_pic" src="${val?.mainImage()?.fileName}" title="${val.value}" alt="${val.value}" />
                             <input class="icon" name="icon" id="icon_${i}" type="hidden" value='${thumbnail}' />
-                        </a>
+                            </a>
                         </td>
                         
                         <td>
@@ -167,18 +169,20 @@ display:none;
                         </tr>
                             </g:each>
                             </table>
+                        <g:if test="${params.action=='edit'}">
+                        <a class="btn btn-primary" id="addNewValue"><i class="icon-plus icon-white"></i></a>
+                        </g:if>
+                        <g:else>
+                        <a class="btn btn-primary" id="createNewValue"><i class="icon-plus icon-white"></i></a>
+                        </g:else>
                         </div>
                     </div>
-
-
                     <div
                         class="control-group ${hasErrors(bean: traitInstance, field: 'notes', 'error')}">
-                        <label class="control-label" for="description"><g:message code="default.description.label" />
-                        </label>
+                            <label class="control-label" for="description"><g:message code="default.description.label" />
+                            </label>
                         <div class="controls">
-                            <textarea id="description" name="description" style="width:705px; height:75px;">
-                                ${traitInstance?.description}
-                            </textarea>
+                            <textarea id="description" name="description" style="width:705px; height:75px;">${traitInstance?.description}</textarea>
             </div>
         </div>
                         <div
@@ -196,11 +200,36 @@ display:none;
                         <div class="controls">
                             
                 <ul id="fieldid" class="fieldid" rel="${g.message(code:'placeholder.add.tags')}">
-                <g:each in="${traitInstance.field}" var="tag">
-                <li>${tag}</li>
-                </g:each>
+                    <li><span class="tagit-label">${field}</span></li>
+                </ul>
+
+                        </div>
+                    </div>
+
+                    <div
             </ul>
 
+                        </div>
+                    </div>
+                     <div
+                        class="control-group ${hasErrors(bean: traitInstance, isNotObservationTrait: 'source', 'error')}">
+                        <label class="control-label" for="value"><g:message code="trait.isNotObservationTrait.label" /></label>
+                        <div class="controls">
+                            <g:checkBox name="isNotObservationTrait" class="input-block-level" value="${traitInstance.isNotObservationTrait}"/>
+                        </div>
+                    </div>
+                   <div
+                        class="control-group ${hasErrors(bean: traitInstance, isParticipatory: 'source', 'error')}">
+                        <label class="control-label" for="value"><g:message code="trait.isParticipatory.label" /></label>
+                        <div class="controls">
+                            <g:checkBox name="isParticipatory" class="input-block-level" value="${traitInstance.isParticipatory}" />
+                        </div>
+                    </div>
+                   <div
+                        class="control-group ${hasErrors(bean: traitInstance, showInObservation: 'source', 'error')}">
+                        <label class="control-label" for="value"><g:message code="trait.showInObservation.label" /> </label>
+                        <div class="controls">                        
+                            <g:checkBox name="showInObservation" class="input-block-level" value="${traitInstance.showInObservation}" />
                         </div>
                     </div>
                              </div>
@@ -364,7 +393,6 @@ display:none;
                         availableTags:data,
                         fieldName: 'fieldid', 
                         showAutocompleteOnFocus: false,
-                        maxTags  : 1,
                         allowSpaces: true,
                         triggerKeys:['comma'], 
                         beforeTagAdded: function(event, ui) {
@@ -380,19 +408,21 @@ display:none;
                     });
                   }
     });
-       /*     $(".fieldid").tagit({
-            select:true, 
-            allowSpaces:true, 
-            placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
-            fieldName: 'fieldid', 
-            maxTags  : 1,
-            autocomplete:{
-                source: window.params.getDataColumnsDB
-            }, 
-            triggerKeys:['enter', 'comma', 'tab'], 
-            maxLength:30
+
+            $(".taxonName").tagit({
+                select:true, 
+                allowSpaces:true,
+                placeholderText:$(".obvCreateTags").attr('rel'),//'Add some tags',
+                fieldName: 'taxonName', 
+                maxTags  : 1,
+                autocomplete:{
+                    source: '/trait/taxonTags'
+                }, 
+                triggerKeys:['enter', 'comma', 'tab'], 
+                maxLength:30
+
         });
-*/
+
 //image icon upload
         if (navigator.appName.indexOf('Microsoft') != -1) {
             $('.upload_resource').css({'visibility':'visible'});
