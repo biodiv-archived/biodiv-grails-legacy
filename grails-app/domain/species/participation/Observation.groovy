@@ -27,6 +27,7 @@ import species.Species;
 import species.dataset.Dataset;
 import au.com.bytecode.opencsv.CSVReader;
 import java.io.InputStream;
+import species.trait.Fact;
 
 
 class Observation extends DataObject {
@@ -38,6 +39,7 @@ class Observation extends DataObject {
 	def observationsSearchService;
     def observationService;
     def userGroupService;
+    def traitService;
 
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -796,4 +798,27 @@ class Observation extends DataObject {
 	def boolean isObvFromChecklist(){
 		return (id != sourceId)
 	}
+
+    Map getTraits() {
+        def factList = Fact.findAllByObjectIdAndObjectType(this.id, this.class.getCanonicalName())
+        def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
+        Map traitFactMap = [:]
+        Map queryParams = ['trait':[:]];
+        //def conRef = []
+        factList.each { fact ->
+            if(!traitFactMap[fact.trait.id]) {
+                traitFactMap[fact.trait.id] = []
+                queryParams['trait'][fact.trait.id] = '';
+                traitFactMap['fact'] = []
+            }
+            traitFactMap[fact.trait.id] << fact.traitValue
+            traitFactMap['fact'] << fact.id
+            queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+        }
+        queryParams.trait.each {k,v->
+            queryParams.trait[k] = v[0..-2];
+        }
+        return ['traitList':traitList, 'traitFactMap':traitFactMap, 'queryParams':queryParams];
+
+    }
 }

@@ -147,6 +147,7 @@ class SUser {
 	def grailsApplication;
 	def commentService;
 	def activityFeedService;
+    def utilsService;
 
 	String username
 	String name;
@@ -315,7 +316,7 @@ class SUser {
 		}
 		uGroups.each {
             try{
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)|| utilsService.isAdmin()) {
 				userGroups.add(it)
 			}
             } catch(e) {

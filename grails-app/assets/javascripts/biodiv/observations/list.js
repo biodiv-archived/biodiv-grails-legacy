@@ -7,7 +7,6 @@ var handlePaginateButtons = function() {
 };
  
 $(document).ready(function(){
-    console.log('obv.list.js start');
     $('#selected_sort').tooltip({placement:'top'});
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
@@ -403,10 +402,8 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-    console.log('obv.click.loadmore');
     $('.observation').on("click", ".loadMore", function() {
-
-        console.log('obv.click.loadmore start');
+console.log('loadMore');
         $.autopager({
 
             autoLoad : true,
@@ -414,10 +411,10 @@ $(document).ready(function(){
             link : 'div.paginateButtons a.nextLink',
 
             // a selector that matches page contents
-            content : '.mainContent',
+            content : '.mainContent:first',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-            appendTo : '.mainContentList',
+            appendTo : '.mainContentList:first',
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
@@ -457,11 +454,12 @@ $(document).ready(function(){
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
+//                $('.observations_list').not('.trait_list').find('.recommendations .nav-tabs').tab();
+
                 //$('.list').trigger('updatedGallery');
             }
         });
 
-        console.log('obv.click.loadmore end');
         $.autopager('load');
         return false;
     });
@@ -474,14 +472,11 @@ $(document).ready(function(){
 
     $('.download-action').click(function(){
         var me = this;
-        console.log(me);
         var download_box = $(me).parent('.download-box');
-        console.log(download_box);
         $.ajax({ 
             url:window.params.isLoggedInUrl,
             success: function(data, statusText, xhr, form) {
                 if(data === "true"){
-                    console.log('show');
                     $(download_box).find('.downloadModal').modal('show');
                     return false;
                 }else{
@@ -494,7 +489,6 @@ $(document).ready(function(){
         });
     });
 
-    console.log('download-form.submit');
     $('.download-form').bind('submit', function(event) {
         var downloadFrom = $(this).find('input[name="downloadFrom"]').val();
         var filterUrl = '';
@@ -545,7 +539,6 @@ $(document).ready(function(){
     event.preventDefault();
     });
 
-    console.log('eat cookies');
     //	last_actions();
     eatCookies();
 
@@ -559,7 +552,6 @@ $(document).ready(function(){
     var propagateGrpHab = $('.propagateGrpHab');
     $('.propagateGrpHab .control-group  label').hide();
 
-    console.log('document..edit_group_btn');
     $(document).on('click','.edit_group_btn',function(){
         $(this).parent().hide();
         $(this).parent().parent().find('.propagateGrpHab').show();
@@ -573,10 +565,8 @@ $(document).ready(function(){
         */
     }); 
 
-    console.log('document.#updateSpeciesGrp');
     $(document).on('submit','#updateSpeciesGrp', function(event) {
 
-        console.log('updateSpeciesGrp ajaxSubmit start');
         var that = $(this);
         $(this).ajaxSubmit({ 
             url: "/observation/updateSpeciesGrp",
@@ -620,14 +610,12 @@ $(document).ready(function(){
             dataType: 'json', 
             type: 'GET',
             beforeSubmit: function(formData, jqForm, options) {
-                console.log(formData);
                 formData.push({'name':'format', 'value':'json', 'type':'text'});
                 updateCommonNameLanguage(that.find('.languageComboBox'));
                 return true;
             }, 
             success: function(data, statusText, xhr, form) {
                 if(data.status == 'success' || data.success == true) {
-                    console.log(data);
                     if(data.canMakeSpeciesCall === 'false'){
                         $('#selectedGroupList').modal('show');
                     } else{
@@ -675,17 +663,17 @@ $(document).ready(function(){
 
     $(document).on('click','.clickSuggest',function(){  
         var obv_id = $(this).attr('rel');
-        var ele_nxt = $(this).next();
+        var ele_nxt = $(this).parent().parent().parent();
         var wrap_place = ele_nxt.find('.addRecommendation_wrap_place');
         wrap_place.is(':empty')
-        if(!ele_nxt.is(':visible') && !$.trim( wrap_place.html() ).length){
+        if(!$.trim( wrap_place.html() ).length){
             wrap_place.html($('#addRecommendation_wrap').html());
             wrap_place.find('.addRecommendation').addClass('addRecommendation_'+obv_id);
             wrap_place.find('input[type="hidden"][name="obvId"]').val(obv_id);
             initializeNameSuggestion();
             initializeLanguage(wrap_place.find('.languageComboBox'));
         }
-        ele_nxt.toggle('slow');
+        //ele_nxt.show('slow');
 
     });
 
@@ -698,13 +686,11 @@ $(document).ready(function(){
     
     initializeSpeciesGroupHabitatDropdowns();
     
-    console.log('obv.list.js end');
 });
 
 /**
  */
 function eatCookies() {	
-    console.log('eatCookies');
 /*    var hashString = window.location.hash.substring(1);
     if ($.cookie("listing") == "list") {
         if(!hashString.startsWith('l')) {
@@ -724,7 +710,6 @@ function eatCookies() {
         }
     }
 */    adjustHeight();
-    console.log('eatCookies end');
 }
 
 function getSelectedGroup() {
@@ -940,9 +925,7 @@ function getSelectedFilters($ele, noneSelected) {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-    console.log('url params : '+params);
     if(removeParam) {
-        console.log(removeParam);
         if(removeParam.match('trait\\.')) {
             var kv = removeParam.split('=');
             var tP = params[kv[0]];
@@ -1231,7 +1214,7 @@ function setActiveTag(activeTag){
 
 function updateListPage(activeTag) {
     return function (data) {
-        $('.observations_list').replaceWith(data.model.obvListHtml);
+        $('.observations_list:first').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);
         $('#summary_section').replaceWith(data.model.summaryHtml);        
@@ -1244,6 +1227,7 @@ function updateListPage(activeTag) {
         last_actions();
         eatCookies();			
         $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
+//        $('.observations_list').not('.trait_list').find('.recommendations .nav-tabs').tab();
         $('.list').trigger('updatedGallery');
         checkList();
     }
@@ -1285,7 +1269,6 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     if(updateHistory != false){
         History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
     }
-    console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
         $.ajax({
             url: doc_url,
@@ -1518,14 +1501,12 @@ function appendGallery(ovbId,images){
         baseUrl,
         thumbUrl;
         $.each(images, function (index, photo) {
-            //console.log("photo ="+photo);
             baseUrl = (photo.indexOf('http://') == -1)?""+window.params.observation.serverURL+photo:photo;
             $('<a/>')
                 .append($('<img>'))
                 .prop('href', baseUrl)                
                 .attr('data-gallery', '')
                 .appendTo(linksContainer);
-           // console.log(carouselLinks);
             carouselLinks.push({
                 href: baseUrl              
             });
@@ -1602,7 +1583,6 @@ function checkUrl(viewText,changeText){
     }
 
 function initializeSpeciesGroupHabitatDropdowns() {
-    console.log('initializeSpeciesGroupHabitatDropdowns');
     /*var selectedGroupHandler = function(e){
         e.stopPropagation();
         //$(this).dropdown('toggle');
