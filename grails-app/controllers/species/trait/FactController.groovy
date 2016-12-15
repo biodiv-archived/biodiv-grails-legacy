@@ -136,7 +136,7 @@ class FactController extends AbstractObjectController {
                         }
                         println "======================"
                         println queryParams
-                        model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'queryParams':queryParams, displayAny:false, editable:true]);
+                        model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
                     } else {
                     }
                 } else {

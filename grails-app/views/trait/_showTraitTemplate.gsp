@@ -12,7 +12,7 @@
         <div style="position:absolute;float: right;right: 0px;top:2px;">
             <a class="btn btn-small btn-primary editFact" data-id="${trait.id}" style="float:right;display: block;">Edit</a>
             <a class="btn btn-small btn-primary cancelFact" data-id="${trait.id}" style="float:right;display:none;" >Cancel</a>
-            <input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" style="float:right;display:none" value="Submit" />
+            <input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" data-objectId = "${object?.id}" data-objectType="${object?.class.getCanonicalName()}" style="float:right;display:none" value="Submit" />
         </div>
         <div class="editFactPanel trait" style="display:none;">
             <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':trait.values(),'factInstance':factInstance, 'displayAny':displayAny, fromSpeciesShow:false, 'traitTypes':trait.traitTypes, 'queryParams':queryParams]"/>
