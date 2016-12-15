@@ -149,4 +149,10 @@ $(document).ready(function(){
         $(this).parent().parent().find('.alert').removeClass('alert alert-error').hide();
 	});
 
+    $(document).on('click', '.submitFact', function () {
+        var $me = $(this);
+        onSubmitFact($me, $me.data('objectid'), $me.data('objecttype'));
+    });
+
+
 });

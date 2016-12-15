@@ -1,4 +1,4 @@
-<div class="row btn-group" style="white-space:inherit;margin-left:20px;width:100%">
+<div class="row btn-group" style="white-space:inherit;margin-left:20px;">
             <g:if test="${displayAny}">
             <div data-tvid='all' data-tid='${traitValues?traitValues[0]?.trait?.id:''}'
                 class="btn span2 all ${queryParams.trait && traitValues && queryParams.trait[traitValues[0]?.trait?.id+'']?'':'active btn-success'}"

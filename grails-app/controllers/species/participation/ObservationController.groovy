@@ -358,6 +358,7 @@ class ObservationController extends AbstractObjectController {
                 }
             }
 
+            Map t = observationInstance.getTraits();
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -412,9 +413,9 @@ class ObservationController extends AbstractObjectController {
                 withFormat {
                     html { 
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap, queryParams:queryParams, displayAny:false];
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false];
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:traitList, factInstanceList:traitFactMap, queryParams:queryParams];
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams];
                         }
                     } 
                     json  { render model as JSON }
@@ -493,33 +494,15 @@ class ObservationController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def edit() {
         def observationInstance = Observation.findWhere(id:params.id?.toLong(), isDeleted:false)
-        
-        def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
-        def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
-        def traitFactMap = [:]
-        def queryParams = ['trait':[:]];
-        //def conRef = []
-        factList.each { fact ->
-                if(!traitFactMap[fact.trait.id]) {
-                    traitFactMap[fact.trait.id] = []
-                    queryParams['trait'][fact.trait.id] = '';
-                    traitFactMap['fact'] = []
-                }
-                traitFactMap[fact.trait.id] << fact.traitValue
-                traitFactMap['fact'] << fact.id
-                queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
-        }
-        queryParams.trait.each {k,v->
-            queryParams.trait[k] = v[0..-2];
-        }
-
+       
+        def t = observationInstance.getTraits();
         if (!observationInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
             redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
             //redirect(action: "list")
         } else if(utilsService.ifOwns(observationInstance.author) && !observationInstance.dataset) {
             def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-            render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature , queryParams:queryParams])
+            render(view: "create", model: [observationInstance: observationInstance, 'springSecurityService':springSecurityService, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature , queryParams:[:]])
         } else {
             flash.message = "${message(code: 'edit.denied.message')}"
             redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress))

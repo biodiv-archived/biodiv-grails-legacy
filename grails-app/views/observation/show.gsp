@@ -123,8 +123,12 @@ if(r) {
 
                 <obv:showStory
                 model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
-
-                <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+                <g:if test="${customFields?.size() > 0}">
+                    <div style="margin-top:8px;" class="sidebar_section">
+                        <h5><g:message code="heading.customfields" /></h5>
+                        <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+                    </div>  
+                </g:if>
 
 
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
@@ -169,7 +173,7 @@ if(r) {
                     <g:if  test="${traitInstanceList}">
                     <div class="sidebar_section" style="margin:10px 0px;">
                         <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
-                        <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow:visible;">
+                        <div class="sidebar_section pre-scrollable" style="height:419px;overflow-x:hidden;">
                             <div id="traits" class="trait">
                                 <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'fromObservationShow': 'show', 'fromSpeciesShow':true, 'instance':observationInstance, displayAny:false, editable:true]"/>
                             </div>

@@ -71,7 +71,7 @@
     }
     .addmargin{
         margin:10px 0px !important;
-        border: 3px solid #a6dfc8 !important;
+        border: 1px solid #a6dfc8 !important;
     }
     .showObvDetails{
       height: 180px;
@@ -193,12 +193,6 @@
 </script>
 
 <g:if test="${!activeFilters.isChecklistOnly}">
-<asset:script>
-$(document).ready(function(){
-
-});
-
-</asset:script>
 <g:if test="${!params?.view || params?.view != 'grid'}">
   <asset:script type="text/javascript">
   $(document).ready(function(){     
