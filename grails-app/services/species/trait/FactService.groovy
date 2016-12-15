@@ -252,6 +252,7 @@ class FactService extends AbstractObjectService {
                                 fact.attribution = attribution;
                                 fact.contributor = contributor;
                                 fact.license = license;
+                                fact.isDeleted = false;
                                 if(!fact.hasErrors() && !fact.save()) { 
                                     writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
                                     fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }

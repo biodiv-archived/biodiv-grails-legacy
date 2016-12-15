@@ -111,8 +111,7 @@ class FactController extends AbstractObjectController {
                     params['attribution'] = springSecurityService.currentUser.email;
                     params['license'] = License.LicenseType.CC_BY.value();
                     if(params.traits) {
-                        params.putAll(factService.getTraits(params.remove('traits')));
-                    }
+                    params.putAll(factService.getTraits(params.remove('traits')));
                     params['replaceFacts'] = 'true';
                     success = factService.updateFacts(params, object, null, true);
                     //TODO: to update this from approprite result from factService.update
@@ -138,7 +137,21 @@ class FactController extends AbstractObjectController {
                         println queryParams
                         model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'queryParams':queryParams, displayAny:false, editable:true]);
                     } else {
+
                     }
+                }else{
+                        // if no traitValue selected 
+                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
+
+                        facts.each { fact ->
+                            fact.isDeleted = true;
+                            fact.save();
+                            result = [success:true, msg:'Successfully deleted fact']
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'queryParams':'', displayAny:false, editable:true]);
+                        }
+
+                }
+
                 } else {
                     result['msg'] = 'Not a valid object'; 
                 }               
