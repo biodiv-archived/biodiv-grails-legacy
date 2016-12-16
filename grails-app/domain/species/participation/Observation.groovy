@@ -40,6 +40,7 @@ class Observation extends DataObject {
     def observationService;
     def userGroupService;
     def traitService;
+    def customFieldService;
 
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -819,6 +820,10 @@ class Observation extends DataObject {
             queryParams.trait[k] = v[0..-2];
         }
         return ['traitList':traitList, 'traitFactMap':traitFactMap, 'queryParams':queryParams];
+    }
 
+
+    Map getCustomFields() {
+    	return customFieldService.fetchAllCustomFields(this);
     }
 }

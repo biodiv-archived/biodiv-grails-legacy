@@ -95,6 +95,7 @@ function onSubmitFact($me, objectId, objectType) {
                 $me.parent().parent().find('.row:first').show();
                 $me.hide();
                 $me.parent().find('.editFact').show();//.css("position","");
+                updateFeeds();
             } else {
                 $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(data.msg).show();
             }

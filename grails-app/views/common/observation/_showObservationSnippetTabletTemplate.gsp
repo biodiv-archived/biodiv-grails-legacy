@@ -155,27 +155,33 @@ def obvId = observationInstance?.id
             </div>
     </div>
     <ul class="nav nav-tabs nav-justified">
-    <li class="active"><a href="#${observationInstance.id}_groups" data-toggle="tab">Groups</a></li>
-    <li class="traits"><a href="#${observationInstance.id}_traits" data-toggle="tab">Traits</a></li>
-    <li class="customFields"><a href="#${observationInstance.id}_customFields" data-toggle="tab">Custom Fields</a></li>
-    <li class="comments"><a href="#${observationInstance.id}_comments" data-toggle="tab">Comments</a></li>
-    <g:if test="${!observationInstance.isLocked}">
-    <li>
-<a href="#${observationInstance.id}_suggestID" data-toggle="tab" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">${g.message(code:'default.reco.clickSuggest')}<i class="icon-chevron-down"></i></a>
-    </li>
-    </g:if>
+        <li class="active"><a href="#${observationInstance.id}_groups" data-toggle="tab">Groups</a></li>
+        <%def traits = observationInstance.getTraits()%>
+        <li class="traits"><a href="#${observationInstance.id}_traits" data-toggle="tab">Traits</a></li>
+        <%Map customFields = observationInstance.getCustomFields()%>
+        <g:if test="${customFields?.size() > 0}">
+        <li class="customFields"><a href="#${observationInstance.id}_customFields" data-toggle="tab">Custom Fields</a></li>
+        </g:if>
+        <li class="comments"><a href="#${observationInstance.id}_comments" data-toggle="tab">Comments</a></li>
+        <g:if test="${!observationInstance.isLocked}">
+        <li>
+    <a href="#${observationInstance.id}_suggestID" data-toggle="tab" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">${g.message(code:'default.reco.clickSuggest')}<i class="icon-chevron-down"></i></a>
+        </li>
+        </g:if>
     </ul>
     <div class="tab-content" style="max-height:160px; text-align:left;">
         <div class="tab-pane  in active" id="${observationInstance.id}_groups">
             <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />   
         </div>
         <div class="tab-pane " id="${observationInstance.id}_traits">
-            <%def traits = observationInstance.getTraits()%>
             <g:render template="/trait/showTraitListTemplate" model="['instanceList':traits.traitList, 'factInstance':traits.traitFactMap, 'instance':observationInstance, displayAny:false, editable:true]"/>
         </div>
-        <div class="tab-pane " id="${observationInstance.id}_customFields">
-                <obv:showCustomFields model="['observationInstance':observationInstance]"/>
-        </div>
+
+        <g:if test="${customFields?.size() > 0}">
+            <div class="tab-pane " id="${observationInstance.id}_customFields">
+                    <obv:showCustomFields model="['observationInstance':observationInstance, 'customFields':customFields]"/>
+            </div>
+        </g:if>
         <div class="tab-pane union-comment" id="${observationInstance.id}_comments">
             <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />
             <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />

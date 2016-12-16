@@ -15,7 +15,7 @@ class CustomFieldService {
 	def springSecurityService
 	def activityFeedService
 	
-	def Map fetchAllCustomFields(Observation obv){
+	Map fetchAllCustomFields(Observation obv){
 		Map result = [:]
 		obv.userGroups.collect{it}.each { ug ->
 			CustomField.fetchCustomFields(ug).each { cf ->
