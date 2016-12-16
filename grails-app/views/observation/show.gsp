@@ -265,7 +265,7 @@ $(document).ready(function(){
             $('.nameContainer input').removeAttr("disabled");
             $('.iAgree button').removeClass("disabled");
         } 
-        initializeLanguage(); 
+        initializeLanguage();
         $(".CustomField_multiselectcombo").multiselect();
         
         var getResourceUrl = "${uGroup.createLink(controller:'observation', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
@@ -280,11 +280,15 @@ $(document).ready(function(){
                     $(this).removeClass('active btn-success');
                 else
                     $(this).addClass('active btn-success');
-            } else {
-                $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-                $(this).addClass('active btn-success');
+            } else if($(this).hasClass('SINGLE_CATEGORICAL')){
+                if($(this).hasClass('btn-success')) {
+                    $(this).removeClass('active btn-success');
+                }
+                else{
+                    $(this).parent().parent().find('.all, .any, .none, button').removeClass('active btn-success');
+                    $(this).addClass('active btn-success');
+                }
             }
-
             return false;
         });
 

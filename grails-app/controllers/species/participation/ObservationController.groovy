@@ -392,7 +392,7 @@ class ObservationController extends AbstractObjectController {
 
                 def model = utilsService.getSuccessModel("", observationInstance, OK.value());
 
-                def factList = Fact.findAllByObjectIdAndObjectType(observationInstance.id, observationInstance.class.getCanonicalName())
+                def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(observationInstance.id, observationInstance.class.getCanonicalName(), false)
                 def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
                 def traitFactMap = [:]
                 def queryParams = ['trait':[:]];
