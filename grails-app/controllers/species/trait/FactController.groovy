@@ -15,6 +15,7 @@ import species.TaxonomyDefinition;
 import species.groups.CustomField;
 import species.auth.SUser;
 import species.License;
+import species.Species;
 
 class FactController extends AbstractObjectController {
 

@@ -225,9 +225,9 @@
                     <g:if  test="${traitInstanceList}">
                     <div class="sidebar_section" style="margin:10px 0px;">
                     <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
-                    <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow:visible;">
+                    <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
                     <div id="traits" class="trait">
-                   <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'fromSpeciesShow':true]"/>
+                   <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true, editable:true]"/>
                     </div>
                     </div>
                     </div>
@@ -358,6 +358,25 @@
                 updateGallery('/species/list', 8, 0, undefined, true,undefined,undefined,undefined,undefined,false);
                 var getResourceUrl = "${uGroup.createLink(controller:'species', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
                 galleryAjax(getResourceUrl+'/'+${speciesInstance.id},'species');
+
+        $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('btn-success')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else if($(this).hasClass('SINGLE_CATEGORICAL')){
+                if($(this).hasClass('btn-success')) {
+                    $(this).removeClass('active btn-success');
+                }
+                else{
+                    $(this).parent().parent().find('.all, .any, .none, button').removeClass('active btn-success');
+                    $(this).addClass('active btn-success');
+                }
+            }
+            return false;
+        });
             });
 
 
