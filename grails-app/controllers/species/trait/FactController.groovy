@@ -22,6 +22,7 @@ class FactController extends AbstractObjectController {
     def factService;
     def customFieldService
     def springSecurityService;
+    def activityFeedService;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -114,16 +115,19 @@ class FactController extends AbstractObjectController {
                     if(params.traits) {
                     params.putAll(factService.getTraits(params.remove('traits')));
                     params['replaceFacts'] = 'true';
-                    success = factService.updateFacts(params, object, null, true);
+                    Map r = factService.updateFacts(params, object, null, true);
                     //TODO: to update this from approprite result from factService.update
+                    success = r.success;
                     result = [success:success, msg:success?'Successfully updated fact':'Error updating fact'];
-                    //success = r.success;
                     if(success) {
-/*                        r.facts { fact ->
-                            def activityFeed = activityFeedService.addActivityFeed(object, fact, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
+                        r.facts_updated.each { fact ->
+                            def activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_UPDATED, fact.getActivityDescription());
+                        }
+                        r.facts_created.each { fact ->
+                            def activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
                         }
                         //utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
-*/
+                    
                         List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
                         Map queryParams = ['trait':[:]], factInstance = [:];
                         queryParams.trait[trait.id] = '';

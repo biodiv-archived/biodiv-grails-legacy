@@ -78,12 +78,15 @@ class FactService extends AbstractObjectService {
         return taxon ? taxon.findSpeciesId() : null;
     }
 
-    boolean updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {
+    Map updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {
         def writeLog;
         if(dl) writeLog = dl.writeLog;
         else writeLog = utilsService.writeLog;
 
         boolean success = false;
+        Map result = [:]
+        result['facts_updated'] = [];
+        result['facts_created'] = [];
         Trait.withSession { session ->
             //def session =  sessionFactory.currentSession;
             session.setFlushMode(FlushMode.MANUAL);
@@ -259,6 +262,11 @@ class FactService extends AbstractObjectService {
                                     success = false;
                                 } else {
                                     success = true;
+                                    if(isUpdate) 
+                                        result['facts_updated'] << fact;
+                                    else
+                                        result['facts_created'] << fact;
+
                                     writeLog("Successfully added fact");
                                 }
                             }
@@ -282,6 +290,7 @@ class FactService extends AbstractObjectService {
 
             session.reconnect(dataSource.connection);
         }
-        return success;
+        result['success'] = success;
+        return result;
     }
 }

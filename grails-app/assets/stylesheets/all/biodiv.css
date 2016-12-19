@@ -1578,7 +1578,7 @@ span.cke_skin_kama {
 
 .nav-tabs>li>a{
     color: black;
-    background-color:rgba(98, 100, 39, 0.14);
+    background-color:#A6DFC8;/*rgba(98, 100, 39, 0.14);*/
     border: none
 }
 .nav-tabs>.active>.btn{
