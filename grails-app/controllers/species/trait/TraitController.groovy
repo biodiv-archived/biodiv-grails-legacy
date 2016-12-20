@@ -34,9 +34,10 @@ class TraitController extends AbstractObjectController {
     def list() {
         def model = getList(params);
         model.userLanguage = utilsService.getCurrentLanguage(request);
-
         if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
         else model.displayAny = true;
+        if(params.editable) model.editable = params.editable?.toBoolean();
+        else model.editable = true;
         //HACK
         if(params.trait) {
             model.queryParams = ['trait':[:]];
@@ -212,7 +213,7 @@ class TraitController extends AbstractObjectController {
             };
         }
         log.debug "Storing all ${params.controller} ids list in session ${session[params.controller+'_ids_list']} for params ${params}";
-        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:params.controller]
+        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:params.controller, 'factInstance':filteredList.traitFactMap, instance:filteredList.object]
     }
 
     def show() {

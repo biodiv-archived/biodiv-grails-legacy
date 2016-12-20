@@ -420,9 +420,9 @@ class TraitService extends AbstractObjectService {
         allInstanceCountQuery.setProperties(queryParts.queryParams)
         allInstanceCount = allInstanceCountQuery.list()[0]
 
+        if(!queryParts.queryParams.trait) 
         queryParts.queryParams.trait = params.trait;
-
-        return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+        return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters, 'traitFactMap':queryParts.traitFactMap, 'object':queryParts.object];
     }
 
     def getFilterQuery(params) {
@@ -433,6 +433,7 @@ class TraitService extends AbstractObjectService {
 
         Map queryParams = [isDeleted : false]
         Map activeFilters = [:]
+        Map r;
 
         String query = "select "
         String taxonQuery = '';
@@ -570,10 +571,31 @@ class TraitService extends AbstractObjectService {
             activeFilters["isParticipatory"] = params.isParticipatory.toBoolean()
         }
 
-        def allInstanceCountQuery = "select count(*) from Trait obv " +taxonQuery+" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+        if(params.objectId && params.objectType){
+            Long objectIdL;
+            try {
+                objectIdL = params.long('objectId');
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            if(objectIdL) {
+                /*query += " , Fact fact "
+                filterQuery += " and fact.objectId = :objectId and fact.objectType = :objectType and fact.isDeleted = false "
+                queryParams["objectId"] = objectIdL;
+                queryParams["objectType"] = params.objectType;
+                activeFilters["objectId"] = objectIdL;
+                activeFilters["objectType"] = params.objectType;
+                */
+                def object = grailsApplication.getDomainClass(params.objectType).clazz.read(objectIdL);
+                r = object.getTraitFacts();
+                queryParams.putAll(r.queryParams);
+                r['object'] = object;
+            }
+        }
 
+        def allInstanceCountQuery = "select count(*) from Trait obv " +taxonQuery+" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
         orderByClause = " order by " + orderByClause;
-        return [query:query, allInstanceCountQuery:allInstanceCountQuery, filterQuery:filterQuery+groupByQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+        return [query:query, allInstanceCountQuery:allInstanceCountQuery, filterQuery:filterQuery+groupByQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters, 'traitFactMap':r?.traitFactMap, 'object':r?.object];
 
     }
 

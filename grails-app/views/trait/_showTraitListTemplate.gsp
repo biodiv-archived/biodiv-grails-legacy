@@ -13,7 +13,6 @@ instanceList.each{ iL ->
     }
 }
 %>                   
-
  <div class="observations_list trait_list" style="clear: both;">
 	<div class="mainContentList">
 		<div class="mainContent trait_list_content" name="p${params?.offset}">

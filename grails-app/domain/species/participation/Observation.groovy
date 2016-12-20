@@ -801,8 +801,14 @@ class Observation extends DataObject {
 	}
 
     Map getTraits() {
-        def factList = Fact.findAllByObjectIdAndObjectType(this.id, this.class.getCanonicalName())
         def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
+        def r = getTraitFacts();
+        r['traitList'] = traitList; 
+        return r;
+    }
+
+    Map getTraitFacts() {
+        def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(this.id, this.class.getCanonicalName(), false);
         Map traitFactMap = [:]
         Map queryParams = ['trait':[:]];
         //def conRef = []
@@ -819,7 +825,7 @@ class Observation extends DataObject {
         queryParams.trait.each {k,v->
             queryParams.trait[k] = v[0..-2];
         }
-        return ['traitList':traitList, 'traitFactMap':traitFactMap, 'queryParams':queryParams];
+        return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
     }
 
 

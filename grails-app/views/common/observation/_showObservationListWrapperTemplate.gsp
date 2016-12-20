@@ -235,15 +235,16 @@ $(document).ready(function() {
         return false;
     });
 
-    /*$(document).on("click",".recommendations .nav.nav-tabs a",function(e) {
-        e.preventDefault();
-        var tab = $(this).attr("href");
-        $(".recommendations div.tab-content div").each(function() {
-            $(this).removeClass("active");
-        });
-        console.log(tab)
-        $(".recommendations div.tab-content "+tab).addClass("active");//.css('height', 'auto');
-    });*/
+    $(document).on("click",".recommendations .nav.nav-tabs a",function(e) {
+       var tab = $(this).attr("href");
+       if($(this).hasClass('traits')) {
+        loadTraits($(this), tab);
+       } else if($(this).hasClass('customFields')) {
+        loadCustomFields($(this), tab);
+       } else if($(this).hasClass('comments')) {
+        loadComments($(this), tab);
+       }
+    });
 
 });
 </asset:script>

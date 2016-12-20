@@ -76,6 +76,7 @@ class ObservationController extends AbstractObjectController {
     def sessionFactory;
     def grailsCacheManager;
     def traitService;
+    def customFieldService;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -392,30 +393,13 @@ class ObservationController extends AbstractObjectController {
 
                 def model = utilsService.getSuccessModel("", observationInstance, OK.value());
 
-                def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(observationInstance.id, observationInstance.class.getCanonicalName(), false)
-                def traitList = traitService.getFilteredList(['sGroup':observationInstance.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
-                def traitFactMap = [:]
-                def queryParams = ['trait':[:]];
-                //def conRef = []
-                factList.each { fact ->
-                        if(!traitFactMap[fact.trait.id]) {
-                            traitFactMap[fact.trait.id] = []
-                            queryParams['trait'][fact.trait.id] = '';
-                            traitFactMap['fact'] = []
-                        }
-                        traitFactMap[fact.trait.id] << fact.traitValue
-                        traitFactMap['fact'] << fact.id
-                        queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
-                }
-                queryParams.trait.each {k,v->
-                    queryParams.trait[k] = v[0..-2];
-                }
                 withFormat {
                     html { 
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false];
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage];
+//traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false];
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams];
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage];// traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams];
                         }
                     } 
                     json  { render model as JSON }
@@ -1994,4 +1978,23 @@ private printCacheEntries(cache) {
         return factUpdate;
     }
 */
+
+    def customFields() {
+        def model = [:];
+        def m=[:];
+        if(params.objectId){
+            Long objectIdL;
+            try {
+                objectIdL = params.long('objectId');
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            if(objectIdL) {
+                model['observationInstance'] = Observation.read(objectIdL);
+                model['customFields'] = model.observationInstance.getCustomFields();
+                m['html'] =  g.render(template:"/observation/showCustomFieldsTemplate", model:model);
+            }
+        }
+        render m as JSON
+    }
 }

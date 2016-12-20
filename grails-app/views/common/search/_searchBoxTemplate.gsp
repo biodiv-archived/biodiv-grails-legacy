@@ -98,7 +98,9 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         distinctIdentifiedRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctIdentifiedReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action,userGroup:userGroupInstance])}",
         speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
         'addRecommendationVoteURL' : "${uGroup.createLink(controller:'observation', action:'addRecommendationVote', 'userGroup':userGroupInstance )}",
-        'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}"
+        'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}",
+        'customFieldsUrl':"${uGroup.createLink(controller:'observation', action: 'customFields', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+        'commentsUrl':"${uGroup.createLink(controller:'observation', action: 'comments', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
 
         },
         'recommendation': {
@@ -142,7 +144,8 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
             'deleteUrl':"${uGroup.createLink(controller:'dataset', action:'delete')}"
         },
         'trait' : {
-            matchingSpeciesListUrl:"${uGroup.createLink(controller:'trait', action: 'matchingSpecies', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}"
+            'matchingSpeciesListUrl':"${uGroup.createLink(controller:'trait', action: 'matchingSpecies', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+            'listUrl':"${uGroup.createLink(controller:'trait', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
         },
         'fact' : {
             'updateFactUrl' : "${uGroup.createLink(controller:'fact', action:'update', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
