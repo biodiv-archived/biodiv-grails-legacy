@@ -182,10 +182,10 @@ class Trait {
         return null;
     }
 
-    static Trait getValidTrait(String traitName, TaxonomyDefinition taxonConcept) {
-        List<Trait> traits = Trait.findAllByNameIlike(traitName);
+    static Trait getValidTrait(def traitId, TaxonomyDefinition taxonConcept) {
+        List<Trait> traits = Trait.findAllById(traitId);
         if(!traits) {
-            println "No trait with name ${traitName}";
+            println "No trait with name ${traitId}";
             return null;
         }
 
@@ -228,7 +228,7 @@ class Trait {
         if(validTraits) {
             return validTraits[0];
         } else {
-            println "No trait defined with name ${traitName} at taxonscope ${ibpParentTaxon}";
+            println "No trait defined with name ${traitId} at taxonscope ${ibpParentTaxon}";
             return null;
         }
     }
