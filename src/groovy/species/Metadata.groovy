@@ -18,7 +18,7 @@ import species.participation.Featured;
 import species.utils.Utils;
 import species.Language;
 import species.dataset.Dataset;
-
+import species.trait.Fact;
 abstract class Metadata {
 	
 	public enum LocationScale {
@@ -226,5 +226,34 @@ abstract class Metadata {
 		}
 		return Utils.getRandomFloat()
 	}
+
+    Map getTraitFacts() {
+        def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(this.id, this.class.getCanonicalName(), false);
+        Map traitFactMap = [:]
+        Map queryParams = ['trait':[:]];
+        //def conRef = []
+        factList.each { fact ->
+            if(!traitFactMap[fact.trait.id]) {
+                traitFactMap[fact.trait.id] = []
+                queryParams['trait'][fact.trait.id] = '';
+                traitFactMap['fact'] = []
+            }
+            traitFactMap[fact.trait.id] << fact.traitValue
+            traitFactMap['fact'] << fact.id
+            queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+        }
+        queryParams.trait.each {k,v->
+            queryParams.trait[k] = v[0..-2];
+        }
+        return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
+    }
+
+    Map getTraits(boolean isObservationTrait=false, boolean isParticipatory = true, boolean showInObservation=false) {
+        def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isObservationTrait':isObservationTrait,'isParticipatory':isParticipatory, 'showInObservation':showInObservation], -1, -1).instanceList;
+        def r = getTraitFacts();
+        r['traitList'] = traitList; 
+        return r;
+    }
+
 
 }

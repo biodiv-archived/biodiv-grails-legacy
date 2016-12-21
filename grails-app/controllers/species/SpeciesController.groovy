@@ -261,7 +261,9 @@ class SpeciesController extends AbstractObjectController {
             }
         }
 		else {
+            Map t = speciesInstance.getTraits();
 
+            /*
             def factList = Fact.findAllByObjectIdAndObjectType(speciesInstance.id, speciesInstance.class.getCanonicalName())
              def traitListValue = traitService.getFilteredList(['sGroup':speciesInstance.guid, 'isNotObservationTrait':true,'taxon':speciesInstance.taxonConcept.id], -1, -1).instanceList;
             def traitList = [];
@@ -279,10 +281,9 @@ class SpeciesController extends AbstractObjectController {
                     traitFactMap['fact'] << fact.id
                     queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
             }
-
+            */
 
             if(params.editMode) {
-                println speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) || !utilsService.isAdmin()
                 if(!speciesPermissionService.isSpeciesContributor(speciesInstance, springSecurityService.currentUser) && !utilsService.isAdmin()) {
                 	def tmp_var   = params.id?speciesInstance.title+' ( '+params.id+' )':''
 			        flash.message = "${message(code: 'species.contribute.not.permitted.message', args: ['contribute to', message(code: 'species.label', default: 'Species'), tmp_var])}"
