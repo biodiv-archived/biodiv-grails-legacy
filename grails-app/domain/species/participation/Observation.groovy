@@ -801,7 +801,7 @@ class Observation extends DataObject {
 	}
 
     Map getTraits() {
-        def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isNotObservationTrait':false,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
+        def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isObservationTrait':true,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
         def r = getTraitFacts();
         r['traitList'] = traitList; 
         return r;
