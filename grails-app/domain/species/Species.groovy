@@ -528,12 +528,13 @@ class Species implements Rateable {
         def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(this.id, this.class.getCanonicalName(), false);
         Map traitFactMap = [:]
         Map queryParams = ['trait':[:]];
-        //def conRef = []
+        def traitList = [];
         factList.each { fact ->
             if(!traitFactMap[fact.trait.id]) {
                 traitFactMap[fact.trait.id] = []
                 queryParams['trait'][fact.trait.id] = '';
                 traitFactMap['fact'] = []
+                traitList << fact.trait;
             }
             traitFactMap[fact.trait.id] << fact.traitValue
             traitFactMap['fact'] << fact.id
@@ -542,14 +543,13 @@ class Species implements Rateable {
         queryParams.trait.each {k,v->
             queryParams.trait[k] = v[0..-2];
         }
-        return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
+        return ['traitList':traitList,'traitFactMap':traitFactMap, 'queryParams':queryParams];
     }
 
     Map getTraits() {
-        def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
+        //def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
         def allTraitList = traitService.getFilteredList(['sGroup':this.guid, 'isNotObservationTrait':true,'taxon':this.taxonConcept.id], -1, -1).instanceList;
         def r = getTraitFacts();
-        r['traitList'] = traitList; 
         r['allTraitList'] = allTraitList; 
         return r;
     }
