@@ -359,7 +359,6 @@ class ObservationController extends AbstractObjectController {
                 }
             }
 
-            Map t = observationInstance.getTraits();
             if (!observationInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -373,6 +372,7 @@ class ObservationController extends AbstractObjectController {
                 }
             }
             else {
+                Map t = observationInstance.getTraits();
                 if(observationInstance.instanceOf(Checklists)){
                     msg = messageSource.getMessage("default.checklist.id", [params.id] as Object[], RCU.getLocale(request))
                     def model = utilsService.getErrorModel(msg, null, OK.value());
@@ -396,10 +396,9 @@ class ObservationController extends AbstractObjectController {
                 withFormat {
                     html { 
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage];
-//traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false];
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false];
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage];// traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams];
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage,  traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams];
                         }
                     } 
                     json  { render model as JSON }

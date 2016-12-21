@@ -403,7 +403,6 @@ $(document).ready(function(){
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
     $('.observation').on("click", ".loadMore", function() {
-console.log('loadMore');
         $.autopager({
 
             autoLoad : true,

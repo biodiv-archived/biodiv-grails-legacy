@@ -37,7 +37,9 @@ class TraitController extends AbstractObjectController {
         if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
         else model.displayAny = true;
         if(params.editable) model.editable = params.editable?.toBoolean();
-        else model.editable = true;
+        else model.editable = false;
+        if(params.fromObservationShow) model.fromObservationShow = params.fromObservationShow;
+ 
         //HACK
         if(params.trait) {
             model.queryParams = ['trait':[:]];

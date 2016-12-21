@@ -154,6 +154,7 @@ def obvId = observationInstance?.id
                 <g:message code="button.show.all" />
             </div>
     </div>
+    <div style="border:1px solid #FFF;margin-top:4px;border-radius:5px;">
     <ul class="nav nav-tabs nav-justified">
 
         <li class="active"><a href="#${observationInstance.id}_groups" data-toggle="tab">Groups</a></li>
@@ -181,7 +182,7 @@ def obvId = observationInstance?.id
             <div class="tab-pane " id="${observationInstance.id}_customFields">
             </div>
 
-        <div class="tab-pane union-comment" id="${observationInstance.id}_comments">
+        <div class="tab-pane union-comment" id="${observationInstance.id}_comments" style="width:99%">
             <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage, 'preLoad':false]" />
             <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
         </div>
@@ -206,6 +207,7 @@ def obvId = observationInstance?.id
             </div>
         </g:if>
 
+    </div>
     </div>
 </div>
 
