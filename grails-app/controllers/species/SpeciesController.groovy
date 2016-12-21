@@ -263,7 +263,7 @@ class SpeciesController extends AbstractObjectController {
 		else {
 
             def factList = Fact.findAllByObjectIdAndObjectType(speciesInstance.id, speciesInstance.class.getCanonicalName())
-            def traitList = traitService.getFilteredList(['sGroup':speciesInstance.guid, 'isNotObservationTrait':true,'isParticipatory':true, 'showInObservation':false, 'taxon':speciesInstance.taxonConcept.id], -1, -1).instanceList;
+            def traitList = traitService.getFilteredList(['sGroup':speciesInstance.guid, 'isNotObservationTrait':true, 'taxon':speciesInstance.taxonConcept.id], -1, -1).instanceList;
             def traitFactMap = [:]
             def queryParams = ['trait':[:]];
             //def conRef = []
