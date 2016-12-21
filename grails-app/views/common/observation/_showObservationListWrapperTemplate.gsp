@@ -241,8 +241,6 @@ $(document).ready(function() {
         loadTraits($(this), tab);
        } else if($(this).hasClass('customFields')) {
         loadCustomFields($(this), tab);
-       } else if($(this).hasClass('comments')) {
-        loadComments($(this), tab);
        }
     });
 

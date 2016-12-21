@@ -117,7 +117,7 @@ function loadTraits($me, compId) {
     params['objectId'] = $me.data('objectid');
     params['objectType'] = $me.data('objecttype');
     params['sGroup'] = $me.data('sgroup');
-    params['isNotObservationTrait'] = $me.data('isnotobservationtrait');
+    params['isObservationTrait'] = $me.data('isobservationtrait');
     params['isParticipatory'] = $me.data('isparticipatory');
     params['showInObservation'] = $me.data('showinobservation');
     params['loadMore'] = true;
@@ -143,19 +143,6 @@ function loadCustomFields($me, compId) {
         data:params,
         success: function(data) {   
             $(compId).html(data.html);
-        }
-    });
-}
-
-function loadComments($me, compId) {
-    var params = {};//$me.data();
-    params['objectId'] = $me.data('objectid');
-    $.ajax({
-        url:window.params.observation.commentsUrl,
-        method:'GET',
-        data:params,
-        success: function(data) {   
-            $(compId).html(data);
         }
     });
 }
