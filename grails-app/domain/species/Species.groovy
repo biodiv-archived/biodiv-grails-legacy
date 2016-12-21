@@ -19,7 +19,7 @@ import org.grails.rateable.*
 import species.participation.Flag;
 import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
-
+import species.trait.Fact;
 import content.eml.Document;
 
 class Species implements Rateable { 
@@ -47,7 +47,7 @@ class Species implements Rateable {
     def speciesUploadService;
     def speciesPermissionService;
     def utilsService;
-
+    def traitService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	private static final log = LogFactory.getLog(this);
@@ -522,6 +522,34 @@ class Species implements Rateable {
 			res = null;//group?.icon(ImageType.ORIGINAL)
         println "Updating reprImage to ${res} ${res.fileName} ${res.url}" 
         this.reprImage = res;
+    }
+
+    Map getTraitFacts() {
+        def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(this.id, this.class.getCanonicalName(), false);
+        Map traitFactMap = [:]
+        Map queryParams = ['trait':[:]];
+        //def conRef = []
+        factList.each { fact ->
+            if(!traitFactMap[fact.trait.id]) {
+                traitFactMap[fact.trait.id] = []
+                queryParams['trait'][fact.trait.id] = '';
+                traitFactMap['fact'] = []
+            }
+            traitFactMap[fact.trait.id] << fact.traitValue
+            traitFactMap['fact'] << fact.id
+            queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+        }
+        queryParams.trait.each {k,v->
+            queryParams.trait[k] = v[0..-2];
+        }
+        return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
+    }
+
+    Map getTraits() {
+        def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
+        def r = getTraitFacts();
+        r['traitList'] = traitList; 
+        return r;
     }
 
     @Override

@@ -142,7 +142,10 @@ function loadCustomFields($me, compId) {
         method:'GET',
         data:params,
         success: function(data) {   
-            $(compId).html(data.html);
+            if(data.html) 
+                $(compId).html(data.html);
+            else
+                $(compId).html("<div class='alert alert-info'>No Custom Fields</div>");
         }
     });
 }

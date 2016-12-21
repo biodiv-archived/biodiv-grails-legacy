@@ -801,33 +801,8 @@ class Observation extends DataObject {
 	}
 
     Map getTraits() {
-        def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isObservationTrait':true,'isParticipatory':true, 'showInObservation':true], -1, -1).instanceList;
-        def r = getTraitFacts();
-        r['traitList'] = traitList; 
-        return r;
+        return getTraits(true, true, true);
     }
-
-    Map getTraitFacts() {
-        def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(this.id, this.class.getCanonicalName(), false);
-        Map traitFactMap = [:]
-        Map queryParams = ['trait':[:]];
-        //def conRef = []
-        factList.each { fact ->
-            if(!traitFactMap[fact.trait.id]) {
-                traitFactMap[fact.trait.id] = []
-                queryParams['trait'][fact.trait.id] = '';
-                traitFactMap['fact'] = []
-            }
-            traitFactMap[fact.trait.id] << fact.traitValue
-            traitFactMap['fact'] << fact.id
-            queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
-        }
-        queryParams.trait.each {k,v->
-            queryParams.trait[k] = v[0..-2];
-        }
-        return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
-    }
-
 
     Map getCustomFields() {
     	return customFieldService.fetchAllCustomFields(this);

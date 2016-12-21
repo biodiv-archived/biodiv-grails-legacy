@@ -1991,7 +1991,8 @@ private printCacheEntries(cache) {
             if(objectIdL) {
                 model['observationInstance'] = Observation.read(objectIdL);
                 model['customFields'] = model.observationInstance.getCustomFields();
-                m['html'] =  g.render(template:"/observation/showCustomFieldsTemplate", model:model);
+                if(model['customFields'].size() > 0)
+                    m['html'] =  g.render(template:"/observation/showCustomFieldsTemplate", model:model);
             }
         }
         render m as JSON
