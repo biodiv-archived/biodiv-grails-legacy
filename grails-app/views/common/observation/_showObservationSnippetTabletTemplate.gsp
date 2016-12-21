@@ -182,7 +182,7 @@ def obvId = observationInstance?.id
             </div>
 
         <div class="tab-pane union-comment" id="${observationInstance.id}_comments">
-            <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />
+            <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage, 'preLoad':false]" />
             <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
         </div>
 
