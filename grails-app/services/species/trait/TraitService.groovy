@@ -515,8 +515,11 @@ class TraitService extends AbstractObjectService {
                 activeFilters['classification'] = classification.id;
                 activeFilters['sGroup'] = params.sGroup;
 
-                filterQuery += ' and obv.showInObservation = :showInObservation '
-                queryParams['showInObservation'] = true ;
+                  if(params.showInObservation && params.showInObservation.toBoolean()){
+                 filterQuery += ' and obv.showInObservation = :showInObservation '
+                 queryParams['showInObservation'] = true ; 
+                }
+
  
                 taxonQuery = " left join obv.taxon taxon left join taxon.hierarchies as reg, SpeciesGroupMapping sgm ";
                 query += taxonQuery;
