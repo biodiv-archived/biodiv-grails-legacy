@@ -226,10 +226,10 @@
                     <g:if  test="${traitInstanceList}">
                     <div class="trait_panel">
                     <div class="sidebar_section" style="margin:10px 0px;">
-                    <sUser:isAdmin>
-                    <button class="btn btn-primary pull-right edit_trait">Edit</button>
-                    </sUser:isAdmin>
-                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
+                    <g:if test="${isSpeciesContributor}">
+                    <button class="btn btn-primary pull-right edit_trait"> ${g.message(code:'default.button.edit.label')}</button>
+                    </g:if>
+                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>${g.message(code:'traits.label')}</h5></a>
                     <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
                     <div id="traits" class="trait">
                    <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true]"/>
@@ -240,10 +240,10 @@
                     <div class="trait_edit_panel">
                     <div class="sidebar_section" style="margin:10px 0px;">
                     <button class="btn btn-primary pull-right edit_save">Save</button>
-                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
+                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>${g.message(code:'traits.label')}</h5></a>
                     <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
                     <div id="traits" class="trait">
-                    <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitListValue, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true,'editable':true]"/>
+                    <g:render template="/trait/showTraitListTemplate" model="['instanceList':allTraitList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true,'editable':true]"/>
                     </div>
                     </div>
                     </div>

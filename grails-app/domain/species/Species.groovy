@@ -547,8 +547,10 @@ class Species implements Rateable {
 
     Map getTraits() {
         def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
+        def allTraitList = traitService.getFilteredList(['sGroup':this.guid, 'isNotObservationTrait':true,'taxon':this.taxonConcept.id], -1, -1).instanceList;
         def r = getTraitFacts();
         r['traitList'] = traitList; 
+        r['allTraitList'] = allTraitList; 
         return r;
     }
 
