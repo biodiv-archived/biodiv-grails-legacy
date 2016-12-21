@@ -753,3 +753,5 @@ drop table custom_fields_group_7;
 select id from field where concept='Natural History' and category='Reproduction';
 update trait set field_id=39 where name='Sex';
 
+#21stDec2016
+alter table trait alter column icon type text;

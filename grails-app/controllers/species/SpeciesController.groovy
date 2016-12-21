@@ -263,7 +263,8 @@ class SpeciesController extends AbstractObjectController {
 		else {
 
             def factList = Fact.findAllByObjectIdAndObjectType(speciesInstance.id, speciesInstance.class.getCanonicalName())
-            def traitList = traitService.getFilteredList(['sGroup':speciesInstance.guid, 'isNotObservationTrait':true, 'taxon':speciesInstance.taxonConcept.id], -1, -1).instanceList;
+             def traitListValue = traitService.getFilteredList(['sGroup':speciesInstance.guid, 'isNotObservationTrait':true,'taxon':speciesInstance.taxonConcept.id], -1, -1).instanceList;
+            def traitList = [];
             def traitFactMap = [:]
             def queryParams = ['trait':[:]];
             //def conRef = []
@@ -272,7 +273,7 @@ class SpeciesController extends AbstractObjectController {
                         traitFactMap[fact.trait.id] = []
                         queryParams['trait'][fact.trait.id] = '';
                         traitFactMap['fact'] = []
-                        //traitList << fact.trait;
+                        traitList << fact.trait;
                     }
                     traitFactMap[fact.trait.id] << fact.traitValue
                     traitFactMap['fact'] << fact.id
@@ -347,7 +348,7 @@ class SpeciesController extends AbstractObjectController {
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
 
                     def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList, factInstanceList:traitFactMap, queryParams:queryParams, displayAny:false]
+                    result = [speciesInstance: speciesInstance, fields:map, totalObservationInstanceList:[:], queryParams:[max:8, offset:0], 'userGroupWebaddress':params.webaddress, 'userLanguage': userLanguage,fieldFromName:fieldFromName, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature, traitInstanceList:traitList, traitListValue:traitListValue, factInstanceList:traitFactMap, queryParams:queryParams, displayAny:false]
 
                     if(springSecurityService.currentUser) {
                         SpeciesField newSpeciesFieldInstance = speciesService.createNewSpeciesField(speciesInstance, fields[0], '');

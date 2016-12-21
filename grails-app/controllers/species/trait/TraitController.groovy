@@ -120,6 +120,8 @@ class TraitController extends AbstractObjectController {
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
+        traitInstance.taxon.clear()
+        if(params.taxonName){
         def taxonId
         params.taxonName.each{
             taxonId=it
@@ -128,6 +130,7 @@ class TraitController extends AbstractObjectController {
             TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
             traitInstance.addToTaxon(taxon);
         }
+    }
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
