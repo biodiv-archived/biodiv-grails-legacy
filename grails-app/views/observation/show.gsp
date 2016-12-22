@@ -160,7 +160,7 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;right: 4px;" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right comment-post-btn" />
                                             <div style="clear:both"></div>
                                 </div>
                                 

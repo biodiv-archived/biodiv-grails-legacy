@@ -169,18 +169,19 @@ def obvId = observationInstance?.id
         <li><a href="#${observationInstance.id}_suggestID" data-toggle="tab" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">${g.message(code:'default.reco.clickSuggest')}</a></li>
         </g:if>
     </ul>
-    <div class="tab-content" style="max-height:160px; text-align:left;">
+    <div class="tab-content" style="max-height:160px; text-align:left;overflow:inherit;">
 
         <div class="tab-pane  in active" id="${observationInstance.id}_groups">
             <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />   
         </div>
 
         <div class="tab-pane " id="${observationInstance.id}_traits">
-            <span class="progress" style="display: none;"><g:message code="msg.loading" /> </span>
+            <span class="progress"><g:message code="msg.loading" /> </span>
         </div>
 
-            <div class="tab-pane " id="${observationInstance.id}_customFields">
-            </div>
+        <div class="tab-pane " id="${observationInstance.id}_customFields">
+            <span class="progress"><g:message code="msg.loading" /> </span>
+        </div>
 
         <div class="tab-pane union-comment" id="${observationInstance.id}_comments" style="width:99%">
             <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage, 'preLoad':false]" />
@@ -200,7 +201,7 @@ def obvId = observationInstance?.id
                 <g:renderErrors bean="${recommendationVoteInstance}" as="list" />
                 </div>
                 </g:hasErrors>
-                <div class="addRecommendation_wrap_place">
+                <div class="addRecommendation_wrap_place" style="position:relative;overflow:visible;margin-bottom:40px;">
                 </div>    
 
                 </div>
