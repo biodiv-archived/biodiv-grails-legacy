@@ -175,7 +175,7 @@ def obvId = observationInstance?.id
             <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />   
         </div>
 
-        <div class="tab-pane " id="${observationInstance.id}_traits">
+        <div class="tab-pane " id="${observationInstance.id}_traits" style="max-height:160px;overflow:auto;">
             <span class="progress"><g:message code="msg.loading" /> </span>
         </div>
 
