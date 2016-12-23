@@ -139,7 +139,7 @@ class FactController extends AbstractObjectController {
                             factInstance[trait.id] << fact.traitValue;
                             otherParams["trait"] = trait.name
                             otherParams["traitValue"] = fact.traitValue
-                            utilsService.sendNotificationMail(utilsService.FACT_UPDATE,fact,null,null,null,otherParams)
+                            utilsService.sendNotificationMail(utilsService.FACT_UPDATE,object,null,null,null,otherParams)
                         }
                         println "======================"
                         println queryParams
