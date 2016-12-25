@@ -38,6 +38,8 @@ class TraitController extends AbstractObjectController {
         else model.displayAny = true;
         if(params.editable) model.editable = params.editable?.toBoolean();
         else model.editable = false;
+        if(params.filterable) model.filterable = params.filterable?.toBoolean();
+        else model.filterable = true;
         if(params.fromObservationShow) model.fromObservationShow = params.fromObservationShow;
  
         //HACK
@@ -57,7 +59,6 @@ class TraitController extends AbstractObjectController {
         }
 
         model = utilsService.getSuccessModel('', null, OK.value(), model);
-
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
@@ -223,6 +224,7 @@ class TraitController extends AbstractObjectController {
 
     def show() {
         Trait traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
+        String msg;
         if(traitInstance) {
             def coverage = traitInstance.taxon
             def traitValue = [];
@@ -242,12 +244,18 @@ class TraitController extends AbstractObjectController {
                 xml { render utilsService.getSuccessModel('', traitInstance, OK.value()) as XML }
             }
         } else {
+            msg = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
+            def model = utilsService.getErrorModel(msg, null, OK.value());
             withFormat {
                 html {
-                    render (view:"list")
+                    flash.message = msg;
+                    redirect (url:uGroup.createLink(action:'list', controller:"trait", 'userGroupWebaddress':params.webaddress))
                 }
+                json { render model as JSON }
+                xml { render model as XML }
             }
         }
+        
         return
     }
 

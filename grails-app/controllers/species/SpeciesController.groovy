@@ -256,7 +256,8 @@ class SpeciesController extends AbstractObjectController {
 						redirect(action: "list")
 					}	
 
-                } json { render model as JSON }
+                } 
+                json { render model as JSON }
                 xml { render model as XML }
             }
         }

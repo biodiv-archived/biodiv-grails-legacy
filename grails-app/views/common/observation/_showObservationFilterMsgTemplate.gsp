@@ -251,7 +251,7 @@
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
 					action:params.action, params:[('trait.'+trait.key): tv])}">
-						${Trait.read(trait.key)?.name}:${tv.equalsIgnoreCase('none')?'None':TraitValue.read(tv)?.value} 
+						${Trait.read(trait.key)?.name}:${tv.equalsIgnoreCase('none')||tv.equalsIgnoreCase('all')||tv.equalsIgnoreCase('any')?tv.capitalize():TraitValue.read(tv)?.value} 
                         <a class="removeQueryFilter" data-target="trait.${trait.key}=${tv}" href="#">[X]</a> 
                         </span>
                         </g:each>
