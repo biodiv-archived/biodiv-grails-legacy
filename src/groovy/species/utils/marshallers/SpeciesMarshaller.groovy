@@ -58,6 +58,7 @@ class SpeciesMarshaller {
 
                 fields:species.fields,
                 resource : species.listResourcesByRating(),
+                traits : species.getTraits(),
                 userGroups : species.userGroups,
                 
 //                flagCount : species.flagCount,
