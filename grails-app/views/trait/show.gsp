@@ -23,6 +23,7 @@
 	    <div class="container">
 	    	<h1 class="sci_name">${traitInstance.name}</h1>
 	    	<div id="content" class="super-section">
+	    	<sUser:isAdmin>
 	    							<a class="btn btn-primary pull-right" title="${g.message(code:'title.document.edit')}" style="margin-right: 5px;"
 							href="${uGroup.createLink(controller:'trait', action:'edit', id:traitInstance.id)}">
 							<i class="icon-edit"></i><g:message code="button.edit" /> 
@@ -33,6 +34,7 @@
         <form action="${uGroup.createLink(controller:'trait', action:'flagDeleted')}" method='POST' name='deleteForm'>
             <input type="hidden" name="id" value="${traitInstance.id}" />
         </form>
+        </sUser:isAdmin>
 			    	<table class="table">
 			    		<g:if test="${traitInstance.description}">
 					    	<tr><td><h6>Description</h6></td>

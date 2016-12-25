@@ -85,6 +85,8 @@ class UtilsService {
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
 
+    static final String FACT_UPDATE = "fact updated";
+
     static final String[] DATE_PATTERNS = ['dd/MM/yyyy', 'MM/dd/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
 
     private Map bannerMessageMap;
@@ -337,6 +339,18 @@ class UtilsService {
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
+                break
+
+                case [FACT_UPDATE]:
+                    println "fact update mail"
+                    def user = springSecurityService.currentUser;
+                    mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
+                    templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
+                    templateMap["trait"] = otherParams["trait"]
+                    templateMap["traitValue"] = otherParams["traitValue"]
+                    bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/factUpdate"
+                    populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                    toUsers.add(user)
                 break
 
 				case [ActivityFeedService.DISCUSSION_CREATED, ActivityFeedService.DISCUSSION_UPDATED] :
