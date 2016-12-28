@@ -27,9 +27,11 @@ instanceList.each{ iL ->
                    
                  <ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
 				<g:each in="${inst.value}" status="i" var="trait_instance">
+				<div data-isNotObservation="${trait_instance.isNotObservationTrait}">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;border:0px !important;">
                     <g:render template="/trait/showTraitTemplate" model="['trait':trait_instance, 'factInstance':factInstance, object:instance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable, 'ifOwns':ifOwns]"/>
 					</li>
+					</div>
 				</g:each>
 			</ul>              
 			</div>
