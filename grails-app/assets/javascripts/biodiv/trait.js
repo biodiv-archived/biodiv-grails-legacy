@@ -26,7 +26,6 @@ function loadMatchingSpeciesList() {
     }
     params['max'] = $(this).data('max');
     params['offset'] = $(this).data('offset');
-
     History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
     var $matchingSpeciesTable = $('#matchingSpeciesTable');
     $.ajax({
@@ -68,7 +67,7 @@ function loadMatchingSpeciesList() {
 }
 
 function showIcon(value,name,url){
-    return  '<img src="'+url+'" width="32" height="32" src="'+name+'-'+value+'" />';
+    return  '<img src="'+url+'" width="32" height="32" title="'+name+'-'+value+'" />';
 }
 
 function onSubmitFact($me, objectId, objectType) {
@@ -167,7 +166,7 @@ $(document).ready(function(){
         'hide': "100"
         },
         'content':function(){
-            return "<div style='width:150px;height:150px;'><img src='"+$(this).data('imageUrl')+"' width='150' height='150' /></div>";
+            return "<div style='width:150px;height:150px;'><img src='"+$(this).data('imageUrl')+"' width='150' height='150' /><p>"+$(this).data('trait')+"-"+$(this).data('traitvalue')+"</p></div>";
         }
     });
         

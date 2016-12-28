@@ -10,6 +10,11 @@
 
 	<!-- main_content -->
 	<div class="list span12 namelist_wrapper" style="margin-left:0px;clear:both">
+        <div class="btn-group" data-toggle="buttons-radio" style="float:right;">
+        <button type="button" class="btn btn-primary  listFilter default" value="species">Species Trait</button>
+        <button type="button" class="btn btn-primary listFilter" value="observation">Observation Trait</button>
+        <button type="button" class="btn btn-primary listFilter all" value="all">All</button>
+    </div>
 		<div class="observation thumbwrap">
 			<obv:showObservationFilterMessage
 						model="['observationInstanceList':instanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'trait']" />
@@ -49,7 +54,7 @@
     </g:each>
 
     $(document).ready (function() {
-
+        $('.default').click();
         var taxonBrowserOptions = {
             expandAll:false,
             controller:"${params.controller?:'observation'}",
@@ -87,6 +92,37 @@
         });
     });
 $(document).ready(function() {
+        element = $('button[data-isNotObservation="false"]');
+        $(element).each(function(){
+            $(this).attr("disabled", "disabled");
+        });
+        element = $('div[data-isNotObservation="false"]');
+        $(element).each(function(){
+            $(this).parent().parent().hide();
+        });
+    $('.listFilter').on('click',function(){
+        var element = {};
+        if($(this).val()=='observation'){
+            $('.all').click();
+            element = $('div[data-isNotObservation="true"]');
+                $(element).each(function(){
+                    $(this).parent().parent().hide();
+                });
+        }
+        else if ($(this).val()=='species'){
+            $('.all').click();
+            element = $('div[data-isNotObservation="false"]');
+            $(element).each(function(){
+                $(this).parent().parent().hide();
+            });
+        }
+        else{
+            element = $('div[data-isNotObservation]');
+            $(element).each(function(){
+                $(this).parent().parent().show();
+            });
+        }
+});
 	$(".trait button").button();
 	$(".trait button").tooltip({placement:'bottom', 'container':'body'});
     <g:each in="${params.trait}" var="t">
