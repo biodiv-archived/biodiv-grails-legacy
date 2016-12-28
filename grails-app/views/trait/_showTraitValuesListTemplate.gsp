@@ -11,6 +11,18 @@
                     All
            </div> 
             </g:if>
+            <g:if test="${fromTraitShow}">
+            <div data-tvid='any' data-tid='${traitValues?traitValues[0]?.trait?.id:''}'
+                class="btn span2 any ${queryParams.trait && traitValues && queryParams.trait[traitValues[0]?.trait?.id+'']?'':'active btn-success'}"
+                value="any"
+                style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;}; line-height:30px;text-align:left;">
+                <img
+                    class="${showDetails ? 'normal_profile_pic' : 'user-icon small_profile_pic'}"
+                    src="${grailsApplication.config.speciesPortal.traits.serverURL}/32/32_any.png" title="All"
+                    alt="all" /> 
+                    All
+           </div> 
+            </g:if>
         
         <g:if test="${fromSpeciesShow!=true}">
             <g:each in="${traitValues}" var="traitValue" status="i">
