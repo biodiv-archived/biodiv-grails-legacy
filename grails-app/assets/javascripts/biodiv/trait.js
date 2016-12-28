@@ -166,7 +166,7 @@ $(document).ready(function(){
         'hide': "100"
         },
         'content':function(){
-            return "<div style='width:150px;height:150px;'><img src='"+$(this).data('imageUrl')+"' width='150' height='150' /><p>"+$(this).data('trait')+"-"+$(this).data('traitvalue')+"</p></div>";
+            return "<div style='width:150px;height:200px;'><img src='"+$(this).data('imageUrl')+"' width='150' height='150' /><p>"+$(this).data('trait')+"-"+$(this).data('traitvalue')+"</p></div>";
         }
     });
         

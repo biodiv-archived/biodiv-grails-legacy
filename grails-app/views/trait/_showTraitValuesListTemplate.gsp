@@ -29,7 +29,7 @@
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue?.trait.id}' data-isNotObservation='${traitValue.trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post ${traitTypes} ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue?.trait.id]?.contains(traitValue.id+'')?'active btn-success':''}"
                         value="${traitValue.value}"
-                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
+                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;width:inherit;">
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
                     </button>
             </g:each> 
