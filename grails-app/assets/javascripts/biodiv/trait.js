@@ -123,6 +123,7 @@ function loadTraits($me, compId) {
     params['displayAny'] = false;
     params['editable'] = true;
     params['fromObservationShow'] = 'show';
+    params['filterable'] = false;
     $.ajax({
         url:window.params.trait.listUrl,
         method:'GET',

@@ -1,5 +1,5 @@
 <%@page import="species.trait.Trait.TraitTypes"%>
-<div class="trait" data-id="${trait.id}">
+<div class="trait  ${filterable==false?'':'filterable'}" data-id="${trait.id}">
 	<a href="${uGroup.createLink(action:'show', controller:'trait', id:trait.id)}">
         <h6>${trait.name}
             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${trait.description}"></i>
