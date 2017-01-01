@@ -709,7 +709,6 @@ class TraitService extends AbstractObjectService {
         return [success:success, url:url, msg:message, errors:errors]
     }
 
-
     def migrateIcons(icon, usersDir){
         if(!icon) return;
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir

@@ -84,6 +84,7 @@ class Trait {
         public enum Units implements org.springframework.context.MessageSourceResolvable{
             CM("cm"),
             M3("m³"),
+            MM("mm"),
 
         private String value;
 
@@ -100,6 +101,7 @@ class Trait {
             return [
                 CM,
                 M3,
+                MM
             ]
         }
 

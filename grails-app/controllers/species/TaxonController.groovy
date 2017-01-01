@@ -807,38 +807,54 @@ class TaxonController {
             println rs.path
             println "++++++++++++++++++++++++++++++++++++++"
             println "++++++++++++++++++++++++++++++++++++++"
-			def sql = new Sql(dataSource)
-			int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-			dataSource.setUnreturnedConnectionTimeout(50000);
-			try{
-	        rs.taxonid.each { t ->
-	              println t
-	              sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
-	
-				  def taxon1 = TaxonomyDefinition.read(t);
-	              taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
-	              }
-			}catch(e){
-				e.printStackTrace()
-			}finally{
-				dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
-			}
+            def sql = new Sql(dataSource)
+            int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+            dataSource.setUnreturnedConnectionTimeout(50000);
+            try{
+                rs.taxonid.each { t ->
+                    println t
+                    sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
+
+                    def taxon1 = TaxonomyDefinition.read(t);
+                    taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
+                }
+            }catch(e){
+                e.printStackTrace()
+            }finally{
+                dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+            }
         } else {
             render ([success:false, msg:"", errors:[]] as JSON)                                                                                       
         }
 
     }
-        boolean hasPermissionSpecies(user,taxon){
-            def sql =  Sql.newInstance(dataSource);
-            def result
-            result = sql.rows("select a.*,b.id as species_id from species_permission a JOIN species b on a.taxon_concept_id=b.taxon_concept_id and a.author_id=:userId and a.taxon_concept_id=:taxonId",[userId:user,taxonId:taxon]);
-                   if(result){
-                    return true;
-                   }
-                   else {
-                    return false;
-                   }  
+
+    boolean hasPermissionSpecies(user,taxon){
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        result = sql.rows("select a.*,b.id as species_id from species_permission a JOIN species b on a.taxon_concept_id=b.taxon_concept_id and a.author_id=:userId and a.taxon_concept_id=:taxonId",[userId:user,taxonId:taxon]);
+        if(result){
+            return true;
+        }
+        else {
+            return false;
+        }  
     }
 
+    @Secured(['ROLE_ADMIN'])
+    def snapAcceptedAndNoIBP() {
+        def sql = new Sql(dataSource)
+        sql.eachRow("select id from taxonomy_definition t where t.status='ACCEPTED' and t.id not in (select taxon_definition_id from taxonomy_registry where classification_id=265799)") { row ->
+            def td = TaxonomyDefinition.read(row.id);
+            if(td) {
+                println td.id;
+                td.doColCuration = false;
+                td.postProcess();
+            } else {
+                println "No td";
+            }
+        }
+
+    }
 }
 
