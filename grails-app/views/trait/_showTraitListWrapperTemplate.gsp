@@ -11,9 +11,9 @@
 	<!-- main_content -->
 	<div class="list span12 namelist_wrapper" style="margin-left:0px;clear:both">
         <div class="btn-group" data-toggle="buttons-radio" style="float:right;">
-        <button type="button" class="btn btn-primary  listFilter default" value="species">Species Trait</button>
-        <button type="button" class="btn btn-primary listFilter" value="observation">Observation Trait</button>
-        <button type="button" class="btn btn-primary listFilter all" value="all">All</button>
+        <button type="button" class="btn listFilter default" value="species"><g:message code="trait.filter.species" /></button>
+        <button type="button" class="btn listFilter" value="observation"><g:message code="trait.filter.observation" /></button>
+        <button type="button" class="btn listFilter all" value="all"><g:message code="trait.filter.all" /></button>
     </div>
 		<div class="observation thumbwrap">
 			<obv:showObservationFilterMessage
