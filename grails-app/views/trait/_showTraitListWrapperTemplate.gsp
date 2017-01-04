@@ -11,9 +11,9 @@
 	<!-- main_content -->
 	<div class="list span12 namelist_wrapper" style="margin-left:0px;clear:both">
         <div class="btn-group" data-toggle="buttons-radio" style="float:right;">
-        <button type="button" class="btn listFilter default" value="species"><g:message code="trait.filter.species" /></button>
-        <button type="button" class="btn listFilter" value="observation"><g:message code="trait.filter.observation" /></button>
-        <button type="button" class="btn listFilter all" value="all"><g:message code="trait.filter.all" /></button>
+        <button type="button" class="btn btn-primary  listFilter default" value="species" id="species">Species Trait</button>
+        <button type="button" class="btn btn-primary listFilter" value="observation" id="observation">Observation Trait</button>
+        <button type="button" class="btn btn-primary listFilter all" value="all" id="all">All</button>
     </div>
 		<div class="observation thumbwrap">
 			<obv:showObservationFilterMessage
@@ -54,7 +54,6 @@
     </g:each>
 
     $(document).ready (function() {
-        $('.default').click();
         var taxonBrowserOptions = {
             expandAll:false,
             controller:"${params.controller?:'observation'}",
@@ -68,7 +67,7 @@
         
         $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
         
-        $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
+        $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none, .listFilter', function(){
             if($(this).hasClass('active')){
             return false;
             }
@@ -89,40 +88,29 @@
 
         $('.list').on('updatedGallery', function() {
             updateMatchingSpeciesTable();
+            element = $('button[data-isNotObservation="false"]');
+            $(element).each(function(){
+                $(this).attr("disabled", "disabled");
+            });
+
+            $('.listFilter').on('click',function(){
+                var element = {};
+                element = $('div[data-isNotObservation]');
+                $(element).each(function(){
+                    $(this).parent().parent().show();
+                });
+                if($(this).hasClass('active')){
+                    return false;
+                }
+                $(this).parent().find('.listFilter').removeClass('active btn-success');
+                $(this).addClass('active btn-success')
+                updateMatchingSpeciesTable();
+                return false;
+            });
         });
     });
+
 $(document).ready(function() {
-        element = $('button[data-isNotObservation="false"]');
-        $(element).each(function(){
-            $(this).attr("disabled", "disabled");
-        });
-        element = $('div[data-isNotObservation="false"]');
-        $(element).each(function(){
-            $(this).parent().parent().hide();
-        });
-    $('.listFilter').on('click',function(){
-        var element = {};
-        if($(this).val()=='observation'){
-            $('.all').click();
-            element = $('div[data-isNotObservation="true"]');
-                $(element).each(function(){
-                    $(this).parent().parent().hide();
-                });
-        }
-        else if ($(this).val()=='species'){
-            $('.all').click();
-            element = $('div[data-isNotObservation="false"]');
-            $(element).each(function(){
-                $(this).parent().parent().hide();
-            });
-        }
-        else{
-            element = $('div[data-isNotObservation]');
-            $(element).each(function(){
-                $(this).parent().parent().show();
-            });
-        }
-});
 	$(".trait button").button();
 	$(".trait button").tooltip({placement:'bottom', 'container':'body'});
     <g:each in="${params.trait}" var="t">

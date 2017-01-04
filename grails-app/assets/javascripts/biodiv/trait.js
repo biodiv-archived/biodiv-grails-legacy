@@ -14,7 +14,35 @@ function loadMatchingSpeciesList() {
     console.log(url);
     var href = url.attr('path');
     var params = getFilterParameters(url);
+    var element = {};
+    var listFilter = $('.listFilter');
+        listFilter.each(function(){
+        if($(this).hasClass('active')) {
+           var traitType = $(this).val();
+           params['traitType'] = traitType;
+        }
+    });
     for(var key in params) {
+        if(key.match('traitType')){
+                if(params[key]=='observation'){
+                element = $('div[data-isNotObservation="true"]');
+                    $(element).each(function(){
+                        $(this).parent().parent().hide();
+                    });
+            }
+            else if (params[key]=='species'){
+                element = $('div[data-isNotObservation="false"]');
+                $(element).each(function(){
+                    $(this).parent().parent().hide();
+                });
+            }
+            else{
+                element = $('div[data-isNotObservation]');
+                $(element).each(function(){
+                    $(this).parent().parent().show();
+                });
+            }
+        }
         if(key.match('trait.')) {
             delete params[key];
         }
