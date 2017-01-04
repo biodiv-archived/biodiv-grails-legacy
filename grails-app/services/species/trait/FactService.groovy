@@ -47,7 +47,6 @@ class FactService extends AbstractObjectService {
         dl.writeLog("Loading facts from ${file}", Level.INFO);
 
         SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).eachWithIndex { m,index ->
-            if(index>1) return;
 
             dl.writeLog("Loading facts ${m}");
             if(!m['taxonid']) {
