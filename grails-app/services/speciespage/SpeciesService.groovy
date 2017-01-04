@@ -72,6 +72,7 @@ import groovy.sql.Sql
 import au.com.bytecode.opencsv.CSVWriter
 import species.utils.ImageType;
 import species.trait.Fact;
+import species.trait.TraitValue;
 import speciespage.ObvUtilService;
 
 class SpeciesService extends AbstractObjectService  {
@@ -2477,10 +2478,10 @@ def checking(){
         def result = _getSpeciesList(params);
         def matchingSpeciesList = [];
         result.speciesInstanceList.each {it->
-            def link = utilsService.createHardLink("species", "show", it.id);
+            String link = utilsService.createHardLink("species", "show", it.id);
             def mainImage = it.mainImage();
             String imagePath = '';
-            def factInstance=Fact.findAllByPageTaxon(it.taxonConcept);
+            List factInstances = Fact.findAllByPageTaxon(it.taxonConcept);
             //println "fact Instance"+factInstance?.traitValue?.icon
             def speciesGroupIcon =  it.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
             if(mainImage?.fileName == speciesGroupIcon.fileName) { 
@@ -2488,9 +2489,17 @@ def checking(){
             } else
                 imagePath = mainImage?mainImage.thumbnailUrl():null;
 
-            def traitIcons = [];
-            factInstance?.traitValue.each{tv ->
-                traitIcons << [tv.value,tv.trait.name, tv.mainImage()?.fileName]
+            List traitIcons = [];
+            factInstances?.each { f ->
+                if(f.traitValue) { 
+                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName]
+                } else if(f.value && f.toValue) {
+                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null]
+                } else if(f.fromDate && f.toDate) {
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null]
+                } else if(f.value) {
+                    traitIcons << [f.value, f.trait.name, null]
+                }
             }
 
             if(params.downloadFrom == 'matchingSpecies') {

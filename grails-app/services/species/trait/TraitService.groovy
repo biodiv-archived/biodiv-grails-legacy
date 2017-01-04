@@ -95,6 +95,7 @@ class TraitService extends AbstractObjectService {
         }
         traitResourceDir = new File(traitResourceDir, UUID.randomUUID().toString()+File.separator+"resources");
         traitResourceDir.mkdirs();
+        String resourceFromDir = (new File(file)).getParent();
 
         while(row) {
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
@@ -172,7 +173,7 @@ class TraitService extends AbstractObjectService {
                         break;
 
                         case 'trait icon' : 
-                        trait.icon = migrateIcons(row[index].trim(), traitResourceDir);
+                        trait.icon = migrateIcons(row[index].trim(), traitResourceDir, resourceFromDir);
                         break;
 
                         case 'taxonid':
@@ -292,6 +293,7 @@ class TraitService extends AbstractObjectService {
         traitResourceDir = new File(traitResourceDir, UUID.randomUUID().toString()+File.separator+"resources");
         traitResourceDir.mkdirs();
 
+        String resourceFromDir = (new File(file)).getParent();
 
         while(row) {
 
@@ -321,7 +323,7 @@ class TraitService extends AbstractObjectService {
                     if(traits?.size() == 1)
                         trait = traits[0];
                 } else {
-                    List traits = Trait.executeQuery("select t from Trait t where t.name=? ", [row[traitNameHeaderIndex]]);
+                    List traits = Trait.executeQuery("select t from Trait t where t.name=? ", [row[traitNameHeaderIndex].trim()]);
                     if(traits?.size() == 1)
                         trait = traits[0];
                     //trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex].trim(), taxon);
@@ -352,13 +354,15 @@ class TraitService extends AbstractObjectService {
                     traitValue.trait = trait;
                     break;
                     case 'value' :
+                    println "====="
+                    println row[index];
                     traitValue.value=row[index].trim();
                     break;
                     case 'value source' : 
                     traitValue.source=row[index].trim()
                     break;
                     case 'value icon' : 
-                    traitValue.icon=migrateIcons(row[index].trim(),traitResourceDir);
+                    traitValue.icon=migrateIcons(row[index].trim(),traitResourceDir, resourceFromDir);
                     break;
                     case 'value definition' : 
                     traitValue.description=row[index].trim()
@@ -709,11 +713,12 @@ class TraitService extends AbstractObjectService {
         return [success:success, url:url, msg:message, errors:errors]
     }
 
-    def migrateIcons(icon, usersDir){
+    private String migrateIcons(icon, usersDir, fromDir=null){
         if(!icon) return;
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(icon));
-        File fi = new File(grailsApplication.config.speciesPortal.content.rootDir +"/trait/"+icon);
+        if(!fromDir) fromDir = grailsApplication.config.speciesPortal.content.rootDir; 
+        File fi = new File(fromDir+"/trait/"+icon);
         (new AntBuilder()).copy(file: fi, tofile: file)
         ImageUtils.createScaledImages(file, usersDir,true);
         def file_name = file.name.toString();

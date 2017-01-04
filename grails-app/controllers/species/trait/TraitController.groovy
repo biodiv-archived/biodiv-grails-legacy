@@ -59,6 +59,8 @@ class TraitController extends AbstractObjectController {
         }
 
         model = utilsService.getSuccessModel('', null, OK.value(), model);
+        println model
+        println model.queryParams
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){

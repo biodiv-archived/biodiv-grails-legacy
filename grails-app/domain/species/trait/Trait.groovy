@@ -85,6 +85,7 @@ class Trait {
             CM("cm"),
             M3("m³"),
             MM("mm"),
+            MONTH("month");
 
         private String value;
 
@@ -101,7 +102,7 @@ class Trait {
             return [
                 CM,
                 M3,
-                MM
+                MM, MONTH
             ]
         }
 
@@ -177,17 +178,17 @@ class Trait {
     static Units fetchUnits(String units){
         if(!units) return null;
         for(Units type : Units) {
-            if(type.name().equals(units)) {
+            if(type.name().equalsIgnoreCase(units)) {
                 return type;
             }
         }
         return null;
     }
 
-    static Trait getValidTrait(def traitId, TaxonomyDefinition taxonConcept) {
-        List<Trait> traits = Trait.findAllById(traitId);
+    static Trait getValidTrait(String name, TaxonomyDefinition taxonConcept) {
+        List<Trait> traits = Trait.findAllByNameIlike(name);
         if(!traits) {
-            println "No trait with name ${traitId}";
+            println "No trait with name ${name}";
             return null;
         }
 
@@ -230,7 +231,7 @@ class Trait {
         if(validTraits) {
             return validTraits[0];
         } else {
-            println "No trait defined with name ${traitId} at taxonscope ${ibpParentTaxon}";
+            println "No trait defined with name ${name} at taxonscope ${ibpParentTaxon}";
             return null;
         }
     }

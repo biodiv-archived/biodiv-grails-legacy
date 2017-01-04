@@ -10,7 +10,10 @@ class Fact {
 
     Trait trait;
     TraitValue traitValue;
-    String value;
+    String value;//default from value if trait type is range
+    String toValue;
+    Date fromDate;
+    Date toDate;
     String attribution;
     SUser contributor;
     License license;
@@ -25,7 +28,11 @@ class Fact {
       //attribution nullable:true
       //contributor nullable:true
       //license nullable:true
+      traitValue nullable:true
       value nullable:true
+      toValue nullable:true
+      fromDate nullable:true
+      toDate nullable:true
       objectId nullable:false
       objectType nullable:false
       pageTaxon nullable:true
@@ -43,6 +50,6 @@ class Fact {
 
     @Override
     String toString() {
-        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue.value})>";
+        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}-${toValue})>";
     }
 }

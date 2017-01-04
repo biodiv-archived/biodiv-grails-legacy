@@ -32,21 +32,7 @@ class FactController extends AbstractObjectController {
     }
 
     def list() {
-        //render (view:'list', model:['traitList' : traitService.listTraits(params)]);
-        def model = [:];
-        model = utilsService.getSuccessModel('', null, 200, model);
-
-        withFormat {
-            html {
-                render(controller:'trait',view:"list", model:model.model);
-            }
-            json {
-                render model as JSON 
-            }
-            xml {
-                render model as XML
-            }
-        }
+        render(controller:'trait', view:"list");
     }
 
     def show() {

@@ -1,7 +1,12 @@
+<%@page import="species.trait.Trait.TraitTypes"%>
+<%@page import="species.trait.Trait.DataTypes"%>
+<%@page import="species.trait.TraitValue"%>
+
 <div class="row btn-group" style="white-space:inherit;margin-left:20px;">
-            <g:if test="${displayAny && traitValues[0].trait.isNotObservationTrait}">
-            <div data-tvid='all' data-tid='${traitValues?traitValues[0]?.trait?.id:''}'
-                class="btn span2 all ${queryParams.trait && traitValues && queryParams.trait[traitValues[0]?.trait?.id+'']?'':'active btn-success'}"
+<g:if test="${traitValues && traitValues.size()>0}">
+            <g:if test="${displayAny && trait.isNotObservationTrait}">
+            <div data-tvid='all' data-tid='${traitValues?trait?.id:''}'
+                class="btn span2 all ${queryParams.trait && traitValues && queryParams.trait[trait?.id+'']?'':'active btn-success'}"
                 value="all"
                 style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;}; line-height:30px;text-align:left;">
                 <img
@@ -12,8 +17,8 @@
            </div> 
             </g:if>
             <g:if test="${fromTraitShow}">
-            <div data-tvid='any' data-tid='${traitValues?traitValues[0]?.trait?.id:''}'
-                class="btn span2 any ${queryParams.trait && traitValues && queryParams.trait[traitValues[0]?.trait?.id+'']?'':'active btn-success'}"
+            <div data-tvid='any' data-tid='${traitValues&&trait?trait?.id:''}'
+                class="btn span2 any ${queryParams.trait && traitValues && queryParams.trait[trait?.id+'']?'':'active btn-success'}"
                 value="any"
                 style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;}; line-height:30px;text-align:left;">
                 <img
@@ -37,9 +42,10 @@
         
         <g:if test="${fromSpeciesShow==true}">
             <g:each in="${traitValues}" var="traitValue" status="i">
-                <% String link="${"/trait/show/"+traitValue.trait.id+"?trait."+traitValue.trait.id+"="+traitValue.id}" %>
+            <g:if test="${(traitValue instanceof TraitValue)}">
+                <% String link="${"/trait/show/"+trait.id+"?trait."+trait.id+"="+traitValue.id}" %>
                 <a href='${link}'>
-                    <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue.trait.id}' data-isNotObservation='${traitValue.trait.isNotObservationTrait}'
+                    <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue.trait.id}' data-isnotobservation='${traitValue.trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue.trait.id]?.contains(traitValue.id+'')?'active btn-success':''}"
                         value="${traitValue.id}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
@@ -47,12 +53,29 @@
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
                     </button> 
                 </a>
+                </g:if>
+                <g:else>
+                    <g:if test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
+                    <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                    class="btn span2 input-prepend single-post disabled"
+                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
+                        ${traitValue}
+                    </span>
+                    </g:if>
+                    <g:else>
+                    <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                    class="btn span2 input-prepend single-post disabled"
+                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
+                        ${traitValue}
+                    </span>
+                    </g:else>
+                    </g:else>
             </g:each>
         </g:if>
         
-            <g:if test="${displayAny && traitValues[0].trait.isNotObservationTrait}">
-            <div data-tvid='none' data-tid='${traitValues? traitValues[0]?.trait?.id:''}'
-                class="btn span2 none ${queryParams.trait && traitValues && queryParams.trait[traitValues[0].trait.id+'']=='none'?'active btn-success':''}"
+            <g:if test="${displayAny && trait.isNotObservationTrait}">
+            <div data-tvid='none' data-tid='${traitValues? trait?.id:''}'
+                class="btn span2 none ${queryParams.trait && traitValues && queryParams.trait[trait.id+'']=='none'?'active btn-success':''}"
                 value="none"
                 style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;line-height:30px;text-align:left;">
                 <img
@@ -61,6 +84,7 @@
                     alt="Undefined" />
                 Undefined
             </div> 
+            </g:if>
             </g:if>
 </div>
 

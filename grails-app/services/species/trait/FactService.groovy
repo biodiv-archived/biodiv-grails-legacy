@@ -28,6 +28,9 @@ import species.AbstractObjectService;
 import species.participation.UploadLog;
 import grails.converters.JSON;
 import org.apache.log4j.Level;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
 
 class FactService extends AbstractObjectService {
 
@@ -38,9 +41,13 @@ class FactService extends AbstractObjectService {
         int noOfFactsLoaded = 0;
 
         File spreadSheet = new File(file);
+        if(!spreadSheet.exists()) {
+            return ['success':false, 'msg':"Cant find the file at ${file}."];
+        }
         dl.writeLog("Loading facts from ${file}", Level.INFO);
 
-        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each { m ->
+        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).eachWithIndex { m,index ->
+            if(index>1) return;
 
             dl.writeLog("Loading facts ${m}");
             if(!m['taxonid']) {
@@ -154,124 +161,107 @@ class FactService extends AbstractObjectService {
                            writeLog("Cannot find trait ${key}", Level.ERROR);
                         } else {
                             Fact.withTransaction {
-                            def factsCriteria = Fact.createCriteria();
-                            List<Fact> facts = factsCriteria.list {
-                                eq ('trait', trait)
-                                eq ('objectType', object.class.getCanonicalName())
-                                eq ('objectId', object.id)
-                            }
-
-                            List<TraitValue> traitValues = [];
-                            if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
-                                if(replaceFacts) {
-                                    facts.each {fact ->
-                                        fact.delete(flush:true);
-                                    }
-                                    facts.clear();
+                                def factsCriteria = Fact.createCriteria();
+                                List<Fact> facts = factsCriteria.list {
+                                    eq ('trait', trait)
+                                    eq ('objectType', object.class.getCanonicalName())
+                                    eq ('objectId', object.id)
                                 }
-                                value.split(',').each { v ->
-                                    writeLog("Loading trait ${trait} with value ${v.trim()}");
-                                    def x = TraitValue.findByTraitAndValueIlike(trait, v.trim());
+
+                                List traitValues = [];
+                                if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
+                                    if(replaceFacts) {
+                                        facts.each {fact ->
+                                            fact.delete(flush:true);
+                                        }
+                                        facts.clear();
+                                    }
+                                    value.split(',').each { v ->
+                                        writeLog("Loading trait ${trait} with value ${v.trim()}");
+                                        def x = getTraitValue(trait, v.trim());
+                                        if(x) traitValues << x;
+                                    }
+                                } else {
+                                    def x = getTraitValue(trait, value);
                                     if(x) traitValues << x;
                                 }
-                            } else {
-                                def x = TraitValue.findByTraitAndValueIlike(trait, value);
-                                if(x) traitValues << x;
-                            }
-                            println "Got traitValues ====================="
-                            println traitValues;
+                                println "Got traitValues ====================="
+                                println traitValues;
 
-                            if(!traitValues) {
-                               writeLog("Cannot find [trait:value] [${trait} : ${value}]", Level.ERROR);
-                                return;
-                            }
+                                if(!traitValues) {
+                                    writeLog("Cannot find [trait:value] [${trait} : ${value}]", Level.ERROR);
+                                    return;
+                                }
 
-                            if(!facts) {
-                                //writeLog("Creating new fact");
-                                Fact fact = new Fact();
-                                fact.trait = trait;
-                                fact.pageTaxon = pageTaxon;
-                                fact.objectId = object.id;
-                                fact.objectType = object.class.getCanonicalName();
-                                fact.traitValue = traitValues[0];
-                                facts << fact;
-                            } 
-                            println facts;
-                            //fact = facts[0];
+                                if(!facts) {
+                                    //writeLog("Creating new fact");
+                                    Fact fact = new Fact();
+                                    fact.trait = trait;
+                                    fact.pageTaxon = pageTaxon;
+                                    fact.objectId = object.id;
+                                    fact.objectType = object.class.getCanonicalName();
+                                    setTraitValue(fact, traitValues[0]);
+                                    facts << fact;
+                                } 
+                                println facts;
+                                //fact = facts[0];
 
-                            switch(trait.traitTypes) {
-                                case Trait.TraitTypes.MULTIPLE_CATEGORICAL : 
-                                boolean isExistingValue = false;
-                                traitValues.each { tV ->
-                                    if(tV) {
-                                        isExistingValue = false;
-                                        println "tv -> ${tV}"
-                                        facts.each { f ->
-                                            println "f -> ${f}"
-                                            if(tV.value.equalsIgnoreCase(f.traitValue.value)) {
-                                                isExistingValue = true;
+                                if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
+                                    boolean isExistingValue = false;
+                                    traitValues.each { tV ->
+                                        if(tV) {
+                                            isExistingValue = false;
+                                            println "tv -> ${tV}"
+                                            facts.each { f ->
+                                                println "f -> ${f}"
+                                                if(tV.value.equalsIgnoreCase(f.traitValue.value)) {
+                                                    isExistingValue = true;
+                                                }
+                                            }
+                                            if(!isExistingValue) {
+                                                Fact fact = new Fact();
+                                                fact.trait = trait;
+                                                fact.pageTaxon = pageTaxon;
+                                                fact.objectId = object.id;
+                                                fact.objectType = object.class.getCanonicalName();
+                                                setTraitValue(fact, tV);
+                                                facts << fact;
                                             }
                                         }
-                                        if(!isExistingValue) {
-                                            Fact fact = new Fact();
-                                            fact.trait = trait;
-                                            fact.pageTaxon = pageTaxon;
-                                            fact.objectId = object.id;
-                                            fact.objectType = object.class.getCanonicalName();
-                                            fact.traitValue = tV;
-                                            facts << fact;
-                                        }
+                                    }
+                                } else {
+                                    setTraitValue(facts[0], traitValues[0]); 
+                                }
+
+                                boolean isUpdate = false;
+                                facts.each { fact ->
+                                    if(fact.id) {
+                                        isUpdate = true;
+                                        writeLog("Updating fact ${fact}");
+                                    } else {
+                                        isUpdate = false;
+                                        writeLog("Creating new fact ${fact}");
+                                    }
+                                    fact.attribution = attribution;
+                                    fact.contributor = contributor;
+                                    fact.license = license;
+                                    fact.isDeleted = false;
+                                    if(!fact.hasErrors() && !fact.save()) { 
+                                        writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
+                                        fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
+                                        success = false;
+                                    } else {
+                                        success = true;
+                                        if(isUpdate) 
+                                            result['facts_updated'] << fact;
+                                        else
+                                            result['facts_created'] << fact;
+
+                                        writeLog("Successfully added fact");
                                     }
                                 }
-                                break;
-
-                                case Trait.TraitTypes.SINGLE_CATEGORICAL : 
-                                facts[0].traitValue = traitValues[0]; 
-                                break;
-                                case Trait.TraitTypes.BOOLEAN : 
-                                facts[0].traitValue = traitValues[0]; 
-                                break;
-                                case Trait.TraitTypes.RANGE : 
-
-                                facts[0].traitValue = traitValues[0]; 
-                                break;
-                                case Trait.TraitTypes.DATE : 
-                                facts[0].traitValue = traitValues[0]; 
-                                break;
-
-                                default : 
-                               writeLog("Invalid trait type ${trait.traitTypes}", Level.ERROR);
-                            }
-
-                            boolean isUpdate = false;
-                            facts.each { fact ->
-                                if(fact.id) {
-                                    isUpdate = true;
-                                    writeLog("Updating fact ${fact}");
-                                } else {
-                                    isUpdate = false;
-                                    writeLog("Creating new fact ${fact}");
-                                }
-                                fact.attribution = attribution;
-                                fact.contributor = contributor;
-                                fact.license = license;
-                                fact.isDeleted = false;
-                                if(!fact.hasErrors() && !fact.save()) { 
-                                    writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
-                                    fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
-                                    success = false;
-                                } else {
-                                    success = true;
-                                    if(isUpdate) 
-                                        result['facts_updated'] << fact;
-                                    else
-                                        result['facts_created'] << fact;
-
-                                    writeLog("Successfully added fact");
                                 }
                             }
-                        }
-                        }
                     }
                 } catch(Exception e) {
                     e.printStackTrace();
@@ -292,5 +282,82 @@ class FactService extends AbstractObjectService {
         }
         result['success'] = success;
         return result;
+    }
+
+    private def getTraitValue(Trait trait, String value) {
+        if(!value) return;
+        if(trait.traitTypes == TraitTypes.SINGLE_CATEGORICAL || trait.traitTypes == TraitTypes.MULTIPLE_CATEGORICAL) { 
+            println "===="
+            println value;
+            return TraitValue.findByTraitAndValueIlike(trait, value.trim());
+        }
+        else {
+            return value.trim();
+        }
+    }
+
+    private void setTraitValue(Fact fact, value) {
+        switch(fact.trait.traitTypes) {
+            case Trait.TraitTypes.RANGE : 
+            setTraitRange(fact, value);
+            break;
+            default:
+            fact.traitValue = value;
+        }
+    }
+
+    private void setTraitRange(Fact fact, value) {
+        String[] v = value.split(':');
+        if(v.length > 1) {
+            switch(fact.trait.dataTypes) {
+                case Trait.DataTypes.DATE:
+                fact.fromDate = getFromDate(v[0], fact.trait.units);
+                fact.toDate = getToDate(v[1], fact.trait.units);
+                break;
+                default: 
+                fact.value = v[0];
+                fact.toValue = v[1];
+            }
+        } else if(v[0]) {
+            switch(fact.trait.dataTypes) {
+                case Trait.DataTypes.DATE:
+                fact.fromDate = getFromDate(v[0]);
+                fact.toDate = getToDate(v[0]);
+                break;
+                default: 
+                fact.value = v[0];
+                fact.toValue = v[0];
+            }
+        }
+    }
+
+    private Date getFromDate(String d, Units units) {
+        switch(units) {
+            case Units.MONTH:
+            return new SimpleDateFormat("dd-MMMM-yyyy").parse("1-"+d+"-"+Calendar.getInstance().get(Calendar.YEAR));
+
+//            GregorianCalendar gc = new GregorianCalendar(Calendar.getInstance().get(Calendar.YEAR), getMonth(d), 1);
+//            return new java.util.Date(gc.getTime().getTime());
+            break;
+            default:
+            return utilsService.parseDate(d,false);
+        }
+    }
+
+    private Date getToDate(String d, Units units) {
+       switch(units) {
+            case Units.MONTH:
+            return new SimpleDateFormat("dd-MMMM-yyyy").parse(getMonthEndDate(d)+"-"+d+"-"+Calendar.getInstance().get(Calendar.YEAR));
+            break;
+            default:
+            return utilsService.parseDate(d,false);
+        }
+    }
+
+    private int getMonthEndDate(String month) {
+        Date date = new SimpleDateFormat("MMMM").parse(month)
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date)
+        return cal.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 }

@@ -755,3 +755,7 @@ update trait set field_id=39 where name='Sex';
 
 #21stDec2016
 alter table trait alter column icon type text;
+
+#03Jan2017
+alter table fact add column to_value varchar(255);
+alter table fact alter column trait_value_id drop not null;
