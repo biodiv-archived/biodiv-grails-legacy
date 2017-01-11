@@ -11,9 +11,9 @@
 	<!-- main_content -->
 	<div class="list span12 namelist_wrapper" style="margin-left:0px;clear:both">
         <div class="btn-group" data-toggle="buttons-radio" style="float:right;">
-        <button type="button" class="btn btn-primary  listFilter default" value="species" id="species">Species Trait</button>
-        <button type="button" class="btn btn-primary listFilter" value="observation" id="observation">Observation Trait</button>
-        <button type="button" class="btn btn-primary listFilter all" value="all" id="all">All</button>
+        <button type="button" class="btn   listFilter default" value="species" id="species">Species Trait</button>
+        <button type="button" class="btn  listFilter" value="observation" id="observation">Observation Trait</button>
+        <button type="button" class="btn  listFilter all" value="all" id="all">All</button>
     </div>
 		<div class="observation thumbwrap">
 			<obv:showObservationFilterMessage
