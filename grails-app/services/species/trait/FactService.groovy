@@ -242,9 +242,12 @@ class FactService extends AbstractObjectService {
                                                 }
                                             }
                                         }else if(tV instanceof String) {
+                                            println 'String';
                                             facts.each { f ->
                                                 println "f -> ${f}"
-                                                if((f.value && tV.equalsIgnoreCase(f.value))) {
+                                                println f.value
+                                                println tV
+                                                if((f.value && utilsService.hex2Rgb(tV).equalsIgnoreCase(f.value))) {
                                                     isExistingValue = true;
                                                 }
                                             }
