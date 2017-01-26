@@ -121,11 +121,11 @@
             data-slider-value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? '['+queryParams.trait[trait.id].replace(':',',')+']':'['+(numericTraitMinMax?numericTraitMinMax.min:0)+','+(numericTraitMinMax?numericTraitMinMax.max:100)+']'}" data-slider-min="${numericTraitMinMax?numericTraitMinMax.min:0}" data-slider-max="${numericTraitMinMax?numericTraitMinMax.max:100}" data-slider-step="1">
             </g:elseif>
             <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
-            <div class="input-group colorpicker-component" style="width:220px;">
+            <div class="input-group colorpicker-component" style="width:220px;display:inline-block;">
             <input 
             type="text" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
-            class="form-control single-post ${traitTypes} trait_color_picker" value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].replace(':',','):''}">
-            <span class="input-group-addon"><i></i></span>
+            class="form-control single-post ${traitTypes} trait_color_picker" value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].replace(':',','):''}"
+            style="display:none;">
             </div>
             </g:elseif>
            <g:else>

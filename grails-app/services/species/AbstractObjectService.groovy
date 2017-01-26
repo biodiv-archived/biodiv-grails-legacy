@@ -513,7 +513,7 @@ class AbstractObjectService {
                             //COLOR is specified as sarray of RGB values. 
                             //Computing Euclidean distance 
                             traitJsonQuery += " and cast(traits_json#>>'{${traitId},r}' as integer) is not null "
-                            orderQuery += " (sqrt(power(${range[0]} - cast(traits_json#>>'{${traitId},r}' as integer), 2) + power(${range[1]} - cast(traits_json#>>'{${traitId},g}' as integer), 2) + power(${range[2]} - cast(traits_json#>>'{${traitId},b}' as integer), 2))) ";
+                            orderQuery += " (sqrt(power(${range[0]} - cast(traits_json#>>'{${traitId},r}' as integer), 2) + power(${range[1]} - cast(traits_json#>>'{${traitId},g}' as integer), 2) + power(${range[2]} - cast(traits_json#>>'{${traitId},b}' as integer), 2))), ";
                     } else {
                         traitQuery += "[${traitId}, ${tvId}],";
                     } 

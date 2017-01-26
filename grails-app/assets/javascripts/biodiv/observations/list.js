@@ -380,15 +380,51 @@ $(document).ready(function(){
             var t = $(this).attr('data-target').split('=');
             var tid = t[0].replace('trait.','');
             var tvid = t[1];
-            if(tvid == 'none') {
-            $('.traitFilter div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
-            $('.trait div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
-            } else {
-            $('.traitFilter button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
-            $('.trait button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+            if(!tvid.startsWith('rgb') && tvid.indexOf(':') == -1) {
+                if(tvid == 'none') {
+                    $('.traitFilter div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                    $('.trait div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                } else {
+                    $('.traitFilter button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                    $('.trait button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                }
+                $('.traitFilter div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
+                $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
             }
-            $('.traitFilter div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
-            $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
+
+            $(".trait_range_slider").each(function(){
+                var v = $(this).val();
+                if(v) {
+                    trait = $(this).attr('data-tid');
+                    if(trait == tid) {
+                        var a = [$(this).data('slider-min'), $(this).data('slider-max')];
+                        $(this).slider('setValue',a).val('');
+                    }
+                }
+            });
+
+            $('.trait_date_range').each(function(){
+                var v = $(this).val();
+                if(v) {
+                    trait = $(this).attr('data-tid');
+                    if(trait == tid) {
+                        $(this).val('');
+                    }
+                }
+            });
+            $(".colorpicker-component").each(function(){
+                var v = $(this).find('input').val();
+                if(v) {
+                    trait = $(this).find('input').attr('data-tid');
+                    if(trait == tid) {
+                        $(this).find('input').val('');
+                        //$('this').colorpicker('setValue','');
+                        //change colorpicker value with .colorpicker('setValue', value)
+                    }
+                } 
+            });
+
+ 
         }
         removeParam = $(this).attr('data-target').replace('#','');
         updateGallery($(this).prev().attr('href'), window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
@@ -750,7 +786,7 @@ function getSelectedTrait($traitFilter, putValue) {
         }
     });
     $(".trait_range_slider").each(function(){
-        var v = $(this).slider('getValue').val();
+        var v = $(this).val();
         if(v) {
             v = v.replace(',',':');
             trait = $(this).attr('data-tid');
@@ -971,7 +1007,8 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             var tvStr = params[kv[0]].split(',');
             params[kv[0]] = '';
             for(var i=0; i<tvStr.length; i++) {
-                if(tvStr[i] != kv[1]) params[kv[0]] += tvStr[i]+',';
+                console.log(tvStr[i]+'  '+kv[1])
+                if(decodeURIComponent(tvStr[i]) != kv[1]) params[kv[0]] += tvStr[i]+',';
             }
             params[kv[0]] = params[kv[0]].substring(0,params[kv[0]].length-1);
         } else {

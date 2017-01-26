@@ -51,8 +51,11 @@ function loadMatchingSpeciesList() {
             delete params[key];
         }
     }
+    console.log(params);
     var History = window.History;
     var traits = getSelectedTrait($('.trait button, .trait .none, .trait .any'));
+    console.log('getSel');
+    console.log(traits);
     for(var m in traits) {
         params['trait.'+m] = traits[m].substring(0,traits[m].length-1);
     }
@@ -189,7 +192,45 @@ function loadCustomFields($me, compId) {
     });
 }
 
+function initTraitFilterControls() {
 
+    $('.trait_range_slider').slider().on('slideStop', function(ev){
+        updateMatchingSpeciesTable();
+    });
+
+    $('.trait_date_range').each(function(){
+        var options = {
+            parentEl: '#'+$(this).parent().parent().attr('id'),
+            autoUpdateInput: false,
+            locale:{
+                format: 'DD/MM/YYYY'
+            },
+            maxDate: moment()
+        }
+        var d = $(this).val().split(':');
+        if(d.length >1) {
+            options['startDate'] = d[0];
+            options['endDate'] = d[1];
+        }
+        $(this).daterangepicker(options).on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ':' + picker.endDate.format('DD/MM/YYYY'));
+            updateMatchingSpeciesTable();
+        })/*.on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        })*/;
+    });
+
+    $('.colorpicker-component').colorpicker({
+        format:'rgb', 
+        container: true,
+        inline: true
+    }).on('changeColor', function(ev){
+        updateMatchingSpeciesTable();
+    });
+
+
+
+}
 
 
 /* For PopOver Traits*/
@@ -233,35 +274,5 @@ $(document).ready(function(){
         onSubmitFact($me, $me.data('objectid'), $me.data('objecttype'));
     });
 
-
-    $('.trait_range_slider').slider().on('slideStop', function(ev){
-        updateMatchingSpeciesTable();
-    });
-
-    $('.trait_date_range').each(function(){
-        var options = {
-            parentEl: '#'+$(this).parent().parent().attr('id'),
-            autoUpdateInput: false,
-            locale:{
-                format: 'DD/MM/YYYY'
-            },
-            maxDate: moment()
-        }
-        var d = $(this).val().split(':');
-        if(d.length >1) {
-            options['startDate'] = d[0];
-            options['endDate'] = d[1];
-        }
-        $(this).daterangepicker(options).on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('DD/MM/YYYY') + ':' + picker.endDate.format('DD/MM/YYYY'));
-            updateMatchingSpeciesTable();
-        })/*.on('cancel.daterangepicker', function(ev, picker) {
-            $(this).val('');
-        })*/;
-    });
-    $('.colorpicker-component').colorpicker({format:'rgb'}).on('changeColor', function(ev){
-        updateMatchingSpeciesTable();
-    });
-
-
+    initTraitFilterControls();
 });

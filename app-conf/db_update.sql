@@ -778,4 +778,3 @@ create table calendar as (
       select date '2017-01-01' + (n || ' days')::interval calendar_date
       from generate_series(0, 365) n
 )
-

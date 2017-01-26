@@ -1757,7 +1757,7 @@ class SpeciesService extends AbstractObjectService  {
             filterQuery += traitQuery['filterQuery'];
             countFilterQuery += traitQuery['filterQuery'];
 
-            orderQuery = "order by "+traitQuery['orderQuery']+(traitQuery['orderQuery']?", ":" ")+orderQuery.replace('order by','');
+            orderQuery = "order by "+traitQuery['orderQuery']+(traitQuery['orderQuery']?" ":" ")+orderQuery.replace('order by','');
 
             queryParams['trait'] = params.trait;
         }
