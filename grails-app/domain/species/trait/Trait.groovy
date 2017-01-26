@@ -13,9 +13,7 @@ class Trait {
         public enum TraitTypes implements org.springframework.context.MessageSourceResolvable{
             SINGLE_CATEGORICAL("Single Categorical"),
             MULTIPLE_CATEGORICAL("Multiple Categorical"),
-            BOOLEAN("Boolean"),
             RANGE("Range"),
-            DATE("Date"),
 
             private String value;
 
@@ -32,9 +30,7 @@ class Trait {
                 return [
                     SINGLE_CATEGORICAL,
                     MULTIPLE_CATEGORICAL,
-                    BOOLEAN,
-                    RANGE,
-                    DATE
+                    RANGE
                 ]
             }
 
@@ -52,6 +48,7 @@ class Trait {
             DATE("Date"),
             NUMERIC("Numeric"),
             BOOLEAN("Boolean"),
+            COLOR("Color"),
 
         private String value;
 
@@ -68,7 +65,8 @@ class Trait {
                 STRING,
                 DATE,
                 NUMERIC,
-                BOOLEAN
+                BOOLEAN,
+                COLOR
             ]
         }
 
@@ -76,7 +74,7 @@ class Trait {
 
         String[] getCodes() {
             ["${getClass().name}.${name()}"] as String[]
-        }
+        } 
 
         String getDefaultMessage() { value() }
     }

@@ -48,6 +48,15 @@ class Fact {
         return trait.name +':'+ traitValue.value;
     }
 
+    String getIcon() {
+        if(this.traitValue) {
+            return traitValue.mainImage()?.fileName
+        } else if (trait.dataTypes == DataTypes.DATE) {
+            return fromDate + (toDate ? ":" + toDate:'')
+        }else {
+            return value + (toValue ? ":" + toValue:'')
+        }
+    }
     @Override
     String toString() {
         return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}-${toValue})>";

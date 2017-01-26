@@ -426,7 +426,12 @@ class TraitService extends AbstractObjectService {
 
         if(!queryParts.queryParams.trait) 
         queryParts.queryParams.trait = params.trait;
-        return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters, 'traitFactMap':queryParts.traitFactMap, 'object':queryParts.object];
+
+        Sql sql = Sql.newInstance(dataSource);
+        List numericTraitMinMax =  sql.rows("""
+        select min(f.value::float),max(f.to_value::float),t.id from fact f,trait t where f.trait_id = t.id and t.data_types='NUMERIC' group by t.id;
+        """);
+        return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters, 'traitFactMap':queryParts.traitFactMap, 'object':queryParts.object,numericTraitMinMax:numericTraitMinMax];
     }
 
     def getFilterQuery(params) {
@@ -552,16 +557,19 @@ class TraitService extends AbstractObjectService {
 
                 def classification;
                 if(params.classification)
-                    classification = Classification.read(Long.parseLong(params.classification))
-                        if(!classification)
-                            classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                    classification = Classification.read(Long.parseLong(params.classification));
 
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+                queryParams['classification'] = classification.id; 
+                activeFilters['classification'] = classification.id;
                 List parentTaxon = taxon.parentTaxonRegistry(classification).get(classification).collect {it.id};
-                queryParams['classification'] = classification.id 
-                    queryParams['parentTaxon'] = parentTaxon 
-                    activeFilters['classification'] = classification.id
+                if(parentTaxon) {
+                    queryParams['parentTaxon'] = parentTaxon ;
 
                     filterQuery += " and taxon.id in (:parentTaxon) or taxon.id is null";
+                }
 
             }
         }

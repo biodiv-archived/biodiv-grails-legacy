@@ -128,3 +128,6 @@
 //= require biodiv/pages.js
 //= require biodiv/dataset.js
 //= require biodiv/trait.js
+
+//= require bootstrap.plugins/bootstrap-slider.js
+//= require bootstrap.plugins/bootstrap-colorpicker.min.js

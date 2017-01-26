@@ -242,12 +242,14 @@ class TaxonomyDefinition extends ScientificName {
 	   
 	   boolean isSnapped = false
 	   for(int i = 0; i < trs.size(); i++){
+           println trs[i]
 		   TaxonomyRegistry tr = trs[i]
 		   if(isSnapped)
 		   		break
 				   
 		    TaxonomyDefinition pTd = tr.parentTaxonDefinition 
 			if(pTd){
+                println "Snapping parent : "+pTd
 				pTd.snapToIBPHir(hirList, targetHir)   
 			 }
 			 isSnapped = _sanpToImmediateParent(tr, targetHir)

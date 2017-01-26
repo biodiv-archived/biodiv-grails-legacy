@@ -241,8 +241,9 @@ abstract class Metadata {
             if(fact.traitValue) {
                 traitFactMap[fact.trait.id] << fact.traitValue
                 queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
-            } else if(fact.value)
+            } else if(fact.value) {
                 traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+            } 
             if(fact.fromDate && fact.toDate)
                 traitFactMap[fact.trait.id] << fact.fromDate+":"+fact.toDate
 

@@ -19,7 +19,10 @@ import species.Species;
 import species.ScientificName.TaxonomyRank;
 import species.participation.DownloadLog;
 import species.participation.UploadLog;
-
+import species.trait.Trait;
+import species.trait.Trait.TraitTypes;
+import species.trait.Trait.DataTypes;
+              
 import org.apache.commons.logging.LogFactory;
 import grails.plugin.cache.Cacheable;
 
@@ -432,10 +435,12 @@ class AbstractObjectService {
         return r;
     }
 
-    protected String getTraitQuery(Map traits) {
+    protected Map getTraitQuery(Map traits) {
         Map andTraitLT = [:];
         List notTraitLT = [], anyTraitLT=[];
         String traitQuery = "";
+        String traitJsonQuery = "";
+        String orderQuery = "";
         String traitArraySlice = 't.traits';
 
         traits?.each{ it ->
@@ -458,31 +463,78 @@ class AbstractObjectService {
         }
         if(anyTraitLT) {
             anyTraitLT.each {
-                traitQuery += " and t.traits[1##999][1] @> cast(ARRAY[["+it+"]] as bigint[])";
+                Trait t = Trait.read(Long.parseLong(it));
+                if(t.traitTypes == TraitTypes.RANGE) {
+                    if(t.dataTypes == DataTypes.DATE) {
+                        traitJsonQuery += " and (traits_json#>>'{${t.id},from_date}') is not null ";
+                    } else {
+                        traitJsonQuery += " and (traits_json#>>'{${t.id},value}') is not null ";
+                    }
+                } else if (t.dataTypes == DataTypes.COLOR) {
+                    traitJsonQuery += " and cast(traits_json#>>'{${t.id},r}' as integer) is not null ";
+                } else { 
+                    traitQuery += " and t.traits[1##999][1] @> cast(ARRAY[["+d.id+"]] as bigint[])";
+                }
             }
         }
         if(andTraitLT) {
-            traitQuery = " and t.traits @> cast(ARRAY["
+            traitQuery = " and t.traits @> cast(ARRAY[ "
             andTraitLT.each { traitId, traitValueId ->
-                traitValueId.split(',').each { tvId ->
-                    traitQuery += "[${traitId}, ${tvId}],";
+                Trait t = Trait.read(Long.parseLong(traitId));
+                String[] values;
+                if(t.dataTypes == DataTypes.COLOR) {
+                    values = traitValueId.split('\\),');
+                } else {
+                    values = traitValueId.split(',');
+                }
+                values.each { tvId ->
+                    if(t.traitTypes == TraitTypes.RANGE) {
+                        if(t.dataTypes == DataTypes.DATE) {
+                            def range = tvId.split(':'); 
+                            if(range.size() == 2) {
+                            //TODO: range value datatype is set to be float... can be date as well
+                            traitJsonQuery += " and (traits_json#>>'{${traitId},from_date}') is not null and daterange(cast(traits_json#>>'{${traitId},from_date}' as date), cast(traits_json#>>'{${traitId},to_date}' as date)) && daterange(to_date('${range[0]}','DD/MM/YYYY'), to_date('${range[1]}','DD/MM/YYYY'))";
+                            }
+                        } else {
+                            def range = tvId.split(':'); 
+                            if(range.size() == 2) {
+                            //TODO: range value datatype is set to be float... can be date as well
+                            traitJsonQuery += " and (traits_json#>>'{${traitId},value}') is not null and numrange(cast(traits_json#>>'{${traitId},value}' as numeric), cast(traits_json#>>'{${traitId},to_value}' as numeric)) && numrange(${range[0]}, ${range[1]})";
+                            }
+                        }
+                    } else if (t.dataTypes == DataTypes.COLOR) {
+                        println tvId
+                        println tvId.replaceAll('rgb\\(|\\)','')
+                            def range = tvId.replaceAll('rgb\\(|\\)','').split(','); 
+                            println "===================="
+                            println "===================="
+                            println "===================="
+                            println range
+                            //COLOR is specified as sarray of RGB values. 
+                            //Computing Euclidean distance 
+                            traitJsonQuery += " and cast(traits_json#>>'{${traitId},r}' as integer) is not null "
+                            orderQuery += " (sqrt(power(${range[0]} - cast(traits_json#>>'{${traitId},r}' as integer), 2) + power(${range[1]} - cast(traits_json#>>'{${traitId},g}' as integer), 2) + power(${range[2]} - cast(traits_json#>>'{${traitId},b}' as integer), 2))) ";
+                    } else {
+                        traitQuery += "[${traitId}, ${tvId}],";
+                    } 
                 }
             }
             traitQuery = traitQuery[0..-2] + "] as bigint[])";
         }
-        return traitQuery;
+        traitQuery += traitJsonQuery;
+        return ['filterQuery' : traitQuery, 'orderQuery':orderQuery];
     }
 
     Map getTraits(String t) {
         Map traits = [:];
         if(t) {
-        t.split(';').each {
-            if(it) {
-                String[] x = it.split(':');
-                if(x.size() == 2)
-                    traits[x[0]] = x[1].trim();
+            t.split(';').each {
+                if(it) {
+                    String[] x = it.split(':');
+                    if(x.size() == 2)
+                        traits[x[0]] = x[1].trim();
+                }
             }
-        }
         }
         return traits;
     }

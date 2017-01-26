@@ -14,6 +14,10 @@ function loadMatchingSpeciesList() {
     console.log(url);
     var href = url.attr('path');
     var params = getFilterParameters(url);
+    delete params['daterangepicker_start'];
+    delete params['daterangepicker_end'];
+    delete params['observedon_start'];
+    delete params['observedon_end'];
     var element = {};
     var listFilter = $('.listFilter');
         listFilter.each(function(){
@@ -82,7 +86,7 @@ function loadMatchingSpeciesList() {
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
                     $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
                     $.each(imagepath,function(index1,item1){ 
-                        $('#imagediv_'+item[0]).append(showIcon(item1[0],item1[1],item1[2]));
+                        $('#imagediv_'+item[0]).append(showIcon(item1[0], item1[1], item1[2], item1[3]));
                     });
                 });
                 $me.data('offset', data.model.next);
@@ -94,8 +98,15 @@ function loadMatchingSpeciesList() {
     });
 }
 
-function showIcon(value,name,url){
-    return  '<img src="'+url+'" width="32" height="32" title="'+name+'-'+value+'" />';
+function showIcon(value,name,url, type){
+    if(url) {
+        return  '<img src="'+url+'" width="32" height="32" title="'+name+'-'+value+'" />';
+    } else if(type == 'Color'){
+        return '<img style="height:32px;width:32px;display:inline-block;background-color:'+value+';" title="'+name+'-'+value+'" ></img>'
+    } else {
+//        return '<b>'+name+'</b> :'+ value;
+//        return '';
+    }
 }
 
 function onSubmitFact($me, objectId, objectType) {
@@ -220,6 +231,36 @@ $(document).ready(function(){
     $(document).on('click', '.submitFact', function () {
         var $me = $(this);
         onSubmitFact($me, $me.data('objectid'), $me.data('objecttype'));
+    });
+
+
+    $('.trait_range_slider').slider().on('slideStop', function(ev){
+        updateMatchingSpeciesTable();
+    });
+
+    $('.trait_date_range').each(function(){
+        var options = {
+            parentEl: '#'+$(this).parent().parent().attr('id'),
+            autoUpdateInput: false,
+            locale:{
+                format: 'DD/MM/YYYY'
+            },
+            maxDate: moment()
+        }
+        var d = $(this).val().split(':');
+        if(d.length >1) {
+            options['startDate'] = d[0];
+            options['endDate'] = d[1];
+        }
+        $(this).daterangepicker(options).on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ':' + picker.endDate.format('DD/MM/YYYY'));
+            updateMatchingSpeciesTable();
+        })/*.on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        })*/;
+    });
+    $('.colorpicker-component').colorpicker({format:'rgb'}).on('changeColor', function(ev){
+        updateMatchingSpeciesTable();
     });
 
 

@@ -742,11 +742,51 @@ function getSelectedTrait($traitFilter, putValue) {
     $traitFilter.each(function(){
         if($(this).hasClass('btn-success')) {
             trait = $(this).attr('data-tid');
-            if(selTrait[trait] == undefined) selTrait[trait]='';
+            if(trait) {
             var v = putValue==true? $(this).attr('value') : $(this).attr('data-tvid');
-            selTrait[trait] += v+',';
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            if(v) selTrait[trait] += v+',';
+            }
         }
     });
+    $(".trait_range_slider").each(function(){
+        var v = $(this).slider('getValue').val();
+        if(v) {
+            v = v.replace(',',':');
+            trait = $(this).attr('data-tid');
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            selTrait[trait] += v+',';
+        } else if($('input[data-tid]').length == 1) {
+            //is from trait show page
+            selTrait[$(this).attr('data-tid')] = 'any,';
+        };
+
+    });
+
+    $('.trait_date_range').each(function(){
+        var v = $(this).val();
+        if(v) {
+             trait = $(this).attr('data-tid');
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            selTrait[trait] += v+',';
+        } else if($('input[data-tid]').length == 1) {
+            //is from trait show page
+            selTrait[$(this).attr('data-tid')] = 'any,';
+        };
+
+    });
+    $(".colorpicker-component").each(function(){
+        var v = $(this).find('input').val();
+        if(v) {
+            trait = $(this).find('input').attr('data-tid');
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            selTrait[trait] += v+',';
+        } else if($('input[data-tid]').length == 1) {
+            //is from trait show page
+            selTrait[$(this).find('input').attr('data-tid')] = 'any,';
+        };
+    });
+
     return selTrait;
 }
 
@@ -1045,14 +1085,14 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['daterangepicker_start'];
         delete params['daterangepicker_end'];
 
-        $.each($(document).find('input[name=daterangepicker_start]'), function(index, value) {
+        $.each($(document).find('#searchToggleBox input[name=daterangepicker_start]'), function(index, value) {
             if($(value).closest('#observedOnDatePicker').length > 0) {
                 params['observedon_start'] = $(value).val();
             } else {
                 params['daterangepicker_start'] = $(value).val();
             }
         });
-        $.each($(document).find('input[name=daterangepicker_end]'), function(index, value) {
+        $.each($(document).find('#searchToggleBox input[name=daterangepicker_end]'), function(index, value) {
             if($(value).closest('#observedOnDatePicker').length > 0) {
                 params['observedon_end'] = $(value).val();
             } else {

@@ -1,8 +1,10 @@
 <%@page import="species.trait.Trait.TraitTypes"%>
 <%@page import="species.trait.Trait.DataTypes"%>
 <%@page import="species.trait.TraitValue"%>
+<%@page import="java.text.SimpleDateFormat" %>
+<%@page import="java.util.Date" %>
 
-<div class="row btn-group" style="white-space:inherit;margin-left:20px;">
+<div class="row btn-group" style="white-space:inherit;margin-left:20px;${trait.dataTypes == DataTypes.DATE?'width:100%;':''}">
 <g:if test="${traitValues && traitValues.size()>0}">
             <g:if test="${displayAny && trait.isNotObservationTrait}">
             <div data-tvid='all' data-tid='${traitValues?trait?.id:''}'
@@ -62,6 +64,13 @@
                         ${traitValue}
                     </span>
                     </g:if>
+                    <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
+                    <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                    class="btn span2 input-prepend single-post disabled" title="${traitValue}"
+                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px; background-color:${traitValue};">
+                    </span>
+                    </g:elseif>
+
                     <g:else>
                     <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post disabled"
@@ -86,5 +95,40 @@
             </div> 
             </g:if>
             </g:if>
+            <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
+            <div id="${trait.id}_datePicker" class="dropdown" style="position: relative;overflow:visible;font-size:initial;">
+                <div class="pull-left" style="text-align:left;padding:5px;" >
+                    <i class="icon-calendar icon-large"></i> 
+                    <%
+                    def df = new SimpleDateFormat('DD/MM/YYYY')
+                    def date_str =   queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].split(':') : '';
+                    def startDate = date_str && date_str[0] ? df.parse(date_str[0]) : null
+                    def endDate = date_str && date_str[1]? df.parse(date_str[1]): null
+                    String dateRange = (startDate && endDate)?date_str[0]+':'+date_str[1] : ''
+                    %>
+                    <input type="text" name="${trait.id}_date" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
+                        class="single-post ${traitTypes} trait_date_range" value="${dateRange}"
+                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;width:inherit;"
+                    />
+                </div>
+            </div>
+            </g:elseif>
+            <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.NUMERIC}">
+            <input 
+            type="text" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
+            class="span2 input-prepend single-post ${traitTypes} trait_range_slider" value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].replace(':',','):''}"
+            style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;width:inherit;"
+            data-slider-value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? '['+queryParams.trait[trait.id].replace(':',',')+']':'['+(numericTraitMinMax?numericTraitMinMax.min:0)+','+(numericTraitMinMax?numericTraitMinMax.max:100)+']'}" data-slider-min="${numericTraitMinMax?numericTraitMinMax.min:0}" data-slider-max="${numericTraitMinMax?numericTraitMinMax.max:100}" data-slider-step="1">
+            </g:elseif>
+            <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
+            <div class="input-group colorpicker-component" style="width:220px;">
+            <input 
+            type="text" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
+            class="form-control single-post ${traitTypes} trait_color_picker" value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].replace(':',','):''}">
+            <span class="input-group-addon"><i></i></span>
+            </div>
+            </g:elseif>
+           <g:else>
+            </g:else>
 </div>
 

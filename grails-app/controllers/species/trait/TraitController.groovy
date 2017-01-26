@@ -17,12 +17,15 @@ import species.utils.Utils;
 import species.utils.ImageUtils;
 import species.TaxonomyDefinition;
 import species.utils.ImageType;
+import groovy.sql.Sql
+import species.trait.Trait.DataTypes;
 
 class TraitController extends AbstractObjectController {
 
     def traitService;
     def speciesService;
-    def messageSource    
+    def messageSource;
+    def dataSource;
 
     static allowedMethods = [show:'GET', index:'GET', list:'GET', edit:"GET" ,  save: "POST", delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"],update:"POST",create:"GET"]
     static defaultAction = "list"
@@ -221,7 +224,7 @@ class TraitController extends AbstractObjectController {
             };
         }
         log.debug "Storing all ${params.controller} ids list in session ${session[params.controller+'_ids_list']} for params ${params}";
-        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:params.controller, 'factInstance':filteredList.traitFactMap, instance:filteredList.object]
+        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:params.controller, 'factInstance':filteredList.traitFactMap, instance:filteredList.object, numericTraitMinMax:filteredList.numericTraitMinMax];
     }
 
     def show() {
@@ -238,6 +241,19 @@ class TraitController extends AbstractObjectController {
             model['coverage'] = coverage*.name
             model['traitValue'] = traitValue
             model['field'] = field.concept
+            if(traitInstance.dataTypes == DataTypes.NUMERIC) {
+            Sql sql = Sql.newInstance(dataSource);
+            List numericTraitMinMax =  sql.rows("""
+            select min(f.value::float),max(f.to_value::float),t.id from fact f,trait t where f.trait_id = t.id and t.data_types='NUMERIC' and t.id=:traitId group by t.id;
+            """, [traitId:traitInstance.id]);
+            println numericTraitMinMax;
+            println "+++++++++++++++++++"
+            println "+++++++++++++++++++"
+            println "+++++++++++++++++++"
+            println "+++++++++++++++++++"
+            model['numericTraitMinMax'] = numericTraitMinMax;
+            }
+
             withFormat {
                 html {
                     render (view:"show", model:model)

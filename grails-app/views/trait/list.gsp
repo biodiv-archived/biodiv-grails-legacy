@@ -5,6 +5,8 @@
     <head>
         <g:set var="title" value="${g.message(code:'traits.label')} ${g.message(code:'msg.beta')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
+
+        <gvisualization:apiImport />
     </head>
     <body>
 

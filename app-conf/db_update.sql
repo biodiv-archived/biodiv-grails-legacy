@@ -759,3 +759,23 @@ alter table trait alter column icon type text;
 #03Jan2017
 alter table fact add column to_value varchar(255);
 alter table fact alter column trait_value_id drop not null;
+
+
+#9thJan2017
+alter table taxonomy_definition add column traits_json json;
+update taxonomy_definition set traits_json = g.item from (
+     select x1.page_taxon_id, format('{%s}', string_agg(x1.item,','))::json as item from (
+        (select x.page_taxon_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.page_taxon_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_id = t.id and (t.data_types='NUMERIC') ) x group by x.page_taxon_id)
+        union
+        (select x.page_taxon_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.page_taxon_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_id = t.id and (t.data_types='DATE') ) x group by x.page_taxon_id)
+        union
+        (select x.page_taxon_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.page_taxon_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_id = t.id and (t.data_types='COLOR')) x group by x.page_taxon_id)
+    ) x1 group by x1.page_taxon_id
+) g where g.page_taxon_id=id;
+
+
+create table calendar as (
+      select date '2017-01-01' + (n || ' days')::interval calendar_date
+      from generate_series(0, 365) n
+)
+

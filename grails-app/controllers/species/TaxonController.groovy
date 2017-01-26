@@ -844,8 +844,8 @@ class TaxonController {
     @Secured(['ROLE_ADMIN'])
     def snapAcceptedAndNoIBP() {
         def sql = new Sql(dataSource)
-        sql.eachRow("select id from taxonomy_definition t where t.status='ACCEPTED' and t.id not in (select taxon_definition_id from taxonomy_registry where classification_id=265799)") { row ->
-            def td = TaxonomyDefinition.read(row.id);
+//        sql.eachRow("select id from taxonomy_definition t where t.status='ACCEPTED' and t.id not in (select taxon_definition_id from taxonomy_registry where classification_id=265799)") { row ->
+            def td = TaxonomyDefinition.read(447537L);
             if(td) {
                 println td.id;
                 td.doColCuration = false;
@@ -853,7 +853,7 @@ class TaxonController {
             } else {
                 println "No td";
             }
-        }
+//        }
 
     }
 }

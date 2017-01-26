@@ -80,7 +80,7 @@
 			    			    	<h5>Filter by value</h5>
 			    <div class="list" style="clear: both;">
 			    	<div class="trait thumbnail" data-toggle="buttons-radio">
-  	                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitValues':factInstance?factInstance[trait.id]:(editable?null:traitValue), 'displayAny':false,'fromTraitShow':true, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
+  	                    <g:render template="/trait/showTraitValuesListTemplate" model="['trait':traitInstance, 'traitValues':factInstance?factInstance[trait.id]:(editable?null:traitValue), 'displayAny':false,'fromTraitShow':true, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
 			    	</div>
 			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
 	    			</div>
@@ -113,14 +113,15 @@
             });
 	    });
 	</script>
-		<asset:script type="text/javascript">
-$(document).ready(function() {
-	$(".trait button").button();
-	$(".trait button").tooltip({placement:'bottom', 'container':'body'});
-    <g:each in="${params.trait}" var="t">
-        $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
-    </g:each>
-});
+	<asset:script type="text/javascript">
+    $(document).ready(function() {
+        $(".trait button").button();
+        $(".trait button").tooltip({placement:'bottom', 'container':'body'});
+        <g:each in="${params.trait}" var="t">
+            $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
+        </g:each>
+
+    });
     function deleteTrait(){
         var test="${message(code: 'default.trait.delete.confirm.message', default: 'This Trait will be deleted. Are you sure ?')}";
         if(confirm(test)){

@@ -1491,8 +1491,8 @@ class ObservationService extends AbstractMetadataService {
                 taxonQuery = recoQuery+" left outer join taxonomy_definition t on reco.taxon_concept_id = t.id ";
                 query += taxonQuery;
            }
-            filterQuery += traitQuery;
-            
+            filterQuery += traitQuery['filterQuery'];
+            orderQuery += traitQuery['orderQuery'];            
             def classification;
             if(params.classification)
                 classification = Classification.read(Long.parseLong(params.classification));

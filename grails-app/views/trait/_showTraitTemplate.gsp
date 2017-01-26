@@ -5,9 +5,8 @@
             <i class="icon-question-sign" data-toggle="tooltip" data-trigger="hover" data-original-title="${trait.description}"></i>
         </h6>
     </a>
-
     <div class="alert alert-error" style="display:none;"></div>
-  	<g:render template="/trait/showTraitValuesListTemplate" model="['trait':trait, 'traitValues':factInstance?factInstance[trait.id]:(editable?null:trait.values()), 'displayAny':displayAny, 'traitTypes':trait.traitTypes, 'queryParams':queryParams]"/>
+  	<g:render template="/trait/showTraitValuesListTemplate" model="['trait':trait, 'traitValues':factInstance?factInstance[trait.id]:(editable?null:trait.values()), 'displayAny':displayAny, 'traitTypes':trait.traitTypes, 'queryParams':queryParams, 'numericTraitMinMax':numericTraitMinMax.find{it.id == trait.id}]"/>
     <g:if test="${editable}">
     <g:if test="${ifOwns || trait.isParticipatory}">
         <div style="position:absolute;float: right;right: 0px;top:2px;">
@@ -16,7 +15,7 @@
             <input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" data-objectId = "${object?.id}" data-objectType="${object?.class?.getCanonicalName()}" style="float:right;display:none" value="Submit" />
         </div>
         <div class="editFactPanel trait" style="display:none;">
-            <g:render template="/trait/showTraitValuesListTemplate" model="['trait':trait, 'traitValues':trait.values(),'factInstance':factInstance, 'displayAny':displayAny, fromSpeciesShow:false, 'traitTypes':trait.traitTypes, 'queryParams':queryParams]"/>
+            <g:render template="/trait/showTraitValuesListTemplate" model="['trait':trait, 'traitValues':trait.values(),'factInstance':factInstance, 'displayAny':displayAny, fromSpeciesShow:false, 'traitTypes':trait.traitTypes, 'queryParams':queryParams,  'numericTraitMinMax':numericTraitMinMax.find{it.id == trait.id}]"/>
         </div>
     </g:if>
     </g:if>

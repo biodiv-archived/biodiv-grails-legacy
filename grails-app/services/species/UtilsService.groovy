@@ -44,7 +44,7 @@ import species.auth.Role;
 import species.auth.SUser;
 import species.auth.SUserRole;
 import au.com.bytecode.opencsv.CSVWriter;
-
+import java.awt.Color;
 
 class UtilsService {
 
@@ -1281,5 +1281,23 @@ class UtilsService {
             }
         }
 
+    /**
+     * 
+     * @param colorStr e.g. "#FFFFFF"
+     * @return 
+     */
+    public static String hex2Rgb(String colorStr) {
+        try {
+        Color c = new Color(
+            Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
+            Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
+            Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+        return "rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+ 
 }
 

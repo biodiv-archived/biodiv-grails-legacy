@@ -8,6 +8,7 @@
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.dataset.Dataset"%>
 <%@ page import="species.trait.Trait"%>
+<%@ page import="species.trait.Trait.DataTypes"%>
 <%@ page import="species.trait.TraitValue"%>
 
 <div class="info-message" ${hideId?'':'id=info-message'}>
@@ -246,12 +247,13 @@
 			<g:if test="${queryParam.key=='trait' && queryParam.value && hackTohideTraits != true}"> 
             <g:message code="trait.for.key" />  
             <g:each in="${queryParam.value}" var="trait">
-            <g:each in="${trait.value.split(',')}" var="tv">
+            <g:each in="${trait.value.startsWith('rgb')?[trait.value]:trait.value.split(',')}" var="tv">
                                     <span
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
 					action:params.action, params:[('trait.'+trait.key): tv])}">
-						${Trait.read(trait.key)?.name}:${tv.equalsIgnoreCase('none')||tv.equalsIgnoreCase('all')||tv.equalsIgnoreCase('any')?tv.capitalize():TraitValue.read(tv)?.value} 
+                    <%Trait t = Trait.read(trait.key)%>
+						${t?.name}:${tv.equalsIgnoreCase('none')||tv.equalsIgnoreCase('all')||tv.equalsIgnoreCase('any')||tv.contains(':')||tv.contains('-')||t.dataTypes == DataTypes.COLOR?tv.capitalize():TraitValue.read(tv)?.value} 
                         <a class="removeQueryFilter" data-target="trait.${trait.key}=${tv}" href="#">[X]</a> 
                         </span>
                         </g:each>

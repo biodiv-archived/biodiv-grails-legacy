@@ -53,5 +53,7 @@
 *= require all/location_picker.css
 *= require all/augmented-maps.css
 *= require all/namelist.css
+*= require all/slider.css
+*= require all/bootstrap-colorpicker.min.css
 */
 
