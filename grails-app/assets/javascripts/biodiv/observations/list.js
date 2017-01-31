@@ -392,13 +392,14 @@ $(document).ready(function(){
                 $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
             }
 
-            $(".trait_range_slider").each(function(){
-                var v = $(this).val();
+            $(".trait_range_slider,.trait_date_range_slider").each(function(){
+                var v = $(this).val().replace(';',':');
                 if(v) {
                     trait = $(this).attr('data-tid');
                     if(trait == tid) {
-                        var a = [$(this).data('slider-min'), $(this).data('slider-max')];
-                        $(this).slider('setValue',a).val('');
+                        var a = [$(this).data('min'), $(this).data('max')];
+                        $(this).data('ionRangeSlider').update({from:$(this).data('min'), to:$(this).data('max')});
+                        $(this).val($(this).data('min')+";"+ $(this).data('max'));
                     }
                 }
             });
@@ -785,13 +786,17 @@ function getSelectedTrait($traitFilter, putValue) {
             }
         }
     });
-    $(".trait_range_slider").each(function(){
+    $(".trait_range_slider,.trait_date_range_slider").each(function(){
         var v = $(this).val();
         if(v) {
-            v = v.replace(',',':');
-            trait = $(this).attr('data-tid');
-            if(selTrait[trait] == undefined) selTrait[trait]='';
-            selTrait[trait] += v+',';
+            v = v.replace(';',':');
+            var x = v.split(':');
+            if($(this).data('min') == x[0] && $(this).data('max') == x[1]) {
+            } else {
+                trait = $(this).attr('data-tid');
+                if(selTrait[trait] == undefined) selTrait[trait]='';
+                selTrait[trait] += v+',';
+            }
         } else if($('input[data-tid]').length == 1) {
             //is from trait show page
             selTrait[$(this).attr('data-tid')] = 'any,';

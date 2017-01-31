@@ -88,6 +88,7 @@ function loadMatchingSpeciesList() {
                     //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
                     $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
+                    $('#imagediv_'+item[0]).empty();
                     $.each(imagepath,function(index1,item1){ 
                         $('#imagediv_'+item[0]).append(showIcon(item1[0], item1[1], item1[2], item1[3]));
                     });
@@ -105,7 +106,7 @@ function showIcon(value,name,url, type){
     if(url) {
         return  '<img src="'+url+'" width="32" height="32" title="'+name+'-'+value+'" />';
     } else if(type == 'Color'){
-        return '<img style="height:32px;width:32px;display:inline-block;background-color:'+value+';" title="'+name+'-'+value+'" ></img>'
+        return '<img style="height:32px;width:32px;display:inline-block;background-color:'+value+';" tooltip="'+name+'-'+value+'" ></img>'
     } else {
 //        return '<b>'+name+'</b> :'+ value;
 //        return '';
@@ -194,9 +195,26 @@ function loadCustomFields($me, compId) {
 
 function initTraitFilterControls() {
 
-    $('.trait_range_slider').slider().on('slideStop', function(ev){
-        updateMatchingSpeciesTable();
+    $('.trait_range_slider').ionRangeSlider({
+        grid:'true',
+        onFinish :  function(data) {
+            updateMatchingSpeciesTable();
+        }
     });
+
+    $('.trait_date_range_slider').ionRangeSlider({
+        grid:'true',
+        values: [
+            "January", "February", "March",
+            "April", "May", "June",
+            "July", "August", "September",
+            "October", "November", "December"
+        ],
+        onFinish :  function(data) {
+            updateMatchingSpeciesTable();
+        }
+    });
+
 
     $('.trait_date_range').each(function(){
         var options = {
@@ -223,7 +241,25 @@ function initTraitFilterControls() {
     $('.colorpicker-component').colorpicker({
         format:'rgb', 
         container: true,
-        inline: true
+        inline: true,
+        colorSelectors: {
+            'black': '#000000',
+            'gray' : '#808080',
+            'silver' : '#C0C0C0',
+            'white': '#ffffff',
+            'maroon' : '#800000 ',
+            'red': '#FF0000',
+            'olive' : '#808000',
+            'yellow' : '#FFFF00',
+            'green' : '#008000',
+            'lime' : '#00FF00',
+            'teal' : '#008080',
+            'aqua' : '#00FFFF',
+            'navy' : '#000080',
+            'blue' : '#0000FF',
+            'purple' : '#800080',
+            'fuchsia' : '#FF00FF'
+        }
     }).on('changeColor', function(ev){
         updateMatchingSpeciesTable();
     });

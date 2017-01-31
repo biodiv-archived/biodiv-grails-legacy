@@ -131,3 +131,4 @@
 
 //= require bootstrap.plugins/bootstrap-slider.js
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
+//= require jquery.plugins/ion.rangeSlider.min

@@ -45,6 +45,10 @@ import species.auth.SUser;
 import species.auth.SUserRole;
 import au.com.bytecode.opencsv.CSVWriter;
 import java.awt.Color;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
+
 
 class UtilsService {
 
@@ -1298,6 +1302,13 @@ class UtilsService {
         }
         return null;
     }
- 
+
+    public static getMonthIndex(String monthName) {
+        Date date = new SimpleDateFormat("MMMM").parse(monthName)
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date)
+        return cal.get(Calendar.MONTH);
+
+    }
 }
 
