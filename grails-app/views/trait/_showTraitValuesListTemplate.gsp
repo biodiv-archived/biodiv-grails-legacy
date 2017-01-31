@@ -99,12 +99,16 @@
             </g:if>
             <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
             <g:if test="${trait.units = Units.MONTH}">
-            <div style="width:260px;">
+            <div style="width:280px;">
+            <%
+                def fromDate1 = (queryParams && queryParams.trait && queryParams.trait[trait.id] &&!queryParams.trait[trait.id].equalsIgnoreCase('any')) ? UtilsService.getMonthIndex(queryParams.trait[trait.id].split(':')[0]) : 0;
+                def toDate1 = (queryParams && queryParams.trait && queryParams.trait[trait.id] && !queryParams.trait[trait.id].equalsIgnoreCase('any')) ? UtilsService.getMonthIndex(queryParams.trait[trait.id].split(':')[1]) : 11;
+            %>
             <input 
             type="text" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
             class="span2 input-prepend single-post ${traitTypes} trait_date_range_slider" value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].replace(':',';'):''}"
             style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;width:inherit;"
-            data-type="double" data-from="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? UtilsService.getMonthIndex(queryParams.trait[trait.id].split(':')[0]):0}" data-to="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? UtilsService.getMonthIndex(queryParams.trait[trait.id].split(':')[1]):12}"
+            data-type="double" data-from="${fromDate1}" data-to="${toDate1}"
             data-min="January" data-max="December" data-step="1">
             </div>
 
@@ -129,17 +133,21 @@
             </g:else>
             </g:elseif>
             <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.NUMERIC}">
-            <div style="width:260px;">
+            <div style="width:280px;">
+            <%
+                float from = queryParams && queryParams.trait && queryParams.trait[trait.id]  && !queryParams.trait[trait.id].equalsIgnoreCase('any') ? queryParams.trait[trait.id].split(':')[0]:(numericTraitMinMax?numericTraitMinMax.min:0)
+                float to =queryParams && queryParams.trait && queryParams.trait[trait.id] && !queryParams.trait[trait.id].equalsIgnoreCase('any')  ? queryParams.trait[trait.id].split(':')[1]:(numericTraitMinMax?numericTraitMinMax.max:100)
+            %>
             <input 
             type="text" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
             class="span2 input-prepend single-post ${traitTypes} trait_range_slider" value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].replace(':',','):''}"
             style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;width:inherit;"
-            data-type="double" data-from="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].split(':')[0]:(numericTraitMinMax?numericTraitMinMax.min:0)}" data-to="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].split(':')[1]:(numericTraitMinMax?numericTraitMinMax.max:100)}"
+            data-type="double" data-from="${from}" data-to="${to}"
             data-min="${numericTraitMinMax?numericTraitMinMax.min:0}" data-max="${numericTraitMinMax?numericTraitMinMax.max:100}" data-step="1">
             </div>
             </g:elseif>
             <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
-            <div class="input-group colorpicker-component" style="width:260px;display:inline-block;">
+            <div class="input-group colorpicker-component" style="width:280px;display:inline-block;">
             <input 
             type="text" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
             class="form-control single-post ${traitTypes} trait_color_picker" value="${queryParams && queryParams.trait && queryParams.trait[trait.id] ? queryParams.trait[trait.id].replace(':',','):''}"

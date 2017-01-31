@@ -1303,7 +1303,8 @@ class UtilsService {
         return null;
     }
 
-    public static getMonthIndex(String monthName) {
+    public static def getMonthIndex(String monthName) {
+        if(monthName.equalsIgnoreCase('any')) return -1;
         Date date = new SimpleDateFormat("MMMM").parse(monthName)
         Calendar cal = Calendar.getInstance();
         cal.setTime(date)

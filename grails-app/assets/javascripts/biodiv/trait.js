@@ -54,10 +54,8 @@ function loadMatchingSpeciesList() {
     console.log(params);
     var History = window.History;
     var traits = getSelectedTrait($('.trait button, .trait .none, .trait .any'));
-    console.log('getSel');
-    console.log(traits);
     for(var m in traits) {
-        params['trait.'+m] = traits[m].substring(0,traits[m].length-1);
+        params['trait.'+m] = traits[m];
     }
     params['max'] = $(this).data('max');
     params['offset'] = $(this).data('offset');

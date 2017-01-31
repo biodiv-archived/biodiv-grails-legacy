@@ -478,7 +478,7 @@ class AbstractObjectService {
                 } else if (t.dataTypes == DataTypes.COLOR) {
                     traitJsonQuery += " and cast(traits_json#>>'{${t.id},r}' as integer) is not null ";
                 } else { 
-                    traitQuery += " and t.traits[1##999][1] @> cast(ARRAY[["+d.id+"]] as bigint[])";
+                    traitQuery += " and t.traits[1##999][1] @> cast(ARRAY[["+t.id+"]] as bigint[])";
                 }
             }
         }

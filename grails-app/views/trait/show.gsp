@@ -88,8 +88,7 @@
 	 	</div>
 	<script>
 	    $(document).ready (function() {
-
-            $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
+            $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none, .listFilter', function(){
                 if($(this).hasClass('active')){
                 return false;
                 }
@@ -107,8 +106,8 @@
                 updateMatchingSpeciesTable();
                 return false;
             });
-
             $('.list').on('updatedGallery', function() {
+                    //TODO:THIS is being run twice on page load .. one call from ionRangeFilter onFinish and other on page load from list.js
                 updateMatchingSpeciesTable();
             });
 	    });

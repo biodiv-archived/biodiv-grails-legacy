@@ -399,7 +399,7 @@ $(document).ready(function(){
                     if(trait == tid) {
                         var a = [$(this).data('min'), $(this).data('max')];
                         $(this).data('ionRangeSlider').update({from:$(this).data('min'), to:$(this).data('max')});
-                        $(this).val($(this).data('min')+";"+ $(this).data('max'));
+                        $(this).val('');
                     }
                 }
             });
@@ -797,11 +797,7 @@ function getSelectedTrait($traitFilter, putValue) {
                 if(selTrait[trait] == undefined) selTrait[trait]='';
                 selTrait[trait] += v+',';
             }
-        } else if($('input[data-tid]').length == 1) {
-            //is from trait show page
-            selTrait[$(this).attr('data-tid')] = 'any,';
-        };
-
+        }
     });
 
     $('.trait_date_range').each(function(){
@@ -810,11 +806,7 @@ function getSelectedTrait($traitFilter, putValue) {
              trait = $(this).attr('data-tid');
             if(selTrait[trait] == undefined) selTrait[trait]='';
             selTrait[trait] += v+',';
-        } else if($('input[data-tid]').length == 1) {
-            //is from trait show page
-            selTrait[$(this).attr('data-tid')] = 'any,';
-        };
-
+        }
     });
     $(".colorpicker-component").each(function(){
         var v = $(this).find('input').val();
@@ -822,13 +814,21 @@ function getSelectedTrait($traitFilter, putValue) {
             trait = $(this).find('input').attr('data-tid');
             if(selTrait[trait] == undefined) selTrait[trait]='';
             selTrait[trait] += v+',';
-        } else if($('input[data-tid]').length == 1) {
-            //is from trait show page
-            selTrait[$(this).find('input').attr('data-tid')] = 'any,';
-        };
+        } 
     });
 
-    return selTrait;
+    //hack for trait show default selection
+    if($('input[data-tid]').length == 1 &&  !selTrait[$('input[data-tid]').attr('data-tid')]) {
+            //is from trait show page
+            selTrait[$('input[data-tid]').attr('data-tid')] = 'any,';
+        };
+
+    var p = {};
+    for(var m in selTrait) {
+        p[m] = selTrait[m].substring(0,selTrait[m].length-1);
+    }
+
+    return p;
 }
 
 function getSelectedTraitStr($traitFilter, putValue) {
@@ -836,7 +836,7 @@ function getSelectedTraitStr($traitFilter, putValue) {
     var traits = getSelectedTrait($traitFilter, putValue);
     var traitsStr = '';
     for(var m in traits) {
-        traitsStr += m+':'+traits[m].substring(0,traits[m].length-1)+';';
+        traitsStr += m+':'+traits[m]+';';
     }
     return traitsStr;
 }
