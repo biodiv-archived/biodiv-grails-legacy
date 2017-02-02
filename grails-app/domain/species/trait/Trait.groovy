@@ -133,7 +133,7 @@ class Trait {
     boolean isParticipatory = true;
     boolean showInObservation = false;
 
-    static hasMany = [taxon:TaxonomyDefinition]
+    static hasMany = [taxon:TaxonomyDefinition,traitTranslations:TraitTranslation]   
 
     static constraints = {
         name nullable:false, blank:false

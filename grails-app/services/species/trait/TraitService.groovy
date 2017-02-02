@@ -72,6 +72,7 @@ class TraitService extends AbstractObjectService {
         int taxonIdHeaderIndex = -1;
         int traitIdHeaderIndex = -1;
         int updateHeaderIndex = -1;
+        int languageHeaderIndex = -1;
         for(int i=0; i<headers.size(); i++) {
             if(headers[i].trim().equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
@@ -81,6 +82,8 @@ class TraitService extends AbstractObjectService {
                 traitIdHeaderIndex = i;
             } else if(headers[i].trim().equalsIgnoreCase('new/update')) {
                 updateHeaderIndex = i;
+            }else if(headers[i].trim().equalsIgnoreCase('language')) {
+                languageHeaderIndex = i;
             }
         }
         if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
@@ -120,9 +123,22 @@ class TraitService extends AbstractObjectService {
 
             //            taxons_scope.each { taxon_scope ->
             Trait trait = null;
+            TraitTranslation traitTranslation = null;
             if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {
                 if(row[traitIdHeaderIndex]) {
+                    println "------------------------------------"+ row[traitIdHeaderIndex]
                     trait = Trait.get(Long.parseLong(row[traitIdHeaderIndex]));
+                    println "----------------trait" + trait
+                    println "----------------languageInstance" + languageInstance
+                    if(trait && languageInstance){
+                        traitTranslation = TraitTranslation.findBYTraitAndLanguage(trait,languageInstance);
+                    }else{
+                        println "-----------------------------------------------------"
+                        println traitTranslation
+                        dl.writeLog("Updating trait ${trait} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");    
+                    }
+                    println "-----------------------------------------------------"
+                    println traitTranslation
                     dl.writeLog("Updating trait ${trait} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
                 } 
                 else {
@@ -134,10 +150,11 @@ class TraitService extends AbstractObjectService {
                 }
             } else if( row[updateHeaderIndex]?.equalsIgnoreCase('new') ){
                 trait = new Trait();
+                traitTranslation = new TraitTranslation();
                 dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]}");
             }
 
-            if(trait) {
+            if(trait && traitTranslation) {
                 //trait = new Trait();
                 headers.eachWithIndex { header, index ->
 
@@ -148,6 +165,7 @@ class TraitService extends AbstractObjectService {
                         //if(!traitInstance){trait.name = row[index].toLowerCase().trim();}
                         //else{i 
                         if(!trait.name) trait.name = row[index].trim();
+                        traitTranslation.name=row[index].trim();
                         //}
                         break;
 
@@ -170,6 +188,7 @@ class TraitService extends AbstractObjectService {
 
                         case 'trait source' : 
                         trait.source = row[index].trim();
+                        traitTranslation.source=row[index].trim();
                         break;
 
                         case 'trait icon' : 
@@ -186,6 +205,7 @@ class TraitService extends AbstractObjectService {
 
                         case 'trait definition':
                         trait.description = row[index].trim();
+                        traitTranslation.description=row[index].trim();
                         break;
 
                         case 'spm':
@@ -211,6 +231,16 @@ class TraitService extends AbstractObjectService {
                 if(!trait.hasErrors() && trait.save(flush:true)) {
                     dl.writeLog("Successfully inserted/updated trait");
                     noOfTraitsLoaded++;
+                    traitTranslation.language = languageInstance;
+                    traitTranslation.trait = trait;
+                    if(!traitTranslation.hasErrors() && traitTranslation.save(flush:true)) {
+                        println "Successfully inserted/updated traitTranslation"
+                        dl.writeLog("Successfully inserted/updated traitTranslation");                        
+                    }else{
+                        dl.writeLog("Failed to save TraitTranslation", Level.ERROR);
+                        println "Failed to save TraitTranslation"
+                        println traitTranslation;
+                    }
                 } else {
                     dl.writeLog("Failed to save trait", Level.ERROR);
                     trait.errors.allErrors.each { 

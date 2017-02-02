@@ -33,6 +33,7 @@ class TraitValue {
         description type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_value_id_seq"] 
     }
+    static hasMany = [traitValueTranslations:TraitValueTranslation]
 
 	Resource icon(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon)).exists()
