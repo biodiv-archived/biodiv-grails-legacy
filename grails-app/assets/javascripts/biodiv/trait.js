@@ -155,6 +155,7 @@ function loadTraits($me, compId) {
     params['sGroup'] = $me.data('sgroup');
     params['isObservationTrait'] = $me.data('isobservationtrait');
     params['isParticipatory'] = $me.data('isparticipatory');
+    params['ifOwns'] = $me.data('ifowns');
     params['showInObservation'] = $me.data('showinobservation');
     params['loadMore'] = true;
     params['displayAny'] = false;

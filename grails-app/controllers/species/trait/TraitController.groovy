@@ -44,7 +44,7 @@ class TraitController extends AbstractObjectController {
         if(params.filterable) model.filterable = params.filterable?.toBoolean();
         else model.filterable = true;
         if(params.fromObservationShow) model.fromObservationShow = params.fromObservationShow;
- 
+        if(params.ifOwns) model.ifOwns = params.ifOwns.toBoolean();
         //HACK
         if(params.trait) {
             model.queryParams = ['trait':[:]];
