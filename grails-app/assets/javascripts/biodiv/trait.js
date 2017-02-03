@@ -188,15 +188,15 @@ function loadCustomFields($me, compId) {
     });
 }
 
+var startFlag = 0;
 function initTraitFilterControls() {
-    var startFlag = false;
     $('.trait_range_slider').ionRangeSlider({
         grid:'true',
-        onStart:function(data) {
-            startFlag = true;
+        onChange:function(data) {
+            startFlag = 1;
         },
         onFinish :  function(data) {
-            if(!startFlag) 
+            if(startFlag == 1) 
                 updateMatchingSpeciesTable();
         }
     });
@@ -209,11 +209,11 @@ function initTraitFilterControls() {
             "July", "August", "September",
             "October", "November", "December"
         ],
-        onStart:function(data) {
-            startFlag = true;
+        onChange:function(data) {
+            startFlag = 1;
         },
         onFinish :  function(data) {
-            if(!startFlag) 
+            if(startFlag == 1) 
                 updateMatchingSpeciesTable();
         }
     });

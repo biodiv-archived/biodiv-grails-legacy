@@ -142,8 +142,8 @@
             <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.NUMERIC}">
             <div style="width:280px;">
             <%
-                float from = queryParams && queryParams.trait && queryParams.trait[trait.id]  && !queryParams.trait[trait.id].equalsIgnoreCase('any') ? queryParams.trait[trait.id].split(':')[0]:(numericTraitMinMax?numericTraitMinMax.min:0)
-                float to =queryParams && queryParams.trait && queryParams.trait[trait.id] && !queryParams.trait[trait.id].equalsIgnoreCase('any')  ? queryParams.trait[trait.id].split(':')[1]:(numericTraitMinMax?numericTraitMinMax.max:100)
+                def from = queryParams && queryParams.trait && queryParams.trait[trait.id]  && !queryParams.trait[trait.id].equalsIgnoreCase('any') ? queryParams.trait[trait.id].split(':')[0]:(numericTraitMinMax?numericTraitMinMax.min:0)
+                def to =queryParams && queryParams.trait && queryParams.trait[trait.id] && !queryParams.trait[trait.id].equalsIgnoreCase('any')  ? queryParams.trait[trait.id].split(':')[1]:(numericTraitMinMax?numericTraitMinMax.max:100)
             %>
             <input 
             type="text" data-tid='${trait.id}' data-isNotObservation='${trait.isNotObservationTrait}'
