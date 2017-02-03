@@ -11,7 +11,6 @@ function loadMatchingSpeciesList() {
     var target = window.location.pathname + window.location.search;
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
-    console.log(url);
     var href = url.attr('path');
     var params = getFilterParameters(url);
     delete params['daterangepicker_start'];
@@ -51,7 +50,6 @@ function loadMatchingSpeciesList() {
             delete params[key];
         }
     }
-    console.log(params);
     var History = window.History;
     var traits = getSelectedTrait($('.trait button, .trait .none, .trait .any'));
     for(var m in traits) {
@@ -125,7 +123,6 @@ function onSubmitFact($me, objectId, objectType) {
         data:params,
         success: function(data, statusText, xhr, form) {
             //TODO:update traits panel
-            console.log(data);
             if(data.success) {
                 $me.parent().parent().find('.alert').removeClass('alert alert-error').addClass('alert alert-info').html(data.msg).show();
                 $me.parent().parent().replaceWith(data.model.traitHtml);
@@ -144,7 +141,6 @@ function onSubmitFact($me, objectId, objectType) {
             //successHandler is used when ajax login succedes
             var successHandler = this.success, errorHandler = function() {
                 //TODO:show error msg
-                console.log(arguments);
                 $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(arguments.msg).show();
             }
             handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
@@ -192,11 +188,15 @@ function loadCustomFields($me, compId) {
 }
 
 function initTraitFilterControls() {
-
+    var startFlag = false;
     $('.trait_range_slider').ionRangeSlider({
         grid:'true',
+        onStart:function(data) {
+            startFlag = true;
+        },
         onFinish :  function(data) {
-            updateMatchingSpeciesTable();
+            if(!startFlag) 
+                updateMatchingSpeciesTable();
         }
     });
 
@@ -208,8 +208,12 @@ function initTraitFilterControls() {
             "July", "August", "September",
             "October", "November", "December"
         ],
+        onStart:function(data) {
+            startFlag = true;
+        },
         onFinish :  function(data) {
-            updateMatchingSpeciesTable();
+            if(!startFlag) 
+                updateMatchingSpeciesTable();
         }
     });
 
@@ -289,7 +293,6 @@ $(document).ready(function(){
         $(this).hide();
         $(this).parent().find('.submitFact, .cancelFact').show();
         $(this).parent().parent().find('.editFactPanel').show();
-        console.log($(this).parent().parent().find('.editFactPanel'));
         return false;
 	});
 
@@ -308,5 +311,4 @@ $(document).ready(function(){
         onSubmitFact($me, $me.data('objectid'), $me.data('objecttype'));
     });
 
-    initTraitFilterControls();
 });

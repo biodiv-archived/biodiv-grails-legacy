@@ -108,6 +108,7 @@
             });
             $('.list').on('updatedGallery', function() {
                     //TODO:THIS is being run twice on page load .. one call from ionRangeFilter onFinish and other on page load from list.js
+                    initTraitFilterControls();
                 updateMatchingSpeciesTable();
             });
 	    });

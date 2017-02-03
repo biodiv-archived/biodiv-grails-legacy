@@ -62,8 +62,15 @@
                     <g:if test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
                     <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post disabled"
-                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
-                        ${traitValue}
+                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;font-weight:bold;">
+
+                        <g:if test="${trait.units == Units.MONTH}">
+                            ${UtilsService.getMonthName(traitValue.split(';')[0])} 
+                            - ${UtilsService.getMonthName(traitValue.split(';')[1])} 
+                        </g:if>
+                        <g:else>
+                            ${traitValue}
+                        </g:else>
                     </span>
                     </g:if>
                     <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
@@ -76,7 +83,7 @@
                     <g:else>
                     <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post disabled"
-                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
+                        style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;font-weight:bold;">
                         ${traitValue}
                     </span>
                     </g:else>
@@ -98,7 +105,7 @@
             </g:if>
             </g:if>
             <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
-            <g:if test="${trait.units = Units.MONTH}">
+            <g:if test="${trait.units == Units.MONTH}">
             <div style="width:280px;">
             <%
                 def fromDate1 = (queryParams && queryParams.trait && queryParams.trait[trait.id] &&!queryParams.trait[trait.id].equalsIgnoreCase('any')) ? UtilsService.getMonthIndex(queryParams.trait[trait.id].split(':')[0]) : 0;

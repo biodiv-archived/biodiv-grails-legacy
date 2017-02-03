@@ -49,6 +49,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.SimpleDateFormat;
 
+import java.text.Format;
 
 class UtilsService {
 
@@ -1309,7 +1310,14 @@ class UtilsService {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date)
         return cal.get(Calendar.MONTH);
+    }
 
+    public static String getMonthName(String dateStr) {
+        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateStr)
+        Format formatter = new SimpleDateFormat("MMMM"); 
+            String s = formatter.format(date);
+                System.out.println(s);
+                return s;
     }
 }
 
