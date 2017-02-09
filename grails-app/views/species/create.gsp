@@ -169,6 +169,7 @@
                 if($(ele).val().trim()) params[$(ele).attr('name')] = $(ele).val().trim();
             });
             params['rank'] = $('#rank').find(":selected").val(); 
+            setRank=params['rank'];
             //Did u mean species 
             $.ajax({
                 url:'/species/validate',

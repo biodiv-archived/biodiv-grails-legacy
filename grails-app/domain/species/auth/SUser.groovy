@@ -147,6 +147,7 @@ class SUser {
 	def grailsApplication;
 	def commentService;
 	def activityFeedService;
+    def utilsService;
 
 	String username
 	String name;
@@ -169,6 +170,8 @@ class SUser {
     boolean sendDigest = true;
 	boolean hideEmailId = true;
 	boolean allowIdentifactionMail = true;
+	Double latitude=0
+	Double longitude=0
 
 	// Language
     Language language;
@@ -193,6 +196,8 @@ class SUser {
 		sexType blank:true,nullable:true
 		occupationType nullable:true,blank:true
 		institutionType nullable:true,blank:true
+		longitude nullable:true
+		latitude nullable:true
 
 	}
 
@@ -311,7 +316,7 @@ class SUser {
 		}
 		uGroups.each {
             try{
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
+			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)|| utilsService.isAdmin()) {
 				userGroups.add(it)
 			}
             } catch(e) {
@@ -341,7 +346,7 @@ class SUser {
 
 	@Override
 	String toString() {
-		return username;
+		return name;
 	}
 
 	def getWebsiteLink(){

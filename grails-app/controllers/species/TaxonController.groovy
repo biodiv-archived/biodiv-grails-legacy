@@ -22,6 +22,10 @@ import species.NamesMetadata.NamePosition;
 import grails.converters.XML;
 import grails.plugin.cache.Cacheable;
 
+
+import species.utils.ImageType
+
+
 class TaxonController {
 
     def dataSource
@@ -31,6 +35,7 @@ class TaxonController {
     def utilsService;
     def grailsApplication;
     def messageSource
+    def namePermissionService;
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
@@ -46,7 +51,6 @@ class TaxonController {
     def listHierarchy() {
         //cache "taxonomy_results"
         includeOriginHeader();
-
         int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0
         def parentId = params.id  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
@@ -82,7 +86,6 @@ class TaxonController {
                 }
                 println taxon
                 tillLevel = taxon.rank;
-                println tillLevel
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
                 println taxonIds
             }
@@ -352,6 +355,7 @@ class TaxonController {
      */
     private List buildHierarchyResult(rs, classSystem) {
         List result = [];
+        boolean hasContributorPermission = false;
         rs.each { r ->
             Map map = [:]
             String parentPath = "";
@@ -364,7 +368,6 @@ class TaxonController {
             } else {
                 id = r.path;
             }
-
             map['id'] = id
             map['parent'] = parentPath?:'#'
             map['text'] = r.name.trim()
@@ -374,7 +377,15 @@ class TaxonController {
             map['classsystem'] = r["classsystem"]
             map['rank'] = r.rank
             map['type'] = r.rank+''
-            map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false
+            map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false           
+            if(r.taxonId){
+                def getAllPermissions = namePermissionService.getAllPermissions(namePermissionService.populateMap([taxon:"" +r.taxonId]));
+                def users=[]
+                getAllPermissions.each { nP ->
+                    users << [id:nP.user.id,name:nP.user.name,perm:nP.permission.value(),profile_pic:nP.user.profilePicture(ImageType.SMALL)];
+                }
+                map['usersList'] = users;
+            }
             if(r.containsKey('isContributor')) {
                 map['isContributor'] = r.isContributor?:false
             } else {
@@ -387,12 +398,21 @@ class TaxonController {
             loaded : r.loaded ?:false,
             disabled  : false  // is the node disabled
             ]
-            
+            map['haspermission']=hasPermissionSpecies(params.user?.toInteger(),r["taxonid"]);
+            if(map['haspermission']==true){
+            map['li_attr'] = ['class':"permission_hilight"]  // attributes for the generated LI node
+        }
+       
+        else{
             map['li_attr'] = []  // attributes for the generated LI node
+        }
+            
             map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
-
             result << map
         }
+
+        println "=========================================================="
+        println result
         return result;
 /*        def writer = new StringWriter ();
         def result = new MarkupBuilder(writer);
@@ -787,27 +807,54 @@ class TaxonController {
             println rs.path
             println "++++++++++++++++++++++++++++++++++++++"
             println "++++++++++++++++++++++++++++++++++++++"
-			def sql = new Sql(dataSource)
-			int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-			dataSource.setUnreturnedConnectionTimeout(50000);
-			try{
-	        rs.taxonid.each { t ->
-	              println t
-	              sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
-	
-				  def taxon1 = TaxonomyDefinition.read(t);
-	              taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
-	              }
-			}catch(e){
-				e.printStackTrace()
-			}finally{
-				dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
-			}
+            def sql = new Sql(dataSource)
+            int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+            dataSource.setUnreturnedConnectionTimeout(50000);
+            try{
+                rs.taxonid.each { t ->
+                    println t
+                    sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
+
+                    def taxon1 = TaxonomyDefinition.read(t);
+                    taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
+                }
+            }catch(e){
+                e.printStackTrace()
+            }finally{
+                dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+            }
         } else {
             render ([success:false, msg:"", errors:[]] as JSON)                                                                                       
         }
 
     }
 
+    boolean hasPermissionSpecies(user,taxon){
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        result = sql.rows("select a.*,b.id as species_id from species_permission a JOIN species b on a.taxon_concept_id=b.taxon_concept_id and a.author_id=:userId and a.taxon_concept_id=:taxonId",[userId:user,taxonId:taxon]);
+        if(result){
+            return true;
+        }
+        else {
+            return false;
+        }  
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def snapAcceptedAndNoIBP() {
+        def sql = new Sql(dataSource)
+//        sql.eachRow("select id from taxonomy_definition t where t.status='ACCEPTED' and t.id not in (select taxon_definition_id from taxonomy_registry where classification_id=265799)") { row ->
+            def td = TaxonomyDefinition.read(447537L);
+            if(td) {
+                println td.id;
+                td.doColCuration = false;
+                td.postProcess();
+            } else {
+                println "No td";
+            }
+//        }
+
+    }
 }
 

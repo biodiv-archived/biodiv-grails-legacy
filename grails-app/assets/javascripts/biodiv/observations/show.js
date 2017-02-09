@@ -277,9 +277,6 @@ function getMonthName(monthIndex) {
 
 function drawVisualization(rows) {
     var d = []
-//    var data = new google.visualization.DataTable();
-//    data.addColumn('date', 'Date');
-//    data.addColumn('number', 'Observation');
     if(rows) {
         var ignoreDate = -19800000 // representing Thu Jan 01 1970 00:00:00 GMT+0530 (IST) in miliseconds
         for(var i=0; i<rows.length; i++) {
@@ -320,7 +317,10 @@ function drawVisualization(rows) {
             }
         });
 
-/*    if(data.getNumberOfRows() > 0) {
+/*    var data = new google.visualization.DataTable();
+    data.addColumn('date', 'Date');
+    data.addColumn('number', 'Observation');
+    if(data.getNumberOfRows() > 0) {
     var grouped_dt = google.visualization.data.group (
             data, [{column:0, modifier:getMonth, type:'number', label:'MonthNo'}],
             [{'column': 1, 'aggregation': google.visualization.data.sum, type: 'number', label:'#Observations'}, {'column': 0, 'aggregation': getMonthName, type: 'string', label:'Month'}]
@@ -344,8 +344,8 @@ function drawVisualization(rows) {
     }
     
     grouped_dt.sort([{column:0}]);
-*/
-/*    var view = new google.visualization.DataView(grouped_dt);
+
+    var view = new google.visualization.DataView(grouped_dt);
     view.setColumns([2,1]);
 
     var columnChart = new google.visualization.ColumnChart(
@@ -358,12 +358,12 @@ function drawVisualization(rows) {
         legend:{position: 'none'},
         chartArea:{width:'80%'}
     });
-  */  /*    var table = new google.visualization.Table(document.getElementById('table'));
+    var table = new google.visualization.Table(document.getElementById('table'));
           table.draw(view, null);
 
           var grouped_table = new google.visualization.Table(document.getElementById('grouped_table'));
           grouped_table.draw(view, null);
-          */
+    }*/
     } else {
         $("#grouped_table").html('<div id="relatedObservationMsg_a" class="alert alert-info" style="">No observations</div>');
     }

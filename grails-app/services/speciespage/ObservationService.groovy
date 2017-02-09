@@ -5,6 +5,8 @@ import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.grails.taggable.TagLink;
 import species.Classification;
 
@@ -85,6 +87,9 @@ import species.ScientificName.TaxonomyRank;
 import species.NamesMetadata.NameStatus;
 import grails.plugin.cache.Cacheable;
 
+import species.trait.Fact;
+import species.trait.Trait;
+import species.trait.TraitValue;
 class ObservationService extends AbstractMetadataService {
 
     static transactional = false
@@ -95,12 +100,13 @@ class ObservationService extends AbstractMetadataService {
     def userGroupService;
     def activityFeedService;
     def SUserService;
-    //def speciesService;
+    def speciesService;
     def messageSource;
     def resourcesService;
     def request;
     def speciesPermissionService;
 	def customFieldService;
+    def factService;
     /**
      * 
      * @param params
@@ -124,8 +130,6 @@ class ObservationService extends AbstractMetadataService {
         observation = super.update(observation, params, Observation.class);
         observation.notes = params.notes;
 
-        observation.agreeTerms = (params.agreeTerms?.equals('on'))?true:false;
-
         observation.sourceId = params.sourceId ?: observation.sourceId
         observation.checklistAnnotations = params.checklistAnnotations?:observation.checklistAnnotations
         if(params.url) {
@@ -134,14 +138,8 @@ class ObservationService extends AbstractMetadataService {
 
         //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
-        println "************************************"
-        println "************************************"
-        println "************************************"
-        println "************************************"
-        println observation.version
 		if(updateResources){
             updateResource(observation, params);
-            println observation.version
     	}
         return observation;
     }
@@ -310,6 +308,9 @@ class ObservationService extends AbstractMetadataService {
                 }
 				
 				customFieldService.updateCustomFields(params, observationInstance.id)
+                def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
+                traitParams.putAll(getTraits(params.traits));
+                factService.updateFacts(traitParams, observationInstance);
                 return utilsService.getSuccessModel('', observationInstance, OK.value())
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
@@ -390,6 +391,10 @@ class ObservationService extends AbstractMetadataService {
         else if(params.filterProperty == 'bulkUploadResources') {
             relatedObv = resourcesService.getBulkUploadResourcesOfUser(SUser.read(params.filterPropertyValue.toLong()), max, offset)
         }
+        else if(params.filterProperty == "contributedSpecies") {
+           relatedObv = speciesService.getuserContributionList(params.filterPropertyValue.toInteger(),max,offset)
+           
+        } 
         
         else{
             if(params.id) {
@@ -399,7 +404,7 @@ class ObservationService extends AbstractMetadataService {
             }
         }
 
-        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources') ){
+        if((params.contextGroupWebaddress || params.webaddress) && (params.filterProperty != 'bulkUploadResources')&&(params.filterProperty!='contributedSpecies') ){
             //def group = UserGroup.findByWebaddress(params.contextGroupWebaddress)
             //println group.webaddress
             relatedObv.observations.each { map ->
@@ -647,7 +652,6 @@ class ObservationService extends AbstractMetadataService {
                 query = "select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') and NOT (r.url != null and length(r.fileName) = 1) order by obv.lastRevised desc"
             }
             def resIdList = Observation.executeQuery (query, ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
-println resIdList
              /*
             def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
             def hqlQuery = sessionFactory.currentSession.createQuery(query) 
@@ -987,7 +991,6 @@ println resIdList
     q.setParameter(:geoExp0, geom, geometryType); 
      */
     Map getFilteredObservations(def params, max, offset, isMapView = false, List eagerFetchProperties=null) {
-
         def queryParts = getFilteredObservationsFilterQuery(params, eagerFetchProperties) 
         String query = queryParts.query;
         long checklistCount = 0, allObservationCount = 0, speciesCount = 0, subSpeciesCount = 0;
@@ -998,7 +1001,7 @@ println resIdList
                   } else {*/
         query += queryParts.filterQuery + queryParts.orderByClause
         //		}
-        
+
         log.debug "query : "+query;
         log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
         log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
@@ -1009,22 +1012,22 @@ println resIdList
 
         log.debug query;
         log.debug queryParts.queryParams;
-        def checklistCountQuery = (queryParts.checklistCountQuery)?sessionFactory.currentSession.createQuery(queryParts.checklistCountQuery):null
-        def allObservationCountQuery = sessionFactory.currentSession.createQuery(queryParts.allObservationCountQuery)
+        def checklistCountQuery = (queryParts.checklistCountQuery)?sessionFactory.currentSession.createSQLQuery(queryParts.checklistCountQuery):null
+        def allObservationCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.allObservationCountQuery)
         //def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
         //def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
         //def speciesCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesCountQuery)
         //def speciesStatusCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesStatusCountQuery)
 
-        def hqlQuery = sessionFactory.currentSession.createQuery(query)
+        def hqlQuery = sessionFactory.currentSession.createSQLQuery(query)
         if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-			if(checklistCountQuery)
-            	checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-            allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-            //speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-            //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
-            //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
+            if(checklistCountQuery)
+                checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+                allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+                //speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+                //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
+                //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
         } 
 
         if(max > -1){
@@ -1032,44 +1035,59 @@ println resIdList
             //distinctRecoQuery.setMaxResults(10);
             queryParts.queryParams["max"] = max
         }
+
         if(offset > -1) {
             hqlQuery.setFirstResult(offset);
             //distinctRecoQuery.setFirstResult(0);
             queryParts.queryParams["offset"] = offset
         }
-        
+
         hqlQuery.setProperties(queryParts.queryParams);
         hqlQuery.setReadOnly(true);
         //hqlQuery.setCacheable(true)
         //hqlQuery.setCacheRegion('obvList');
-/*def qTranslator = (new org.hibernate.hql.ast.ASTQueryTranslatorFactory()).createQueryTranslator('123', query, ['limit':3,'max':2], sessionFactory);
-qTranslator.compile(queryParts.queryParams, false);
-println "******************************"
-println qTranslator;
-println qTranslator.getQueryString();
-println qTranslator.getSQLString();
-println "******************************"
-*/        def observationInstanceList = hqlQuery.list();
-
+        /*def qTranslator = (new org.hibernate.hql.ast.ASTQueryTranslatorFactory()).createQueryTranslator('123', query, ['limit':3,'max':2], sessionFactory);
+        qTranslator.compile(queryParts.queryParams, false);
+        println "******************************"
+        println qTranslator;
+        println qTranslator.getQueryString();
+        println qTranslator.getSQLString();
+        println "******************************"
+         */
+        def observationInstanceList, observationInstanceListIds;
         def distinctRecoList = [];
         def speciesGroupCountList = [];
-		if(checklistCountQuery){
-        	checklistCountQuery.setProperties(queryParts.queryParams)
-			checklistCount = checklistCountQuery.list()[0]
-		}
+        if(params.identified=="true") {
+            observationInstanceList=getObservationInstanceList(params)
+            allObservationCount = observationInstanceList.size()
+        }
+        else {
+            observationInstanceList = hqlQuery.addEntity('obv', Observation).list();
+            for(int i=0;i < observationInstanceList.size(); i++) {
+                println observationInstanceList[i].isChecklist
+                if(observationInstanceList[i].isChecklist) {
+                    //observationInstanceList[i] = Checklists.read(observationInstanceList[i].id);
+                }
+            }
 
-        allObservationCountQuery.setProperties(queryParts.queryParams)
-        //speciesCountQuery.setProperties(queryParts.queryParams)
-        //speciesStatusCountQuery.setProperties(queryParts.queryParams)
-        allObservationCount = allObservationCountQuery.list()[0]
-        /*def speciesCounts = speciesCountQuery.list()
-        speciesCount = speciesCounts[0]
-        subSpeciesCount = speciesCounts[1]
+            if(checklistCountQuery){
+                checklistCountQuery.setProperties(queryParts.queryParams);
+                checklistCount = checklistCountQuery.list()[0];
+            }
 
-        def speciesStatusCounts = speciesStatusCountQuery.list()
-        def acceptedSpeciesCount = speciesStatusCounts[0]
-        def synonymSpeciesCount = speciesStatusCounts[1]
-        */
+            allObservationCountQuery.setProperties(queryParts.queryParams)
+            //speciesCountQuery.setProperties(queryParts.queryParams)
+            //speciesStatusCountQuery.setProperties(queryParts.queryParams)
+            allObservationCount = allObservationCountQuery.list()[0]
+            /*def speciesCounts = speciesCountQuery.list()
+            speciesCount = speciesCounts[0]
+            subSpeciesCount = speciesCounts[1]
+
+            def speciesStatusCounts = speciesStatusCountQuery.list()
+            def acceptedSpeciesCount = speciesStatusCounts[0]
+            def synonymSpeciesCount = speciesStatusCounts[1]
+             */
+        }
 
         if(!params.loadMore?.toBoolean()) {
             /*distinctRecoQuery.setProperties(queryParts.queryParams)
@@ -1086,6 +1104,7 @@ println "******************************"
         if(params.daterangepicker_start){
             queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
         }
+
         if(params.daterangepicker_end){
             queryParts.queryParams["daterangepicker_end"] =  params.daterangepicker_end
         }
@@ -1093,9 +1112,11 @@ println "******************************"
         if(params.observedon_start){
             queryParts.queryParams["observedon_start"] = params.observedon_start
         }
+
         if(params.observedon_end){
             queryParts.queryParams["observedon_end"] =  params.observedon_end
         }
+
         return [observationInstanceList:observationInstanceList, allObservationCount:allObservationCount, checklistCount:checklistCount, speciesGroupCountList:speciesGroupCountList, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
     }
 
@@ -1106,48 +1127,60 @@ println "******************************"
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
-		params.isMediaFilter = (params.isMediaFilter) ?: 'true'
+		params.isMediaFilter = (params.isMediaFilter) ?: 'false'
         //params.userName = springSecurityService.currentUser.username;
 
         def queryParams = [:];
         def activeFilters = [:]
 
-        def query = "select "
-
+        def query = """select 
+        CASE
+                   WHEN chk.id IS NOT NULL THEN 1
+                              WHEN obv.id IS NOT NULL THEN 0
+                                     END AS clazz_,
+                          """;
+        def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '', traitQuery = '', recoQuery='';
+        def filterQuery = " where obv.is_deleted = false "
+ 
         if(!params.sort || params.sort == 'score') {
             params.sort = "lastRevised"
         }
-        def orderByClause = "  obv." + params.sort +  " desc, obv.id asc"
+        def m = sessionFactory.getClassMetadata(Observation);
+        def orderByClause = "  obv." +m.getPropertyColumnNames(params.sort)[0] +  " desc, obv.id asc"
 
+        recoQuery += " left outer join recommendation reco on obv.max_voted_reco_id = reco.id "; 
         if(params.fetchField) {
             query += " obv.id as id,"
             params.fetchField.split(",").each { fetchField ->
-                if(!fetchField.equalsIgnoreCase('id'))
-                    query += " obv."+fetchField+" as "+fetchField+","
+                if(!fetchField.equalsIgnoreCase('id') && !fetchField.equalsIgnoreCase('title'))
+                    query += " obv."+m.getPropertyColumnNames(fetchField)[0]+" as "+fetchField+","
+                else if(fetchField.equalsIgnoreCase('title'))
+                    query += " chk."+m.getPropertyColumnNames(fetchField)[0]+" as "+fetchField+","
+
             }
             query = query [0..-2];
             queryParams['fetchField'] = params.fetchField
-            query += " from Observation obv ";
+            //query += " from Observation obv join checklists_observation chk_obv on obv.id = chk_obv.observation_id ";
+            query += " from Observation obv left outer join checklists chk on obv.id = chk.id ";
         } else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
-            query += " obv "
-            query += " from Observation obv ";
+            query += " obv.*, chk.* "
+            query += " from Observation obv left outer join Checklists chk on chk.id = obv.id  ";
         } 
         else {
-            query += " obv "
-            query += " from Observation obv inner join fetch obv.author left join fetch obv.maxVotedReco left outer join fetch obv.reprImage ";
+            query += " obv.*, chk.* "
+            query += " from Observation obv left outer join Checklists chk on chk.id = obv.id inner join suser u on obv.author_id = u.id left outer join resource r on obv.repr_image_id = r.id ";
+//            query += recoQuery;
         }
         //def mapViewQuery = "select obv.id, obv.topology, obv.isChecklist from Observation obv "
 
-        def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '';
-        def filterQuery = " where obv.isDeleted = false "
-        
+       
         if(params.featureBy == "true" || params.userGroup || params.webaddress){
             params.userGroup = getUserGroup(params);
         }
 
         if(params.featureBy == "true" ) {
             if(params.userGroup == null) {
-                filterQuery += " and obv.featureCount > 0 "     
+                filterQuery += " and obv.feature_count > 0 "     
                 //featureQuery = " join (select f.objectId, f.objectType from Featured f group by f.objectType, f.objectId) as feat"
               //  featureQuery = ", select distinct Featured.objectId from Featured where Featured.objectType = :featType as feat "
             } else {
@@ -1158,7 +1191,7 @@ println "******************************"
             if(params.userGroup == null) {
                 //filterQuery += " and feat.userGroup is null "     
             }else {
-                filterQuery += " and obv.id = feat.objectId and (feat.objectType =:featType or feat.objectType=:featType1) and feat.userGroup.id = :userGroupId "
+                filterQuery += " and obv.id = feat.object_id and (feat.object_type =:featType or feat.object_type=:featType1) and feat.user_group_id = :userGroupId "
                 queryParams["userGroupId"] = params.userGroup?.id
             }
             queryParams["featureBy"] = params.featureBy
@@ -1170,7 +1203,7 @@ println "******************************"
         if(params.featureBy == "false") {
             featureQuery = ", Featured feat "
             query += featureQuery;
-            filterQuery += " and obv.id != feat.objectId and feat.objectType = :featType "
+            filterQuery += " and obv.id != feat.object_id and feat.object_type = :featType "
             queryParams["featureBy"] = params.featureBy
             queryParams["featType"] = Observation.class.getCanonicalName();
 
@@ -1182,10 +1215,17 @@ println "******************************"
             if(!groupId){
                 log.debug("No groups for id " + params.sGroup)
             }else{
-                filterQuery += " and obv.group.id = :groupId "
+                filterQuery += " and obv.group_id = :groupId "
                 queryParams["groupId"] = groupId
                 activeFilters["sGroup"] = groupId
             }
+        }
+
+        if(params.recom && params.identified!='true'){
+            params.recom = params.recom.toLong();
+            filterQuery += " and (obv.max_voted_reco_id = :recom) ";
+            queryParams["recom"] = params.recom;
+            activeFilters["recom"] = params.recom;
         }
 
         if(params.webaddress) {
@@ -1195,18 +1235,18 @@ println "******************************"
 
         if(params.userGroup) {
             log.debug "Filtering from usergourp : ${params.userGroup}"
-            userGroupQuery = " join obv.userGroups userGroup "
+            userGroupQuery = " join user_group_observations  userGroup on userGroup.observation_id = obv.id "
             query += userGroupQuery
-            filterQuery += " and userGroup.id =:userGroupId "
+            filterQuery += " and userGroup.user_group_id =:userGroupId "
             queryParams['userGroupId'] = params.userGroup.id
             queryParams['userGroup'] = params.userGroup
         } 
 
         if(params.tag){
-            tagQuery = ",  TagLink tagLink "
+            tagQuery = ",  TagLink tagLink, Tags tag "
             query += tagQuery;
             //mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
-            filterQuery +=  " and obv.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
+            filterQuery +=  " and obv.id = tagLink.tag_ref and tagLink.type = :tagType and tagLink.tag_id = tag.id and tag.name = :tag "
 
             queryParams["tag"] = params.tag
             queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
@@ -1214,25 +1254,25 @@ println "******************************"
         }
 
         if(params.habitat && (params.habitat != Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id)){
-            filterQuery += " and obv.habitat.id = :habitat "
+            filterQuery += " and obv.habitat_id = :habitat "
             queryParams["habitat"] = params.habitat
             activeFilters["habitat"] = params.habitat
         }
 
         if(params.user){
-            filterQuery += " and obv.author.id = :user "
+            filterQuery += " and obv.author_id = :user "
             queryParams["user"] = params.user.toLong()
             activeFilters["user"] = params.user.toLong()
         }
 
         if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
-            filterQuery += " and (obv.isChecklist = false and obv.maxVotedReco is null) "
+            filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
             //queryParams["speciesName"] = params.speciesName
             activeFilters["speciesName"] = params.speciesName
         } 
 
         if (params.isFlagged && params.isFlagged.toBoolean()){
-            filterQuery += " and obv.flagCount > 0 "
+            filterQuery += " and obv.flag_count > 0 "
             activeFilters["isFlagged"] = params.isFlagged.toBoolean()
         }
 
@@ -1282,10 +1322,10 @@ println "******************************"
             def neLat = bounds[2].toFloat()
             def neLon = bounds[3].toFloat()
 
-            def boundGeometry = getBoundGeometry(swLat, swLon, neLat, neLon)
-            filterQuery += " and within (obv.topology, :boundGeometry) = true " //) ST_Contains( :boundGeomety,  obv.topology) "
-            //filterQuery += " and 1=0 ";// and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
-            queryParams['boundGeometry'] = boundGeometry
+            //def boundGeometry = getBoundGeometry(swLat, swLon, neLat, neLon)
+            //filterQuery += " and within (obv.topology, :boundGeometry) = true " //) ST_Contains( :boundGeomety,  obv.topology) "
+            filterQuery += "and obv.latitude > " + swLat + " and  obv.latitude < " + neLat + " and obv.longitude > " + swLon + " and obv.longitude < " + neLon
+            //queryParams['boundGeometry'] = boundGeometry
             activeFilters["bounds"] = params.bounds
         }  
 
@@ -1315,10 +1355,11 @@ println "******************************"
             def parMaxVotedReco = parentObv.maxVotedReco;
             if(parMaxVotedReco) {
                 if(parMaxVotedReco.taxonConcept) {
-                    filterQuery += " and (obv.maxVotedReco = :parMaxVotedReco  or obv.maxVotedReco.taxonConcept = :parMaxVotedRecoTaxonConcept)" //removed check for not equal to parentId to include it in show page 
+                    recoQuery = recoQuery+" left outer join taxonomy_definition t on reco.taxon_concept_id = t.id ";
+                    filterQuery += " and obv.max_voted_reco_id = :parMaxVotedReco" //removed check for not equal to parentId to include it in show page 
                     queryParams['parMaxVotedRecoTaxonConcept'] = parMaxVotedReco.taxonConcept
                 } else {
-                    filterQuery += " and (obv.maxVotedReco = :parMaxVotedReco)" //removed check for not equal to parentId to include it in show page 
+                    filterQuery += " and (obv.max_voted_reco_id = :parMaxVotedReco)" //removed check for not equal to parentId to include it in show page 
                 }
                 queryParams['parMaxVotedReco'] = parMaxVotedReco
 
@@ -1344,7 +1385,7 @@ println "******************************"
             //query += nearByRelatedObvQuery;
             Observation observation = Observation.read(params.parentId);
             String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-            filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, "+(params.maxNearByRadius/111.32)+") = true and obv.isDeleted = false "
+            filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, "+(params.maxNearByRadius/111.32)+") = true and obv.is_deleted = false "
 
 //            filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, :maxNearByRadius/111.32) and obv.isDeleted = false "                                              //removed check for not equal to parentId to include it in show page
             queryParams['parentId'] = params.parentId
@@ -1363,12 +1404,12 @@ println "******************************"
             if(taxon) {
                 List<Recommendation> scientificNameRecos = recommendationService.searchRecoByTaxonConcept(taxon);
                 if(scientificNameRecos) {
-                    filterQuery += " and obv.maxVotedReco in (:scientificNameRecos)"
-                        queryParams['scientificNameRecos'] = scientificNameRecos
+                    filterQuery += " and obv.max_voted_reco_id in (:scientificNameRecos)";
+                    queryParams['scientificNameRecos'] = scientificNameRecos;
 
-                        activeFilters["filterProperty"] = params.filterProperty
-                        activeFilters["parentId"] = params.parentId
-                        activeFilters["filterPropertyValue"] = params.filterPropertyValue;
+                    activeFilters["filterProperty"] = params.filterProperty;
+                    activeFilters["parentId"] = params.parentId;
+                    activeFilters["filterPropertyValue"] = params.filterPropertyValue;
                 }
                 /*queryParams['taxon'] = taxon.id
                 activeFilters['taxon'] = taxon.id
@@ -1399,26 +1440,28 @@ println "******************************"
             if(taxon){
                 queryParams['taxon'] = taxon.id
                 activeFilters['taxon'] = taxon.id
-                taxonQuery = " join obv.maxVotedReco.taxonConcept.hierarchies as reg "
+                taxonQuery = recoQuery + " join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id "
                 query += taxonQuery;
+
+                //taxonQuery = " join recommendation reco on obv.max_voted_reco_id = reco.id  "+taxonQuery;
 
                 def classification;
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification))
                 if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
 
                 queryParams['classification'] = classification.id 
                 activeFilters['classification'] = classification.id
  
-                filterQuery += " and reg.classification.id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                filterQuery += " and reg.classification_id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
             }
         }
 		
         if(params.dataset) {
             if(params.dataset == 'false') {
-                filterQuery += " and obv.dataset is null ";
+                filterQuery += " and obv.dataset_id is null ";
                 queryParams['dataset'] = false
                 activeFilters['dataset'] = false
             } else {
@@ -1427,39 +1470,59 @@ println "******************************"
                     queryParams['dataset'] = dataset.id
                     activeFilters['dataset'] = dataset.id
 
-                    filterQuery += " and obv.dataset.id = :dataset ";
+                    filterQuery += " and obv.dataset_id = :dataset ";
                 }
             }
         }
 		
 		if(params.isMediaFilter.toBoolean()){
-			filterQuery += " and obv.isShowable = true ";
+			filterQuery += " and obv.is_showable = true ";
 		}
 		
 		if(params.areaFilter && (!params.areaFilter.trim().equalsIgnoreCase('all'))){
-			filterQuery += " and obv.locationScale = :locationScale "
+			filterQuery += " and obv.location_scale = :locationScale "
 			activeFilters["areaFilter"] = params.areaFilter.toLowerCase()
 			queryParams['locationScale'] = Metadata.LocationScale.getEnum(params.areaFilter)
 		}
 
+        if(params.trait){
+            traitQuery = getTraitQuery(params.trait);
+            if(!taxonQuery) {
+                taxonQuery = recoQuery+" left outer join taxonomy_definition t on reco.taxon_concept_id = t.id ";
+                query += taxonQuery;
+           }
+            filterQuery += traitQuery['filterQuery'];
+            orderQuery += traitQuery['orderQuery'];            
+            def classification;
+            if(params.classification)
+                classification = Classification.read(Long.parseLong(params.classification));
+            if(!classification)
+                classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+            queryParams['classification'] = classification.id;
+            activeFilters['classification'] = classification.id
+ 
+            //filterQuery += " and reg.classification_id = :classification";
+            queryParams['trait'] = params.trait;
+
+        }
 				
         String checklistObvCond = ""
-        if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
-            checklistObvCond = " and obv.id != obv.sourceId "
+        if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()) {
+            checklistObvCond = " and obv.id != obv.source_id "
         }
 
-        def distinctRecoQuery = "select obv.maxVotedReco.id, count(*) from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+checklistObvCond+ " and obv.maxVotedReco is not null group by obv.maxVotedReco order by count(*) desc,obv.maxVotedReco.id asc";
-        def distinctRecoCountQuery = "select count(distinct obv.maxVotedReco.id)   from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ checklistObvCond + " and obv.maxVotedReco is not null ";
-        def speciesGroupCountQuery = "select obv.group.name, count(*),(case when obv.maxVotedReco.id is not null  then 1 else 2 end) from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ " and obv.isChecklist=false " + checklistObvCond + "group by obv.group.name,(case when obv.maxVotedReco.id is not null  then 1 else 2 end) order by obv.group.name desc";
+        def distinctRecoQuery = "select obv.max_voted_reco_id, count(*) from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+checklistObvCond+ " and obv.max_voted_reco_id is not null group by obv.max_voted_reco_id order by count(*) desc,obv.max_voted_reco_id asc";
+        def distinctRecoCountQuery = "select count(distinct obv.max_voted_reco_id)   from Observation obv  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ checklistObvCond + " and obv.max_voted_reco_id is not null ";
+        def speciesGroupCountQuery = "select sg.name, count(*),(case when obv.max_voted_reco_id is not null  then 1 else 2 end) from Observation obv join species_group sg on obv.group_id = sg.id  "+ userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery+ " and obv.is_checklist=false " + checklistObvCond + "group by sg.name,(case when obv.max_voted_reco_id is not null  then 1 else 2 end) order by sg.name desc";
 		def checklistCountQuery =  null
-		
-        if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
-            filterQuery += " and obv.isChecklist = true "
+        if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()) {
+            filterQuery += " and obv.is_checklist = true "
 			checklistCountQuery = "select count(*) from Observation obv " + userGroupQuery +" "+ taxonQuery +" "+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+((params.filterProperty == 'nearByRelated')?nearByRelatedObvQuery:'')+filterQuery
-			checklistCountQuery += " and obv.isChecklist = true "
+			checklistCountQuery += " and obv.is_checklist = true "
             activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
-        }else{
-			filterQuery += " and obv.isChecklist = false "
+        } else {
+			filterQuery += " and obv.is_checklist = false "
 			activeFilters["isChecklistOnly"] = false
 		}
 
@@ -1559,8 +1622,8 @@ println "******************************"
             for (row in recommendationVotesList) {
                 finalResult.add(RecommendationVote.findById(row.getProperty("id")))
             }
-            //return recommendationVotesList;
             return finalResult;
+
 
             /*
             def recommendationVotesList = sql.rows("select recoVote from recommendation_vote recoVote , observation o where recoVote.author_id = :userId and recoVote.observation_id = o.id and o.is_deleted = :isDeleted and o.is_showable = :isShowable order by recoVote.voted_on desc", [userId:user.id, isDeleted:false, isShowable:true])
@@ -2110,8 +2173,6 @@ println "******************************"
         return [success:success, url:url, msg:message, errors:errors]
     }
 
-    /**
-     */
     def addAnnotation(params, Observation obv){
         def ann = new Annotation(params)
         obv.addToAnnotations(ann);
@@ -2239,9 +2300,9 @@ println "******************************"
         def boundGeometry = queryParts.queryParams.remove('boundGeometry'); 
 		log.debug "distinctRecoQuery  : "+queryParts.distinctRecoQuery;
         log.debug "distinctRecoCountQuery  : "+queryParts.distinctRecoCountQuery;
-
-        def distinctRecoQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoQuery)
-        def distinctRecoCountQuery = sessionFactory.currentSession.createQuery(queryParts.distinctRecoCountQuery)
+        log.debug "queryparams"+queryParts.queryParams;
+        def distinctRecoQuery = sessionFactory.currentSession.createSQLQuery(queryParts.distinctRecoQuery)
+        def distinctRecoCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.distinctRecoCountQuery)
 
         if(params.bounds && boundGeometry) {
             distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
@@ -2262,16 +2323,14 @@ println "******************************"
             def reco = Recommendation.read(it[0]);
             if(params.downloadFrom == 'uniqueSpecies') {
                 //HACK: request not available as its from job scheduler
-                distinctRecoList << [reco.name, reco.isScientificName, it[1], getSpeciesHardLink(reco)]
+                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
             }else {
-                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, it[1]]
+                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
             }
         }
-
         def count = distinctRecoCountQuery.list()[0]
         return [distinctRecoList:distinctRecoList, totalCount:count];
     }
-
     /**
      */
     def getDistinctRecoListFromSearch(params, int max, int offset) {
@@ -2352,7 +2411,7 @@ println "******************************"
 
         log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
 
-        def speciesGroupCountQuery = sessionFactory.currentSession.createQuery(queryParts.speciesGroupCountQuery)
+        def speciesGroupCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.speciesGroupCountQuery)
 
         if(params.bounds && boundGeometry) {
             speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
@@ -2466,10 +2525,10 @@ println "******************************"
         log.debug "occurences query : "+query;
         log.debug queryParts.queryParams;
         
-        def hqlQuery = sessionFactory.currentSession.createQuery(query)
-        if(params.bounds && boundGeometry) {
+        def hqlQuery = sessionFactory.currentSession.createSQLQuery(query)
+        /* if(params.bounds && boundGeometry) {
             hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-        } 
+        } */
         
         hqlQuery.setMaxResults(1000);
         hqlQuery.setFirstResult(0);
@@ -2764,4 +2823,127 @@ println "******************************"
   //      def result = RecommendationVote.executeQuery("select count(recoVote) from RecommendationVote recoVote where recoVote.author.id = :userId and recoVote.observation.isDeleted = :isDeleted and recoVote.observation.isShowable = :isShowable", [userId:user.id, isDeleted:false, isShowable:true]);
         return (long)result[0]["count"];
     }
+
+    def getDistinctIdentifiedRecoList(params, int max, int offset) {  
+        println "identified params+"+params;
+        def sql =  Sql.newInstance(dataSource);
+        def distinctIdentifiedRecoList = [];
+        def distinctIdentifiedQuery
+        def distinctIdentifiedCountQuery
+        def queryParts = getFilteredObservationsFilterQuery(params)
+        if(params.userGroup)
+        { 
+            if(params.sGroup!=829){
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc limit 10 offset "+params.offset+" "
+                distinctIdentifiedCountQuery="select count(recoVote.recommendation_id) from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc "
+                }
+             else{
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc limit 10 offset "+params.offset+" "
+                distinctIdentifiedCountQuery="select count(recoVote.recommendation_id) from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc "
+                }
+        }
+         else
+        { 
+            if(params.sGroup!=829){
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+"  group by recoVote.recommendation_id order by count(*) desc limit 10 offset "+params.offset+" "
+                distinctIdentifiedCountQuery="select count(recoVote.recommendation_id) from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+"  group by recoVote.recommendation_id order by count(*) desc "
+                }
+             else{
+                distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true group by recoVote.recommendation_id order by count(*) desc limit 10 offset "+params.offset+" "
+                distinctIdentifiedCountQuery="select count(recoVote.recommendation_id) from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true group by recoVote.recommendation_id order by count(*) desc "
+                }
+        }
+                def distinctIdentifiedRecoListResult =sql.rows(distinctIdentifiedQuery)
+                def disntinctIdentifiedCount=sql.rows(distinctIdentifiedCountQuery)
+                distinctIdentifiedRecoListResult.each {it->
+                def reco = Recommendation.read(it['voteid']);
+                if(params.downloadFrom == 'uniqueSpecies') {
+                    distinctIdentifiedRecoList << [reco.name, reco.isScientificName, it['count'], getSpeciesHardLink(reco)]
+                        }
+                else {
+                    distinctIdentifiedRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getIdentifiedObservationHardLink(it['voteid'],it['count'],params.user,true)]
+                        }
+                    }
+                def count=disntinctIdentifiedCount.size()
+                println "count==="+count
+                return [distinctIdentifiedRecoList:distinctIdentifiedRecoList, totalCount:count];
+            }
+
+    private String getObservationHardLink(reco,count) {
+        if(!reco) return ;
+        def link=utilsService.generateLink("observation", "list", ["recom": reco])
+        return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
+        }
+
+    private String getObservationHardLink(reco,count,user) {
+        if(!reco) return ;
+        def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user])
+        return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
+        //return link 
+        }
+
+    private String getIdentifiedObservationHardLink(reco,count,user,identified) {
+        if(!reco) return ;
+        def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user,"identified":true])
+        return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
+        //return link 
+        }
+
+    def getObservationInstanceList(params){
+        def finalInstanceResult=[]
+        def sql =  Sql.newInstance(dataSource);
+        def result=sql.rows("select obv.id from recommendation_vote recoVote,observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=:rId and recoVote.author_id=:userId",[rId:(params.recom).toInteger(), userId:(params.user).toInteger()]);
+
+        for(row in result){
+            finalInstanceResult.add(Observation.findById(row.getProperty("id")))
+        }
+        return finalInstanceResult
+    }
+
+/*
+    boolean factUpdate(params){
+        println "================="+params
+        def observationInstance = Observation.findById(params.observation);
+        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
+        traitParams.putAll(getTraits(params.traits));
+        Trait trait;
+        TraitValue traitValue;
+        def factInstance;
+        traitParams.each { key, value ->
+                    if(!value) {
+                        return;
+                    }
+                    key = key.trim();
+                    value = value ? value.trim() : null ;
+
+                    switch(key) {
+                        case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
+                        default :
+                        trait=Trait.findById(key);
+                        traitValue = TraitValue.findByTraitAndValueIlike(trait, value.trim());
+                        factInstance=Fact.findByIdAndTrait(params.factId,trait);
+                        
+                    }
+                }
+                
+                if(!factInstance){factInstance = new Fact();}
+                        factInstance.trait = trait
+                        factInstance.traitValue = traitValue;
+                        factInstance.objectId = observationInstance.id
+                        factInstance.attribution = traitParams['attribution'];
+                        factInstance.contributor = traitParams['contributor'] ? SUser.findByEmail(traitParams['contributor']?.trim()) : null;
+                        factInstance.license = traitParams['license']? License.findByName(License.fetchLicenseType(traitParams['license'].trim())) : null;
+                        factInstance.objectType = observationInstance.class.getCanonicalName(); 
+
+                if(!factInstance.hasErrors() && !factInstance.save()) { 
+                    println "Error in Fact upudate"
+                    factInstance.errors.allErrors.each {println it }
+                    return false;
+                } else {
+                    println "Successfully updated fact";
+                    return true;
+                }
+               // factService.updateFacts(traitParams, observationInstance);
+    }
+*/
 }

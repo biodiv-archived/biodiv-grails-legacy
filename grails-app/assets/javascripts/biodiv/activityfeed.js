@@ -255,7 +255,7 @@ function removeActivity(targetComp){
 	$(targetComp).closest('.activityFeed-container').parent().remove();
 }
 
-function getTargetComp(){
+function getTargetComp(postComp){
 	var targetComp = $('.activityfeedAll');
 	if(targetComp.length > 0){
 		return targetComp;
@@ -279,7 +279,9 @@ function getTargetComp(){
 	targetComp = $('.activityfeedSpecific');
 	if(targetComp.length == 1){
 		return targetComp;
-	}
+    } else if(postComp) {
+        return $(postComp).parent().parent().prev();
+    }
         
         targetComp = $('.activityfeedUser');
 	if(targetComp.length == 1){
@@ -288,8 +290,8 @@ function getTargetComp(){
 	return null;
 }
 
-function updateFeeds(){
-	var targetComp = getTargetComp();
+function updateFeeds(postComp){
+	var targetComp = getTargetComp(postComp);
 	if(targetComp){
 		var refreshType = $(targetComp).children('input[name="refreshType"]').val();
 		if(refreshType == "manual"){

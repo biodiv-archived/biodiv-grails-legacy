@@ -10,6 +10,7 @@ import species.utils.Utils;
 import species.NamesMetadata.NameStatus;
 import species.NamesMetadata.COLNameStatus;
 import species.participation.NamelistService
+import species.participation.NamePermission
 import species.sourcehandler.XMLConverter;
 import species.participation.ActivityFeedService
 import species.auth.SUser
@@ -47,7 +48,7 @@ class TaxonomyDefinition extends ScientificName {
 	def namelistUtilService
 	def activityFeedService
 	def dataSource
-	
+
 	static hasMany = [author:String, year:String, hierarchies:TaxonomyRegistry]
     static mappedBy = [hierarchies:'taxonDefinition']
 
@@ -74,6 +75,8 @@ class TaxonomyDefinition extends ScientificName {
 		version false;
 		tablePerHierarchy true
         defaultHierarchy type:'text'
+		activityDescription type:'text'
+		
 	}
 	
 	static transients = [ "doColCuration" ]
@@ -165,6 +168,14 @@ class TaxonomyDefinition extends ScientificName {
         */
     }
 	
+	TaxonomyDefinition fetchRoot(){
+		TaxonomyRegistry ibpClassi = TaxonomyRegistry.findByTaxonDefinitionAndClassification(this, Classification.fetchIBPClassification())
+		if(ibpClassi){
+			return TaxonomyDefinition.read(ibpClassi.path.tokenize('_')[0])
+		}
+	}
+	
+	
 	String fetchRootId(){
 		def hir = fetchDefaultHierarchy()
 		if(hir)
@@ -231,12 +242,14 @@ class TaxonomyDefinition extends ScientificName {
 	   
 	   boolean isSnapped = false
 	   for(int i = 0; i < trs.size(); i++){
+           println trs[i]
 		   TaxonomyRegistry tr = trs[i]
 		   if(isSnapped)
 		   		break
 				   
 		    TaxonomyDefinition pTd = tr.parentTaxonDefinition 
 			if(pTd){
+                println "Snapping parent : "+pTd
 				pTd.snapToIBPHir(hirList, targetHir)   
 			 }
 			 isSnapped = _sanpToImmediateParent(tr, targetHir)
@@ -249,27 +262,31 @@ class TaxonomyDefinition extends ScientificName {
    
    
    private boolean _sanpToImmediateParent(TaxonomyRegistry sourceTr,  Classification targetHir){
-	   if(!sourceTr.parentTaxonDefinition){
-		   println "No parent "
-		   return false
-	   }
-	   if(sourceTr.parentTaxonDefinition.status != NameStatus.ACCEPTED){
+	   if(sourceTr.parentTaxonDefinition && (sourceTr.parentTaxonDefinition.status != NameStatus.ACCEPTED)){
 		   println "Immediate parent has following status " + sourceTr.parentTaxonDefinition.status
 		   return false
 	   }
+	   
 	   TaxonomyRegistry targetTr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(sourceTr.parentTaxonDefinition, targetHir)
 	   if(!targetTr){
 		   	println  "Immediate parent does not have ibp hir or this is the raw name at kingdom level " + this
-	   		return false
 	   }
 	   
 	   
 	   TaxonomyRegistry ibpTr = new TaxonomyRegistry()
-	   ibpTr.properties = targetTr.properties
-	   ibpTr.parentTaxon = targetTr
-	   ibpTr.parentTaxonDefinition = targetTr.taxonDefinition
+	   	if(targetTr){
+	   		ibpTr.properties = targetTr.properties
+	   		ibpTr.parentTaxon = targetTr
+	   		ibpTr.parentTaxonDefinition = targetTr.taxonDefinition
+	   		ibpTr.path = targetTr.path + "_" + sourceTr.taxonDefinition.id
+	   	}else{
+	   		ibpTr.classification = targetHir
+	   		ibpTr.parentTaxon = null
+	   		ibpTr.parentTaxonDefinition = null
+	   		ibpTr.path = sourceTr.taxonDefinition.id
+	   	}
+
 	   ibpTr.taxonDefinition = sourceTr.taxonDefinition
-	   ibpTr.path = targetTr.path + "_" + sourceTr.taxonDefinition.id
 	   ibpTr.contributors = null
 	   
 	   if(!ibpTr.save(flush:true)){
@@ -632,16 +649,19 @@ class TaxonomyDefinition extends ScientificName {
 				matchDatabaseName = tmpMatchDatabaseName
 				nameSourceId = tmpNameSourceId
 				viaDatasource = tmpViaDatasource
-				//this one should create ibp hir and getting priority over all the hirerchies
-				if(latestHir){
+			}
+			
+			//this one should create ibp hir and getting priority over all the hirerchies
+			if((this.position == NamesMetadata.NamePosition.CLEAN) || NamePermission.isAdmin(springSecurityService.currentUser)){ 
+				if(latestHir && (latestHir.taxonDefinition == this)){
 					Classification ibpClassification = Classification.fetchIBPClassification()
 					createTargetHirFromTaxonReg(latestHir, ibpClassification)
 					List sqlStrings = []
 					moveChildren(sqlStrings)
 					UPDATE_SQL_LIST.addAll(sqlStrings)
+					//XXX these sql's will be run in speciesbulkupload job at the end
 					//excuteSql(sqlStrings);
 					//println "finished move children === "
-					
 				}
 			}
 			if(!save()) {
@@ -649,8 +669,48 @@ class TaxonomyDefinition extends ScientificName {
 			}
 		}
 	}
+	
+	/**
+	 * This method is used to update ibp hir from given hir. 
+	 * This is to update hir by admin from namelist UI actoin only for one name at a time 
+	 * @param latestHir
+	 * @return
+	 */
+	
+	def updateIBPHir(TaxonomyRegistry latestHir){
+		if(latestHir && (latestHir.taxonDefinition == this) && NamePermission.isAdmin(springSecurityService.currentUser)){
+			Classification ibpClassification = Classification.fetchIBPClassification()
+			createTargetHirFromTaxonReg(latestHir, ibpClassification)
+			List sqlStrings = []
+			moveChildren(sqlStrings)
+			excuteHirUpdateSql(sqlStrings)
+			utilsService.clearCache("defaultCache")
+		}
+	}
 
+	private void excuteHirUpdateSql(List sqlStrings){
+		if(!sqlStrings)
+			return
 
+		Sql sql = new Sql(dataSource)
+		sqlStrings.each { String s ->
+			log.debug " Path update query " + s
+			try{
+				int updateCount = sql.executeUpdate(s);
+				log.debug " updated path count  " + 	updateCount
+				}catch(e){
+					e.printStackTrace()
+				}
+		}
+		String defHirUpdateSql = """ update taxonomy_definition set default_hierarchy = g.dh from (select x.lid, json_agg(x) dh from (select s.lid, t.id, t.name, t.canonical_form, t.rank from taxonomy_definition t, (select taxon_definition_id as lid, regexp_split_to_table(path,'_')::integer as tid from taxonomy_registry tr where tr.classification_id = 265799 order by tr.id) s where s.tid=t.id order by lid, t.rank) x group by x.lid) g where g.lid=id; """
+		try{
+			int hirupdateCount = sql.executeUpdate(defHirUpdateSql);
+			log.debug " Default hir update count " + hirupdateCount
+		}catch(e){
+			e.printStackTrace()
+		}
+	}
+	
 	
 	public String fetchLogSummary(){
 		return name + "\n" 
@@ -685,7 +745,7 @@ class TaxonomyDefinition extends ScientificName {
 		s += "Via Datasource : " + viaDatasource  + lineBreak
 		s += "Match Id : " + matchId + lineBreak
 
-		s += "IBP Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
+		s += "Hierarchy : " + fetchDefaultHierarchy().collect{it.name}.join("->")  + lineBreak
 		//s += "Number of COL Matches : " + noOfCOLMatches + lineBreak
 		if(isFlagged) {
 			s += "IsFlagged reason : " + flaggingReason.tokenize('###')[-1];
@@ -753,4 +813,9 @@ class TaxonomyDefinition extends ScientificName {
 		TaxonomyRegistry tr = TaxonomyRegistry.findByParentTaxonDefinitionAndClassification(this, ibpClassification)
 		return tr?true:false
 	}
+
+    @Override
+    String toString() {
+        return "<${this.class} : ${id} - ${name}>"
+    }
 }

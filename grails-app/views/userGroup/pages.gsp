@@ -28,6 +28,9 @@
         background-color: #CEEBD3;
         border: none
     }
+    .page_chevron{
+    	position:absolute;
+    }
 </style>
 </head>
 <body>
@@ -57,24 +60,25 @@
 			<div class="list" style="clear: both;">
 				<div id="contentMenu" class="tabbable tabs-right" style="">
 
-            					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs">
+            					<ul class="nav nav-tabs sidebar_section span4" id="pageTabs" style="float: left;margin-left: 0px;  margin-right: 20px;list-style: outside none none;">
                                                 <li><h5><g:message code="default.pages.label" /></h5></li>
 						<g:each in="${newsletters}" var="newsletterInstance" status="i">
 	                        <g:if test="${newsletterInstance.parentId ==0}">                        
-		                        <li id="newsletter_${newsletterInstance.id}">
+		                        <li class="newsletter_parent" id="newsletter_${newsletterInstance.id}">
 		                            <a data-toggle="tab" class="pageTab" href="#${newsletterInstance.id}">
-		                            	<p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:13px;margin-bottom:2px;">
+		                            	<p style="width: 300px;overflow:hidden;padding-top: 5px; margin-bottom: 5px;text-overflow:ellipsis;white-space:nowrap;height:13px;margin-bottom:2px;">
 		                                	${fieldValue(bean: newsletterInstance, field: "title")}
 		                                </p>
 		                            	<sUser:permToReorderPages model="['userGroupInstance':userGroupInstance]"><i class="icon-circle-arrow-down pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}","${newsletterInstance.id}", "down", "newsletter")'></i><i class="icon-circle-arrow-up pull-right" onclick='changeDisplayOrder("${uGroup.createLink(controller: 'newsletter', action:'changeDisplayOrder', 'userGroup':userGroupInstance)}", "${newsletterInstance.id}", "up", "newsletter")'></i>
 		                                </sUser:permToReorderPages>
 		                            </a>
-		                                <ul>
+		                            <span class="newsletter_sub_c" style="float: right;top: -25px;position: relative;right: 25px;cursor: pointer;"></span>
+		                                <ul style="margin:0px;list-style: outside none none;" class="subnewsl">
 		                                <g:each in="${newsletters}" var="subnewsl" status="j">
                    	                       <g:if test="${subnewsl.parentId ==newsletterInstance.id}">                        
-			                                	<li id="newsletter_${subnewsl.id}">
-			                                		<a data-toggle="tab" class="pageTab" href="#${subnewsl.id}">
-					                            	<p style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+			                                	<li id="newsletter_${subnewsl.id}"  style="  border: 1px solid #ccc;">
+			                                		<a data-toggle="tab" class="pageTab subAnchor" href="#${subnewsl.id}">
+					                            	<p style=" width: 270px; padding-top: 5px; margin-bottom: 5px; margin-left: 30px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
 					                                	${fieldValue(bean: subnewsl, field: "title")}
 					                                </p>
 					                                </a>
@@ -105,6 +109,17 @@
 
 	<asset:script>
 		$(document).ready(function(){
+			$('#pageTabs ul').hide();
+			$('#pageTabs .newsletter_parent').each(function(){
+				var t = $(this).find('ul li').length;
+				if(t >0 ){ $(this).find('.newsletter_sub_c').html(t+'<i class="icon-chevron-right page_chevron"></i>'); }
+			});
+
+			/*$('.newsletter_sub_c').click(function(){
+				$('#pageTabs ul').hide();
+				$(this).parent().find('ul').show();
+			});*/
+
 			var baseURL = "${uGroup.createLink('controller':'newsletter', 'action':'show', 'userGroup':userGroupInstance) }";
 			<%if(userGroupInstance ) {%>
 				var pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
@@ -112,6 +127,13 @@
 				var pageURL = "/page";
 			<%}%>
 	        $('#pageTabs a').click(function (e) {
+  				$('#pageTabs li').removeClass('active');  	
+  				if(!$(this).hasClass('subAnchor')){
+  					$('#pageTabs .subnewsl').hide(); 
+  					$('.page_chevron').removeClass('icon-chevron-down').addClass('icon-chevron-right');
+  					$(this).parent().find('.page_chevron').removeClass('icon-chevron-right').addClass('icon-chevron-down');
+  				}
+  				$(this).parent().find('.subnewsl').show(); 
   				
   				var me = $(this);
   				var contentID = me.attr('href');//e.target.hash; //get anchor
@@ -120,7 +142,8 @@
 	  				var History = window.History;
 		           	$(contentID).load(baseURL+'/'+contentID.replace('#','')+' #pageContent', function(){
 				    	History.pushState({state:1}, document.title, pageURL+'/'+contentID.replace('#',''));
-		            	me.tab('show');		            	
+		            	me.tab('show');
+		            	$( '.cycle-slideshow' ).cycle();
 		           	});
 	           	} 
 			});

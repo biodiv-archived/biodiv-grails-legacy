@@ -84,7 +84,7 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 */
 	public getFBLoginCookie(HttpServletRequest request) {
 		String cookieName = "fb_login"
-		log.debug "looking for cookie named $cookieName";
+		//log.debug "looking for cookie named $cookieName";
 		return request.cookies.find { Cookie it ->
 			//log.debug("Cookie $it.name, expected $cookieName")
 			return it.name == cookieName

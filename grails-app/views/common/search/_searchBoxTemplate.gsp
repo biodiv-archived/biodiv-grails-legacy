@@ -1,4 +1,7 @@
 <%@page import="species.utils.Utils"%>
+<%@ page import="species.groups.SpeciesGroup"%>
+<%@ page import="species.Habitat"%>
+
 
 <div id='searchToggleBox' class="input-append" style="z-index:1">
 	<form method="get"
@@ -75,6 +78,7 @@ googleOAuthSuccessUrl : "/oauth/google/success",
         'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
         'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
         'inviteFormUrl' : "${uGroup.createLink(controller:'species', action: 'invite','userGroup':userGroupInstance)}",
+        'inviteAddFormUrl' : "${uGroup.createLink(controller:'namelist', action: 'addPermission','userGroup':userGroupInstance)}",
         'saveModifiedSpecies' : "${uGroup.createLink(controller:'species', action:'saveModifiedSpeciesFile','userGroup':userGroupInstance) }",
         'generateNamesReportURL' : "${uGroup.createLink(controller:'species', action:'generateNamesReport','userGroup':userGroupInstance) }",
         'uploadSpecies' : "${uGroup.createLink(action:'upload', controller:'species', 'userGroup':userGroupInstance)}",
@@ -92,9 +96,12 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
         uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
         distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+        distinctIdentifiedRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctIdentifiedReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action,userGroup:userGroupInstance])}",
         speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
         'addRecommendationVoteURL' : "${uGroup.createLink(controller:'observation', action:'addRecommendationVote', 'userGroup':userGroupInstance )}",
-        'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}"
+        'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}",
+        'customFieldsUrl':"${uGroup.createLink(controller:'observation', action: 'customFields', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+        'commentsUrl':"${uGroup.createLink(controller:'observation', action: 'comments', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
 
         },
         'recommendation': {
@@ -136,6 +143,13 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         },
         'dataset':{
             'deleteUrl':"${uGroup.createLink(controller:'dataset', action:'delete')}"
+        },
+        'trait' : {
+            'matchingSpeciesListUrl':"${uGroup.createLink(controller:'trait', action: 'matchingSpecies', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+            'listUrl':"${uGroup.createLink(controller:'trait', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+        },
+        'fact' : {
+            'updateFactUrl' : "${uGroup.createLink(controller:'fact', action:'update', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
         }
         <sUser:isAdmin>
         ,
@@ -164,7 +178,8 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
                 "re":"${g.message(code:'resubmit.form')}",
                 "sub":"${g.message(code:'resubmit.login')}",
                 "un":"${g.message(code:'service.later')}",
-                "er":"${g.message(code:'fix.errors')}"
+                "er":"${g.message(code:'fix.errors')}",
+                "type":"${g.message(code:'placeholder.name.email')}"
                 
             },
             "ajaxLogin" : {
@@ -283,7 +298,17 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
                 "mrecord" :"${g.message(code:'maps.all.records')}",
                 "moccur"  :"${g.message(code:'maps.occurence.records')}",
                 "msearch" :"${g.message(code:'default.search')}",
-                "noselect":"${g.message(code:'maps.no.selected')}"
+                "noselect":"${g.message(code:'maps.no.selected')}",
+                "nofeatureselect":"${g.message(code:'maps.no.featured.select')}",
+                "reset":"${g.message(code:'maps.reset')}",
+                "det":"${g.message(code:'maps.details')}",
+                "ln":"${g.message(code:'maps.link')}",
+                "but_1":"${g.message(code:'maps.legend.button1')}",
+                "but_2":"${g.message(code:'maps.legend.button2')}",
+                "but_3":"${g.message(code:'maps.legend.button3')}",
+                "but_4":"${g.message(code:'maps.legend.button4')}",
+                "resAll":"${g.message(code:'maps.resetall')}"
+
             }      
 
 
@@ -305,5 +330,17 @@ $(document).ready(function(){
         $(this).next().slideToggle('slow');
    });
 });
+
+	function setDefaultGroup(){
+		var defId = "#group_" + "${SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
+		$(defId).click();
+	}
+	function setDefaultHabitat(){
+		var defId = "#habitat_" + "${Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id}"
+		$(defId).click();
+	}
+	$(document).ready(function() {
+			initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");
+	});
 
 </script>

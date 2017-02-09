@@ -25,7 +25,7 @@ class NamesParser {
 	 * @return List of IName objects
 	 */
 	List<TaxonomyDefinition> parse(List<String> names) {
-		log.debug "Parsing names : "+names;
+		//log.debug "Parsing names : "+names;
 		def cleanNames = [];
 		List<TaxonomyDefinition> parsedNames = new ArrayList<TaxonomyDefinition>();
 		for(name in names) {
@@ -36,7 +36,7 @@ class NamesParser {
 			def parsedNamesJSON = gniNamesParser(cleanNames);
 			parsedNames.addAll(getParsedNames(parsedNamesJSON));
 			cleanNames.clear();
-			log.debug "Finished parsing rest of the names";
+			//log.debug "Finished parsing rest of the names";
 		}
 
 		return parsedNames;
@@ -68,15 +68,15 @@ class NamesParser {
 
 	private def gniNamesParser(names) {
 		def parsedJSON = []
-		log.debug "Opening a socket connection to ${config.speciesPortal.names.parser.serverURL}:${config.speciesPortal.names.parser.port}";
+		//log.debug "Opening a socket connection to ${config.speciesPortal.names.parser.serverURL}:${config.speciesPortal.names.parser.port}";
 		def s = new Socket(config.speciesPortal.names.parser.serverURL, config.speciesPortal.names.parser.port);
 		s.withStreams { input, output ->
 			names.each { name ->
 				if(name) {
-                    log.debug "sending ${name}"
+                    //log.debug "sending ${name}"
                     output << name + "\n"
                     def result = input.newReader().readLine()
-                    log.debug result;
+                    //log.debug result;
                     parsedJSON.add(JSON.parse(result));
                 } else {
 				    parsedJSON.add(null);
@@ -167,6 +167,10 @@ class NamesParser {
                             
 						}
 
+						if((part.infraspecies instanceof List) && part.infraspecies[0]){
+							 parsedName.authorYear = part.infraspecies[0]?.authorship?.toString();
+						}
+
 						if(sciName.hybrid) {
 							//hybridName.addToNames(parsedName);
 						}
@@ -192,7 +196,7 @@ class NamesParser {
 	 */
 	public String getItalicisedForm(sciName) {
 		def name = sciName.verbatim;
-		log.debug "Italicising scientific name  : "+name;
+		//log.debug "Italicising scientific name  : "+name;
 		BitSet flags = new BitSet(name.length());
 
 		def italicisedForm = name;
@@ -211,11 +215,11 @@ class NamesParser {
 		while(matcher.find()) {
 			flags.set(matcher.start()+1);
 			flags.set(matcher.end());
-			log.debug matcher.start()
-			log.debug matcher.end();
+			//log.debug matcher.start()
+			//log.debug matcher.end();
 		}
 
-		log.debug "Italicizing positions : "+flags
+		//log.debug "Italicizing positions : "+flags
 
 		int start = 0;
 		int prevStart = 0;
@@ -242,7 +246,7 @@ class NamesParser {
 		italicisedForm += "</i>";
 		italicisedForm = italicisedForm.replaceAll(/\<i\>\s*\<\/i\>/, " ");
 		italicisedForm = italicisedForm.replaceAll(/\<i\>\s*,\s*<\/i\>/, ", ");
-		log.debug "Italicized form : "+italicisedForm
+		//log.debug "Italicized form : "+italicisedForm
 		return italicisedForm;
 	}
 }

@@ -19,11 +19,9 @@
 		</div>
 		<div class="observation thumbwrap">
 			<div class="observation">
-				<div>
 					<obv:showObservationFilterMessage
 						model="['observationInstanceList':observationInstanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'observation']" />
 						
-				</div>
 				<div style="clear: both;"></div>
 				
 				
@@ -182,11 +180,13 @@
         if(${params.taxon?:false}){
             taxonBrowserOptions['taxonId'] = "${params.taxon}";
         }
+        
+        $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
 
         $('.list').on('updatedGallery', function() {
-            $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
             loadSpeciesGroupCount();
             updateDistinctRecoTable();
+            updateDistinctIdentifiedRecoTable();
         });
     });
 
@@ -218,6 +218,48 @@ $(document).ready(function() {
         //refreshList(mapLocationPicker.getSelectedBounds());
         $("#bounds").val('');
         refreshMapBounds(mapLocationPicker);
+    });
+
+/*    $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
+        if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+            $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+            if($(this).hasClass('btn-success')) 
+                $(this).removeClass('active btn-success');
+            else
+                $(this).addClass('active btn-success');
+        } else {
+            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+            $(this).addClass('active btn-success');
+        }
+
+        return false;
+    });*/
+        $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('btn-success')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else if($(this).hasClass('SINGLE_CATEGORICAL')){
+                if($(this).hasClass('btn-success')) {
+                    $(this).removeClass('active btn-success');
+                }
+                else{
+                    $(this).parent().parent().find('.all, .any, .none, button').removeClass('active btn-success');
+                    $(this).addClass('active btn-success');
+                }
+            }
+            return false;
+        });
+
+    $(document).on("click",".recommendations .nav.nav-tabs a",function(e) {
+       var tab = $(this).attr("href");
+       if($(this).hasClass('traits')) {
+        loadTraits($(this), tab);
+       } else if($(this).hasClass('customFields')) {
+        loadCustomFields($(this), tab);
+       }
     });
 
 });

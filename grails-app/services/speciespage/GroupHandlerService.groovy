@@ -26,7 +26,7 @@ class GroupHandlerService {
 
     def dataSource
 
-	static int BATCH_SIZE = 50;
+	static int BATCH_SIZE = 25;
 
 	def speciesGroupMappings;
 
@@ -114,8 +114,8 @@ class GroupHandlerService {
         long startTime = System.currentTimeMillis();
         int count = 0;
 
-        //        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        //        dataSource.setUnreturnedConnectionTimeout(500);
+        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+        dataSource.setUnreturnedConnectionTimeout(500);
 
         def conn;
         while(true) {
@@ -128,7 +128,6 @@ class GroupHandlerService {
                 } else {
                     taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
                 }
-                println taxonConcepts
                // TaxonomyDefinition.withNewTransaction {
                     taxonConcepts.each { taxonConceptRow ->
                         def taxonConcept = TaxonomyDefinition.get(taxonConceptRow.id);
@@ -139,7 +138,7 @@ class GroupHandlerService {
                     }
 
 
-                    if(count && count == BATCH_SIZE) {
+                    if(count == BATCH_SIZE) {
                         cleanUpGorm();
                         noOfUpdations += count;
                         count = 0;
@@ -163,7 +162,8 @@ class GroupHandlerService {
 			cleanUpGorm();
 			noOfUpdations += count;
 		}
-		
+        log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+        dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		log.info "Updated group for taxonConcepts ${noOfUpdations} in total"
 		log.info "Time taken to update groups for taxonConcepts ${noOfUpdations} is ${System.currentTimeMillis()-startTime}(msec)";
 		return noOfUpdations;
@@ -203,8 +203,10 @@ class GroupHandlerService {
         def ibpParentTaxon;
         if(taxonConcept instanceof SynonymsMerged) {
             def acceptedTaxonConcept = taxonConcept.fetchAcceptedNames()[0];
-			acceptedTaxonConcept.postProcess()
-            ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+            if(acceptedTaxonConcept) {
+                acceptedTaxonConcept.postProcess()
+                ibpParentTaxon = acceptedTaxonConcept.parentTaxonRegistry(classification).values()[0];
+            }
         } else {
 			taxonConcept.postProcess()
             ibpParentTaxon = taxonConcept.parentTaxonRegistry(classification).values()[0];
@@ -246,7 +248,7 @@ class GroupHandlerService {
 	/**
 	 * returns the groups if there is a match with mappings defined 
 	 */
-	private SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
+	SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
 		SpeciesGroup group;
 		if(!speciesGroupMappings) {
 			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
@@ -262,6 +264,21 @@ class GroupHandlerService {
 		}
 		return group;
 	}
+
+    List<TaxonomyDefinition> getTaxonByMapping(SpeciesGroup group) {
+ 		List taxons = [];
+		if(!speciesGroupMappings) {
+			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
+		}
+		
+		speciesGroupMappings.each { mapping ->
+			if((group.id.equals(mapping.speciesGroup.id))) {
+                //TODO:optimize following by having taxonids in speciesGroupMapping
+                taxons << TaxonomyDefinition.findByCanonicalFormAndRank(mapping.taxonName, mapping.rank);
+			}
+		}
+		return taxons;
+    }
 
 	/**
 	 * returns the group for the closest ancestor.

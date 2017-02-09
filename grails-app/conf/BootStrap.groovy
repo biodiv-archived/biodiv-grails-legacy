@@ -39,6 +39,7 @@ class BootStrap {
 	def emailConfirmationService
 	def userGroupService
     def utilsService
+    def speciesTraitsService;
 	/**
 	 * 
 	 */
@@ -54,6 +55,8 @@ class BootStrap {
         initJSONMarshallers();
         initCaches();
         initBannerMessageMap();
+        initFiltersMap();
+        //speciesTraitsService.init();
        
   	}
 
@@ -167,6 +170,7 @@ class BootStrap {
                     url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
 
                 }
+
                 return [url: url]
 			} else {
 				//TODO
@@ -208,6 +212,10 @@ class BootStrap {
 
 	def initBannerMessageMap() {
 		utilsService.loadBannerMessageMap();
+	}
+
+	def initFiltersMap(){
+		utilsService.loadFilterMap();
 	}
 	/**
 	 * 

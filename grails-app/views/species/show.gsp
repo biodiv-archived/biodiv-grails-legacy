@@ -31,7 +31,7 @@
         def gThumbnail = r.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix)?:null;
         if(r && gThumbnail) {
         if(r.type == ResourceType.IMAGE) {
-        imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.resources.serverURL,	file: gThumbnail)
+        imagePath = g.createLinkTo(base:grailsApplication.config.speciesPortal.resources.serverURL, file: gThumbnail)
         } else if(r.type == ResourceType.VIDEO){
         imagePath = r.thumbnailUrl()
         }
@@ -98,6 +98,8 @@
                 margin-left:-15px;
             }           
             .citation{background-color:white;padding:15px;} 
+            .reco-comment-table{ right: inherit; }
+            .edit_trait{float:right}
         </style>
 
         <!--[if lt IE 8]><style>
@@ -219,8 +221,34 @@
                 </div>
 
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
+                
                 <div class="span12" style="margin-left:0px">
-
+                    <g:if  test="${traitInstanceList}">
+                    <div class="trait_panel">
+                    <div class="sidebar_section" style="margin:10px 0px;">
+                    <g:if test="${isSpeciesContributor}">
+                    <button class="btn btn-primary pull-right edit_trait"> ${g.message(code:'default.button.edit.label')}</button>
+                    </g:if>
+                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>${g.message(code:'traits.label')}</h5></a>
+                    <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
+                    <div id="traits" class="trait">
+                   <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true]"/>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="trait_edit_panel">
+                    <div class="sidebar_section" style="margin:10px 0px;">
+                    <button class="btn btn-primary pull-right edit_save">Save</button>
+                    <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>${g.message(code:'traits.label')}</h5></a>
+                    <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
+                    <div id="traits" class="trait">
+                    <g:render template="/trait/showTraitListTemplate" model="['instanceList':allTraitList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true,'editable':true]"/>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    </g:if>
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
                     
                     <g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
@@ -248,7 +276,7 @@
                         </s:hasContent>
                         </g:each>
                     </ul>
-                </div>			
+                </div>          
                 <g:if test="${!sparse}">
                 <div id="speciesFieldContainer" class="grid_12"></div>
                 </g:if>
@@ -274,7 +302,7 @@
                         ${g.message(code:'info.about.map.species')}
                     </div>
 
-                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />	
+                    <comment:showCommentPopup model="['commentHolder':[objectType:ActivityFeedService.SPECIES_MAPS, id:speciesInstance.id], 'rootHolder':speciesInstance, 'userLanguage':userLanguage]" />  
 
                     </div-->
                     <!-- Citation  -->
@@ -334,21 +362,48 @@
             taxonRanks.push({value:"${t.ordinal()}", text:"${g.message(error:t)}"});
             </g:each>
 
-            </script>	
+            </script>   
             <asset:script>
             $(document).ready(function() {
                 var uploadResource; 
+                $('.trait_edit_panel').hide();
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
+                $('.observations_list').removeClass('observations_list');
                 window.params.queryParamsMax = 8;
                 intializesSpeciesHabitatInterest(false);
                 updateGallery('/species/list', 8, 0, undefined, true,undefined,undefined,undefined,undefined,false);
                 var getResourceUrl = "${uGroup.createLink(controller:'species', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
                 galleryAjax(getResourceUrl+'/'+${speciesInstance.id},'species');
+
+        $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('btn-success')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else if($(this).hasClass('SINGLE_CATEGORICAL')){
+                if($(this).hasClass('btn-success')) {
+                    $(this).removeClass('active btn-success');
+                }
+                else{
+                    $(this).parent().parent().find('.all, .any, .none, button').removeClass('active btn-success');
+                    $(this).addClass('active btn-success');
+                }
+            }
+            return false;
+        });
+        $('.edit_trait').click(function(){
+            $('.trait_edit_panel').show();
+            $('.trait_panel').hide();
+        });
+        $('.edit_save').click(function(){
+            $('.trait_edit_panel').hide();
+            $('.trait_panel').show();
             });
-
-
+        });
             </asset:script>
         </body>
 

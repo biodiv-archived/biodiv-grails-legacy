@@ -13,6 +13,12 @@
     .latlng{
         margin-left: 285px !important;
     }
+    .sidebar_section{
+        margin-bottom:0px;
+    }
+    .collapse{
+        height:0px;
+    }
 </style>
 </head>
 <body>
@@ -67,9 +73,15 @@
                         </div>
                     </div>
                 </div>
+ 
+				<g:render template="customFieldsForm" model="['observationInstance':observationInstance, 'userGroupInstance':userGroupInstance]"/>
                 
-                <div class="span12 super-section"  style="clear: both">
-				 	<g:render template="customFieldsForm" model="['observationInstance':observationInstance, 'userGroupInstance':userGroupInstance]"/>
+                <div class="span12 super-section"  style="clear: both;height:500px;overflow-x:hidden;">
+                <h3>Traits</h3>
+                <input id="traits" name="traits" type="hidden" value=""/>
+                <% def emptyTraitListInitializer = ['instanceList':[], 'count':0, 'fromObservationCreate':true];
+                emptyTraitListInitializer['queryParams'] = [:];%>
+                    <g:render template="/trait/showTraitListTemplate" model='emptyTraitListInitializer'/>
 				</div>
                 
                 <div class="span12 super-section"  style="clear: both">
@@ -137,6 +149,7 @@
 
 
 $(document).ready(function(){
+
     var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
     uploadResource.POLICY = "${policy}";
     uploadResource.SIGNATURE = "${signature}";
@@ -152,6 +165,29 @@ $(document).ready(function(){
     $(".CustomField_multiselectcombo").multiselect();
 
     intializesSpeciesHabitatInterest(false);
+
+    $('#speciesGroupFilter button').click(function(){
+        updateGallery('/trait/list?isObservationTrait=true&displayAny=false', -1, 0, undefined, true);
+    });
+
+    <%def paramStr = (queryParams && queryParams.trait) ? queryParams.trait.collect { k,v -> "trait.$k=$v" }.join('&'):'' %>
+    updateGallery('/trait/list?isObservationTrait=true&displayAny=false&${raw(paramStr)}', -1, 0, undefined, true, undefined, undefined, undefined, undefined, false);
+    
+
+    
+    $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none', function(){
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('btn-success')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else {
+                $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+                $(this).addClass('active btn-success');
+            }
+      return false;
+    });
 });
 
 function deleteObservation(){

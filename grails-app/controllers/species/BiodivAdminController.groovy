@@ -347,12 +347,12 @@ def user = {
  * 
  */
 def contentupdate(){
-    String content = params.content?.trim()
+      String content = params.content?.trim()
     String group = params.groupName?.trim()
 
     try {
         def bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);
-        bannerMessageFile.append('\n'+group+content);
+        bannerMessageFile.append('\n'+group+"_"+utilsService.getCurrentLanguage(request).threeLetterCode+"-"+content);
         utilsService.loadBannerMessageMap();
         flash.message = "Updated banner message content successfully!"
         redirect(action: "index")

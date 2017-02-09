@@ -56,4 +56,7 @@ class SynonymsMerged extends TaxonomyDefinition {
 		super.beforeInsert()
 	}
 	
+    def beforeUpdate(){
+        super.beforeUpdate()
+    }
 }

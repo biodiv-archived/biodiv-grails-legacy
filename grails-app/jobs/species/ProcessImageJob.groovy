@@ -10,6 +10,7 @@ import species.participation.ProcessImage;
 
 class ProcessImageJob {
     static triggers = {
+        println "==========================Setting trigger for ProcessImageJob";
       simple repeatInterval: 1000l // execute job once in 5 seconds
     }
 

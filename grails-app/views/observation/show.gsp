@@ -8,6 +8,7 @@
 <%@page import="species.Resource"%>
 <%@page import="speciespage.ChartService"%>
 <%@page import="species.participation.Featured"%>
+<%@page import="species.UtilsService"%>
 
 <html>
 <head>
@@ -123,8 +124,12 @@ if(r) {
 
                 <obv:showStory
                 model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
-
-                <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+                <g:if test="${customFields?.size() > 0}">
+                    <div style="margin-top:8px;" class="sidebar_section">
+                        <h5><g:message code="heading.customfields" /></h5>
+                        <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+                    </div>  
+                </g:if>
 
 
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
@@ -156,7 +161,7 @@ if(r) {
                                             value="${observationInstance.id}" />
                                     
                                      <input type="submit"
-                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right" style="position: relative; border-radius:4px;right: 4px;" />
+                                            value="${g.message(code:'title.value.add')}" class="btn btn-primary btn-small pull-right comment-post-btn" />
                                             <div style="clear:both"></div>
                                 </div>
                                 
@@ -165,7 +170,18 @@ if(r) {
                         </div>
                         
                                             </div>
-                                                                                       
+                    <g:set var="utilsService" bean="utilsService"/>
+                    <g:if  test="${traitInstanceList}">
+                    <div class="sidebar_section" style="margin:10px 0px;">
+                        <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>Traits</h5></a>
+                        <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
+                            <div id="traits" class="trait">
+                                <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'fromObservationShow': 'show', 'fromSpeciesShow':true, 'instance':observationInstance, displayAny:false, editable:true, 'ifOwns':utilsService.ifOwns(observationInstance.author)]"/>
+                            </div>
+                        </div>
+                        </div>
+                    </g:if>
+                                                                                      
                     <uGroup:objectPostToGroupsWrapper 
                         model="['observationInstance':observationInstance, 'objectType':observationInstance.class.canonicalName]"/>
 
@@ -180,6 +196,7 @@ if(r) {
                             </div>
                         </div>  
                         </g:if>
+                    
                         <div class="union-comment">
                     <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage]" />
                     <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
@@ -217,9 +234,6 @@ $(document).ready(function(){
    
     var observationId = ${observationInstance.id};
     $(document).ready(function(){
-<%--        initRelativeTime("${uGroup.createLink(controller:'activityFeed', action:'getServerTime')}");--%>
-<%--        dcorateCommentBody($('.yj-message-body')); --%>      
-
         
         $('#voteCountLink').click(function() {
             $('#voteDetails').show();
@@ -238,7 +252,7 @@ $(document).ready(function(){
                  
         $(".nav a.disabled").click(function() {
             return false;
-        })
+        });
 
         preLoadRecos(3, 0, false,observationId);
         //loadObjectInGroups();
@@ -252,7 +266,7 @@ $(document).ready(function(){
             $('.nameContainer input').removeAttr("disabled");
             $('.iAgree button').removeClass("disabled");
         } 
-        initializeLanguage(); 
+        initializeLanguage();
         $(".CustomField_multiselectcombo").multiselect();
         
         var getResourceUrl = "${uGroup.createLink(controller:'observation', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
@@ -260,6 +274,24 @@ $(document).ready(function(){
         initializeSpeciesGroupHabitatDropdowns();
 
 
+        $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('btn-success')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else if($(this).hasClass('SINGLE_CATEGORICAL')){
+                if($(this).hasClass('btn-success')) {
+                    $(this).removeClass('active btn-success');
+                }
+                else{
+                    $(this).parent().parent().find('.all, .any, .none, button').removeClass('active btn-success');
+                    $(this).addClass('active btn-success');
+                }
+            }
+            return false;
+        });
 
 
     });

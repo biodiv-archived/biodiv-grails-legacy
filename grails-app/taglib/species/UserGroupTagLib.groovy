@@ -275,6 +275,7 @@ class UserGroupTagLib {
 		def user = springSecurityService.getCurrentUser();
 		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
 		def result = [:]
+	
 		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again
 			def obvInUserGroups = attrs.model.observationInstance.userGroups.intersect(userGroups)
@@ -283,8 +284,7 @@ class UserGroupTagLib {
 				result[it] = true;
 			}
 		}
-
-		userGroups.each {
+	userGroups.each {
 			result[it] = false;
 		}
 		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:['userGroups':result]);
@@ -360,7 +360,6 @@ class UserGroupTagLib {
 	def aclUtilService
 	def gormUserDetailsService
 	def perm = { attrs, body ->
-		println aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(attrs.model.user.email, true), attrs.model.userGroupInstance, attrs.model.permission)
 		//println aclUtilService.readAcl(attrs.model.userGroupInstance);
 	}
 
@@ -395,7 +394,7 @@ class UserGroupTagLib {
 					out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':g.message(code:'suser.member.label'), 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				case expertRole.id :
-                    out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Expert of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
+                    out << render(template:"/common/userGroup/showUserGroupsTemplate", model:['title':'Moderator of', 'userGroupInstanceList':it.value.collect{it.userGroup}]);
 					break;
 				default :
 					log.error "Invalid role id for user ${userInstance} : ${it}"
@@ -493,7 +492,7 @@ class UserGroupTagLib {
 
 	def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
 
-			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
+			out <<  "<div class=countvaluecontributed>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
 
 
 	}

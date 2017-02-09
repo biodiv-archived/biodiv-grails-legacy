@@ -30,7 +30,6 @@ import grails.util.Environment
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
-import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationEntryPoint
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import species.auth.DefaultOauthUserDetailsService;
@@ -44,7 +43,8 @@ import grails.rest.render.json.JsonRenderer;
 import org.codehaus.groovy.grails.web.mime.MimeType;
 import species.participation.Comment;
 import species.auth.RestTokenValidationFilter;
-
+import species.MyEntityInterceptor;
+import species.auth.AjaxAwareAuthenticationEntryPoint;
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
@@ -57,7 +57,7 @@ beans = {
         useReferer = true // false
         redirectStrategy = ref('redirectStrategy')
     }
-
+    
     // default 'authenticationEntryPoint'
     //overriding entry point defined in rest plugin to redirect to login page on accessdenied exception. Workd only when anonymous auth is present in the session
     authenticationEntryPoint(AjaxAwareAuthenticationEntryPoint, conf.auth.loginFormUrl) { // '/login/auth'
@@ -66,6 +66,7 @@ beans = {
         useForward = conf.auth.useForward // false
         portMapper = ref('portMapper')
         portResolver = ref('portResolver')
+        userGroupService = ref('userGroupService') 
     }
 
     /** securityContextRepository */
@@ -351,7 +352,7 @@ beans = {
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
-        unreturnedConnectionTimeout = 50 // seconds
+        //unreturnedConnectionTimeout = 50 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
      } 
@@ -441,6 +442,8 @@ beans = {
     }
 
     webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
+    entityInterceptor(species.MyEntityInterceptor);
+
 }
 
 

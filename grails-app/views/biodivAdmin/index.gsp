@@ -39,7 +39,13 @@
             </div>
    
         <g:set var="utilsService" bean="utilsService"/>
-
+        <% def userFilePath=grailsApplication.config.speciesPortal.userDetailsFilePath %>
+        <div>
+            <h5>User Profile Download</h5>
+            <ul>
+                <li><td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadUserFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:userFilePath])}"><g:message code="button.download.user" /></a></td></li>
+            </ul>
+        </div>
         <h5>Banner Message</h5>
 
         <form class="form-horizontal" id="frmgroup" method="post" action="${uGroup.createLink(controller:'biodivAdmin', action:'getMessage')}"> 
@@ -69,7 +75,7 @@
         </div>
         <div class="banner_editor">
         <form class="form-horizontal" id="frmcontent" class="frmcontent" method="post" action="${uGroup.createLink(controller:'biodivAdmin', action:'contentupdate')}"> 
-        <input type="hidden" name="groupName" value="${getGroup+" - "}"/>
+        <input type="hidden" name="groupName" value="${getGroup}"/>
             <textarea name="content" class="content">
                    ${getMessage}
             </textarea>

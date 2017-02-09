@@ -383,9 +383,9 @@ class XMLConverter extends SourceConverter {
                         language = fieldNode.language[0].value();
 
                         if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.COMMON_NAME, 2, language))) {
-							log.debug "Cammon name added at the time of name update" 
+							//log.debug "Cammon name added at the time of name update" 
                         } else if(category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.SYNONYMS, 2, language))) {
-							log.debug "Synonym added at the time of name update"	
+							//log.debug "Synonym added at the time of name update"	
                         }
                         else if(subcategory && subcategory.equalsIgnoreCase(getFieldFromName(fieldsConfig.GLOBAL_DISTRIBUTION_GEOGRAPHIC_ENTITY, 3, language))) {
                             List<GeographicEntity> countryGeoEntities = getCountryGeoEntity(s, fieldNode);
@@ -417,7 +417,7 @@ class XMLConverter extends SourceConverter {
                             }
 
                         } else if(category && ( category.toLowerCase().endsWith(fieldsConfig.TAXONOMIC_HIERARCHY.toLowerCase()) ||  category.toLowerCase().startsWith("Hiérarchie Taxonomique".toLowerCase()))) {
-                            log.debug "Added Hirerachy at the time of name update" 
+                            //log.debug "Added Hirerachy at the time of name update" 
                         } else {
                             List<SpeciesField> speciesFields = createSpeciesFields(s, fieldNode, SpeciesField.class, species.images[0], species.icons[0], species.audio[0], species.video[0], s.taxonConcept.fetchSynonyms());
                             speciesFields.each {
@@ -443,6 +443,8 @@ class XMLConverter extends SourceConverter {
 		if(!species) return null;
 		
 		try {
+			StringBuilder sb = new StringBuilder()
+			individualNameSumm = ""
 			log.info "Creating/Updating names"
 			//Thread.dumpStack()
 			removeInvalidNode(species);
@@ -485,6 +487,7 @@ class XMLConverter extends SourceConverter {
 				// then the taxonConept is null and sciName of species is saved as concept and is used to create the page
 				taxonConcept = taxonConcept ?: getTaxonConceptFromName(speciesName, rank, true, speciesNameNode);
 				
+				List tmpTaxonList = []
 				if(taxonConcept) {
 					//adding taxonomy classifications
 					TaxonomyRegistry latestHir
@@ -496,17 +499,20 @@ class XMLConverter extends SourceConverter {
 						}else{
 							th.taxonDefinition.updateNameSignature(getUserContributors(speciesNameNode.data))
 						}
+						
+						tmpTaxonList.add(th.taxonDefinition)
 					}
 					
-					println " latest hir -------convertname------------ <<<<<<<<<>>>>>>>>>>>>>>> " + latestHir
+					//println " latest hir -------convertname------------ <<<<<<<<<>>>>>>>>>>>>>>> " + latestHir
 					//taxonConcept.updateNameStatus(targetStatus)
 					taxonConcept.updatePosition(speciesNameNode?.position?.text(), getNameSourceInfo(species), latestHir)
 					updateUserPrefForColCuration(taxonConcept, speciesNameNode)
 					taxonConcept.postProcess()
 					taxonConcept.updateNameSignature(getUserContributors(speciesNameNode.data))
 					
-					List<SynonymsMerged> synonyms;
-
+					List<SynonymsMerged> synonyms = [];
+					List<CommonNames> commNames = []
+					
 					for(Node fieldNode : species.children()) {
 						if(fieldNode.name().equals("field")) {
 							if(!isValidField(fieldNode)) {
@@ -525,10 +531,20 @@ class XMLConverter extends SourceConverter {
 								synonyms = createSynonyms(fieldNode, taxonConcept);
 								synonyms.each {taxonConcept.addSynonym(it); }
 							}else if (category && category.equalsIgnoreCase(getFieldFromName(fieldsConfig.COMMON_NAME, 2, language))) {
-								List<CommonNames> commNames = createCommonNames(fieldNode, taxonConcept);
+								commNames = createCommonNames(fieldNode, taxonConcept);
 							}  
 						}
 					}
+					
+					//writing name summary
+					def s = taxonConcept
+					sb.append(s.name + "|" + s.id+ "|" + s.status + "|" + s.position + "|" + s.rank + "|" + s.matchId)
+					sb.append("|" + tmpTaxonList.collect { it.id + ":" + it.name }.join(">"))
+					sb.append("|" + synonyms.collect { it.name }.join("#"))
+					sb.append("|" + commNames.collect { it.name }.join("#"))
+					individualNameSumm = sb.toString()
+					
+					addToSummary("TaxonConcept id  >>>   " + taxonConcept.id)
 					return taxonConcept;
 				} else {
 					log.error "TaxonConcept is not found"
@@ -654,7 +670,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private List<SpeciesField> createSpeciesFields(Species s, Node fieldNode, Class sFieldClass, Node imagesNode, Node iconsNode, Node audiosNode, Node videosNode, List synonyms) {
-        log.debug "Creating species field from node : =========== "+fieldNode;
+        //log.debug "Creating species field from node : =========== "+fieldNode;
         List<SpeciesField> speciesFields = new ArrayList<SpeciesField>();
         Field field = getField(fieldNode, false);
         if(field == null) {
@@ -676,7 +692,6 @@ class XMLConverter extends SourceConverter {
                 fetchMode 'attributors', FetchMode.JOIN
             }
         }
-
         Language language = field.language;
 
         for(Node dataNode : fieldNode.data) {
@@ -738,7 +753,12 @@ class XMLConverter extends SourceConverter {
             if(!speciesField) {
                 log.debug "Adding new field to species ${s} ===  " + "  field " + field + "  data " + data
                 //XXX giving default uploader now. At the time of actual save updating this with logged in user.
-                speciesField = sFieldClass.newInstance(field:field, description:data);
+                if(field.connection != 81){
+                	speciesField = sFieldClass.newInstance(field:field, description:data);
+                }else{
+                	speciesField =  sFieldClass.newInstance(field:field, description:"dummy");                
+                }
+
             } else {
                 log.debug "Overwriting existing ${speciesField}. Removing all metadata associate with previous field."
                 speciesField.description = data;
@@ -759,7 +779,13 @@ class XMLConverter extends SourceConverter {
                 audienceTypes.each { speciesField.addToAudienceTypes(it); }
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
-                references.each { speciesField.addToReferences(it); }
+                if(field.connection == 81 ){
+					def ref = new Reference(title:data);
+                    speciesField.addToReferences(ref);                	
+            	}else{
+					references.each { speciesField.addToReferences(it); }            		
+            	}
+            
                 speciesField.language = language;
                 speciesFields.add(speciesField);
             } else {
@@ -767,6 +793,7 @@ class XMLConverter extends SourceConverter {
                 addToSummary("IGNORING SPECIES FIELD AS THERE ARE NO CONTRIBUTORS FOR SPECIESFIELD ${speciesField}")
             }           
         }
+
         return speciesFields;
     } 
 
@@ -943,19 +970,7 @@ class XMLConverter extends SourceConverter {
     License getLicenseByType(licenseType, boolean createNew) {
         if(!licenseType) return null;
 
-        LicenseType type;
-        if(licenseType instanceof LicenseType) {
-            type = licenseType
-        } else {
-            licenseType = licenseType?.toString().trim();
-            if(!licenseType.startsWith("CC") && !licenseType.equalsIgnoreCase(LicenseType.CC_PUBLIC_DOMAIN.value())) {
-                licenseType = "CC "+licenseType.trim()
-            }
-            if(licenseType.startsWith('CC-')) {
-                licenseType = licenseType.replaceFirst('CC-','CC ');
-            }
-            type = License.fetchLicenseType(licenseType)
-        }
+        LicenseType type = License.fetchLicenseType(licenseType)
 
         if(!type) return null;
 
@@ -1500,6 +1515,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private List<Reference> getReferences(Node dataNode, boolean createNew, TaxonomyDefinition taxon, List synonyms) {
+    	
         List<Reference> references = new ArrayList<Reference>();
 
         NodeList refs = dataNode.reference;
@@ -1638,13 +1654,13 @@ class XMLConverter extends SourceConverter {
 	                def parsedNames = namesParser.parse([cleanName]);
 	                def viaDatasource = null;
 	                if(n.viaDatasource) {
-	                    println "=======SOURCE HAI == == " + n.viaDatasource.text();
+	                    //println "=======SOURCE HAI == == " + n.viaDatasource.text();
 	                    viaDatasource = n.viaDatasource.text();
 	                }
 	                def sfield = saveSynonym(parsedNames[0], rel, taxonConcept, viaDatasource, n, taxonContributors);
 	                if(sfield) {
 	                    //adding contributors
-						println "--------------------- contribtors to be added for " + sfield + "  contr " + getUserContributors(n)
+						//println "--------------------- contribtors to be added for " + sfield + "  contr " + getUserContributors(n)
 	                    sfield.updateContributors(getUserContributors(n))
 	                    synonyms.add(sfield);
 	                }
@@ -1697,6 +1713,7 @@ class XMLConverter extends SourceConverter {
 					//if existing name is acceted then ignoring XXX need to be reported to user
 	                //sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
 					log.error "Ignoring synonym taxon entry as the name existing name is ACCEPTED : "+parsedName.name
+					addToSummary("Ignoring synonym taxon entry as the name existing name is ACCEPTED : "+parsedName.name)
 					return
 	            } else {
 	                sfield = taxon as SynonymsMerged;
@@ -1706,7 +1723,7 @@ class XMLConverter extends SourceConverter {
 			if(dataNode){
 				sfield.updatePosition(dataNode?.position?.text())
 			}
-            println "======== Synonym ============= " + sfield
+            //println "======== Synonym ============= " + sfield
             return sfield;
         } else {
             log.error "Ignoring synonym taxon entry as the name is not parsed : "+parsedName.name
@@ -1852,7 +1869,7 @@ class XMLConverter extends SourceConverter {
                     //              }
 
                     def parsedName = parsedNames.get(i++);
-                    log.debug "Parsed name ${parsedName?.canonicalForm}"
+                    //log.debug "Parsed name ${parsedName?.canonicalForm}"
                     if(parsedName?.canonicalForm) {
                         //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
                         //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
@@ -1895,12 +1912,12 @@ class XMLConverter extends SourceConverter {
                         }
 
                         if(registry) {
-                            log.debug "Taxon registry already exists : "+registry;
+                            //log.debug "Taxon registry already exists : "+registry;
                             if(saveTaxonHierarchy)
                                 registry.updateContributors(getUserContributors(fieldNode.data))
                                 taxonEntities.add(registry);
                         } else if(saveTaxonHierarchy) {
-                            log.debug "Saving taxon registry entity : "+ent;
+                            //log.debug "Saving taxon registry entity : "+ent;
                             if(!ent.save()) {
                                 ent.errors.each { log.error it }
                             } else {
@@ -1976,7 +1993,8 @@ class XMLConverter extends SourceConverter {
                 }
 
                 def parsedName = parsedNames.get(i++);
-                log.debug "Parsed name ${parsedName?.canonicalForm}"
+                def authorYear = parsedName.authorYear;
+                //log.debug "Parsed name ${parsedName?.canonicalForm}"
                 if(parsedName?.canonicalForm) {
                     //TODO: IMP equality of given name with the one in db should include synonyms of taxonconcepts
                     //i.e., parsedName.canonicalForm == taxonomyDefinition.canonicalForm or Synonym.canonicalForm
@@ -2109,7 +2127,7 @@ class XMLConverter extends SourceConverter {
                         return;
                     }
                     if(!fromCOL && taxon && (taxon.position != NamePosition.WORKING )) {
-                        println " =========== got taxon and reusing it  " + taxon
+                        //println " =========== got taxon and reusing it  " + taxon
                         //taxon = null;
                     }
                     boolean addNewNameToSession = (taxon && taxon.id)?false:true
@@ -2236,6 +2254,15 @@ class XMLConverter extends SourceConverter {
                     taxon.updateNameStatus(fieldNode?.status?.text())
                     //saving taxon new position
                     taxon.updatePosition(fieldNode?.position?.text(), null, null, parsedName)
+
+                    def nameRunningStatus = fieldNode?.nameRunningStatus?.text();
+                     
+                    if("new".equalsIgnoreCase(nameRunningStatus)){                     
+                       taxon.authorYear=authorYear;
+                       if(!taxon.save(flush:true)) {
+                            taxon.errors.each { println it; log.error it }
+                        }
+                    }
                     
                     if(addNewNameToSession){
                         NamelistService.addNewNameInSession(taxon)
@@ -2259,11 +2286,11 @@ class XMLConverter extends SourceConverter {
                     ent.parentTaxonDefinition = ent.parentTaxon?.taxonDefinition
                     ent.path = path;
                     if(saveTaxonHierarchy) {
-                        log.debug "Saving Taxon registry : " +  ent;
+                        //log.debug "Saving Taxon registry : " +  ent;
                         if(!ent.save(flush:true)) {
                             ent.errors.each { log.error it }
                         } else {
-                            log.debug "Saved taxon registry entity : "+ent;
+                            //log.debug "Saved taxon registry entity : "+ent;
                             ent.updateContributors(getUserContributors(fieldNode.data))
                             taxonEntities.add(ent);
                         }

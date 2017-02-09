@@ -6,7 +6,7 @@ def results = [];
 def sfInstance 	  = category.value.get('speciesFieldInstance');
 def references = [];
 if(sfInstance) {
-
+/*
 if(sfInstance.size() >0 ){
 for (int i = 0; i < sfInstance.size(); i++) {
     if(sfInstance && sfInstance[i]?.description && sfInstance[i]?.description != 'dummy') { %>    	
@@ -18,7 +18,7 @@ for (int i = 0; i < sfInstance.size(); i++) {
     }
   }
 }
-
+*/
 def criteria = SpeciesField.createCriteria();
 results = criteria.list {
     groupProperty('field')
