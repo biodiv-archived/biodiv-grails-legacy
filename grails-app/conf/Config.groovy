@@ -196,6 +196,7 @@ speciesPortal {
     resources {
         rootDir = "${app.rootDir}/img"
         serverURL = "http://localhost.indiabiodiversity.org/${appName}/img"
+        filesutraURL = "http://localhost.filesutra.indiabiodiversity.org"
         images {
             defaultType = "jpg"
             thumbnail {
@@ -781,6 +782,7 @@ environments {
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "http://${servername}/${appName}/img"
+                filesutraURL = "http://filesutra.indiabiodiversity.org"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
