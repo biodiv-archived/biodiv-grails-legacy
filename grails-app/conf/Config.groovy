@@ -653,6 +653,7 @@ environments {
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "http://${servername}/${appName}/img"
+                filesutraURL = "http://filesutra.pamba.strandls.com"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
