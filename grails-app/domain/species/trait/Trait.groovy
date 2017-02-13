@@ -6,6 +6,8 @@ import species.UtilsService;
 import species.Classification;
 import species.SynonymsMerged;
 import grails.util.Holders;
+import species.Language;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 class Trait {
 
@@ -269,5 +271,35 @@ class Trait {
 
     List values() {
         return TraitValue.findAllByTrait(this);
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#name()
+     */
+    @Override
+    public String getName(){
+        def locale = LocaleContextHolder.getLocale();
+        def languageInstance = Language.findByTwoLetterCode(locale);
+        def traitTrans = TraitTranslation.findByTraitAndLanguage(this,languageInstance);
+        return (traitTrans?.name)?:'';
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#name()
+     */
+    @Override
+    public String getDescription(){
+        def locale = LocaleContextHolder.getLocale();
+        def languageInstance = Language.findByTwoLetterCode(locale);
+        def traitTrans = TraitTranslation.findByTraitAndLanguage(this,languageInstance);
+        return (traitTrans?.description)?:'';
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#name()
+     */
+    @Override
+    public String getSource(){
+        def locale = LocaleContextHolder.getLocale();
+        def languageInstance = Language.findByTwoLetterCode(locale);
+        def traitTrans = TraitTranslation.findByTraitAndLanguage(this,languageInstance);
+        return (traitTrans?.source)?:'';
     }
 }
