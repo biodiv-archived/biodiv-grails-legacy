@@ -101,7 +101,8 @@ class TraitController extends AbstractObjectController {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
         }  else {
-            render(view: "create", model: [traitInstance: traitInstance , field: field.concept+'|'+field.category])
+            Language userLanguage = utilsService.getCurrentLanguage(request);
+            render(view: "create", model: [traitInstance: traitInstance , userLanguage:userLanguage,field: field.concept+'|'+field.category])
         }
         return;
     }
@@ -127,7 +128,7 @@ class TraitController extends AbstractObjectController {
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
-        traitInstance.taxon.clear()
+        traitInstance?.taxon?.clear()
         if(params.taxonName){
         def taxonId
         params.taxonName.each{

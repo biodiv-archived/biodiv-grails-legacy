@@ -1,6 +1,8 @@
 <%@page import="java.util.Arrays"%>
 <%@page import="species.trait.Trait"%>
 <%@page import="species.trait.TraitValue"%>
+<%@page import="species.trait.TraitTranslation"%>
+<%@page import="species.trait.TraitValueTranslation"%>
 <%@page import="species.utils.Utils"%>
 <%@page import="species.Classification"%>
 <%@ page import="species.ScientificName.TaxonomyRank"%>
@@ -32,6 +34,14 @@ display:none;
     def form_button_val = "Add Trait"
 
     if(params.action == 'edit' || params.action == 'update'){
+        
+            def traitTrans = TraitTranslation.findByTraitAndLanguage(traitInstance,userLanguage);
+            println traitTrans?.dump()
+            println
+            traitInstance.name = (traitTrans?.name)?:'';
+            traitInstance.description = (traitTrans?.description)?:'';
+            traitInstance.source = (traitTrans?.source)?:'';
+            
             form_action = uGroup.createLink(action:'update', controller:'trait', id:traitInstance.id)
             form_button_name = "${g.message(code:'button.update.trait')}"
             form_button_val = "Update Trait"
@@ -128,6 +138,12 @@ display:none;
                       
                         </tr>
                         <g:each in="${value}" var="val" status="i">
+                        <%
+                        def traitValueTrans = TraitValueTranslation.findByTraitValueAndLanguage(val,userLanguage);
+                        val.value = (traitValueTrans?.value)?:'';
+                        val.description = (traitValueTrans?.description)?:'';
+                        val.source = (traitValueTrans?.source)?:'';
+                        %>
                         <tr>
                         
                         <td>

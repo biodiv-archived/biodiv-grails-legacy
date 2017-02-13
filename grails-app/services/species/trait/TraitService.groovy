@@ -743,11 +743,11 @@ class TraitService extends AbstractObjectService {
                 def traitValTransInstance= TraitValueTranslation.findByTraitValueAndLanguage(traitValueInstance,params.languageInstance);
                 if(!traitValTransInstance)
                     traitValTransInstance = new TraitValueTranslation();
-                traitValTransInstance.name = traitValueInstance.name
+                traitValTransInstance.value = traitValueInstance.value;
                 traitValTransInstance.description = traitValueInstance.description
                 traitValTransInstance.source = traitValueInstance.source
                 traitValTransInstance.language=params.languageInstance
-                traitValTransInstance.trait=traitValueInstance
+                traitValTransInstance.traitValue=traitValueInstance
                 traitValTransInstance.save(flush: true);
                 def msg = "Trait Value Added Successfully"
             }
