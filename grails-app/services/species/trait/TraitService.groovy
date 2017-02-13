@@ -739,6 +739,16 @@ class TraitService extends AbstractObjectService {
             traitValueInstance.icon = getTraitIcon(params["icon_"+i])
 
             if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+
+                def traitValTransInstance= TraitValueTranslation.findByTraitValueAndLanguage(traitValueInstance,params.languageInstance);
+                if(!traitValTransInstance)
+                    traitValTransInstance = new TraitValueTranslation();
+                traitValTransInstance.name = traitValueInstance.name
+                traitValTransInstance.description = traitValueInstance.description
+                traitValTransInstance.source = traitValueInstance.source
+                traitValTransInstance.language=params.languageInstance
+                traitValTransInstance.trait=traitValueInstance
+                traitValTransInstance.save(flush: true);
                 def msg = "Trait Value Added Successfully"
             }
             else{

@@ -1,3 +1,4 @@
+<%@page import="species.trait.TraitTranslation"%>
 <style>
 .sidebar_section{margin-bottom:0px;}
 </style>
@@ -12,7 +13,7 @@ instanceList.each{ iL ->
         instanceFieldList[iL.field] = [iL]
     }
 }
-%>                   
+%>          
  <div class="observations_list trait_list" style="clear: both;">
 	<div class="mainContentList">
 		<div class="mainContent trait_list_content" name="p${params?.offset}">
@@ -29,6 +30,12 @@ instanceList.each{ iL ->
 				<g:each in="${inst.value}" status="i" var="trait_instance">
 				<div data-isNotObservation="${trait_instance.isNotObservationTrait}">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;border:0px !important;">
+					<%						
+				        def traitTrans = TraitTranslation.findByTraitAndLanguage(trait_instance,userLanguage);
+				        trait_instance.name = (traitTrans?.name)?:'';
+				        trait_instance.description = (traitTrans?.description)?:'';
+				        trait_instance.source = (traitTrans?.source)?:'';
+					%>
                     <g:render template="/trait/showTraitTemplate" model="['trait':trait_instance, 'factInstance':factInstance, object:instance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable, 'ifOwns':ifOwns, 'filterable':filterable, numericTraitMinMax:numericTraitMinMax]"/>
 					</li>
 					</div>

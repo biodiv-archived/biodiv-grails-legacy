@@ -121,6 +121,7 @@ class TraitController extends AbstractObjectController {
         params.isNotObservationTrait = (params.isNotObservationTrait)?true:false;
         params.isParticipatory = (params.isParticipatory)?true:false;
         params.showInObservation = (params.showInObservation)?true:false;
+        params.languageInstance = languageInstance
         
         traitInstance.properties = params;
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
@@ -139,6 +140,15 @@ class TraitController extends AbstractObjectController {
     }
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
+            def traitTransInstance= TraitTranslation.findByTraitAndLanguage(traitInstance,params.languageInstance);
+                if(!traitTransInstance)
+                    traitTransInstance = new TraitTranslation();
+            traitTransInstance.name = traitInstance.name
+            traitTransInstance.description = traitInstance.description
+            traitTransInstance.source = traitInstance.source
+            traitTransInstance.language=languageInstance
+            traitTransInstance.trait=traitInstance
+            traitTransInstance.save(flush: true)
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
             def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
             if(params.action=='update'){
@@ -229,12 +239,23 @@ class TraitController extends AbstractObjectController {
 
     def show() {
         Trait traitInstance = Trait.findByIdAndIsDeleted(params.id,false)
+        Language userLanguage = utilsService.getCurrentLanguage(request);
         String msg;
         if(traitInstance) {
             def coverage = traitInstance.taxon
             def traitValue = [];
             Field field;
+            def traitTrans = TraitTranslation.findByTraitAndLanguage(traitInstance,userLanguage);
+                traitInstance.name = (traitTrans?.name)?:'';
+                traitInstance.description = (traitTrans?.description)?:'';
+                traitInstance.source = (traitTrans?.source)?:'';
             traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
+            traitValue.each{ tv ->
+            def traitValTrans = TraitValueTranslation.findByTraitValueAndLanguage(tv,userLanguage);
+                tv.value = (traitValTrans?.value)?:'';
+                tv.description = (traitValTrans?.description)?:'';
+                tv.source = (traitValTrans?.source)?:'';
+            }
             field = Field.findById(traitInstance.fieldId);
             def model = getList(params);
             model['traitInstance'] = traitInstance

@@ -74,32 +74,5 @@ class TraitValue {
         return thumbnailUrl;
     }
 
-    @Override
-    public String getValue(){
-        def locale = LocaleContextHolder.getLocale();
-        def languageInstance = Language.findByTwoLetterCode(locale);
-        def traitTrans = TraitValueTranslation.findByTraitValueAndLanguage(this,languageInstance);
-        return (traitTrans?.value)?:'';
-    }
-    /* (non-Javadoc)
-     * @see java.lang.Object#name()
-     */
-    @Override
-    public String getDescription(){
-        def locale = LocaleContextHolder.getLocale();
-        def languageInstance = Language.findByTwoLetterCode(locale);
-        def traitTrans = TraitValueTranslation.findByTraitValueAndLanguage(this,languageInstance);
-        return (traitTrans?.description)?:'';
-    }
-    /* (non-Javadoc)
-     * @see java.lang.Object#name()
-     */
-    @Override
-    public String getSource(){
-        def locale = LocaleContextHolder.getLocale();
-        def languageInstance = Language.findByTwoLetterCode(locale);
-        def traitTrans = TraitValueTranslation.findByTraitValueAndLanguage(this,languageInstance);
-        return (traitTrans?.source)?:'';
-    }
     
 }
