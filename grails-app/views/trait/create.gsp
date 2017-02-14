@@ -138,6 +138,7 @@ display:none;
                       
                         </tr>
                         <g:each in="${value}" var="val" status="i">
+                        <g:if test="${val.traitValueTranslations}">
                         <%
                         def traitValueTrans = TraitValueTranslation.findByTraitValueAndLanguage(val,userLanguage);
                         val.value = (traitValueTrans?.value)?:'';
@@ -183,6 +184,7 @@ display:none;
                          </div>
                         </td>
                         </tr>
+                        </g:if>
                             </g:each>
                             </table>
                         <g:if test="${params.action=='edit'}">

@@ -128,18 +128,19 @@ class TraitController extends AbstractObjectController {
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
-        traitInstance?.taxon?.clear()
+        traitInstance?.taxon?.clear()       
+        
         if(params.taxonName){
-        def taxonId
-        params.taxonName.each{
-            taxonId=it
-            taxonId = taxonId.substring(taxonId.indexOf("(") + 1);
-            taxonId = taxonId.substring(0, taxonId.indexOf("-"));
-            TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
-            traitInstance.addToTaxon(taxon);
-        }
-    }
-
+            def taxonId
+            params.taxonName = !String.isCase(params.taxonName)?params.taxonName:[params.taxonName];
+            params.taxonName.each{
+                taxonId=it
+                taxonId = taxonId.substring(taxonId.indexOf("(") + 1);                    
+                taxonId = taxonId.substring(0, taxonId.indexOf("-"));                
+                TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
+                traitInstance.addToTaxon(taxon);
+            }
+        }        
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             def traitTransInstance= TraitTranslation.findByTraitAndLanguage(traitInstance,params.languageInstance);
                 if(!traitTransInstance)
