@@ -47,10 +47,12 @@
 						    	<table class="table">
 						    		<tr><th>Icon</th><th>Value</th><th>Description</th><th>Source</th></tr>
 						    			<g:each in="${traitValue}" var="value">
+						    			<g:if test="${traitValue.traitValueTranslations}">
 						    				<tr><td><img
 				                    				 class="user-icon small_profile_pic"
 				                    				 src="${value?.mainImage()?.fileName}" title="${value.value}"
 				                    					alt="${value.value}" /> </td><td>${value.value}</td><td>${value.description}</td><td>${value.source}</td></tr>
+						    			</g:if>
 						    			</g:each>
 						    	</table>
 					    	</td>

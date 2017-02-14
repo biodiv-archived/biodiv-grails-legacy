@@ -738,18 +738,9 @@ class TraitService extends AbstractObjectService {
             traitValueInstance.trait = traitInstance
             traitValueInstance.icon = getTraitIcon(params["icon_"+i])
 
-            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
-
-                def traitValTransInstance= TraitValueTranslation.findByTraitValueAndLanguage(traitValueInstance,params.languageInstance);
-                if(!traitValTransInstance)
-                    traitValTransInstance = new TraitValueTranslation();
-                traitValTransInstance.value = traitValueInstance.value;
-                traitValTransInstance.description = traitValueInstance.description
-                traitValTransInstance.source = traitValueInstance.source
-                traitValTransInstance.language=params.languageInstance
-                traitValTransInstance.traitValue=traitValueInstance
-                traitValTransInstance.save(flush: true);
+            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {               
                 def msg = "Trait Value Added Successfully"
+                updateTraitValueTranslation(traitValueInstance,params.languageInstance);
             }
             else{
                 def errors = [];
@@ -843,5 +834,17 @@ class TraitService extends AbstractObjectService {
         def file_name = file.name.toString();
         return usersDir.absolutePath.replace(rootDir, "")+'/'+file_name;
 
+    }
+
+    def updateTraitValueTranslation(traitValueInstance,languageInstance){
+        def traitValTransInstance= TraitValueTranslation.findByTraitValueAndLanguage(traitValueInstance,languageInstance);
+        if(!traitValTransInstance)
+            traitValTransInstance = new TraitValueTranslation();
+        traitValTransInstance.value = traitValueInstance.value;
+        traitValTransInstance.description = traitValueInstance.description
+        traitValTransInstance.source = traitValueInstance.source
+        traitValTransInstance.language=languageInstance
+        traitValTransInstance.traitValue=traitValueInstance
+        traitValTransInstance.save(flush: true);
     }
 }
