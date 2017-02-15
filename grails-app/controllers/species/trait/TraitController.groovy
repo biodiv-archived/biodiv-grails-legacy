@@ -268,6 +268,7 @@ class TraitController extends AbstractObjectController {
             model['coverage'] = coverage*.name
             model['traitValue'] = traitValueRes
             model['field'] = field.concept
+            model['userLanguage']=userLanguage
             if(traitInstance.dataTypes == DataTypes.NUMERIC) {
             Sql sql = Sql.newInstance(dataSource);
             List numericTraitMinMax =  sql.rows("""
