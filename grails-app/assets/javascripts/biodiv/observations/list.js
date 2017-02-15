@@ -392,13 +392,14 @@ $(document).ready(function(){
                 $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
             }
 
-            $(".trait_range_slider").each(function(){
-                var v = $(this).val();
+            $(".trait_range_slider,.trait_date_range_slider").each(function(){
+                var v = $(this).val().replace(';',':');
                 if(v) {
                     trait = $(this).attr('data-tid');
                     if(trait == tid) {
-                        var a = [$(this).data('slider-min'), $(this).data('slider-max')];
-                        $(this).slider('setValue',a).val('');
+                        var a = [$(this).data('min'), $(this).data('max')];
+                        $(this).data('ionRangeSlider').update({from:$(this).data('min'), to:$(this).data('max')});
+                        $(this).val('');
                     }
                 }
             });
@@ -785,18 +786,18 @@ function getSelectedTrait($traitFilter, putValue) {
             }
         }
     });
-    $(".trait_range_slider").each(function(){
+    $(".trait_range_slider,.trait_date_range_slider").each(function(){
         var v = $(this).val();
         if(v) {
-            v = v.replace(',',':');
-            trait = $(this).attr('data-tid');
-            if(selTrait[trait] == undefined) selTrait[trait]='';
-            selTrait[trait] += v+',';
-        } else if($('input[data-tid]').length == 1) {
-            //is from trait show page
-            selTrait[$(this).attr('data-tid')] = 'any,';
-        };
-
+            v = v.replace(';',':');
+            var x = v.split(':');
+            if($(this).data('min') == x[0] && $(this).data('max') == x[1]) {
+            } else {
+                trait = $(this).attr('data-tid');
+                if(selTrait[trait] == undefined) selTrait[trait]='';
+                selTrait[trait] += v+',';
+            }
+        }
     });
 
     $('.trait_date_range').each(function(){
@@ -805,11 +806,7 @@ function getSelectedTrait($traitFilter, putValue) {
              trait = $(this).attr('data-tid');
             if(selTrait[trait] == undefined) selTrait[trait]='';
             selTrait[trait] += v+',';
-        } else if($('input[data-tid]').length == 1) {
-            //is from trait show page
-            selTrait[$(this).attr('data-tid')] = 'any,';
-        };
-
+        }
     });
     $(".colorpicker-component").each(function(){
         var v = $(this).find('input').val();
@@ -817,13 +814,21 @@ function getSelectedTrait($traitFilter, putValue) {
             trait = $(this).find('input').attr('data-tid');
             if(selTrait[trait] == undefined) selTrait[trait]='';
             selTrait[trait] += v+',';
-        } else if($('input[data-tid]').length == 1) {
-            //is from trait show page
-            selTrait[$(this).find('input').attr('data-tid')] = 'any,';
-        };
+        } 
     });
 
-    return selTrait;
+    //hack for trait show default selection
+    if($('input[data-tid]').length == 1 &&  !selTrait[$('input[data-tid]').attr('data-tid')]) {
+            //is from trait show page
+            selTrait[$('input[data-tid]').attr('data-tid')] = 'any,';
+        };
+
+    var p = {};
+    for(var m in selTrait) {
+        p[m] = selTrait[m].substring(0,selTrait[m].length-1);
+    }
+
+    return p;
 }
 
 function getSelectedTraitStr($traitFilter, putValue) {
@@ -831,7 +836,7 @@ function getSelectedTraitStr($traitFilter, putValue) {
     var traits = getSelectedTrait($traitFilter, putValue);
     var traitsStr = '';
     for(var m in traits) {
-        traitsStr += m+':'+traits[m].substring(0,traits[m].length-1)+';';
+        traitsStr += m+':'+traits[m]+';';
     }
     return traitsStr;
 }

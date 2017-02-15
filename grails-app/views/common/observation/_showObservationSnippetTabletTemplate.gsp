@@ -1,5 +1,6 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.UtilsService"%>
 <g:set var="mainImage" value="${observationInstance?.mainImage()}" />
 <%
 def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource||observationInstance.dataset ? '.png' :null): null;
@@ -155,11 +156,12 @@ def obvId = observationInstance?.id
             </div>
     </div>
     <div style="border:1px solid #FFF;margin-top:4px;border-radius:5px;">
+    <g:set var="utilsService" bean="utilsService"/>
     <ul class="nav nav-tabs nav-justified">
 
         <li class="active"><a href="#${observationInstance.id}_groups" data-toggle="tab">Groups</a></li>
 
-        <li><a href="#${observationInstance.id}_traits" data-toggle="tab" class="traits" data-objectId="${observationInstance.id}" data-objectType="${observationInstance.class.getCanonicalName()}" data-sGroup = "${observationInstance.group.id}" data-isObservationTrait="true" data-isParticipatory="true" data-showInObservation="true">Traits</a></li>
+        <li><a href="#${observationInstance.id}_traits" data-toggle="tab" class="traits" data-objectId="${observationInstance.id}" data-objectType="${observationInstance.class.getCanonicalName()}" data-sGroup = "${observationInstance.group.id}" data-isObservationTrait="true" data-ifOwns="${utilsService.ifOwns(observationInstance.author)}" data-isParticipatory="true" data-showInObservation="true">Traits</a></li>
 
         <li><a href="#${observationInstance.id}_customFields" data-toggle="tab" class="customFields" data-objectId="${observationInstance.id}">Custom Fields</a></li>
 

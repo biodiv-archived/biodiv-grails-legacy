@@ -44,7 +44,7 @@ class TraitController extends AbstractObjectController {
         if(params.filterable) model.filterable = params.filterable?.toBoolean();
         else model.filterable = true;
         if(params.fromObservationShow) model.fromObservationShow = params.fromObservationShow;
- 
+        if(params.ifOwns) model.ifOwns = params.ifOwns.toBoolean();
         //HACK
         if(params.trait) {
             model.queryParams = ['trait':[:]];
@@ -62,8 +62,6 @@ class TraitController extends AbstractObjectController {
         }
 
         model = utilsService.getSuccessModel('', null, OK.value(), model);
-        println model
-        println model.queryParams
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
@@ -269,19 +267,21 @@ class TraitController extends AbstractObjectController {
             model['traitValue'] = traitValueRes
             model['field'] = field.concept
             model['userLanguage']=userLanguage
-            if(traitInstance.dataTypes == DataTypes.NUMERIC) {
-            Sql sql = Sql.newInstance(dataSource);
-            List numericTraitMinMax =  sql.rows("""
-            select min(f.value::float),max(f.to_value::float),t.id from fact f,trait t where f.trait_id = t.id and t.data_types='NUMERIC' and t.id=:traitId group by t.id;
-            """, [traitId:traitInstance.id]);
-            println numericTraitMinMax;
-            println "+++++++++++++++++++"
-            println "+++++++++++++++++++"
-            println "+++++++++++++++++++"
-            println "+++++++++++++++++++"
-            model['numericTraitMinMax'] = numericTraitMinMax;
-            }
 
+            //HACK
+            if(params.trait) {
+                model.queryParams = ['trait':[:]];
+                params.trait.each { t,v ->
+                    model.queryParams.trait[Long.parseLong(t)] = v
+                }
+            }
+            if(traitInstance.dataTypes == DataTypes.NUMERIC) {
+                Sql sql = Sql.newInstance(dataSource);
+                List numericTraitMinMax =  sql.rows("""
+                select min(f.value::float)::integer,max(f.to_value::float)::integer,t.id from fact f,trait t where f.trait_id = t.id and t.data_types='NUMERIC' and t.id=:traitId group by t.id;
+                """, [traitId:traitInstance.id]);
+                model['numericTraitMinMax'] = numericTraitMinMax[0];
+            }
             withFormat {
                 html {
                     render (view:"show", model:model)

@@ -22,7 +22,12 @@ import species.participation.UploadLog;
 import species.trait.Trait;
 import species.trait.Trait.TraitTypes;
 import species.trait.Trait.DataTypes;
-              
+import species.trait.Trait.Units;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
+
+             
 import org.apache.commons.logging.LogFactory;
 import grails.plugin.cache.Cacheable;
 
@@ -473,7 +478,7 @@ class AbstractObjectService {
                 } else if (t.dataTypes == DataTypes.COLOR) {
                     traitJsonQuery += " and cast(traits_json#>>'{${t.id},r}' as integer) is not null ";
                 } else { 
-                    traitQuery += " and t.traits[1##999][1] @> cast(ARRAY[["+d.id+"]] as bigint[])";
+                    traitQuery += " and t.traits[1##999][1] @> cast(ARRAY[["+t.id+"]] as bigint[])";
                 }
             }
         }
@@ -492,8 +497,14 @@ class AbstractObjectService {
                         if(t.dataTypes == DataTypes.DATE) {
                             def range = tvId.split(':'); 
                             if(range.size() == 2) {
-                            //TODO: range value datatype is set to be float... can be date as well
-                            traitJsonQuery += " and (traits_json#>>'{${traitId},from_date}') is not null and daterange(cast(traits_json#>>'{${traitId},from_date}' as date), cast(traits_json#>>'{${traitId},to_date}' as date)) && daterange(to_date('${range[0]}','DD/MM/YYYY'), to_date('${range[1]}','DD/MM/YYYY'))";
+                                if(t.units == Units.MONTH) {
+                                    int getFromMonth = utilsService.getMonthIndex(range[0]);
+                                    int getToMonth = utilsService.getMonthIndex(range[1]);
+                                    traitJsonQuery += " and (traits_json#>>'{${traitId},from_date}') is not null and numrange(cast(extract(month from cast(traits_json#>>'{${traitId},from_date}' as date)) as numeric), cast(extract(month from cast(traits_json#>>'{${traitId},to_date}' as date)) as numeric)) && numrange(${getFromMonth}, ${getToMonth})";
+                                } else {
+                                    //TODO: range value datatype is set to be float... can be date as well
+                                    traitJsonQuery += " and (traits_json#>>'{${traitId},from_date}') is not null and daterange(cast(traits_json#>>'{${traitId},from_date}' as date), cast(traits_json#>>'{${traitId},to_date}' as date)) && daterange(getMonth(to_date('${range[0]}','DD/MM/YYYY'), to_date('${range[1]}','DD/MM/YYYY'))";
+                                }
                             }
                         } else {
                             def range = tvId.split(':'); 
@@ -503,13 +514,7 @@ class AbstractObjectService {
                             }
                         }
                     } else if (t.dataTypes == DataTypes.COLOR) {
-                        println tvId
-                        println tvId.replaceAll('rgb\\(|\\)','')
                             def range = tvId.replaceAll('rgb\\(|\\)','').split(','); 
-                            println "===================="
-                            println "===================="
-                            println "===================="
-                            println range
                             //COLOR is specified as sarray of RGB values. 
                             //Computing Euclidean distance 
                             traitJsonQuery += " and cast(traits_json#>>'{${traitId},r}' as integer) is not null "
@@ -538,4 +543,5 @@ class AbstractObjectService {
         }
         return traits;
     }
+
 }

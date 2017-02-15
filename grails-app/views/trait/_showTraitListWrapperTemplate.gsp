@@ -87,7 +87,8 @@
         });
 
         $('.list').on('updatedGallery', function() {
-                initTraitFilterControls();
+                console.log('updatedGallery');
+            initTraitFilterControls();
             updateMatchingSpeciesTable();
             element = $('button[data-isNotObservation="false"]');
             $(element).each(function(){

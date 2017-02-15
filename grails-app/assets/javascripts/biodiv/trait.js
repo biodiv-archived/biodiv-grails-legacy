@@ -11,7 +11,6 @@ function loadMatchingSpeciesList() {
     var target = window.location.pathname + window.location.search;
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
-    console.log(url);
     var href = url.attr('path');
     var params = getFilterParameters(url);
     delete params['daterangepicker_start'];
@@ -51,13 +50,10 @@ function loadMatchingSpeciesList() {
             delete params[key];
         }
     }
-    console.log(params);
     var History = window.History;
     var traits = getSelectedTrait($('.trait button, .trait .none, .trait .any'));
-    console.log('getSel');
-    console.log(traits);
     for(var m in traits) {
-        params['trait.'+m] = traits[m].substring(0,traits[m].length-1);
+        params['trait.'+m] = traits[m];
     }
     params['max'] = $(this).data('max');
     params['offset'] = $(this).data('offset');
@@ -88,6 +84,7 @@ function loadMatchingSpeciesList() {
                     //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
                     $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
+                    $('#imagediv_'+item[0]).empty();
                     $.each(imagepath,function(index1,item1){ 
                         $('#imagediv_'+item[0]).append(showIcon(item1[0], item1[1], item1[2], item1[3]));
                     });
@@ -105,7 +102,7 @@ function showIcon(value,name,url, type){
     if(url) {
         return  '<img src="'+url+'" width="32" height="32" title="'+name+'-'+value+'" />';
     } else if(type == 'Color'){
-        return '<img style="height:32px;width:32px;display:inline-block;background-color:'+value+';" title="'+name+'-'+value+'" ></img>'
+        return '<img style="height:32px;width:32px;display:inline-block;background-color:'+value+';" tooltip="'+name+'-'+value+'" ></img>'
     } else {
 //        return '<b>'+name+'</b> :'+ value;
 //        return '';
@@ -126,7 +123,6 @@ function onSubmitFact($me, objectId, objectType) {
         data:params,
         success: function(data, statusText, xhr, form) {
             //TODO:update traits panel
-            console.log(data);
             if(data.success) {
                 $me.parent().parent().find('.alert').removeClass('alert alert-error').addClass('alert alert-info').html(data.msg).show();
                 $me.parent().parent().replaceWith(data.model.traitHtml);
@@ -145,7 +141,6 @@ function onSubmitFact($me, objectId, objectType) {
             //successHandler is used when ajax login succedes
             var successHandler = this.success, errorHandler = function() {
                 //TODO:show error msg
-                console.log(arguments);
                 $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(arguments.msg).show();
             }
             handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
@@ -160,6 +155,7 @@ function loadTraits($me, compId) {
     params['sGroup'] = $me.data('sgroup');
     params['isObservationTrait'] = $me.data('isobservationtrait');
     params['isParticipatory'] = $me.data('isparticipatory');
+    params['ifOwns'] = $me.data('ifowns');
     params['showInObservation'] = $me.data('showinobservation');
     params['loadMore'] = true;
     params['displayAny'] = false;
@@ -192,11 +188,36 @@ function loadCustomFields($me, compId) {
     });
 }
 
+var startFlag = 0;
 function initTraitFilterControls() {
-
-    $('.trait_range_slider').slider().on('slideStop', function(ev){
-        updateMatchingSpeciesTable();
+    $('.trait_range_slider').ionRangeSlider({
+        grid:'true',
+        onChange:function(data) {
+            startFlag = 1;
+        },
+        onFinish :  function(data) {
+            if(startFlag == 1) 
+                updateMatchingSpeciesTable();
+        }
     });
+
+    $('.trait_date_range_slider').ionRangeSlider({
+        grid:'true',
+        values: [
+            "January", "February", "March",
+            "April", "May", "June",
+            "July", "August", "September",
+            "October", "November", "December"
+        ],
+        onChange:function(data) {
+            startFlag = 1;
+        },
+        onFinish :  function(data) {
+            if(startFlag == 1) 
+                updateMatchingSpeciesTable();
+        }
+    });
+
 
     $('.trait_date_range').each(function(){
         var options = {
@@ -223,7 +244,25 @@ function initTraitFilterControls() {
     $('.colorpicker-component').colorpicker({
         format:'rgb', 
         container: true,
-        inline: true
+        inline: true,
+        colorSelectors: {
+            'black': '#000000',
+            'gray' : '#808080',
+            'silver' : '#C0C0C0',
+            'white': '#ffffff',
+            'maroon' : '#800000 ',
+            'red': '#FF0000',
+            'olive' : '#808000',
+            'yellow' : '#FFFF00',
+            'green' : '#008000',
+            'lime' : '#00FF00',
+            'teal' : '#008080',
+            'aqua' : '#00FFFF',
+            'navy' : '#000080',
+            'blue' : '#0000FF',
+            'purple' : '#800080',
+            'fuchsia' : '#FF00FF'
+        }
     }).on('changeColor', function(ev){
         updateMatchingSpeciesTable();
     });
@@ -255,7 +294,6 @@ $(document).ready(function(){
         $(this).hide();
         $(this).parent().find('.submitFact, .cancelFact').show();
         $(this).parent().parent().find('.editFactPanel').show();
-        console.log($(this).parent().parent().find('.editFactPanel'));
         return false;
 	});
 
@@ -274,5 +312,4 @@ $(document).ready(function(){
         onSubmitFact($me, $me.data('objectid'), $me.data('objecttype'));
     });
 
-    initTraitFilterControls();
 });

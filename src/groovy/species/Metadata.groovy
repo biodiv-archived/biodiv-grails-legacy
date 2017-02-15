@@ -245,7 +245,7 @@ abstract class Metadata {
                 traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
             } 
             if(fact.fromDate && fact.toDate)
-                traitFactMap[fact.trait.id] << fact.fromDate+":"+fact.toDate
+                traitFactMap[fact.trait.id] << fact.fromDate+";"+fact.toDate
 
             traitFactMap['fact'] << fact.id
         }

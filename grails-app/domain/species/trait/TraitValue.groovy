@@ -40,7 +40,7 @@ class TraitValue {
 	Resource icon(ImageType type) {
 		boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon)).exists()
 		if(!iconPresent || !this.icon) {
-            log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon
+            //log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon
 			return new Resource(fileName:grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg", type:ResourceType.ICON, title:"");
 		}
 		return new Resource(fileName:grailsApplication.config.speciesPortal.traits.serverURL+'/'+this.icon, type:ResourceType.ICON, title:this.value);
@@ -66,7 +66,7 @@ class TraitValue {
         isFilePresent = ImageUtils.getFileName(this.icon, imageType, defaultFileType)
         boolean iconPresent = (new File(grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+isFilePresent)).exists()
         if(!iconPresent) {
-            log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon
+            //log.warn "Couldn't find logo at "+grailsApplication.config.speciesPortal.traits.rootDir.toString()+'/'+this.icon
             thumbnailUrl = grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg";
         }else{
             thumbnailUrl = newBaseUrl + "/" + isFilePresent;

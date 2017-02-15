@@ -79,6 +79,8 @@ class TraitService extends AbstractObjectService {
         int traitIdHeaderIndex = -1;
         int updateHeaderIndex = -1;
         int languageHeaderIndex = -1;
+        println headers
+        dl.writeLog("Reading headers : "+headers)
         for(int i=0; i<headers.size(); i++) {
             if(headers[i].trim().equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
@@ -92,6 +94,10 @@ class TraitService extends AbstractObjectService {
                 languageHeaderIndex = i;
             }
         }
+        dl.writeLog("Found required columns at indexes ${traitNameHeaderIndex} ${taxonIdHeaderIndex} ${updateHeaderIndex}");
+        println traitNameHeaderIndex;
+        println taxonIdHeaderIndex
+        println updateHeaderIndex
         if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
             dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
             return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':"Trait name column and/or taxonId column or update column is not defined"];

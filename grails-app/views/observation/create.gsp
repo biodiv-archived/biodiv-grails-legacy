@@ -81,7 +81,7 @@
                 <input id="traits" name="traits" type="hidden" value=""/>
                 <% def emptyTraitListInitializer = ['instanceList':[], 'count':0, 'fromObservationCreate':true];
                 emptyTraitListInitializer['queryParams'] = [:];%>
-                    <g:render template="/trait/showTraitListTemplate" model='emptyTraitListInitializer'/>
+                    <g:render template="/trait/showTraitListTemplate" model="['fromObservationShow': 'show', 'fromSpeciesShow':true, displayAny:false, editable:true]"/>
 				</div>
                 
                 <div class="span12 super-section"  style="clear: both">
