@@ -3,8 +3,18 @@
 <%@page import="species.auth.SUser"%>
 <%@page import="species.participation.Featured"%>
 <%@page import="species.groups.UserGroup"%>
+<%@page import="species.trait.TraitValueTranslation"%>
+
+<%                      
+    def traitTrans = TraitValueTranslation.findByTraitValueAndLanguage(traitValue,userLanguage);
+    traitValue.value = (traitTrans?.value)?:'';
+    traitValue.description = (traitTrans?.description)?:'';
+    traitValue.source = (traitTrans?.source)?:'';
+%>
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'} traitIcon"
     data-image-url="${traitValue.thumbnailUrl(null)}"
+    data-traitValue="${traitValue.value}"
+    data-trait="${traitValue.trait.name}"
     style="margin-left: 0px; height: 32px;">
     <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">

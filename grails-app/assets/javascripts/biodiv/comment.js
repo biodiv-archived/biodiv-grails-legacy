@@ -141,7 +141,7 @@ function postAsAjax(postComp, url, newCommentUrl, update){
     			$(postComp).children('input[name="newerTimeRef"]').val(data.newerTimeRef);
     			updateCountOnPopup(postComp, data.newlyAddedCommentCount);
     			if(update){
-    				updateFeeds();
+    				updateFeeds(postComp);
     				setFollowButton();
     				updateUnionComment(postComp, newCommentUrl);
     			}

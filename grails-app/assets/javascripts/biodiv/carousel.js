@@ -205,7 +205,6 @@ var getSnippetHTML = function(carousel, item) {
 
 var getSnippetTabletHTML = function(carousel, item) {
 	var paramsString = "";
-    console.log(window.params.obvShowPage)
     if(item.inGroup)
         item.url = window.params.obvShowPage+'/'+item.id;
 

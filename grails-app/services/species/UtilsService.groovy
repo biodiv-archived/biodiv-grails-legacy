@@ -44,7 +44,12 @@ import species.auth.Role;
 import species.auth.SUser;
 import species.auth.SUserRole;
 import au.com.bytecode.opencsv.CSVWriter;
+import java.awt.Color;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
 
+import java.text.Format;
 
 class UtilsService {
 
@@ -84,6 +89,8 @@ class UtilsService {
     
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
+
+    static final String FACT_UPDATE = "fact updated";
 
     static final String[] DATE_PATTERNS = ['dd/MM/yyyy', 'MM/dd/yyyy', "yyyy-MM-dd'T'HH:mm'Z'", 'EEE, dd MMM yyyy HH:mm:ss z', 'yyyy-MM-dd'];
 
@@ -337,6 +344,18 @@ class UtilsService {
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.add(getOwner(obv))
+                break
+
+                case [FACT_UPDATE]:
+                    println "fact update mail"
+                    def user = springSecurityService.currentUser;
+                    mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
+                    templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
+                    templateMap["trait"] = otherParams["trait"]
+                    templateMap["traitValue"] = otherParams["traitValue"]
+                    bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/factUpdate"
+                    populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
+                    toUsers.add(user)
                 break
 
 				case [ActivityFeedService.DISCUSSION_CREATED, ActivityFeedService.DISCUSSION_UPDATED] :
@@ -1251,5 +1270,54 @@ class UtilsService {
         return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
     }
 
+    def writeLog = { String content, Level level=Level.DEBUG -> 
+            switch(level) { 
+                case Level.INFO : 
+                log.info content;
+                break;
+                case Level.WARN :
+                log.warn content;
+                break;
+                case Level.ERROR :
+                log.error content;
+                break;
+                default : 
+                log.debug content;
+            }
+        }
+
+    /**
+     * 
+     * @param colorStr e.g. "#FFFFFF"
+     * @return 
+     */
+    public static String hex2Rgb(String colorStr) {
+        try {
+        Color c = new Color(
+            Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
+            Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
+            Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+        return "rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static def getMonthIndex(String monthName) {
+        if(monthName.equalsIgnoreCase('any')) return -1;
+        Date date = new SimpleDateFormat("MMMM").parse(monthName)
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date)
+        return cal.get(Calendar.MONTH);
+    }
+
+    public static String getMonthName(String dateStr) {
+        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateStr)
+        Format formatter = new SimpleDateFormat("MMMM"); 
+            String s = formatter.format(date);
+                System.out.println(s);
+                return s;
+    }
 }
 

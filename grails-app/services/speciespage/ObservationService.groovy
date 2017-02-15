@@ -87,6 +87,9 @@ import species.ScientificName.TaxonomyRank;
 import species.NamesMetadata.NameStatus;
 import grails.plugin.cache.Cacheable;
 
+import species.trait.Fact;
+import species.trait.Trait;
+import species.trait.TraitValue;
 class ObservationService extends AbstractMetadataService {
 
     static transactional = false
@@ -103,6 +106,7 @@ class ObservationService extends AbstractMetadataService {
     def request;
     def speciesPermissionService;
 	def customFieldService;
+    def factService;
     /**
      * 
      * @param params
@@ -134,14 +138,8 @@ class ObservationService extends AbstractMetadataService {
 
         //XXX: in all normal case updateResources flag will be true, but when updating some checklist and checklist
 		// has some global update like habitat, group in that case updating its observation info but not the resource info
-        println "************************************"
-        println "************************************"
-        println "************************************"
-        println "************************************"
-        println observation.version
 		if(updateResources){
             updateResource(observation, params);
-            println observation.version
     	}
         return observation;
     }
@@ -310,6 +308,9 @@ class ObservationService extends AbstractMetadataService {
                 }
 				
 				customFieldService.updateCustomFields(params, observationInstance.id)
+                def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
+                traitParams.putAll(getTraits(params.traits));
+                factService.updateFacts(traitParams, observationInstance);
                 return utilsService.getSuccessModel('', observationInstance, OK.value())
             } else {
                 observationInstance.errors.allErrors.each { log.error it }
@@ -491,7 +492,6 @@ class ObservationService extends AbstractMetadataService {
         observations.each {
             result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
         }
-        println "observation result"+result
         return ["observations":result, "count":count[0]["count"]]
     }
 
@@ -652,7 +652,6 @@ class ObservationService extends AbstractMetadataService {
                 query = "select r.id, obv.id from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg join obv.resource r where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') and NOT (r.url != null and length(r.fileName) = 1) order by obv.lastRevised desc"
             }
             def resIdList = Observation.executeQuery (query, ['classification':classification, 'isDeleted': false, max : limit.toInteger(), offset: offset.toInteger()]);
-println resIdList
              /*
             def query = "select res.id from Observation obv, Resource res where obv.resource.id = res.id and obv.maxVotedReco in (:scientificNameRecos) and obv.isDeleted = :isDeleted order by res.id asc"
             def hqlQuery = sessionFactory.currentSession.createQuery(query) 
@@ -1064,7 +1063,6 @@ println resIdList
         }
         else {
             observationInstanceList = hqlQuery.addEntity('obv', Observation).list();
-            println observationInstanceList
             for(int i=0;i < observationInstanceList.size(); i++) {
                 println observationInstanceList[i].isChecklist
                 if(observationInstanceList[i].isChecklist) {
@@ -1154,7 +1152,6 @@ println resIdList
         if(params.fetchField) {
             query += " obv.id as id,"
             params.fetchField.split(",").each { fetchField ->
-                println fetchField+"========================================="
                 if(!fetchField.equalsIgnoreCase('id') && !fetchField.equalsIgnoreCase('title'))
                     query += " obv."+m.getPropertyColumnNames(fetchField)[0]+" as "+fetchField+","
                 else if(fetchField.equalsIgnoreCase('title'))
@@ -1494,8 +1491,8 @@ println resIdList
                 taxonQuery = recoQuery+" left outer join taxonomy_definition t on reco.taxon_concept_id = t.id ";
                 query += taxonQuery;
            }
-            filterQuery += traitQuery;
-            
+            filterQuery += traitQuery['filterQuery'];
+            orderQuery += traitQuery['orderQuery'];            
             def classification;
             if(params.classification)
                 classification = Classification.read(Long.parseLong(params.classification));
@@ -2877,18 +2874,21 @@ println resIdList
         def link=utilsService.generateLink("observation", "list", ["recom": reco])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         }
+
     private String getObservationHardLink(reco,count,user) {
         if(!reco) return ;
         def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         //return link 
         }
+
     private String getIdentifiedObservationHardLink(reco,count,user,identified) {
         if(!reco) return ;
         def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user,"identified":true])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         //return link 
         }
+
     def getObservationInstanceList(params){
         def finalInstanceResult=[]
         def sql =  Sql.newInstance(dataSource);
@@ -2899,4 +2899,51 @@ println resIdList
         }
         return finalInstanceResult
     }
+
+/*
+    boolean factUpdate(params){
+        println "================="+params
+        def observationInstance = Observation.findById(params.observation);
+        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
+        traitParams.putAll(getTraits(params.traits));
+        Trait trait;
+        TraitValue traitValue;
+        def factInstance;
+        traitParams.each { key, value ->
+                    if(!value) {
+                        return;
+                    }
+                    key = key.trim();
+                    value = value ? value.trim() : null ;
+
+                    switch(key) {
+                        case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
+                        default :
+                        trait=Trait.findById(key);
+                        traitValue = TraitValue.findByTraitAndValueIlike(trait, value.trim());
+                        factInstance=Fact.findByIdAndTrait(params.factId,trait);
+                        
+                    }
+                }
+                
+                if(!factInstance){factInstance = new Fact();}
+                        factInstance.trait = trait
+                        factInstance.traitValue = traitValue;
+                        factInstance.objectId = observationInstance.id
+                        factInstance.attribution = traitParams['attribution'];
+                        factInstance.contributor = traitParams['contributor'] ? SUser.findByEmail(traitParams['contributor']?.trim()) : null;
+                        factInstance.license = traitParams['license']? License.findByName(License.fetchLicenseType(traitParams['license'].trim())) : null;
+                        factInstance.objectType = observationInstance.class.getCanonicalName(); 
+
+                if(!factInstance.hasErrors() && !factInstance.save()) { 
+                    println "Error in Fact upudate"
+                    factInstance.errors.allErrors.each {println it }
+                    return false;
+                } else {
+                    println "Successfully updated fact";
+                    return true;
+                }
+               // factService.updateFacts(traitParams, observationInstance);
+    }
+*/
 }

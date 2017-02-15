@@ -664,7 +664,7 @@ def moveCleanNameSpeciesToGroup(groupId){
 //test()
 
 //multipleIbp()
-deleteHir()
+//deleteHir()
 //moveCleanNameSpeciesToGroup(48)
 
 

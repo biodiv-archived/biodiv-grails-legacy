@@ -133,7 +133,9 @@ class ChecklistService {
 				isGlobalUpdate = isGlobalUpdateForObv(checklistInstance)
                 mailType = feedType
 			}
-			
+            //HACK: to clear off errors happened during data inding instance.properties = params
+			checklistInstance.clearErrors()
+            
             // ignoring saving when there is no valid observation
             boolean validObvPresent = false
             for(Map m in params.checklistData) {
@@ -147,10 +149,8 @@ class ChecklistService {
                 //def request = RequestContextHolder.currentRequestAttributes().request
 				return ['success' : false, 'msg':messageSource.getMessage("Error.not.valid.ignore", null, LCH.getLocale()), checklistInstance:checklistInstance]
             }
-            
+
             if(params.checklistData.size() == 0 && params.action != 'save') validObvPresent = true;
-           
-			checklistInstance.clearErrors()
 			if(validObvPresent && !checklistInstance.hasErrors() && checklistInstance.save(flush:true)) {
 				log.debug "Successfully created checklistInstance : "+checklistInstance
 				activityFeedService.addActivityFeed(checklistInstance, null, feedAuthor, feedType);
@@ -176,7 +176,6 @@ class ChecklistService {
 					
 				return ['success' : true, 'msg':'Successfully saved checklist.', checklistInstance:checklistInstance]
 			} else {
-				println "####################### got errors"
 				checklistInstance.errors.allErrors.each { log.error it }
 				return ['success' : false, 'msg':checklistInstance.errors, checklistInstance:checklistInstance]
 			}
@@ -305,7 +304,9 @@ class ChecklistService {
 		def media = m[MEDIA_COLUMN]
 		def snCol = m[cl.sciNameColumn]
 		def cnCol = m[cl.commonNameColumn]
-		
+	    if(!(snCol	|| cnCol || media)) {
+           cl.errors.rejectValue('sciNameColumn','checklist.required.field.missing') 
+        }
 		return snCol || cnCol || media
 	}
 	

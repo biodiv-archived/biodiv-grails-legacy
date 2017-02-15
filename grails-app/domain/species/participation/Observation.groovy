@@ -27,6 +27,7 @@ import species.Species;
 import species.dataset.Dataset;
 import au.com.bytecode.opencsv.CSVReader;
 import java.io.InputStream;
+import species.trait.Fact;
 
 
 class Observation extends DataObject {
@@ -38,6 +39,8 @@ class Observation extends DataObject {
 	def observationsSearchService;
     def observationService;
     def userGroupService;
+    def traitService;
+    def customFieldService;
 
 	public enum OccurrenceStatus {
 		ABSENT ("Absent"),	//http://rs.gbif.org/terms/1.0/occurrenceStatus#absent
@@ -796,4 +799,12 @@ class Observation extends DataObject {
 	def boolean isObvFromChecklist(){
 		return (id != sourceId)
 	}
+
+    Map getTraits() {
+        return getTraits(true, true, true);
+    }
+
+    Map getCustomFields() {
+    	return customFieldService.fetchAllCustomFields(this);
+    }
 }

@@ -43,6 +43,9 @@ import org.codehaus.groovy.grails.web.converters.marshaller.xml.MapMarshaller;
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException;
 import java.util.Map;
 import grails.converters.XML;
+import species.trait.Trait;
+import species.trait.TraitValue;
+import species.trait.Fact;
 
 class CustomObjectMarshallers {
     
@@ -103,7 +106,6 @@ class CustomObjectMarshallers {
         }
         
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
-            println 'TaxonomyDefinition Marshaller'
             List<TaxonomyDefinition> defaultHierarchy = it.fetchDefaultHierarchy();
             String parentName = defaultHierarchy ? (defaultHierarchy.size()==1?null:defaultHierarchy[-2].canonicalForm) : null
             String group = defaultHierarchy ?  defaultHierarchy[0].canonicalForm : null
@@ -112,12 +114,10 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(Classification) {
-            println 'Classification Marshaller'
             return ['id':it.id, 'name':it.name, 'citation':it.citation]
         }
 
         JSON.registerObjectMarshaller(TaxonomyRegistry) {
-            println 'TaxonomyRegistry Marshaller'
             return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
         }
         
@@ -126,27 +126,22 @@ class CustomObjectMarshallers {
         }
  
         JSON.registerObjectMarshaller(Recommendation) {
-            println 'Recommendation Marshaller'
             def r = ['id':it.id, 'name':it.name];
             if(it.taxonConcept) {
                 r['taxonomyDefinition'] = it.taxonConcept;
             }
-            println 'taxonConcept'
 /*            Long speciesId = it.taxonConcept?.findSpeciesId();
             if(speciesId) {
                 r['speciesId'] = speciesId;
             }
-            println 'speciesId'
 */
             if(it.languageId) {
                 r['language'] = Language.read(it.languageId);
             }
-            println 'language'
             return r;
         }
 
         JSON.registerObjectMarshaller(RecommendationVote) {
-            println 'RecommendationVote Marshaller'
             def r = [id:it.id, observation:it.observation.id, recommendation:it.recommendation, author:it.author, confidence: it.confidence?.value(), votedOn: it.votedOn];
             if(it.commonNameReco) {
                 r['commonNameReco'] = it.commonNameReco
@@ -158,12 +153,10 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(UserGroup) {
-            println 'UserGroup Marshaller'
             return ['id':it.id, 'name':it.name, 'description' : it.description, 'domainName':it.domainName, 'webaddress':it.webaddress, 'foundedOn':it.foundedOn, 'icon':it.icon ];
         }
 
         JSON.registerObjectMarshaller(Resource) {
-            println 'Resource Marshaller'
             def basePath = '';
             String originalUrl = it.thumbnailUrl(basePath, null, ImageType.ORIGINAL);
             def imagePath = it.thumbnailUrl(basePath);
@@ -174,7 +167,6 @@ class CustomObjectMarshallers {
         }
 	
 		JSON.registerObjectMarshaller(Comment) {
-            println "comment marshaller"
 			return ['id':it.id, 'text':it.body, 'author':it.author, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
 		}
 
@@ -243,6 +235,18 @@ class CustomObjectMarshallers {
         
         JSON.registerObjectMarshaller(Contributor) {
             return ['name':it.name];
+        }
+
+        JSON.registerObjectMarshaller(Trait) {
+            return ['id':it.id, 'name':it.name, 'description':it.description, 'createdOn':it.createdOn, 'source':it.source, 'icon':it.icon, 'ontologyUrl':it.ontologyUrl, 'field':it.field, 'taxon':it.taxon, 'traitTypes':it.traitTypes, 'dataTypes':it.dataTypes, 'units':it.units];
+        }
+
+        JSON.registerObjectMarshaller(TraitValue) {
+            return ['value':it.value, 'description':it.description, 'icon':it.icon, 'source':it.source];
+        }
+        
+        JSON.registerObjectMarshaller(Fact) {
+            return ['objectId':it.objectId, 'objectType':it.objectType, 'trait':it.trait, 'traitValue':it.traitValue, 'value':it.value, 'attribution':it.attribution, 'contributor':it.contributor, 'license':it.license, 'pageTaxon':it.pageTaxon];
         }
     }
     }

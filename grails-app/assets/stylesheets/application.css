@@ -54,5 +54,8 @@
 *= require all/location_picker.css
 *= require all/augmented-maps.css
 *= require all/namelist.css
+*= require all/bootstrap-colorpicker.min.css
+*= require all/ion.rangeSlider.css
+*= require all/ion.rangeSlider.skinSimple.css
 */
 

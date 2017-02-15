@@ -497,7 +497,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
-    bannerFilePath = "${app.rootDir}/bannerMessage.txt" 
+    bannerFilePath = "${app.rootDir}/bannerMessage.txt"
+    userDetailsFilePath = "${app.rootDir}/userInfo.csv" 
     filterFilePath = "${app.rootDir}/filters.txt" 
 }
 
@@ -582,7 +583,7 @@ environments {
             warn   'org.springframework.security'
             warn   'org.springframework.security.web'
             warn   'org.springframework.security.authentication'
-            info   'speciespage',
+            debug   'speciespage',
             'species'
             debug   'com.the6hours', 
             'grails.app.taglib.com.the6hours'

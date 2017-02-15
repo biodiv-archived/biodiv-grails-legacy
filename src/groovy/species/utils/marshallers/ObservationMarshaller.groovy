@@ -36,6 +36,7 @@ class ObservationMarshaller {
 
                 resource : obv.listResourcesByRating(),
                 userGroups : obv.userGroups,
+                traits : obv.getTraits(),
                 language : obv.language,
 
                 isDeleted : obv.isDeleted,

@@ -11,19 +11,19 @@
 	<g:if test="${!showDetails }">
 		<h5 class="ellipsis">
 			<a
-				href="${uGroup.createLink([action:"show", controller:"user", id:userInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
+				href="${uGroup.createLink([action:"show", controller:"user", id:userInstance?.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':userGroupWebaddress])}">
 				${userInstance.name} </a>
 		</h5>
 	</g:if>
 
 	<div class="pull-left" style="padding-bottom: 0px;width:100%;">
+    <g:if test="${showDetails}">
 	<div class="profilepic pull-right">
  <a
-                        href="${uGroup.createLink(action:'show', controller:'user', id:user.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                        <img class="img-thumbnail" src="${user.profilePicture()}" /> </a>                 
+                        href="${uGroup.createLink(action:'show', controller:'user', id:userInstance?.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                        <img class="img-thumbnail" src="${userInstance.profilePicture()}" /> </a>                 
 
 </div>
-		<g:if test="${showDetails}">
 			<div class="prop">
 				<span class="name"><i class="icon-user"></i> <g:message
 						code="suser.username.label" /> </span>
@@ -116,12 +116,12 @@
                                 type="datetime" style="MEDIUM" />
                         </div>
                     </div>
-                            <g:if test="${user.lastLoginDate}">
+                            <g:if test="${userInstance.lastLoginDate}">
                         <div class="prop">
                             <span class="name"><i class="icon-time"></i><g:message code="default.last.visited.label" /></span>
                             <div class="value">
                                 
-                                    <g:formatDate format="dd/MM/yyyy" date="${user.lastLoginDate}"
+                                    <g:formatDate format="dd/MM/yyyy" date="${userInstance.lastLoginDate}"
                                         type="datetime" style="MEDIUM" />
                             
                             </div>
@@ -179,13 +179,13 @@
                                             <g:if test="${userInstance?.language?.id != userLanguage?.id}">
                                                 <%  
                                                   styleVar = "none"
-                                                  clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+user?.language?.threeLetterCode.toUpperCase()+'</a>';
+                                                  clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+userInstance?.language?.threeLetterCode.toUpperCase()+'</a>';
                                                 %>
                                             </g:if>
 
                                             ${raw(clickcontentVar)}
                                             <div style="display:${styleVar}">
-                                                ${raw(user.aboutMe.replace('\n', '<br/>\n'))}
+                                                ${raw(userInstance.aboutMe.replace('\n', '<br/>\n'))}
                                             </div>
                                                 
                                             </g:if>

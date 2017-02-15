@@ -165,7 +165,7 @@ class BootStrap {
                 }
                 def url
                 if(userToken.controller == "userGroup" || userToken.controller == "userGroupGeneric"){
-                    url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
+                    url = userGroupService.userGroupBasedLink(mapping: 'userGroupGeneric', controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
                 }else{
                     url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
 
