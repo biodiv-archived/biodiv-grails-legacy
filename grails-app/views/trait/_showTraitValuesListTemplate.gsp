@@ -6,7 +6,7 @@
 <%@page import="java.util.Date" %>
 <%@page import="species.UtilsService"%>
 
-<div class="row btn-group" style="white-space:inherit;margin-left:20px;${trait.dataTypes == DataTypes.DATE?'width:100%;':''}">
+<div class="row btn-group" style="white-space:inherit;margin-left:20px;${trait?.dataTypes == DataTypes.DATE?'width:100%;':''}">
 <g:if test="${traitValues && traitValues.size()>0}">
             <g:if test="${displayAny && trait.isNotObservationTrait}">
             <div data-tvid='all' data-tid='${traitValues?trait?.id:''}'
@@ -59,7 +59,7 @@
                 </a>
                 </g:if>
                 <g:else>
-                    <g:if test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
+                    <g:if test="${trait.traitTypes == TraitTypes.RANGE && trait?.dataTypes == DataTypes.DATE}">
                     <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post disabled"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;font-weight:bold;">
@@ -104,7 +104,7 @@
             </div> 
             </g:if>
             </g:if>
-            <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
+            <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait?.dataTypes == DataTypes.DATE}">
             <g:if test="${trait.units == Units.MONTH}">
             <div style="width:280px;">
             <%
