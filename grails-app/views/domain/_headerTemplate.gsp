@@ -159,6 +159,10 @@
 	margin:2px 0px;
 }
 
+.dropdown .contributeUlLi a{
+  color:white !important;
+}
+
 </style>
 
 
