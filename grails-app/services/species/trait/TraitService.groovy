@@ -112,6 +112,7 @@ class TraitService extends AbstractObjectService {
 
             List taxons_scope = [];
             row[taxonIdHeaderIndex].tokenize(",").each { taxonId ->
+                taxonId = taxonId.replaceAll('"','');
                 try {
                     TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(taxonId?.trim()));
                     if(t) taxons_scope << t;
@@ -425,8 +426,10 @@ class TraitService extends AbstractObjectService {
 
         hqlQuery.setProperties(queryParts.queryParams);
         def instanceList;
+        utilsService.logSql {
         instanceList = hqlQuery.list();
-
+        }
+println queryParts.queryParams
         allInstanceCountQuery.setProperties(queryParts.queryParams)
         allInstanceCount = allInstanceCountQuery.list()[0]
 
@@ -545,7 +548,7 @@ class TraitService extends AbstractObjectService {
                     filterQuery += " ";// and reg.classification.id = :classification and ( ${inQuery} ) and taxon is null  ";
                 } else if(parentTaxon) {
                     inQuery = " taxon.id in (:parentTaxon) or " 
-                    filterQuery += " and taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id = :sGroup ";
+                    filterQuery += " and (taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id = :sGroup) ";
                 }
 
 
@@ -733,10 +736,11 @@ class TraitService extends AbstractObjectService {
         File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(icon));
         if(!fromDir) fromDir = grailsApplication.config.speciesPortal.content.rootDir; 
         File fi = new File(fromDir+"/trait/"+icon);
-        (new AntBuilder()).copy(file: fi, tofile: file)
-        ImageUtils.createScaledImages(file, usersDir,true);
-        def file_name = file.name.toString();
-        return usersDir.absolutePath.replace(rootDir, "")+'/'+file_name;
-
+        if(fi.exists()) {
+            (new AntBuilder()).copy(file: fi, tofile: file)
+            ImageUtils.createScaledImages(file, usersDir,true);
+            def file_name = file.name.toString();
+            return usersDir.absolutePath.replace(rootDir, "")+'/'+file_name;
+        }
     }
 }
