@@ -447,12 +447,17 @@ class SpeciesUploadService {
 			}else{
 				for(Node speciesElement : speciesElements) {
 					//Species.withNewTransaction { status ->
-						Species s = converter.convertSpecies(speciesElement)
+						Species s = null;
+                        utilsService.benchmark ("convertSpecies", {
+                            s = converter.convertSpecies(speciesElement);
+                        });
 						if(s)
 							species.add(s);
 					//}
 				}
+                utilsService.benchmark("saveSpecies", {
 				noOfInsertions += saveSpecies(species);
+                });
 			}
 		}catch (org.springframework.dao.OptimisticLockingFailureException e) {
 			//log.error "OptimisticLockingFailureException : $e.message"
@@ -486,9 +491,15 @@ class SpeciesUploadService {
 	 */	
 	int saveSpecies(List<Species> species) {
 		log.info "Saving species : "+species.size()
-		int noOfInsertions = saveSpeciesToDB(species);
+		int noOfInsertions = 0;
+        utilsService.benchmark ("saveSpeciesToDB" , {
+        noOfInsertions = saveSpeciesToDB(species);
+        });
+        
+        utilsService.benchmark ("postProcessSpecies" , {
 		//All species should be saved before updating any group information or publishing it to search index
 		postProcessSpecies(species);
+        });
 
 		try {
 			speciesSearchService.publishSearchIndex(species);
@@ -571,18 +582,29 @@ class SpeciesUploadService {
 		//TODO: got to move this to the end of taxon creation
 		for(Species s : species) {
 			try{
+                utilsService.benchmark ("afterInsert", {
 				s.afterInsert();
+                });
+
 				def taxonConcept = s.taxonConcept;
+
+                utilsService.benchmark ("updateGroup", {
 				groupHandlerService.updateGroup(taxonConcept);
+                });
+
+                utilsService.benchmark ("resource", {
 				def rCount = s.fetchResourceCount();
 	            def rsfCount = s.fetchSpeciesFieldResourceCount();
 	            if(rCount.size() > 0 || rsfCount > 0) {
 					s.updateHasMediaValue(true);
 	            }
-				
+                });
+
+                utilsService.benchmark ("eternalLinks", {
 				//this fucntion may time out some times
 				externalLinksService.updateExternalLinks(s.taxonConcept)
-				
+                });
+
 				log.info "post processed spcecies ${s}"
 			}
 			catch(e) {

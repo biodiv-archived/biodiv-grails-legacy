@@ -284,7 +284,8 @@ class ChecklistController {
             redirect (url:uGroup.createLink(action:'list', controller:"checklist", 'userGroupWebaddress':params.webaddress))
         }
 		def observations = checklistService.getObservationData(params.id, params)
-		def model =[observations:observations, checklistInstance:Checklists.read(params.id.toLong())]
+        def checklistInstance = Checklists.read(params.id.toLong());
+		def model =[observations:observations, checklistInstance:checklistInstance, observationsCount:checklistInstance.speciesCount]
 		render(template:"/common/checklist/showChecklistDataTemplate", model:model);
 	}
 	///////////////////////////////////////////////////////////////////////////////

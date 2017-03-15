@@ -447,7 +447,7 @@ $(document).ready(function(){
             link : 'div.paginateButtons a.nextLink',
 
             // a selector that matches page contents
-            content : '.mainContent:first',
+            content : '.mainContent',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
             appendTo : '.mainContentList:first',
