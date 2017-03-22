@@ -91,7 +91,7 @@
             </div>
             <div class="entry">
                 ${g.message(code:'title.species.id')}
-                <div class="stats_number">345</div>
+                <div class="stats_number">420</div>
             </div>
         </div>
 
@@ -136,7 +136,7 @@
                             <a href="http://www.fofifa.mg"><img class="img-polaroid" src="/assets/all/partnerlogo/FOFIFA_logo.png"></a>
                             <a href="http://www.msiri.mu/"><img class="img-polaroid" src="/assets/all/partnerlogo/MCIA-LOGO1.png"></a>
                             <a href="http://www.msiri.mu/"><img class="img-polaroid" src="/assets/all/partnerlogo/MSIRI-2_logo.png"></a>
-                            <a href="http://www.cndrs-comores.org"><img class="img-polaroid" src="/assets/all/partnerlogo/CNDRS2_logo.png"></a>
+                            <a href="http://www.cndrs-comores.org"><img class="img-polaroid" src="/assets/all/partnerlogo/CNDRS2_logo.png"></a><br>
                             <a href="http://www.europa.eu/index_fr.htm"><img class="img-polaroid" src="/assets/all/partnerlogo/UE-TC_logo.png"></a>
                             <a href="http://www.acp-st.eu/"><img class="img-polaroid" src="/assets/all/partnerlogo/acp-st_logo.png"></a>
                             <a href="http://www.acp.int/"><img class="img-polaroid" src="/assets/all/partnerlogo/ACP.jpg"></a>

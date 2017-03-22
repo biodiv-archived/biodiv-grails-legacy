@@ -86,13 +86,28 @@ class License {
         cache usage: 'read-only', include: 'non-lazy'
     }
 	
-	
-	static LicenseType fetchLicenseType(String value){
-		for(LicenseType l : LicenseType){
-			if(l.value().equalsIgnoreCase(value))
-				return l
-		}
-	}
+    static LicenseType fetchLicenseType(licenseType){
+        if(!licenseType) return null;
+
+        LicenseType type;
+        if(licenseType instanceof LicenseType) {
+            type = licenseType
+        } else {
+            licenseType = licenseType?.toString().trim();
+            if(!licenseType.startsWith("CC") && !licenseType.equalsIgnoreCase(LicenseType.CC_PUBLIC_DOMAIN.value())) {
+                licenseType = "CC "+licenseType.trim()
+            }
+            if(licenseType.startsWith('CC-')) {
+                licenseType = licenseType.replaceFirst('CC-','CC ');
+            }
+
+            for(LicenseType l : LicenseType){
+                if(l.value().equalsIgnoreCase(licenseType))
+                    type = l
+            }
+        }
+        return type
+    }
 
     static List<License> list() { 
         println "License overridden fn for cache"

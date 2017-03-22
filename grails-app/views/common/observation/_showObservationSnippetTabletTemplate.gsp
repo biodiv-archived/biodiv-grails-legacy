@@ -1,5 +1,6 @@
 <%@page import="species.Resource.ResourceType"%>
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.UtilsService"%>
 <g:set var="mainImage" value="${observationInstance?.mainImage()}" />
 <%
 def imagePath = mainImage?mainImage.thumbnailUrl(null, !observationInstance.resource||observationInstance.dataset ? '.png' :null): null;
@@ -134,45 +135,82 @@ def obvId = observationInstance?.id
         </div>
     </div>            
 </div>
-    <div class="recommendations sidebar_section" style="margin-bottom:0px;padding:5px;text-align:center;position: relative; ${styleviewcheck? 'display:block;': 'display:none;'}">
-        <div>
-            <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
-              <g:if test="${recoVotes}">
-               <g:render template="/common/observation/showObservationRecosTemplate" model ="['observationInstance':observationInstance, 'result':recoVotes.recoVotes, 'totalVotes':recoVotes.totalVotes, 'uniqueVotes':recoVotes.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]"/>
-              </g:if>
-            </ul>
-             <g:if test="${observationInstance.isLocked}">
-                  <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-success isLocked">
-                    <g:message code="species.validate.message" />
-                  </div>
-              </g:if>
-              <g:else>
-              <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-info" style="display:none;"></div>                
-              </g:else>
-              <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:${recoVotes?.uniqueVotes>=3?'block':'none' };">
-                  <g:message code="button.show.all" />
-              </div>
-        </div>
-        <g:if test="${!observationInstance.isLocked}">
-        <a href="javascript:void(0);" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">${g.message(code:'default.reco.clickSuggest')}<i class="icon-chevron-down"></i></a>
-        <div class="input-append" style="width:98%; display:none; height: 130px;">
-            <g:hasErrors bean="${recommendationInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${recommendationInstance}" as="list" />
-            </div>
-            </g:hasErrors>
-            <g:hasErrors bean="${recommendationVoteInstance}">
-            <div class="errors">
-                <g:renderErrors bean="${recommendationVoteInstance}" as="list" />
-            </div>
-            </g:hasErrors>
-            <div class="addRecommendation_wrap_place">
-            </div>    
 
-        </div>
-        </g:if>
-        <div>
-           <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />   
-        </div>
+<div class="recommendations sidebar_section" style="margin-bottom:0px;padding:5px;text-align:center;position: relative; ${styleviewcheck? 'display:block;': 'display:none;'}">
+    <div>
+        <ul id="recoSummary" class="pollBars recoSummary_${observationInstance.id}">
+            <g:if test="${recoVotes}">
+            <g:render template="/common/observation/showObservationRecosTemplate" model ="['observationInstance':observationInstance, 'result':recoVotes.recoVotes, 'totalVotes':recoVotes.totalVotes, 'uniqueVotes':recoVotes.uniqueVotes, 'userGroupWebaddress':params.userGroupWebaddress]"/>
+            </g:if>
+        </ul>
+            <g:if test="${observationInstance.isLocked}">
+                <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-success isLocked">
+                <g:message code="species.validate.message" />
+                </div>
+            </g:if>
+            <g:else>
+            <div id="seeMoreMessage_${observationInstance.id}" class="alert alert-info" style="display:none;"></div>                
+            </g:else>
+            <div id="seeMore_${observationInstance.id}" onclick="preLoadRecos(-1, 3, true,${observationInstance.id});" class="btn btn-mini" style="display:${recoVotes?.uniqueVotes>=3?'block':'none' };">
+                <g:message code="button.show.all" />
+            </div>
     </div>
+    <div style="border:1px solid #FFF;margin-top:4px;border-radius:5px;">
+    <g:set var="utilsService" bean="utilsService"/>
+    <ul class="nav nav-tabs nav-justified">
+
+        <li class="active"><a href="#${observationInstance.id}_groups" data-toggle="tab">Groups</a></li>
+
+        <li><a href="#${observationInstance.id}_traits" data-toggle="tab" class="traits" data-objectId="${observationInstance.id}" data-objectType="${observationInstance.class.getCanonicalName()}" data-sGroup = "${observationInstance.group.id}" data-isObservationTrait="true" data-ifOwns="${utilsService.ifOwns(observationInstance.author)}" data-isParticipatory="true" data-showInObservation="true">Traits</a></li>
+
+        <li><a href="#${observationInstance.id}_customFields" data-toggle="tab" class="customFields" data-objectId="${observationInstance.id}">Custom Fields</a></li>
+
+        <li><a href="#${observationInstance.id}_comments" data-toggle="tab" class="comments" data-objectId="${observationInstance.id}">Comments</a></li>
+
+        <g:if test="${!observationInstance.isLocked}">
+        <li><a href="#${observationInstance.id}_suggestID" data-toggle="tab" class="clickSuggest" style="display:block;" rel="${observationInstance.id}">${g.message(code:'default.reco.clickSuggest')}</a></li>
+        </g:if>
+    </ul>
+    <div class="tab-content" style="max-height:160px; text-align:left;overflow:inherit;">
+
+        <div class="tab-pane  in active" id="${observationInstance.id}_groups">
+            <uGroup:resourceInGroups model="['observationInstance':observationInstance,'isList':true]"  />   
+        </div>
+
+        <div class="tab-pane" id="${observationInstance.id}_traits" style="max-height:160px;overflow:auto;">
+            <span class="progress"><g:message code="msg.loading" /> </span>
+        </div>
+
+        <div class="tab-pane " id="${observationInstance.id}_customFields">
+            <span class="progress"><g:message code="msg.loading" /> </span>
+        </div>
+
+        <div class="tab-pane union-comment" id="${observationInstance.id}_comments" style="width:99%">
+            <feed:showAllActivityFeeds model="['rootHolder':observationInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable', 'userLanguage':userLanguage, 'preLoad':false]" />
+            <comment:showAllComments model="['commentHolder':observationInstance, commentType:'super','showCommentList':false, 'userLanguage':userLanguage]" />
+        </div>
+
+        <g:if test="${!observationInstance.isLocked}">
+            <div class="tab-pane " id="${observationInstance.id}_suggestID">
+                <div style="width:98%">
+                <g:hasErrors bean="${recommendationInstance}">
+                <div class="errors">
+                <g:renderErrors bean="${recommendationInstance}" as="list" />
+                </div>
+                </g:hasErrors>
+                <g:hasErrors bean="${recommendationVoteInstance}">
+                <div class="errors">
+                <g:renderErrors bean="${recommendationVoteInstance}" as="list" />
+                </div>
+                </g:hasErrors>
+                <div class="addRecommendation_wrap_place" style="position:relative;overflow:visible;margin-bottom:40px;">
+                </div>    
+
+                </div>
+            </div>
+        </g:if>
+
+    </div>
+    </div>
+</div>
 

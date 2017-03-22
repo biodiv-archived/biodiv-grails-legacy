@@ -674,7 +674,12 @@ ALTER TABLE suser ADD COLUMN longitude double precision;
 #21Sep2016
 alter table taxonomy_definition add column traits bigint[][];
 alter table taxonomy_definition alter column traits  type bigint[][] using traits::bigint[][];
-                update taxonomy_definition set traits = g.item from (
+CREATE AGGREGATE array_agg_custom(anyarray)
+(
+        SFUNC = array_cat,
+            STYPE = anyarray
+        );
+update taxonomy_definition set traits = g.item from (
              select x.page_taxon_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.page_taxon_id, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id ) x group by x.page_taxon_id
 ) g where g.page_taxon_id=id;
 
@@ -683,3 +688,93 @@ CREATE INDEX taxonomy_definition_traits ON taxonomy_definition using gin(traits)
 
 alter table trait add column is_deleted boolean not null default false;
 alter table fact add column is_deleted boolean not null default false;
+
+
+#3rd Oct
+alter table fact drop constraint fact_object_id_page_taxon_id_trait_id_key;
+alter table fact add constraint  fact_object_id_page_taxon_id_trait_id_trait_value_id_key unique(object_id, page_taxon_id, trait_id, trait_value_id);
+delete from fact;
+delete from trait_value;
+delete from trait;
+create sequence trait_id_seq start 1;
+create sequence trait_value_id_seq start 1;
+create sequence fact_id_seq start 1;
+
+#18thOct2016
+alter table resource add column gbifID bigint;
+
+#20th Oct 2016   for merging uploadjob and species bulk upload
+insert into upload_log(id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, class) select id,version, author_id, end_date, file_path, notes, start_date, status, error_file_path, images_dir, species_created, species_updated, stubs_created, upload_type, log_file_path, 'species.participation.SpeciesBulkUpload' as class from species_bulk_upload ;
+
+update upload_log set upload_type = 'species bulk upload';
+
+#27thOct2016
+alter table trait_value add column is_deleted boolean not null default false;
+
+#15th Nov 2016
+alter table fact add column object_type varchar(255);
+update fact set object_type = class;
+alter table fact alter column object_type set not null;
+alter table fact drop column class;
+alter table fact drop constraint fact_trait_value_id_object_id_page_taxon_id_trait_id_key;
+create index fact_trait_value_id_object_id_object_type_trait_id_key on fact (trait_value_id, object_id, object_type, trait_id);
+alter table fact alter column page_taxon_id drop not null;
+
+#16thNov2016
+alter table trait add column is_not_observation_trait boolean default 'f';
+alter table trait add column show_in_observation boolean default 'f';
+alter table trait add column is_participatory boolean default 't';
+update species_group_mapping set taxon_concept_id = g.id from (select id,name from taxonomy_definition t ) as g where  g.name = taxon_name;
+
+#21stNov2016
+insert into trait_taxonomy_definition(trait_taxon_id,taxonomy_definition_id)  select id, taxon_id from trait;
+alter table trait alter column taxon_id drop not null;
+alter table trait drop column taxon_id;
+
+
+#27/11 custom fields migration sqls
+delete from custom_field where id not in (5,6);
+select * from custom_fields_group_18 where cf_4 is not null and cf_4 != '';
+alter table custom_fields_group_18 drop column cf_4;
+select * from custom_fields_group_13 where cf_1 is not null and cf_1 != '';
+drop table custom_fields_group_13;
+select * from custom_fields_group_30 where cf_7 is not null and cf_7 != '';
+drop table custom_fields_group_30;
+select * from custom_fields_group_33 where cf_9 is not null and cf_9 != '';
+select * from custom_fields_group_33 where cf_10 is not null and cf_10 != '';
+select * from custom_fields_group_33 where cf_11 is not null and cf_11 != '';
+drop table custom_fields_group_33;
+select * from custom_fields_group_38 where cf_8 is not null and cf_8 != '';
+drop table custom_fields_group_38;
+select * from custom_fields_group_7 where cf_2 is not null and cf_2 != '';
+select * from custom_fields_group_7 where cf_3 is not null and cf_3 != '';
+drop table custom_fields_group_7;
+
+select id from field where concept='Natural History' and category='Reproduction';
+update trait set field_id=39 where name='Sex';
+
+#21stDec2016
+alter table trait alter column icon type text;
+
+#03Jan2017
+alter table fact add column to_value varchar(255);
+alter table fact alter column trait_value_id drop not null;
+
+
+#9thJan2017
+alter table taxonomy_definition add column traits_json json;
+update taxonomy_definition set traits_json = g.item from (
+     select x1.page_taxon_id, format('{%s}', string_agg(x1.item,','))::json as item from (
+        (select x.page_taxon_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.page_taxon_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_id = t.id and (t.data_types='NUMERIC') ) x group by x.page_taxon_id)
+        union
+        (select x.page_taxon_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.page_taxon_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_id = t.id and (t.data_types='DATE') ) x group by x.page_taxon_id)
+        union
+        (select x.page_taxon_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.page_taxon_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_id = t.id and (t.data_types='COLOR')) x group by x.page_taxon_id)
+    ) x1 group by x1.page_taxon_id
+) g where g.page_taxon_id=id;
+
+
+create table calendar as (
+      select date '2017-01-01' + (n || ' days')::interval calendar_date
+      from generate_series(0, 365) n
+)

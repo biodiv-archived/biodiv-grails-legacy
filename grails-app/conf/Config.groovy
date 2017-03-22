@@ -281,6 +281,7 @@ speciesPortal {
             databaseDir = "${app.rootDir}/traits"
             traitValueFile="${app.rootDir}/icons.csv"
     }
+    filterFilePath = "${app.rootDir}/filters.txt"
 
     names.parser.serverURL = "127.0.0.1"
     names.parser.port = 4334
@@ -496,7 +497,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
-    bannerFilePath = "${app.rootDir}/bannerMessage.txt" 
+    bannerFilePath = "${app.rootDir}/bannerMessage.txt"
+    userDetailsFilePath = "${app.rootDir}/userInfo.csv" 
     filterFilePath = "${app.rootDir}/filters.txt" 
 }
 
@@ -581,7 +583,7 @@ environments {
             warn   'org.springframework.security'
             warn   'org.springframework.security.web'
             warn   'org.springframework.security.authentication'
-            info   'speciespage',
+            debug   'speciespage',
             'species'
             debug   'com.the6hours', 
             'grails.app.taglib.com.the6hours'
@@ -686,7 +688,14 @@ environments {
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
-		
+            traits{
+                rootDir = "${app.rootDir}/traits"
+                serverURL = "http://${servername}/${appName}/traits"
+
+                databaseDir = "${app.rootDir}/traits"
+                traitValueFile="${app.rootDir}/icons.csv"
+            }	
+            filterFilePath = "${app.rootDir}/filters.txt"
 
             search.serverURL="http://${servername}:8080/solr"
             grails {
@@ -825,7 +834,15 @@ environments {
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
-		
+	        traits{
+                rootDir = "${app.rootDir}/traits"
+                serverURL = "http://${servername}/${appName}/traits"
+
+                databaseDir = "${app.rootDir}/traits"
+                traitValueFile="${app.rootDir}/icons.csv"
+            }	
+            filterFilePath = "${app.rootDir}/filters.txt"
+	
             search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {

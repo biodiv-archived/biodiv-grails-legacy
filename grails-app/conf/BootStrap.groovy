@@ -170,6 +170,7 @@ class BootStrap {
                     url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
 
                 }
+
                 return [url: url]
 			} else {
 				//TODO

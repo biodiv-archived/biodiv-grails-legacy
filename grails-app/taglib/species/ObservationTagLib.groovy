@@ -259,7 +259,8 @@ class ObservationTagLib {
 	}
 	
 	def showCustomFields = {attrs, body->
-		attrs.model.customFields = customFieldService.fetchAllCustomFields(attrs.model.observationInstance)
+        if(attrs.model.customFields == null)
+    		attrs.model.customFields = customFieldService.fetchAllCustomFields(attrs.model.observationInstance);
 		out << render(template:"/observation/showCustomFieldsTemplate", model:attrs.model);
 	}
 

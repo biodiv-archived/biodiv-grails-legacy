@@ -37,7 +37,7 @@
 
 			</ul>
 
-			<div class="tab-content">
+			<div class="tab-content" style="overflow:initial;">
                 <div id="list" class="tab-pane active">
                     <div class="observation">
                         <s:speciesFilter></s:speciesFilter>

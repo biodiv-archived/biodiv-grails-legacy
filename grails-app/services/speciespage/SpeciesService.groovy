@@ -69,6 +69,11 @@ import java.io.File ;
 import species.participation.NamelistService
 import species.participation.RecommendationVote;
 import groovy.sql.Sql
+import au.com.bytecode.opencsv.CSVWriter
+import species.utils.ImageType;
+import species.trait.Fact;
+import species.trait.TraitValue;
+import speciespage.ObvUtilService;
 
 class SpeciesService extends AbstractObjectService  {
 
@@ -86,6 +91,7 @@ class SpeciesService extends AbstractObjectService  {
     def activityFeedService;
     def messageSource;
 	def namelistService;
+    def obvUtilService;
 	
 	static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy hh:mm aaa")
     static int BATCH_SIZE = 10;
@@ -1057,9 +1063,9 @@ class SpeciesService extends AbstractObjectService  {
                 //return [success:false, msg:"Commonname with id ${cnId} is not found"]
             } else if(oldCommonname.name == value && oldCommonname.language.equals(lang)) {
                 return [success:true, msg:messageSource.getMessage("info.nothing.change", null, LCH.getLocale())]
-            } else if(!oldCommonname.isContributor()) {
+            } /*else if(!oldCommonname.isContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
-            }
+            }*/
         }
 
         Species.withTransaction { status ->
@@ -1272,7 +1278,6 @@ class SpeciesService extends AbstractObjectService  {
     }
     
     def deleteSynonym(SynonymsMerged oldSynonym, Species speciesInstance = null, TaxonomyDefinition taxonConcept = null) {
-       println oldSynonym; 
         if(!oldSynonym) {
             def messagesourcearg = new Object[1];
             messagesourcearg[0] = oldSynonym.id;
@@ -1347,7 +1352,7 @@ class SpeciesService extends AbstractObjectService  {
         }
         //Permission check only if its from species show page
         if(speciesInstance) {
-            if(!oldCommonname.isContributor()) {
+            if(!oldCommonname.isSpeciesContributor()) {
                 return [success:false, msg:messageSource.getMessage("info.no.permission.update", null, LCH.getLocale())]
             }
 
@@ -1359,13 +1364,13 @@ class SpeciesService extends AbstractObjectService  {
             String msg = '';
             def content;
             try{
-                if(utilsService.isAdmin(springSecurityService.currentUser)){
+               // if(utilsService.isAdmin(springSecurityService.currentUser)){
                     if(oldCommonname.contributors.size() > 0) {
                         oldCommonname.contributors.clear();
                        }
-                }else{ 
+               /* }else{ 
                     oldCommonname.removeFromContributors(springSecurityService.currentUser);
-                }
+                }*/
                 if(oldCommonname.contributors.size() == 0) {
                     oldCommonname.delete(failOnError:true)
                 } else {
@@ -1631,7 +1636,6 @@ class SpeciesService extends AbstractObjectService  {
     * get species list query
     */
     def _getSpeciesListQuery(params) {
-        println params;
         params.startsWith = params.startsWith?:"A-Z"
 		params.isDeleted = params.isDeleted ?: "false"
         def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
@@ -1639,7 +1643,7 @@ class SpeciesService extends AbstractObjectService  {
         params.sGroup = params.sGroup ?: allGroup.id+""
         
         int count = 0;
-        String query, countQuery;
+        String query, fromQuery, countQuery;
         String filterQuery = " where s.id is not null " //dummy statement
         String countFilterQuery = " where s.id is not null " //dummy statement
         String speciesCountQuery = "select t.rank, count(*) as count from Species s, taxonomy_definition t "
@@ -1680,13 +1684,15 @@ class SpeciesService extends AbstractObjectService  {
 
         if(groupIds.size() == 1 && groupIds[0] == allGroup.id) {
             if(params.startsWith == "A-Z") {
-                query = "select s.* from species s, taxonomy_definition t " 
+                query = "select s.* ";
+                fromQuery = " from species s, taxonomy_definition t " 
                 filterQuery += " and s.taxon_concept_id = t.id  "
                 countQuery = "select s.percent_of_info, count(*) as count from species s, taxonomy_definition t "
                 countFilterQuery += " and s.taxon_concept_id = t.id ";
 
             } else {
-                query = "select s.* from species s, taxonomy_definition t " 
+                query = "select s.* ";
+                fromQuery = " from species s, taxonomy_definition t " 
                 filterQuery += " and s.taxon_concept_id = t.id  "
                 countQuery = "select s.percent_of_info, count(*) as count from species s, taxonomy_definition t "
                 countFilterQuery += " and s.taxon_concept_id = t.id ";
@@ -1697,14 +1703,16 @@ class SpeciesService extends AbstractObjectService  {
             }
         } else if(groupIds.size() == 1 && groupIds[0] == othersGroup.id) {
             if(params.startsWith == "A-Z") {
-                query = "select s.* from Species s, taxonomy_definition t " 
+                query = "select s.* ";
+                fromQuery = " from Species s, taxonomy_definition t " 
                 filterQuery += " and s.taxon_concept_id = t.id and t.group_id  is null "
                 countQuery = "select s.percent_of_info, count(*) as count from Species s, taxonomy_definition t "
                 countFilterQuery += " and s.taxon_concept_id = t.id and t.group_id  is null ";
                 speciesCountQuery = "select t.rank, count(*) as count from Species s, taxonomy_definition t "
                 speciesStatusCountQuery = "select t.status, count(*) as count from Species s, taxonomy_definition t "
             } else {
-                query = "select s.* from Species s, taxonomy_definition t "
+                query = "select s.* ";
+                fromQuery = " from Species s, taxonomy_definition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxon_concept_id = t.id and t.group_id  is null "
                 countQuery = "select s.percent_of_info, count(*) as count from Species s, taxonomy_definition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxon_concept_id = t.id and t.group_id  is null ";
@@ -1716,7 +1724,8 @@ class SpeciesService extends AbstractObjectService  {
             queryParams['groupId']  = groupIds[0]
         } else {
             if(params.startsWith == "A-Z") {
-                query = "select s.* from Species s, taxonomy_definition t "
+                query = "select s.* ";
+                fromQuery = " from Species s, taxonomy_definition t "
                 filterQuery += " and s.taxon_concept_id = t.id and t.group_id  in (:sGroup) "
                 countQuery = "select s.percent_of_info, count(*) as count from Species s, taxonomy_definition t "
                 countFilterQuery += " and s.taxon_concept_id = t.id and t.group_id  in (:sGroup)  ";
@@ -1725,7 +1734,8 @@ class SpeciesService extends AbstractObjectService  {
                 speciesStatusCountQuery = "select t.status, count(*) as count from Species s, taxonomy_definition t "
 
             } else {
-                query = "select s.* from Species s, taxonomy_definition t "
+                query = "select s.* ";
+                fromQuery = " from Species s, taxonomy_definition t "
                 filterQuery += " and title like '<i>${params.startsWith}%' and s.taxon_concept_id = t.id and t.group_id  in (:sGroup) "
                 countQuery = "select s.percent_of_info, count(*) as count from Species s, taxonomy_definition t "
                 countFilterQuery += " and s.title like '<i>${params.startsWith}%' and s.taxon_concept_id = t.id and t.group_id  in (:sGroup)  ";
@@ -1739,9 +1749,16 @@ class SpeciesService extends AbstractObjectService  {
         }
         
         if(params.trait){
-            String traitQuery = getTraitQuery(params.trait);
-            filterQuery += traitQuery;
-            countFilterQuery += traitQuery;
+            Map traitQuery = getTraitQuery(params.trait);
+            println "************************"
+            println traitQuery
+            println "************************"
+
+            filterQuery += traitQuery['filterQuery'];
+            countFilterQuery += traitQuery['filterQuery'];
+
+            orderQuery = "order by "+traitQuery['orderQuery']+(traitQuery['orderQuery']?" ":" ")+orderQuery.replace('order by','');
+
             queryParams['trait'] = params.trait;
         }
 
@@ -1799,7 +1816,7 @@ class SpeciesService extends AbstractObjectService  {
             if(userGroupInstance){
                 queryParams['userGroup'] = userGroupInstance
                 //will have to join 2 tables user_group_species
-                query += " , user_group_species userGroup "
+                fromQuery += " , user_group_species userGroup "
                 filterQuery += " and userGroup.user_group_id=:userGroup and s.id = userGroup.species_id "
                 countQuery += " , user_group_species userGroup "
                 countFilterQuery += " and userGroup.user_group_id=:userGroup and s.id = userGroup.species_id "
@@ -1821,7 +1838,7 @@ class SpeciesService extends AbstractObjectService  {
 
                 queryParams['classification'] = classification.id 
                 activeFilters['classification'] = classification.id
-                query += " , taxonomy_registry as reg "
+                fromQuery += " , taxonomy_registry as reg "
                 filterQuery += " and reg.taxon_definition_id = t.id and reg.classification_id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!')";
                 countQuery += " , taxonomy_registry reg "
                 countFilterQuery += " and reg.taxon_definition_id = t.id and reg.classification_id=:classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!')";
@@ -1865,14 +1882,14 @@ class SpeciesService extends AbstractObjectService  {
 //			def userInstance = params.user.toLong()
 //			if(userInstance){
 //				queryParams['user'] = userInstance
-//				query += " join s.fields as f "
+//				fromQuery += " join s.fields as f "
 //				filterQuery += " and f.uploader.id=:user "
 //				countQuery += " join s.fields as f "
 //				countFilterQuery += " and f.uploader.id=:user "
 //			}
 //		}
 
-        query += filterQuery + orderQuery;
+        //query += filterQuery + orderQuery;
 
         speciesCountFilterQuery = countFilterQuery +" group by t.rank having t.rank in :ranks ";
         queryParams['ranks'] = [TaxonomyRank.SPECIES.ordinal(), TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()]
@@ -1885,7 +1902,7 @@ class SpeciesService extends AbstractObjectService  {
 		
         countQuery += countFilterQuery + " group by s.percent_of_info"
 
-        return [query:query, countQuery:countQuery, speciesCountQuery:speciesCountQuery,  speciesStatusCountQuery:speciesStatusCountQuery, queryParams:queryParams]
+        return [query:query, fromQuery:fromQuery, filterQuery:filterQuery, orderQuery:orderQuery, countQuery:countQuery, speciesCountQuery:speciesCountQuery,  speciesStatusCountQuery:speciesStatusCountQuery, queryParams:queryParams]
 
 
     }
@@ -1896,7 +1913,7 @@ class SpeciesService extends AbstractObjectService  {
     private _getSpeciesList(params) {
         //cache "taxonomy_results"
         def queryParts = _getSpeciesListQuery(params)
-        println queryParts
+        queryParts.query += queryParts.fromQuery + queryParts.filterQuery + queryParts.orderQuery;
         def hqlQuery = sessionFactory.currentSession.createSQLQuery(queryParts.query)
         def hqlCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.countQuery)
         def hqlSpeciesCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.speciesCountQuery)
@@ -1916,12 +1933,9 @@ class SpeciesService extends AbstractObjectService  {
         
         log.debug "Species list query :${queryParts.query} with params ${queryParams}"
         def speciesInstanceList;// = hqlQuery.addEntity(Species.class).list();
-        utilsService.logSql {
         speciesInstanceList = hqlQuery.addEntity(Species.class).list();
-        }
         log.debug "Species list count query :${queryParts.countQuery} with params ${queryParams}"
         def rs = hqlCountQuery.list();
-
         def speciesCountWithContent = 0;
         int count = 0
         for(c in rs) {
@@ -1930,12 +1944,13 @@ class SpeciesService extends AbstractObjectService  {
                 speciesCountWithContent += c[1];
         }
         // Added for species count in namelist
-        if(count == 0){
+        /*if(count == 0){
             def sc = Species.findByIsDeletedAndTaxonConcept(false, TaxonomyDefinition.read(params.taxon));
             if(sc){
               count++;  
             }
         }
+        println count;*/
 
         if(params.daterangepicker_start){
             queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
@@ -2057,8 +2072,6 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
             int index = 0;
-            println "pullImage resources"
-            println resId
             resId.each {
                 def r = Resource.get(it.toLong())
                 println r
@@ -2075,7 +2088,6 @@ class SpeciesService extends AbstractObjectService  {
             }
 
             if(params.resourceListType == "fromRelatedObv"){
-                println resId
                 resId.each{
                     def rid = it
                     def obv = Observation.withCriteria(){
@@ -2100,10 +2112,6 @@ class SpeciesService extends AbstractObjectService  {
                 }
             }
         }
-        println "------------------------------------------"
-        println "------------------------------------------"
-        println "------------------------------------------"
-        println resources
         //species.refresh();
         resources.each { resource ->
             if(params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField") {
@@ -2116,10 +2124,6 @@ class SpeciesService extends AbstractObjectService  {
             }
             species.addToResources(resource);
         }
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        println resources;
         //species.merge();
         if(resources.size() > 0) {
             if(species.instanceOf(Species)) {
@@ -2484,14 +2488,76 @@ def checking(){
         def result = _getSpeciesList(params);
         def matchingSpeciesList = [];
         result.speciesInstanceList.each {it->
-            def link = utilsService.createHardLink("species", "show", it.id);
+            String link = utilsService.createHardLink("species", "show", it.id);
+            def mainImage = it.mainImage();
+            String imagePath = '';
+            List factInstances = Fact.findAllByPageTaxon(it.taxonConcept);
+            //println "fact Instance"+factInstance?.traitValue?.icon
+            def speciesGroupIcon =  it.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
+
+            List traitIcons = [];
+            factInstances?.each { f ->
+                if(f.traitValue) { 
+                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                } else if(f.value && f.toValue) {
+                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                } else if(f.fromDate && f.toDate) {
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                } else if(f.value) {
+                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
+                }
+            }
+
             if(params.downloadFrom == 'matchingSpecies') {
                 //HACK: request not available as its from job scheduler
-                matchingSpeciesList << [it.title, true, 0, link, link]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath, traitIcons]
             } else {
-                matchingSpeciesList << [it.title, true, 0, link, link, params.user]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons]
             }
         }
+
+        Map queryParts = _getSpeciesListQuery(params);
+/*        String query = "select f.trait_id, extract (year from calendar_date) calendar_year, extract (month from calendar_date) calendar_month, count(*) "+queryParts.fromQuery+" , fact f, calendar "+queryParts.filterQuery+" and f.from_date is not null and f.to_date is not null and extract(month from calendar.calendar_date) between extract(month from f.from_date) and extract(month from f.to_date) group by f.trait_id, calendar_year, calendar_month order by calendar_year, calendar_month";
+        println "No of taxon per trait per month++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++"
+        println query
+        println "++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++"
+        Sql sql = Sql.newInstance(dataSource);
+        List taxonPerTraitPerMonth =  sql.rows(query, queryParts.queryParams);
+println taxonPerTraitPerMonth;
+*/
         return [matchingSpeciesList:matchingSpeciesList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
     }
+
+    private File downloadUserDetails(){
+                def sql = Sql.newInstance(dataSource)
+                File csvFile = new File('/home/ifp/git/biodiv/app-conf/', "userInfo.csv")
+                CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+                writer.writeNext("UserName#About Me#Date Created#Email Id#Location#Name#Institution#Occupation#Sex".split("#"))
+                def userInfo = sql.rows("select * from suser where account_expired=false")
+                def dataToWrite = []
+            userInfo.each {
+                log.debug "Writting " + it
+                def temp = []
+                temp.add("" + it[7]);
+                temp.add("" + it[8]);
+                temp.add("" + it[9]);
+                temp.add("" + it[10]);
+                temp.add("" + it[13]);
+                temp.add("" + it[14]);
+                temp.add("" + it[24]);
+                temp.add("" + it[25]);
+                temp.add("" + it[26]);
+                dataToWrite.add(temp.toArray(new String[0]))
+        }
+                writer.writeAll(dataToWrite);
+                writer.flush()
+                writer.close()
+                return csvFile
+        }
 }

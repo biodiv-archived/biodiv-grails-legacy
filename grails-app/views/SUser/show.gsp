@@ -301,15 +301,6 @@ def contact_me_text=g.message(code:'button.contact.me')
                                             <s:namesReportTable model="[uploadList:namesReportList]" />
                                         </div>
                                         </g:if>
-                                        
-                                        <g:if test="${!speciesBulkUploadList.isEmpty()}">
-                                        <div id="uploads" class="section" style="clear: both;overflow:auto;">
-                                            <h6>
-                                                <span class="name" style="color: #b1b1b1;"></span> <g:message code="suser.show.species.bulk.uploads" />
-                                            </h6>
-                                            <s:rollBackTable model="[uploadList:speciesBulkUploadList]" />
-                                        </div>
-                                        </g:if>
                                         <g:if test="${!uploadLogList.isEmpty()}">
                                         <div id="uploads" class="section" style="clear: both;overflow:auto;">
                                             <h6>

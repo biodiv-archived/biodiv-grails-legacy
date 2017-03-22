@@ -65,14 +65,14 @@ class DigestService {
         if(digestContent) {
             while(emailFlag){
                 List<SUser> usersEmailList = [];
-                //Digest.withTransaction { status ->
+                Digest.withTransaction([readOnly:true]) { status ->
                     usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
-                //}
-                if(usersEmailList.size() != 0){
-                    sendDigest(digest, usersEmailList, false, digestContent)
-                    offset = offset + max
-                }else{
-                    emailFlag = false
+                    if(usersEmailList.size() != 0){
+                        sendDigest(digest, usersEmailList, false, digestContent)
+                        offset = offset + max
+                    }else{
+                        emailFlag = false
+                    }
                 }
 
                 if(emailFlag) 

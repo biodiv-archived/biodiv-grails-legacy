@@ -10,6 +10,11 @@
 
 	<!-- main_content -->
 	<div class="list span12 namelist_wrapper" style="margin-left:0px;clear:both">
+        <div class="btn-group" data-toggle="buttons-radio" style="float:right;">
+        <button type="button" class="btn   listFilter default" value="species" id="species">Species Trait</button>
+        <button type="button" class="btn  listFilter" value="observation" id="observation">Observation Trait</button>
+        <button type="button" class="btn  listFilter all" value="all" id="all">All</button>
+    </div>
 		<div class="observation thumbwrap">
 			<obv:showObservationFilterMessage
 						model="['observationInstanceList':instanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'trait']" />
@@ -33,14 +38,9 @@
                     </div>
                 </div>
             </div>
-            <div class="span9 right-shadow-box">
-                <div class="sidebar_section">
-                    <h5>Traits</h5>
-                    <div class="filters" style="position: relative;height:360px;overflow:auto;">
-                        <g:render template="showTraitListTemplate"/>
-                    </div>
-                </div>
-                </div>
+            <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow-y: scroll;">
+                <g:render template="showTraitListTemplate" model="['displayAny':true, 'editable':false]"/>
+            </div>
         </div>
     </div>
 </div>
@@ -54,7 +54,6 @@
     </g:each>
 
     $(document).ready (function() {
-
         var taxonBrowserOptions = {
             expandAll:false,
             controller:"${params.controller?:'observation'}",
@@ -65,31 +64,61 @@
         if(${params.taxon?:false}){
             taxonBrowserOptions['taxonId'] = "${params.taxon}";
         }
-
-        $('.list').on('updatedGallery', function() {
-            $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
-
-            $('.trait button, .trait .all, .trait .any, .trait .none').on('click', function(){
-                if($(this).hasClass('active')){
-                return false;
-                }
+        
+        $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
+        
+        $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none, .listFilter', function(){
+            if($(this).hasClass('active')){
+            return false;
+            }
+            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+                if($(this).hasClass('btn-success')) 
+                    $(this).removeClass('active btn-success');
+                else
+                    $(this).addClass('active btn-success');
+            } else {
                 $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
                 $(this).addClass('active btn-success');
+            }
 
+            updateMatchingSpeciesTable();
+            return false;
+        });
+
+        $('.list').on('updatedGallery', function() {
+                console.log('updatedGallery');
+            initTraitFilterControls();
+            updateMatchingSpeciesTable();
+            element = $('button[data-isNotObservation="false"]');
+            $(element).each(function(){
+                $(this).attr("disabled", "disabled");
+            });
+
+            $('.listFilter').on('click',function(){
+                var element = {};
+                element = $('div[data-isNotObservation]');
+                $(element).each(function(){
+                    $(this).parent().parent().show();
+                });
+                if($(this).hasClass('active')){
+                    return false;
+                }
+                $(this).parent().find('.listFilter').removeClass('active btn-success');
+                $(this).addClass('active btn-success')
                 updateMatchingSpeciesTable();
                 return false;
             });
-            updateMatchingSpeciesTable();
         });
     });
-</script>
-<asset:script type="text/javascript">
+
 $(document).ready(function() {
 	$(".trait button").button();
-	$(".trait button").tooltip({placement:'bottom'});
+	$(".trait button").tooltip({placement:'bottom', 'container':'body'});
     <g:each in="${params.trait}" var="t">
-        $('.trait button[data-tvid="${t.value}"][data-tid="${t.key}"]').addClass('active btn-success');
+        <g:each in="${t.value.split(',')}" var="tv">
+            $('.trait button[data-tvid="${tv}"][data-tid="${t.key}"]').addClass('active btn-success');
+        </g:each>
     </g:each>
-   
 });
-</asset:script>
+</script>

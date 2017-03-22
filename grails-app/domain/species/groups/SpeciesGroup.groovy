@@ -16,7 +16,8 @@ class SpeciesGroup {
 	SpeciesGroup parentGroup;
 	int groupOrder;
 	def grailsApplication;
-	
+    def groupHandlerService;
+
 	static hasMany = [taxonConcept:TaxonomyDefinition, speciesGroupMapping:SpeciesGroupMapping]
 	
 	static fetchMode = [parentGroup: 'eager']
@@ -105,4 +106,8 @@ class SpeciesGroup {
             cache true
         }
     } 
+
+    List<TaxonomyDefinition> getTaxon() {
+        return groupHandlerService.getTaxonByMapping(this);        
+    }
 }

@@ -180,7 +180,9 @@ $(document).ready(function(){
                 'This Month': [moment().startOf('month'), moment().endOf('month')],
                 'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
             },*/
-            format: 'DD/MM/YYYY',
+            locale:{
+                format: 'DD/MM/YYYY'
+            },
             startDate: startDate,
             endDate: endDate,
             maxDate: moment(),

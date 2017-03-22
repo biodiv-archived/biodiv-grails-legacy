@@ -469,7 +469,7 @@ function last_actions() {
     console.log('last actions done');
 }
 
-function loadSuggestedGroups(targetComp, url,offset){	
+function loadSuggestedGroups(targetComp, url,offset,menuCall){	
 	$(document).unbind('click');
 	$('.dropdown-menu').bind('scroll');
 	menuFunction();
@@ -479,7 +479,10 @@ function loadSuggestedGroups(targetComp, url,offset){
 		$(targetComp).show();
 	}
 	var res = $(targetComp).children('li');	
-	var countUGL = $('.usergrouplist').size();
+	var countUGL = $(targetComp).find('.usergrouplist').size();
+	if(menuCall != "undefined" && menuCall && countUGL != 0){		
+		return
+	}
 	if(typeof offset == "undefined"){ offset = 0; }else{offset = countUGL }
 	if((res.length > 0) && (offset == 0) && (countUGL != 0)){
 		return 
@@ -493,9 +496,17 @@ function loadSuggestedGroups(targetComp, url,offset){
 		data: {"offset":offset},
 		success: function(data) {			
 				$(targetComp).find('.load_more_usergroup').remove();
-				$(targetComp).find('.group_load').remove();
-				$(targetComp).append($(data.suggestedGroupsHtml));			
+				$(targetComp).find('.group_load').remove();				
+				if(menuCall != "undefined" && menuCall){
+					$(targetComp).html($(data.suggestedGroupsHtml));
+					if($('.groupMore').length == 0){
+						$(targetComp).append('<li class="groupMore usergrouplist" style="float: right;margin-top: 20px;"><a href="/group/list" >More...</a></li>');
+					}
+				}else{
+					$(targetComp).append($(data.suggestedGroupsHtml));
+				}
 				$(targetComp).show();
+
 				return false;
 		}, error: function(xhr, status, error) {
 			alert(xhr.responseText);

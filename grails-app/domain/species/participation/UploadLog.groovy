@@ -104,20 +104,21 @@ paramsMapAsText type:'text';
 
     def updateStatus(Status status){
         //refresh()
+        UploadLog.withTransaction {
+            this.status = status;
 
-        this.status = status;
+            if((status == Status.ABORTED) ||(status == Status.FAILED) || (status == Status.UPLOADED)){
+                this.endDate = new Date()
+                //updateSpeciesCount()
+            }
 
-        if((status == Status.ABORTED) ||(status == Status.FAILED) || (status == Status.UPLOADED)){
-            this.endDate = new Date()
-            //updateSpeciesCount()
-        }
-
-        if(!this.save(flush:true)){
-            this.errors.allErrors.each { log.error it }
+            if(!this.save(flush:true)){
+                this.errors.allErrors.each { log.error it }
+            }
         }
     }
 
-    def writeLog(String content, Level level = Level.DEBUG) {
+    def writeLog = { String content, Level level=Level.DEBUG -> 
         if(!logFilePath){
             String contentRootDir = Holders.config.speciesPortal.content.rootDir;
             String tmpFileName = (new File(filePath)).getName()+".log";
@@ -131,18 +132,6 @@ paramsMapAsText type:'text';
 
         def ln = System.getProperty('line.separator');
         logFile << "$ln${level.toString()} : $content";
-        switch(level) { 
-            case Level.INFO : 
-            log.info content;
-            break;
-            case Level.WARN :
-            log.warn content;
-            break;
-            case Level.ERROR :
-            log.error content;
-            break;
-            default : 
-            log.debug content;
-        }
+        utilsService.writeLog(content,level);
     }
 }

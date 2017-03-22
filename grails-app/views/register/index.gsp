@@ -256,9 +256,10 @@
 							</div>
 						</div>
 
+
 						<div class="control-group">
-							<span class="policy-text"> <g:message code="register.index.policy" />
-								<a href="/terms"><g:message code="link.terms.conditions" /></a><g:message code="register.index.use.of.site" /> 
+							<span class="policy-text"><g:message code="register.certify" /><br> <g:message code="register.index.policy" /> 
+								<a href="/portal/terms"><g:message code="link.terms.conditions" /></a><g:message code="register.index.use.of.site" /> 
 							</span>
 							<s2ui:submitButton elementId='createButton' form='registerForm'
 								messageCode='spring.security.ui.login.register'

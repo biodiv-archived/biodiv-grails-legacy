@@ -311,8 +311,6 @@ h2{
 }
 
 
-
-
 /*Maps TOC  */
  .layer_explorer_sidebar_items li a   {
 	padding-left:15px;
@@ -328,5 +326,9 @@ margin-right: 16px;
 }
 #home #IDAOTool {
 background-image: url(../images/IDAO.png);
+}
+
+.contributeUlLi a{
+	color:white;
 }
 

@@ -107,22 +107,22 @@
                         <div id="gridSection" class="section checklist-slickgrid ${params.action=='create'?'hide':''}">
                             <span id="addNewColumn" class="btn-link"><g:message code="checklist.create.add.new.column" /></span>
                             <span class="help-inline"> <g:message code="checklist.create.mark.name" /> 
-                                <asset:image src="/all/dropdown_active.gif" absolute="true"/>
+                                <asset:image src="/all/dropdown_active.gif" absolute="true"/>)
 
                             </span>
 
                             
-                            <div id="myGrid" class="" style="width:100%;height:350px;"></div>
+                            <div id="myGrid" class=" ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;height:350px;"></div>
                             <div id="nameSuggestions" style="display: block;"></div>
                             <div id="legend" class="hide">
                                 <span class="incorrectName badge"><g:message code="error.incorrect.names" /></span>
                             </div>
 
                             <div class="section" style="clear:both;margin:0;">
-                                <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
+                                <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'errors')}">
                                     <!--span class="pull-left span3"><g:message
                                         code="observation.mark.sciNameColumn.label" default="Marked Scientific & Common Name Columns:" /></span-->
-                                    <div class="controls">
+                                    <div class="controls" style="clear:both;margin:0;">
                                         <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance?.sciNameColumn}"/>
                                         <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance?.commonNameColumn}"/>
                                         <input type="hidden" id="latitude" class="markColumn" name="latitude" value="${latitude}"/>

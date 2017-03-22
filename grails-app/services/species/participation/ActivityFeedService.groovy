@@ -126,6 +126,8 @@ class ActivityFeedService {
 	static final String SPECIES_MAPS = "species_Occurrence Records"
 	static final String SPECIES_TAXON_RECORD_NAME = "species_Taxon Record Name"
 	static final String TAXON_NAME_UPDATED = "Taxon name updated"
+	static final String FACT_UPDATED = "Updated fact"
+	static final String FACT_CREATED = "Added a fact"
 	
 	
 	private static DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
@@ -161,6 +163,7 @@ class ActivityFeedService {
 		
 		//if not pass through params hiding object whose isShowable = false. In all other cases making feed showable
 		isShowable= (isShowable != null) ? isShowable : (rootHolder.hasProperty('isShowable') && rootHolder.isShowable != null)? rootHolder.isShowable : true
+        println activityType;
 		ActivityFeed af = new ActivityFeed(author:author, activityHolderId:activityHolder?.id, \
 						activityHolderType:getType(activityHolder), \
 						rootHolderId:rootHolder?.id, rootHolderType:getType(rootHolder), \
@@ -391,7 +394,7 @@ class ActivityFeedService {
 				activityTitle = getLocalizedMessage(activityType)
 				text = feedInstance.activityDescrption
 				break
-            case TAXON_NAME_UPDATED :
+            case [TAXON_NAME_UPDATED,FACT_UPDATED, FACT_CREATED] :
                 activityTitle = getLocalizedMessage(activityType)
 				text = feedInstance.activityDescrption
                 break
