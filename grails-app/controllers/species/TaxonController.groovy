@@ -36,6 +36,7 @@ class TaxonController {
     def grailsApplication;
     def messageSource
     def namePermissionService;
+    def externalLinksService;
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
@@ -855,6 +856,31 @@ class TaxonController {
             }
 //        }
 
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def updateExternalLinksFromSheet() {
+        if(params.file) {
+            String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
+            if(new File(file).exists()) {
+                List<Map> content = SpreadsheetReader.readSpreadSheet(file, 0, 0);
+                content.each { row ->
+                    try {
+                    println row;
+                    TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(Long.parseLong(row.get('taxon id')));
+                    if(taxonConcept) {
+                        println taxonConcept.id+" - "+row.get('link');
+                        externalLinksService.updateExternalLink(taxonConcept, "frlht", row.get('link'), false, new Date());
+                    }
+                    } catch(e) {
+                        e.printStackTrace();
+                    }
+                }
+                utilsService.cleanUpGorm(true);
+                println "======= updateExternalLinksFromSheet DONE";
+            }
+        }
+        render "done"
     }
 }
 

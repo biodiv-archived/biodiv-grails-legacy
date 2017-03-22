@@ -8,6 +8,7 @@ class ExternalLinks {
 	String itisId;
 	String ncbiId;
 	String colId
+    String frlhtUrl;
 	
 	Date eolFetchDate;
 	Integer noOfDataObjects;

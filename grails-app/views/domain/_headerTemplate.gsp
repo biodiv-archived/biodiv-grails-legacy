@@ -235,7 +235,7 @@
           </li>
           <!-- /.dropdown -->
           <% def map_href = '/map';
-          	if(userGroupInstance){
+          	if(userGroupInstance && userGroupInstance.webaddress){
           		map_href = uGroup.createLink('mapping':'userGroup', 'action':'map', 'userGroup':userGroupInstance)
           	}
           %>
@@ -302,9 +302,9 @@
           </li>
           <!-- /.dropdown -->
           <% def pageURL,aboutURL
-           if(userGroupInstance) {
+           if(userGroupInstance && userGroupInstance.webaddress) {
               pageURL = "${uGroup.createLink('mapping':'userGroup', 'action':'page', 'userGroup':userGroupInstance) }";
-              aboutURL = "${uGroup.createLink(mapping:'userGroup', 'action':'about', 'userGroup':userGroupInstance)}";
+              aboutURL = "${uGroup.createLink('mapping':'userGroup', 'action':'about', 'userGroup':userGroupInstance)}";
              } else {
               pageURL = "/page";
               aboutURL = "/theportal";
