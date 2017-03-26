@@ -131,6 +131,11 @@ class ExternalLinksService {
 				//log.debug "Setting ncbi link id to : "+idVal
 				taxonConcept.externalLinks.ncbiId = idVal;
 				break;
+			case "frlht" :
+				//log.debug "Setting frlht link id to : "+idVal
+				taxonConcept.externalLinks.frlhtUrl = idVal;
+                //taxonConcept.externalLinks.noOfDataObjects++;
+
 		}
 
 		if(persist) {

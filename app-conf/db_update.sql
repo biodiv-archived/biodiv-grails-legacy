@@ -778,3 +778,6 @@ create table calendar as (
       select date '2017-01-01' + (n || ' days')::interval calendar_date
       from generate_series(0, 365) n
 )
+
+#15th March 2017
+alter table external_links add column frlht_url varchar;
