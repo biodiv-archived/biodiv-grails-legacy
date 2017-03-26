@@ -638,6 +638,7 @@ environments {
                         'org.springframework.security.web'
 */
             debug 'species'
+            info    'com.linkedin.grails.ProfilerPlugin'
         }
     }
     pamba {

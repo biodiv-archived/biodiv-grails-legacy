@@ -336,7 +336,7 @@ class UserGroupTagLib {
 	def isUserGroupMember = { attrs, body->
 		def user = springSecurityService.getCurrentUser();
 		//TODO:optimize count
-		if(user && user.getUserGroups().size() > 0) {
+		if(user && UserGroupMemberRole.countBySUser(user) > 0) {
 			out << body();
 		}
 	}
@@ -486,34 +486,25 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/inviteExpertTemplate", model:attrs.model);
 	}
 
-	def showNoOfFoundedUserGroups  = {attrs, body->
+    def showNoOfFoundedUserGroups  = {attrs, body->
+        def userInstance = attrs.model?.userInstance;
+        def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+        out <<  "<div class=countvaluecontributed>"+count+"</div>"
+    }
+
+	def showNoOfMemberUserGroups  = {attrs, body->
 		def userInstance = attrs.model?.userInstance;
-		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
-
-	def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
-
-			out <<  "<div class=countvaluecontributed>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
-
-
+		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+		out <<  "<div class=countvalue>"+count+"</div>"
 	}
-		def showNoOfMemberUserGroups  = {attrs, body->
+
+    def showNoOfExpertUserGroups  = {attrs, body->
 		def userInstance = attrs.model?.userInstance;
-		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
-		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-
-
-			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,memberRole).size()+"</div>"
-
-
-	}
-		def showNoOfExpertUserGroups  = {attrs, body->
-		def userInstance = attrs.model?.userInstance;
-		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
-		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
-
-			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,expertRole).size()+"</div>"
-
-
+		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+		out <<  "<div class=countvalue>"+count+"</div>"
 	}
 
 }
