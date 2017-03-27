@@ -6,7 +6,7 @@ h4. Basic Stat
 * *REST method* : GET
 * *Requests* :
 {code}
-http://indiabiodiversity.localhost.org/api/chart/basicStat
+http://indiabiodiversity.org/api/chart/basicStat
 {code}
 * *Response* : 
 {code}
@@ -27,7 +27,7 @@ h4. Top Contributors
 * *REST method* : GET
 * *Requests* :
 {code}
-http://indiabiodiversity.localhost.org/api/chart/topContributors
+http://indiabiodiversity.org/api/chart/topContributors
 {code}
 * *Response* : 
 {code}

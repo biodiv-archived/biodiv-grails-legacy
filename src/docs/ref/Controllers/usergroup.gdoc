@@ -20,7 +20,7 @@ h4. list
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Requests* :
 {code}
-http://indiabiodiversity.localhost.org/api/group
+http://indiabiodiversity.org/api/group
 {code}
 
 * *Response* :
@@ -67,8 +67,8 @@ h4. show
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/group/3 or
-http://indiabiodiversity.localhost.org/api/group/birdwatch
+http://indiabiodiversity.org/api/group/3 or
+http://indiabiodiversity.org/api/group/birdwatch
 {code}
 * *Response* :
 ** Successful response
@@ -113,7 +113,7 @@ h4. user
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/group/1/user
+http://indiabiodiversity.org/api/group/1/user
 {code}
 * *Response* :
 ** Successful response
@@ -155,7 +155,7 @@ h4. founders
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/group/1/founders
+http://indiabiodiversity.org/api/group/1/founders
 {code}
 * *Response* :
 ** Successful response
@@ -203,7 +203,7 @@ h4. moderators
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/moderators
+http://indiabiodiversity.org/api/userGroup/moderators
 {code}
 * *Response* :
 ** Successful response
@@ -229,7 +229,7 @@ h4. joinUs
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/group/1/joinUs
+http://indiabiodiversity.org/api/group/1/joinUs
 {code}
 * *Response* :
 ** Successful response
@@ -267,7 +267,7 @@ h4. leaveUs
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/group/1/leaveUs
+http://indiabiodiversity.org/api/group/1/leaveUs
 {code}
 * *Response* :
 ** Successful response
@@ -286,7 +286,7 @@ h4. inviteMembers
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/group/1/inviteMembers
+http://indiabiodiversity.org/api/group/1/inviteMembers
 id:1
 memberUserIds:2,3
 {code}
@@ -321,7 +321,7 @@ h4. inviteExperts
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/inviteExperts
+http://indiabiodiversity.org/api/userGroup/inviteExperts
 id:1
 memberUserIds:2,3
 {code}
@@ -355,7 +355,7 @@ h4. requestMembership
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/requestMembership
+http://indiabiodiversity.org/api/userGroup/requestMembership
 {code}
 * *Response* :
 ** Successful response
@@ -387,7 +387,7 @@ h4. requestModeratorship
 * *Permissions* : logged in user
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/requestModeratorship
+http://indiabiodiversity.org/api/userGroup/requestModeratorship
 {code}
 * *Response* :
 ** Successful response
@@ -448,7 +448,7 @@ h4. getUserUserGroups
 * *REST method* : GET
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/userGroup/getUserUserGroups?id=1184
+http://indiabiodiversity.org/api/userGroup/getUserUserGroups?id=1184
 {code}
 * *Response* :
 ** Successful response

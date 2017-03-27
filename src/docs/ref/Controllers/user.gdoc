@@ -55,7 +55,7 @@ h4. show
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/user/1
+http://indiabiodiversity.org/api/user/1
 {code}
 * *Response* : 
 ** Successful response
@@ -129,45 +129,45 @@ http://indiabiodiversity.localhost.org/api/user/1
                 "htmlData": [
                     [
                     "<button class=\"btn species_groups_sprites mammals_gall_th active\" title=\"Mammals\"></button>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=841&user=1\">Mammals</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=841&user=1\">4</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=841&user=1\">5</a>"
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=841&user=1\">Mammals</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=841&user=1\">4</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=841&user=1\">5</a>"
                     ],
                 [
                     "<button class=\"btn species_groups_sprites reptiles_gall_th active\" title=\"Reptiles\"></button>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=843&user=1\">Reptiles</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=843&user=1\">0</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=843&user=1\">4</a>"
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=843&user=1\">Reptiles</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=843&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=843&user=1\">4</a>"
                     ],
                 [
                     "<button class=\"btn species_groups_sprites molluscs_gall_th active\" title=\"Molluscs\"></button>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=856&user=1\">Molluscs</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=856&user=1\">0</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=856&user=1\">2</a>"
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=856&user=1\">Molluscs</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=856&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=856&user=1\">2</a>"
                     ],
                 [
                     "<button class=\"btn species_groups_sprites plants_gall_th active\" title=\"Plants\"></button>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=833&user=1\">Plants</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=833&user=1\">0</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=833&user=1\">2</a>"
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=833&user=1\">Plants</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=833&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=833&user=1\">2</a>"
                     ],
                 [
                     "<button class=\"btn species_groups_sprites fish_gall_th active\" title=\"Fish\"></button>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=845&user=1\">Fish</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=845&user=1\">0</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=845&user=1\">1</a>"
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=845&user=1\">Fish</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=845&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=845&user=1\">1</a>"
                     ],
                 [
                     "<button class=\"btn species_groups_sprites birds_gall_th active\" title=\"Birds\"></button>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=837&user=1\">Birds</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=837&user=1\">0</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=837&user=1\">11</a>"
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=837&user=1\">Birds</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=837&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=837&user=1\">11</a>"
                     ],
                 [
                     "<button class=\"btn species_groups_sprites arthropods_gall_th active\" title=\"Arthropods\"></button>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=839&user=1\">Arthropods</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=839&user=1\">0</a>",
-                "<a href=\"http://indiabiodiversity.localhost.org/observation/list?sGroup=839&user=1\">21</a>"
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=839&user=1\">Arthropods</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=839&user=1\">0</a>",
+                "<a href=\"http://indiabiodiversity.org/observation/list?sGroup=839&user=1\">21</a>"
                     ]
                     ],
                 "htmlColumns": [
@@ -230,7 +230,7 @@ h4. update
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/user/1
+http://indiabiodiversity.org/api/user/1
 {code}
 * *Response* : 
 ** Successful response
@@ -303,7 +303,7 @@ h4. Upload Resource
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/user/1/upload_resource
+http://indiabiodiversity.org/api/user/1/upload_resource
 {code}
 * *Response* : 
 ** Successfull response

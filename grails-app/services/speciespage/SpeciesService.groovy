@@ -1431,6 +1431,7 @@ class SpeciesService extends AbstractObjectService  {
             //a species page with guid as taxon concept is considered as duplicate
             Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
             if(existingSpecies) {
+                log.debug "Found duplicate species : "+existingSpecies;
 				existingSpecies.clearBasicContent()
                 speciesInstance = existingSpecies;
             }
