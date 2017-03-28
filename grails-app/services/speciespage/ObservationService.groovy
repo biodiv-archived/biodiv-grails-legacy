@@ -1184,7 +1184,7 @@ class ObservationService extends AbstractMetadataService {
                 //featureQuery = " join (select f.objectId, f.objectType from Featured f group by f.objectType, f.objectId) as feat"
               //  featureQuery = ", select distinct Featured.objectId from Featured where Featured.objectType = :featType as feat "
             } else {
-                featureQuery = ", Featured feat "
+                featureQuery = " join Featured feat on obv.id = feat.object_id "
             }
             query += featureQuery;
             //filterQuery += " and obv.featureCount > 0 "

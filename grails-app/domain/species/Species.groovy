@@ -394,8 +394,10 @@ class Species implements Rateable {
 	 */
 	def clearBasicContent(){
 		//this.resources?.clear();
-		fields.each { sf -> 
-			removeFromFields(sf)
+        def tmp = [] ;
+        tmp.addAll fields;
+		tmp.each { sf -> 
+			this.removeFromFields(sf)
 			def ge = GeographicEntity.read(sf.id)
 			if(ge){
 				s.removeFromGlobalDistributionEntities(ge)

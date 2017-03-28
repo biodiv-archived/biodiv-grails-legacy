@@ -98,7 +98,7 @@ http://indiabiodiversity.org/api/related/observation/speciesName/358907
 
 ** __Related Observations by location__
 {code}
-http://indiabiodiversity.localhost.org/api/related/observation/nearByRelated/358907
+http://indiabiodiversity.org/api/related/observation/nearByRelated/358907
 {code}
 
 h4. occurrences 
@@ -115,7 +115,7 @@ http://indiabiodiversity.org/api/observation/distinctReco?sGroup=829&habitat=267
 h4. Count of observations as per speciesGroup
 
 {code}
-http://indiabiodiversity.localhost.org/api/observation/speciesGroupCount
+http://indiabiodiversity.org/api/observation/speciesGroupCount
 {code}
 
 h4. show 
@@ -208,7 +208,7 @@ http://indiabiodiversity.org/api/observation/269204
                     "id": 3,
                     "name": "The Western Ghats",
                     "description": "<h2 style=\"margin: 10px 0px; font-family: Verdana, Helvetica, sans-serif; font-weight: normal; line-height: 40px; color: rgb(85, 85, 85); text-rendering: optimizelegibility; font-size: 31.5px; padding: 5px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(229, 229, 229);\">\r\n\t<span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghats, a mountainous ridge running parallel to the west coast of India&rsquo;s ancient peninsula, has a rich and intriguing history.&nbsp;</span><span style=\"color: rgb(94, 94, 94); font-size: 14px;\">The Western Ghat portal seeks to provide a platform for aggregating diverse information on the biodiversity of the Western Ghats. As interested, discerning readers, students and researchers we request you to participate and create an online open collaborative system for sharing biodiversity information.</span></h2>\r\n<p>\r\n\t&nbsp;</p>\r\n",
-                    "domainName": "http://thewesternghats.indiabiodiversity.localhost.org",
+                    "domainName": "http://thewesternghats.indiabiodiversity.org",
                     "webaddress": "the_western_ghats",
                     "foundedOn": "2013-07-15T18:09:55Z",
                     "icon": "/7d3bb3f5-2626-4a13-b9aa-ecfaabe84263/resources/807.gif"
@@ -260,7 +260,7 @@ h4. save
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/save?url_1=http://www.youtube.com/watch?v=v8HVWDrGr6o&type_1=VIDEO&rating_1=2&resourceListType=ofObv&fromDate=01/06/2014&placeName=Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India&areas=POINT(76.42376839999997 9.6297152)&location_accuracy=Approximate&notes=    Found this bird on my trip to&nbsp;Kumarakom Bird Sanctuary</p>&tags=parrot, bird&agreeTerms=on&group_id=829&habitat_id=267838"
+http://indiabiodiversity.org/api/observation/save?url_1=http://www.youtube.com/watch?v=v8HVWDrGr6o&type_1=VIDEO&rating_1=2&resourceListType=ofObv&fromDate=01/06/2014&placeName=Kumarakom Bird Sanctuary, SH 42, Kerala 686563, India&areas=POINT(76.42376839999997 9.6297152)&location_accuracy=Approximate&notes=    Found this bird on my trip to&nbsp;Kumarakom Bird Sanctuary</p>&tags=parrot, bird&agreeTerms=on&group_id=829&habitat_id=267838"
 {code}
 For example
 {code}
@@ -380,7 +380,7 @@ h4. upload_resource
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=species.participation.Observation
+http://indiabiodiversity.org/api/observation/upload_resource?resType=species.participation.Observation
 {code}
 * *Response* : 
 ** Successfull response
@@ -396,7 +396,7 @@ http://indiabiodiversity.localhost.org/api/observation/upload_resource?resType=s
                 {
                     "fileName": "/7a4b7349-4845-468f-afba-a9986e9b2c93/704.JPG",
                     "url": "",
-                    "thumbnail": "http://indiabiodiversity.localhost.org/biodiv/observations//7a4b7349-4845-468f-afba-a9986e9b2c93/704_gall.jpg",
+                    "thumbnail": "http://indiabiodiversity.org/biodiv/observations//7a4b7349-4845-468f-afba-a9986e9b2c93/704_gall.jpg",
                     "type": {
                         "enumType": "species.Resource$ResourceType",
                         "name": "IMAGE"
@@ -429,7 +429,7 @@ h4. getRecommendationVotes
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/245/getRecommendationVotes
+http://indiabiodiversity.org/api/observation/245/getRecommendationVotes
 {code}
 * *Response* :
 ** on success
@@ -496,7 +496,7 @@ h4. addRecommendationVote
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/id/addRecommendationVote?obvId=245&recoName=Animalia&commonName=common name&languageName=English
+http://indiabiodiversity.org/api/observation/id/addRecommendationVote?obvId=245&recoName=Animalia&commonName=common name&languageName=English
 {code}
 * *Response* :
 ** on success
@@ -586,7 +586,7 @@ h4. flagDelete
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/observation/flagDeleted?id=234
+http://indiabiodiversity.org/api/observation/flagDeleted?id=234
 {code}
 * *Response* :
 ** on success
