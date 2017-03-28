@@ -1737,3 +1737,6 @@ grails {
 */
 grails.assets.bundle=true
 grails.assets.minifyJs=false
+cble.logging = trueors.url.pattern = '/api/*'
+cors.headers = ['Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, TRACE, OPTIONS']
+cors.enable.logging = true

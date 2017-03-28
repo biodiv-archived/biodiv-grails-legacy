@@ -51,7 +51,7 @@ class TaxonController {
      */
     def listHierarchy() {
         //cache "taxonomy_results"
-        includeOriginHeader();
+        //includeOriginHeader();
         int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0
         def parentId = params.id  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
@@ -478,14 +478,12 @@ class TaxonController {
      * @param origin
      * @return
      */
+/*
+    installed cors plugin
     private boolean isValid(String origin) {
         String originHost = (new URL(origin)).getHost();
         return grailsApplication.config.speciesPortal.validCrossDomainOrigins.contains(originHost)
     }
-
-    /**
-     * 
-     */
     private void includeOriginHeader() {
         String origin = request.getHeader("Origin");
         if(origin) {
@@ -496,6 +494,7 @@ class TaxonController {
             response.setHeader("Access-Control-Max-Age", "86400");
         }
     }
+    */
 
 	@Secured(['ROLE_USER'])
     def create() {
