@@ -17,21 +17,22 @@
                 def counter = 0 
             %>
             <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
+            <li class="filePicker" style="width:100%"></li>
             <li class="add_file addedResource" >
             
             <div class="add_file_container">
-                <div class="add_image"><span class="add_resource_text"><g:message code="default.resource.add.image.label" /></span></div> 
+                <div class="add_image"><span class="add_resource_text"><%--<g:message code="default.resource.add.image.label" />--%></span></div> 
                
-                <div class="add_video editable"><span class="add_resource_text"><g:message code="default.resource.add.video.label" /></span></div>
+                <div class="add_video editable"><span class="add_resource_text"><%--<g:message code="default.resource.add.video.label" />--%></span></div>
                 
-                <div class="add_audio"><span class="add_resource_text"><g:message code="default.resource.add.audio.label" /></span></div>
+                <div class="add_audio"><span class="add_resource_text"><%--<g:message code="default.resource.add.audio.label" />--%></span></div>
 
             </div>
             <div class="progress">
                 <div class="translucent_box"></div>
                 <div class="progress_bar"></div>
                 <div class="progress_msg"></div>
-                <div class="mediaProgressBar" style ="margin-top:117px"></div>
+                <div class="mediaProgressBar" style ="margin-top:0px;height:0px;"></div>
             </div>
             </li>
             </g:if>

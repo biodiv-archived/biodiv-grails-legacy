@@ -7,8 +7,11 @@ window.filesutra = {
     var filesutraServer = window.params.filesutraURL
 
     if (options && options.dialogType == 'iframe') {
-      var iframe = document.getElementById(options.parentId)
-      iframe.src = filesutraServer;
+        /*var ifrm = document.createElement("iframe");
+        ifrm.src = filesutraServer;
+        ifrm.style.width = "640px";
+        ifrm.style.height = "480px";
+        document.getElementsByClassName(options.parentSelector)[0].prepend(ifrm);*/
     } else {
       window.open(filesutraServer, "Filesutra", "width=1000, height=600, top=100, left=300");
     }
@@ -17,8 +20,7 @@ window.filesutra = {
 };
 
 window.onmessage = function (e) {
-  var data = e.data;
-  if (data.type === 'filesutra') {
-    window.filesutraCallback(data.data);
+  if (e.data.type === 'filesutra') {
+    window.filesutraCallback(e.data);
   }
 };

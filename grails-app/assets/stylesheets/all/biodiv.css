@@ -542,35 +542,34 @@ div.errors {
 	overflow: inherit !important;
 }
 .add_image {
-	background-image: url('/assets/all/add_photo.png');
+/*	background-image: url('/assets/all/add_photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
-/* 	background-position: 2px 2px; */
 	width: 170px;
 	height: 65px;
 	cursor: pointer;
 	border-bottom: 3px red;
 	position: relative;
+*/
 }
 .add_video {
-	background-image: url('/assets/all/add_video.png');
+/*	background-image: url('/assets/all/add_video.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
-/* 	background-position: 2px 2px; */
 	width: 170px;
 	height: 65px;
 	cursor: pointer;
 	position: relative;
-}
+*/}
 .add_audio {
-	background-image: url('/assets/all/add_audio.png');
+/*	background-image: url('/assets/all/add_audio.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-audio.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
 	width: 170px;
 	height: 65px;
 	cursor: pointer;
 	position: relative;
-}
+*/}
 
 .add_resource_text{
   position: absolute;

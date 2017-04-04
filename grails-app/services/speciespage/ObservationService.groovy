@@ -878,7 +878,7 @@ class ObservationService extends AbstractMetadataService {
         def sql =  Sql.newInstance(dataSource);
         try {
             String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
-            def rows = sql.rows("select count(*) as count from observation as g2 where ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false", [maxRadius:maxRadius]);
+            def rows = sql.rows("select count(*) as count from observation as g2 where ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false");
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
             def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false order by ${point} <-> g2.topology, g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
@@ -1064,7 +1064,6 @@ class ObservationService extends AbstractMetadataService {
         else {
             observationInstanceList = hqlQuery.addEntity('obv', Observation).list();
             for(int i=0;i < observationInstanceList.size(); i++) {
-                println observationInstanceList[i].isChecklist
                 if(observationInstanceList[i].isChecklist) {
                     //observationInstanceList[i] = Checklists.read(observationInstanceList[i].id);
                 }

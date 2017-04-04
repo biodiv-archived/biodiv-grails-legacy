@@ -273,11 +273,11 @@ function createResources(start, end, w, count) {
                     }
                     return d.promise() 
                 }, 
-                    validate :  function(value) {
-                        if($.trim(value) == '') {
-                            return window.i8ln.observation.addResource.fr;
-                        }
-                    }, 
+                validate :  function(value) {
+                    if($.trim(value) == '') {
+                        return window.i8ln.observation.addResource.fr;
+                    }
+                }, 
                 title : window.i8ln.observation.addResource.ayoutube
             };
 
@@ -286,8 +286,14 @@ function createResources(start, end, w, count) {
             me.$ele.find('.add_video').editable(videoOptions);
            // me.$ele.find('.add_audio').editable(audioOptions);
 
+            var ifrm = document.createElement("iframe");
+            ifrm.src =  window.params.filesutraURL;
+            ifrm.style.width = "100%";
+            ifrm.style.height = "242px";
+            $('.filePicker').prepend(ifrm);
+            $('.filePicker').data('uploadResource', me);
 
-
+            window.filesutraCallback = me.filePick;
 
             me.$form.ajaxForm({ 
                 url:window.params.observation.uploadUrl,
@@ -312,12 +318,11 @@ function createResources(start, end, w, count) {
             //this.$ele.find('.progress_msg').html(window.i8ln.observation.addResource.uploading);
         },
 
-        filePick : function(e) {
-            var me = this;
-            
-            filesutra.importFiles(function(FPFiles) {
-              console.log(FPFiles);
-                $(".sortMediaOnExif").addClass("disabled");
+        filePick : function(data) {
+            var me = $('.filePicker').data('uploadResource');
+            var FPFiles = data.data;
+            console.log(FPFiles);
+            $(".sortMediaOnExif").addClass("disabled");
                 var count = 0;
                 me.uploadedFiles = FPFiles;
                 console.log(me.uploadedFiles);
@@ -329,12 +334,17 @@ function createResources(start, end, w, count) {
                 me.$form.find("input[name='resources']").remove();
 
                 $.each(FPF, function(){
+                    console.log('each');
                     console.log(JSON.stringify(this));
-                    $('<input>').attr({
-                        type: 'hidden',
-                        name: 'resources',
-                        value:JSON.stringify(this)
-                    }).appendTo(me.$form);
+                    if(data.contentType == 'videoUrl') {
+                        $('.videoUrl').val(JSON.stringify(this).replace('"',''));
+                    } else {
+                        $('<input>').attr({
+                            type: 'hidden',
+                            name: 'resources',
+                            value:JSON.stringify(this)
+                        }).appendTo(me.$form);
+                    }
                     count = count + 1;
                 });
                 if($( "input[name='resType']" ).val() == "species.auth.SUser") {
@@ -352,7 +362,6 @@ function createResources(start, end, w, count) {
                 });
                 me.$ele.find(".ui-progressbar-value").css('background','darkgoldenrod');
                 me.submitRes();
-              });
             /*var onSuccess = function(FPFiles){
                 $(".sortMediaOnExif").addClass("disabled");
                 var count = 0;
@@ -474,7 +483,7 @@ function createResources(start, end, w, count) {
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
             $(form).find("span.msg").html("");
             //me.$ele.find(".progress").css('z-index',90);
-            //me.$ele.find('.progress_msg').html('Processing Image......');
+            me.$ele.find('.progress_msg').html('');
             me.$ele.find(".iemsg").html("");
             //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
             //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'

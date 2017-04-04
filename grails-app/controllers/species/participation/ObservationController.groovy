@@ -706,6 +706,10 @@ class ObservationController extends AbstractObjectController {
 				if(params.videoUrl) {
 					//TODO:validate url;
 					def videoUrl = params.videoUrl;
+                    println '--------------------------------';
+                    println '--------------------------------';
+                    println '--------------------------------';
+                    println videoUrl;
 					if(videoUrl && Utils.isURL(videoUrl)) {
 						String videoId = Utils.getYouTubeVideoId(videoUrl);
 						if(videoId) {
