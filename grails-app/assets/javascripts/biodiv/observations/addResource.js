@@ -289,7 +289,7 @@ function createResources(start, end, w, count) {
             var ifrm = document.createElement("iframe");
             ifrm.src =  window.params.filesutraURL;
             ifrm.style.width = "100%";
-            ifrm.style.height = "242px";
+            ifrm.style.height = "350px";
             $('.filePicker').prepend(ifrm);
             $('.filePicker').data('uploadResource', me);
 
@@ -483,7 +483,6 @@ function createResources(start, end, w, count) {
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
             $(form).find("span.msg").html("");
             //me.$ele.find(".progress").css('z-index',90);
-            me.$ele.find('.progress_msg').html('');
             me.$ele.find(".iemsg").html("");
             //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
             //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
@@ -516,6 +515,7 @@ function createResources(start, end, w, count) {
             } else {
                 attachThumbnailAndProcess(me, images); 
             }
+            me.$ele.find('.progress_msg').html('');
         },
 
         onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
