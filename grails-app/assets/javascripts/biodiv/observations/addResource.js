@@ -105,7 +105,13 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
     if(!jobId) {
         console.log("NO JOB ID");
         return;
+    } else if(jobId == 'dummyJobId') {
+        flag = false;
+        attachThumbnailAndProcess(me, images);
+        submitNextUpload(me);
+        return;
     }
+
     $.ajax({
         url:window.params.getProcessedImageUrl,
         dataType: "json",
@@ -170,10 +176,10 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
 }
 
 function getProcessedImageStatus(jobId, images, me) {
-    if(!jobId) {
+    /*if(!jobId) {
         console.log("NO JOB ID");
         return;
-    }
+    }*/
     getProcessedImageStatusInAjax(jobId, images, me);
 }
 
@@ -357,7 +363,7 @@ function createResources(start, end, w, count) {
                     }).appendTo(me.$form);
                 }
                 me.$ele.find(".progress").css('z-index',110);
-                me.$ele.find('.progress_msg').html('Processing <br> Images...');
+                me.$ele.find('.progress_msg').html('Processing...');
                 me.$ele.find(".mediaProgressBar").progressbar({
                     value:0
                 });
@@ -390,7 +396,7 @@ function createResources(start, end, w, count) {
                     }).appendTo(me.$form);
                 }
                 me.$ele.find(".progress").css('z-index',110);
-                me.$ele.find('.progress_msg').html('Processing <br> Images...');
+                me.$ele.find('.progress_msg').html('Processing...');
                 me.$ele.find(".mediaProgressBar").progressbar({
                     value:0
                 });
@@ -511,7 +517,7 @@ function createResources(start, end, w, count) {
                 x--;
             });
             console.log(uploadedObjType);
-            if(uploadedObjType == "IMAGE"){
+            if(uploadedObjType == "IMAGE" || uploadedObjType == "AUDIO"){
                 getProcessedImageStatus(me.jobId, images, me); 
             } else {
                 attachThumbnailAndProcess(me, images); 

@@ -668,7 +668,7 @@ class ObservationController extends AbstractObjectController {
                                 new AntBuilder().copy( file:url,tofile:file)
                             }else{
                                 log.debug "download"
-                                download(url, file );                       
+                                download(url, file); 
                             }						
                         } else {
                             log.debug "file transfer"
@@ -697,7 +697,7 @@ class ObservationController extends AbstractObjectController {
                         if(pi)
                             resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
                         else 
-						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:'dummyJobId']);
 					       
                         if(parsedVal == true){
                             def deleteFile = new File(f.url)
