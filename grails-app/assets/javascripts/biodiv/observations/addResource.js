@@ -4,7 +4,7 @@ function removeResource(event, imageId) {
     if (event.target) targ = event.target;
     else if (event.srcElement) targ = event.srcElement; //for IE
     else {}
-    if(($(targ).closest(".imagesList").size() == 1) && ($( "input[name='resType']" ).val() == "species.auth.SUser")){
+    if(($(targ).closest(".uploaded_files_list").size() == 1) && ($( "input[name='resType']" ).val() == "species.auth.SUser")){
         var resId =  $(targ).parent('.addedResource').find(".resId").val();
         var fileName = $(targ).parent('.addedResource').find(".fileName").val();
         var resDeleteUrl = window.params.resDeleteUrl;
@@ -47,7 +47,7 @@ function attachThumbnailAndProcess(me , images) {
         });
     }
     rate(metadataEle.find('.star_obvcreate'));
-    me.$ele.find(".imagesList li:first" ).after (metadataEle);
+    me.$ele.find(".uploaded_files_list li:first" ).after (metadataEle);
     me.$ele.find(".add_file" ).fadeIn(3000);
     me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
     me.$ele.find(".image-resources-msg").html("");
@@ -290,6 +290,7 @@ function createResources(start, end, w, count) {
             ifrm.src =  window.params.filesutraURL;
             ifrm.style.width = "100%";
             ifrm.style.height = "350px";
+            ifrm.style.border = "1px solid";
             $('.filePicker').prepend(ifrm);
             $('.filePicker').data('uploadResource', me);
 
@@ -515,7 +516,7 @@ function createResources(start, end, w, count) {
             } else {
                 attachThumbnailAndProcess(me, images); 
             }
-            me.$ele.find('.progress_msg').html('');
+            //me.$ele.find('.progress_msg').html('');
         },
 
         onUploadResourceError : function (xhr, ajaxOptions, thrownError) {

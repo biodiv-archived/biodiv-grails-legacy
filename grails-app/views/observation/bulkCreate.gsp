@@ -17,9 +17,7 @@
                 border-top: 1px solid #9E9E9E;
                 box-shadow: 0 2px 11px -3px inset;
                 padding: 10px;
-                min-height: 212px;
-                height:250px;
-                width:870px;
+                min-height: 260px;
             }
             td {
                 text-align:center;
@@ -139,13 +137,16 @@
             .controls.textbox {
                 height:40px !important;
             }
-            .imagesListWrapper {
+            .uploaded_files_list_container {
                 overflow-x:scroll;
                 overflow-y:hidden;
-                height: 284px;
+                clear:both;
+                margin-left:0px;
+                width:100%
+                /*height: 284px;
                 width:884px;
                 margin-left:2px;
-            }
+            */}
             .imageHolder {
                 border: 1px solid grey ;
                 background-color: lightgrey ;
@@ -168,7 +169,7 @@
                 color: grey;
                 line-height: 23px;
             }
-            .imagesListWrapper .imagesList {
+            .uploaded_files_list {
                 width:100000px;
                 white-space:nowrap !important;
             }
@@ -222,6 +223,7 @@
             .sortMediaOnExif {
                 margin-right:2px;
                 margin-top:2px;
+                clear:both;
             }            
             .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div{
                 width: 220px;

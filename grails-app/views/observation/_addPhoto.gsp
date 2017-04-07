@@ -18,6 +18,8 @@
             %>
             <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
             <li class="filePicker" style="width:100%"></li>
+            <li class="uploaded_files_list_container">
+            <ul class="uploaded_files_list thumbnails" style="margin-left:0px;">
             <li class="add_file addedResource" >
             
             <div class="add_file_container">
@@ -186,4 +188,5 @@
     </div>
     <div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
     </li>
+    </ul></li>
 </script>

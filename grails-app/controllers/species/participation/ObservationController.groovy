@@ -664,11 +664,14 @@ class ObservationController extends AbstractObjectController {
                             //modifying url to give permissions.
                             //url += '?signature=' + fp.signature +'&policy='+fp.policy
 						    if(parsedVal == true){
+                                log.debug "AntBuilder().copy";
                                 new AntBuilder().copy( file:url,tofile:file)
                             }else{
+                                log.debug "download"
                                 download(url, file );                       
                             }						
                         } else {
+                            log.debug "file transfer"
                             f.transferTo( file );
                         }
                         String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
