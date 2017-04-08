@@ -919,7 +919,7 @@ function openDetails(row, cell) {
         return false;
     }
 
-    $('#addResourcesModal ul.imagesList>li.addedResource.thumbnail').remove();
+    $('#addResourcesModal ul.uploaded_files_list>li.addedResource.thumbnail').remove();
 
     var data = grid.getData()[row];
     var media = data.Media;
@@ -953,7 +953,7 @@ function openDetails(row, cell) {
             rate($ratingContainer)
         })
 
-        $(".imagesList li:first" ).after (metadataEle);
+        $(".uploaded_files_list" ).after (metadataEle);
     }
 
     $('#addResourcesModal').data({'row':row, 'cell':cell}).modal('show');
@@ -974,7 +974,7 @@ $(document).ready(function() {
            return false;
        }
         var data = grid.getData()[row]
-        var addedResources = $('#addResourcesModal ul.imagesList>li');
+        var addedResources = $('#addResourcesModal ul.uploaded_files_list>li');
         data.Media = new Array($(addedResources).length-1);
         for(var i=0; i<$(addedResources).length-1; i++) {
             data.Media[i] = {};
