@@ -94,6 +94,7 @@ function submitNextUpload(me) {
         }
         me.submitRes();
     } else {
+        $('.add_file.addedResource').hide();
         me.$ele.find(".progress").css('z-index',90);
         me.$ele.find(".mediaProgressBar").progressbar("destroy");
         me.$ele.find('.progress_msg').html('');
@@ -158,6 +159,7 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
                 return;
 
             } else if(data.imageStatus == "Failed") {
+                $('.add_file.addedResource').hide();
                 me.$ele.find(".progress").css('z-index',90);
                 me.$ele.find('.progress_msg').html('');
                 flag = false;
@@ -295,7 +297,7 @@ function createResources(start, end, w, count) {
             var ifrm = document.createElement("iframe");
             ifrm.src =  window.params.filesutraURL;
             ifrm.style.width = "100%";
-            ifrm.style.height = "350px";
+            ifrm.style.height = "330px";
             ifrm.style.border = "1px solid";
             $('.filePicker').prepend(ifrm);
             $('.filePicker').data('uploadResource', me);
@@ -362,6 +364,7 @@ function createResources(start, end, w, count) {
                         value: count
                     }).appendTo(me.$form);
                 }
+                $('.add_file.addedResource').show();
                 me.$ele.find(".progress").css('z-index',110);
                 me.$ele.find('.progress_msg').html('Processing...');
                 me.$ele.find(".mediaProgressBar").progressbar({
@@ -538,6 +541,7 @@ function createResources(start, end, w, count) {
                 me.$form.find("span.msg").html("");
                 me.$ele.find('.videoUrl').val('');
                 me.$ele.find('.audioUrl').val('');
+                $('.add_file.addedResource').hide();
                 me.$ele.find(".progress").css('z-index',90);
                 me.$ele.find('.add_video').editable('setValue','', false);
               //  me.$ele.find('.add_audio').editable('setValue','', false);

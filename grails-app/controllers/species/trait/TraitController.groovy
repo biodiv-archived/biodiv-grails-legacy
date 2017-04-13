@@ -279,16 +279,28 @@ class TraitController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def upload() {
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir + File.separator + params.controller);          
-        if(!contentRootDir.exists()) {
-            contentRootDir.mkdir();
+        if(!params.file || ! params.tvFile) {
+            flash.message = "Traits definition and value files are required";
+            render (view:'upload', model:[file:params.file, tvFile:params.tvFile]);
+            return;
         }
 
         params.file = contentRootDir.getAbsolutePath() + File.separator + params.file;
         params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile;
 
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir + File.separator + params.controller);          
+        if(!contentRootDir.exists()) {
+            contentRootDir.mkdir();
+        }
+
         def r = traitService.upload(params);
-        redirect(action: "list")
+        if(r.success) {
+            flash.message = r.msg;
+            redirect(action: "list")
+        } else {
+            flash.message = r.msg;
+            redirect(action: "create", model:[file:params.file, tvFile:params.tvFile, errors:errors]);
+        }
     }
 
     def matchingSpecies() {

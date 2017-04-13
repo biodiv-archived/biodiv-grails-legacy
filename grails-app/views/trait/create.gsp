@@ -43,7 +43,7 @@ display:none;
             onsubmit="document.getElementById('traitFormSubmit').disabled = 1;"
             class="form-horizontal">
 
-            <div class="span12 super-section" style="margin-left: 150px;">
+            <div class="span12 super-section">
                 <div class="section">
                     <div
                         class="control-group ${hasErrors(bean: traitInstance, field: 'name', 'error')}">

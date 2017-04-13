@@ -20,7 +20,7 @@
             <li class="filePicker" style="width:100%"></li>
             <li class="uploaded_files_list_container">
             <ul class="uploaded_files_list thumbnails" style="margin-left:0px;">
-            <li class="add_file addedResource" >
+            <li class="add_file addedResource" style="display:none;">
             
             <div class="add_file_container">
                 <div class="add_image"><span class="add_resource_text"><%--<g:message code="default.resource.add.image.label" />--%></span></div> 
