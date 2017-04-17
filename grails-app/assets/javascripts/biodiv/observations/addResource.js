@@ -330,48 +330,53 @@ function createResources(start, end, w, count) {
         filePick : function(data) {
             var me = $('.filePicker').data('uploadResource');
             var FPFiles = data.data;
+            console.log('-----------------');
             console.log(FPFiles);
             $(".sortMediaOnExif").addClass("disabled");
-                var count = 0;
-                me.uploadedFiles = FPFiles;
-                console.log(me.uploadedFiles);
-                me.uploadedFilesSize = FPFiles.length;
+            var count = 0;
+            if(me.uploadedFiles == undefined) {
                 me.start = 0;
                 me.w = 1;
-                var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
-                me.start = me.start + me.w;
-                me.$form.find("input[name='resources']").remove();
+                me.uploadedFiles = [];
+            }
+            console.log(me.start);
+            me.uploadedFiles = me.uploadedFiles.concat(FPFiles);
+            console.log(me.uploadedFiles);
+            me.uploadedFilesSize = me.uploadedFiles.length;
+            var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
+            me.start = me.start + me.w;
+            me.$form.find("input[name='resources']").remove();
 
-                $.each(FPF, function(){
-                    console.log('each');
-                    console.log(JSON.stringify(this));
-                    if(data.contentType == 'videoUrl') {
-                        $('.videoUrl').val(JSON.stringify(this).replace('"',''));
-                    } else {
-                        $('<input>').attr({
-                            type: 'hidden',
-                            name: 'resources',
-                            value:JSON.stringify(this)
-                        }).appendTo(me.$form);
-                    }
-                    count = count + 1;
-                });
-                if($( "input[name='resType']" ).val() == "species.auth.SUser") {
-                    $("input[name='obvDir']").val('');
+            $.each(FPF, function(){
+                console.log('each');
+                console.log(JSON.stringify(this));
+                if(data.contentType == 'videoUrl') {
+                    $('.videoUrl').val(JSON.stringify(this).replace('"',''));
+                } else {
                     $('<input>').attr({
                         type: 'hidden',
-                        name: 'lastUploaded',
-                        value: count
+                        name: 'resources',
+                        value:JSON.stringify(this)
                     }).appendTo(me.$form);
                 }
-                $('.add_file.addedResource').show();
-                me.$ele.find(".progress").css('z-index',110);
-                me.$ele.find('.progress_msg').html('Processing...');
-                me.$ele.find(".mediaProgressBar").progressbar({
-                    value:0
-                });
-                me.$ele.find(".ui-progressbar-value").css('background','darkgoldenrod');
-                me.submitRes();
+                count = count + 1;
+            });
+            if($( "input[name='resType']" ).val() == "species.auth.SUser") {
+                $("input[name='obvDir']").val('');
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'lastUploaded',
+                    value: count
+                }).appendTo(me.$form);
+            }
+            $('.add_file.addedResource').show();
+            me.$ele.find(".progress").css('z-index',110);
+            me.$ele.find('.progress_msg').html('Processing...');
+            me.$ele.find(".mediaProgressBar").progressbar({
+                value:0
+            });
+            me.$ele.find(".ui-progressbar-value").css('background','darkgoldenrod');
+            me.submitRes();
             /*var onSuccess = function(FPFiles){
                 $(".sortMediaOnExif").addClass("disabled");
                 var count = 0;
@@ -431,7 +436,7 @@ function createResources(start, end, w, count) {
 
 
 
-
+/*
 
 
          filePickAudio : function(e) {
@@ -483,7 +488,7 @@ function createResources(start, end, w, count) {
             }
                                     
         },
-
+*/
 
 
 

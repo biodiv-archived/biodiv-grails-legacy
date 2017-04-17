@@ -142,11 +142,13 @@
                 overflow-y:hidden;
                 clear:both;
                 margin-left:0px;
-                width:100%
+                width:100%;
+                line-height:20px !important;
                 /*height: 284px;
                 width:884px;
                 margin-left:2px;
-            */}
+            */
+            }
             .imageHolder {
                 border: 1px solid grey ;
                 background-color: lightgrey ;

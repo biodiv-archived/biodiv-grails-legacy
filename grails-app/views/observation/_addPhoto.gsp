@@ -17,10 +17,18 @@
                 def counter = 0 
             %>
             <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
-            <li class="filePicker" style="width:100%"></li>
-            <li class="uploaded_files_list_container">
+            <li class="filePicker" style="width:100%;height:330px;"></li>
+            <li class="uploaded_files_list_container" style="line-height:0px">
+            <g:if test="${resourceListType == 'usersResource'}">
+            
+            <a style="margin-bottom:3px;" class="pull-right sortMediaOnExif btn" onclick='sortMediaOnExif()'><g:message code="button.sort.date" /></a>
+            
+            <i class="icon-picture"></i><span style="font-weight:bold;margin-left:2px;"><g:message code="button.my.uploads" /></span> <span> <g:message code="text.stored.period" /></span>
+            </g:if>
+
+
             <ul class="uploaded_files_list thumbnails" style="margin-left:0px;">
-            <li class="add_file addedResource" style="display:none;">
+            <li class="add_file addedResource" style="display:none !important;">
             
             <div class="add_file_container">
                 <div class="add_image"><span class="add_resource_text"><%--<g:message code="default.resource.add.image.label" />--%></span></div> 
