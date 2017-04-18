@@ -11,7 +11,7 @@ class NameValidationJob {
 	
     static triggers = {
         println "==========================Setting trigger for NameValidationJob";
-      simple startDelay: 1000l, repeatInterval: 5000l // starts after 1 second  and execute job once in 5 seconds 
+      simple name:'NameValidationJob', startDelay: 1000l, repeatInterval: 5000l // starts after 1 second  and execute job once in 5 seconds 
     }
 
     def execute() {
