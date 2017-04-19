@@ -373,9 +373,11 @@
 
 
     $(document).ready(function(){
-        var uploadResource = new $.fn.components.UploadResource($('.bulk_observation_create'));
-        uploadResource.POLICY = "${policy}";
-        uploadResource.SIGNATURE = "${signature}";
+        var uploadResource = new $.fn.components.UploadResource($('.bulk_observation_create'),{
+            POLICY : "${policy}",
+            SIGNATURE :"${signature}" 
+        });
+        $('.filePicker').data('uploadResource', uploadResource);
 
             <%
                 if(observationInstance?.group) {
