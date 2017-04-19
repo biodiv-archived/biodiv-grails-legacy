@@ -11,7 +11,7 @@ class ClearUserResourcesJob {
 
     static triggers = {
         println "==========================Setting trigger for ClearUserResourcesJob";
-        cron name:'cronTriggerForClearRes', startDelay:600l, cronExpression: '0 0 2 ? * *'
+        cron name:'ClearUserResourcesJob', startDelay:600l, cronExpression: '0 0 2 ? * *'
     }
 
     def execute() {

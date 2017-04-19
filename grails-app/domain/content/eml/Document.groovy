@@ -219,6 +219,7 @@ class Document extends DataObject implements Comparable {
 	int compareTo(obj) {
 		createdOn.compareTo(obj.createdOn)
 	}
+
 	Map fetchSciNames(){
 		Map nameValue = [:]
 		Map nameParseValues = [:]
@@ -232,7 +233,7 @@ class Document extends DataObject implements Comparable {
 		def docSciNames = results ;//DocSciName.findAllByDocument(this)
 		docSciNames.each{ dsn ->
 		nameValue.put(dsn.scientificName,dsn.frequency)
-		nameParseValues.put(dsn.scientificName,dsn.canonicalForm)
+		nameParseValues.put(dsn.scientificName,dsn.taxonConcept)
 		nameId.put(dsn.scientificName,dsn.id)
 		primaryname.put(dsn.id,dsn.primary_name)
 		}

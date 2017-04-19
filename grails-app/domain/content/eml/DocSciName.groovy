@@ -21,7 +21,7 @@ class DocSciName {
 		canonicalForm nullable:true
 		taxonConcept nullable:true
 	}
-
+    static fetchMode = [taxonConcept: 'eager']
     public static boolean speciesHasDocuments( Species speciesInstance) {
         if(DocSciName.findByScientificName(speciesInstance.taxonConcept.canonicalForm)) {
             return true;

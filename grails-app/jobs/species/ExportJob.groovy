@@ -21,7 +21,7 @@ class ExportJob {
 	
     static triggers = {
         println "==========================Setting trigger for ExportJob";
-      simple startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
+      simple name:'ExportJob', startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
     }
 
     def execute() {

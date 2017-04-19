@@ -167,7 +167,7 @@ class DiscussionService extends AbstractObjectService {
 		}
 
 		if(params.tag){
-			query = "select discussion from Discussion discussion,  TagLink tagLink "
+			query += ",  TagLink tagLink "
 			filterQuery += " and discussion.id = tagLink.tagRef and tagLink.type = :tagType and tagLink.tag.name = :tag "
 			queryParams["tag"] = params.tag
 			queryParams["tagType"] = GrailsNameUtils.getPropertyName(Discussion.class)

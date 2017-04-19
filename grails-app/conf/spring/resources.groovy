@@ -352,6 +352,14 @@ beans = {
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
+
+        minPoolSize = 5
+// /       maxPoolSieT =  30
+//        initialPoolSize = 3
+//        acquireIncrement = 3
+        testConnectionOnCheckout=true
+        preferredTestQuery='SELECT 1'
+        numHelperThreads = 5
         unreturnedConnectionTimeout = 90 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
