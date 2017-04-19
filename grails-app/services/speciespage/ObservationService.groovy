@@ -1142,7 +1142,7 @@ class ObservationService extends AbstractMetadataService {
         def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '', traitQuery = '', recoQuery='';
         def filterQuery = " where obv.is_deleted = false "
  
-        if(!params.sort || params.sort == 'score') {
+        if(!params.sort || params.sort == 'score' || params.sort.toLowerCase() == 'lastrevised') {
             params.sort = "lastRevised"
         }
         def m = sessionFactory.getClassMetadata(Observation);

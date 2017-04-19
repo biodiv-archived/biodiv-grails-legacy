@@ -2024,7 +2024,7 @@ class NamelistService extends AbstractObjectService {
     	println "===================== params " + params 
         def sql = new Sql(dataSource)
         def sqlStr, rs
-        def classSystem = params.classificationId.toLong()
+        def classSystem = params.classificationId?params.classificationId.toLong():Classification.fetchIBPClassification().id;
         def parentId = params.parentId;
         def limit = params.limit ? params.limit.toInteger() : 100
         def offset = params.offset ? params.offset.toLong() : 0
