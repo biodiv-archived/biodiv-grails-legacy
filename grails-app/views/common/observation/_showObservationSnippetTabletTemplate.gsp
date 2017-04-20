@@ -161,7 +161,7 @@ def obvId = observationInstance?.id
 
         <li class="active"><a href="#${observationInstance.id}_groups" data-toggle="tab">Groups</a></li>
 
-        <li><a href="#${observationInstance.id}_traits" data-toggle="tab" class="traits" data-objectId="${observationInstance.id}" data-objectType="${observationInstance.class.getCanonicalName()}" data-sGroup = "${observationInstance.group.id}" data-isObservationTrait="true" data-ifOwns="${utilsService.ifOwns(observationInstance.author)}" data-isParticipatory="true" data-showInObservation="true">Traits</a></li>
+        <li><a href="#${observationInstance.id}_traits" data-toggle="tab" class="traits" data-objectId="${observationInstance.id}" data-objectType="${observationInstance.class.getCanonicalName()}" data-sGroup = "${observationInstance.group.id}" data-isObservationTrait="true" data-ifOwns="${utilsService.ifOwns(observationInstance.author)}" data-showInObservation="true">Traits</a></li>
 
         <li><a href="#${observationInstance.id}_customFields" data-toggle="tab" class="customFields" data-objectId="${observationInstance.id}">Custom Fields</a></li>
 
