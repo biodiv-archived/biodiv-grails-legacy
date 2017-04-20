@@ -54,9 +54,8 @@ function attachThumbnailAndProcess(me , images) {
     me.$form.find("input[name='resources']").remove();
     me.$ele.find('.videoUrl').val('');
     me.$ele.find('.audioUrl').val('');
-    me.$ele.find('.add_video').editable('setValue','', false);
+//    me.$ele.find('.add_video').editable('setValue','', false);
     // me.$ele.find('.add_audio').editable('setValue','', false);		
-    me.$ele.find('.add_video').editable('setValue','', false);	
 
     if($( "input[name='resType']" ).val() == "species.auth.SUser") {
         var count = $("input[name='lastUploaded']").val();
@@ -538,7 +537,7 @@ function createResources(start, end, w, count) {
                 me.$ele.find('.audioUrl').val('');
                 $('.add_file.addedResource').hide();
                 me.$ele.find(".progress").css('z-index',90);
-                me.$ele.find('.add_video').editable('setValue','', false);
+                //me.$ele.find('.add_video').editable('setValue','', false);
               //  me.$ele.find('.add_audio').editable('setValue','', false);
                 //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 

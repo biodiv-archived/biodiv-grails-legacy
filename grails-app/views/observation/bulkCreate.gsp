@@ -154,18 +154,21 @@
                 background-color: lightgrey ;
                 margin-bottom:90px !important;
                 position: relative; 
-                left: 50px; 
+                left: 25px; 
                 top: 0; 
-                width: 150px; 
+                width: 200px; 
                 height: 250px; 
                 padding: 0.5em; 
                 margin: 10px;
-                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)})
+                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)});
+                background-position: 38px;
+
+
             }
             .imageDr{
                 position: absolute;
                 top: 46%;
-                width: 127px;
+                width: 200px;
                 margin-left: 15px;
                 font-size: 19px;
                 color: grey;
@@ -176,7 +179,7 @@
                 white-space:nowrap !important;
             }
             .imagesListWrapper .imagesList .addedResource {
-                display : inline !important;   
+                //display : inline !important;   
                 z-index:15;             
             }
             .resources .addedResource input[type="text"]{

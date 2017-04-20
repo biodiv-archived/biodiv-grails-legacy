@@ -172,6 +172,7 @@ function dropAction(event, ui, ele) {
     $(ele).find(".star_obvcreate").last().children().remove();
     var form = $(ele).closest(".addObservation");
     var $ratingCont = $(ele).find(".star_obvcreate").last();
+    $ratingCont.attr('data-score', $(ui.draggable).find(".star_obvcreate").last().find('input').val());
     rate($ratingCont);
     $(ui.draggable).draggable('disable');
     //var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
@@ -283,7 +284,6 @@ $(".applyAll").click(function(){
 
 function initializers(){
     initializeSpeciesGroupHabitatDropdowns();
-    console.log('bulkCreate');
     $('.propagateGrpHab .control-group  label').show();
 
     $( ".date" ).datepicker({ 
