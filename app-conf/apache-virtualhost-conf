@@ -113,8 +113,8 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
 </VirtualHost>
 <VirtualHost *:80>
     ProxyRequests Off
-    ServerName localhost.filesutra.indiabiodiversity.org
-    ServerAlias www.localhost.filesutra.indiabiodiversity.org
+    ServerName localhost.fileops.indiabiodiversity.org
+    ServerAlias www.localhost.fileops.indiabiodiversity.org
     DirectoryIndex index.php index.html index.html index.htm index.shtml
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 	
@@ -123,8 +123,8 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
 
 
 
-    ProxyPass / http://localhost.filesutra.indiabiodiversity.org:5000/Filesutra/
-    ProxyPassReverse / http://localhost.filesutra.indiabiodiversity.org:5000/Filesutra/
+    ProxyPass / http://localhost.fileops.indiabiodiversity.org:5000/Filesutra/
+    ProxyPassReverse / http://localhost.fileops.indiabiodiversity.org:5000/Filesutra/
 
     ProxyPassReverseCookiePath /Filesutra /
     
