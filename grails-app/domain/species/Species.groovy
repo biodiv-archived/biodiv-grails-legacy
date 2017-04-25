@@ -393,6 +393,9 @@ class Species implements Rateable {
 	 * @return
 	 */
 	def clearBasicContent(){
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
 		//this.resources?.clear();
         def tmp = [] ;
         tmp.addAll fields;
