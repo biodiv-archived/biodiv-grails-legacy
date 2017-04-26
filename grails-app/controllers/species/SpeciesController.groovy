@@ -1875,5 +1875,20 @@ class SpeciesController extends AbstractObjectController {
 	    def m = [author:"1", userGroups:params.userGroupId, objectType:Species.class.getCanonicalName(), submitType:'post', objectIds: new File(file).text]
 	    println m
 	    userGroupService.updateResourceOnGroup(m)
+        render "done";
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def getSpeciesIdsForTaxonIds(){
+        String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
+        String text = new File(file).text;
+        List speciesIds = [];
+        text.split(',').each { taxonId ->
+            def taxon = TaxonomyDefinition.read(Long.parseLong(taxonId.trim()));
+            if(taxon) {
+                speciesIds << taxon.id;
+            }        
+        }
+        render speciesIds.join(',');
     }
 }

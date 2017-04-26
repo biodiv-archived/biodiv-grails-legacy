@@ -1361,10 +1361,12 @@ class UserGroupService {
 			if(objectIds && objectIds != ""){
 				objectIds.split(",").each { 
 					def obj = domainClass.read(Long.parseLong(it.trim()))
-					obvs << obj
-					if(obj.instanceOf(Checklists)){
-						obvs.addAll(obj.observations)
-					}
+                    if(obj) {
+                        obvs << obj
+                        if(obj.instanceOf(Checklists)){
+                            obvs.addAll(obj.observations)
+                        }
+                    }
 				}
 			}
 			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
