@@ -1874,7 +1874,7 @@ class SpeciesController extends AbstractObjectController {
         String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
 	    def m = [author:"1", userGroups:params.userGroupId, objectType:Species.class.getCanonicalName(), submitType:(params.submitType?:'post'), objectIds: new File(file).text]
 	    println m
-	    userGroupService.updateResourceOnGroup(m)
+	    userGroupService.updateResourceOnGroup(m, params.sendMail?:false)
         render "done";
     }
 
