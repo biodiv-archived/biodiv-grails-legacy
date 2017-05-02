@@ -27,9 +27,8 @@
     </div>
 
 	 <div class="content">
-		    <p>Agencies involved in the implementation of the action are:
-
-			</p><br><table cellspacing="0" cellpadding="5" border="0" class="cTable">
+		    <p>Les institutions impliquées dans la mise en oeuvre de l’action sont :</p><br>
+		    <table cellspacing="0" cellpadding="5" border="0" class="cTable">
 			<tbody>
 
 			<tr style="border-top: 1px solid;">
