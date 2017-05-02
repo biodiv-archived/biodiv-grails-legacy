@@ -119,19 +119,44 @@ paramsMapAsText type:'text';
     }
 
     def writeLog = { String content, Level level=Level.DEBUG -> 
-        if(!logFilePath){
+        File errorFile;
+        println "-------------------------________"
+        if(!logFilePath && filePath) {
+            println "===================="
+            println filePath
             String contentRootDir = Holders.config.speciesPortal.content.rootDir;
-            String tmpFileName = (new File(filePath)).getName()+".log";
-            logFile = utilsService.createFile(tmpFileName, uploadType, contentRootDir)
+            File ipFile = new File(filePath);
+            String tmpFileName = ipFile.getName()+".log";
+            logFile = ipFile.exists() ? new File(ipFile.getParent(), tmpFileName) : utilsService.createFile(tmpFileName, uploadType, contentRootDir)
             logFilePath = logFile.getAbsolutePath();
+            println 'Creating error file log-------------------';
+            errorFile = new File(ipFile.getParent(), ipFile.getName()+'.dev.log');
+            errorFilePath = errorFile.getAbsolutePath();
+ 
             if(!this.save(flush:true)){ 
                 this.errors.allErrors.each { log.error it }
             }
             println "----------------------- logFile path " + logFilePath
-        }
+            println "----------------------- logFile path " + errorFilePath
+       }
 
-        def ln = System.getProperty('line.separator');
-        logFile << "$ln${level.toString()} : $content";
-        utilsService.writeLog(content,level);
+       if(logFilePath) {
+           logFile = new File(logFilePath);
+       }
+
+       if(errorFilePath) {
+           errorFile = new File(errorFilePath);
+       }
+
+       def ln = System.getProperty('line.separator');
+       if(errorFile) {
+           errorFile << "$ln${level.toString()} : $content";
+       }
+       if(logFile) {
+           if(level.toInt() > Level.DEBUG.toInt()) {
+               logFile << "$ln${level.toString()} : $content";
+           }
+       }
+       utilsService.writeLog(content, level);
     }
 }

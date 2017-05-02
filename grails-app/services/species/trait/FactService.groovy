@@ -40,17 +40,18 @@ class FactService extends AbstractObjectService {
     Map upload(String file, Map params, UploadLog dl) {
         int noOfFactsLoaded = 0;
 
-        File spreadSheet = new File(file);
+        File spreadSheet = new File(params.fFile);
         if(!spreadSheet.exists()) {
             return ['success':false, 'msg':"Cant find the file at ${file}."];
         }
-        dl.writeLog("Loading facts from ${file}", Level.INFO);
+        dl.writeLog("Loading facts from ${params.fFile}", Level.INFO);
 
         SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).eachWithIndex { m,index ->
 
-            dl.writeLog("Loading facts ${m}");
+            dl.writeLog("============================================\n", Level.INFO);            
+            dl.writeLog("Loading facts ${m} from row no ${index+2}", Level.INFO);
             if(!m['taxonid']) {
-                writeLog("Finding species from species name ${m['name']}");
+                dl.writeLog("Finding species from species name ${m['name']}");
                 m['taxonid'] = findSpeciesIdFromName(m['name'])?.taxonConcept?.id;
             }
 
@@ -65,15 +66,15 @@ class FactService extends AbstractObjectService {
                 //def session =  sessionFactory.currentSession;
                 session.setFlushMode(FlushMode.MANUAL);
 
-                if(updateFacts(m, species, dl)) {
-                    noOfFactsLoaded++;
+                def r = updateFacts(m, species, dl); 
+                if(r.success) {
+                    noOfFactsLoaded += r.noOfFactsLoaded;
                 }
                 session.flush();
                 session.clear();
                 // we need to disconnect and get a new DB connection here
                 def connection = session.disconnect();
                 if(connection) {
-                    println "---------------------------------";
                     connection.close();
                 }
 
@@ -101,7 +102,7 @@ class FactService extends AbstractObjectService {
 
 
         }
-        dl.writeLog("Successfully added ${noOfFactsLoaded} facts");
+        dl.writeLog("\n====================================\nLoaded ${noOfFactsLoaded} facts\n====================================\n", Level.INFO);
         return ['success':true, 'msg':"Loaded ${noOfFactsLoaded} facts."];
     }
 
@@ -111,6 +112,35 @@ class FactService extends AbstractObjectService {
         return taxon ? taxon.findSpeciesId() : null;
     }
 
+    Map validateFactsFile(String file, UploadLog dl) {
+        File spreadSheet = new File(file);
+        if(!spreadSheet.exists()) {
+            return ['success':false, 'msg':"Cant find the file at ${file}."];
+        }
+        dl.writeLog("Loading facts from ${file}", Level.INFO);
+
+        List reqdHeaders = ['taxonid', 'attribution', 'contributor', 'license'];
+        return validateSpreadsheetHeaders(file, dl, reqdHeaders);       
+    }
+
+    Map validateSpreadsheetHeaders(String file, UploadLog dl, List reqdHeaders) {
+
+        List<Map> headers = SpreadsheetReader.getHeaders((new File(file)).getAbsolutePath(), 0, 0);
+        dl.writeLog("Reading headers : "+headers)
+
+        Map headerNames = [:];
+        for(int i=0; i<headers.size(); i++) {
+            headerNames[headers[i].name.trim().toLowerCase()] = true;
+        }
+
+        List missingHeaders = reqdHeaders - headerNames.keySet();
+        if(missingHeaders.size() == 0) {
+            return ['success':true, 'msg':""];
+        } else {
+            return ['success':false, 'msg':"Columns missing : ${missingHeaders}"];
+        }
+    }
+
     Map updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {
         def writeLog;
         if(dl) writeLog = dl.writeLog;
@@ -118,6 +148,8 @@ class FactService extends AbstractObjectService {
 
         boolean success = false;
         Map result = [:]
+        int noOfFactsLoaded = 0;
+
         result['facts_updated'] = [];
         result['facts_created'] = [];
         writeLog("Loading facts ${m}");
@@ -136,10 +168,11 @@ class FactService extends AbstractObjectService {
             return;
         }
 
-        writeLog("Loading facts for object ${object.class}:${object.id}");
+        writeLog("Loading facts for object ${object.class}:${object.id}\n");
         m.each { key, value ->
             try {
                 if(!value) {
+                    //writeLog("Value is null\n", Level.ERROR);
                     return;
                 }
                 key = key.trim();
@@ -148,11 +181,10 @@ class FactService extends AbstractObjectService {
                     case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts'] : break;
                     default : 
                     value = value ? value.trim() : null ;
-                    writeLog("Loading trait ${key} : ${value}");
 
+                    writeLog("Loading trait ${key} : ${value}", Level.INFO);
                     Trait trait;
                     TaxonomyDefinition pageTaxon;
-                    println object.class.getCanonicalName();
                     switch(object.class.getCanonicalName()) {
                         case 'species.Species': 
                         pageTaxon = object.taxonConcept;
@@ -167,12 +199,12 @@ class FactService extends AbstractObjectService {
                         if(Trait.isValidTrait(t, object.group.getTaxon())) {
                             trait = t;
                         } else {
-                            writeLog("${t} is not valid as per taxon", Level.ERROR);
+                            writeLog("Trait ${t} is not valid as per taxon", Level.ERROR);
                         }
 
                         if(t.isNotObservationTrait) {
                             trait = null;
-                            writeLog("${t} is not observation trait", Level.ERROR);
+                            writeLog("Trait ${t} is not observation trait", Level.ERROR);
                         }
                         break;
                     }
@@ -180,7 +212,7 @@ class FactService extends AbstractObjectService {
                     println "Got trait ${trait}";
 
                     if(!trait) {
-                        writeLog("Cannot find trait ${key}", Level.ERROR);
+                        writeLog("Cannot find trait ${key}\n", Level.ERROR);
                     } else {
                         Fact.withTransaction {
                             def factsCriteria = Fact.createCriteria();
@@ -193,6 +225,7 @@ class FactService extends AbstractObjectService {
                             List traitValues = [];
                             if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
                                 if(replaceFacts) {
+                                    writeLog("Replacing old facts with new ones");
                                     facts.each {fact ->
                                         fact.delete(flush:true);
                                     }
@@ -273,10 +306,10 @@ class FactService extends AbstractObjectService {
                             facts.each { fact ->
                                 if(fact.id) {
                                     isUpdate = true;
-                                    writeLog("Updating fact ${fact}");
+                                    writeLog("Updating fact ${fact}", Level.INFO);
                                 } else {
                                     isUpdate = false;
-                                    writeLog("Creating new fact ${fact}");
+                                    writeLog("Creating new fact ${fact}", Level.INFO);
                                 }
                                 fact.attribution = attribution;
                                 fact.contributor = contributor;
@@ -285,15 +318,17 @@ class FactService extends AbstractObjectService {
                                 if(!fact.hasErrors() && !fact.save()) { 
                                     writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
                                     fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
+                                    writeLog('\n');
                                     success = false;
                                 } else {
                                     success = true;
+                                    noOfFactsLoaded++;
                                     if(isUpdate) 
                                         result['facts_updated'] << fact;
                                     else
                                         result['facts_created'] << fact;
 
-                                    writeLog("Successfully added fact");
+                                    writeLog("Successfully added fact\n", Level.INFO);
                                 }
                             }
                         }
@@ -301,12 +336,13 @@ class FactService extends AbstractObjectService {
                 }
             } catch(Exception e) {
                 e.printStackTrace();
-                writeLog("Error saving fact ${key} : ${value} for ${object}", Level.ERROR);
+                writeLog("Error saving fact ${key} : ${value} for ${object}\n", Level.ERROR);
             }
         } 
         println "=========================================================================="
 
         result['success'] = success;
+        result['noOfFactsLoaded'] = noOfFactsLoaded;
         return result;
     }
 

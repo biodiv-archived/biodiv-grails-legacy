@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
     <head>
-        <g:set var="title" value="${g.message(code:'facts.label')}"/>
+        <g:set var="title" value="${g.message(code:'default.fact.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
             .btn-group.open .dropdown-menu {
@@ -76,93 +76,70 @@
     </head>
     <body>
         <%
-        def form_id = "createFacts"
-        def form_action = uGroup.createLink(controller:'species', action:'saveFacts')
-        def form_button_name = "Create Facts"
+        def form_id = "createTraits"
+        def form_action = uGroup.createLink(controller:'fact', action:'upload')
+        def form_button_name = "Create Traits"
         def form_button_val = "${g.message(code:'button.create.facts')}"
-        entityName="Create Facts"	
+        entityName="Upload Traits"
         if(params.action == 'edit' || params.action == 'update'){
         //form_id = "updateGroup"
-        form_action = uGroup.createLink(controller:'species', action:'uploadFacts')
-        form_button_name = "Update Facts"
+        form_action = uGroup.createLink(controller:'fact', action:'upload')
+        form_button_name = "Update Traits"
         form_button_val = "${g.message(code:'button.update.facts')}"
-        entityName = "Edit Facts"
+        entityName = "Edit Traits"
         }
-        String uploadDir = "facts/"+ UUID.randomUUID().toString()	
+        String uploadDir = "fact/"+ UUID.randomUUID().toString()	
 
         %>
         <div class="observation_create">
             <div class="span12">
-                <uGroup:showSubmenuTemplate  model="['entityName':entityName]"/>
+                <g:render template="/fact/addFactMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Trait':'Upload Traits']"/>
 
-
-                <form id="${form_id}" action="${form_action}" method="POST"  enctype="multipart/form-data"
+                <form id="${form_id}" class="super-section form-horizontal" action="${form_action}" method="POST"  enctype="multipart/form-data"
                     class="form-horizontal">
-
-                        <div
-                            class="row control-group left-indent ">
-                            <label class="control-label" for="file"><g:message code="default.resource.label" /> <span
-                                    class="req">*</span></label>
+                    <div class="section">
+                        <div class="row control-group left-indent">
+                            <label class="control-label" for="file">
+                                <g:message code="default.fact.label" /> 
+                                <span class="req">*</span>
+                            </label>
                             <div class="controls" style="">
-
-                                <%def allowedExtensions="['tsv']"%>
+                                <%def allowedExtensions="['xls','xlsx']"%>
                                 <g:render template='/UFile/docUpload'
-                                model="['name': 'ufilepath', 'path': uFile?.path, 'size':uFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'facts_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
-                                <% def upload_file_text="${g.message(code:'default.upload.file.label')}"
-                                %>
-                                <script type="text/javascript">
-
-                                    $(document).ready(function(){
-                                            $('.qq-upload-button').contents().first()[0].textContent = '${upload_file_text}';
-                                            });
-
-                                        </script>
-
-                                        <g:message code="loginformtemplate.or" />
-                                        <input type="text" id="uFilePath" class="input-block-level" name="path"
-                                        placeholder="${g.message(code:'placeholder.document.enter.url')}"
-                                        value="${uFile?.path}" />
-
+                                model="['name': 'factsPath', 'inputName': 'fFile', 'path': fFile?.path, 'size':fFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'facts_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                <small class="help-block"><g:message code="default.fact.fileFormat" /> </small>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                           <div class="" style="margin-top: 20px; margin-bottom: 40px;">
+                       </div>
+                        <div class="" style="margin-top: 20px; margin-bottom: 40px;">
 
-                               <a href="${createLink(controller:'species', action:'list')}" class="btn"
-                                   style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
+                            <a href="${createLink(controller:'trait', action:'list')}" class="btn"
+                            style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
 
-                            <a id="createFactsSubmit"
-                                class="btn btn-primary" style="float: right; margin-right: 5px;">
-                                ${form_button_val} </a>
+                            <a id="createFactsSubmit" class="btn btn-primary" style="float: right; margin-right: 5px;">
+                                ${form_button_val} 
+                            </a>
                             <span class="policy-text"> <g:message code="default.create.submitting.for.new" args="['facts']"/> <a href="/terms"><g:message code="link.terms.conditions" /></a> <g:message code="register.index.use.of.site" /> </span>
                         </div>
 
                     </form>
-
                 </div>
-
             </div>
-        </div>
 
-    </div>
 
     <asset:script>
     function facts_upload_callback() {
         $('#uFilePath').val('');        
-        $('#mappingFile, #multimediaFile, #multimediaMappingFile').val('');
+        $('#factsPath').val('');        
     }
 
-    $('#mappingFileUpload, #multimediaFileUpload, #multimediaMappingFileUpload').change(function(e) {
-        $('#mappingFile, #multimediaFile, #multimediaMappingFile').val('');
-    });
 
     $(document).ready(function() {	
-    $("#createFactsSubmit").click(function(){
-    $("#${form_id}").submit();
-    return false;
-    });
+        $("#createFactsSubmit").click(function(){
+            $("#${form_id}").submit();
+            return false;
+        });
     });
     </asset:script>
 

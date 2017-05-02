@@ -279,36 +279,43 @@ class TraitController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def upload() {
-        if(!params.file || ! params.tvFile) {
+
+        if(!params.tFile?.path || ! params.tvFile?.path) {
             flash.message = "Traits definition and value files are required";
-            render (view:'upload', model:[file:params.file, tvFile:params.tvFile]);
+            render (view:'upload', model:[tFile:['path':params.tFile?.path,'size':params.tFile?.size], tvFile:['path':params.tvFile?.path, 'size':params.tvFile?.size]]);
             return;
         }
 
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir + File.separator + params.controller);          
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir);
         if(!contentRootDir.exists()) {
             contentRootDir.mkdir();
         }
 
-        params.file = contentRootDir.getAbsolutePath() + File.separator + params.file;
-        params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile;
+        params.tFile = contentRootDir.getAbsolutePath() + File.separator + params.tFile.path;
+        params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile.path;
+        params.file = params.tFile;
 
-        def tFileValidation = traitService.validateTraitDefinitions(params.file, null);
-        def tvFileValidation = traitService.validateTraitValuesDefinitions(params.file, null);
-
+        def tFileValidation = traitService.validateTraitDefinitions(params.tFile, new UploadLog());
+        def tvFileValidation = traitService.validateTraitValues(params.tvFile, new UploadLog());
+        
         if(tFileValidation.success && tvFileValidation.success) {
+            log.debug "Validation of trait files done. Proceeding with upload"
             def r = traitService.upload(params);
             if(r.success) {
                 flash.message = r.msg;
                 redirect(action: "list")
             } else {
                 flash.message = r.msg;
-                redirect(action: "create", model:[file:params.file, tvFile:params.tvFile, errors:errors]);
+                render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], errors:errors]);
             }
         } else {
-            flash.message = "In traits definition file : "+tFileValidation.msg+" ; In traits values file : "+tvFileValidation.msg;
-            redirect(action: "create", model:[file:params.file, tvFile:params.tvFile, errors:errors]);
-
+            String msg = "";
+            if(!tFileValidation.success)
+                msg += "Error(s) in trait definition file : "+tFileValidation.msg+"  ";
+            if(!tvFileValidation.success)
+                msg += "Error(s) in trait values file : "+tvFileValidation.msg+"  ";
+            flash.message = msg;
+            render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], errors:errors]);
         }
     }
 

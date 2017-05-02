@@ -93,8 +93,7 @@
         %>
         <div class="observation_create">
             <div class="span12">
-                <uGroup:showSubmenuTemplate  model="['entityName':entityName]"/>
-
+                <g:render template="/trait/addTraitMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Trait':'Upload Traits']"/>
 
                 <form id="${form_id}" class="super-section form-horizontal" action="${form_action}" method="POST"  enctype="multipart/form-data"
                     class="form-horizontal">
@@ -107,7 +106,8 @@
                             <div class="controls" style="">
                                 <%def allowedExtensions="['tsv','csv','txt']"%>
                                 <g:render template='/UFile/docUpload'
-                                model="['name': 'traitsPath', 'path': uFile?.path, 'size':uFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                model="['name': 'traitsPath', 'inputName': 'tFile', 'path': tFile?.path, 'size':tFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                <small class="help-block"><g:message code="default.trait.definition.fileFormat" /> </small>
                             </div>
                         </div>
 
@@ -119,8 +119,9 @@
                             </label>
                             <div class="controls" style="">
                                 <g:render template='/UFile/docUpload'
-                                model="['name': 'traitValuesPath', 'path': uFile?.path, 'size':uFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                model="['name': 'traitValuesPath', 'inputName': 'tvFile', 'path': tvFile?.path, 'size':tvFile?tvFile.size:'','fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
  
+                                <small class="help-block"><g:message code="default.trait.values.fileFormat" /> </small>
                                 <% def upload_file_text="${g.message(code:'default.upload.file.label')}"%>
                                 <script type="text/javascript">
                                     $(document).ready(function(){

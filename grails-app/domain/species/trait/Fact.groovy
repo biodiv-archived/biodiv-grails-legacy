@@ -57,8 +57,9 @@ class Fact {
             return value + (toValue ? ":" + toValue:'')
         }
     }
+
     @Override
     String toString() {
-        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}-${toValue})>";
+        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}${toValue?'-'+toValue:''})>";
     }
 }

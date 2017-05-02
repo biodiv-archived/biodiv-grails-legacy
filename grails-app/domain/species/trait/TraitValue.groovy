@@ -25,7 +25,7 @@ class TraitValue {
         value nullable:false
 		description nullable:true
         icon nullable:true
-        source nullable:false
+        source nullable:true
         //taxon nullable:false
     }
 

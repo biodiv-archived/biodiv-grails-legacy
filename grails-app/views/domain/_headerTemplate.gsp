@@ -267,7 +267,23 @@
                                     data-original-title="Add Document" title="${g.message(code:'link.add.document')}">
                                     <i class="icon-plus"></i><g:message code="link.add.document" />  
                                 </a>
-                  </li>                  
+                  </li> 
+
+                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.trait.info')}" data-trigger="hover"
+                                    href="${uGroup.createLink(
+                                    controller:'trait', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                                    data-original-title="Add Trait" title="${g.message(code:'link.add.trait')}">
+                                    <i class="icon-plus"></i><g:message code="link.add.trait" />  
+                                </a>
+                  </li>
+
+                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.fact.info')}" data-trigger="hover"
+                                    href="${uGroup.createLink(
+                                    controller:'fact', action:'upload', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                                    data-original-title="Add Fact" title="${g.message(code:'link.add.fact')}">
+                                    <i class="icon-plus"></i><g:message code="link.add.fact" />  
+                                </a>
+                  </li>
                 </ul>
               </li>
             </ul>

@@ -46,7 +46,7 @@ class TraitService extends AbstractObjectService {
     Map upload(String file, Map params, UploadLog dl) {
         //def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
         Language languageInstance = utilsService.getCurrentLanguage();
-        Map result = uploadTraitDefinitions(file, dl, languageInstance);
+        Map result = uploadTraitDefinitions(params.tFile, dl, languageInstance);
         uploadTraitValues(params.tvFile, dl, languageInstance);
         return result;
     }
@@ -61,44 +61,46 @@ class TraitService extends AbstractObjectService {
         return null;
     }
 
-    Map validateTraitDefinitions(String file, UploadLog dl=null) {
-        int noOfTraitsLoaded = 0;
+    Map validateTraitDefinitions(String file, UploadLog dl) {
         dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
+        List reqdHeaders = ['trait', 'traittype', 'datatype', 'units', 'spm'];
+        return validateCSVHeaders(file, dl, reqdHeaders);
+    }
+ 
+    Map validateTraitValues(String file, UploadLog dl) {
+        dl.writeLog("Loading trait values from ${file}", Level.INFO);
+        List reqdHeaders = ['trait', 'value'];
+        return validateCSVHeaders(file, dl, reqdHeaders);
+    }   
+
+    Map validateCSVHeaders(String file, UploadLog dl, List reqdHeaders) {
 
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
-        String[] row = reader.readNext();
-        int traitNameHeaderIndex = -1;
-        int taxonIdHeaderIndex = -1;
-        int traitIdHeaderIndex = -1;
-        int updateHeaderIndex = -1;
-        println headers
-        dl.writeLog("Reading headers : "+headers)
+        dl.writeLog("Reading headers : "+headers, Level.INFO);
+
+        Map headerNames = [:];
         for(int i=0; i<headers.size(); i++) {
-            if(headers[i].trim().equalsIgnoreCase('trait')) {
-                traitNameHeaderIndex = i;
-            } else if(headers[i].trim().equalsIgnoreCase('taxonid')) {
-                taxonIdHeaderIndex = i;
-            } else if(headers[i].trim().equalsIgnoreCase('traitid')) {
-                traitIdHeaderIndex = i;
-            } else if(headers[i].trim().equalsIgnoreCase('new/update')) {
-                updateHeaderIndex = i;
-            }
+            headerNames[headers[i].trim().toLowerCase()] = true;
         }
-        dl.writeLog("Found required columns at indexes ${traitNameHeaderIndex} ${taxonIdHeaderIndex} ${updateHeaderIndex}");
-        if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
-            dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
-            return ['success':false, 'msg':"Trait name column and/or taxonId column or update column is not defined"];
+
+        List missingHeaders = reqdHeaders - headerNames.keySet();
+        if(missingHeaders.size() == 0) {
+            return ['success':true, 'msg':""];
+        } else {
+            return ['success':false, 'msg':"Columns missing : ${missingHeaders}"];
         }
-        return ['success':true, 'msg':""];
-
-
     }
 
     Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance) {
         int noOfTraitsLoaded = 0;
         dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
 
+        def validationResult = validateTraitDefinitions(file, dl);
+        if(!validationResult.success) {
+            return validationResult;
+        }
+
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
@@ -106,8 +108,6 @@ class TraitService extends AbstractObjectService {
         int taxonIdHeaderIndex = -1;
         int traitIdHeaderIndex = -1;
         int updateHeaderIndex = -1;
-        println headers
-        dl.writeLog("Reading headers : "+headers)
         for(int i=0; i<headers.size(); i++) {
             if(headers[i].trim().equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
@@ -118,11 +118,6 @@ class TraitService extends AbstractObjectService {
             } else if(headers[i].trim().equalsIgnoreCase('new/update')) {
                 updateHeaderIndex = i;
             }
-        }
-        dl.writeLog("Found required columns at indexes ${traitNameHeaderIndex} ${taxonIdHeaderIndex} ${updateHeaderIndex}");
-        if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
-            dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
-            return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':"Trait name column and/or taxonId column or update column is not defined"];
         }
 
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
@@ -137,22 +132,22 @@ class TraitService extends AbstractObjectService {
         int rowNo = 1;
         while(row) {
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
-                dl.writeLog("Ignoring row (${rowNo})" + row, Level.WARN);
+                dl.writeLog("============================================\n", Level.INFO);
+                dl.writeLog("Ignoring row (${rowNo}) : " + row, Level.WARN);
                 row = reader.readNext();
                 rowNo++;
-                dl.writeLog("============================================\n", Level.INFO);            
                 continue;
             }
             dl.writeLog("============================================\n", Level.INFO);            
-            dl.writeLog("Processing row (${rowNo})" + row, Level.INFO);            
+            dl.writeLog("Processing row (${rowNo}) : " + row, Level.INFO);            
 
             List taxons_scope = [];
-            row[taxonIdHeaderIndex].tokenize(",").each { taxonId ->
+            row[taxonIdHeaderIndex].tokenize(",").each { taxonId -> 
                 taxonId = taxonId.replaceAll('"','');
-                try {
+                try { 
                     TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(taxonId?.trim()));
                     if(t) taxons_scope << t;
-                    else {
+                    el se {
                         dl.writeLog("Cannot find taxon " + taxonId, Level.ERROR);
                     }
                 } catch(e) {
@@ -166,7 +161,7 @@ class TraitService extends AbstractObjectService {
             if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {
                 if(row[traitIdHeaderIndex]) {
                     trait = Trait.get(Long.parseLong(row[traitIdHeaderIndex]));
-                    dl.writeLog("Updating trait ${trait} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
+                    dl.writeLog("Updating trait ${trait} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}", Level.INFO);
                 } 
                 else {
                     if(taxon_scope.size() == 1) {
@@ -177,7 +172,7 @@ class TraitService extends AbstractObjectService {
                 }
             } else if( row[updateHeaderIndex]?.equalsIgnoreCase('new') ){
                 trait = new Trait();
-                dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]}");
+                dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]}", Level.INFO);
             }
 
             if(trait) {
@@ -252,7 +247,7 @@ class TraitService extends AbstractObjectService {
                 }
 
                 if(!trait.hasErrors() && trait.save(flush:true)) {
-                    dl.writeLog("Successfully inserted/updated trait");
+                    dl.writeLog("Successfully inserted/updated trait", Level.INFO);
                     noOfTraitsLoaded++;
                 } else {
                     dl.writeLog("Failed to save trait", Level.ERROR);
@@ -271,7 +266,7 @@ class TraitService extends AbstractObjectService {
             rowNo++;
         }
 
-        dl.writeLog("\n====================================\nSuccessfully added ${noOfTraitsLoaded} traits\n====================================\n");
+        dl.writeLog("====================================\nLoaded ${noOfTraitsLoaded} traits\n====================================\n", Level.INFO);
         return ['success':true, 'msg':"Loaded ${noOfTraitsLoaded} traits."];
      }
 
@@ -296,46 +291,16 @@ class TraitService extends AbstractObjectService {
         }
     }
 
-    Map validateTraitValues(String file, UploadLog dl=null) {
-        int noOfValuesLoaded=0;
-
-        dl.writeLog("Loading trait values from ${file}", Level.INFO);
-
-        CSVReader reader = getCSVReader(new File(file))
-        String[] headers = reader.readNext();//headers
-        String[] row = reader.readNext();
-
-        int traitNameHeaderIndex = -1;
-        int valueHeaderIndex = -1;
-        int taxonIdHeaderIndex=-1;
-        int traitIdHeaderIndex=-1;
-
-        for(int i=0; i<headers.size(); i++) {
-            if(headers[i].equalsIgnoreCase('trait')) {
-                traitNameHeaderIndex = i;
-            }
-            if(headers[i].equalsIgnoreCase('value')) {
-                valueHeaderIndex = i;
-            }
-            if(headers[i].equalsIgnoreCase('taxonid')) {
-                taxonIdHeaderIndex = i;
-            }
-            if(headers[i].equalsIgnoreCase('traitid')) {
-                traitIdHeaderIndex = i;
-            }
-        }
-        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || traitIdHeaderIndex == -1) {
-            dl.writeLog("Some of trait name, value and traitid columns are not defined", Level.ERROR);
-            return ['success':false, 'msg':"Some of trait name, value and traitid columns are not defined"];
-        }
-        return ['success':true, 'msg':''];
-    }
-
     Map uploadTraitValues(String file, UploadLog dl, Language languageInstance) {
         int noOfValuesLoaded=0;
 
         dl.writeLog("Loading trait values from ${file}", Level.INFO);
 
+        def validationResult = validateTraitValues(file, dl);
+        if(!validationResult.success) {
+            return validationResult;
+        }
+
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
@@ -358,10 +323,6 @@ class TraitService extends AbstractObjectService {
             if(headers[i].equalsIgnoreCase('traitid')) {
                 traitIdHeaderIndex = i;
             }
-        }
-        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || traitIdHeaderIndex == -1) {
-            dl.writeLog("Some of trait name, value and traitid columns are not defined", Level.ERROR);
-            return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':"Some of trait name, value and traitid columns are not defined"];
         }
 
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
@@ -373,14 +334,14 @@ class TraitService extends AbstractObjectService {
         traitResourceDir.mkdirs();
 
         String resourceFromDir = (new File(file)).getParent();
-
+        int rowNo = 1;
         while(row) {
 
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
+                dl.writeLog("============================================\n", Level.INFO);            
                 dl.writeLog("Ignoring row (${rowNo})" + row, Level.WARN);
                 row = reader.readNext();
                 rowNo++;
-                dl.writeLog("============================================\n", Level.INFO);            
                 continue;
             }
             dl.writeLog("============================================\n", Level.INFO);            
@@ -427,10 +388,10 @@ class TraitService extends AbstractObjectService {
             TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), trait);
 
             if(!traitValue) {
-                dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name}");
+                dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name}", Level.INFO);
                 traitValue = new TraitValue();
             } else {
-                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name}");
+                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name}", Level.INFO);
             }
 
             headers.eachWithIndex { header, index ->
@@ -459,7 +420,7 @@ class TraitService extends AbstractObjectService {
             }
 
             if(!traitValue.hasErrors() && traitValue.save(flush:true)) {
-                dl.writeLog("Successfully inserted/updated trait value");
+                dl.writeLog("Successfully inserted/updated trait value", Level.INFO);
                 noOfValuesLoaded++;
             }
             else {
@@ -472,7 +433,7 @@ class TraitService extends AbstractObjectService {
             row = reader.readNext();
         }
 
-        dl.writeLog("\n====================================\nSuccessfully added ${noOfValuesLoaded} trait values\n====================================\n");
+        dl.writeLog("====================================\nLoaded ${noOfValuesLoaded} trait values\n====================================\n");
         return ['success':true, 'msg':"Loaded ${noOfValuesLoaded} trait values."];
     }
 

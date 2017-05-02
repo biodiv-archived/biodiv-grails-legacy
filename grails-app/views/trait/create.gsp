@@ -39,6 +39,8 @@ display:none;
     }
     %>
     <div class="span12 observation_create">
+
+                <g:render template="/trait/addTraitMenu" model="['entityName':(params.action == 'edit' || params.action == 'update')?'Edit Trait':'Upload Traits']"/>
         <form id="traitForm" action="${form_action}" method="POST"
             onsubmit="document.getElementById('traitFormSubmit').disabled = 1;"
             class="form-horizontal">

@@ -193,14 +193,43 @@ class FactController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def upload() {
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);          
+
+        if(!params.fFile?.path) {
+            flash.message = "Facts file is required";
+            render (view:'upload', model:[fFile:['path':params.fFile?.path,'size':params.fFile?.size]]);
+            return;
+        }
+
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir);
         if(!contentRootDir.exists()) {
             contentRootDir.mkdir();
         }
+
+        params.fFile = contentRootDir.getAbsolutePath() + File.separator + params.fFile.path;
+        params.file = params.fFile;
+        println params;
+        println "((((((((((((((((((((("
+
+        def fFileValidation = factService.validateFactsFile(params.fFile, new UploadLog());
         
-        params.file = contentRootDir.getAbsolutePath()+File.separator+params.file;
-        def r = factService.upload(params);
-        redirect(action: "list")
+        if(fFileValidation.success) {
+            log.debug "Validation of fact file is done. Proceeding with upload"
+            def r = factService.upload(params);
+            if(r.success) {
+                flash.message = r.msg;
+                redirect(controller:'trait', action: "list")
+            } else {
+                flash.message = r.msg;
+                render (view:'upload', model:[fFile:['path':params.fFile], errors:errors]);
+            }
+        } else {
+            log.error fFileValidation;
+            String msg = "";
+            if(!fFileValidation.success)
+                msg += "Error(s) in fact file : "+fFileValidation.msg+"  ";
+            flash.message = msg;
+            render (view:'upload', model:[fFile:['path':params.fFile], errors:errors]);
+        }
     }
 
     def migrateCustomFields() {
