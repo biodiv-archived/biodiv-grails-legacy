@@ -147,7 +147,7 @@ class TraitService extends AbstractObjectService {
                 try { 
                     TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(taxonId?.trim()));
                     if(t) taxons_scope << t;
-                    el se {
+                    else {
                         dl.writeLog("Cannot find taxon " + taxonId, Level.ERROR);
                     }
                 } catch(e) {
@@ -368,10 +368,14 @@ class TraitService extends AbstractObjectService {
                     List traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon.id = ?", [row[traitNameHeaderIndex], Long.parseLong(row[taxonIdHeaderIndex])]);
                     if(traits?.size() == 1)
                         trait = traits[0];
+                    else
+                        dl.writeLog("There are multiple traits ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${traits}", Level.ERROR);
                 } else {
                     List traits = Trait.executeQuery("select t from Trait t where t.name=? ", [row[traitNameHeaderIndex].trim()]);
                     if(traits?.size() == 1)
                         trait = traits[0];
+                    else
+                        dl.writeLog("There are multiple traits ${row[traitNameHeaderIndex]} : ${traits}", Level.ERROR);
                     //trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex].trim(), taxon);
                 }
             } catch(e) {
