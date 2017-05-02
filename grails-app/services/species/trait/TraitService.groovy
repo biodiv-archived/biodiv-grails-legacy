@@ -61,6 +61,40 @@ class TraitService extends AbstractObjectService {
         return null;
     }
 
+    Map validateTraitDefinitions(String file, UploadLog dl=null) {
+        int noOfTraitsLoaded = 0;
+        dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
+
+        CSVReader reader = getCSVReader(new File(file))
+        String[] headers = reader.readNext();//headers
+        String[] row = reader.readNext();
+        int traitNameHeaderIndex = -1;
+        int taxonIdHeaderIndex = -1;
+        int traitIdHeaderIndex = -1;
+        int updateHeaderIndex = -1;
+        println headers
+        dl.writeLog("Reading headers : "+headers)
+        for(int i=0; i<headers.size(); i++) {
+            if(headers[i].trim().equalsIgnoreCase('trait')) {
+                traitNameHeaderIndex = i;
+            } else if(headers[i].trim().equalsIgnoreCase('taxonid')) {
+                taxonIdHeaderIndex = i;
+            } else if(headers[i].trim().equalsIgnoreCase('traitid')) {
+                traitIdHeaderIndex = i;
+            } else if(headers[i].trim().equalsIgnoreCase('new/update')) {
+                updateHeaderIndex = i;
+            }
+        }
+        dl.writeLog("Found required columns at indexes ${traitNameHeaderIndex} ${taxonIdHeaderIndex} ${updateHeaderIndex}");
+        if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
+            dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
+            return ['success':false, 'msg':"Trait name column and/or taxonId column or update column is not defined"];
+        }
+        return ['success':true, 'msg':""];
+
+
+    }
+
     Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance) {
         int noOfTraitsLoaded = 0;
         dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
@@ -86,9 +120,6 @@ class TraitService extends AbstractObjectService {
             }
         }
         dl.writeLog("Found required columns at indexes ${traitNameHeaderIndex} ${taxonIdHeaderIndex} ${updateHeaderIndex}");
-        println traitNameHeaderIndex;
-        println taxonIdHeaderIndex
-        println updateHeaderIndex
         if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
             dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
             return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':"Trait name column and/or taxonId column or update column is not defined"];
@@ -103,12 +134,17 @@ class TraitService extends AbstractObjectService {
         traitResourceDir.mkdirs();
         String resourceFromDir = (new File(file)).getParent();
 
+        int rowNo = 1;
         while(row) {
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
-                dl.writeLog("Ignoring row " + row, Level.WARN);
+                dl.writeLog("Ignoring row (${rowNo})" + row, Level.WARN);
                 row = reader.readNext();
+                rowNo++;
+                dl.writeLog("============================================\n", Level.INFO);            
                 continue;
             }
+            dl.writeLog("============================================\n", Level.INFO);            
+            dl.writeLog("Processing row (${rowNo})" + row, Level.INFO);            
 
             List taxons_scope = [];
             row[taxonIdHeaderIndex].tokenize(",").each { taxonId ->
@@ -232,11 +268,12 @@ class TraitService extends AbstractObjectService {
 
             //}
             row = reader.readNext();
+            rowNo++;
         }
 
         dl.writeLog("\n====================================\nSuccessfully added ${noOfTraitsLoaded} traits\n====================================\n");
         return ['success':true, 'msg':"Loaded ${noOfTraitsLoaded} traits."];
-    }
+     }
 
     private Field getField(String string, Language languageInstance) {
 
@@ -257,6 +294,41 @@ class TraitService extends AbstractObjectService {
         if(x) {
             return x;
         }
+    }
+
+    Map validateTraitValues(String file, UploadLog dl=null) {
+        int noOfValuesLoaded=0;
+
+        dl.writeLog("Loading trait values from ${file}", Level.INFO);
+
+        CSVReader reader = getCSVReader(new File(file))
+        String[] headers = reader.readNext();//headers
+        String[] row = reader.readNext();
+
+        int traitNameHeaderIndex = -1;
+        int valueHeaderIndex = -1;
+        int taxonIdHeaderIndex=-1;
+        int traitIdHeaderIndex=-1;
+
+        for(int i=0; i<headers.size(); i++) {
+            if(headers[i].equalsIgnoreCase('trait')) {
+                traitNameHeaderIndex = i;
+            }
+            if(headers[i].equalsIgnoreCase('value')) {
+                valueHeaderIndex = i;
+            }
+            if(headers[i].equalsIgnoreCase('taxonid')) {
+                taxonIdHeaderIndex = i;
+            }
+            if(headers[i].equalsIgnoreCase('traitid')) {
+                traitIdHeaderIndex = i;
+            }
+        }
+        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || traitIdHeaderIndex == -1) {
+            dl.writeLog("Some of trait name, value and traitid columns are not defined", Level.ERROR);
+            return ['success':false, 'msg':"Some of trait name, value and traitid columns are not defined"];
+        }
+        return ['success':true, 'msg':''];
     }
 
     Map uploadTraitValues(String file, UploadLog dl, Language languageInstance) {
@@ -305,10 +377,16 @@ class TraitService extends AbstractObjectService {
         while(row) {
 
             if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
-                dl.writeLog("Ignoring row " + row, Level.WARN);
+                dl.writeLog("Ignoring row (${rowNo})" + row, Level.WARN);
                 row = reader.readNext();
+                rowNo++;
+                dl.writeLog("============================================\n", Level.INFO);            
                 continue;
             }
+            dl.writeLog("============================================\n", Level.INFO);            
+            dl.writeLog("Processing row (${rowNo})" + row, Level.INFO);            
+
+
 
             /*            TaxonomyDefinition taxon;
             try {

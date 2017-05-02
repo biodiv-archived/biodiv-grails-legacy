@@ -124,16 +124,16 @@ class TraitController extends AbstractObjectController {
         def speciesField=params.fieldid.replaceAll(">", "|").trim()
         def fieldInstance=traitService.getField(speciesField,languageInstance)
         traitInstance.field=fieldInstance
-        traitInstance.taxon.clear()
+        traitInstance.taxon?.clear()
         if(params.taxonName){
-        def taxonId
-        params.taxonName.each{
-            taxonId=it
-            taxonId = taxonId.substring(taxonId.indexOf("(") + 1);
-            taxonId = taxonId.substring(0, taxonId.indexOf("-"));
-            TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
-            traitInstance.addToTaxon(taxon);
-        }
+            def taxonId
+            params.taxonName.each{
+                taxonId=it
+                taxonId = taxonId.substring(taxonId.indexOf("(") + 1);
+                taxonId = taxonId.substring(0, taxonId.indexOf("-"));
+                TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
+                traitInstance.addToTaxon(taxon);
+            }
     }
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
@@ -285,21 +285,30 @@ class TraitController extends AbstractObjectController {
             return;
         }
 
-        params.file = contentRootDir.getAbsolutePath() + File.separator + params.file;
-        params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile;
-
         File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir + File.separator + params.controller);          
         if(!contentRootDir.exists()) {
             contentRootDir.mkdir();
         }
 
-        def r = traitService.upload(params);
-        if(r.success) {
-            flash.message = r.msg;
-            redirect(action: "list")
+        params.file = contentRootDir.getAbsolutePath() + File.separator + params.file;
+        params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile;
+
+        def tFileValidation = traitService.validateTraitDefinitions(params.file, null);
+        def tvFileValidation = traitService.validateTraitValuesDefinitions(params.file, null);
+
+        if(tFileValidation.success && tvFileValidation.success) {
+            def r = traitService.upload(params);
+            if(r.success) {
+                flash.message = r.msg;
+                redirect(action: "list")
+            } else {
+                flash.message = r.msg;
+                redirect(action: "create", model:[file:params.file, tvFile:params.tvFile, errors:errors]);
+            }
         } else {
-            flash.message = r.msg;
+            flash.message = "In traits definition file : "+tFileValidation.msg+" ; In traits values file : "+tvFileValidation.msg;
             redirect(action: "create", model:[file:params.file, tvFile:params.tvFile, errors:errors]);
+
         }
     }
 

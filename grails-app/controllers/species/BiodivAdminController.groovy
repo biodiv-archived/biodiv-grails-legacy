@@ -228,7 +228,7 @@ class BiodivAdminController {
             noOfUpdations = groupHandlerService.updateGroups([Species.get(Long.parseLong(params.speciesId))], true);
             flash.message = noOfUpdations +" species updated" 
             } else {
-            noOfUpdations = groupHandlerService.updateGroups(params.runForSynonyms?params.runForSynonyms.toBoolean():false);
+            noOfUpdations = groupHandlerService.updateGroups(params.runForSynonyms?params.runForSynonyms.toBoolean():false, params.updateWhereNoGroup?params.updateWhereNoGroup.toBoolean():false);
             flash.message = messageSource.getMessage("default.admin.success.updated.group", ['associations',noOfUpdations] as Object[], RCU.getLocale(request))
             }
         } catch(e) {
