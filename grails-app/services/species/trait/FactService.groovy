@@ -12,8 +12,6 @@ import species.sourcehandler.XMLConverter;
 import species.TaxonomyDefinition;
 import species.ScientificName.TaxonomyRank
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 import species.trait.Trait;
 import species.Species;
 import species.Field;
@@ -121,34 +119,6 @@ class FactService extends AbstractObjectService {
 
         List reqdHeaders = ['taxonid', 'attribution', 'contributor', 'license'];
         return validateSpreadsheetHeaders(file, dl, reqdHeaders);       
-    }
-
-    Map validateSpreadsheetHeaders(String file, UploadLog dl, List reqdHeaders) {
-
-        List errors = [];
-        Map headerNames = [:];
-
-        def v = SpreadsheetReader.readSpreadSheet((new File(file)).getAbsolutePath()).get(0);
-        dl.writeLog("Reading headers : "+v[0])
-
-        List missingHeaders = reqdHeaders - v[0].keySet();
-        if(missingHeaders.size() != 0) {
-            errors << "Columns missing : ${missingHeaders}";
-            return ['success':false, 'errors':errors];
-        }
-        
-        v.eachWithIndex { m,index ->
-            for(int i=0; i<reqdHeaders.size(); i++) {
-                if(!m[reqdHeaders[i]]) {
-                    errors << "Row ${index+2} has missing value for ${reqdHeaders[i]}";
-                }
-            }
-        }
-        if(errors) {
-            return ['success':false, 'errors':errors];
-        }
-
-        return ['success':true, 'msg':""];
     }
 
     Map updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {

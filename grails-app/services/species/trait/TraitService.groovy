@@ -12,6 +12,7 @@ import species.sourcehandler.XMLConverter;
 import species.TaxonomyDefinition;
 import species.ScientificName.TaxonomyRank
 
+import species.formatReader.SpreadsheetReader;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import species.trait.Trait;
@@ -51,70 +52,10 @@ class TraitService extends AbstractObjectService {
         return result;
     }
 
-    //TO BE DELETED AND MOVED TO UTILSSERVICE
-    private CSVReader getCSVReader(File file) {
-        char separator = '\t'
-        if(file.exists()) {
-            CSVReader reader = new CSVReader(new FileReader(file), separator, CSVWriter.NO_QUOTE_CHARACTER);
-            return reader
-        }
-        return null;
-    }
-
     Map validateTraitDefinitions(String file, UploadLog dl) {
         dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
         List reqdHeaders = ['trait', 'traittype', 'datatype', 'spm'];
-        return validateCSVHeaders(file, dl, reqdHeaders);
-    }
- 
-    Map validateTraitValues(String file, UploadLog dl) {
-        dl.writeLog("Loading trait values from ${file}", Level.INFO);
-        List reqdHeaders = ['trait', 'value'];
-        return validateCSVHeaders(file, dl, reqdHeaders);
-    }   
-
-    Map validateCSVHeaders(String file, UploadLog dl, List reqdHeaders) {
-        
-        List errors = [];
-
-        CSVReader reader = getCSVReader(new File(file))
-        String[] headers = reader.readNext();//headers
-        dl.writeLog("Reading headers : "+headers, Level.INFO);
-
-        Map headerNames = [:];
-        boolean[] reqdColIndexes = new boolean[headers.size()];
-        for(int i=0; i<headers.size(); i++) {
-            String lowercaseHeader = headers[i].trim().toLowerCase();
-            headerNames[lowercaseHeader] = true;
-            for(int j=0; j<reqdHeaders.size(); j++) {
-                if(reqdHeaders[j].toLowerCase() == lowercaseHeader) {
-                    reqdColIndexes[i] = true
-                }
-            }
-        }
-        
-        List missingHeaders = reqdHeaders - headerNames.keySet();
-        if(missingHeaders.size() != 0) {
-            errors << "Columns missing : ${missingHeaders}";
-            return ['success':false, 'errors':errors];
-        }
-
-        int rowNo = 2;
-        String[] row = reader.readNext();
-        while(row) {
-            for(int i=0; i<row.size(); i++) {
-                if(!row[i] && reqdColIndexes[i]) {
-                    errors << "Row ${rowNo} has missing value for ${headers[i]}";
-                }
-            }
-            row = reader.readNext();
-            rowNo++;
-        }
-
-        if(errors) {
-            return ['success':false, 'errors':errors];
-        }
-        return ['success':true];
+        return validateSpreadsheetHeaders(file, dl, reqdHeaders);
     }
 
     Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance) {
@@ -125,8 +66,11 @@ class TraitService extends AbstractObjectService {
         if(!validationResult.success) {
             return validationResult;
         }
-
-        CSVReader reader = getCSVReader(new File(file))
+        String traitNameHeaderIndex = 'trait';
+        String taxonIdHeaderIndex = 'taxonid';
+        String traitIdHeaderIndex = 'traitid';
+        String updateHeaderIndex = 'new/update';
+/*        CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
         int traitNameHeaderIndex = -1;
@@ -144,6 +88,7 @@ class TraitService extends AbstractObjectService {
                 updateHeaderIndex = i;
             }
         }
+*/
 
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File traitResourceDir = new File(rootDir);
@@ -154,15 +99,14 @@ class TraitService extends AbstractObjectService {
         traitResourceDir.mkdirs();
         String resourceFromDir = (new File(file)).getParent();
 
-        int rowNo = 1;
-        while(row) {
-            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
+        SpreadsheetReader.readSpreadSheet(new File(file).getAbsolutePath()).get(0).eachWithIndex { row, rowNo ->
+            /*if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
                 dl.writeLog("============================================\n", Level.INFO);
                 dl.writeLog("Ignoring row (${rowNo}) : " + row, Level.WARN);
                 row = reader.readNext();
                 rowNo++;
                 continue;
-            }
+            }*/
             dl.writeLog("============================================\n", Level.INFO);            
             dl.writeLog("Processing row (${rowNo}) : " + row, Level.INFO);            
 
@@ -202,41 +146,41 @@ class TraitService extends AbstractObjectService {
 
             if(trait) {
                 //trait = new Trait();
-                headers.eachWithIndex { header, index ->
-
+                //headers.eachWithIndex { header, index ->
+                row.each { header, value ->
                     switch(header.toLowerCase()) {
 
                         case 'trait' :
-                        //traitInstance = Trait.findByName(row[index].toLowerCase().trim())
-                        //if(!traitInstance){trait.name = row[index].toLowerCase().trim();}
+                        //traitInstance = Trait.findByName(value.toLowerCase().trim())
+                        //if(!traitInstance){trait.name = value.toLowerCase().trim();}
                         //else{i 
-                        if(!trait.name) trait.name = row[index].trim();
+                        if(!trait.name) trait.name = value.trim();
                         //}
                         break;
 
                         /*case 'values' : 
-                        if(!traitInstance){trait.values = row[index].trim()}
-                        else{traitInstance.values = row[index].trim()}
+                        if(!traitInstance){trait.values = value.trim()}
+                        else{traitInstance.values = value.trim()}
                         break;
                          */
                         case 'datatype' : 
-                        trait.dataTypes = Trait.fetchDataTypes(row[index].trim());
+                        trait.dataTypes = Trait.fetchDataTypes(value.trim());
                         break;
 
                         case 'traittype' :
-                        trait.traitTypes = Trait.fetchTraitTypes(row[index].trim());
+                        trait.traitTypes = Trait.fetchTraitTypes(value.trim());
                         break;
 
                         case 'units' : 
-                        trait.units = Trait.fetchUnits(row[index].trim());
+                        trait.units = Trait.fetchUnits(value.trim());
                         break;
 
                         case 'trait source' : 
-                        trait.source = row[index].trim();
+                        trait.source = value.trim();
                         break;
 
                         case 'trait icon' : 
-                        trait.icon = migrateIcons(row[index].trim(), traitResourceDir, resourceFromDir);
+                        trait.icon = migrateIcons(value.trim(), traitResourceDir, resourceFromDir);
                         break;
 
                         case 'taxonid':
@@ -248,23 +192,23 @@ class TraitService extends AbstractObjectService {
                         break;
 
                         case 'trait definition':
-                        trait.description = row[index].trim();
+                        trait.description = value.trim();
                         break;
 
                         case 'spm':
-                        trait.field = getField(row[index], languageInstance);
+                        trait.field = getField(value, languageInstance);
                         break;
 
                         case 'isobvtrait':
-                        trait.isNotObservationTrait = !row[index]?.trim()?.toBoolean();
+                        trait.isNotObservationTrait = !value?.trim()?.toBoolean();
                         break;
 
                         case 'isparticipatory':
-                        trait.isParticipatory = row[index]?.trim()?.toBoolean();
+                        trait.isParticipatory = value?.trim()?.toBoolean();
                         break;
 
                         case 'showinobservation':
-                        trait.showInObservation = row[index]?.trim()?.toBoolean();
+                        trait.showInObservation = value?.trim()?.toBoolean();
                         break;
 
 
@@ -287,8 +231,8 @@ class TraitService extends AbstractObjectService {
 
 
             //}
-            row = reader.readNext();
-            rowNo++;
+            //row = reader.readNext();
+            //rowNo++;
         }
 
         dl.writeLog("====================================\nLoaded ${noOfTraitsLoaded} traits\n====================================\n", Level.INFO);
@@ -316,6 +260,12 @@ class TraitService extends AbstractObjectService {
         }
     }
 
+    Map validateTraitValues(String file, UploadLog dl) {
+        dl.writeLog("Loading trait values from ${file}", Level.INFO);
+        List reqdHeaders = ['trait', 'value'];
+        return validateSpreadsheetHeaders(file, dl, reqdHeaders);
+    }   
+
     Map uploadTraitValues(String file, UploadLog dl, Language languageInstance) {
         int noOfValuesLoaded=0;
 
@@ -326,16 +276,16 @@ class TraitService extends AbstractObjectService {
             return validationResult;
         }
 
-        CSVReader reader = getCSVReader(new File(file))
+/*      CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
+*/
+        String traitNameHeaderIndex = 'trait';
+        String valueHeaderIndex = 'value';
+        String taxonIdHeaderIndex='taxonid';
+        String traitIdHeaderIndex='traitid';
 
-        int traitNameHeaderIndex = -1;
-        int valueHeaderIndex = -1;
-        int taxonIdHeaderIndex=-1;
-        int traitIdHeaderIndex=-1;
-
-        for(int i=0; i<headers.size(); i++) {
+/*        for(int i=0; i<headers.size(); i++) {
             if(headers[i].equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
             }
@@ -349,7 +299,7 @@ class TraitService extends AbstractObjectService {
                 traitIdHeaderIndex = i;
             }
         }
-
+*/
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File traitResourceDir = new File(rootDir);
         if(!traitResourceDir.exists()) {
@@ -359,16 +309,17 @@ class TraitService extends AbstractObjectService {
         traitResourceDir.mkdirs();
 
         String resourceFromDir = (new File(file)).getParent();
-        int rowNo = 1;
-        while(row) {
+        //int rowNo = 1;
+        //while(row) {
+        SpreadsheetReader.readSpreadSheet(new File(file).getAbsolutePath()).get(0).eachWithIndex { row, rowNo ->
 
-            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
+            /*if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
                 dl.writeLog("============================================\n", Level.INFO);            
                 dl.writeLog("Ignoring row (${rowNo})" + row, Level.WARN);
                 row = reader.readNext();
                 rowNo++;
-                continue;
-            }
+                return;
+            }*/
             dl.writeLog("============================================\n", Level.INFO);            
             dl.writeLog("Processing row (${rowNo})" + row, Level.INFO);            
 
@@ -409,8 +360,8 @@ class TraitService extends AbstractObjectService {
             }
             if(!trait){
                 dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]}", Level.ERROR);
-                row = reader.readNext();
-                continue;
+                //row = reader.readNext();
+                return;
             }
 
 
@@ -423,24 +374,24 @@ class TraitService extends AbstractObjectService {
                 dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name}", Level.INFO);
             }
 
-            headers.eachWithIndex { header, index ->
+            row.each { header, value ->
                 switch(header.toLowerCase()) {
                     case 'trait' :
                     traitValue.trait = trait;
                     break;
                     case 'value' :
                     println "====="
-                    println row[index];
-                    traitValue.value=row[index].trim();
+                    println value;
+                    traitValue.value=value.trim();
                     break;
                     case 'value source' : 
-                    traitValue.source=row[index].trim()
+                    traitValue.source=value.trim()
                     break;
                     case 'value icon' : 
-                    traitValue.icon=migrateIcons(row[index].trim(),traitResourceDir, resourceFromDir);
+                    traitValue.icon=migrateIcons(value.trim(),traitResourceDir, resourceFromDir);
                     break;
                     case 'value definition' : 
-                    traitValue.description=row[index].trim()
+                    traitValue.description=value.trim()
                     break;
                     //case 'taxon id' : 
                     //traitValue.taxon = taxon
@@ -459,7 +410,7 @@ class TraitService extends AbstractObjectService {
                 }
             }
 
-            row = reader.readNext();
+            //row = reader.readNext();
         }
 
         dl.writeLog("====================================\nLoaded ${noOfValuesLoaded} trait values\n====================================\n");
