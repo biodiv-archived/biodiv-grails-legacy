@@ -313,16 +313,12 @@ class TraitController extends AbstractObjectController {
                 redirect(action: "list")
             } else {
                 flash.message = r.msg;
-                render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], iconsFile:['path':params.iconsFile], errors:errors]);
+                render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], iconsFile:['path':params.iconsFile], errors:r.errors]);
             }
         } else {
-            String msg = "";
-            if(!tFileValidation.success)
-                msg += "Error(s) in trait definition file : "+tFileValidation.msg+"  ";
-            if(!tvFileValidation.success)
-                msg += "Error(s) in trait values file : "+tvFileValidation.msg+"  ";
+            String msg = g.message(code: 'newsletter.create.fix.error', default:'Please fix the errors before proceeding');
             flash.message = msg;
-            render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], iconsFile:['path':params.iconsFile], errors:errors]);
+            render (view:'upload', model:[tFile:['path':params.tFile, errors:tFileValidation.errors], tvFile:['path':params.tvFile, 'errors':tvFileValidation.errors], iconsFile:['path':params.iconsFile]]);
         }
     }
 

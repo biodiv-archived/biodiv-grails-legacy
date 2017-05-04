@@ -125,20 +125,30 @@ class FactService extends AbstractObjectService {
 
     Map validateSpreadsheetHeaders(String file, UploadLog dl, List reqdHeaders) {
 
-        List<Map> headers = SpreadsheetReader.getHeaders((new File(file)).getAbsolutePath(), 0, 0);
-        dl.writeLog("Reading headers : "+headers)
-
+        List errors = [];
         Map headerNames = [:];
-        for(int i=0; i<headers.size(); i++) {
-            headerNames[headers[i].name.trim().toLowerCase()] = true;
+
+        def v = SpreadsheetReader.readSpreadSheet((new File(file)).getAbsolutePath()).get(0);
+        dl.writeLog("Reading headers : "+v[0])
+
+        List missingHeaders = reqdHeaders - v[0].keySet();
+        if(missingHeaders.size() != 0) {
+            errors << "Columns missing : ${missingHeaders}";
+            return ['success':false, 'errors':errors];
+        }
+        
+        v.eachWithIndex { m,index ->
+            for(int i=0; i<reqdHeaders.size(); i++) {
+                if(!m[reqdHeaders[i]]) {
+                    errors << "Row ${index+2} has missing value for ${reqdHeaders[i]}";
+                }
+            }
+        }
+        if(errors) {
+            return ['success':false, 'errors':errors];
         }
 
-        List missingHeaders = reqdHeaders - headerNames.keySet();
-        if(missingHeaders.size() == 0) {
-            return ['success':true, 'msg':""];
-        } else {
-            return ['success':false, 'msg':"Columns missing : ${missingHeaders}"];
-        }
+        return ['success':true, 'msg':""];
     }
 
     Map updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {

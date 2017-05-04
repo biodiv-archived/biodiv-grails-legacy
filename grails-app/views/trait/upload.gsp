@@ -112,13 +112,20 @@
                                 <%def allowedExtensions="['tsv','csv','txt']"%>
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'traitsPath', 'inputName': 'tFile', 'path': tFile?.path, 'size':tFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                <g:if test="${tFile.errors}"> 
+                                <div class="help-inline alert-danger">
+                                <g:each in="${tFile.errors}" var="err">
+                                ${err}<br/>
+                                </g:each>
+                                </div>
+                                </g:if> 
                                 <small class="help-block">
                                 <g:message code="default.trait.upload.fileFormat" /> 
                                 <ul>
                                 <li><b>Trait*</b>: Name of the trait</li>
                                 <li><b>TraitType*</b>: The categorical type of values that the trait can hold. Choose from Single categorical (one value), Multiple  categorical (multiple values) or range (a range of values)</li>
                                 <li><b>DataType*</b>: The data type of the trait. Choose from String, Numeric, Boolean, Date or Color</li>
-                                <li><b>Units*</b>: The unit of the values</li>
+                                <li><b>Units</b>: The unit of the values</li>
                                 <li><b>Trait source</b>: The source of the trait</li>
                                 <li><b>Trait definition</b>: The definition of the trait</li>
                                 <li><b>Trait Icon</b>: File name for the icon representing the trait  (files should be uploaded separately)</li>
@@ -147,7 +154,13 @@
                             <div class="controls" style="">
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'traitValuesPath', 'inputName': 'tvFile', 'path': tvFile?.path, 'size':tvFile?tvFile.size:'','fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
- 
+                            <g:if test="${tvFile.errors}"> 
+                            <div class="help-inline alert-danger">
+                                <g:each in="${tvFile.errors}" var="err">
+                                ${err}<br/>
+                                </g:each>
+                            </div>
+                            </g:if>
                                 <small class="help-block">
                                 <g:message code="default.trait.upload.fileFormat" /> 
                                 <ul>

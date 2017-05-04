@@ -110,7 +110,15 @@
                             <div class="controls" style="">
                                 <%def allowedExtensions="['xls','xlsx']"%>
                                 <g:render template='/UFile/docUpload'
-                                model="['name': 'factsPath', 'inputName': 'fFile', 'path': fFile?.path, 'size':fFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'facts_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                    model="['name': 'factsPath', 'inputName': 'fFile', 'path': fFile?.path, 'size':fFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'facts_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
+                                <g:if test="${fFile.errors}"> 
+                                <div class="help-inline alert-danger">
+                                    <g:each in="${fFile.errors}" var="err">
+                                    ${err}<br/>
+                                    </g:each>
+                                </div>
+                                </g:if>
+    
                                 <small class="help-block"><g:message code="default.fact.upload.fileFormat" />
                                 <ul>
                                     <li><b>Taxon name</b>: The name of the species for which the trait applies</li>

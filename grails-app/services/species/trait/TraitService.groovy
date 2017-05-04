@@ -63,7 +63,7 @@ class TraitService extends AbstractObjectService {
 
     Map validateTraitDefinitions(String file, UploadLog dl) {
         dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
-        List reqdHeaders = ['trait', 'traittype', 'datatype', 'units', 'spm'];
+        List reqdHeaders = ['trait', 'traittype', 'datatype', 'spm'];
         return validateCSVHeaders(file, dl, reqdHeaders);
     }
  
@@ -74,22 +74,47 @@ class TraitService extends AbstractObjectService {
     }   
 
     Map validateCSVHeaders(String file, UploadLog dl, List reqdHeaders) {
+        
+        List errors = [];
 
         CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         dl.writeLog("Reading headers : "+headers, Level.INFO);
 
         Map headerNames = [:];
+        boolean[] reqdColIndexes = new boolean[headers.size()];
         for(int i=0; i<headers.size(); i++) {
-            headerNames[headers[i].trim().toLowerCase()] = true;
+            String lowercaseHeader = headers[i].trim().toLowerCase();
+            headerNames[lowercaseHeader] = true;
+            for(int j=0; j<reqdHeaders.size(); j++) {
+                if(reqdHeaders[j].toLowerCase() == lowercaseHeader) {
+                    reqdColIndexes[i] = true
+                }
+            }
+        }
+        
+        List missingHeaders = reqdHeaders - headerNames.keySet();
+        if(missingHeaders.size() != 0) {
+            errors << "Columns missing : ${missingHeaders}";
+            return ['success':false, 'errors':errors];
         }
 
-        List missingHeaders = reqdHeaders - headerNames.keySet();
-        if(missingHeaders.size() == 0) {
-            return ['success':true, 'msg':""];
-        } else {
-            return ['success':false, 'msg':"Columns missing : ${missingHeaders}"];
+        int rowNo = 2;
+        String[] row = reader.readNext();
+        while(row) {
+            for(int i=0; i<row.size(); i++) {
+                if(!row[i] && reqdColIndexes[i]) {
+                    errors << "Row ${rowNo} has missing value for ${headers[i]}";
+                }
+            }
+            row = reader.readNext();
+            rowNo++;
         }
+
+        if(errors) {
+            return ['success':false, 'errors':errors];
+        }
+        return ['success':true];
     }
 
     Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance) {

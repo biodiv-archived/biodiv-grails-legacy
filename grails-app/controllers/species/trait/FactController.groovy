@@ -207,8 +207,6 @@ class FactController extends AbstractObjectController {
 
         params.fFile = contentRootDir.getAbsolutePath() + File.separator + params.fFile.path;
         params.file = params.fFile;
-        println params;
-        println "((((((((((((((((((((("
 
         def fFileValidation = factService.validateFactsFile(params.fFile, new UploadLog());
         
@@ -220,15 +218,12 @@ class FactController extends AbstractObjectController {
                 redirect(controller:'trait', action: "list")
             } else {
                 flash.message = r.msg;
-                render (view:'upload', model:[fFile:['path':params.fFile], errors:errors]);
+                render (view:'upload', model:[fFile:['path':params.fFile], errors:r.errors]);
             }
         } else {
-            log.error fFileValidation;
-            String msg = "";
-            if(!fFileValidation.success)
-                msg += "Error(s) in fact file : "+fFileValidation.msg+"  ";
+            String msg = g.message(code: 'newsletter.create.fix.error', default:'Please fix the errors before proceeding');
             flash.message = msg;
-            render (view:'upload', model:[fFile:['path':params.fFile], errors:errors]);
+            render (view:'upload', model:[fFile:['path':params.fFile, errors:fFileValidation.errors]]);
         }
     }
 
