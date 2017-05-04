@@ -70,6 +70,10 @@
             min-width: 100%;
             max-width: 100%;
             }
+            .help-block {
+                height: 100px;
+                overflow-y: scroll;
+            }
         </style>
 
 
@@ -108,7 +112,27 @@
                                 <%def allowedExtensions="['tsv','csv','txt']"%>
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'traitsPath', 'inputName': 'tFile', 'path': tFile?.path, 'size':tFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
-                                <small class="help-block"><g:message code="default.trait.definition.fileFormat" /> </small>
+                                <small class="help-block">
+                                <g:message code="default.trait.upload.fileFormat" /> 
+                                <ul>
+                                <li><b>Trait*</b>: Name of the trait</li>
+                                <li><b>TraitType*</b>: The categorical type of values that the trait can hold. Choose from Single categorical (one value), Multiple  categorical (multiple values) or range (a range of values)</li>
+                                <li><b>DataType*</b>: The data type of the trait. Choose from String, Numeric, Boolean, Date or Color</li>
+                                <li><b>Units*</b>: The unit of the values</li>
+                                <li><b>Trait source</b>: The source of the trait</li>
+                                <li><b>Trait definition</b>: The definition of the trait</li>
+                                <li><b>Trait Icon</b>: File name for the icon representing the trait  (files should be uploaded separately)</li>
+                                <li><b>SPM*</b>: The Concept, catergory and subcatergory (if any) from the species profile model separated with the "|" symbol. Eg: Overview|Diagnostic|Description</li>
+                                <li><b>Taxon name</b>: The highest level of taxa for which the trait applies . Ie: the taxonomic scope</li>
+                                <li><b>TaxonID</b>: The taxon ID of the taxa</li>
+                                <li><b>new/update</b>: Denotes whether the trait being uploaded is new or an update of an existing trait.</li>
+                                <li><b>TraitID</b>: If updating an existing trait, mention the ID of the trait to be updated</li>
+                                <li><b>isObvTrait</b>: Mark "True" if the trait can potentially be used within observations. (as opposed to IUCN status which is never an observed trait)</li>
+                                <li><b>isParticipatory</b>: Mark as "True" If it is enabled in observations, and the trait should be available for participants other than the observer to edit.</li>
+                                <li><b>showInObservation</b>: Mark "True" if the trait should be displayed for input during observation upload.</li>
+
+                                </ul>
+                                </small>
                             </div>
                         </div>
 
@@ -122,7 +146,17 @@
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'traitValuesPath', 'inputName': 'tvFile', 'path': tvFile?.path, 'size':tvFile?tvFile.size:'','fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
  
-                                <small class="help-block"><g:message code="default.trait.values.fileFormat" /> </small>
+                                <small class="help-block">
+                                <g:message code="default.trait.upload.fileFormat" /> 
+                                <ul>
+                                    <li><b>Value*</b>: The Name of the value</li>
+                                    <li><b>Trait*</b>: The Trait name for which this value is applicable</li>
+                                    <li><b>TraitID</b>: If appending to existing trait values, mention the ID of the Trait</li>
+                                    <li><b>Value Icon</b>: File name for the icon representing the value (files should be uploaded separately)</li>
+                                    <li><b>Value Definition</b>: Definition of the trait value</li>
+                                    <li><b>Value Source</b>: Source of the trait value</li>
+                                </ul>
+                                </small>
                             </div>
                         </div>
 

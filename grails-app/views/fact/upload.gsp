@@ -70,6 +70,10 @@
             min-width: 100%;
             max-width: 100%;
             }
+            .help-block {
+                height: 100px;
+                overflow-y: scroll;
+            }
         </style>
 
 
@@ -107,7 +111,15 @@
                                 <%def allowedExtensions="['xls','xlsx']"%>
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'factsPath', 'inputName': 'fFile', 'path': fFile?.path, 'size':fFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'facts_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
-                                <small class="help-block"><g:message code="default.fact.fileFormat" /> </small>
+                                <small class="help-block"><g:message code="default.fact.upload.fileFormat" />
+                                <ul>
+                                    <li><b>Taxon name</b>: The name of the species for which the trait applies</li>
+                                    <li><b>TaxonId*</b>: The taxon ID for the species</li>
+                                    <li><b>Attribution*</b>: Attribution for the fact</li>
+                                    <li><b>Contributor*</b>: Email of the registered user who has provided the fact</li>
+                                    <li><b>License*</b>: Creative Commons Licence for the fact (eg: BY)</li>
+                                </ul>
+                                </small>
                             </div>
                         </div>
 
