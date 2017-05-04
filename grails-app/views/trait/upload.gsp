@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
     <head>
-        <g:set var="title" value="${g.message(code:'traits.label')}"/>
+        <g:set var="title" value="${g.message(code:'link.upload.trait')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
             .btn-group.open .dropdown-menu {
@@ -78,17 +78,18 @@
         <%
         def form_id = "createTraits"
         def form_action = uGroup.createLink(controller:'trait', action:'upload')
-        def form_button_name = "Create Traits"
-        def form_button_val = "${g.message(code:'button.create.traits')}"
-        entityName="Upload Traits"
+        def form_button_name = "${g.message(code:'button.create.traitvalues')}"
+        def form_button_val = "${g.message(code:'button.create.traitvalues')}"
+        entityName="Upload Trait/Values"
         if(params.action == 'edit' || params.action == 'update'){
         //form_id = "updateGroup"
         form_action = uGroup.createLink(controller:'trait', action:'upload')
-        form_button_name = "Update Traits"
+        form_button_name = "${g.message(code:'button.create.traitvalues')}"
         form_button_val = "${g.message(code:'button.update.traits')}"
         entityName = "Edit Traits"
         }
         String uploadDir = "trait/"+ UUID.randomUUID().toString()	
+        String iconsUploadDir = uploadDir+"/icons"	
 
         %>
         <div class="observation_create">
@@ -122,6 +123,18 @@
                                 model="['name': 'traitValuesPath', 'inputName': 'tvFile', 'path': tvFile?.path, 'size':tvFile?tvFile.size:'','fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
  
                                 <small class="help-block"><g:message code="default.trait.values.fileFormat" /> </small>
+                            </div>
+                        </div>
+
+                        <%def iconsAllowedExtensions="['zip']"%>
+                        <div class="row control-group left-indent">
+                            <label class="control-label" for="file">
+                                <g:message code="trait.icon.zip.label" /> 
+                            </label>
+                            <div class="controls" style="">
+                                <g:render template='/UFile/docUpload'
+                                model="['name': 'iconsPath', 'inputName': 'iconsFile', 'path': iconsFile?.path, 'size':iconsFile?.size,'fileParams':['uploadDir':iconsUploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+ 
                                 <% def upload_file_text="${g.message(code:'default.upload.file.label')}"%>
                                 <script type="text/javascript">
                                     $(document).ready(function(){
@@ -130,6 +143,8 @@
                                 </script>
                             </div>
                         </div>
+
+
                         </div>
                         <div class="" style="margin-top: 20px; margin-bottom: 40px;">
 

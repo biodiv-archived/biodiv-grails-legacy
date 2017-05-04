@@ -268,7 +268,7 @@
                                     <i class="icon-plus"></i><g:message code="link.add.document" />  
                                 </a>
                   </li> 
-
+                  <sUser:isAdmin>
                   <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.trait.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'trait', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
@@ -284,6 +284,7 @@
                                     <i class="icon-plus"></i><g:message code="link.add.fact" />  
                                 </a>
                   </li>
+                  </sUser:isAdmin>
                 </ul>
               </li>
             </ul>

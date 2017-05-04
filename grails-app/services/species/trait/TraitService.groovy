@@ -778,7 +778,7 @@ println queryParts.queryParams
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(icon));
         if(!fromDir) fromDir = grailsApplication.config.speciesPortal.content.rootDir; 
-        File fi = new File(fromDir+"/trait/"+icon);
+        File fi = new File(fromDir+"/icons/"+icon);
         if(fi.exists()) {
             (new AntBuilder()).copy(file: fi, tofile: file)
             ImageUtils.createScaledImages(file, usersDir,true);

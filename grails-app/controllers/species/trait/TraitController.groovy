@@ -19,6 +19,8 @@ import species.TaxonomyDefinition;
 import species.utils.ImageType;
 import groovy.sql.Sql
 import species.trait.Trait.DataTypes;
+import org.apache.commons.io.FilenameUtils;
+
 
 class TraitController extends AbstractObjectController {
 
@@ -277,12 +279,12 @@ class TraitController extends AbstractObjectController {
         return
     }
 
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
     def upload() {
 
         if(!params.tFile?.path || ! params.tvFile?.path) {
             flash.message = "Traits definition and value files are required";
-            render (view:'upload', model:[tFile:['path':params.tFile?.path,'size':params.tFile?.size], tvFile:['path':params.tvFile?.path, 'size':params.tvFile?.size]]);
+            render (view:'upload', model:[tFile:['path':params.tFile?.path,'size':params.tFile?.size], tvFile:['path':params.tvFile?.path, 'size':params.tvFile?.size], iconsFile:['path':params.iconsFile?.path, 'size':params.iconsFile?.size]]);
             return;
         }
 
@@ -293,6 +295,7 @@ class TraitController extends AbstractObjectController {
 
         params.tFile = contentRootDir.getAbsolutePath() + File.separator + params.tFile.path;
         params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile.path;
+        params.iconsFile = contentRootDir.getAbsolutePath() + File.separator + params.iconsFile.path;
         params.file = params.tFile;
 
         def tFileValidation = traitService.validateTraitDefinitions(params.tFile, new UploadLog());
@@ -300,13 +303,17 @@ class TraitController extends AbstractObjectController {
         
         if(tFileValidation.success && tvFileValidation.success) {
             log.debug "Validation of trait files done. Proceeding with upload"
+            File iconsFile = new File(params.iconsFile);
+            if(FilenameUtils.getExtension(iconsFile.getName()).equals('zip')) {
+                def ant = new AntBuilder().unzip(src: iconsFile,dest: iconsFile.getParent(), overwrite:true);            
+            }
             def r = traitService.upload(params);
             if(r.success) {
                 flash.message = r.msg;
                 redirect(action: "list")
             } else {
                 flash.message = r.msg;
-                render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], errors:errors]);
+                render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], iconsFile:['path':params.iconsFile], errors:errors]);
             }
         } else {
             String msg = "";
@@ -315,7 +322,7 @@ class TraitController extends AbstractObjectController {
             if(!tvFileValidation.success)
                 msg += "Error(s) in trait values file : "+tvFileValidation.msg+"  ";
             flash.message = msg;
-            render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], errors:errors]);
+            render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], iconsFile:['path':params.iconsFile], errors:errors]);
         }
     }
 

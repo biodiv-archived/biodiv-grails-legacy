@@ -191,7 +191,7 @@ class FactController extends AbstractObjectController {
     }
 
 
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
     def upload() {
 
         if(!params.fFile?.path) {
