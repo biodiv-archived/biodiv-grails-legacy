@@ -603,27 +603,31 @@ class AbstractObjectService {
 
         List errors = [];
         Map headerNames = [:];
+        File f = file?new File(file):null;
+        if(f && f.exists()) {
+            def v = SpreadsheetReader.readSpreadSheet(f.getAbsolutePath()).get(0);
+            dl.writeLog("Reading headers : "+v[0])
 
-        def v = SpreadsheetReader.readSpreadSheet((new File(file)).getAbsolutePath()).get(0);
-        dl.writeLog("Reading headers : "+v[0])
+            List missingHeaders = reqdHeaders - v[0].keySet();
+            if(missingHeaders.size() != 0) {
+                errors << "Columns missing : ${missingHeaders}";
+                return ['success':false, 'errors':errors];
+            }
 
-        List missingHeaders = reqdHeaders - v[0].keySet();
-        if(missingHeaders.size() != 0) {
-            errors << "Columns missing : ${missingHeaders}";
-            return ['success':false, 'errors':errors];
-        }
-        
-        v.eachWithIndex { m,index ->
-            for(int i=0; i<reqdHeaders.size(); i++) {
-                if(!m[reqdHeaders[i]]) {
-                    errors << "Row ${index+2} has missing value for ${reqdHeaders[i]}";
+            v.eachWithIndex { m,index ->
+                for(int i=0; i<reqdHeaders.size(); i++) {
+                    if(!m[reqdHeaders[i]]) {
+                        errors << "Row ${index+2} has missing value for ${reqdHeaders[i]}";
+                    }
                 }
             }
+            if(errors) {
+                return ['success':false, 'errors':errors];
+            }
+        } else {
+            errors << "File ${file} doesn't exist."
+            return ['success':false, 'msg':""];
         }
-        if(errors) {
-            return ['success':false, 'errors':errors];
-        }
-
         return ['success':true, 'msg':""];
     }
 }

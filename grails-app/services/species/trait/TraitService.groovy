@@ -47,8 +47,17 @@ class TraitService extends AbstractObjectService {
     Map upload(String file, Map params, UploadLog dl) {
         //def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
         Language languageInstance = utilsService.getCurrentLanguage();
-        Map result = uploadTraitDefinitions(params.tFile, dl, languageInstance);
-        uploadTraitValues(params.tvFile, dl, languageInstance);
+        Map result = [success:false, msg:''];
+        if(params.tFile) {
+            def r = uploadTraitDefinitions(params.tFile, dl, languageInstance);
+            result.success = r.success;
+            result.msg += r.msg;
+        }
+        if(params.tvFile) {
+            def r = uploadTraitValues(params.tvFile, dl, languageInstance);
+            result.success = r.success && result.success;
+            result.msg += r.msg;
+        }
         return result;
     }
 

@@ -139,6 +139,8 @@
                                 <li><b>showInObservation</b>: Mark "True" if the trait should be displayed for input during observation upload.</li>
 
                                 </ul>
+                               </small>
+                               <small>
                                 <g:message code="default.trait.upload.samplefileFormat" /> 
                                 <a href="${createLinkTo(dir: '/../static/templates/', file:'traitTemplate_v1.tsv' , base:grailsApplication.config.speciesPortal.resources.serverURL)}"><g:message code="msg.here" /></a>
                                 </small>
@@ -171,6 +173,7 @@
                                     <li><b>Value Definition</b>: Definition of the trait value</li>
                                     <li><b>Value Source</b>: Source of the trait value</li>
                                 </ul>
+                                </small><small>
                                 <g:message code="default.trait.values.upload.samplefileFormat" /> 
                                 <a href="${createLinkTo(dir: '/../static/templates/', file:'traitValuesTemplate_v1.tsv' , base:grailsApplication.config.speciesPortal.resources.serverURL)}"><g:message code="msg.here" /></a>
 

@@ -127,6 +127,8 @@
                                     <li><b>Contributor*</b>: Email of the registered user who has provided the fact</li>
                                     <li><b>License*</b>: Creative Commons Licence for the fact (eg: BY)</li>
                                 </ul>
+                                </small>
+                                <small>
                                 <g:message code="default.fact.upload.samplefileFormat" /> 
                                 <a href="${createLinkTo(dir: '/../static/templates/', file:'factTemplate_v1.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}"><g:message code="msg.here" /></a>
 

@@ -282,8 +282,8 @@ class TraitController extends AbstractObjectController {
     @Secured(['ROLE_ADMIN'])
     def upload() {
 
-        if(!params.tFile?.path || ! params.tvFile?.path) {
-            flash.message = "Traits definition and value files are required";
+        if(!params.tFile?.path && ! params.tvFile?.path) {
+            flash.message = "Traits definition or values file is required";
             render (view:'upload', model:[tFile:['path':params.tFile?.path,'size':params.tFile?.size], tvFile:['path':params.tvFile?.path, 'size':params.tvFile?.size], iconsFile:['path':params.iconsFile?.path, 'size':params.iconsFile?.size]]);
             return;
         }
@@ -293,18 +293,18 @@ class TraitController extends AbstractObjectController {
             contentRootDir.mkdir();
         }
 
-        params.tFile = contentRootDir.getAbsolutePath() + File.separator + params.tFile.path;
-        params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile.path;
-        params.iconsFile = contentRootDir.getAbsolutePath() + File.separator + params.iconsFile.path;
-        params.file = params.tFile;
+        params.tFile = params.tFile.path ? contentRootDir.getAbsolutePath() + File.separator + params.tFile.path : null;
+        params.tvFile = params.tvFile ? contentRootDir.getAbsolutePath() + File.separator + params.tvFile.path : null;
+        params.iconsFile = params.iconsFile.path ? contentRootDir.getAbsolutePath() + File.separator + params.iconsFile.path : null;
+        params.file = params.tFile?:params.tvFile;
 
         def tFileValidation = traitService.validateTraitDefinitions(params.tFile, new UploadLog());
         def tvFileValidation = traitService.validateTraitValues(params.tvFile, new UploadLog());
         
-        if(tFileValidation.success && tvFileValidation.success) {
+        if(tFileValidation.success || tvFileValidation.success) {
             log.debug "Validation of trait files done. Proceeding with upload"
-            File iconsFile = new File(params.iconsFile);
-            if(FilenameUtils.getExtension(iconsFile.getName()).equals('zip')) {
+            File iconsFile = params.iconsFile ? new File(params.iconsFile) : null;
+            if(iconsFile && iconsFile.exists() && FilenameUtils.getExtension(iconsFile.getName()).equals('zip')) {
                 def ant = new AntBuilder().unzip(src: iconsFile,dest: iconsFile.getParent(), overwrite:true);            
             }
             def r = traitService.upload(params);
