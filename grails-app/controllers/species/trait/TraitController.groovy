@@ -112,31 +112,37 @@ class TraitController extends AbstractObjectController {
         Trait traitInstance;
         Language languageInstance = utilsService.getCurrentLanguage();
         if(params.id){
-            traitInstance=Trait.findById(params.id)
+            traitInstance = Trait.findById(params.id)
         }
-        else{traitInstance=new Trait();
-            traitInstance.traitTypes=Trait.fetchTraitTypes(params.traittype);
-            traitInstance.dataTypes=Trait.fetchDataTypes(params.datatype);
+        else{
+            traitInstance=new Trait();
+            traitInstance.traitTypes = Trait.fetchTraitTypes(params.traittype);
+            traitInstance.dataTypes = Trait.fetchDataTypes(params.datatype);
         }
         params.isNotObservationTrait = (params.isNotObservationTrait)?true:false;
         params.isParticipatory = (params.isParticipatory)?true:false;
         params.showInObservation = (params.showInObservation)?true:false;
         
         traitInstance.properties = params;
-        def speciesField=params.fieldid.replaceAll(">", "|").trim()
-        def fieldInstance=traitService.getField(speciesField,languageInstance)
-        traitInstance.field=fieldInstance
+        if(params.fieldid) {
+            def speciesField = params.fieldid.replaceAll(">", "|").trim();
+            if(speciesField) {
+                def fieldInstance = traitService.getField(speciesField, languageInstance);
+                traitInstance.field = fieldInstance
+            }
+        }
         traitInstance.taxon?.clear()
         if(params.taxonName){
             def taxonId
-            params.taxonName.each{
+            params.taxonName.each {
+                println it
                 taxonId=it
-                taxonId = taxonId.substring(taxonId.indexOf("(") + 1);
+                taxonId = taxonId.substring(taxonId.lastIndexOf("(") + 1);
                 taxonId = taxonId.substring(0, taxonId.indexOf("-"));
                 TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
                 traitInstance.addToTaxon(taxon);
             }
-    }
+        }
 
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"

@@ -249,17 +249,19 @@ class TraitService extends AbstractObjectService {
      }
 
     private Field getField(String string, Language languageInstance) {
+        if(!string) return null;
 
-        def f = string.tokenize("|");
+        String f = string.tokenize("|");
 
         Field field;
         if(f.size() == 1) {
-            f = Field.findByLanguageAndConcept(languageInstance, f[0].trim());
+            field = Field.findByLanguageAndConcept(languageInstance, f[0].trim());
         } else if (f.size() == 2) {
-            f = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
+            field = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
         } else  if (f.size() == 3) {
-            f = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
+            field = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
         } 
+        return field;
     }
 
     private getTaxon(String taxonList) {
@@ -666,7 +668,7 @@ println queryParts.queryParams
     def createTraitValue(Trait traitInstance, params){
 
         def valueCount = params.valueCount?params.valueCount:0;
-        for(def i=1;i<=valueCount;i++){
+        for(def i=1;i<=valueCount;i++) {
             TraitValue traitValueInstance = new TraitValue();
             traitValueInstance.value = params["value_"+i];
             traitValueInstance.description = params["traitDesc_"+i];

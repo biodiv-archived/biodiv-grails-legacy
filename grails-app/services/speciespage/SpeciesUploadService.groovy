@@ -159,19 +159,19 @@ class SpeciesUploadService {
 		def speciesDataFile = sBulkUploadEntry.filePath
 		def imagesDir = sBulkUploadEntry.imagesDir
 		sBulkUploadEntry.updateStatus(UploadLog.Status.RUNNING)
+		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		
+		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
+
 		def res = uploadMappedSpreadsheet(speciesDataFile, speciesDataFile, 2,0,0,0, imagesDir?1:-1, imagesDir, sBulkUploadEntry)
 		
 		//writing log after upload
 		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
 		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " 
 		//mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
-		mylog += "  \n\n    Developer log \n\n" + res.log
-		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
+		//mylog += "  \n\n    Developer log \n\n" + res.log
 		errorFile.write(mylog)
-		
-		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
-		
+			
 		if(!sBulkUploadEntry.save(flush:true)){
 			sBulkUploadEntry.errors.allErrors.each { log.error it }
 		}
@@ -375,8 +375,12 @@ class SpeciesUploadService {
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
-				sBulkUploadEntry?.writeLog(res.idSummary)
-				
+				sBulkUploadEntry?.writeLog(res.idSummary);
+                if(sBulkUploadEntry && sBulkUploadEntry.errorFilePath) {
+				    new File(sBulkUploadEntry?.errorFilePath).write(converter.getLogs()?:'');
+                    converter.clearLogs();
+                }
+            				
 			}
 			
 			processNameCount += contentSubList.size()
