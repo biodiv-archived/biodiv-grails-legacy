@@ -377,7 +377,14 @@ class SpeciesUploadService {
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
 				sBulkUploadEntry?.writeLog(res.idSummary);
                 if(sBulkUploadEntry && sBulkUploadEntry.errorFilePath) {
-				    new File(sBulkUploadEntry?.errorFilePath).write(converter.getLogs()?:'');
+                    def ln = System.getProperty('line.separator');
+				    new File(sBulkUploadEntry?.errorFilePath).withWriterAppend("UTF-8") { 
+                        it.write(ln+converter.getLogs()?:'');
+                    }
+                    log.info "================================ LOG ============================="
+                    println  converter.getLogs()
+                    log.info "=================================================================="
+
                     converter.clearLogs();
                 }
             				
@@ -394,9 +401,6 @@ class SpeciesUploadService {
 			sBulkUploadEntry.updateStatus(isAborted ? UploadLog.Status.ABORTED : UploadLog.Status.UPLOADED)
 		//}
 		
-		log.info "================================ LOG ============================="
-		println  converter.getLogs()
-		log.info "=================================================================="
 		
 		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		log.info "Total number of species that got added : ${noOfInsertions}"
