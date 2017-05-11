@@ -17,7 +17,9 @@ documentInstance = Document.read(documentInstance.id)
         </div>
         <g:render template="/common/featureNotesTemplate" model="['instance':documentInstance, 'featuredNotes':featuredNotes]"/>
         </g:if>
-<g:else>
+
+        
+        <g:else>
             <g:if test="${documentInstance.uFile}">
                 <% def extension = documentInstance?.uFile?.path.split("\\.")[-1] %>
                     <g:if test="${extension.toUpperCase() == 'PDF' && (showPDFViewer != null)?showPDFViewer:true}">
@@ -44,6 +46,7 @@ documentInstance = Document.read(documentInstance.id)
                 </g:if>
             </g:else>
 
+            <g:if test="${showDetails}">
             <div class="sidebar_section">
             <h5><g:message code="link.coverage.information" /></h5>
             <div id="coverageInfo" class="speciesField collapse in">
@@ -97,7 +100,7 @@ documentInstance = Document.read(documentInstance.id)
             </div>
                     <div class="sidebar_section">
                     <h5><g:message code="Details" /></h5>
-                    <div id="coverageInfo" class="speciesField collapse in">
+                    <div class="speciesField collapse in">
                     <div class="prop">
                     <span class="name"><g:message code="default.file.label" /></span>
                     <div class="value">  <a href="${url}"><span class="pdficon" style="display:inline-block; margin-left: 5px; margin-right:5px;"></span>${raw(documentInstance?.title)}</a></div>
@@ -143,19 +146,22 @@ documentInstance = Document.read(documentInstance.id)
                 </g:if>
             </div>
             </div>
+            </g:if>
 
+            <g:if test="${showDetails}">
             <div class="sidebar_section">
                 <h5><g:message code="Metadata" /></h5>
-                <div id="coverageInfo" class="speciesField collapse in">
+                <div class="speciesField collapse in">
+                </g:if>
                 <g:if test="${documentInstance?.contributors}">
                 <div class="prop">
                 <span class="name"><g:message code="default.contributors.label" /></span>
                 <div class="value">
                 ${documentInstance?.contributors}
                 </div>
-            </div>
-            </g:if>
-            <g:if test="${documentInstance?.attribution}">
+                </g:if>
+                </div>
+                <g:if test="${documentInstance?.attribution}">
                 <div class="prop">
                 <span class="name"><g:message code="default.attribution.label" /></span>
                 <div class="value">
@@ -164,9 +170,9 @@ documentInstance = Document.read(documentInstance.id)
                 ${documentInstance?.attribution}
                 </div>    
                 </div>
-            </div>
-            </g:if>
-            <g:if test="${documentInstance?.license}">
+                </div>
+                </g:if>
+                <g:if test="${documentInstance?.license}">
                 <div class="prop">
                 <span class="name"><g:message code="default.licenses.label" /></span>
 
@@ -174,9 +180,9 @@ documentInstance = Document.read(documentInstance.id)
                 <asset:image src="/all/license/${documentInstance?.license?.name.value().toLowerCase().replaceAll('\\s+','')+'.png'}" absolute="true" title="${documentInstance.license.name}" />
                 </div>
                 </div>
-            </g:if>
+                </g:if>
 
-            <g:if test="${showDetails && documentInstance?.fetchSource()}">
+                <g:if test="${showDetails && documentInstance?.fetchSource()}">
                 <div class="prop">
                 <span class="name"><g:message code="default.source.label" /></span>
                 <%  
@@ -191,9 +197,9 @@ documentInstance = Document.read(documentInstance.id)
                 ${sourceObj}</a>
                 </div>
                 </div>
-            </g:if>
+                </g:if>
 
-            <g:if test="${showDetails}">
+                <g:if test="${showDetails}">
                 <div class="prop" style="margin-bottom: 5px;">
                 <div style="height: 26px;">
                 <span class="name"><g:message code="default.tags.label" /></span>
@@ -208,9 +214,13 @@ documentInstance = Document.read(documentInstance.id)
                 model="['userInstance':documentInstance.author, 'userGroup':userGroup]" />
                 </div>           
                 </div>
+                </g:if>
+
+            <g:if test="${showDetails}">
+            </div>
+            </div>
             </g:if>
-            </g:else>
-            </div>
-            </div>
-            </div>
+    </g:else>
+            
+</div>
 
