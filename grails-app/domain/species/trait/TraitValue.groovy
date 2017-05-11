@@ -22,7 +22,17 @@ class TraitValue {
     
     static constraints = {
         trait nullable:false, blank:false, unique:['value']
-        value nullable:false
+        value nullable:false, validator : { val, obj ->
+            println obj.trait.dataTypes
+            switch(obj.trait.dataTypes) {
+                case Trait.DataTypes.STRING : return true;
+                case Trait.DataTypes.DATE : return utilsService.parseDate(val)?true:false;
+                case Trait.DataTypes.NUMERIC : println val; println val.isNumber(); return val.isNumber();
+                case Trait.DataTypes.BOOLEAN : return Boolean.parseBoolean(val) ;
+                case Trait.DataTypes.COLOR:return true;
+            }
+            return true;
+		}
 		description nullable:true
         icon nullable:true
         source nullable:true

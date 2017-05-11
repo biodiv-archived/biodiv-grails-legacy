@@ -58,38 +58,39 @@ display:none;
                         </div>
 
                     </div>
-                    <g:if test="${params.action=='create'}">
+                    
                     <div
-                        class="control-group ${hasErrors(bean: traitInstance, field: 'DataType', 'error')}">
+                        class="control-group ${hasErrors(bean: traitInstance, field: 'dataTypes', 'error')}">
                         <label class="control-label" for="title"><g:message
                             code="trait.datatype.label" default="${g.message(code:'trait.datatype.label')}" /><span class="req">*</span></label>
                         <div class="controls">
                             <g:select name="datatype" class="input-block-level"
                             placeholder="${g.message(code:'placeholder.document.select')}"
+                            noSelection="${['null':'Select One...']}"
+                            optionKey="key" optionValue="value"
                             from="${species.trait.Trait$DataTypes?.values()}"
                             keys="${species.trait.Trait$DataTypes?.values()*.value()}"
                             value="${traitInstance?.dataTypes?.value()}" />
                         </div>
-                        </div> 
-                        </g:if>
+                    </div> 
 
-                    <g:if test="${params.action=='create'}">
                     <div
-                        class="control-group ${hasErrors(bean: traitInstance, field: 'traittypes', 'error')}">
+                        class="control-group ${hasErrors(bean: traitInstance, field: 'traitTypes', 'error')}">
                         <label class="control-label" for="traittypes"><g:message code="trait.traittypes.label" /></label>
                         <div class="controls">
                              <g:select name="traittype" class="input-block-level"
                             placeholder="${g.message(code:'placeholder.document.select')}"
+                            noSelection="${['null':'Select One...']}"
+                            optionKey="key" optionValue="value"
                             from="${species.trait.Trait$TraitTypes?.values()}"
                             keys="${species.trait.Trait$TraitTypes?.values()*.value()}"
                             value="${traitInstance?.traitTypes?.value()}" />
 
+                            <input type="hidden" id="valueCount" name="valueCount" />
                         </div>
                     </div> 
-                    <input type="hidden" id="valueCount" name="valueCount" />
-                    </g:if>
 
-                <div class="control-group sciNameDiv" style="margin-top:5px;">
+                <div class="control-group sciNameDiv  ${hasErrors(bean: traitInstance, field: 'taxon', 'error')}" style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
                     code="observation.recommendationVote.label" default="${g.message(code:'trait.taxon.name')}" />
                 </label>
@@ -118,9 +119,9 @@ display:none;
                         <div class="controls">
                         <%
                         def value=[];
-                        value=TraitValue.findAllByTrait(Trait.findById(traitInstance.id)) ;
+                        value=traitValues;
                         %>
-
+${value?.size()}
                         <table class="table" id="valueTable">
                         <tr>
                         <th>Value</th>
@@ -132,27 +133,27 @@ display:none;
                         <g:each in="${value}" var="val" status="i">
                         <tr>
                         
-                        <td>
+                        <td class="control-group ${hasErrors(bean: val, field: 'value', 'error')}">
                             <input type="hidden" name="traitValueId" id="traitValueId_${i}" value="${val.id}" />
                            <g:textField name="value_${i}" id="value_${i}" class="input-block-level"
                             value="${val.value}"
                             placeholder="${g.message(code:'placeholder.trait.enter.values')}" style="display:none;" /> 
                             <div  id="valuelable_${i}">${val.value}</div>
                         </td>
-                        <td>
+                        <td class="${hasErrors(bean: val, field: 'description', 'error')}">
                             <g:textField name="traitDesc_${i}" id="traitDesc_${i}" class="input-block-level"
                             value="${val.description}"
                             placeholder="${g.message(code:'placeholder.trait.enter.description')}" style="display:none;"/>
                             <div id="traitDescLable_${i}">${val.description}</div>
                         </td>
-                        <td>
+                        <td class="${hasErrors(bean: val, field: 'source', 'error')}">
                             <g:textField name="traitSource_${i}" class="input-block-level" id="traitSource_${i}"
                             value="${val.source}"
                             placeholder="${g.message(code:'placeholder.trait.enter.source')}" style="display:none;" />
                             <div id="traitSourceLable_${i}">${val.source}</div>
                         </td>
 
-                        <td>
+                        <td class="${hasErrors(bean: val, field: 'icon', 'error')}">
                             <%def thumbnail = val.icon%>
                             <a onclick="$('#attachFile').select()[0].click();return false;" style="postiion:relative;">
                             <img id="thumbnail" class="user-icon small_profile_pic" src="${val?.mainImage()?.fileName}" title="${val.value}" alt="${val.value}" />
@@ -200,11 +201,11 @@ display:none;
                         class="control-group ${hasErrors(bean: traitInstance, field: 'fieldid', 'error')}">
                         <label class="control-label" for="value"><g:message code="trait.fieldid.label" /></label>
                         <div class="controls">
-                            
-                <ul id="fieldid" class="fieldid" rel="${g.message(code:'placeholder.add.tags')}">
-                    <li><span class="tagit-label">${field}</span></li>
-                </ul>
 
+                            <input id="fieldid"
+                data-provide="typeahead" type="text" class="input-block-level"
+                name="fieldid" value="${traitInstance?.field}"
+                placeholder="${g.message(code:'placeholder.add.tags')}" autocomplete='off'/> 
                         </div>
                     </div>
 
@@ -391,12 +392,17 @@ display:none;
         url:window.params.getDataColumnsDB,
                 dataType:'JSON',
                 success:function(data){
+$("#fieldid").typeahead({
+            source: data
+        });
+/*
                         $("#fieldid").tagit({
                         availableTags:data,
                         fieldName: 'fieldid', 
                         showAutocompleteOnFocus: false,
                         allowSpaces: true,
                         triggerKeys:['comma'], 
+                        tagLimit:1,
                         beforeTagAdded: function(event, ui) {
                             if(data.indexOf(ui.tagLabel) == -1)
                             {
@@ -408,7 +414,7 @@ display:none;
                             }
                         }
                     });
-                  }
+  */                }
     });
 
             $(".taxonName").tagit({

@@ -251,12 +251,15 @@ class TraitService extends AbstractObjectService {
     private Field getField(String string, Language languageInstance) {
         if(!string) return null;
 
-        String f = string.tokenize("|");
-
+        String[] f = string.tokenize("|");
+println f
         Field field;
         if(f.size() == 1) {
             field = Field.findByLanguageAndConcept(languageInstance, f[0].trim());
         } else if (f.size() == 2) {
+            println f[0]
+            println f[1]
+            println languageInstance
             field = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
         } else  if (f.size() == 3) {
             field = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
@@ -547,13 +550,13 @@ println queryParts.queryParams
                 List<TaxonomyDefinition> taxons = SpeciesGroup.read(params.sGroup)?.getTaxon(); 
                 def classification;
                 if(params.classification)
-                    classification = Classification.read(Long.parseLong(params.classification))
-                        if(!classification)
-                            classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
-                List parentTaxon = [];
-                taxons.each {taxon ->
+                    classification = Classification.read(Long.parseLong(params.classification));
+                    if(!classification)
+                        classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                    List parentTaxon = [];
+                    taxons.each {taxon ->
                     if(taxon) {
-                    parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                        parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
                     }
                 }
                 queryParams['classification'] = classification.id; 
@@ -563,9 +566,9 @@ println queryParts.queryParams
                 activeFilters['classification'] = classification.id;
                 activeFilters['sGroup'] = params.sGroup;
 
-                  if(params.showInObservation && params.showInObservation.toBoolean()){
-                 filterQuery += ' and obv.showInObservation = :showInObservation '
-                 queryParams['showInObservation'] = true ; 
+                if(params.showInObservation && params.showInObservation.toBoolean()){
+                    filterQuery += ' and obv.showInObservation = :showInObservation '
+                    queryParams['showInObservation'] = true ; 
                 }
 
  
@@ -665,10 +668,11 @@ println queryParts.queryParams
         return traitFilter
     }    
 
-    def createTraitValue(Trait traitInstance, params){
+    List createTraitValues(Trait traitInstance, params){
 
-        def valueCount = params.valueCount?params.valueCount:0;
-        for(def i=1;i<=valueCount;i++) {
+        int valueCount = params.valueCount?params.int('valueCount'):0;
+        List traitValues = [];
+        for(int i=1; i<=valueCount; i++) {
             TraitValue traitValueInstance = new TraitValue();
             traitValueInstance.value = params["value_"+i];
             traitValueInstance.description = params["traitDesc_"+i];
@@ -676,17 +680,35 @@ println queryParts.queryParams
             traitValueInstance.trait = traitInstance
             traitValueInstance.icon = getTraitIcon(params["icon_"+i])
 
-            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
+            traitValueInstance.validate();
+            traitValueInstance.errors.allErrors .each {
+                    def formattedMessage = messageSource.getMessage(it, null);
+                    log.error formattedMessage
+                }
+     
+            traitValues << traitValueInstance; 
+        }
+        return traitValues;
+    }
+    
+    Map saveTraitValues(List<TraitValue> traitValues) {
+
+        def valueCount = traitValues.size();
+        Map result = ['success':true, errors:[]];
+        for(int i=1; i<=valueCount; i++) {
+            if (!traitValues[i] && traitValues[i].save(flush: true)) {
                 def msg = "Trait Value Added Successfully"
             }
-            else{
-                def errors = [];
-                traitValueInstance.errors.allErrors .each {
+            else {
+                traitValues[i].errors.allErrors .each {
                     def formattedMessage = messageSource.getMessage(it, null);
-                    errors << [field: it.field, message: formattedMessage]
+                    result.errors << [field: it.field, message: formattedMessage]
                 }
+                result.success = false;
             }
         }
+        return result;
+       
     }
 
     private String getTraitIcon(String icon) {    

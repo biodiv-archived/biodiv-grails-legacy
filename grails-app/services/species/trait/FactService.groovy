@@ -161,7 +161,7 @@ class FactService extends AbstractObjectService {
                     case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts'] : break;
                     default : 
                     value = value ? value.trim() : null ;
-
+                    
                     writeLog("Loading trait ${key} : ${value}", Level.INFO);
                     Trait trait;
                     TaxonomyDefinition pageTaxon;
@@ -169,8 +169,19 @@ class FactService extends AbstractObjectService {
                         case 'species.Species': 
                         pageTaxon = object.taxonConcept;
                         if(pageTaxon) {
+                            println m.traitId
                             writeLog("validate if this trait ${key} can be given to this pageTaxon ${pageTaxon} as per traits taxon scope");
-                            trait = Trait.getValidTrait(key, pageTaxon);
+                            if(m.traitId) {
+                                Trait t  = Trait.read(Long.parseLong(m.traitId));
+                                println t
+                                if(Trait.isValidTrait(t, pageTaxon)) {
+                                    trait = t;
+                                } else {
+                                    writeLog("Trait ${t} is not valid as per taxon", Level.ERROR);
+                                }
+                            } else {
+                                trait = Trait.getValidTrait(key, pageTaxon);
+                            }
                         }
                         break;
                         case 'species.participation.Observation': 

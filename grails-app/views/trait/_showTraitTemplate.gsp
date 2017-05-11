@@ -8,7 +8,7 @@
     <div class="alert alert-error" style="display:none;"></div>
   	<g:render template="/trait/showTraitValuesListTemplate" model="['trait':trait, 'traitValues':factInstance?factInstance[trait.id]:(editable?null:trait.values()), 'displayAny':displayAny, 'traitTypes':trait.traitTypes, 'queryParams':queryParams, 'numericTraitMinMax':numericTraitMinMax.find{it.id == trait.id}]"/>
     <g:if test="${editable}">
-    <g:if test="${ifOwns || trait.isParticipatory}">
+    <g:if test="${ifOwns || trait.isParticipatory || fromSpeciesShow}">
         <div style="position:absolute;float: right;right: 0px;top:2px;">
             <a class="btn btn-small btn-primary editFact" data-id="${trait.id}" style="float:right;display: block;">Edit</a>
             <a class="btn btn-small btn-primary cancelFact" data-id="${trait.id}" style="float:right;display:none;" >Cancel</a>

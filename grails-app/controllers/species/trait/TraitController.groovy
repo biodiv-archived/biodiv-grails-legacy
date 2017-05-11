@@ -111,11 +111,11 @@ class TraitController extends AbstractObjectController {
         def msg = "";
         Trait traitInstance;
         Language languageInstance = utilsService.getCurrentLanguage();
-        if(params.id){
+        if(params.id) {
             traitInstance = Trait.findById(params.id)
         }
-        else{
-            traitInstance=new Trait();
+        else {
+            traitInstance = new Trait();
             traitInstance.traitTypes = Trait.fetchTraitTypes(params.traittype);
             traitInstance.dataTypes = Trait.fetchDataTypes(params.datatype);
         }
@@ -124,39 +124,63 @@ class TraitController extends AbstractObjectController {
         params.showInObservation = (params.showInObservation)?true:false;
         
         traitInstance.properties = params;
+
         if(params.fieldid) {
+            log.debug "Fetching field ${params.fieldid}";
             def speciesField = params.fieldid.replaceAll(">", "|").trim();
+            println speciesField
             if(speciesField) {
                 def fieldInstance = traitService.getField(speciesField, languageInstance);
+                println fieldInstance
                 traitInstance.field = fieldInstance
             }
         }
+
         traitInstance.taxon?.clear()
         if(params.taxonName){
-            def taxonId
-            params.taxonName.each {
-                println it
-                taxonId=it
+            if(params.taxonName instanceof String) {
+                def taxonId = params.taxonName;
                 taxonId = taxonId.substring(taxonId.lastIndexOf("(") + 1);
                 taxonId = taxonId.substring(0, taxonId.indexOf("-"));
                 TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
                 traitInstance.addToTaxon(taxon);
+
+            } else {
+                params.taxonName.each { taxonId ->
+                    taxonId = taxonId.substring(taxonId.lastIndexOf("(") + 1);
+                    taxonId = taxonId.substring(0, taxonId.indexOf("-"));
+                    TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
+                    traitInstance.addToTaxon(taxon);
+                }
             }
         }
 
+        List<TraitValue> traitValues = traitService.createTraitValues(traitInstance, params)
+
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
-            def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
-            if(params.action=='update'){
-                traitService.createTraitValue(traitInstance,params)
-            }
-            withFormat {
-                html {
-                    flash.message = msg;
-                    redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
+            Map r = traitService.saveTraitValues(traitValues);
+            if(r.success) {
+                def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
                 }
-                json { render model as JSON }
-                xml { render model as XML }
+            } else {
+                def model = utilsService.getErrorModel(msg, traitInstance, OK.value(), r.errors);
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(url: uGroup.createLink(controller:"trait" , action: "create", model:[traitInstance:traitInstance, traitValues:traitValues]))
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+
             }
             return
         }
@@ -165,12 +189,13 @@ class TraitController extends AbstractObjectController {
             traitInstance.errors.allErrors .each {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
+                log.error errors;
             }
 
             def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
             withFormat {
                 html {
-                    render(view: "create", model: [traitInstance: traitInstance])
+                    render(view: "create", model: [traitInstance: traitInstance, traitValues: traitValues])
                 }
                 json { render model as JSON }
                 xml { render model as XML }
