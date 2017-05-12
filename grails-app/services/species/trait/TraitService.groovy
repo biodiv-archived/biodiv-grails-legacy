@@ -698,19 +698,19 @@ println queryParts.queryParams
     }
     
     Map saveTraitValues(List<TraitValue> traitValues) {
-
+        log.debug "saving trait values";
         def valueCount = traitValues.size();
         Map result = ['success':true, errors:[]];
-        for(int i=1; i<=valueCount; i++) {
-            if (!traitValues[i] && traitValues[i].save(flush: true)) {
-                def msg = "Trait Value Added Successfully"
-            }
-            else {
+        for(int i=0; i<valueCount; i++) {
+            if (traitValues[i].save(flush: true)) {
+                log.debug "saved trait value ${traitValues[i]} for trait ${traitValues[i].trait}"
+            } else {
                 traitValues[i].errors.allErrors .each {
                     def formattedMessage = messageSource.getMessage(it, null);
                     result.errors << [field: it.field, message: formattedMessage]
                 }
                 result.success = false;
+                log.error result.errors;
             }
         }
         return result;

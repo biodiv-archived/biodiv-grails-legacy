@@ -76,7 +76,7 @@ display:none;
 
                     <div
                         class="control-group ${hasErrors(bean: traitInstance, field: 'traitTypes', 'error')}">
-                        <label class="control-label" for="traittypes"><g:message code="trait.traittypes.label" /></label>
+                        <label class="control-label" for="traittypes"><g:message code="trait.traittypes.label" /><span class="req">*</span></label>
                         <div class="controls">
                              <g:select name="traittype" class="input-block-level"
                             placeholder="${g.message(code:'placeholder.document.select')}"
@@ -92,7 +92,7 @@ display:none;
 
                 <div class="control-group sciNameDiv  ${hasErrors(bean: traitInstance, field: 'taxon', 'error')}" style="margin-top:5px;">
                 <label for="recommendationVote" class="control-label"> <g:message
-                    code="observation.recommendationVote.label" default="${g.message(code:'trait.taxon.name')}" />
+                    code="observation.recommendationVote.label" default="${g.message(code:'trait.taxon.name')}" /><span class="req">*</span>
                 </label>
                 <div class="controls">
                     <div class="textbox nameContainer">
@@ -199,7 +199,7 @@ ${value?.size()}
                     </div>
                         <div
                         class="control-group ${hasErrors(bean: traitInstance, field: 'fieldid', 'error')}">
-                        <label class="control-label" for="value"><g:message code="trait.fieldid.label" /></label>
+                        <label class="control-label" for="value"><g:message code="trait.fieldid.label" /><span class="req">*</span></label>
                         <div class="controls">
 
                             <input id="fieldid"

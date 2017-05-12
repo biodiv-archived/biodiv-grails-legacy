@@ -101,7 +101,7 @@ class TraitController extends AbstractObjectController {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
         }  else {
-            render(view: "create", model: [traitInstance: traitInstance , field: field.concept+'|'+field.category])
+            render(view: "create", model: [traitInstance: traitInstance , traitValues:TraitValue.findAllByTrait(traitInstance), field: field.concept+'|'+field.category])
         }
         return;
     }
@@ -156,7 +156,8 @@ class TraitController extends AbstractObjectController {
         }
 
         List<TraitValue> traitValues = traitService.createTraitValues(traitInstance, params)
-
+println traitValues;
+println "===================+"
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
             Map r = traitService.saveTraitValues(traitValues);
@@ -175,7 +176,7 @@ class TraitController extends AbstractObjectController {
                 withFormat {
                     html {
                         flash.message = msg;
-                        redirect(url: uGroup.createLink(controller:"trait" , action: "create", model:[traitInstance:traitInstance, traitValues:traitValues]))
+                        render(view: "create", model:[traitInstance:traitInstance, traitValues:traitValues]);
                     }
                     json { render model as JSON }
                     xml { render model as XML }
@@ -189,8 +190,8 @@ class TraitController extends AbstractObjectController {
             traitInstance.errors.allErrors .each {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
-                log.error errors;
             }
+            log.error errors;
 
             def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
             withFormat {
