@@ -33,7 +33,7 @@
            </div> 
             </g:if>
         
-        <g:if test="${fromSpeciesShow!=true}">
+        <g:if test="${fromSpeciesShow!=true || editable}">
             <g:each in="${traitValues}" var="traitValue" status="i">
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue?.trait.id}' data-isNotObservation='${traitValue.trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post ${traitTypes} ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue?.trait.id]?.contains(traitValue.id+'')?'active btn-success':''}"
@@ -44,14 +44,14 @@
             </g:each> 
         </g:if>
         
-        <g:if test="${fromSpeciesShow==true}">
+        <g:if test="${fromSpeciesShow==true && !editable}">
             <g:each in="${traitValues}" var="traitValue" status="i">
             <g:if test="${(traitValue instanceof TraitValue)}">
                 <% String link="${"/trait/show/"+trait.id+"?trait."+trait.id+"="+traitValue.id}" %>
                 <a href='${link}'>
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue.trait.id}' data-isnotobservation='${traitValue.trait.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue.trait.id]?.contains(traitValue.id+'')?'active btn-success':''}"
-                        value="${traitValue.id}"
+                        value="${traitValue.value}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
 
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>

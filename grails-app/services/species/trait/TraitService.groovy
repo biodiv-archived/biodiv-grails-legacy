@@ -622,6 +622,12 @@ println queryParts.queryParams
             activeFilters["isNotObservationTrait"] = !params.isObservationTrait.toBoolean()
         }
 
+        if(params.isNotObservationTrait && params.isNotObservationTrait.toBoolean()){
+            filterQuery += " and obv.isNotObservationTrait = :isNotObservationTrait "
+            queryParams["isNotObservationTrait"] = params.isNotObservationTrait.toBoolean()
+            activeFilters["isNotObservationTrait"] = params.isNotObservationTrait.toBoolean()
+        }
+
         if(params.isParticipatory && params.isParticipatory.toBoolean()){
             filterQuery += " and obv.isParticipatory = :isParticipatory "
             queryParams["isParticipatory"] = params.isParticipatory.toBoolean()

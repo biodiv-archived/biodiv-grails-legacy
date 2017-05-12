@@ -366,7 +366,7 @@
                 updateGallery('/species/list', 8, 0, undefined, true,undefined,undefined,undefined,undefined,false);
                 var getResourceUrl = "${uGroup.createLink(controller:'species', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
                 galleryAjax(getResourceUrl+'/'+${speciesInstance.id},'species');
-
+        });
         $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
             if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
                 $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
@@ -385,16 +385,7 @@
             }
             return false;
         });
-        /*$('.edit_trait').click(function(){
-            $('.trait_edit_panel').show();
-            $('.trait_panel').hide();
-        });
-        $('.edit_save').click(function(){
-            $('.trait_edit_panel').hide();
-            $('.trait_panel').show();
-            });
-        });*/
-            </asset:script>
+           </asset:script>
         </body>
 
     </html>

@@ -15,7 +15,7 @@
             <input type="submit" class="btn btn-small btn-primary submitFact" data-id="${trait.id}" data-objectId = "${object?.id}" data-objectType="${object?.class?.getCanonicalName()}" style="float:right;display:none" value="Submit" />
         </div>
         <div class="editFactPanel trait" style="display:none;">
-            <g:render template="/trait/showTraitValuesListTemplate" model="['trait':trait, 'traitValues':trait.values(),'factInstance':factInstance, 'displayAny':displayAny, fromSpeciesShow:false, 'traitTypes':trait.traitTypes, 'queryParams':queryParams,  'numericTraitMinMax':numericTraitMinMax.find{it.id == trait.id}]"/>
+            <g:render template="/trait/showTraitValuesListTemplate" model="['trait':trait, 'traitValues':trait.values(),'factInstance':factInstance, 'displayAny':displayAny, fromSpeciesShow:fromSpeciesShow, 'traitTypes':trait.traitTypes, 'queryParams':queryParams,  'numericTraitMinMax':numericTraitMinMax.find{it.id == trait.id}]"/>
         </div>
     </g:if>
     </g:if>
