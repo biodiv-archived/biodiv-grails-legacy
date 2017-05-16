@@ -170,7 +170,9 @@ class SpeciesUploadService {
 		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " 
 		//mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
 		//mylog += "  \n\n    Developer log \n\n" + res.log
-		errorFile.write(mylog)
+        errorFile.withWriterAppend("UTF-8") { 
+            it.write(mylog);
+        }
 			
 		if(!sBulkUploadEntry.save(flush:true)){
 			sBulkUploadEntry.errors.allErrors.each { log.error it }

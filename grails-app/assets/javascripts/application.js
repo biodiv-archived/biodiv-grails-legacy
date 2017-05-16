@@ -133,3 +133,4 @@
 
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
 //= require jquery.plugins/ion.rangeSlider.min
+//= require dropzone.js
