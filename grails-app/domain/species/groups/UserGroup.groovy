@@ -21,6 +21,18 @@ import species.Language;
 import species.participation.Discussion;
 import species.participation.Digest;
 import utils.Newsletter;
+import grails.converters.JSON;
+import org.codehaus.groovy.grails.web.json.JSONObject;
+import org.codehaus.groovy.grails.web.json.JSONArray;
+import com.vividsolutions.jts.geom.GeometryFactory
+import content.eml.Coverage;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
+
 
 class UserGroup implements Taggable {
 	
@@ -47,6 +59,7 @@ class UserGroup implements Taggable {
 	String homePage;
 	String theme;
 	String domainName;
+    String filterRule;
 
 	def grailsApplication;
 	def aclUtilService
@@ -81,6 +94,7 @@ class UserGroup implements Taggable {
 		theme nullable:true
 		domainName nullable:true
 		language nullable:false
+        filterRule nullable:true
 	}
 
 	static mapping = {
@@ -90,9 +104,6 @@ class UserGroup implements Taggable {
 		sort name:"asc"
         cache true
 	}
-
-
-
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -130,6 +141,7 @@ class UserGroup implements Taggable {
 			//log.debug other.name
 		}catch(e){
 			log.error e.getMessage()
+            e.printStackTrace();
 			UserGroup.withNewSession{
 				other = UserGroup.get(other.id)
 				//log.debug other.name
@@ -445,4 +457,70 @@ class UserGroup implements Taggable {
         }
     }
 
+    void addFilterRule(String fieldName, String ruleName, List<String> ruleValues) {
+        def fRJson = this.filterRule?JSON.parse(this.filterRule):new JSONArray();
+        def ruleValuesJSONArray = new JSONArray();
+        ruleValuesJSONArray.addAll(ruleValues);
+        fRJson.add(['fieldName':fieldName, 'ruleName':ruleName, 'ruleValues':ruleValuesJSONArray]);
+        this.filterRule = fRJson.toString();
+    }
+    
+    void setFilterRules(JSONObject filterRules) {
+        this.filterRule = filterRules.toString();
+    }
+
+    List<FilterRule> getFilterRules() {
+        List<FilterRule> filterRules = [];
+        if(this.filterRule) {
+            JSON.parse(this.filterRule).each {
+                def rule = JSON.parse(it);
+                if(rule.fieldName.equalsIgnoreCase('topology') && rule.ruleName.equalsIgnoreCase('dwithin')) {
+                    GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+                    if(rule.ruleValues[0]) {
+                        WKTReader wkt = new WKTReader(geometryFactory);
+                        try {
+                            Geometry geom = wkt.read(rule.ruleValues[0]);
+                            rule.ruleValues = [geom];
+                        } catch(ParseException e) {
+                            e.printStackTrace();
+                            rule.rulesValues = [];
+                        }
+                    }
+                }
+                filterRules << new FilterRule(rule.fieldName, rule.ruleName, rule.ruleValues);
+            }
+        }
+        return filterRules;
+    }
+
+    void clearFilterRules() {
+        this.filterRule = new JSONArray();
+    }
+
+    String getTopologyFilterRuleValue() {
+        String topologyFilterRule;
+        if(this.filterRule) {
+            JSON.parse(this.filterRule).each {
+                def rule = JSON.parse(it);
+                if(rule.fieldName.equalsIgnoreCase('topology') && rule.ruleName.equalsIgnoreCase('dwithin')) {
+                    topologyFilterRule = rule.ruleValues[0];
+                    return;
+               }
+            }
+        }
+        return topologyFilterRule;
+    }
+
+    public class FilterRule {
+        String fieldName;
+        String ruleName;
+        List<String> ruleValues;
+
+        FilterRule(String fieldName, String ruleName,  ruleValues) {
+            this.fieldName = fieldName;
+            this.ruleName = ruleName;
+            this.ruleValues = ruleValues;
+        }
+        
+    }
 }

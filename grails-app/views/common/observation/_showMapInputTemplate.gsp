@@ -139,7 +139,7 @@
 
                     </div>
 
-                    <div class="map_canvas" style="display:none;">
+                    <div class="map_canvas" style="display:none;"  data-topologyfilterrule="${userGroupInstance?userGroupInstance.getTopologyFilterRuleValue():''}">
                         <center>
                             <div class="spinner">
                                 <asset:image src="/all/spinner.gif" absolute="true" alt="${message(code:'spinner.alt',default:'Loading...')}"/>

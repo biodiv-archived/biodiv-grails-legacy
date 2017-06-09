@@ -189,17 +189,15 @@ class AbstractMetadataService extends AbstractObjectService {
         if(params.groupsWithSharingNotAllowed) {
             setUserGroups(instance, [params.groupsWithSharingNotAllowed], sendMail);
         } else {
-            if(params.userGroupsList) {
-                def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-
-                setUserGroups(instance, userGroups, sendMail);
-            }
+            List validUserGroups = getValidUserGroups(instance, params.userGroupsList);
+            if(validUserGroups)
+                setUserGroups(instance, validUserGroups, sendMail);
         }
     }
 
     def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
 		if(!instance) return
-		def instanceInUserGroups = instance.userGroups.collect { it.id + ""}
+		def instanceInUserGroups = instance.userGroups.collect { it.id }
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
 			log.debug 'removing instance from usergroups'
@@ -211,6 +209,34 @@ class AbstractMetadataService extends AbstractObjectService {
 			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		}
 	}
+
+    List getValidUserGroups(instance, String userGroupsList) {
+        List validUserGroups = [];
+        List userGroupIds = [];
+        if(userGroupsList) {
+            userGroupsList.split(',').each {
+                if(it) userGroupIds << Long.parseLong(it);
+            }
+        }
+        return userGroupIds;
+        /*
+        boolean hasValidUserGroup = instance.metaClass.respondsTo(instance, "isUserGroupValidForPosting");
+        if(hasValidUserGroup) {
+            //these are groups with autoPull = on
+            List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
+            userGroupsWithFilterRule.each { uGroup ->
+                if(instance.isUserGroupValidForPosting(uGroup))
+                    validUserGroups << uGroup.id;
+                else 
+                    userGroupIds.remove(uGroup.id);
+            }
+            if(userGroupIds) {
+                validUserGroups.addAll(userGroupIds);
+            }
+        }
+        return validUserGroups;
+        */
+    }
 
     Date parseDate(date){
 		return utilsService.parseDate(date)

@@ -16,6 +16,15 @@ class CustomSecurityAclTagLib extends SecurityAclTagLib {
 
 	private ObjectIdentityGenerator objectIdentityGenerator = new ObjectIdentityRetrievalStrategyImpl();
 
+    def utilsService;
+
+    def permitted = { attrs, body ->
+
+		if ((springSecurityService.isLoggedIn() && utilsService.isAdmin(springSecurityService.currentUser)) || hasPermission(attrs, 'permitted')) {
+            out << body()
+        }
+    }
+
 	def isPermittedAsPerGroups = { attrs, body ->
 		if (hasPermissionAsPerGroup(attrs, 'permitted')) {
 			out << body();
