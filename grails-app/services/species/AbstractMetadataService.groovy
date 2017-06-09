@@ -196,16 +196,28 @@ class AbstractMetadataService extends AbstractObjectService {
     }
 
     def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
-		if(!instance) return
+		if(!instance) return;
+        println "*********************************" 
+        println "*********************************" 
+        println "*********************************" 
+        userGroupIds = userGroupIds?.collect {Long.parseLong(it)}
+        println userGroupIds
+        println userGroupIds[0].class
 		def instanceInUserGroups = instance.userGroups.collect { it.id }
+        println instanceInUserGroups
+        println instanceInUserGroups[0].class
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
+        println toRemainInUserGroups
 		if(userGroupIds.size() == 0) {
 			log.debug 'removing instance from usergroups'
 			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
+            println userGroupIds
+            println "Adding resources to ${userGroupIds}"
 			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail);
 			instanceInUserGroups.removeAll(toRemainInUserGroups)
+            println "Removing from ${instanceInUserGroups}"
 			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		}
 	}

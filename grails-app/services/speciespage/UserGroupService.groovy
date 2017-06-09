@@ -1470,7 +1470,8 @@ class UserGroupService {
                     //session.setFlushMode(FlushMode.MANUAL);
                     obvs = isBulk ? rf.next() : obvs
                     groups.each { UserGroup ug ->
-                        List postedObvs = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
+                        List obvs_1 = new ArrayList(obvs);
+                        List postedObvs = postInBatch(ug, obvs_1, params.submitType, updateFunction, groupRes)
                         if(postedObvs){
                             log.debug "Transcation complete with resource pull now adding feed and sending mail..."
                             def af = activityFeedService.addFeedOnGroupResoucePull(postedObvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false, sendMail)
@@ -1500,7 +1501,6 @@ class UserGroupService {
 		private List postInBatch(UserGroup ug, List obvs, String submitType, String updateFunction, String groupRes){
 			
             List postedObvs = [];
-
 			UserGroup.withTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
@@ -1509,7 +1509,6 @@ class UserGroupService {
 					obvs = getFeatureSafeList(ug, obvs)
 				}
 			}
-			
 			if(obvs.isEmpty()){
 				log.debug "Nothing to update because of permissoin or not part of group"
 				return postedObvs

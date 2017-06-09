@@ -534,361 +534,348 @@ println queryParts.queryParams
 	///////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////// BULK UPLOAD//////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
-	
-	def processBatch(params){
-		File fileDir = new File(params.fileDir)
-		if(!fileDir.exists()){
-			log.error "File dir not found. Aborting upload"
-			return
-		}
 
-		File spreadSheet = new File(params.batchFileName)
-		if(!spreadSheet.exists()){
-			log.error "Main batch file not found. Aborting upload"
-			return
-		}
-		
-		def resultObv = []
-		int i = 0;
-		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
-			log.debug "================" + m
-			
-			if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
-				uploadDoc(fileDir, m, resultObv)
-				i++
-				if(i > BATCH_SIZE){
-					utilsService.cleanUpGorm(true)
-					def obvs = resultObv.collect { Document.read(it) }
-					try{
-						documentSearchService.publishSearchIndex(obvs, true);
-					}catch (Exception e) {
-						log.error e.printStackTrace();
-					}
-					resultObv.clear();
-					i = 0;
-				}
-			}
-		}
-	}
- 		def processLinkBatch(params){
-		File spreadSheet = new File(params.batchFileName)
-		if(!spreadSheet.exists()){
-			log.error "Main batch file not found. Aborting upload"
-			return
-		}
-		
-		def resultObv = []
-		int i = 0;
-		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
-			println "================" + m
-			
-			if(m['file path'].trim() != "" || m['externalurl'].trim() != '' ){
-
-				uploadLinkDoc(m, resultObv,params)
-				i++
-				if(i > BATCH_SIZE){
-					utilsService.cleanUpGorm(true)
-					def obvs = resultObv.collect { Document.read(it) }
-
-					try{
-						documentSearchService.publishSearchIndex(obvs, true);
-					}catch (Exception e) {
-						log.error e.printStackTrace();
-					}
-					resultObv.clear();
-					i = 0;
-				}
-			}
-		}
- 	}
-	
-	private uploadDoc(fileDir, Map m, resultObv){
-		Document document = new Document()
-		
-		//setting ufile and uri
-		File sourceFile = new File(fileDir, m['file path'])
-		if(sourceFile.exists()){
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-			String contentRootDir = config.speciesPortal.content.rootDir
-			File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
-			try{
-				Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
-				UFile f = new UFile()
-				f.size = destinationFile.length()
-				f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "")
-				document.uFile = f
-				log.debug "============== " + f.path
-			}catch(e){
-				e.printStackTrace()
-			}
-		}
-		
-		document.externalUrl = m['externalurl']
-		document.title = m['title']
-		
-		if(!document.title){
-			log.error 'title cant be null'
-			return 
-		}
-		
-		if(!document.uFile  && !document.externalUrl){
-			log.error "Either ufile or uri is null so ignoring this document"
-			return
-		}
-		//other params
-		document.author = SUser.findByEmail(m['user email'].trim())
-		document.type = Document.fetchDocumentType(m['type'])
-		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
-	
-        if(!document.license) {
-		    document.license =  License.findByName(LicenseType.CC_BY)
+    def processBatch(params){
+        File fileDir = new File(params.fileDir)
+        if(!fileDir.exists()){
+            log.error "File dir not found. Aborting upload"
+            return
         }
 
-		document.contributors =  m['contributors']
-		document.attribution =  m['attribution']
-		document.notes =  m['description']
-		
-		document.speciesGroups = []
-		m['species groups'].split(",").each {
-			def s = SpeciesGroup.findByName(it.trim())
-			if(s)
-				document.addToSpeciesGroups(s);
-		}
-
-		document.habitats  = []
-		m['habitat'].split(",").each {
-			def h = Habitat.findByName(it.trim())
-			document.addToHabitats(h);
-		}
-		
-		document.longitude = (m['longitude'] ?:76.658279)
-		document.latitude = (m['lattitude'] ?: 12.32112)
-		document.geoPrivacy = m["geoprivacy"]
-		
-		
-//		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-//		if(document.latitude && document.longitude) {
-//			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
-//		}
-//		
-		saveDoc(document, m)
-		
-		if(document.id){
-			resultObv << document.id
-		}
-	}
-	private uploadLinkDoc(Map m, resultObv,params){
-		Document document = new Document()
-		println "========================================================="
-		println m
-	//	document.uri = m['uri']
-		document.title = m['title']		
-		if(!document.title){
-			log.error 'title cant be null'
-			return 
-		}
-		//other params
-		println "author=================================" + SUser.findByEmail(m['user email'])
-		document.author =SUser.findByEmail(m['user email']?.trim())//SUser.findByEmail(m['user email'].trim())
-		document.language=params.language
-		document.type = Document.fetchDocumentType(m['type'])
-		document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
-	
-        if(!document.license) {
-		    document.license =  License.findByName(LicenseType.CC_BY)
+        File spreadSheet = new File(params.batchFileName)
+        if(!spreadSheet.exists()){
+            log.error "Main batch file not found. Aborting upload"
+            return
         }
 
-		document.contributors =  m['contributors']
-		document.attribution =  m['attribution']
-		document.notes =  m['description']
-		
-		document.speciesGroups = []
-		m['species groups'].split(",").each {
-			def s = SpeciesGroup.findByName(it.trim())
-			if(s)
-				document.addToSpeciesGroups(s);
-		}
+        def resultObv = []
+        int i = 0;
+        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
+            log.debug "================" + m
 
-		document.habitats  = []
-		m['habitat'].split(",").each {
-			def h = Habitat.findByName(it.trim())
-			document.addToHabitats(h);
-		}
-		def latitude;
-		def longitude;
-		if(m['latitude']){latitude=(Double.parseDouble(m['latitude']))}else{latitude=12.32112};
-		if(m['longitude']){longitude=(Double.parseDouble(m['longitude']))}else{longitude=76.658279};
-		//def logitude=(Double.parseDouble(m['longitude']))?:76.65827;
-		document.longitude = longitude
-		document.latitude = latitude
-		document.geoPrivacy = m["geoprivacy"]
-		println "-------------Geo Privacy======================="+m["geoprivacy"]
-		document.externalUrl=m["externalurl"]
-		document.placeName=m["place_name"]
-
-		println "====================Place Name=========="+m["place_name"]
-//		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-//		if(document.latitude && document.longitude) {
-//			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
-//		}
-		saveDoc(document, m)
-		runCurrentDocuments(document,m)
-		
-		if(document.id){
-			resultObv << document.id
-		}
-	}
-	private saveDoc(documentInstance, Map m) {
-		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
-		if (documentInstance.save(flush: true) && !documentInstance.hasErrors()) {
-			
-			activityFeedService.addActivityFeed(documentInstance, null, documentInstance.author, activityFeedService.DOCUMENT_CREATED);
-			
-			def tags = (m['tags'] && (m['tags'].trim() != "")) ? m['tags'].trim().split(",").collect{it.trim()} : new ArrayList();
-			documentInstance.setTags(tags)
-			
-			def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
-			//println "==========User Group======================" + userGroupIds
-			userGroupIds = userGroupIds.collect { "" + it }
-			setUserGroups(documentInstance, userGroupIds,false);
-		}
-		else {
-			documentInstance.errors.allErrors.each { log.error it }
-		}
-	}
-
-	def runCurrentDocuments(documentInstance,Map m) {
-				def tokenUrl=""
-				def url= m["externalurl"]
-				def hostName = 'http://gnrd.globalnames.org' //url.getHost()
-                HTTPBuilder http = new HTTPBuilder(hostName)
-                http.request( GET, JSON ) {
-					uri.path = "/name_finder.json"
-					uri.query = [ url:url ]     	
-					headers.Accept = '*/*'
-					response.success = { resp,  reader ->
-					//println "========reader====="+reader;
-					//println "========reader====="+reader.token_url;
-					tokenUrl = reader.token_url;
-                     }
-                    response.'404' = { status = ObvUtilService.FAILED }
+            if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+                uploadDoc(fileDir, m, resultObv)
+                i++
+                if(i > BATCH_SIZE){
+                    utilsService.cleanUpGorm(true)
+                    def obvs = resultObv.collect { Document.read(it) }
+                    try{
+                        documentSearchService.publishSearchIndex(obvs, true);
+                    }catch (Exception e) {
+                        log.error e.printStackTrace();
                     }
-                    DocumentTokenUrl.createLog(documentInstance, tokenUrl);
-                 
-                   // File csvFile = new File(grailsApplication.config.speciesPortal.reportPath, "upload_report.csv")
-                    //CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
-                    //writer.writeNext("Document Title:#Upload Status:".split("#"))
-                   
-                  //  if(tokenUrl){
-                   // writer.writeNext(("${documentInstance.title}#Success").split("#"))
-                    //successCount++
-                   // }
-                   // else
-                    //{
-                    //	writer.writeNext("${documentInstance}#Failed".split("#"))
-                    //	failedCount++
-                    //}
-                    //writer.writeNext("Total no of document uploaded successfully#${successCount}".split("#"))
-                    //writer.writeNext("Total no of document failed to upload#${failedCount}".split("#"))
-                    //writer.flush()
-					//writer.close()
-   				 }
-
-	Map getGnrdScientificNames(String tokenUrl){
-			//	println "=====token==="+tokenUrl
-			URL url = new URL(tokenUrl)
-			def hostName = 'http://gnrd.globalnames.org' //url.getHost()
-			//println "===hostName==="+hostName
-			def path = url.getPath()
-			//println "===path==="+path
-			def query=url.getQuery()
-			//println "===query==="+query
-
-		HTTPBuilder http = new HTTPBuilder(hostName)
-		Map names = [:];
-		Map offset = [:];
-		Map parsedNameSet = [:];
-		String status = '';
-       http.request( GET, JSON ) {  
-       
-			
-			 //def q1 = query.split('=')[0];
-			def q = query.split('=')[1];
-
-        	 uri.path = path
- 			 uri.query = [ token:q ]     	
-
-  			headers.Accept = '*/*'
-           	response.success = { resp, reader ->
-      			//println "================ resp ==" + response
-    			//println "================ reader ==" + reader
-      			//println "=====STATUS CODE==== " + reader.status
-      			names = countScientificNames(reader.names);
-      			offset = getOffsetValues(reader.names);
-      			List nameSetKeys = names.keySet().toList();
-      			parsedNameSet = gnrdNameParsing(nameSetKeys);
-
-      			//println "=====names===" +names
-      			int statusCode = reader.status
-      			if(statusCode == 303){
-      				status = ObvUtilService.SCHEDULED
-      			} else if(statusCode == 404){
-      				status = ObvUtilService.FAILED
-      			} else if(statusCode == 200){
-      				status = ObvUtilService.SUCCESS
-      			} else {
-      				status = ObvUtilService.FAILED
-      			}
-         	}
-            response.'404' = { status = ObvUtilService.FAILED }
-
-        }
-        return [success: (status.equals(ObvUtilService.SUCCESS)) ? true : false, status:status, names:names, offsetMap:offset, parsedNameSetMap:parsedNameSet]
-	}
-
-
-	private Map countScientificNames(List names) {
-		Map clearNameset = [:]
-		names.each { name ->
-		 if(clearNameset[name.scientificName]) {//adding count to map
-
-              clearNameset[name.scientificName] = clearNameset[name.scientificName] + 1
-
-          } else {
-
-                 clearNameset[name.scientificName] = 1
-
+                    resultObv.clear();
+                    i = 0;
+                }
             }
         }
-        return clearNameset.sort { a, b -> b.value <=> a.value }
-	}
+    }
 
-	private Map gnrdNameParsing(List names) {
-		NamesParser nameParser = new NamesParser();
-		Map parsedNameSetMap = [:]
-		names.each { name ->
-			parsedNameSetMap[name] = nameParser.parse([name])[0].canonicalForm
-		}
-		return parsedNameSetMap
-	}
+    def processLinkBatch(params){
+        File spreadSheet = new File(params.batchFileName)
+        if(!spreadSheet.exists()){
+            log.error "Main batch file not found. Aborting upload"
+            return
+        }
 
-	private Map getOffsetValues(List names){
-			Map offsetMap = [:]
-			names.each { name ->
-				List countArray = []
-					countArray[0] = name.offsetStart
-					countArray[1] = name.offsetEnd
-					if(!offsetMap[name.scientificName]){
-						offsetMap[name.scientificName] = []
-						offsetMap[name.scientificName].add(countArray)
-					}else{
-						
-						offsetMap[name.scientificName].add(countArray)
-					}
-			}
-		return offsetMap;	
+        def resultObv = []
+        int i = 0;
+        SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
+            println "================" + m
 
-	}
+            if(m['file path'].trim() != "" || m['externalurl'].trim() != '' ){
+
+                uploadLinkDoc(m, resultObv,params)
+                i++
+                if(i > BATCH_SIZE){
+                    utilsService.cleanUpGorm(true)
+                    def obvs = resultObv.collect { Document.read(it) }
+
+                    try{
+                        documentSearchService.publishSearchIndex(obvs, true);
+                    }catch (Exception e) {
+                        log.error e.printStackTrace();
+                    }
+                    resultObv.clear();
+                    i = 0;
+                }
+            }
+        }
+    }
+
+    private uploadDoc(fileDir, Map m, resultObv){
+        Document document = new Document()
+
+        //setting ufile and uri
+        File sourceFile = new File(fileDir, m['file path'])
+        if(sourceFile.exists()){
+            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            String contentRootDir = config.speciesPortal.content.rootDir
+            File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
+            try{
+                Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
+                UFile f = new UFile()
+                f.size = destinationFile.length()
+                f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "")
+                document.uFile = f
+                log.debug "============== " + f.path
+            }catch(e){
+                e.printStackTrace()
+            }
+        }
+
+        document.externalUrl = m['externalurl']
+        document.title = m['title']
+
+        if(!document.title){
+            log.error 'title cant be null'
+            return 
+        }
+
+        if(!document.uFile  && !document.externalUrl){
+            log.error "Either ufile or uri is null so ignoring this document"
+            return
+        }
+        //other params
+        document.author = SUser.findByEmail(m['user email'].trim())
+        document.type = Document.fetchDocumentType(m['type'])
+        document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
+
+        if(!document.license) {
+            document.license =  License.findByName(LicenseType.CC_BY)
+        }
+
+        document.contributors =  m['contributors']
+        document.attribution =  m['attribution']
+        document.notes =  m['description']
+
+        document.speciesGroups = []
+        m['species groups'].split(",").each {
+            def s = SpeciesGroup.findByName(it.trim())
+            if(s)
+                document.addToSpeciesGroups(s);
+        }
+
+        document.habitats  = []
+        m['habitat'].split(",").each {
+            def h = Habitat.findByName(it.trim())
+            document.addToHabitats(h);
+        }
+
+        document.longitude = (m['longitude'] ?:76.658279)
+        document.latitude = (m['lattitude'] ?: 12.32112)
+        document.geoPrivacy = m["geoprivacy"]
+
+
+        //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        //		if(document.latitude && document.longitude) {
+        //			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
+        //		}
+        //		
+        saveDoc(document, m)
+
+        if(document.id){
+            resultObv << document.id
+        }
+    }
+
+    private uploadLinkDoc(Map m, resultObv,params){
+        Document document = new Document()
+        println "========================================================="
+        println m
+        //	document.uri = m['uri']
+        document.title = m['title']		
+        if(!document.title){
+            log.error 'title cant be null'
+            return 
+        }
+        //other params
+        println "author=================================" + SUser.findByEmail(m['user email'])
+        document.author =SUser.findByEmail(m['user email']?.trim())//SUser.findByEmail(m['user email'].trim())
+        document.language=params.language
+        document.type = Document.fetchDocumentType(m['type'])
+        document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
+
+        if(!document.license) {
+            document.license =  License.findByName(LicenseType.CC_BY)
+        }
+
+        document.contributors =  m['contributors']
+        document.attribution =  m['attribution']
+        document.notes =  m['description']
+
+        document.speciesGroups = []
+        m['species groups'].split(",").each {
+            def s = SpeciesGroup.findByName(it.trim())
+            if(s)
+                document.addToSpeciesGroups(s);
+        }
+
+        document.habitats  = []
+        m['habitat'].split(",").each {
+            def h = Habitat.findByName(it.trim())
+            document.addToHabitats(h);
+        }
+        def latitude;
+        def longitude;
+        if(m['latitude']){latitude=(Double.parseDouble(m['latitude']))}else{latitude=12.32112};
+        if(m['longitude']){longitude=(Double.parseDouble(m['longitude']))}else{longitude=76.658279};
+        //def logitude=(Double.parseDouble(m['longitude']))?:76.65827;
+        document.longitude = longitude
+        document.latitude = latitude
+        document.geoPrivacy = m["geoprivacy"]
+        println "-------------Geo Privacy======================="+m["geoprivacy"]
+        document.externalUrl=m["externalurl"]
+        document.placeName=m["place_name"]
+
+        println "====================Place Name=========="+m["place_name"]
+        //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        //		if(document.latitude && document.longitude) {
+        //			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
+        //		}
+        saveDoc(document, m)
+        runCurrentDocuments(document,m)
+
+        if(document.id){
+            resultObv << document.id
+        }
+    }
+
+    private saveDoc(documentInstance, Map m) {
+        save(documentInstance, m, true, documentInstance.author, activityFeedService.DOCUMENT_CREATED, documentSearchService);
+    }
+
+    def runCurrentDocuments(documentInstance,Map m) {
+        def tokenUrl=""
+        def url= m["externalurl"]
+        def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+        HTTPBuilder http = new HTTPBuilder(hostName)
+        http.request( GET, JSON ) {
+            uri.path = "/name_finder.json"
+            uri.query = [ url:url ]     	
+            headers.Accept = '*/*'
+            response.success = { resp,  reader ->
+            //println "========reader====="+reader;
+            //println "========reader====="+reader.token_url;
+            tokenUrl = reader.token_url;
+            }
+            response.'404' = { status = ObvUtilService.FAILED }
+        }
+        DocumentTokenUrl.createLog(documentInstance, tokenUrl);
+
+        // File csvFile = new File(grailsApplication.config.speciesPortal.reportPath, "upload_report.csv")
+        //CSVWriter writer = obvUtilService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+        //writer.writeNext("Document Title:#Upload Status:".split("#"))
+
+        //  if(tokenUrl){
+        // writer.writeNext(("${documentInstance.title}#Success").split("#"))
+        //successCount++
+        // }
+        // else
+        //{
+        //	writer.writeNext("${documentInstance}#Failed".split("#"))
+        //	failedCount++
+        //}
+        //writer.writeNext("Total no of document uploaded successfully#${successCount}".split("#"))
+        //writer.writeNext("Total no of document failed to upload#${failedCount}".split("#"))
+        //writer.flush()
+        //writer.close()
+    }
+
+    Map getGnrdScientificNames(String tokenUrl){
+            //	println "=====token==="+tokenUrl
+            URL url = new URL(tokenUrl)
+            def hostName = 'http://gnrd.globalnames.org' //url.getHost()
+            //println "===hostName==="+hostName
+            def path = url.getPath()
+            //println "===path==="+path
+            def query=url.getQuery()
+            //println "===query==="+query
+
+            HTTPBuilder http = new HTTPBuilder(hostName)
+            Map names = [:];
+            Map offset = [:];
+            Map parsedNameSet = [:];
+            String status = '';
+            http.request( GET, JSON ) {  
+
+
+            //def q1 = query.split('=')[0];
+            def q = query.split('=')[1];
+
+            uri.path = path
+            uri.query = [ token:q ]     	
+
+            headers.Accept = '*/*'
+            response.success = { resp, reader ->
+            //println "================ resp ==" + response
+            //println "================ reader ==" + reader
+            //println "=====STATUS CODE==== " + reader.status
+            names = countScientificNames(reader.names);
+            offset = getOffsetValues(reader.names);
+            List nameSetKeys = names.keySet().toList();
+            parsedNameSet = gnrdNameParsing(nameSetKeys);
+
+            //println "=====names===" +names
+            int statusCode = reader.status
+            if(statusCode == 303){
+            status = ObvUtilService.SCHEDULED
+            } else if(statusCode == 404){
+            status = ObvUtilService.FAILED
+            } else if(statusCode == 200){
+            status = ObvUtilService.SUCCESS
+            } else {
+            status = ObvUtilService.FAILED
+            }
+            }
+            response.'404' = { status = ObvUtilService.FAILED }
+
+            }
+            return [success: (status.equals(ObvUtilService.SUCCESS)) ? true : false, status:status, names:names, offsetMap:offset, parsedNameSetMap:parsedNameSet]
+    }
+
+    private Map countScientificNames(List names) {
+    Map clearNameset = [:]
+    names.each { name ->
+    if(clearNameset[name.scientificName]) {//adding count to map
+
+    clearNameset[name.scientificName] = clearNameset[name.scientificName] + 1
+
+    } else {
+
+    clearNameset[name.scientificName] = 1
+
+    }
+    }
+    return clearNameset.sort { a, b -> b.value <=> a.value }
+    }
+
+    private Map gnrdNameParsing(List names) {
+    NamesParser nameParser = new NamesParser();
+    Map parsedNameSetMap = [:]
+    names.each { name ->
+    parsedNameSetMap[name] = nameParser.parse([name])[0].canonicalForm
+    }
+    return parsedNameSetMap
+    }
+
+    private Map getOffsetValues(List names){
+    Map offsetMap = [:]
+    names.each { name ->
+    List countArray = []
+    countArray[0] = name.offsetStart
+    countArray[1] = name.offsetEnd
+    if(!offsetMap[name.scientificName]){
+    offsetMap[name.scientificName] = []
+    offsetMap[name.scientificName].add(countArray)
+    }else{
+
+    offsetMap[name.scientificName].add(countArray)
+    }
+    }
+    return offsetMap;	
+
+    }
 
     def runAllDocuments() {
         List documentInstanceList = Document.list();
@@ -896,7 +883,7 @@ println queryParts.queryParams
     }
 
     def runDocuments(List documentInstanceList, boolean rerun=false) {
-    	
+
         def url = '';
         def tokenUrl = '';
         int i = 0;
@@ -914,7 +901,7 @@ println queryParts.queryParams
                     if(instance?.uFile != null){
                         url = grailsApplication.config.speciesPortal.content.serverURL
                         url = url+instance?.uFile?.path
-                      //  println url
+                        //  println url
 
                     } else {
                         url=instance.externalUrl;
@@ -926,17 +913,17 @@ println queryParts.queryParams
                         uri.query = [ url:url ]     	
                         headers.Accept = '*/*'
                         response.success = { resp,  reader ->
-                            println "========reader====="+reader;
-                            println "========reader====="+reader.token_url;
-                            tokenUrl = reader.token_url;
+                        println "========reader====="+reader;
+                        println "========reader====="+reader.token_url;
+                        tokenUrl = reader.token_url;
                         }
                         response.'404' = { status = ObvUtilService.FAILED }
-                    }
-                    DocumentTokenUrl.createLog(instance, tokenUrl);
-                }//IF
-                else {
-                    println "Already tried"
-                }
+            }
+            DocumentTokenUrl.createLog(instance, tokenUrl);
+            }//IF
+            else {
+            println "Already tried"
+            }
             }
         }//each
     }

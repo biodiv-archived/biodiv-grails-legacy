@@ -103,6 +103,7 @@ class UserGroup implements Taggable {
 		//aboutUs type:'text';
 		sort name:"asc"
         cache true
+		filterRule type:'text';
 	}
 
 	/* (non-Javadoc)

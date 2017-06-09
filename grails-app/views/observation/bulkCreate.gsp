@@ -268,7 +268,7 @@
                                     def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                                     %>
                                     <div>
-                                        <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                                        <obv:showMapInput model="[observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?', webaddress:params.webaddress]"></obv:showMapInput>
                                     </div>
                                 </div>
                                 <div class="column span6 propagateTags block_row">
