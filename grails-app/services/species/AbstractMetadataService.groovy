@@ -197,23 +197,14 @@ class AbstractMetadataService extends AbstractObjectService {
 
     def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
 		if(!instance) return;
-        println "*********************************" 
-        println "*********************************" 
-        println "*********************************" 
-        userGroupIds = userGroupIds?.collect {Long.parseLong(it)}
-        println userGroupIds
-        println userGroupIds[0].class
+        userGroupIds = userGroupIds?.collect {(it instanceof Long) ? it : Long.parseLong(it)}
 		def instanceInUserGroups = instance.userGroups.collect { it.id }
-        println instanceInUserGroups
-        println instanceInUserGroups[0].class
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
-        println toRemainInUserGroups
 		if(userGroupIds.size() == 0) {
 			log.debug 'removing instance from usergroups'
 			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
-            println userGroupIds
             println "Adding resources to ${userGroupIds}"
 			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail);
 			instanceInUserGroups.removeAll(toRemainInUserGroups)
@@ -222,19 +213,21 @@ class AbstractMetadataService extends AbstractObjectService {
 		}
 	}
 
-    List getValidUserGroups(instance, String userGroupsList) {
+    protected List getValidUserGroups(instance, String userGroupsList) {
         List validUserGroups = [];
-        List userGroupIds = [];
+        HashSet userGroupIds = new HashSet();
         if(userGroupsList) {
             userGroupsList.split(',').each {
                 if(it) userGroupIds << Long.parseLong(it);
             }
         }
-        return userGroupIds;
-        /*
-        boolean hasValidUserGroup = instance.metaClass.respondsTo(instance, "isUserGroupValidForPosting");
+        List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
+        userGroupIds.addAll(userGroupsWithFilterRule.collect {it.id})
+        return new ArrayList(userGroupIds);
+
+        /*boolean hasValidUserGroup = instance.metaClass.respondsTo(instance, "isUserGroupValidForPosting");
         if(hasValidUserGroup) {
-            //these are groups with autoPull = on
+            //these are groups with filter rule that means autoPull = on
             List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
             userGroupsWithFilterRule.each { uGroup ->
                 if(instance.isUserGroupValidForPosting(uGroup))
@@ -248,6 +241,7 @@ class AbstractMetadataService extends AbstractObjectService {
         }
         return validUserGroups;
         */
+        
     }
 
     Date parseDate(date){
