@@ -189,28 +189,66 @@ class AbstractMetadataService extends AbstractObjectService {
         if(params.groupsWithSharingNotAllowed) {
             setUserGroups(instance, [params.groupsWithSharingNotAllowed], sendMail);
         } else {
-            if(params.userGroupsList) {
-                def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-
-                setUserGroups(instance, userGroups, sendMail);
-            }
+            List validUserGroups = getValidUserGroups(instance, params.userGroupsList);
+            if(validUserGroups)
+                setUserGroups(instance, validUserGroups, sendMail);
         }
     }
 
     def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
-		if(!instance) return
-		def instanceInUserGroups = instance.userGroups.collect { it.id + ""}
+		if(!instance) return;
+        println "*********************************" 
+        println "*********************************" 
+        println "*********************************" 
+        userGroupIds = userGroupIds?.collect {Long.parseLong(it)}
+        println userGroupIds
+        println userGroupIds[0].class
+		def instanceInUserGroups = instance.userGroups.collect { it.id }
+        println instanceInUserGroups
+        println instanceInUserGroups[0].class
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
+        println toRemainInUserGroups
 		if(userGroupIds.size() == 0) {
 			log.debug 'removing instance from usergroups'
 			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
+            println userGroupIds
+            println "Adding resources to ${userGroupIds}"
 			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail);
 			instanceInUserGroups.removeAll(toRemainInUserGroups)
+            println "Removing from ${instanceInUserGroups}"
 			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
 		}
 	}
+
+    List getValidUserGroups(instance, String userGroupsList) {
+        List validUserGroups = [];
+        List userGroupIds = [];
+        if(userGroupsList) {
+            userGroupsList.split(',').each {
+                if(it) userGroupIds << Long.parseLong(it);
+            }
+        }
+        return userGroupIds;
+        /*
+        boolean hasValidUserGroup = instance.metaClass.respondsTo(instance, "isUserGroupValidForPosting");
+        if(hasValidUserGroup) {
+            //these are groups with autoPull = on
+            List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
+            userGroupsWithFilterRule.each { uGroup ->
+                if(instance.isUserGroupValidForPosting(uGroup))
+                    validUserGroups << uGroup.id;
+                else 
+                    userGroupIds.remove(uGroup.id);
+            }
+            if(userGroupIds) {
+                validUserGroups.addAll(userGroupIds);
+            }
+        }
+        return validUserGroups;
+        */
+    }
 
     Date parseDate(date){
 		return utilsService.parseDate(date)

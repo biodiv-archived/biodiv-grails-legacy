@@ -251,6 +251,7 @@ class ObservationTagLib {
 			sourceType = 'observation'
 		 
 		model.sourceType = sourceType
+        model.userGroupInstance = utilsService.getUserGroup(attrs.model);
         out << render(template:"/common/observation/showMapInputTemplate",model:attrs.model);
 	}
 	

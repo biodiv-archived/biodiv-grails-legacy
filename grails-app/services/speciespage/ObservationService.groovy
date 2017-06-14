@@ -1002,9 +1002,9 @@ class ObservationService extends AbstractMetadataService {
         query += queryParts.filterQuery + queryParts.orderByClause
         //		}
 
-        log.debug "query : "+query;
-        log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
-        log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
+        //log.debug "query : "+query;
+        //log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
+        //log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
         //log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
         //log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
         //log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
@@ -1327,6 +1327,23 @@ class ObservationService extends AbstractMetadataService {
             //queryParams['boundGeometry'] = boundGeometry
             activeFilters["bounds"] = params.bounds
         }  
+
+        /*if(params.state) {
+            def sql =  Sql.newInstance(dataSource);
+            def t = sql.rows('select topology from state_topology where lower(name)=:state', [state:params.state.toLowerCase()]);
+            if(t) {                
+                params.topology = t[0].topology;
+                activeFilters["state"] = params.state;
+            }
+        }*/
+
+        if(params.topology) {        
+            if(params.topology.startsWith('ST_')) {
+                filterQuery += " and ST_WITHIN(obv.topology, "+params.topology+") "
+            } else {
+                filterQuery += " and ST_WITHIN(obv.topology, '"+params.topology+"') "
+            }
+        }
 
         if(params.type == 'nearBy' && params.lat && params.long) {
             String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"

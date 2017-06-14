@@ -16,7 +16,7 @@
 				<div class="span8 main_heading" style="margin-left: 0px;">
 					<h1><g:message code="button.about.us" /></h1>
 				</div>
-				<sec:permitted className='species.groups.UserGroup'
+				<customsecurity:permitted className='species.groups.UserGroup'
 					id='${userGroupInstance.id}'
 					permission='${org.springframework.security.acls.domain.BasePermission.ADMINISTRATION}'>
 
@@ -24,7 +24,7 @@
 						href="${uGroup.createLink(mapping:'userGroup', action:'edit', userGroup:userGroupInstance)}">
 						<i class="icon-edit"></i><g:message code="button.edit.group" /> </a>
 					<!-- a class="btn btn-primary" href="${uGroup.createLink(mapping:'userGroup', action:'settings', userGroup:userGroupInstance)}"><i class="icon-cog"></i>Settings</a-->
-				</sec:permitted>
+				</customsecurity:permitted>
 
 			</div>
 		</div>

@@ -91,7 +91,17 @@ function useTitle(obj){
             var G = google.maps;
             this.M= L;
             this.M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
-            this.allowedBounds = new this.M.LatLngBounds(new this.M.LatLng('6.74678', '68.03215'), new this.M.LatLng('35.51769', '97.40238'));
+            var topologyFilterRule = this.$ele.data('topologyfilterrule');
+            var obj;
+            if(topologyFilterRule) {
+                var wkt = new Wkt.Wkt();
+                try { 
+                    wkt.read(topologyFilterRule);
+                } catch (e1) {
+                } 
+                obj = wkt.toObject(); 
+            }
+            this.allowedBounds = obj ? obj.getBounds() : new this.M.LatLngBounds(new this.M.LatLng('6.74678', '68.03215'), new this.M.LatLng('35.51769', '97.40238'));
             //var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '59'), new this.M.LatLng('45', '105'));
             var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '69'), new this.M.LatLng('36', '98'));
             var nagpur_latlng = new this.M.LatLng('21.07', '79.27');                
@@ -107,6 +117,9 @@ function useTitle(obj){
                 noWrap:true
             });
             this.map.addLayer(ggl).fitBounds( this.allowedBounds);
+
+            if(obj) this.map.addLayer(obj);
+            
             //var layersControl = 
             this.M.control.layers({'Google':ggl, 'OpenStreetMap':L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',

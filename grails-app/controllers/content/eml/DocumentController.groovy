@@ -73,7 +73,7 @@ class DocumentController extends AbstractObjectController {
             def model = utilsService.getSuccessModel(flash.message, documentInstance, OK.value());
             withFormat {
                 html {
-			        redirect(action: "show", id: documentInstance.id)
+			        render(action: "show", id: documentInstance.id)
                 }
                 json { render model as JSON }
                 xml { render model as XML }

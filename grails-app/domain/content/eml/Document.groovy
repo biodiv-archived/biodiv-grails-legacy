@@ -15,6 +15,11 @@ import species.participation.Featured;
 import species.Language;
 import org.springframework.context.MessageSourceResolvable;
 import content.eml.DocSciName;
+import com.vividsolutions.jts.geom.Coordinate;
+import species.groups.UserGroup.FilterRule;
+import com.vividsolutions.jts.geom.GeometryFactory
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -242,4 +247,35 @@ class Document extends DataObject implements Comparable {
 
 	}
 
+    boolean isUserGroupValidForPosting(UserGroup userGroup) {
+        List<FilterRule> filterRule = userGroup.getFilterRules();
+        boolean isValid = true;
+        filterRule.each { fRule ->
+            switch(fRule.fieldName) {
+                case 'topology' : 
+                if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
+                    GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+                    def location = geometryFactory.createPoint(new Coordinate(this.longitude, this.latitude));
+                    isValid = isValid && fRule.ruleValues[0].covers(location);
+                }
+                break;
+                case 'taxon' : 
+                if(fRule.ruleName.equalsIgnoreCase('scope')) {
+                    //isValid = fRule.ruleValues[0].covers(instance[fRule.fieldName]);
+                }
+                break;
+            }
+        }
+        return isValid;
+    }
+
+    List<UserGroup> getValidUserGroups() {
+        List<UserGroup> userGroups = UserGroup.list();
+        List<UserGroup> validUserGroups = [];
+        userGroups.each { uGroup ->
+            if(this.isUserGroupValidForPosting(uGroup))
+                validUserGroups << uGroup;
+        }
+        return validUserGroups;
+    }
 }
