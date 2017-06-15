@@ -1386,10 +1386,11 @@ function updateMapView (params, callback) {
     var p = jQuery.extend({}, params);
     //delete p.bounds;
     //delete oldParams.bounds;
-    var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker'); 
+    var mapCanvasEle = document.getElementById('big_map_canvas');
+    var mapLocationPicker = $(mapCanvasEle).data('maplocationpicker'); 
     if(mapLocationPicker == undefined) {
-        loadGoogleMapsAPI(function() {
-            mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+        loadGoogleMapsAPI(mapCanvasEle, function() {
+            mapLocationPicker = new $.fn.components.MapLocationPicker(mapCanvasEle);
             mapLocationPicker.initialize();
            
             $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);

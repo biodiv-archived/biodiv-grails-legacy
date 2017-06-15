@@ -127,8 +127,9 @@
     }
 
     $(document).ready(function() {
-        loadGoogleMapsAPI(function() {
-            var mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+        var mapCanvasEle = document.getElementById("big_map_canvas");
+        loadGoogleMapsAPI(mapCanvasEle, function() {
+            var mapLocationPicker = new $.fn.components.MapLocationPicker(mapCanvasEle);
 
             mapLocationPicker.initialize();
             <g:if test="${!observationInstance.isChecklist}">

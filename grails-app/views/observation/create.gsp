@@ -188,6 +188,7 @@ $(document).ready(function(){
             }
       return false;
     });
+
 });
 
 function deleteObservation(){

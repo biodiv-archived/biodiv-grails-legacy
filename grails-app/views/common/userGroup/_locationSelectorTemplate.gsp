@@ -1,6 +1,7 @@
 <script type="text/javascript">
     $(document).ready(function(){
-    loadGoogleMapsAPI(function(){
+    var mapCanvasEle = document.getElementById('map_canvas');
+    loadGoogleMapsAPI(mapCanvasEle, function(){
     var swRestriction = new google.maps.LatLng('8', '69');
     var neRestriction = new google.maps.LatLng('36', '98');
     var allowedBounds = new google.maps.LatLngBounds(swRestriction, neRestriction);
@@ -13,8 +14,7 @@
           zoom: 4,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-        var map = new google.maps.Map(document.getElementById('map_canvas'),
-          mapOptions);
+        var map = new google.maps.Map(mapCanvasEle, mapOptions);
 
         google.maps.event.addListener(map, 'click', function(event) { initRect(event.latLng); });
 

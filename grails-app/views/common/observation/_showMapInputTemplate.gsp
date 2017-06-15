@@ -22,9 +22,9 @@
                 lastPlaceName=commandInstance.location
             }
             else{
-                lastPlaceName = (observationInstance?.placeName)?observationInstance?.placeName:obvInfoFeeder?.placeName;
+                lastPlaceName = (observationInstance?.placeName)?observationInstance?.placeName:'';//obvInfoFeeder?.placeName;
             }
-            def lastTopology = (observationInstance?.topology)?:obvInfoFeeder?.topology;
+            def lastTopology = (observationInstance?.topology);//?:obvInfoFeeder?.topology;
          %>
 		<g:if test="${sourceType == 'observation'  || ((params.action == 'edit') && (sourceType == 'checklist-obv'))}">
         	<input type="radio" style="margin-bottom: 6px;" name="locationScale" value="Accurate" ${isAccurateChecked} /><g:message code="default.accurate.label" /> 
@@ -57,7 +57,11 @@
     <label for="topology" class="control-label userlocation">
         <i class="icon-map-marker"></i>
         <g:message
-        code="observation.topology.label" default="${g.message(code:'default.label.at')}" /> <span class="req">*</span></label>
+        code="observation.topology.label" default="${g.message(code:'default.label.at')}" /> <span class="req">*</span>
+        <g:if test="{obvInfoFeeder?.topology}">
+        <small class="lastTopology btn-link" style="display:block" data-lasttopology="${Utils.GeometryAsWKT(obvInfoFeeder.topology)}" data-lastplacename="${obvInfoFeeder.placeName}">Last used location</small>
+        </g:if>
+    </label>
     <div class="controls ">
  
     <div style="margin-left:0px;">
@@ -152,7 +156,4 @@
     </div>
 
 </div>
-
-<script type="text/javascript">
-</script>
 </div>

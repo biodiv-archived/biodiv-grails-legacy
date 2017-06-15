@@ -56,7 +56,7 @@ $(document).ready(function() {
         'carousel':{maxHeight:150, maxWidth:150},
         'imagesPath': "${assetPath(src:'/all/images', absolute:true)}",
         'locationsUrl': "${uGroup.createLink(controller:'observation', action: 'locations')}",
-        'defaultMarkerIcon':"${assetPath(src:'/all/images', absolute:true)}",
+        'defaultMarkerIcon':"${assetPath(src:'/all/images/', absolute:true)}",
         'isChecklistOnly':"${params.isChecklistOnly?.toBoolean()?.toString()}",
         'obvListPage' : "${uGroup.createLink(controller:'observation', action:'list','userGroup':userGroupInstance, absolute:true)}",
         'obvShowPage' : "${uGroup.createLink(controller:'observation', action:'show','userGroup':userGroupInstance, absolute:true)}",

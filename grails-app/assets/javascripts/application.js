@@ -33,7 +33,6 @@
 //= require biodiv/search.js
 //= require leaflet/leaflet.js
 //= require leaflet/Google.js
-//= require leaflet/Leaflet.Coordinates-0.1.1.min.js
 //= require leaflet/leaflet.label.js
 //= require leaflet/L.Control.Locate.js
 //= require leaflet/leaflet.awesome-markers.min.js
@@ -41,7 +40,8 @@
 //= require leaflet/leaflet.draw.js
 //= require leaflet/wicket.js
 //= require leaflet/wicket-leaflet.js
-//= require leaflet/leaflet.markercluster-src.js
+//= require leaflet/leaflet.markercluster.js
+//= require leaflet/wise-leaflet-pip.js
 //= require bootstrap.plugins/bootstrap_gallery/jquery.blueimp-gallery.min.js
 //= require biodiv/gallery.js
 //= require jquery.plugins/tag-it.min.js

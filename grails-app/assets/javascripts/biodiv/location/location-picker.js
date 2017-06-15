@@ -29,7 +29,7 @@ function loadMapInput(geotaggedImages) {
         locationPicker =  $(map_class).data('locationpicker');
     }
     if(locationPicker.isInitialised == false || locationPicker.isInitialised == undefined) {
-        loadGoogleMapsAPI(function() {
+        loadGoogleMapsAPI(undefined, function() {
             locationPicker.initialize();
             $(map_class).find('.spinner').hide();
             
@@ -52,10 +52,18 @@ function loadMapInput(geotaggedImages) {
         if(geotaggedImages)
             update_geotagged_images_list_for_bulkUpload(geotaggedImages, map_class);
     }
+
+        $('.lastTopology').click(function() {
+            var map_class = $(this).closest(".map_class");
+            var locationPicker1 =  $(map_class).data('locationpicker');
+            console.log('using last topology');
+            $(this).parent().parent().find('input.areas').val($(this).data('lasttopology'));
+            $(this).parent().parent().find('input.placeName').val($(this).data('lastplacename'));
+            //me.initArea();
+            locationPicker1.mapLocationPicker.drawArea($(this).data('lasttopology'), true,true,true);
+        });
+
 }
-
-
-
 
 
 
@@ -92,39 +100,41 @@ function useTitle(obj){
             this.M= L;
             this.M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
             var topologyFilterRule = this.$ele.data('topologyfilterrule');
-            var obj;
             if(topologyFilterRule) {
                 var wkt = new Wkt.Wkt();
                 try { 
                     wkt.read(topologyFilterRule);
                 } catch (e1) {
                 } 
-                obj = wkt.toObject(); 
+                this.boundsPolygon = wkt.toObject(); 
             }
-            this.allowedBounds = obj ? obj.getBounds() : new this.M.LatLngBounds(new this.M.LatLng('6.74678', '68.03215'), new this.M.LatLng('35.51769', '97.40238'));
+            this.allowedBounds = this.boundsPolygon ? this.boundsPolygon.getBounds() : new this.M.LatLngBounds(new this.M.LatLng('6.74678', '68.03215'), new this.M.LatLng('35.51769', '97.40238'));
             //var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '59'), new this.M.LatLng('45', '105'));
             var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '69'), new this.M.LatLng('36', '98'));
             var nagpur_latlng = new this.M.LatLng('21.07', '79.27');                
 
-            var ggl = new this.M.Google('HYBRID');
             this.map = new this.M.Map(this.$ele.context, {
-                //        crs:L.CRS.EPSG4326,
+//              crs:L.CRS.EPSG4326,
                 center: this.allowedBounds.getCenter(),
-                //        maxBounds:viewBounds,
+//              maxBounds:viewBounds,
                 zoom:4,
                 minZoom:4,
-                //       maxZoom:15,
+                maxZoom:15,
                 noWrap:true
             });
-            this.map.addLayer(ggl).fitBounds( this.allowedBounds);
-
-            if(obj) this.map.addLayer(obj);
-            
-            //var layersControl = 
-            this.M.control.layers({'Google':ggl, 'OpenStreetMap':L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            var ggl = new this.M.Google ('HYBRID');
+            var openstreetmapLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
                         noWrap: true
-                        })}, {}, {collapsed:true}).addTo( this.map)
+                        });
+            this.map.addLayer(ggl).fitBounds(this.allowedBounds);
+
+            if(this.boundsPolygon) this.map.addLayer(this.boundsPolygon);
+            
+            var layersControl = this.M.control.layers({
+                'Google':ggl, 
+                'OpenStreetMap':openstreetmapLayer
+            }, {}, {collapsed:true}).addTo(this.map)
 
             //    this.M.marker(new this.M.LatLng('6', '68')).addTo(map);
             //    this.M.marker(new this.M.LatLng('35', '97')).addTo(map);
@@ -137,8 +147,6 @@ function useTitle(obj){
                 color: 'blue'
             });
             this.checklistIcon = this.M.AwesomeMarkers.icon({
-                icon: 'list', 
-                color: 'green'
             });
             this.geoPrivacyPointIcon = this.M.AwesomeMarkers.icon({
                 icon: undefined, 
@@ -207,9 +215,9 @@ function useTitle(obj){
                 drawControls = $.extend({}, {
                     marker:true,
                     circle:false,
-                             rectangle:false,
-                             polyline:false,
-                             polygon:false
+                    rectangle:false,
+                    polyline:false,
+                    polygon:false
                 }, drawControls);
 
                 var drawControl;
@@ -223,9 +231,10 @@ function useTitle(obj){
                         draw:drawControls
                     });
                 }
-                drawControl.addTo( this.map);
+                drawControl.addTo(this.map);
                 var me = this;
                 me.map.on('draw:drawstart', me.clearDrawnItems);
+                me.map.on('draw:drawstop', me.validateDrawnItems);
                 me.map.on('draw:created', $.proxy(me.addDrawnItems, me));
 
 
@@ -318,6 +327,32 @@ function useTitle(obj){
             }
         },
 
+        validateDrawnItems : function() {
+            var me = this;
+            var valid = true;
+            if(me.drawnItems) {
+                me.drawnItems.eachLayer(function (layer) {
+                    valid = valid && me.validateBounds(layer.getLatLng());
+                });
+                if(me.searchMarker)
+                    valid = valid && me.validateBounds(me.searchMarker.getLatLng());
+            }
+            return valid;
+        },
+        
+        validateBounds : function(latlng) {
+            var me = this;
+            //if marker is not in allowed bounds return;
+            if(!me.allowedBounds.contains(latlng)) {
+                return false;
+            } else if(me.boundsPolygon != undefined) {
+                if(!me.boundsPolygon.contains(latlng)) {
+                    return false;
+                }
+            }
+            return true;
+        },
+
         addDrawnItems:function(e) {
             var me = this;
             var type = e.layerType;
@@ -338,7 +373,10 @@ function useTitle(obj){
                     selected:true, 
                     clickable:true
             }, options);
-
+            if(!this.validateBounds(latlng)) {
+                alert('Cannot set marker outside the polygon');
+                return;
+            }
             this.searchMarker = this.set_location(latlng.lat, latlng.lng, this.searchMarker, options);
             this.drawnItems.addLayer(this.searchMarker);
             this.setLatLngFields(latlng.lat, latlng.lng);
@@ -347,7 +385,7 @@ function useTitle(obj){
         addMarker : function(lat, lng, options) {
             var marker = this.createMarker(lat, lng, options)
                 if(marker)
-                    marker.addTo( this.map);
+                    marker.addTo(this.map);
             return marker;
         },
 
@@ -358,17 +396,23 @@ function useTitle(obj){
             var me = this;
             var location = new me.M.LatLng(lat, lng);
 
+            if(!me.validateBounds(location)) {
+                alert("Cannot set marker outside the bounds");
+                return;
+            }
+
             options = $.extend({}, {
                 title:options.layer?options.layer:'',
-                    clickable:true
+                clickable:true
             }, options);
 
             //var marker = new L.Draw.Marker(map, {})._mouseMarker;
 
-            var marker = new me.M.marker(location, options)
-                if(options.label) {
-                    //marker.bindLabel(options.label).showLabel();
-                }
+            var marker = new me.M.marker(location, options);          
+            
+            if(options.label) {
+                //marker.bindLabel(options.label).showLabel();
+            }
 
             /*    if(options.layer) {
                   if(!overlays[optionsa
@@ -384,9 +428,10 @@ function useTitle(obj){
             if(options.draggable) {
                 var lastPosition = marker.getLatLng();
                 marker.on("dragend", function(event) {
-                    if(!me.allowedBounds.contains(this.getLatLng())){
+                    if(!me.validateBounds(this.getLatLng())) {
+                        alert("Cannot set marker outside the polygon");
                         marker.setLatLng(lastPosition);
-                    }else {
+                    } else {
                         lastPosition = marker.getLatLng();
                     };
                     me.select_location(marker);
@@ -798,7 +843,6 @@ function useTitle(obj){
                     e.preventDefault();
                 }
             });
-
         //  $('#current_location').click(locate); 
 
         $('#image_location').click(function() {

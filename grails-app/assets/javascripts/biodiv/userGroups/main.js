@@ -52,8 +52,9 @@ function getSelectedVal(labelClass) {
 } 
 
 function loadUserGroupLocation (ne_latitude, ne_longitude, sw_latitude, sw_longitude) { 
-    loadGoogleMapsAPI(function() {
-        initialize(document.getElementById("map_canvas"), false);
+    var mapCanvasEle = document.getElementById("map_canvas");
+    loadGoogleMapsAPI(mapCanvasEle, function() {
+        initialize(mapCanvasEle, false);
         var bounds = [[ne_latitude, ne_longitude], [sw_latitude, sw_longitude]];
         L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
         map.fitBounds(bounds);

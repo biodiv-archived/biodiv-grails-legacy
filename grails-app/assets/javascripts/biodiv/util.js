@@ -130,16 +130,21 @@ function initLoader() {
     document.getElementsByTagName("head")[0].appendChild(script);
 }
 
-function loadGoogleMapsAPI(callback) {
+function loadGoogleMapsAPI(mapCanvasEle, callback) {
     //if (typeof google === 'object' && typeof google.maps === 'object') {
     //    console.log("google maps already loaded")
     //} else {
         if(google != undefined) {
             console.log("loading google maps")
-            google.load("maps", "3.12", {'callback':function() {
-                google.maps.visualRefresh = true;
-                callback();
-            }, other_params: "sensor=true"});
+                console.log(mapCanvasEle);
+            google.load("maps", "3.28", {
+                'callback':function() {
+                    //google.maps.visualRefresh = true;
+                    //new google.maps.Map(mapCanvasEle, {});
+                    callback();
+                }, 
+                other_params: "key=AIzaSyDX0oT5ZOwZhoB2S5AfW81D7WVAjjCNciU"
+            });
         }
     //}
 }
