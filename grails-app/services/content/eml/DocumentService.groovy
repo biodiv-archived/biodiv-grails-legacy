@@ -59,6 +59,7 @@ import species.NamesParser;
 import species.Metadata
 import species.Classification;
 import au.com.bytecode.opencsv.CSVWriter
+import static org.springframework.http.HttpStatus.*;
 
 class DocumentService extends AbstractMetadataService {
 
@@ -315,7 +316,6 @@ class DocumentService extends AbstractMetadataService {
 		return false;
 	}
 
-
 	def nameTerms(params) {
 		List result = new ArrayList();
 
@@ -327,7 +327,6 @@ class DocumentService extends AbstractMetadataService {
 		}
 		return result;
 	}
-
 
 	/**
 	 * Handle the filtering on Documetns
@@ -741,8 +740,61 @@ println queryParts.queryParams
         }
     }
 
-    private saveDoc(documentInstance, Map m) {
-        save(documentInstance, m, true, documentInstance.author, activityFeedService.DOCUMENT_CREATED, documentSearchService);
+    Map saveDocument(params, sendMail=true, boolean updateResources = true) {
+        params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
+		params.author = springSecurityService.currentUser;
+        def documentInstance, feedType, feedAuthor, mailType; 
+
+        try {
+            if(params.action == "save" || params.action == "bulkSave") {
+                documentInstance = create(params);
+                feedType = activityFeedService.DOCUMENT_CREATED
+                feedAuthor = documentInstance.author
+                mailType = activityFeedService.DOCUMENT_CREATED
+            } else {
+                documentInstance = Document.get(params.id.toLong())
+                params.author = documentInstance.author;
+                updateDocument(documentInstance, params);
+                feedType = activityFeedService.DOCUMENT_UPDATED
+                feedAuthor = springSecurityService.currentUser
+                if(params.action == "update") {
+                    mailType = activityFeedService.DOCUMENT_UPDATED
+                }
+            }
+
+            def result = super.save(documentInstance, params, sendMail, feedAuthor, feedType, documentSearchService);
+            if(result.success) {
+                log.debug "Successfully created document : "+documentInstance
+                if (params.tokenUrl != '') {
+                    List docSciNames = DocSciName.findAllByDocument(documentInstance);
+                    docSciNames.each{ 
+                        it.delete(flush: true)
+                    }
+
+                    DocumentTokenUrl.createLog(documentInstance,params.tokenUrl)
+                }
+
+                return utilsService.getSuccessModel('', documentInstance, OK.value())
+            } else {
+                def errors = [];
+
+                documentInstance.errors.allErrors .each {
+                    def formattedMessage = messageSource.getMessage(it, null);
+                    errors << [field: it.field, message: formattedMessage]
+                }
+                
+                return utilsService.getErrorModel('Failed to save document', documentInstance, OK.value(), errors)
+            }
+
+
+        } catch(e) {
+            e.printStackTrace();
+            return utilsService.getErrorModel('Failed to save document', documentInstance, OK.value(), [e.getMessage()])
+        }
+    }
+
+    private saveDoc(documentInstance, Map m, boolean sendMail=true) {
+        super.save(documentInstance, m, sendMail, documentInstance.author, activityFeedService.DOCUMENT_CREATED, documentSearchService);
     }
 
     def runCurrentDocuments(documentInstance,Map m) {

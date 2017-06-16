@@ -378,14 +378,14 @@ function useTitle(obj){
                     clickable:true
             }, options);
             if(!this.validateBounds(latlng)) {
-                alert('Cannot set marker outside the polygon');
-                console.log('Cannot set marker outside the polygon');
-                console.trace();
+                alert('Location is out of bounds');
                 return;
             }
             this.searchMarker = this.set_location(latlng.lat, latlng.lng, this.searchMarker, options);
-            this.drawnItems.addLayer(this.searchMarker);
-            this.setLatLngFields(latlng.lat, latlng.lng);
+            if(this.searchMarker) {
+                this.drawnItems.addLayer(this.searchMarker);
+                this.setLatLngFields(latlng.lat, latlng.lng);
+            }
         },
 
         addMarker : function(lat, lng, options) {
