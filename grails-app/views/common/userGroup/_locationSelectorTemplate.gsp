@@ -90,6 +90,7 @@
 </script>
 <div class="observation_location">
 <div id="map_canvas" style="width:100%; height: 300px;"></div>
+<div class="alert alert-danger hide" style="margin:0px;padding-left:3px;"></div>
 </div>
 <input id="sw_latitude" type="hidden" name="sw_latitude" value="${userGroupInstance?.sw_latitude}"/>
 <input id="sw_longitude" type="hidden" name="sw_longitude" value="${userGroupInstance?.sw_longitude}"/>

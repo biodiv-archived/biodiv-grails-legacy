@@ -344,12 +344,16 @@ function useTitle(obj){
             var me = this;
             //if marker is not in allowed bounds return;
             if(!me.allowedBounds.contains(latlng)) {
-                return false;
+                console.log(me.$ele);
+                me.$ele.next('.alert').html('Location is outside allowed bounds').show();      
+                return true;
             } else if(me.boundsPolygon != undefined) {
                 if(!me.boundsPolygon.contains(latlng)) {
-                    return false;
+                    me.$ele.next('.alert').html('Location is outside allowed bounds').show();      
+                    return true;
                 }
             }
+            me.$ele.next('.alert').html('').hide();
             return true;
         },
 
@@ -375,6 +379,8 @@ function useTitle(obj){
             }, options);
             if(!this.validateBounds(latlng)) {
                 alert('Cannot set marker outside the polygon');
+                console.log('Cannot set marker outside the polygon');
+                console.trace();
                 return;
             }
             this.searchMarker = this.set_location(latlng.lat, latlng.lng, this.searchMarker, options);
@@ -398,6 +404,7 @@ function useTitle(obj){
 
             if(!me.validateBounds(location)) {
                 alert("Cannot set marker outside the bounds");
+                console.log("Cannot set marker outside the bounds");
                 return;
             }
 
@@ -430,6 +437,7 @@ function useTitle(obj){
                 marker.on("dragend", function(event) {
                     if(!me.validateBounds(this.getLatLng())) {
                         alert("Cannot set marker outside the polygon");
+                        console.log("Cannot set marker outside the polygon");
                         marker.setLatLng(lastPosition);
                     } else {
                         lastPosition = marker.getLatLng();

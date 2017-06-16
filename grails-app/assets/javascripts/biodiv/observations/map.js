@@ -12,7 +12,7 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
     if(mapLocationPicker.markers) {
         mapLocationPicker.markers.clearLayers();
     } else 
-        mapLocationPicker.markers = new mapLocationPicker.M.MarkerClusterGroup({maxClusterRadius:50});
+        mapLocationPicker.markers = new mapLocationPicker.M.markerClusterGroup({maxClusterRadius:50});
     $.ajax({
         url: url,
         dataType: "json",

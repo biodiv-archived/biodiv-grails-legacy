@@ -139,6 +139,7 @@
         </div>        
 		<div class="map_wrapper">
 			<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
+            <div class="alert alert-danger hide" style="margin:0px;padding-left:3px;"></div>
 		</div>
 	</div>
 </div>

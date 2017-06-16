@@ -73,7 +73,7 @@ class DocumentController extends AbstractObjectController {
             def model = utilsService.getSuccessModel(flash.message, documentInstance, OK.value());
             withFormat {
                 html {
-			        render(action: "show", id: documentInstance.id)
+                    redirect (url:uGroup.createLink(action:'show', controller:"document", id:documentInstance.id, 'userGroupWebaddress':params.webaddress));
                 }
                 json { render model as JSON }
                 xml { render model as XML }

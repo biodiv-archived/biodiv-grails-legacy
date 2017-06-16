@@ -1493,6 +1493,7 @@ class UserGroupService {
 
                     isNotOver = isBulk ? rf.hasNext() : false;
                 }
+                println "isNotOver"
             }
             return afDescriptionList.join(" ");
 		}
@@ -1640,7 +1641,10 @@ class UserGroupService {
                 break
             }
 
-            Map removeResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'remove', 'filterUrl':grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?userGroup=${ug.id}", webaddress:ug.webaddress, 'selectionType':'selectAll']) 
+            if(!params.notInUserGroup) {
+                //dont remove when we are doing incremental update
+                Map removeResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'remove', 'filterUrl':grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?userGroup=${ug.id}", webaddress:ug.webaddress, 'selectionType':'selectAll']) 
+            }
 
             String filterUrl = grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?";
             filterRules.each {
@@ -1651,8 +1655,14 @@ class UserGroupService {
                     filterUrl += it.fieldName+"="+it.ruleValues;
                 }
             }
-//            log.debug "Posting observations with filterUrl ${filterUrl}";
-            Map postResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'post', 'filterUrl':filterUrl, 'selectionType':'selectAll']) 
+            
+            if(params.notInUserGroup) {
+                filterUrl += "&notInUserGroup=${ug.id}";
+            }
+
+            log.debug "Posting observations with filterUrl ${filterUrl}";
+            Map postResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'post', 'filterUrl':filterUrl, 'selectionType':'selectAll'], false); 
+            println "REFRESH COMPLETE with result ${postResult}";
         }
     }
 }

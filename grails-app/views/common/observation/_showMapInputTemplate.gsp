@@ -58,8 +58,8 @@
         <i class="icon-map-marker"></i>
         <g:message
         code="observation.topology.label" default="${g.message(code:'default.label.at')}" /> <span class="req">*</span>
-        <g:if test="{obvInfoFeeder?.topology}">
-        <small class="lastTopology btn-link" style="display:block" data-lasttopology="${Utils.GeometryAsWKT(obvInfoFeeder.topology)}" data-lastplacename="${obvInfoFeeder.placeName}">Last used location</small>
+        <g:if test="${obvInfoFeeder && obvInfoFeeder.topology}">
+        <small class="lastTopology btn-link" style="display:block" data-lasttopology="${obvInfoFeeder && obvInfoFeeder.topology ? Utils.GeometryAsWKT(obvInfoFeeder.topology) : ''}" data-lastplacename="${obvInfoFeeder ? obvInfoFeeder.placeName : ''}">Last used location</small>
         </g:if>
     </label>
     <div class="controls ">
@@ -150,6 +150,7 @@
                             </div>
                         </center>
                     </div>
+                    <div class="alert alert-danger hide" style="margin:0px;padding-left:3px;"></div>
                 </div>
             </div>
         </div>
