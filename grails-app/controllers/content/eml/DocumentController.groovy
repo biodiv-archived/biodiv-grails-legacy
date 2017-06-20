@@ -332,7 +332,7 @@ class DocumentController extends AbstractObjectController {
             msg = "Its already at the extreme"
             success = false
         }
-                def result = [success:success, msg:msg]
+        def result = [success:success, msg:msg]
         render result as JSON
     }
 
