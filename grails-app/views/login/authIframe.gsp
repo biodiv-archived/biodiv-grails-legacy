@@ -24,6 +24,8 @@
 <script type="text/javascript">
 window.params = {
     'login' : {
+            googleApiKey : "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.apikey}",
+            googleClientID: "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.key}",
             googleOAuthSuccessUrl : "/oauth/google/success",
             ibpServerCookieDomain : "${Utils.getIBPServerCookieDomain()}",
             authSuccessUrl : "${uGroup.createLink(controller:'login', action:'authSuccess')}",

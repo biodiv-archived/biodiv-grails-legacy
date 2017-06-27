@@ -83,6 +83,7 @@ var getCookies = function(){
     var cookies = {};
     for (var i=0; i<pairs.length; i++){
         var pair = pairs[i].split("=");
+        console.log(pair);
         cookies[pair[0].trim()] = unescape(pair[1]);
     }
     return cookies;
