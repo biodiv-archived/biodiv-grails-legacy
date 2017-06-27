@@ -71,6 +71,8 @@ $(document).ready(function() {
         'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
         'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
         'login' : {
+            'googleApiKey' : "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.apikey}",
+            'googleClientID': "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.key}",
             googleOAuthSuccessUrl : "/oauth/google/success",
             ibpServerCookieDomain : "${Utils.getIBPServerCookieDomain()}",
             authSuccessUrl : "${uGroup.createLink(controller:'login', action:'authSuccess')}",

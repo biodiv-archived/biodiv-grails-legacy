@@ -255,8 +255,8 @@ $(document).ready(function() {
 
 
     ////////////////////////GOOGLE RELATED CALLS START HERE ///////////////////////
-    var apiKey = 'IzaSyAyhfqwsO200BkWr3nH8Zbn8NteoxNhe0o';
-    var clientId = '317806372709-roromqiujiji1po5jh8adpcr5um895mb.apps.googleusercontent.com';
+    var apiKey = window.params.login.googleApiKey;
+    var clientId = window.params.login.googleClientID;
     //var scopes = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
     var scopes = 'https://www.googleapis.com/auth/plus.me';
     gapi.load('auth2', gapiInit);
