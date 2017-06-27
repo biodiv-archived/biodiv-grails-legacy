@@ -13,6 +13,7 @@
 //= require jquery.plugins/jquery.ellipses.js
 //= require jquery.plugins/popuplib.js
 //= require biodiv/ajaxLogin.js
+//= require biodiv/login.js
 //= require biodiv/users.js
 //= require jquery.plugins/jquery.linkify-1.0.js
 //= require jquery.plugins/timeago.js

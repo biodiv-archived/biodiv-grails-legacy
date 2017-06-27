@@ -745,7 +745,8 @@ function eatCookies() {
             }
         }
     }
-*/    adjustHeight();
+*/
+    //adjustHeight();
 }
 
 function getSelectedGroup() {

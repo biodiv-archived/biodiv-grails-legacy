@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.openid.OpenIDAuthenticationToken;
 
 class OpenIDAuthenticationProvider extends
 org.springframework.security.openid.OpenIDAuthenticationProvider {
@@ -20,7 +21,6 @@ org.springframework.security.openid.OpenIDAuthenticationProvider {
 		Authentication openIdAuthToken = super.authenticate(authentication);
 		def user = openIdAuthToken.principal;
 		Assert.notNull(user, "retrieveUser returned null - a violation of the interface contract");
-
 		try {
 			preAuthenticationChecks.check(user);
 		} catch (AuthenticationException exception) {
@@ -30,4 +30,9 @@ org.springframework.security.openid.OpenIDAuthenticationProvider {
 		postAuthenticationChecks.check(user);
 		return openIdAuthToken
 	}
+
+    public boolean supports(Class<?> authentication) {
+        println authentication.class
+        return OpenIDAuthenticationToken.class.isAssignableFrom(authentication);
+    }
 }

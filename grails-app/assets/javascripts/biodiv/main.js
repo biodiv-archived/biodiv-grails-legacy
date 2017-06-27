@@ -7,84 +7,6 @@ if (typeof (console.log) == "undefined") {
     }
 }
 
-
-function show_login_dialog(successHandler, errorHandler, cancelHandler) {
-    ajaxLoginSuccessCallbackFunction = successHandler;
-    ajaxLoginErrorCallbackFunction = errorHandler;
-    ajaxLoginCancelCallbackFunction = cancelHandler;
-    $('#ajaxLogin').modal({'keyboard':true, 'show':true});
-}
-
-function cancelLogin() {
-    $('#ajaxLogin').modal('hide');
-}
-
-
-function updateLoginInfo(){
-    $('#ajaxLogin').modal('hide');
-    $('#loginMessage').html('').removeClass().hide();
-    reloadLoginInfo();
-}
-
-function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler, cancelHandler) {
-    if (xhr.status == 401) {
-        show_login_dialog(successHandler, errorHandler, cancelHandler);
-        //window.location.href = "/biodiv/login?spring-security-redirect="+window.location.href;
-    } else {
-        if (errorHandler)
-            errorHandler();
-        else
-            console.log(errorThrown);
-    }
-}
-
-function adjustHeight() {
-    console.log('adjustHeight start');
-//    $(".ellipsis").trunk8();
-    $('.snippet .observation_story_image').each(function() {
-        console.log($(this).next())
-        $(this).css({
-            'height': $(this).next().height()
-        });
-    });
-    console.log('adjustHeight end');
-}
-// Callback to execute whenever ajax login is successful.
-// Todo some thing meaningful with the response data
-var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction, ajaxLoginCancelCallbackFunction;
-
-var reloadLoginInfo = function() {
-    if(typeof window.appContext == 'undefined')
-        window.appContext = '';
-    $.ajax({
-        url : window.appContext+"/SUser/loginTemplate",
-        success : function(data) {
-            $('.header_userInfo').replaceWith(data);
-        }, error: function (xhr, ajaxOptions, thrownError){
-            alert("Error while getting login information : "+xhr.responseText);
-        }
-    });
-}
-
-var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
-    if (json.success || json.status == 'success') {		
-        if (ajaxLoginSuccessCallbackFunction) {
-            ajaxLoginSuccessCallbackFunction(json,
-                    statusText, xhr);
-            ajaxLoginSuccessCallbackFunction = undefined;
-        }
-        updateLoginInfo()
-    } else if(json.error && json.status === 401) {
-        $('#loginMessage').html("Resending previous request").removeClass().addClass('alter alert-info').show();
-        ajaxLoginErrorCallbackFunction(json);		
-        //updateLoginInfo()                
-    } else if (json.error || json.status == 'error') {
-        $('#loginMessage').html(json.error).removeClass().addClass('alter alert-error').show();
-    } else {
-        $('#loginMessage').html(json).removeClass().addClass('alter alert-info').show();
-    }
-}
-
 /**
  * show status update message for AJAX calls as text in $ele and 
  * handle ele class according to data.status 
@@ -112,20 +34,6 @@ jQuery(document).ready(function($) {
 
 
     var domain = document.domain.replace('http://','').replace('www.','').replace(':8080','');
-    //	if (domain == appWGPDomain){
-    //        $('#ibp-header').hide();
-    //        $('#wgp-header').show();
-    //        $('#ibp-footer').hide();
-    //        $('#wgp-footer').show();
-    //    }
-    //
-    //    if (domain == appIBPDomain){
-    //        $('#wgp-header').hide();
-    //        $('#ibp-header').show();
-    //        $('#wgp-footer').hide();
-    //        $('#ibp-footer').show();
-    //    }
-
     $("#menu .navigation li").hover(
         function () {
             $(".subnavigation", this).show();
@@ -133,18 +41,18 @@ jQuery(document).ready(function($) {
         function () {
             $(".subnavigation", this).hide();
         }
-        );
+    );
     $.widget( "custom.catcomplete", $.ui.autocomplete, {
         _renderMenu: function( ul, items ) {
             var self = this,
-        currentCategory = "";
-    $.each( items, function( index, item ) {
-        if ( item.category != currentCategory ) {
-            ul.append( "<li class='ui-autocomplete-category'>" +item.category + "</li>" );
-            currentCategory = item.category;
-        }
-        self._renderItem( ul, item );
-    });
+            currentCategory = "";
+            $.each( items, function( index, item ) {
+                if ( item.category != currentCategory ) {
+                    ul.append( "<li class='ui-autocomplete-category'>" +item.category + "</li>" );
+                    currentCategory = item.category;
+                }
+                self._renderItem( ul, item );
+            });
         }
     });
 
@@ -267,4 +175,25 @@ jQuery(document).ready(function($) {
         var target = $(this).data('target');
         $(this).parent().siblings('.'+target).toggle();
     });
+
+
+    $(".ui-icon-control").click(function() {
+        var div = $(this).siblings("div.toolbarIconContent");
+        if (div.is(":visible")) {
+            div.hide(400);
+        } else {
+            div.slideDown("slow");	
+            if(div.offset().left < 0) {
+                div.offset({left:div.parent().offset().left});					
+            }
+        }
+    });
+
+    $("a.ui-icon-close").click(function() {
+        $(this).parent().hide("slow");
+    });
+
+
 });
+
+

@@ -4,17 +4,19 @@
 			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress) }"><g:message code="button.login" /></a> | 
 			<a href="${uGroup.createLink(controller:'register', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress) }"><g:message code="button.register" /></a> 
 		</legend>
-		<div class="control-group"
+		<div class="control-group ${ajax?'ajax':''}"
 			style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>
 		<div class="control_group">
 			<auth:externalAuthProviders
-				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl, "ajax":ajax]' />
+				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl, "ajax":ajax, "isSubGroup":isSubGroup]' />
 		</div>
-		<form action='${daoPostUrl}' method='POST' class="form-horizontal"
+		<form id='loginForm' action='${daoPostUrl}' method='POST' class="form-horizontal ${isSubGroup?'isSubGroup':'isParentGroup'}"
 			name='loginForm'>
 			<div class="control-group"
 				style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;"><g:message code="loginformtemplate.or" />,
 				<g:message code="loginformtemplate.login.user.account" />:</div>
+
+			<div class="loginMessage" class="alert alert-error" style="display:none"></div>
 			<div class="control-group">
 				<label class="control-label" for="username"><g:message
 						code='spring.security.ui.login.username' /> </label>
@@ -45,7 +47,7 @@
 							code='spring.security.ui.login.rememberme' /> | 
 							<a href="${uGroup.createLink(controller:'register', action:'forgotPassword','userGroupWebaddress':params.webaddress)}">
 							<g:message code='spring.security.ui.login.forgotPassword' />
-						</a> </label> <input class="btn btn-primary" type="submit" value="${g.message(code:'button.login')}"
+						</a> </label> <input class="btn btn-primary" type="submit" value="${g.message(code:'button.login')}" 
 						style="float: right;margin: 3px;">
 				</div>
 			</div>

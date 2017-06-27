@@ -71,8 +71,14 @@ $(document).ready(function() {
         'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
         'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
         'login' : {
-googleOAuthSuccessUrl : "/oauth/google/success",
-
+            googleOAuthSuccessUrl : "/oauth/google/success",
+            ibpServerCookieDomain : "${Utils.getIBPServerCookieDomain()}",
+            authSuccessUrl : "${uGroup.createLink(controller:'login', action:'authSuccess')}",
+            checkauthUrl : "${uGroup.createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
+            channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
+            springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
+            authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
+            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
         },
         'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
         'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
@@ -149,7 +155,8 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         },
         'fact' : {
             'updateFactUrl' : "${uGroup.createLink(controller:'fact', action:'update', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-        }
+        },
+        'serverURL':"${grailsApplication.config.grails.serverURL.replace('/biodiv', '')}"
         <sUser:isAdmin>
         ,
             'isAdmin':true
