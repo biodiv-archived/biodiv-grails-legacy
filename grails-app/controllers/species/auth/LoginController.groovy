@@ -247,7 +247,13 @@ class LoginController {
 
     def authIframe = {
         if (springSecurityService.isLoggedIn()) {
-            render (view:'authIframe', model:['isLoggedIn':true]);
+            def model = [:];
+            if(params.logout) {
+                model['logout'] = true;
+            } else {
+                model['isLoggedIn'] = true;
+            }
+            render (view:'authIframe', model:model);
             return;
         }
         render (view:'authIframe');

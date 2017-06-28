@@ -80,6 +80,7 @@ $(document).ready(function() {
             channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
             springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
             authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
+            logoutUrl : "${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
             fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
         },
         'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",

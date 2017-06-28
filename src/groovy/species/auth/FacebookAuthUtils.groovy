@@ -119,11 +119,8 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
             cookie2.value = false
 			cookie2.maxAge = 0
 			cookie2.path = '/'
-			//cookie2.domain = "."+Utils.getIBPServerCookieDomain();
-			httpServletResponse.addCookie(cookie2)
 			cookie2.domain = "."+Utils.getIBPServerCookieDomain();
 			httpServletResponse.addCookie(cookie2)
-
 		}
 	}
 

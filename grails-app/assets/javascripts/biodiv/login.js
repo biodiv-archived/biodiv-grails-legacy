@@ -89,6 +89,17 @@ var getCookies = function(){
     return cookies;
 }
 
+//used on logout in ajax call in hidden frame
+function clearAllCookies() {
+    var cookies = document.cookie.split(";");
+    for(var i=0; i < cookies.length; i++) {
+        var equals = cookies[i].indexOf("=");
+        var name = equals > -1 ? cookies[i].substr(0, equals) : cookies[i];
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+
+}
+
 function callAuthSuccessUrl(url, p) {
     $.ajax({
         url: url,
@@ -299,13 +310,13 @@ $(document).ready(function() {
 
 });
 
-function loadBiodivLoginIframe(callback) {
+function loadBiodivLoginIframe(callback, logout=false) {
     if(!$(document.getElementsByName("biodiv_iframe")[0]).attr("src")) {
-        console.log('loading authIframe-------------------------------');
-        $(document.getElementsByName("biodiv_iframe")[0]).attr("src", window.params.login.authIframeUrl).load(function(e) {
-        console.log('loading authIframe callllllllllllllbaaaaaaaaaaaackkkkkkkkk-------------------------------');
+        $(document.getElementsByName("biodiv_iframe")[0]).attr("src", window.params.login.authIframeUrl+'?logout='+logout).load(function(e) {
             callback();
         });
+    } else {
+        callback();
     }
 
 }

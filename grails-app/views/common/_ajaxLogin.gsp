@@ -50,6 +50,22 @@
                         return false;
                     });
                    
+                    $('#logout.isSubGroup').on('click', function() {
+                        $('body').addClass('busy');
+                        event.stopPropagation();
+                        var isAjax = $("#ajaxLogin").is(':visible'); 
+                        loadBiodivLoginIframe(function() {
+                            var iframe = document.getElementsByName("biodiv_iframe")[0];
+                            if(iframe) {
+                                var iframeWindow = (iframe.contentWindow || iframe.contentDocument);
+                                console.log(event);
+                                iframeWindow.postMessage(JSON.stringify({logout:'true', 'isAjax':isAjax}), '*');
+                            }
+                        }, true);
+                        return false;
+
+                    });
+
 
                     // Create IE + others compatible event handler
                     var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
@@ -78,6 +94,12 @@
                                 window.location.href = window.location.origin;
                         } else if(childMsg.signin == 'error'){
                             $('.loginMessage').html(childMsg.error).addClass('alert alert-error').show();
+                        } else if(childMsg.signout == 'success'){
+                            clearAllCookies();
+                           $.each(childMsg.cookies, function(key,value) {
+                                $.cookie(key, value, {path:'/'});
+                            });
+                            window.location.href = window.location.origin;
                         }
                         $('body').removeClass('busy');
 
