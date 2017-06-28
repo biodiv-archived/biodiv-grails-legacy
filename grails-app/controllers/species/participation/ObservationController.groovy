@@ -1776,13 +1776,6 @@ class ObservationController extends AbstractObjectController {
         }
     }
 
-    /*def getRecommendationListJSON(LinkedHashMap result){
-        if(result){         
-            def test = ['result' : result];
-            return test; // as JSON;
-        }
-    }*/ 
-   
     @Secured(['ROLE_USER'])
     def bulkCreate(){
         def observationInstance = new Observation()
@@ -1847,10 +1840,6 @@ def filterChain() {
     render springSecurityFilterChain
 }
 
-/*    def filePickerSecurityCodes() {
-        utilsService.filePickerSecurityCodes();
-    }
-*/    
     @Secured(['ROLE_USER'])
     def updateCustomField(){
         log.debug params
@@ -1961,13 +1950,6 @@ private printCacheEntries(cache) {
             }
         }
     }
-/*    
-    boolean updateFact(){
-        println "updateFactParams--------"+params
-        def factUpdate = observationService.factUpdate(params);
-        return factUpdate;
-    }
-*/
 
     def customFields() {
         def model = [:];

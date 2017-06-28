@@ -1686,6 +1686,19 @@ println "2222222222222222222"
         flash.message = r.msgCode;
     } 
 
+    def filterRules() {
+    	def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
+		if (!userGroupInstance) return;
+        def rules= [];
+        if(userGroupInstance.filterRule) {
+            def filterRuleJson = JSON.parse(userGroupInstance.filterRule);
+            JSON.parse(userGroupInstance.filterRule).each {
+                def rule = JSON.parse(it);
+                rules << rule
+            }
+        }
+        render rules as JSON
+    }
 }
 
 class UserGroupCommand {

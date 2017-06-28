@@ -81,12 +81,12 @@
 ////= require checklist
 //= require biodiv/checklist.js
 //= require bootstrap.plugins/bootstrap-rowlink.min.js
-//= require biodiv/location/location-picker.js
-//= require biodiv/observations/map.js
+////= require biodiv/location/location-picker.js
+////= require biodiv/observations/map.js
 
 ////add_file
 //= require biodiv/content.js
-//= require biodiv/location/location-picker.js
+////= require biodiv/location/location-picker.js
 
 ////bulkupload
 //= require biodiv/parseUtil.js
