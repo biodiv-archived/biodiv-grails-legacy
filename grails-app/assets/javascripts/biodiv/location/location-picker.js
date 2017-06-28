@@ -395,14 +395,14 @@ function useTitle(obj){
             return marker;
         },
 
-        createMarker : function(lat, lng, options) {
+        createMarker : function(lat, lng, options, validate=true) {
             if(!lat || !lng) return;
             if(options == undefined) options = {};
 
             var me = this;
             var location = new me.M.LatLng(lat, lng);
 
-            if(!me.validateBounds(location)) {
+            if(validate && !me.validateBounds(location)) {
                 alert("Cannot set marker outside the bounds");
                 console.log("Cannot set marker outside the bounds");
                 return;
