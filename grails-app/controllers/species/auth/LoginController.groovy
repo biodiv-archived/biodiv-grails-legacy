@@ -249,7 +249,7 @@ class LoginController {
         if (springSecurityService.isLoggedIn()) {
             def model = [:];
             if(params.logout) {
-                model['logout'] = true;
+                model['logout'] = params.logout;
             } else {
                 model['isLoggedIn'] = true;
             }
