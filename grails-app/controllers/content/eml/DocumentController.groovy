@@ -39,65 +39,22 @@ class DocumentController extends AbstractObjectController {
 
 	@Secured(['ROLE_USER'])
 	def save() {
-        params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
-		params.author = springSecurityService.currentUser;
-		params.locale_language = utilsService.getCurrentLanguage(request);
-		def documentInstance = documentService.create(params)
-
-		log.debug( "document instance with params assigned >>>>>>>>>>>>>>>>: "+ documentInstance)
-		if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
-
-			flash.message = "${message(code: 'default.created.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
-			activityFeedService.addActivityFeed(documentInstance, null, documentInstance.author, activityFeedService.DOCUMENT_CREATED);
-
-			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-			
-			documentInstance.setTags(tags)
-			if(params.groupsWithSharingNotAllowed) {
-				documentService.setUserGroups(documentInstance, [
-					params.groupsWithSharingNotAllowed
-				]);
-			} else {
-				if(params.userGroupsList) {
-					def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-
-					documentService.setUserGroups(documentInstance, userGroups);
-				}
-			}
-			if (params.tokenUrl != '') {
-				DocumentTokenUrl.createLog(documentInstance,params.tokenUrl)
-			}
-			utilsService.sendNotificationMail(activityFeedService.DOCUMENT_CREATED, documentInstance, request, params.webaddress);
-			documentSearchService.publishSearchIndex(documentInstance, true)
-
-            def model = utilsService.getSuccessModel(flash.message, documentInstance, OK.value());
+        if(request.method == 'POST') {
+            //TODO:edit also calls here...handle that wrt other domain objects
+            saveAndRender(params, false)
+        } else {
+            msg = "Method Not Allowed"
+            def model = utilsService.getErrorModel(msg, null, METHOD_NOT_ALLOWED.value());
             withFormat {
                 html {
-			        render(action: "show", id: documentInstance.id)
+                    flash.message = msg;
+                    redirect (url:uGroup.createLink(action:'create', controller:"document", 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
             }
-		}
-		else {
-            def errors = [];
-
-            documentInstance.errors.allErrors .each {
-                def formattedMessage = messageSource.getMessage(it, null);
-                errors << [field: it.field, message: formattedMessage]
-            }
-
-            def model = utilsService.getErrorModel("Failed to save document", documentInstance, OK.value(), errors);
-            withFormat {
-                html {
-                    documentInstance.errors.allErrors.each { log.error it }
-                    render(view: "create", model: [documentInstance: documentInstance])
-                }
-                json { render model as JSON }
-                xml { render model as XML }
-            }
-		}
-	}
+        }
+    }
 
 	def show() {
 		//cache "content"
@@ -150,72 +107,8 @@ class DocumentController extends AbstractObjectController {
         def msg = "";
 		if (documentInstance) {
             params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
-			if (params.version) {
-				def version = params.version.toLong()
-				if (documentInstance.version > version) {
-
-					documentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-						message(code: 'document.label', default: 'Document')] as Object[], "Another user has updated this Document while you were editing")
-					render(view: "create", model: [documentInstance: documentInstance])
-					return
-				}
-			}
-			if(params.tokenUrl != '') {
-				List docSciNames = DocSciName.findAllByDocument(documentInstance);
-				docSciNames.each{ 
-	 				it.delete(flush: true)
-		  		}
-				DocumentTokenUrl.createLog(documentInstance, params.tokenUrl)
-			}
-			params.locale_language = utilsService.getCurrentLanguage(request);
-			//documentInstance.properties = params
-			documentService.updateDocument(documentInstance, params)
-			if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
-				activityFeedService.addActivityFeed(documentInstance, null, springSecurityService.currentUser, activityFeedService.DOCUMENT_UPDATED);
-				def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
-				
-				documentInstance.setTags(tags)
-				
-				if(params.groupsWithSharingNotAllowed) {
-					documentService.setUserGroups(documentInstance, [params.groupsWithSharingNotAllowed]);
-				} else {
-					if(params.userGroupsList) {
-						def userGroups = (params.userGroupsList != null) ? params.userGroupsList.split(',').collect{k->k} : new ArrayList();
-						
-						documentService.setUserGroups(documentInstance, userGroups);
-					}
-				}
-				documentSearchService.publishSearchIndex(documentInstance, true) 
-				msg = "${message(code: 'default.updated.message', args: [message(code: 'document.label', default: 'Document'), documentInstance.id])}"
-                def model = utilsService.getSuccessModel(msg, documentInstance, OK.value());
-                withFormat {
-                    html {
-                        flash.message = msg;
-				        redirect(action: "show", id: documentInstance.id)
-                    }
-                    json { render model as JSON }
-                    xml { render model as XML }
-                }
-			}
-            else {
-                    def errors = [];
-                    documentInstance.errors.allErrors .each {
-                        def formattedMessage = messageSource.getMessage(it, null);
-                        errors << [field: it.field, message: formattedMessage]
-                    }
-
-                    def model = utilsService.getErrorModel("Failed to update document", documentInstance, OK.value(), errors);
-                    withFormat {
-                        html {
-                            render(view: "create", model: [documentInstance: documentInstance])
-                        }
-                        json { render model as JSON }
-                        xml { render model as XML }
-                    }
-                    return;
-            }
-		}
-		else {
+            saveAndRender(params,true);
+        } else {
             msg = "${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}"
             def model = utilsService.getErrorModel(msg, null, OK.value(), errors);
             withFormat {
@@ -227,6 +120,29 @@ class DocumentController extends AbstractObjectController {
                 xml { render model as XML }
             }
 		}
+	}
+
+    private saveAndRender(params, sendMail=true) {
+        params.locale_language = utilsService.getCurrentLanguage(request);
+
+		def result = documentService.saveDocument(params, sendMail);
+        if(result.success) {
+            redirect (url:uGroup.createLink(action:'show', controller:"document", id:result.instance.id, 'userGroupWebaddress':params.webaddress));
+        } else {
+            withFormat {
+                html {
+                    render(view: "create", model: [documentInstance: result.instance])
+                }
+                json {
+                    result.remove('instance');
+                    render result as JSON 
+                }
+                xml {
+                    result.remove('instance');
+                    render result as XML
+                }
+            }
+        }
 	}
 
     @Secured(['ROLE_USER'])	
@@ -416,7 +332,7 @@ class DocumentController extends AbstractObjectController {
             msg = "Its already at the extreme"
             success = false
         }
-                def result = [success:success, msg:msg]
+        def result = [success:success, msg:msg]
         render result as JSON
     }
 

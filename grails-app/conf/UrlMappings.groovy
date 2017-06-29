@@ -210,6 +210,12 @@ class UrlMappings {
                 action = "createFacebookAccount"
             }
 
+            "/$webaddress/logout" {
+                controller = "logout"
+                action = "index"
+            }
+
+
 
             "/$webaddress/group/$action/$id?" {
                 controller = "userGroup"

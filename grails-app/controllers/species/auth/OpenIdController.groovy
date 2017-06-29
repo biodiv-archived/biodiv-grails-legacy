@@ -67,7 +67,7 @@ class OpenIdController {
 		def config = SpringSecurityUtils.securityConfig
 
  		if (springSecurityService.isLoggedIn()) {
-			redirect uri: config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
 			return
 		}
 		
@@ -130,7 +130,7 @@ class OpenIdController {
 		log.debug "Processing OpenId authentication in createAccount/merge"
 		String email
         if(openId) {
-           emailAttribute = attributes.find { l ->
+           email = attributes.find { l ->
                 if(l.name == 'email') {
                     email = l.values[0]
                 }
@@ -278,7 +278,7 @@ class OpenIdController {
 			(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, savedRequest.getRedirectUrl());
 		}
 		else {
-			redirect uri: config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
 		}
 	}
 

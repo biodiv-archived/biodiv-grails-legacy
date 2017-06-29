@@ -45,6 +45,7 @@ import species.participation.Comment;
 import species.auth.RestTokenValidationFilter;
 import species.MyEntityInterceptor;
 import species.auth.AjaxAwareAuthenticationEntryPoint;
+import grails.plugin.springsecurity.SecurityFilterPosition
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
@@ -321,14 +322,13 @@ beans = {
         exceptionMappings = conf.failureHandler.exceptionMappings // [:]
     }
 
-
-
     openIDAuthProvider(OpenIDAuthenticationProvider) {
         userDetailsService = ref('userDetailsService')
         preAuthenticationChecks 	= ref('preAuthenticationChecks')
         postAuthenticationChecks = ref('postAuthenticationChecks')
     }
 
+//    SpringSecurityUtils.clientRegisterFilter 'openIdAuthenticationFilter', SecurityFilterPosition.FORM_LOGIN_FILTER.order + 2
     openIDAuthenticationFilter(OpenIDAuthenticationFilter) {
         //claimedIdentityFieldName = conf.openid.claimedIdentityFieldName // openid_identifier
         consumer = ref('openIDConsumer')

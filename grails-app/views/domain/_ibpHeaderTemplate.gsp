@@ -102,7 +102,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 		${flash.message}
 	</div>
 
-	<auth:ajaxLogin />
+	<auth:ajaxLogin  model="['isSubGroup':(userGroupInstance && userGroupInstance.domainName)]"/>
 	<div id="fb-root"></div>
     </div>
 </div>

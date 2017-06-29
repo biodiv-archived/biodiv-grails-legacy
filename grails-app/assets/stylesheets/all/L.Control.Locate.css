@@ -1,23 +1,12 @@
-.leaflet-bar-part-single {
-	-webkit-border-radius: 4px 4px 4px 4px;
-	        border-radius: 4px 4px 4px 4px;
-	border-bottom: none;
-}
-
-.leaflet-touch .leaflet-bar-part-single {
-	-webkit-border-radius: 7px 7px 7px 7px;
-	        border-radius: 7px 7px 7px 7px;
-	border-bottom: none;
-}
-
+/* Compatible with Leaflet 0.7 */
 .leaflet-control-locate a {
-	background-image: url('images/locate.png');
+  font-size: 1.4em;
+  color: #444;
+  cursor: pointer;
 }
-
-.leaflet-control-locate.requesting a {
-    background-image: url('images/spinner.gif');
-}
-
 .leaflet-control-locate.active a {
-    background-image: url('images/locate_active.png');
+  color: #2074B6;
+}
+.leaflet-control-locate.active.following a {
+  color: #FC8428;
 }

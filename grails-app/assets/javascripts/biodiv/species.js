@@ -100,37 +100,37 @@ function positionTOC() {
 }
 
 function showOccurence(speciesName) {
-    loadGoogleMapsAPI(function() {
+    loadGoogleMapsAPI(undefined, function() {
         var mapOptions = {
             popup_enabled : true,
-    toolbar_enabled : true
-        //bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
+            toolbar_enabled : true
+                //bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
         };
         var layersOptions = [
-    {
-        title :window.i8ln.species.specie.oc ,
-    layers : 'ibp:occurrence',
-    styles : '',
-    cql_filter : "species_name='" + speciesName + "'",
-    opacity : 0.7
-    },
-    {
-        title :window.i8ln.species.specie.obs ,
-    layers : 'ibp:observation_locations',
-    styles : '',
-    cql_filter : "species_name='" + speciesName + "'",
-    opacity : 0.7
-    },
-    {
-        title :window.i8ln.species.specie.ckl,
-        layers : 'ibp:checklist_species_locations',
-        styles : '',
-        cql_filter : "species_name='" + speciesName + "'",
-        opacity : 0.7
-    }
-    ]
-        showMap("map1311326056727", mapOptions, layersOptions)
-        $("#mapSpinner").hide();
+        {
+            title :window.i8ln.species.specie.oc ,
+            layers : 'ibp:occurrence',
+            styles : '',
+            cql_filter : "species_name='" + speciesName + "'",
+            opacity : 0.7
+        },
+        {
+            title :window.i8ln.species.specie.obs ,
+            layers : 'ibp:observation_locations',
+            styles : '',
+            cql_filter : "species_name='" + speciesName + "'",
+            opacity : 0.7
+        },
+        {
+            title :window.i8ln.species.specie.ckl,
+            layers : 'ibp:checklist_species_locations',
+            styles : '',
+            cql_filter : "species_name='" + speciesName + "'",
+            opacity : 0.7
+        }
+        ]
+            showMap("map1311326056727", mapOptions, layersOptions)
+            $("#mapSpinner").hide();
     });
 }
 

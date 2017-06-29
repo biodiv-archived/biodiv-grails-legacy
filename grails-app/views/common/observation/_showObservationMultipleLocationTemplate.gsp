@@ -22,6 +22,7 @@
                             </div>
                        </center>
                     </div>
+                    <div class="alert alert-danger hide" style="margin:0px;padding-left:3px;"></div>
 		</div>
 	</div>
         

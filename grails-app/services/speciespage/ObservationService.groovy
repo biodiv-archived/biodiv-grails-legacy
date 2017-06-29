@@ -1241,6 +1241,15 @@ class ObservationService extends AbstractMetadataService {
             queryParams['userGroup'] = params.userGroup
         } 
 
+        if(params.notInUserGroup) {
+            log.debug "Filtering from notInUsergourp : ${params.userGroup}"
+            userGroupQuery = " left outer join user_group_observations  userGroup on userGroup.observation_id = obv.id  and userGroup.user_group_id = :userGroupId"
+            query += userGroupQuery
+            filterQuery += " and userGroup.user_group_id is null "
+            queryParams['userGroupId'] = Long.parseLong(params.notInUserGroup)
+
+        }
+
         if(params.tag){
             tagQuery = ",  TagLink tagLink, Tags tag "
             query += tagQuery;

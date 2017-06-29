@@ -643,15 +643,15 @@ def messageSource;
 		return count
 	}
 
-	
-	def long getActivityFeedCount(params){
-		def userGroup 
-		if(params.webaddress) {
-			userGroup = userGroupService.get(params.webaddress)
-		}
-		
-		return ActivityFeed.getActivityCount(null, null, userGroup)
-	}
+
+    def long getActivityFeedCount(params){
+        def userGroup 
+        if(params.webaddress) {
+            userGroup = userGroupService.get(params.webaddress)
+        }
+
+        return ActivityFeed.getActivityCount(null, null, userGroup)
+    }
 
     def activeUserStatsAuthorAndCount(max, userGroupInstance , startDate){ 
 
@@ -680,5 +680,64 @@ def messageSource;
             order 'total', 'desc'
         }
         return result
+    }
+
+    def topIDProviders(params, request){
+        int days = params.days ? params.days.toInteger() : 7
+        int max = params.max ? params.max.toInteger() : 10
+
+        def startDate = new Date().minus(days)
+        UserGroup userGroupInstance
+        if(params.webaddress) {
+            userGroupInstance = userGroupService.get(params.webaddress);
+//            startDate = userGroupInstance.foundedOn
+            startDate = new Date(0);
+        }
+
+        DateGroovyMethods.clearTime(startDate)
+
+        def result = topIDProviders(userGroupInstance, startDate, new Date(), max);
+
+        def finalResult = []
+        result.each { r ->
+            def link = utilsService.generateLink("SUser", "show", ["id": r.user.id], request)
+            link =  "" + '<a  href="' +  link +'"><i>' + r.user.name + "</i></a>"
+            finalResult.add([ getUserImage(r.user), link, getHyperLinkForUser(r.user.id, startDate, r.recoCount, request)])
+        }
+
+        return [data : result, htmlData:finalResult, columns : [
+        ['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
+        ['number', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
+        ],
+        htmlColumns : [
+        ['string', ''],
+        ['string', messageSource.getMessage("value.user", null, LCH.getLocale())],
+        ['string', messageSource.getMessage("default.observation.label", null, LCH.getLocale())]
+        ]
+        ]
+    }
+
+    def topIDProviders(UserGroup userGroupInstance, Date startDate, Date currentDate, int limit) {
+        def sql =  Sql.newInstance(dataSource);
+        limit = limit ? limit : 5;
+
+        DateGroovyMethods.clearTime(startDate)
+        DateGroovyMethods.clearTime(currentDate)
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+        def startDateInFormat = dateFormat.format(startDate);
+        def currentDateInFormat = dateFormat.format(currentDate);
+
+        def queryParams = ['userGroupId' : userGroupInstance.id, 'startDateInFormat':startDateInFormat, 'currentDateInFormat':currentDateInFormat];   
+        def resultSet = sql.rows("select u.id as userid, u.username, u.date_created as registered, u.last_login_date, recoCount from ( select rv.author_id uid, count(*) recoCount from recommendation_vote rv, observation o, user_group_observations ugo where rv.observation_id = o.id and o.id = ugo.observation_id and o.is_deleted = false and o.is_showable = true and o.is_checklist = false and ugo.user_group_id=:userGroupId and  rv.voted_on >= to_timestamp(:startDateInFormat, 'yyyy-MM-dd HH24:mi:ss') and rv.voted_on <= to_timestamp(:currentDateInFormat, 'yyyy-MM-dd HH24:mi:ss') group by rv.author_id) group_user_reco, suser u where u.id = group_user_reco.uid order by recoCount desc", queryParams, 0, limit);
+
+        log.debug resultSet
+
+        List topIDProviders = [];
+        for (row in resultSet){
+            topIDProviders.add(["user":SUser.findById(row.getProperty("userid")), "recoCount":row.getProperty("recocount")])
+        }
+
+        log.debug "topIDProviders in ${userGroupInstance} ${topIDProviders}"
+        return topIDProviders;
     }
 }

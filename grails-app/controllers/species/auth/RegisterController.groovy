@@ -43,7 +43,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;
 		}
 		
@@ -95,7 +95,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		
 		log.debug "Registering user $command"
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;
 		}
 		
@@ -257,7 +257,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
     def verifyRegistration = {
         if (springSecurityService.isLoggedIn()) {
-            redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
             return;
         }
 
@@ -270,7 +270,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         def registrationCode = token ? RegistrationCode.findByToken(token) : null
         if (!registrationCode) {
             flash.error = message(code: 'spring.security.ui.register.badCode')
-            redirect uri: defaultTargetUrl
+            redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ defaultTargetUrl
             return
         }
 
@@ -289,7 +289,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.register.badCode')
-			redirect uri: defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ defaultTargetUrl
 			return	
 		}
 
@@ -395,7 +395,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         def registrationCode = token ? RegistrationCode.findByToken(token) : null
         if (!registrationCode) {
             flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
-            redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
             return
         }
         flash.error = '';
@@ -430,7 +430,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
         def conf = SpringSecurityUtils.securityConfig
         String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
-        redirect uri: postResetUrl
+        redirect uri: request.scheme+"://"+request.serverName+request.contextPath+postResetUrl
     }
 
 	protected String generateLink(String controller, String action, linkParams, request) {

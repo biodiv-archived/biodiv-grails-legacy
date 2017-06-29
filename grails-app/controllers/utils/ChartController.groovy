@@ -47,4 +47,8 @@ class ChartController {
     def topContributors = {        
 	    render chartService.activeUserStats(params, request) as JSON
     }
+
+    def topIDProviders = {
+	    render chartService.topIDProviders(params, request) as JSON
+    }
 }

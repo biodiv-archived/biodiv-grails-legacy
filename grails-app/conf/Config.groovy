@@ -627,6 +627,7 @@ environments {
              */
             trace   'com.grailsrocks.emailconfirmation'
             debug   'com.odobo.grails.plugin.springsecurity.rest'
+            debug   'com.odobo.grails.plugin.springsecurity.openid'
             debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
             debug   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
@@ -640,6 +641,9 @@ environments {
 */
             debug 'species'
             info    'com.linkedin.grails.ProfilerPlugin'
+            debug 'org.apache.http.wire'
+            trace 'grails.plugin.springsecurity.SpringSecurityUtils'
+
         }
     }
     pamba {
@@ -1593,7 +1597,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 '/api/oauth/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
 '/api/register/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
 '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
-'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
+'/**': 'JOINED_FILTERS,-restAuthenticationFilter,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
 ]
 
 //http://mrhaki.blogspot.in/2014/07/grails-goodness-enable-accept-header.html
