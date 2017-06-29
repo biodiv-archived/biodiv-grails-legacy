@@ -312,9 +312,15 @@ $(document).ready(function() {
 
 function loadBiodivLoginIframe(callback, logout=false) {
     if(!$(document.getElementsByName("biodiv_iframe")[0]).attr("src")) {
-        $(document.getElementsByName("biodiv_iframe")[0]).attr("src", window.params.login.authIframeUrl+'?logout='+logout).load(function(e) {
+        if(logout) {
+            $(document.getElementsByName("biodiv_iframe")[0]).attr("src", window.params.login.authIframeUrl+'?logout='+logout).load(function(e) {
             callback();
         });
+        } else {
+             $(document.getElementsByName("biodiv_iframe")[0]).attr("src", window.params.login.authIframeUrl).load(function(e) {
+                callback();
+            });
+        }
     } else {
         callback();
     }
