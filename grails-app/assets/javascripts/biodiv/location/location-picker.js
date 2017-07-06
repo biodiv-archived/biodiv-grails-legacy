@@ -5,7 +5,7 @@ function update_geotagged_images_list_for_bulkUpload(geotaggedImages, ele){
     });
 }
 
-function loadMapInput(geotaggedImages) {
+function loadMapInput(geotaggedImages=undefined) {
     //$(".address .add-on").trigger("click"); 
     var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
@@ -791,12 +791,14 @@ function useTitle(obj){
                             
                             $.getJSON( window.params.locationsUrl, request, function( data, status, xhr ) {
                                 $.each(data, function(index, item) {
+                                    if(item.location[1] != undefined) {
                                     r.push({
                                         label: item.location[0]+' ('+item.location[1]+')',
                                         value: item.location[0],
                                         topology:item.topology,
                                         category:item.category
-                                        })
+                                        });
+                                    }
                                 })
                                 response(r);
                             });
@@ -810,7 +812,9 @@ function useTitle(obj){
                             me.mapLocationPicker.drawArea(ui.item.topology, true, true, true);
                             me.$ele.closest(".map_class").find('input.areas').val(ui.item.topology);
                         } else {
-                            me.mapLocationPicker.addSearchMarker({lat:ui.item.latitude, lng:ui.item.longitude}, {label:ui.item.label, draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+                            if(ui.item.latitude && ui.item.longitude) {
+                                me.mapLocationPicker.addSearchMarker({lat:ui.item.latitude, lng:ui.item.longitude}, {label:ui.item.label, draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+                            }
                         }
                     },
 

@@ -15,9 +15,11 @@
 
 .openid-loginbox .form-horizontal .controls input , .openid-loginbox .form-horizontal .controls select {
 	width: 290px;
-    padding:4px 6px;
-    font-size : 14px;
 }
+.openid-loginbox .form-horizontal .controls select {
+	width: 304px;
+}
+
 .map_search {
     background-color:transparent;
 }
@@ -161,6 +163,12 @@
                                 <g:renderErrors bean="${command}" field="location"/>
                                 </div>
                             </g:hasErrors>
+                            <g:hasErrors bean="${command}" field="latitude">
+                                    <div class="help-inline">
+                                    <g:renderErrors bean="${command}" field="latitude" />
+                                    <g:renderErrors bean="${command}" field="longitude" />
+                                    </div>
+                                    </g:hasErrors>
 
                         <div class='suggestions' class='dropdown'></div>
                     </div>
@@ -174,15 +182,9 @@
 		                            <span class="add-on" style="vertical-align:middle;"><g:message code="default.long.label" /></span>
                                     <input class="degree_field longitude_field" type="text" name="longitude" value="${command.longitude}"></input>
                                     </div>
-                                    <g:hasErrors bean="${command}" field="latitude">
-                                        <div class="help-inline">
-								    		<g:renderErrors bean="${command}" field="latitude" />
-										    <g:renderErrors bean="${command}" field="longitude" />
-	                    	            </div>
-	                               </g:hasErrors>
-	                    </div>
-                       
+                                    </div>
 
+                                    
                     </div>
 
                     <div class="map_canvas" style="display:none;">
