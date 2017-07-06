@@ -11,8 +11,7 @@
 </head>
 <body>
     <auth:ajaxLogin model="['isSubGroup':false]"/>
-				<a id="logout" class="hide isParentGroup"
-					href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"/>
+    <a id="logout" class="hide isParentGroup" href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"/>
 
 
 <asset:javascript src="jquery.js"/>
@@ -75,6 +74,7 @@ $(document).ready(function() {
         <g:else>
             window.addEventListener("message", receiveMessage, false);
             window.isAjax = false;
+            window.referer = '';
             function receiveMessage(event) {
                 //if (event.origin !== "http://example.org:8080")
                 //    return;
@@ -83,16 +83,20 @@ $(document).ready(function() {
                 if(data.fbJustConnect_login == 'true') {
                     $('.isParentGroup .fbJustConnect').click();
                     window.isAjax = data.isAjax;
+                    window.referer = data.referer;
                 } else if(data.googleConnect_login == 'true') {
                     $('.isParentGroup .googleConnect').click();
                     window.isAjax = data.isAjax;
+                    window.referer = data.referer;
                 } else if(data.yahooConnect_login == 'true') {
                     $('.isParentGroup .yahooConnect').click();
                     window.isAjax = data.isAjax;
+                    window.referer = data.referer;
                 } else if(data.regular_login == 'true') {
                     $('input[name="j_username"]').val(data.j_username);
                     $('input[name="j_password"]').val(data.j_password);
                     window.isAjax = data.isAjax;
+                    window.referer = data.referer;
                     $('#ajaxLogin form').submit();
                 } else if(data.logout == 'true') {
                     $('.isParentGroup#logout').click();
@@ -104,10 +108,8 @@ $(document).ready(function() {
                     type : 'POST',
                     dataType : 'json',
                     success : function(data, statusText, xhr){
-                        console.log('success');
-                        console.log(arguments);
                         if(data.success) {
-                            window.top.postMessage( JSON.stringify({signin: 'success', 'cookies':getCookies(), 'isAjax':window.isAjax, 'data':data, 'statusText':statusText}), '*' );
+                            window.top.postMessage( JSON.stringify({signin: 'success', 'cookies':getCookies(), 'isAjax':window.isAjax, 'data':data, 'statusText':statusText, 'referer':window.referer}), '*' );
                         } else {
                             window.top.postMessage( JSON.stringify({signin: 'error', 'error':data.error, 'isAjax':window.isAjax}), '*' );
                         }

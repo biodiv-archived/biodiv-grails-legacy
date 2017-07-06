@@ -453,9 +453,23 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	}
 
     static locationValidator = { String location, command ->
-        String usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-        if (command.location=="") {
+        if (!command.location || !command.latitude || !command.longitude) {
             return "command.location.error"
+        }
+
+        if(command.latitude == 0.0 || command.longitude == 0.0) {
+            return "command.latitude.error";
+        }
+    }
+    static latitudeValidator = { double latitude, command ->
+        if (!command.latitude || command.latitude == 0.0) {
+                return "command.latitude.error"
+        }
+    }
+
+    static longitudeValidator = { double longitude, command ->
+        if (!command.longitude || command.longitude == 0.0) {
+            return "command.latitude.error"
         }
     }
 
@@ -616,7 +630,9 @@ class CustomRegisterCommand {
 			}
  		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
-        location validator:RegisterController.locationValidator
+        location blank:false, nullable:false, validator : RegisterController.locationValidator
+        latitude blank:false, nullable:false, validator : RegisterController.latitudeValidator
+        longitude blank:false, nullable:false, validator : RegisterController.longitudeValidator
 		password2 validator: RegisterController.password2Validator
 		captcha_response blank:false, nullable:false, validator: { value, command ->
 			def session = RCH.requestAttributes.session
@@ -673,7 +689,10 @@ class CustomRegisterCommand2 {
 		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
-        location  validator:RegisterController.locationValidator
+        location blank:false, nullable:false, validator : RegisterController.locationValidator
+        latitude blank:false, nullable:false, validator : RegisterController.latitudeValidator
+        longitude blank:false, nullable:false, validator : RegisterController.longitudeValidator
+
 	}
 
 	/* (non-Javadoc)

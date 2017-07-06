@@ -29,8 +29,8 @@
         <ul class="siteNav nav">
         <li class="dropdown ${(['species','namelist','trait'].contains(params.controller))?'active':''}">
 	        <a href="#" title="${g.message(code:'default.species.label')}" class="dropdown-toggle" data-toggle="dropdown">
-								<g:message code="default.species.label" />
 								<span  title="${g.message(code:'updated.today')}" class="statsTicker speciesUpdateCount"> </span>
+								<g:message code="default.species.label" />
 								<b class="caret"></b>
 			</a>
 		
@@ -50,8 +50,8 @@
 
 		 <li class="dropdown ${(['observation','checklist','datasource'].contains(params.controller))?'active':''}">
 		 <a	href="#" title="${g.message(code:'default.observation.label')}" class="dropdown-toggle" data-toggle="dropdown">
-		 		<g:message code="default.observation.label" />
 		 		<span title="${g.message(code:'created.today')}" class="statsTicker obvUpdateCount"> </span>
+		 		<g:message code="default.observation.label" />
 		 		<b class="caret"></b>
 		  </a>
             <ul class="dropdown-menu mega-menu">
@@ -78,8 +78,8 @@
 		<li	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}">
 			<a href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
                title="${g.message(code:'button.documents')}">
-               <g:message code="button.documents" />
                <span title="${g.message(code:'updated.today')}" class="statsTicker docUpdateCount"> </span>
+               <g:message code="button.documents" />
                </a>
          </li>	
           <li class="dropdown" > 
@@ -136,13 +136,20 @@
             
           </li>
           <li class=" ${(params.controller == 'discussion')?'active':''}" style="margin-left: 45px;"><a
-                                            href="${uGroup.createLink("controller":"discussion", "action":"list", 'userGroup':userGroupInstance)}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
+                                            href="${uGroup.createLink("controller":"discussion", "action":"list", 'userGroup':userGroupInstance)}" title="${g.message(code:'button.discussions')}">
+                                            <span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span>
+                                            <g:message code="button.discussions" />
+                                            </a>
 		  </li>
 
 		  <li class="dropdown ${(params.controller == 'group')?'active':''}">
 		  <a onmouseover="loadSuggestedGroups($(this).next('ul'), '${uGroup.createLink(controller:'userGroup', action:'suggestedGroups', 'userGroup':userGroupInstance)}',0,true);return false;" 
 		     onclick="loadSuggestedGroups($(this).next('ul'), '${uGroup.createLink(controller:'userGroup', action:'suggestedGroups', 'userGroup':userGroupInstance)}',0,true);return false;"
-                                            href="#" title="${g.message(code:'default.groups.label')}" class="dropdown-toggle" data-toggle="dropdown" ><g:message code="default.groups.label" /><span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span><b class="caret"></b></a>
+                                            href="#" title="${g.message(code:'default.groups.label')}" class="dropdown-toggle" data-toggle="dropdown" >
+                                            
+                                            <span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span>
+                                            <g:message code="default.groups.label" />
+                                            <b class="caret"></b></a>
           
             <ul class="dropdown-menu mega-menu pull-right groupMenu">
               

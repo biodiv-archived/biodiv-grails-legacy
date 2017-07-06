@@ -215,6 +215,7 @@ class UrlMappings {
                 action = "index"
             }
 
+            "/$webaddress/oauth/${provider}/${action}"(controller: 'oauth')
 
 
             "/$webaddress/group/$action/$id?" {

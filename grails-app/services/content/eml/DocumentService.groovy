@@ -446,6 +446,14 @@ println queryParts.queryParams
 				filterQuery += " and userGroup=:userGroup "
 			//}
 		}
+        
+        if(params.notInUserGroup) {
+            log.debug "Filtering from notInUsergourp : ${params.userGroup}"
+			query += " join document.userGroups userGroup "
+			countQuery += " join document.userGroups userGroup "
+            filterQuery += " and userGroup is null "
+            queryParams['userGroupId'] = Long.parseLong(params.notInUserGroup)
+        }
 		
 		if(params.taxon) {
 			def taxon = TaxonomyDefinition.read(params.taxon);

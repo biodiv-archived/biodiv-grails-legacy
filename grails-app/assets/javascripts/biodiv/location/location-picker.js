@@ -5,7 +5,7 @@ function update_geotagged_images_list_for_bulkUpload(geotaggedImages, ele){
     });
 }
 
-function loadMapInput(geotaggedImages) {
+function loadMapInput(geotaggedImages=undefined) {
     //$(".address .add-on").trigger("click"); 
     var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
@@ -56,7 +56,6 @@ function loadMapInput(geotaggedImages) {
         $('.lastTopology').click(function() {
             var map_class = $(this).closest(".map_class");
             var locationPicker1 =  $(map_class).data('locationpicker');
-            console.log('using last topology');
             $(this).parent().parent().find('input.areas').val($(this).data('lasttopology'));
             $(this).parent().parent().find('input.placeName').val($(this).data('lastplacename'));
             //me.initArea();
@@ -344,7 +343,6 @@ function useTitle(obj){
             var me = this;
             //if marker is not in allowed bounds return;
             if(!me.allowedBounds.contains(latlng)) {
-                console.log(me.$ele);
                 me.$ele.next('.alert').html('Location is outside allowed bounds').show();      
                 return true;
             } else if(me.boundsPolygon != undefined) {
@@ -793,12 +791,14 @@ function useTitle(obj){
                             
                             $.getJSON( window.params.locationsUrl, request, function( data, status, xhr ) {
                                 $.each(data, function(index, item) {
+                                    if(item.location[1] != undefined) {
                                     r.push({
                                         label: item.location[0]+' ('+item.location[1]+')',
                                         value: item.location[0],
                                         topology:item.topology,
                                         category:item.category
-                                        })
+                                        });
+                                    }
                                 })
                                 response(r);
                             });
@@ -812,7 +812,9 @@ function useTitle(obj){
                             me.mapLocationPicker.drawArea(ui.item.topology, true, true, true);
                             me.$ele.closest(".map_class").find('input.areas').val(ui.item.topology);
                         } else {
-                            me.mapLocationPicker.addSearchMarker({lat:ui.item.latitude, lng:ui.item.longitude}, {label:ui.item.label, draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+                            if(ui.item.latitude && ui.item.longitude) {
+                                me.mapLocationPicker.addSearchMarker({lat:ui.item.latitude, lng:ui.item.longitude}, {label:ui.item.label, draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+                            }
                         }
                     },
 
@@ -966,7 +968,6 @@ function useTitle(obj){
 }(window.jQuery)); 
 
 $(document).ready(function() { 
-    console.log('location-picker start'); 
   $('.placeName').attr('placeholder', $(".placeName").attr('rel')); 
 
 //alert($(".placename").attr('rel'));
@@ -991,6 +992,5 @@ $(document).ready(function() {
 
   });
 
-  console.log('location-picker end'); 
 });
 
