@@ -190,7 +190,7 @@ class LoginController {
 		}
 		
         if (springSecurityService.isAjax(request)) {
-			render([error: msg] as JSON)
+			render([success:false, msg:msg] as JSON)
 		}
 		else {
 			flash.error = msg
@@ -203,7 +203,19 @@ class LoginController {
 	 * The Ajax success redirect url.
 	 */
 	def ajaxSuccess = {
-		render([success: true, username: springSecurityService.authentication.name] as JSON)
+/*        def requestCache = new HttpSessionRequestCache();
+        println request;
+        def defaultSavedRequest = requestCache.getRequest(request, response);
+        log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
+        def redirectUrl = '';
+        try {
+            if(defaultSavedRequest) {
+                redirectUrl = defaultSavedRequest.getRedirectUrl();
+            } 
+        } finally {
+            requestCache.removeRequest request, response
+        }
+*/		render([success: true, username: springSecurityService.authentication.name, redirectUrl:redirectUrl] as JSON)
 	}
 
 	/**

@@ -7,7 +7,7 @@
 	<div class="openid-loginbox super-section">
 
         <div>
-    	<auth:loginForm model="['isSubGroup':(userGroupInstance && userGroupInstance.domainName)]"/>
+    	<auth:loginForm model="['isSubGroup':false]"/>
         </div>
 	</div>
 </body>

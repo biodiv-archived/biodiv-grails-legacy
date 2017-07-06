@@ -98,8 +98,8 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
 <VirtualHost *:80>
     ProxyRequests Off
 
-    ServerName assambiodiversity.localhost.in
-    ServerAlias www.assambiodiversity.localhost.in
+    ServerName assambiodiversity.localhost.indiabiodiversity.org
+    ServerAlias www.assambiodiversity.localhost.indiabiodiversity.org
     DirectoryIndex index.php index.html index.html index.htm index.shtml
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
     
@@ -121,8 +121,8 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
     RewriteRule ^(.*)$ $1 [QSA,L]
 
     RewriteCond %{REQUEST_URI} ^/biodiv/(assets|static|plugins|data|bootstrap|js|css|j_spring_security_check|j_spring_openid_security_check|images|j_spring_security_logout|observation/upload_resource|comment|newsletter|edit|emailConfirmation|jcaptcha|ck|biodivofm|resource|authAjax).*
-    RewriteRule ^/biodiv(.*)$ http://assambiodiversity.localhost.in:8080/biodiv$1 [P]
-    ProxyPassReverse /biodiv http://assambiodiversity.localhost.in:8080/biodiv
+    RewriteRule ^/biodiv(.*)$ http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv$1 [P]
+    ProxyPassReverse /biodiv http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv
 
     RewriteCond %{REQUEST_URI} ^/biodiv/group/assam_biodiversity_portal
     RewriteRule ^/biodiv/group/assam_biodiversity_portal(.*)$ $1 [R=301]
@@ -135,33 +135,15 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
     ProxyPassReverse / http://localhost:8080/biodiv
 
 
-    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|moderators|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck|biodivofm|chart|UFile|project|rateable|rating|document|direction|data|biodivAdmin|recommendation|action).*
-    RewriteRule ^(.*)$ http://assambiodiversity.localhost.in:8080/biodiv/group/assam_biodiversity_portal$1 [P]
-    ProxyPassReverse / http://assambiodiversity.localhost.in:8080/biodiv/group/assam_biodiversity_portal
+    RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|moderators|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck|biodivofm|chart|UFile|project|rateable|rating|document|direction|data|biodivAdmin|recommendation|action|oauth).*
+    RewriteRule ^(.*)$ http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv/group/assam_biodiversity_portal$1 [P]
+    ProxyPassReverse / http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv/group/assam_biodiversity_portal
 
 
-RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pages|login|logout|register|biodiv|geoserver|sites|about|openId))
+RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pages|login|logout|register|biodiv|geoserver|sites|about|openId|oauth))
     RewriteRule ^(.*)$ $1?userGroup=assam_biodiversity_portal [QSA,L]
 
     RewriteCond %{REQUEST_URI} ^/user/login
     RewriteRule ^(.*)$ $1 [QSA,L]
 </VirtualHost>
-
-<VirtualHost *:80>
-    ProxyRequests Off
-    ServerName thewesternghats.localhost.in
-    ServerAlias www.thewesternghats.localhost.in
-    DirectoryIndex index.php index.html index.html index.htm index.shtml
-    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
-
-    DocumentRoot /var/www
-	
-    RewriteEngine on
-
-    RewriteCond %{REQUEST_URI} ^/
-    RewriteRule /(.*) http://thewesternghats.localhost.indiabiodiversity.org/$1 [L,R=301]
-
-
-</VirtualHost>
-
 

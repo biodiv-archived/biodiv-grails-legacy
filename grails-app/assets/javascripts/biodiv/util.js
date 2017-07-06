@@ -143,7 +143,7 @@ function loadGoogleMapsAPI(mapCanvasEle, callback) {
                     //new google.maps.Map(mapCanvasEle, {});
                     callback();
                 }, 
-                other_params: "key=AIzaSyDX0oT5ZOwZhoB2S5AfW81D7WVAjjCNciU"
+                other_params: 'key='+window.params.login.googleApiKey
             });
         }
     //}

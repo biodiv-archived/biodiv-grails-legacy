@@ -13,7 +13,7 @@ function cancelLogin() {
 
 function updateLoginInfo(){
     $('#ajaxLogin').modal('hide');
-    $('#loginMessage').html('').removeClass().hide();
+    $('.loginMessage').html('').removeClass().hide();
     reloadLoginInfo();
 }
 
@@ -68,13 +68,13 @@ var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
         }
         updateLoginInfo()
     } else if(json.error && json.status === 401) {
-        $('#loginMessage').html("Resending previous request").removeClass().addClass('alter alert-info').show();
+        $('.loginMessage').html("Resending previous request").removeClass().addClass('alter alert-info').show();
         ajaxLoginErrorCallbackFunction(json);		
         //updateLoginInfo()                
     } else if (json.error || json.status == 'error') {
-        $('#loginMessage').html(json.error).removeClass().addClass('alter alert-error').show();
+        $('.loginMessage').html(json.error).removeClass().addClass('alter alert-error').show();
     } else {
-        $('#loginMessage').html(json).removeClass().addClass('alter alert-info').show();
+        $('.loginMessage').html(json).removeClass().addClass('alter alert-info').show();
     }
 }
 
@@ -83,7 +83,6 @@ var getCookies = function(){
     var cookies = {};
     for (var i=0; i<pairs.length; i++){
         var pair = pairs[i].split("=");
-        console.log(pair);
         cookies[pair[0].trim()] = unescape(pair[1]);
     }
     return cookies;
@@ -106,25 +105,23 @@ function callAuthSuccessUrl(url, p) {
         method:'POST',
         data:p,
         success: function(data, statusText, xhr) {
-            console.log(data);
             if(data.success) {
                 window.top.postMessage( JSON.stringify({signin: 'success', 'cookies':getCookies(), 'isAjax':window.isAjax, 'data':data, 'statusText':statusText}), '*' );
                 ajaxLoginSuccessHandler(data, statusText, xhr);
             } else {
-                window.top.postMessage( JSON.stringify({signin: 'error', 'error':xhr.responseText, 'isAjax':window.isAjax}), '*' );
-                $('#loginMessage').html(data.msg).removeClass().addClass('alter alert-error').show();
+                window.top.postMessage( JSON.stringify({signin: 'error', 'error':data.msg, 'isAjax':window.isAjax}), '*' );
+                $('.loginMessage').html(data.msg).removeClass().addClass('alter alert-error').show();
             }
         },  error: function(xhr, ajaxOptions, thrownError) {
                 window.top.postMessage( JSON.stringify({signin: 'error', 'error':xhr.responseText}), '*' );
-                $('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
+                $('.loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
         }
     });
 }
 
 function closeHandler() {
-    $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
+    $('.loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
     var authParams = window.mynewparams;
-    console.log(authParams);
     $.ajax({
         url:  window.params.login.springOpenIdSecurityUrl,
         method: "POST",
@@ -135,7 +132,7 @@ function closeHandler() {
         },
         error: function(xhr, ajaxOptions, thrownError) {
             window.top.postMessage( JSON.stringify({signin: 'error', 'error':xhr.responseText, 'isAjax':window.isAjax}), '*' );
-            $('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
+            $('.loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
         }
     });
 };
@@ -153,7 +150,7 @@ $(document).ready(function() {
                 if (response.status == 'connected') {
                     $.cookie("fb_login", "true", { path: '/', domain:"."+window.params.login.ibpServerCookieDomain});
                     if($(clickedObject).hasClass('ajaxForm')) {
-                        $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
+                        $('.loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
                         var p = {};
                         p['uid'] = response.authResponse.userID;
                         //p['spring-security-redirect'] = '${targetUrl}'
@@ -169,6 +166,52 @@ $(document).ready(function() {
         });
     });
     
+   $('.openid-loginbox form.isSubGroup').on('submit', function(e) {
+       $('body').addClass('busy');
+       e.stopPropagation();
+       var isAjax = $("#ajaxLogin").is(':visible'); 
+       loadBiodivLoginIframe(function() {
+           var iframe = document.getElementsByName("biodiv_iframe")[0];
+           if(iframe) {
+               var iframeWindow = (iframe.contentWindow || iframe.contentDocument);
+               var username = isAjax ? $($('.isSubGroup input[name="j_username"]')[0]).val() : $($('.isSubGroup input[name="j_username"]')[1]).val()
+               var password = isAjax ? $($('.isSubGroup input[name="j_password"]')[0]).val() : $($('.isSubGroup input[name="j_password"]')[1]).val()
+               iframeWindow.postMessage(JSON.stringify({'regular_login':'true', 'j_username':username,'j_password':password, isAjax:isAjax}), '*');
+           }
+       });
+       return false;
+   });
+
+   $('.isSubGroup .fbJustConnect, .isSubGroup .googleConnect, .isSubGroup .yahooConnect' ).click(function(event) {
+       $('body').addClass('busy');
+       event.stopPropagation();
+       var isAjax = $("#ajaxLogin").is(':visible'); 
+       loadBiodivLoginIframe(function() {
+           var iframe = document.getElementsByName("biodiv_iframe")[0];
+           if(iframe) {
+               var iframeWindow = (iframe.contentWindow || iframe.contentDocument);
+               var className = event.currentTarget.className.split(' ')[0]+'_login';
+               iframeWindow.postMessage(JSON.stringify({[className]:'true', 'isAjax':isAjax}), '*');
+           }
+       });
+       return false;
+   });
+
+   $('#logout.isSubGroup').on('click', function() {
+       $('body').addClass('busy');
+       event.stopPropagation();
+       var isAjax = $("#ajaxLogin").is(':visible'); 
+       loadBiodivLoginIframe(function() {
+           var iframe = document.getElementsByName("biodiv_iframe")[0];
+           if(iframe) {
+               var iframeWindow = (iframe.contentWindow || iframe.contentDocument);
+               iframeWindow.postMessage(JSON.stringify({logout:'true', 'isAjax':isAjax}), '*');
+           }
+       }, true);
+       return false;
+
+   });
+
 
 }); 
 
@@ -291,12 +334,10 @@ $(document).ready(function() {
 
     //https://developers.google.com/api-client-library/javascript/start/start-js#how-it-looks-in-javascript
     function handleAuthResult(authResult) {
-        console.log(authResult);
         if (authResult && !authResult.error) {
             $('.loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
             delete authResult['g-oauth-window'];
             var authParams = {'response': JSON.stringify(authResult).replace(/:/g,' : ')};
-            console.log( window.params.login.googleOAuthSuccessUrl);
             callAuthSuccessUrl( window.params.login.googleOAuthSuccessUrl, authParams);
         } else {
             //authorizeButton.onclick = handleAuthClick;
@@ -324,5 +365,4 @@ function loadBiodivLoginIframe(callback, logout=false) {
     } else {
         callback();
     }
-
 }

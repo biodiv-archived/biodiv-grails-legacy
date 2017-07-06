@@ -56,7 +56,6 @@ function loadMapInput(geotaggedImages) {
         $('.lastTopology').click(function() {
             var map_class = $(this).closest(".map_class");
             var locationPicker1 =  $(map_class).data('locationpicker');
-            console.log('using last topology');
             $(this).parent().parent().find('input.areas').val($(this).data('lasttopology'));
             $(this).parent().parent().find('input.placeName').val($(this).data('lastplacename'));
             //me.initArea();
@@ -344,7 +343,6 @@ function useTitle(obj){
             var me = this;
             //if marker is not in allowed bounds return;
             if(!me.allowedBounds.contains(latlng)) {
-                console.log(me.$ele);
                 me.$ele.next('.alert').html('Location is outside allowed bounds').show();      
                 return true;
             } else if(me.boundsPolygon != undefined) {
@@ -966,7 +964,6 @@ function useTitle(obj){
 }(window.jQuery)); 
 
 $(document).ready(function() { 
-    console.log('location-picker start'); 
   $('.placeName').attr('placeholder', $(".placeName").attr('rel')); 
 
 //alert($(".placename").attr('rel'));
@@ -991,6 +988,5 @@ $(document).ready(function() {
 
   });
 
-  console.log('location-picker end'); 
 });
 
