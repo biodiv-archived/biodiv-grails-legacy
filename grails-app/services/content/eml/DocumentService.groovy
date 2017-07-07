@@ -592,8 +592,14 @@ println queryParts.queryParams
 
             if(m['file path'].trim() != "" || m['externalurl'].trim() != '' ){
 
-                uploadLinkDoc(m, resultObv,params)
-                i++
+                def tags = (m['tags'] && (m['tags'].trim() != "")) ? m['tags'].trim().split(",").collect{it.trim()} : new ArrayList();
+                m['tags'] = tags;
+
+                def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
+                m['userGroupsList'] = userGroupIds.join(',');
+
+                uploadLinkDoc(m, resultObv,params);
+                i++;
                 if(i > BATCH_SIZE){
                     utilsService.cleanUpGorm(true)
                     def obvs = resultObv.collect { Document.read(it) }

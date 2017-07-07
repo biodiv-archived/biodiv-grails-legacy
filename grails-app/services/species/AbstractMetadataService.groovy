@@ -183,7 +183,7 @@ class AbstractMetadataService extends AbstractObjectService {
 
     def setAssociations(instance, params, sendMail) {
 
-        def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
+        def tags = (params.tags != null) ? ((params.tags instanceof List) ? params.tags : Arrays.asList(params.tags)) : new ArrayList();
         instance.setTags(tags)
 
         if(params.groupsWithSharingNotAllowed) {
