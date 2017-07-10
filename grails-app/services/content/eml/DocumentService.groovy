@@ -598,7 +598,7 @@ println queryParts.queryParams
                 def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
                 m['userGroupsList'] = userGroupIds.join(',');
 
-                uploadLinkDoc(m, resultObv,params);
+                uploadLinkDoc(m, resultObv,params, false);
                 i++;
                 if(i > BATCH_SIZE){
                     utilsService.cleanUpGorm(true)
@@ -692,7 +692,7 @@ println queryParts.queryParams
         }
     }
 
-    private uploadLinkDoc(Map m, resultObv,params){
+    private uploadLinkDoc(Map m, resultObv,params, boolean sendMail=true){
         Document document = new Document()
         println "========================================================="
         println m
@@ -746,7 +746,7 @@ println queryParts.queryParams
         //		if(document.latitude && document.longitude) {
         //			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
         //		}
-        saveDoc(document, m)
+        saveDoc(document, m, sendMail);
         runCurrentDocuments(document,m)
 
         if(document.id){
