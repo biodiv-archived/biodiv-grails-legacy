@@ -2559,15 +2559,18 @@ class NamelistService extends AbstractObjectService {
 	
 	
 	private moveRecoAndObv(oldName, newName){
-		def newReco = Recommendation.findByTaxonConcept(newName)
-		def reco = Recommendation.findByTaxonConcept(oldName)
-		if(reco){
+        println "Moving ${oldName} to ${newName}";
+		def newReco = newName ? Recommendation.findByTaxonConcept(newName) : null;
+		def reco = oldName ? Recommendation.findByTaxonConcept(oldName) : null;
+		if(reco && newReco) {
 			RecommendationVote.findAllByRecommendationOrCommonNameReco(reco, reco).each { r ->
 				println " saving reco vote  " + r
 				if(r.recommendation == reco){
+                    println "Setting recommendation to ${newReco}" 
 					r.recommendation = newReco
 				}
 				if(r.commonNameReco == reco){
+                    println "Setting commonName reco to ${newReco}"
 					r.commonNameReco = newReco
 				}
 				if(!r.save(flush:true)){
@@ -2575,6 +2578,7 @@ class NamelistService extends AbstractObjectService {
 				}
 			}
 			Observation.findAllByMaxVotedReco(reco).each { obv ->
+                println "Setting obv ${obv} maxVoted to ${newReco}"
 				obv.maxVotedReco = newReco
 				if(!obv.save(flush:true)){
 					obv.errors.allErrors.each { log.error it }
@@ -2583,7 +2587,15 @@ class NamelistService extends AbstractObjectService {
 			}
 			println "========= deleting reco " + reco
 			reco.delete(flush:true)
-		}
+		} else if(reco && !newReco) {
+            //new Reco null means deleting oldName ... removing taxonid link onto reco.
+            println "Removing taxon link on reco"
+            reco.taxonConcept = null;
+            reco.acceptedName = null;
+            if(!reco.save(flush:true)){
+					reco.errors.allErrors.each { log.error it }
+			}
+        }
 	}
 	
 	private moveOtherNamesReference(oldName, newName){

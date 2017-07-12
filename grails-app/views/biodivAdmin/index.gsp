@@ -22,8 +22,8 @@
             <div>
                 <h5><g:message code="link.recommendations" /></h5>
                 <ul>
-                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadNames')}"> <g:message code="biodivadmin.index.sync.reco.names" /></a></li>
-                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadNamesIndex')}"> <g:message code="biodivadmin.index.recreate.names.index" /></a></li>
+                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadNames')}"> <g:message code="biodivadmin.index.sync.reco.names" /></a>Sync names from taxonomy list into recommendation table</li>
+                    <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadNamesIndex')}"> <g:message code="biodivadmin.index.recreate.names.index" /></a>Sync names from recommendation table into autocomplete tree</li>
                 </ul> 
             </div>
 
