@@ -124,9 +124,9 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
     RewriteRule ^/biodiv(.*)$ http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv$1 [P]
     ProxyPassReverse /biodiv http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv
 
-    RewriteCond %{REQUEST_URI} ^/biodiv/group/assam_biodiversity_portal
-    RewriteRule ^/biodiv/group/assam_biodiversity_portal(.*)$ $1 [R=301]
-    ProxyPassReverse / http://localhost:8080/biodiv/group/assam_biodiversity_portal
+    RewriteCond %{REQUEST_URI} ^/biodiv/group/assam_biodiversity
+    RewriteRule ^/biodiv/group/assam_biodiversity(.*)$ $1 [R=301]
+    ProxyPassReverse / http://localhost:8080/biodiv/group/assam_biodiversity
 
     RewriteRule (^(/biodiv/(logo$|observations|newsletters|group-themes|users|userGroups|img|images|content|datasources))) - [L]
 	
@@ -136,12 +136,12 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
 
 
     RewriteCond %{REQUEST_URI} ^/(species|observation|activity|activityFeed|SUser|user|page|pages|login|logout|register|about|requestMembership|joinUs|leaveUs|inviteMembers|show|newsletter|edit|update|delete|founders|user|moderators|terms|upload_resource|group|emailConfirmation|settings|search|checklist|comment|openId|ck|biodivofm|chart|UFile|project|rateable|rating|document|direction|data|biodivAdmin|recommendation|action|oauth).*
-    RewriteRule ^(.*)$ http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv/group/assam_biodiversity_portal$1 [P]
-    ProxyPassReverse / http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv/group/assam_biodiversity_portal
+    RewriteRule ^(.*)$ http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv/group/assam_biodiversity$1 [P]
+    ProxyPassReverse / http://assambiodiversity.localhost.indiabiodiversity.org:8080/biodiv/group/assam_biodiversity
 
 
 RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pages|login|logout|register|biodiv|geoserver|sites|about|openId|oauth))
-    RewriteRule ^(.*)$ $1?userGroup=assam_biodiversity_portal [QSA,L]
+    RewriteRule ^(.*)$ $1?userGroup=assam_biodiversity [QSA,L]
 
     RewriteCond %{REQUEST_URI} ^/user/login
     RewriteRule ^(.*)$ $1 [QSA,L]

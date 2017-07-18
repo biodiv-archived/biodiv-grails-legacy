@@ -21,7 +21,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 
         <g:set var="domain" value="${Utils.getDomain(request)}"/>
         <script src="https://www.google.com/jsapi?key=${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.apikey}" type="text/javascript"></script>
-        <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+        <script src="https://code.jquery.com/jquery-migrate-1.2.1.js"></script>
         <script src="https://apis.google.com/js/auth.js" type="text/javascript">
         </script>
 
