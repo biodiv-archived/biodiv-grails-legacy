@@ -147,7 +147,6 @@
 		     onclick="loadSuggestedGroups($(this).next('ul'), '${uGroup.createLink(controller:'userGroup', action:'suggestedGroups', 'userGroup':userGroupInstance)}',0,true);return false;"
                                             href="#" title="${g.message(code:'default.groups.label')}" class="dropdown-toggle" data-toggle="dropdown" >
                                             
-                                            <span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span>
                                             <g:message code="default.groups.label" />
                                             <b class="caret"></b></a>
           

@@ -1622,7 +1622,7 @@ class UserGroupService {
     ///////////////////////////////// Filter Rules specific //////////////////////////////
     def refreshPostingsOnFilterRules(params) {
         UserGroup ug = utilsService.getUserGroup(params);
-
+        if(ug) {
         List filterRules = ug.getFilterRules();
         if(filterRules) {
             String filterObjController = ""
@@ -1665,6 +1665,10 @@ class UserGroupService {
             log.debug "Posting observations with filterUrl ${filterUrl}";
             Map postResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'post', 'filterUrl':filterUrl, 'selectionType':'selectAll'], false); 
             println "REFRESH COMPLETE with result ${postResult}";
+            return postResult;
+        }
+        } else {
+            log.error "CANT FIND USER GROUP";
         }
     }
 }
