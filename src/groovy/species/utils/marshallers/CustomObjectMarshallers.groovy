@@ -238,15 +238,15 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(Trait) {
-            return ['id':it.id, 'name':it.name, 'description':it.description, 'createdOn':it.createdOn, 'source':it.source, 'icon':it.icon, 'ontologyUrl':it.ontologyUrl, 'field':it.field, 'taxon':it.taxon, 'traitTypes':it.traitTypes, 'dataTypes':it.dataTypes, 'units':it.units];
+            return ['id':it.id, 'name':it.name, 'description':it.description, 'createdOn':it.createdOn, 'source':it.source, 'icon':it.icon, 'ontologyUrl':it.ontologyUrl, 'field':it.field, 'taxon':it.taxon, 'traitTypes':it.traitTypes, 'dataTypes':it.dataTypes, 'units':it.units, values:it.values()];
         }
 
         JSON.registerObjectMarshaller(TraitValue) {
-            return ['value':it.value, 'description':it.description, 'icon':it.icon, 'source':it.source];
+            return ['id':it.id, 'value':it.value, 'description':it.description, 'icon':it.icon, 'source':it.source];
         }
         
         JSON.registerObjectMarshaller(Fact) {
-            return ['objectId':it.objectId, 'objectType':it.objectType, 'trait':it.trait, 'traitValue':it.traitValue, 'value':it.value, 'attribution':it.attribution, 'contributor':it.contributor, 'license':it.license, 'pageTaxon':it.pageTaxon];
+            return ['id':it.id, 'objectId':it.objectId, 'objectType':it.objectType, 'trait':it.trait, 'traitValue':it.traitValue, 'value':it.value, 'attribution':it.attribution, 'contributor':it.contributor, 'license':it.license, 'pageTaxon':it.pageTaxon];
         }
     }
     }

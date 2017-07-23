@@ -1474,7 +1474,7 @@ class ObservationService extends AbstractMetadataService {
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification))
                 if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
                 queryParams['classification'] = classification.id 
                 activeFilters['classification'] = classification.id
@@ -1517,7 +1517,7 @@ class ObservationService extends AbstractMetadataService {
                 query += taxonQuery;
            }
             filterQuery += traitQuery['filterQuery'];
-            orderQuery += traitQuery['orderQuery'];            
+            orderByClause += traitQuery['orderQuery'];            
             def classification;
             if(params.classification)
                 classification = Classification.read(Long.parseLong(params.classification));
