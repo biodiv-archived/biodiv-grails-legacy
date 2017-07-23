@@ -356,11 +356,7 @@
             </script>   
             <asset:script>
             $(document).ready(function() {
-                var uploadResource = new $.fn.components.UploadResource($('#uploadSpeciesImagesForm'), {
-                    POLICY : "${policy}",  
-                    SIGNATURE :"${signature}"       
-                });
-
+                var uploadResource = new $.fn.components.UploadResource($('#uploadSpeciesImagesForm'));
                 $('.filePicker').data('uploadResource', uploadResource);
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
