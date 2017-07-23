@@ -373,7 +373,7 @@ function createResources(start, end, w, count) {
                     console.log('each');
                     console.log(JSON.stringify(this));
                     if(e.contentType == 'videoUrl') {
-                        $('.videoUrl').val(JSON.stringify(this).replace('"',''));
+                        $('.videoUrl').val(JSON.stringify(this).replace(new RegExp('"', 'g'), ''));
                     } else {
                         $('<input>').attr({
                             type: 'hidden',
