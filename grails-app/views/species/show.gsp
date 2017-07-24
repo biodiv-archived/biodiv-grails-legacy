@@ -356,8 +356,7 @@
             </script>   
             <asset:script>
             $(document).ready(function() {
-                var uploadResource = new $.fn.components.UploadResource($('#uploadSpeciesImagesForm'));
-                $('.filePicker').data('uploadResource', uploadResource);
+                var uploadResource; 
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");

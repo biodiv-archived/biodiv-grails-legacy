@@ -220,6 +220,7 @@ $(document).ready(function() {
         uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
         uploadResource.POLICY = $("input[name='policy']").val();
         uploadResource.SIGNATURE = $("input[name='signature']").val();
+        $('.filePicker').data('uploadResource', uploadResource);
         $(".speciesImage-wrapper").toggle();
         $('html, body').animate({
             scrollTop: $(".speciesImage-wrapper").offset().top
@@ -269,6 +270,7 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
                 uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
                 uploadResource.POLICY = $("input[name='policy']").val();
                 uploadResource.SIGNATURE = $("input[name='signature']").val();
+                $('.filePicker').data('uploadResource', uploadResource);
                 $("input[name='speciesFieldId']").val(spFieldId);
             }
         }, error: function(xhr, status, error) {
