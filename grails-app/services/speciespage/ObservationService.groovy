@@ -1462,27 +1462,36 @@ class ObservationService extends AbstractMetadataService {
         }
 		
         if(params.taxon) {
-            def taxon = TaxonomyDefinition.read(params.taxon.toLong());
-            if(taxon){
-                queryParams['taxon'] = taxon.id
-                activeFilters['taxon'] = taxon.id
-                taxonQuery = recoQuery + " join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id "
-                query += taxonQuery;
+            boolean isAdded = false;
+            params.taxon.split(',').each { taxonId ->
+            def taxon = TaxonomyDefinition.read(taxonId.toLong());
+            if(taxon) {
+                if(!isAdded) {
+                    queryParams['taxon'] = taxon.id
+                    activeFilters['taxon'] = taxon.id
+                    taxonQuery = recoQuery + " join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id "
+                    query += taxonQuery;
 
-                //taxonQuery = " join recommendation reco on obv.max_voted_reco_id = reco.id  "+taxonQuery;
+                    //taxonQuery = " join recommendation reco on obv.max_voted_reco_id = reco.id  "+taxonQuery;
 
-                def classification;
-                if(params.classification)
-                    classification = Classification.read(Long.parseLong(params.classification))
-                if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                    def classification;
+                    if(params.classification)
+                        classification = Classification.read(Long.parseLong(params.classification))
+                    if(!classification)
+                        classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
-                queryParams['classification'] = classification.id 
-                activeFilters['classification'] = classification.id
- 
-                filterQuery += " and reg.classification_id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                    queryParams['classification'] = classification.id 
+                    activeFilters['classification'] = classification.id
+                    filterQuery += " and reg.classification_id = :classification and (";
+                    isAdded = true;
+                } else {
+                    filterQuery += ' or ';
+                }
+                filterQuery += " (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
             }
+            }
+            filterQuery += ")";
         }
 		
         if(params.dataset) {
