@@ -457,18 +457,18 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return "command.location.error"
         }
 
-        if(command.latitude == 0.0 || command.longitude == 0.0) {
+        if(command.latitude <= 0.0 || command.longitude <= 0.0) {
             return "command.latitude.error";
         }
     }
     static latitudeValidator = { double latitude, command ->
-        if (!command.latitude || command.latitude == 0.0) {
+        if (!command.latitude || command.latitude <= 0.0) {
                 return "command.latitude.error"
         }
     }
 
     static longitudeValidator = { double longitude, command ->
-        if (!command.longitude || command.longitude == 0.0) {
+        if (!command.longitude || command.longitude <= 0.0) {
             return "command.latitude.error"
         }
     }
