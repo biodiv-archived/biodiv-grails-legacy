@@ -67,24 +67,6 @@
 
 	$(".s2ui_hidden_button").hide();
 
-
-
-/*function oauth_login(app) {
-    var redirectUrl = 'http://localhost.indiabiodiversity.org/login/' + app.toLowerCase();
-    if (window.opener) {
-        window.location = redirectUrl;
-    } else {
-        var oAuthWndow = window.open(redirectUrl, "Biodiversity Portal", "width=800, height=600, top=100, left=300");
-        var interval = window.setInterval(function() {
-            console.log('sdfsdfdf');
-            if (oAuthWndow.location.href.indexOf('biodiv') != -1) {
-                oAuthWndow.close();
-                location.reload();
-            }
-        }, 1000);
-    }
-}*/
-
     var remember = $.cookie('remember');
 	//alert(remember);
     if (remember == 'true') 
@@ -120,4 +102,23 @@
         
   	});
 
+
+
 })(jQuery);
+
+/*function oauth_login(app) {
+    var redirectUrl = 'http://localhost.indiabiodiversity.org/login/' + app.toLowerCase();
+    if (window.opener) {
+        window.location = redirectUrl;
+    } else {
+        var oAuthWndow = window.open(redirectUrl, "Biodiversity Portal", "width=800, height=600, top=100, left=300");
+        var interval = window.setInterval(function() {
+            console.log('sdfsdfdf');
+            if (oAuthWndow.location.href.indexOf('biodiv') != -1) {
+                oAuthWndow.close();
+                location.reload();
+            }
+        }, 1000);
+    }
+}*/
+
