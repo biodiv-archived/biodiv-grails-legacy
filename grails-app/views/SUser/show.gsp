@@ -159,7 +159,6 @@ def contact_me_text=g.message(code:'button.contact.me')
                             </div>
                         </div>
 
-                <%--  <obv:identificationByEmail model="['source':'userProfileShow', 'requestObject':request]" />--%>
                 <div>
                     <div class="row-fluid userProfileSection">
 

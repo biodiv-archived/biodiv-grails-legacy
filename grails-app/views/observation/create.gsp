@@ -68,7 +68,7 @@
                             def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
                             %>
                             <div>
-                            	<obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
+                            	<obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?', webaddress:params.webaddress]"></obv:showMapInput>
                             </div>
                         </div>
                     </div>
@@ -188,6 +188,7 @@ $(document).ready(function(){
             }
       return false;
     });
+
 });
 
 function deleteObservation(){

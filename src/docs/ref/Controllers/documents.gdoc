@@ -16,7 +16,7 @@ h4. list
 * *Requests* :
 ** __Documents with a tag__
 {code}
-http://indiabiodiversity.localhost.org/api/document?tag=india
+http://indiabiodiversity.org/api/document?tag=india
 {code}
 
 * *Response* :
@@ -52,7 +52,7 @@ h4. show
 * *REST method* : GET
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/document/670
+http://indiabiodiversity.org/api/document/670
 {code}
 * *Response* :
 ** Successful response
@@ -124,7 +124,7 @@ h4. Save
 * *Permissions* : logged in user. needs X-Auth-Token header
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/document/save
+http://indiabiodiversity.org/api/document/save
 
 type:Report
 title:My title
@@ -213,7 +213,7 @@ habitat.1:267839
 }
 {code}
 
-http://indiabiodiversity.localhost.org/UFile/fileUpload?uploadDir=documents%2Fdocument-9501a16f-6470-4ec1-aa3b-051af9cc6b92&qqfile=_.+BITS+FD+Admission+-+2013_+Net+banking+Receipt+.pdf
+http://indiabiodiversity.org/UFile/fileUpload?uploadDir=documents%2Fdocument-9501a16f-6470-4ec1-aa3b-051af9cc6b92&qqfile=_.+BITS+FD+Admission+-+2013_+Net+banking+Receipt+.pdf
 
 uploadDir:documents/document-9501a16f-6470-4ec1-aa3b-051af9cc6b92
 qqfile:_. BITS FD Admission - 2013_ Net banking Receipt .pdf
@@ -228,7 +228,7 @@ h4. update
 * *Headers Required* : X-Auth-Token, Accept:application/json, text/json, X-AppKey
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/document/1
+http://indiabiodiversity.org/api/document/1
 {code}
 * *Response* : 
 ** Successful response
@@ -258,7 +258,7 @@ h4. delete
 * *REST Method* : DELETE
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/document/234/delete
+http://indiabiodiversity.org/api/document/234/delete
 {code}
 * *Response* :
 ** on success

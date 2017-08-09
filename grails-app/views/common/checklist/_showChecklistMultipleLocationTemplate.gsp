@@ -7,9 +7,9 @@
                 var markers = [];
                 var big_map;
                 var  nagpur_latlng, swRestriction, neRestriction, allowedBounds;
-  
+                var mapCanvasEle = document.getElementById("big_map_canvas"), 
                 $(document).ready(function() {
-                    loadGoogleMapsAPI(function() {
+                    loadGoogleMapsAPI(mapCanvasEle, function() {
                         initMap();
                     });
                 });
@@ -28,7 +28,7 @@
                     minZoom: 4,
                     maxZoom: 15
                   };
-                  big_map = new google.maps.Map(document.getElementById("big_map_canvas"), options);
+                  big_map = new google.maps.Map(mapCanvasEle,options);
 
                     var infowindow = new google.maps.InfoWindow({
                         content: 'InfoWindow',
@@ -139,6 +139,7 @@
         </div>        
 		<div class="map_wrapper">
 			<div id="big_map_canvas" style="height: 500px; width: 100%;"></div>
+            <div class="alert alert-danger hide" style="margin:0px;padding-left:3px;"></div>
 		</div>
 	</div>
 </div>

@@ -35,7 +35,7 @@ class UploadJob {
 
     static triggers = {
         println "==========================Setting trigger for UploadJob";
-        simple startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
+        simple name:'UploadJob', startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
     }
 
     def execute() {

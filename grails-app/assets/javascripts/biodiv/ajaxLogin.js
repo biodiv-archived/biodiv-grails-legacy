@@ -10,10 +10,10 @@
 				.ajaxSubmit(
 						{
 							type : 'POST',
-							target : '#loginMessage',
+							target : '.loginMessage',
 							dataType : 'json',
 							beforeSubmit : function(formData, jqForm, options) {
-								$('#loginMessage').html('Logging in ...')
+								$('.loginMessage').html('Logging in ...')
 										.removeClass().addClass(
 												'alter alert-info').show();
 								return true;
@@ -31,7 +31,7 @@
 												ajaxLoginErrorCallbackFunction();
 												ajaxLoginErrorCallbackFunction = undefined;
 											} else {
-												$('#loginMessage')
+												$('.loginMessage')
 														.html(xhr.responseText)
 														.removeClass()
 														.addClass(
@@ -43,22 +43,12 @@
 										});
 							}
 						});
-		event.preventDefault();
+		event.stopPropagation();
 		return false;
 	}
-
-	$('#ajaxLogin form').bind('submit', ajaxLoginFormHandler);
 	
-	$('.googleConnect').click(function(e) { 
-		//googleOpener.popup(450,500);
-        handleAuthClick(e);
-		return true; 
-	});
+    $('#ajaxLogin form.isParentGroup').on('submit', ajaxLoginFormHandler);
 	
-	$('.yahooConnect').click(function() { 
-		yahooOpener.popup(450,500);
-		return true; 
-	});
 	
 	$('#ajaxLogin').modal({
 		"show" : false,
@@ -72,35 +62,29 @@
                 }
 	})
 	
+	$('#ajaxLogin').on('show', function () {
+	});
+
 	$(".s2ui_hidden_button").hide();
 
-    //https://developers.google.com/api-client-library/javascript/start/start-js#how-it-looks-in-javascript
-    function handleAuthResult(authResult) {
-        console.log(authResult);
-        if (authResult && !authResult.error) {
-            $('#loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
-            var authParams = {'response': JSON.stringify(authResult).replace(/:/g,' : ')};
-            $.ajax({
-                url: window.params.login.googleOAuthSuccessUrl,
-                method:"POST",
-                data:authParams,
-                success: function(data, statusText, xhr) {
-                    ajaxLoginSuccessHandler(data, statusText, xhr);
-                },  error: function(xhr, ajaxOptions, thrownError) {
-                    $('#loginMessage').html(xhr.responseText).removeClass().addClass('alter alert-error').show();
-                }
-            });
 
-        } else {
-            //authorizeButton.onclick = handleAuthClick;
-            alert('Failed to connect to Google');
-        }
-    }
-    function handleAuthClick(event) {
-        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
-        return false;
-    }
+})(jQuery);
 
+/*function oauth_login(app) {
+    var redirectUrl = 'http://localhost.indiabiodiversity.org/login/' + app.toLowerCase();
+    if (window.opener) {
+        window.location = redirectUrl;
+    } else {
+        var oAuthWndow = window.open(redirectUrl, "Biodiversity Portal", "width=800, height=600, top=100, left=300");
+        var interval = window.setInterval(function() {
+            console.log('sdfsdfdf');
+            if (oAuthWndow.location.href.indexOf('biodiv') != -1) {
+                oAuthWndow.close();
+                location.reload();
+            }
+        }, 1000);
+    }
+}*/
 
     var remember = $.cookie('remember');
 	//alert(remember);

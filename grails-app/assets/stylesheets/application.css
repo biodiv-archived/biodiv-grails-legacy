@@ -13,7 +13,7 @@
 //leaflet
 *= require all/leaflet.css
 *= require ie/leaflet.ie.css
-*= require all/Leaflet.Coordinates-0.1.1.css
+*= require all/Leaflet.Coordinates-0.1.5.css
 *= require all/leaflet.label.css
 *= require all/L.Control.Locate.css
 *= require ie/L.Control.Locate.ie.css

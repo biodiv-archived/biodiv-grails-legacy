@@ -119,11 +119,6 @@ class ObservationController extends AbstractObjectController {
         def model;
         params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         model = runLastListQuery(params);
-        /*Map cacheEntries = sessionFactory.getStatistics()
-                .getSecondLevelCacheStatistics('species.groups.SpeciesGroup')
-                        .getEntries();
-*/
-
         model.userLanguage = utilsService.getCurrentLanguage(request);
         model.filters = traitService.getAllFilter(utilsService.getModuleFilters('observation'));
         model.queryParams.view = (params?.view && params?.view=='grid')?'grid':'list';
@@ -134,10 +129,6 @@ class ObservationController extends AbstractObjectController {
             model['obvListHtml'] =  g.render(template:"/common/observation/showObservationListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
             def tagsHtml = "";
-            if(model.showTags) {
-                //              def filteredTags = observationService.getTagsFromObservation(model.totalObservationInstanceList.collect{it[0]})
-                //              tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
-            }
             model.remove('observationInstanceList');
         }
         
@@ -1785,13 +1776,6 @@ class ObservationController extends AbstractObjectController {
         }
     }
 
-    /*def getRecommendationListJSON(LinkedHashMap result){
-        if(result){         
-            def test = ['result' : result];
-            return test; // as JSON;
-        }
-    }*/ 
-   
     @Secured(['ROLE_USER'])
     def bulkCreate(){
         def observationInstance = new Observation()
@@ -1856,10 +1840,6 @@ def filterChain() {
     render springSecurityFilterChain
 }
 
-    def filePickerSecurityCodes() {
-        utilsService.filePickerSecurityCodes();
-    }
-    
     @Secured(['ROLE_USER'])
     def updateCustomField(){
         log.debug params
@@ -1970,13 +1950,6 @@ private printCacheEntries(cache) {
             }
         }
     }
-/*    
-    boolean updateFact(){
-        println "updateFactParams--------"+params
-        def factUpdate = observationService.factUpdate(params);
-        return factUpdate;
-    }
-*/
 
     def customFields() {
         def model = [:];

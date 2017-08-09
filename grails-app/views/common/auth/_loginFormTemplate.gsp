@@ -4,17 +4,21 @@
 			<a href="${uGroup.createLink(controller:'login', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress) }"><g:message code="button.login" /></a> | 
 			<a href="${uGroup.createLink(controller:'register', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress) }"><g:message code="button.register" /></a> 
 		</legend>
-		<div class="control-group"
+		
+        <div class="loginMessage" class="alert alert-error" style="display:none"></div>
+		
+        <div class="control-group ${ajax?'ajax':''}"
 			style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>
 		<div class="control_group">
 			<auth:externalAuthProviders
-				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl, "ajax":ajax]' />
+				model='["openidIdentifier":openidIdentifier, "openIdPostUrl":openIdPostUrl, "ajax":ajax, "isSubGroup":isSubGroup]' />
 		</div>
-		<form action='${daoPostUrl}' method='POST' class="form-horizontal"
-			name='loginForm' id="${!ajax ? 'loginForm' : ''}">
+		<form id='loginForm' action='${daoPostUrl}' method='POST' class="form-horizontal ${isSubGroup?'isSubGroup':'isParentGroup'}"
+			name='loginForm'>
 			<div class="control-group"
 				style="clear: both; border-top: 1px solid #Eee; padding-top: 5px;"><g:message code="loginformtemplate.or" />,
-				<g:message code="loginformtemplate.login.user.account" />${controller}:</div>
+				<g:message code="loginformtemplate.login.user.account" />:</div>
+
 			<div class="control-group">
 				<label class="control-label" for="username"><g:message
 						code='spring.security.ui.login.username' /> </label>

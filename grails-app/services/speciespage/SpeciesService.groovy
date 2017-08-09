@@ -1431,6 +1431,7 @@ class SpeciesService extends AbstractObjectService  {
             //a species page with guid as taxon concept is considered as duplicate
             Species existingSpecies = converter.findDuplicateSpecies(speciesInstance);
             if(existingSpecies) {
+                log.debug "Found duplicate species : "+existingSpecies;
 				existingSpecies.clearBasicContent()
                 speciesInstance = existingSpecies;
             }
@@ -1748,8 +1749,15 @@ class SpeciesService extends AbstractObjectService  {
             queryParams['groupId']  = groupIds[0]
         }
         
-        if(params.trait){
-            Map traitQuery = getTraitQuery(params.trait);
+        if(params.trait) {
+            Map traitParams;
+            if(params.trait instanceof String) {
+                traitParams = getTraits(params.trait);
+                params.trait = traitParams;
+            } else {
+                traitParams = params.trait;
+            }
+            Map traitQuery = getTraitQuery(traitParams);
             println "************************"
             println traitQuery
             println "************************"
@@ -1759,7 +1767,7 @@ class SpeciesService extends AbstractObjectService  {
 
             orderQuery = "order by "+traitQuery['orderQuery']+(traitQuery['orderQuery']?" ":" ")+orderQuery.replace('order by','');
 
-            queryParams['trait'] = params.trait;
+            queryParams['trait'] = traitParams;
         }
 
         if(params.featureBy == "true" ) {
@@ -1864,8 +1872,8 @@ class SpeciesService extends AbstractObjectService  {
                     return
                 }
             }
-            queryParams['status'] = st;
-            activeFilters['status'] = st;
+            queryParams['status'] = st.value();
+            activeFilters['status'] = st.value();
             filterQuery += " and t.status=:status";
             countFilterQuery += " and t.status=:status";
         }

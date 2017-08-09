@@ -37,11 +37,12 @@ documentInstance = Document.read(documentInstance.id)
                         </div>
             </g:if>
             <g:else>
-                    <% def extension = "pdf" %>
-                    <g:if test="${extension.toUpperCase() == 'PDF' && (showPDFViewer != null)?showPDFViewer:true}">
+                <% def extension = "pdf" %>
+                <g:if test="${extension.toUpperCase() == 'PDF' && (showPDFViewer != null)?showPDFViewer:true}">
                     <% url = documentInstance?.externalUrl %>              
                     <iframe id="viewer" src = "${url}" width='612' height='400' allowfullscreen webkitallowfullscreen></iframe>                
-            </g:if>
+                </g:if>
+            </g:else>
 
             <div class="sidebar_section">
             <h5><g:message code="link.coverage.information" /></h5>
@@ -142,7 +143,6 @@ documentInstance = Document.read(documentInstance.id)
                 </g:if>
             </div>
             </div>
-            </g:else>
 
             <div class="sidebar_section">
                 <h5><g:message code="Metadata" /></h5>

@@ -13,38 +13,19 @@
 	margin-left: 140px;
 }
 
-.openid-loginbox .form-horizontal .controls input {
+.openid-loginbox .form-horizontal .controls input , .openid-loginbox .form-horizontal .controls select {
 	width: 290px;
 }
-.map_class {
-                position:relative;
-            }
-.map_canvas {
-    border-color: rgba(82,168,236,0.8) !important;
-    //position: absolute !important;
-    width: 103% !important;
-    display: block;
-    left: 0px;
-    z-index:10 !important;
-    height:360px !important;
+.openid-loginbox .form-horizontal .controls select {
+	width: 304px;
 }
 
-            .map_search {
-                position:inherit;btn:hover;
-                background-color: #cfede1;
-            }
-                        .propagateLocation .map_canvas{
-                width:99% !important;
-            }
-            .locationScale{display:none;
-            }
-            .latlng{display:none !important;} 
-        
-            select{width:100%  !important;}
-            .add-on{position:relative !important;margin-left:-28px !important;}
-            .location .help-inline ul {
-    				margin-left: 165px;
-				}
+.map_search {
+    background-color:transparent;
+}
+.latlng {
+    display:none !important;
+}
 </style>
 </head>
 
@@ -70,6 +51,8 @@
 					</div>
 				</g:if>
 				<g:else>
+
+			        <div class="loginMessage" class="alert alert-error" style="display:none"></div>
 
 					<div class="control-group"
 						style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>
@@ -158,17 +141,64 @@
 						</div>
 
 						<div
-							class="control-group ${hasErrors(bean: command, field: 'longitude', 'error')} ${hasErrors(bean: command, field: 'latitude', 'error')} ${hasErrors(bean: command, field: 'location', 'error')}">
+							class="control-group map_class ${hasErrors(bean: command, field: 'longitude', 'error')} ${hasErrors(bean: command, field: 'latitude', 'error')} ${hasErrors(bean: command, field: 'location', 'error')}">
 							<label class="control-label" for="location"><g:message
 									code='user.location.label' default='Location *' /> </label>
-							<div class="controls location" style="margin-left:auto;">
-								 <obv:showMapInput model="[commandInstance:command,observationInstance:obvInfoFeeder, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?']"></obv:showMapInput>
-								<g:hasErrors bean="${command}" field="location">
-									<div class="help-inline">
-										<g:renderErrors bean="${command}" field="location" />
-									</div>
-								</g:hasErrors>
+							<div class="controls location">
 
+
+
+    <div style="margin-left:0px;">
+
+        <div class="map_area" style="width:304px;">
+            <div class="map_search">
+                <div class="wrapperParent">
+                    <div class="address input-append control-group ${hasErrors(bean: command, field:location, 'error')} ${hasErrors(bean: command, field: location, 'error')} " style="z-index:2;margin-bottom:0px;">
+                        <input class="placeName" name="location" type="text" title="${g.message(code:'showmapinput.find.place')}"  class="input-large section-item" value="${command.location}" rel="${g.message(code:'default.search')}" style="width:260px;"/>
+
+                        <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>
+                        
+                            <g:hasErrors bean="${command}" field="location">
+                                <div class="help-inline">
+                                <g:renderErrors bean="${command}" field="location"/>
+                                </div>
+                            </g:hasErrors>
+                            <g:hasErrors bean="${command}" field="latitude">
+                                    <div class="help-inline">
+                                    <g:renderErrors bean="${command}" field="latitude" />
+                                    <g:renderErrors bean="${command}" field="longitude" />
+                                    </div>
+                                    </g:hasErrors>
+
+                        <div class='suggestions' class='dropdown'></div>
+                    </div>
+                    <div class="latlng ${hasErrors(bean: command, field:location, 'error')}" style="display:none;">
+                        <div class="input-prepend pull-left control-group ${hasErrors(bean: command, field: location, 'error')}">
+	                            <div class="input-prepend pull-left control-group">
+		                            <span class="add-on" style="vertical-align:middle;"><g:message code="default.lat.label" /></span>
+                                    <input class="degree_field latitude_field" type="text" name="latitude" value="${command.latitude}"/>
+                                </div>
+		                        <div class="input-prepend pull-left control-group">
+		                            <span class="add-on" style="vertical-align:middle;"><g:message code="default.long.label" /></span>
+                                    <input class="degree_field longitude_field" type="text" name="longitude" value="${command.longitude}"></input>
+                                    </div>
+                                    </div>
+
+                                    
+                    </div>
+
+                    <div class="map_canvas" style="display:none;">
+                        <center>
+                            <div class="spinner">
+                                <asset:image src="/all/spinner.gif" absolute="true" alt="${message(code:'spinner.alt',default:'Loading...')}"/>
+                            </div>
+                        </center>
+                    </div>
+                    <div class="alert alert-danger hide" style="margin:0px;padding-left:3px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 							</div>
 							</div>
 
@@ -177,10 +207,11 @@
 							<label class="control-label" for="sex"><g:message
 									code='user.sex.label' default='${g.message(code:"default.sex.label")}' /> </label>
 							<div class="controls">
-								 <g:select name="sexType" class="input-block-level" id="sexType"
+								 <g:select name="sexType" class="input-large" id="sexType"
                             placeholder="${g.message(code:'placeholder.sex.select')}"
                             from="${species.auth.SUser$SexType?.values()}"
                             keys="${species.auth.SUser$SexType?.values()*.value()}"
+                            value="${command.sexType}"
                             noSelection="${['':'Select One...']}"/>
 
 									
@@ -193,10 +224,11 @@
 							<label class="control-label" for="sex"><g:message
 									code='user.occupation.label' default='${g.message(code:"default.occupationtype.label")}' /> </label>
 							<div class="controls">
-								 <g:select name="occupationType" class="input-block-level" id="occupationType"
+								 <g:select name="occupationType" class="input-large" id="occupationType"
                             placeholder="${g.message(code:'placeholder.occupation.select')}"
                             from="${species.auth.SUser$OccupationType?.values()}"
                             keys="${species.auth.SUser$OccupationType?.values()*.value()}"
+                            value="${command.occupationType}"
                             noSelection="${['':'Select One...']}" />
 
 							</div>
@@ -206,10 +238,10 @@
 							<label class="control-label" for="sex"><g:message
 									code='user.institution.label' default='${g.message(code:"user.institution.label")}' /> </label>
 							<div class="controls">
-								 <g:select name="institutionType" class="input-block-level" id="institutionType"
+								 <g:select name="institutionType" class="input-large" id="institutionType"
                             placeholder="${g.message(code:'placeholder.institution.select')}"
                             from="${species.auth.SUser$InstitutionType?.values()}"
-                            
+                            value="${command.institutionType}"
                             noSelection="${['':'Select One...']}"/>
 
 							</div>
@@ -316,22 +348,5 @@
 			</fieldset>
 		</div>
 	</div>
-    <script type="text/javascript">
-    $(document).ready(function(){
-    	$('.placeName').attr('name', 'location');
-    	$('.userlocation').hide();
-    	});
-/*
-    var onRecaptchaSuccess = function(g_recaptcha_response) {
-    $('#g_recaptcha_response').val(g_recaptcha_response);
-    }
-    var onloadCallback = function() {
-    //    grecaptcha.render('html_element', <recaptcha:renderParameters successCallback='onRecaptchaSuccess' tabindex="2"/>);
-        grecaptcha.render('html_element', { 'sitekey': '${grailsApplication.config.recaptcha.publicKey}', 'callback': onRecaptchaSuccess, 'tabindex': '2'});
-    $('#g_recaptcha_response').val('');
-    };
-    */
-    </script>
-
 </body>
 </html>

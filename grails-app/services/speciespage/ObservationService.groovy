@@ -1002,9 +1002,9 @@ class ObservationService extends AbstractMetadataService {
         query += queryParts.filterQuery + queryParts.orderByClause
         //		}
 
-        log.debug "query : "+query;
-        log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
-        log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
+        //log.debug "query : "+query;
+        //log.debug "checklistCountQuery : "+queryParts.checklistCountQuery;
+        //log.debug "allObservationCountQuery : "+queryParts.allObservationCountQuery;
         //log.debug "distinctRecoQuery : "+queryParts.distinctRecoQuery;
         //log.debug "speciesGroupCountQuery : "+queryParts.speciesGroupCountQuery;
         //log.debug "speciesCountQuery : "+queryParts.speciesCountQuery;
@@ -1142,7 +1142,7 @@ class ObservationService extends AbstractMetadataService {
         def userGroupQuery = " ", tagQuery = '', featureQuery = '', nearByRelatedObvQuery = '', taxonQuery = '', traitQuery = '', recoQuery='';
         def filterQuery = " where obv.is_deleted = false "
  
-        if(!params.sort || params.sort == 'score') {
+        if(!params.sort || params.sort == 'score' || params.sort.toLowerCase() == 'lastrevised') {
             params.sort = "lastRevised"
         }
         def m = sessionFactory.getClassMetadata(Observation);
@@ -1184,7 +1184,7 @@ class ObservationService extends AbstractMetadataService {
                 //featureQuery = " join (select f.objectId, f.objectType from Featured f group by f.objectType, f.objectId) as feat"
               //  featureQuery = ", select distinct Featured.objectId from Featured where Featured.objectType = :featType as feat "
             } else {
-                featureQuery = ", Featured feat "
+                featureQuery = " join Featured feat on obv.id = feat.object_id "
             }
             query += featureQuery;
             //filterQuery += " and obv.featureCount > 0 "
@@ -1241,6 +1241,15 @@ class ObservationService extends AbstractMetadataService {
             queryParams['userGroupId'] = params.userGroup.id
             queryParams['userGroup'] = params.userGroup
         } 
+
+        if(params.notInUserGroup) {
+            log.debug "Filtering from notInUsergourp : ${params.userGroup}"
+            userGroupQuery = " left outer join user_group_observations  userGroup on userGroup.observation_id = obv.id  and userGroup.user_group_id = :userGroupId"
+            query += userGroupQuery
+            filterQuery += " and userGroup.user_group_id is null "
+            queryParams['userGroupId'] = Long.parseLong(params.notInUserGroup)
+
+        }
 
         if(params.tag){
             tagQuery = ",  TagLink tagLink, Tags tag "
@@ -1328,6 +1337,23 @@ class ObservationService extends AbstractMetadataService {
             //queryParams['boundGeometry'] = boundGeometry
             activeFilters["bounds"] = params.bounds
         }  
+
+        /*if(params.state) {
+            def sql =  Sql.newInstance(dataSource);
+            def t = sql.rows('select topology from state_topology where lower(name)=:state', [state:params.state.toLowerCase()]);
+            if(t) {                
+                params.topology = t[0].topology;
+                activeFilters["state"] = params.state;
+            }
+        }*/
+
+        if(params.topology) {        
+            if(params.topology.startsWith('ST_')) {
+                filterQuery += " and ST_WITHIN(obv.topology, "+params.topology+") "
+            } else {
+                filterQuery += " and ST_WITHIN(obv.topology, '"+params.topology+"') "
+            }
+        }
 
         if(params.type == 'nearBy' && params.lat && params.long) {
             String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
@@ -1436,27 +1462,36 @@ class ObservationService extends AbstractMetadataService {
         }
 		
         if(params.taxon) {
-            def taxon = TaxonomyDefinition.read(params.taxon.toLong());
-            if(taxon){
-                queryParams['taxon'] = taxon.id
-                activeFilters['taxon'] = taxon.id
-                taxonQuery = recoQuery + " join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id "
-                query += taxonQuery;
+            boolean isAdded = false;
+            params.taxon.split(',').each { taxonId ->
+            def taxon = TaxonomyDefinition.read(taxonId.toLong());
+            if(taxon) {
+                if(!isAdded) {
+                    queryParams['taxon'] = taxon.id
+                    activeFilters['taxon'] = taxon.id
+                    taxonQuery = recoQuery + " join taxonomy_definition t on reco.taxon_concept_id = t.id join taxonomy_registry reg on reg.taxon_definition_id = t.id "
+                    query += taxonQuery;
 
-                //taxonQuery = " join recommendation reco on obv.max_voted_reco_id = reco.id  "+taxonQuery;
+                    //taxonQuery = " join recommendation reco on obv.max_voted_reco_id = reco.id  "+taxonQuery;
 
-                def classification;
-                if(params.classification)
-                    classification = Classification.read(Long.parseLong(params.classification))
-                if(!classification)
-                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+                    def classification;
+                    if(params.classification)
+                        classification = Classification.read(Long.parseLong(params.classification))
+                    if(!classification)
+                        classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
-                queryParams['classification'] = classification.id 
-                activeFilters['classification'] = classification.id
- 
-                filterQuery += " and reg.classification_id = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
+                    queryParams['classification'] = classification.id 
+                    activeFilters['classification'] = classification.id
+                    filterQuery += " and reg.classification_id = :classification and (";
+                    isAdded = true;
+                } else {
+                    filterQuery += ' or ';
+                }
+                filterQuery += " (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!')";
 
             }
+            }
+            filterQuery += ")";
         }
 		
         if(params.dataset) {
@@ -1492,7 +1527,7 @@ class ObservationService extends AbstractMetadataService {
                 query += taxonQuery;
            }
             filterQuery += traitQuery['filterQuery'];
-            orderQuery += traitQuery['orderQuery'];            
+            orderByClause += traitQuery['orderQuery'];            
             def classification;
             if(params.classification)
                 classification = Classification.read(Long.parseLong(params.classification));
@@ -2323,9 +2358,9 @@ class ObservationService extends AbstractMetadataService {
             def reco = Recommendation.read(it[0]);
             if(params.downloadFrom == 'uniqueSpecies') {
                 //HACK: request not available as its from job scheduler
-                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
+                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1], params.user, params.webaddress), getSpeciesHardLink(reco)]
             }else {
-                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
+                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1], params.user, params.webaddress),getObservationHardLink(it[0],it[1],params.user, params.webaddress)]
             }
         }
         def count = distinctRecoCountQuery.list()[0]
@@ -2869,18 +2904,23 @@ class ObservationService extends AbstractMetadataService {
                 return [distinctIdentifiedRecoList:distinctIdentifiedRecoList, totalCount:count];
             }
 
-    private String getObservationHardLink(reco,count) {
+/*    private String getObservationHardLink(int reco, int count) {
         if(!reco) return ;
         def link=utilsService.generateLink("observation", "list", ["recom": reco])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         }
-
-    private String getObservationHardLink(reco,count,user) {
+*/
+    private String getObservationHardLink(int reco, int count, def user, String webaddress) {
         if(!reco) return ;
-        def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user])
+        def link='';
+        if(user) {
+            link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user, 'webaddress':webaddress])
+        } else {
+            link=utilsService.generateLink("observation", "list", ["recom": reco, 'webaddress':webaddress])
+        }
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         //return link 
-        }
+    }
 
     private String getIdentifiedObservationHardLink(reco,count,user,identified) {
         if(!reco) return ;

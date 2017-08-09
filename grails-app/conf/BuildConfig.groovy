@@ -217,6 +217,8 @@ grails.project.dependency.resolution = {
         //compile ":redis:1.6.6"
         compile "org.grails.plugins:app-info:1.1.1"
         compile "org.grails.plugins:app-info-hibernate:0.4.1"
+        compile "org.grails.plugins:profiler:0.5"
+        runtime ":cors:1.3.0"
     } 
 
     grails.war.resources = { stagingDir ->

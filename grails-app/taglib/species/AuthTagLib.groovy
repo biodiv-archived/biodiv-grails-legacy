@@ -14,7 +14,8 @@ class AuthTagLib {
 					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
-					openidIdentifier: config.openid.claimedIdentityFieldName]
+					openidIdentifier: config.openid.claimedIdentityFieldName,
+                    isSubGroup : attrs.model?.isSubGroup]
 		out << render(template:"/common/ajaxLogin", model:attrs.model);
 	}
 	

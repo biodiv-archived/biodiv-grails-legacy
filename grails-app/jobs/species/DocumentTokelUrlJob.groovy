@@ -13,7 +13,7 @@ import content.eml.DocSciName;
 class DocumentTokelUrlJob {
     static triggers = {
         println "==========================Setting trigger for DocumentTokelUrlJob";
-      simple repeatInterval: 1000l // execute job once in 5 seconds
+      simple name:'DocumentTokelUrlJob' , repeatInterval: 1000l // execute job once in 1 seconds
     }
     def documentService;
 

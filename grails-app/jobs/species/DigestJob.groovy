@@ -11,12 +11,12 @@ class DigestJob {
 	
     static triggers = {
         println "==========================Setting trigger for DigestJob";
-        cron name:'cronTriggerForDigest', startDelay:600l, cronExpression: '0 0 5 * * ?'
+        cron name:'DigestJob', startDelay:600l, cronExpression: '0 0 5 * * ?'
     }
 
     def execute() {
 		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(1000);
+//		dataSource.setUnreturnedConnectionTimeout(200);
 		try{
 	        println "============SENDING DIGEST MAIL STARTED==================="
 	        digestService.sendDigestAction();

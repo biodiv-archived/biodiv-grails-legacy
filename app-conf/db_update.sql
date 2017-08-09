@@ -781,3 +781,7 @@ create table calendar as (
 
 #15th March 2017
 alter table external_links add column frlht_url varchar;
+
+#2nd June 2017
+alter table user_group add column filter_rule text;
+

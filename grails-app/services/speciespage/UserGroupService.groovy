@@ -11,6 +11,7 @@ import groovy.sql.Sql;
 import groovy.util.Eval;
 
 import org.apache.solr.common.SolrException;
+import org.hibernate.FlushMode;
 
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.plugin.springsecurity.acl.AclEntry
@@ -67,6 +68,9 @@ import species.participation.Checklists
 import species.participation.Featured
 import species.formatReader.SpreadsheetReader
 import species.participation.Digest
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
 
 class UserGroupService {
 
@@ -1101,9 +1105,9 @@ class UserGroupService {
 		}
 		else {
 			if(!bean.save()){
-				bean.errors.allErrors.each { println  it }
+				bean.errors.allErrors.each { log.debug  it }
 			}else{
-				println "saved succssful"
+				log.debug "saved succssful"
 			}
 		}
 		bean
@@ -1355,6 +1359,11 @@ class UserGroupService {
 				    UserGroup.read(Long.parseLong(it.trim()))
 			    }
             }
+            List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
+            HashSet<UserGroup> allGroups = new HashSet();
+            allGroups.addAll(userGroupsWithFilterRule);
+            allGroups.addAll(groups);
+
 			def objectIds = params['objectIds']
 			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
 			List obvs = []
@@ -1394,7 +1403,7 @@ class UserGroupService {
 					break
 			}
 			
-			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, groups, obvs, groupRes, functionString, sendMail)
+			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, functionString, sendMail)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
 		}catch (Exception e) {
@@ -1439,34 +1448,60 @@ class UserGroupService {
 		private static final log = LogFactory.getLog(this);
 		
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction, boolean sendMail=true){
-			ResourceFetcher rf
+			ResourceFetcher rf;
+            boolean isBulk = false;
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
+                isBulk = true;
 				rf = new ResourceFetcher(params.objectType, params.filterUrl, params.webaddress)
-				List newList = rf.getAllResult()
-				newList.removeAll(allObvs)
-				allObvs = newList
+//				List newList = rf.getAllResult()
+//				newList.removeAll(allObvs)
+//				allObvs = newList
 			}
 			
-			log.debug " All Resources " +  allObvs.size()
 			log.debug " All Groups " + groups
 			
 			def afDescriptionList = []
 			def currUser = springSecurityService.currentUser?:SUser.read(params.author?.toLong()) 
-			groups.each { UserGroup ug ->
-				def obvs = new ArrayList(allObvs)
-				boolean success = postInBatch(ug, obvs, params.submitType, updateFunction, groupRes)
-				if(success){
-					log.debug "Transcation complete with resource pull now adding feed and sending mail..."
-					def af = activityFeedService.addFeedOnGroupResoucePull(obvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false, sendMail)
-					afDescriptionList <<  getStatusMsg(af, allObvs[0].class.canonicalName, allObvs.size() - obvs.size(), params.submitType, ug)
-				}
-			}
-			return afDescriptionList.join(" ")
+            boolean isNotOver = isBulk ? rf.hasNext() : true;
+            List obvs = new ArrayList(allObvs)
+            while(isNotOver) {
+                UserGroup.withSession { session ->
+                    //def session =  sessionFactory.currentSession;
+                    //session.setFlushMode(FlushMode.MANUAL);
+                    obvs = isBulk ? rf.next() : obvs
+                    groups.each { UserGroup ug ->
+                        List obvs_1 = new ArrayList(obvs);
+                        List postedObvs = postInBatch(ug, obvs_1, params.submitType, updateFunction, groupRes)
+                        if(postedObvs){
+                            log.debug "Transcation complete with resource pull now adding feed and sending mail..."
+                            def af = activityFeedService.addFeedOnGroupResoucePull(postedObvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false, sendMail)
+                            afDescriptionList <<  getStatusMsg(af, obvs[0].class.canonicalName, obvs.size() - obvs.size(), params.submitType, ug)
+                        }
+                    }
+                    obvs.clear();
+                    println "Flushing and clearing session"
+                    session.flush();
+                    //session.clear();
+
+                    // we need to disconnect and get a new DB connection here
+                    def connection = session.disconnect();
+                    if(connection) {
+                        connection.close();
+                    }
+
+                    session.reconnect(dataSource.connection);
+
+                    isNotOver = isBulk ? rf.hasNext() : false;
+                }
+                println "isNotOver"
+            }
+            return afDescriptionList.join(" ");
 		}
 		
 		
-		private boolean postInBatch(ug, obvs, String submitType, String updateFunction, String groupRes){
+		private List postInBatch(UserGroup ug, List obvs, String submitType, String updateFunction, String groupRes){
 			
+            List postedObvs = [];
 			UserGroup.withTransaction(){  status ->
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
@@ -1475,31 +1510,58 @@ class UserGroupService {
 					obvs = getFeatureSafeList(ug, obvs)
 				}
 			}
-			
 			if(obvs.isEmpty()){
 				log.debug "Nothing to update because of permissoin or not part of group"
-				return false
+				return postedObvs
 			}
+
 			//XXX: to avoid connection time out posting in batches
 			List resSubLists = obvs.collate(POST_BATCH_SIZE)
 			resSubLists.each { resList ->
-				UserGroup.withTransaction(){  status ->
+				UserGroup.withTransaction() {  status ->
 					log.debug submitType + " for group " + ug + "  resources size " +  resList.size()
-					ug = ug.merge()
+					//ug = ug.merge()
+                    boolean saveUg = false;
 					resList.each { obv ->
 						obv = obv.merge()
+                        println "testing group validity for ${obv}"
+                        boolean hasValidUserGroup = obv.metaClass.respondsTo(obv, "isUserGroupValidForPosting");
+ 
+                        if(hasValidUserGroup) {
+                            if(!obv.isUserGroupValidForPosting(ug)) {
+                               if(submitType == 'post') {
+                                    log.error "Cannot do operation ${submitType} on ${obv} in usergroup ${ug} because it is not valid as per usergroup filters";
+                                    return; 
+
+                                }
+                            } else {
+                                if(submitType != 'post' && ug.getFilterRules()) {
+                                    log.error "Cannot do operation ${submitType} on ${obv} in usergroup ${ug} because it is  valid as per usergroup filters";
+                                    return;
+                                }
+                            }
+                        }
 						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+                        println "valid : "+ug.observations.size();
+                        saveUg = true;
+                        postedObvs << obv;
 					}
-					try{
-						ug.save(flush:true, failOnError:true)
-					}catch(Exception e){
+					try {
+                        if(saveUg) {
+                            println "Saving usergroup with new postings"
+                            if(!ug.save(failOnError:true)) {
+						        ug.errors.allErrors.each { log.debug it }
+                            }
+                        }
+                    } catch(Exception e) {
 						ug.errors.allErrors.each { log.debug it }
+                        println "rolling back"
 						status.setRollbackOnly()
 						e.printStackTrace()
 					} 
 				}
 			}
-			return !ug.hasErrors()
+			return postedObvs
 		}
 		
 		private String getStatusMsg(af, resoruceClassName, remainingCount, submitType, userGroup){
@@ -1540,13 +1602,13 @@ class UserGroupService {
 			}
 			
 			UserGroup ug = UserGroup.get(params.groupId.toLong())
-			println "user gropu name " + ug.name + " and userIds " + userIds 
+			log.debug "user gropu name " + ug.name + " and userIds " + userIds 
 
 			
 			UserGroup.withTransaction { 
 				userIds.each { uid ->
 					SUser u = SUser.get(uid)
-					println  "Deleting user " + uid + " from group " + ug
+					log.info  "Deleting user " + uid + " from group " + ug
 					ug.deleteMember(u)
 				}
 			}
@@ -1555,4 +1617,56 @@ class UserGroupService {
 		}
 	}
 
+    ///////////////////////////////// Filter Rules specific //////////////////////////////
+    def refreshPostingsOnFilterRules(params) {
+        UserGroup ug = utilsService.getUserGroup(params);
+        if(ug) {
+        List filterRules = ug.getFilterRules();
+        if(filterRules) {
+            String filterObjController = ""
+            switch (objectType) {
+                case [Observation.class.getCanonicalName(), Checklists.class.getCanonicalName()]:
+                filterObjController += 'observation'
+                break
+                case Species.class.getCanonicalName():
+                filterObjController += 'species'
+                break
+                case Document.class.getCanonicalName():
+                filterObjController += 'document'
+                break
+                case Discussion.class.getCanonicalName():
+                filterObjController += 'discussion'
+                break
+                default:
+                break
+            }
+
+            if(!params.notInUserGroup) {
+                //dont remove when we are doing incremental update
+                Map removeResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'remove', 'filterUrl':grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?userGroup=${ug.id}", webaddress:ug.webaddress, 'selectionType':'selectAll']) 
+            }
+
+            String filterUrl = grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?";
+            filterRules.each {
+                if(it.fieldName.equalsIgnoreCase('topology')) {
+                    Geometry polygon = it.ruleValues[0];
+                    filterUrl += it.fieldName+"=ST_GeomFromText('${polygon.toString()}', ${grailsApplication.config.speciesPortal.maps.SRID})";
+                } else {
+                    filterUrl += it.fieldName+"="+it.ruleValues;
+                }
+            }
+            
+            if(params.notInUserGroup) {
+                filterUrl += "&notInUserGroup=${ug.id}";
+            }
+
+            log.debug "Posting observations with filterUrl ${filterUrl}";
+            Map postResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'post', 'filterUrl':filterUrl, 'selectionType':'selectAll'], false); 
+            println "REFRESH COMPLETE with result ${postResult}";
+            return postResult;
+        }
+        } else {
+            log.error "CANT FIND USER GROUP";
+        }
+    }
 }

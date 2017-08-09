@@ -19,6 +19,7 @@ export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M"
 export GEOSERVER_DATA_DIR=/apps/biodiv/geoserver_data_dir
 
 export BIODIV_CONFIG_LOCATION=/apps/biodiv/additional-config.groovy
+export FILESUTRA_CONFIG=/apps/biodiv/filesutra-config.groovy
 
 alias tstop='catalina.sh stop'
 alias tstart='catalina.sh start'

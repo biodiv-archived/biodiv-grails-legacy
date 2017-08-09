@@ -145,7 +145,7 @@ http://indiabiodiversity.saturn.strandls.com/api/species/1
                 "habitat": null,
                 "createdOn": "3912-02-22T18:30:00Z",
                 "lastRevised": "2014-11-26T12:27:30Z",
-                "thumbnail": "http://indiabiodiversity.localhost.org/biodiv/group_icons/speciesGroups/plants_th1.png",
+                "thumbnail": "http://indiabiodiversity.org/biodiv/group_icons/speciesGroups/plants_th1.png",
                 "notes": "",
                 "summary": "",
                 "fields": [],
@@ -195,7 +195,7 @@ h4. delete
 ** Permission : Need admin permission to delete
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/species/234/delete
+http://indiabiodiversity.org/api/species/234/delete
 {code}
 * *Response* :
 ** on success
@@ -244,7 +244,7 @@ h4. update
 ** Requests 
 * __ Adding synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/275594/update
+url : http://indiabiodiversity.org/api/species/275594/update
 name:synonym
 value:Test indica
 pk:275594
@@ -253,7 +253,7 @@ relationship:Synonym
 
 * __ Editing synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/update
+url : http://indiabiodiversity.org/api/species/update
 name:synonym
 value:Test indicatwo
 pk:275594
@@ -263,7 +263,7 @@ sid:221654
 
 * __ Deleting synonym __
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/update
+url : http://indiabiodiversity.org/api/species/update
 name:synonym
 pk:275594
 act:delete
@@ -272,7 +272,7 @@ sid:221655
 
 * __ Adding speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/update
+url : http://indiabiodiversity.org/api/species/update
 description:<p>desc</p>
 attribution:a1
 contributor:1
@@ -288,7 +288,7 @@ runForImages:false
 
 * __ Editing speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/update
+url : http://indiabiodiversity.org/api/species/update
 description:<p>desc2</p>
 attribution:a1
 contributor:1
@@ -304,7 +304,7 @@ runForImages:false
 
 * __ Deleting speciesfield __
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/update
+url : http://indiabiodiversity.org/api/species/update
 pk:501520
 speciesid:275594
 act:delete
@@ -329,7 +329,7 @@ h4. setResources
 ** Notes : use index format as in _ for all keys such as title, license, url etc., to give multiple resources in same call. Existing resources of the species will be deleted and all mentioned in this call are set for the species. 
 * *Request* :
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/setResources
+url : http://indiabiodiversity.org/api/species/setResources
 speciesId:275594
 file_1:/8378307e-55ad-4e95-8600-7c8beb5e09ba/861.JPG
 url_1:
@@ -338,7 +338,7 @@ date_1:false
 rating_1:
 license_1:CC BY
 contributor_1:
-source_1:http://indiabiodiversity.localhost.org/observation/show/349285
+source_1:http://indiabiodiversity.org/observation/show/349285
 title_1:
 pullImage_1:true
 resId_1:343640
@@ -349,7 +349,7 @@ date_0:false
 rating:
 license_0:CC BY
 contributor_0:
-source_0:http://indiabiodiversity.localhost.org/observation/show/349188
+source_0:http://indiabiodiversity.org/observation/show/349188
 title_0:
 pullImage_0:true
 resId_0:343540
@@ -358,7 +358,7 @@ resourceListType:fromRelatedObv
 {code}
 
 {code}
-url : http://indiabiodiversity.localhost.org/api/species/setResources
+url : http://indiabiodiversity.org/api/species/setResources
 speciesId:275594
 file_2:v
 url_2:http://www.youtube.com/watch?v=v8HVWDrGr6o
@@ -418,7 +418,7 @@ h4. requestPermission
 ** Notes :  
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/species/requestPermission
+http://indiabiodiversity.org/api/species/requestPermission
 invitetype:contributor
 message:test
 selectedNodes:94899
@@ -436,7 +436,7 @@ h4. invite
 ** Notes :  
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/species/invite
+http://indiabiodiversity.org/api/species/invite
 {code}
 
 
@@ -465,6 +465,6 @@ h4. getRelatedObvForSpecies
 ** Notes :  
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/species/getRelatedObvForSpecies?speciesId=275594
+http://indiabiodiversity.org/api/species/getRelatedObvForSpecies?speciesId=275594
 {code}
 
