@@ -68,7 +68,6 @@
 	$(".s2ui_hidden_button").hide();
 
 
-})(jQuery);
 
 /*function oauth_login(app) {
     var redirectUrl = 'http://localhost.indiabiodiversity.org/login/' + app.toLowerCase();
