@@ -14,7 +14,8 @@
 		<div class="return">
 			
 		</div>
-		<h3><g:message code="link.feedbak" /></h3>																														
+		<h3><g:message code="link.feedbak" /></h3>
+		<p>Retour d’expérience et suggestions</p>																												
 		
 		
 	<div id="node-101" class="node clear-block">
@@ -24,9 +25,10 @@
 	    </div>
 
 	 <div class="content">
-	 <p>S'il vous plaît utiliser cette page pour poster des commentaires que vous pourriez avoir sur le site , y compris le contenu . Ceci est un site construit sur la science citoyenne modalité, où nous fournissons une plate-forme pour l'agrégation et la publication d'informations sur les mauvaises herbes de l'océan Indien occidental et la région de l'Afrique australe , nous comptons sur votre participation à l'amélioration.</p>
-	 <p>S'il y a des erreurs ou des erreurs sur les données et informations fournies sur ce site , nous vous serions très reconnaissants si vous pouviez les apporter à notre avis . Nous espérons que d'évoluer et de grandir avec votre contribution et la participation.</p>
-	 <p>Pour tout commentaire , s'il vous plaît contactez-nous au projectwikwio [at] gmail [dot] com</p>
+	 <p>Veuillez utiliser cette page pour publier vos commentaires sur le site. Il s'agit d'un site participatif public où nous fournissons une plate-forme pour aggréger et publier des informations sur les adventices des systèmes de culture de l'océan Indien occidental.</p>
+	 <p>S'il ya des erreurs ou des erreurs sur les informations fournies sur le site, nous vous serions très reconnaissants si vous les portez  à notre connaissance. Nous espérons faire évoluer et améliorer le Portail Wikwio grâce à votre participation et vos contributions.</p>
+	 <p>Pour tout commentaire technique, veuillez nous contacter à projectwikwio [at] gmail [dot] com</p>
+	 <p>Pour tout commentaire sur le contenu, veuillez contacter Dr. Thomas Le Bourgeois à thomas.le_bourgeois [at] cirad.fr</p>
 		  </div>
 
 		  </div>						
