@@ -2358,9 +2358,9 @@ class ObservationService extends AbstractMetadataService {
             def reco = Recommendation.read(it[0]);
             if(params.downloadFrom == 'uniqueSpecies') {
                 //HACK: request not available as its from job scheduler
-                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
+                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1], params.user, params.webaddress), getSpeciesHardLink(reco)]
             }else {
-                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
+                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1], params.user, params.webaddress),getObservationHardLink(it[0],it[1],params.user, params.webaddress)]
             }
         }
         def count = distinctRecoCountQuery.list()[0]
@@ -2904,18 +2904,23 @@ class ObservationService extends AbstractMetadataService {
                 return [distinctIdentifiedRecoList:distinctIdentifiedRecoList, totalCount:count];
             }
 
-    private String getObservationHardLink(reco,count) {
+/*    private String getObservationHardLink(int reco, int count) {
         if(!reco) return ;
         def link=utilsService.generateLink("observation", "list", ["recom": reco])
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         }
-
-    private String getObservationHardLink(reco,count,user) {
+*/
+    private String getObservationHardLink(int reco, int count, def user, String webaddress) {
         if(!reco) return ;
-        def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user])
+        def link='';
+        if(user) {
+            link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user, 'webaddress':webaddress])
+        } else {
+            link=utilsService.generateLink("observation", "list", ["recom": reco, 'webaddress':webaddress])
+        }
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         //return link 
-        }
+    }
 
     private String getIdentifiedObservationHardLink(reco,count,user,identified) {
         if(!reco) return ;

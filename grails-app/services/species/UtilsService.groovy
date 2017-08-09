@@ -124,7 +124,8 @@ class UtilsService {
         try{
             request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest());
         } catch(e) {
-            e.printStackTrace();
+            println e.getMessage();
+            println "Ignoring exception";
         }
         return userGroupBasedLink(base: Utils.getDomainServerUrl(request),
             controller:controller, action: action,
@@ -1220,7 +1221,7 @@ class UtilsService {
     }
 
     def getModuleFilters(mod){        
-        if(mod && filterMap.size() >0){
+        if(mod && filterMap?.size() >0){
             return filterMap[mod];
         }
         return [];
