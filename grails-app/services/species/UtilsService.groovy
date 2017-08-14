@@ -121,7 +121,12 @@ class UtilsService {
     ///////////////////////LINKS/////////////////////////////////
 
     public String generateLink( String controller, String action, linkParams, request=null) {
-        request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
+        try{
+            request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest());
+        } catch(e) {
+            println e.getMessage();
+            println "Ignoring exception";
+        }
         return userGroupBasedLink(base: Utils.getDomainServerUrl(request),
             controller:controller, action: action,
             params: linkParams)
