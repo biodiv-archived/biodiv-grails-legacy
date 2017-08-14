@@ -937,7 +937,7 @@ class UtilsService {
      * @param groupId
      * @return
      */
-    Object getSpeciesGroupIds(groupId){
+    Object getSpeciesGroupIds(Long groupId){
         def groupName = SpeciesGroup.read(groupId)?.name
         //if filter group is all
         if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
@@ -1216,7 +1216,7 @@ class UtilsService {
     }
 
     def getModuleFilters(mod){        
-        if(mod && filterMap.size() >0){
+        if(mod && filterMap?.size() >0){
             return filterMap[mod];
         }
         return [];
