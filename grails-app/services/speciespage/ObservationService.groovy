@@ -2982,13 +2982,11 @@ class ObservationService extends AbstractMetadataService {
             link=utilsService.generateLink("observation", "list", ["recom": reco, 'webaddress':webaddress])
         }
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
-<<<<<<< HEAD
         //return link
         }
-=======
         //return link 
     }
->>>>>>> 5f1d387ceb2155079da2bfadc2c0b6719af6b3a3
+
 
     private String getIdentifiedObservationHardLink(reco,count,user,identified) {
         if(!reco) return ;
