@@ -1042,6 +1042,7 @@ class ObservationService extends AbstractMetadataService {
             queryParts.queryParams["offset"] = offset
         }
 
+
         hqlQuery.setProperties(queryParts.queryParams);
         hqlQuery.setReadOnly(true);
         //hqlQuery.setCacheable(true)
@@ -1297,15 +1298,13 @@ class ObservationService extends AbstractMetadataService {
             params.userGroupList.split(',').each {
                 try {
                     userGroupIdList << it.toLong();
+                    println "--------------- "+userGroupIdList
                 } catch(NumberFormatException e) {
                     println "Not a number : e.getMessage()";
                 }
             }
-            println "+++++++++++++++++++++++++++++++++++++"
-            println "+++++++++++++++++++++++++++++++++++++"
-            println "+++++++++++++++++++++++++++++++++++++"
-            println userGroupIdList;
-            queryParams['userGroupList'] = params.userGroupIdList;
+
+            queryParams['userGroupList'] = userGroupIdList;
             //queryParams['userGroup'] = params.userGroup
         }
 
@@ -1340,6 +1339,10 @@ class ObservationService extends AbstractMetadataService {
 
         if (params.isFlagged && params.isFlagged.toBoolean()){
             filterQuery += " and obv.flag_count > 0 "
+            activeFilters["isFlagged"] = params.isFlagged.toBoolean()
+        }
+        if (params.isFlagged && !params.isFlagged.toBoolean()){
+            filterQuery += " and obv.flag_count = 0 "
             activeFilters["isFlagged"] = params.isFlagged.toBoolean()
         }
 
@@ -2979,7 +2982,7 @@ class ObservationService extends AbstractMetadataService {
         return "" + '<a  href="' +  link +'"><i>' + count + "</i></a>"
         //return link
         }
-        
+
     private String getIdentifiedObservationHardLink(reco,count,user,identified) {
         if(!reco) return ;
         def link=utilsService.generateLink("observation", "list", ["recom": reco,"user":user,"identified":true])
