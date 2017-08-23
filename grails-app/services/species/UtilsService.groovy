@@ -942,7 +942,7 @@ class UtilsService {
      * @param groupId
      * @return
      */
-    Object getSpeciesGroupIds(groupId){
+    Object getSpeciesGroupIds(Long groupId){
         def groupName = SpeciesGroup.read(groupId)?.name
         //if filter group is all
         if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
