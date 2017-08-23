@@ -1129,7 +1129,7 @@ class ObservationService extends AbstractMetadataService {
         params.sGroup = (params.sGroup)? params.sGroup : allSGroupId;
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
-		params.isMediaFilter = (params.isMediaFilter) ?: 'false'
+		    params.isMediaFilter = (params.isMediaFilter) ?: 'false'
         //params.userName = springSecurityService.currentUser.username;
 
         def queryParams = [:];
@@ -1330,12 +1330,26 @@ class ObservationService extends AbstractMetadataService {
             queryParams["user"] = params.user.toLong()
             activeFilters["user"] = params.user.toLong()
         }
-
+  /*
         if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
             filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
             //queryParams["speciesName"] = params.speciesName
             activeFilters["speciesName"] = params.speciesName
         }
+       */
+        if(params.speciesName && (params.speciesName.equalsIgnoreCase('UNIDENTIFED'))){
+          filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
+          //queryParams["speciesName"] = params.speciesName
+          activeFilters["speciesName"] = params.speciesName
+      }
+ if(params.speciesName && (params.speciesName.equalsIgnoreCase('IDENTIFED'))){
+          filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is not null) "
+          //queryParams["speciesName"] = params.speciesName
+          activeFilters["speciesName"] = params.speciesName
+      }
+//FOR ALL Observations no filter condition on param.speciesName
+
+
 
         if (params.isFlagged && params.isFlagged.toBoolean()){
             filterQuery += " and obv.flag_count > 0 "
@@ -1570,10 +1584,20 @@ class ObservationService extends AbstractMetadataService {
                 }
             }
         }
-
-		if(params.isMediaFilter.toBoolean()){
+        /*
+		if(params.isMediaFilter && params.isMediaFilter.toBoolean()){
 			filterQuery += " and obv.is_showable = true ";
 		}
+    if(params.isMediaFilter && !params.isMediaFilter.toBoolean()){
+			filterQuery += " and obv.is_showable = false ";
+		}
+*/
+    if(params.isMediaFilter) {
+      filterQuery += " and obv.is_showable = :isMediaFilter "
+     queryParams['isMediaFilter'] = params.isMediaFilter.toBoolean();
+
+    }
+
 
 		if(params.areaFilter && (!params.areaFilter.trim().equalsIgnoreCase('all'))){
 			filterQuery += " and obv.location_scale = :locationScale "
