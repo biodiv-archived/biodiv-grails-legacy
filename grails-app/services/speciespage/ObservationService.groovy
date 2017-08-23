@@ -1249,9 +1249,9 @@ class ObservationService extends AbstractMetadataService {
             if(!groupIdList){
                 log.debug("No valid groups for id " + groupIdList);
                 }else{
-                    filterQuery += " and obv.group_id in (:groupIdList) "
-                    queryParams["groupIdList"] = groupIdList
-                    activeFilters["sGroupIdList"] = groupIdList
+                    filterQuery += " and obv.group_id in (:sGroup) "
+                    queryParams["sGroup"] = groupIdList
+                    activeFilters["sGroup"] = groupIdList
                 }
 
         }
