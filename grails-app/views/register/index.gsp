@@ -199,6 +199,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+    $(document).ready(function() {
+            $(document).on('click', '#createButton', function(e) {
+                var msg = '';
+                if(!$('.placeName').val() || !$('.latitude_field').val() || !$('.longitude_field').val()) {
+                    msg += 'Please select location from the map.'; 
+                    alert(msg);
+                    e.preventDefault();
+                    return false;
+                    } else {
+                        document.forms.registerForm.submit();
+
+                    }
+                    }); 
+
+            });     
+</script>
 							</div>
 							</div>
 
@@ -292,9 +310,8 @@
 							<span class="policy-text"> <g:message code="register.index.policy" />
 								<a href="/terms"><g:message code="link.terms.conditions" /></a><g:message code="register.index.use.of.site" /> 
 							</span>
-							<s2ui:submitButton elementId='createButton' form='registerForm'
-								messageCode='spring.security.ui.login.register'
-								class="btn btn-primary" />
+                            <a id="createButton"  class="btn btn-primary" >${g.message(code:'spring.security.ui.login.register')}</a>
+                            <input type='submit' value=' ' id='createButton_submit' class='s2ui_hidden_button' />
 						</div>
 
 
@@ -347,5 +364,6 @@
 			</fieldset>
 		</div>
 	</div>
+
 </body>
 </html>
