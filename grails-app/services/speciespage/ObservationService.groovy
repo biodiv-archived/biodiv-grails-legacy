@@ -1128,7 +1128,7 @@ class ObservationService extends AbstractMetadataService {
         params.sGroup = (params.sGroup)? params.sGroup : allSGroupId;
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
-		    params.isMediaFilter = (params.isMediaFilter) ?: 'false'
+		//params.isMediaFilter = (params.isMediaFilter) ?: 'true';
         //params.userName = springSecurityService.currentUser.username;
 
         def queryParams = [:];
@@ -2432,7 +2432,6 @@ class ObservationService extends AbstractMetadataService {
             distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             distinctRecoCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         }
-
         if(max > -1){
             distinctRecoQuery.setMaxResults(max);
         }
@@ -2444,6 +2443,7 @@ class ObservationService extends AbstractMetadataService {
         distinctRecoCountQuery.setProperties(queryParts.queryParams)
         def distinctRecoListResult = distinctRecoQuery.list()
         distinctRecoListResult.each {it->
+            println it;
             def reco = Recommendation.read(it[0]);
             if(params.downloadFrom == 'uniqueSpecies') {
                 //HACK: request not available as its from job scheduler
@@ -2949,6 +2949,8 @@ class ObservationService extends AbstractMetadataService {
     }
 
     def getDistinctIdentifiedRecoList(params, int max, int offset) {
+        def allSGroupId = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id.toString();
+        def sGroupId = params.sGroup?params.int('sGroup'):allSGroupId;
         println "identified params+"+params;
         def sql =  Sql.newInstance(dataSource);
         def distinctIdentifiedRecoList = [];
@@ -2957,7 +2959,7 @@ class ObservationService extends AbstractMetadataService {
         def queryParts = getFilteredObservationsFilterQuery(params)
         if(params.userGroup)
         {
-            if(params.sGroup!=829){
+            if(sGroupId && sGroupId != allSGroupId){
                 distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc limit 10 offset "+params.offset+" "
                 distinctIdentifiedCountQuery="select count(recoVote.recommendation_id) from recommendation_vote recoVote , recommendation reco, observation obv,user_group_observations ugo where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+" and ugo.user_group_id ="+params.userGroup.id+" and ugo.observation_id=obv.id group by recoVote.recommendation_id order by count(*) desc "
                 }
@@ -2968,7 +2970,7 @@ class ObservationService extends AbstractMetadataService {
         }
          else
         {
-            if(params.sGroup!=829){
+            if(sGroupId && sGroupId != allSGroupId){
                 distinctIdentifiedQuery="select recoVote.recommendation_id as voteID,count(*) as count from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+"  group by recoVote.recommendation_id order by count(*) desc limit 10 offset "+params.offset+" "
                 distinctIdentifiedCountQuery="select count(recoVote.recommendation_id) from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true and obv.group_id="+params.sGroup+"  group by recoVote.recommendation_id order by count(*) desc "
                 }
@@ -2977,21 +2979,24 @@ class ObservationService extends AbstractMetadataService {
                 distinctIdentifiedCountQuery="select count(recoVote.recommendation_id) from recommendation_vote recoVote , recommendation reco, observation obv where recoVote.observation_id=obv.id and recoVote.recommendation_id=reco.id and reco.is_scientific_name=true and recoVote.author_id="+params.user+" and obv.is_deleted=false and obv.is_showable=true group by recoVote.recommendation_id order by count(*) desc "
                 }
         }
-                def distinctIdentifiedRecoListResult =sql.rows(distinctIdentifiedQuery)
-                def disntinctIdentifiedCount=sql.rows(distinctIdentifiedCountQuery)
-                distinctIdentifiedRecoListResult.each {it->
+        log.debug distinctIdentifiedQuery;
+        log.debug distinctIdentifiedCountQuery;
+
+        def distinctIdentifiedRecoListResult =sql.rows(distinctIdentifiedQuery)
+            def disntinctIdentifiedCount=sql.rows(distinctIdentifiedCountQuery)
+            distinctIdentifiedRecoListResult.each {it->
                 def reco = Recommendation.read(it['voteid']);
                 if(params.downloadFrom == 'uniqueSpecies') {
                     distinctIdentifiedRecoList << [reco.name, reco.isScientificName, it['count'], getSpeciesHardLink(reco)]
-                        }
+                }
                 else {
                     distinctIdentifiedRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getIdentifiedObservationHardLink(it['voteid'],it['count'],params.user,true)]
-                        }
-                    }
-                def count=disntinctIdentifiedCount.size()
-                println "count==="+count
-                return [distinctIdentifiedRecoList:distinctIdentifiedRecoList, totalCount:count];
+                }
             }
+        def count=disntinctIdentifiedCount.size()
+            println "count==="+count
+            return [distinctIdentifiedRecoList:distinctIdentifiedRecoList, totalCount:count];
+    }
 
     private String getObservationHardLink(reco,count) {
         if(!reco) return ;
