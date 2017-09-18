@@ -2705,7 +2705,7 @@ class ObservationService extends AbstractMetadataService {
     }
 
     boolean hasObvLockPerm(obvId, recoId) {
-        def observationInstance = Observation.get(obvId.toLong());
+//        def observationInstance = Observation.get(obvId.toLong());
         def taxCon = Recommendation.read(recoId.toLong())?.taxonConcept
         return springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || (taxCon && speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])) )
     }
@@ -2849,6 +2849,8 @@ class ObservationService extends AbstractMetadataService {
                     map.put("showLock", true);
                 }
             }
+
+            map.put('hasObvLockPerm', hasObvLockPerm(recoVote.observation_id, recoVote.reco_id));
 		}
 
         obvListRecoVotesResult.each { key, obvRecoVotesResult ->

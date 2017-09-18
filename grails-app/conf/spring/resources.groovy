@@ -397,6 +397,7 @@ beans = {
     customObjectMarshallers( CustomObjectMarshallers ) {
         grailsApplication = ref('grailsApplication') 
         userGroupService = ref('userGroupService') 
+        observationService = ref('observationService') 
 
         marshallers = [
             new ObservationMarshaller(),
