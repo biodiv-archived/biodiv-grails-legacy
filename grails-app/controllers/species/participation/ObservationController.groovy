@@ -1966,6 +1966,8 @@ private printCacheEntries(cache) {
                 model['customFields'] = model.observationInstance.getCustomFields();
                 if(model['customFields'].size() > 0)
                     m['html'] =  g.render(template:"/observation/showCustomFieldsTemplate", model:model);
+                    m['customFields'] = model['customFields'];
+               
             }
         }
         render m as JSON
