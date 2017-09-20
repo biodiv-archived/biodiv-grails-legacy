@@ -2446,11 +2446,17 @@ class ObservationService extends AbstractMetadataService {
         distinctRecoListResult.each {it->
             println it;
             def reco = Recommendation.read(it[0]);
-            if(params.downloadFrom == 'uniqueSpecies') {
-                //HACK: request not available as its from job scheduler
-                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
-            }else {
-                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
+            if(params.hackRes) {
+                distinctRecoList << [name:reco.name, speciesId: reco.taxonConcept?.findSpeciesId(), isScientificName:reco.isScientificName, recoId:it[0], count:it[1]];
+            } else {
+
+                if(params.downloadFrom == 'uniqueSpecies') {
+                    //HACK: request not available as its from job scheduler
+                    distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
+                }else {
+                    distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
+
+                }
             }
         }
         def count = distinctRecoCountQuery.list()[0]
@@ -2505,7 +2511,17 @@ class ObservationService extends AbstractMetadataService {
         return [distinctRecoList:distinctRecoList]
     }
 
-	private String getSpeciesHyperLinkedName(Recommendation reco){
+/*	private Map getSpecies(Recommendation reco){
+        if(!reco) [:];
+        def res = [name:reco.name, id:''];
+		def speciesid = reco.taxonconcept?.findspeciesid()
+		if(!speciesId){
+			res.name = reco.name
+		}
+        res.id = speciesId;
+        return res;
+	}
+*/	private String getSpeciesHyperLinkedName(Recommendation reco){
         if(!reco) return;
 		def speciesId = reco.taxonConcept?.findSpeciesId()
 		if(!speciesId){
