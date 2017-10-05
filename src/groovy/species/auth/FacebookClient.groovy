@@ -1,5 +1,7 @@
 package species.auth;
 
+import org.pac4j.core.context.WebContext;
+
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.core.util.CommonHelper;
 import org.scribe.model.OAuthConfig;
@@ -7,7 +9,6 @@ import org.scribe.builder.api.FacebookApi;
 import org.scribe.oauth.OAuth20ServiceImpl;
 import org.scribe.model.SignatureType;
 import org.scribe.model.Token;
-import org.apache.commons.lang3.StringUtils;
 
 class FacebookClient extends org.pac4j.oauth.client.FacebookClient {
 
@@ -24,11 +25,11 @@ class FacebookClient extends org.pac4j.oauth.client.FacebookClient {
     }
 
     @Override
-    protected void internalInit() {
-        super.internalInit();
+    protected void clientInit(final WebContext context) {
+        super.clientInit(context);
         CommonHelper.assertNotBlank("fields", this.fields);
         this.api20 = new FacebookApi();
-        if (StringUtils.isNotBlank(this.scope)) {
+        if (!this.scope) {
             this.service = new OAuth20ServiceImpl(this.api20,  new OAuthConfig(this.key, this.secret,
             this.callbackUrl,
             SignatureType.Header, this.scope,
@@ -47,14 +48,10 @@ class FacebookClient extends org.pac4j.oauth.client.FacebookClient {
             this.connectTimeout, this.readTimeout, this.proxyHost,
             this.proxyPort);*/
         }
+        configuration.setWithState(false);
     }
 
-    @Override
-    protected boolean requiresStateParameter() {
-        return false;
-    }
 
-    @Override
     protected String sendRequestForData(final Token accessToken, final String dataUrl) {
         init();
         return super.sendRequestForData(accessToken, dataUrl);

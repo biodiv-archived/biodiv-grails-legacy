@@ -64,7 +64,7 @@ class SUserSearchService extends AbstractSearchService {
 		if(!susers) return;
 		log.info "Initializing publishing to Users search index : "+susers.size();
 
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];

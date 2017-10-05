@@ -611,8 +611,7 @@ class Observation extends DataObject {
 		
 		res[ObvUtilService.USER_GROUPS] = ugList.join(", ")
 		
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-		//def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+		def config = grails.util.Holders.config
 		//def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
 		res[ObvUtilService.AUTHOR_NAME] = author.name
 		res[ObvUtilService.AUTHOR_URL] = utilsService.createHardLink('user', 'show', author.id) 
@@ -627,7 +626,7 @@ class Observation extends DataObject {
 		
 		def res = []
 		
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 		String base = config.speciesPortal.observations.serverURL
 		
 		Iterator iterator = resource?.iterator();

@@ -190,7 +190,7 @@ class BiodivSearchService extends AbstractSearchService {
      * executing query
      */
     Map getFilteredObjectsFromSearch(params, max, offset, isMapView){
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObjectsQueryFromSearch(params, max, offset, isMapView);
         NamedList paramsList = queryParts.paramsList
         def queryParams = queryParts.queryParams
@@ -330,8 +330,8 @@ class BiodivSearchService extends AbstractSearchService {
     }
 
     private Map getFilteredObjectsQueryFromSearch(params, max, offset, isMapView) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
+        def config = grails.util.Holders.config;
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()

@@ -1,6 +1,6 @@
 package species;
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import java.util.Date;
@@ -45,7 +45,7 @@ class AbstractObjectService {
     /**
     */
     protected static List createUrlList2(observations) {
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 		String iconBasePath = config.speciesPortal.observations.serverURL
 		def urlList = createUrlList2(observations, iconBasePath)
 		return urlList
@@ -93,7 +93,7 @@ class AbstractObjectService {
     protected static asJSON(def obv, String iconBasePath) {
             def item = [:] 
             item.id = obv.id
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			def config = grails.util.Holders.config
             def sGroup = obv.fetchSpeciesGroup()
             if(sGroup)
 			    item.sGroup = sGroup.name
@@ -137,7 +137,7 @@ class AbstractObjectService {
     /**
     */
     protected String getIconBasePath(String controller) {
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
         String iconBasePath = '';
         switch(controller) {
             case "observation": 

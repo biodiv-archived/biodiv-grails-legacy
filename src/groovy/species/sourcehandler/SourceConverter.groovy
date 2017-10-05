@@ -605,7 +605,7 @@ class SourceConverter {
                             connectionMap = new HashMap<Integer, Field>();
                             def fields = Field.list(sort:'id');
 
-                            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                            def config = grails.util.Holders.config
                             def fieldsConfig = config.speciesPortal.fields
 
                             for(Field field in fields) {

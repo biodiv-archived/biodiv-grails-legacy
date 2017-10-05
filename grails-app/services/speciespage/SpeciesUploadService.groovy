@@ -95,7 +95,7 @@ class SpeciesUploadService {
 	def speciesPermissionService;
     //def namelistService;
 
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
 
 	static int BATCH_SIZE = 1;
 	//int noOfFields = Field.count();

@@ -444,7 +444,7 @@ class SUserController extends UserController {
 			params.sort = params.sort && params.sort != 'score' ? params.sort : "activity";
 			String userNameQuery = "";
 			if (params['query']) {
-				def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+				def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 				if(params['query'].startsWith(searchFieldsConfig.CANONICAL_NAME)) {
 					def usernamesList = searchObservations(params);
 					String usernames = getUsernamesSearchCondition(usernamesList);
@@ -541,7 +541,7 @@ class SUserController extends UserController {
 	}
 
 	private def searchObservations(params) {
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 		def newParams = [:];
 		newParams["facet.field"] = searchFieldsConfig.CONTRIBUTOR+"_exact";
 		newParams["facet.limit"] = params.max;
@@ -1001,7 +1001,7 @@ class SUserController extends UserController {
 				recommendationVoteList.each { recoVote ->
 					def map = recoVote.recommendation.getRecommendationDetails(recoVote.observation);
 					//map.put("noOfVotes", map.);
-					def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+					def config = grails.util.Holders.config
 					def image = recoVote.observation.mainImage()
 					def imagePath = image.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, config.speciesPortal.resources.images.thumbnail.suffix)
 					def imageLink = config.speciesPortal.observations.serverURL +  imagePath

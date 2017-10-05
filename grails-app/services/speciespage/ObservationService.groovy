@@ -4,7 +4,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.grails.taggable.TagLink;
@@ -846,7 +846,7 @@ class ObservationService extends AbstractMetadataService {
 
         try {
             Observation observation = Observation.read(Long.parseLong(observationId));
-            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
 //           def rows = sql.rows("select count(*) as count from observation as g1 where ST_DWithin(ST_Centroid(g1.topology), ${centroid}, :maxRadius) and g1.is_deleted = false", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
 //            totalResultCount = Math.min(rows[0].getProperty("count")-1, maxObvs);
             limit = Math.min(limit, maxObvs - offset);
@@ -877,7 +877,7 @@ class ObservationService extends AbstractMetadataService {
         long totalResultCount = 0;
         def sql =  Sql.newInstance(dataSource);
         try {
-            String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
             def rows = sql.rows("select count(*) as count from observation as g2 where ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false", [maxRadius:maxRadius]);
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
@@ -1431,7 +1431,7 @@ class ObservationService extends AbstractMetadataService {
         }
 
         if(params.type == 'nearBy' && params.lat && params.long) {
-            String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
             int maxRadius = params.maxRadius?params.int('maxRadius'):200
             filterQuery += " and (ST_DWithin(ST_Centroid(obv.topology), ${point}, "+(maxRadius/111.32)+")) = TRUE ";
             queryParams['maxRadius'] = maxRadius;
@@ -1485,7 +1485,7 @@ class ObservationService extends AbstractMetadataService {
             //nearByRelatedObvQuery = ', Observation as g2';
             //query += nearByRelatedObvQuery;
             Observation observation = Observation.read(params.parentId);
-            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
             filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, "+(params.maxNearByRadius/111.32)+") = true and obv.is_deleted = false "
 
 //            filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, :maxNearByRadius/111.32) and obv.isDeleted = false "                                              //removed check for not equal to parentId to include it in show page
@@ -1677,7 +1677,7 @@ class ObservationService extends AbstractMetadataService {
         arr[2] = p3
         arr[3] = p4
         arr[4] = p1
-        def gf = new GeometryFactory(new PrecisionModel(), ConfigurationHolder.getConfig().speciesPortal.maps.SRID)
+        def gf = new GeometryFactory(new PrecisionModel(), grails.util.Holders.getConfig().speciesPortal.maps.SRID)
         def lr = gf.createLinearRing(arr)
         def pl = gf.createPolygon(lr, null)
         return pl
@@ -1869,7 +1869,7 @@ class ObservationService extends AbstractMetadataService {
      * executing query
      */
     Map getFilteredObservationsFromSearch(params, max, offset, isMapView){
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, isMapView);
         def paramsList = queryParts.paramsList
         def queryParams = queryParts.queryParams
@@ -1954,7 +1954,7 @@ class ObservationService extends AbstractMetadataService {
     }
 
     private Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
@@ -2335,7 +2335,7 @@ class ObservationService extends AbstractMetadataService {
         }
          */
 
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         String query = ""
         if(springSecurityService.currentUser){
             query += searchFieldsConfig.CONTRIBUTOR+":"+springSecurityService.currentUser.name+" AND "
@@ -2459,7 +2459,7 @@ class ObservationService extends AbstractMetadataService {
     /**
      */
     def getDistinctRecoListFromSearch(params, int max, int offset) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, false);
         def paramsList = queryParts.paramsList
         def queryParams = queryParts.queryParams
@@ -2550,7 +2550,7 @@ class ObservationService extends AbstractMetadataService {
     /**
      */
     def  getSpeciesGroupCountFromSearch(params) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, -1, -1, false);
         def paramsList = queryParts.paramsList
 

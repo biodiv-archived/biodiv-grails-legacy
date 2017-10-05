@@ -25,7 +25,9 @@ import species.TaxonomyRegistry;
 import species.Classification;
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils;
-
+import java.security.Provider;
+import java.security.Security;
+import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 
 class BootStrap {
 
@@ -57,7 +59,9 @@ class BootStrap {
         initBannerMessageMap();
         initFiltersMap();
         //speciesTraitsService.init();
-       
+
+        Provider bc = BouncyCastleProviderSingleton.getInstance();
+        Security.addProvider(bc);
   	}
 
 	def initDefs() {
@@ -144,14 +148,19 @@ class BootStrap {
 	 * 
 	 */
 	def initFilters() {
+        SpringSecurityUtils.clientRegisterFilter 'facebookAuthCookieTransparentFilter', 721
+
+        SpringSecurityUtils.registerProvider 'jwtAuthTokenProvider'
         //SpringSecurityUtils.clientRegisterFilter('openIDAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+50)
 /*        SpringSecurityUtils.registerProvider 'openIDAuthProvider'
         SpringSecurityUtils.clientRegisterFilter 'openIDAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+1
         SpringSecurityUtils.clientRegisterFilter 'restAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+2
+        */
         println SpringSecurityUtils.providerNames;
         println SpringSecurityUtils.afterInvocationManagerProviderNames;
         println SpringSecurityUtils.orderedFilters;
-*/
+        println SpringSecurityUtils.configuredOrderedFilters;
+
 	}
 
 	def initEmailConfirmationService() {

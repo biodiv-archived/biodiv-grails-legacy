@@ -17,9 +17,9 @@
 		</div>
 
         <g:if test="${userGroupInstance && userGroupInstance.domainName}">
-            <!--iframe id="biodiv_iframe " name="biodiv_iframe" class="hide" src="" width="450px" height="280px"   allowTransparency="true" frameborder="0" scrolling="yes" style="width:100%;"></iframe-->
+            <iframe id="biodiv_iframe " name="biodiv_iframe" class="show" src="" width="450px" height="280px"   allowTransparency="true" frameborder="0" scrolling="yes" style="width:100%;"></iframe>
             <asset:script type="text/javascript">
-                /*$(document).ready(function() {
+                $(document).ready(function() {
                     // Create IE + others compatible event handler
                     var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
                     var eventer = window[eventMethod];
@@ -55,7 +55,7 @@
 
                     },false);
 
-                });*/
+                });
             </asset:script>
             </g:if>
 

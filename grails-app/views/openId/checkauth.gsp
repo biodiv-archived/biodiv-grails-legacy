@@ -23,7 +23,16 @@
 			</div>
 		</div>
 	</div>
-	<script type="text/javascript">
+	<asset:script type="text/javascript">
+        $(document).ready(function(){
+            var loginInfo = {
+                "access_token":"${access_token}",
+                "expires_in":"${expires_in}",
+                "refresh_token":"${refresh_token}"
+            };
+            setLoginInfo(loginInfo, false);
+        });
+
 <%--		alert("parent location" +window.opener.location );--%>
 <%--		alert("closing window " + window.location);--%>
 <%--		window.opener.mynewlocation = window.location.search;--%>
@@ -33,8 +42,7 @@
 <%--		alert("url params " + JSON.stringify(ee));--%>
 <%--		alert("=== " +  JSON.stringify($.param(ee)));--%>
 <%--		alert("=== " +  JSON.stringify(decodeURIComponent($.param(ee))));--%>
-		
-		window.opener.mynewparams = getUrlParams();
+	/*	window.opener.mynewparams = getUrlParams();
 		
 	    window.close();
 	    function getUrlParams(){
@@ -51,6 +59,6 @@
 			
 			return params;
 	    }
-	    
-	</script>	
+	  */  
+	</asset:script>	
 </body>

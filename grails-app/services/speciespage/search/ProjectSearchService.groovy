@@ -63,8 +63,8 @@ class ProjectSearchService extends AbstractSearchService {
 		if(!projects) return;
 		log.info "Initializing publishing to projects search index : "+projects.size();
 
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];

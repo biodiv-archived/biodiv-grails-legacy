@@ -6,7 +6,7 @@ import groovy.util.Node;
 import java.util.List
 
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.FetchMode;
@@ -59,7 +59,7 @@ class XMLConverter extends SourceConverter {
 
 
     //protected static SourceConverter instance;
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
     def fieldsConfig = config.speciesPortal.fields
     NamesParser namesParser;
     String resourcesRootDir = config.speciesPortal.resources.rootDir;
@@ -88,7 +88,7 @@ class XMLConverter extends SourceConverter {
 
     public XMLConverter() {
         namesParser = new NamesParser();
-        def ctx = ApplicationHolder.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getApplication().getMainContext();
         //markupSanitizerService = ctx.getBean("markupSanitizerService");
     }
 
@@ -589,7 +589,7 @@ class XMLConverter extends SourceConverter {
 		}
 		try {
 			def colId = nameNode.colId.text()
-			return ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
+			return grails.util.Holders.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
 		}catch(e){
 			e.printStackTrace()
 		}
@@ -1711,7 +1711,7 @@ class XMLConverter extends SourceConverter {
 	            println "Looking at existing name : ${taxon}"
 	            if(taxon.status == NameStatus.ACCEPTED) {
 					//if existing name is acceted then ignoring XXX need to be reported to user
-	                //sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
+	                //sfield = grails.util.Holders.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
 					log.error "Ignoring synonym taxon entry as the name existing name is ACCEPTED : "+parsedName.name
 					addToSummary("Ignoring synonym taxon entry as the name existing name is ACCEPTED : "+parsedName.name)
 					return
@@ -2341,7 +2341,7 @@ class XMLConverter extends SourceConverter {
 		if(colId){
 			def taxon = TaxonomyDefinition.findByMatchId(colId)
 			if(!taxon)
-				taxon =  ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
+				taxon =  grails.util.Holders.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
 				
 			return [taxon]
 		}
@@ -2359,7 +2359,7 @@ class XMLConverter extends SourceConverter {
     static int getTaxonRank(String rankStr) {
 		return ScientificName.TaxonomyRank.getTaxonRank(rankStr);
         /* // moved to TaxonRank
-        MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
+        MessageSource messageSource = grails.util.Holders.application.mainContext.getBean('messageSource')
         def request = null;
         try {
             request = RequestContextHolder.currentRequestAttributes().request
@@ -2521,7 +2521,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private updateSpeciesGroup(List<TaxonomyRegistry> taxonEntities) {
-        def ctx = ApplicationHolder.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getApplication().getMainContext();
         groupHandlerService = ctx.getBean("groupHandlerService");
 
         taxonEntities.each { taxonReg ->
@@ -2537,7 +2537,7 @@ class XMLConverter extends SourceConverter {
      *
      */
     private void cleanUpGorm() {
-        def ctx = ApplicationHolder.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getApplication().getMainContext();
         SessionFactory sessionFactory = ctx.getBean("sessionFactory")
         def hibSession = sessionFactory?.getCurrentSession()
         if(hibSession) {

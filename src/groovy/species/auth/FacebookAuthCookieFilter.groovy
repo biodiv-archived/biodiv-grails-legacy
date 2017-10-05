@@ -36,7 +36,6 @@ import species.auth.SUserRole
 import species.utils.Utils;
 
 
-import org.springframework.social.facebook.api.FacebookProfile;
 
 
 /**
@@ -65,6 +64,8 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
         HttpServletRequest request = servletRequest
         HttpServletResponse response = servletResponse
         String url = request.requestURI.substring(request.contextPath.length())
+        println "+++++++++++++++++++++++++++++++++++++++++++++++++++"+url;
+        println SecurityContextHolder.context
         logger.debug("Processing url: $url with params : ${request.getParameterMap()} with method : ${request.getMethod()}")
         //logger.debug("SecurityContext authentication : ${SecurityContextHolder.context.authentication }");
         if (url != logoutUrl && SecurityContextHolder.context.authentication == null) {
@@ -72,21 +73,32 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
             assert facebookAuthUtils != null
             Cookie cookie = facebookAuthUtils.getAuthCookie(request)
             Cookie fbLoginCookie = facebookAuthUtils.getFBLoginCookie(request);
+            Cookie jwtTokenCookie = facebookAuthUtils.getJwtTokenCookie(request);
+            logger.debug ("Got jwtToken : ${jwtTokenCookie}"); 
+            def token;
+            if(jwtTokenCookie != null) {
+                token = facebookAuthUtils.buildJwtToken(jwtTokenCookie.value);
+                logger.debug ("Got jwtToken : ${token}"); 
+            }
+
             if (cookie != null && fbLoginCookie != null) {
+                token = facebookAuthUtils.build(cookie.value)
+                token.user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
+            }
+
+            if (token != null) {
                 //logger.debug("Found fbsr & fb_login cookie");
-                FacebookAuthToken token;
                 try {
-                    token = facebookAuthUtils.build(cookie.value)
                     if (token != null) {
                         //logger.debug("Got fbAuthToken $token");
-                        token.user = request.getSession().getAttribute("LAST_FACEBOOK_USER");
-                        Authentication authentication = null
+                        Authentication authentication = null;
                         authentication = authenticationManager.authenticate(token);
                         if (authentication && authentication.authenticated) {
 
 
                             // Store to SecurityContextHolder
                             SecurityContextHolder.context.authentication = authentication;
+        println SecurityContextHolder.context
 
                             // Fire event only if its the authSuccess url
                             if (this.eventPublisher != null && (url == '/login/authSuccess' || url == '/oauth/google/success')) {

@@ -77,7 +77,7 @@ class ObservationsSearchService extends AbstractSearchService {
         if(!obvs) return;
         log.info "Initializing publishing to observations search index : "+obvs.size();
 
-        //def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
+        //def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 
         Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
         Map names = [:];
@@ -95,7 +95,7 @@ class ObservationsSearchService extends AbstractSearchService {
     /**
      */
     public List<SolrInputDocument> getSolrDocument(Observation obv) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         List docs = [];
         if(!obv.isDeleted) {
             SolrInputDocument doc = new SolrInputDocument();
@@ -185,7 +185,7 @@ class ObservationsSearchService extends AbstractSearchService {
      * @param name
      */
     private void addNameToDoc(Observation obv, SolrInputDocument doc) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         doc.addField(searchFieldsConfig.MAX_VOTED_SPECIES_NAME, obv.fetchSpeciesCall());
 
         def recoVotes = obv.recommendationVote
@@ -209,7 +209,7 @@ class ObservationsSearchService extends AbstractSearchService {
     private List<SolrInputDocument> addChecklistData(Observation obv, SolrInputDocument doc){
         if(!obv.isChecklist) return []
 
-            def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+            def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
             def chk = obv 
 
             doc.addField(searchFieldsConfig.TITLE, chk.title);
@@ -262,7 +262,7 @@ class ObservationsSearchService extends AbstractSearchService {
     }
 
     List getResourcesDocs(Observation obv) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         List resourcesDocs = [];
         SolrInputDocument resourceDoc;
         obv.resource.each { resource ->

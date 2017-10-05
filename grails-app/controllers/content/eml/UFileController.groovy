@@ -23,7 +23,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.converters.JSON
-import static org.codehaus.groovy.grails.commons.ConfigurationHolder.config as Config
+import static grails.util.Holders.config as Config
 import org.springframework.http.HttpStatus
 import uk.co.desirableobjects.ajaxuploader.exception.FileUploadException
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -53,7 +53,7 @@ class UFileController {
     def springSecurityService;
     def grailsApplication
     def speciesUploadService;
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
     def messageSource
     def speciesService;
 	String contentRootDir = config.speciesPortal.content.rootDir

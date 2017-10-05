@@ -1,5 +1,5 @@
 package species.sourcehandler.exporter
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 import org.hibernate.SessionFactory;
 import java.text.SimpleDateFormat;
 import org.hibernate.exception.ConstraintViolationException;
@@ -46,7 +46,7 @@ class DwCSpeciesExporter{
 	
 def exportSpecieData(directory, DownloadLog dl, String userGroupWebaddress) {
 		log.info "Darwin Core specie export started"
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 		String f = File.separator
 		String dir= config.speciesPortal.species.speciesDownloadDir
 

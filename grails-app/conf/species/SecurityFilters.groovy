@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
 import javax.servlet.http.HttpServletResponse;
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders;
 import static org.springframework.http.HttpStatus.*;
 
 class SecurityFilters {
@@ -62,7 +62,7 @@ class SecurityFilters {
                 if(request.forwardURI.startsWith("/${appName}/api/")) {
                     if (!actionName) actionName = 'index'
                         println "MATCHED--------${params.controller}------${params.action}---${controllerName}--${actionName}------------)"
-                        for( cc in ApplicationHolder.application.controllerClasses) {
+                        for( cc in Holders.application.controllerClasses) {
                             for (m in cc.clazz.methods) {
                                 def ann = m.getAnnotation(grails.plugin.springsecurity.annotation.Secured)
                                 if (ann) {

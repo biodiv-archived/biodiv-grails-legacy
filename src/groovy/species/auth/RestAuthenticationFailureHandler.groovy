@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-class RestAuthenticationFailureHandler extends com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationFailureHandler {
+class RestAuthenticationFailureHandler extends grails.plugin.springsecurity.rest.RestAuthenticationFailureHandler {
 
     /**
      * Called when an authentication attempt fails.

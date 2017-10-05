@@ -74,8 +74,8 @@ class SpeciesSearchService extends AbstractSearchService {
 		if(!species) return;
 		log.info "Initializing publishing to search index for species : "+species.size();
 
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
 		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		Map names = [:];
@@ -244,7 +244,7 @@ class SpeciesSearchService extends AbstractSearchService {
 	 * @param name
 	 */
 	private void addNameToDoc(SolrInputDocument doc, TaxonomyDefinition name) {
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
 		if(name.name) doc.addField(searchFieldsConfig.TITLE, name.name);
 		if(name.canonicalForm) doc.addField(searchFieldsConfig.CANONICAL_NAME, name.canonicalForm);
@@ -279,7 +279,7 @@ class SpeciesSearchService extends AbstractSearchService {
 	}
 
     List getResourcesDocs(Species species) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         List resourcesDocs = [];
         def resourceDoc;
         species.resources.each { resource ->
@@ -294,7 +294,7 @@ class SpeciesSearchService extends AbstractSearchService {
     }
 
     List getResourcesDocs(SpeciesField speciesField) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         List resourcesDocs = [];
         def resourceDoc;
         speciesField.resources.each { resource ->

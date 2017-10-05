@@ -115,6 +115,19 @@ class LoginController {
                 model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), params);
             } else if(params.error) {
                 model = utilsService.getErrorModel(params.message, null, params.int('error'))
+            } else {
+
+                def requestCache = new HttpSessionRequestCache();
+                def defaultSavedRequest = requestCache.getRequest(request, response);
+                //def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+                log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
+                if(defaultSavedRequest) {
+                    (new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+                    return
+                } else {
+                    redirect uri:request.scheme+"://"+request.serverName+request.contextPath+"/";
+                    return;
+                }
             }
             withFormat {
                 json { render model as JSON }

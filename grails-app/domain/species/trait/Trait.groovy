@@ -205,20 +205,20 @@ class Trait {
         }
 
         if(ibpParentTaxon) {
-            traits.each { trait ->
+            traits.each { traitInstance ->
                 boolean s = false;
                 ibpParentTaxon.each { t ->
-                    trait.taxon.each { taxon ->
+                    traitInstance.taxon.each { taxon ->
                         println taxon.id
                         if(taxon.id == t.id)
-                            validTraits << trait;
+                            validTraits << traitInstance;
                         s = true
                     }
                 }
                 if(!s) {
-                    if(!trait.taxon) {
+                    if(!traitInstance.taxon) {
                         //Root level traits
-                        validTraits << trait;
+                        validTraits << traitInstance;
                     }
                 }
             }
@@ -234,15 +234,15 @@ class Trait {
         }
     }
 
-    static boolean isValidTrait(Trait trait, List<TaxonomyDefinition> taxonConcepts) {
+    static boolean isValidTrait(Trait traitInstance, List<TaxonomyDefinition> taxonConcepts) {
         boolean isValid = true;
         taxonConcepts. each {
-            isValid = isValid || isValidTrait(trait, it);
+            isValid = isValid || isValidTrait(traitInstance, it);
         }
         return isValid;
     }
 
-    static boolean isValidTrait(Trait trait, TaxonomyDefinition taxonConcept) {
+    static boolean isValidTrait(Trait traitInstance, TaxonomyDefinition taxonConcept) {
         boolean isValid = false;
         String ibpClassificationName = Holders.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY;
         def classification = Classification.findByName(ibpClassificationName);
@@ -258,8 +258,8 @@ class Trait {
 
         if(ibpParentTaxon) {
             ibpParentTaxon.each { t ->
-                trait.taxon.each { taxon ->
-                    if(trait.taxon.id == t.id)
+                traitInstance.taxon.each { taxon ->
+                    if(traitInstance.taxon.id == t.id)
                        isValid = true;
                 }
             }

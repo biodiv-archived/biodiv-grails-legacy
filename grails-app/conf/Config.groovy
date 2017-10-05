@@ -641,8 +641,8 @@ environments {
             debug 'species'
             info    'com.linkedin.grails.ProfilerPlugin'
             debug 'org.apache.http.wire'
+            //debug  'org.codehaus.groovy.grails.orm.hibernate.cfg'
             trace 'grails.plugin.springsecurity.SpringSecurityUtils'
-
         }
     }
     pamba {
@@ -992,12 +992,13 @@ grails.plugin.springsecurity.userLookup.usernamePropertyName = 'email'
 grails.plugin.springsecurity.successHandler.useReferer = true;
 //grails.plugin.springsecurity.auth.defaultRoleNames = ['ROLE_USER']
 //grails.plugin.springsecurity.apf.filterProcessesUrl = '/j_drupal_spring_security_check'
-//grails.plugin.springsecurity.providerNames = [
-//	'drupalAuthentiactionProvider',
-//	'daoAuthenticationProvider',
-//	'anonymousAuthenticationProvider',
-//	'rememberMeAuthenticationProvider'
-//];
+grails.plugin.springsecurity.providerNames = [
+	'jwtTokenAuthProvider',
+	'facebookAuthProvider',
+	'daoAuthenticationProvider',
+	'anonymousAuthenticationProvider',
+	'rememberMeAuthenticationProvider'
+];
 
 //grails.plugin.springsecurity.openid.nonceMaxSeconds =  600;
 
@@ -1353,7 +1354,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 '/js/**':       ['permitAll'],
 '/css/**':      ['permitAll'],
 '/images/**':   ['permitAll'],
-'/plugins/ckeditor-3.6.3.0/**':   ['permitAll'],
+'/plugins/ckeditor**':   ['permitAll'],
 '/bootstrap/img/*':['permitAll'],
 '/plugins/jquery-ui-1.10.3/**':['permitAll'],
 '/login/**':        ['permitAll'],
@@ -1438,13 +1439,13 @@ filteringCodecForContentType {
 remove this line */
 //grails.dependency.cache.dir = "${userHome}/.ivy2/cache"
 //TODO remove this client side fb authentication ... as this is legacy code in plugin
-grails.plugin.springsecurity.facebook.filter.type='cookie,transparent'
+grails.plugin.springsecurity.facebook.filter.type='transparent'
 grails.plugin.springsecurity.facebook.autoCreate.roles = ['ROLE_USER']
 //TODO:In Spring Security 3.0 and earlier, the username was stored in the HTTP session under the key "SPRING_SECURITY_LAST_USERNAME". This no longer done, but the plugin will use the old behavior if the grails.plugin.springsecurity.apf.storeLastUsername setting is set to true (the default is false ). Further, the name is no longer escaped before storing, it is stored exactly as entered by the user, so you must escape it when redisplaying to avoid XSS attacks.
 grails.plugin.springsecurity.apf.storeLastUsername=true
 grails.plugin.springsecurity.useSessionFixationPrevention = false
 
-grails.databinding.useSpringBinder=true
+//grails.databinding.useSpringBinder=true
 // What URL patterns should be processed by the resources plugin
 grails.resources.adhoc.includes = ['/images/**', '/css/**', '/js/**', '/plugins/**', '/bootstrap/**']
 
@@ -1583,8 +1584,12 @@ grails.plugins.dynamicController.mixins = [
     'app.info.custom.example.MyConfigControllerMixin' :
     'com.burtbeckwith.appinfo_test.AdminManageController'
 ]
-
-
+grails.plugins.springsecurity.filterChain.filterNames = [
+   'securityContextPersistenceFilter', 'logoutFilter',
+      'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
+         'rememberMeAuthenticationFilter', 'anonymousAuthenticationFilter',
+            'exceptionTranslationFilter', 'filterInvocationInterceptor'
+            ]
 grails.plugin.springsecurity.filterChain.chainMap = [
 '/**/js/**':'exceptionTranslationFilter',
 '/**/css/**':'exceptionTranslationFilter',

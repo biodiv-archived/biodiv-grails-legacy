@@ -19,14 +19,50 @@ function updateLoginInfo(){
 
 function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler, cancelHandler) {
     if (xhr.status == 401) {
-        show_login_dialog(successHandler, errorHandler, cancelHandler);
-        //window.location.href = "/biodiv/login?spring-security-redirect="+window.location.href;
+        var now = new Date().getTime();
+        var brToken = $.cookie("BRToken");
+        var baTokenExpiresCookie = $.cookie("BATokenExpires");
+        baTokenExpiresCookie = baTokenExpiresCookie ? baTokenExpiresCookie : 0;
+        var timeleft = baTokenExpiresCookie + (5*24*60*60*1000) - now;
+        if(brToken == null || timeleft <= 0) {
+            show_login_dialog(successHandler, errorHandler, cancelHandler);
+        } else {
+            ajaxLoginSuccessCallbackFunction = successHandler;
+            ajaxLoginErrorCallbackFunction = errorHandler;
+            ajaxLoginCancelCallbackFunction = cancelHandler;
+            //get new accessToken with existing refreshtoken
+            getNewAccessToken();
+            
+        }//window.location.href = "/biodiv/login?spring-security-redirect="+window.location.href;
     } else {
         if (errorHandler)
             errorHandler();
         else
             console.log(errorThrown);
     }
+}
+
+function getNewAccessToken() {
+    var brTokenCookie = $.cookie("BRToken");
+    var isAjax = $("#ajaxLogin").is(':visible'); 
+    $.ajax({
+        url: window.params.login.tokenUrl,
+        method:'POST',
+        data:{grant_type:'access_token', 'refresh_token':brTokenCookie},
+        type:'json',
+        success : function(data) {
+            console.log(data);
+            setLoginInfo(data, isAjax);
+        }, error: function (xhr, ajaxOptions, thrownError) {
+            $('.loginMessage').html(xhr.responseJSON.message).removeClass().addClass('alert alert-error').show();
+            if(isAjax == true && ajaxLoginErrorCallbackFunction) {
+                ajaxLoginErrorCallbackFunction();
+                updateLoginInfo();
+                alert(xhr.responseJSON.message);
+            }
+        }
+
+    });
 }
 
 /*function adjustHeight() {
@@ -60,13 +96,13 @@ var reloadLoginInfo = function() {
 
 var ajaxLoginSuccessHandler = function(json, statusText, xhr, $form) {
 
-    if (json.success || json.status == 'success') {		
+    if (json.success || json.status == 'success' || json.access_token != null) {		
         if (ajaxLoginSuccessCallbackFunction) {
             ajaxLoginSuccessCallbackFunction(json,
                     statusText, xhr);
             ajaxLoginSuccessCallbackFunction = undefined;
         }
-        updateLoginInfo()
+        updateLoginInfo();
     } else if(json.error && json.status === 401) {
         $('.loginMessage').html("Resending previous request").removeClass().addClass('alter alert-info').show();
         ajaxLoginErrorCallbackFunction(json);		
@@ -137,12 +173,72 @@ function closeHandler() {
     });
 };
 
+function isLoggedIn() {
+    if($.cookie("BAToken")) {
+        reloadLoginInfo();
+        return true;
+    } else {
+        if($.cookie("BRToken")) {
+            getNewAccessToken();
+        } else {
+            return false;
+        }
+    }    
+}
 
- 
+function setLoginInfo(data, isAjax) {
+    var date = new Date();
+    date.setTime(date.getTime()+data.expires_in);
+    $.cookie("BAToken", data.access_token, {path : '/', expires : date});
+    console.log(date);
+    $.cookie("BATokenExpires", date.getTime(), {path : '/', expires : 60});
+    $.cookie("BRToken", data.refresh_token, {path : '/', expires : 60});//setting for 60 days
+    if(typeof isAjax == undefined)
+       isAjax = $("#ajaxLogin").is(':visible'); 
+    if(isAjax == false) 
+        window.location = window.params.login.authSuccessUrl;
+    else {
+        ajaxLoginSuccessHandler(data);
+    }
+}
+
 $(document).ready(function() {
-   $('.isParentGroup .fbJustConnect').click(function() {
-        var clickedObject = this;
-        var scope = { scope: "" };
+   $('.fbJustConnect').click(function() {
+        window.location.href =  "https://www.facebook.com/dialog/oauth?response_type=code&client_id=115305755799166&redirect_uri=http%3A%2F%2Fapi.local.ibp.org%2Flogin%2Fcallback%3Fclient_name%3DfacebookClient&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_website%2Cuser_work_history&state=biodiv-api-state";
+        /*$.ajax({
+            async: true,
+            crossDomain: true,
+            url: "https://www.facebook.com/dialog/oauth?response_type=code&client_id=115305755799166&redirect_uri=http%3A%2F%2Fapi.local.ibp.org%2Flogin%2Fcallback%3Fclient_name%3DfacebookClient&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_website%2Cuser_work_history&state=biodiv-api-state",
+            method: "GET",
+            headers: {
+                "cache-control": "no-cache",
+            },
+            type:'json',
+           success : function(data) {
+               console.log(data);
+               var date = new Date();
+               date.setTime(date.getTime()+data.expires_in);
+               $.cookie("BAToken", data.access_token, {path : '/', expires : date});
+               console.log(date);
+                $.cookie("BATokenExpires", date.getTime(), {path : '/', expires : 60});
+               $.cookie("BRToken", data.refresh_token, {path : '/', expires : 60});//setting for 60 days
+               if(isAjax == false) 
+                window.location = window.params.login.authSuccessUrl;
+               else {
+                ajaxLoginSuccessHandler(data);
+               }
+           }, error: function (xhr, ajaxOptions, thrownError) {
+                $('.loginMessage').html(xhr.responseJSON.message).removeClass().addClass('alert alert-error').show();
+                if(isAjax == true && ajaxLoginErrorCallbackFunction) {
+                    ajaxLoginErrorCallbackFunction();
+                    updateLoginInfo();
+                }
+           }
+           });*/
+
+        /*
+         var clickedObject = this;
+         var scope = { scope: "" };
         scope.scope = "email,user_about_me,user_location,user_hometown,user_website";
 
         window.fbEnsure(function() {
@@ -163,25 +259,43 @@ $(document).ready(function() {
                     alert("Failed to connect to Facebook");
                 }
             }, scope);
-        });
+        });*/
     });
-    
-   $('.openid-loginbox form.isSubGroup').on('submit', function(e) {
+
+   $('#loginForm, .openid-loginbox form').on('submit', function(e) {
        $('body').addClass('busy');
        e.stopPropagation();
+        $('.loginMessage').html("Logging in ...").removeClass().addClass('alert alert-info').show();
+       
        var isAjax = $("#ajaxLogin").is(':visible'); 
-       loadBiodivLoginIframe(function() {
-           var iframe = document.getElementsByName("biodiv_iframe")[0];
-           if(iframe) {
-               var iframeWindow = (iframe.contentWindow || iframe.contentDocument);
-               var username = isAjax ? $($('.isSubGroup input[name="j_username"]')[0]).val() : $($('.isSubGroup input[name="j_username"]')[1]).val()
-               var password = isAjax ? $($('.isSubGroup input[name="j_password"]')[0]).val() : $($('.isSubGroup input[name="j_password"]')[1]).val()
-               iframeWindow.postMessage(JSON.stringify({'regular_login':'true', 'j_username':username,'j_password':password, isAjax:isAjax}), '*');
+       var username = isAjax ? $($('.isSubGroup input[name="j_username"]')[0]).val() : $($('.isSubGroup input[name="j_username"]')[1]).val();
+       var password = isAjax ? $($('.isSubGroup input[name="j_password"]')[0]).val() : $($('.isSubGroup input[name="j_password"]')[1]).val();
+       $.ajax({
+           url: window.params.login.loginUrl,
+           method:'POST',
+           data:{'username':username, 'password':password},
+           type:'json',
+           success : function(data) {
+               console.log(data);
+               setLoginInfo(data, isAjax);
+            }, error: function (xhr, ajaxOptions, thrownError) {
+                $('.loginMessage').html(xhr.responseJSON.message).removeClass().addClass('alert alert-error').show();
+                if(isAjax == true && ajaxLoginErrorCallbackFunction) {
+                    ajaxLoginErrorCallbackFunction();
+                    updateLoginInfo();
+                }
            }
        });
+       /*loadBiodivLoginIframe(function() {
+           var iframe = document.getElementsByName("biodiv_iframe")[0];
+           if(iframe) {
+            var iframeWindow = (iframe.contentWindow || iframe.contentDocument);
+            iframeWindow.postMessage(JSON.stringify({'regular_login':'true', 'j_username':username,'j_password':password, isAjax:isAjax}), '*');
+           }
+       });*/
        return false;
    });
-
+   /*
    $('.isSubGroup .fbJustConnect, .isSubGroup .googleConnect, .isSubGroup .yahooConnect' ).click(function(event) {
        $('body').addClass('busy');
        event.stopPropagation();
@@ -196,9 +310,10 @@ $(document).ready(function() {
        });
        return false;
    });
-
-   $('#logout.isSubGroup').on('click', function() {
-       $('body').addClass('busy');
+*/
+   $('#logout').on('click', function() {
+        clearAllCookies();
+/*       $('body').addClass('busy');
        event.stopPropagation();
        var isAjax = $("#ajaxLogin").is(':visible'); 
        loadBiodivLoginIframe(function() {
@@ -209,14 +324,14 @@ $(document).ready(function() {
            }
        }, true);
        return false;
-
+*/
    });
 
 
 }); 
 
 //////////////////////// FB RELATED CALLS ///////////////////////
-
+/*
 window.fbInitCalls = Array();
 window.fbAsyncInit = function() {	
     if (!window.facebookInitialized) { 
@@ -261,6 +376,7 @@ window.fbEnsure = function(callback) {
 
 fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
+*/
 ////////////////////////FB RELATED CALLS END HERE ///////////////////////
 
 
@@ -321,13 +437,14 @@ $(document).ready(function() {
     }
     ////////////////////////GOOGLE RELATED CALLS END HERE ///////////////////////
 
-    $('.isParentGroup .googleConnect').click(function(e) { 
-		//googleOpener.popup(450,500);
-        handleAuthClick(e);
+    $('.googleConnect').click(function(e) { 
+        //handleAuthClick(e);
+
+        window.location.href = "https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=317806372709-roromqiujiji1po5jh8adpcr5um895mb.apps.googleusercontent.com&redirect_uri=http://api.local.ibp.org/login/callback?client_name=google2Client&access_type=offline&scope=email";
 		return true; 
 	});
 	
-	$('.isParentGroup .yahooConnect').click(function() { 
+/*	$('.isParentGroup .yahooConnect').click(function() { 
 		yahooOpener.popup(450,500);
 		return true; 
 	});
@@ -335,7 +452,7 @@ $(document).ready(function() {
     //https://developers.google.com/api-client-library/javascript/start/start-js#how-it-looks-in-javascript
     function handleAuthResult(authResult) {
         if (authResult && !authResult.error) {
-            $('.loginMessage').html("Logging in ...").removeClass().addClass('alter alert-info').show();
+            $('.loginMessage').html("Logging in ...").removeClass().addClass('alert alert-info').show();
             delete authResult['g-oauth-window'];
             var authParams = {'response': JSON.stringify(authResult).replace(/:/g,' : ')};
             callAuthSuccessUrl( window.params.login.googleOAuthSuccessUrl, authParams);
@@ -348,10 +465,10 @@ $(document).ready(function() {
         gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
         return false;
     }
-
+*/
 });
 
-function loadBiodivLoginIframe(callback, logout=false) {
+/*function loadBiodivLoginIframe(callback, logout=false) {
     if(!$(document.getElementsByName("biodiv_iframe")[0]).attr("src")) {
         if(logout) {
             $(document.getElementsByName("biodiv_iframe")[0]).attr("src", window.params.login.authIframeUrl+'?logout='+logout).load(function(e) {
@@ -365,4 +482,4 @@ function loadBiodivLoginIframe(callback, logout=false) {
     } else {
         callback();
     }
-}
+}*/

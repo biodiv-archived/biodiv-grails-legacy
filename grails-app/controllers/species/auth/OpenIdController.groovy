@@ -14,9 +14,8 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.PortResolver;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
-import org.springframework.social.facebook.api.FacebookProfile;
+import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
 import org.springframework.util.StringUtils;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -53,7 +52,10 @@ class OpenIdController {
 	def messageSource
 	static defaultAction = 'auth'
 
-	def checkauth = { log.debug "inside check auth " + params }
+	def checkauth = { 
+        log.debug "inside check auth " + params 
+        render (view : 'checkauth', model:params);
+    }
 
 	/**
 	 * Shows the login page. The user has the choice between using an OpenID and a username
@@ -220,8 +222,9 @@ class OpenIdController {
 
 		log.debug "Processing facebook registration in createAccount"
 		FacebookTemplate facebook = new FacebookTemplate(token.accessToken.accessToken);
-		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
-		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
+        //TODO:following line shd be enabled
+//		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
+		User fbProfile = facebook.userOperations().getUserProfile();
 
 		//TODO: if there are multiple email accounts available choose among them
 		String email = fbProfile.email;

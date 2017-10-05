@@ -8,7 +8,7 @@ import species.License;
 
 class Fact {
 
-    Trait trait;
+    Trait traitInstance;
     TraitValue traitValue;
     String value;//default from value if trait type is range
     String toValue;
@@ -24,7 +24,7 @@ class Fact {
     boolean isDeleted = false;
 
     static constraints = {
-      trait nullable:false, unique:['objectType', 'objectId','traitValue']
+      traitInstance nullable:false, unique:['objectType', 'objectId','traitValue']
       //attribution nullable:true
       //contributor nullable:true
       //license nullable:true
@@ -39,6 +39,7 @@ class Fact {
     }
 
     static mapping = {
+        traitInstance column:"trait"
         description type:"text"
         attribution type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "fact_id_seq"] 

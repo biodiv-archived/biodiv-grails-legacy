@@ -228,17 +228,17 @@ class Utils {
 	}
 
 	//	static String getIBPServerUrl() {
-	//		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+	//		def config = grails.util.Holders.config;
 	//		return getIBPServerDomain() + "/$config.appName";
 	//	}
 
 	static String getIBPServerDomain() {
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+		def config = grails.util.Holders.config;
 		return "http://$config.ibp.domain";
 	}
 
 	static String getIBPServerCookieDomain() {
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+		def config = grails.util.Holders.config;
 		return "$config.ibp.domain";
 	}
 
@@ -249,7 +249,7 @@ class Utils {
 		}
 		
 		def domain = getDomain(request);
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 
 		if(domain.startsWith(config.wgp.domain)) {
 			return "The Westernghats Portal"

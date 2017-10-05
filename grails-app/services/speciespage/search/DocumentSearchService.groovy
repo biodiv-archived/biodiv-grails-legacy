@@ -63,8 +63,8 @@ class DocumentSearchService extends AbstractSearchService {
 		if(!documents) return;
 		log.info "Initializing publishing to Documents search index : "+documents.size();
 
-        def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
         Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
         Map names = [:];

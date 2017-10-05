@@ -15,7 +15,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         <asset:javascript src="jquery.js"/>
         <asset:javascript src="fileuploader.js"/>
         <asset:stylesheet href="application.css"/>
-        <asset:stylesheet src="/all/${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.app.siteCode}.css"/>
+        <asset:stylesheet src="/all/${grails.util.Holders.config.speciesPortal.app.siteCode}.css"/>
         <g:layoutHead />
         <ckeditor:resources />
 

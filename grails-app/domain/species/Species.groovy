@@ -3,7 +3,7 @@ package species
 import java.util.Date;
 
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
+import grails.util.Holders;
 
 import species.Resource;
 import species.Resource.ResourceType;
@@ -48,11 +48,11 @@ class Species implements Rateable {
     def speciesPermissionService;
     def utilsService;
     def traitService;
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
 
 	private static final log = LogFactory.getLog(this);
 	
-	def fieldsConfig = ConfigurationHolder.config.speciesPortal.fields
+	def fieldsConfig = Holders.config.speciesPortal.fields
 	
 	static hasMany = [fields: SpeciesField,
 		globalDistributionEntities:GeographicEntity, 

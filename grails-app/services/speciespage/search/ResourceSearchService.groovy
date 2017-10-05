@@ -76,7 +76,7 @@ class ResourceSearchService extends AbstractSearchService {
         /*if(!resources) return;
         log.info "Initializing publishing to resource search index : "+resources.size();
 
-        //def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
+        //def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 
         Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
         Map docsMap = [:]
@@ -94,7 +94,7 @@ class ResourceSearchService extends AbstractSearchService {
     /**
      */
     public SolrInputDocument getSolrDocument(Resource r) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField(searchFieldsConfig.ID, r.class.simpleName +"_"+r.id.toString());
         doc.addField(searchFieldsConfig.OBJECT_TYPE, r.class.simpleName);

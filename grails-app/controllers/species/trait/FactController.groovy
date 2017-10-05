@@ -16,6 +16,7 @@ import species.groups.CustomField;
 import species.auth.SUser;
 import species.License;
 import species.Species;
+import species.trait.Trait;
 
 class FactController extends AbstractObjectController {
 
@@ -75,14 +76,15 @@ class FactController extends AbstractObjectController {
 
     @Secured(['ROLE_USER'])
     def update() {
+        Trait biodiv_trait;
         boolean success=false;
-        Map model = [:], result=[:];
-        Trait trait;
+        Map model = new HashMap();
+        Map result= new HashMap();
         try {
         if(params.traitId) {
-            trait = Trait.read(params.long('traitId'));
+            biodiv_trait = Trait.read(params.long('traitId'));
         }
-        if(trait) {
+        if(biodiv_trait) {
             if(params.objectId && params.objectType) {
                 def object;
                 switch(params.objectType) {
@@ -114,7 +116,7 @@ class FactController extends AbstractObjectController {
                             activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
                         }
                         
-                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
+                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(biodiv_trait, object.id, object.class.getCanonicalName());
                         Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
                         queryParams.trait[trait.id] = '';
                         facts.each { fact ->
@@ -129,19 +131,19 @@ class FactController extends AbstractObjectController {
                         }
                         println "======================"
                         println queryParams
-                        model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
+                        model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':biodiv_trait, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
                     } else {
 
                     }
                 }else{
                         // if no traitValue selected 
-                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
+                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(biodiv_trait, object.id, object.class.getCanonicalName());
 
                         facts.each { fact ->
                             fact.isDeleted = true;
                             fact.save();
                             result = [success:true, msg:'Successfully deleted fact']
-                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'queryParams':'', displayAny:false, editable:true]);
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':biodiv_trait, 'queryParams':'', displayAny:false, editable:true]);
                         }
 
                 }
@@ -268,26 +270,26 @@ class FactController extends AbstractObjectController {
                     if(tv_str) {
                         tv_str.split(',').each {v->
                         def tv = v.trim().split("\\|");
-                        def taxon,trait,traitValue;
+                        def taxon,biodiv_trait,traitValue;
                         if(cf_taxons[cf+' taxonID']) {
                             taxon = TaxonomyDefinition.read(Long.parseLong(cf_taxons[cf+' taxonID'])); 
                             def traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [tv[0], taxon]);
-                            if(traits) trait = traits[0];
+                            if(traits) biodiv_trait = traits[0];
                         } else {
-                            trait = Trait.findByName(tv[0]);
+                            biodiv_trait = Trait.findByName(tv[0]);
                         }
-                        traitValue = TraitValue.findByTraitAndValue(trait, tv[1]);
-                        if(traitValue && trait) {
+                        traitValue = TraitValue.findByTraitAndValue(biodiv_trait, tv[1]);
+                        if(traitValue && biodiv_trait) {
                             //TODO:do get contri and attr from activity feed
                             def contributor;
                             def authors = ActivityFeed.executeQuery("select author from ActivityFeed where activity_holder_id=:oid and activity_type='Custom field edited' order by last_updated desc limit 1",[oid:obv.id]);
                             if(authors) contributor = authors[0];
                             if(!contributor) contributor = SUser.findByEmail('admin@strandls.com');
                             Map m = ['attribution':contributor.name, 'contributor':contributor.email, 'license':'BY'];
-                            if(!m[trait.id+''])  {
-                                m[trait.id+''] = traitValue.value
+                            if(!m[biodiv_trait.id+''])  {
+                                m[biodiv_trait.id+''] = traitValue.value
                             } else {
-                                m[trait.id+''] += ','+traitValue.value
+                                m[biodiv_trait.id+''] += ','+traitValue.value
                             }
                             println '=================='
                             println m;

@@ -622,7 +622,7 @@ println queryParts.queryParams
         //setting ufile and uri
         File sourceFile = new File(fileDir, m['file path'])
         if(sourceFile.exists()){
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = grails.util.Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir
             File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
             try{

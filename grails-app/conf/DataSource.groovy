@@ -1,6 +1,7 @@
 dataSource {
     pooled = true
-    
+    username = ""
+    password = ""
     //Added bu hibernatespatial plugin
 // //     driverClassName = "org.postgis.DriverWrapper"
     dialect = org.hibernatespatial.postgis.PostgisDialect

@@ -15,7 +15,7 @@
 							beforeSubmit : function(formData, jqForm, options) {
 								$('.loginMessage').html('Logging in ...')
 										.removeClass().addClass(
-												'alter alert-info').show();
+												'alert alert-info').show();
 								return true;
 							},
 							success : ajaxLoginSuccessHandler,

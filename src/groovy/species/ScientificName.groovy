@@ -3,7 +3,7 @@ package species
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.MessageSource
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 
 abstract class ScientificName extends NamesMetadata {
 
@@ -121,7 +121,7 @@ abstract class ScientificName extends NamesMetadata {
 		}
 
     static int getTaxonRank(String rankStr) {
-        MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
+        MessageSource messageSource = grails.util.Holders.application.mainContext.getBean('messageSource')
         def request = null;
         try {
             request = RequestContextHolder.currentRequestAttributes().request

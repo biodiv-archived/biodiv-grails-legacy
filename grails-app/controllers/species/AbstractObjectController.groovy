@@ -80,7 +80,7 @@ abstract class AbstractObjectController {
                 log.debug "no related observations"
             }
         } else {
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = grails.util.Holders.config
             List urlList = []
             for(param in relatedObv.observations){
                 def res = param['observation'];

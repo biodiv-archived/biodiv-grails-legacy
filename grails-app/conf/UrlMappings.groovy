@@ -1,5 +1,4 @@
 import org.gualdi.grails.plugins.ckeditor.CkeditorConfig
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class UrlMappings {
 

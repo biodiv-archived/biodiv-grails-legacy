@@ -1,6 +1,6 @@
 grails.servlet.version = "3.0" // Change depending on target container compliance (2.5 or 3.0)
-grails.project.target.level = 1.6
-grails.project.source.level = 1.6
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
 
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
@@ -28,7 +28,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // uncomment to disable ehcache
         // excludes 'ehcache'
-        excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs', 'stax-api', 'lucene-spellchecker', 'lucene-analyzers'
+        excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs', 'stax-api', 'lucene-spellchecker', 'lucene-analyzers', 'bcprov-jdk14'
 
     }
 
@@ -50,14 +50,14 @@ grails.project.dependency.resolution = {
         mavenLocal()
         mavenCentral()
         //mavenRepo "http://repository.codehaus.org"
-        mavenRepo "https://repo.grails.org/grails/plugins" 
+        mavenRepo "https://repo.grails.org/grails/plugins/" 
         mavenRepo "http://download.java.net/maven/2/"
         mavenRepo 'http://download.osgeo.org/webdav/geotools'
         mavenRepo 'http://www.hibernatespatial.org/repository'
         mavenRepo "http://repository.jboss.com/maven2/"
         //mavenRepo "http://snapshots.repository.codehaus.org"
         mavenRepo "https://repository.jboss.org/nexus/content/groups/public"
-        mavenRepo "http://repo.desirableobjects.co.uk/"
+        //mavenRepo "http://repo.desirableobjects.co.uk/"
         mavenRepo "http://mvnrepository.com/artifact/"
         mavenRepo "http://repo.spring.io/milestone/"
         mavenRepo "http://repo1.maven.org/maven2"
@@ -70,7 +70,6 @@ grails.project.dependency.resolution = {
 
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-
         compile ('org.apache.solr:solr-solrj:4.10.0') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
@@ -97,14 +96,16 @@ grails.project.dependency.resolution = {
         }
 
         compile group:'org.apache.poi', name:'poi-scratchpad', version:'3.7'
-        compile(group:'org.apache.poi', name:'poi-ooxml', version:'3.7') {
+        compile (group:'org.apache.poi', name:'poi-ooxml', version:'3.7') {
             excludes 'geronimo-stax-api_1.0_spec'
         }
-        compile ('org.springframework.social:spring-social-facebook:1.0.0.RELEASE') {
+        compile ('org.springframework.social:spring-social-facebook:2.0.3.RELEASE') {
             excludes 'spring-web' 
         }
-        compile('net.sf.opencsv:opencsv:2.3')
-        compile('com.itextpdf:itextpdf:5.0.6')
+        compile ('net.sf.opencsv:opencsv:2.3')
+        compile ('com.itextpdf:itextpdf:5.0.6'){
+            excludes "bcprov-jdk14"
+        }
         /*   compile('org.hibernatespatial:hibernate-spatial:1.0') {
              excludes 'slf4j-api', 'jcl-over-slf4j'
         }
@@ -144,7 +145,8 @@ grails.project.dependency.resolution = {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }*/
 
-
+        compile "org.pac4j:pac4j-jwt:2.1.0"
+        compile "org.pac4j:pac4j-oauth:2.1.0"
     }
 
     plugins { 
@@ -153,6 +155,7 @@ grails.project.dependency.resolution = {
         //build ':jetty:2.0.3'
 
         //compile ":scaffolding:2.0.1"
+        compile group: 'org.grails.plugins', name: 'platform-core', version: '1.0.0'
         //TODO enable this plugin
         compile (':cache:1.1.8') {
                 excludes "servlet-api" 
@@ -171,8 +174,8 @@ grails.project.dependency.resolution = {
         //compile ":spring-security-core:1.2.7.3" 
         compile "org.grails.plugins:spring-security-acl:2.0.1"
 
-        compile (":spring-security-rest:1.4.0") {
-                excludes 'spring-security-core', 'cors'
+        compile (":spring-security-rest:1.5.4") {
+                excludes 'spring-security-core', 'cors','pac4j-cas'
         }
 
         compile (":spring-security-facebook:0.15.2-CORE2") {
@@ -189,11 +192,13 @@ grails.project.dependency.resolution = {
         compile ':plugin-config:0.1.8'
         //compile ":error-pages-fix:0.2"
         compile ":ajax-uploader:1.1"
-        compile ":cache-headers:1.1.5"
+        compile ":cache-headers:1.1.7"
 //        runtime ":cached-resources:1.0"
-        compile ":ckeditor:3.6.3.0"
-        compile ':scaffolding:2.0.3' 
-        compile ':email-confirmation:1.0.5'
+        compile ":ckeditor:4.5.4.1"
+        compile ':scaffolding:2.1.0' 
+        compile (':email-confirmation:2.0.8') {
+            excludes 'platform-core'
+        }
         //        compile ":famfamfam:1.0.1"
         //        compile ":google-analytics:2.1.1"
         compile ":google-visualization:0.6.2"
@@ -215,9 +220,9 @@ grails.project.dependency.resolution = {
         compile "org.grails.plugins:twitter-bootstrap:2.3.2.2"
         compile "org.grails.plugins:asset-pipeline:2.7.4"
         //compile ":redis:1.6.6"
-        compile "org.grails.plugins:app-info:1.1.1"
-        compile "org.grails.plugins:app-info-hibernate:0.4.1"
-        compile "org.grails.plugins:profiler:0.5"
+        //compile "org.grails.plugins:app-info:1.1.1"
+        //compile "org.grails.plugins:app-info-hibernate:0.4.1"
+        //compile "org.grails.plugins:profiler:0.5"
         runtime ":cors:1.3.0"
     } 
 

@@ -6,9 +6,6 @@ import grails.plugin.springsecurity.userdetails.DefaultPreAuthenticationChecks;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
-import org.springframework.social.connect.support.ConnectionFactoryRegistry;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao;
 
@@ -29,7 +26,7 @@ import org.apache.solr.core.CoreContainer;
 import grails.util.Environment
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
+import grails.util.Holders as CH 
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import species.auth.DefaultOauthUserDetailsService;
@@ -37,7 +34,7 @@ import species.auth.MyOauthService;
 import species.utils.marshallers.*;
 import species.auth.RestAuthenticationFailureHandler;
 import species.auth.BiodivRestAuthenticationTokenJsonRenderer;
-import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
+import grails.plugin.springsecurity.rest.RestAuthenticationSuccessHandler;
 import grails.plugin.mail.MailMessageContentRenderer;
 import grails.rest.render.json.JsonRenderer;
 import org.codehaus.groovy.grails.web.mime.MimeType;
@@ -46,6 +43,8 @@ import species.auth.RestTokenValidationFilter;
 import species.MyEntityInterceptor;
 import species.auth.AjaxAwareAuthenticationEntryPoint;
 import grails.plugin.springsecurity.SecurityFilterPosition
+import species.auth.JwtTokenAuthProvider;
+
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
@@ -87,8 +86,8 @@ beans = {
 
     userDetailsService(OpenIdUserDetailsService) { grailsApplication = ref('grailsApplication') }
 
-    def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
+    def configRoot = CH.config
+    def config = CH.config.speciesPortal.search
 
     if (Environment.current == Environment.DEVELOPMENT) {
         // In development we use messageLocalService as implementation
@@ -270,7 +269,7 @@ beans = {
         applicationId = conf.facebook.appId
         filterTypes = ['cookie', 'transparent']
         requiredPermissions = ['email']
-
+        userDetailsService = ref('userDetailsService')
     }
 
     facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { 
@@ -302,8 +301,6 @@ beans = {
         userDomainClassName = conf.userLookup.userDomainClassName
         facebookAuthDao = ref('facebookAuthDao')
     }
-
-
 
     facebookAuthProvider(FacebookAuthProvider) {
         facebookAuthDao = ref('facebookAuthDao')
@@ -348,7 +345,7 @@ beans = {
 
     dataSource(ComboPooledDataSource) { bean ->
         bean.destroyMethod = 'close'
-        user = CH.config.dataSource.username
+        user =  CH.config.dataSource.username
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
@@ -404,7 +401,6 @@ beans = {
             new DocumentMarshaller()
         ]
     }
-
     restAuthenticationFailureHandler(species.auth.RestAuthenticationFailureHandler) {
         statusCode = conf.rest.login.failureStatusCode?:HttpServletResponse.SC_FORBIDDEN
     }
@@ -413,7 +409,6 @@ beans = {
     restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler) { 
         renderer = ref('restAuthenticationTokenJsonRenderer')
     }
-
     /* restAuthenticationFilter */
     /*
     restAuthenticationFilter(RestAuthenticationFilter) {
@@ -435,7 +430,6 @@ beans = {
     }
  */
     
-
     restTokenValidationFilter(RestTokenValidationFilter) {
         grailsApplication = ref('grailsApplication') 
         webInvocationPrivilegeEvaluator = ref('webInvocationPrivilegeEvaluator') 
@@ -448,10 +442,12 @@ beans = {
         authenticationFailureHandler = ref('restAuthenticationFailureHandler')
         restAuthenticationProvider = ref('restAuthenticationProvider')
     }
-
     webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
     entityInterceptor(species.MyEntityInterceptor);
 
+    jwtTokenAuthProvider(JwtTokenAuthProvider) {
+        coreUserDetailsService = ref('userDetailsService')
+    }
 }
 
 

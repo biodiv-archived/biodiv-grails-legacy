@@ -319,7 +319,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	   * executing query
 	   */
 	 Map getFilteredUsersFromSearch(params, max, offset){
-	 	def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+	 	def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 		//Store all teh parameter list here
 		NamedList paramsList = new NamedList();
 		//Check for the parameters passed by user and convert them to solr queries

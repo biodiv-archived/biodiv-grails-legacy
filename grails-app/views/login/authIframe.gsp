@@ -10,7 +10,7 @@
 </style>
 </head>
 <body>
-    <auth:ajaxLogin model="['isSubGroup':false]"/>
+    <auth:ajaxLogin model="['isSubGroup':true]"/>
     <a id="logout" class="hide isParentGroup" href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"/>
 
 

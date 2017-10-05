@@ -785,3 +785,13 @@ alter table external_links add column frlht_url varchar;
 #2nd June 2017
 alter table user_group add column filter_rule text;
 
+
+#6thSep2017
+create table token(id bigint not null, value varchar(255) not null, type varchar(255) not null, user_id bigint not null, created_on timestamp without time zone not null);
+alter table token add  PRIMARY KEY (id);
+alter table token add constraint user_id_fk foreign key(user_id) references suser(id);
+alter table token add  constraint value_user_id_uk unique (value, user_id);
+create index on token(user_id);
+create index on token(value);
+create index on token(value,user_id);
+

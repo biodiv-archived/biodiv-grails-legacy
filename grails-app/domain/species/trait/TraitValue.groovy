@@ -10,7 +10,7 @@ import species.utils.ImageUtils;
 
 class TraitValue {
 
-    Trait trait;
+    Trait traitInstance;
     String value;
     String description;
     String icon;
@@ -21,7 +21,7 @@ class TraitValue {
     boolean isDeleted = false;
     
     static constraints = {
-        trait nullable:false, blank:false, unique:['value']
+        traitInstance nullable:false, blank:false, unique:['value']
         value nullable:false
 		description nullable:true
         icon nullable:true
@@ -31,6 +31,7 @@ class TraitValue {
 
     static mapping = {
         description type:"text"
+        traitInstance column:"trait"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_value_id_seq"] 
     }
 

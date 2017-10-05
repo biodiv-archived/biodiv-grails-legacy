@@ -150,7 +150,7 @@ class FactService extends AbstractObjectService {
                     value = value ? value.trim() : null ;
                     writeLog("Loading trait ${key} : ${value}");
 
-                    Trait trait;
+                    Trait traitInstance;
                     TaxonomyDefinition pageTaxon;
                     println object.class.getCanonicalName();
                     switch(object.class.getCanonicalName()) {
@@ -158,40 +158,40 @@ class FactService extends AbstractObjectService {
                         pageTaxon = object.taxonConcept;
                         if(pageTaxon) {
                             writeLog("validate if this trait ${key} can be given to this pageTaxon ${pageTaxon} as per traits taxon scope");
-                            trait = Trait.getValidTrait(key, pageTaxon);
+                            traitInstance = Trait.getValidTrait(key, pageTaxon);
                         }
                         break;
                         case 'species.participation.Observation': 
                         //TODO:validatetrait as per speciesgroup taxon list for observations
                         def t = Trait.read(Long.parseLong(key));
                         if(Trait.isValidTrait(t, object.group.getTaxon())) {
-                            trait = t;
+                            traitInstance = t;
                         } else {
                             writeLog("${t} is not valid as per taxon", Level.ERROR);
                         }
 
                         if(t.isNotObservationTrait) {
-                            trait = null;
+                            traitInstance = null;
                             writeLog("${t} is not observation trait", Level.ERROR);
                         }
                         break;
                     }
 
-                    println "Got trait ${trait}";
+                    println "Got trait ${traitInstance}";
 
-                    if(!trait) {
+                    if(!traitInstance) {
                         writeLog("Cannot find trait ${key}", Level.ERROR);
                     } else {
                         Fact.withTransaction {
                             def factsCriteria = Fact.createCriteria();
                             List<Fact> facts = factsCriteria.list {
-                                eq ('trait', trait)
+                                eq ('trait', traitInstance)
                                 eq ('objectType', object.class.getCanonicalName())
                                 eq ('objectId', object.id)
                             }
 
                             List traitValues = [];
-                            if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
+                            if(traitInstance.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
                                 if(replaceFacts) {
                                     facts.each {fact ->
                                         fact.delete(flush:true);
@@ -199,26 +199,26 @@ class FactService extends AbstractObjectService {
                                     facts.clear();
                                 }
                                 value.split(',').each { v ->
-                                    writeLog("Loading trait ${trait} with value ${v.trim()}");
-                                    def x = getTraitValue(trait, v.trim());
+                                    writeLog("Loading trait ${traitInstance} with value ${v.trim()}");
+                                    def x = getTraitValue(traitInstance, v.trim());
                                     if(x) traitValues << x;
                                 }
                             } else {
-                                def x = getTraitValue(trait, value);
+                                def x = getTraitValue(traitInstance, value);
                                 if(x) traitValues << x;
                             }
                             println "Got traitValues ====================="
                             println traitValues;
 
                             if(!traitValues) {
-                                writeLog("Cannot find [trait:value] [${trait} : ${value}]", Level.ERROR);
+                                writeLog("Cannot find [trait:value] [${traitInstance} : ${value}]", Level.ERROR);
                                 return;
                             }
 
                             if(!facts) {
                                 //writeLog("Creating new fact");
                                 Fact fact = new Fact();
-                                fact.trait = trait;
+                                fact.traitInstance = traitInstance;
                                 fact.pageTaxon = pageTaxon;
                                 fact.objectId = object.id;
                                 fact.objectType = object.class.getCanonicalName();
@@ -228,7 +228,7 @@ class FactService extends AbstractObjectService {
                             println facts;
                             //fact = facts[0];
 
-                            if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
+                            if(traitInstance.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
                                 boolean isExistingValue = false;
                                 traitValues.each { tV ->
                                     if(tV) {
@@ -256,7 +256,7 @@ class FactService extends AbstractObjectService {
 
                                         if(!isExistingValue) {
                                             Fact fact = new Fact();
-                                            fact.trait = trait;
+                                            fact.traitInstance = traitInstance;
                                             fact.pageTaxon = pageTaxon;
                                             fact.objectId = object.id;
                                             fact.objectType = object.class.getCanonicalName();
@@ -283,7 +283,7 @@ class FactService extends AbstractObjectService {
                                 fact.license = license;
                                 fact.isDeleted = false;
                                 if(!fact.hasErrors() && !fact.save()) { 
-                                    writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
+                                    writeLog("Error saving fact ${fact.id} ${fact.traitInstance.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
                                     fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
                                     success = false;
                                 } else {
@@ -310,22 +310,22 @@ class FactService extends AbstractObjectService {
         return result;
     }
 
-    private def getTraitValue(Trait trait, String value) {
+    private def getTraitValue(Trait traitInstance, String value) {
         if(!value) return;
-        if(!(trait.traitTypes == TraitTypes.RANGE || trait.dataTypes == DataTypes.COLOR)) { 
-            return TraitValue.findByTraitAndValueIlike(trait, value.trim());
+        if(!(traitInstance.traitTypes == TraitTypes.RANGE || trait.dataTypes == DataTypes.COLOR)) { 
+            return TraitValue.findByTraitAndValueIlike(traitInstance, value.trim());
         } else {
             return value.trim();
         }
     }
 
     private void setTraitValue(Fact fact, value) {
-        switch(fact.trait.traitTypes) {
+        switch(fact.traitInstance.traitTypes) {
             case Trait.TraitTypes.RANGE : 
             setTraitRange(fact, value);
             break;
             default:
-            if(fact.trait.dataTypes == DataTypes.COLOR) {
+            if(fact.traitInstance.dataTypes == DataTypes.COLOR) {
                 fact.value = utilsService.hex2Rgb(value);
             } else {
                 fact.traitValue = value;
@@ -336,10 +336,10 @@ class FactService extends AbstractObjectService {
     private void setTraitRange(Fact fact, value) {
         String[] v = value.split(':');
         if(v.length > 1) {
-            switch(fact.trait.dataTypes) {
+            switch(fact.traitInstance.dataTypes) {
                 case Trait.DataTypes.DATE:
-                fact.fromDate = getFromDate(v[0], fact.trait.units);
-                fact.toDate = getToDate(v[1], fact.trait.units);
+                fact.fromDate = getFromDate(v[0], fact.traitInstance.units);
+                fact.toDate = getToDate(v[1], fact.traitInstance.units);
                 if(fact.fromDate>fact.toDate) {
                     Date x = fact.fromDate;
                     fact.fromDate = fact.toDate;
@@ -351,7 +351,7 @@ class FactService extends AbstractObjectService {
                 fact.toValue = v[1];
             }
         } else if(v[0]) {
-            switch(fact.trait.dataTypes) {
+            switch(fact.traitInstance.dataTypes) {
                 case Trait.DataTypes.DATE:
                 fact.fromDate = getFromDate(v[0]);
                 fact.toDate = getToDate(v[0]);

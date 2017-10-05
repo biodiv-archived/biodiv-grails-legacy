@@ -24,7 +24,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
 	//protected static SourceConverter _instance;
 	private static def log = LogFactory.getLog(this);
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 	def fieldsConfig = config.speciesPortal.fields
 	
 	public List<Map> imagesMetaData;
@@ -489,7 +489,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	private void populateImageNode(Node images, List<String> groupValues, String delimiter, int location, int source, int caption, int attribution, int contributor, int license, int name, boolean incremental, String imagesDir, Language language) {
 		if(location != -1 && groupValues.get(location)) {
 			String locationStr = groupValues.get(location);
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			def config = grails.util.Holders.config
 			String uploadDir = imagesDir;
 			if(locationStr) {
 				if(delimiter) {

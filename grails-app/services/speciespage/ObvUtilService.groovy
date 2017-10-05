@@ -390,7 +390,7 @@ class ObvUtilService {
     }
 */	
     def exportAsKML(File downloadDir, DownloadLog dl, String userGroupWebaddress){
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        def config = grails.util.Holders.config
         String iconBasePath = config.speciesPortal.observations.serverURL
 
         def builder = new StreamingMarkupBuilder()

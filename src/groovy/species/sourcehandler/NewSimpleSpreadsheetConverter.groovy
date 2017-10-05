@@ -14,7 +14,7 @@ class NewSimpleSpreadsheetConverter extends SourceConverter {
 
 	protected static SourceConverter _instance;
 	private static final log = LogFactory.getLog(this);
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 	def fieldsConfig = config.speciesPortal.fields
 	
 	private NewSimpleSpreadsheetConverter() {

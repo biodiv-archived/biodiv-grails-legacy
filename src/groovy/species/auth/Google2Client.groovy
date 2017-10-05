@@ -1,5 +1,6 @@
 package species.auth;
 
+import org.pac4j.core.context.WebContext;
 import org.scribe.model.Token;
 
 class Google2Client extends org.pac4j.oauth.client.Google2Client {
@@ -14,16 +15,11 @@ class Google2Client extends org.pac4j.oauth.client.Google2Client {
     }
 
     @Override
-    protected void internalInit() {
-        super.internalInit();
+    protected void clientInit(final WebContext context) {
+        super.internalInit(context);
+        configuration.setWithState(false);
     }
 
-    @Override
-    protected boolean requiresStateParameter() {
-        return false;
-    }
-
-    @Override
     protected String sendRequestForData(final Token accessToken, final String dataUrl) {
         init();
         return super.sendRequestForData(accessToken, dataUrl);

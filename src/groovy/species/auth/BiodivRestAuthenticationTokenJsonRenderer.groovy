@@ -1,25 +1,24 @@
 package species.auth;
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationToken
-import com.odobo.grails.plugin.springsecurity.rest.oauth.OauthUser
+import  grails.plugin.springsecurity.rest.token.rendering.AccessTokenJsonRenderer
+import grails.plugin.springsecurity.rest.token.AccessToken
+import grails.plugin.springsecurity.rest.oauth.OauthUser
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import org.pac4j.core.profile.CommonProfile
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.util.Assert
-import com.odobo.grails.plugin.springsecurity.rest.token.rendering.DefaultRestAuthenticationTokenJsonRenderer;
-import com.odobo.grails.plugin.springsecurity.rest.token.rendering.RestAuthenticationTokenJsonRenderer;
 import static org.springframework.http.HttpStatus.*;
 
-class BiodivRestAuthenticationTokenJsonRenderer  implements RestAuthenticationTokenJsonRenderer {//extends DefaultRestAuthenticationTokenJsonRenderer {
+class BiodivRestAuthenticationTokenJsonRenderer  implements AccessTokenJsonRenderer {//extends DefaultRestAuthenticationTokenJsonRenderer {
     def utilsService;
 
     @Override
-    String generateJson(RestAuthenticationToken restAuthenticationToken) {
+    String generateJson(AccessToken restAuthenticationToken) {
         Assert.isInstanceOf(UserDetails, restAuthenticationToken.principal, "A UserDetails implementation is required")
         UserDetails userDetails = restAuthenticationToken.principal
 
@@ -32,7 +31,7 @@ class BiodivRestAuthenticationTokenJsonRenderer  implements RestAuthenticationTo
         def result = [:]
         result["id"] = userDetails.id
         result["$usernameProperty"] = userDetails.username
-        result["$tokenProperty"] = restAuthenticationToken.tokenValue
+        result["$tokenProperty"] = restAuthenticationToken.accessToken
         result["$authoritiesProperty"] = userDetails.authorities.collect {GrantedAuthority role -> role.authority }
 
         if (userDetails instanceof OauthUser) {
@@ -43,7 +42,7 @@ class BiodivRestAuthenticationTokenJsonRenderer  implements RestAuthenticationTo
             }
         }
 
-        utilsService = ApplicationHolder.getApplication().getMainContext().getBean("utilsService");
+        utilsService = grails.util.Holders.getApplication().getMainContext().getBean("utilsService");
         def model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), result);
         def jsonResult = model as JSON
 

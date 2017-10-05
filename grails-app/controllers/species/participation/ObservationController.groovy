@@ -1503,7 +1503,7 @@ class ObservationController extends AbstractObjectController {
      */
     def terms = {
         params.field = params.field?params.field.replace('aq.',''):"autocomplete";
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         if(params.field == searchFieldsConfig.CONTRIBUTOR) {
             params.field = searchFieldsConfig.USERNAME +"_exact"
         }
@@ -1866,7 +1866,12 @@ def filterChain() {
     def updateSpeciesGrp(){
         log.debug params
         def observationInstance =  Observation.read(params.observationId);        
-        def result = observationService.updateSpeciesGrp(params,observationInstance)
+        if(!observationInstance) {
+            def model = utilsService.getErrorModel("No observation instance with id ${observationId}", null, OK.value(), null);
+            render model as JSON
+            return;
+        }
+        def result = observationService.updateSpeciesGrp(params, observationInstance);
         def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
         render model as JSON
         return;
