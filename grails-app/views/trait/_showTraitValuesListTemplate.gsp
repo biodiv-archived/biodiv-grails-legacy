@@ -21,7 +21,7 @@
            </div> 
             </g:if>
             <g:if test="${fromTraitShow}">
-            <div data-tvid='any' data-tid='${traitValues?traitValues[0]?.trait?.id:''}'
+            <div data-tvid='any' data-tid='${traitValues?traitValues[0]?.traitInstance?.id:''}'
                 class="btn span2 any ${queryParams.trait && traitValues && queryParams.trait[traitInstance?.id+'']?'':'active btn-success'}"
                 value="any"
                 style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;}; line-height:30px;text-align:left;">

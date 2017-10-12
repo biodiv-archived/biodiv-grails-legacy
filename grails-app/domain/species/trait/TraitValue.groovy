@@ -31,7 +31,6 @@ class TraitValue {
 
     static mapping = {
         description type:"text"
-        traitInstance column:"trait"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_value_id_seq"] 
     }
 

@@ -268,6 +268,7 @@ class Trait {
     }
 
     List values() {
-        return TraitValue.findAllByTrait(this);
+        //find 'from TraitValue tv where tv.traitInstance.id = :traitId', ['traitId':this.id]; 
+        return TraitValue.findAllByTraitInstance(this);
     }
 }

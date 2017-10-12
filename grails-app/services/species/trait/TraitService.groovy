@@ -438,7 +438,7 @@ class TraitService extends AbstractObjectService {
 
         Sql sql = Sql.newInstance(dataSource);
         List numericTraitMinMax =  sql.rows("""
-        select min(f.value::float)::integer,max(f.to_value::float)::integer,t.id from fact f,trait t where f.trait_id = t.id and t.data_types='NUMERIC' group by t.id;
+        select min(f.value::float)::integer,max(f.to_value::float)::integer,t.id from fact f,trait t where f.trait_instance_id = t.id and t.data_types='NUMERIC' group by t.id;
         """);
         return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters, 'traitFactMap':queryParts.traitFactMap, 'object':queryParts.object,numericTraitMinMax:numericTraitMinMax];
     }
@@ -628,7 +628,7 @@ class TraitService extends AbstractObjectService {
         filters.each{ f -> 
             traitInstance = Trait.findByName(f);
             if(traitInstance){ 
-                traitValue = TraitValue.findAllByTrait(traitInstance);
+                traitValue = TraitValue.findAllByTraitInstance(traitInstance);
                 traitFilter[""+traitInstance.name]=traitValue          
             }
         }

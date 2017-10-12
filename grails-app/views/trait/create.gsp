@@ -116,7 +116,7 @@ display:none;
                         <div class="controls">
                         <%
                         def value=[];
-                        value=TraitValue.findAllByTrait(Trait.findById(traitInstance.id)) ;
+                        value=TraitValue.findAllByTraitInstance(Trait.findById(traitInstance.id)) ;
                         %>
 
                         <table class="table" id="valueTable">

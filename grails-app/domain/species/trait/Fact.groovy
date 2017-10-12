@@ -39,7 +39,6 @@ class Fact {
     }
 
     static mapping = {
-        traitInstance column:"trait"
         description type:"text"
         attribution type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "fact_id_seq"] 
