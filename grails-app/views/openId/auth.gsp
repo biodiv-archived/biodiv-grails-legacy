@@ -10,4 +10,10 @@
     	<auth:loginForm model="['isSubGroup':true]"/>
         </div>
 	</div>
+
+<asset:script>
+$(document).ready(function() {
+    isLoggedIn();
+});
+</asset:script>
 </body>

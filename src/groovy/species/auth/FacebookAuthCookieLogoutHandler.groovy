@@ -20,7 +20,7 @@ class FacebookAuthCookieLogoutHandler extends com.the6hours.grails.springsecurit
 		super.logout(httpServletRequest, httpServletResponse, authentication);
 
 		facebookAuthUtils.logout(httpServletRequest, httpServletResponse);
-		facebookAuthUtils.logoutJwtAuth(httpServletRequest, httpServletResponse);
+		//facebookAuthUtils.logoutJwtAuth(httpServletRequest, httpServletResponse);
 
 	}
 

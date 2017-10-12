@@ -71,7 +71,7 @@ beans = {
 
     /** securityContextRepository */
     securityContextRepository(HttpSessionSecurityContextRepository) {
-        allowSessionCreation = conf.scr.allowSessionCreation // true
+        allowSessionCreation = false//conf.scr.allowSessionCreation // true
         disableUrlRewriting = conf.scr.disableUrlRewriting // true
         springSecurityContextKey = conf.scr.springSecurityContextKey // SPRING_SECURITY_CONTEXT
     }
@@ -79,7 +79,7 @@ beans = {
           
     requestCache(HttpSessionRequestCache) {
         portResolver = ref('portResolver')
-        createSessionAllowed = conf.requestCache.createSession // true
+        createSessionAllowed = false//conf.requestCache.createSession // true
         requestMatcher = ref('requestMatcher')
     }
 

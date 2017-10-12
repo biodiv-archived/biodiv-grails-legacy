@@ -65,24 +65,13 @@ function getNewAccessToken() {
     });
 }
 
-/*function adjustHeight() {
-    console.log('adjustHeight start');
-//    $(".ellipsis").trunk8();
-    $('.snippet .observation_story_image').each(function() {
-        console.log($(this).next())
-        $(this).css({
-            'height': $(this).next().height()
-        });
-    });
-    console.log('adjustHeight end');
-}*/
 
 // Callback to execute whenever ajax login is successful.
 // Todo some thing meaningful with the response data
 var ajaxLoginSuccessCallbackFunction, ajaxLoginErrorCallbackFunction, ajaxLoginCancelCallbackFunction;
 
 var reloadLoginInfo = function() {
-    if(typeof window.appContext == 'undefined')
+    if(typeof window.appContext === 'undefined')
         window.appContext = '';
     $.ajax({
         url : window.appContext+"/SUser/loginTemplate",
@@ -174,30 +163,33 @@ function closeHandler() {
 };
 
 function isLoggedIn() {
-    if($.cookie("BAToken")) {
-        reloadLoginInfo();
-        return true;
-    } else {
-        if($.cookie("BRToken")) {
+    var aToken = $.cookie("BAToken"); 
+    if(aToken === null) {
+       if($.cookie("BRToken")) {
             getNewAccessToken();
         } else {
             return false;
         }
-    }    
+    } else {
+        reloadLoginInfo();
+        return true;
+    } 
 }
 
 function setLoginInfo(data, isAjax) {
-    var date = new Date();
-    date.setTime(date.getTime()+data.expires_in);
-    $.cookie("BAToken", data.access_token, {path : '/', expires : date});
-    console.log(date);
-    $.cookie("BATokenExpires", date.getTime(), {path : '/', expires : 60});
+
+    var decoded = jwt_decode(data.access_token);
+    var expires_in = new Date();
+    expires_in.setTime(decoded.exp);
+
+    $.cookie("BAToken", data.access_token, {path : '/', expires : expires_in});
     $.cookie("BRToken", data.refresh_token, {path : '/', expires : 60});//setting for 60 days
-    if(typeof isAjax == undefined)
+    if(typeof isAjax === 'undefined')
        isAjax = $("#ajaxLogin").is(':visible'); 
-    if(isAjax == false) 
+    if(isAjax == false) {
         window.location = window.params.login.authSuccessUrl;
-    else {
+        //TODO: try to previously requested url
+    } else {
         ajaxLoginSuccessHandler(data);
     }
 }
@@ -265,8 +257,8 @@ $(document).ready(function() {
    $('#loginForm, .openid-loginbox form').on('submit', function(e) {
        $('body').addClass('busy');
        e.stopPropagation();
-        $('.loginMessage').html("Logging in ...").removeClass().addClass('alert alert-info').show();
-       
+       var me = $(this);
+        me.parent().find('.loginMessage').html("Logging in ...").removeClass().addClass('loginMessage alert alert-info').show();
        var isAjax = $("#ajaxLogin").is(':visible'); 
        var username = isAjax ? $($('.isSubGroup input[name="j_username"]')[0]).val() : $($('.isSubGroup input[name="j_username"]')[1]).val();
        var password = isAjax ? $($('.isSubGroup input[name="j_password"]')[0]).val() : $($('.isSubGroup input[name="j_password"]')[1]).val();
@@ -279,7 +271,7 @@ $(document).ready(function() {
                console.log(data);
                setLoginInfo(data, isAjax);
             }, error: function (xhr, ajaxOptions, thrownError) {
-                $('.loginMessage').html(xhr.responseJSON.message).removeClass().addClass('alert alert-error').show();
+                me.parent().find('.loginMessage').html(xhr.responseJSON.message).removeClass().addClass('loginMessage alert alert-error').show();
                 if(isAjax == true && ajaxLoginErrorCallbackFunction) {
                     ajaxLoginErrorCallbackFunction();
                     updateLoginInfo();
@@ -312,7 +304,36 @@ $(document).ready(function() {
    });
 */
    $('#logout').on('click', function() {
-        clearAllCookies();
+        $('body').addClass('busy');
+       event.stopPropagation();
+
+        var brToken = $.cookie("BRToken");
+        $.ajax({
+            url: '/logout/index',
+           method:'GET',
+           type:'json',
+            data:{'refresh_token':brToken},
+           success : function(data) {
+//               $.ajax({
+//                url: window.params.login.logoutUrl,
+//                method:'GET',
+//                data:{'refresh_token':brToken},
+//                type:'json',
+//                success : function(data) {
+                    console.log(data);
+                        clearAllCookies();
+                    updateLoginInfo()
+//                }, error: function (xhr, ajaxOptions, thrownError) {
+//                    console.log('Error during logout');
+//                }
+//            });
+
+           }, error: function (xhr, ajaxOptions, thrownError) {
+                    console.log('Error during logout');
+            }
+       });
+
+
 /*       $('body').addClass('busy');
        event.stopPropagation();
        var isAjax = $("#ajaxLogin").is(':visible'); 

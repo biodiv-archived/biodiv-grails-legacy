@@ -997,8 +997,8 @@ grails.plugin.springsecurity.providerNames = [
 	'facebookAuthProvider',
 	'daoAuthenticationProvider',
 	'anonymousAuthenticationProvider',
-	'rememberMeAuthenticationProvider'
 ];
+//'rememberMeAuthenticationProvider'
 
 //grails.plugin.springsecurity.openid.nonceMaxSeconds =  600;
 
@@ -1462,7 +1462,8 @@ grails.exceptionresolver.logRequestParameters=true
 
 
 grails.plugin.springsecurity.logout.postOnly = false
-grails.plugin.springsecurity.logout.handlerNames = ['rememberMeServices', 'securityContextLogoutHandler', 'facebookAuthCookieLogout'];
+//'rememberMeServices', 
+grails.plugin.springsecurity.logout.handlerNames = ['securityContextLogoutHandler', 'facebookAuthCookieLogout'];
 
 grails.doc.title="${speciesPortal.app.siteName}"
 grails.doc.subtitle=""
@@ -1584,10 +1585,12 @@ grails.plugins.dynamicController.mixins = [
     'app.info.custom.example.MyConfigControllerMixin' :
     'com.burtbeckwith.appinfo_test.AdminManageController'
 ]
+//'securityContextPersistenceFilter',
+//'rememberMeAuthenticationFilter', 
 grails.plugins.springsecurity.filterChain.filterNames = [
-   'securityContextPersistenceFilter', 'logoutFilter',
+    'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
-         'rememberMeAuthenticationFilter', 'anonymousAuthenticationFilter',
+         'anonymousAuthenticationFilter',
             'exceptionTranslationFilter', 'filterInvocationInterceptor'
             ]
 grails.plugin.springsecurity.filterChain.chainMap = [
@@ -1599,7 +1602,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 '/api/oauth/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
 '/api/register/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
 '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
-'/**': 'JOINED_FILTERS,-restAuthenticationFilter,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
+'/**': 'JOINED_FILTERS,-securityContextPersistenceFilter,-restAuthenticationFilter,-restTokenValidationFilter,-restExceptionTranslationFilter,-rememberMeAuthenticationFilter' // Traditional chain
 ]
 
 //http://mrhaki.blogspot.in/2014/07/grails-goodness-enable-accept-header.html
