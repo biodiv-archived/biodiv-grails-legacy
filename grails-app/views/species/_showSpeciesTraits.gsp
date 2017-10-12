@@ -6,7 +6,6 @@
         <g:render template="/common/titleTemplate" model="['title':title]"/>
     </head>
     <body>
-    	<%= trait %>
     </body>
 </html>
 

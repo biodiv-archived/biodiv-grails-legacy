@@ -24,10 +24,10 @@
 	    	<h1 class="sci_name">${traitInstance.name}</h1>
 	    	<div id="content" class="super-section">
 	    	<sUser:isAdmin>
-	    							<a class="btn btn-primary pull-right" title="${g.message(code:'title.document.edit')}" style="margin-right: 5px;"
+	    	    <a class="btn btn-primary pull-right" title="${g.message(code:'title.document.edit')}" style="margin-right: 5px;"
 							href="${uGroup.createLink(controller:'trait', action:'edit', id:traitInstance.id)}">
 							<i class="icon-edit"></i><g:message code="button.edit" /> 
-						</a>
+				</a>
 		<a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
             href="#"
             onclick="return deleteTrait();"><i class="icon-trash"></i><g:message code="button.delete" /></a>
@@ -80,7 +80,7 @@
 			    			    	<h5>Filter by value</h5>
 			    <div class="list" style="clear: both;">
 			    	<div class="trait thumbnail" data-toggle="buttons-radio">
-  	                    <g:render template="/trait/showTraitValuesListTemplate" model="['trait':traitInstance, 'traitValues':factInstance?factInstance[trait.id]:(editable?null:traitValue), 'displayAny':false,'fromTraitShow':true, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
+  	                    <g:render template="/trait/showTraitValuesListTemplate" model="['traitInstance':traitInstance, 'traitValues':factInstance?factInstance[traitInstance.id]:(editable?null:traitValue), 'displayAny':false,'fromTraitShow':true, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
 			    	</div>
 			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
 	    			</div>

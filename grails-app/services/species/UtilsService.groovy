@@ -356,7 +356,7 @@ class UtilsService {
                     def user = springSecurityService.currentUser;
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
-                    templateMap["trait"] = otherParams["trait"]
+                    templateMap["traitInstance"] = otherParams["trait"]
                     templateMap["traitValue"] = otherParams["traitValue"]
                     bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/factUpdate"
                     populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)

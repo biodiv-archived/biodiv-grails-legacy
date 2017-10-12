@@ -118,14 +118,14 @@ class FactController extends AbstractObjectController {
                         
                         List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(biodiv_trait, object.id, object.class.getCanonicalName());
                         Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
-                        queryParams.trait[trait.id] = '';
+                        queryParams.trait[biodiv_trait.id] = '';
                         facts.each { fact ->
-                            queryParams.trait[trait.id] += fact.traitValue.id+',';
-                            if(!factInstance[trait.id]) {
-                                factInstance[trait.id] = [];
+                            queryParams.trait[biodiv_trait.id] += fact.traitValue.id+',';
+                            if(!factInstance[biodiv_trait.id]) {
+                                factInstance[biodiv_trait.id] = [];
                             }
-                            factInstance[trait.id] << fact.traitValue;
-                            otherParams["trait"] = trait.name
+                            factInstance[biodiv_trait.id] << fact.traitValue;
+                            otherParams["traitInstance"] = biodiv_trait.name
                             otherParams["traitValue"] = fact.traitValue
                             utilsService.sendNotificationMail(utilsService.FACT_UPDATE,object,null,null,null,otherParams)
                         }
