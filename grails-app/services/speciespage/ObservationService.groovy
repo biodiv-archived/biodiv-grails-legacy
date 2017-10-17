@@ -696,8 +696,10 @@ class ObservationService extends AbstractMetadataService {
                 order("lastRevised", "desc")
             }*/
             String countQuery = "select count(*) from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') ";
-            def countRes = Observation.executeQuery (countQuery, ['classification':classification, 'isDeleted': false]);
-
+            def countRes = 0;
+            utilsService.logSql {
+                countRes = Observation.executeQuery (countQuery, ['classification':classification, 'isDeleted': false]);
+            }
 
             def count = countRes[0]//observations.totalCount;
             def result = [];
@@ -1269,15 +1271,6 @@ class ObservationService extends AbstractMetadataService {
 
             def userGroupInstance =	utilsService.getUserGroup(params)
             params.userGroup = userGroupInstance;
-        }
-
-        if(params.userGroup) {
-            log.debug "Filtering from usergourp : ${params.userGroup}"
-            userGroupQuery = " join user_group_observations  userGroup on userGroup.observation_id = obv.id "
-            query += userGroupQuery
-            filterQuery += " and userGroup.user_group_id = :userGroupId "
-            queryParams['userGroupId'] = params.userGroup.id;
-            queryParams['userGroup'] = params.userGroup
         }
 
         if(params.notInUserGroup) {

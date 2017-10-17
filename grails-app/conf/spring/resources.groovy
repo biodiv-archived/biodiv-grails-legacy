@@ -48,6 +48,7 @@ import species.auth.JwtTokenAuthProvider;
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
+    println conf;
     authenticationSuccessHandler(species.auth.AjaxAwareAuthenticationSuccessHandler) {
         requestCache = ref('requestCache')
         defaultTargetUrl = conf.successHandler.defaultTargetUrl // '/'
@@ -261,7 +262,12 @@ beans = {
         defaultRoleNames = ['ROLE_USER']
 
     }
-
+println "++++++++++++++++++++++++++++++"
+println "++++++++++++++++++++++++++++++"
+println conf.facebook.apiKey
+println conf.facebook.secret
+println "++++++++++++++++++++++++++++++"
+println "++++++++++++++++++++++++++++++"
     facebookAuthUtils(FacebookAuthUtils) { 
         grailsApplication = ref('grailsApplication') 
         apiKey = conf.facebook.apiKey

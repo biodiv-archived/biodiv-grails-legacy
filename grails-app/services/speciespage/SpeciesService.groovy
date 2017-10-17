@@ -2510,13 +2510,13 @@ def checking(){
             List traitIcons = [];
             factInstances?.each { f ->
                 if(f.traitValue) { 
-                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                    traitIcons << [f.traitValue.value, f.traitInstance.name, f.traitValue.mainImage()?.fileName, f.traitInstance.dataTypes.value()]
                 } else if(f.value && f.toValue) {
-                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value+":"+f.toValue, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.fromDate && f.toDate) {
-                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.value) {
-                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 }
             }
 
@@ -2529,7 +2529,7 @@ def checking(){
         }
 
         Map queryParts = _getSpeciesListQuery(params);
-/*        String query = "select f.trait_id, extract (year from calendar_date) calendar_year, extract (month from calendar_date) calendar_month, count(*) "+queryParts.fromQuery+" , fact f, calendar "+queryParts.filterQuery+" and f.from_date is not null and f.to_date is not null and extract(month from calendar.calendar_date) between extract(month from f.from_date) and extract(month from f.to_date) group by f.trait_id, calendar_year, calendar_month order by calendar_year, calendar_month";
+/*        String query = "select f.trait_instance_id, extract (year from calendar_date) calendar_year, extract (month from calendar_date) calendar_month, count(*) "+queryParts.fromQuery+" , fact f, calendar "+queryParts.filterQuery+" and f.from_date is not null and f.to_date is not null and extract(month from calendar.calendar_date) between extract(month from f.from_date) and extract(month from f.to_date) group by f.trait_instance_id, calendar_year, calendar_month order by calendar_year, calendar_month";
         println "No of taxon per trait per month++++++++++++++++++++++++++"
         println "++++++++++++++++++++++++++"
         println query

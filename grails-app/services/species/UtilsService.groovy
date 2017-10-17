@@ -1016,6 +1016,17 @@ class UtilsService {
     }
 
 	boolean ifOwns(SUser user) {
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
+        println springSecurityService.isLoggedIn()
+        println springSecurityService.currentUser?.id
+        println user.id
+        println  SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
         if(!user) return false
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}

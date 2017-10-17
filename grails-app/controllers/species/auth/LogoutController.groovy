@@ -7,6 +7,7 @@ class LogoutController {
 
     def grailsLinkGenerator;
     def logoutHandlers;
+    def grailsApplication;
 
 	/**
 	 * Index action. Redirects to the Spring security logout uri.
@@ -21,6 +22,6 @@ class LogoutController {
             }
         }
 //		redirect uri: request.scheme+"://"+request.serverName+SpringSecurityUtils.securityConfig.logout.filterProcessesUrl // '/j_spring_security_logout'
-		redirect uri: request.scheme+"://"+request.serverName+"/biodiv-api/logout?refresh_token=${params.refresh_token}"
+		redirect uri: "${grailsApplication.config.speciesPortal.api.logoutURL}?refresh_token=${params.refresh_token}"
 	}
 }

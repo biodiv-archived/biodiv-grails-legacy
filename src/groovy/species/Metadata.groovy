@@ -233,19 +233,19 @@ abstract class Metadata {
         Map queryParams = ['trait':[:]];
         //def conRef = []
         factList.each { fact ->
-            if(!traitFactMap[fact.trait.id]) {
-                traitFactMap[fact.trait.id] = []
-                queryParams['trait'][fact.trait.id] = '';
+            if(!traitFactMap[fact.traitInstance.id]) {
+                traitFactMap[fact.traitInstance.id] = []
+                queryParams['trait'][fact.traitInstance.id] = '';
                 traitFactMap['fact'] = []
             }
             if(fact.traitValue) {
-                traitFactMap[fact.trait.id] << fact.traitValue
-                queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+                traitFactMap[fact.traitInstance.id] << fact.traitValue
+                queryParams['trait'][fact.traitInstance.id] += fact.traitValue.id+',';
             } else if(fact.value) {
-                traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+                traitFactMap[fact.traitInstance.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
             } 
             if(fact.fromDate && fact.toDate)
-                traitFactMap[fact.trait.id] << fact.fromDate+";"+fact.toDate
+                traitFactMap[fact.traitInstance.id] << fact.fromDate+";"+fact.toDate
 
             traitFactMap['fact'] << fact.id
         }

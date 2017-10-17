@@ -786,7 +786,7 @@ alter table external_links add column frlht_url varchar;
 alter table user_group add column filter_rule text;
 
 
-#6thSep2017
+#6thSep2017 for biodiv-api
 create table token(id bigint not null, value varchar(255) not null, type varchar(255) not null, user_id bigint not null, created_on timestamp without time zone not null);
 alter table token add  PRIMARY KEY (id);
 alter table token add constraint user_id_fk foreign key(user_id) references suser(id);
@@ -795,3 +795,5 @@ create index on token(user_id);
 create index on token(value);
 create index on token(value,user_id);
 
+alter table trait_value rename trait_id to trait_instance_id;
+alter table fact rename trait_id to trait_instance_id;

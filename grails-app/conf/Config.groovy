@@ -1587,7 +1587,7 @@ grails.plugins.dynamicController.mixins = [
 ]
 //'securityContextPersistenceFilter',
 //'rememberMeAuthenticationFilter', 
-grails.plugins.springsecurity.filterChain.filterNames = [
+grails.plugin.springsecurity.filterChain.filterNames = [
     'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
          'anonymousAuthenticationFilter',

@@ -82,7 +82,7 @@ $(document).ready(function() {
             authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
             'loginUrl':"${request.contextPath}-api/login",
             'tokenUrl':"${request.contextPath}-api/login/token",
-            logoutUrl : "${request.contextPath}-api/logout",
+            logoutUrl : "${uGroup.createLink(controller:'logout', action:'index')}",
             fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
         },
         'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",

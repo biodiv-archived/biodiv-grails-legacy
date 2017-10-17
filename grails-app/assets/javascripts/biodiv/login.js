@@ -309,7 +309,7 @@ $(document).ready(function() {
 
         var brToken = $.cookie("BRToken");
         $.ajax({
-            url: '/logout/index',
+            url:window.params.login.logoutUrl,
            method:'GET',
            type:'json',
             data:{'refresh_token':brToken},
