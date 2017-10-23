@@ -3,6 +3,7 @@ package species.auth
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 
+import grails.converters.JSON
 class LogoutController {
 
     def grailsLinkGenerator;
@@ -22,6 +23,7 @@ class LogoutController {
             }
         }
 //		redirect uri: request.scheme+"://"+request.serverName+SpringSecurityUtils.securityConfig.logout.filterProcessesUrl // '/j_spring_security_logout'
-		redirect uri: "${grailsApplication.config.speciesPortal.api.logoutURL}?refresh_token=${params.refresh_token}"
-	}
+//		redirect uri: "${grailsApplication.config.speciesPortal.api.logoutURL}?refresh_token=${params.refresh_token}"
+        render (['success':true] as JSON)
+    }
 }

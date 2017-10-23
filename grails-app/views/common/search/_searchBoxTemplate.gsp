@@ -83,7 +83,18 @@ $(document).ready(function() {
             'loginUrl':"${request.contextPath}-api/login",
             'tokenUrl':"${request.contextPath}-api/login/token",
             logoutUrl : "${uGroup.createLink(controller:'logout', action:'index')}",
-            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
+            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}",
+            api : {
+                logoutUrl : "${grailsApplication.config.speciesPortal.api.logoutURL}", 
+                facebook : {
+                    apiKey : "${grailsApplication.config.speciesPortal.api.facebook.apiKey}",
+                    redirect_uri : "${grailsApplication.config.speciesPortal.api.facebook.redirect_uri}"
+                },
+                google : {
+                    apiKey : "${grailsApplication.config.speciesPortal.api.google.apiKey}",
+                    redirect_uri : "${grailsApplication.config.speciesPortal.api.google.redirect_uri}"
+                }
+            }
         },
         'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
         'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",

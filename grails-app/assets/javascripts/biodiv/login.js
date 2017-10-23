@@ -196,7 +196,7 @@ function setLoginInfo(data, isAjax) {
 var loginPopupWindow;
 $(document).ready(function() {
    $('.fbJustConnect').click(function() {
-        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id=115305755799166&redirect_uri=http%3A%2F%2Fapi.local.ibp.org%2Flogin%2Fcallback%3Fclient_name%3DfacebookClient&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_website%2Cuser_work_history&state=biodiv-api-state");
+        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id="+window.params.login.api.facebook.apiKey+"&redirect_uri="+window.params.login.api.facebook.redirect_uri+"&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_website%2Cuser_work_history&state=biodiv-api-state");
         /*$.ajax({
             async: true,
             crossDomain: true,
@@ -308,25 +308,30 @@ $(document).ready(function() {
        event.stopPropagation();
 
         var brToken = $.cookie("BRToken");
+        var baToken = $.cookie("BAToken");
         $.ajax({
             url:window.params.login.logoutUrl,
            method:'GET',
            type:'json',
-            data:{'refresh_token':brToken},
+          
+           data:{'refresh_token':brToken},
            success : function(data) {
-//               $.ajax({
-//                url: window.params.login.logoutUrl,
-//                method:'GET',
-//                data:{'refresh_token':brToken},
-//                type:'json',
-//                success : function(data) {
+               $.ajax({
+                url: window.params.login.api.logoutUrl,
+                method:'GET',
+                data:{'refresh_token':brToken},
+                type:'json',
+                beforeSend: function(xhr){
+                    xhr.setRequestHeader('X-AUTH-TOKEN', baToken);
+                },
+                success : function(data) {
                     console.log(data);
                         clearAllCookies();
                     updateLoginInfo()
-//                }, error: function (xhr, ajaxOptions, thrownError) {
-//                    console.log('Error during logout');
-//                }
-//            });
+                }, error: function (xhr, ajaxOptions, thrownError) {
+                    console.log('Error during logout from api server');
+                }
+            });
 
            }, error: function (xhr, ajaxOptions, thrownError) {
                     console.log('Error during logout');
@@ -461,7 +466,7 @@ $(document).ready(function() {
     $('.googleConnect').click(function(e) { 
         //handleAuthClick(e);
 
-        window.open("https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=317806372709-roromqiujiji1po5jh8adpcr5um895mb.apps.googleusercontent.com&redirect_uri=http://api.local.ibp.org/login/callback?client_name=google2Client&access_type=offline&scope=email");
+        window.open("https://accounts.google.com/o/oauth2/auth?response_type=code&client_id="+window.params.login.api.google.apiKey+"&redirect_uri="+window.params.login.api.google.redirect_uri+"&access_type=offline&scope=email");
 		return true; 
 	});
 	
