@@ -69,7 +69,7 @@ class OpenIdController {
 		def config = SpringSecurityUtils.securityConfig
 
  		if (springSecurityService.isLoggedIn()) {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+config.successHandler.defaultTargetUrl
 			return
 		}
 		
@@ -101,8 +101,8 @@ class OpenIdController {
 		        requestCache.removeRequest(request, response);
 			}
 		}
-		render (view:'auth', model:[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",
+		render (view:'auth', model:[openIdPostUrl: "$openIDAuthenticationFilter.filterProcessesUrl",
+					daoPostUrl:"${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
 					openidIdentifier: config.openid.claimedIdentityFieldName,
@@ -281,7 +281,7 @@ class OpenIdController {
 			(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, savedRequest.getRedirectUrl());
 		}
 		else {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+config.successHandler.defaultTargetUrl
 		}
 	}
 

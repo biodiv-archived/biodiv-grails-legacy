@@ -20,8 +20,8 @@
             channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
             springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
             authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
-            'loginUrl':"${request.contextPath}-api/login",
-            'tokenUrl':"${request.contextPath}-api/login/token",
+            'loginUrl':"biodiv-api/login",
+            'tokenUrl':"biodiv-api/login/token",
             logoutUrl : "${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
             fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
         }

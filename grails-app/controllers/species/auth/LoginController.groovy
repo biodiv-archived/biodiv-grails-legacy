@@ -47,7 +47,7 @@ class LoginController {
 	 */
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 		}
 		else {
 			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
@@ -61,11 +61,11 @@ class LoginController {
 	def auth = {
 		def config = SpringSecurityUtils.securityConfig
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ config.successHandler.defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+ config.successHandler.defaultTargetUrl
 			return
 		}
 		String view = 'auth'
-		String postUrl = "${request.contextPath}${config.apf.filterProcessesUrl}"
+		String postUrl = "${config.apf.filterProcessesUrl}"
 		render view: view, model: [postUrl: postUrl,
 					rememberMeParameter: config.rememberMe.parameter]
 	}
@@ -93,7 +93,7 @@ class LoginController {
 				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 				return
 			} else {
-				redirect uri:request.scheme+"://"+request.serverName+request.contextPath+"/";
+				redirect uri:request.scheme+"://"+request.serverName+"/";
 				return;
 			}
 		} else {
@@ -125,7 +125,7 @@ class LoginController {
                     (new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
                     return
                 } else {
-                    redirect uri:request.scheme+"://"+request.serverName+request.contextPath+"/";
+                    redirect uri:request.scheme+"://"+request.serverName+"/";
                     return;
                 }
             }
@@ -163,7 +163,7 @@ class LoginController {
 		def config = SpringSecurityUtils.securityConfig
 		render controller:'openId', view: 'auth', params: params,
 				model: [hasCookie: authenticationTrustResolver.isRememberMe(SCH.context?.authentication),
-					postUrl: "${request.contextPath}${config.apf.filterProcessesUrl}"]
+					postUrl: "${config.apf.filterProcessesUrl}"]
 	}
 
 	/**
@@ -242,7 +242,7 @@ class LoginController {
 		def config = SpringSecurityUtils.securityConfig
 
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+config.successHandler.defaultTargetUrl
 			return
 		}
 		//		//String postUrl = "/${grailsApplication.metadata['app.name']}${config.apf.filterProcessesUrl}"
