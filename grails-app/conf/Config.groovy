@@ -568,7 +568,7 @@ environments {
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
             'grails.util'
-            info 'org.codehaus.groovy.grails.plugins' // plugins
+            info 'org.codehaus.groovy.grails.plugin' // plugins
             info "grails.plugin" 
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
@@ -744,7 +744,7 @@ environments {
             'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
             'org.codehaus.groovy.grails.web.mapping', // URL mapping
             'org.codehaus.groovy.grails.commons', // core / classloading
-            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.plugin', // plugins
             'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
@@ -882,7 +882,7 @@ environments {
             'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
             'org.codehaus.groovy.grails.web.mapping', // URL mapping
             'org.codehaus.groovy.grails.commons', // core / classloading
-            'org.codehaus.groovy.grails.plugins', // plugins
+            'org.codehaus.groovy.grails.plugin', // plugins
             'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
