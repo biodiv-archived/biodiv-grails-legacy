@@ -1,6 +1,20 @@
 <%@page import="species.utils.Utils"%>
 <div id="ibp-footer" class="gradient-bg-reverse navbar">
+<g:set var="userGroupService" bean="userGroupService"/>
+<%
+	def newsletters = userGroupService.getNewsLetters(userGroupInstance, -1, 0, "displayOrder", "asc", null, ['showInFooter':true]);
+    def pages = [:];
+    def pagesWithNoParent = [:];
+    newsletters.each {
+        if(it.parentId) {
+            if(!pages[it.parentId]) pages[it.parentId] = [];
+            pages[it.parentId] << it;
+        } else {
+            pagesWithNoParent[(int)it.id] = it;
+        }
+    }
 
+%>
 	<div class="container outer-wrapper" style="width:940px">
 		<div class="links_box_column">
 			<ul>
@@ -23,7 +37,19 @@
 				</li-->
 			</ul>
 		</div>
-		<div class="links_box_column">
+
+        <g:each var="page" in="${pages}">
+        	<div class="links_box_column">
+			<ul>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href="${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':pagesWithNoParent[page.key].id, 'userGroup':userGroupInstance):'/page/'+pagesWithNoParent[page.key].id }">${pagesWithNoParent[page.key].title}</a></li>
+                <%pagesWithNoParent.remove(page.key)%>
+                <g:each var="sub_page" in="${page.value}">
+				    <li><a href="${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':sub_page.id, 'userGroup':userGroupInstance):'/page/'+sub_page.id }">${sub_page.title}</a></li>
+                </g:each>
+	        </ul>	
+            </div>
+        </g:each>
+		<!--div class="links_box_column">
 			<ul>
 				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/theportal'><g:message code="link.the.portal" /></a></li>               
 				<li><a href="${ '/biodiversity_in_india'}"><g:message code="link.biodiversity.india" /></a>
@@ -56,10 +82,16 @@
 				</li>
 
 			</ul>
-		</div>
+		</div-->
 		<div class="links_box_column">
 			<ul>
 				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>
+        <g:if test="${pagesWithNoParent}">
+                <g:each var="page" in="${pagesWithNoParent}">
+				    <li><a href="">${page.value.title}</a></li>
+                </g:each>
+        </g:if>
+
                 <li><a href="http://blog.indiabiodiversity.org/"><g:message code="link.blog" /></a></li>
 				<li><a href="${ '/sitemap'}"><g:message code="link.sitemap" /></a>
 				</li>

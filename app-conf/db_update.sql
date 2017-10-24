@@ -785,3 +785,8 @@ alter table external_links add column frlht_url varchar;
 #2nd June 2017
 alter table user_group add column filter_rule text;
 
+#24 Oct 2017
+alter table newsletter add column show_in_footer boolean;
+update newsletter set show_in_footer = 'f';
+alter table newsletter alter column show_in_footer set not null;
+update newsletter set show_in_footer = 't' where user_group_id is null and parent_id !=0 ;
