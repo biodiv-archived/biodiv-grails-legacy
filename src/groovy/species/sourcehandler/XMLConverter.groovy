@@ -88,7 +88,7 @@ class XMLConverter extends SourceConverter {
 
     public XMLConverter() {
         namesParser = new NamesParser();
-        def ctx = grails.util.Holders.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getGrailsApplication().getMainContext();
         //markupSanitizerService = ctx.getBean("markupSanitizerService");
     }
 

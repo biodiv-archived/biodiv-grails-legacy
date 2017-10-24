@@ -37,11 +37,6 @@ grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationEntryPoin
 		if (ajaxLoginFormUrl != null && SpringSecurityUtils.isAjax(request)) {
 			return ajaxLoginFormUrl;
 		}
-
-        println request;
-        println request.getRequestURI();
-        println request.getQueryString();
-println request.getParameterMap();
         def userGroupId = request.getParameter('userGroupInstanceId');
         String url = getLoginFormUrl();
         if(userGroupId) {
@@ -50,7 +45,16 @@ println request.getParameterMap();
                 url = userGroupService.userGroupBasedLink([ 'controller':'login', 'action':'auth', 'userGroup':userGroup]);
         }
 		return url;
-	}
+    }
+    /**
+     * Dependency injection for the Ajax login form url, e.g. '/login/authAjax'.
+     * @param url the url
+     */
+    public void setAjaxLoginFormUrl(final String url) {
+        //Assert.isTrue(url == null || url.startsWith("/"), "ajaxLoginFormUrl must begin with '/'");
+        //ajaxLoginFormUrl = url;
+        this.@ajaxLoginFormUrl = url
+    }
 }
 
 
