@@ -222,7 +222,7 @@ class UtilsService {
                 url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             }
         }
-        return url;//.replace('/api/', '/');
+        return url;//.replaceAll('//', '/');
     }
 
     File getUniqueFile(File root, String fileName){

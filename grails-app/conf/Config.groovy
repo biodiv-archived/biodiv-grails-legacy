@@ -515,7 +515,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
     development {
-        grails.serverURL = "http://localhost.indiabiodiversity.org/"
+        grails.serverURL = "http://localhost.indiabiodiversity.org"
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
@@ -648,7 +648,7 @@ environments {
     }
     pamba {
         servername = 'pamba.strandls.com'
-        grails.serverURL = "http://${servername}/"
+        grails.serverURL = "http://${servername}"
 
         speciesPortal {
             app.rootDir = "/apps/biodiv"
@@ -794,7 +794,7 @@ environments {
     }
     kk {
         servername = 'indiabiodiversity.org'
-        grails.serverURL = "http://${servername}/"
+        grails.serverURL = "http://${servername}"
 
         speciesPortal {
             app.rootDir = "/apps/biodiv"
