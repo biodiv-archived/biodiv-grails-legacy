@@ -80,11 +80,11 @@ $(document).ready(function() {
             channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
             springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
             authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
-            'loginUrl':"biodiv-api/login",
-            'tokenUrl':"biodiv-api/login/token",
             logoutUrl : "${uGroup.createLink(controller:'logout', action:'index')}",
             fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}",
             api : {
+                loginUrl : "${grailsApplication.config.speciesPortal.api.loginURL}", 
+                tokenUrl : "${grailsApplication.config.speciesPortal.api.tokenURL}", 
                 logoutUrl : "${grailsApplication.config.speciesPortal.api.logoutURL}", 
                 facebook : {
                     apiKey : "${grailsApplication.config.speciesPortal.api.facebook.apiKey}",

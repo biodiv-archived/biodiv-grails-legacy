@@ -46,7 +46,7 @@ function getNewAccessToken() {
     var brTokenCookie = $.cookie("BRToken");
     var isAjax = $("#ajaxLogin").is(':visible'); 
     $.ajax({
-        url: window.params.login.tokenUrl,
+        url: window.params.login.api.tokenUrl,
         method:'POST',
         data:{grant_type:'access_token', 'refresh_token':brTokenCookie},
         type:'json',
@@ -263,7 +263,7 @@ $(document).ready(function() {
        var username = isAjax ? $($('.isSubGroup input[name="j_username"]')[0]).val() : $($('.isSubGroup input[name="j_username"]')[1]).val();
        var password = isAjax ? $($('.isSubGroup input[name="j_password"]')[0]).val() : $($('.isSubGroup input[name="j_password"]')[1]).val();
        $.ajax({
-           url: window.params.login.loginUrl,
+           url: window.params.login.api.loginUrl,
            method:'POST',
            data:{'username':username, 'password':password},
            type:'json',
