@@ -115,12 +115,19 @@ var getCookies = function(){
 
 //used on logout in ajax call in hidden frame
 function clearAllCookies() {
-    var cookies = document.cookie.split(";");
+/*    var cookies = document.cookie.split(";");
+    var clearCookies = "";
     for(var i=0; i < cookies.length; i++) {
         var equals = cookies[i].indexOf("=");
         var name = equals > -1 ? cookies[i].substr(0, equals) : cookies[i];
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        clearCookies += name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
+    document.cookie = clearCookies;
+*/
+    document.cookie.split(";").forEach(function(c) { 
+        console.log(c);
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+    });
 
 }
 
@@ -326,8 +333,9 @@ $(document).ready(function() {
                 },
                 success : function(data) {
                     console.log(data);
-                        clearAllCookies();
-                    updateLoginInfo()
+                    clearAllCookies();
+                    window.location = window.params.login.defaultLogoutUrl; 
+                    //updateLoginInfo()
                 }, error: function (xhr, ajaxOptions, thrownError) {
                     console.log('Error during logout from api server');
                 }

@@ -81,6 +81,7 @@ $(document).ready(function() {
             springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
             authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
             logoutUrl : "${uGroup.createLink(controller:'logout', action:'index')}",
+            defaultLogoutUrl : "${userGroupInstance?uGroup.createLink(mapping:'onlyUserGroup', controller:'userGroup', action:'index', 'userGroup':userGroupInstance):'/'}",
             fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}",
             api : {
                 loginUrl : "${grailsApplication.config.speciesPortal.api.loginURL}", 

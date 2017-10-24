@@ -17,16 +17,13 @@ class LogoutController {
 		// TODO put any pre-logout code here
         // Logout programmatically
         def auth = SecurityContextHolder.context.authentication
-        println "++++++++++++++++++++++++++++++++++"
         if (auth) {
-            println auth
             logoutHandlers.each  { handler->
                 handler.logout(request,response,auth)
             }
         }
 //		redirect uri: request.scheme+"://"+request.serverName+SpringSecurityUtils.securityConfig.logout.filterProcessesUrl // '/j_spring_security_logout'
 //		redirect uri: "${grailsApplication.config.speciesPortal.api.logoutURL}?refresh_token=${params.refresh_token}"
-        println "resulttttttttttttttttt"
         render (['success':true] as JSON)
     }
 }

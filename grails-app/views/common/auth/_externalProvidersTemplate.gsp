@@ -13,7 +13,7 @@
 	</g:if>
 	<g:else>
 		<div class="sign_in_external_bttn">
-            <a href="/biodiv/oauth/google/authenticate?redirectUrl=${targetUrl}" provider="google" class="external_bttn googleButton"></a>
+            <a href="/oauth/google/authenticate?redirectUrl=${targetUrl}" provider="google" class="external_bttn googleButton"></a>
 		</div>
 		
 		<div class="sign_in_external_bttn">
