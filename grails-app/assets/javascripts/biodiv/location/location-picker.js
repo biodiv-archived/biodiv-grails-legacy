@@ -6,6 +6,9 @@ function update_geotagged_images_list_for_bulkUpload(geotaggedImages, ele){
 }
 
 function loadMapInput(geotaggedImages=undefined) {
+    if(geotaggedImages.target) {
+        geotaggedImages = undefined;
+    }
     //$(".address .add-on").trigger("click"); 
     var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
@@ -341,6 +344,10 @@ function useTitle(obj){
         
         validateBounds : function(latlng) {
             var me = this;
+            if(typeof latlng === undefined || !latlng.lat || !latlng.lng) {
+                me.$ele.next('.alert').html('Location is compulsory. Please provide a valid location.').show();
+                return true;
+            }    
             //if marker is not in allowed bounds return;
             if(!me.allowedBounds.contains(latlng)) {
                 me.$ele.next('.alert').html('Location is outside allowed bounds').show();      

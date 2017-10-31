@@ -1309,10 +1309,10 @@ class ObservationService extends AbstractMetadataService {
         }
 
         if(params.tag){
-            tagQuery = ",  TagLink tagLink, Tags tag "
+            tagQuery = ",  tag_link tagLink, tags tag "
             query += tagQuery;
             //mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
-            filterQuery +=  " and obv.id = tagLink.tag_ref and tagLink.type = :tagType and tagLink.tag_id = tag.id and tag.name = :tag "
+            filterQuery +=  " and obv.id = tag_link.tag_ref and tag_link.type = :tagType and tag_link.tag_id = tag.id and tag.name = :tag "
 
             queryParams["tag"] = params.tag
             queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
@@ -1337,7 +1337,7 @@ class ObservationService extends AbstractMetadataService {
             activeFilters["speciesName"] = params.speciesName
         }
        */
-        if(params.speciesName && (params.speciesName.equalsIgnoreCase('UNIDENTIFED'))){
+        if(params.speciesName && ((params.speciesName.equalsIgnoreCase('UNIDENTIFED')) || (params.speciesName.equalsIgnoreCase('Unknown')))){
           filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
           //queryParams["speciesName"] = params.speciesName
           activeFilters["speciesName"] = params.speciesName
