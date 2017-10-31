@@ -645,10 +645,11 @@ environments {
             //debug  'org.codehaus.groovy.grails.orm.hibernate.cfg'
             trace 'grails.plugin.springsecurity.SpringSecurityUtils'
         }
+        logHibernateStats = 'ALWAYS' // From ALWAYS, ALLOWED, NEVER
     }
     pamba {
         servername = 'pamba.strandls.com'
-        grails.serverURL = "http://${servername}"
+        grails.serverURL = "https://${servername}"
 
         speciesPortal {
             app.rootDir = "/apps/biodiv"
@@ -657,44 +658,44 @@ environments {
 
             resources {
                 rootDir = "${app.rootDir}/img"
-                serverURL = "http://${servername}/${appName}/img"
+                serverURL = "https://${servername}/${appName}/img"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
                 rootDir = "${app.rootDir}/observations"
-                serverURL = "http://${servername}/${appName}/observations"
+                serverURL = "https://${servername}/${appName}/observations"
                 //filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
-                serverURL = "http://${servername}/${appName}/userGroups"
+                serverURL = "https://${servername}/${appName}/userGroups"
             }
             datasource {
                 rootDir = "${app.rootDir}/datasources"
-                serverURL = "http://${servername}/${appName}/datasources"
+                serverURL = "https://${servername}/${appName}/datasources"
             }
             users {
                 rootDir = "${app.rootDir}/users"
-                serverURL = "http://${servername}/${appName}/users"
+                serverURL = "https://${servername}/${appName}/users"
             }
 
             content{
                 rootDir = "${app.rootDir}/content"
-                serverURL = "http://${servername}/${appName}/content"
+                serverURL = "https://${servername}/${appName}/content"
             }	
             maps {
-                serverURL = "http://${servername}/${appName}/maps"
+                serverURL = "https://${servername}/${appName}/maps"
             }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
-                serverURL = "http://${servername}/${appName}/usersRes"   
+                serverURL = "https://${servername}/${appName}/usersRes"   
             }
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
             traits{
                 rootDir = "${app.rootDir}/traits"
-                serverURL = "http://${servername}/${appName}/traits"
+                serverURL = "https://${servername}/${appName}/traits"
 
                 databaseDir = "${app.rootDir}/traits"
                 traitValueFile="${app.rootDir}/icons.csv"
@@ -791,6 +792,8 @@ environments {
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']
+
+        logHibernateStats = 'NEVER' // From ALWAYS, ALLOWED, NEVER
     }
     kk {
         servername = 'indiabiodiversity.org'
@@ -920,6 +923,8 @@ environments {
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']
+
+        logHibernateStats = 'NEVER' // From ALWAYS, ALLOWED, NEVER
     }
 }
 

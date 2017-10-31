@@ -1319,9 +1319,18 @@ class ObservationService extends AbstractMetadataService {
         }
 
         if(params.user){
+            if(params.user.indexOf(',') != -1) {
+            filterQuery += " and obv.author_id in :user "
+            def userIds = params.user;
+            queryParams["user"] = userIds
+            activeFilters["user"] = userIds
+
+            } else {
+            
             filterQuery += " and obv.author_id = :user "
             queryParams["user"] = params.user.toLong()
             activeFilters["user"] = params.user.toLong()
+            }
         }
   /*
         if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){

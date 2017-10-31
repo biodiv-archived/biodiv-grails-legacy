@@ -54,7 +54,8 @@ function getNewAccessToken() {
             console.log(data);
             setLoginInfo(data, isAjax);
         }, error: function (xhr, ajaxOptions, thrownError) {
-            $('.loginMessage').html(xhr.responseJSON.message).removeClass().addClass('alert alert-error').show();
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText; 
+            $('.loginMessage').html(msg).removeClass().addClass('alert alert-error').show();
             if(isAjax == true && ajaxLoginErrorCallbackFunction) {
                 ajaxLoginErrorCallbackFunction();
                 updateLoginInfo();
@@ -278,7 +279,8 @@ $(document).ready(function() {
                console.log(data);
                setLoginInfo(data, isAjax);
             }, error: function (xhr, ajaxOptions, thrownError) {
-                me.parent().find('.loginMessage').html(xhr.responseJSON.message).removeClass().addClass('loginMessage alert alert-error').show();
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : xhr.responseText; 
+                me.parent().find('.loginMessage').html(msg).removeClass().addClass('loginMessage alert alert-error').show();
                 if(isAjax == true && ajaxLoginErrorCallbackFunction) {
                     ajaxLoginErrorCallbackFunction();
                     updateLoginInfo();

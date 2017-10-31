@@ -358,7 +358,7 @@ println "++++++++++++++++++++++++++++++"
 
         minPoolSize = 5
 // /       maxPoolSieT =  30
-//        initialPoolSize = 3
+        initialPoolSize = 5
 //        acquireIncrement = 3
         testConnectionOnCheckout=true
         preferredTestQuery='SELECT 1'

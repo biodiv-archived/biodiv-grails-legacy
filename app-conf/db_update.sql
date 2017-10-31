@@ -478,7 +478,7 @@ create view observation_locations as  SELECT obs.id,
                     recommendation r
                       WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND (obs.is_showable = true OR obs.external_id is not null);
 
-create view checklist_species_view as SELECT obs.source_id AS id,
+create materialized view checklist_species_view as SELECT obs.source_id AS id,
     r.name AS species_name
        FROM observation obs,
         recommendation r
@@ -486,7 +486,7 @@ create view checklist_species_view as SELECT obs.source_id AS id,
           GROUP BY obs.source_id, r.name;
 
 
-create view checklist_species_locations as SELECT csv.id,
+create materialized view checklist_species_locations as SELECT csv.id,
 'checklist:'::text || csv.id AS source,
     cls.title,
         csv.species_name,
@@ -495,6 +495,8 @@ create view checklist_species_locations as SELECT csv.id,
                 observation obs,
                     checklists cls
                         WHERE csv.id = obs.id AND obs.id = cls.id;
+create index on checklist_species_locations using gist(topology);
+create index on checklist_species_locations using btree(species_name);
 
 drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
 select max(id) from document; select max(id) from observation; select max(id) from species; select max(id) from suser;
@@ -797,3 +799,71 @@ create index on token(value,user_id);
 
 alter table trait_value rename trait_id to trait_instance_id;
 alter table fact rename trait_id to trait_instance_id;
+
+#27thOct2017
+create index on activity_feed(root_holder_type,activity_type,is_showable,date_created);
+create index on process_image (status) where status = 'Scheduled';
+create index on document_token_url(status) where status = 'Scheduled';
+create index on download_log(status) where status = 'Scheduled';
+create index on upload_log(status) where status = 'Scheduled';
+create index on names_report_generator(status) where status = 'Scheduled';
+
+alter table process_image add column finished_on timestamp without time zone;
+
+
+
+
+#30th Oct 2017
+
+create table observation_locations as SELECT obs.id, 'observation:'::text || obs.id AS source,
+r.name AS species_name,
+obs.topology,
+obs.last_revised                                                              
+FROM observation obs,                                                                            
+recommendation r                                                                                                   
+WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND (obs.is_showable = true OR obs.external_id is not null);
+
+create or replace function observation_locations_insert () returns trigger as
+$$
+BEGIN
+    if NEW.is_deleted = false AND (NEW.is_showable = true OR NEW.external_id IS NOT NULL) then
+    INSERT INTO observation_locations(id,source,topology,last_revised) values(NEW.id, 'observation:'::text || NEW.id, NEW.topology, NEW.last_revised);
+    RETURN NEW;
+    end if;
+END;
+$$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER observation_locations_insert_trigger
+  AFTER INSERT
+  ON observation 
+  FOR EACH ROW
+      EXECUTE PROCEDURE observation_locations_insert();
+
+
+create or replace function observation_locations_update() returns trigger as
+$$
+BEGIN
+    if NEW.is_deleted = false AND (NEW.is_showable = true OR NEW.external_id IS NOT NULL) then
+        UPDATE observation_locations set topology = NEW.topology, last_revised = NEW.last_revised where id = NEW.id;
+        if (OLD.max_voted_reco_id is null and NEW.max_voted_reco_id is not null) or NEW.max_voted_reco_id <> OLD.max_voted_reco_id then
+            UPDATE observation_locations set species_name = r.name from (select name from recommendation where id=NEW.max_voted_reco_id) as r ;
+        end if;
+        RETURN NEW;
+    elsif NEW.is_deleted = true then
+        DELETE from observation_locations where id = NEW.id;
+        RETURN NEW;
+    end if;
+    
+END;
+$$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER observation_locations_update_trigger
+  AFTER UPDATE
+  ON observation
+  FOR EACH ROW
+      EXECUTE PROCEDURE observation_locations_update();
+
+create index on  observation_locations using gist(topology);
+create index on  observation_locations(species_name);

@@ -37,7 +37,24 @@
                     <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadDocumentSearchIndex')}">Reload Documents Search Index</a></li>
                 </ul>
             </div>
-   
+            <g:set var="jobManagerService" bean="jobManagerService"/>
+            <div>
+                <h5>All Jobs</h5>
+                <ul>
+                    <g:each in="${jobManagerService.getJobs('GRAILS_JOBS')}" var="job">
+                    <li>${job.getName()} : ${job.jobDetail}</li>
+                    </g:each>
+                </ul>
+
+                <h5>Running Jobs</h5>
+                <ul>
+                    <g:each in="${jobManagerService.getRunningJobs()}" var="job">
+                    <li>${job}</li>
+                    </g:each>
+                </ul>
+
+
+            </div>
         <g:set var="utilsService" bean="utilsService"/>
         <% def userFilePath=grailsApplication.config.speciesPortal.userDetailsFilePath %>
         <div>

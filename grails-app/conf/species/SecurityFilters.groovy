@@ -20,10 +20,12 @@ class SecurityFilters {
     def grailsApplication;
     def springSecurityService;
     def utilsService;
+    def sessionFactory;
 
     private static final AtomicLong REQUEST_NUMBER_COUNTER = new AtomicLong()
     private static final String START_TIME_ATTRIBUTE = 'Controller__START_TIME__'
     private static final String REQUEST_NUMBER_ATTRIBUTE = 'Controller__REQUEST_NUMBER__'
+    private static final String START_TIME = 'Hibernate_Start_Time'
 
     def filters = {
         all(controller:'*', action:'*') {
@@ -202,6 +204,49 @@ class SecurityFilters {
                 }
             }
 
+        }
+
+        logHibernateStats(controller: '*', action: '*') {
+            before = {
+                String enabledString = grailsApplication.config.logHibernateStats
+                def stats = sessionFactory.statistics
+
+                if (enabledString == 'ALWAYS' || (enabledString == 'ALLOWED' && params.logHibernateStats)) {
+                    log.info "\n### In action: $controllerName/$actionName ###"
+
+                    if (!stats.statisticsEnabled) {
+                        stats.statisticsEnabled = true
+                    }
+
+                    request[START_TIME] = System.currentTimeMillis()
+
+                }  else if (enabledString == 'ALLOWED' && stats.statisticsEnabled) {
+                    stats.statisticsEnabled = false // We assume no one else is using stats
+                }
+            }
+
+            afterView = {
+                String enabledString = grailsApplication.config.logHibernateStats
+
+                if (enabledString == 'ALWAYS' || (enabledString == 'ALLOWED' && params.logHibernateStats)) {
+                    Long end = System.currentTimeMillis()
+                    Long start = request[START_TIME]
+
+                    def stats = sessionFactory.statistics
+
+                    log.info """
+############## Hibernate Stats ##############
+Action:                     /${controllerName}/${actionName} : ${end-start}ms
+Transaction Count:          ${stats.transactionCount}
+Flush Count:                ${stats.flushCount}
+Prepared Statement Count:   ${stats.prepareStatementCount}
+Total time:                 ${end - start} ms
+#############################################
+"""
+
+stats.clear() // We assume no one else is using stats
+                }
+            }
         }
     }
 
