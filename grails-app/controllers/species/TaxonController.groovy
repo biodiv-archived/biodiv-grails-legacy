@@ -59,6 +59,7 @@ def list(){
   def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
   Long taxonId = params.id ? Long.parseLong(params.id) : null
   Set taxonIds = new HashSet();
+
   if(params.taxonIds) {
     params.taxonIds.split(',').each { tId ->
         try{
@@ -68,10 +69,11 @@ def list(){
         }
     }
   }
+
   if(taxonId) taxonIds << taxonId;
 
- println expandTaxon
  long startTime = System.currentTimeMillis();
+
  def rs = new ArrayList<GroovyRowResult>();
 
  if(expandSpecies) {
@@ -82,6 +84,7 @@ def list(){
  } else {
      def fieldsConfig = grailsApplication.config.speciesPortal.fields
      def classification = classSystem ? Classification.read(classSystem) : Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+     classSystem = classification.id
      def tillLevel = level+3;
       if(expandTaxon) {
           Set tIds = taxonIds.clone();
@@ -112,18 +115,13 @@ def list(){
  render buildlistResult(rs, classSystem) as JSON
 }
 
-private List buildlistResult(rs,classSystem) {  
-
-
+private List buildlistResult(rs,classSystem) {
     List result = [];
     Map lookup=[:];
     boolean hasContributorPermission = false;
-    rs.each { r ->        
-
+    rs.each { r ->
         Map map = [:]
-
         lookup[r.taxonid] = map;
-
         map['id'] = r["taxonid"]
         map['parent'] = r['parentid']?:'#'
         map['text'] = r.name.trim()
@@ -155,19 +153,15 @@ private List buildlistResult(rs,classSystem) {
         loaded : r.loaded ?:false,
         disabled  : false  // is the node disabled
         ];
-
         map['haspermission']=hasPermissionSpecies(params.user?.toInteger(),r["taxonid"]);
-        
+
         if(map['haspermission']==true) {
             map['li_attr'] = ['class':"permission_hilight"];  // attributes for the generated LI node
         } else {
             map['li_attr'] = []  // attributes for the generated LI node
         }
-        
         map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
-      
         //r.children = [];
-
         if(r.parentid && lookup[r.parentid]){
             if(!lookup[r.parentid].children)
                 lookup[r.parentid].children = [];
@@ -195,7 +189,7 @@ private List buildlistResult(rs,classSystem) {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-      
+
         return _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
     }
 
@@ -211,6 +205,7 @@ private List buildlistResult(rs,classSystem) {
         } else {
             def fieldsConfig = grailsApplication.config.speciesPortal.fields
             def classification = classSystem ? Classification.read(classSystem) : Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+            classSystem = classification.id;
             def taxonIds = [];
             def tillLevel = level+3;
              if(expandTaxon) {
@@ -223,7 +218,10 @@ private List buildlistResult(rs,classSystem) {
                 println taxon
                 tillLevel = taxon.rank;
                 taxonIds = getSpeciesHierarchyTaxonIds(taxonId, classification.id);
+                println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
                 println taxonIds
+                println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
+
             }
             //def cl = Classification.read(classSystem.toLong());
             getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds);
@@ -387,26 +385,28 @@ private List buildlistResult(rs,classSystem) {
     private List getSpeciesHierarchyTaxonIds(Long taxonId, Long classSystem) {
         def sql = new Sql(dataSource)
         String s = """select s.path as path
-        from taxonomy_registry s,
-        taxonomy_definition t
-        where
-        s.taxon_definition_id = t.id and t.is_deleted = false and
-        ${(classSystem?"s.classification_id = :classSystem and ":"")}
-        (s.path like '%!_"""+taxonId+"!_%' or s.path like '"+taxonId+"!_%' or s.path like '%!_"+taxonId+"'  escape '!')";
+        from taxonomy_registry s
+        where ${(classSystem?"s.classification_id = :classSystem and ":"")}
+        s.taxon_definition_id = :taxonId
+        """
+
+        log.debug "getSpeciesHierarchyTaxonIds query : ${s}";
         def rs
         if(classSystem) {
-            rs = sql.rows(s, [classSystem:classSystem])
+            rs = sql.rows(s, [classSystem:classSystem, taxonId:taxonId])
         } else {
             rs = sql.rows(s)
         }
         def paths = rs.collect {it.path};
-
+        println paths
+        println "========================="
         def result = [];
         paths.each {
             it.tokenize("_").each {
                 result.add(Long.parseLong(it));
             }
         }
+        println result
         return result;
         //		return [Species.get(speciesId).id]
     }

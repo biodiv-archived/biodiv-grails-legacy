@@ -1324,13 +1324,31 @@ class ObservationService extends AbstractMetadataService {
             queryParams["habitat"] = params.habitat
             activeFilters["habitat"] = params.habitat
         }
+        if(params.user){
+          if(params.user.indexOf(',') != -1) {
+          filterQuery += " and obv.author_id in (:user) "
 
+
+          List<Long> userIds = new ArrayList<Long>();
+          for (String userId : params.user.split(","))
+          userIds.add(Long.valueOf(userId));
+          queryParams["user"] = userIds
+          activeFilters["user"] = userIds
+
+          } else {
+
+          filterQuery += " and obv.author_id = :user "
+          queryParams["user"] = params.user.toLong()
+          activeFilters["user"] = params.user.toLong()
+          }
+      }
+          /*
         if(params.user){
             filterQuery += " and obv.author_id = :user "
             queryParams["user"] = params.user.toLong()
             activeFilters["user"] = params.user.toLong()
         }
-  /*
+
         if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
             filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
             //queryParams["speciesName"] = params.speciesName
