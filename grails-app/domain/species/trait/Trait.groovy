@@ -146,10 +146,10 @@ class Trait {
         units nullable:true
         traitTypes nullable:false
         dataTypes nullable:false
-        taxon validator : { val, obj ->
+/*      taxon validator : { val, obj ->
 			val && val.size() > 0 
 		}
-    }
+*/    }
 
     static mapping = {
         description type:"text"
