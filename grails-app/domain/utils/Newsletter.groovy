@@ -10,6 +10,7 @@ class Newsletter {
 	boolean sticky = false;
     int displayOrder;
     int parentId;
+    boolean showInFooter = false;
     Language language;
 
 	static belongsTo = [userGroup: UserGroup]
@@ -20,6 +21,7 @@ class Newsletter {
 		userGroup nullable:true;
         displayOrder nullable:false;
         parentId nullable:false;
+        showInFooter nullable:false;
         language nullable:false;
     }
 	

@@ -20,7 +20,21 @@ class CustomFieldService {
 		obv.userGroups.collect{it}.each { ug ->
 			CustomField.fetchCustomFields(ug).each { cf ->
 				def val = fetchForDisplay(cf, obv.id)
-				result[cf] = [key:cf.name, value : val, ugId:ug.id]
+				result[cf] = [
+						id:cf.id,
+						key:cf.name, 
+						value : val,
+						notes:cf.notes,
+						ugId:ug.id,
+						author:cf.author,
+						isMandatory:cf.isMandatory, 
+						allowed_participation:cf.allowedParticipation,
+						allowedMultiple:cf.allowedMultiple,
+						dataType:cf.dataType,
+						defaultValue:cf.defaultValue,
+						displayOrder:cf.displayOrder,
+						options:cf.options						
+					   ]
 			}
 		}
 		return result

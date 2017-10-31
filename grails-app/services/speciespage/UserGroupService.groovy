@@ -86,7 +86,7 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-	
+
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
 	}
@@ -115,8 +115,8 @@ class UserGroupService {
 		addInterestedSpeciesGroups(userGroup, params.speciesGroup)
 		addInterestedHabitats(userGroup, params.habitat)
 		updateHomePage(userGroup, params)
-		
-		
+
+
 		if(params.sw_latitude)
 			userGroup.sw_latitude = Float.parseFloat(params.sw_latitude)
 		if(params.sw_longitude)
@@ -127,21 +127,21 @@ class UserGroupService {
 			userGroup.ne_longitude = Float.parseFloat(params.ne_longitude)
 
 		userGroup.statStartDate = utilsService.parseDate(params.campStatStartDate)
-			
+
 		if(!userGroup.hasErrors() && userGroup.save()) {
 			def tags = (params.tags != null) ? Arrays.asList(params.tags) : new ArrayList();
 			userGroup.setTags(tags);
 
 			List founders = Utils.getUsersList(params.founderUserIds);
 			setUserGroupFounders(userGroup, founders, params.founderMsg, params.domain);
-			
+
 			List experts = Utils.getUsersList(params.expertUserIds);
 			setUserGroupExperts(userGroup, experts, params.expertMsg, params.domain);
 			params.founders = founders;
-			
-			//updating digest 
+
+			//updating digest
 			Digest.updateDigest(userGroup)
-		}  
+		}
 	}
 
 	//@PreAuthorize("hasPermission(#id, 'species.groups.UserGroup', read) or hasPermission(#id, 'species.groups.UserGroup', admin)")
@@ -202,7 +202,7 @@ class UserGroupService {
 			userGroupInstance.addToHabitats(Habitat.read(value.toLong()));
 		}
 	}
-	
+
 	private void updateHomePage(userGroup, params){
 		//on create correcting webaddress of home page in other cases(i.e update) no need to do any thing
 		if(params.homePage){
@@ -243,6 +243,7 @@ class UserGroupService {
 
 	//@Transactional
 	def getUserGroups(SUser userInstance) {
+		
 		return userInstance.getUserGroups()
 	}
 
@@ -255,24 +256,24 @@ class UserGroupService {
 
 		String query = "";
 		if(userInstance) {
-			query += '''select user_group_id, count(distinct(s_user_id)) as c 
+			query += '''select user_group_id, count(distinct(s_user_id)) as c
 						from user_group_member_role '''
 			query += " where user_group_id in (select distinct(user_group_id) from user_group_member_role where s_user_id = "+userInstance.id+") "
-			query += 	''' group by user_group_id 
+			query += 	''' group by user_group_id
 						order by c desc limit 20''';
-//			query = '''select distinct s.user_group_id, max(s.count) as maxCount 
-//						from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, 
-//								(select observation_id, count(*) from user_group_observations group by observation_id) u2 
-//								where u1.observation_id=u2.observation_id) 
-//							union 
-//							(select distinct u1.user_group_species_groups_id, u2.count from  user_group_species_group u1, 
-//								(select species_group_id, count(*) from user_group_species_group group by species_group_id) u2 
-//									where u1.species_group_id=u2.species_group_id) 
-//							union 
-//							(select distinct u1.user_group_habitats_id, u2.count from  user_group_habitat u1, 
-//								(select habitat_id, count(*) from user_group_habitat group by habitat_id) u2 
-//								where u1.habitat_id=u2.habitat_id)) s 
-//						where s.user_group_id not in (select distinct user_group_id from user_group_member_role where s_user_id=${userInstance.id}) 
+//			query = '''select distinct s.user_group_id, max(s.count) as maxCount
+//						from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1,
+//								(select observation_id, count(*) from user_group_observations group by observation_id) u2
+//								where u1.observation_id=u2.observation_id)
+//							union
+//							(select distinct u1.user_group_species_groups_id, u2.count from  user_group_species_group u1,
+//								(select species_group_id, count(*) from user_group_species_group group by species_group_id) u2
+//									where u1.species_group_id=u2.species_group_id)
+//							union
+//							(select distinct u1.user_group_habitats_id, u2.count from  user_group_habitat u1,
+//								(select habitat_id, count(*) from user_group_habitat group by habitat_id) u2
+//								where u1.habitat_id=u2.habitat_id)) s
+//						where s.user_group_id not in (select distinct user_group_id from user_group_member_role where s_user_id=${userInstance.id})
 //						group by s.user_group_id order by maxCount desc;'''
 		} else {
 			query += '''select user_group_id, count(distinct(s_user_id)) as c
@@ -280,7 +281,7 @@ class UserGroupService {
 			query += 	''' group by user_group_id
 						order by c desc limit 20 offset '''+offset;
 //			query = '''select distinct s.user_group_id, max(s.count) as maxCount from ((select distinct u1.user_group_id, u2.count from  user_group_observations u1, (select observation_id, count(*) from user_group_observations group by observation_id) u2 where u1.observation_id=u2.observation_id) union (select distinct u1.user_group_species_groups_id, u2.count from  user_group_species_group u1, (select species_group_id, count(*) from user_group_species_group group by species_group_id) u2 where u1.species_group_id=u2.species_group_id) union (select distinct u1.user_group_habitats_id, u2.count from  user_group_habitat u1, (select habitat_id, count(*) from user_group_habitat group by habitat_id) u2 where u1.habitat_id=u2.habitat_id)) s group by s.user_group_id order by maxCount desc;'''
-		}		
+		}
 		//log.debug "Suggested usergroup query ${query}"
 		conn.eachRow(query,
 				{ row ->
@@ -570,7 +571,7 @@ class UserGroupService {
                 query += "join obv.userGroups userGroup where userGroup=:userGroup"
             count =  Document.executeQuery(query, queryParams, [cache:true])[0]
             break;
-			
+
 			case Discussion.simpleName :
 			query = "select count(*) from Discussion obv "
 			if(userGroupInstance)
@@ -579,7 +580,7 @@ class UserGroupService {
         }
         return count;
 	}
-	
+
 
 
 
@@ -735,7 +736,7 @@ class UserGroupService {
 			}
 		}
 	}
-	
+
 	@PreAuthorize("hasPermission(#userGroupInstance, write) or hasPermission(#userGroup, admin)")
 	def setUserGroupExperts(userGroupInstance, experts, expertsMsg, domain) {
 		//experts.add(springSecurityService.currentUser);
@@ -840,7 +841,7 @@ class UserGroupService {
 	}
 
 
-	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order, def currentLanguage= null) {
+	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order, def currentLanguage= null, def filterParams=null) {
 		String query = "from Newsletter newsletter ";
 		def queryParams = [:]
 		if(userGroupInstance) {
@@ -860,7 +861,13 @@ class UserGroupService {
 		if(currentLanguage){
 			query += " and language="+currentLanguage.id;
 		}
-		
+        if(filterParams) {
+            filterParams.each {
+                query += " and newsletter.${it.key}=:${it.key} "
+			    queryParams[it.key] = it.value;
+            }
+        }
+
 		if(max && max != -1) {
 			queryParams['max'] = max;
 		}
@@ -928,7 +935,7 @@ class UserGroupService {
 	def fetchHomePageTitle(UserGroup userGroupInstance){
 		if(!userGroupInstance.homePage)
 			return null
-		
+
 		//if home page is news letter then getting title from newsletter
 		String newsletterId = userGroupInstance.homePage.tokenize('/').last()
 		if(newsletterId.isNumber()){
@@ -941,9 +948,9 @@ class UserGroupService {
 		}else{
 			//returning one of about/activity page
 			return userGroupInstance.homePage
-		}	
+		}
 	}
-	
+
 	def userGroupBasedLink(attrs) {
         return utilsService.userGroupBasedLink(attrs);
     }
@@ -976,11 +983,11 @@ class UserGroupService {
 
 		return jsonData;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////// User migration to wgp ///////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	def migrateUserPermission(){
 		UserGroup wgpGroup = UserGroup.read(1)
 		def wgpUserDate = new Date(111, 7, 8)
@@ -1003,11 +1010,11 @@ class UserGroupService {
 			//adding fouder permission to ramesh br
 			addPermissionTest(SUser.read(797).email, 2, i++)
 			addPermissionTest(SUser.read(797).email, 16, i++)
-			
+
 			addPermissionTest(SUser.read(1117).email, 2, i++)
 			addPermissionTest(SUser.read(1117).email, 16, i++)
-			
-			//adding dummy founder 
+
+			//adding dummy founder
 			addPermissionTest(SUser.read(1184).email, 16, i++)
 			addPermissionTest(SUser.read(1188).email, 16, i++)
 		}
@@ -1112,9 +1119,9 @@ class UserGroupService {
 		}
 		bean
 	}
-	
-	
-	
+
+
+
 	/////////////// DOCUMENTS RELATED /////////////////
 	void postDocumenttoUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
         addResourceOnGroups(document, userGroupIds, sendMail);
@@ -1188,12 +1195,12 @@ class UserGroupService {
 		/*def queryParams = [:]
 		queryParams['userGroup'] = userGroupInstance
 		queryParams['isDeleted'] = false;
-		
+
 		def query = "select count(*) from Document doc join doc.userGroups userGroup where doc.isDeleted = :isDeleted and userGroup=:userGroup"
 		return Document.executeQuery(query, queryParams)[0]
         */
 	}
-	
+
 	/////////////// Discussion RELATED /////////////////
 	void postDiscussiontoUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
         addResourceOnGroups(discussion, userGroupIds, sendMail);
@@ -1308,19 +1315,19 @@ class UserGroupService {
 		//TODO
 		return projectInstance.userGroups;
 	}
-	
-	
+
+
 	def boolean hasPermissionAsPerGroup(object, property, permission){
 		def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
 		return secTagLib.hasPermissionAsPerGroup(['permission':permission, 'object':object, 'property':property], 'permitted')
 	}
-	
-	//XXX same call from taglib leadind to no session errro. to avoid that puttins same checkin in service and exposing through domain object 
+
+	//XXX same call from taglib leadind to no session errro. to avoid that puttins same checkin in service and exposing through domain object
 	def boolean hasPermission(object, permission){
 		def secTagLib = grailsApplication.mainContext.getBean('species.CustomSecurityAclTagLib');
 		return secTagLib.hasPermission(['permission':permission, 'object':object], 'permitted')
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////// Bulk posting ////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -1367,7 +1374,7 @@ class UserGroupService {
 			def domainClass = grailsApplication.getArtefact("Domain",params.objectType)?.getClazz()
 			List obvs = []
 			if(objectIds && objectIds != ""){
-				objectIds.split(",").each { 
+				objectIds.split(",").each {
 					def obj = domainClass.read(Long.parseLong(it.trim()))
                     if(obj) {
                         obvs << obj
@@ -1378,7 +1385,7 @@ class UserGroupService {
 				}
 			}
 			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
-			
+
 			String submitType = params.submitType
 			String objectType = params.objectType
 			String groupRes = ""
@@ -1405,7 +1412,7 @@ class UserGroupService {
 				default:
 					break
 			}
-			
+
 			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, functionString, sendMail)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
@@ -1416,23 +1423,23 @@ class UserGroupService {
 		}
 		return r
 	}
-	
+
 	def boolean getResourcePullPermission(params, isBulkPull=true){
 		if(!springSecurityService.isLoggedIn()){
 			return false
 		}
-		
+
 		SUser currUser = springSecurityService.currentUser;
 		//returning true for user with admin role
 		if(utilsService.isAdmin(currUser)){
 			return true
 		}
-		
+
 		int groupCount = UserGroupMemberRole.countBySUser(currUser)
 		if(groupCount == 0){
 			return false
 		}
-		
+
 		if(!getExpertGroupsOnly(isBulkPull, params)){
 			return true
 		}
@@ -1440,16 +1447,16 @@ class UserGroupService {
 		//on list apge of any resource (i.e. obv, species, docs)
 		return currUser.fetchIsFounderOrExpert()
 	}
-	
+
 	def boolean getExpertGroupsOnly(boolean isBulkPull, params){
-		//resource like species or bulk post can be done only by expert or founder in his group only  
+		//resource like species or bulk post can be done only by expert or founder in his group only
 		return (isBulkPull || params.controller == 'species')
 	}
-	
+
 	private class ResourceUpdate {
 		public static final int POST_BATCH_SIZE = 100
 		private static final log = LogFactory.getLog(this);
-		
+
 		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction, boolean sendMail=true){
 			ResourceFetcher rf;
             boolean isBulk = false;
@@ -1460,11 +1467,11 @@ class UserGroupService {
 //				newList.removeAll(allObvs)
 //				allObvs = newList
 			}
-			
+
 			log.debug " All Groups " + groups
-			
+
 			def afDescriptionList = []
-			def currUser = springSecurityService.currentUser?:SUser.read(params.author?.toLong()) 
+			def currUser = springSecurityService.currentUser?:SUser.read(params.author?.toLong())
             boolean isNotOver = isBulk ? rf.hasNext() : true;
             List obvs = new ArrayList(allObvs)
             while(isNotOver) {
@@ -1500,10 +1507,10 @@ class UserGroupService {
             }
             return afDescriptionList.join(" ");
 		}
-		
-		
+
+
 		private List postInBatch(UserGroup ug, List obvs, String submitType, String updateFunction, String groupRes){
-			
+
             List postedObvs = [];
 			UserGroup.withTransaction(){  status ->
 				if(submitType == 'post'){
@@ -1529,12 +1536,12 @@ class UserGroupService {
 						obv = obv.merge()
                         println "testing group validity for ${obv}"
                         boolean hasValidUserGroup = obv.metaClass.respondsTo(obv, "isUserGroupValidForPosting");
- 
+
                         if(hasValidUserGroup) {
                             if(!obv.isUserGroupValidForPosting(ug)) {
                                if(submitType == 'post') {
                                     log.error "Cannot do operation ${submitType} on ${obv} in usergroup ${ug} because it is not valid as per usergroup filters";
-                                    return; 
+                                    return;
 
                                 }
                             } else {
@@ -1561,21 +1568,21 @@ class UserGroupService {
                         println "rolling back"
 						status.setRollbackOnly()
 						e.printStackTrace()
-					} 
+					}
 				}
 			}
 			return postedObvs
 		}
-		
+
 		private String getStatusMsg(af, resoruceClassName, remainingCount, submitType, userGroup){
-			String msg = af ? (activityFeedService.getContextInfo(af).activityTitle) : ("No " + activityFeedService.getResourceDisplayName(resoruceClassName) +  ((submitType == 'post') ? " posted to group ": " removed from group ") + activityFeedService.getUserGroupHyperLink(userGroup)) 
+			String msg = af ? (activityFeedService.getContextInfo(af).activityTitle) : ("No " + activityFeedService.getResourceDisplayName(resoruceClassName) +  ((submitType == 'post') ? " posted to group ": " removed from group ") + activityFeedService.getUserGroupHyperLink(userGroup))
 			if(remainingCount > 0){
 				msg += ( ", " + remainingCount + " were " ) + ((submitType == 'post') ? "already part of this group" : "not part of this group")
 			}
 			msg += "."
-			return msg 
+			return msg
 		}
-		
+
 		private List getFeatureSafeList(ug, obvs){
 			SUser currUser = springSecurityService.currentUser;
 			//if admin or founder or expert then can un post any featured resource
@@ -1583,7 +1590,7 @@ class UserGroupService {
 				log.debug "prevlidge user in the gropu " + ug + "    uesr " + currUser
 				return obvs
 			}
-			
+
 			def newObvs = []
 			obvs.each { obv ->
 				if(( obv.metaClass.hasProperty(obv, 'author') && (obv.author == currUser)) || !Featured.isFeaturedAnyWhere(obv)){
@@ -1594,7 +1601,7 @@ class UserGroupService {
 			return newObvs
 		}
 	}
-	
+
 	///////////////////////////////// Remove user in bulk ////////////////////////////////
 	def removeMemberInBulk(params){
 		try{
@@ -1603,12 +1610,12 @@ class UserGroupService {
 			for (Map row : content) {
 				userIds << row.get("userid").toLong();
 			}
-			
-			UserGroup ug = UserGroup.get(params.groupId.toLong())
-			log.debug "user gropu name " + ug.name + " and userIds " + userIds 
 
-			
-			UserGroup.withTransaction { 
+			UserGroup ug = UserGroup.get(params.groupId.toLong())
+			log.debug "user gropu name " + ug.name + " and userIds " + userIds
+
+
+			UserGroup.withTransaction {
 				userIds.each { uid ->
 					SUser u = SUser.get(uid)
 					log.info  "Deleting user " + uid + " from group " + ug
@@ -1646,7 +1653,7 @@ class UserGroupService {
 
             if(!params.notInUserGroup) {
                 //dont remove when we are doing incremental update
-                Map removeResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'remove', 'filterUrl':grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?userGroup=${ug.id}", webaddress:ug.webaddress, 'selectionType':'selectAll']) 
+                Map removeResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'remove', 'filterUrl':grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?userGroup=${ug.id}", webaddress:ug.webaddress, 'selectionType':'selectAll'])
             }
 
             String filterUrl = grailsApplication.config.grails.serverURL+"/"+filterObjController+"/list?";
@@ -1658,13 +1665,13 @@ class UserGroupService {
                     filterUrl += it.fieldName+"="+it.ruleValues;
                 }
             }
-            
+
             if(params.notInUserGroup) {
                 filterUrl += "&notInUserGroup=${ug.id}";
             }
 
             log.debug "Posting observations with filterUrl ${filterUrl}";
-            Map postResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'post', 'filterUrl':filterUrl, 'selectionType':'selectAll'], false); 
+            Map postResult = updateResourceOnGroup(['userGroups':ug.id+'', 'objectType':params.objectType, 'pullType':'bulk', 'submitType':'post', 'filterUrl':filterUrl, 'selectionType':'selectAll'], false);
             println "REFRESH COMPLETE with result ${postResult}";
             return postResult;
         }

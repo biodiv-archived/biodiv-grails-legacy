@@ -37,7 +37,23 @@
                     <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'reloadDocumentSearchIndex')}">Reload Documents Search Index</a></li>
                 </ul>
             </div>
-   
+            <g:set var="jobManagerService" bean="jobManagerService"/>
+            <div>
+                <h5>All Jobs</h5>
+                <ul>
+                <g:each in="${jobManagerService.getJobs('GRAILS_JOBS')}" var="job">
+                <li>${job.getName()} : ${job.jobDetail}</li>
+                </g:each>
+                </ul>
+
+                <h5>Running Jobs</h5>
+                <ul>
+                <g:each in="${jobManagerService.getRunningJobs()}" var="job">
+                <li>${job}</li>
+                </g:each>
+                </ul>
+            </div>
+
         <g:set var="utilsService" bean="utilsService"/>
         <% def userFilePath=grailsApplication.config.speciesPortal.userDetailsFilePath %>
         <div>
@@ -46,6 +62,8 @@
                 <li><td><a class="btn btn-mini" href="${uGroup.createLink(action:'downloadUserFile', controller:'UFile', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':[downloadFile:userFilePath])}"><g:message code="button.download.user" /></a></td></li>
             </ul>
         </div>
+
+
         <h5>Banner Message</h5>
 
         <form class="form-horizontal" id="frmgroup" method="post" action="${uGroup.createLink(controller:'biodivAdmin', action:'getMessage')}"> 

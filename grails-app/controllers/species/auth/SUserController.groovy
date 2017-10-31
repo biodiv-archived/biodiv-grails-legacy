@@ -55,7 +55,7 @@ class SUserController extends UserController {
     static defaultAction = "list"
 
 	def isLoggedIn = { render springSecurityService.isLoggedIn() }
-    
+
     def index () {
 		redirect(action: "list", params: params)
 	}
@@ -85,9 +85,9 @@ class SUserController extends UserController {
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
         }
 
-        model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model) 
+        model = utilsService.getSuccessModel("Success in executing ${actionName} of ${params.controller}", null, OK.value(), model)
         withFormat {
-            html { 
+            html {
                 if(params.loadMore?.toBoolean()){
                     render(template:"/common/suser/showUserListTemplate", model:model.model);
                     return;
@@ -126,7 +126,7 @@ class SUserController extends UserController {
 		if (!user.save(flush: true)) {
             def model = utilsService.getErrorModel("Error in executing ${actionName} of ${params.controller}", user, UNPROCESSABLE_ENTITY.value())
             withFormat {
-                html { 
+                html {
                     render view: 'create', model: [user: user, authorityList: sortedRoles()]
                 }
                 json { render model as JSON }
@@ -141,7 +141,7 @@ class SUserController extends UserController {
 
         def model = utilsService.getSuccessModel("${message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), user.id])}", user, CREATED.value())
         withFormat {
-            html { 
+            html {
                 flash.message = model.msg
                 redirect action: edit, id: user.id
             }
@@ -181,7 +181,7 @@ class SUserController extends UserController {
             r.roleMap.each {role, granted ->
                 if(granted) {
                     result.roles << role.authority
-                }                    
+                }
             }
             result['stat'] = chartService.getUserStats(SUserInstance, userGroupInstance);
             result['userLanguage'] = userLanguage;
@@ -209,7 +209,7 @@ class SUserController extends UserController {
 		if((params.id && utilsService.ifOwns(params.long('id'))) || (params.email && utilsService.ifOwnsByEmail(params.email))) {
 			def user = params.username ? lookupUserClass().findWhere((usernameFieldName): params.username) : null
 			if (!user) user = findById();
-            
+
             def model
 			if (!user) model = [];
             else model = buildUserModel(user);
@@ -217,12 +217,12 @@ class SUserController extends UserController {
                 html {
                     return model
                 }
-                '*' { 
+                '*' {
                     render model
                 }
             }
 
-            return model; 
+            return model;
         }
 
         withFormat {
@@ -230,8 +230,8 @@ class SUserController extends UserController {
                 flash.message = "${message(code: 'edit.denied.message')}";
                 redirect (url:uGroup.createLink(action:'show', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
             }
-            '*' { 
-                render status: UNAUTHORIZED 
+            '*' {
+                render status: UNAUTHORIZED
             }
         }
     }
@@ -302,7 +302,7 @@ class SUserController extends UserController {
 
             def model = utilsService.getSuccessModel("${message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), user.id])}", user, OK.value())
             withFormat {
-                html { 
+                html {
                     flash.message = model.msg
 			        redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
                 }
@@ -312,7 +312,7 @@ class SUserController extends UserController {
 		} else {
             def model = utilsService.getErrorModel("${message(code: 'update.denied.message')}", null, OK.value())
             withFormat {
-                html { 
+                html {
                     flash.message = model.msg
                     redirect (url:uGroup.createLink(action:'show', controller:"user", id:user.id, 'userGroupWebaddress':params.webaddress))
                 }
@@ -328,7 +328,7 @@ class SUserController extends UserController {
 		if (!user) {
             def model = utilsService.getErrorModel("${message(code: 'info.id.not.found', args: [message(code: 'user.label', default: 'User'), params.id])}", null, NOT_FOUND.value())
             withFormat {
-                html { 
+                html {
                     flash.error = model.msg
                     redirect (url:uGroup.createLink(action:'list', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
                 }
@@ -367,7 +367,7 @@ class SUserController extends UserController {
             def model = utilsService.getSuccessModel("${message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), user.name])}", null, NO_CONTENT.value())
 
             withFormat {
-                html { 
+                html {
                     flash.message = model.msg
                     redirect (url:uGroup.createLink(action:'list', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
                     return;
@@ -380,7 +380,7 @@ class SUserController extends UserController {
 			e.printStackTrace();
             def model = utilsService.getErrorModel("${message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), user.name])}", null, INTERNAL_SERVER_ERROR.value(),[msg:e.getMessage()])
             withFormat {
-                html { 
+                html {
                     flash.error = model.msg
                     redirect (url:uGroup.createLink(action:'edit', controller:"user", id:params.id, 'userGroupWebaddress':params.webaddress))
 
@@ -397,7 +397,7 @@ class SUserController extends UserController {
 		//def model = getUsersList(params);
 		def model = SUserService.getUsersFromSearch(params);
 		// add query params to model for paging
-	
+
 		//model['isSearch'] = true;
 		actionName = 'search'
 		params.controller = 'SUser'
@@ -643,8 +643,8 @@ class SUserController extends UserController {
 		return result;
 	}
 
-	def loginTemplate() { 
-        String s = g.render template:"/common/suser/userLoginBoxTemplate"  
+	def loginTemplate() {
+        String s = g.render template:"/common/suser/userLoginBoxTemplate"
         render s
     }
 
@@ -663,13 +663,13 @@ class SUserController extends UserController {
         render s;
 	}
 
-	def sidebarTemplate() { 
-        String s = g.render template:"/common/userGroup/sidebarTemplate" 
+	def sidebarTemplate() {
+        String s = g.render template:"/common/userGroup/sidebarTemplate"
         render s;
     }
 
-	def footerTemplate() { 
-        String s = g.render template:"/domain/ibpFooterTemplate" 
+	def footerTemplate() {
+        String s = g.render template:"/domain/ibpFooterTemplate"
         render s;
     }
 
@@ -679,7 +679,7 @@ class SUserController extends UserController {
 
 		for (String key in params.keySet()) {
 			if (key.contains('ROLE') && 'on' == params.get(key)) {
-                log.debug "Assigning role : ${key}" 
+                log.debug "Assigning role : ${key}"
                 try {
 				lookupUserRoleClass().create user, lookupRoleClass()."findBy$upperAuthorityFieldName"(key), flush
                 }catch (Exception e) {
@@ -769,7 +769,7 @@ class SUserController extends UserController {
 			}
             def uniqueVotes = observationService.getAllRecommendationsOfUser(userInstance, userGroupInstance);
 
-            def observations = recommendationVoteList.collect{it.observation};	
+            def observations = recommendationVoteList.collect{it.observation};
             def result = []
             observations.each {
                 result.add(['observation':it, 'title':it.fetchSpeciesCall()]);
@@ -777,8 +777,8 @@ class SUserController extends UserController {
             def relatedObv = ['observations':result, count:uniqueVotes];
             if(relatedObv.observations) {
                     relatedObv.observations = observationService.createUrlList2(relatedObv.observations);
-            } 
-             
+            }
+
             def model = utilsService.getSuccessModel("", null, OK.value(), relatedObv)
             withFormat {
                 json { render model as JSON }
@@ -871,7 +871,7 @@ class SUserController extends UserController {
 				// render some XML markup to the response
 				if(usersDir && resourcesInfo) {
                     withFormat {
-                        json { 
+                        json {
                             def res = [];
                             for(r in resourcesInfo) {
                                 res << ['fileName':r.fileName, 'size':r.size]
@@ -879,8 +879,8 @@ class SUserController extends UserController {
                             def model = utilsService.getSuccessModel("", null, OK.value(), [users:[dir:usersDir.absolutePath.replace(rootDir, ""), resources : res]])
                             render model as JSON
                         }
- 
-                        xml { 
+
+                        xml {
                             render(contentType:'text/xml') {
                                 response {
                                     success(true)
@@ -996,7 +996,7 @@ class SUserController extends UserController {
 	}
 
 	private processResult(List  recommendationVoteList, Long uniqueVotes, Map params) {
-		try { 
+		try {
 			if (recommendationVoteList.size() > 0) {
 				def result = [];
 				recommendationVoteList.each { recoVote ->
@@ -1069,7 +1069,7 @@ class SUserController extends UserController {
     def myuploads(){
         def author = springSecurityService.currentUser;
 		def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-		return ['springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature] 
+		return ['springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
     }
 
     @Secured(['ROLE_ADMIN'])
@@ -1095,11 +1095,11 @@ class SUserController extends UserController {
 
         if(!appKey.save(flush:true)) {
             def errors = [];
-		    appKey.errors?.allErrors.each { 
+		    appKey.errors?.allErrors.each {
 
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
-                log.error it 
+                log.error it
             }
             render ([success:false, msg:'Error in creating/updating app key', 'errors':errors] as JSON)
         }
@@ -1108,6 +1108,24 @@ class SUserController extends UserController {
         render ([success:true, 'appKey':appKey.key, 'msg':'This app key is also sent in an email to your account'] as JSON)
 
     }
+
+   def getUserUserGroups() {
+        if(params.id) {
+           SUser user = SUser.read(Long.parseLong(params.id));
+           if(user) {
+                render (userGroupService.getUserUserGroups(user, -1, -1) as JSON);
+                return;
+           } 
+       }
+
+        def model = utilsService.getErrorModel("${message(code: 'default.not.found.message', args: [message(code: 'SUser.label', default: 'SUser'), params.id])}", SUserInstance, NOT_FOUND.value());
+        render model as JSON;
+   }
+
+   @Secured(["ROLE_USER"])
+   def getUserUserGroupsWithWrite() {
+         render (userGroupService.getUserGroups(springSecurityService.currentUser) as JSON)
+   }
 
 }
 class ResetPasswordCommand {
@@ -1123,10 +1141,10 @@ class ResetPasswordCommand {
 		currentPassword nullable: false, blank:false, validator: { value, command ->
 			def currentUser = command.springSecurityService.currentUser;
 			String salt = command.saltSource instanceof NullSaltSource ? null : params.username
-			if (!currentUser.password.equals(command.springSecurityService.encodePassword(value, salt))) { 
-				return 'spring.security.ui.resetPassword.currentPassword.doesnt.match' 
+			if (!currentUser.password.equals(command.springSecurityService.encodePassword(value, salt))) {
+				return 'spring.security.ui.resetPassword.currentPassword.doesnt.match'
 			}
-		} 
+		}
 		password blank: false, nullable: false, validator: grails.plugin.springsecurity.ui.RegisterController.passwordValidator
 		password2 validator: RegisterController.password2Validator
 	}

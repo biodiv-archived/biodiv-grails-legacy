@@ -1308,10 +1308,10 @@ class ObservationService extends AbstractMetadataService {
         }
 
         if(params.tag){
-            tagQuery = ",  TagLink tagLink, Tags tag "
+            tagQuery = ",  tag_link tagLink, tags tag "
             query += tagQuery;
             //mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
-            filterQuery +=  " and obv.id = tagLink.tag_ref and tagLink.type = :tagType and tagLink.tag_id = tag.id and tag.name = :tag "
+            filterQuery +=  " and obv.id = tag_link.tag_ref and tag_link.type = :tagType and tag_link.tag_id = tag.id and tag.name = :tag "
 
             queryParams["tag"] = params.tag
             queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
@@ -1336,7 +1336,7 @@ class ObservationService extends AbstractMetadataService {
             activeFilters["speciesName"] = params.speciesName
         }
        */
-        if(params.speciesName && (params.speciesName.equalsIgnoreCase('UNIDENTIFED'))){
+        if(params.speciesName && ((params.speciesName.equalsIgnoreCase('UNIDENTIFED')) || (params.speciesName.equalsIgnoreCase('Unknown')))){
           filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
           //queryParams["speciesName"] = params.speciesName
           activeFilters["speciesName"] = params.speciesName
@@ -2445,11 +2445,17 @@ class ObservationService extends AbstractMetadataService {
         distinctRecoListResult.each {it->
             println it;
             def reco = Recommendation.read(it[0]);
-            if(params.downloadFrom == 'uniqueSpecies') {
-                //HACK: request not available as its from job scheduler
-                distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
-            }else {
-                distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
+            if(params.hackRes) {
+                distinctRecoList << [name:reco.name, speciesId: reco.taxonConcept?.findSpeciesId(), isScientificName:reco.isScientificName, recoId:it[0], count:it[1]];
+            } else {
+
+                if(params.downloadFrom == 'uniqueSpecies') {
+                    //HACK: request not available as its from job scheduler
+                    distinctRecoList << [reco.name, reco.isScientificName, getObservationHardLink(it[0],it[1]), getSpeciesHardLink(reco)]
+                }else {
+                    distinctRecoList << [getSpeciesHyperLinkedName(reco), reco.isScientificName, getObservationHardLink(it[0],it[1]),getObservationHardLink(it[0],it[1],params.user)]
+
+                }
             }
         }
         def count = distinctRecoCountQuery.list()[0]
@@ -2504,7 +2510,17 @@ class ObservationService extends AbstractMetadataService {
         return [distinctRecoList:distinctRecoList]
     }
 
-	private String getSpeciesHyperLinkedName(Recommendation reco){
+/*	private Map getSpecies(Recommendation reco){
+        if(!reco) [:];
+        def res = [name:reco.name, id:''];
+		def speciesid = reco.taxonconcept?.findspeciesid()
+		if(!speciesId){
+			res.name = reco.name
+		}
+        res.id = speciesId;
+        return res;
+	}
+*/	private String getSpeciesHyperLinkedName(Recommendation reco){
         if(!reco) return;
 		def speciesId = reco.taxonConcept?.findSpeciesId()
 		if(!speciesId){
@@ -2704,7 +2720,7 @@ class ObservationService extends AbstractMetadataService {
     }
 
     boolean hasObvLockPerm(obvId, recoId) {
-        def observationInstance = Observation.get(obvId.toLong());
+//        def observationInstance = Observation.get(obvId.toLong());
         def taxCon = Recommendation.read(recoId.toLong())?.taxonConcept
         return springSecurityService.isLoggedIn() && (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN') || SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN') || (taxCon && speciesPermissionService.isTaxonContributor(taxCon, springSecurityService.currentUser, [SpeciesPermission.PermissionType.ROLE_CONTRIBUTOR, SpeciesPermission.PermissionType.ROLE_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_CURATOR, SpeciesPermission.PermissionType.ROLE_TAXON_EDITOR])) )
     }
@@ -2848,6 +2864,8 @@ class ObservationService extends AbstractMetadataService {
                     map.put("showLock", true);
                 }
             }
+
+            map.put('hasObvLockPerm', hasObvLockPerm(recoVote.observation_id, recoVote.reco_id));
 		}
 
         obvListRecoVotesResult.each { key, obvRecoVotesResult ->
