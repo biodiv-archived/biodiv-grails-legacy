@@ -790,3 +790,5 @@ alter table newsletter add column show_in_footer boolean;
 update newsletter set show_in_footer = 'f';
 alter table newsletter alter column show_in_footer set not null;
 update newsletter set show_in_footer = 't' where user_group_id is null and parent_id !=0 ;
+update newsletter set show_in_footer = true where id in (select parent_id from newsletter  where show_in_footer=true);
+
