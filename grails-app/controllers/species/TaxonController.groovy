@@ -900,9 +900,9 @@ private List buildlistResult(rs,classSystem) {
             TaxonomyRegistry reg = TaxonomyRegistry.read(r.regid);
 
             def p = reg.parentTaxon
-            print p;
+            
             while(p) {
-                result.add(reg.taxonDefinition.id);
+                result.add(p.path);
                 p = p.parentTaxon;
             }
         }
