@@ -168,7 +168,7 @@ class SetupService {
             println row;
 			def classification = Classification.findByName(row.get('name'));
 			if(!classification) {
-				classification = new Classification(name : row.get("name"), citation:row.get('citation'));
+				classification = new Classification(name : row.get("name"), citation:row.get('citation'), language:Language.getLanguage(null));
 			} else {
 				classification.citation = row.get('citation');
 			}
