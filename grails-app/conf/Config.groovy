@@ -160,7 +160,7 @@ else if (new File("${userHome}/.grails/${appName}-config.properties").exists()) 
     "file:${userHome}/.grails/${appName}-config.properties"
     ]
 }
-else if (new File(System.getenv(ENV_NAME)).exists()) {
+else if (new File("${userHome}/.grails/additional-config.groovy").exists()) {
     println "*** Additional config: file:${userHome}/.grails/additional-config.groovy. ***"
     grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
 }
