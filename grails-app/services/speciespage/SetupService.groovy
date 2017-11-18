@@ -30,8 +30,8 @@ class SetupService {
 	 *
 	 */
 	def setupDefs() {
-		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Definitions.xlsx");
 		uploadLanguages(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Language_iso639-2.csv");
+		uploadFields(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Definitions.xlsx");		
 		uploadCountries(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Countries_ISO-3166-1.csv");
 		uploadClassifications(grailsApplication.config.speciesPortal.data.rootDir+"/datarep/species/templates/Classifications.xlsx", 0, 0);
 		uploadLicences();
