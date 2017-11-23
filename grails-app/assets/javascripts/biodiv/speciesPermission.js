@@ -41,7 +41,7 @@ function getNextRelatedObvImages(speciesId, url, resourceListType, context){
                 $(context).remove();
                 return;
             } 
-            imagesListWrapper.find(".imagesList" ).append(addPhotoHtmlData);
+            imagesListWrapper.find(".uploaded_files_list" ).append(addPhotoHtmlData);
             imagesListWrapper.find(".relatedImagesOffset").val(parseInt(offset) + parseInt(data.relatedObvCount));
             imagesListWrapper.append($(context));
         }, error: function(xhr, status, error) {
@@ -220,6 +220,7 @@ $(document).ready(function() {
         uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
         uploadResource.POLICY = $("input[name='policy']").val();
         uploadResource.SIGNATURE = $("input[name='signature']").val();
+        $('.filePicker').data('uploadResource', uploadResource);
         $(".speciesImage-wrapper").toggle();
         $('html, body').animate({
             scrollTop: $(".speciesImage-wrapper").offset().top
@@ -262,13 +263,14 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
         success: function(data) {
             if(data.statusComplete){
                 var addPhotoHtmlData = $(data.addPhotoHtml);
-                $("#speciesFieldImage-tab1 .imagesList .addedResource").remove();
-                $("#speciesFieldImage-tab1 .imagesList").append(addPhotoHtmlData);
+                $("#speciesFieldImage-tab1 .uploaded_files_list .addedResource").remove();
+                $("#speciesFieldImage-tab1 .uploaded_files_list").append(addPhotoHtmlData);
                 $("#addSpFieldResourcesModal").modal("toggle");
                 $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
                 uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
                 uploadResource.POLICY = $("input[name='policy']").val();
                 uploadResource.SIGNATURE = $("input[name='signature']").val();
+                $('.filePicker').data('uploadResource', uploadResource);
                 $("input[name='speciesFieldId']").val(spFieldId);
             }
         }, error: function(xhr, status, error) {

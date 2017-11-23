@@ -393,6 +393,9 @@ class Species implements Rateable {
 	 * @return
 	 */
 	def clearBasicContent(){
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
 		//this.resources?.clear();
         def tmp = [] ;
         tmp.addAll fields;
@@ -558,9 +561,9 @@ class Species implements Rateable {
 
     Map getTraits() {
         //def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
-        def allTraitList = traitService.getFilteredList(['sGroup':this.guid, 'isNotObservationTrait':true,'taxon':this.taxonConcept.id], -1, -1).instanceList;
+//        def allTraitList = traitService.getFilteredList(['isNotObservationTrait':true, 'showInObservation':false, 'taxon':this.taxonConcept.id], -1, -1).instanceList;
         def r = getTraitFacts();
-        r['allTraitList'] = allTraitList; 
+//        r['allTraitList'] = allTraitList; 
         return r;
     }
 

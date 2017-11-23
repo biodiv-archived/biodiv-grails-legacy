@@ -586,6 +586,14 @@ class SourceConverter {
 	public String getLogs(){
 		return summary.toString()
 	}
+    
+    public void clearSummary() {
+        shortSummary.setLength(0);
+    }
+
+    public void clearLogs() {
+        summary.setLength(0);
+    }
 
 	def static myPrint(str){
 //		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){

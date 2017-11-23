@@ -800,7 +800,7 @@ class Observation extends DataObject {
 	}
 
     Map getTraits() {
-        return getTraits(true, true, true);
+        return getTraits(true, null, true);
     }
 
     Map getCustomFields() {

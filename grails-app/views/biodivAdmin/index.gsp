@@ -15,7 +15,7 @@
             <div>
                 <h5><g:message code="biodivadmin.index.taxon.concept" /></h5>
                 <ul>
-                    <li><a href="${uGroup.createLink('controller':'biodivAdmin', 'action':'updateGroups')}"><g:message code="biodivadmin.index.update.species.groups" /></a></li>
+                    <li><a href="${uGroup.createLink('controller':'biodivAdmin', 'action':'updateGroups')}"><g:message code="biodivadmin.index.update.species.groups" /> </a><br/>(Params that can be used with this url : taxonId, speciesId, runForSynonyms=true|false, updateWhereNoGroup=true|false)</li>
                     <li><a href="${uGroup.createLink(controller:'biodivAdmin', action:'updateExternalLinks')}"><g:message code="biodivadmin.index.update.external.links" /></a></li>
                 </ul> 
             </div>

@@ -70,6 +70,8 @@
 //= require biodiv/chooseLanguage.js
 
 ////= require slickgrid
+//= require biodiv/filesutra.js
+
 ////= require create
 //= require jquery.plugins/filepicker.js
 //= require jquery.plugins/jquery.exif.js
@@ -132,3 +134,4 @@
 
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
 //= require jquery.plugins/ion.rangeSlider.min
+//= require dropzone.js

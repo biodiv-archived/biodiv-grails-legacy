@@ -200,4 +200,42 @@ public class SpreadsheetReader {
 		}
 		return -1;
 	}
+
+	public static List<Map> getHeaders(String file, int sheetNo,
+			int headerRowNo) {
+		InputStream inp;
+		try {
+			inp = new FileInputStream(file);
+			Workbook wb = WorkbookFactory.create(inp);
+			return getHeaders(wb, sheetNo, headerRowNo);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static List<Map> getHeaders(Workbook wb, int sheetNo,
+			int headerRowNo) {
+		List<Map> content = new ArrayList<Map>();
+
+		Sheet sheet = wb.getSheetAt(sheetNo);
+		Row headerRow = sheet.getRow(headerRowNo);
+        List<Map> headerList = new ArrayList<Map>();
+        if(headerRow !=null){
+            for (Cell cell : headerRow) {
+                String cellVal = getCellText(cell);
+                HashMap headerConfig = new LinkedHashMap();
+                if (cellVal != null && !cellVal.equals("")) {
+                    headerConfig.put("name", cellVal.trim().toLowerCase());
+                    headerConfig.put("position", cell.getColumnIndex() + "");
+                    headerList.add(headerConfig);
+                }
+            }
+        }
+        return headerList;
+    }     
 }

@@ -24,7 +24,7 @@
                     <obv:showSnippet model="['observationInstance':instance.instance]"></obv:showSnippet>
                     </g:elseif>
                     <g:elseif test="${className == Document.simpleName}">
-                    <g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':instance.instance, showPDFViewer:false]"/>
+                    <g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':instance.instance, showPDFViewer:false, 'showDetails':false]"/>
                     </g:elseif>
                     <g:elseif test="${className == SUser.simpleName}">
                     <g:render template="/common/suser/showUserSnippetTemplate" model="['userInstance':instance.instance]"/>

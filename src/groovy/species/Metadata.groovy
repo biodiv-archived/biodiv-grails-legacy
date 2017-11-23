@@ -255,10 +255,17 @@ abstract class Metadata {
         return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
     }
 
-    Map getTraits(boolean isObservationTrait=false, boolean isParticipatory = true, boolean showInObservation=false) {
-        def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isObservationTrait':isObservationTrait,'isParticipatory':isParticipatory, 'showInObservation':showInObservation], -1, -1).instanceList;
+    Map getTraits(Boolean isObservationTrait=false, Boolean isParticipatory = true, Boolean showInObservation=false) {
+        Map queryParams = ['sGroup':this.group.id];
+        
+        if(isObservationTrait != null) queryParams['isObservationTrait'] = isObservationTrait;
+        if(isParticipatory != null) queryParams['isParticipatory'] = isParticipatory;
+        if(!showInObservation != null) queryParams['showInObservation'] = showInObservation;
+        
+        def traitList = traitService.getFilteredList(queryParams, -1, -1).instanceList;
         def r = getTraitFacts();
         r['traitList'] = traitList; 
+
         return r;
     }
 

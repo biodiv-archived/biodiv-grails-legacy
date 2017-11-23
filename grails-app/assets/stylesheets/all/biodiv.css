@@ -541,22 +541,21 @@ div.errors {
 .addedResource .metadata{
 	overflow: inherit !important;
 }
-.add_image {
+/*.add_image {
 	background-image: url('/assets/all/add_photo.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-photo.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
-/* 	background-position: 2px 2px; */
 	width: 170px;
 	height: 65px;
 	cursor: pointer;
 	border-bottom: 3px red;
 	position: relative;
+
 }
 .add_video {
 	background-image: url('/assets/all/add_video.png');
 	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=url('/assets/all/add-video.png'),sizingMethod='crop');
 	background-repeat: no-repeat;
-/* 	background-position: 2px 2px; */
 	width: 170px;
 	height: 65px;
 	cursor: pointer;
@@ -571,7 +570,7 @@ div.errors {
 	cursor: pointer;
 	position: relative;
 }
-
+*/
 .add_resource_text{
   position: absolute;
   left: 40%;
