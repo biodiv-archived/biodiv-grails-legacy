@@ -754,7 +754,9 @@ $(document).ready(function(){
         return JSON.stringify(ck);
     }
 
-    
+    function getSelectedTraitForCreate() {
+        return getSelectedTraitStr(undefined , true);
+    }
 
     /**
      *
@@ -784,8 +786,13 @@ $(document).ready(function(){
                 var input = $("<input>").attr("type", "hidden").attr("name", "habitat_id").val(element);
                 $('.addObservation').append($(input));	
             })
-            
+           
+            console.log(getSelectedUserGroups());
             $(".userGroupsList").val(getSelectedUserGroups());
+
+            var traits = getSelectedTraitForCreate();
+            $('#traits').val(traits);
+
             var locationpicker = $(".map_class").data('locationpicker'); 
             if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
                 var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();

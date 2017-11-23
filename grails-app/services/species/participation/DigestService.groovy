@@ -65,14 +65,14 @@ class DigestService {
         if(digestContent) {
             while(emailFlag){
                 List<SUser> usersEmailList = [];
-                //Digest.withTransaction { status ->
+                Digest.withTransaction([readOnly:true]) { status ->
                     usersEmailList = getParticipantsForDigest(digest.userGroup, max, offset)
-                //}
-                if(usersEmailList.size() != 0){
-                    sendDigest(digest, usersEmailList, false, digestContent)
-                    offset = offset + max
-                }else{
-                    emailFlag = false
+                    if(usersEmailList.size() != 0){
+                        sendDigest(digest, usersEmailList, false, digestContent)
+                        offset = offset + max
+                    }else{
+                        emailFlag = false
+                    }
                 }
 
                 if(emailFlag) 
@@ -281,9 +281,6 @@ class DigestService {
 
             def startDate = newDate.minus(days)
             DateGroovyMethods.clearTime(startDate)
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
-            def startDateInFormat = "'"+dateFormat.format(startDate) +"'";
-            def currentDateInFormat = "'"+dateFormat.format(newDate) + "'";
 
             if(digest.sendTopContributors){
                 log.debug "activeUserStatsAuthorAndCount in ${userGroupInstance}"
@@ -294,14 +291,7 @@ class DigestService {
 
             if(digest.sendTopIDProviders){
                 log.debug "topIDProviders in ${userGroupInstance}"
-                def sql =  Sql.newInstance(dataSource);
-                def resultSet = sql.rows("select u.id as userid, u.username, u.date_created as registered, u.last_login_date, recoCount from ( select rv.author_id uid, count(*) recoCount from recommendation_vote rv, observation o, user_group_observations ugo where rv.observation_id = o.id and o.id = ugo.observation_id and o.is_deleted = false and o.is_showable = true and o.is_checklist = false and ugo.user_group_id="+digest.userGroup.id+" and  rv.voted_on >= "+startDateInFormat+" and rv.voted_on <= "+currentDateInFormat+" group by rv.author_id) group_user_reco, suser u where u.id = group_user_reco.uid order by recoCount desc limit 5")                
-log.debug resultSet
-                for (row in resultSet){
-                    topIDProviders.add(["user":SUser.findById(row.getProperty("userid")), "recoCount":row.getProperty("recocount")])
-                }
-                log.debug "topIDProviders in ${userGroupInstance} ${topIDProviders}"
-                res['topIDProviders'] = topIDProviders
+                res['topIDProviders'] = chartService.topIDProviders(userGroupInstance, startDate, newDate, 5); 
             }
 
             def announcedInstances = Featured.fetchFeature(Discussion.class.getCanonicalName(),digest.userGroup, null, new Date());

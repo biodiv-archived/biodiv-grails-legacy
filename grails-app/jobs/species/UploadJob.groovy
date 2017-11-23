@@ -35,7 +35,7 @@ class UploadJob {
 
     static triggers = {
         println "==========================Setting trigger for UploadJob";
-        simple startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
+        simple name:'UploadJob', startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
     }
 
     def execute() {
@@ -77,11 +77,13 @@ class UploadJob {
                         TaxonomyDefinition.UPDATE_SQL_LIST.clear();
                         speciesUploadService.upload(dl)
                         dl.updateStatus(Status.SUCCESS)
+                        result = ['success':true];
                         utilsService.clearCache("defaultCache")
                         excuteSql()
                     }catch (Exception e) {
                         log.debug " Error while running task $dl"
                         e.printStackTrace()
+                        result = ['success':false];
                         dl.updateStatus(Status.FAILED)
                     }finally{
                         TaxonomyDefinition.UPDATE_SQL_LIST.clear();

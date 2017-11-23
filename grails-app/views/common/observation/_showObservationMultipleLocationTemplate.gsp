@@ -11,8 +11,10 @@
                     </g:else>
                 });
                 </script>
+                <% String topologyFilterRule = userGroupInstance?userGroupInstance.getTopologyFilterRuleValue():'';
+                %>
 		<div class="map_wrapper map_class">
-                    <div id="big_map_canvas">
+                    <div id="big_map_canvas" data-topologyfilterrule="${topologyFilterRule}">
                         <center>
                             <div id="spinner" class="spinner">
 
@@ -20,6 +22,7 @@
                             </div>
                        </center>
                     </div>
+                    <div class="alert alert-danger hide" style="margin:0px;padding-left:3px;"></div>
 		</div>
 	</div>
         

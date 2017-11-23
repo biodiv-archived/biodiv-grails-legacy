@@ -160,7 +160,7 @@ else if (new File("${userHome}/.grails/${appName}-config.properties").exists()) 
     "file:${userHome}/.grails/${appName}-config.properties"
     ]
 }
-else if (new File(System.getenv(ENV_NAME)).exists()) {
+else if (new File("${userHome}/.grails/additional-config.groovy").exists()) {
     println "*** Additional config: file:${userHome}/.grails/additional-config.groovy. ***"
     grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
 }
@@ -498,7 +498,8 @@ speciesPortal {
 
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
-    bannerFilePath = "${app.rootDir}/bannerMessage.txt" 
+    bannerFilePath = "${app.rootDir}/bannerMessage.txt"
+    userDetailsFilePath = "${app.rootDir}/userInfo.csv" 
     filterFilePath = "${app.rootDir}/filters.txt" 
 }
 
@@ -583,7 +584,7 @@ environments {
             warn   'org.springframework.security'
             warn   'org.springframework.security.web'
             warn   'org.springframework.security.authentication'
-            info   'speciespage',
+            debug   'speciespage',
             'species'
             debug   'com.the6hours', 
             'grails.app.taglib.com.the6hours'
@@ -628,6 +629,7 @@ environments {
              */
             trace   'com.grailsrocks.emailconfirmation'
             debug   'com.odobo.grails.plugin.springsecurity.rest'
+            debug   'com.odobo.grails.plugin.springsecurity.openid'
             debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
             debug   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
@@ -640,6 +642,10 @@ environments {
                         'org.springframework.security.web'
 */
             debug 'species'
+            info    'com.linkedin.grails.ProfilerPlugin'
+            debug 'org.apache.http.wire'
+            trace 'grails.plugin.springsecurity.SpringSecurityUtils'
+
         }
     }
     pamba {
@@ -869,7 +875,7 @@ environments {
                 image.denied = []
             }
         }
-        log4jConsoleLogLevel = Priority.DEBUG
+        log4jConsoleLogLevel = Priority.INFO
         log4j = {
             appenders {
                 console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c - %m%n'), threshold: Priority.DEBUG
@@ -910,9 +916,9 @@ environments {
             info   'grails.app.filters.species.SecurityFilters'
             debug   'grails.app.services.species.participation.DigestService'
             debug   'species.DigestJob'
-            debug   'grails.app.services.speciespage.ObservationService'
-            debug   'grails.app.services.speciespage'
-            debug   'grails.app.services.species'
+            info   'grails.app.services.speciespage.ObservationService'
+            info   'grails.app.services.speciespage'
+            info   'grails.app.services.species'
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']
@@ -1591,7 +1597,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 '/api/oauth/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
 '/api/register/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor',
 '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter, -rememberMeAuthenticationFilter',  // Stateless chain
-'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
+'/**': 'JOINED_FILTERS,-restAuthenticationFilter,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
 ]
 
 //http://mrhaki.blogspot.in/2014/07/grails-goodness-enable-accept-header.html
@@ -1738,3 +1744,6 @@ grails {
 */
 grails.assets.bundle=true
 grails.assets.minifyJs=false
+cble.logging = trueors.url.pattern = '/api/*'
+cors.headers = ['Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, TRACE, OPTIONS']
+//cors.enable.logging = true

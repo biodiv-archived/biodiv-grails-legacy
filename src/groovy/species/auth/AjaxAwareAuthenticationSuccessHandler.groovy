@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.WebAttributes;
+import grails.plugin.springsecurity.SpringSecurityUtils;
 
 import species.utils.Utils;
 
@@ -26,6 +27,31 @@ grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHa
 	public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response,
 	final Authentication authentication) throws ServletException, IOException {
 
+        boolean ajax = SpringSecurityUtils.isAjax(request)
+
+        // GPSPRINGSECURITYCORE-240
+        if (ajax) {
+            requestCache.removeRequest request, response
+        }
+
+        try {
+            if (ajax) {
+                clearAuthenticationAttributes request
+                if (logger.debugEnabled) {
+                    logger.debug 'Redirecting to Ajax Success Url: ' + ajaxSuccessUrl
+                }
+                redirectStrategy.sendRedirect request, response, ajaxSuccessUrl
+            }
+            else {
+                super.onAuthenticationSuccess request, response, authentication
+            }
+        }
+        finally {
+                // always remove the saved request
+                requestCache.removeRequest request, response
+        }
+
+
 		Cookie cookie = getLoginStatusCookie(request)
 		if (cookie == null) {
 			cookie = new Cookie("login", "true");
@@ -36,8 +62,9 @@ grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHa
 		cookie.path = '/'
 		cookie.domain = "."+Utils.getDomain(request);
 		response.addCookie(cookie)
-
-		super.onAuthenticationSuccess(request, response, authentication);
+        println "------------------"
+	//	super.onAuthenticationSuccess(request, response, authentication);
+        println "------------------"
 		//removing login referrer
 		request.getSession().removeAttribute("LOGIN_REFERRER");
 		

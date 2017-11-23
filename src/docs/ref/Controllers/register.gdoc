@@ -13,7 +13,7 @@ h4. Register
 * *REST method* : POST
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/register/user?email=username@gmail.com&password=password&password2=password&name=User
+http://indiabiodiversity.org/api/register/user?email=username@gmail.com&password=password&password2=password&name=User
 {code}
 * *Response* :
 ** Successful response : 
@@ -48,7 +48,7 @@ h4. Resend the verification email
 * *Rest Method* : GET
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/register/resend?email=username@gmail.com
+http://indiabiodiversity.org/api/register/resend?email=username@gmail.com
 {code}
 * *Response* :
 ** on success
@@ -77,7 +77,7 @@ h4. Forgot Password
 * *REST Method* : POST
 * *Request* :
 {code}
-http://indiabiodiversity.localhost.org/api/register/forgotPassword?email=username@gmail.com
+http://indiabiodiversity.org/api/register/forgotPassword?email=username@gmail.com
 {code}
 * *Response* :
 ** on success

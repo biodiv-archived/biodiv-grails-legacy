@@ -5,7 +5,10 @@ function update_geotagged_images_list_for_bulkUpload(geotaggedImages, ele){
     });
 }
 
-function loadMapInput(geotaggedImages) {
+function loadMapInput(geotaggedImages=undefined) {
+    if(geotaggedImages.target) {
+        geotaggedImages = undefined;
+    }
     //$(".address .add-on").trigger("click"); 
     var drawControls, editControls;
     var map_class = $(this).closest(".map_class");
@@ -29,7 +32,7 @@ function loadMapInput(geotaggedImages) {
         locationPicker =  $(map_class).data('locationpicker');
     }
     if(locationPicker.isInitialised == false || locationPicker.isInitialised == undefined) {
-        loadGoogleMapsAPI(function() {
+        loadGoogleMapsAPI(undefined, function() {
             locationPicker.initialize();
             $(map_class).find('.spinner').hide();
             
@@ -52,10 +55,17 @@ function loadMapInput(geotaggedImages) {
         if(geotaggedImages)
             update_geotagged_images_list_for_bulkUpload(geotaggedImages, map_class);
     }
+
+        $('.lastTopology').click(function() {
+            var map_class = $(this).closest(".map_class");
+            var locationPicker1 =  $(map_class).data('locationpicker');
+            $(this).parent().parent().find('input.areas').val($(this).data('lasttopology'));
+            $(this).parent().parent().find('input.placeName').val($(this).data('lastplacename'));
+            //me.initArea();
+            locationPicker1.mapLocationPicker.drawArea($(this).data('lasttopology'), true,true,true);
+        });
+
 }
-
-
-
 
 
 
@@ -92,27 +102,42 @@ function useTitle(obj){
             var G = google.maps;
             this.M= L;
             this.M.Icon.Default.imagePath = window.params.defaultMarkerIcon;
-            this.allowedBounds = new this.M.LatLngBounds(new this.M.LatLng('26.647', '88.692'), new this.M.LatLng('28.280', '92.170'));
+            var topologyFilterRule = this.$ele.data('topologyfilterrule');
+            if(topologyFilterRule) {
+                var wkt = new Wkt.Wkt();
+                try { 
+                    wkt.read(topologyFilterRule);
+                } catch (e1) {
+                } 
+                this.boundsPolygon = wkt.toObject(); 
+            }
+            this.allowedBounds = this.boundsPolygon ? this.boundsPolygon.getBounds() : new this.M.LatLngBounds(new this.M.LatLng('26.647', '88.692'), new this.M.LatLng('28.280', '92.170'));
             //var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '59'), new this.M.LatLng('45', '105'));
             var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('26.421', '88.505'), new this.M.LatLng('28.632', '92.433'));
             var nagpur_latlng = new this.M.LatLng('27.445', '90.450');                
 
-            var ggl = new this.M.Google('HYBRID');
             this.map = new this.M.Map(this.$ele.context, {
-                //        crs:L.CRS.EPSG4326,
+//              crs:L.CRS.EPSG4326,
                 center: this.allowedBounds.getCenter(),
-                //        maxBounds:viewBounds,
+//              maxBounds:viewBounds,
                 zoom:4,
                 minZoom:4,
-                //       maxZoom:15,
+                maxZoom:15,
                 noWrap:true
             });
-            this.map.addLayer(ggl).fitBounds( this.allowedBounds);
-            //var layersControl = 
-            this.M.control.layers({'Google':ggl, 'OpenStreetMap':L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            var ggl = new this.M.Google ('HYBRID');
+            var openstreetmapLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
                         noWrap: true
-                        })}, {}, {collapsed:true}).addTo( this.map)
+                        });
+            this.map.addLayer(ggl).fitBounds(this.allowedBounds);
+
+            if(this.boundsPolygon) this.map.addLayer(this.boundsPolygon);
+            
+            var layersControl = this.M.control.layers({
+                'Google':ggl, 
+                'OpenStreetMap':openstreetmapLayer
+            }, {}, {collapsed:true}).addTo(this.map)
 
             //    this.M.marker(new this.M.LatLng('6', '68')).addTo(map);
             //    this.M.marker(new this.M.LatLng('35', '97')).addTo(map);
@@ -125,8 +150,6 @@ function useTitle(obj){
                 color: 'blue'
             });
             this.checklistIcon = this.M.AwesomeMarkers.icon({
-                icon: 'list', 
-                color: 'green'
             });
             this.geoPrivacyPointIcon = this.M.AwesomeMarkers.icon({
                 icon: undefined, 
@@ -195,9 +218,9 @@ function useTitle(obj){
                 drawControls = $.extend({}, {
                     marker:true,
                     circle:false,
-                             rectangle:false,
-                             polyline:false,
-                             polygon:false
+                    rectangle:false,
+                    polyline:false,
+                    polygon:false
                 }, drawControls);
 
                 var drawControl;
@@ -211,9 +234,10 @@ function useTitle(obj){
                         draw:drawControls
                     });
                 }
-                drawControl.addTo( this.map);
+                drawControl.addTo(this.map);
                 var me = this;
                 me.map.on('draw:drawstart', me.clearDrawnItems);
+                me.map.on('draw:drawstop', me.validateDrawnItems);
                 me.map.on('draw:created', $.proxy(me.addDrawnItems, me));
 
 
@@ -306,6 +330,39 @@ function useTitle(obj){
             }
         },
 
+        validateDrawnItems : function() {
+            var me = this;
+            var valid = true;
+            if(me.drawnItems) {
+                me.drawnItems.eachLayer(function (layer) {
+                    valid = valid && me.validateBounds(layer.getLatLng());
+                });
+                if(me.searchMarker)
+                    valid = valid && me.validateBounds(me.searchMarker.getLatLng());
+            }
+            return valid;
+        },
+        
+        validateBounds : function(latlng) {
+            var me = this;
+            if(typeof latlng === undefined || !latlng.lat || !latlng.lng) {
+                me.$ele.next('.alert').html('Location is compulsory. Please provide a valid location.').show();
+                return true;
+            }    
+            //if marker is not in allowed bounds return;
+            if(!me.allowedBounds.contains(latlng)) {
+                me.$ele.next('.alert').html('Location is outside allowed bounds').show();      
+                return true;
+            } else if(me.boundsPolygon != undefined) {
+                if(!me.boundsPolygon.contains(latlng)) {
+                    me.$ele.next('.alert').html('Location is outside allowed bounds').show();      
+                    return true;
+                }
+            }
+            me.$ele.next('.alert').html('').hide();
+            return true;
+        },
+
         addDrawnItems:function(e) {
             var me = this;
             var type = e.layerType;
@@ -326,37 +383,49 @@ function useTitle(obj){
                     selected:true, 
                     clickable:true
             }, options);
-
+            if(!this.validateBounds(latlng)) {
+                alert('Location is out of bounds');
+                return;
+            }
             this.searchMarker = this.set_location(latlng.lat, latlng.lng, this.searchMarker, options);
-            this.drawnItems.addLayer(this.searchMarker);
-            this.setLatLngFields(latlng.lat, latlng.lng);
+            if(this.searchMarker) {
+                this.drawnItems.addLayer(this.searchMarker);
+                this.setLatLngFields(latlng.lat, latlng.lng);
+            }
         },
 
         addMarker : function(lat, lng, options) {
             var marker = this.createMarker(lat, lng, options)
                 if(marker)
-                    marker.addTo( this.map);
+                    marker.addTo(this.map);
             return marker;
         },
 
-        createMarker : function(lat, lng, options) {
+        createMarker : function(lat, lng, options, validate=true) {
             if(!lat || !lng) return;
             if(options == undefined) options = {};
 
             var me = this;
             var location = new me.M.LatLng(lat, lng);
 
+            if(validate && !me.validateBounds(location)) {
+                alert("Cannot set marker outside the bounds");
+                console.log("Cannot set marker outside the bounds");
+                return;
+            }
+
             options = $.extend({}, {
                 title:options.layer?options.layer:'',
-                    clickable:true
+                clickable:true
             }, options);
 
             //var marker = new L.Draw.Marker(map, {})._mouseMarker;
 
-            var marker = new me.M.marker(location, options)
-                if(options.label) {
-                    //marker.bindLabel(options.label).showLabel();
-                }
+            var marker = new me.M.marker(location, options);          
+            
+            if(options.label) {
+                //marker.bindLabel(options.label).showLabel();
+            }
 
             /*    if(options.layer) {
                   if(!overlays[optionsa
@@ -372,9 +441,11 @@ function useTitle(obj){
             if(options.draggable) {
                 var lastPosition = marker.getLatLng();
                 marker.on("dragend", function(event) {
-                    if(!me.allowedBounds.contains(this.getLatLng())){
+                    if(!me.validateBounds(this.getLatLng())) {
+                        alert("Cannot set marker outside the polygon");
+                        console.log("Cannot set marker outside the polygon");
                         marker.setLatLng(lastPosition);
-                    }else {
+                    } else {
                         lastPosition = marker.getLatLng();
                     };
                     me.select_location(marker);
@@ -728,12 +799,14 @@ function useTitle(obj){
                             
                             $.getJSON( window.params.locationsUrl, request, function( data, status, xhr ) {
                                 $.each(data, function(index, item) {
+                                    if(item.location[1] != undefined) {
                                     r.push({
                                         label: item.location[0]+' ('+item.location[1]+')',
                                         value: item.location[0],
                                         topology:item.topology,
                                         category:item.category
-                                        })
+                                        });
+                                    }
                                 })
                                 response(r);
                             });
@@ -747,7 +820,9 @@ function useTitle(obj){
                             me.mapLocationPicker.drawArea(ui.item.topology, true, true, true);
                             me.$ele.closest(".map_class").find('input.areas').val(ui.item.topology);
                         } else {
-                            me.mapLocationPicker.addSearchMarker({lat:ui.item.latitude, lng:ui.item.longitude}, {label:ui.item.label, draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+                            if(ui.item.latitude && ui.item.longitude) {
+                                me.mapLocationPicker.addSearchMarker({lat:ui.item.latitude, lng:ui.item.longitude}, {label:ui.item.label, draggable:true, layer:'Search Marker. Drag Me to set location', selected:true});
+                            }
                         }
                     },
 
@@ -786,7 +861,6 @@ function useTitle(obj){
                     e.preventDefault();
                 }
             });
-
         //  $('#current_location').click(locate); 
 
         $('#image_location').click(function() {
@@ -902,7 +976,6 @@ function useTitle(obj){
 }(window.jQuery)); 
 
 $(document).ready(function() { 
-    console.log('location-picker start'); 
   $('.placeName').attr('placeholder', $(".placeName").attr('rel')); 
 
 //alert($(".placename").attr('rel'));
@@ -927,6 +1000,5 @@ $(document).ready(function() {
 
   });
 
-  console.log('location-picker end'); 
 });
 

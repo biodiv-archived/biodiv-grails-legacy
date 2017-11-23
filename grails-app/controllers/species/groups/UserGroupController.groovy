@@ -26,6 +26,14 @@ import grails.plugin.springsecurity.annotation.Secured;
 import groovy.text.SimpleTemplateEngine
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import static org.springframework.http.HttpStatus.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import species.groups.UserGroup.FilterRule;
+
 
 class UserGroupController {
 
@@ -1655,9 +1663,43 @@ println "2222222222222222222"
         println "========== CREATED Digest instance ============="
     }
 
+    @Secured(['ROLE_ADMIN'])
+    def createFilterRule() {
+        UserGroup ug = utilsService.getUserGroup(params);
+        String msg = ''
+        if(ug) {
+            ug.clearFilterRules();
+            File topologyFile = new File(grailsApplication.config.speciesPortal.content.rootDir+"/usergroup/"+params.file); 
+            if(topologyFile.exists()) {
+                ug.addFilterRule('topology', 'dwithin', [topologyFile.text]);
+                if(!ug.save(flush:true)) {
+                    this.errros.allErrors.each { msg += it; println it; }
+                }
+            }
+        }
+        render msg?:'done';
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def refreshPostingsOnFilterRules() {
+        def r = userGroupService.refreshPostingsOnFilterRules(params);
+        flash.message = r.msgCode;
+    } 
+
+    def filterRules() {
+    	def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
+		if (!userGroupInstance) return;
+        def rules= [];
+        if(userGroupInstance.filterRule) {
+            def filterRuleJson = JSON.parse(userGroupInstance.filterRule);
+            JSON.parse(userGroupInstance.filterRule).each {
+                def rule = JSON.parse(it);
+                rules << rule
+            }
+        }
+        render rules as JSON
+    }
 }
-
-
 
 class UserGroupCommand {
 	String name

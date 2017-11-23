@@ -9,7 +9,7 @@ h4. Basic Login
 * *REST Method* : POST
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/login?username=emailAddress&password=password
+http://indiabiodiversity.org/api/login?username=emailAddress&password=password
 {code}
 * *Response* :
 ** on success
@@ -62,7 +62,7 @@ Facebook
 * *REST Method* : GET
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/oauth/callback/facebook?access_token=CAAE7wX9joZBUBAP6LcCLyelAGFA3X6YgZBZBAVj9NMSv7ZC6ZCTCMr3ce4PBMZARJzcP5tQ3i0NoxVbPc7ghmjmrYXaZAHnl1MLKh2lkVaDA6ClU1QLTMZC1tMfCzmhVvJUaxV2lYsypG2zkJ1WRE68oebnifeAmqi1p1Nca6jlZB8lGZBZCoKy7JyV
+http://indiabiodiversity.org/api/oauth/callback/facebook?access_token=CAAE7wX9joZBUBAP6LcCLyelAGFA3X6YgZBZBAVj9NMSv7ZC6ZCTCMr3ce4PBMZARJzcP5tQ3i0NoxVbPc7ghmjmrYXaZAHnl1MLKh2lkVaDA6ClU1QLTMZC1tMfCzmhVvJUaxV2lYsypG2zkJ1WRE68oebnifeAmqi1p1Nca6jlZB8lGZBZCoKy7JyV
 {code}
 * *Response* :
 ** on success
@@ -96,7 +96,7 @@ Google
 * *REST Method* : GET
 * *Request* : 
 {code}
-http://indiabiodiversity.localhost.org/api/oauth/callback/google?access_token=ya29.NQAgcZ76JSRLPiEAAAAyQqVUs71Vg5mwee3MZYI8oYKkTDToIPLRabO42Aamki3LSBWmLTfYw49PqbRIlBs&token_type=Bearer&expires_in=3600
+http://indiabiodiversity.org/api/oauth/callback/google?access_token=ya29.NQAgcZ76JSRLPiEAAAAyQqVUs71Vg5mwee3MZYI8oYKkTDToIPLRabO42Aamki3LSBWmLTfYw49PqbRIlBs&token_type=Bearer&expires_in=3600
 {code}
 * *Response* :
 ** on success

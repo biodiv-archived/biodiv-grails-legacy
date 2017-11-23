@@ -147,6 +147,7 @@ class SUser {
 	def grailsApplication;
 	def commentService;
 	def activityFeedService;
+    def utilsService;
 
 	String username
 	String name;
@@ -313,11 +314,19 @@ class SUser {
 		}else{
 			uGroups = UserGroupMemberRole.findAllBySUser(this).collect{it.userGroup}
 		}
+        println "+++++++++++++++++++++++++++++++++++++++"
+        println uGroups
+        println "+++++++++++++++++++++++++++++++++++++++"
+
 		uGroups.each {
             try{
-			if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
-				userGroups.add(it)
-			}
+                println it;
+                println springSecurityService.getAuthentication()
+                println aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)
+                println utilsService.isAdmin();
+                if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)|| utilsService.isAdmin()) {
+                    userGroups.add(it)
+                }
             } catch(e) {
                 e.printStackTrace()
                 log.error e.getMessage();
@@ -345,7 +354,7 @@ class SUser {
 
 	@Override
 	String toString() {
-		return username;
+		return name;
 	}
 
 	def getWebsiteLink(){

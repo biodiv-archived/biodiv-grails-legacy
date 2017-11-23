@@ -51,11 +51,11 @@ def digestContent(){
 
 def sendDigestMail(){
     def digService = ctx.getBean("digestService");
-    digService.sendDigest(Digest.get(1L))
+    digService.sendDigestWrapper(Digest.get(1L))
     println "========== DONE ============="
 }
 
-//sendDigestMail()
+sendDigestMail()
 
 
 //creating a new digest instance

@@ -14,6 +14,7 @@
 //= require jquery.plugins/jquery.ellipses.js
 //= require jquery.plugins/popuplib.js
 //= require biodiv/ajaxLogin.js
+//= require biodiv/login.js
 //= require biodiv/users.js
 //= require jquery.plugins/jquery.linkify-1.0.js
 //= require jquery.plugins/timeago.js
@@ -34,7 +35,6 @@
 //= require biodiv/search.js
 //= require leaflet/leaflet.js
 //= require leaflet/Google.js
-//= require leaflet/Leaflet.Coordinates-0.1.1.min.js
 //= require leaflet/leaflet.label.js
 //= require leaflet/L.Control.Locate.js
 //= require leaflet/leaflet.awesome-markers.min.js
@@ -42,7 +42,8 @@
 //= require leaflet/leaflet.draw.js
 //= require leaflet/wicket.js
 //= require leaflet/wicket-leaflet.js
-//= require leaflet/leaflet.markercluster-src.js
+//= require leaflet/leaflet.markercluster.js
+//= require leaflet/wise-leaflet-pip.js
 //= require bootstrap.plugins/bootstrap_gallery/jquery.blueimp-gallery.min.js
 //= require biodiv/gallery.js
 //= require jquery.plugins/tag-it.min.js
@@ -80,12 +81,12 @@
 ////= require checklist
 //= require biodiv/checklist.js
 //= require bootstrap.plugins/bootstrap-rowlink.min.js
-//= require biodiv/location/location-picker.js
-//= require biodiv/observations/map.js
+////= require biodiv/location/location-picker.js
+////= require biodiv/observations/map.js
 
 ////add_file
 //= require biodiv/content.js
-//= require biodiv/location/location-picker.js
+////= require biodiv/location/location-picker.js
 
 ////bulkupload
 //= require biodiv/parseUtil.js
@@ -128,3 +129,6 @@
 //= require biodiv/pages.js
 //= require biodiv/dataset.js
 //= require biodiv/trait.js
+
+//= require bootstrap.plugins/bootstrap-colorpicker.min.js
+//= require jquery.plugins/ion.rangeSlider.min

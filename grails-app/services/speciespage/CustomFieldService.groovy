@@ -15,12 +15,26 @@ class CustomFieldService {
 	def springSecurityService
 	def activityFeedService
 	
-	def Map fetchAllCustomFields(Observation obv){
+	Map fetchAllCustomFields(Observation obv){
 		Map result = [:]
 		obv.userGroups.collect{it}.each { ug ->
 			CustomField.fetchCustomFields(ug).each { cf ->
 				def val = fetchForDisplay(cf, obv.id)
-				result[cf] = [key:cf.name, value : val, ugId:ug.id]
+				result[cf] = [
+						id:cf.id,
+						key:cf.name, 
+						value : val,
+						notes:cf.notes,
+						ugId:ug.id,
+						author:cf.author,
+						isMandatory:cf.isMandatory, 
+						allowed_participation:cf.allowedParticipation,
+						allowedMultiple:cf.allowedMultiple,
+						dataType:cf.dataType,
+						defaultValue:cf.defaultValue,
+						displayOrder:cf.displayOrder,
+						options:cf.options						
+					   ]
 			}
 		}
 		return result
@@ -221,17 +235,6 @@ class CustomFieldService {
 		updateCustomFields(m, 336296)
 	}
 	
-	def test(){
-		//test1()
-		println "============= " + fetchAllCustomFields(Observation.read(368571))
-//		addCf()
-//		createTable(UserGroup.read(2))
-//		List l = CustomField.fetchCustomFields(UserGroup.read(2))
-//		l.each {
-//			addColumn(it)
-//		}
-	}
-	
 	def List addCf(){
 		UserGroup ug = UserGroup.read(2)
 
@@ -253,7 +256,10 @@ class CustomFieldService {
 		
 		return [cf]
 	}
-	
+
+    def delCf(query, params) {
+        executeQuery(query,params);
+    }
 	
 }
 

@@ -19,7 +19,7 @@ import org.grails.rateable.*
 import species.participation.Flag;
 import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
-
+import species.trait.Fact;
 import content.eml.Document;
 
 class Species implements Rateable { 
@@ -47,7 +47,7 @@ class Species implements Rateable {
     def speciesUploadService;
     def speciesPermissionService;
     def utilsService;
-
+    def traitService;
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
 	private static final log = LogFactory.getLog(this);
@@ -394,8 +394,10 @@ class Species implements Rateable {
 	 */
 	def clearBasicContent(){
 		//this.resources?.clear();
-		fields.each { sf -> 
-			removeFromFields(sf)
+        def tmp = [] ;
+        tmp.addAll fields;
+		tmp.each { sf -> 
+			this.removeFromFields(sf)
 			def ge = GeographicEntity.read(sf.id)
 			if(ge){
 				s.removeFromGlobalDistributionEntities(ge)
@@ -522,6 +524,44 @@ class Species implements Rateable {
 			res = null;//group?.icon(ImageType.ORIGINAL)
         println "Updating reprImage to ${res} ${res.fileName} ${res.url}" 
         this.reprImage = res;
+    }
+
+    Map getTraitFacts() {
+        def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(this.id, this.class.getCanonicalName(), false);
+        Map traitFactMap = [:]
+        Map queryParams = ['trait':[:]];
+        def traitList = [];
+        factList.each { fact ->
+            if(!traitFactMap[fact.trait.id]) {
+                traitFactMap[fact.trait.id] = []
+                if(fact.traitValue)
+                    queryParams['trait'][fact.trait.id] = '';
+                traitFactMap['fact'] = []
+                traitList << fact.trait;
+            }
+            if(fact.traitValue) {
+                traitFactMap[fact.trait.id] << fact.traitValue
+                queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+            } else if(fact.value)
+                traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+            if(fact.fromDate && fact.toDate)
+                traitFactMap[fact.trait.id] << fact.fromDate.toString()+";"+fact.toDate.toString()
+
+            traitFactMap['fact'] << fact.id
+        }
+        println queryParams;
+        queryParams.trait.each {k,v->
+            queryParams.trait[k] = v[0..-2];
+        }
+        return ['traitList':traitList,'traitFactMap':traitFactMap, 'queryParams':queryParams];
+    }
+
+    Map getTraits() {
+        //def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
+        def allTraitList = traitService.getFilteredList(['sGroup':this.guid, 'isNotObservationTrait':true,'taxon':this.taxonConcept.id], -1, -1).instanceList;
+        def r = getTraitFacts();
+        r['allTraitList'] = allTraitList; 
+        return r;
     }
 
     @Override

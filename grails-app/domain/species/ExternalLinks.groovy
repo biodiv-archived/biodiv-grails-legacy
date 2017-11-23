@@ -8,11 +8,12 @@ class ExternalLinks {
 	String itisId;
 	String ncbiId;
 	String colId
+    String frlhtUrl;
 	
 	Date eolFetchDate;
 	Integer noOfDataObjects;
 	
-	static belongsTo = [taxonConcept:TaxonomyDefinition];
+	static belongsTo = TaxonomyDefinition;
 	
     static constraints = {
 		eolId(nullable:true);
@@ -21,6 +22,7 @@ class ExternalLinks {
 		itisId(nullable:true);
 		ncbiId(nullable:true);
 		colId(nullable:true)
+		frlhtUrl(nullable:true)
 		eolFetchDate(nullable:true);
 		noOfDataObjects(nullable:true);
     }

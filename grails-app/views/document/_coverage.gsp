@@ -15,7 +15,7 @@
 		</div>
 	</div>
 	<hr>
-	<obv:showMapInput model="[observationInstance:coverageInstance, obvInfoFeeder:coverageInstance, locationHeading:'Geographical Coverage', 'sourceInstance':sourceInstance]"></obv:showMapInput>
+	<obv:showMapInput model="[observationInstance:coverageInstance, obvInfoFeeder:null, locationHeading:'Geographical Coverage', 'sourceInstance':sourceInstance, webaddress:params.webaddress]"></obv:showMapInput>
 </div>
 
 <asset:script>

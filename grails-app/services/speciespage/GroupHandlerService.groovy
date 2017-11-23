@@ -128,7 +128,6 @@ class GroupHandlerService {
                 } else {
                     taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
                 }
-                println taxonConcepts
                // TaxonomyDefinition.withNewTransaction {
                     taxonConcepts.each { taxonConceptRow ->
                         def taxonConcept = TaxonomyDefinition.get(taxonConceptRow.id);
@@ -249,7 +248,7 @@ class GroupHandlerService {
 	/**
 	 * returns the groups if there is a match with mappings defined 
 	 */
-	private SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
+	SpeciesGroup getGroupByMapping(TaxonomyDefinition taxonConcept) {
 		SpeciesGroup group;
 		if(!speciesGroupMappings) {
 			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
@@ -265,6 +264,21 @@ class GroupHandlerService {
 		}
 		return group;
 	}
+
+    List<TaxonomyDefinition> getTaxonByMapping(SpeciesGroup group) {
+ 		List taxons = [];
+		if(!speciesGroupMappings) {
+			speciesGroupMappings = SpeciesGroupMapping.listOrderByRank('desc');
+		}
+		
+		speciesGroupMappings.each { mapping ->
+			if((group.id.equals(mapping.speciesGroup.id))) {
+                //TODO:optimize following by having taxonids in speciesGroupMapping
+                taxons << TaxonomyDefinition.findByCanonicalFormAndRank(mapping.taxonName, mapping.rank);
+			}
+		}
+		return taxons;
+    }
 
 	/**
 	 * returns the group for the closest ancestor.

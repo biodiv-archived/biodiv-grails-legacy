@@ -30,7 +30,6 @@ import grails.util.Environment
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH 
-import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationEntryPoint
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import species.auth.DefaultOauthUserDetailsService;
@@ -45,6 +44,8 @@ import org.codehaus.groovy.grails.web.mime.MimeType;
 import species.participation.Comment;
 import species.auth.RestTokenValidationFilter;
 import species.MyEntityInterceptor;
+import species.auth.AjaxAwareAuthenticationEntryPoint;
+import grails.plugin.springsecurity.SecurityFilterPosition
 // Place your Spring DSL code here
 beans = {
     def conf = SpringSecurityUtils.securityConfig;
@@ -57,7 +58,7 @@ beans = {
         useReferer = true // false
         redirectStrategy = ref('redirectStrategy')
     }
-
+    
     // default 'authenticationEntryPoint'
     //overriding entry point defined in rest plugin to redirect to login page on accessdenied exception. Workd only when anonymous auth is present in the session
     authenticationEntryPoint(AjaxAwareAuthenticationEntryPoint, conf.auth.loginFormUrl) { // '/login/auth'
@@ -66,6 +67,7 @@ beans = {
         useForward = conf.auth.useForward // false
         portMapper = ref('portMapper')
         portResolver = ref('portResolver')
+        userGroupService = ref('userGroupService') 
     }
 
     /** securityContextRepository */
@@ -320,14 +322,13 @@ beans = {
         exceptionMappings = conf.failureHandler.exceptionMappings // [:]
     }
 
-
-
     openIDAuthProvider(OpenIDAuthenticationProvider) {
         userDetailsService = ref('userDetailsService')
         preAuthenticationChecks 	= ref('preAuthenticationChecks')
         postAuthenticationChecks = ref('postAuthenticationChecks')
     }
 
+//    SpringSecurityUtils.clientRegisterFilter 'openIdAuthenticationFilter', SecurityFilterPosition.FORM_LOGIN_FILTER.order + 2
     openIDAuthenticationFilter(OpenIDAuthenticationFilter) {
         //claimedIdentityFieldName = conf.openid.claimedIdentityFieldName // openid_identifier
         consumer = ref('openIDConsumer')
@@ -351,7 +352,15 @@ beans = {
         password = CH.config.dataSource.password
         driverClass = CH.config.dataSource.driverClassName
         jdbcUrl = CH.config.dataSource.url
-        //unreturnedConnectionTimeout = 50 // seconds
+
+        minPoolSize = 5
+// /       maxPoolSieT =  30
+//        initialPoolSize = 3
+//        acquireIncrement = 3
+        testConnectionOnCheckout=true
+        preferredTestQuery='SELECT 1'
+        numHelperThreads = 5
+        unreturnedConnectionTimeout = 90 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
      } 
@@ -388,6 +397,7 @@ beans = {
     customObjectMarshallers( CustomObjectMarshallers ) {
         grailsApplication = ref('grailsApplication') 
         userGroupService = ref('userGroupService') 
+        observationService = ref('observationService') 
 
         marshallers = [
             new ObservationMarshaller(),
@@ -442,6 +452,7 @@ beans = {
 
     webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
     entityInterceptor(species.MyEntityInterceptor);
+
 }
 
 

@@ -47,7 +47,7 @@ class LoginController {
 	 */
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 		}
 		else {
 			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
@@ -61,7 +61,7 @@ class LoginController {
 	def auth = {
 		def config = SpringSecurityUtils.securityConfig
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: config.successHandler.defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ config.successHandler.defaultTargetUrl
 			return
 		}
 		String view = 'auth'
@@ -71,7 +71,7 @@ class LoginController {
 	}
 
 	def authSuccess = {
-		if(params.uid) {
+		if(params.uid && !springSecurityService.isAjax(request)) {
 			def targetUrl = request.getParameter(SpringSecurityUtils.DEFAULT_TARGET_PARAMETER);
 			if (StringUtils.hasText(targetUrl)) {
 				try {
@@ -93,7 +93,7 @@ class LoginController {
 				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 				return
 			} else {
-				redirect uri:"/";
+				redirect uri:request.scheme+"://"+request.serverName+request.contextPath+"/";
 				return;
 			}
 		} else {
@@ -110,6 +110,8 @@ class LoginController {
                 SUser m = SUser.read(params.id);
                 params.username = m.email;
                 params.roles = SUserRole.findAllBySUser(m).collect {it.role.authority};
+                model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), params);
+            } else if(params.uid) {
                 model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), params);
             } else if(params.error) {
                 model = utilsService.getErrorModel(params.message, null, params.int('error'))
@@ -188,7 +190,7 @@ class LoginController {
 		}
 		
         if (springSecurityService.isAjax(request)) {
-			render([error: msg] as JSON)
+			render([success:false, msg:msg] as JSON)
 		}
 		else {
 			flash.error = msg
@@ -201,7 +203,19 @@ class LoginController {
 	 * The Ajax success redirect url.
 	 */
 	def ajaxSuccess = {
-		render([success: true, username: springSecurityService.authentication.name] as JSON)
+/*        def requestCache = new HttpSessionRequestCache();
+        println request;
+        def defaultSavedRequest = requestCache.getRequest(request, response);
+        log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
+        def redirectUrl = '';
+        try {
+            if(defaultSavedRequest) {
+                redirectUrl = defaultSavedRequest.getRedirectUrl();
+            } 
+        } finally {
+            requestCache.removeRequest request, response
+        }
+*/		render([success: true, username: springSecurityService.authentication.name, redirectUrl:redirectUrl] as JSON)
 	}
 
 	/**
@@ -215,7 +229,7 @@ class LoginController {
 		def config = SpringSecurityUtils.securityConfig
 
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
 			return
 		}
 		//		//String postUrl = "/${grailsApplication.metadata['app.name']}${config.apf.filterProcessesUrl}"
@@ -242,4 +256,18 @@ class LoginController {
 			//redirect (action:'auth');
 		}
 	}
+
+    def authIframe = {
+        if (springSecurityService.isLoggedIn()) {
+            def model = [:];
+            if(params.logout) {
+                model['logout'] = params.logout;
+            } else {
+                model['isLoggedIn'] = true;
+            }
+            render (view:'authIframe', model:model);
+            return;
+        }
+        render (view:'authIframe');
+    }
 }

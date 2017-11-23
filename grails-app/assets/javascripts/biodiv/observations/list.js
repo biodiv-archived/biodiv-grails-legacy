@@ -7,7 +7,6 @@ var handlePaginateButtons = function() {
 };
  
 $(document).ready(function(){
-    console.log('obv.list.js start');
     $('#selected_sort').tooltip({placement:'top'});
     $('button').tooltip();
     $('.dropdown-toggle').dropdown();
@@ -244,12 +243,20 @@ $(document).ready(function(){
         return false;
     });
 
-    $('.traitFilter .any, .traitFilter .all, .traitFilter button, .traitFilter .none').click(function(){
+    $(document).on('click', '.traitFilter button, .traitFilter .none, .traitFilter .any', function(){
         if($(this).hasClass('active')){
             return false;
         }
-        $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-        $(this).addClass('active btn-success');
+        if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+            $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+            if($(this).hasClass('btn-success')) 
+                $(this).removeClass('active btn-success');
+            else
+                $(this).addClass('active btn-success');
+        } else {
+            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+            $(this).addClass('active btn-success');
+        }
 
         updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
         return false;
@@ -373,18 +380,55 @@ $(document).ready(function(){
             var t = $(this).attr('data-target').split('=');
             var tid = t[0].replace('trait.','');
             var tvid = t[1];
-            if(tvid == 'none') {
-            $('.traitFilter div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
-            $('.trait div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
-            } else {
-            $('.traitFilter button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
-            $('.trait button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+            if(!tvid.startsWith('rgb') && tvid.indexOf(':') == -1) {
+                if(tvid == 'none') {
+                    $('.traitFilter div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                    $('.trait div[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                } else {
+                    $('.traitFilter button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                    $('.trait button[data-tid='+tid+'][data-tvid='+tvid+']').removeClass('active btn-success');
+                }
+                $('.traitFilter div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
+                $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
             }
-            $('.traitFilter div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
-            $('.trait div[data-tid='+tid+'][data-tvid=all]').addClass('active btn-success');
+
+            $(".trait_range_slider,.trait_date_range_slider").each(function(){
+                var v = $(this).val().replace(';',':');
+                if(v) {
+                    trait = $(this).attr('data-tid');
+                    if(trait == tid) {
+                        var a = [$(this).data('min'), $(this).data('max')];
+                        $(this).data('ionRangeSlider').update({from:$(this).data('min'), to:$(this).data('max')});
+                        $(this).val('');
+                    }
+                }
+            });
+
+            $('.trait_date_range').each(function(){
+                var v = $(this).val();
+                if(v) {
+                    trait = $(this).attr('data-tid');
+                    if(trait == tid) {
+                        $(this).val('');
+                    }
+                }
+            });
+            $(".colorpicker-component").each(function(){
+                var v = $(this).find('input').val();
+                if(v) {
+                    trait = $(this).find('input').attr('data-tid');
+                    if(trait == tid) {
+                        $(this).find('input').val('');
+                        //$('this').colorpicker('setValue','');
+                        //change colorpicker value with .colorpicker('setValue', value)
+                    }
+                } 
+            });
+
+ 
         }
         removeParam = $(this).attr('data-target').replace('#','');
-        updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
+        updateGallery($(this).prev().attr('href'), window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate, undefined, undefined, undefined, removeParam);
         return false;
     });
 
@@ -395,10 +439,7 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-    console.log('obv.click.loadmore');
     $('.observation').on("click", ".loadMore", function() {
-
-        console.log('obv.click.loadmore start');
         $.autopager({
 
             autoLoad : true,
@@ -409,7 +450,7 @@ $(document).ready(function(){
             content : '.mainContent',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-            appendTo : '.mainContentList',
+            appendTo : '.mainContentList:first',
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
@@ -449,11 +490,12 @@ $(document).ready(function(){
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
+//                $('.observations_list').not('.trait_list').find('.recommendations .nav-tabs').tab();
+
                 //$('.list').trigger('updatedGallery');
             }
         });
 
-        console.log('obv.click.loadmore end');
         $.autopager('load');
         return false;
     });
@@ -466,14 +508,11 @@ $(document).ready(function(){
 
     $('.download-action').click(function(){
         var me = this;
-        console.log(me);
         var download_box = $(me).parent('.download-box');
-        console.log(download_box);
         $.ajax({ 
             url:window.params.isLoggedInUrl,
             success: function(data, statusText, xhr, form) {
                 if(data === "true"){
-                    console.log('show');
                     $(download_box).find('.downloadModal').modal('show');
                     return false;
                 }else{
@@ -486,7 +525,6 @@ $(document).ready(function(){
         });
     });
 
-    console.log('download-form.submit');
     $('.download-form').bind('submit', function(event) {
         var downloadFrom = $(this).find('input[name="downloadFrom"]').val();
         var filterUrl = '';
@@ -537,7 +575,6 @@ $(document).ready(function(){
     event.preventDefault();
     });
 
-    console.log('eat cookies');
     //	last_actions();
     eatCookies();
 
@@ -551,7 +588,6 @@ $(document).ready(function(){
     var propagateGrpHab = $('.propagateGrpHab');
     $('.propagateGrpHab .control-group  label').hide();
 
-    console.log('document..edit_group_btn');
     $(document).on('click','.edit_group_btn',function(){
         $(this).parent().hide();
         $(this).parent().parent().find('.propagateGrpHab').show();
@@ -565,10 +601,8 @@ $(document).ready(function(){
         */
     }); 
 
-    console.log('document.#updateSpeciesGrp');
     $(document).on('submit','#updateSpeciesGrp', function(event) {
 
-        console.log('updateSpeciesGrp ajaxSubmit start');
         var that = $(this);
         $(this).ajaxSubmit({ 
             url: "/observation/updateSpeciesGrp",
@@ -612,14 +646,12 @@ $(document).ready(function(){
             dataType: 'json', 
             type: 'GET',
             beforeSubmit: function(formData, jqForm, options) {
-                console.log(formData);
                 formData.push({'name':'format', 'value':'json', 'type':'text'});
                 updateCommonNameLanguage(that.find('.languageComboBox'));
                 return true;
             }, 
             success: function(data, statusText, xhr, form) {
                 if(data.status == 'success' || data.success == true) {
-                    console.log(data);
                     if(data.canMakeSpeciesCall === 'false'){
                         $('#selectedGroupList').modal('show');
                     } else{
@@ -667,17 +699,17 @@ $(document).ready(function(){
 
     $(document).on('click','.clickSuggest',function(){  
         var obv_id = $(this).attr('rel');
-        var ele_nxt = $(this).next();
+        var ele_nxt = $(this).parent().parent().parent();
         var wrap_place = ele_nxt.find('.addRecommendation_wrap_place');
         wrap_place.is(':empty')
-        if(!ele_nxt.is(':visible') && !$.trim( wrap_place.html() ).length){
+        if(!$.trim( wrap_place.html() ).length){
             wrap_place.html($('#addRecommendation_wrap').html());
             wrap_place.find('.addRecommendation').addClass('addRecommendation_'+obv_id);
             wrap_place.find('input[type="hidden"][name="obvId"]').val(obv_id);
             initializeNameSuggestion();
             initializeLanguage(wrap_place.find('.languageComboBox'));
         }
-        ele_nxt.toggle('slow');
+        //ele_nxt.show('slow');
 
     });
 
@@ -690,13 +722,11 @@ $(document).ready(function(){
     
     initializeSpeciesGroupHabitatDropdowns();
     
-    console.log('obv.list.js end');
 });
 
 /**
  */
 function eatCookies() {	
-    console.log('eatCookies');
 /*    var hashString = window.location.hash.substring(1);
     if ($.cookie("listing") == "list") {
         if(!hashString.startsWith('l')) {
@@ -715,8 +745,8 @@ function eatCookies() {
             }
         }
     }
-*/    adjustHeight();
-    console.log('eatCookies end');
+*/
+    //adjustHeight();
 }
 
 function getSelectedGroup() {
@@ -742,15 +772,74 @@ function getSelectedHabitat() {
     return hbt;	
 } 
 
-function getSelectedTrait() {
-    var hbt = '',trait='',selTrait={}; 
-    $('.traitFilter button, .traitFilter .none, .traitFilter .any, .trait button, .trait .none, .trait .any').each(function(){
-        if($(this).hasClass('active')) {
+function getSelectedTrait($traitFilter, putValue) {
+    putValue = (putValue === undefined)?false:true;
+    if($traitFilter == undefined)
+        $traitFilter = $('.traitFilter.filterable button, .traitFilter.filterable .none, .traitFilter.filterable .any, .trait.filterable button, .trait.filterable .none, .trait.filterable .any');
+    var trait='',selTrait={}; 
+    $traitFilter.each(function(){
+        if($(this).hasClass('btn-success')) {
             trait = $(this).attr('data-tid');
-            selTrait[trait] = $(this).attr('data-tvid');
+            if(trait) {
+            var v = putValue==true? $(this).attr('value') : $(this).attr('data-tvid');
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            if(v) selTrait[trait] += v+',';
+            }
         }
     });
-    return selTrait;
+    $(".trait_range_slider,.trait_date_range_slider").each(function(){
+        var v = $(this).val();
+        if(v) {
+            v = v.replace(';',':');
+            var x = v.split(':');
+            if($(this).data('min') == x[0] && $(this).data('max') == x[1]) {
+            } else {
+                trait = $(this).attr('data-tid');
+                if(selTrait[trait] == undefined) selTrait[trait]='';
+                selTrait[trait] += v+',';
+            }
+        }
+    });
+
+    $('.trait_date_range').each(function(){
+        var v = $(this).val();
+        if(v) {
+             trait = $(this).attr('data-tid');
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            selTrait[trait] += v+',';
+        }
+    });
+    $(".colorpicker-component").each(function(){
+        var v = $(this).find('input').val();
+        if(v) {
+            trait = $(this).find('input').attr('data-tid');
+            if(selTrait[trait] == undefined) selTrait[trait]='';
+            selTrait[trait] += v+',';
+        } 
+    });
+
+    //hack for trait show default selection
+    if($('input[data-tid]').length == 1 &&  !selTrait[$('input[data-tid]').attr('data-tid')]) {
+            //is from trait show page
+            selTrait[$('input[data-tid]').attr('data-tid')] = 'any,';
+        };
+
+    var p = {};
+    for(var m in selTrait) {
+        p[m] = selTrait[m].substring(0,selTrait[m].length-1);
+    }
+
+    return p;
+}
+
+function getSelectedTraitStr($traitFilter, putValue) {
+    putValue = (putValue === undefined)?false:true;
+    var traits = getSelectedTrait($traitFilter, putValue);
+    var traitsStr = '';
+    for(var m in traits) {
+        traitsStr += m+':'+traits[m]+';';
+    }
+    return traitsStr;
 }
 
 function selectTickUserGroupsSignature(parentGroupId) {
@@ -917,9 +1006,20 @@ function getSelectedFilters($ele, noneSelected) {
 
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
-    console.log('url params : '+params);
     if(removeParam) {
-        delete params[removeParam]
+        if(removeParam.match('trait\\.')) {
+            var kv = removeParam.split('=');
+            var tP = params[kv[0]];
+            var tvStr = params[kv[0]].split(',');
+            params[kv[0]] = '';
+            for(var i=0; i<tvStr.length; i++) {
+                console.log(tvStr[i]+'  '+kv[1])
+                if(decodeURIComponent(tvStr[i]) != kv[1]) params[kv[0]] += tvStr[i]+',';
+            }
+            params[kv[0]] = params[kv[0]].substring(0,params[kv[0]].length-1);
+        } else {
+            delete params[removeParam];
+        }
     }
     removeSort = (typeof removeSort === "undefined") ? false : removeSort;
 
@@ -967,11 +1067,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         params['habitat'] = habitat;
     }
 
-    for(var key in params) {
-        if(key.match('trait.')) {
+    /*for(var key in params) {
+        if(key.match('trait\\.')) {
             delete params[key];
         }
-    }
+    }*/
     var trait = getSelectedTrait();
     for(var key in trait) { 
         params['trait.'+key]=trait[key];
@@ -1028,14 +1128,14 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
         delete params['daterangepicker_start'];
         delete params['daterangepicker_end'];
 
-        $.each($(document).find('input[name=daterangepicker_start]'), function(index, value) {
+        $.each($(document).find('#searchToggleBox input[name=daterangepicker_start]'), function(index, value) {
             if($(value).closest('#observedOnDatePicker').length > 0) {
                 params['observedon_start'] = $(value).val();
             } else {
                 params['daterangepicker_start'] = $(value).val();
             }
         });
-        $.each($(document).find('input[name=daterangepicker_end]'), function(index, value) {
+        $.each($(document).find('#searchToggleBox input[name=daterangepicker_end]'), function(index, value) {
             if($(value).closest('#observedOnDatePicker').length > 0) {
                 params['observedon_end'] = $(value).val();
             } else {
@@ -1196,7 +1296,7 @@ function setActiveTag(activeTag){
 
 function updateListPage(activeTag) {
     return function (data) {
-        $('.observations_list').replaceWith(data.model.obvListHtml);
+        $('.observations_list:first').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);
         $('#summary_section').replaceWith(data.model.summaryHtml);        
@@ -1209,6 +1309,7 @@ function updateListPage(activeTag) {
         last_actions();
         eatCookies();			
         $(".paginateButtons a").off('click').on('click', handlePaginateButtons);
+//        $('.observations_list').not('.trait_list').find('.recommendations .nav-tabs').tab();
         $('.list').trigger('updatedGallery');
         checkList();
     }
@@ -1250,7 +1351,6 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     if(updateHistory != false){
         History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
     }
-    console.log("doc_url " + doc_url);
     if(isGalleryUpdate) {
         $.ajax({
             url: doc_url,
@@ -1287,10 +1387,11 @@ function updateMapView (params, callback) {
     var p = jQuery.extend({}, params);
     //delete p.bounds;
     //delete oldParams.bounds;
-    var mapLocationPicker = $('#big_map_canvas').data('maplocationpicker'); 
+    var mapCanvasEle = document.getElementById('big_map_canvas');
+    var mapLocationPicker = $(mapCanvasEle).data('maplocationpicker'); 
     if(mapLocationPicker == undefined) {
-        loadGoogleMapsAPI(function() {
-            mapLocationPicker = new $.fn.components.MapLocationPicker(document.getElementById("big_map_canvas"));
+        loadGoogleMapsAPI(mapCanvasEle, function() {
+            mapLocationPicker = new $.fn.components.MapLocationPicker(mapCanvasEle);
             mapLocationPicker.initialize();
            
             $('#big_map_canvas').data('maplocationpicker', mapLocationPicker);
@@ -1483,14 +1584,12 @@ function appendGallery(ovbId,images){
         baseUrl,
         thumbUrl;
         $.each(images, function (index, photo) {
-            //console.log("photo ="+photo);
             baseUrl = (photo.indexOf('http://') == -1)?""+window.params.observation.serverURL+photo:photo;
             $('<a/>')
                 .append($('<img>'))
                 .prop('href', baseUrl)                
                 .attr('data-gallery', '')
                 .appendTo(linksContainer);
-           // console.log(carouselLinks);
             carouselLinks.push({
                 href: baseUrl              
             });
@@ -1567,7 +1666,6 @@ function checkUrl(viewText,changeText){
     }
 
 function initializeSpeciesGroupHabitatDropdowns() {
-    console.log('initializeSpeciesGroupHabitatDropdowns');
     /*var selectedGroupHandler = function(e){
         e.stopPropagation();
         //$(this).dropdown('toggle');

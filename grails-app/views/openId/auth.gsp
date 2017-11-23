@@ -5,6 +5,9 @@
 
 <body>
 	<div class="openid-loginbox super-section">
-		<auth:loginForm />
+
+        <div>
+    	<auth:loginForm model="['isSubGroup':false]"/>
+        </div>
 	</div>
 </body>

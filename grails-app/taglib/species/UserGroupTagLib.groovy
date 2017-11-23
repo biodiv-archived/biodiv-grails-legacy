@@ -275,6 +275,7 @@ class UserGroupTagLib {
 		def user = springSecurityService.getCurrentUser();
 		def userGroups = user.getUserGroups(attrs.model?.onlyExpertGroups);
 		def result = [:]
+	
 		if(attrs.model?.observationInstance && attrs.model.observationInstance.userGroups) {
 			//check if the obv already belongs to userGroup and disable the control for it not to submit again
 			def obvInUserGroups = attrs.model.observationInstance.userGroups.intersect(userGroups)
@@ -283,8 +284,7 @@ class UserGroupTagLib {
 				result[it] = true;
 			}
 		}
-
-		userGroups.each {
+	userGroups.each {
 			result[it] = false;
 		}
 		out << render(template:"/common/userGroup/showCurrentUserUserGroupsTemplate", model:['userGroups':result]);
@@ -336,7 +336,7 @@ class UserGroupTagLib {
 	def isUserGroupMember = { attrs, body->
 		def user = springSecurityService.getCurrentUser();
 		//TODO:optimize count
-		if(user && user.getUserGroups().size() > 0) {
+		if(user && UserGroupMemberRole.countBySUser(user) > 0) {
 			out << body();
 		}
 	}
@@ -360,7 +360,6 @@ class UserGroupTagLib {
 	def aclUtilService
 	def gormUserDetailsService
 	def perm = { attrs, body ->
-		println aclUtilService.hasPermission(gormUserDetailsService.loadUserByUsername(attrs.model.user.email, true), attrs.model.userGroupInstance, attrs.model.permission)
 		//println aclUtilService.readAcl(attrs.model.userGroupInstance);
 	}
 
@@ -487,34 +486,25 @@ class UserGroupTagLib {
 		out << render(template:"/common/userGroup/inviteExpertTemplate", model:attrs.model);
 	}
 
-	def showNoOfFoundedUserGroups  = {attrs, body->
+    def showNoOfFoundedUserGroups  = {attrs, body->
+        def userInstance = attrs.model?.userInstance;
+        def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+        out <<  "<div class=countvaluecontributed>"+count+"</div>"
+    }
+
+	def showNoOfMemberUserGroups  = {attrs, body->
 		def userInstance = attrs.model?.userInstance;
-		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
-
-	def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
-
-			out <<  "<div class=countvaluecontributed>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,founderRole).size()+"</div>"
-
-
+		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+		out <<  "<div class=countvalue>"+count+"</div>"
 	}
-		def showNoOfMemberUserGroups  = {attrs, body->
+
+    def showNoOfExpertUserGroups  = {attrs, body->
 		def userInstance = attrs.model?.userInstance;
-		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
-		def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-
-
-			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,memberRole).size()+"</div>"
-
-
-	}
-		def showNoOfExpertUserGroups  = {attrs, body->
-		def userInstance = attrs.model?.userInstance;
-		def result = userGroupService.getUserUserGroups(userInstance, -1, -1);
-		def expertRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
-
-			out <<  "<div class=countvalue>"+UserGroupMemberRole.findAllBySUserAndRole(userInstance,expertRole).size()+"</div>"
-
-
+		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+		out <<  "<div class=countvalue>"+count+"</div>"
 	}
 
 }

@@ -1,9 +1,9 @@
-<div class="external_providers">
+<div class="external_providers ${isSubGroup?'isSubGroup':'isParentGroup'}">
 
 	<div class="sign_in_external_bttn external_bttn facebookButton">
-		<div class="fbJustConnect ${ajax?'ajaxForm':'' }"><g:message code="common.auth.login.facebook" /></div>
+		<div class="fbJustConnect ${ajax?'ajaxForm':'' } ${isSubGroup?'isSubGroupForm':'isParentGroupForm'}"><g:message code="common.auth.login.facebook" /></div>
 	</div>
-	<g:if test="${ajax}">
+	<g:if test="${ajax || isSubGroup}">
 		<div class="sign_in_external_bttn external_bttn googleButton">
 			<div class="googleConnect"><g:message code="common.auth.login.google" /></div>
 		</div>

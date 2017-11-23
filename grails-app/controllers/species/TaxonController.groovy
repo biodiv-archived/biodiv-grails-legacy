@@ -36,21 +36,157 @@ class TaxonController {
     def grailsApplication;
     def messageSource
     def namePermissionService;
+    def externalLinksService;
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     //def combinedHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.COMBINED_TAXONOMIC_HIERARCHY);
 
     /**
-     * 
+     *
      */
     def index = {
     }
 
-    /**
-     * 
-     */
+
+def list(){
+  //cache "taxonomy_results"
+  //includeOriginHeader();
+  int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0
+  def parentId = params.parent ?params.parent : null;
+  def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
+  def expandSpecies = params.expand_species  ? (new Boolean(params.expand_species)).booleanValue(): false
+  Long classSystem = params.classSystem ? Long.parseLong(params.classSystem): null;
+  Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
+  def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
+  Long taxonId = params.id ? Long.parseLong(params.id) : null
+  Set taxonIds = new HashSet();
+  if(params.taxonIds) {
+    params.taxonIds.split(',').each { tId ->
+        try{
+            taxonIds << Long.parseLong(tId);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+  }
+  if(taxonId) taxonIds << taxonId;
+
+ println expandTaxon
+ long startTime = System.currentTimeMillis();
+ def rs = new ArrayList<GroovyRowResult>();
+
+ if(expandSpecies) {
+     //def taxonIds = getSpeciesHierarchyTaxonIds(speciesid, classSystem)
+     //getHierarchyNodes(rs, 0, 8, null, classSystem, false, expandSpecies, taxonIds);
+     Long regId = classSystem;
+     getSpeciesHierarchy(speciesid, rs, regId);
+ } else {
+     def fieldsConfig = grailsApplication.config.speciesPortal.fields
+     def classification = classSystem ? Classification.read(classSystem) : Classification.findByName(fieldsConfig.IBP_TAXONOMIC_HIERARCHY);
+     def tillLevel = level+3;
+      if(expandTaxon) {
+          Set tIds = taxonIds.clone();
+          tIds.each { tId ->
+              println "expandTaxon ${tId}"
+              def taxon = TaxonomyDefinition.read(tId);
+              if(taxon instanceof species.SynonymsMerged) {
+                  //    taxon = taxon.accepted
+                  //TODO
+              }
+              println taxon
+              tillLevel = taxon.rank;
+              def x = getSpeciesHierarchyTaxonIds(taxon.id, classification.id);
+              x.each { taxonIds << it; }
+              println taxonIds;
+
+          }
+          println taxonIds
+      }
+      //def cl = Classification.read(classSystem.toLong());
+      getHierarchyNodes(rs, level, tillLevel, parentId, classSystem, expandAll, expandSpecies, taxonIds.toList());
+      /*if(cl == classification) {
+        def authorClass = Classification.findByName(fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
+        getHierarchyNodes(rs, level, tillLevel, parentId, authorClass.id, expandAll, expandSpecies, null,"RAW");
+        }*/
+ }
+ log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
+ render buildlistResult(rs, classSystem) as JSON
+}
+
+private List buildlistResult(rs,classSystem) {  
+
+
+    List result = [];
+    Map lookup=[:];
+    boolean hasContributorPermission = false;
+    rs.each { r ->        
+
+        Map map = [:]
+
+        lookup[r.taxonid] = map;
+
+        map['id'] = r["taxonid"]
+        map['parent'] = r['parentid']?:'#'
+        map['text'] = r.name.trim()
+        map['icon'] = false;
+        map['speciesid'] = r["speciesid"]
+        map['taxonid'] = r["taxonid"];
+        map['path'] = r["path"];
+        map['classsystem'] = r["classsystem"]
+        map['rank'] = r.rank
+        map['type'] = r.rank+''
+        map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false
+        if(r.taxonId){
+            def getAllPermissions = namePermissionService.getAllPermissions(namePermissionService.populateMap([taxon:"" +r.taxonId]));
+            def users=[]
+            getAllPermissions.each { nP ->
+                users << [id:nP.user.id,name:nP.user.name,perm:nP.permission.value(),profile_pic:nP.user.profilePicture(ImageType.SMALL)];
+            }
+            map['usersList'] = users;
+        }
+        if(r.containsKey('isContributor')) {
+            map['isContributor'] = r.isContributor?:false
+        } else {
+            map['isContributor'] = false
+        }
+        map['position'] = r["position"]
+
+        map['state'] = [
+        opened    : r.expanded?:false,  // is the node open
+        loaded : r.loaded ?:false,
+        disabled  : false  // is the node disabled
+        ];
+
+        map['haspermission']=hasPermissionSpecies(params.user?.toInteger(),r["taxonid"]);
+        
+        if(map['haspermission']==true) {
+            map['li_attr'] = ['class':"permission_hilight"];  // attributes for the generated LI node
+        } else {
+            map['li_attr'] = []  // attributes for the generated LI node
+        }
+        
+        map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
+      
+        //r.children = [];
+
+        if(r.parentid && lookup[r.parentid]){
+            if(!lookup[r.parentid].children)
+                lookup[r.parentid].children = [];
+            lookup[r.parentid].children << map;
+        }
+        else{
+            result << map;
+        }
+    }
+    return result;
+   }
+
+
+
+
+
     def listHierarchy() {
         //cache "taxonomy_results"
-        includeOriginHeader();
+        //includeOriginHeader();
         int level = params.n_level ? Integer.parseInt(params.n_level)+1 : 0
         def parentId = params.id  ?: null
         def expandAll = params.expand_all  ? (new Boolean(params.expand_all)).booleanValue(): false
@@ -59,7 +195,7 @@ class TaxonController {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-       println expandTaxon 
+      
         return _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
     }
 
@@ -100,8 +236,11 @@ class TaxonController {
         render buildHierarchyResult(rs, classSystem) as JSON
     }
 
+
+
+
     /**
-     * 
+     *
      * @param resultSet
      * @param level
      * @param parentId
@@ -115,15 +254,16 @@ class TaxonController {
         String sqlStr;
 
         long startTime = System.currentTimeMillis();
-
+        Map p = [:];
+        if(position) p['position'] = position;
         if(classSystem) {
             if(!parentId) {
-                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name, s.path as path, ${classSystem} as classsystem, t.position as position \
+                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name, s.parent_taxon_definition_id as parentid, s.path as path, ${classSystem} as classsystem, t.position as position \
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and t.is_deleted = false and "+
-                    (classSystem?"s.classification_id = :classSystem and ":"")+ 
+                    (classSystem?"s.classification_id = :classSystem and ":"")+
                     (position?"t.position = :position and ": "")+
                     "t.rank = 0";
                 rs = sql.rows(sqlStr, [classSystem:classSystem, position:position])
@@ -131,7 +271,7 @@ class TaxonController {
             else if(level == TaxonomyRank.SPECIES.ordinal()) {
                 println level;
                 println position;
-                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
+                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name, s.parent_taxon_definition_id as parentid, s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and t.is_deleted = false and "+
@@ -141,7 +281,7 @@ class TaxonController {
                     "s.path ~ '^"+parentId+"_[0-9]+\$' "
                     rs = sql.rows(sqlStr , [classSystem:classSystem, position:position]);
             } else {
-                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
+                sqlStr = "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name, s.parent_taxon_definition_id as parentid, s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
@@ -154,26 +294,32 @@ class TaxonController {
             }
         } else {
             if(!parentId) {
-                sqlStr = "select t.id as taxonid, 1 as count, 0 as rank, t.name as name, s.path as path , ${classSystem} as classsystem, t.position as position\
+                sqlStr = "select t.id as taxonid, 1 as count, 0 as rank, t.name as name,s.parent_taxon_definition_id as parentid, s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (position?"t.position = :position and ": "")+
                     "t.rank = 0 group by s.path, t.id, t.name";
-                rs = sql.rows(sqlStr, [position:position])
+                if(p)
+                    rs = sql.rows(sqlStr, p);
+                else
+                    rs = sql.rows(sqlStr);
             }
             else if(level == TaxonomyRank.SPECIES.ordinal()) {
-                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
+                sqlStr = "select t.id as taxonid,  1 as count, t.rank as rank, t.name as name, s.parent_taxon_definition_id as parentid, s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, taxonomy_definition t \
                     where \
                     s.taxon_definition_id = t.id and t.is_deleted = false and "+
                     (position?"t.position = :position and ": "")+
                     "t.rank = "+level+" and \
                     s.path ~ '^"+parentId+"_[0-9]+\$' group by s.path, t.id, t.name";
-                rs = sql.rows(sqlStr, [position:position]);
+                if(p)
+                    rs = sql.rows(sqlStr, p);
+                else
+                    rs = sql.rows(sqlStr);
             } else {
-                sqlStr =  "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name,  s.path as path , ${classSystem} as classsystem, t.position as position\
+                sqlStr =  "select t.id as taxonid, 1 as count, t.rank as rank, t.name as name, s.parent_taxon_definition_id as parentid, s.path as path , ${classSystem} as classsystem, t.position as position\
                     from taxonomy_registry s, \
                     taxonomy_definition t \
                     where \
@@ -181,7 +327,10 @@ class TaxonController {
                     (position?"t.position = :position and ": "")+
                     "s.path ~ '^"+parentId+"_[0-9]+\$' group by s.path, t.rank, t.id, t.name" +
                     " order by t.rank asc, t.name"
-                    rs = sql.rows(sqlStr, [position:position])
+                    if(p)
+                        rs = sql.rows(sqlStr, p);
+                    else
+                        rs = sql.rows(sqlStr);
             }
         }
         log.debug "Time taken to execute taxon hierarchy query : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
@@ -207,7 +356,7 @@ class TaxonController {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param taxonId
      * @param path
@@ -220,7 +369,7 @@ class TaxonController {
     }
 
     /**
-     * TODO:optimize 
+     * TODO:optimize
      * @param id
      * @return
      */
@@ -230,18 +379,18 @@ class TaxonController {
     }
 
     /**
-     * 
+     *
      * @param speciesId
      * @param classSystem
      * @return
      */
     private List getSpeciesHierarchyTaxonIds(Long taxonId, Long classSystem) {
         def sql = new Sql(dataSource)
-        String s = """select s.path as path 
-        from taxonomy_registry s, 
-        taxonomy_definition t 
-        where 
-        s.taxon_definition_id = t.id and t.is_deleted = false and 
+        String s = """select s.path as path
+        from taxonomy_registry s,
+        taxonomy_definition t
+        where
+        s.taxon_definition_id = t.id and t.is_deleted = false and
         ${(classSystem?"s.classification_id = :classSystem and ":"")}
         (s.path like '%!_"""+taxonId+"!_%' or s.path like '"+taxonId+"!_%' or s.path like '%!_"+taxonId+"'  escape '!')";
         def rs
@@ -283,7 +432,7 @@ class TaxonController {
     }
 
     /**
-     * 
+     *
      */
 
     private List getSpeciesHierarchy(Long speciesTaxonId, List rs, Long regId) {
@@ -293,7 +442,7 @@ class TaxonController {
             //Classification classification = Classification.get(classSystem);
             //TaxonomyRegistry.findAllByTaxonDefinitionAndClassification(taxonConcept, classification).each {reg ->
             def reg = TaxonomyRegistry.read(regId);
-                def list = [] 
+                def list = []
                 while(reg != null) {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()]
                     populateSpeciesDetails(reg.taxonDefinition.id, result);
@@ -308,16 +457,16 @@ class TaxonController {
             TaxonomyDefinition taxonConcept = Species.read(speciesTaxonId)?.taxonConcept;
             TaxonomyRegistry.findAllByTaxonDefinition(taxonConcept).each { reg ->
                 def list = [];
-                while(reg != null) {					
+                while(reg != null) {
                     def result = [id:reg.id, parentId:reg.parentTaxon?.id, 'count':1, 'rank':reg.taxonDefinition.rank, 'name':reg.taxonDefinition.name, 'path':reg.path, 'classSystem':reg.classification.id, 'expanded':true, 'loaded':true, 'isContributor':reg.isContributor()];
                     populateSpeciesDetails(speciesTaxonId, result);
-                    list.add(result);					
+                    list.add(result);
                     reg = reg.parentTaxon;
                 }
                 //if(list.size() >= minHierarchySize) {
                     list = list.sort {it.rank};
                     speciesHier.addAll(list);
-                //}				
+                //}
             }
         }
 
@@ -334,7 +483,7 @@ class TaxonController {
     }
 
     /**
-     * 
+     *
      */
     private void populateSpeciesDetails(Long speciesTaxonId, Map result) {
         //if(result.rank == TaxonomyRank.SPECIES.ordinal()) {
@@ -354,6 +503,9 @@ class TaxonController {
      * @return
      */
     private List buildHierarchyResult(rs, classSystem) {
+      println "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+      println rs
+      println "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         List result = [];
         boolean hasContributorPermission = false;
         rs.each { r ->
@@ -377,7 +529,7 @@ class TaxonController {
             map['classsystem'] = r["classsystem"]
             map['rank'] = r.rank
             map['type'] = r.rank+''
-            map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false           
+            map['isSpecies'] =  (r.rank == TaxonomyRank.SPECIES.ordinal()) ? true : false
             if(r.taxonId){
                 def getAllPermissions = namePermissionService.getAllPermissions(namePermissionService.populateMap([taxon:"" +r.taxonId]));
                 def users=[]
@@ -402,16 +554,15 @@ class TaxonController {
             if(map['haspermission']==true){
             map['li_attr'] = ['class':"permission_hilight"]  // attributes for the generated LI node
         }
-       
+
         else{
             map['li_attr'] = []  // attributes for the generated LI node
         }
-            
+
             map['a_attr'] = ['class':map['position'], 'data-taxonid':r["taxonid"]]  // attributes for the generated A node
             result << map
         }
 
-        println "=========================================================="
         println result
         return result;
 /*        def writer = new StringWriter ();
@@ -463,18 +614,16 @@ class TaxonController {
 */    }
 
     /**
-     * 
+     *
      * @param origin
      * @return
      */
+/*
+    installed cors plugin
     private boolean isValid(String origin) {
         String originHost = (new URL(origin)).getHost();
         return grailsApplication.config.speciesPortal.validCrossDomainOrigins.contains(originHost)
     }
-
-    /**
-     * 
-     */
     private void includeOriginHeader() {
         String origin = request.getHeader("Origin");
         if(origin) {
@@ -485,6 +634,7 @@ class TaxonController {
             response.setHeader("Access-Control-Max-Age", "86400");
         }
     }
+    */
 
 	@Secured(['ROLE_USER'])
     def create() {
@@ -542,7 +692,7 @@ class TaxonController {
         }
 
     }
-    
+
 	@Secured(['ROLE_USER'])
 	def update()  {
 		//Do only when params coming from curation interface
@@ -696,10 +846,8 @@ class TaxonController {
 		}
 	}
 
-	
-	//////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////Navigator query related ///////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
     private def getTaxonMap(taxon, author, iucn, gbif) {
@@ -719,7 +867,7 @@ class TaxonController {
         map.put('classification', classifi);
         return map;
     }
- 
+
 
     def search(params) {
         //setIfMissing 'max', 12, 100
@@ -727,7 +875,7 @@ class TaxonController {
         int totalCount = 0;
         def result = [];
 
-        if(!params.str) 
+        if(!params.str)
             render result as JSON;
 
         def fieldsConfig = grailsApplication.config.speciesPortal.fields
@@ -750,7 +898,9 @@ class TaxonController {
 
         rs.each { r ->
             TaxonomyRegistry reg = TaxonomyRegistry.read(r.regid);
+
             def p = reg.parentTaxon
+            
             while(p) {
                 result.add(p.path);
                 p = p.parentTaxon;
@@ -785,17 +935,17 @@ class TaxonController {
         }
     }
 
-    @Secured(['ROLE_ADMIN'])   
-    def mergeIntoIBPHierarchy() {   
-        def msg;               
+    @Secured(['ROLE_ADMIN'])
+    def mergeIntoIBPHierarchy() {
+        def msg;
 
-        def errors = [], result = [success:false]; 
+        def errors = [], result = [success:false];
         if(params.taxonId && params.sourceHier) {
             TaxonomyDefinition taxon = TaxonomyDefinition.read(params.long('taxonId'));
             Classification sourceHie = Classification.read(params.long('sourceHier'));
             Classification ibpHierarchy = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
-            //get all children 
+            //get all children
             def rs = new ArrayList<GroovyRowResult>();
             TaxonomyRegistry tr = TaxonomyRegistry.findByTaxonDefinitionAndClassification(taxon, sourceHie);
 
@@ -803,42 +953,82 @@ class TaxonController {
             println "++++++++++++++++++++++++++++++++++++++"
             println "++++++++++++++++++++++++++++++++++++++"
             println rs.size()
-            println rs.taxonid;        
+            println rs.taxonid;
             println rs.path
             println "++++++++++++++++++++++++++++++++++++++"
             println "++++++++++++++++++++++++++++++++++++++"
-			def sql = new Sql(dataSource)
-			int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-			dataSource.setUnreturnedConnectionTimeout(50000);
-			try{
-	        rs.taxonid.each { t ->
-	              println t
-	              sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
-	
-				  def taxon1 = TaxonomyDefinition.read(t);
-	              taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
-	              }
-			}catch(e){
-				e.printStackTrace()
-			}finally{
-				dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
-			}
+            def sql = new Sql(dataSource)
+            int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+            dataSource.setUnreturnedConnectionTimeout(50000);
+            try{
+                rs.taxonid.each { t ->
+                    println t
+                    sql.executeUpdate(" delete from taxonomy_registry where id in ( select id from taxonomy_registry where classification_id = "+ibpHierarchy.id+" and (path like '%\\_" + t + "\\_%' or path like '" + t + "\\_%' or path like '%\\_" + t + "'  or path like '" + t + "'))" )
+
+                    def taxon1 = TaxonomyDefinition.read(t);
+                    taxon1.snapToIBPHir([sourceHie], ibpHierarchy)
+                }
+            }catch(e){
+                e.printStackTrace()
+            }finally{
+                dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+            }
         } else {
-            render ([success:false, msg:"", errors:[]] as JSON)                                                                                       
+            render ([success:false, msg:"", errors:[]] as JSON)
         }
 
     }
-        boolean hasPermissionSpecies(user,taxon){
-            def sql =  Sql.newInstance(dataSource);
-            def result
-            result = sql.rows("select a.*,b.id as species_id from species_permission a JOIN species b on a.taxon_concept_id=b.taxon_concept_id and a.author_id=:userId and a.taxon_concept_id=:taxonId",[userId:user,taxonId:taxon]);
-                   if(result){
-                    return true;
-                   }
-                   else {
-                    return false;
-                   }  
+
+    boolean hasPermissionSpecies(user,taxon){
+        def sql =  Sql.newInstance(dataSource);
+        def result
+        result = sql.rows("select a.*,b.id as species_id from species_permission a JOIN species b on a.taxon_concept_id=b.taxon_concept_id and a.author_id=:userId and a.taxon_concept_id=:taxonId",[userId:user,taxonId:taxon]);
+        if(result){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
-}
+    @Secured(['ROLE_ADMIN'])
+    def snapAcceptedAndNoIBP() {
+        def sql = new Sql(dataSource)
+//        sql.eachRow("select id from taxonomy_definition t where t.status='ACCEPTED' and t.id not in (select taxon_definition_id from taxonomy_registry where classification_id=265799)") { row ->
+            def td = TaxonomyDefinition.read(447537L);
+            if(td) {
+                println td.id;
+                td.doColCuration = false;
+                td.postProcess();
+            } else {
+                println "No td";
+            }
+//        }
 
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def updateExternalLinksFromSheet() {
+        if(params.file) {
+            String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
+            if(new File(file).exists()) {
+                List<Map> content = SpreadsheetReader.readSpreadSheet(file, 0, 0);
+                content.each { row ->
+                    try {
+                    println row;
+                    TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(Long.parseLong(row.get('taxon id')));
+                    if(taxonConcept) {
+                        println taxonConcept.id+" - "+row.get('link');
+                        externalLinksService.updateExternalLink(taxonConcept, "frlht", row.get('link'), false, new Date());
+                    }
+                    } catch(e) {
+                        e.printStackTrace();
+                    }
+                }
+                utilsService.cleanUpGorm(true);
+                println "======= updateExternalLinksFromSheet DONE";
+            }
+        }
+        render "done"
+    }
+}

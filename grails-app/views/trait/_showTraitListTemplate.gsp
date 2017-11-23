@@ -1,3 +1,6 @@
+<style>
+.sidebar_section{margin-bottom:0px;}
+</style>
 <% 
 def ref=[];
 def instanceFieldList=[:]
@@ -10,44 +13,38 @@ instanceList.each{ iL ->
     }
 }
 %>                   
- <div class="observations_list observation" style="clear: both;">
+ <div class="observations_list trait_list" style="clear: both;">
 	<div class="mainContentList">
-		<div class="mainContent" name="p${params?.offset}">
+		<div class="mainContent trait_list_content" name="p${params?.offset}">
 		    <div class="filters">
             <g:each in="${instanceFieldList}" status="j" var="inst">                
                 <div class="sidebar_section">
-                    <a class="speciesFieldHeader" data-toggle="collapse" href="#trait${j}">
+                <g:if test="${fromObservationShow!='show'}">
+	              <a class="speciesFieldHeader"  data-toggle="collapse" href="#trait${j}">
                     	<h5>${inst.key}</h5>
-                    </a>
-			<ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
-				<g:each in="${inst.value}" status="i" var="instance">
-					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;">
-                    <g:render template="/trait/showTraitTemplate" model="['trait':instance]"/>
+                   </a> 
+                   </g:if>
+                   
+                 <ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
+				<g:each in="${inst.value}" status="i" var="trait_instance">
+				<div data-isNotObservation="${trait_instance.isNotObservationTrait}">
+					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;border:0px !important;">
+                    <g:render template="/trait/showTraitTemplate" model="['trait':trait_instance, 'factInstance':factInstance, object:instance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable, 'ifOwns':ifOwns, 'filterable':filterable, numericTraitMinMax:numericTraitMinMax]"/>
 					</li>
+					</div>
 				</g:each>
-			</ul>
+			</ul>              
 			</div>
 			</g:each>
 			</div>			
 		</div>
 	</div>
-        
-    <g:if test="${instanceTotal > (queryParams.max?:0)}">
-		<div class="centered">
-			<div class="btn loadMore">
-				<span class="progress" style="display: none;"><g:message code="msg.loading" /></span> <span
-					class="buttonTitle"><g:message code="msg.load.more" /></span>
-			</div>
-		</div>
-	</g:if>
-	
-	<%
-		activeFilters?.loadMore = true
-		activeFilters?.webaddress = userGroupInstance?.webaddress
-	%>
-	<div class="paginateButtons" style="visibility: hidden; clear: both">
-		<p:paginate total="${instanceTotal?:0}" action="${params.action}" controller="${params.controller?:'observation'}"
-			userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
-			 max="${queryParams.max}" params="${activeFilters}" />
-	</div>	
+       
 </div>
+
+<asset:script>
+$(document).ready(function(){
+	$('.icon-question-sign').tooltip({'placement': 'top','container':'body'});
+});
+</asset:script>
+

@@ -193,6 +193,7 @@ class Utils {
 	}
 
 	static String getDomain(HttpServletRequest httpServletRequest) {
+        if(!httpServletRequest) return null;
 		// maybe we are behind a proxy
 		String header = httpServletRequest.getHeader("X-Forwarded-Host");
 		if(header != null) {
@@ -216,6 +217,7 @@ class Utils {
 	}
 
 	static String getDomainServerUrl(HttpServletRequest request) {
+        if(!request) return null;
 		def domain = getDomain(request);
 		return "$request.scheme://$domain";
 	}

@@ -50,10 +50,11 @@ class ActivityFeedTagLib {
 		model.feedOrder = model.feedOrder?:activityFeedService.OLDEST_FIRST
 		model.feedPermission = model.feedPermission?:activityFeedService.READ_ONLY
 		model.refreshType = model.refreshType ?:activityFeedService.AUTO
-		if(model.refreshType == activityFeedService.MANUAL){
-			preloadFeeds(model)
-		}else{
+		if(model.refreshType == activityFeedService.MANUAL && model.preLoad != false){
+			preloadFeeds(model);
+		}else {
 			model.feeds = []
+            model.remainingFeedCount = -1;
 		}
 		out << render(template:"/common/activityfeed/showAllActivityFeedTemplate", model:model);
 	}

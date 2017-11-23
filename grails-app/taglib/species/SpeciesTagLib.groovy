@@ -49,6 +49,10 @@ class SpeciesTagLib {
 			case "wikipedia" :
 				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm?:attrs.model.taxonConcept.name}\" title=\"View on Wikipedia\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/wiki.png', absolute:true)}\"/></a>";
 				break;
+			case "frlhtUrl" :
+				out << "<a href=\"${extLink.frlhtUrl}\" title=\"View on FRLHT's ENVIS\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FRLHT32x32.gif', absolute:true)}\"/></a>";
+				break;
+
 		}
 	}
 	

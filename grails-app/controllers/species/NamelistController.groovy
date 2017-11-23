@@ -493,7 +493,7 @@ class NamelistController {
 						println "needed hir updates"
                         // Needed hir check
 						def r = namelistService.changeSynToAcc(params.taxonId.toLong(), null);
-                        activityMsg +='| Taxon status updated : '+td.status.capitalize() +" to "+ params.status.capitalize()
+                        activityMsg +='| Taxon status updated : '+td.status.label() +" to "+ params.status.capitalize()
                         chkStatus = true;
                         result['msg'] +="\n Status changed to "+params.status                       
 					}else if(hasPerm && (params.status.capitalize() == NameStatus.SYNONYM.value())){
@@ -502,7 +502,7 @@ class NamelistController {
 							 def reco = Recommendation.read(params.newRecoId.toLong());
 							 if(reco){
 								 def r = namelistService.changeAccToSyn(td.id, reco.taxonConcept.id);
-                                 activityMsg +='| Taxon status updated : '+td.status.capitalize() +" to "+ params.status.capitalize()
+                                 activityMsg +='| Taxon status updated : '+td.status.label() +" to "+ params.status.capitalize()
                                  chkStatus = true;
 								 println "Accepted to synonym success";
 								 result['msg'] +="\n Status changed to "+params.status

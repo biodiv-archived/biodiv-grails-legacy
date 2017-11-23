@@ -12,7 +12,7 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
     if(mapLocationPicker.markers) {
         mapLocationPicker.markers.clearLayers();
     } else 
-        mapLocationPicker.markers = new mapLocationPicker.M.MarkerClusterGroup({maxClusterRadius:50});
+        mapLocationPicker.markers = new mapLocationPicker.M.markerClusterGroup({maxClusterRadius:50});
     $.ajax({
         url: url,
         dataType: "json",
@@ -34,7 +34,8 @@ function refreshMarkers(p, url, callback, mapLocationPicker) {
                     icon:icon,
                     clickable:load_content,
                     data:{id:(obv.id?obv.id:obv[1])}
-                });
+                }, false);//false parameter is to not validate markers as per bounds.
+                //assuming filter query get only valid markers
                 if(marker) m.push(marker);
             }
             mapLocationPicker.markers.addLayers(m);
