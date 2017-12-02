@@ -205,7 +205,7 @@ class Observation extends DataObject {
 			//XXX ignoring validator for checklist and its child observation. 
 			//all the observation generated from checklist will have source id in advance based on that we are ignoring validation.
 			// Genuine observation will not have source id and checklist as false
-			if(!obj.sourceId && !obj.isChecklist && !obj.externalId) 
+			if(!obj.sourceId && !obj.isChecklist && !obj.externalId && obj.protocol!=ProtocolType.LIST) 
 				val && val.size() > 0 
 		}
 		latitude nullable: false

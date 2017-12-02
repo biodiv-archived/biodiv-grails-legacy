@@ -124,7 +124,7 @@ class UFileController {
                     headerMetadata = getHeaderMetaDataInFormat(uploaded);
                     //println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
                 }
-                res = convertExcelToCSV(uploaded, params)
+                res = convertExcelToCSV(uploaded, params, ",");
                 if(res != null) {
                     isSimpleSheet = res.get("isSimpleSheet")
                     relPath = res.get("relPath")
@@ -568,7 +568,7 @@ class UFileController {
         return res
     }
 
-    private Map convertExcelToCSV(File uploaded, params ) {
+    private Map convertExcelToCSV(File uploaded, params , String separator = ',') {
         def compContent
         def spread
         File outCSVFile = utilsService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
@@ -581,7 +581,7 @@ class UFileController {
             def headerNameList = spread.get(0).collect {
                 StringEscapeUtils.escapeCsv(it.getKey());
             }
-            def  joinedHeader = headerNameList.join(",")
+            def  joinedHeader = headerNameList.join(separator)
             bw.write(joinedHeader + "\r\r\n\n")
 
             spread.each { rowMap->  
@@ -589,7 +589,7 @@ class UFileController {
                 rowMap.each{
                     rowValues << StringEscapeUtils.escapeCsv(it.getValue());
                 }
-                def joinedContent = rowValues.join(",")
+                def joinedContent = rowValues.join(separator)
                 bw.write(joinedContent + "\r\r\n\n")
             }
         }else{
@@ -616,7 +616,7 @@ class UFileController {
                 }
                 index = index + 1
             }
-            def  joinedHeader = headerRow.join(",")
+            def  joinedHeader = headerRow.join(separator)
             bw.write(joinedHeader + "\r\r\n\n")
             def counter = 0
             compContent.each{ stringRow ->
@@ -629,7 +629,7 @@ class UFileController {
                         }
                         k++;
                     }
-                    def joinedContent = rowValues.join(",")
+                    def joinedContent = rowValues.join(separator)
                     bw.write(joinedContent + "\r\r\n\n")
                 }
                 counter = counter + 1

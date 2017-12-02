@@ -768,6 +768,9 @@ class ObservationService extends AbstractMetadataService {
             }
         }
         utilsService.benchmark('findReco.sciName') {
+            println "--------------------"
+            println "--------------------"
+            println "--------------------"
             scientificNameReco = recommendationService.findReco(recoName, true, null, null, true, false);
         }
 

@@ -966,6 +966,7 @@ class UtilsService {
         if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
             println "%%%%%%%%%%%% logging sql ${blockName}"  
             sqlLogger.setLevel(Level.TRACE)
+            println "%%%%%%%%%%%% END logging sql ${blockName}"  
         }
         def result = closure.call()
 

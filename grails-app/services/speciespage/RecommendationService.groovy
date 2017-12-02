@@ -246,6 +246,7 @@ class RecommendationService {
 			}
 			
 			Recommendation reco;
+            println "###################################3"
             utilsService.benchmark('searchReco') {
                 reco = searchReco(name, isScientificName, languageId, taxonConceptForNewReco)
             }
