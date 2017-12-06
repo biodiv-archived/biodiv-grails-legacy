@@ -89,11 +89,13 @@
 
 							<label for="supportingModules" class="control-label"><g:message
 									code="dataPackage.supportingModules.label" default="${g.message(code:'dataPackage.supportingModules.label')}" /></label>
+
+                        <% def supportingModules = dataPackageInstance?dataPackageInstance.supportingModules():[]; %>
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
                                     <g:each in="${DataPackage.SupportingModules.list()}" var="supportingModule">
                                         <label class="checkbox" style="text-align: left;"> 
-                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" /> ${supportingModule.value()} 
+                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" ${supportingModules.contains(supportingModule)?'checked':''}/> ${supportingModule.value()} 
                                         </label>
                                     </g:each>
 									<div class="help-inline">
@@ -108,6 +110,7 @@
 						</div>
 
 
+                        <% def allowedDataTableTypes = dataPackageInstance?dataPackageInstance.allowedDataTableTypes():[]; %>
 						<div
 							class="row control-group left-indent ${hasErrors(bean: dataPackageInstance, field: 'allowedDataTableTypes', 'error')}">
 
@@ -117,7 +120,7 @@
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
                                     <g:each in="${DataPackage.DataTableType.list()}" var="allowedDataTableType">
                                         <label class="checkbox" style="text-align: left;"> 
-                                            <input type="checkbox" name="allowedDataTableType.${allowedDataTableType.ordinal()}" /> ${allowedDataTableType.value()} 
+                                            <input type="checkbox" name="allowedDataTableType.${allowedDataTableType.ordinal()}"  ${allowedDataTableTypes.contains(allowedDataTableType)?'checked':''}/> ${allowedDataTableType.value()} 
                                         </label>
                                     </g:each>
 									<div class="help-inline">
