@@ -4,7 +4,7 @@
 <%@ page import="species.dataset.DataPackage.SupportingModules"%>
 
 <% def supportingModules = (instance && instance instanceof Dataset1)?instance.dataPackage?.supportingModules():instance.dataset.dataPackage.supportingModules();
-if(instance.dataPackage == null) {
+if(instance && instance instanceof Dataset1 && instance.dataPackage == null) {
     supportingModules = supportingModules?:SupportingModules.list();
 }
 %>

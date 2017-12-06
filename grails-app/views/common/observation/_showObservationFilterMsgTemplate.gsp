@@ -7,6 +7,7 @@
 <%@ page import="species.NamesMetadata"%>
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.dataset.Dataset"%>
+<%@ page import="species.dataset.DataTable"%>
 <%@ page import="species.trait.Trait"%>
 <%@ page import="species.trait.Trait.DataTypes"%>
 <%@ page import="species.trait.TraitValue"%>
@@ -142,6 +143,29 @@
                  <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
                 </span>
             </g:elseif>
+            <g:if
+				test="${queryParam.key == 'dataTable' && queryParam.value instanceof Long }">
+				<g:if test="${queryParam.value && DataTable.read(queryParam.value)}">
+                                  <g:message code="text.in" />   <span class="highlight"><a
+						href="${uGroup.createLink(
+						controller:params.controller, action:params.action,
+						params:[dataTable: queryParam.value, isMediaFilter:false])}">
+                        ${DataTable.read(queryParam.value).title} </a>
+                    
+                        <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                        </span>
+                            </g:if>
+			</g:if>
+			<g:elseif test="${queryParam.key == 'dataTable' && queryParam.value}">
+                           		 <g:message code="text.in" /> <span class="highlight"><a
+					href="${uGroup.createLink(
+					controller:params.controller, action:params.action,
+					params:[dataTable: queryParam.value.id, isMediaFilter:false])}">
+						${queryParam.value.title } </a>  
+                 <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                </span>
+            </g:elseif>
+
 
 			<g:if
 				test="${queryParam.key == 'taxonRank' && queryParam.value instanceof Integer }">

@@ -18,8 +18,8 @@
 					<tr>
 						<th style="width:30%"><g:message code="dataPackage.name.label" /></th>
 						<th style="width:20%"><g:message code="default.name.label" /></th>
-						<th><g:message code="button.datasets" /></th>
-						<th><g:message code="default.observation.label"/></th>
+						<th>Allowed Supporting Modules</th>
+						<th>Allowed Datatable types</th>
 						<th><g:message code="button.last.updated" /></th>
 					</tr>
 				</thead>
