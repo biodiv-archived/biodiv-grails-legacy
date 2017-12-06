@@ -206,8 +206,10 @@
         });
 
         <g:if test="${datasetInstance.isAttached() }">
-        <%        def user = SUser.read(datasetInstance.party.contributorId);%>
+        if(dataset_contributor_autofillUsersComp.length > 0) {
+            <%        def user = SUser.read(datasetInstance.party.contributorId);%>
                 dataset_contributor_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
+                }
         </g:if>
 
         
@@ -267,8 +269,6 @@
 CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
 CKEDITOR.replace('description', config);
-<g:if test="${datasetInstance?.dataPackage}">
-</g:if>
 
         });
 

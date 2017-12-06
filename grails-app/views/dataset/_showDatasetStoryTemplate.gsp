@@ -41,12 +41,15 @@
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
                         %> 
-                        <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
+                            <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
                                 <%  
                                     styleVar = "none"
                                     clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
                                 %>
                             </g:if>
+                            <g:else>
+ <%                           clickcontentVar = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%>
+                            </g:else>
                             ${raw(clickcontentVar)}
                     
                         </div>
@@ -146,7 +149,7 @@
 
                     <div class="value linktext">
                         <g:if test="${datasetInstance.party.attributions}">
-                        ${datasetInstance.party.attributions}
+                        ${raw(datasetInstance.party.attributions.replaceAll('(?:\r\n|\r|\n)', '<br />'))}
                         </g:if>
                         <g:else>
                         ${datasetInstance.title} (${UtilsService.formatDate(datasetInstance.createdOn)})
