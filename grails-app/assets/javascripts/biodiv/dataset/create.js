@@ -193,7 +193,9 @@ $(document).ready(function() {
                 CKEDITOR.instances[instance].updateElement();
             }
 
-		    $('input[name="contributorUserIds"]').val(dataTable_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+            if(dataTable_contributor_autofillUsersComp.length > 0) {
+		        $('input[name="contributorUserIds"]').val(dataTable_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+            }
             $(".addDataTable").ajaxSubmit({ 
                 dataType: 'json', 
                 beforeSubmit: function(arr, $form, options) { 
