@@ -8,7 +8,7 @@
     <h5>
         <a name="${dataTableInstance.id}"></a>
         <span><g:message code="default.dataTable.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataTable':dataTableInstance.id, isMediaFilter:false) }" name="l${pos}">
+        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataTable':dataTableInstance.id, isMediaFilter:false, max:12, offset:0) }" name="l${pos}">
         ${dataTableInstance.title}
         </g:link>
 

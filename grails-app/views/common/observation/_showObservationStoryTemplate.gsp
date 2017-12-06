@@ -98,6 +98,11 @@
                 <g:render template="/datasource/showDatasourceSignatureTemplate" model="['instance':observationInstance.dataset.datasource, 'showDetails':true]"/>
                 </g:if>
 
+                <g:if test="${observationInstance.dataTable}">
+                <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':observationInstance.dataTable.dataset, 'showDetails':true, showTitleDetail:true ]"/>
+                </g:if>
+
+
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-share-alt"></i><g:message code="default.name.label" /></span>

@@ -63,7 +63,7 @@
                 <ul>
                   <li><a href="${uGroup.createLink('controller':'observation', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'checklist', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.checklist.label')}"><g:message code="default.checklist.label" /></a></li>
-                  <li><a href="${uGroup.createLink('controller':'dataset', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'dataset', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasets.label')}"><g:message code="default.datasets.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'datasource', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li>
  
                 </ul>
