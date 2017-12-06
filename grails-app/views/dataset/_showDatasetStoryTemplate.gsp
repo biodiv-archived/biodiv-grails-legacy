@@ -149,7 +149,7 @@
                         ${datasetInstance.party.attributions}
                         </g:if>
                         <g:else>
-                        ${datasetInstance.title} (${UtilsService.formatDate(datasetInstance.createOn)})
+                        ${datasetInstance.title} (${UtilsService.formatDate(datasetInstance.createdOn)})
                         </g:else>
                     </div>
                 </div>
