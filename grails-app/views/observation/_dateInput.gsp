@@ -9,7 +9,7 @@
 
 
     <div class="controls textbox">
-        <g:if test="${params.controller == 'checklist'}">
+        <g:if test="${params.controller != 'observation'}">
 
         <input name="fromDate" type="text" class="date" class="input-block-level"
         value="${observationInstance?.fromDate?.format('dd/MM/yyyy')}"

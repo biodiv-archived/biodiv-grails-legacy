@@ -12,6 +12,7 @@ class SpeciesTagLib {
     def springSecurityService;
     def speciesService;
 	def speciesPermissionService;
+    def utilsService;
 
 	def showSpeciesImages = { attrs, body->
 		out << render(template:"/common/speciesImagesTemplate", model:attrs.model);
@@ -199,8 +200,10 @@ class SpeciesTagLib {
 	}
 
 	def noOfContributedSpecies={attrs,body->
-		def noOfSpecies=speciesService.totalContributedSpecies(attrs.model.user)
-
+		def noOfSpecies;
+        utilsService.logSql ({
+        noOfSpecies = speciesService.totalContributedSpecies(attrs.model.user)
+        }, 'noOfContributedSpecies');
 		out << "<td class=countvaluecontributed>"+noOfSpecies+"</td>"
 
 	}

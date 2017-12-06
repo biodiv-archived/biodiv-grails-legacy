@@ -3,31 +3,10 @@
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
+<%@page import="species.auth.SUser"%>
 
 <div name="${datasetInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
-    <h5>
-        <a name="${datasetInstance.id}"></a>
-        <span><g:message code="dataset.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
-        ${datasetInstance.title}
-        </g:link>
-    
-    </h5>
-    <sUser:ifOwns model="['user':datasetInstance.author]">
-
-        <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-            href="${uGroup.createLink(controller:'dataset', action:'edit', id:datasetInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-            <i class="icon-edit"></i><g:message code="button.edit" /></a>
-
-        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;" data-id="${datasetInstance.id}"
-            href="#"
-            onclick="if(confirm('${message(code: 'default.delete.confirm.message', args:['dataset'], default: 'This dataset will be deleted. Are you sure ?')}')) {deleteDataset(this);}"><i class="icon-trash"></i><g:message code="button.delete" /></a>
-
-        </sUser:ifOwns>
-
-
-
-    <g:if test="${showFeatured}">
+   <g:if test="${showFeatured}">
     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
     </g:if>
 
@@ -41,36 +20,19 @@
     </div>
     </g:if>
     <g:else>
-    <%long noOfObservations = Observation.countByDatasetAndIsDeleted(datasetInstance, false)%>
-    <g:if test="${noOfObservations || datasetInstance.id == 3}">
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-        <div class="prop">
-            <g:if test="${showDetails}">
-            <span class="name"><i class="icon-share-alt"></i><g:message code="showdataset.observationCount" /></span>
-            </g:if>
-            <g:else>
-            <i class="pull-left icon-share-alt"></i>
-            </g:else>
-            <div class="value">
-                <g:if test="${datasetInstance.id != 3}">
-                <span class="stats_number" title="No of Observations">${noOfObservations}</span>
+        <g:if test="${showTitleDetail}">
+                <div class="prop">
+                    <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
+
+                    <div class="value">
+                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title}</b></a>
+                    </div>
+                </div>
                 </g:if>
 
-                <div>
-                    <%
-                    String url = uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false);
-                    if(datasetInstance.id == 3) {
-                        url = '/map?layers=lyr_410_butterflyspeciesdistribution&title=Butterfly';
-                    }
-                    %> 
-                    <g:link class="btn btn-small btn-primary" url="${url}" name="l${pos}">
-                    View All
-                    </g:link>
-                </div>
-            </div>
-        </div> 
-            </g:if>
-            
+
+
             <g:if test="${datasetInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">
@@ -86,7 +48,6 @@
                                 %>
                             </g:if>
                             ${raw(clickcontentVar)}
-                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
                     
                         </div>
                     </g:if>
@@ -100,7 +61,7 @@
                 </div>
             </g:if>
 
-            <g:if test="${datasetInstance.rights}">
+            <g:if test="${datasetInstance.access.licenseId}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
@@ -110,12 +71,10 @@
                     </g:else>
 
                     <div class="value">
-                        ${datasetInstance.rights}
+                        ${datasetInstance.access.licenseId}
                     </div>
                 </div>
-                </g:if>
-
-
+            </g:if>
             <g:if test="${showDetails}">
                 <div class="prop">
                     <g:if test="${showDetails}">
@@ -159,6 +118,24 @@
                 </div>
                 </g:if>
 
+            <g:if test="${datasetInstance.party.contributorId}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-user"></i><g:message code="default.contributors.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-user"></i>
+                    </g:else>
+
+                    <div class="value">
+                    <%def contributor = SUser.read(datasetInstance.party.contributorId);%>
+                        <a href="${uGroup.createLink(controller:'SUser', action:'show', id:contributor.id)}">${contributor.name}</a>
+                    </div>
+                </div>
+                </g:if>
+
+
+
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
@@ -168,11 +145,11 @@
                     </g:else>
 
                     <div class="value linktext">
-                        <g:if test="${datasetInstance.attribution}">
-                        ${datasetInstance.attribution}
+                        <g:if test="${datasetInstance.party.attributions}">
+                        ${datasetInstance.party.attributions}
                         </g:if>
                         <g:else>
-                        ${datasetInstance.datasource.title} (${UtilsService.formatDate(datasetInstance.publicationDate)}) ${datasetInstance.title}
+                        ${datasetInstance.title} (${UtilsService.formatDate(datasetInstance.publicationDate)})
                         </g:else>
                     </div>
                 </div>

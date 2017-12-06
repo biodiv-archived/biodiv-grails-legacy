@@ -129,9 +129,9 @@
 ////= require userGroups
 //= require biodiv/userGroups/main.js
 //= require biodiv/pages.js
-//= require biodiv/dataset.js
-//= require biodiv/trait.js
-
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
 //= require jquery.plugins/ion.rangeSlider.min
 //= require dropzone.js
+//= require biodiv/dataset/dataset.js
+//= require biodiv/dataset/create.js
+//= require biodiv/trait.js

@@ -13,11 +13,11 @@ function editCommentActivity(targetComp, commentId){
 
 }
 
-$('.cancelComment').live('click',function(){	
+$(document).on('click', '.cancelComment', function(){	
 	showComment($(this));	
 });
 
-$('.updateComment').live('click',function(){
+$(document).on('click', '.updateComment', function(){	
 	var that = $(this);
 	var editCommentWrapper = that.parent();
 	var message_body = that.parent().parent().find('.yj-message-body');
@@ -329,8 +329,7 @@ $(document).ready(function()
     var word=/@(\w+)/ig ;
     var word2=/@(\w+\s\w+)/ig ;
 
-$(".contentbox").live("keyup",function() 
-{
+$(document).on('keyup', '.contentbox', function(){	
     //stripTags($(this));
     var content=$(this).text();
     var go= content.match(start);
@@ -393,8 +392,7 @@ $(".contentbox").live("focusout",function() {
 });
 */
 
-$(".addname").live("click",function() 
-{
+$(document).on('click', '.addname', function(){	
     var username   = $(this).attr('title');
     var userId     = $(this).attr('id');
     var contentbox = $(this).parent().parent().find(".contentbox");

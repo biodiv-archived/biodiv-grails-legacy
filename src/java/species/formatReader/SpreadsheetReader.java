@@ -26,7 +26,7 @@ public class SpreadsheetReader {
 	private static DataFormatter formatter = new DataFormatter();
 	private static final Log log = LogFactory.getLog(SpreadsheetReader.class);
 	
-	public static List<List<Map>> readSpreadSheet(String file) {
+	public static List<List<Map>> readSpreadSheet(String file) throws Exception {
 		log.info("Reading spreadsheet "+file);
 		List<List<Map>> sheetContent = new ArrayList<List<Map>>();
 		InputStream inp;
@@ -51,7 +51,7 @@ public class SpreadsheetReader {
 
 	
 	public static List<Map> readSpreadSheet(String file, String sheetName,
-			int headerRowNo) {
+			int headerRowNo) throws Exception {
 		InputStream inp;
 		try {
 			inp = new FileInputStream(file);
@@ -73,7 +73,7 @@ public class SpreadsheetReader {
 
 	
 	public static List<Map> readSpreadSheet(String file, int sheetNo,
-			int headerRowNo) {
+			int headerRowNo) throws Exception {
 		InputStream inp;
 		try {
 			inp = new FileInputStream(file);
@@ -90,7 +90,7 @@ public class SpreadsheetReader {
 	}
 
 	private static List<Map> readSpreadSheet(Workbook wb, int sheetNo,
-			int headerRowNo) {
+			int headerRowNo) throws Exception{
 		List<Map> content = new ArrayList<Map>();
 
 		Sheet sheet = wb.getSheetAt(sheetNo);
@@ -122,8 +122,10 @@ public class SpreadsheetReader {
 								try{
 									value = getCellText(row.getCell(index, Row.CREATE_NULL_AS_BLANK));
 								}catch(RuntimeException e){
-									System.out.println("Error in Sheet Reading ||| Row Num " + row.getRowNum() + " === index " + index + "  column Name " + key);
-									throw(e);
+                                    System.out.println(row);
+                                    String msg = "Error in reading sheet @ RowNum " + row.getRowNum() + " === index " + index + "  columnName " + key;
+									System.out.println(msg);
+									throw(new Exception(msg, e));
 								}
                                 // String validTagName =
                                 // DocumentUtils.convertToValidXMLTagName(key);
@@ -150,7 +152,7 @@ public class SpreadsheetReader {
 		return content;
 	}
 
-	public static List<List<String>> readSpreadSheet(String file, int sheetNo) {
+	public static List<List<String>> readSpreadSheet(String file, int sheetNo) throws Exception{
 		InputStream inp;
 		try {
 			inp = new FileInputStream(file);

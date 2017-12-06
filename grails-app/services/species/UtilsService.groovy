@@ -966,6 +966,7 @@ class UtilsService {
         if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
             println "%%%%%%%%%%%% logging sql ${blockName}"  
             sqlLogger.setLevel(Level.TRACE)
+            println "%%%%%%%%%%%% END logging sql ${blockName}"  
         }
         def result = closure.call()
 
@@ -1323,6 +1324,20 @@ class UtilsService {
             String s = formatter.format(date);
                 System.out.println(s);
                 return s;
+    }
+    
+    public Map getTraits(String t) {
+        Map traits = [:];
+        if(t) {
+            t.split(';').each {
+                if(it) {
+                    String[] x = it.split(':');
+                    if(x.size() == 2)
+                        traits[x[0]] = x[1].trim();
+                }
+            }
+        }
+        return traits;
     }
 }
 

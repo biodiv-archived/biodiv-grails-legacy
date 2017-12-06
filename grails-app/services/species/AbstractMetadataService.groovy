@@ -100,10 +100,21 @@ class AbstractMetadataService extends AbstractObjectService {
             instance.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
         if( params.fromDate != ""){
+            if(params.fromDate && (params.fromDate instanceof Date)) {
+                instance.fromDate = params.fromDate;
+            } else if(params.fromDate) {
+                instance.fromDate = parseDate(params.fromDate);
+            }
             log.debug "Parsing date ${params.fromDate}"
-            instance.fromDate = parseDate(params.fromDate);
             log.debug "got ${instance.fromDate}"
-            instance.toDate = params.toDate ? parseDate(params.toDate) : instance.fromDate
+  
+            if(params.toDate && (params.toDate instanceof Date)) {
+                instance.toDate = params.toDate;
+            } else if(params.toDate) {
+                instance.toDate = parseDate(params.toDate);
+            } else {
+                instance.toDate = instance.toDate;
+            }
 
         }
 
@@ -136,7 +147,9 @@ class AbstractMetadataService extends AbstractObjectService {
         //        if(params.latitude && params.longitude) {
         //            instance.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
         //        } else 
-        if(params.areas) {
+        if(params.topology) {
+            instance.topology = params.topology;
+        } else if(params.areas) {
             log.debug "Setting topology ${params.areas}"
             WKTReader wkt = new WKTReader(geometryFactory);
             try {
@@ -158,7 +171,7 @@ class AbstractMetadataService extends AbstractObjectService {
         if (!instance.hasErrors() && instance.save(flush: true)) {
             //mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
             //String msg = messageSource.getMessage("instance.label", [instance.id], LCH.getLocale())
-            activityFeedService.addActivityFeed(instance, null, instance.author, feedType);
+            activityFeedService.addActivityFeed(instance, null, instance.getAuthor(), feedType);
             setAssociations(instance, params, sendMail);
             if(sendMail)
                 utilsService.sendNotificationMail(feedType, instance, null, params.webaddress);
@@ -175,7 +188,7 @@ class AbstractMetadataService extends AbstractObjectService {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
             }
-
+            println errors;
             def model = utilsService.getErrorModel("Failed to save ${instance}", instance, OK.value(), errors);
             return model;
         }
@@ -184,14 +197,18 @@ class AbstractMetadataService extends AbstractObjectService {
     def setAssociations(instance, params, sendMail) {
 
         def tags = (params.tags != null) ? ((params.tags instanceof List) ? params.tags : Arrays.asList(params.tags)) : new ArrayList();
-        instance.setTags(tags)
+        if(tags) {
+            instance.setTags(tags)
+        }
+        if(instance.metaClass.respondsTo(instance, "userGroups")) {
 
-        if(params.groupsWithSharingNotAllowed) {
-            setUserGroups(instance, [params.groupsWithSharingNotAllowed], sendMail);
-        } else {
-            List validUserGroups = getValidUserGroups(instance, params.userGroupsList);
-            if(validUserGroups)
-                setUserGroups(instance, validUserGroups, sendMail);
+            if(params.groupsWithSharingNotAllowed) {
+                setUserGroups(instance, [params.groupsWithSharingNotAllowed], sendMail);
+            } else {
+                List validUserGroups = getValidUserGroups(instance, params.userGroupsList);
+                if(validUserGroups)
+                    setUserGroups(instance, validUserGroups, sendMail);
+            }
         }
     }
 

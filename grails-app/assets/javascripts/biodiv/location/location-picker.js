@@ -975,7 +975,7 @@ function useTitle(obj){
 
 }(window.jQuery)); 
 
-$(document).ready(function() { 
+function initLocationPicker() {
   $('.placeName').attr('placeholder', $(".placeName").attr('rel')); 
 
 //alert($(".placename").attr('rel'));
@@ -996,9 +996,10 @@ $(document).ready(function() {
   });
   $(".address").unbind('click').click(loadMapInput);
 
-  $(function() {
 
-  });
+}
 
+$(document).ready(function() { 
+    initLocationPicker();
 });
 
