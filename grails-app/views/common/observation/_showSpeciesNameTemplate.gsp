@@ -26,7 +26,7 @@
 			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l +'#'+observationInstance.dataset.id+ '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_dataset+'</a>'
 		}
         if(observationInstance.dataTable && !isHeading) {
-            def l = uGroup.createLink(controller:'dataset', action:'show', id:observationInstance.dataTable.id,  'userGroupWebaddress':params?.webaddress, absolute:true) 
+            def l = uGroup.createLink(controller:'dataset', action:'show', id:observationInstance.dataTable.dataset.id, fragment:observationInstance.dataTable.id, 'userGroupWebaddress':params?.webaddress, absolute:true) 
 			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l +'#'+observationInstance.dataTable.id+ '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_dataTable+'</a>'
 		}
 
