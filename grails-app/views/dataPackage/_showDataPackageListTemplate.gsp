@@ -35,7 +35,7 @@
                                         href="${uGroup.createLink(controller:'dataPackage', action:'show', id:instance.id)}">
                                         <img
                                         class="normal_profile_pic"
-                                        src="${}" title="${instance.title}"
+                                        src="" title="${instance.title}"
                                         alt="${instance.title}" /> </a>
                                 </div>
 

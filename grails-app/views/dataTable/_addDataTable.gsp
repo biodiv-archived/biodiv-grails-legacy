@@ -1,5 +1,4 @@
 <div>
-    <h3 style="text-align:center;border-bottom:solid 1px lightgray;">Add ${dataTableInstance.dataTableType}</h3>
     <%
     def allowedExtensions = "['csv', 'xls', 'xlsx']"
 
@@ -62,8 +61,8 @@
                 <div class="btn btn-danger"
                 style="float: right; margin-right: 5px;">
                 <a
-                href="${createLink(mapping:'dataset', action:'delete', id:dataTableInstance?.id)}"
-                onclick="return confirm('${message(code: 'default.delete.confirm.message', args:['dataset'])}');"><g:message code="button.delete.dataset" /></a>
+                href="${createLink(mapping:'dataTable', action:'delete', id:dataTableInstance?.id)}"
+                onclick="return confirm('${message(code: 'default.delete.confirm.message', args:['dataset'])}');"><g:message code="button.delete.dataTable" /></a>
                 </div>
                 </g:if>
                 <a id="createDataTableSubmit" class="btn btn-primary" style="float: right; margin-right: 5px;">
