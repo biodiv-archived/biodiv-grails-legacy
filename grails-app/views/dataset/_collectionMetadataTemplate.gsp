@@ -1,9 +1,17 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.License"%>
+<%@ page import="species.dataset.Dataset1"%>
+<%@ page import="species.dataset.DataPackage.SupportingModules"%>
+
+<% def supportingModules = (instance && instance instanceof Dataset1)?instance.dataPackage?.supportingModules():instance.dataset.dataPackage.supportingModules();
+if(instance.dataPackage == null) {
+    supportingModules = supportingModules?:SupportingModules.list();
+}
+%>
 
 <div class="section">
+    <g:if test="${supportingModules.contains(SupportingModules.TITLE)}">
     <h3><g:message code="default.title.label" /> </h3>
- 
     <div class="control-group ${hasErrors(bean: instance, field: 'title', 'error')}">
         <label for="name" class="control-label"><g:message
             code="default.title.label" default="${g.message(code:'default.title.label')}" />*</label>
@@ -20,7 +28,9 @@
             </div>
         </div>
     </div>
+    </g:if>
 
+    <g:if test="${supportingModules.contains(SupportingModules.DESCRIPTION)}">
     <div class="control-group ${hasErrors(bean: instance, field: 'description', 'error')}">
         <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
         <div class="controls  textbox">
@@ -35,8 +45,10 @@
             </div>
         </div>
     </div>
+    </g:if>
 </div>
 
+    <g:if test="${supportingModules.contains(SupportingModules.ACCESS)}">
 <div class="section">
     <h3><g:message code="default.access.label" /> </h3>
     
@@ -75,7 +87,9 @@
         </div>
     </div>
 </div>
+</g:if>
 
+    <g:if test="${supportingModules.contains(SupportingModules.PARTY)}">
 <div class="section">
     <h3><g:message code="default.party.label" /> </h3>
 
@@ -106,18 +120,23 @@
         </div>
     </div>
 </div>
+</g:if>
 
+<g:if test="${supportingModules.contains(SupportingModules.TAXONOMIC_COVERAGE)}">
 <div class="section">
     <h3><g:message code="default.taxonomicCoverage.label" /> </h3>
     <g:render template="/observation/taxonInput" model="['instance':instance.taxonomicCoverage]"/>
 </div>
+</g:if>
 
-
+<g:if test="${supportingModules.contains(SupportingModules.TEMPORAL_COVERAGE)}">
 <div class="section">
     <h3><g:message code="default.temporalCoverage.label" /> </h3>
     <g:render template="/observation/dateInput" model="['observationInstance':instance.temporalCoverage]"/>
 </div>
+</g:if>
 
+<g:if test="${supportingModules.contains(SupportingModules.GEOGRAPHICAL_COVERAGE)}">
 <div class="section">
     <h3><g:message code="default.geographicalCoverage.label" /> </h3>
     <% def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : instance.geographicalCoverage; %>
@@ -126,9 +145,12 @@
     </div>
 
 </div>
+</g:if>
 
 <div class="section">
     <h3><g:message code="default.others.label" /> </h3>
+
+    <g:if test="${supportingModules.contains(SupportingModules.PROJECT)}">
      <div class="control-group ${hasErrors(bean: instance, field: 'project', 'error')}">
         <label for="project" class="control-label"><g:message
             code="default.project.label" default="${g.message(code:'default.project.label')}" /></label>
@@ -145,6 +167,10 @@
             </div>
         </div>
     </div>
+    </g:if>
+
+
+    <g:if test="${supportingModules.contains(SupportingModules.METHODS)}">
     <div class="control-group ${hasErrors(bean: instance, field: 'methods', 'error')}">
         <label for="name" class="control-label"><g:message
             code="default.methods.label" default="${g.message(code:'default.methods.label')}" /></label>
@@ -161,6 +187,7 @@
             </div>
         </div>
     </div>
+    </g:if>
 
     <div class="control-group ${hasErrors(bean: instance, field: 'externalUrl', 'error')}">
         <label for="source" class="control-label"><g:message

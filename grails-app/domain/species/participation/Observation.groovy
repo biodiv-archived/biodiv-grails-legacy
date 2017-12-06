@@ -697,6 +697,11 @@ class Observation extends DataObject {
 	def fetchChecklistAnnotation(){
 		def res = [:]
 		Checklists cl = Checklists.read(sourceId)
+        println  "*****************************************"
+        println  "*****************************************"
+        println checklistAnnotations
+        println  "*****************************************"
+        println  "*****************************************"
 		if(cl && checklistAnnotations){
 			def m = JSON.parse(checklistAnnotations)
 			cl.fetchColumnNames().each { name ->
@@ -730,6 +735,7 @@ class Observation extends DataObject {
             }
             res = m;
         }
+        println res;
 		return res
 	}
 
