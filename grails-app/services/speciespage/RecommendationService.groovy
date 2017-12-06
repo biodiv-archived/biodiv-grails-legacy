@@ -238,6 +238,7 @@ class RecommendationService {
 			// if sn then only sending to names parser for common name only cleaning
 			//XXX setting language id null for scientific name
 			if(isScientificName){
+                println  "Utils.getCanonicalForm Utils.getCanonicalForm Utils.getCanonicalForm "
                 name = Utils.getCanonicalForm(name);
 				languageId = null
 			}else{

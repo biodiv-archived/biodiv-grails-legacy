@@ -244,6 +244,7 @@
                    console.log(data);
                    if(data.success) {
                         $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
+                        window.location.href = data.url;
                         $(".datasetEditSection").hide();
                         $(".datasetShowSection").slideDown();
                    } else {

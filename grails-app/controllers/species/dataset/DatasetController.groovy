@@ -92,6 +92,7 @@ class DatasetController extends AbstractObjectController {
 			        redirect(controller:'dataset', action: "show", id: result.instance.id)
                 }
                 json {
+                    result.url = uGroup.createLink(action:'show', controller:"dataset", id:result.instance.id, 'userGroupWebaddress':params.webaddress);
                     render result as JSON 
                 }
                 xml {
@@ -117,7 +118,6 @@ class DatasetController extends AbstractObjectController {
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
 	def show() {
         params.id = params.long('id');
         def msg;
@@ -174,7 +174,6 @@ class DatasetController extends AbstractObjectController {
 		render(template:"/common/checklist/showChecklistDataTemplate", model:model);
 	}
 
-	@Secured(['ROLE_ADMIN'])
 	def list() {
 		def model = getDatasetList(params);
         model.userLanguage = utilsService.getCurrentLanguage(request);
@@ -231,18 +230,6 @@ class DatasetController extends AbstractObjectController {
         def count = filteredDataset.instanceTotal	
 
         activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
-
-        if(params.append?.toBoolean() && session["obv_ids_list"]) {
-            session["dataset_ids_list"].addAll(instanceList.collect {
-                params.fetchField?it[0]:it.id
-            }); 
-        } else {
-            session["dataset_ids_list_params"] = params.clone();
-            session["dataset_ids_list"] = instanceList.collect {
-                params.fetchField?it[0]:it.id
-            };
-        }
-        log.debug "Storing all dataset ids list in session ${session['dataset_ids_list']} for params ${params}";
         return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset']
 	}
 

@@ -1,5 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@page import="species.dataset.Dataset1"%>
+<%@page import="species.dataset.DataTable"%>
 
 <html>
     <head>
@@ -10,31 +12,40 @@
         <r:require modules="checklist"/>
         <style>
             .observation_story .observation_footer {
-                margin-top:50px;
+            margin-top:50px;
+            }
+            .list_view li:nth-child(odd) {
+                margin-left:0px;
+            }
+            .list_view li:nth-child(even) {
+                clear:right;
             }
         </style>
     </head>
     <body>
 
-        <div class="row-fluid namelist-wrapper span12">
+        <div class="row-fluid span12">
 
-	        <clist:showSubmenuTemplate />
-             <g:if test="${datasetInstance}">
-                            <g:set var="featureCount" value="${0}"/>
+            <clist:showSubmenuTemplate />
+            <g:if test="${datasetInstance}">
+            <g:set var="featureCount" value="${0}"/>
             </g:if>
 
             <div class="page-header clearfix">
                 <div style="width:100%;">
                     <div class="main_heading" style="margin-left:0px; position:relative">
-                    <%def featuredTitle = g.message(code:"title.feature")%>
-                        <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? featuredTitle:''}"></span>
+                        <%
+                        def featuredTitle = g.message(code:"title.feature")
+                        %>
+                        <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? featuredTitle:''}">
+                        </span>
 
                         <div class="pull-right">
-                            <sUser:ifOwns model="['user':datasetInstance.getAuthor()]">
+                            <sUser:ifOwns model="['user':datasetInstance.author]">
 
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'dataTable', action:'create', dataset:datasetInstance.id)}"
-                                ><i class="icon-plus"></i><g:message code="default.add.label" args="['DataTable']" /></a>
+                                ><i class="icon-plus"></i><g:message code="button.create.dataTable" /></a>
 
 
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
@@ -49,7 +60,7 @@
 
                         </div>
                         <s:showHeadingAndSubHeading
-                            model="['preText':'Dataset : ','heading':datasetInstance.title, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
+                            model="['preText':'Dataset : ', 'heading':datasetInstance.title, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 
                         </div>
                     </div>
@@ -57,30 +68,29 @@
                 </div>	
 
                 <div class="span12 right-shadow-box observation" style="margin:0">
-                        <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':datasetInstance, showDetails:true,'userLanguage':userLanguage]"/>
+                    <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':datasetInstance, showDetails:true,'userLanguage':userLanguage]"/>
+
+                    <div class="mainContentList">
+                        <div class="mainContent">
+                            <ul class="list_view obvListWrapper" style="list-style:none;margin-left:0px;">
+                                <g:each in="${DataTable.findAllByDatasetAndIsDeleted(datasetInstance, false, [sort:'createdOn', order:'desc'])}" var="dataTableInstance">
+                                <li id="dataTable_${dataTableInstance.id}" class="span6" style="margin-top:10px;">
+                                <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage]"/>
+                                </li>
+                                </g:each>
+                            </ul>			
+                        </div>
+                    </div>
+
                     <div class="union-comment">
                         <feed:showAllActivityFeeds model="['rootHolder':datasetInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                         <comment:showAllComments model="['commentHolder':datasetInstance, commentType:'super','showCommentList':false]" />
                     </div>
 
                 </div>
+
+
             </div>	
-            <asset:script>
-            $(document).ready(function(){
-           
-            function deleteDataset(){
-                var test=${message(code: 'default.delete.confirm.message', args:['dataset'], default: 'This dataset will be deleted. Are you sure ?')}';
-                if(confirm(test)){
-                    $.ajax({
-                        url:window.params.dataset.deleteUrl,
-                        method:'POST',
-                        dataType: "json",
-                        data:{'id':$(this).data('id')},
-                        success: function(data) {
-                        }
-                    });
-                }
-            }
-            </asset:script>
-        </body>
-    </html>
+        </div>
+    </body>
+</html>

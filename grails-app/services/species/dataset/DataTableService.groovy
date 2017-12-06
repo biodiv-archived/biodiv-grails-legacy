@@ -178,7 +178,7 @@ class DataTableService extends AbstractMetadataService {
       
         dataTable.lastRevised = new Date();
 
-        DataTable.withTransaction {
+    //    DataTable.withTransaction {
             result = save(dataTable, params, true, null, feedType, null);
             if(result.success) {
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
@@ -198,7 +198,7 @@ class DataTableService extends AbstractMetadataService {
                     break;
                 }
             }
-        } 
+    //    } 
         return result;
 	}
 /*

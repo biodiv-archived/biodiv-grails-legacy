@@ -31,6 +31,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 import species.Metadata;
 import species.utils.Utils;
 import species.Language;
+import species.groups.UserGroup;
 /**
  * @author sravanthi
  *
@@ -72,6 +73,9 @@ abstract class CollMetadata implements Taggable, Rateable {
 	int featureCount = 0;
 	
 	boolean isDeleted = false;
+
+    static hasMany = [userGroups:UserGroup];
+	static belongsTo = [UserGroup]
 
 	//EML-physical
 //	UFile uFile;
@@ -159,21 +163,24 @@ abstract class CollMetadata implements Taggable, Rateable {
         }
 
         //geographicalCoverage
-        this.geographicalCoverage = new GeographicalCoverage([placeName:params.placeName, latitude:params.double('latitude'), longitude:params.double('longitude')]);
-        def locScale =  Metadata.LocationScale.getEnum(params.locationScale)
-        this.geographicalCoverage.locationScale = locScale?:Metadata.LocationScale.APPROXIMATE
-        //this.geographicalCoverage.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
+        if((params.latitude && params.longitude) || params.areas) {
+            this.geographicalCoverage = new GeographicalCoverage([placeName:params.placeName, latitude:params.double('latitude'), longitude:params.double('longitude')]);
 
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        params.areas = params.areas?:params.topology;
-        if(params.areas) {
-            log.debug "Setting topology ${params.areas}"
-            WKTReader wkt = new WKTReader(geometryFactory);
-            try {
-                Geometry geom = wkt.read(params.areas);
-                this.geographicalCoverage.topology = geom;
-            } catch(ParseException e) {
-                log.error "Error parsing polygon wkt : ${params.areas}"
+            def locScale =  Metadata.LocationScale.getEnum(params.locationScale)
+            this.geographicalCoverage.locationScale = locScale?:Metadata.LocationScale.APPROXIMATE
+            //this.geographicalCoverage.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
+
+            GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+            params.areas = params.areas?:params.topology;
+            if(params.areas) {
+                log.debug "Setting topology ${params.areas}"
+                WKTReader wkt = new WKTReader(geometryFactory);
+                try {
+                    Geometry geom = wkt.read(params.areas);
+                    this.geographicalCoverage.topology = geom;
+                } catch(ParseException e) {
+                    log.error "Error parsing polygon wkt : ${params.areas}"
+                }
             }
         }
 

@@ -8,12 +8,17 @@
 	<!-- main_content -->
 	<div class="list" style="margin-left:0px;clear:both">
 		<div class="filters" style="position: relative;">
+		<div class="filters" style="position: relative;">
+			<obv:showGroupFilter
+			    model="[forObservations:false, hideHabitatFilter:true]" />
+		</div>
+	
 		</div>
 		<div class="observation thumbwrap">
 			<div class="observation">
 				<div>
 					<obv:showObservationFilterMessage
-						model="['instanceList':instanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'observation']" />
+						model="['instanceList':instanceList, 'instanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'dataset']" />
 						
 				</div>
 				<div style="clear: both;"></div>
@@ -43,24 +48,24 @@
 
 				
 			</div>
-            <div class="span8 right-shadow-box" style="margin:0px;clear:both;">
+            <div class="span12 right-shadow-box" style="margin:0px;clear:both;">
                 <g:render template="/dataset/showDatasetListTemplate"/>
             </div>
-            <div class="span4" style="position:relative;top:20px">
+            <!--div class="span4" style="position:relative;top:20px">
 
                 <div id="observations_list_map" class="observation sidebar_section"
                     style="clear:both;overflow:hidden;display:none;">
                     <h5><g:message code="default.species.distribution.label" /></h5>
                 </div>
-             </div>
+             </div-->
         </div>
     </div>
 
 	<!-- main_content end -->
 </div>
-<r:script type="text/javascript">
+<asset:script type="text/javascript">
 $(document).ready(function() {
-    window.params.tagsLink = "${uGroup.createLink(controller:'observation', action: 'tags')}"
+    window.params.tagsLink = "${uGroup.createLink(controller:'dataset', action: 'tags')}"
 
     $("#map_view_bttn a").click(function(){
         $(this).parent().css('background-color', '#9acc57');
@@ -87,7 +92,7 @@ $(document).ready(function() {
         $("#bounds").val('');
         refreshMapBounds(mapLocationPicker);
     });
-
+    mapViewSlideToggleHandler();
 });
-</r:script>
+</asset:script>
 

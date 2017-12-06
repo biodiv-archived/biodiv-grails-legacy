@@ -59,7 +59,7 @@ class DataTableController extends AbstractObjectController {
 		def dataTableInstance = DataTable.findWhere(id:params.id?.toLong(), isDeleted:false)
 		if (!dataTableInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'DataTable'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
 		} else if(utilsService.ifOwns(dataTableInstance.author)) {
             String dir = (new File(grailsApplication.config.speciesPortal.content.rootDir + dataTableInstance.uFile.path).parentFile).getAbsolutePath().replace(grailsApplication.config.speciesPortal.content.rootDir, '');
@@ -69,7 +69,7 @@ class DataTableController extends AbstractObjectController {
 			render(view: "create", model: [dataTableInstance: dataTableInstance, multimediaFile:multimediaFile, mappingFile:mappingFile, multimediaMappingFile:multimediaMappingFile, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
-			redirect (url:uGroup.createLink(action:'show', controller:"datasource", id:dataTableInstance.datasource.id, 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'show', controller:"dataset", id:dataTableInstance.dataset.id, 'userGroupWebaddress':params.webaddress))
 		}
 	}
 
@@ -105,6 +105,7 @@ class DataTableController extends AbstractObjectController {
 			        redirect(controller:'datatable', action: "show", id: result.instance.id)
                 }
                 json {
+                    result.url = uGroup.createLink(action:'show', controller:"dataset", id:result.instance.dataset.id, fragment:'dataTable_'+result.instance.id, 'userGroupWebaddress':params.webaddress);
                     render result as JSON 
                 }
                 xml {
@@ -130,7 +131,6 @@ class DataTableController extends AbstractObjectController {
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
 	def show() {
         params.id = params.long('id');
         def msg;
@@ -142,7 +142,7 @@ class DataTableController extends AbstractObjectController {
                 withFormat {
                     html {
 				        flash.message = model.msg;
-				        redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
+				        redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
                     }
                     json { render model as JSON }
                     xml { render model as XML }
@@ -177,7 +177,6 @@ class DataTableController extends AbstractObjectController {
         }
 	}
 
-	@Secured(['ROLE_ADMIN'])
 	def list() {
 		def model = getDataTableList(params);
         model.userLanguage = utilsService.getCurrentLanguage(request);

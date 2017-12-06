@@ -50,6 +50,7 @@ function loadSpeciesGroupTraits() {
         type:'json',
         success: function(data) {   
             $('#speciesGroupTraits').data('speciesGroupTraitsList', data.model.instanceList);
+            showSampleDataTable();
         }
     });
     return false;
@@ -70,6 +71,10 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         el += "<th>"+n.name+"</th>";
     });
     el += "</tr><tr>"
+    var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
+        if(speciesGroupTraitsList === undefined) {
+            alert("Please click a species group to show respective traits");
+        } 
     $.each(columns, function(i, n){
         //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
         el += "<th><select class='mapColumns' multiple name='attribute."+n.name+"'>";
@@ -82,10 +87,15 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         el += "<option class='generalColumn' value='longitude'>Longitude</option></optgroup>"; 
 
         el += "<optgroup label='Traits'>"
-        $.each($('#speciesGroupTraits').data('speciesGroupTraitsList'), function(index, val) {
-            el += "<option class='traitColumn' value='trait."+val.id+"'>"+val.name+"</option>"; 
-        });
-        el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
+        var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
+        if(speciesGroupTraitsList === undefined) {
+        //    alert("Please click a species group to show respective traits");
+        } else {
+            $.each(speciesGroupTraitsList, function(index, val) {
+                el += "<option class='traitColumn' value='trait."+val.id+"'>"+val.name+"</option>"; 
+            });
+        }
+        //el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
         el += "</select>";
         el += "</th>";
     });
@@ -95,7 +105,7 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
     });
     el += "</tr><tr>"
     $.each(columns, function(i, n){
-        el += "<td>"+data[0][n.name]+"</td>";
+        el += "<td>"+data[1][n.name]+"</td>";
     });
     el += "</tr>";
 
@@ -109,16 +119,16 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         nonSelectedText: "Select Mapping",
         maxHeight:300,
         buttonWidth:200,
-        enableCaseInsensitiveFiltering: true,
+        enableCaseInsensitiveFiltering: false,
         onChange: function(option, checked, select) {
             var values = [];
-            console.log(select);
             option.parent().parent().find('option').each(function() {
                 if ($(this).val() !== option.val()) {
                     values.push($(this).val());
                 }
             });                                                                                             
             option.parent().parent().multiselect('deselect', values);
+            $('.mapColumns').next().removeClass('open');
         }
     });
 
@@ -187,21 +197,23 @@ $(document).ready(function() {
                 beforeSubmit: function(arr, $form, options) { 
                     // The array of form data takes the following form: 
                     // [ { name: 'username', value: 'jresig' }, { name: 'password', value: 'secret' } ] 
-                    $('#addDataTable').hide();
+                    /*$('#addDataTable').hide();
                     var str = "<div id='' class='dataTable sidebar_section observation_story'><h5>Uploading dataTable : </h5>";
                     $.each(arr, function(index, p) {
                         str += "<div class='prop'><span class='name'>"+p.name+"</span><div class='value'>"+p.value+"</div></div>";
                     });
                     $('#workspace').prepend(str+"</div>");
-                    return true;
+                    return true;*/
                 },
                 success: function(data, statusText, xhr) {
                    console.log(data);
                    if(data.success) {
                         $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
                         //TODO:show dataTable snippet and remove form
-                        
+                        //redirect to show page
+                        window.location.href = data.url;
                    } else {
+                        window.scrollTo(0, 0);
                         $(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
                         $.each(data.errors, function(index, value) {
                              $(".addDataTable").find('[name='+value.field+']').parents(".control-group").addClass("error");

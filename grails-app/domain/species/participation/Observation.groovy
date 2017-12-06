@@ -29,6 +29,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import java.io.InputStream;
 import species.trait.Fact;
 import species.groups.UserGroup.FilterRule;
+import species.dataset.DataTable;
 
 class Observation extends DataObject {
 	
@@ -192,7 +193,7 @@ class Observation extends DataObject {
     int noOfIdentifications=0;
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
-	static belongsTo = [SUser, UserGroup, Checklists, Dataset]
+	static belongsTo = [SUser, UserGroup, Checklists, Dataset, DataTable]
     static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
 
  	static constraints = {

@@ -4,13 +4,28 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 
-<div name="${datasetInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
+<div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
     <h5>
-        <a name="${datasetInstance.id}"></a>
-        <span><g:message code="dataset.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
-        ${datasetInstance.title}
+        <a name="${dataTableInstance.id}"></a>
+        <span><g:message code="default.dataTable.label" /> : </span>
+        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataTable':dataTableInstance.id, isMediaFilter:false) }" name="l${pos}">
+        ${dataTableInstance.title}
         </g:link>
+                        <div class="pull-right">
+                            <sUser:ifOwns model="['user':dataTableInstance.author]">
+
+                            <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'dataset', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                <i class="icon-edit"></i><g:message code="button.edit" /></a>
+
+                            <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'dataset', action:'flagDeleted', id:dataTableInstance.id)}"
+                                onclick="return confirm('${message(code: 'default.dataset.delete.confirm.message', default: 'This dataset will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+
+                            </sUser:ifOwns>
+
+                        </div>
+ 
     
     </h5>
     <g:if test="${showFeatured}">
@@ -23,12 +38,12 @@
             <div class="heading">
             </div>
         </div>
-        <g:render template="/common/featureNotesTemplate" model="['instance':datasetInstance, 'featuredNotes':featuredNotes, 'userLanguage': userLanguage]"/>
+        <g:render template="/common/featureNotesTemplate" model="['instance':dataTableInstance, 'featuredNotes':featuredNotes, 'userLanguage': userLanguage]"/>
     </div>
     </g:if>
     <g:else>
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-            <g:if test="${datasetInstance.description}">
+            <g:if test="${dataTableInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
@@ -36,19 +51,19 @@
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
                         %> 
-                        <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
+                        <g:if test="${dataTableInstance?.language?.id != userLanguage?.id}">
                                 <%  
                                     styleVar = "none"
-                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataTableInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
                                 %>
                             </g:if>
                             ${raw(clickcontentVar)}
-                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
+                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(dataTableInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
                     
                         </div>
                     </g:if>
                     <g:else>
-                    <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
+                    <% String desc = dataTableInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
                     <div class="value notes_view linktext ellipsis multiline">
                         ${raw(desc)}
                     </div>
@@ -57,7 +72,7 @@
                 </div>
             </g:if>
 
-            <g:if test="${datasetInstance.access.rights}">
+            <g:if test="${dataTableInstance.access.rights}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
@@ -67,7 +82,7 @@
                     </g:else>
 
                     <div class="value">
-                        ${datasetInstance.access.rights}
+                        ${dataTableInstance.access.rights}
                     </div>
                 </div>
                 </g:if>
@@ -83,7 +98,7 @@
                     </g:else>
                     <div class="value">
                         <time class="timeago"
-                        datetime="${datasetInstance.createdOn.getTime()}"></time>
+                        datetime="${dataTableInstance.createdOn.getTime()}"></time>
                     </div>
                 </div>
 
@@ -96,12 +111,12 @@
                     </g:else>
                     <div class="value">
                         <time class="timeago"
-                        datetime="${datasetInstance.lastRevised?.getTime()}"></time>
+                        datetime="${dataTableInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
 
 
-                <g:if test="${datasetInstance.externalUrl}">
+                <g:if test="${dataTableInstance.externalUrl}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i><g:message code="default.externalId.label" /></span>
@@ -111,7 +126,7 @@
                     </g:else>
 
                     <div class="value">
-                        <a href="${datasetInstance.externalUrl}">${datasetInstance.externalId?:datasetInstance.externalUrl}</a> 
+                        <a href="${dataTableInstance.externalUrl}">${dataTableInstance.externalId?:dataTableInstance.externalUrl}</a> 
                     </div>
                 </div>
                 </g:if>
@@ -125,11 +140,11 @@
                     </g:else>
 
                     <div class="value linktext">
-                        <g:if test="${datasetInstance.party.attributions}">
-                        ${datasetInstance.party.attributions}
+                        <g:if test="${dataTableInstance.party.attributions}">
+                        ${dataTableInstance.party.attributions}
                         </g:if>
                         <g:else>
-                        ${datasetInstance.title} (${UtilsService.formatDate(datasetInstance.publicationDate)})
+                        ${dataTableInstance.title} (${UtilsService.formatDate(dataTableInstance.publicationDate)})
                         </g:else>
                     </div>
                 </div>

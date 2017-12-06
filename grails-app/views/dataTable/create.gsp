@@ -99,7 +99,9 @@
 
                         <div id="dataTableShowSection" class="section">
                             <!--h3>Dataset</h3-->
+                            <%--
                             <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':dataTableInstance.dataset, showDetails:true, userLanguage:userLanguage]"/>
+                            --%>
                         </div>
 
                         <!--div class="section">

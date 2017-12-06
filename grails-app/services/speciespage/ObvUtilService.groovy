@@ -37,6 +37,9 @@ import grails.converters.JSON;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import species.participation.Observation.BasisOfRecord;
 import species.participation.Observation.ProtocolType;
+import species.License;
+import species.License.LicenseType;
+
 
 class ObvUtilService {
 
@@ -105,6 +108,7 @@ class ObvUtilService {
 	def commentService
     def messageSource;
     def sessionFactory;
+    def factService;
 
     SpeciesGroup defaultSpeciesGroup;
     Habitat defaultHabitat;
@@ -712,6 +716,9 @@ class ObvUtilService {
 
         if(m[DwCObservationImporter.ANNOTATION_HEADER])
             obvParams['checklistAnnotations'] = m[DwCObservationImporter.ANNOTATION_HEADER] as JSON;
+        if(m[DwCObservationImporter.TRAIT_HEADER])
+            obvParams['traits'] = m[DwCObservationImporter.TRAIT_HEADER];
+
 
 
 		obvParams['basisOfRecord'] = m[BASISOFRECORD] ? BasisOfRecord.getEnum(m[BASISOFRECORD]): BasisOfRecord.HUMAN_OBSERVATION;
@@ -775,7 +782,9 @@ class ObvUtilService {
 
 				params.obvId = observationInstance.id
 				params.author = observationInstance.author
+                println "11111111111"
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+                println "2222222222"
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
@@ -796,11 +805,9 @@ class ObvUtilService {
 
     private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null) {
         params.identifiedBy = params.identifiedBy;
-
-        utilsService.benchmark('addReco') {
-            addReco(params, observationInstance, newObv)
-        }
-
+println "333333333333"
+        addReco(params, observationInstance, newObv)
+println "444444444444"
         if(uploadLog) 
             uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id;
         
@@ -813,6 +820,7 @@ class ObvUtilService {
             def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
             observationInstance.setTags(tags);
         }
+
         utilsService.benchmark('setGroups') {
             if(params.groupsWithSharingNotAllowed) {
                 observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
@@ -823,7 +831,17 @@ class ObvUtilService {
             }
         }
 		
-        if(!observationInstance.save(flush:true)){
+        //customFieldService.updateCustomFields(params, observationInstance.id)
+        utilsService.benchmark('setTraits') {
+            println "Saving Traits"
+        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
+        traitParams.putAll(params.traits);
+        println "---------------------"
+        println traitParams;
+        factService.updateFacts(traitParams, observationInstance);
+        }
+
+        if(!observationInstance.save()){
             if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
                 observationInstance.errors.allErrors.each { 
                     if(uploadLog) uploadLog << "\n"+it; 
@@ -834,10 +852,8 @@ class ObvUtilService {
 
 	private addReco(params, Observation observationInstance, boolean newObv=false){
 		def recoResultMap;
-        utilsService.benchmark('observationService.getRecommendation') {
-            params.flushImmediately = false;
-            recoResultMap = observationService.getRecommendation(params);
-        }
+        params.flushImmediately = false;
+        recoResultMap = observationService.getRecommendation(params);
         println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
@@ -862,7 +878,7 @@ class ObvUtilService {
                 recommendationVoteInstance.votedOn = dateIdentified;
             }
 		}
-		
+	println "savingRecoVote savingRecoVote savingRecoVote savingRecoVote savingRecoVote"	
         utilsService.benchmark('savingRecoVote') {
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save()) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance

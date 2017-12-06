@@ -228,6 +228,9 @@ class DatasetService extends AbstractMetadataService {
     }
 
     def getFilteredDatasetFilterQuery(params) {
+        def allSGroupId = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id.toString();
+        params.sGroup = (params.sGroup)? params.sGroup : allSGroupId;
+
         //params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         //params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         //params.habitat = params.habitat.toLong()
@@ -258,7 +261,7 @@ class DatasetService extends AbstractMetadataService {
         else {
             query += " obv "
         }
-        query += " from Dataset obv "
+        query += " from Dataset1 obv "
 
         def filterQuery = " where obv.isDeleted = :isDeleted "
         
@@ -312,9 +315,40 @@ class DatasetService extends AbstractMetadataService {
             activeFilters["daterangepicker_end"] =  params.daterangepicker_end
         }
 
-      
+      if(params.sGroup){
+
+            List  groupIdList=[];
+            params.sGroup.split(',').each{ sGroupId->
+                if(sGroupId) {
+                    try {
+                        sGroupId = sGroupId.toLong();
+                        if(sGroupId != allSGroupId) {
+                            println sGroupId;
+                            def sGId = getSpeciesGroupIds(sGroupId);
+                            if(sGId) {
+                                groupIdList << sGId;
+                            }
+                        }
+                    } catch(NumberFormatException e) {
+                        println e.getMessage();
+                    }
+                }
+            }
+
+
+            if(!groupIdList){
+                log.debug("No valid groups for id " + groupIdList);
+                }else{
+                    filterQuery += " and obv.taxonomicCoverage.groupId in (:sGroup) "
+                    queryParams["sGroup"] = groupIdList
+                    activeFilters["sGroup"] = groupIdList
+                }
+
+        }
+
+
         
-		def allDatasetCountQuery = "select count(*) from Dataset obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+		def allDatasetCountQuery = "select count(*) from Dataset1 obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 	
         orderByClause = " order by " + orderByClause;
 

@@ -140,10 +140,13 @@ class UFileController {
             //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
 			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
-
+            e.printStackTrace();
 			log.error("Failed to upload file.", e)
 			return render(text: [success:false] as JSON, contentType:'text/html')
-		}
+		} catch(Exception e) {
+            e.printStackTrace();
+			return render(text: [success:false, 'msg':"Failed to upload file. Error:"+e.getMessage()] as JSON, contentType:'text/html')
+        }
 	}
 
 	/**

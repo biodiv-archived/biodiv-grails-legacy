@@ -53,6 +53,7 @@ import species.Species;
 import species.Metadata
 import species.SpeciesPermission;
 import species.dataset.Dataset;
+import species.dataset.DataTable;
 
 
 //import org.apache.lucene.document.DateField;
@@ -1587,6 +1588,23 @@ class ObservationService extends AbstractMetadataService {
                 }
             }
         }
+
+        if(params.dataTable) {
+            if(params.dataTable == 'false') {
+                filterQuery += " and obv.data_table_id is null ";
+                queryParams['dataTable'] = false
+                activeFilters['dataTable'] = false
+            } else {
+                def dataTable = DataTable.read(params.dataTable.toLong());
+                if(dataTable) {
+                    queryParams['dataTable'] = dataTable.id
+                    activeFilters['dataTable'] = dataTable.id
+
+                    filterQuery += " and obv.data_table_id = :dataTable ";
+                }
+            }
+        }
+
         /*
 		if(params.isMediaFilter && params.isMediaFilter.toBoolean()){
 			filterQuery += " and obv.is_showable = true ";

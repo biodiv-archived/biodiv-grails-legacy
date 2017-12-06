@@ -22,10 +22,10 @@
         <g:set var="dataset_contributor_autofillUsersId" value="contributor_id" />
         <g:render template="/dataset/collectionMetadataTemplate" model="['instance':dataTableInstance, autofillUserComp:dataset_contributor_autofillUsersId]"/>
         <div class="section">
-            <h3><g:message code="default.datatable.label" /> </h3>
+            <h3><g:message code="default.dataTable.label" /> </h3>
     
                 <div class="upload_file" style="display:inline-block">
-                    <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'showSampleDataTable()']" />
+                    <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:' if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">
                     <div id="myGrid" class=" ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;height:350px;overflow:auto;"></div>

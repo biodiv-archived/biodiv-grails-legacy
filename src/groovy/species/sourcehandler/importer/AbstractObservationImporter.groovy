@@ -10,6 +10,7 @@ import java.io.InputStream;
 abstract class AbstractObservationImporter extends AbstractImporter {
 
     public static String ANNOTATION_HEADER = 'Annotations';
+    public static String TRAIT_HEADER = 'traits';
     public static String MEDIA_ANNOTATION_HEADER = 'media_annotations';
 
     protected CSVReader observationReader
@@ -232,9 +233,20 @@ abstract class AbstractObservationImporter extends AbstractImporter {
             dataToWrite.add(temp.toArray(new String[0]))
         }
         mapping.attribute.each { ipColumnName, mappedColumnName ->
-            if(mappedColumnName instanceof Map) {
-                println mappedColumnName    
+            println ipColumnName
+            println mappedColumnName;
+            
+                println "%%%%%%%%%%%%%%55^^^^^^^^^^^^^^TRAIT^^^^^^^^^^^^^^^^^^^^"
+            if(mappedColumnName.startsWith("trait.")) {
+                println "^^^^^^^^^^^^^^TRAIT^^^^^^^^^^^^^^^^^^^^"
+                println mappedColumnName 
+                String column = ipColumnName;
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
+                def temp = [];
+                temp.add("http://ibp.org/terms/trait/mappedColumn/"+mappedColumnName.replace("trait.",""));
+                temp.add(column);
+                temp.add("10000");
+                dataToWrite.add(temp.toArray(new String[0]))
             }
         }
 
@@ -349,8 +361,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                             m[header.field] = row[header.column]
                         }
                     } 
-
+                    
+                    
                     if(row.size()>header.column && row[header.column]) {
+                        
                         if(!m[ANNOTATION_HEADER]) m[ANNOTATION_HEADER] =  new java.util.LinkedHashMap();
                         String value = row[header.column];
                         switch(dwcObvHeader[header.column].toLowerCase()) {
@@ -360,6 +374,11 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                             value = 'http://www.gbif.org/dataset/'+value; break;
                         } 
                         m[ANNOTATION_HEADER][dwcObvHeader[header.column]] = value;  
+                        
+                        if(!m[TRAIT_HEADER]) m[TRAIT_HEADER] =  new java.util.LinkedHashMap();
+                        if(header.url && header.url.startsWith("http://ibp.org/") && row[header.column]) {
+                            m[TRAIT_HEADER][header.url.replace("http://ibp.org/terms/trait/mappedColumn/","")] = value;  
+                        }
                     }
                 }
             }

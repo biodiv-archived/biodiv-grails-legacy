@@ -3,17 +3,10 @@
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
+<%@page import="species.auth.SUser"%>
 
 <div name="${datasetInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
-    <h5>
-        <a name="${datasetInstance.id}"></a>
-        <span><g:message code="dataset.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
-        ${datasetInstance.title}
-        </g:link>
-    
-    </h5>
-    <g:if test="${showFeatured}">
+   <g:if test="${showFeatured}">
     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
     </g:if>
 
@@ -28,6 +21,18 @@
     </g:if>
     <g:else>
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
+        <g:if test="${showTitleDetail}">
+                <div class="prop">
+                    <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
+
+                    <div class="value">
+                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title}</b></a>
+                    </div>
+                </div>
+                </g:if>
+
+
+
             <g:if test="${datasetInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">
@@ -43,7 +48,6 @@
                                 %>
                             </g:if>
                             ${raw(clickcontentVar)}
-                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
                     
                         </div>
                     </g:if>
@@ -57,7 +61,7 @@
                 </div>
             </g:if>
 
-            <g:if test="${datasetInstance.access.rights}">
+            <g:if test="${datasetInstance.access.licenseId}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
@@ -67,12 +71,10 @@
                     </g:else>
 
                     <div class="value">
-                        ${datasetInstance.access.rights}
+                        ${datasetInstance.access.licenseId}
                     </div>
                 </div>
-                </g:if>
-
-
+            </g:if>
             <g:if test="${showDetails}">
                 <div class="prop">
                     <g:if test="${showDetails}">
@@ -115,6 +117,24 @@
                     </div>
                 </div>
                 </g:if>
+
+            <g:if test="${datasetInstance.party.contributorId}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-user"></i><g:message code="default.contributors.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-user"></i>
+                    </g:else>
+
+                    <div class="value">
+                    <%def contributor = SUser.read(datasetInstance.party.contributorId);%>
+                        <a href="${uGroup.createLink(controller:'SUser', action:'show', id:contributor.id)}">${contributor.name}</a>
+                    </div>
+                </div>
+                </g:if>
+
+
 
                 <div class="prop">
                     <g:if test="${showDetails}">

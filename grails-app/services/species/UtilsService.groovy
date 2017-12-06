@@ -1325,5 +1325,19 @@ class UtilsService {
                 System.out.println(s);
                 return s;
     }
+    
+    public Map getTraits(String t) {
+        Map traits = [:];
+        if(t) {
+            t.split(';').each {
+                if(it) {
+                    String[] x = it.split(':');
+                    if(x.size() == 2)
+                        traits[x[0]] = x[1].trim();
+                }
+            }
+        }
+        return traits;
+    }
 }
 
