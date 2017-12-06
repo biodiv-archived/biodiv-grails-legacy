@@ -114,13 +114,10 @@ class DataPackage {
 
     List<SupportingModules> supportingModules() {
         List<SupportingModules> s = [];   
-        println  "++++++++++++++++++++++++++++"
-        println  "++++++++++++++++++++++++++++"
-        println  "++++++++++++++++++++++++++++"
-        println  "++++++++++++++++++++++++++++"
-        println  JSON.parse(this.supportingModules)
-        JSON.parse(this.supportingModules).each {
-            s << SupportingModules.list()[it];
+        if(this.supportingModules) {
+            JSON.parse(this.supportingModules).each {
+                s << SupportingModules.list()[it];
+            }
         }
         return s
     }

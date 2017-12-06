@@ -267,7 +267,8 @@
 CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
 CKEDITOR.replace('description', config);
-
+<g:if test="${datasetInstance?.dataPackage}">
+</g:if>
 
         });
 

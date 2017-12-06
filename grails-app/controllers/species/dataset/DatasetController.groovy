@@ -35,8 +35,11 @@ class DatasetController extends AbstractObjectController {
 		
         datasetInstance.properties = params;
 
-		def author = springSecurityService.currentUser;
+		//def author = springSecurityService.currentUser;
 
+        if(params.dataPackage) {
+          datasetInstance.dataPackage = DataPackage.read(params.long('dataPackage'));  
+        }
         return [datasetInstance: datasetInstance]
 	}
 
