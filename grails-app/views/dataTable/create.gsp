@@ -4,7 +4,7 @@
 <%@ page import="species.participation.Checklists"%>
 <html>
     <head>
-        <g:set var="title" value="${g.message(code:'dataTable.label')}"/>
+        <g:set var="title" value="${g.message(code:'default.dataTable.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
             .btn-group.open .dropdown-menu {
@@ -134,7 +134,7 @@
                             <h3>Add Datatables</h3>
                             <div id="workspace" style="overflow:auto;background-color:white;border:solid 1px;">
                                 <div id="allowedDataTableTypes" class="span2" style="margin-left:0px;">
-                                    <g:render template="/dataTable/selectDataTable" model="[dataTableTypes : dataTableInstance.dataset.dataPackage.allowedDataTableTypes(), datasetInstanceId:dataTableInstance.dataset.id]"/>
+                                    <g:render template="/dataTable/selectDataTable" model="[dataTableTypes : dataTableInstance.dataset.dataPackage.allowedDataTableTypes(), datasetInstanceId:dataTableInstance.dataset.id, dataTableInstanceId:dataTableInstance.id]"/>
                                 </div>
                                 <div id="addDataTable" class="span10">
                                 </div>
@@ -147,7 +147,7 @@
                     <!--div class="" style="margin-top: 20px; margin-bottom: 40px;">
 
                     <g:if test="${dataTableInstance?.id}">
-                    <a href="${createLink(controller:'dataPackage', action:'show', id:dataTableInstance.dataPackage.id)}" class="btn"
+                    <a href="${createLink(controller:'dataPackage', action:'show', id:dataTableInstance.dataset.dataPackage.id)}" class="btn"
                     style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
                     </g:if>
                     <g:else>

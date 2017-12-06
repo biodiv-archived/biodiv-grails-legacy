@@ -11,21 +11,7 @@
         <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataTable':dataTableInstance.id, isMediaFilter:false) }" name="l${pos}">
         ${dataTableInstance.title}
         </g:link>
-                        <div class="pull-right">
-                            <sUser:ifOwns model="['user':dataTableInstance.author]">
 
-                            <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataset', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                <i class="icon-edit"></i><g:message code="button.edit" /></a>
-
-                            <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataset', action:'flagDeleted', id:dataTableInstance.id)}"
-                                onclick="return confirm('${message(code: 'default.dataset.delete.confirm.message', default: 'This dataset will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
-
-                            </sUser:ifOwns>
-
-                        </div>
- 
     
     </h5>
     <g:if test="${showFeatured}">
@@ -43,6 +29,21 @@
     </g:if>
     <g:else>
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
+                        <div class="pull-right">
+                            <sUser:ifOwns model="['user':dataTableInstance.author]">
+
+                            <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'dataTable', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                <i class="icon-edit"></i><g:message code="button.edit" /></a>
+
+                            <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                                href="${uGroup.createLink(controller:'dataTable', action:'flagDeleted', id:dataTableInstance.id)}"
+                                onclick="return confirm('${message(code: 'default.dataset.delete.confirm.message', default: 'This dataset will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+
+                            </sUser:ifOwns>
+
+                        </div>
+ 
             <g:if test="${dataTableInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">

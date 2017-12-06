@@ -70,7 +70,7 @@
                 <div class="span12 right-shadow-box observation" style="margin:0">
                     <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':datasetInstance, showDetails:true,'userLanguage':userLanguage]"/>
 
-                    <div class="mainContentList">
+                    <div class="mainContentList" style="overflow:hidden;">
                         <div class="mainContent">
                             <ul class="list_view obvListWrapper" style="list-style:none;margin-left:0px;">
                                 <g:each in="${DataTable.findAllByDatasetAndIsDeleted(datasetInstance, false, [sort:'createdOn', order:'desc'])}" var="dataTableInstance">
@@ -81,7 +81,6 @@
                             </ul>			
                         </div>
                     </div>
-
                     <div class="union-comment">
                         <feed:showAllActivityFeeds model="['rootHolder':datasetInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                         <comment:showAllComments model="['commentHolder':datasetInstance, commentType:'super','showCommentList':false]" />

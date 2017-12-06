@@ -14,7 +14,7 @@ function dataPackageChanged(dataPackageId) {
     }
 }
 var dataTable_contributor_autofillUsersComp;
-function onDataTableClick(event, dataTableTypeId, datasetId) {
+function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
     event.preventDefault();
     if(CKEDITOR.instances.description)  CKEDITOR.instances.description.destroy();
     console.log(dataTableTypeId);
@@ -22,7 +22,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId) {
         $.ajax({
             url:'/dataset/dataTableTypeChanged',
             type:'POST',
-            data:{'dataTableTypeId':dataTableTypeId,'datasetId':datasetId}, 
+            data:{'dataTableTypeId':dataTableTypeId,'datasetId':datasetId, dataTableId:dataTableId}, 
             success:function(data,textStatus){
                 $('#addDataTable').html(data);
                 initObservationCreate();
@@ -85,6 +85,8 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         el += "<option class='generalColumn' value='placeName'>Place Name</option>"; 
         el += "<option class='generalColumn' value='latitude'>Latitude</option>"; 
         el += "<option class='generalColumn' value='longitude'>Longitude</option></optgroup>"; 
+        el += "<option class='generalColumn' value='user email'>Contributor</option></optgroup>"; 
+        el += "<option class='generalColumn' value='license'>License</option></optgroup>"; 
 
         el += "<optgroup label='Traits'>"
         var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');

@@ -214,16 +214,8 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                     if(url == 'http://rs.tdwg.org/dwc/terms/locality') column = ipColumnName
                 }  else if(mappedColumnName == 'latitude') {
                     if(url == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') column = ipColumnName
-                }  else if(mappedColumnName instanceof Map) {
-                    println "#################################"
-                    println "#################################"
-                    println mappedColumnName;
-                    println "#################################"
-                    println "#################################"
-                    //if(mappedColumnName.traitstartsWith('trait.')) {
-                    //if(url == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') column = ipColumnName
-                    if(uploadLog) uploadLog << "\n\n\n\n\n\nmapping "+ipColumnName+" : "+mappedColumnName+" ("+url+")";
-                } 
+                }  
+               
                 if(uploadLog) uploadLog << "\nmapping "+ipColumnName+" : "+mappedColumnName+" ("+url+")";
             }
             def temp = [];
@@ -243,9 +235,23 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 String column = ipColumnName;
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
                 def temp = [];
-                temp.add("http://ibp.org/terms/trait/mappedColumn/"+mappedColumnName.replace("trait.",""));
+                temp.add("http://ibp.org/terms/trait/"+mappedColumnName.replace("trait.",""));
                 temp.add(column);
                 temp.add("10000");
+                dataToWrite.add(temp.toArray(new String[0]))
+            } else if(mappedColumnName == 'user email') {
+                if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
+                def temp = [];
+                temp.add("http://ibp.org/terms/observation/"+mappedColumnName);
+                temp.add(column);
+                temp.add("1000");
+                dataToWrite.add(temp.toArray(new String[0]))
+            } else if(mappedColumnName == 'license') {
+                if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
+                def temp = [];
+                temp.add("http://ibp.org/terms/observation/"+mappedColumnName);
+                temp.add(column);
+                temp.add("1001");
                 dataToWrite.add(temp.toArray(new String[0]))
             }
         }
