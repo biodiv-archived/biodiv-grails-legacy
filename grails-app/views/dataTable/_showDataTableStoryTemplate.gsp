@@ -142,10 +142,10 @@
 
                     <div class="value linktext">
                         <g:if test="${dataTableInstance.party.attributions}">
-                        ${dataTableInstance.party.attributions}
+                        ${raw(dataTableInstance.party.attributions.replaceAll('(?:\r\n|\r|\n)', '<br />'))}
                         </g:if>
                         <g:else>
-                        ${dataTableInstance.title} (${UtilsService.formatDate(dataTableInstance.publicationDate)})
+                        ${dataTableInstance.title} (${UtilsService.formatDate(dataTableInstance.cratedOn)})
                         </g:else>
                     </div>
                 </div>
