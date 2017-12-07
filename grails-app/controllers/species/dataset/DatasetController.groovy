@@ -265,7 +265,10 @@ class DatasetController extends AbstractObjectController {
 
     def dataPackageChanged() {
         DataPackage dataPackage = DataPackage.read(params.long('dataPackageId'));
-        render g.render(template:"/dataTable/selectDataTable", model:[dataTableTypes : dataPackage.allowedDataTableTypes()]);
+		def datasetInstance = new Dataset1()
+        datasetInstance.dataPackage = dataPackage
+        datasetInstance.clearErrors();
+        render g.render(template:"/dataset/collectionMetadataTemplate", model:[instance:datasetInstance]);
     }
     
     def dataTableTypeChanged() {

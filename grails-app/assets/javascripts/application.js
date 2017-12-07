@@ -132,5 +132,6 @@
 //= require biodiv/dataset/dataset.js
 //= require biodiv/dataset/create.js
 //= require biodiv/trait.js
+//= require biodiv/customfield.js
 
 

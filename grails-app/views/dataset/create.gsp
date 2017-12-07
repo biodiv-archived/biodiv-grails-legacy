@@ -150,9 +150,8 @@
                                 </div>
                             </div>
                         </div>
+                        <g:set var="dataset_contributor_autofillUsersId" value="contributor_id" />
                         <div id="datasetEditSection" class="section">
-                            <h3>Save Dataset As</h3>
-                        	<g:set var="dataset_contributor_autofillUsersId" value="contributor_id" />
                             <g:render template="/dataset/collectionMetadataTemplate" model="['instance':datasetInstance, autofillUserComp:dataset_contributor_autofillUsersId]"/>
                         </div>
                    </div>
@@ -160,11 +159,11 @@
                     <div class="" style="margin-top: 20px; margin-bottom: 40px;">
 
                     <g:if test="${datasetInstance?.id}">
-                    <a href="${createLink(controller:'dataPackage', action:'show', id:datasetInstance.dataPackage.id)}" class="btn"
+                    <a href="${createLink(controller:'dataPacakage', action:'show', id:datasetInstance.dataPackage.id)}" class="btn"
                     style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
                     </g:if>
                     <g:else>
-                    <a href="${createLink(controller:'dataPackage', action:'list')}" class="btn"
+                    <a href="${createLink(controller:'dataPacakage', action:'list')}" class="btn"
                     style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
                     </g:else>
 
@@ -183,14 +182,6 @@
                     </div>
 
                     </form>
-
-                    <!--div id="workspace" class="section" style="overflow:auto;background-color:white;border:solid 1px;display:none;">
-                            <h3 style="color:lightgray;">Add Datatables</h3>
-                            <div id="allowedDataTableTypes" class="span2" style="margin-left:0px;"></div>
-                            <div id="addDataTable" class="span10"></div>
-                    </div-->
-
-
                     </div>
 
             </div>
@@ -238,7 +229,9 @@
                 CKEDITOR.instances[instance].updateElement();
             }
 
-		    $('input[name="contributorUserIds"]').val(dataset_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+            if(dataset_contributor_autofillUsersComp.length > 0) {
+		        $('input[name="contributorUserIds"]').val(dataset_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+            }
 
             $("#${form_id}").ajaxSubmit({ 
                 dataType: 'json', 

@@ -95,6 +95,7 @@ class DataPackageService extends AbstractMetadataService {
     def activityFeedService
     def obvUtilService;
     def springSecurityService;
+    def customFieldService;
 
     DataPackage create(params) {
         //return super.create(DataPackage.class, params);
@@ -131,11 +132,25 @@ class DataPackageService extends AbstractMetadataService {
             dataPackage = create(params);
             feedType = activityFeedService.INSTANCE_CREATED;
         }
-       
+      
+println "sssssssssssssssssssssssssssssssssss"
+        def customFieldMapList = [];
+        if(params.customFieldMapList) {
+            customFieldMapList = JSON.parse(params.customFieldMapList);
+        }
+
         if(params.supportingModule) {
-            List s = [];
-            params.supportingModule.each { it
-                s << Integer.parseInt(it.key)
+            Map s = [:];
+            params.supportingModule.each { sm,v ->
+                List x = [];
+                customFieldMapList.each { m ->
+                    println m
+                    println  sm
+                    if(m['supportingModule'] == sm) {
+                        x << m;
+                    }
+                }
+                s[Integer.parseInt(sm)] = x;
             }
             dataPackage.supportingModules = s as JSON;
         }
@@ -152,6 +167,9 @@ class DataPackageService extends AbstractMetadataService {
 
         DataPackage.withTransaction {
             result = save(dataPackage, params, true, null, feedType, null);
+            if(result.success) {
+			    //customFieldService.addToDataPackage(params.customFieldMapList, dataPackage)
+            }
         } 
         return result;
     }

@@ -1,6 +1,8 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.dataset.DataPackage"%>
+<%@ page import="species.dataset.DataPackage.SupportingModules"%>
 <%@ page import="species.Habitat"%>
+<%@ page import="species.groups.CustomField"%>
 <html>
 <head>
 <g:set var="title" value="${g.message(code:'dataPackage.name.label')}"/>
@@ -90,12 +92,20 @@
 							<label for="supportingModules" class="control-label"><g:message
 									code="dataPackage.supportingModules.label" default="${g.message(code:'dataPackage.supportingModules.label')}" /></label>
 
-                        <% def supportingModules = dataPackageInstance?dataPackageInstance.supportingModules():[]; %>
+                        <% Map supportingModules = dataPackageInstance?dataPackageInstance.supportingModules():null;
+                        if(!supportingModules) supportingModules = DataPackage.defaultSupportingModules(); %>
 							<div class="controls textbox">
 								<div id="groups_div" class="btn-group" style="z-index: 3;">
                                     <g:each in="${DataPackage.SupportingModules.list()}" var="supportingModule">
                                         <label class="checkbox" style="text-align: left;"> 
-                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" ${supportingModules.contains(supportingModule)?'checked':''}/> ${supportingModule.value()} 
+                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" ${supportingModules.containsKey(supportingModule)?'checked=checked disabled':''}/> ${supportingModule.value()} 
+                                            <g:if test="${supportingModules.containsKey(supportingModule)}">
+                                            <input type="hidden" name="supportingModule.${supportingModule.ordinal()}" value="on"/> 
+                                            </g:if>
+
+                                            <g:if test="${supportingModule == SupportingModules.ACCESS || supportingModule == SupportingModules.PARTY}">
+				 	                            <g:render template="/observation/createCustomFieldTemplate" model="['supportingModule':supportingModule.ordinal()]"/>
+                                            </g:if>
                                         </label>
                                     </g:each>
 									<div class="help-inline">
@@ -109,6 +119,8 @@
 							</div>
 						</div>
 
+				<div class="super-section"  style="clear: both">
+				</div>
 
                         <% def allowedDataTableTypes = dataPackageInstance?dataPackageInstance.allowedDataTableTypes():[]; %>
 						<div
@@ -172,8 +184,15 @@
 	<asset:script>
         $(document).ready(function() {
             $("#createDataPackageSubmit").click(function(){
+                var cfInput = $("<input>").attr("type", "hidden").attr("name", "customFieldMapList").val(getCustomFields());
+                $('#${form_id}').append($(cfInput));
+
                 $("#${form_id}").submit();
                 return false;
+            });
+
+            $(document).on('click', ".addNewCustomField", function() {
+                $(this).parent().prev().prop('checked', true);
             });
         });
     </asset:script>

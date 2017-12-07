@@ -2,13 +2,8 @@
 <%@ page import="species.groups.CustomField"%>
 
 
-<div class="section" style="position: relative; overflow: visible;">
-<h3><g:message code="heading.customfields" /></h3>
-<g:render template="/observation/showExistingCustomFieldsTemplate" model="['userGroupInstance':userGroupInstance]"/>
-<hr>
-
 <ul class="customFieldList" style="list-style:none;">
-<script id="newCustomField" type="text/x-jquery-tmpl">
+<script class="newCustomField" type="text/x-jquery-tmpl">
 <li>
 <div class="btn btn-primary" style="float:right;" onclick="$(this).parent().remove();">Remove</div>
 <div class="control-group customField"  style="margin-top:5px;">
@@ -110,64 +105,12 @@
           </div>
       </div>
 </div>
-
-
+<g:if test="${supportingModule}">
+<input type="hidden" class="${CustomField.PREFIX + 'supportingModule'}" value="${supportingModule}"/>
+</g:if>
 
 <hr>
 </li>
-<div>
 </script>
 <div class="addNewCustomField btn btn-primary">Add another custom field</div>
 </ul>
-</div>
-
-<asset:script>
-	$(document).ready(function(){
-	function registerCustomFieldEvent(){
-		$('input.cfRaidioButtonSelector').unbind('change').change( function(){
-				var lo = $(this).closest(".customField").siblings(".listOptions");
-				if($(this).val() == 'textbox') {
-        			lo.hide();
-        		}else{
-        			lo.show();
-        		}
-        });
-
-		$(".CustomField_dataType").unbind('change').change(function() {
-				var dType = $(this).val();
- 			 	var fT = $(this).closest(".customField").siblings(".formType");
- 			 	var lo = $(this).closest(".customField").siblings(".listOptions");
- 			 	var multiList = fT.find('.multipleFromList');
- 			 	var oneList = fT.find('.oneFromList');
- 			 	
- 			 	if((dType == 'PARAGRAPH_TEXT') || (dType == 'DATE') ){
- 			 		oneList.hide();
- 			 		multiList.hide();
- 			 		lo.hide();
- 			 		fT.find('.defTextbox').find('input').prop("checked", true); 
- 			 	}else if((dType == 'INTEGER') || (dType == 'DECIMAL')){
- 			 		oneList.show();
- 			 		multiList.hide();
- 			 		fT.find('.defTextbox').find('input').prop('checked' , true);
- 			 		lo.hide();
- 			 	}else{
- 			 		oneList.show();
- 			 		multiList.show();
- 			 	}
-		});
-		}
-
-		$(".addNewCustomField").click(function() {
-			var p = new Object();
-    		p['radioGroupName']= 'cfradioGroup' + Math.floor((Math.random() * 1000) + 1);
-  			var html = $("#newCustomField").render(p);
-  			$(this).before(html); 
-  			registerCustomFieldEvent();
-  			return false;
-  		});
-  		$(".addNewCustomField").trigger('click');
-  		
-  		
-  		
-});
-</asset:script>

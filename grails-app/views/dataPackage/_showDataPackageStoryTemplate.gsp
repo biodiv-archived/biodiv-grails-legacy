@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@page import="species.utils.ImageType"%>
+<%@page import="species.dataset.DataPackage.SupportingModules"%>
 
 <g:set var="mainImage" value="${null}" />
 <%def imagePath = mainImage?mainImage.fileName : null%>
@@ -38,7 +39,14 @@
             </div>
             </g:if>
             <div>
-            Supporting Modules : ${dataPackageInstance.supportingModules()}
+            Supporting Modules : 
+            <g:each in="${dataPackageInstance.supportingModules()}" var="${sm}">
+                ${SupportingModules.list()[Integer.parseInt(sm.key)]}
+                <g:if test="${sm.value}">
+                    ( ${sm.value.collect {it.name}})
+                </g:if>
+                ,
+            </g:each>
             </div>
             <div>
             Allowed DataTable Types : ${dataPackageInstance.allowedDataTableTypes()}

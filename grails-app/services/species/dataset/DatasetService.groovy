@@ -119,7 +119,6 @@ class DatasetService extends AbstractMetadataService {
 
         instance.clearErrors();
 
-
         if(params.dataPackage) {
             DataPackage dp = params.dataPackage instanceof DataPackage ? params.dataPackage : DataPackage.read(params.long('dataPackage'));
             if(dp)
@@ -175,6 +174,8 @@ class DatasetService extends AbstractMetadataService {
 
         Dataset1.withTransaction {
             result = save(dataset, params, true, null, feedType, null);
+            if(result.success) {
+            }
         } 
         return result;
     }

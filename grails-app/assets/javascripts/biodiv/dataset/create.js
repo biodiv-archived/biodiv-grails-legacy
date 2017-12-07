@@ -6,7 +6,9 @@ function dataPackageChanged(dataPackageId) {
             type:'POST',
             data:'dataPackageId='+dataPackageId, 
             success:function(data,textStatus){
-                $('#allowedDataTableTypes').html(data);
+                $('#datasetEditSection').html(data);
+                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+                CKEDITOR.replace('description', config);
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
             }

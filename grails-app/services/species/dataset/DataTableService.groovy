@@ -523,8 +523,17 @@ class DataTableService extends AbstractMetadataService {
     private Map getParamsToPropagate(DataTable dataTable) {
         Map paramsToPropagate = new HashMap();
 
-        paramsToPropagate[ObvUtilService.LICENSE] = License.read(dataTable.access.licenseId).name.value().replace("cc ", "");
-        paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = SUser.read(dataTable.party.contributorId).email;
+        def cfs = dataTable.fetchCustomFields();
+        cfs.each { cf -> 
+            if(cf['license'])
+                paramsToPropagate[ObvUtilService.LICENSE] = cf['license'];
+            //License.read(dataTable.access.licenseId).name.value().replace("cc ", "");
+            else if(cf['contributor'])
+                paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = cf['contributor'];
+                //SUser.findByEmail(dataTable.party.contributorId).email;
+            else
+                paramsToPropagate[cf.key] = cf.value;
+        }
 
         //geographical coverage
         paramsToPropagate[ObvUtilService.LOCATION] = dataTable.geographicalCoverage.placeName;

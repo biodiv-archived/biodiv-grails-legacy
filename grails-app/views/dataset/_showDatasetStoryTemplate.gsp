@@ -22,18 +22,18 @@
     <g:else>
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
         <g:if test="${showTitleDetail}">
-                <div class="prop">
-                    <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
+            <div class="prop">
+                <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
 
-                    <div class="value">
+                <div class="value">
                         <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title}</b></a>
-                    </div>
                 </div>
-                </g:if>
+            </div>
+        </g:if>
 
 
 
-            <g:if test="${datasetInstance.description}">
+        <g:if test="${datasetInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
@@ -53,7 +53,7 @@
                             ${raw(clickcontentVar)}
                     
                         </div>
-                    </g:if>
+                   </g:if>
                     <g:else>
                     <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
                     <div class="value notes_view linktext ellipsis multiline">
@@ -62,23 +62,10 @@
 
                     </g:else>
                 </div>
-            </g:if>
+        </g:if>
 
-            <g:if test="${datasetInstance.access.licenseId}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-globe"></i>
-                    </g:else>
-
-                    <div class="value">
-                        ${datasetInstance.access.licenseId}
-                    </div>
-                </div>
-            </g:if>
-            <g:if test="${showDetails}">
+   
+        <g:if test="${showDetails}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-time"></i><g:message code="default.submitted.label" /></span>
@@ -120,48 +107,34 @@
                     </div>
                 </div>
                 </g:if>
-
-            <g:if test="${datasetInstance.party.contributorId}">
+               
+                <g:if test="${datasetInstance.customFields}">
+                <g:each in="${datasetInstance.fetchCustomFields()}" var="${cf}">
+                <g:each in="${cf}" var="${cfv}">
                 <div class="prop">
                     <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-user"></i><g:message code="default.contributors.label" /></span>
+                    <span class="name"><i class="icon-globe"></i>${cfv.key}</span>
                     </g:if>
                     <g:else>
-                    <i class="pull-left icon-user"></i>
+                    <i class="pull-left icon-globe"></i>
                     </g:else>
 
                     <div class="value">
-                    <%def contributor = SUser.read(datasetInstance.party.contributorId);%>
-                        <a href="${uGroup.createLink(controller:'SUser', action:'show', id:contributor.id)}">${contributor.name}</a>
+                        ${cfv.value} 
                     </div>
                 </div>
+                </g:each>
+                </g:each>
                 </g:if>
 
-
-
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-info-sign"></i>
-                    </g:else>
-
-                    <div class="value linktext">
-                        <g:if test="${datasetInstance.party.attributions}">
-                        ${raw(datasetInstance.party.attributions.replaceAll('(?:\r\n|\r|\n)', '<br />'))}
-                        </g:if>
-                        <g:else>
-                        ${datasetInstance.title} (${UtilsService.formatDate(datasetInstance.createdOn)})
-                        </g:else>
-                    </div>
-                </div>
-   
-           </g:if>
+                
+                
+  
+        </g:if>
 
         </div>
         </g:else>
-    </div>
+</div>
 <style>
     <g:if test="${!showDetails}">
 

@@ -4,6 +4,7 @@ import javassist.bytecode.stackmap.BasicBlock.Catch;
 import grails.converters.JSON
 import species.auth.SUser
 import species.participation.Observation
+import species.dataset.DataPackage
 
 class CustomField {
 	public static final String PREFIX = 'CustomField_'
@@ -75,7 +76,7 @@ class CustomField {
 	//if true then any logged in user can change
 	boolean allowedParticipation = false
 	
-	static belongsTo = [userGroup: UserGroup]
+	static belongsTo = [userGroup: UserGroup, dataPackage:DataPackage]
 	
 	static constraints = {
 		name (nullable: false, unique:['userGroup'])
