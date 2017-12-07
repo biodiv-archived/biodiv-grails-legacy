@@ -38,8 +38,6 @@ class DataPackageController extends AbstractObjectController {
 		def dataPackageInstance = new DataPackage()
 		
         dataPackageInstance.properties = params;
-		def author = springSecurityService.currentUser;
-        
         return [dataPackageInstance: dataPackageInstance]
 	}
 

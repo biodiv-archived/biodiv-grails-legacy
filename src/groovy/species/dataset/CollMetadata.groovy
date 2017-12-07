@@ -1,6 +1,7 @@
 package species.dataset
 
 import java.util.Date;
+import grails.converters.JSON
 
 import org.grails.rateable.Rateable;
 import org.grails.taggable.Taggable;
@@ -32,6 +33,7 @@ import species.Metadata;
 import species.utils.Utils;
 import species.Language;
 import species.groups.UserGroup;
+import species.groups.CustomField;
 /**
  * @author sravanthi
  *
@@ -42,10 +44,11 @@ abstract class CollMetadata implements Taggable, Rateable {
 	String description;
 
 	//EML-Access fields
-	Access access;
+	//Access access;
 
 	//EML-Party fields
-	Party party;
+	//Party party;
+    SUser uploader;
 
 	//EML-Coverage fields
 	GeographicalCoverage geographicalCoverage;
@@ -57,7 +60,10 @@ abstract class CollMetadata implements Taggable, Rateable {
 	
 	//EML-Methods;
 	String methods;
-	
+
+    //CustomFields
+    String customFields;
+
 	Date createdOn = new Date();
 	Date lastRevised = new Date();
 
@@ -92,8 +98,8 @@ abstract class CollMetadata implements Taggable, Rateable {
 		viaId nullable:true
 		viaCode nullable:true
 		
-		access nullable:true;
-		party nullable:true;
+		//access nullable:true;
+		//party nullable:true;
 	
 		geographicalCoverage nullable:true;
 		temporalCoverage nullable:true;
@@ -103,15 +109,17 @@ abstract class CollMetadata implements Taggable, Rateable {
 		methods nullable:true;
 		
 		uFile nullable:true;
+		customFields nullable:true;
 	}
 
 	static mapping = {
 		description type:'text'
+		customFields type:'text'
 		tablePerHierarchy false
 		//        tablePerSubClass true
 	}
 
-    static embedded = ['access', 'party', 'geographicalCoverage', 'temporalCoverage', 'taxonomicCoverage'];
+    static embedded = ['geographicalCoverage', 'temporalCoverage', 'taxonomicCoverage'];
 
 	def beforeInsert(){
 	}
@@ -124,7 +132,8 @@ abstract class CollMetadata implements Taggable, Rateable {
         XMLConverter xmlConverter = new XMLConverter();
 
         //Party
-        if(params.author)  {
+        this.uploader = springSecurityService.currentUser;
+/*      if(params.author)  {
             log.debug "Setting access to ${params.author}"
             this.party = new Party(uploaderId:params.author.id);
         } else {
@@ -133,27 +142,15 @@ abstract class CollMetadata implements Taggable, Rateable {
         }
 
         if(params.contributorUserIds)  {
-            /*this.party.contributorIds?.clear();
-            params.contributorIds.each {
-                SUser user = SUser.read(it);
-                if(user) 
-                    this.party.contributorIds << user.id;
-            }*/
-            this.party.contributorId = SUser.read(params.long('contributorUserIds')).id;
+           this.party.contributorId = SUser.read(params.long('contributorUserIds')).id;
         }
         
         if(params.attributions)  {
-            /*this.party.attributions?.clear();
-            params.attributions.split('\n').each {
-                Contributor contributor = xmlConverter.getContributorByName(it, true);
-                this.party.attributions << contributor;
-            }
-            */
-            this.party.attributions = params.attributions;
+           this.party.attributions = params.attributions;
         }
-
+*/
         //Access
-        String licensesStr = params.license_0?:params.license
+/*      String licensesStr = params.license_0?:params.license
         if(licensesStr) {
             log.debug "Setting access to ${licenseStr}"
             this.access = new Access(licenseId : xmlConverter.getLicenseByType(licenseStr, false).id)
@@ -161,7 +158,7 @@ abstract class CollMetadata implements Taggable, Rateable {
             log.debug "Setting access to ${LicenseType.CC_BY}"
             this.access = new Access(licenseId : xmlConverter.getLicenseByType(LicenseType.CC_BY, false).id);
         }
-
+*/
         //geographicalCoverage
         if((params.latitude && params.longitude) || params.areas) {
             this.geographicalCoverage = new GeographicalCoverage([placeName:params.placeName, latitude:params.double('latitude'), longitude:params.double('longitude')]);
@@ -199,6 +196,16 @@ abstract class CollMetadata implements Taggable, Rateable {
         log.debug "Setting group ${params.group}"
 		this.taxonomicCoverage = params.group ? new TaxonomicCoverage(groupId:params.long('group')):null;
 
+        //customFields
+        def cf = [];
+        params.each { paramName, paramValue -> 
+            if(paramName.startsWith(CustomField.PREFIX)) {
+                String columnName = paramName.replaceAll(CustomField.PREFIX, "");
+                cf << [(columnName):paramValue]
+            }
+        }
+        this.customFields = cf as JSON;
+
         this.language = params.locale_language;
         
         this.externalId = params.externalId;
@@ -209,21 +216,12 @@ abstract class CollMetadata implements Taggable, Rateable {
 
     }
 
-    SUser getUploader() {
-        return SUser.read(this.party.uploaderId);
-    }
-
-    void setUploader(SUser user) {
-         this.party.uploaderId = user.id;
-    }
-
     SUser getAuthor() {
-        return SUser.read(this.party.contributorId);
+        return this.uploader;//SUser.read(this.party.contributorId);
     }
-/*
-    void setAuthor(SUser uploader) {
-        this.party.uploaderId = uploader.id;
+
+    def fetchCustomFields() {
+        return customFields?JSON.parse(customFields):null;
     }
-*/
 }
 

@@ -6,7 +6,9 @@ function dataPackageChanged(dataPackageId) {
             type:'POST',
             data:'dataPackageId='+dataPackageId, 
             success:function(data,textStatus){
-                $('#allowedDataTableTypes').html(data);
+                $('#datasetEditSection').html(data);
+                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+                CKEDITOR.replace('description', config);
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
             }
@@ -193,7 +195,9 @@ $(document).ready(function() {
                 CKEDITOR.instances[instance].updateElement();
             }
 
-		    $('input[name="contributorUserIds"]').val(dataTable_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+            if(dataTable_contributor_autofillUsersComp.length > 0) {
+		        $('input[name="contributorUserIds"]').val(dataTable_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+            }
             $(".addDataTable").ajaxSubmit({ 
                 dataType: 'json', 
                 beforeSubmit: function(arr, $form, options) { 

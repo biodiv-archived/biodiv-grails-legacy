@@ -225,6 +225,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
             dataToWrite.add(temp.toArray(new String[0]))
         }
         mapping.attribute.each { ipColumnName, mappedColumnName ->
+            String column = ipColumnName;
             println ipColumnName
             println mappedColumnName;
             
@@ -232,7 +233,6 @@ abstract class AbstractObservationImporter extends AbstractImporter {
             if(mappedColumnName.startsWith("trait.")) {
                 println "^^^^^^^^^^^^^^TRAIT^^^^^^^^^^^^^^^^^^^^"
                 println mappedColumnName 
-                String column = ipColumnName;
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
                 def temp = [];
                 temp.add("http://ibp.org/terms/trait/"+mappedColumnName.replace("trait.",""));
@@ -382,8 +382,8 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                         m[ANNOTATION_HEADER][dwcObvHeader[header.column]] = value;  
                         
                         if(!m[TRAIT_HEADER]) m[TRAIT_HEADER] =  new java.util.LinkedHashMap();
-                        if(header.url && header.url.startsWith("http://ibp.org/") && row[header.column]) {
-                            m[TRAIT_HEADER][header.url.replace("http://ibp.org/terms/trait/mappedColumn/","")] = value;  
+                        if(header.url && header.url.startsWith("http://ibp.org/terms/trait") && row[header.column]) {
+                            m[TRAIT_HEADER][header.url.replace("http://ibp.org/terms/trait/","")] = value;  
                         }
                     }
                 }

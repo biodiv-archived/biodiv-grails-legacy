@@ -1067,13 +1067,17 @@ class ObservationService extends AbstractMetadataService {
             allObservationCount = observationInstanceList.size()
         }
         else {
+            utilsService.logSql {
             observationInstanceList = hqlQuery.addEntity('obv', Observation).list();
             for(int i=0;i < observationInstanceList.size(); i++) {
                 if(observationInstanceList[i].isChecklist) {
                     //observationInstanceList[i] = Checklists.read(observationInstanceList[i].id);
                 }
             }
-
+            }
+println "*******************************************"
+println "*******************************************"
+println "*******************************************"
             if(checklistCountQuery){
                 checklistCountQuery.setProperties(queryParts.queryParams);
                 checklistCount = checklistCountQuery.list()[0];

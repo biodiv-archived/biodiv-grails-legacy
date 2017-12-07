@@ -1,9 +1,27 @@
 <%@ page import="species.Species"%>
 <%@ page import="species.License"%>
+<%@ page import="species.dataset.Dataset1"%>
+<%@ page import="species.dataset.DataTable"%>
+<%@ page import="species.dataset.DataPackage.SupportingModules"%>
+<%@ page import="species.groups.CustomField"%>
+${supportingModules_dp}
+<% 
+
+Map<SupportingModules, CustomField> supportingModules;
+if(supportingModules_dp) {
+    supportingModules = supportingModules_dp;
+    } else if(instance  && instance instanceof DataTable) {
+        supportingModules = instance.dataset.dataPackage.supportingModules();
+    } else if(instance && instance instanceof Dataset1 && instance.dataPackage == null) {
+        supportingModules = supportingModules?:[:];
+}else if(instance && instance instanceof Dataset1){
+        supportingModules = instance.dataPackage?.supportingModules()
+    } 
+%>
 
 <div class="section">
+    <g:if test="${supportingModules.containsKey(SupportingModules.TITLE.ordinal()+'')}">
     <h3><g:message code="default.title.label" /> </h3>
- 
     <div class="control-group ${hasErrors(bean: instance, field: 'title', 'error')}">
         <label for="name" class="control-label"><g:message
             code="default.title.label" default="${g.message(code:'default.title.label')}" />*</label>
@@ -20,7 +38,9 @@
             </div>
         </div>
     </div>
+    </g:if>
 
+    <g:if test="${supportingModules.containsKey(SupportingModules.DESCRIPTION.ordinal()+'')}">
     <div class="control-group ${hasErrors(bean: instance, field: 'description', 'error')}">
         <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
         <div class="controls  textbox">
@@ -35,12 +55,14 @@
             </div>
         </div>
     </div>
+    </g:if>
 </div>
 
+    <g:if test="${supportingModules.containsKey(SupportingModules.ACCESS.ordinal()+'')}">
 <div class="section">
     <h3><g:message code="default.access.label" /> </h3>
     
-    <div class="control-group ${hasErrors(bean: instance.access, field: 'licenseId', 'error')}">
+    <%--div class="control-group ${hasErrors(bean: instance.access, field: 'licenseId', 'error')}">
         <label class="control-label" for="License"><g:message code="default.licenses.label" /> </label>
 
         <div class="controls">
@@ -73,13 +95,21 @@
 
             </div>
         </div>
+    </div--%>
+    <!-- customFields -->
+    <div class="section customFieldForm" style="position: relative; overflow: visible;">
+        <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.ACCESS.ordinal()+'']}">
+            <g:render template="/observation/customFieldTemplate" model="['observationInstance':observationInstance, 'customFieldInstance':customFieldInstance]"/>
+        </g:each>
     </div>
 </div>
+</g:if>
 
+    <g:if test="${supportingModules.containsKey(SupportingModules.PARTY.ordinal()+'')}">
 <div class="section">
     <h3><g:message code="default.party.label" /> </h3>
 
-    <div  class="control-group ${hasErrors(bean: instance.party, field: 'contributorId', 'error')}">
+    <%--div  class="control-group ${hasErrors(bean: instance.party, field: 'contributorId', 'error')}">
         <label for="contributor" class="control-label"><g:message
             code="default.party.contributor"  />*</label>
         <div class="controls  textbox">
@@ -104,20 +134,31 @@
                 </div>
             </div>
         </div>
+    </div--%>
+    <!-- customFields -->
+    <div class="section customFieldForm" style="position: relative; overflow: visible;">
+        <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.PARTY.ordinal()+'']}">
+            <g:render template="/observation/customFieldTemplate" model="['observationInstance':observationInstance, 'customFieldInstance':customFieldInstance]"/>
+        </g:each>
     </div>
 </div>
+</g:if>
 
+<g:if test="${supportingModules.containsKey(SupportingModules.TAXONOMIC_COVERAGE.ordinal()+'')}">
 <div class="section">
     <h3><g:message code="default.taxonomicCoverage.label" /> </h3>
     <g:render template="/observation/taxonInput" model="['instance':instance.taxonomicCoverage]"/>
 </div>
+</g:if>
 
-
+<g:if test="${supportingModules.containsKey(SupportingModules.TEMPORAL_COVERAGE.ordinal()+'')}">
 <div class="section">
     <h3><g:message code="default.temporalCoverage.label" /> </h3>
     <g:render template="/observation/dateInput" model="['observationInstance':instance.temporalCoverage]"/>
 </div>
+</g:if>
 
+<g:if test="${supportingModules.containsKey(SupportingModules.GEOGRAPHICAL_COVERAGE.ordinal()+'')}">
 <div class="section">
     <h3><g:message code="default.geographicalCoverage.label" /> </h3>
     <% def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : instance.geographicalCoverage; %>
@@ -126,9 +167,13 @@
     </div>
 
 </div>
+</g:if>
 
+<g:if test="${supportingModules.containsKey(SupportingModules.METHODS.ordinal()+'') || supportingModules.containsKey(SupportingModules.PROJECT.ordinal()+'') }">
 <div class="section">
     <h3><g:message code="default.others.label" /> </h3>
+
+    <g:if test="${supportingModules.containsKey(SupportingModules.PROJECT.ordinal()+'')}">
      <div class="control-group ${hasErrors(bean: instance, field: 'project', 'error')}">
         <label for="project" class="control-label"><g:message
             code="default.project.label" default="${g.message(code:'default.project.label')}" /></label>
@@ -145,6 +190,10 @@
             </div>
         </div>
     </div>
+    </g:if>
+
+
+    <g:if test="${supportingModules.containsKey(SupportingModules.METHODS.ordinal()+'')}">
     <div class="control-group ${hasErrors(bean: instance, field: 'methods', 'error')}">
         <label for="name" class="control-label"><g:message
             code="default.methods.label" default="${g.message(code:'default.methods.label')}" /></label>
@@ -161,8 +210,9 @@
             </div>
         </div>
     </div>
+    </g:if>
 
-    <div class="control-group ${hasErrors(bean: instance, field: 'externalUrl', 'error')}">
+    <!--div class="control-group ${hasErrors(bean: instance, field: 'externalUrl', 'error')}">
         <label for="source" class="control-label"><g:message
             code="default.externalId.label" default="${g.message(code:'default.externalId.label')}" /></label>
         <div class="controls textbox">
@@ -177,5 +227,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div-->
 </div>
+</g:if>

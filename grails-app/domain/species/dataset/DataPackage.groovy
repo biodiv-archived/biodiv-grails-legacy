@@ -3,6 +3,7 @@ package species.dataset
 import species.auth.SUser;
 
 import grails.converters.JSON;
+import species.groups.CustomField;
 
 class DataPackage {	
 	
@@ -112,23 +113,45 @@ class DataPackage {
         description type:'text'		
 	}
 
-    List<SupportingModules> supportingModules() {
-        List<SupportingModules> s = [];   
-        println  "++++++++++++++++++++++++++++"
-        println  "++++++++++++++++++++++++++++"
-        println  "++++++++++++++++++++++++++++"
-        println  "++++++++++++++++++++++++++++"
-        println  JSON.parse(this.supportingModules)
-        JSON.parse(this.supportingModules).each {
-            s << SupportingModules.list()[it];
+    Map<SupportingModules, CustomField> supportingModules() {
+        Map<SupportingModules, CustomField> s = [:];   
+        if(this.supportingModules) {
+            JSON.parse(this.supportingModules).each {sm, cfs ->
+                List cfsList = [];
+                cfs.each { m->
+                    if(m.name && m.dataType){
+                        def dataType = CustomField.DataType.getDataType(m.dataType) 
+                        boolean allowedMultiple = (dataType == CustomField.DataType.TEXT)?m.allowedMultiple:false
+                        def options = m.options? m.options.split(",").collect{it.trim()}.join(","):""
+                        CustomField cf =  new CustomField(dataPackage:this, name:m.name, dataType:dataType, isMandatory:m.isMandatory, allowedParticipation:m.allowedParticipation, allowedMultiple:m.allowedMultiple, defaultValue:m.defaultValue, options:options, notes:m.description)
+                        cfsList << cf;
+                    }else{
+                        log.debug "Either name or type is missing ${m}"
+                    }
+                }
+
+                s[sm] = cfsList;
+            }
         }
-        return s
+        return s;
+    }
+    
+    static Map<SupportingModules, CustomField> defaultSupportingModules() {
+        Map<SupportingModules, CustomField> s = [:];
+        s[SupportingModules.TITLE] = new CustomField();
+        s[SupportingModules.DESCRIPTION] = new  CustomField(); 
+        s[SupportingModules.TEMPORAL_COVERAGE] = new  CustomField(); 
+        s[SupportingModules.GEOGRAPHICAL_COVERAGE] = new  CustomField(); 
+        s[SupportingModules.TAXONOMIC_COVERAGE] = new  CustomField(); 
+        return s;
     }
 
     List<DataTableType> allowedDataTableTypes() {
         List<DataTableType> s = [];   
-        JSON.parse(this.allowedDataTableTypes).each {
-            s << DataTableType.list()[it];
+        if(this.allowedDataTableTypes) {
+            JSON.parse(this.allowedDataTableTypes).each {
+                s << DataTableType.list()[it];
+            }
         }
         return s
     }

@@ -10,13 +10,14 @@
 		def speciesLink = " "
         def see_checklists=g.message(code:"button.see.checklist")
         def see_dataset=g.message(code:"button.see.dataset")
+        def see_dataTable=g.message(code:"button.see.dataTable")
         def sourcechecklists=g.message(code:"showspeciesnametemp.title.source")
         def see_species=g.message(code:"button.see.species")
 		if(speciesId && !isHeading){
             def l = uGroup.createLink(controller:'species', action:'show', id:speciesId, 'userGroupWebaddress':params?.webaddress, absolute:true)
 			speciesLink += '<a class="species-page-link" style="font-style: normal;" href="' + l + '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_species+'</a>'
 		} 
-        if(observationInstance.sourceId && observationInstance.id != observationInstance.sourceId && !isHeading) {
+        if(observationInstance.sourceId && observationInstance.id != observationInstance.sourceId && !isHeading && !observationInstance.dataTable) {
             def l = uGroup.createLink(controller:'checklist', action:'show', id:observationInstance.sourceId, 'userGroupWebaddress':params?.webaddress, absolute:true) 
 			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l + '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_checklists+'</a>'
 		}
@@ -24,6 +25,11 @@
             def l = uGroup.createLink(controller:'datasource', action:'show', id:observationInstance.dataset.datasource.id,  'userGroupWebaddress':params?.webaddress, absolute:true) 
 			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l +'#'+observationInstance.dataset.id+ '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_dataset+'</a>'
 		}
+        if(observationInstance.dataTable && !isHeading) {
+            def l = uGroup.createLink(controller:'dataset', action:'show', id:observationInstance.dataTable.dataset.id, fragment:observationInstance.dataTable.id, 'userGroupWebaddress':params?.webaddress, absolute:true) 
+			speciesLink += '<a class="species-page-link" title="'+g.message(code:"showspeciesnametemp.title.source")+'" style="font-style: normal;" href="' + l +'#'+observationInstance.dataTable.id+ '">' + '<i class="icon-info-sign" style="margin-right: 1px; margin-left: 10px;"></i>'+see_dataTable+'</a>'
+		}
+
 
 	%>
 	<g:set var="speciesLinkHtml" value="${raw(speciesLink.replaceAll('"',"'"))}" />

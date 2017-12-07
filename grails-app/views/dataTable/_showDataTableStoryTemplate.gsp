@@ -8,7 +8,7 @@
     <h5>
         <a name="${dataTableInstance.id}"></a>
         <span><g:message code="default.dataTable.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataTable':dataTableInstance.id, isMediaFilter:false) }" name="l${pos}">
+        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataTable':dataTableInstance.id, isMediaFilter:false, max:12, offset:0) }" name="l${pos}">
         ${dataTableInstance.title}
         </g:link>
 
@@ -73,21 +73,6 @@
                 </div>
             </g:if>
 
-            <g:if test="${dataTableInstance.access.rights}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-globe"></i>
-                    </g:else>
-
-                    <div class="value">
-                        ${dataTableInstance.access.rights}
-                    </div>
-                </div>
-                </g:if>
-
 
             <g:if test="${showDetails}">
                 <div class="prop">
@@ -131,25 +116,27 @@
                     </div>
                 </div>
                 </g:if>
-
+ 
+                <g:if test="${dataTableInstance.customFields}">
+                <g:each in="${dataTableInstance.fetchCustomFields()}" var="${cf}">
+                <g:each in="${cf}" var="${cfv}">
                 <div class="prop">
                     <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
+                    <span class="name"><i class="icon-globe"></i>${cfv.key}</span>
                     </g:if>
                     <g:else>
-                    <i class="pull-left icon-info-sign"></i>
+                    <i class="pull-left icon-globe"></i>
                     </g:else>
 
-                    <div class="value linktext">
-                        <g:if test="${dataTableInstance.party.attributions}">
-                        ${dataTableInstance.party.attributions}
-                        </g:if>
-                        <g:else>
-                        ${dataTableInstance.title} (${UtilsService.formatDate(dataTableInstance.publicationDate)})
-                        </g:else>
+                    <div class="value">
+                        ${cfv.value} 
                     </div>
                 </div>
-   
+                </g:each>
+                </g:each>
+                </g:if>
+
+  
            </g:if>
 
         </div>

@@ -35,8 +35,12 @@ class DatasetController extends AbstractObjectController {
 		
         datasetInstance.properties = params;
 
-		def author = springSecurityService.currentUser;
+		//def author = springSecurityService.currentUser;
 
+        if(params.dataPackage) {
+          datasetInstance.dataPackage = DataPackage.read(params.long('dataPackage'));  
+        }
+        datasetInstance.clearErrors();
         return [datasetInstance: datasetInstance]
 	}
 
@@ -48,6 +52,8 @@ class DatasetController extends AbstractObjectController {
     @Secured(['ROLE_ADMIN'])
 	def edit() {
 		def datasetInstance = Dataset1.findWhere(id:params.id?.toLong(), isDeleted:false)
+
+        datasetInstance.clearErrors();
 		if (!datasetInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
@@ -259,7 +265,10 @@ class DatasetController extends AbstractObjectController {
 
     def dataPackageChanged() {
         DataPackage dataPackage = DataPackage.read(params.long('dataPackageId'));
-        render g.render(template:"/dataTable/selectDataTable", model:[dataTableTypes : dataPackage.allowedDataTableTypes()]);
+		def datasetInstance = new Dataset1()
+        datasetInstance.dataPackage = dataPackage
+        datasetInstance.clearErrors();
+        render g.render(template:"/dataset/collectionMetadataTemplate", model:[instance:datasetInstance]);
     }
     
     def dataTableTypeChanged() {
