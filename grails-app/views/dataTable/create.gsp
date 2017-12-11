@@ -133,8 +133,9 @@
                         <div class="section">
                             <h3>Add Datatables</h3>
                             <div id="workspace" style="overflow:auto;background-color:white;border:solid 1px;">
+                                <%def allowedDataTableTypes = params.action=='edit' ? [dataTableInstance.dataTableType] : dataTableInstance.dataset.dataPackage.allowedDataTableTypes();%>
                                 <div id="allowedDataTableTypes" class="span2" style="margin-left:0px;">
-                                    <g:render template="/dataTable/selectDataTable" model="[dataTableTypes : dataTableInstance.dataset.dataPackage.allowedDataTableTypes(), datasetInstanceId:dataTableInstance.dataset.id, dataTableInstanceId:dataTableInstance.id]"/>
+                                    <g:render template="/dataTable/selectDataTable" model="[dataTableTypes : allowedDataTableTypes, datasetInstanceId:dataTableInstance.dataset.id, dataTableInstance:dataTableInstance]"/>
                                 </div>
                                 <div id="addDataTable" class="span10">
                                 </div>
@@ -183,6 +184,9 @@
     <asset:script>
 
     $(document).ready(function() {	
+            <g:if test="${params.action=='edit'}">
+                $('#allowedDataTableTypes button').first().trigger('click');
+            </g:if>
         });
     </asset:script>
 

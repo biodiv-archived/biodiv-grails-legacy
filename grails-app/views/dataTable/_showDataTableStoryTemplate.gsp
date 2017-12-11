@@ -15,9 +15,6 @@ String instanceType = "Observations";
         <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
         ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
         </g:link>
-        of <span><g:message code="dataset.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'dataset', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.dataset.id) }">${dataTableInstance.dataset.title}</g:link>
-
     
     </h5>
     <g:if test="${showFeatured}">
@@ -106,6 +103,21 @@ String instanceType = "Observations";
                         datetime="${dataTableInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
+
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-globe"></i><g:message code="dataset.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-globe"></i>
+                    </g:else>
+
+                    <div class="value">
+                        <g:link url="${uGroup.createLink(controller:'dataset', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.dataset.id) }">${dataTableInstance.dataset.title}</g:link>
+                    </div>
+                </div>
+ 
+
 
 
                 <g:if test="${dataTableInstance.externalUrl}">

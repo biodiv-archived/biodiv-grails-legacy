@@ -41,7 +41,7 @@
             <div>
             Supporting Modules : 
             <g:each in="${dataPackageInstance.supportingModules()}" var="${sm}">
-                ${SupportingModules.list()[Integer.parseInt(sm.key)]}
+                ${sm.key}
                 <g:if test="${sm.value}">
                     ( ${sm.value.collect {it.name}})
                 </g:if>

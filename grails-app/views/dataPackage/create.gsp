@@ -93,18 +93,19 @@
 									code="dataPackage.supportingModules.label" default="${g.message(code:'dataPackage.supportingModules.label')}" /></label>
 
                         <% Map supportingModules = dataPackageInstance?dataPackageInstance.supportingModules():null;
-                        if(!supportingModules) supportingModules = DataPackage.defaultSupportingModules(); %>
+                        def defaultSupportingModules =  DataPackage.defaultSupportingModules(); 
+                        if(!supportingModules) supportingModules = defaultSupportingModules; %>
 							<div class="controls textbox">
-								<div id="groups_div" class="btn-group" style="z-index: 3;">
+								<div id="groups_div" class="btn-group" style="z-index: 3;width:100%">
                                     <g:each in="${DataPackage.SupportingModules.list()}" var="supportingModule">
                                         <label class="checkbox" style="text-align: left;"> 
-                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" ${supportingModules.containsKey(supportingModule)?'checked=checked disabled':''}/> ${supportingModule.value()} 
+                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" ${supportingModules.containsKey(supportingModule)?'checked=checked':''}  ${defaultSupportingModules.containsKey(supportingModule)?'disabled':''} /> ${supportingModule.value()} 
                                             <g:if test="${supportingModules.containsKey(supportingModule)}">
                                             <input type="hidden" name="supportingModule.${supportingModule.ordinal()}" value="on"/> 
                                             </g:if>
 
-                                            <g:if test="${supportingModule == SupportingModules.ACCESS || supportingModule == SupportingModules.PARTY}">
-				 	                            <g:render template="/observation/createCustomFieldTemplate" model="['supportingModule':supportingModule.ordinal()]"/>
+                                            <g:if test="${supportingModule == SupportingModules.USAGE_RIGHTS || supportingModule == SupportingModules.PARTY}">
+				 	                            <g:render template="/observation/createCustomFieldTemplate" model="['supportingModule':supportingModule.ordinal(),'customFields':dataPackageInstance?.fetchCustomFields(supportingModule)]"/>
                                             </g:if>
                                         </label>
                                     </g:each>
@@ -129,7 +130,7 @@
 							<label for="allowedDataTableTypes" class="control-label"><g:message
 									code="dataPackage.allowedDataTableTypes.label" default="${g.message(code:'dataPackage.allowedDataTableTypes.label')}" /> *</label>
 							<div class="controls textbox">
-								<div id="groups_div" class="btn-group" style="z-index: 3;">
+								<div id="groups_div" class="btn-group" style="z-index: 3;width:100%;">
                                     <g:each in="${DataPackage.DataTableType.list()}" var="allowedDataTableType">
                                         <label class="checkbox" style="text-align: left;"> 
                                             <input type="checkbox" name="allowedDataTableType.${allowedDataTableType.ordinal()}"  ${allowedDataTableTypes.contains(allowedDataTableType)?'checked':''}/> ${allowedDataTableType.value()} 

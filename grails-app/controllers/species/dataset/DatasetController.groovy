@@ -275,17 +275,18 @@ class DatasetController extends AbstractObjectController {
         if(params.datasetId) {
             Dataset1 datasetInstance = Dataset1.read(params.long('datasetId'));
             if(datasetInstance) {
-                DataTable dataTableInstance = new DataTable()
+                DataTable dataTableInstance;
                 if(params.dataTableId) {
                     dataTableInstance = DataTable.read(params.long('dataTableId'));
                 } else {
+                    dataTableInstance = new DataTable()
                     dataTableInstance.dataset = datasetInstance;
                     dataTableInstance.properties = params;
                 }
                 if(params.int('dataTableTypeId') == DataTableType.OBSERVATIONS.ordinal()) {
                     dataTableInstance.dataTableType = DataTableType.OBSERVATIONS; 
-                    render g.render(template:"/dataTable/addDataTable", model:[dataTableInstance:dataTableInstance]);
                 }
+                render g.render(template:"/dataTable/addDataTable", model:[dataTableInstance:dataTableInstance]);
             }       
         }
     }

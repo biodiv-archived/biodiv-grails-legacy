@@ -67,22 +67,3 @@ class DataTable extends CollMetadata {
 
 }
 
-class ObservationDataTable extends DataTable {
-	static hasMany = [observations:Observation]
-}
-
-class SpeciesDataTable extends DataTable {
-	static hasMany = [species:Species]
-}
-
-class SpeciesFieldDataTable extends DataTable {
-	static hasMany = [speciesFields:SpeciesField]
-}
-
-class DocumentsDataTable extends DataTable {
-	static hasMany = [documents:Document]
-}
-
-class TraitsDataTable extends DataTable {
-	static hasMany = [traits:Trait]
-}

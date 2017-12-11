@@ -1,8 +1,13 @@
 <div>
     <%
     def allowedExtensions = "['csv', 'xls', 'xlsx']"
-
-    def fileParams = [uploadDir:dataTableInstance?dataTableInstance.dataset?.uFile.path+'/'+ UUID.randomUUID().toString()	:'datatable', fileConvert:true]
+    String uploadDir="";
+    if(dataTableInstance && dataTableInstance.uFile?.path) {
+        uploadDir = (new File(dataTableInstance.uFile.path)).getParent()
+    } else {
+        uploadDir = (new File(dataTableInstance.dataset.uFile.path)).getAbsolutePath()+'/'+ UUID.randomUUID().toString()
+    }
+    def fileParams = [uploadDir:uploadDir, fileConvert:true]
     def form_id = "addDataTable"
     def form_action = uGroup.createLink(action:'save', controller:'dataTable', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
     def form_button_name = "Add ${dataTableInstance.dataTableType}"
@@ -24,7 +29,7 @@
             <h3><g:message code="default.dataTable.label" /> </h3>
     
                 <div class="upload_file" style="display:inline-block">
-                    <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
+                    <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">
                     <div id="myGrid" class=" ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;height:350px;overflow:auto;"></div>

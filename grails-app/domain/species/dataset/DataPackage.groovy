@@ -45,7 +45,7 @@ class DataPackage {
 		TITLE("Title"),
 		DESCRIPTION("Description"),
 
-		ACCESS("Access"),
+		USAGE_RIGHTS("Usage Rights"),
 		PARTY("Party"),
 
         TAGS("Tags"),
@@ -68,7 +68,7 @@ class DataPackage {
 			[
 		        TITLE,
                 DESCRIPTION,
-                ACCESS,
+                USAGE_RIGHTS,
                 PARTY,
                 TAGS,
                 TEMPORAL_COVERAGE,
@@ -113,7 +113,7 @@ class DataPackage {
         description type:'text'		
 	}
 
-    Map<SupportingModules, CustomField> supportingModules() {
+    Map<SupportingModules, List<CustomField>> supportingModules() {
         Map<SupportingModules, CustomField> s = [:];   
         if(this.supportingModules) {
             JSON.parse(this.supportingModules).each {sm, cfs ->
@@ -132,7 +132,7 @@ class DataPackage {
                     }
                 }
 
-                s[sm] = cfsList;
+                s[SupportingModules.list()[Integer.parseInt(sm)]] = cfsList;
             }
         }
         return s;
@@ -156,5 +156,9 @@ class DataPackage {
             }
         }
         return s
+    }
+    
+    List<CustomField> fetchCustomFields(SupportingModules supportingModule) {
+        return supportingModules().get(supportingModule);
     }
 }

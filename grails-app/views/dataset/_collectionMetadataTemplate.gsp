@@ -99,7 +99,7 @@ if(supportingModules_dp) {
     <!-- customFields -->
     <div class="section customFieldForm" style="position: relative; overflow: visible;">
         <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.ACCESS.ordinal()+'']}">
-            <g:render template="/observation/customFieldTemplate" model="['observationInstance':observationInstance, 'customFieldInstance':customFieldInstance]"/>
+            <g:render template="/dataTable/customFieldTemplate" model="['observationInstance':instance, 'customFieldInstance':customFieldInstance]"/>
         </g:each>
     </div>
 </div>
