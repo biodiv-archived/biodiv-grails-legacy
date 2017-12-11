@@ -702,14 +702,21 @@ class Observation extends DataObject {
         println checklistAnnotations
         println  "*****************************************"
         println  "*****************************************"
-		if(cl && checklistAnnotations){
+		if(cl && checklistAnnotations && isChecklist){
+            println "CHECKLISTTTTTTTTTTTTTTTTTT"
 			def m = JSON.parse(checklistAnnotations)
 			cl.fetchColumnNames().each { name ->
 				res.put(name, m[name])
 			}
-		} else if(checklistAnnotations) {
+		} else if(dataTable) {
+            def m = JSON.parse(checklistAnnotations)
+			this.dataTable.fetchColumnNames().each { name ->
+                println name
+				res.put(name[1], m[name[1]])
+			}
+        } else if(checklistAnnotations) {
             res = JSON.parse(checklistAnnotations);
-            
+            println res
             //read dwcObvMapping
             InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
             Map dwcObvMapping = [:];
@@ -728,7 +735,10 @@ class Observation extends DataObject {
 
             res = res.sort { dwcObvMapping[it.key.toLowerCase()]?dwcObvMapping[it.key.toLowerCase()].order:1000 }
             def m = [:];
+            println "+++++++++++++++++++++++"
+            println dwcObvMapping
             res.each {
+                println it;
                 if(it.value) {
                     m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key]?.url?:'']
                 }

@@ -136,7 +136,7 @@
                                         noSelection="${['null':'Select One...']}"
                                         value="${dataPackage?:(datasetInstance?.dataPackage?.id)}"
                                         optionKey="id" optionValue="title"
-                                        onchange="dataPackageChanged(this.value);" />
+                                        onchange="dataPackageChangedForDataset(this.value);" />
 
 
                                         <div class="help-inline">
@@ -198,9 +198,7 @@
 
         <g:if test="${datasetInstance.isAttached() }">
         if(dataset_contributor_autofillUsersComp.length > 0) {
-            <%        def user = SUser.read(datasetInstance.party.contributorId);%>
-                dataset_contributor_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
-                }
+        }
         </g:if>
 
         

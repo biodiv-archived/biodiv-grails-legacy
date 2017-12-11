@@ -263,7 +263,7 @@ class DatasetController extends AbstractObjectController {
         }
 	}
 
-    def dataPackageChanged() {
+    def dataPackageChangedForDataset() {
         DataPackage dataPackage = DataPackage.read(params.long('dataPackageId'));
 		def datasetInstance = new Dataset1()
         datasetInstance.dataPackage = dataPackage

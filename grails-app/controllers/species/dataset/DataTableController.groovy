@@ -153,8 +153,8 @@ class DataTableController extends AbstractObjectController {
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
                 def model = utilsService.getSuccessModel("", dataTableInstance, OK.value());
-                model['observations'] = Observation.findAllByDataTable(dataTableInstance, [max:10, offset:0]);
-                model['observationsCount'] = Observation.countByDataTable(dataTableInstance);
+                model['observations'] = dataTableService.getObservationData(params.id, params)
+                model['observationsCount'] = Observation.countByDataTableAndIsDeleted(dataTableInstance, false);
 
                 withFormat {
                     html {
@@ -261,6 +261,18 @@ class DataTableController extends AbstractObjectController {
             json { render result as JSON }
             xml { render result as XML }
         }
+	}
+
+	def observationData = {
+        if(!params.id) {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'default.dataTable.label', default: 'DataTable'), params.id])}"
+            redirect (url:uGroup.createLink(action:'list', controller:"dataTable", 'userGroupWebaddress':params.webaddress))
+        }
+		def observations = dataTableService.getObservationData(params.id, params)
+        def dataTableInstance = DataTable.read(params.id.toLong());
+        int instanceCount = Observation.countByDataTableAndIsDeleted(dataTableInstance, false);
+		def model =[observations:observations, dataTableInstance:dataTableInstance, observationsCount:instanceCount];
+		render(template:"/dataTable/showDataTableDataTemplate", model:model);
 	}
 
 }

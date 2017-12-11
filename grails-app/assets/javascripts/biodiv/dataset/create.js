@@ -1,8 +1,8 @@
-function dataPackageChanged(dataPackageId) {
+function dataPackageChangedForDataset(dataPackageId) {
     console.log(dataPackageId);
     if(dataPackageId != "null") {
         $.ajax({
-            url:'/dataset/dataPackageChanged',
+            url:'/dataset/dataPackageChangedForDataset',
             type:'POST',
             data:'dataPackageId='+dataPackageId, 
             success:function(data,textStatus){
@@ -68,11 +68,14 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
     
     var cols = '', d = '';
 
+    var colStr = '';
     var el = "<table class='table table-striped table-bordered'><thead><tr>";
     $.each(columns, function(i, n){
         el += "<th>"+n.name+"</th>";
+        colStr += n.name+',';
     });
     el += "</tr><tr>"
+    $("#columns").val(colStr);
     var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
         if(speciesGroupTraitsList === undefined) {
             alert("Please click a species group to show respective traits");

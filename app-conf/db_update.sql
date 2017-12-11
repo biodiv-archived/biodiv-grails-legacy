@@ -792,3 +792,6 @@ alter table newsletter alter column show_in_footer set not null;
 update newsletter set show_in_footer = 't' where user_group_id is null and parent_id !=0 ;
 update newsletter set show_in_footer = true where id in (select parent_id from newsletter  where show_in_footer=true);
 
+#11 Dec 2017
+create index on observation(id,data_table_id) where data_table_id is not null;
+

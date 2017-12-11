@@ -57,6 +57,17 @@ class GeographicalCoverage {
 			topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
 		}
 	}
+
+	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
+		if(!geoPrivacy || utilsService.ifOwns(author)){
+			return 0
+		}
+		//for backend thred e.g download request reqUser will be passed as argument
+		if(reqUser && (reqUser.id == author.id || utilsService.isAdmin(reqUser))){
+			return 0
+		}
+		return Utils.getRandomFloat()
+	}
 }
 
 

@@ -20,7 +20,7 @@ abstract class AbstractImporter {
     public CSVReader getCSVReader(File file, char separator = separator) {
         //char separator = '\t'
         if(file.exists()) {
-            CSVReader reader = new CSVReader(new FileReader(file), separator, CSVWriter.NO_QUOTE_CHARACTER);
+            CSVReader reader = new CSVReader(new FileReader(file), separator);
             return reader
         }
         return null;

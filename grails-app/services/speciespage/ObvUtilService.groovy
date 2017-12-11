@@ -832,13 +832,15 @@ println "444444444444"
         }
 		
         //customFieldService.updateCustomFields(params, observationInstance.id)
-        utilsService.benchmark('setTraits') {
-            println "Saving Traits"
-        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
-        traitParams.putAll(params.traits);
-        println "---------------------"
-        println traitParams;
-        factService.updateFacts(traitParams, observationInstance);
+        if(params.traits) {
+            utilsService.benchmark('setTraits') {
+                println "Saving Traits"
+                def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
+                traitParams.putAll(params.traits);
+                println "---------------------"
+                println traitParams;
+                factService.updateFacts(traitParams, observationInstance);
+            }
         }
 
         if(!observationInstance.save()){

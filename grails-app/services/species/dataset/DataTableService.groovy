@@ -159,6 +159,26 @@ class DataTableService extends AbstractMetadataService {
             instance.dataTableType = DataTableType.values()[params.int('dataTableType')];
         }
 
+        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        String contentRootDir = config.speciesPortal.content.rootDir
+        File dataTableFile = new File(contentRootDir, instance.uFile.path);
+
+        File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
+        List colMapping = FileObservationImporter.getInstance().saveObservationMapping(params, mappingFile, null, null);
+        List columns = [];
+        params.columns.split(',').each {
+            String url = "";
+            String order = '100000';
+            colMapping.each {colM ->
+                if(colM[1]==it) {
+                    url = colM[0];
+                    order = colM[2];
+                }
+            }
+            columns << [url,it,order];
+        }
+        instance.columns = columns as JSON;
+
        return instance;
     } 
 
@@ -181,13 +201,12 @@ class DataTableService extends AbstractMetadataService {
     //    DataTable.withTransaction {
             result = save(dataTable, params, true, null, feedType, null);
             if(result.success) {
+
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
-                
-                File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
-                FileObservationImporter.getInstance().saveObservationMapping(params, mappingFile, null, null);
 
+                File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
                 //TODO:schedule datatable for upload
                 //upload([file:dataTable.uFile.path, notes:dataTable.title, uploadType:dataTable]);   
                 switch(dataTable.dataTableType.ordinal()) {
@@ -552,21 +571,9 @@ class DataTableService extends AbstractMetadataService {
     }
 
     private void inheritParams(Map obvParams, Map paramsToPropagate) {
-        if(!obvParams[ObvUtilService.LICENSE]) obvParams[ObvUtilService.LICENSE] = paramsToPropagate[ObvUtilService.LICENSE];
-        if(!obvParams[ObvUtilService.AUTHOR_EMAIL]) obvParams[ObvUtilService.AUTHOR_EMAIL] = paramsToPropagate[ObvUtilService.AUTHOR_EMAIL];
-        
-        //geometrical coverage
-        if(!obvParams[ObvUtilService.LOCATION]) obvParams[ObvUtilService.LOCATION] = paramsToPropagate[ObvUtilService.LOCATION];
-        if(!obvParams[ObvUtilService.TOPOLOGY]) obvParams[ObvUtilService.TOPOLOGY] = paramsToPropagate[ObvUtilService.TOPOLOGY];
-        if(!obvParams[ObvUtilService.LATITUDE]) obvParams[ObvUtilService.LATITUDE] = paramsToPropagate[ObvUtilService.LATITUDE];
-        if(!obvParams[ObvUtilService.LONGITUDE]) obvParams[ObvUtilService.LONGITUDE] = paramsToPropagate[ObvUtilService.LONGITUDE];
-        if(!obvParams[ObvUtilService.LOCATION_SCALE]) obvParams[ObvUtilService.LOCATION_SCALE] = paramsToPropagate[ObvUtilService.LOCATION_SCALE];
-        
-        //temporal coverage
-        if(!obvParams[ObvUtilService.OBSERVED_ON]) obvParams[ObvUtilService.OBSERVED_ON] = paramsToPropagate[ObvUtilService.OBSERVED_ON];
-        if(!obvParams[ObvUtilService.TO_DATE]) obvParams[ObvUtilService.TO_DATE] = paramsToPropagate[ObvUtilService.TO_DATE];
-        
-        //taxonomic coverage
+        paramsToPropagate.each { key, value ->
+            if(!obvParams[key]) obvParams[key] = value;
+        }
     }
 
     //FIX: This code is subjected to SQL INJECTION. Please make sure your data is sanitized
@@ -1111,5 +1118,51 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 				
         return [success:success, url:url, msg:message, errors:errors]
     }
+
+    /**
+     */
+    def getMapFeatures(DataTable dt) {
+        String query = "select t.type as type, t.feature as feature from map_layer_features t where ST_WITHIN('"+dt.geographicalCoverage.topology.toText()+"', t.topology)order by t.type" ;
+        log.debug query;
+        def features = [:]
+        if(!Environment.getCurrent().getName().equalsIgnoreCase("development")) {
+            try {
+                def sql =  Sql.newInstance(dataSource);
+                //sql.in(new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()), obv.topology)
+
+                sql.rows(query).each {
+                    switch (it.getProperty("type")) {
+                        case "140" : features['Rainfall'] = it.getProperty("feature")+" mm";break;
+                        case "138" : features['Soil'] = it.getProperty("feature");break;
+                        case "161" : features['Temperature'] = it.getProperty("feature")+" C";break;
+                        case "139" : features['Forest Type'] = it.getProperty("feature").toLowerCase().capitalize();break;
+                        case "136" : features['Tahsil'] = it.getProperty("feature");break;
+                    }
+                };
+                sql.close();
+            } catch(e) {
+                e.printStackTrace();
+                log.error e.getMessage();
+            }
+        }
+        return features
+    }
+
+	def List getObservationData(id, params=[:]){
+        println params
+        //Done because of java melody error - junk coming with offset value
+        params.offset = params.offset ? params.offset.tokenize("/?")[0] : 0;
+		params.max = params.max ? params.max.toInteger() :10
+		params.offset = params.offset ? params.offset.toInteger() :0
+		def sql =  Sql.newInstance(dataSource);
+		def query = "select id  as obv_id from observation where data_table_id = " + id + " order by id limit " + params.max + " offset " + params.offset;
+        log.debug "Running query : ${query}";
+		def res = []
+		sql.rows(query).each{
+            println "Reading observation ${it.getProperty('obv_id')}"
+			res << Observation.read(it.getProperty("obv_id"));
+		}
+		return res 
+	}
 
 } 
