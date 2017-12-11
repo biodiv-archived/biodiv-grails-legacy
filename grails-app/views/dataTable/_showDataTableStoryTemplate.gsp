@@ -4,13 +4,19 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 
+<% 
+int instanceCount = Observation.countByDataTableAndIsDeleted(dataTableInstance, false);
+String instanceType = "Observations";
+%>
 <div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
     <h5>
         <a name="${dataTableInstance.id}"></a>
         <span><g:message code="default.dataTable.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataTable':dataTableInstance.id, isMediaFilter:false, max:12, offset:0) }" name="l${pos}">
-        ${dataTableInstance.title}
+        <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
+        ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
         </g:link>
+        of <span><g:message code="dataset.label" /> : </span>
+        <g:link url="${uGroup.createLink(controller:'dataset', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.dataset.id) }">${dataTableInstance.dataset.title}</g:link>
 
     
     </h5>

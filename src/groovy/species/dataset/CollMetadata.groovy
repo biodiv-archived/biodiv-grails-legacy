@@ -34,6 +34,7 @@ import species.utils.Utils;
 import species.Language;
 import species.groups.UserGroup;
 import species.groups.CustomField;
+import species.participation.Featured;
 /**
  * @author sravanthi
  *
@@ -79,9 +80,6 @@ abstract class CollMetadata implements Taggable, Rateable {
 	int featureCount = 0;
 	
 	boolean isDeleted = false;
-
-    static hasMany = [userGroups:UserGroup];
-	static belongsTo = [UserGroup]
 
 	//EML-physical
 //	UFile uFile;
@@ -161,7 +159,11 @@ abstract class CollMetadata implements Taggable, Rateable {
 */
         //geographicalCoverage
         if((params.latitude && params.longitude) || params.areas) {
-            this.geographicalCoverage = new GeographicalCoverage([placeName:params.placeName, latitude:params.double('latitude'), longitude:params.double('longitude')]);
+            this.geographicalCoverage = new GeographicalCoverage([placeName:params.placeName]);
+            if(params.latitude) 
+                this.geographicalCoverage.latitude = params.double('latitude');
+            if(params.longitude)
+                this.geographicalCoverage.latitude = params.double('longitude');
 
             def locScale =  Metadata.LocationScale.getEnum(params.locationScale)
             this.geographicalCoverage.locationScale = locScale?:Metadata.LocationScale.APPROXIMATE
@@ -223,5 +225,10 @@ abstract class CollMetadata implements Taggable, Rateable {
     def fetchCustomFields() {
         return customFields?JSON.parse(customFields):null;
     }
+
+    List featuredNotes() {
+        return Featured.featuredNotes(this, null);
+    }
+
 }
 

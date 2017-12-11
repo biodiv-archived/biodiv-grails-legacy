@@ -36,7 +36,7 @@ function loadMapInput(geotaggedImages=undefined) {
             locationPicker.initialize();
             $(map_class).find('.spinner').hide();
             
-            if(window.params.controller == 'checklist'){
+            if(window.params.controller == 'checklist'||window.params.controller == 'dataset' || window.params.controller == 'dataTable'){
                 drawControls = {
                     rectangle:true,
                     polygon:true,

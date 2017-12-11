@@ -119,6 +119,8 @@ class DataPackage {
             JSON.parse(this.supportingModules).each {sm, cfs ->
                 List cfsList = [];
                 cfs.each { m->
+                    println m
+                    println '=================='
                     if(m.name && m.dataType){
                         def dataType = CustomField.DataType.getDataType(m.dataType) 
                         boolean allowedMultiple = (dataType == CustomField.DataType.TEXT)?m.allowedMultiple:false

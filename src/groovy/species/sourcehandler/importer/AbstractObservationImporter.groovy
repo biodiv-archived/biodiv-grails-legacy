@@ -195,8 +195,9 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         return dwcMediaMapping[header];
      }
 
-    public void saveObservationMapping(Map mapping, File mappingFile, File multimediaMappingFile, File uploadLog=null) {
+    public List saveObservationMapping(Map mapping, File mappingFile, File multimediaMappingFile, File uploadLog=null) {
         readHeaders(uploadLog);
+
         def writer = getCSVWriter(mappingFile.getParent(), mappingFile.getName());
         def header = ['Field', 'Column', 'Order'];
         writer.writeNext(header.toArray(new String[0]))
@@ -215,21 +216,20 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 }  else if(mappedColumnName == 'latitude') {
                     if(url == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') column = ipColumnName
                 }  
-               
                 if(uploadLog) uploadLog << "\nmapping "+ipColumnName+" : "+mappedColumnName+" ("+url+")";
             }
-            def temp = [];
-            temp.add(url+"");
-            temp.add(column);
-            temp.add(fieldMapping.order+"");
-            dataToWrite.add(temp.toArray(new String[0]))
+            if(column) {
+                def temp = [];
+                temp.add(url+"");
+                temp.add(column);
+                temp.add(fieldMapping.order+"");
+                dataToWrite.add(temp.toArray(new String[0]))
+            }
         }
         mapping.attribute.each { ipColumnName, mappedColumnName ->
             String column = ipColumnName;
             println ipColumnName
             println mappedColumnName;
-            
-                println "%%%%%%%%%%%%%%55^^^^^^^^^^^^^^TRAIT^^^^^^^^^^^^^^^^^^^^"
             if(mappedColumnName.startsWith("trait.")) {
                 println "^^^^^^^^^^^^^^TRAIT^^^^^^^^^^^^^^^^^^^^"
                 println mappedColumnName 
@@ -253,6 +253,13 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 temp.add(column);
                 temp.add("1001");
                 dataToWrite.add(temp.toArray(new String[0]))
+            } else {
+                if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
+                def temp = [];
+                temp.add("http://ibp.org/terms/observation/"+mappedColumnName);
+                temp.add(column);
+                temp.add("1002");
+                dataToWrite.add(temp.toArray(new String[0]))
             }
         }
 
@@ -262,7 +269,8 @@ abstract class AbstractObservationImporter extends AbstractImporter {
 
         //observationHeader.sort {it?it.order:10000000}
         log.debug "Observation Mapping file ${mappingFile.getAbsolutePath()}"
-        if(uploadLog) uploadLog << "\n\n ObservationMappingFile : ${mappingFile}"
+        if(uploadLog) uploadLog << "\n\n ObservationMappingFile : ${mappingFile}";
+        return dataToWrite;
     }
 
     protected Map readMedia() {

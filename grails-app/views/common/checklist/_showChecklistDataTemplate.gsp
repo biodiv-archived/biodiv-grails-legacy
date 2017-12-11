@@ -5,6 +5,8 @@
     }
 </style>
 <div class="resizable sidebar_section" style="border:1px solid; overflow:auto;max-height:400px;margin-bottom:0px;">
+
+    <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage]"/>
     <table class="table table-striped table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
         <thead>

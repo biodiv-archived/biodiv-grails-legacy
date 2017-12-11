@@ -98,9 +98,9 @@
                 <g:render template="/datasource/showDatasourceSignatureTemplate" model="['instance':observationInstance.dataset.datasource, 'showDetails':true]"/>
                 </g:if>
 
-                <g:if test="${observationInstance.dataTable}">
+                <%--g:if test="${observationInstance.dataTable}">
                 <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':observationInstance.dataTable.dataset, 'showDetails':true, showTitleDetail:true ]"/>
-                </g:if>
+                </g:if--%>
 
 
                 <div class="prop">

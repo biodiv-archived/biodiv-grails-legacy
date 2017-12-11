@@ -25,7 +25,12 @@
         </tr>
         <tr>
             <td colspan="2">
+            <g:if test="${observationInstance.locationScale instanceof String}">
+                <div title="${observationInstance.locationScale}"> ${observationInstance.locationScale} </div>
+            </g:if>
+            <g:else>
                 <div title="${observationInstance.locationScale?.value()}"> ${observationInstance.locationScale?.value()} </div>
+            </g:else>
         </tr>    
         <tr>
             <td colspan="2">
@@ -37,6 +42,7 @@
                 if(observationInstance.isChecklist) {
                     checklistObvPoints = observationInstance.fetchObservationsLatLongs()
                 }
+
                 latitude = observationInstance.latitude + geoPrivacyAdjustment
                 longitude = observationInstance.longitude + geoPrivacyAdjustment
 

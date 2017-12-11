@@ -15,7 +15,7 @@
     </head>
     <body>
 
-        <div class="span12">
+        <div class="span12 row-fluid">
 
 	    <clist:showSubmenuTemplate />
              <g:if test="${dataTableInstance}">
@@ -61,7 +61,8 @@
                 <div class="span8 observation" style="margin:0">
                     <div class="observation_story">
 
-                    <clist:showData model="['checklistInstance':dataTableInstance]"/>
+                    <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+
                     <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage]"/>
                     </div>
                     <uGroup:objectPostToGroupsWrapper 
@@ -76,8 +77,7 @@
                 <div class="span4">
 
                     <div class="sidebar_section">
-                        <obv:showLocation
-                            model="['observationInstance':dataTableInstance]" />
+                    <g:render template="/dataTable/showDataTableLocationTemplate" model="['dataTableInstance':dataTableInstance, 'geographicalCoverage':dataTableInstance.geographicalCoverage]"/>
                     </div>
                             </div>
 
