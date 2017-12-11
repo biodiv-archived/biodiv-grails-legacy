@@ -206,15 +206,17 @@ class DataTableService extends AbstractMetadataService {
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
 
-                File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
-                //TODO:schedule datatable for upload
-                //upload([file:dataTable.uFile.path, notes:dataTable.title, uploadType:dataTable]);   
-                switch(dataTable.dataTableType.ordinal()) {
-                    case DataTableType.OBSERVATIONS.ordinal() :
-                    uploadObservations(dataTable, dataTableFile, null, mappingFile, null,  new File(dataTableFile.getParentFile(), "upload.log"));  
-                    break;
-                    case DataTableType.TRAITS.ordinal(): 
-                    break;
+                if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
+                    File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
+                    //TODO:schedule datatable for upload
+                    //upload([file:dataTable.uFile.path, notes:dataTable.title, uploadType:dataTable]);   
+                    switch(dataTable.dataTableType.ordinal()) {
+                        case DataTableType.OBSERVATIONS.ordinal() :
+                        uploadObservations(dataTable, dataTableFile, null, mappingFile, null,  new File(dataTableFile.getParentFile(), "upload.log"));  
+                        break;
+                        case DataTableType.TRAITS.ordinal(): 
+                        break;
+                    }
                 }
             }
     //    } 
