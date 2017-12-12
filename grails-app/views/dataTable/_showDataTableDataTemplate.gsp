@@ -19,8 +19,9 @@
         <tbody class="mainContentList rowlink">
             <g:each in="${observations}" var="observation">
             <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
-                <g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
-                    <g:if test="${annot.key.equalsIgnoreCase('sciNameColumn')}">
+            <% def checklistAnnotations = observation.fetchChecklistAnnotation(); %>
+                <g:each in="${dataTableInstance.fetchColumnNames()}" var="cName">
+                    <g:if test="${cName[0].equalsIgnoreCase('http://ibp.org/terms/observation/sciNameColumn')}">
                         <td class="nameColumn">
                         <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
                         <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
@@ -29,14 +30,13 @@
                         </a>
                         </g:if>
                         <g:else>
-                        <i>${annot.value}</i>
+                        <i>${checklistAnnotations[cName[1]]}</i>
                         </g:else>
                         </td>
                     </g:if>
                     <g:else>
                     <td>
-                        
-                        ${annot.value?:''}
+                        ${checklistAnnotations[cName[1]]?:''}
                     </td>
                     </g:else>
                 </g:each>

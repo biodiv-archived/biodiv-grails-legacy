@@ -14,13 +14,13 @@ if(supportingModules_dp) {
         supportingModules = instance.dataset.dataPackage.supportingModules();
     } else if(instance && instance instanceof Dataset1 && instance.dataPackage == null) {
         supportingModules = supportingModules?:[:];
-}else if(instance && instance instanceof Dataset1){
+    }else if(instance && instance instanceof Dataset1){
         supportingModules = instance.dataPackage?.supportingModules()
     } 
 %>
 
 <div class="section">
-    <g:if test="${supportingModules.containsKey(SupportingModules.TITLE.ordinal()+'')}">
+    <g:if test="${supportingModules.containsKey(SupportingModules.TITLE)}">
     <h3><g:message code="default.title.label" /> </h3>
     <div class="control-group ${hasErrors(bean: instance, field: 'title', 'error')}">
         <label for="name" class="control-label"><g:message
@@ -40,7 +40,7 @@ if(supportingModules_dp) {
     </div>
     </g:if>
 
-    <g:if test="${supportingModules.containsKey(SupportingModules.DESCRIPTION.ordinal()+'')}">
+    <g:if test="${supportingModules.containsKey(SupportingModules.DESCRIPTION)}">
     <div class="control-group ${hasErrors(bean: instance, field: 'description', 'error')}">
         <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
         <div class="controls  textbox">
@@ -58,7 +58,7 @@ if(supportingModules_dp) {
     </g:if>
 </div>
 
-    <g:if test="${supportingModules.containsKey(SupportingModules.ACCESS.ordinal()+'')}">
+    <g:if test="${supportingModules.containsKey(SupportingModules.USAGE_RIGHTS)}">
 <div class="section">
     <h3><g:message code="default.access.label" /> </h3>
     
@@ -98,14 +98,14 @@ if(supportingModules_dp) {
     </div--%>
     <!-- customFields -->
     <div class="section customFieldForm" style="position: relative; overflow: visible;">
-        <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.ACCESS.ordinal()+'']}">
-            <g:render template="/observation/customFieldTemplate" model="['observationInstance':observationInstance, 'customFieldInstance':customFieldInstance]"/>
+        <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.USAGE_RIGHTS]}">
+            <g:render template="/dataTable/customFieldTemplate" model="['instance':instance, 'customFieldInstance':customFieldInstance]"/>
         </g:each>
     </div>
 </div>
 </g:if>
 
-    <g:if test="${supportingModules.containsKey(SupportingModules.PARTY.ordinal()+'')}">
+    <g:if test="${supportingModules.containsKey(SupportingModules.PARTY)}">
 <div class="section">
     <h3><g:message code="default.party.label" /> </h3>
 
@@ -137,28 +137,28 @@ if(supportingModules_dp) {
     </div--%>
     <!-- customFields -->
     <div class="section customFieldForm" style="position: relative; overflow: visible;">
-        <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.PARTY.ordinal()+'']}">
-            <g:render template="/observation/customFieldTemplate" model="['observationInstance':observationInstance, 'customFieldInstance':customFieldInstance]"/>
+        <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.PARTY]}">
+            <g:render template="/dataTable/customFieldTemplate" model="['instance':instance, 'customFieldInstance':customFieldInstance]"/>
         </g:each>
     </div>
 </div>
 </g:if>
 
-<g:if test="${supportingModules.containsKey(SupportingModules.TAXONOMIC_COVERAGE.ordinal()+'')}">
+<g:if test="${supportingModules.containsKey(SupportingModules.TAXONOMIC_COVERAGE)}">
 <div class="section">
     <h3><g:message code="default.taxonomicCoverage.label" /> </h3>
     <g:render template="/observation/taxonInput" model="['instance':instance.taxonomicCoverage]"/>
 </div>
 </g:if>
 
-<g:if test="${supportingModules.containsKey(SupportingModules.TEMPORAL_COVERAGE.ordinal()+'')}">
+<g:if test="${supportingModules.containsKey(SupportingModules.TEMPORAL_COVERAGE)}">
 <div class="section">
     <h3><g:message code="default.temporalCoverage.label" /> </h3>
     <g:render template="/observation/dateInput" model="['observationInstance':instance.temporalCoverage]"/>
 </div>
 </g:if>
 
-<g:if test="${supportingModules.containsKey(SupportingModules.GEOGRAPHICAL_COVERAGE.ordinal()+'')}">
+<g:if test="${supportingModules.containsKey(SupportingModules.GEOGRAPHICAL_COVERAGE)}">
 <div class="section">
     <h3><g:message code="default.geographicalCoverage.label" /> </h3>
     <% def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : instance.geographicalCoverage; %>
@@ -169,11 +169,11 @@ if(supportingModules_dp) {
 </div>
 </g:if>
 
-<g:if test="${supportingModules.containsKey(SupportingModules.METHODS.ordinal()+'') || supportingModules.containsKey(SupportingModules.PROJECT.ordinal()+'') }">
+<g:if test="${supportingModules.containsKey(SupportingModules.METHODS) || supportingModules.containsKey(SupportingModules.PROJECT) }">
 <div class="section">
     <h3><g:message code="default.others.label" /> </h3>
 
-    <g:if test="${supportingModules.containsKey(SupportingModules.PROJECT.ordinal()+'')}">
+    <g:if test="${supportingModules.containsKey(SupportingModules.PROJECT)}">
      <div class="control-group ${hasErrors(bean: instance, field: 'project', 'error')}">
         <label for="project" class="control-label"><g:message
             code="default.project.label" default="${g.message(code:'default.project.label')}" /></label>
@@ -193,7 +193,7 @@ if(supportingModules_dp) {
     </g:if>
 
 
-    <g:if test="${supportingModules.containsKey(SupportingModules.METHODS.ordinal()+'')}">
+    <g:if test="${supportingModules.containsKey(SupportingModules.METHODS)}">
     <div class="control-group ${hasErrors(bean: instance, field: 'methods', 'error')}">
         <label for="name" class="control-label"><g:message
             code="default.methods.label" default="${g.message(code:'default.methods.label')}" /></label>

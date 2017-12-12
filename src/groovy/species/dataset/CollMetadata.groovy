@@ -35,6 +35,8 @@ import species.Language;
 import species.groups.UserGroup;
 import species.groups.CustomField;
 import species.participation.Featured;
+import species.dataset.DataPackage.SupportingModules;
+
 /**
  * @author sravanthi
  *
@@ -199,11 +201,11 @@ abstract class CollMetadata implements Taggable, Rateable {
 		this.taxonomicCoverage = params.group ? new TaxonomicCoverage(groupId:params.long('group')):null;
 
         //customFields
-        def cf = [];
+        def cf = [:];
         params.each { paramName, paramValue -> 
             if(paramName.startsWith(CustomField.PREFIX)) {
                 String columnName = paramName.replaceAll(CustomField.PREFIX, "");
-                cf << [(columnName):paramValue]
+                cf[(columnName)] = paramValue;
             }
         }
         this.customFields = cf as JSON;
@@ -224,6 +226,11 @@ abstract class CollMetadata implements Taggable, Rateable {
 
     def fetchCustomFields() {
         return customFields?JSON.parse(customFields):null;
+    }
+
+    def fetchCustomFields(SupportingModules supportingModule) {
+        Map cfs = customFields?JSON.parse(customFields):[];
+        return cfs[supportingModule.value()];
     }
 
     List featuredNotes() {

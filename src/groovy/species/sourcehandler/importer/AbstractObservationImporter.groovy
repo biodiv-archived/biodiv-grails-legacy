@@ -239,19 +239,12 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 temp.add(column);
                 temp.add("10000");
                 dataToWrite.add(temp.toArray(new String[0]))
-            } else if(mappedColumnName == 'user email') {
+            } else if(mappedColumnName == 'user email' ||mappedColumnName == 'license' || mappedColumnName == 'attribution' ) {
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
                 def temp = [];
                 temp.add("http://ibp.org/terms/observation/"+mappedColumnName);
                 temp.add(column);
                 temp.add("1000");
-                dataToWrite.add(temp.toArray(new String[0]))
-            } else if(mappedColumnName == 'license') {
-                if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
-                def temp = [];
-                temp.add("http://ibp.org/terms/observation/"+mappedColumnName);
-                temp.add(column);
-                temp.add("1001");
                 dataToWrite.add(temp.toArray(new String[0]))
             } else {
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;

@@ -33,6 +33,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                     usersUrl : window.params.userTermsUrl
                 });
                 CKEDITOR.replace('description', config)
+                showSampleDataTable();
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
                 console.log('error onDataTableClick');
@@ -61,7 +62,9 @@ function loadSpeciesGroupTraits() {
 function showSampleDataTable(){
     var input = $("#dataTableFile_path").val();
     var res = "dataTable";
-    parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+    if(input) {
+        parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+    }
 }
 
 function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
@@ -90,8 +93,9 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         el += "<option class='generalColumn' value='placeName'>Place Name</option>"; 
         el += "<option class='generalColumn' value='latitude'>Latitude</option>"; 
         el += "<option class='generalColumn' value='longitude'>Longitude</option></optgroup>"; 
-        el += "<option class='generalColumn' value='user email'>Contributor</option></optgroup>"; 
         el += "<option class='generalColumn' value='license'>License</option></optgroup>"; 
+        el += "<option class='generalColumn' value='user email'>Contributor</option></optgroup>"; 
+        el += "<option class='generalColumn' value='attribution'>Attribution</option></optgroup>"; 
 
         el += "<optgroup label='Traits'>"
         var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
