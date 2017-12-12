@@ -546,11 +546,11 @@ class DataTableService extends AbstractMetadataService {
 
         def cfs = dataTable.fetchCustomFields();
         cfs.each { cf -> 
-            if(cf['license'])
-                paramsToPropagate[ObvUtilService.LICENSE] = cf['license'];
+            if(cf.key.equalsIgnoreCase('license'))
+                paramsToPropagate[ObvUtilService.LICENSE] = cf.value;
             //License.read(dataTable.access.licenseId).name.value().replace("cc ", "");
-            else if(cf['contributor'])
-                paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = cf['contributor'];
+            else if(cf.key.equalsIgnoreCase('contributor'))
+                paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = cf.value;
                 //SUser.findByEmail(dataTable.party.contributorId).email;
             else
                 paramsToPropagate[cf.key] = cf.value;

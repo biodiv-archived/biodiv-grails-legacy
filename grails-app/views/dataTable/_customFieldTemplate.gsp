@@ -7,7 +7,8 @@
 	</g:if>      
       <%
 		def paramCfValue = params.get(CustomField.PREFIX + customFieldInstance.name) 
-		def cValue = paramCfValue?:instance.fetchCustomFields()[paramCfValue]
+        def cfs = instance.fetchCustomFields();
+		def cValue = paramCfValue?:(cfs?cfs[customFieldInstance.name]:null)
 		if(customFieldInstance.allowedMultiple){
 		  	if(cValue && cValue instanceof String)
 		  		cValue = cValue.tokenize(",")
