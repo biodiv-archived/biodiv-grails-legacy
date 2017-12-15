@@ -898,7 +898,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         uploadLog << "\nTotal time taken for uploading ${((new Date()).getTime() - startTime.getTime())/1000} sec"
     }
 
-    Map getFilteredDataTables(def params, max, offset, isMapView = false) {
+    Map getFilteredDataTables(params, max, offset, isMapView = false) {
 
         def queryParts = getFilteredDataTableFilterQuery(params) 
         String query = queryParts.query;

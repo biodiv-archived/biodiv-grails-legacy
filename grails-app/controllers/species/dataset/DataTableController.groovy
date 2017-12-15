@@ -106,9 +106,7 @@ class DataTableController extends AbstractObjectController {
 			        redirect(controller:'datatable', action: "show", id: result.instance.id)
                 }
                 json {
-                    if(result.instance.dataset) {
-                        result.url = uGroup.createLink(action:'show', controller:"dataset", id:result.instance.dataset.id, fragment:result.instance.id, 'userGroupWebaddress':params.webaddress);
-                    }
+                    result.url = uGroup.createLink(action:'show', controller:"dataTable", id:result.instance.id, fragment:result.instance.id, 'userGroupWebaddress':params.webaddress);
                     render result as JSON 
                 }
                 xml {

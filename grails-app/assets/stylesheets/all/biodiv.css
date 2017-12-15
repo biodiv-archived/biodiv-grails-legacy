@@ -3585,3 +3585,6 @@ margin-bottom:5px;
     width:0px;
     transform:rotate(0deg);
 }
+.span12.row-fluid {
+    margin-left:0px;
+}

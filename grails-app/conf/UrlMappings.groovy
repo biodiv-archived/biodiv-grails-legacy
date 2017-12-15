@@ -274,6 +274,7 @@ class UrlMappings {
     "/admin/manage/$action?"(controller: "adminManage")
     "/adminManage/$action?"(controller: "errors", action: "urlMapping")
     
+<<<<<<< HEAD
     //Custom URL Mapping for BBP
    "/bbp" (view:'/portal/bioinbhutan')
    "/bbp/theportal" (view:'/portal/bioinbhutan')
@@ -290,5 +291,8 @@ class UrlMappings {
    "/bbp/faq" (view:'/portal/qna') 
    "/bbp/technology" (view:'/portal/technology')
     }
+    "/checklist/$action?"(controller: "dataTable")
 
+    }
+    
 }
