@@ -25,20 +25,20 @@ class TemporalCoverage {
 	Date toDate;
 	
 	static constraints = {
-		fromDate nullable:true
-		/*, validator : {val, obj ->
+		fromDate(nullable:false, validator : {val, obj ->
+            println val
+            println  "DDDDDDDDDDDDDDAAAAAAAAAAAAAAAAAAAATTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEE"
 			if(!val){
-				return true
+				return false
 			}
 			return val < new Date()
-		}*/
-		toDate nullable:true;
-		/*, validator : {val, obj ->
+		})
+		toDate(nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
 			}
 			return val < new Date() ;//&& val >= obj.fromDate
-		}*/
+		})
 	}
 
 	static mapping = {

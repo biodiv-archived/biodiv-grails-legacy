@@ -161,24 +161,25 @@ class DataTableService extends AbstractMetadataService {
 
         def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
         String contentRootDir = config.speciesPortal.content.rootDir
-        File dataTableFile = new File(contentRootDir, instance.uFile.path);
+        if(instance.uFile) {
+            File dataTableFile = new File(contentRootDir, instance.uFile.path);
 
-        File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
-        List colMapping = FileObservationImporter.getInstance().saveObservationMapping(params, mappingFile, null, null);
-        List columns = [];
-        params.columns.split(',').each {
-            String url = "";
-            String order = '100000';
-            colMapping.each {colM ->
-                if(colM[1]==it) {
-                    url = colM[0];
-                    order = colM[2];
+            File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
+            List colMapping = FileObservationImporter.getInstance().saveObservationMapping(params, mappingFile, null, null);
+            List columns = [];
+            params.columns.split(',').each {
+                String url = "";
+                String order = '100000';
+                colMapping.each {colM ->
+                    if(colM[1]==it) {
+                        url = colM[0];
+                        order = colM[2];
+                    }
                 }
+                columns << [url,it,order];
             }
-            columns << [url,it,order];
+            instance.columns = columns as JSON;
         }
-        instance.columns = columns as JSON;
-
        return instance;
     } 
 

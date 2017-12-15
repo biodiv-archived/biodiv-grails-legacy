@@ -90,6 +90,8 @@ abstract class CollMetadata implements Taggable, Rateable {
     def grailsApplication;
     def commentService;
 
+    static embedded = ['access', 'party', 'geographicalCoverage', 'temporalCoverage', 'taxonomicCoverage'];
+
 	static constraints = {
 		title nullable:false, blank:false;
 		description nullable:false, blank:false, type:'text';
@@ -99,14 +101,7 @@ abstract class CollMetadata implements Taggable, Rateable {
 		viaId nullable:true
 		viaCode nullable:true
 		
-		//access nullable:true;
-		//party nullable:true;
-	
-		geographicalCoverage nullable:true;
-		temporalCoverage nullable:true;
-		taxonomicCoverage nullable:true;
-		
-		project nullable:true;
+        project nullable:true;
 		methods nullable:true;
 		
 		uFile nullable:true;
@@ -119,8 +114,6 @@ abstract class CollMetadata implements Taggable, Rateable {
 		tablePerHierarchy false
 		//        tablePerSubClass true
 	}
-
-    static embedded = ['access', 'party', 'geographicalCoverage', 'temporalCoverage', 'taxonomicCoverage'];
 
 	def beforeInsert(){
 	}
@@ -197,9 +190,17 @@ abstract class CollMetadata implements Taggable, Rateable {
             log.debug "Parsing date ${params.fromDate}"
             Date fromDate = params.fromDate instanceof Date ?params.fromDate:utilsService.parseDate(params.fromDate);
             log.debug "got ${fromDate}"
+            
             Date toDate = params.toDate ?  (params.toDate instanceof Date ?params.toDate:utilsService.parseDate(params.toDate)) : fromDate
-
-            this.temporalCoverage = new TemporalCoverage([fromDate:fromDate, toDate:toDate]);
+            if(fromDate > new Date()) {
+                this.errors.reject('temporalCoverage.fromDate', 'From date cannot be null')
+            } else if(toDate < fromDate) {
+                this.errors.reject('temporalCoverage.toDate', 'To date cannot be null and should be > than from date')
+            } else {
+                this.temporalCoverage = new TemporalCoverage([fromDate:fromDate, toDate:toDate]);
+            }
+        } else {
+            this.errors.reject('temporalCoverage.fromDate', 'From date and to date cannot be null')
         }
 
         //taxonomicCoverage

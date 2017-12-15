@@ -30,11 +30,22 @@
         <div class="section">
             <h3><g:message code="default.dataTable.label" /> </h3>
     
-                <div class="upload_file" style="display:inline-block">
-                    <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
+                <div class="upload_file" style="display:${dataTableInstance?.uFile?.path?'none':'inline-block'}">
+                        <div class="row control-group ${hasErrors(bean: dataTableInstance, field: 'uFile', 'errors')}">
+
+                            <div class="controls" style="clear:both;margin-left:25px;">
+                                <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
+                                <div class="help-inline">
+                                    <g:hasErrors bean="${dataTableInstance}" field="uFile">
+                                    </g:hasErrors>
+                                </div>
+                                
+                            </div>
+                        </div>	
+
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">
-                    <div id="myGrid" class=" ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;overflow-y:visible;"></div>
+                    <div id="myGrid" class=" ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;overflow-x:scroll"></div>
                     <div class="section" style="clear:both;margin:0;">
                         <div class="row control-group ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}">
                             <div class="controls" style="clear:both;margin:0;">

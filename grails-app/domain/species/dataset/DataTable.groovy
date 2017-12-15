@@ -32,6 +32,7 @@ class DataTable extends CollMetadata {
 		dataset nullable:true
 		agreeTerms nullable:true
 		checklistId nullable:true
+		uFile nullable:false
 		columns nullable:false, blank:false;
 	}
 	
