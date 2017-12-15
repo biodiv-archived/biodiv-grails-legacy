@@ -195,7 +195,7 @@ String instanceType = "Observations";
 
                     <div class="story-footer" style="right:3px;">
                         <sUser:showUserTemplate
-                        model="['userInstance':dataTableInstance.party.getContributor(), 'userGroup':userGroup]" />
+                        model="['userInstance':dataTableInstance.party.fetchContributor(), 'userGroup':userGroup]" />
                     </div>
                 </div>
 

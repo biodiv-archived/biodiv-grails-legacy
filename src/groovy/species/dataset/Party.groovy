@@ -27,7 +27,7 @@ class Party {
         attributions type:'text'
     }
 
-    SUser getContributor() {
+    SUser fetchContributor() {
         return SUser.get(contributorId);
     }
 }

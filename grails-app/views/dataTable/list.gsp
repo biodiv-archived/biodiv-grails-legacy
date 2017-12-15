@@ -1,7 +1,7 @@
 <%@page import="species.utils.Utils"%>
 <html>
     <head>
-        <g:set var="title" value="${g.message(code:'default.dataTable.label')}"/>
+        <g:set var="title" value="${g.message(code:'default.dataTables.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <r:require modules="observations_list" />
     </head>
