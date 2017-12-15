@@ -24,14 +24,14 @@
 					var="dataTableInstance">
 
 					<g:if test="${i%4 == 0}">
-						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="clear: both;margin-left:0px;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
+						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="clear: both;margin-left:0px;height:100%;width:100%;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
 					</g:if>
 					<g:else>
-						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
+						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="height:100%;width:100%;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
 					</g:else>
-					</li>
 
                     <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true, showTitleDetail:true, 'userLanguage':userLanguage]"/>
+					</li>
 				</g:each>
 			</ul>			
 		</div>

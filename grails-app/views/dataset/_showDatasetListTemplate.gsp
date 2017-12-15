@@ -23,14 +23,14 @@
 					var="datasetInstance">
 
 					<g:if test="${i%4 == 0}">
-						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="clear: both;margin-left:0px;${!inGroupMap || inGroupMap[datasetInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
+						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="width:100%;clear: both;margin-left:0px;${!inGroupMap || inGroupMap[datasetInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
 					</g:if>
 					<g:else>
-						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="${!inGroupMap || inGroupMap[datasetInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
+						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="width:100%;${!inGroupMap || inGroupMap[datasetInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
 					</g:else>
-					</li>
 
                     <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':datasetInstance, showDetails:true, showTitleDetail:true, 'userLanguage':userLanguage]"/>
+					</li>
 				</g:each>
 			</ul>			
 		</div>

@@ -5,7 +5,7 @@
 <%@page import="species.participation.Observation"%>
 <%@page import="species.auth.SUser"%>
 
-<div name="${datasetInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
+<div name="${datasetInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%">
    <g:if test="${showFeatured}">
     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
     </g:if>
