@@ -104,7 +104,7 @@
                                             <input type="hidden" name="supportingModule.${supportingModule.ordinal()}" value="on"/> 
                                             </g:if>
 
-                                            <g:if test="${supportingModule == SupportingModules.USAGE_RIGHTS || supportingModule == SupportingModules.PARTY}">
+                                            <g:if test="${supportingModule == SupportingModules.USAGE_RIGHTS || supportingModule == SupportingModules.PARTY || supportingModule == SupportingModules.OTHERS}">
 				 	                            <g:render template="/observation/createCustomFieldTemplate" model="['supportingModule':supportingModule.ordinal(),'customFields':dataPackageInstance?.fetchCustomFields(supportingModule)]"/>
                                             </g:if>
                                         </label>

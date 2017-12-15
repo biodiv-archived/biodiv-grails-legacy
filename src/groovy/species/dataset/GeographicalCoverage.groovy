@@ -28,7 +28,7 @@ class GeographicalCoverage {
 
 	boolean geoPrivacy = false;
 	//XXX to be removed after locationScale migration
-//	String locationAccuracy;
+	String locationAccuracy;
 //	LocationScale locationScale;
 	Geometry topology;
 
@@ -43,7 +43,7 @@ class GeographicalCoverage {
 		//reverseGeocodedName(nullable:true)
 		latitude(nullable: true)
 		longitude(nullable:true)
-		//locationAccuracy(nullable: true)
+		locationAccuracy(nullable: true)
 		topology nullable:true, validator : { val, obj ->
 			if(!val){
 				return true

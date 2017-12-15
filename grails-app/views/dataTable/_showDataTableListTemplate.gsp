@@ -21,7 +21,7 @@
 			<ul class="grid_view thumbnails obvListwrapper">
 			
 				<g:each in="${instanceList}" status="i"
-					var="observationInstance">
+					var="dataTableInstance">
 
 					<g:if test="${i%4 == 0}">
 						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="clear: both;margin-left:0px;${!inGroupMap || inGroupMap[observationInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
@@ -31,6 +31,7 @@
 					</g:else>
 					</li>
 
+                    <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true, showTitleDetail:true, 'userLanguage':userLanguage]"/>
 				</g:each>
 			</ul>			
 		</div>

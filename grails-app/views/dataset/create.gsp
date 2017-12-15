@@ -150,9 +150,11 @@
                                 </div>
                             </div>
                         </div>
-                        <g:set var="dataset_contributor_autofillUsersId" value="contributor_id" />
                         <div id="datasetEditSection" class="section">
-                            <g:render template="/dataset/collectionMetadataTemplate" model="['instance':datasetInstance, autofillUserComp:dataset_contributor_autofillUsersId]"/>
+                            <g:if test="${params.action != 'create'}">
+                                <g:set var="dataset_contributor_autofillUsersId" value="contributor_id" />
+                                <g:render template="/dataset/collectionMetadataTemplate" model="['instance':datasetInstance, 'autofillUserComp':dataset_contributor_autofillUsersId]"/>
+                            </g:if>
                         </div>
                    </div>
 
@@ -190,77 +192,25 @@
     </div>
 
     <asset:script>
-    $(document).ready(function() {	
+        CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
+ 
+        $(document).ready(function() {	
+            dataset_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
+                        usersUrl : window.params.userTermsUrl
+            });
         
-        var dataset_contributor_autofillUsersComp = $("#userAndEmailList_${dataset_contributor_autofillUsersId}").autofillUsers({
-            usersUrl : '${createLink(controller:'user', action: 'terms')}'
-        });
-
-        <g:if test="${datasetInstance.isAttached() }">
-        if(dataset_contributor_autofillUsersComp.length > 0) {
-        }
-        </g:if>
-
-        
-        $("#createDatasetSubmit").click(function(){
-
-            var speciesGroups = getSelectedGroupArr();
-
-            $.each(speciesGroups, function(index, element){
-                var input = $("<input>").attr("type", "hidden").attr("name", "group").val(element);
-                $("#${form_id}").append($(input));	
-            })
-
-
-           var locationpicker = $(".map_class").data('locationpicker'); 
-            if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
-                var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
-                if(areas.length > 0) {
-                    var wkt = new Wkt.Wkt();
-                    wkt.fromObject(areas[0]);
-                    $("input.areas").val(wkt.write());
-                }
-            }
-
-           
-            for ( instance in CKEDITOR.instances ) {
-                CKEDITOR.instances[instance].updateElement();
-            }
-
+            <g:if test="${datasetInstance.isAttached() }">
             if(dataset_contributor_autofillUsersComp.length > 0) {
-		        $('input[name="contributorUserIds"]').val(dataset_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+                <%        def user = SUser.read(datasetInstance.party.contributorId);%>
+                dataset_contributor_autofillUsersComp[0].addUserId({'item':{'userId':'${user.id}', 'value':'${user.name}'}});
             }
+            </g:if>
 
-            $("#${form_id}").ajaxSubmit({ 
-                dataType: 'json', 
-                success: function(data, statusText, xhr) {
-                   console.log(data);
-                   if(data.success) {
-                        $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
-                        window.location.href = data.url;
-                        $(".datasetEditSection").hide();
-                        $(".datasetShowSection").slideDown();
-                   } else {
-                        $(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
-                        $.each(data.errors, function(index, value) {
-                             $("#${form_id}").find('[name='+value.field+']').parents(".control-group").addClass("error");
-                             $("#${form_id}").find('[name='+value.field+']').nextAll('.help-inline').append("<li>"+value.message+"</li>")
-                        });
-                    }    
-                }, error:function (xhr, ajaxOptions, thrownError){
-                    //successHandler is used when ajax login succedes
-                    var successHandler = this.success;
-                    handleError(xhr, ajaxOptions, thrownError, successHandler, function() {
-                        var response = $.parseJSON(xhr.responseText);
-                        console.log(response);
-                    });
-                } 
-            });	
-        });
-CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
-var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
-CKEDITOR.replace('description', config);
-
+            
+            <g:if test="${params.action != 'create'}">
+                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+                CKEDITOR.replace('description', config);
+            </g:if>
         });
 
     </asset:script>

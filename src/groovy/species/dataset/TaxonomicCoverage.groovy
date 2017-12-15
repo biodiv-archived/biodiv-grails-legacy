@@ -21,16 +21,28 @@ import speciespage.ObservationService;
 
 class TaxonomicCoverage {
 
-    Long groupId;
-
-	//static hasMany = [taxons:TaxonomyDefinition];
+    String groupIds;
 
 	static constraints = {
-
+        groupIds nullable:false;
 	}
 
 	static mapping = {
 
 	}
+
+    Set groups() {
+        Set gps = new HashSet();
+        if(groupIds) {
+            groupIds.split(',').each {
+                gps << Integer.parseInt(it);
+            }
+        }
+        return gps;
+    }
+
+    void updateGroups(Set groups) {
+        this.groupIds = groups.join(',');
+    }
 }
 

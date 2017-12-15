@@ -4,8 +4,8 @@ import content.eml.UFile;
 
 class Dataset1 extends CollMetadata {
 	
-	DataPackage dataPackage;
-UFile uFile;	
+    DataPackage dataPackage;
+    UFile uFile;	
 	static hasMany = [dataTables: DataTable];
 	
 	static mapping = {

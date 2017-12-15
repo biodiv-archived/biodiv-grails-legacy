@@ -29,32 +29,33 @@ class DataTableController extends AbstractObjectController {
 		redirect(action: "list", params: params)
 	}
     
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
 	def create() {
+        Dataset1 datasetInstance;
         if(params.dataset) {
-            Dataset1 datasetInstance = Dataset1.read(params.long('dataset'));
-            if(datasetInstance) {
-                DataTable dataTableInstance = new DataTable()
-
-                dataTableInstance.dataset = datasetInstance;
-                dataTableInstance.properties = params;
-                return [dataTableInstance: dataTableInstance]
-            } else {
-                flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
-                redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
-            }
+            datasetInstance = Dataset1.read(params.long('dataset'));
         } else {
-        	flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+            datasetInstance = new Dataset1();
+            datasetInstance.dataPackage = DataPackage.findByTitle('Checklist');
         }
-	}
+        
+        if(datasetInstance) {
+            DataTable dataTableInstance = new DataTable()
+            dataTableInstance.dataset = datasetInstance;
+            dataTableInstance.properties = params;
+            return [dataTableInstance: dataTableInstance]
+        } else {
+            flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
+            redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
+        }
+    }
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_USER'])
 	def save() {
 	    saveAndRender(params, false)
 	}
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
 	def edit() {
 		def dataTableInstance = DataTable.findWhere(id:params.id?.toLong(), isDeleted:false)
 		if (!dataTableInstance) {
@@ -73,7 +74,7 @@ class DataTableController extends AbstractObjectController {
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_USER'])
 	def update() {
 		def dataTableInstance = DataTable.get(params.long('id'))
         def msg;
@@ -105,7 +106,9 @@ class DataTableController extends AbstractObjectController {
 			        redirect(controller:'datatable', action: "show", id: result.instance.id)
                 }
                 json {
-                    result.url = uGroup.createLink(action:'show', controller:"dataset", id:result.instance.dataset.id, fragment:result.instance.id, 'userGroupWebaddress':params.webaddress);
+                    if(result.instance.dataset) {
+                        result.url = uGroup.createLink(action:'show', controller:"dataset", id:result.instance.dataset.id, fragment:result.instance.id, 'userGroupWebaddress':params.webaddress);
+                    }
                     render result as JSON 
                 }
                 xml {
@@ -182,9 +185,9 @@ class DataTableController extends AbstractObjectController {
         model.userLanguage = utilsService.getCurrentLanguage(request);
 
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
-            model.resultType = 'dataset'
+            model.resultType = 'datatable'
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
-            model['obvListHtml'] =  g.render(template:"/dataset/showDataTableListTemplate", model:model);
+            model['obvListHtml'] =  g.render(template:"/dataTable/showDataTableListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
             model.remove('dataTableInstanceList');
         }
@@ -194,7 +197,7 @@ class DataTableController extends AbstractObjectController {
         withFormat {
             html {
                 if(params.loadMore?.toBoolean()){
-                    render(template:"/dataset/showDataTableListTemplate", model:model.model);
+                    render(template:"/dataTable/showDataTableListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
                     model.model['width'] = 300;

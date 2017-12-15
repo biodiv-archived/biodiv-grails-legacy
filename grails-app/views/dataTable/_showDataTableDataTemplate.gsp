@@ -21,7 +21,7 @@
             <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
             <% def checklistAnnotations = observation.fetchChecklistAnnotation(); %>
                 <g:each in="${dataTableInstance.fetchColumnNames()}" var="cName">
-                    <g:if test="${cName[0].equalsIgnoreCase('http://ibp.org/terms/observation/sciNameColumn')}">
+                    <g:if test="${cName[0].equalsIgnoreCase('http://rs.tdwg.org/dwc/terms/scientificName')}">
                         <td class="nameColumn">
                         <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
                         <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">

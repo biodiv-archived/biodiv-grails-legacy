@@ -253,8 +253,12 @@ abstract class Metadata {
 
             traitFactMap['fact'] << fact.id
         }
-        queryParams.trait.each {k,v->
-            queryParams.trait[k] = v[0..-2];
+        if(queryParams.trait) {
+            queryParams.trait.each {k,v->
+                if(queryParams.trait[k]) {
+                    queryParams.trait[k] = v[0..-2];
+                }
+            }
         }
         return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
     }

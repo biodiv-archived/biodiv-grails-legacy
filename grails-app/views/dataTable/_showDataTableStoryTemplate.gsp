@@ -77,6 +77,23 @@ String instanceType = "Observations";
             </g:if>
 
 
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-time"></i><g:message code="default.observed.on.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-time"></i>
+                    </g:else>
+                    <div class="value">
+                        <time class="timeago"
+                        datetime="${dataTableInstance.temporalCoverage.fromDate.getTime()}"></time>
+                        <g:if test="${dataTableInstance.temporalCoverage.toDate && dataTableInstance.temporalCoverage.fromDate != dataTableInstance.temporalCoverage.toDate}">&nbsp;
+                        <b>-</b>&nbsp; <time class="timeago" datetime="${dataTableInstance.temporalCoverage.toDate.getTime()}"></time>
+                        </g:if>
+                    </div>
+                </div>
+
+
             <g:if test="${showDetails}">
                 <div class="prop">
                     <g:if test="${showDetails}">
@@ -104,6 +121,7 @@ String instanceType = "Observations";
                     </div>
                 </div>
 
+                <g:if test="${dataTableInstance.dataset}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i><g:message code="dataset.label" /></span>
@@ -116,6 +134,7 @@ String instanceType = "Observations";
                         <g:link url="${uGroup.createLink(controller:'dataset', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.dataset.id) }">${dataTableInstance.dataset.title}</g:link>
                     </div>
                 </div>
+                </g:if>
  
 
 
@@ -131,6 +150,20 @@ String instanceType = "Observations";
 
                     <div class="value">
                         <a href="${dataTableInstance.externalUrl}">${dataTableInstance.externalId?:dataTableInstance.externalUrl}</a> 
+                    </div>
+                </div>
+                </g:if>
+ 
+                <g:if test="${dataTableInstance.party?.attributions}">
+                <div class="prop" >
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-info-sign"></i>
+                    </g:else>
+                    <div class="value linktext">
+                        ${dataTableInstance.party.attributions}
                     </div>
                 </div>
                 </g:if>
@@ -153,9 +186,17 @@ String instanceType = "Observations";
                 </g:each>
                 </g:each>
                 </g:if>
-
   
            </g:if>
+
+                <div class="row observation_footer" style="margin-left:0px;">
+                    <g:render template="/dataTable/showDataTableStoryFooterTemplate" model="['instance':dataTableInstance, 'showDetails':showDetails, 'showLike':true]" />
+
+                    <div class="story-footer" style="right:3px;">
+                        <sUser:showUserTemplate
+                        model="['userInstance':dataTableInstance.uploader, 'userGroup':userGroup]" />
+                    </div>
+                </div>
 
         </div>
         </g:else>

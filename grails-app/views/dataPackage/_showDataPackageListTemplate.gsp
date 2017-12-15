@@ -44,7 +44,13 @@
                                 ${instance.title}
                             </td>
                             <td>
-                                ${instance.supportingModules()}
+                            <g:each in="${instance.supportingModules()}" var="${sm}">
+                            ${sm.key}
+                            <g:if test="${sm.value}">
+                                ${sm.value.collect {it.name}}
+                            </g:if>
+                            ,
+                            </g:each>
                             </td>
                             <td>
                                 ${instance.allowedDataTableTypes()}

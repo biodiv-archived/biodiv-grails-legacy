@@ -47,10 +47,10 @@ abstract class CollMetadata implements Taggable, Rateable {
 	String description;
 
 	//EML-Access fields
-	//Access access;
+	Access access;
 
 	//EML-Party fields
-	//Party party;
+	Party party;
     SUser uploader;
 
 	//EML-Coverage fields
@@ -88,6 +88,7 @@ abstract class CollMetadata implements Taggable, Rateable {
     def utilsService;
     def springSecurityService;
     def grailsApplication;
+    def commentService;
 
 	static constraints = {
 		title nullable:false, blank:false;
@@ -119,7 +120,7 @@ abstract class CollMetadata implements Taggable, Rateable {
 		//        tablePerSubClass true
 	}
 
-    static embedded = ['geographicalCoverage', 'temporalCoverage', 'taxonomicCoverage'];
+    static embedded = ['access', 'party', 'geographicalCoverage', 'temporalCoverage', 'taxonomicCoverage'];
 
 	def beforeInsert(){
 	}
@@ -133,7 +134,7 @@ abstract class CollMetadata implements Taggable, Rateable {
 
         //Party
         this.uploader = springSecurityService.currentUser;
-/*      if(params.author)  {
+        if(params.author)  {
             log.debug "Setting access to ${params.author}"
             this.party = new Party(uploaderId:params.author.id);
         } else {
@@ -142,36 +143,41 @@ abstract class CollMetadata implements Taggable, Rateable {
         }
 
         if(params.contributorUserIds)  {
-           this.party.contributorId = SUser.read(params.long('contributorUserIds')).id;
+           this.party.contributorId = SUser.read(Long.parseLong(params.contributorUserIds)).id;
         }
         
         if(params.attributions)  {
            this.party.attributions = params.attributions;
         }
-*/
+
         //Access
-/*      String licensesStr = params.license_0?:params.license
-        if(licensesStr) {
+        String licenseStr = params.licenseName?:params.licenseName
+        if(licenseStr) {
             log.debug "Setting access to ${licenseStr}"
             this.access = new Access(licenseId : xmlConverter.getLicenseByType(licenseStr, false).id)
         } else {
             log.debug "Setting access to ${LicenseType.CC_BY}"
             this.access = new Access(licenseId : xmlConverter.getLicenseByType(LicenseType.CC_BY, false).id);
         }
-*/
+
         //geographicalCoverage
         if((params.latitude && params.longitude) || params.areas) {
             this.geographicalCoverage = new GeographicalCoverage([placeName:params.placeName]);
             if(params.latitude) 
-                this.geographicalCoverage.latitude = params.double('latitude');
+                this.geographicalCoverage.latitude = Double.parseDouble(params.latitude);
             if(params.longitude)
-                this.geographicalCoverage.latitude = params.double('longitude');
+                this.geographicalCoverage.longitude = Double.parseDouble(params.longitude);
 
             def locScale =  Metadata.LocationScale.getEnum(params.locationScale)
             this.geographicalCoverage.locationScale = locScale?:Metadata.LocationScale.APPROXIMATE
-            //this.geographicalCoverage.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
+            this.geographicalCoverage.geoPrivacy = params.geoPrivacy ? (params.geoPrivacy.trim().toLowerCase().toBoolean()):false;
+            this.geographicalCoverage.locationAccuracy = params.locationAccuracy;
 
             GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+            if(params.topology) {
+                this.geographicalCoverage.topology = params.topology;
+            }
+            else {
             params.areas = params.areas?:params.topology;
             if(params.areas) {
                 log.debug "Setting topology ${params.areas}"
@@ -183,14 +189,15 @@ abstract class CollMetadata implements Taggable, Rateable {
                     log.error "Error parsing polygon wkt : ${params.areas}"
                 }
             }
+            }
         }
 
         //temporalCoverage
         if( params.fromDate != ""){
             log.debug "Parsing date ${params.fromDate}"
-            Date fromDate = utilsService.parseDate(params.fromDate);
+            Date fromDate = params.fromDate instanceof Date ?params.fromDate:utilsService.parseDate(params.fromDate);
             log.debug "got ${fromDate}"
-            Date toDate = params.toDate ? utilsService.parseDate(params.toDate) : fromDate
+            Date toDate = params.toDate ?  (params.toDate instanceof Date ?params.toDate:utilsService.parseDate(params.toDate)) : fromDate
 
             this.temporalCoverage = new TemporalCoverage([fromDate:fromDate, toDate:toDate]);
         }
@@ -198,7 +205,14 @@ abstract class CollMetadata implements Taggable, Rateable {
         //taxonomicCoverage
         //SpeciesGroup sG = params.group_id ? SpeciesGroup.findByName(params.group_id) : null
         log.debug "Setting group ${params.group}"
-		this.taxonomicCoverage = params.group ? new TaxonomicCoverage(groupId:params.long('group')):null;
+        if(params.group) {
+            Set groups = new HashSet();
+            params.group.each { i,v->
+                groups << Long.parseLong(v);
+            }
+		    this.taxonomicCoverage = new TaxonomicCoverage();
+            this.taxonomicCoverage.updateGroups(groups);
+        }
 
         //customFields
         def cf = [:];
@@ -236,6 +250,10 @@ abstract class CollMetadata implements Taggable, Rateable {
     List featuredNotes() {
         return Featured.featuredNotes(this, null);
     }
+
+	def fetchCommentCount(){
+		return commentService.getCount(null, this, null, null)
+	}
 
 }
 
