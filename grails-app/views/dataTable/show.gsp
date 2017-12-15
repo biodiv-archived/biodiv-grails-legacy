@@ -31,20 +31,27 @@
                         <span class="badge ${(featureCount>0) ? 'featured':''}" style="left:-50px"  title="${(featureCount>0) ? featuredTitle:''}">
                                             </span>
 
-                        <div class="pull-right">
-                            <sUser:ifOwns model="['user':dataTableInstance.author]">
-                            <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataTable', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
-                            <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataTable', action:'flagDeleted', id:dataTableInstance.id)}"
-                                onclick="return confirm('${message(code: 'default.dataTable.delete.confirm.message', default: 'This dataTable will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+                                            <div class="pull-right">
+                                                <g:if test="${dataTableInstance}">
+                                                <sUser:ifOwns model="['user':dataTableInstance.uploader]">
+                                                
+                                                <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                                   href="${uGroup.createLink(controller:'dataTable', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                                                    <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
-                            </sUser:ifOwns>
-
-                        </div>
-                        <s:showHeadingAndSubHeading
+                                                <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                                                    href="#"
+                                                    onclick="return deleteDataTable();"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+                                                <form action="${uGroup.createLink(controller:'dataTable', action:'flagDeleted')}" method='POST' name='deleteForm'>
+                                                    <input type="hidden" name="id" value="${dataTableInstance.id}" />
+                                                </form>
+ 
+                                                </sUser:ifOwns>
+                                                </g:if>
+                                            </div>
+ 
+                       <s:showHeadingAndSubHeading
                             model="['heading':dataTableInstance.title, 'headingClass':headingClass, 'subHeadingClass':subHeadingClass]" />
 
                         </div>
@@ -90,6 +97,13 @@
             $(".dataTable-data ." + species).css("background-color","#66FF66");
             }
             });
-            </asset:script>
+            function deleteDataTable(){
+                var test="${message(code: 'default.delete.confirm.message', args:['data table'])}";
+
+                if(confirm(test)){
+                    document.forms.deleteForm.submit();
+                }
+            }
+</asset:script>
         </body>
     </html>

@@ -1056,86 +1056,6 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
     }
 
-    def delete(params){
-        String messageCode;
-        String url = utilsService.generateLink(params.controller, 'list', []);
-        String label = Utils.getTitleCase(params.controller?:'Dataset')
-        def messageArgs = [label, params.id]
-        def errors = [];
-        boolean success = false;
-        if(!params.id) {
-            messageCode = 'default.not.found.message'
-        } else {
-            try {
-                def datasetInstance = Dataset.get(params.id.toLong())
-                if (datasetInstance) {
-                    //datasetInstance.removeResourcesFromSpecies()
-                    boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
-                    if(isFeatureDeleted && utilsService.ifOwns(datasetInstance.author)) {
-                        def mailType = activityFeedService.INSTANCE_DELETED
-                        try {
-                            datasetInstance.isDeleted = true;
-
-                            Observation.findAllByDataset(datasetInstance).each {
-                                it.isDeleted = true; 
-                                if(!it.save(flush:true)){
-                                    it.errors.allErrors.each { log.error it } 
-                                }
-                            }
-
-                            if(!datasetInstance.hasErrors() && datasetInstance.save(flush: true)){
-                                utilsService.sendNotificationMail(mailType, datasetInstance, null, params.webaddress);
-                                //observationsSearchService.delete(observationInstance.id);
-                                messageCode = 'default.deleted.message'
-                                url = utilsService.generateLink(params.controller, 'list', [])
-                                ActivityFeed.updateIsDeleted(datasetInstance)
-                                success = true;
-                            } else {
-                                messageCode = 'default.not.deleted.message'
-                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
-                                datasetInstance.errors.allErrors.each { log.error it }
-                                datasetInstance.errors.allErrors .each {
-                                    def formattedMessage = messageSource.getMessage(it, null);
-                                    errors << [field: it.field, message: formattedMessage]
-                                }
-
-                            }
-                        }
-                        catch (org.springframework.dao.DataIntegrityViolationException e) {
-                            messageCode = 'default.not.deleted.message'
-                            url = utilsService.generateLink(params.controller, 'show', [id: params.id])
-                            e.printStackTrace();
-                            log.error e.getMessage();
-                            errors << [message:e.getMessage()];
-                        }
-                    } else {
-                        if(!isFeatureDeleted) {
-                            messageCode = 'default.not.deleted.message'
-                            log.warn "Couldnot delete feature"
-                        }
-                        else {
-                            messageArgs.add(0,'delete');
-                            messageCode = 'default.not.permitted.message'
-                            log.warn "${datasetInstance.author} doesn't own dataset to delete"
-                        }
-                    }
-                } else {
-                    messageCode = 'default.not.found.message'
-                    url = utilsService.generateLink(params.controller, 'list', [])
-                }
-            } catch(e) {
-                e.printStackTrace();
-                url = utilsService.generateLink(params.controller, 'list', [])
-                messageCode = 'default.not.deleted.message'
-                errors << [message:e.getMessage()];
-            }
-        }
-        
-        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
-				
-        return [success:success, url:url, msg:message, errors:errors]
-    }
-
     /**
      */
     def getMapFeatures(DataTable dt) {
@@ -1181,5 +1101,83 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 		}
 		return res 
 	}
+
+    def delete(params){
+        String messageCode;
+        String url = utilsService.generateLink(params.controller, 'list', []);
+        String label = Utils.getTitleCase(params.controller?:'DataTable')
+        def messageArgs = [label, params.id]
+        def errors = [];
+        boolean success = false;
+        println "+++++++++++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++++++++++"
+        if(!params.id) {
+            messageCode = 'default.not.found.message'
+        } else {
+            try {
+                def dataTableInstance = DataTable.get(params.id.toLong())
+                if (dataTableInstance) {
+                    boolean isFeatureDeleted = Featured.deleteFeatureOnObv(dataTableInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
+                    if(isFeatureDeleted && utilsService.ifOwns(dataTableInstance.uploader)) {
+                        def mailType = utilsService.DATATABLE_DELETED
+                        try {
+                            dataTableInstance.isDeleted = true;
+                            //Delete underlying observations of data table
+                            dataTableInstance.deleteAllObservations();
+
+                            if(!dataTableInstance.hasErrors() && dataTableInstance.save(flush: true)){
+                                utilsService.sendNotificationMail(mailType, dataTableInstance, null, params.webaddress);
+                                //TODO: dataTableSearchService.delete(observationInstance.id);
+                                messageCode = 'default.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'list', [])
+                                ActivityFeed.updateIsDeleted(dataTableInstance)
+                                success = true;
+                            } else {
+                                messageCode = 'default.not.deleted.message'
+                                url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                                observationInstance.errors.allErrors.each { log.error it }
+                                observationInstance.errors.allErrors .each {
+                                    def formattedMessage = messageSource.getMessage(it, null);
+                                    errors << [field: it.field, message: formattedMessage]
+                                }
+
+                            }
+                        }
+                        catch (org.springframework.dao.DataIntegrityViolationException e) {
+                            messageCode = 'default.not.deleted.message'
+                            url = utilsService.generateLink(params.controller, 'show', [id: params.id])
+                            e.printStackTrace();
+                            log.error e.getMessage();
+                            errors << [message:e.getMessage()];
+                        }
+                    } else {
+                        if(!isFeatureDeleted) {
+                            messageCode = 'default.not.deleted.message'
+                            log.warn "Couldnot delete feature"
+                        }
+                        else {
+                            messageArgs.add(0,'delete');
+                            messageCode = 'default.not.permitted.message'
+                            log.warn "${dataTableInstance.author} doesn't own object to delete"
+                        }
+                    }
+                } else {
+                    messageCode = 'default.not.found.message'
+                    url = utilsService.generateLink(params.controller, 'list', [])
+                }
+            } catch(e) {
+                e.printStackTrace();
+                url = utilsService.generateLink(params.controller, 'list', [])
+                messageCode = 'default.not.deleted.message'
+                errors << [message:e.getMessage()];
+            }
+        }
+
+        String message = messageSource.getMessage(messageCode, messageArgs.toArray(), Locale.getDefault())
+
+        return [success:success, url:url, msg:message, errors:errors]
+    }
+
 
 } 

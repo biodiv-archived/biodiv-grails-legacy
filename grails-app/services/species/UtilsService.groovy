@@ -75,6 +75,7 @@ class UtilsService {
     static final String OBSERVATION_FLAGGED = "observationFlagged";
     static final String OBSERVATION_DELETED = "observationDeleted";
     static final String CHECKLIST_DELETED= "checklistDeleted";
+    static final String DATATABLE_DELETED= "dataTableDeleted";
     static final String DOWNLOAD_REQUEST = "downloadRequest";
     static final String IMPORT_REQUEST = "importRequest";
     //static final int MAX_EXPORT_SIZE = -1;
@@ -452,7 +453,7 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
-                case CHECKLIST_DELETED :
+                case [CHECKLIST_DELETED,DATATABLE_DELETED] :
                 mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.checklistDeleted.emailSubject", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["actionObject"] = messageSource.getMessage("default.checklist.label", null, LCH.getLocale())

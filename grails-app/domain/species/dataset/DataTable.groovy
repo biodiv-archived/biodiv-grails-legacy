@@ -66,6 +66,16 @@ class DataTable extends CollMetadata {
         return dataTableService.getMapFeatures(this);
     }
 
-
+    def deleteAllObservations() {
+        def obvs = Observation.findAllByDataTable(this);
+        obvs.each { obv ->    
+            obv.isDeleted = true;
+            if(!obv.save(flush:true)){
+                obv.errors.allErrors.each { log.error obv } 
+            }
+        }
+        return
+    }
+	
 }
 
