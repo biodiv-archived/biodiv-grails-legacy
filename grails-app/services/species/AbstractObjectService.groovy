@@ -535,7 +535,7 @@ class AbstractObjectService {
 
     Map getTraits(String t) {
         //HACK to use this fn from obvUtilService in bulk upload... shd be placed in obvutil
-        return utilsService.getTraits(it);
+        return utilsService.getTraits(t);
     }
 
     //TO BE DELETED AND MOVED TO UTILSSERVICE

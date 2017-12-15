@@ -804,6 +804,8 @@ alter table data_table add column geographical_coverage_location_accuracy varcha
 create table user_group_data_tables(user_group_id bigint references user_group(id), data_table_id bigint REFERENCES data_table(id), primary key (user_group_id, data_table_id));
 alter table data_table alter column access_license_id set not null;
 alter table data_table alter column party_contributor_id set not null;
+alter table data_table alter column temporal_coverage_from_date set not null;
+alter table data_table alter column taxonomic_coverage_group_ids set not null;
 
 ####15 Dec 2017 CHECKLIST 2 Datatable migration related
 # run this target to move all checklists to datatable /checklist/migrateChecklistToDataTable
