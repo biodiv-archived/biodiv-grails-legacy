@@ -794,4 +794,28 @@ update newsletter set show_in_footer = 't' where user_group_id is null and paren
 
 #11 Dec 2017
 create index on observation(id,data_table_id) where data_table_id is not null;
+alter table data_table alter column dataset_id drop not null;
+alter table dataset1 add column taxonomic_coverage_group_ids varchar;
+alter table dataset1 add column geographical_coverage_location_accuracy varchar;
+alter table data_table add column taxonomic_coverage_group_ids varchar;
+alter table data_table add column geographical_coverage_location_accuracy varchar;
+ alter table data_table alter column party_attributions type text;
+ alter table dataset1 alter column party_attributions type text;
+create table user_group_data_tables(user_group_id bigint references user_group(id), data_table_id bigint REFERENCES data_table(id), primary key (user_group_id, data_table_id));
+
+
+####15 Dec 2017 CHECKLIST 2 Datatable migration related
+# run this target to move all checklists to datatable /checklist/migrateChecklistToDataTable
+# and then make following db changes
+## stop system before running these stmts
+
+alter table user_group_data_tables drop constraint user_group_data_tables_data_table_id_fkey;
+alter table observation drop constraint fk74ad82c50fa501d;
+update user_group_data_tables set data_table_id = g.checklist_id from (select id, checklist_id from data_table where checklist_id is not null) g where g.id = data_table_id;
+ update observation set data_table_id = g.checklist_id from (select id, checklist_id from data_table where checklist_id is not null) g where g.id = data_table_id;
+update data_table set id=checklist_id where dataset_id is null and checklist_id is not null;
+alter table user_group_data_tables add FOREIGN KEY (data_table_id) REFERENCES data_table(id);
+ alter table observation add FOREIGN KEY (data_table_id) REFERENCES data_table(id);
+update activity_feed set root_holder_type='species.dataset.DataTable' where root_holder_type='species.participation.Checklists';
+update follow set object_type='species.dataset.DataTable' where object_type='species.participation.Checklists';
 

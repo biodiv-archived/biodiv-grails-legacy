@@ -8,7 +8,7 @@
 int instanceCount = Observation.countByDataTableAndIsDeleted(dataTableInstance, false);
 String instanceType = "Observations";
 %>
-<div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
+<div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;">
     <h5>
         <a name="${dataTableInstance.id}"></a>
         <span><g:message code="default.dataTable.label" /> : </span>
@@ -171,6 +171,7 @@ String instanceType = "Observations";
                 <g:if test="${dataTableInstance.customFields}">
                 <g:each in="${dataTableInstance.fetchCustomFields()}" var="${cf}">
                 <g:each in="${cf}" var="${cfv}">
+                <g:if test="${cfv.value}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-globe"></i>${cfv.key}</span>
@@ -178,18 +179,18 @@ String instanceType = "Observations";
                     <g:else>
                     <i class="pull-left icon-globe"></i>
                     </g:else>
-
                     <div class="value">
-                        ${cfv.value} 
+                        ${raw(cfv.value)} 
                     </div>
                 </div>
+                </g:if>
                 </g:each>
                 </g:each>
                 </g:if>
   
            </g:if>
 
-                <div class="row observation_footer" style="margin-left:0px;">
+                <div class="row observation_footer" style="margin-left:0px;height:40px;">
                     <g:render template="/dataTable/showDataTableStoryFooterTemplate" model="['instance':dataTableInstance, 'showDetails':showDetails, 'showLike':true]" />
 
                     <div class="story-footer" style="right:3px;">

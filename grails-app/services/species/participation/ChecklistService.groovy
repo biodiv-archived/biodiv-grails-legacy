@@ -797,28 +797,30 @@ if(!contributor)
                 dataTable.checklistId = cl.id; 
                 //uFile
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-                String contentRootDir = config.speciesPortal.content.rootDir;
-                try{
-                    File destinationFile = new File(contentRootDir, cl.rawChecklist);
-                    if(destinationFile.exists()) {
-                        UFile f = new UFile()
-                        f.size = destinationFile.length()
-                        f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "");
-                        log.debug "============== " + f.path
-                        if(f.save()) {
-                            dataTable.uFile = f;
+                if(cl.rawChecklist) {
+                    String contentRootDir = config.speciesPortal.content.rootDir;
+                    try{
+                        File destinationFile = new File(contentRootDir, cl.rawChecklist);
+                        if(destinationFile.exists()) {
+                            UFile f = new UFile()
+                            f.size = destinationFile.length()
+                            f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "");
+                            log.debug "============== " + f.path
+                            if(f.save()) {
+                                dataTable.uFile = f;
+                            }
+                        } else {
+                            UFile f = new UFile()
+                            f.size = 0;
+                            f.path = cl.rawChecklist;
+                            log.debug "============== " + f.path
+                            if(f.save()) {
+                                dataTable.uFile = f;
+                            }
                         }
-                    } else {
-                        UFile f = new UFile()
-                        f.size = 0;
-                        f.path = cl.rawChecklist;
-                        log.debug "============== " + f.path
-                        if(f.save()) {
-                            dataTable.uFile = f;
-                        }
+                    }catch(e){
+                        e.printStackTrace()
                     }
-                }catch(e){
-                    e.printStackTrace()
                 }
 
 
@@ -855,6 +857,8 @@ if(!contributor)
                 }
                 utilsService.cleanUpGorm();
             }
+            println "Checklist ${cl} migration done"
 	    }
+        println "Successfully migrated all checklists"
 	}
 }

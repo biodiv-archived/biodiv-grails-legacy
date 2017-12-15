@@ -6,7 +6,7 @@
         <r:require modules="observations_list" />
     </head>
     <body>
-        <div class="span12">
+        <div class="row-fluid span12">
             <obv:showSubmenuTemplate/>
             <div class="page-header clearfix">
                 <div style="width:100%;">
