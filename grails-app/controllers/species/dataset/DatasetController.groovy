@@ -29,7 +29,7 @@ class DatasetController extends AbstractObjectController {
 		redirect(action: "list", params: params)
 	}
     
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
 	def create() {
 		def datasetInstance = new Dataset1()
 		
@@ -44,12 +44,12 @@ class DatasetController extends AbstractObjectController {
         return [datasetInstance: datasetInstance]
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_ADMIN'])
 	def save() {
 	    saveAndRender(params, false)
 	}
 
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
 	def edit() {
 		def datasetInstance = Dataset1.findWhere(id:params.id?.toLong(), isDeleted:false)
 
@@ -66,7 +66,7 @@ class DatasetController extends AbstractObjectController {
 		}
 	}
 
-	@Secured(['ROLE_USER'])
+	@Secured(['ROLE_ADMIN'])
 	def update() {
 		def datasetInstance = Dataset1.get(params.long('id'))
         def msg;
@@ -248,7 +248,7 @@ class DatasetController extends AbstractObjectController {
         render ""
     }
 
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
 	def delete() {
 		def result = datasetService.delete(params)
         result.remove('url')

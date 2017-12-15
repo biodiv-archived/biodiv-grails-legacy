@@ -250,6 +250,14 @@ class DataTableController extends AbstractObjectController {
 	}
 
     @Secured(['ROLE_USER'])
+	def flagDeleted() {
+        println "00000000000000000000000000";
+		def result = dataTableService.delete(params)
+		flash.message = result.message
+		redirect (url:result.url)
+	}
+
+    @Secured(['ROLE_USER'])
 	def delete() {
 		def result = dataTableService.delete(params)
         result.remove('url')

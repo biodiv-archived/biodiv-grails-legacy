@@ -8,7 +8,7 @@
 int instanceCount = Observation.countByDataTableAndIsDeleted(dataTableInstance, false);
 String instanceType = "Observations";
 %>
-<div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;">
+<div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;width:100%">
     <h5>
         <a name="${dataTableInstance.id}"></a>
         <span><g:message code="default.dataTable.label" /> : </span>
@@ -32,21 +32,6 @@ String instanceType = "Observations";
     </g:if>
     <g:else>
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-                        <div class="pull-right">
-                            <sUser:ifOwns model="['user':dataTableInstance.author]">
-
-                            <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataTable', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                                <i class="icon-edit"></i><g:message code="button.edit" /></a>
-
-                            <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataTable', action:'flagDeleted', id:dataTableInstance.id)}"
-                                onclick="return confirm('${message(code: 'default.dataset.delete.confirm.message', default: 'This dataset will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
-
-                            </sUser:ifOwns>
-
-                        </div>
- 
             <g:if test="${dataTableInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">

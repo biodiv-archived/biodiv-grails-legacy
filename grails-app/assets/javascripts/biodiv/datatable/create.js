@@ -217,6 +217,9 @@ $(document).ready(function() {
                 },
                 success: function(data, statusText, xhr) {
                     console.log(data);
+                    $(".addDataTable").find(".control-group").removeClass("error");
+                    $(".addDataTable").find('.help-inline').html('');
+
                     if(data.success) {
                         $(".alertMsg").removeClass('alert alert-error').addClass('alert alert-success').html(data.msg);
                         //TODO:show dataTable snippet and remove form
@@ -224,11 +227,25 @@ $(document).ready(function() {
                         window.location.href = data.url;
                     } else {
                         window.scrollTo(0, 0);
-                        $(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg);
+                        var errorMsg = data.msg+'<br/>';
                         $.each(data.errors, function(index, value) {
-                            $(".addDataTable").find('[name='+value.field+']').parents(".control-group").addClass("error");
-                            $(".addDataTable").find('[name='+value.field+']').nextAll('.help-inline').append("<li>"+value.message+"</li>")
+                 //           errorMsg += value.message+'<br/>';
+                            if(value.field == 'party.contributorId') value.field = 'contributorUserIds';
+                            if(value.field == 'party.attributions') value.field = 'attributions';
+                            if(value.field == 'temporalCoverage') value.field = 'fromDate';
+                            if(value.field == 'geographicalCoverage') value.field = 'placeName';
+                            if(value.field == 'taxonomicCoverage') {
+                                 $(".addDataTable").find('#speciesGroupFilter').parents(".control-group").addClass("error");
+                                $(".addDataTable").find('#speciesGroupFilter').nextAll('.help-inline').html("<li>"+value.message+"</li>")
+                            } else if(value.field == 'uFile'){
+                                $(".addDataTable").find('#au-dataTableFile_uploader').parents(".control-group").addClass("error");
+                                $(".addDataTable").find('#au-dataTableFile_uploader').nextAll('.help-inline').html("<li>"+value.message+"</li>")
+                            } else {
+                                $(".addDataTable").find('[name='+value.field+']').parents(".control-group").addClass("error");
+                                $(".addDataTable").find('[name='+value.field+']').nextAll('.help-inline').html("<li>"+value.message+"</li>")
+                            }
                         });
+                        $(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(errorMsg);
                     }    
                 }, error:function (xhr, ajaxOptions, thrownError){
                     //successHandler is used when ajax login succedes
@@ -249,5 +266,3 @@ $(document).ready(function() {
     });
 
 });
-
-

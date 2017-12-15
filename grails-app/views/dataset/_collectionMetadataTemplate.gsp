@@ -118,6 +118,14 @@ if(supportingModules_dp) {
             <sUser:selectUsers model="['id':autofillUserComp]" />
             <%def user = SUser.read(instance?.party?.contributorId);%>
             <input type="hidden" name="contributorUserIds" id="contributorUserIds" data-contributorid="${user?.id}"  data-contributorname="${user?.name}" />
+            <div class="help-inline">
+            <g:hasErrors bean="${instance.party}" field="contributorId">
+            <g:eachError bean="${instance.party}" field="contributorId">
+            <li><g:message error="${it}" /></li>
+            </g:eachError>
+            </g:hasErrors>
+            </div>
+
         </div>
     </div>
 
