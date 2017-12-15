@@ -48,7 +48,7 @@
           </li>
           <!-- /.dropdown -->
 
-		 <li class="dropdown ${(['observation','checklist','datasource'].contains(params.controller))?'active':''}">
+		 <li class="dropdown ${(['observation','checklist','dataTable', 'dataset'].contains(params.controller))?'active':''}">
 		 <a	href="#" title="${g.message(code:'default.observation.label')}" class="dropdown-toggle" data-toggle="dropdown">
 		 		<span title="${g.message(code:'created.today')}" class="statsTicker obvUpdateCount"> </span>
 		 		<g:message code="default.observation.label" />
@@ -58,10 +58,10 @@
               <li class="mega-menu-column">
                 <ul>
                   <li><a href="${uGroup.createLink('controller':'observation', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a></li>
-                  <li><a href="${uGroup.createLink('controller':'checklist', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.checklist.label')}"><g:message code="default.checklist.label" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'checklist', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.list.label')}"><g:message code="default.list.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'dataTable', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.dataTables.label')}"><g:message code="default.dataTables.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'dataset', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasets.label')}"><g:message code="default.datasets.label" /></a></li>
-                  <li><a href="${uGroup.createLink('controller':'datasource', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li>
+                  <!--li><a href="${uGroup.createLink('controller':'datasource', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li-->
  
                 </ul>
               </li>

@@ -26,37 +26,10 @@ class Party {
     static mapping = {
         attributions type:'text'
     }
-/*
-    SUser getUploader() {
-        return SUser.get(uploaderId);
-    }
-
-    void setUploader(SUser user) {
-        this.uploaderId = user.id;
-    }
 
     SUser getContributor() {
         return SUser.get(contributorId);
     }
-
-    void setContributor(SUser user) {
-        this.contributorId = user.id;
-    }
-
-    List<String> getAttributions() {
-        return attributions;
-    }
-
-    void setAttributions(List<String> attributions) {
-        def a = [];
-        attributions.each {
-            a << new Contributor(name:it);
-        }
-        this.attributions = a;
-    }
-*/
-
-
 }
 
 

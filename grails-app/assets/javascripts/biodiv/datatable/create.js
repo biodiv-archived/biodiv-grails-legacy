@@ -20,7 +20,8 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                 showSampleDataTable();
                 var contributorId = $('#contributorUserIds').data('contributorid'); 
                 var contributorName = $('#contributorUserIds').data('contributorname'); 
-                dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
+                if(contributorId != '' )
+                    dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
                 loadSpeciesGroupTraits();
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
@@ -79,13 +80,24 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         el += "<optgroup label='General'>"
             el += "<option class='generalColumn' value='sciNameColumn'>Scientific Name</option>"; 
         el += "<option class='generalColumn' value='commonNameColumn'>Common Name</option>"; 
-        el += "<option class='generalColumn' value='obvDate'>Date</option>"; 
-        el += "<option class='generalColumn' value='placeName'>Place Name</option>"; 
+        el += "<option class='generalColumn' value='language'>Common Name Language</option>"; 
+        el += "<option class='generalColumn' value='observed on'>Date</option>"; 
+        el += "<option class='generalColumn' value='group'>Species Group</option></optgroup>"; 
+        el += "<option class='generalColumn' value='habitat'>Habitat</option></optgroup>"; 
+        el += "<option class='generalColumn' value='location title'>Place Name</option>"; 
         el += "<option class='generalColumn' value='latitude'>Latitude</option>"; 
         el += "<option class='generalColumn' value='longitude'>Longitude</option></optgroup>"; 
+        el += "<option class='generalColumn' value='location scale'>Location Scale</option></optgroup>"; 
+        el += "<option class='generalColumn' value='geoprivacy'>Geo-privacy</option></optgroup>"; 
         el += "<option class='generalColumn' value='license'>License</option></optgroup>"; 
         el += "<option class='generalColumn' value='user email'>Contributor</option></optgroup>"; 
         el += "<option class='generalColumn' value='attribution'>Attribution</option></optgroup>"; 
+        el += "<option class='generalColumn' value='filename'>Filenames (CSV)</option></optgroup>"; 
+        el += "<option class='generalColumn' value='notes'>Notes</option></optgroup>"; 
+        el += "<option class='generalColumn' value='tags'>Tags</option></optgroup>"; 
+        el += "<option class='generalColumn' value='help identify?'>Help Identify?</option></optgroup>"; 
+        el += "<option class='generalColumn' value='post to user groups'>Post to User Groups</option></optgroup>"; 
+        el += "<option class='generalColumn' value='comment'>Comment</option></optgroup>"; 
 
         el += "<optgroup label='Traits'>"
             var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');

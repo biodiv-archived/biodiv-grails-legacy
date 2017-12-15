@@ -209,12 +209,14 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                     if(url == 'http://rs.tdwg.org/dwc/terms/scientificName') column = ipColumnName
                 } else if(mappedColumnName == 'commonNameColumn') {
                     if(url == 'http://rs.tdwg.org/dwc/terms/vernacularName') column = ipColumnName
-                } else if(mappedColumnName == 'obvDate') {
+                } else if(mappedColumnName == 'observed on') {
                     if(url == 'http://rs.tdwg.org/dwc/terms/eventDate') column = ipColumnName
-                }  else if(mappedColumnName == 'placeName') {
+                }  else if(mappedColumnName == 'location title') {
                     if(url == 'http://rs.tdwg.org/dwc/terms/locality') column = ipColumnName
                 }  else if(mappedColumnName == 'latitude') {
                     if(url == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') column = ipColumnName
+                }  else if(mappedColumnName == 'longitude') {
+                    if(url == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') column = ipColumnName
                 }  
                 if(uploadLog) uploadLog << "\nmapping "+ipColumnName+" : "+mappedColumnName+" ("+url+")";
             }
