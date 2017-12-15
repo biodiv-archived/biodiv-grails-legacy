@@ -18,7 +18,9 @@ import species.participation.Featured;
 import species.utils.Utils;
 import species.Language;
 import species.dataset.Dataset;
+import species.dataset.DataTable;
 import species.trait.Fact;
+
 abstract class Metadata {
 	
 	public enum LocationScale {
@@ -101,6 +103,7 @@ abstract class Metadata {
     Date lastCrawled;
 
     Dataset dataset;
+    DataTable dataTable;
 
     def grailsApplication
 	def activityFeedService
@@ -139,6 +142,7 @@ abstract class Metadata {
 		viaId nullable:true
 		viaCode nullable:true
 		dataset nullable:true
+		dataTable nullable:true
         lastInterpreted nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
@@ -249,8 +253,12 @@ abstract class Metadata {
 
             traitFactMap['fact'] << fact.id
         }
-        queryParams.trait.each {k,v->
-            queryParams.trait[k] = v[0..-2];
+        if(queryParams.trait) {
+            queryParams.trait.each {k,v->
+                if(queryParams.trait[k]) {
+                    queryParams.trait[k] = v[0..-2];
+                }
+            }
         }
         return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
     }

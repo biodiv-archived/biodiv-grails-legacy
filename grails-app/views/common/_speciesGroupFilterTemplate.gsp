@@ -101,17 +101,7 @@ $(document).ready(function(){
 	</div>
 </g:if>
 <g:if test="${forObservations}">
-<%--	<div id="observationAllChecklistFilter" class="btn-group"--%>
-<%--		style="float: right; margin-right: 5px; z-index: 10; position: absolute; margin-top: -65px; right: 250px;">--%>
-<%--		<input type="text" id="observationAllChecklistFilter"--%>
-<%--			value="${params.isChecklistOnly}" style="display: none" />--%>
-<%--		<button id="observationAllButton" class="btn"--%>
-<%--			rel="tooltip" data-original-title="${g.message(code:'speciesgroupfilter.title.show.all')}"><g:message code="default.all.label" /></button>--%>
-<%--		<button id="observationChecklistOnlyButton" class="btn" rel="tooltip"--%>
-<%--			data-original-title="${g.message(code:'speciesgroupfilter.title.show.only')}"><g:message code="default.checklist.label" /></button>--%>
-<%--	</div>--%>
-
-	<div style="height:30px;">
+<div style="height:30px;">
 	<g:if test="${!params.isChecklistOnly}">
 		<div id="observationMediaFilter" class="btn-group"
 			style="float: right;">

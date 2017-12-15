@@ -1,5 +1,12 @@
 <%@ page import="species.groups.CustomField"%>
-<g:if test="${userGroupInstance.id && !CustomField.fetchCustomFields(userGroupInstance).isEmpty()}">
+<% def customFields;
+if(userGroupInstance && userGroupInstance.id) {
+    customFields = CustomField.fetchCustomFields(userGroupInstance);
+} else if(dataPackageInstance ** dataPackageInstance.id) {
+    customFields = CustomField.fetchCustomFields(dataPackageInstance);
+}
+%>
+<g:if test="${!customFields.isEmpty()}">
 <div>
 	<div>
 		<table class="table table-hover" style="margin-left: 0px;">
@@ -18,7 +25,7 @@
 			</thead>
 		
 			<tbody class="mainContentList">
-				<g:each in="${CustomField.fetchCustomFields(userGroupInstance)}" status="i"
+				<g:each in="${customFields}" status="i"
 					var="cf">
 					<tr class="mainContent">
 						<td>

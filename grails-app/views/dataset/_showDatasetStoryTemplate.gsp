@@ -3,31 +3,10 @@
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
+<%@page import="species.auth.SUser"%>
 
-<div name="${datasetInstance.id}" class="sidebar_section observation_story" style="height:100%;width:100%;margin:0px;">
-    <h5>
-        <a name="${datasetInstance.id}"></a>
-        <span><g:message code="dataset.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false) }" name="l${pos}">
-        ${datasetInstance.title}
-        </g:link>
-    
-    </h5>
-    <sUser:ifOwns model="['user':datasetInstance.author]">
-
-        <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-            href="${uGroup.createLink(controller:'dataset', action:'edit', id:datasetInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-            <i class="icon-edit"></i><g:message code="button.edit" /></a>
-
-        <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;" data-id="${datasetInstance.id}"
-            href="#"
-            onclick="if(confirm('${message(code: 'default.delete.confirm.message', args:['dataset'], default: 'This dataset will be deleted. Are you sure ?')}')) {deleteDataset(this);}"><i class="icon-trash"></i><g:message code="button.delete" /></a>
-
-        </sUser:ifOwns>
-
-
-
-    <g:if test="${showFeatured}">
+<div name="${datasetInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%">
+   <g:if test="${showFeatured}">
     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
     </g:if>
 
@@ -41,37 +20,20 @@
     </div>
     </g:if>
     <g:else>
-    <%long noOfObservations = Observation.countByDatasetAndIsDeleted(datasetInstance, false)%>
-    <g:if test="${noOfObservations || datasetInstance.id == 3}">
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-        <div class="prop">
-            <g:if test="${showDetails}">
-            <span class="name"><i class="icon-share-alt"></i><g:message code="showdataset.observationCount" /></span>
-            </g:if>
-            <g:else>
-            <i class="pull-left icon-share-alt"></i>
-            </g:else>
-            <div class="value">
-                <g:if test="${datasetInstance.id != 3}">
-                <span class="stats_number" title="No of Observations">${noOfObservations}</span>
-                </g:if>
+        <g:if test="${showTitleDetail}">
+            <div class="prop">
+                <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
 
-                <div>
-                    <%
-                    String url = uGroup.createLink(controller:'observation', action:'list', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'dataset':datasetInstance.id, isMediaFilter:false);
-                    if(datasetInstance.id == 3) {
-                        url = '/map?layers=lyr_410_butterflyspeciesdistribution&title=Butterfly';
-                    }
-                    %> 
-                    <g:link class="btn btn-small btn-primary" url="${url}" name="l${pos}">
-                    View All
-                    </g:link>
+                <div class="value">
+                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title}</b></a>
                 </div>
             </div>
-        </div> 
-            </g:if>
-            
-            <g:if test="${datasetInstance.description}">
+        </g:if>
+
+
+
+        <g:if test="${datasetInstance.description}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
@@ -79,17 +41,19 @@
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
                         %> 
-                        <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
+                            <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
                                 <%  
                                     styleVar = "none"
                                     clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
                                 %>
                             </g:if>
+                            <g:else>
+ <%                           clickcontentVar = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%>
+                            </g:else>
                             ${raw(clickcontentVar)}
-                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
                     
                         </div>
-                    </g:if>
+                   </g:if>
                     <g:else>
                     <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
                     <div class="value notes_view linktext ellipsis multiline">
@@ -98,25 +62,10 @@
 
                     </g:else>
                 </div>
-            </g:if>
+        </g:if>
 
-            <g:if test="${datasetInstance.rights}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-globe"></i><g:message code="default.accessRights.label" /></span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-globe"></i>
-                    </g:else>
-
-                    <div class="value">
-                        ${datasetInstance.rights}
-                    </div>
-                </div>
-                </g:if>
-
-
-            <g:if test="${showDetails}">
+   
+        <g:if test="${showDetails}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-time"></i><g:message code="default.submitted.label" /></span>
@@ -158,30 +107,34 @@
                     </div>
                 </div>
                 </g:if>
-
+               
+                <g:if test="${datasetInstance.customFields}">
+                <g:each in="${datasetInstance.fetchCustomFields()}" var="${cf}">
+                <g:each in="${cf}" var="${cfv}">
                 <div class="prop">
                     <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
+                    <span class="name"><i class="icon-globe"></i>${cfv.key}</span>
                     </g:if>
                     <g:else>
-                    <i class="pull-left icon-info-sign"></i>
+                    <i class="pull-left icon-globe"></i>
                     </g:else>
 
-                    <div class="value linktext">
-                        <g:if test="${datasetInstance.attribution}">
-                        ${datasetInstance.attribution}
-                        </g:if>
-                        <g:else>
-                        ${datasetInstance.datasource.title} (${UtilsService.formatDate(datasetInstance.publicationDate)}) ${datasetInstance.title}
-                        </g:else>
+                    <div class="value">
+                        ${cfv.value} 
                     </div>
                 </div>
-   
-           </g:if>
+                </g:each>
+                </g:each>
+                </g:if>
+
+                
+                
+  
+        </g:if>
 
         </div>
         </g:else>
-    </div>
+</div>
 <style>
     <g:if test="${!showDetails}">
 

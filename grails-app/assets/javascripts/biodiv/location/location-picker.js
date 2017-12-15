@@ -36,7 +36,7 @@ function loadMapInput(geotaggedImages=undefined) {
             locationPicker.initialize();
             $(map_class).find('.spinner').hide();
             
-            if(window.params.controller == 'checklist'){
+            if(window.params.controller == 'checklist'||window.params.controller == 'dataset' || window.params.controller == 'dataTable'){
                 drawControls = {
                     rectangle:true,
                     polygon:true,
@@ -975,7 +975,7 @@ function useTitle(obj){
 
 }(window.jQuery)); 
 
-$(document).ready(function() { 
+function initLocationPicker() {
   $('.placeName').attr('placeholder', $(".placeName").attr('rel')); 
 
 //alert($(".placename").attr('rel'));
@@ -996,9 +996,10 @@ $(document).ready(function() {
   });
   $(".address").unbind('click').click(loadMapInput);
 
-  $(function() {
 
-  });
+}
 
+$(document).ready(function() { 
+    initLocationPicker();
 });
 

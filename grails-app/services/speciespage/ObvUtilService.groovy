@@ -13,7 +13,6 @@ import species.auth.SUser
 import species.groups.SpeciesGroup;
 import species.groups.UserGroup 
 import species.participation.*
-import species.participation.Observation.ProtocolType;
 import species.participation.RecommendationVote.ConfidenceType
 import species.Habitat
 import species.utils.Utils;
@@ -38,6 +37,9 @@ import grails.converters.JSON;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import species.participation.Observation.BasisOfRecord;
 import species.participation.Observation.ProtocolType;
+import species.License;
+import species.License.LicenseType;
+
 
 class ObvUtilService {
 
@@ -48,6 +50,7 @@ class ObvUtilService {
 	static final String SPECIES_GROUP = "group"
 	static final String HABITAT = "habitat"
 	static final String OBSERVED_ON   = "observed on"
+	static final String TO_DATE   = "to date"
 	static final String CN    = "common name"
 	static final String LANGUAGE    = "language"
 	static final String SN    = "scientific name"
@@ -105,6 +108,7 @@ class ObvUtilService {
 	def commentService
     def messageSource;
     def sessionFactory;
+    def factService;
 
     SpeciesGroup defaultSpeciesGroup;
     Habitat defaultHabitat;
@@ -608,7 +612,7 @@ class ObvUtilService {
 		resultObv.clear();
 	}
 	
-	boolean uploadObservation(imageDir, Map m, List resultObv, File uploadLog=null) {
+	boolean uploadObservation(imageDir, Map m, List resultObv, File uploadLog=null, ProtocolType protocolType = ProtocolType.MULTI_OBSERVATION) {
         Map obvParams = [:];
         boolean result;
 
@@ -622,25 +626,25 @@ class ObvUtilService {
                 }
             }
 
-            if(!obvParams){
+            if(!obvParams && !(protocolType == ProtocolType.BULK_UPLOAD || protocolType == ProtocolType.LIST)){
               log.error "No image file .. aborting this obs upload with params " + m
               return false
             }
 
             utilsService.benchmark ('populateParams') {
-                populateParams(obvParams, m)
+                populateParams(obvParams, m, protocolType)
             }
 
 
             log.debug "Populated Obv Params ${obvParams}"
             utilsService.benchmark('saveObv') {
-                result = saveObv(obvParams, resultObv, uploadLog, true)
+                result = saveObv(obvParams, resultObv, uploadLog, true, protocolType);
             }
         }
         return result;
 	}
 	
-	private void populateParams(Map obvParams, Map m){
+	private void populateParams(Map obvParams, Map m, ProtocolType protocolType){
 		
 		//mandatory
         SpeciesGroup sG = m[SPECIES_GROUP] ? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()) : null
@@ -655,6 +659,12 @@ class ObvUtilService {
 		obvParams['reverse_geocoded_name'] = m[LOCATION]
 		obvParams['topology'] = m[TOPOLOGY];
 		//reco related
+        println "+++++++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++++++"
+        println m
+        println m[SN]
+        println "+++++++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++++++"
 		obvParams['recoName'] = m[SN]
 		obvParams['commonName'] = m[CN] 
 		obvParams['languageName'] = m[LANGUAGE]
@@ -669,6 +679,7 @@ class ObvUtilService {
 		obvParams['userGroupsList'] = getUserGroupIds(m[USER_GROUPS])
 		
 		obvParams['fromDate'] = m[OBSERVED_ON]
+		obvParams['toDate'] = m[TO_DATE]
 		
 		//author
         if(m[AUTHOR_EMAIL]) {
@@ -684,7 +695,10 @@ class ObvUtilService {
 		obvParams['externalUrl'] = m[OBSERVATION_URL]
 		obvParams['viaId'] = m[COLLECTION_ID]
 		obvParams['viaCode'] = m[COLLECTION_CODE]
-		obvParams['dataset'] = m['dataset']
+        if(m['dataTable']) {
+            obvParams['dataTable'] = m['dataTable'];
+            obvParams['sourceId'] = m['dataTable'].id;
+        }
 
         if(m['geoprivacy'] || m[GEO_PRIVACY])
     		obvParams['geoPrivacy'] = m["geoprivacy"] ?: m[GEO_PRIVACY];
@@ -702,10 +716,13 @@ class ObvUtilService {
 
         if(m[DwCObservationImporter.ANNOTATION_HEADER])
             obvParams['checklistAnnotations'] = m[DwCObservationImporter.ANNOTATION_HEADER] as JSON;
+        if(m[DwCObservationImporter.TRAIT_HEADER])
+            obvParams['traits'] = m[DwCObservationImporter.TRAIT_HEADER];
+
 
 
 		obvParams['basisOfRecord'] = m[BASISOFRECORD] ? BasisOfRecord.getEnum(m[BASISOFRECORD]): BasisOfRecord.HUMAN_OBSERVATION;
-		obvParams['protocol'] = m[PROTOCOL]? ProtocolType.getEnum(m[PROTOCOL]) : ProtocolType.MULTI_OBSERVATION;
+		obvParams['protocol'] = m[PROTOCOL]? ProtocolType.getEnum(m[PROTOCOL]) : protocolType;
 		obvParams['externalDatasetKey'] = m[EXTERNAL_DATASET_KEY]
 		obvParams['lastCrawled'] = m[LAST_CRAWLED]
 		obvParams['catalogNumber'] = m[CATALOG_NUMBER]
@@ -736,19 +753,21 @@ class ObvUtilService {
 		return gIds.join(",")
 	}
 	
-	private boolean saveObv(Map params, List result, File uploadLog=null, boolean newObv=false) {
+	private boolean saveObv(Map params, List result, File uploadLog=null, boolean newObv=false, ProtocolType protocolType=ProtocolType.MULTI_OBSERVATION) {
         boolean success = false;
-		if(!params.author && !params.originalAuthor) {
-			log.error "Author not found for params $params"
-            if(uploadLog) uploadLog << "\nAuthor not found for params $params"
+	
+	
+        if(!isValidObservation(params, uploadLog, protocolType)) {
+			log.error "Aborting saving this observation as it is not valid for above reasons. Obv : $params"
+            if(uploadLog) uploadLog << "\nAborting saving this observation as it is not valid for above reasons. Obv: $params"
 
 			return false
-		}
-		
+		}	
+
 		def observationInstance;
 		try {
 			observationInstance =  observationService.create(params);
-            observationInstance.protocol = ProtocolType.BULK_UPLOAD;
+            observationInstance.protocol = protocolType;
             observationInstance.clearErrors();
             //following line was needed as : image saving in XMLConverter was calling observation before and afterUpdate.... so obv is gng out of sync
             println "+++++++++++++++++++++++++++++++++++++"
@@ -763,7 +782,9 @@ class ObvUtilService {
 
 				params.obvId = observationInstance.id
 				params.author = observationInstance.author
+                println "11111111111"
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
+                println "2222222222"
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
@@ -784,16 +805,14 @@ class ObvUtilService {
 
     private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null) {
         params.identifiedBy = params.identifiedBy;
-
-        utilsService.benchmark('addReco') {
-            addReco(params, observationInstance, newObv)
-        }
-
+println "333333333333"
+        addReco(params, observationInstance, newObv)
+println "444444444444"
         if(uploadLog) 
             uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id;
         
 		println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
-        if(observationInstance.dataset && observationInstance.maxVotedReco?.taxonConcept &&observationInstance.maxVotedReco?.taxonConcept.group ) {
+        if(observationInstance.dataTable && observationInstance.maxVotedReco?.taxonConcept && observationInstance.maxVotedReco?.taxonConcept.group ) {
             observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
         }
 
@@ -801,6 +820,7 @@ class ObvUtilService {
             def tags = (params.tags != null) ? new ArrayList(params.tags) : new ArrayList();
             observationInstance.setTags(tags);
         }
+
         utilsService.benchmark('setGroups') {
             if(params.groupsWithSharingNotAllowed) {
                 observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
@@ -811,7 +831,19 @@ class ObvUtilService {
             }
         }
 		
-        if(!observationInstance.save(flush:true)){
+        //customFieldService.updateCustomFields(params, observationInstance.id)
+        if(params.traits) {
+            utilsService.benchmark('setTraits') {
+                println "Saving Traits"
+                def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
+                traitParams.putAll(params.traits);
+                println "---------------------"
+                println traitParams;
+                factService.updateFacts(traitParams, observationInstance);
+            }
+        }
+
+        if(!observationInstance.save()){
             if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
                 observationInstance.errors.allErrors.each { 
                     if(uploadLog) uploadLog << "\n"+it; 
@@ -822,10 +854,11 @@ class ObvUtilService {
 
 	private addReco(params, Observation observationInstance, boolean newObv=false){
 		def recoResultMap;
-        utilsService.benchmark('observationService.getRecommendation') {
-            params.flushImmediately = false;
-            recoResultMap = observationService.getRecommendation(params);
-        }
+        params.flushImmediately = false;
+        recoResultMap = observationService.getRecommendation(params);
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 		def reco = recoResultMap.mainReco;
 		def commonNameReco =  recoResultMap.commonNameReco;
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
@@ -847,7 +880,7 @@ class ObvUtilService {
                 recommendationVoteInstance.votedOn = dateIdentified;
             }
 		}
-		
+	println "savingRecoVote savingRecoVote savingRecoVote savingRecoVote savingRecoVote"	
         utilsService.benchmark('savingRecoVote') {
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save()) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
@@ -873,9 +906,9 @@ class ObvUtilService {
 			
 	}
 
-	private uploadImageFiles(imageDir, imagePaths, license, author){
-		def resourcesInfo = [:];
-		def rootDir = grailsApplication.config.speciesPortal.observations.rootDir
+	private Map uploadImageFiles(imageDir, imagePaths, license, author){
+		Map resourcesInfo = [:];
+		String rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 		File obvDir
 		int index = 1
 		imagePaths.each{ path ->
@@ -883,7 +916,7 @@ class ObvUtilService {
             if(f.exists()){
 				log.debug "uploading file $f"
 				if(f.length()  > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-					log.debug  'File size cannot exceed ${104857600/1024}KB'
+					log.debug  'File size cannot exceed ${104857600/1024}KB' 
 				} else if(f.length() == 0) {
 					log.debug 'File cannot be empty'
 				} else {
@@ -914,5 +947,45 @@ class ObvUtilService {
 		return resourcesInfo
 	}
 	
+    private boolean isValidObservation(Map params, File uploadLog, ProtocolType protocolType) {
+        def media = params['file_1']
+        def snCol = params['recoName']
+        def cnCol = params['commonName']
+
+        boolean isValid = true;
+        if(!params.author && !params.originalAuthor) {
+			log.error "Author not found for params $params"
+            if(uploadLog) uploadLog << "\nAuthor not found for params $params"
+            isValid = false;
+		}
+
+        switch(protocolType) {
+            case(ProtocolType.BULK_UPLOAD) :
+            if(media && (snCol	|| cnCol) ) {
+            } else {
+                log.error "Media and either of sciNameColumn or commonNameColumn is required"
+                if(uploadLog) uploadLog << "\n Media and either of sciNameColumn or commonNameColumn or Media is required";
+                isValid = false;
+            }
+            break;
+            case(ProtocolType.LIST):
+            if(!(snCol	|| cnCol || media) ) {
+                log.error "Either of sciNameColumn or commonNameColumn or Media is required";
+                if(uploadLog) uploadLog << "\n Either of sciNameColumn or commonNameColumn or Media is required";
+                isValid = false;
+            }
+            break;
+            default:
+            if(!media) {
+                log.error "Atleast one media resource is required"
+                if(uploadLog) uploadLog << "\n Atleast one media resource is required";
+                isValid = false;
+            }
+            break;
+            //TODO: More validation on obv is reqd here.e.g., on  location col
+
+        }
+        return isValid;
+    }
 
 }

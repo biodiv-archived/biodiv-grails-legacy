@@ -52,7 +52,7 @@
           </li>
           <!-- /.dropdown -->
 
-		 <li class="dropdown ${(['observation','checklist','datasource'].contains(params.controller))?'active':''}">
+		 <li class="dropdown ${(['observation','checklist','dataTable', 'dataset'].contains(params.controller))?'active':''}">
 		 <a	href="#" title="${g.message(code:'default.observation.label')}" class="dropdown-toggle" data-toggle="dropdown">
 		 		<span title="${g.message(code:'created.today')}" class="statsTicker obvUpdateCount"> </span>
 		 		<g:message code="default.observation.label" />
@@ -62,8 +62,11 @@
               <li class="mega-menu-column">
                 <ul>
                   <li><a href="${uGroup.createLink('controller':'observation', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a></li>
-                  <li><a href="${uGroup.createLink('controller':'checklist', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.checklist.label')}"><g:message code="default.checklist.label" /></a></li>
-                  <li><a href="${uGroup.createLink('controller':'datasource', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'checklist', 'userGroup':userGroupInstance)}" title="${g.message(code:'heading.browse.checklists')}"><g:message code="heading.browse.checklists" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'dataTable', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.dataTables.label')}"><g:message code="default.dataTables.label" /></a></li>
+                  <!--li><a href="${uGroup.createLink('controller':'dataset', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasets.label')}"><g:message code="default.datasets.label" /></a></li-->
+                  <!--li><a href="${uGroup.createLink('controller':'datasource', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li-->
+ 
                 </ul>
               </li>
             </ul>
@@ -107,7 +110,7 @@
                   </li>
                   <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.list.description')}" data-trigger="hover"
                                     href="${uGroup.createLink(
-                                    controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add a List" title="${g.message(code:'link.add.list')}"> <i class="icon-plus"></i><g:message code="link.add.list" /></a>
+                                    controller:'dataTable', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add a List" title="${g.message(code:'link.add.list')}"> <i class="icon-plus"></i><g:message code="link.add.list" /></a>
  </li>
                   
                   <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.document.info')}" data-trigger="hover"
@@ -150,8 +153,8 @@
                                             href="${uGroup.createLink("controller":"discussion", "action":"list")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
 					</li>
 
-                    <li class=" ${(params.controller == 'datasource')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"datasource", "action":"list")}" title="${g.message(code:'button.datasources')}"><g:message code="button.datasources" /></a>
+                    <li class=" ${(params.controller == 'dataset')?'active':''}"><a
+                                            href="${uGroup.createLink("controller":"dataset", "action":"list")}" title="${g.message(code:'button.datasets')}"><g:message code="button.datasets" /></a>
 					</li>
 
 
@@ -191,7 +194,8 @@
 						</ul>
 					</li>
 				        <!-- /.nav --> 
-      </nav>
+            </ul>
+     </nav>
       <!--/.nav-collapse --> 
 			
 		</div>

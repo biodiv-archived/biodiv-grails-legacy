@@ -20,8 +20,11 @@ import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
 import org.springframework.util.StringUtils;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-
+import org.springframework.social.facebook.connect.FacebookConnectionFactory;
+import org.springframework.social.facebook.api.Facebook;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.LinkedMultiValueMap;
 
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 import species.auth.Role
@@ -212,17 +215,33 @@ class OpenIdController {
 	def createFacebookAccount = {
 
 		def token = session["LAST_FACEBOOK_USER"]
-
 		if (!token) {
 			flash.error = messageSource.getMessage("login.errors.facebook.fetch.accessToken", null, RCU.getLocale(request))
 			return
 		}
 
 		log.debug "Processing facebook registration in createAccount"
+        log.debug "LAST_FACEBOOK_USER : ${token}"
 		FacebookTemplate facebook = new FacebookTemplate(token.accessToken.accessToken);
+        log.debug facebook
+        println ClientHttpRequestFactorySelector.getRequestFactory();
+        
+        /*def facebookConnectionFactory = new FacebookConnectionFactory(client, secret);
+        facebookConnectionFactory.setScope("public_profile,email");
+        Connection<Facebook> connection = facebookConnectionFactory.findPrimaryConnection(Facebook.class);
+        Facebook facebook = connection != null ? connection.getApi() : null;
+*/
 		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
-		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
-
+        MultiValueMap map = new LinkedMultiValueMap();
+        map.addAll('fields', 'id, name, email');
+        FacebookProfile fbProfile = facebook.fetchObject("me", FacebookProfile.class, map);
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+		//FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
+log.debug fbProfile
 		//TODO: if there are multiple email accounts available choose among them
 		String email = fbProfile.email;
 

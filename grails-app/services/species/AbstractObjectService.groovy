@@ -534,17 +534,8 @@ class AbstractObjectService {
     }
 
     Map getTraits(String t) {
-        Map traits = [:];
-        if(t) {
-            t.split(';').each {
-                if(it) {
-                    String[] x = it.split(':');
-                    if(x.size() == 2)
-                        traits[x[0]] = x[1].trim();
-                }
-            }
-        }
-        return traits;
+        //HACK to use this fn from obvUtilService in bulk upload... shd be placed in obvutil
+        return utilsService.getTraits(t);
     }
 
     //TO BE DELETED AND MOVED TO UTILSSERVICE

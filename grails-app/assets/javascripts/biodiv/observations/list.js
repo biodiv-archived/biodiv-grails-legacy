@@ -1296,6 +1296,7 @@ function setActiveTag(activeTag){
 
 function updateListPage(activeTag) {
     return function (data) {
+    console.log(data);
         $('.observations_list:first').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);

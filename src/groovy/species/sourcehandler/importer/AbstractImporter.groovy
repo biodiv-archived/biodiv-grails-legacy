@@ -8,6 +8,8 @@ import grails.converters.JSON;
 import java.io.InputStream;
 
 abstract class AbstractImporter {
+
+    public char separator = '\t';
     
     public CSVReader getCSVReader(String directory, String fileName) {
         char separator = '\t'
@@ -15,10 +17,10 @@ abstract class AbstractImporter {
         return getCSVReader(f);
     }
 
-    public CSVReader getCSVReader(File file) {
-        char separator = '\t'
+    public CSVReader getCSVReader(File file, char separator = separator) {
+        //char separator = '\t'
         if(file.exists()) {
-            CSVReader reader = new CSVReader(new FileReader(file), separator, CSVWriter.NO_QUOTE_CHARACTER);
+            CSVReader reader = new CSVReader(new FileReader(file), separator);
             return reader
         }
         return null;
@@ -37,6 +39,14 @@ abstract class AbstractImporter {
         
     }
 
+    def CSVWriter getCSVWriter(String directory, String fileName) {
+        char separator = '\t'
+        File dir =  new File(directory)
+        if(!dir.exists()){
+            dir.mkdirs()
+        }
+        return new CSVWriter(new FileWriter("$directory/$fileName"), separator, CSVWriter.NO_QUOTE_CHARACTER );
+    }
 //    abstract Map importData(String directory, File uploadLog=null);
 }
 

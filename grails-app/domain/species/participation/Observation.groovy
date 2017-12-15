@@ -29,6 +29,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import java.io.InputStream;
 import species.trait.Fact;
 import species.groups.UserGroup.FilterRule;
+import species.dataset.DataTable;
 
 class Observation extends DataObject {
 	
@@ -192,7 +193,7 @@ class Observation extends DataObject {
     int noOfIdentifications=0;
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
-	static belongsTo = [SUser, UserGroup, Checklists, Dataset]
+	static belongsTo = [SUser, UserGroup, Checklists, Dataset, DataTable]
     static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
 
  	static constraints = {
@@ -205,7 +206,7 @@ class Observation extends DataObject {
 			//XXX ignoring validator for checklist and its child observation. 
 			//all the observation generated from checklist will have source id in advance based on that we are ignoring validation.
 			// Genuine observation will not have source id and checklist as false
-			if(!obj.sourceId && !obj.isChecklist && !obj.externalId) 
+			if(!obj.sourceId && !obj.isChecklist && !obj.externalId && obj.protocol!=ProtocolType.LIST) 
 				val && val.size() > 0 
 		}
 		latitude nullable: false
@@ -696,14 +697,26 @@ class Observation extends DataObject {
 	def fetchChecklistAnnotation(){
 		def res = [:]
 		Checklists cl = Checklists.read(sourceId)
-		if(cl && checklistAnnotations){
+        println  "*****************************************"
+        println  "*****************************************"
+        println checklistAnnotations
+        println  "*****************************************"
+        println  "*****************************************"
+		if(cl && checklistAnnotations && isChecklist){
+            println "CHECKLISTTTTTTTTTTTTTTTTTT"
 			def m = JSON.parse(checklistAnnotations)
 			cl.fetchColumnNames().each { name ->
 				res.put(name, m[name])
 			}
-		} else if(checklistAnnotations) {
+		} else if(dataTable) {
+            def m = JSON.parse(checklistAnnotations)
+			this.dataTable.fetchColumnNames().each { name ->
+                println name
+				res.put(name[1], m[name[1]])
+			}
+        } else if(checklistAnnotations) {
             res = JSON.parse(checklistAnnotations);
-            
+            println res
             //read dwcObvMapping
             InputStream dwcObvMappingFile = this.class.classLoader.getResourceAsStream('species/dwcObservationMapping.tsv')
             Map dwcObvMapping = [:];
@@ -722,13 +735,17 @@ class Observation extends DataObject {
 
             res = res.sort { dwcObvMapping[it.key.toLowerCase()]?dwcObvMapping[it.key.toLowerCase()].order:1000 }
             def m = [:];
+            println "+++++++++++++++++++++++"
+            println dwcObvMapping
             res.each {
+                println it;
                 if(it.value) {
                     m[it.key] = ['value':it.value, 'url':dwcObvMapping[it.key]?.url?:'']
                 }
             }
             res = m;
         }
+        println res;
 		return res
 	}
 

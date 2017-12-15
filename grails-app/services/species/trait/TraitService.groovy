@@ -542,29 +542,37 @@ println f
         }
 
         if(params.sGroup) {
-            params.sGroup = params.sGroup.toLong()
             //def groupId = getSpeciesGroupIds(params.sGroup)
+            if(params.sGroup instanceof Long) params.sGroup = params.sGroup+'';
             if(!params.sGroup){
                 log.debug("No groups for id " + params.sGroup)
             }else{
-                List<TaxonomyDefinition> taxons = SpeciesGroup.read(params.sGroup)?.getTaxon(); 
+                List<TaxonomyDefinition> taxons = [];
+                List s = [];
+                params.sGroup.split(',').each {
+                    Long x = Long.parseLong(it); 
+                    taxons.addAll(SpeciesGroup.read(x)?.getTaxon());
+                    s << x;
+                }
+
                 def classification;
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification));
-                    if(!classification)
-                        classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
-                    List parentTaxon = [];
-                    taxons.each {taxon ->
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                
+                List parentTaxon = [];
+                taxons.each {taxon ->
                     if(taxon) {
                         parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
                     }
                 }
                 queryParams['classification'] = classification.id; 
-                queryParams['sGroup'] = params.sGroup;
+                queryParams['sGroup'] = s;
                 queryParams['parentTaxon'] = parentTaxon ;
                 //queryParams['taxons'] = taxons;
                 activeFilters['classification'] = classification.id;
-                activeFilters['sGroup'] = params.sGroup;
+                activeFilters['sGroup'] = s;
 
                 if(params.showInObservation && params.showInObservation.toBoolean()){
                     filterQuery += ' and obv.showInObservation = :showInObservation '
@@ -581,7 +589,7 @@ println f
                     filterQuery += " ";// and reg.classification.id = :classification and ( ${inQuery} ) and taxon is null  ";
                 } else if(parentTaxon) {
                     inQuery = " taxon.id in (:parentTaxon) or " 
-                    filterQuery += " and (taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id = :sGroup) ";
+                    filterQuery += " and (taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id in (:sGroup)) ";
                 }
 
 
