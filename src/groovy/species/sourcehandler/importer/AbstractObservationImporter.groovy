@@ -202,21 +202,36 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         def header = ['Field', 'Column', 'Order'];
         writer.writeNext(header.toArray(new String[0]))
         def dataToWrite = [];
+        boolean sciNameFound=false;
+        boolean commonNameColumn=false;
+        boolean observedOn=false;
+        boolean locationTitle=false;
+        boolean latitude=false;
+        boolean longitude=false
         dwcObvMapping.each { url, fieldMapping ->
             String column = '';
             mapping.attribute.each {ipColumnName, mappedColumnName ->
                 if(mappedColumnName == 'sciNameColumn') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/scientificName') column = ipColumnName
+                    if(url == 'http://rs.tdwg.org/dwc/terms/scientificName') {column = ipColumnName
+                        sciNameFound = true;}
                 } else if(mappedColumnName == 'commonNameColumn') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/vernacularName') column = ipColumnName
+                    if(url == 'http://rs.tdwg.org/dwc/terms/vernacularName') {column = ipColumnName
+                        commonNameColumn=true;}
                 } else if(mappedColumnName == 'observed on') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/eventDate') column = ipColumnName
+                    if(url == 'http://rs.tdwg.org/dwc/terms/eventDate') {column = ipColumnName
+                        observedOn = true;
+                    }
                 }  else if(mappedColumnName == 'location title') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/locality') column = ipColumnName
+                    if(url == 'http://rs.tdwg.org/dwc/terms/locality'){ column = ipColumnName
+                        locationTitle=true;
+                    }
                 }  else if(mappedColumnName == 'latitude') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') column = ipColumnName
+                    if(url == 'http://rs.tdwg.org/dwc/terms/decimalLatitude'){ column = ipColumnName
+                        latitude=true;
+                    }
                 }  else if(mappedColumnName == 'longitude') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') column = ipColumnName
+                    if(url == 'http://rs.tdwg.org/dwc/terms/decimalLongitude'){ column = ipColumnName
+                        longitude=true;}
                 }  
                 if(uploadLog) uploadLog << "\nmapping "+ipColumnName+" : "+mappedColumnName+" ("+url+")";
             }
@@ -248,7 +263,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 temp.add(column);
                 temp.add("1000");
                 dataToWrite.add(temp.toArray(new String[0]))
-            } else {
+            } else if(!(sciNameFound||commonNameColumn||observedOn||locationTitle||latitude||longitude)){
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
                 def temp = [];
                 temp.add("http://ibp.org/terms/observation/"+mappedColumnName);

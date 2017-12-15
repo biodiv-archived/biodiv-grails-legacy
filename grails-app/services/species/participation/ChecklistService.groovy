@@ -857,7 +857,7 @@ if(!contributor)
                 }
                 utilsService.cleanUpGorm();
             }
-            println "Checklist ${cl} migration done"
+            println "Checklist ${id} migration done"
 	    }
         println "Successfully migrated all checklists"
 	}

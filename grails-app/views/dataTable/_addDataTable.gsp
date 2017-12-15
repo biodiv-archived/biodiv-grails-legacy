@@ -21,7 +21,7 @@
     }
 
     %>
-    <form id="${form_id}" action="${form_action}" method="POST" class="form-horizontal ${form_id}">
+    <form action="${form_action}" method="POST" class="form-horizontal ${form_id}">
 
         <input type="hidden" name="id" value="${dataTableInstance?.id}"/>
         <input type="hidden" name="dataset" value="${dataTableInstance?.dataset?.id}"/>
