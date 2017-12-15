@@ -153,8 +153,8 @@
                                             href="${uGroup.createLink("controller":"discussion", "action":"list")}" title="${g.message(code:'button.discussions')}"><g:message code="button.discussions" /><span title="${g.message(code:'updated.today')}" class="statsTicker disUpdateCount"> </span></a>
 					</li>
 
-                    <li class=" ${(params.controller == 'datasource')?'active':''}"><a
-                                            href="${uGroup.createLink("controller":"datasource", "action":"list")}" title="${g.message(code:'button.datasources')}"><g:message code="button.datasources" /></a>
+                    <li class=" ${(params.controller == 'dataset')?'active':''}"><a
+                                            href="${uGroup.createLink("controller":"dataset", "action":"list")}" title="${g.message(code:'button.datasets')}"><g:message code="button.datasets" /></a>
 					</li>
 
 
