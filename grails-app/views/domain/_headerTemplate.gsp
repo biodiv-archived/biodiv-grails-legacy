@@ -94,12 +94,12 @@
             <ul class="dropdown-menu mega-menu pull-right contributeUL" style="width:280px;">
               <li class="mega-menu-column">
                 <ul>
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.species.detailed.info')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.species.detailed.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'species', action:'contribute', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="${g.message(code:'link.contribute.to')}" title="${g.message(code:'link.contribute.to')}"> <i class="icon-plus"></i><g:message code="link.contribute.to" /></a>
 </li>
 
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.observation.info')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.observation.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'observation', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add an Observatios" title="${g.message(code:'link.add.observation')}"> <i class="icon-plus"></i><g:message code="link.add.observation" /></a>
                                 </li>
@@ -108,12 +108,12 @@
                                     href="${uGroup.createLink(
                                     controller:'observation', action:'bulkCreate', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add Multiple Observations" title="${g.message(code:'title.add.multiple')}"> <i class="icon-plus"></i><g:message code="link.add.multiple" /></a>
                   </li>
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.list.description')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.list.description')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'dataTable', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}" data-original-title="Add a List" title="${g.message(code:'link.add.list')}"> <i class="icon-plus"></i><g:message code="link.add.list" /></a>
  </li>
                   
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.document.info')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.document.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'document', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                     data-original-title="Add Document" title="${g.message(code:'link.add.document')}">
@@ -121,7 +121,7 @@
                                 </a>
                   </li> 
                   <sUser:isAdmin>
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.trait.info')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.trait.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'trait', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                     data-original-title="Add Trait" title="${g.message(code:'link.add.trait')}">
@@ -129,7 +129,7 @@
                                 </a>
                   </li>
 
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.fact.info')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.fact.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'fact', action:'upload', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                     data-original-title="Add Fact" title="${g.message(code:'link.add.fact')}">
