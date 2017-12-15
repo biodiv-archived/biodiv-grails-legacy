@@ -4,7 +4,7 @@
 <%@ page import="species.dataset.DataTable"%>
 <%@ page import="species.dataset.DataPackage.SupportingModules"%>
 <%@ page import="species.groups.CustomField"%>
-${supportingModules_dp}
+<%@ page import="species.auth.SUser"%>
 <% 
 
 Map<SupportingModules, CustomField> supportingModules;
@@ -62,7 +62,7 @@ if(supportingModules_dp) {
 <div class="section">
     <h3><g:message code="default.access.label" /> </h3>
     
-    <%--div class="control-group ${hasErrors(bean: instance.access, field: 'licenseId', 'error')}">
+    <div class="control-group ${hasErrors(bean: instance.access, field: 'licenseId', 'error')}">
         <label class="control-label" for="License"><g:message code="default.licenses.label" /> </label>
 
         <div class="controls">
@@ -95,13 +95,15 @@ if(supportingModules_dp) {
 
             </div>
         </div>
-    </div--%>
+    </div>
     <!-- customFields -->
-    <div class="section customFieldForm" style="position: relative; overflow: visible;">
+    <g:if test="${supportingModules}">
+    <div class="customFieldForm" style="position: relative; overflow: visible;">
         <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.USAGE_RIGHTS]}">
             <g:render template="/dataTable/customFieldTemplate" model="['instance':instance, 'customFieldInstance':customFieldInstance]"/>
         </g:each>
     </div>
+    </g:if>
 </div>
 </g:if>
 
@@ -109,12 +111,13 @@ if(supportingModules_dp) {
 <div class="section">
     <h3><g:message code="default.party.label" /> </h3>
 
-    <%--div  class="control-group ${hasErrors(bean: instance.party, field: 'contributorId', 'error')}">
+    <div  class="control-group ${hasErrors(bean: instance.party, field: 'contributorId', 'error')}">
         <label for="contributor" class="control-label"><g:message
             code="default.party.contributor"  />*</label>
         <div class="controls  textbox">
             <sUser:selectUsers model="['id':autofillUserComp]" />
-            <input type="hidden" name="contributorUserIds" id="contributorUserIds" />
+            <%def user = SUser.read(instance?.party?.contributorId);%>
+            <input type="hidden" name="contributorUserIds" id="contributorUserIds" data-contributorid="${user?.id}"  data-contributorname="${user?.name}" />
         </div>
     </div>
 
@@ -134,12 +137,14 @@ if(supportingModules_dp) {
                 </div>
             </div>
         </div>
-    </div--%>
+    </div>
     <!-- customFields -->
-    <div class="section customFieldForm" style="position: relative; overflow: visible;">
+    <div class="customFieldForm" style="position: relative; overflow: visible;">
+    <g:if test="${supportingModules}">
         <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.PARTY]}">
             <g:render template="/dataTable/customFieldTemplate" model="['instance':instance, 'customFieldInstance':customFieldInstance]"/>
         </g:each>
+    </g:if>
     </div>
 </div>
 </g:if>
@@ -169,7 +174,7 @@ if(supportingModules_dp) {
 </div>
 </g:if>
 
-<g:if test="${supportingModules.containsKey(SupportingModules.METHODS) || supportingModules.containsKey(SupportingModules.PROJECT) }">
+<g:if test="${supportingModules.containsKey(SupportingModules.METHODS) || supportingModules.containsKey(SupportingModules.PROJECT) || supportingModules.containsKey(SupportingModules.OTHERS) }">
 <div class="section">
     <h3><g:message code="default.others.label" /> </h3>
 
@@ -209,6 +214,15 @@ if(supportingModules_dp) {
                 </div>
             </div>
         </div>
+    </div>
+    </g:if>
+
+    <!-- customFields -->
+    <g:if test="${supportingModules}">
+    <div class="customFieldForm" style="position: relative; overflow: visible;">
+        <g:each var="customFieldInstance" in="${supportingModules[SupportingModules.OTHERS]}">
+            <g:render template="/dataTable/customFieldTemplate" model="['instance':instance, 'customFieldInstance':customFieldInstance]"/>
+        </g:each>
     </div>
     </g:if>
 

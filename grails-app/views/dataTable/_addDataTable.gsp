@@ -4,8 +4,10 @@
     String uploadDir="";
     if(dataTableInstance && dataTableInstance.uFile?.path) {
         uploadDir = (new File(dataTableInstance.uFile.path)).getParent()
-    } else {
+    } else if(dataTableInstance.dataset && dataTableInstance.dataset.uFile){
         uploadDir = (new File(dataTableInstance.dataset.uFile.path)).getAbsolutePath()+'/'+ UUID.randomUUID().toString()
+    } else {
+        uploadDir = 'dataTables';
     }
     def fileParams = [uploadDir:uploadDir, fileConvert:true]
     def form_id = "addDataTable"
@@ -32,7 +34,7 @@
                     <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">
-                    <div id="myGrid" class=" ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;overflow:auto;"></div>
+                    <div id="myGrid" class=" ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;overflow-y:visible;"></div>
                     <div class="section" style="clear:both;margin:0;">
                         <div class="row control-group ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}">
                             <div class="controls" style="clear:both;margin:0;">

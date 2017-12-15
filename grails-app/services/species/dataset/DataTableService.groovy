@@ -898,20 +898,20 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         uploadLog << "\nTotal time taken for uploading ${((new Date()).getTime() - startTime.getTime())/1000} sec"
     }
 
-    Map getFilteredDatasets(def params, max, offset, isMapView = false) {
+    Map getFilteredDataTables(def params, max, offset, isMapView = false) {
 
-        def queryParts = getFilteredDatasetFilterQuery(params) 
+        def queryParts = getFilteredDataTableFilterQuery(params) 
         String query = queryParts.query;
-        long allDatasetCount = 0;
+        long allDataTableCount = 0;
 
         query += queryParts.filterQuery + queryParts.orderByClause
         
         log.debug "query : "+query;
-        log.debug "allDatasetCountQuery : "+queryParts.allDatasetCountQuery;
+        log.debug "allDataTableCountQuery : "+queryParts.allDataTableCountQuery;
 
         log.debug query;
         log.debug queryParts.queryParams;
-        def allDatasetCountQuery = sessionFactory.currentSession.createQuery(queryParts.allDatasetCountQuery)
+        def allDataTableCountQuery = sessionFactory.currentSession.createQuery(queryParts.allDataTableCountQuery)
 
         def hqlQuery = sessionFactory.currentSession.createQuery(query)
 
@@ -925,10 +925,10 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         }
         
         hqlQuery.setProperties(queryParts.queryParams);
-        def datasetInstanceList = hqlQuery.list();
+        def dataTableInstanceList = hqlQuery.list();
 
-        allDatasetCountQuery.setProperties(queryParts.queryParams)
-        allDatasetCount = allDatasetCountQuery.list()[0]
+        allDataTableCountQuery.setProperties(queryParts.queryParams)
+        allDataTableCount = allDataTableCountQuery.list()[0]
 
         if(params.daterangepicker_start){
             queryParts.queryParams["daterangepicker_start"] = params.daterangepicker_start
@@ -943,10 +943,11 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         if(params.observedon_end){
             queryParts.queryParams["observedon_end"] =  params.observedon_end
         }
-        return [instanceList:datasetInstanceList, instanceTotal:allDatasetCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
+        println dataTableInstanceList
+        return [instanceList:dataTableInstanceList, instanceTotal:allDataTableCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters]
     }
 
-    def getFilteredDatasetFilterQuery(params) {
+    def getFilteredDataTableFilterQuery(params) {
         //params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         //params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         //params.habitat = params.habitat.toLong()
@@ -977,7 +978,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         else {
             query += " obv "
         }
-        query += " from Dataset obv "
+        query += " from DataTable obv "
 
         def filterQuery = " where obv.isDeleted = :isDeleted "
         
@@ -987,7 +988,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             query += featureQuery;
             filterQuery += " and obv.id != feat.objectId and feat.objectType = :featType "
             queryParams["featureBy"] = params.featureBy
-            queryParams["featType"] = Dataset.class.getCanonicalName();
+            queryParams["featType"] = DataTable.class.getCanonicalName();
         }
 
         if(params.tag){
@@ -999,6 +1000,20 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             queryParams["tag"] = params.tag
             queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
             activeFilters["tag"] = params.tag
+        }
+
+        if(params.isChecklist && params.isChecklist.toBoolean()){
+            filterQuery += " and obv.dataset is null and obv.dataTableType = :dataTableType"
+            queryParams["isChecklist"] = params.isChecklist.toBoolean()
+            activeFilters["user"] = params.isChecklist.toBoolean()
+            queryParams["dataTableType"] = DataTableType.OBSERVATIONS;
+            activeFilters["dataTableType"] = DataTableType.OBSERVATIONS;
+        }
+
+        if(params.dataTableType){
+            filterQuery += " and obv.dataTableType = :dataTableType"
+            queryParams["dataTableType"] = params.dataTableType;
+            activeFilters["dataTableType"] = params.dataTableType;
         }
 
         if(params.user){
@@ -1033,11 +1048,11 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
       
         
-		def allDatasetCountQuery = "select count(*) from Dataset obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+		def allDataTableCountQuery = "select count(*) from DataTable obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 	
         orderByClause = " order by " + orderByClause;
 
-        return [query:query, allDatasetCountQuery:allDatasetCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
+        return [query:query, allDataTableCountQuery:allDataTableCountQuery, filterQuery:filterQuery, orderByClause:orderByClause, queryParams:queryParams, activeFilters:activeFilters]
 
     }
 

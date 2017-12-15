@@ -56,7 +56,9 @@ class DataPackage {
         
 		PROJECT("Project"),
 
-		METHODS("Methods");
+		METHODS("Methods"),
+		
+        OTHERS("Others");
 
 		private String value;
 
@@ -75,7 +77,8 @@ class DataPackage {
                 TAXONOMIC_COVERAGE,
                 GEOGRAPHICAL_COVERAGE,
                 PROJECT,
-                METHODS
+                METHODS,
+                OTHERS
 			]
 		}
 

@@ -96,95 +96,33 @@
                 <uGroup:showSubmenuTemplate  model="['entityName':entityName]"/>
 
                    <div class="super-section">
-
-                        <div id="dataTableShowSection" class="section">
-                            <!--h3>Dataset</h3-->
-                            <%--
-                            <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':dataTableInstance.dataset, showDetails:true, userLanguage:userLanguage]"/>
-                            --%>
-                        </div>
-
-                        <!--div class="section">
-                            <h3>Select Workflow</h3>
-                            <div class="control-group ${hasErrors(bean: dataTableInstance, field: 'dataPackage', 'error')}">
-                                <label for="dataPackage" class="control-label"><g:message code="dataPackage.name.label" default="${g.message(code:'dataPackage.name.label')}" />*</label>
-                                <div class="controls textbox">
-                                    <div class="btn-group" style="z-index: 3;">
-                                        <g:select name="dataPackage" disabled="disabled"
-                                        from="${DataPackage.list()}"
-                                        noSelection="${['null':'Select One...']}"
-                                        value="${dataPackage?:(dataTableInstance?.dataset?.dataPackage?.id)}"
-                                        optionKey="id" optionValue="title"
-                                        onchange="dataPackageChanged(this.value);" />
-
-
-                                        <div class="help-inline">
-                                            <g:hasErrors bean="${dataTableInstance?.dataset}" field="dataPackage">
-                                            <g:eachError bean="${dataTableInstance?.dataset}" field="dataPackage">
-                                            <li><g:message error="${it}" /></li>
-                                            </g:eachError>
-                                            </g:hasErrors>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div-->
-
                         <div class="section">
                             <h3>Add Datatables</h3>
                             <div id="workspace" style="overflow:auto;background-color:white;border:solid 1px;">
                                 <%def allowedDataTableTypes = params.action=='edit' ? [dataTableInstance.dataTableType] : dataTableInstance.dataset.dataPackage.allowedDataTableTypes();%>
                                 <div id="allowedDataTableTypes" class="span2" style="margin-left:0px;">
-                                    <g:render template="/dataTable/selectDataTable" model="[dataTableTypes : allowedDataTableTypes, datasetInstanceId:dataTableInstance.dataset.id, dataTableInstance:dataTableInstance]"/>
+                                    <g:render template="/dataTable/selectDataTable" model="[dataTableTypes : allowedDataTableTypes, datasetInstanceId:dataTableInstance.dataset?.id, dataTableInstance:dataTableInstance]"/>
                                 </div>
                                 <div id="addDataTable" class="span10">
                                 </div>
                             </div>
                         </div>
-
-
                    </div>
-
-                    <!--div class="" style="margin-top: 20px; margin-bottom: 40px;">
-
-                    <g:if test="${dataTableInstance?.id}">
-                    <a href="${createLink(controller:'dataPackage', action:'show', id:dataTableInstance.dataset.dataPackage.id)}" class="btn"
-                    style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
-                    </g:if>
-                    <g:else>
-                    <a href="${createLink(controller:'dataPackage', action:'list')}" class="btn"
-                    style="float: right; margin-right: 5px;"> <g:message code="button.cancel" /> </a>
-                    </g:else>
-
-                    <g:if test="${dataTableInstance?.id}">
-                    <div class="btn btn-danger"
-                    style="float: right; margin-right: 5px;">
-                    <a
-                    href="${createLink(mapping:'dataTable', action:'delete', id:dataTableInstance?.id)}"
-                    onclick="return confirm('${message(code: 'default.delete.confirm.message', args:['dataTable'])}');"><g:message code="button.delete.dataTable" /></a>
-                    </div>
-                    </g:if>
-                    <a id="createDataTableSubmit"
-                    class="btn btn-primary" style="float: right; margin-right: 5px;">
-                    ${form_button_val} </a>
-                    <span class="policy-text"> <g:message code="default.create.submitting.for.new" args="['dataTable']"/> <a href="/terms"><g:message code="link.terms.conditions" /></a> <g:message code="register.index.use.of.site" /> </span>
-                    </div-->
-
-                    </div>
-
             </div>
 
-            <script type='text/javascript'>
-                CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
+        </div>
 
-                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
-            </script>
+        <script type='text/javascript'>
+            CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
+
+            var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+        </script>
 
 
     <asset:script>
 
-    $(document).ready(function() {	
-            <g:if test="${params.action=='edit'}">
+        $(document).ready(function() {	
+            <g:if test="${params.action=='edit' || allowedDataTableTypes.size() == 1}">
                 $('#allowedDataTableTypes button').first().trigger('click');
             </g:if>
         });

@@ -14,7 +14,7 @@
             <g:each in="${SpeciesGroup.list() }" var="sGroup" status="i">
                 <g:if test="${sGroup != othersGroup }">
                     <button class="btn species_groups_sprites ${sGroup.iconClass()}"
-                        id="${"group_" + sGroup.id}" value="${sGroup.id}"
+                        id="${"group_" + sGroup.id}" value="${sGroup.id}" type="button"
                         title="${sGroup.name}"></button>
                 </g:if>
 
@@ -58,7 +58,9 @@
 
 $(document).ready(function(){
 	$("#speciesGroupFilter").button();
-	$('#speciesGroupFilter button[value="${instance?.groupId}"]').addClass('active');
+    <g:each in="${instance?.groups()}" var="sGroup">
+	    $('#speciesGroupFilter button[value="${sGroup}"]').addClass('active');
+    </g:each>
     $('#speciesGroupFilter button').tooltip({placement:'top'});
 
         var taxonBrowserOptions = {

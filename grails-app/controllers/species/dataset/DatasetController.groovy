@@ -29,7 +29,7 @@ class DatasetController extends AbstractObjectController {
 		redirect(action: "list", params: params)
 	}
     
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
 	def create() {
 		def datasetInstance = new Dataset1()
 		
@@ -44,12 +44,12 @@ class DatasetController extends AbstractObjectController {
         return [datasetInstance: datasetInstance]
 	}
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_USER'])
 	def save() {
 	    saveAndRender(params, false)
 	}
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
 	def edit() {
 		def datasetInstance = Dataset1.findWhere(id:params.id?.toLong(), isDeleted:false)
 
@@ -66,7 +66,7 @@ class DatasetController extends AbstractObjectController {
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_USER'])
 	def update() {
 		def datasetInstance = Dataset1.get(params.long('id'))
         def msg;
@@ -268,26 +268,36 @@ class DatasetController extends AbstractObjectController {
 		def datasetInstance = new Dataset1()
         datasetInstance.dataPackage = dataPackage
         datasetInstance.clearErrors();
-        render g.render(template:"/dataset/collectionMetadataTemplate", model:[instance:datasetInstance]);
+        render g.render(template:"/dataset/collectionMetadataTemplate", model:[instance:datasetInstance, 'autofillUserComp':'contributor_id']);
     }
     
     def dataTableTypeChanged() {
+        Dataset1 datasetInstance;
+        DataTable dataTableInstance;
+        
         if(params.datasetId) {
-            Dataset1 datasetInstance = Dataset1.read(params.long('datasetId'));
-            if(datasetInstance) {
-                DataTable dataTableInstance;
-                if(params.dataTableId) {
-                    dataTableInstance = DataTable.read(params.long('dataTableId'));
-                } else {
-                    dataTableInstance = new DataTable()
-                    dataTableInstance.dataset = datasetInstance;
-                    dataTableInstance.properties = params;
-                }
-                if(params.int('dataTableTypeId') == DataTableType.OBSERVATIONS.ordinal()) {
-                    dataTableInstance.dataTableType = DataTableType.OBSERVATIONS; 
-                }
-                render g.render(template:"/dataTable/addDataTable", model:[dataTableInstance:dataTableInstance]);
-            }       
+            datasetInstance = Dataset1.read(params.long('datasetId'));
         }
-    }
+            
+        if(params.dataTableId) {
+            dataTableInstance = DataTable.read(params.long('dataTableId'));
+        } else {
+            dataTableInstance = new DataTable()
+        }
+        if(datasetInstance) {
+            dataTableInstance.dataset = datasetInstance;
+            dataTableInstance.properties = datasetInstance.properties;
+            dataTableInstance.uFile = null;
+        } else {
+            datasetInstance = new Dataset1();
+            datasetInstance.dataPackage = DataPackage.findByTitle('Checklist');
+            dataTableInstance.dataset = datasetInstance;
+        }
+
+
+        if(params.int('dataTableTypeId') == DataTableType.OBSERVATIONS.ordinal()) {
+            dataTableInstance.dataTableType = DataTableType.OBSERVATIONS; 
+        }
+        render g.render(template:"/dataTable/addDataTable", model:[dataTableInstance:dataTableInstance]);
+    }       
 }

@@ -23,12 +23,9 @@ class Party {
            })*/
     }
     
-    /*static mapping = {
-        hasMany joinTable: [name: 'party_contributor',
-        key: 'party_id',
-        column: 'attribution',
-        type: String]
-    }*/
+    static mapping = {
+        attributions type:'text'
+    }
 /*
     SUser getUploader() {
         return SUser.get(uploaderId);

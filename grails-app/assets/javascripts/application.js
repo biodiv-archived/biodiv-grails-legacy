@@ -58,6 +58,8 @@
 //= require jquery.plugins/jquery.url.js
 //= require jquery.plugins/jstree.min.js
 //= require jquery.plugins/jquery.autopager-1.0.0.min.js
+//= require biodiv/dataset/create.js
+//= require biodiv/datatable/create.js
 //= require biodiv/observations/list.js
 		
 //= require biodiv/comment.js
@@ -132,7 +134,7 @@
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
 //= require jquery.plugins/ion.rangeSlider.min
 //= require dropzone.js
-//= require biodiv/dataset/dataset.js
+//= require biodiv/datatable/create.js
 //= require biodiv/dataset/create.js
 //= require biodiv/trait.js
 //= require biodiv/customfield.js

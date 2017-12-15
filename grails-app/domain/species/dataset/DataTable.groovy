@@ -22,14 +22,16 @@ class DataTable extends CollMetadata {
 	
 	//serialized object to store list of column names
 	String columns;
-
+    Long checklistId;
     static hasMany = [userGroups:UserGroup];
 	static belongsTo = [UserGroup]
 
     def dataTableService;
-
+    
 	static constraints = {
+		dataset nullable:true
 		agreeTerms nullable:true
+		checklistId nullable:true
 		columns nullable:false, blank:false;
 	}
 	
