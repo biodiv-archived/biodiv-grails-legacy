@@ -793,6 +793,8 @@ update newsletter set show_in_footer = 't' where user_group_id is null and paren
 update newsletter set show_in_footer = true where id in (select parent_id from newsletter  where show_in_footer=true);
 
 #11 Dec 2017
+alter table data_package alter column supporting_modules type text;
+alter table data_package alter column allowed_data_table_types type text;
 create index on observation(id,data_table_id) where data_table_id is not null;
 alter table data_table alter column dataset_id drop not null;
 alter table dataset1 add column taxonomic_coverage_group_ids varchar;
@@ -806,6 +808,19 @@ alter table data_table alter column access_license_id set not null;
 alter table data_table alter column party_contributor_id set not null;
 alter table data_table alter column temporal_coverage_from_date set not null;
 alter table data_table alter column taxonomic_coverage_group_ids set not null;
+alter table data_table alter column columns type text;
+alter table dataset1 alter column custom_fields type text;
+alter table dataset1 alter column description type text;
+alter table data_table alter column description type text;
+alter table data_table alter column custom_fields type text;
+alter table data_table alter column geographical_coverage_place_name type text;
+alter table dataset1 alter column geographical_coverage_place_name type text;
+alter table dataset1 alter column methods type text;
+alter table data_table alter column methods type text;
+alter table data_table alter column project type text;
+alter table dataset1 alter column project type text;
+alter table dataset1 alter column title type text;
+alter table data_table alter column title type text;
 
 ####15 Dec 2017 CHECKLIST 2 Datatable migration related
 # run this target to move all checklists to datatable /checklist/migrateChecklistToDataTable
@@ -821,4 +836,9 @@ alter table user_group_data_tables add FOREIGN KEY (data_table_id) REFERENCES da
  alter table observation add FOREIGN KEY (data_table_id) REFERENCES data_table(id);
 update activity_feed set root_holder_type='species.dataset.DataTable' where root_holder_type='species.participation.Checklists';
 update follow set object_type='species.dataset.DataTable' where object_type='species.participation.Checklists';
+
+select max(id) from data_table;
+select setval('datatable_id_seq',,false);
+
+
 

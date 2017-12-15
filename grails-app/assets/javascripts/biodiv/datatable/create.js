@@ -154,7 +154,7 @@ function getMarkedColumns() {
 
 $(document).ready(function() {	
 
-    $(document).on('click', '#addDataTable #speciesGroupFilter button', function(e){
+    $(document).on('click', '.addDataTable #speciesGroupFilter button', function(e){
         console.log('speciesGroupFilter button click');
         e.preventDefault();
         loadSpeciesGroupTraits();
