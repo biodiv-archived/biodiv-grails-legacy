@@ -72,7 +72,7 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         $("#columns").val(colStr);
     var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
     if(speciesGroupTraitsList === undefined) {
-        alert("Please click a species group to show respective traits");
+        //alert("Please click a species group to show respective traits");
     } 
     $.each(columns, function(i, n){
         //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
