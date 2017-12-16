@@ -849,6 +849,8 @@ println "444444444444"
                     if(uploadLog) uploadLog << "\n"+it; 
                     log.error it 
                 }
+        } else {
+            println "Successfully saved observation"
         }
     }
 

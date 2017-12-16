@@ -160,6 +160,10 @@ class AbstractMetadataService extends AbstractObjectService {
             }
         }
 
+        if(params.dataTable) {
+            instance.dataTable = params.dataTable;
+        }
+
         return instance;
     }
 
