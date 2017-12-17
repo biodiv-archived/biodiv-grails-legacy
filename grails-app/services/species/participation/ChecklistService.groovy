@@ -745,7 +745,7 @@ class ChecklistService {
 	def migrateChecklistToDataTable(){
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-		List clIdList = Checklists.listOrderById(order: "asc", max:100).collect{it.id}
+		List clIdList = Checklists.listOrderById(order: "asc").collect{it.id}
 		clIdList.each {  id ->
             println "migrating checklist : ${id}"
             Checklists.withNewTransaction {
