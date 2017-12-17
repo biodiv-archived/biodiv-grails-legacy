@@ -306,9 +306,17 @@ max-width: 100%;
 					</div>
 				</div>
 				
-				<div class="super-section"  style="clear: both">
-				 	<g:render template="/observation/createCustomFieldTemplate" model="['userGroupInstance':userGroupInstance]"/>
-				</div>
+                <div class="super-section"  style="clear: both">
+                <div class="section" style="position: relative; overflow: visible;">
+                <h3><g:message code="heading.customfields" /></h3>
+                <g:render template="/observation/showExistingCustomFieldsTemplate" model="['userGroupInstance':userGroupInstance]"/>
+                <hr>
+
+
+                <g:render template="/observation/createCustomFieldTemplate" model="['userGroupInstance':userGroupInstance]"/>
+
+                </div>
+                </div>
 
 				<div class="super-section" style="clear: both;">
 					<div class="section"
@@ -516,26 +524,6 @@ $(document).ready(function() {
 	    return hbt;	
 	}
 	
-	function getCustomFields(){
-		var result = [];
-		var cPrefixClass = '.CustomField_';
-		var fieldList = ['name', 'description','dataType', 'isMandatory', 'allowedMultiple' , 'options', 'defaultValue', 'allowedParticipation'];
-		$("ul.customFieldList li").each( function (index){
-			var thisli = $(this);
-			var cfMap = {};
-			$.each(fieldList, function(index, value){
-				var key = cPrefixClass + value;
-				var val = $(thisli).find(key).val();
-				if(key == '.CustomField_isMandatory' || key == '.CustomField_allowedMultiple' ||  key == '.CustomField_allowedParticipation' ){
-					var val = $(thisli).find(key).prop('checked');
-				}
-				cfMap[value] = val;
-			});
-			result.push(cfMap);
-		});
-		return  JSON.stringify(result);
-	}
-	
 	$("#createGroupSubmit").click(function(){
 		$('input[name="founderUserIds"]').val(founders_autofillUsersComp[0].getEmailAndIdsList().join(","));
 		$('input[name="expertUserIds"]').val(experts_autofillUsersComp[0].getEmailAndIdsList().join(","));
@@ -594,6 +582,8 @@ $(document).ready(function() {
 	%>
  	
         $('.dropdown-toggle').dropdown()
+
+        $(".addNewCustomField").trigger('click');
 });
 </asset:script>
 

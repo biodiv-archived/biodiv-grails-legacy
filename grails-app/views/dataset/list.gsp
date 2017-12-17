@@ -6,7 +6,7 @@
         <r:require modules="observations_list" />
     </head>
     <body>
-        <div class="span12">
+        <div class="span12 row-fluid">
             <obv:showSubmenuTemplate/>
             <div class="page-header clearfix">
                 <div style="width:100%;">
@@ -19,7 +19,7 @@
 
             <uGroup:rightSidebar/>
 
-            <g:render template="/datasource/showDatasourceListWrapperTemplate"/>
+            <g:render template="/dataset/showDatasetListWrapperTemplate"/>
         </div>
     </body>
 </html>

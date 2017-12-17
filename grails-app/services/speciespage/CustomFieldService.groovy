@@ -7,6 +7,8 @@ import species.groups.CustomField
 import species.groups.UserGroup
 import species.participation.Observation
 import species.auth.SUser
+import species.dataset.DataPackage
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 
 class CustomFieldService {
 	
@@ -260,7 +262,7 @@ class CustomFieldService {
     def delCf(query, params) {
         executeQuery(query,params);
     }
-	
+
 }
 
 

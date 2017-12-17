@@ -1,4 +1,4 @@
-	package speciespage
+package speciespage
 
 import java.util.Date;
 import java.util.List;
@@ -71,6 +71,7 @@ import species.participation.Digest
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
+import species.dataset.DataTable;
 
 class UserGroupService {
 
@@ -1408,6 +1409,10 @@ class UserGroupService {
 				case Discussion.class.getCanonicalName():
 					groupRes += 'discussions'
 					functionString += (submitType == 'post')? 'addToDiscussions' : 'removeFromDiscussions'
+					break
+				case DataTable.class.getCanonicalName():
+					groupRes += 'dataTables'
+					functionString += (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'
 					break
 				default:
 					break

@@ -17,6 +17,7 @@ import org.grails.rateable.*
 import species.participation.Observation;
 import grails.converters.JSON;
 import grails.converters.XML;
+import species.groups.UserGroup;
 
 class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
 
@@ -83,6 +84,11 @@ class Dataset extends DatasourceMetadata  implements Taggable, Rateable {
     String attribution;
 
     boolean isDeleted = false;   
+
+    static hasMany = [userGroups:UserGroup];
+	static belongsTo = [UserGroup]
+
+
     // EML specific properties which are not persisted on the dataset table!
     //List<Citation> bibliographicCitations = Lists.newArrayList();
        //Project project;

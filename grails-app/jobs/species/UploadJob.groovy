@@ -20,6 +20,7 @@ class UploadJob {
 	private final static String TRAIT = "trait";
 	private final static String FACT = "fact";
 	public final static String SPECIES_BULK_UPLOAD = "species bulk upload";
+	public final static String BULK_UPLOAD = "bulk upload";
 	
 	def obvUtilService
     def utilsService;

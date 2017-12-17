@@ -1,19 +1,19 @@
 <%@ page import="species.utils.Utils"%>
 
-<div class="control-group locationScale ${hasErrors(bean: observationInstance, field: 'locationScale', 'error')}" >
+<div class="control-group locationScale ${hasErrors(bean: sourceInstance, field: 'locationScale', 'error')}" >
 	<label for="locationScale" class="control-label"> <g:message
     	code="observation.locationScale.label" default="Location Scale" /><span class="req">*</span>
     </label>
 	<div class="controls"  style="margin-top:5px;">
 		<%
-        	def defaultAccuracy = (obvInfoFeeder?.locationScale) ? obvInfoFeeder.locationScale.value().toLowerCase() : "approximate"
+        	def defaultAccuracy = (obvInfoFeeder?.locationScale) ? ((obvInfoFeeder.locationScale instanceof String) ? obvInfoFeeder.locationScale.toLowerCase():obvInfoFeeder.locationScale.value().toLowerCase()) : "approximate"
             def isAccurateChecked = (defaultAccuracy == "accurate")? "checked" : ""
             def isApproxChecked = (defaultAccuracy == "approximate")? "checked" : ""
 			def isLocalChecked = (defaultAccuracy == "local")? "checked" : ""
 			def isRegionChecked = (defaultAccuracy == "region")? "checked" : ""
 			def isCountryChecked = (defaultAccuracy == "country")? "checked" : ""
 			
-			def isGeoPrivacyChecked = (observationInstance?.geoPrivacy) ? "checked" : ""
+			def isGeoPrivacyChecked = (sourceInstance?.geoPrivacy) ? "checked" : ""
             def lastPlaceName;
             if(userInstance){
                 lastPlaceName=userInstance.location
@@ -22,9 +22,9 @@
                 lastPlaceName=commandInstance.location
             }
             else{
-                lastPlaceName = (observationInstance?.placeName)?observationInstance?.placeName:'';//obvInfoFeeder?.placeName;
+                lastPlaceName = (sourceInstance?.placeName)?sourceInstance?.placeName:'';//obvInfoFeeder?.placeName;
             }
-            def lastTopology = (observationInstance?.topology);//?:obvInfoFeeder?.topology;
+            def lastTopology = (sourceInstance?.topology);//?:obvInfoFeeder?.topology;
          %>
 		<g:if test="${sourceType == 'observation'  || ((params.action == 'edit') && (sourceType == 'checklist-obv'))}">
         	<input type="radio" style="margin-bottom: 6px;" name="locationScale" value="Accurate" ${isAccurateChecked} /><g:message code="default.accurate.label" /> 
@@ -38,7 +38,7 @@
 		
 
 	    <div class="help-inline">
-        	<g:hasErrors bean="${observationInstance}" field="locationScale">
+        	<g:hasErrors bean="${sourceInstance}" field="locationScale">
         		<g:message code="observation.locationScale.not_selected" />
         	</g:hasErrors>
 	    </div>
@@ -96,7 +96,7 @@
 	                        <g:if test="${params.controller != 'checklist'}">
 	                            <div class="input-prepend pull-left control-group" style="width:250px;">
 		                            <span class="add-on" style="vertical-align:middle;"><g:message code="default.lat.label" /></span>
-		                            <input class="degree_field latitude_field" type="text" name="latitude" value="${params.latitude}"/>
+		                            <input class="degree_field latitude_field" type="text" name="latitude" value="${params.latitude?:sourceInstance?.latitude}"/>
 		                            <input class="dms_field latitude_deg_field" type="text" name="latitude_deg" placeholder="${g.message(code:'placeholder.deg')}"/>
 		                            <input class="dms_field latitude_min_field" type="text" name="latitude_min" placeholder="${g.message(code:'placeholder.min')}"/>
 		                            <input class="dms_field latitude_sec_field" type="text" name="latitude_sec" placeholder="${g.message(code:'placeholder.sec')}"/>
@@ -104,7 +104,7 @@
 		                        </div>
 		                        <div class="input-prepend pull-left control-group" style="width:250px;">
 		                            <span class="add-on" style="vertical-align:middle;"><g:message code="default.long.label" /></span>
-		                            <input class="degree_field longitude_field" type="text" name="longitude" style="width:193px;" value="${params.longitude}"></input>
+		                            <input class="degree_field longitude_field" type="text" name="longitude" style="width:193px;" value="${params.longitude?:sourceInstance?.longitude}"></input>
 		                            <input class="dms_field longitude_deg_field" type="text" name="longitude_deg" placeholder="${g.message(code:'placeholder.deg')}"/>
 		                            <input class="dms_field longitude_min_field" type="text" name="longitude_min" placeholder="${g.message(code:'placeholder.min')}"/>
 		                            <input class="dms_field longitude_sec_field" type="text" name="longitude_sec" placeholder="${g.message(code:'placeholder.sec')}"/>
@@ -115,7 +115,7 @@
 		                                name="use_dms" value="${use_dms}" />
 		                                <g:message code="default.use.deg-min-sec.label" /> </label>
 		                            <g:if test="${sourceType != 'checklist'}">    
-										<label class="pull-left" style="text-align:center; font-weight:normal;margin-left: 20px;"><input type="checkbox" class="pull-left" name="geoPrivacy" value="${observationInstance?.geoPrivacy}" onclick="$(this).val('' + $(this).prop('checked'))" ${isGeoPrivacyChecked} /><g:message code="default.hide.location.label" /></label>
+										<label class="pull-left" style="text-align:center; font-weight:normal;margin-left: 20px;"><input type="checkbox" class="pull-left" name="geoPrivacy" value="${sourceInstance?.geoPrivacy}" onclick="$(this).val('' + $(this).prop('checked'))" ${isGeoPrivacyChecked} /><g:message code="default.hide.location.label" /></label>
 									</g:if>	  
 							    </div>
 		                 	</g:if>
