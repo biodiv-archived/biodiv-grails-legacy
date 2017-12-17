@@ -5,6 +5,7 @@
     }
 </style>
 <div class="resizable sidebar_section" style="border:1px solid; overflow:auto;max-height:400px;margin-bottom:0px;">
+
     <table class="table table-striped table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
         <thead>
@@ -19,8 +20,9 @@
         <tbody class="mainContentList rowlink" name="p${params?.offset}">
             <g:each in="${observations}" var="observation">
             <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
-                <g:each in="${observation.fetchChecklistAnnotation()}" var="annot">
-                    <g:if test="${annot.key.equalsIgnoreCase(checklistInstance.sciNameColumn)}">
+            <%def checklistAnnotations = observation.fetchChecklistAnnotation();%>
+                <g:each in="${checklistInstance.fetchColumnNames()}" var="cName">
+                    <g:if test="${cName.equalsIgnoreCase(checklistInstance.sciNameColumn)}">
                         <td class="nameColumn">
                         <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
                         <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
@@ -29,13 +31,12 @@
                         </a>
                         </g:if>
                         <g:else>
-                        <i>${annot.value}</i>
+                        <i>${checklistAnnotations[cName]}</i>
                         </g:else>
                     </td>
                     </g:if>
                     <g:else>
-                    <td>
-                        ${annot.value}
+                    <td>${checklistAnnotations[cName]}
                     </td>
                     </g:else>
                 </td>

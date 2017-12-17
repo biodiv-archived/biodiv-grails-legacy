@@ -31,7 +31,8 @@ import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
-
+import species.dataset.Dataset1;
+import species.dataset.DataTable;
 
 
 class UserGroup implements Taggable {
@@ -74,7 +75,7 @@ class UserGroup implements Taggable {
 	//when sending digest mail to count no. of days for calulating top contributors
 	Date statStartDate = new Date();
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species, discussions:Discussion]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species, discussions:Discussion, dataTables:DataTable, datasets:Dataset1]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true

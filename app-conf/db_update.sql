@@ -790,3 +790,55 @@ alter table newsletter add column show_in_footer boolean;
 update newsletter set show_in_footer = 'f';
 alter table newsletter alter column show_in_footer set not null;
 update newsletter set show_in_footer = 't' where user_group_id is null and parent_id !=0 ;
+
+
+#11 Dec 2017
+alter table data_package alter column supporting_modules type text;
+alter table data_package alter column allowed_data_table_types type text;
+create index on observation(id,data_table_id) where data_table_id is not null;
+alter table data_table alter column dataset_id drop not null;
+alter table dataset1 add column taxonomic_coverage_group_ids varchar;
+alter table dataset1 add column geographical_coverage_location_accuracy varchar;
+alter table data_table add column taxonomic_coverage_group_ids varchar;
+alter table data_table add column geographical_coverage_location_accuracy varchar;
+ alter table data_table alter column party_attributions type text;
+ alter table dataset1 alter column party_attributions type text;
+create table user_group_data_tables(user_group_id bigint references user_group(id), data_table_id bigint REFERENCES data_table(id), primary key (user_group_id, data_table_id));
+alter table data_table alter column access_license_id set not null;
+alter table data_table alter column party_contributor_id set not null;
+alter table data_table alter column temporal_coverage_from_date set not null;
+alter table data_table alter column taxonomic_coverage_group_ids set not null;
+alter table data_table alter column columns type text;
+alter table dataset1 alter column custom_fields type text;
+alter table dataset1 alter column description type text;
+alter table data_table alter column description type text;
+alter table data_table alter column custom_fields type text;
+alter table data_table alter column geographical_coverage_place_name type text;
+alter table dataset1 alter column geographical_coverage_place_name type text;
+alter table dataset1 alter column methods type text;
+alter table data_table alter column methods type text;
+alter table data_table alter column project type text;
+alter table dataset1 alter column project type text;
+alter table dataset1 alter column title type text;
+alter table data_table alter column title type text;
+
+####15 Dec 2017 CHECKLIST 2 Datatable migration related
+# run this target to move all checklists to datatable /checklist/migrateChecklistToDataTable
+# and then make following db changes
+## stop system before running these stmts
+
+alter table user_group_data_tables drop constraint user_group_data_tables_data_table_id_fkey;
+alter table observation drop constraint fk74ad82c50fa501d;
+update user_group_data_tables set data_table_id = g.checklist_id from (select id, checklist_id from data_table where checklist_id is not null) g where g.id = data_table_id;
+ update observation set data_table_id = g.checklist_id from (select id, checklist_id from data_table where checklist_id is not null) g where g.id = data_table_id;
+update data_table set id=checklist_id where dataset_id is null and checklist_id is not null;
+alter table user_group_data_tables add FOREIGN KEY (data_table_id) REFERENCES data_table(id);
+ alter table observation add FOREIGN KEY (data_table_id) REFERENCES data_table(id);
+update activity_feed set root_holder_type='species.dataset.DataTable' where root_holder_type='species.participation.Checklists';
+update follow set object_type='species.dataset.DataTable' where object_type='species.participation.Checklists';
+
+select max(id) from data_table;
+select setval('datatable_id_seq',,false);
+
+
+

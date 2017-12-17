@@ -20,7 +20,8 @@ class ChecklistController {
     def utilsService;
 	
 	def index = {
-		redirect(action:'list', params: params)
+        params.isChecklist = true;
+		redirect(controller:'dataTable', action:'list', params: params)
 	}
 
 	def list() {
@@ -163,26 +164,6 @@ class ChecklistController {
 			}
 		}
 		params.columns = validColumnList
-		
-		//params.sciNameColumn = params.sciNameColumn ?: "scientific_name"
-		//params.commonNameColumn = params.commonNameColumn ?: "common_name"
-		
-		//params.group_id = "841" //params.group?:SpeciesGroup.get(params.group_id);
-		//params.placeName = "honey valley " 
-		//params.location_accuracy = params.locationAccuracy  = "Accurate" 
-		
-		//params.habitat_id = "267836";
-		//params.agreeTerms = 'on'
-		//params.latitude = "" + 23.314
-		//params.longitude = "" + 77.74
-		
-		//params.rawChecklist =  "checklist raw file" //params.rawChecklist
-		//params.title =  "cl title" 
-		//params.refText =  "ref text " //params.refText
-		//params.sourceText =  "source text " // params.sourceText
-		
-		//params.publicationDate =  null //params.publicationDate ? observationService.parseDate(params.publicationDate) : null
-		//params.reservesValue =  null //params.reservesValue
 	} 
 	
 	@Secured(['ROLE_USER'])
@@ -277,7 +258,6 @@ class ChecklistController {
 		redirect (url:result.url)
 	}
 	
-	
 	def observationData = {
         if(!params.id) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'checklist.label', default: 'Checklist'), params.id])}"
@@ -288,13 +268,7 @@ class ChecklistController {
 		def model =[observations:observations, checklistInstance:checklistInstance, observationsCount:checklistInstance.speciesCount]
 		render(template:"/common/checklist/showChecklistDataTemplate", model:model);
 	}
-	///////////////////////////////////////////////////////////////////////////////
-	////////////////////////////// SEARCH /////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 *
-	 */
 	def search() {
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
 
@@ -323,9 +297,6 @@ class ChecklistController {
 		}
 	}
 
-	/**
-	 *
-	 */
 	def terms() {
 		params.field = params.field?params.field.replace('aq.',''):"autocomplete";
 		
@@ -339,154 +310,9 @@ class ChecklistController {
 		checklistService.serializeClData()
 		render " done  "
 	}
-	///////////////////////////////////////////////////////////////////////////////
-	////////////////////////////// SEARCH END /////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////
-	
-	/*
-	private def getPrevNextChecklists(int pos, String userGroupWebaddress) {
-		String listKey = "checklist_ids_list";
-		String listParamsKey = "checklist_ids_list_params"
-		
-		if(userGroupWebaddress) {
-			listKey = userGroupWebaddress + listKey;
-			listParamsKey = userGroupWebaddress + listParamsKey;
-		}
-		def lastListParams = session[listParamsKey]?.clone();
-		if(lastListParams) {
-			if(!session[listKey]) {
-				log.debug "Fetching checklist list as its not present in session "
-				runLastListQuery(lastListParams);
-			}
-			long noOfChecklist = session[listKey].size();
-			log.debug "Current ids list in session ${session[listKey]} and position ${pos}";
-			def nextId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
-			if(nextId == null) {
-				def max = Math.min(lastListParams.max ? lastListParams.int('max') : 50, 100)
-				def offset = lastListParams.offset ? lastListParams.int('offset') : 0
-				lastListParams.offset = offset + max;
-				log.debug "Fetching new list of checklist using params ${lastListParams}";
-				runLastListQuery(lastListParams);
-				lastListParams.offset = offset;
-				nextId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
-			}
-			
-			def prevId = pos > 0 ? session[listKey][pos-1] : null;
-			lastListParams.remove('isGalleryUpdate');
-			lastListParams.remove("append");
-			lastListParams.remove("loadMore");
-			lastListParams['max'] = noOfChecklist;
-			lastListParams['offset'] = 0;
-			return ['prevObservationId':prevId, 'nextObservationId':nextId, 'lastListParams':lastListParams];
-		}
-	}
-	
-	private void runLastListQuery(Map params) {
-		log.debug params;
-		getFilteredChecklist(params)
-	}
-	
-	protected getFilteredChecklist(params){
-		def allGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL);
-		def speciesGroup = params.sGroup ? SpeciesGroup.get(params.sGroup.toLong()) : allGroup
-		def max = Math.min(params.max ? params.int('max') : 12, 100);
-		def offset = params.offset ? params.int('offset') : 0
-		def userGroupInstance = userGroupService.get("" + params.webaddress);
-		
-		speciesGroup = (speciesGroup != allGroup) ? speciesGroup : null
-		def checklistInstanceList = getChecklist(speciesGroup, userGroupInstance, max, offset)
-		def checklistInstanceTotal = getChecklistCount(speciesGroup, userGroupInstance)
-		def checklistMapInstanceList = getChecklist(speciesGroup, userGroupInstance, null, null)
-		
-		def queryParams = [sGroup : params.sGroup, max:max, offset:offset]
-		
-		def activeFilters = [sGroup : params.sGroup]
-		//storing in session for prev <-> next checklist
-		String webAddress = (userGroupInstance)? userGroupInstance.webaddress : ""
-		session[webAddress + "checklist_ids_list_params"] = params.clone();
-		session[webAddress + "checklist_ids_list"] = checklistInstanceList.collect {it.id};
-		return [checklistInstanceList:checklistInstanceList, instanceTotal:checklistInstanceTotal, checklistMapInstanceList:checklistMapInstanceList, 'userGroupWebaddress':params.webaddress, activeFilters:activeFilters, queryParams:queryParams]
-	}
 
-	private getChecklist(speciesGroup, userGroupInstance, max, offset){
-		return Checklists.withCriteria(){
-			and{
-				if(speciesGroup){
-					eq('group', speciesGroup)
-				}
-				if(userGroupInstance){
-					userGroups{
-						eq('id', userGroupInstance.id)
-					}
-				}
-			}
-			if(max){
-				maxResults max
-			}
-			if(offset){
-				firstResult offset
-			}
-			
-			order 'id', 'desc'
-		}
-	}
-	*/
-	
-
-	
-//	def create() {
-//		log.debug params;
-//	}
-	
-	
-//	@Secured(['ROLE_ADMIN'])
-//	def breakChecklist = {
-//		log.debug params
-//		checklistUtilService.migrateObservationFromChecklist()
-//		render "=== done "
-//	}
-	
-	//	@Secured(['ROLE_ADMIN'])
-	//	def correctCn = {
-	//		checklistService.mCn()
-	//		render "=== done "
-	//	}
-	//
-	//	@Secured(['ROLE_ADMIN'])
-	//	def migrateNewChecklist = {
-	//		log.debug params
-	//		checklistService.migrateNewChecklist(params)
-	//		render "=== done "
-	//	}
-	//
-		/*
-		@Secured(['ROLE_USER'])
-		def test = {
-			userGroupService.migrateUserPermission()
-			render "=== done "
-		}
-	
-		@Secured(['ROLE_USER'])
-		def addSpecialFounder = {
-			userGroupService.addSpecialFounder()
-			render "=== done "
-		}
-		*/
-
-    /*
-    def createWizardFlow = {
-        main {
-            on('createChecklist').to "createChecklist"
-        }
-
-        createChecklist {
-			on('submit') {
-                def result = saveAndRender(params)
-                if(result.success) show()
-                else createFlow()
-            }
-            on('show').to 'show'
-            on('createFlow').to 'createChecklist'
-        }
-    }*/
+	@Secured(['ROLE_ADMIN'])
+    def migrateChecklistToDataTable() {
+        checklistService.migrateChecklistToDataTable();
+    }
 }

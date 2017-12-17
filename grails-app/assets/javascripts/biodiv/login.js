@@ -314,10 +314,14 @@ $(document).ready(function() {
     var clientId = window.params.login.googleClientID;
     //var scopes = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
     var scopes = 'https://www.googleapis.com/auth/plus.me';
+    if(typeof gapi === undefined) {
     gapi.load('auth2', gapiInit);
     function gapiInit() {
         if(gapi.client)
             gapi.client.setApiKey(apiKey);
+    }
+    } else {
+        console.log('gapi not defined. Check your connectivity');
     }
     ////////////////////////GOOGLE RELATED CALLS END HERE ///////////////////////
 

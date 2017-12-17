@@ -105,6 +105,7 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
             } else {
               log.error("No expires in response: $data")
             }
+            println "Returning facebookAuthToken ${token}"
             //log.debug("Got AccessToken: $token")
             return token
         } catch (IOException e) {

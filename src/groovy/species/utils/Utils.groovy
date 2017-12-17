@@ -147,8 +147,10 @@ class Utils {
 	}
 
 	static String getCanonicalForm(String name){
+        println namesParser;
 		try {
 			def taxonDef = namesParser.parse([name])?.get(0)
+            println taxonDef;
 			if(taxonDef){
 				return taxonDef.canonicalForm ?:taxonDef.name
 			}
