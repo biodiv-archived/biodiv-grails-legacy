@@ -743,6 +743,7 @@ class ChecklistService {
 	}
 	
 	def migrateChecklistToDataTable(){
+        dataSource.setUnreturnedConnectionTimeout(10000000);
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 		List clIdList = Checklists.listOrderById(order: "asc").collect{it.id}
