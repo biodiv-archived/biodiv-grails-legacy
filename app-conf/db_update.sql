@@ -842,4 +842,6 @@ select max(id) from data_table;
 select setval('datatable_id_seq',,false);
 
 #19Dec2017
-alter table observation add column date_accuracy varchar(255);
+alter table observation add column date_accuracy varchar(100);
+alter table data_table add column temporal_coverage_date_accuracy varchar(100);
+alter table dataset1 add column temporal_coverage_date_accuracy varchar(100);

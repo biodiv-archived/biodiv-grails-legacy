@@ -106,7 +106,7 @@
                         <a class="btn btn-danger pull-right" style="margin-right: 5px;"
                             href="#"
                             onclick="return deleteObservation();"><i class="icon-trash"></i><g:message code="button.delete.observation" /></a>
-                        <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm'>
+                        <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm' class="deleteForm">
                             <input type="hidden" name="id" value="${observationInstance.id}" />
                         </form>
                     </div>

@@ -567,6 +567,7 @@ class DataTableService extends AbstractMetadataService {
         //temporal coverage
         paramsToPropagate[ObvUtilService.OBSERVED_ON] = dataTable.temporalCoverage.fromDate;
         paramsToPropagate[ObvUtilService.TO_DATE] = dataTable.temporalCoverage.toDate;
+        paramsToPropagate[ObvUtilService.DATE_ACCURACY] = dataTable.temporalCoverage.dateAccuracy;
 
         //taxonomic coverage
 
