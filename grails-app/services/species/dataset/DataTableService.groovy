@@ -981,7 +981,8 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         }
         query += " from DataTable obv "
 
-        def filterQuery = " where obv.isDeleted = :isDeleted "
+        String userGroupQuery = "";
+        String filterQuery = " where obv.isDeleted = :isDeleted "
         
         //TODO: check logic
         if(params.featureBy == "false") {
@@ -1048,8 +1049,28 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         }
 
       
-        
-		def allDataTableCountQuery = "select count(*) from DataTable obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+        if(params.webaddress) {
+
+            def userGroupInstance =	utilsService.getUserGroup(params)
+            params.userGroup = userGroupInstance;
+        }
+
+        if(params.userGroup) {
+            log.debug "Filtering from usergourp : ${params.userGroup}"
+            query += " join obv.userGroups userGroup "
+            userGroupQuery += " join obv.userGroups userGroup "
+            filterQuery += " and userGroup = :userGroup "
+            queryParams['userGroup'] = params.userGroup;
+        }
+
+        if(params.notInUserGroup) {
+            log.debug "Filtering from notInUsergourp : ${params.userGroup}"
+            query += " join obv.userGroups userGroup "
+            userGroupQuery += " join obv.userGroups userGroup "
+            filterQuery += " and userGroup is null "
+        }
+
+		def allDataTableCountQuery = "select count(*) from DataTable obv " +((userGroupQuery)?userGroupQuery:'')+((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 	
         orderByClause = " order by " + orderByClause;
 

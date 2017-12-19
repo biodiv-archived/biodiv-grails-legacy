@@ -743,9 +743,10 @@ class ChecklistService {
 	}
 	
 	def migrateChecklistToDataTable(){
+        dataSource.setUnreturnedConnectionTimeout(10000000);
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-		List clIdList = Checklists.listOrderById(order: "asc", max:100).collect{it.id}
+		List clIdList = Checklists.listOrderById(order: "asc").collect{it.id}
 		clIdList.each {  id ->
             println "migrating checklist : ${id}"
             Checklists.withNewTransaction {
@@ -785,7 +786,7 @@ println cl.contributors.collect{it.id+','}.join(',')
 String contributor = cl.contributors.collect{it.id+','}.join(',')
 if(!contributor)
     contributor = cl.author.id+'';
-                dataTable.initParams([author:cl.author, contributorUserIds:contributor,attributions:attributions, licenseStr:cl.license.name, placeName:cl.placeName, latitude:cl.latitude+'', longitude:cl.longitude+'', topology:cl.topology, locationScale:cl.locationScale.value(),locationAccuracy:cl.locationAccuracy, geoPrivacy:cl.geoPrivacy, fromDate:cl.fromDate, toDate:cl.toDate, group:['0':cl.group.id+''], (CustomField.PREFIX+"References"):cl.refText, (CustomField.PREFIX+"Publication Date"):cl.publicationDate]);
+                dataTable.initParams([author:cl.author, contributorUserIds:contributor,attributions:attributions, licenseStr:cl.license.name, placeName:cl.placeName, latitude:cl.latitude+'', longitude:cl.longitude+'', topology:cl.topology, locationScale:cl.locationScale.value(),locationAccuracy:cl.locationAccuracy, geoPrivacy:Boolean.toString(cl.geoPrivacy), fromDate:cl.fromDate, toDate:cl.toDate, group:['0':cl.group.id+''], (CustomField.PREFIX+"References"):cl.refText, (CustomField.PREFIX+"Publication Date"):cl.publicationDate]);
                 dataTable.uploader = cl.author;
                 dataTable.createdOn = cl.createdOn;
                 dataTable.lastRevised = cl.lastRevised;

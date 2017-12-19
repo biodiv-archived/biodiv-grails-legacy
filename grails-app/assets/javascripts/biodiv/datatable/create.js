@@ -77,11 +77,12 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
     $.each(columns, function(i, n){
         //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
         el += "<th><select class='mapColumns' multiple name='attribute."+n.name+"'>";
-        el += "<optgroup label='General'>"
-            el += "<option class='generalColumn' value='sciNameColumn'>Scientific Name</option>"; 
+        el += "<optgroup label='General'>";
+        el += "<option class='generalColumn' value='sciNameColumn'>Scientific Name</option>"; 
         el += "<option class='generalColumn' value='commonNameColumn'>Common Name</option>"; 
         el += "<option class='generalColumn' value='language'>Common Name Language</option>"; 
         el += "<option class='generalColumn' value='observed on'>Date</option>"; 
+        el += "<option class='generalColumn' value='date accuracy'>Date Accuracy</option>"; 
         el += "<option class='generalColumn' value='group'>Species Group</option></optgroup>"; 
         el += "<option class='generalColumn' value='habitat'>Habitat</option></optgroup>"; 
         el += "<option class='generalColumn' value='location title'>Place Name</option>"; 
