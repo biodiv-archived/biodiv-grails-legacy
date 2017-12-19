@@ -678,7 +678,7 @@ class ObvUtilService {
 		
 		obvParams['fromDate'] = m[OBSERVED_ON]
 		obvParams['toDate'] = m[TO_DATE]
-		obvParams['dateAccuracy'] = m[AbstractObservationImporter.ANNOTATION_HEADER][DATE_ACCURACY]
+		obvParams['dateAccuracy'] = m[DATE_ACCURACY]?:(m[AbstractObservationImporter.ANNOTATION_HEADER]?m[AbstractObservationImporter.ANNOTATION_HEADER][DATE_ACCURACY]:null)
 		//author
         if(m[AUTHOR_EMAIL]) {
 		    obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
