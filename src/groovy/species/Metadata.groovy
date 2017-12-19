@@ -175,6 +175,7 @@ abstract class Metadata {
 			}
 			return val < new Date() && val >= obj.fromDate
 		}
+		dateAccuracy(nullable: true)
 		license nullable:false
 		language nullable:false
 		externalId nullable:true
