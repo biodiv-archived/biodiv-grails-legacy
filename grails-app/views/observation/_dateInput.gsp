@@ -1,3 +1,22 @@
+<%@ page import="species.Metadata.DateAccuracy"%>
+<div class="control-group ${hasErrors(bean: observationInstance, field: 'dateAccuracy', 'error')}" >
+    <label for="dateAccuracy" class="control-label"> <g:message
+        code="observation.dateAccuracy.label" default="Date Accuracy" />
+    </label>
+    <div class="controls"  style="margin-top:5px;">
+            <%DateAccuracy dA = observationInstance ? (observationInstance.dateAccuracy instanceof DateAccuracy) ? observationInstance.dateAccuracy : DateAccuracy.getEnum(observationInstance.dateAccuracy) : DateAccuracy.ACCURATE%>
+            <g:each in="${DateAccuracy.list()}" var="dateAccuracy">
+                <input type="radio" style="margin-bottom: 6px;" name="dateAccuracy" class="dateAccuracy" value="${dateAccuracy}" ${dA?.ordinal() == dateAccuracy.ordinal()?'checked':''} />${dateAccuracy.value()} 
+            </g:each>
+
+        <div class="help-inline">
+            <g:hasErrors bean="${observationInstance}" field="dateAccuracy">
+                <g:message code="observation.dateAccuracy.not_selected" />
+            </g:hasErrors>
+        </div>
+    </div>
+</div>
+
 
 <div
     class=" control-group ${hasErrors(bean: observationInstance, field: 'fromDate', 'error')} ${hasErrors(bean: observationInstance, field: 'toDate', 'error')}">
@@ -68,5 +87,8 @@
 
 
         </g:else>
-    </div>
+
+     </div>
 </div>
+
+
