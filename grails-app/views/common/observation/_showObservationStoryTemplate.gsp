@@ -147,6 +147,9 @@
                         <g:if test="${observationInstance.toDate && observationInstance.fromDate != observationInstance.toDate}">&nbsp;
                         <b>-</b>&nbsp; <time class="timeago" datetime="${observationInstance.toDate.getTime()}"></time>
                         </g:if>
+                        <g:if test="${observationInstance.metaClass.hasProperty(observationInstance, 'dateAccuracy')}">
+                            (${observationInstance.dateAccuracy.value()})
+                        </g:if>
                     </div>
                 </div>
 

@@ -56,7 +56,10 @@ import java.net.URL;
 import java.lang.Boolean;
 import species.NamesParser;
 import species.Metadata
+import species.Metadata.DateAccuracy;
 import species.Classification;
+import species.participation.Flag;
+import species.participation.Flag.FlagType;
 
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
@@ -99,6 +102,20 @@ class AbstractMetadataService extends AbstractObjectService {
         if(params.habitat instanceof String || params.habitat_id)
             instance.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
+        def dateAccuracy =  Metadata.DateAccuracy.getEnum(params.dateAccuracy)
+        if(dateAccuracy) {
+            switch(dateAccuracy) {
+                case DateAccuracy.UNKNOWN : 
+                instance.fromDate = new Date(0);
+                //TODO:add flag
+                break;
+                case DateAccuracy.APPROXIMATE : 
+                //TODO:add flag
+                break;
+            }
+            instance.dateAccuracy = dateAccuracy?:(params.toDate?Metadata.DateAccuracy.APPROXIMATE:Metadata.DateAccuracy.ACCURATE); 
+        }
+
         if( params.fromDate != ""){
             if(params.fromDate && (params.fromDate instanceof Date)) {
                 instance.fromDate = params.fromDate;
@@ -115,8 +132,8 @@ class AbstractMetadataService extends AbstractObjectService {
             } else {
                 instance.toDate = instance.toDate;
             }
-
-        }
+       }
+       
 
         String licenseStr = params.license_0?:params.license
         if(licenseStr) {
@@ -164,7 +181,7 @@ class AbstractMetadataService extends AbstractObjectService {
             instance.dataTable = params.dataTable;
         }
 
-        return instance;
+       return instance;
     }
 
     def save(instance, params, sendMail, feedAuthor, feedType, searchService) {
@@ -201,9 +218,10 @@ class AbstractMetadataService extends AbstractObjectService {
     def setAssociations(instance, params, sendMail) {
 
         def tags = (params.tags != null) ? ((params.tags instanceof List) ? params.tags : Arrays.asList(params.tags)) : new ArrayList();
-        if(tags) {
+        if(tags) { 
             instance.setTags(tags)
         }
+
         if(instance.metaClass.respondsTo(instance, "userGroups")) {
 
             if(params.groupsWithSharingNotAllowed) {
@@ -214,6 +232,19 @@ class AbstractMetadataService extends AbstractObjectService {
                     setUserGroups(instance, validUserGroups, sendMail);
             }
         }
+
+        if(instance.metaClass.hasProperty(instance, "dateAccuracy")) {
+            println "qqqqqqqqqqqqqqqqq^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+            switch(instance.dateAccuracy) {
+                case DateAccuracy.UNKNOWN:
+                case DateAccuracy.APPROXIMATE : 
+                    flagIt(instance, FlagType.DATE_INAPPROPRIATE, "Date is "+dateAccuracy.value());
+                    break;
+           }
+        } else {
+            println "NO PROP"
+        }
+
     }
 
     def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
@@ -288,5 +319,28 @@ class AbstractMetadataService extends AbstractObjectService {
         }
     }
 
-
+    public void flagIt(instance, FlagType flagType, String notes=null) {
+        log.info "Flagging instance ${instance}"
+        def flagInstance = Flag.findWhere(author: instance.author, objectId: instance.id, objectType:instance.class.getCanonicalName());
+        if (!flagInstance) {
+            try {
+                flagInstance = new Flag(objectId: instance.id, objectType: instance.class.getCanonicalName(), author: instance.author, flag:flagType, notes:notes)
+                if(!flagInstance.save(flush:true)){
+                    flagInstance.errors.allErrors.each { println it }
+                    return null
+                }
+                log.info "Saving flagCount"
+                instance.flagCount++
+                instance.save(flush:true)
+                log.info "Adding flagged activity"
+                def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
+                def act = activityFeedService.addActivityFeed(instance, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                e.printStackTrace();
+            }
+        } else {
+            log.error "object ${instance} is already flagged by author"
+        }
+    }
 }

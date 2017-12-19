@@ -452,7 +452,6 @@ println queryParts.queryParams
 			query += " join document.userGroups userGroup "
 			countQuery += " join document.userGroups userGroup "
             filterQuery += " and userGroup is null "
-            queryParams['userGroupId'] = Long.parseLong(params.notInUserGroup)
         }
 		
 		if(params.taxon) {
