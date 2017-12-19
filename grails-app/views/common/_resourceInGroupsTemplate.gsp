@@ -4,9 +4,9 @@
 
 <% def observationUserGroups = observationInstance.userGroups;
     if(observationInstance.hasProperty('sourceId')){
-        if(observationInstance.sourceId && observationInstance.id != observationInstance.sourceId){
-            observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
-        }
+//        if(observationInstance.sourceId && observationInstance.id != observationInstance.sourceId){
+//            observationUserGroups.addAll(Observation.read(observationInstance.sourceId).userGroups);
+//        }
     }
 %>
 <div class="resource_in_groups prop" rel="${isList}" style="display:${( observationUserGroups.size()==0 && isList) ? 'none;': 'block;' }">

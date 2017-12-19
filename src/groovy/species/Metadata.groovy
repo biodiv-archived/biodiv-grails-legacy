@@ -66,8 +66,8 @@ abstract class Metadata {
 	}
 	
 	public enum DateAccuracy {
-		APPROXIMATE ("Approximate"),
 		ACCURATE ("Accurate"),
+		APPROXIMATE ("Approximate"),
 		UNKNOWN ("Unknown")
 		
 		private String value;
@@ -79,7 +79,11 @@ abstract class Metadata {
 		String value() {
 			return this.value;
 		}
-		
+
+        static List list() {
+            return [ACCURATE, APPROXIMATE, UNKNOWN];
+        }
+
 		static DateAccuracy getEnum(value){
 			if(!value) return null
 			
@@ -93,17 +97,14 @@ abstract class Metadata {
 					return DateAccuracy.APPROXIMATE
 				case 'ACCURATE':
 					return DateAccuracy.ACCURATE
-				case 'LOCAL':
-					return DateAccuracy.LOCAL
-				case 'REGION':
-					return DateAccuracy.REGION
-				case 'COUNTRY':
-					return DateAccuracy.COUNTRY
+				case 'UNKNOWN':
+					return DateAccuracy.UNKNOWN
 				default:
 					return null	
 			}
 		}
 	}
+
 	//Geographic Coverage
 	String placeName;
 	String reverseGeocodedName

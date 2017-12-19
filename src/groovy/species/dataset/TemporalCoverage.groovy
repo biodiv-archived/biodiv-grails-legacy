@@ -23,7 +23,8 @@ class TemporalCoverage {
 
 	Date fromDate;
 	Date toDate;
-	
+    String dateAccuracy;
+
 	static constraints = {
 		fromDate(nullable:false, validator : {val, obj ->
             println val
@@ -39,6 +40,7 @@ class TemporalCoverage {
 			}
 			return val < new Date() ;//&& val >= obj.fromDate
 		})
+        dateAccuracy nullable:true;
 	}
 
 	static mapping = {
