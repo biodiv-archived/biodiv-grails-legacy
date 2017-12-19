@@ -39,7 +39,10 @@ import species.participation.Observation.BasisOfRecord;
 import species.participation.Observation.ProtocolType;
 import species.License;
 import species.License.LicenseType;
-
+import species.sourcehandler.importer.AbstractObservationImporter;
+import species.Metadata.DateAccuracy;
+import species.participation.Flag;
+import species.participation.Flag.FlagType;
 
 class ObvUtilService {
 
@@ -51,6 +54,7 @@ class ObvUtilService {
 	static final String HABITAT = "habitat"
 	static final String OBSERVED_ON   = "observed on"
 	static final String TO_DATE   = "to date"
+	static final String DATE_ACCURACY   = "date accuracy"
 	static final String CN    = "common name"
 	static final String LANGUAGE    = "language"
 	static final String SN    = "scientific name"
@@ -659,12 +663,6 @@ class ObvUtilService {
 		obvParams['reverse_geocoded_name'] = m[LOCATION]
 		obvParams['topology'] = m[TOPOLOGY];
 		//reco related
-        println "+++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++"
-        println m
-        println m[SN]
-        println "+++++++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++++++"
 		obvParams['recoName'] = m[SN]
 		obvParams['commonName'] = m[CN] 
 		obvParams['languageName'] = m[LANGUAGE]
@@ -680,7 +678,7 @@ class ObvUtilService {
 		
 		obvParams['fromDate'] = m[OBSERVED_ON]
 		obvParams['toDate'] = m[TO_DATE]
-		
+		obvParams['dateAccuracy'] = m[AbstractObservationImporter.ANNOTATION_HEADER][DATE_ACCURACY]
 		//author
         if(m[AUTHOR_EMAIL]) {
 		    obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
@@ -770,10 +768,6 @@ class ObvUtilService {
             observationInstance.protocol = protocolType;
             observationInstance.clearErrors();
             //following line was needed as : image saving in XMLConverter was calling observation before and afterUpdate.... so obv is gng out of sync
-            println "+++++++++++++++++++++++++++++++++++++"
-            println "+++++++++++++++++++++++++++++++++++++"
-            println "+++++++++++++++++++++++++++++++++++++"
-            println "+++++++++++++++++++++++++++++++++++++"
 
 			if(!observationInstance.hasErrors() && observationInstance.save(flush:true)) {
 				log.debug "Successfully created observation : "+observationInstance
@@ -782,9 +776,7 @@ class ObvUtilService {
 
 				params.obvId = observationInstance.id
 				params.author = observationInstance.author
-                println "11111111111"
 				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                println "2222222222"
                 postProcessObervation(params, observationInstance, newObv, uploadLog);
 				result.add(observationInstance.id)
 				
@@ -805,9 +797,7 @@ class ObvUtilService {
 
     private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null) {
         params.identifiedBy = params.identifiedBy;
-println "333333333333"
         addReco(params, observationInstance, newObv)
-println "444444444444"
         if(uploadLog) 
             uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id;
         
@@ -843,6 +833,13 @@ println "444444444444"
             }
         }
 
+        /*switch(observationInstance.dateAccuracy) {
+            case DateAccuracy.UNKNOWN:
+            case DateAccuracy.APPROXIMATE : 
+                observationService.flagIt(observationInstance, FlagType.DATE_INAPPROPRIATE, "Date is "+observationInstance.dateAccuracy.value());
+            break;
+        }*/
+
         if(!observationInstance.save()){
             if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
                 observationInstance.errors.allErrors.each { 
@@ -858,9 +855,6 @@ println "444444444444"
 		def recoResultMap;
         params.flushImmediately = false;
         recoResultMap = observationService.getRecommendation(params);
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 		def reco = recoResultMap.mainReco;
 		def commonNameReco =  recoResultMap.commonNameReco;
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
@@ -882,7 +876,6 @@ println "444444444444"
                 recommendationVoteInstance.votedOn = dateIdentified;
             }
 		}
-	println "savingRecoVote savingRecoVote savingRecoVote savingRecoVote savingRecoVote"	
         utilsService.benchmark('savingRecoVote') {
 		if(recommendationVoteInstance && !recommendationVoteInstance.hasErrors() && recommendationVoteInstance.save()) {
 			log.debug "Successfully added reco vote : " + recommendationVoteInstance
@@ -945,7 +938,6 @@ println "444444444444"
                 log.error " File not found please check the image folder " + f
             }
 		}
-		println resourcesInfo
 		return resourcesInfo
 	}
 	

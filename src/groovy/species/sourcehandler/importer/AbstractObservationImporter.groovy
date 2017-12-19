@@ -245,8 +245,6 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         }
         mapping.attribute.each { ipColumnName, mappedColumnName ->
             String column = ipColumnName;
-            println ipColumnName
-            println mappedColumnName;
             if(mappedColumnName.startsWith("trait.")) {
                 println "^^^^^^^^^^^^^^TRAIT^^^^^^^^^^^^^^^^^^^^"
                 println mappedColumnName 
@@ -255,13 +253,6 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 temp.add("http://ibp.org/terms/trait/"+mappedColumnName.replace("trait.",""));
                 temp.add(column);
                 temp.add("10000");
-                dataToWrite.add(temp.toArray(new String[0]))
-            } else if(mappedColumnName == 'user email' ||mappedColumnName == 'license' || mappedColumnName == 'attribution' ) {
-                if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
-                def temp = [];
-                temp.add("http://ibp.org/terms/observation/"+mappedColumnName);
-                temp.add(column);
-                temp.add("1000");
                 dataToWrite.add(temp.toArray(new String[0]))
             } else if(!(sciNameFound||commonNameColumn||observedOn||locationTitle||latitude||longitude)){
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;

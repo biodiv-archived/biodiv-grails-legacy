@@ -841,3 +841,5 @@ update follow set object_type='species.dataset.DataTable' where object_type='spe
 select max(id) from data_table;
 select setval('datatable_id_seq',,false);
 
+#19Dec2017
+alter table observation add column date_accuracy varchar(255);
