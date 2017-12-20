@@ -216,14 +216,13 @@ class AbstractMetadataService extends AbstractObjectService {
     }
 
     def setAssociations(instance, params, sendMail) {
-
+        log.debug "setAssociations tags"
         def tags = (params.tags != null) ? ((params.tags instanceof List) ? params.tags : Arrays.asList(params.tags)) : new ArrayList();
         if(tags) { 
             instance.setTags(tags)
         }
-
-        if(instance.metaClass.respondsTo(instance, "userGroups")) {
-
+        if(instance.metaClass.hasProperty(instance, "userGroups")) {
+            log.debug "setAssociations userGroups"
             if(params.groupsWithSharingNotAllowed) {
                 setUserGroups(instance, [params.groupsWithSharingNotAllowed], sendMail);
             } else {
