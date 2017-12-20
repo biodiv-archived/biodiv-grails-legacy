@@ -91,6 +91,18 @@
                         datetime="${datasetInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-time"></i>Date Accuracy</span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-time"></i>
+                    </g:else>
+                    <div class="value">
+                        ${datasetInsatnce.dateAccuracy}
+                    </div>
+                </div>
+
 
 
                 <g:if test="${datasetInstance.externalUrl}">

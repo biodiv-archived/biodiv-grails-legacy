@@ -130,7 +130,7 @@ class AbstractMetadataService extends AbstractObjectService {
             } else if(params.toDate) {
                 instance.toDate = parseDate(params.toDate);
             } else {
-                instance.toDate = instance.toDate;
+                instance.toDate = instance.fromDate;
             }
        }
        

@@ -30,6 +30,7 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 import species.Metadata;
+import species.Metadata.DateAccuracy;
 import species.utils.Utils;
 import species.Language;
 import species.groups.UserGroup;
@@ -188,23 +189,33 @@ abstract class CollMetadata implements Taggable, Rateable {
         }
 
         //temporalCoverage
-        if( params.fromDate != ""){
-            log.debug "Parsing date ${params.fromDate}"
-            Date fromDate = params.fromDate instanceof Date ?params.fromDate:utilsService.parseDate(params.fromDate);
-            log.debug "got ${fromDate}"
-            
-            Date toDate = params.toDate ?  (params.toDate instanceof Date ?params.toDate:utilsService.parseDate(params.toDate)) : fromDate
-            if(fromDate > new Date()) {
-                this.errors.reject('temporalCoverage.fromDate', 'From date cannot be null')
-            } else if(toDate < fromDate) {
-                this.errors.reject('temporalCoverage.toDate', 'To date cannot be null and should be > than from date')
-            } else {
-                this.temporalCoverage = new TemporalCoverage([fromDate:fromDate, toDate:toDate]);
-            }
+        DateAccuracy dateAccuracy =  Metadata.DateAccuracy.getEnum(params.dateAccuracy)
+        println dateAccuracy
+println "*************************************"
+println params.fromDate
+        if(dateAccuracy == Metadata.DateAccuracy.UNKNOWN) {
+            this.temporalCoverage = new TemporalCoverage([fromDate:new Date(0), toDate:new Date(0), dateAccuracy:Metadata.DateAccuracy.UNKNOWN.value()]);
         } else {
-            this.errors.reject('temporalCoverage.fromDate', 'From date and to date cannot be null')
-        }
+            if(params.fromDate != "") {
+                log.debug "Parsing date ${params.fromDate}"
+                Date fromDate = params.fromDate instanceof Date ?params.fromDate:utilsService.parseDate(params.fromDate);
+                log.debug "got ${fromDate}"
 
+                Date toDate = params.toDate ?  (params.toDate instanceof Date ?params.toDate:utilsService.parseDate(params.toDate)) : fromDate
+                if(fromDate > new Date()) {
+                    this.errors.reject('temporalCoverage.fromDate', 'From date cannot be null')
+                } else if(toDate < fromDate) {
+                    this.errors.reject('temporalCoverage.toDate', 'To date cannot be null and should be > than from date')
+                } else {
+                    this.temporalCoverage = new TemporalCoverage([fromDate:fromDate, toDate:toDate]);
+                }
+                dateAccuracy = dateAccuracy?:Metadata.DateAccuracy.ACCURATE;
+                this.temporalCoverage.dateAccuracy = dateAccuracy;
+            } else {
+                this.errors.reject('temporalCoverage.fromDate', 'From date and to date cannot be null')
+            }
+        }
+println  this.temporalCoverage.dateAccuracy
         //taxonomicCoverage
         //SpeciesGroup sG = params.group_id ? SpeciesGroup.findByName(params.group_id) : null
         log.debug "Setting group ${params.group}"
