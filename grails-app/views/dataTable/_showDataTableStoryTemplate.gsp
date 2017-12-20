@@ -75,7 +75,9 @@ String instanceType = "Observations";
                         <g:if test="${dataTableInstance.temporalCoverage.toDate && dataTableInstance.temporalCoverage.fromDate != dataTableInstance.temporalCoverage.toDate}">&nbsp;
                         <b>-</b>&nbsp; <time class="timeago" datetime="${dataTableInstance.temporalCoverage.toDate.getTime()}"></time>
                         </g:if>
-                        (${dataTableInstance.temporalCoverage.dateAccuracy})
+                        <g:if test="${dataTableInstance.temporalCoverage.dateAccuracy}">
+                        (${dataTableInstance.temporalCoverage.dateAccuracy.value()})
+                        </g:if>
                     </div>
                 </div>
 
