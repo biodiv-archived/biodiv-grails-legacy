@@ -295,9 +295,7 @@ class DatasetController extends AbstractObjectController {
         }
 
 
-        if(params.int('dataTableTypeId') == DataTableType.OBSERVATIONS.ordinal()) {
-            dataTableInstance.dataTableType = DataTableType.OBSERVATIONS; 
-        }
+        dataTableInstance.dataTableType = DataTableType.list()[params.int('dataTableTypeId')]; 
         render g.render(template:"/dataTable/addDataTable", model:[dataTableInstance:dataTableInstance]);
     }       
 }
