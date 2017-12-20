@@ -151,10 +151,8 @@
                             </div>
                         </div>
                         <div id="datasetEditSection" class="section">
-                            <g:if test="${params.action != 'create'}">
                                 <g:set var="dataset_contributor_autofillUsersId" value="contributor_id" />
                                 <g:render template="/dataset/collectionMetadataTemplate" model="['instance':datasetInstance, 'autofillUserComp':dataset_contributor_autofillUsersId]"/>
-                            </g:if>
                         </div>
                    </div>
 

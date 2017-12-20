@@ -76,7 +76,7 @@ String instanceType = "Observations";
                         <b>-</b>&nbsp; <time class="timeago" datetime="${dataTableInstance.temporalCoverage.toDate.getTime()}"></time>
                         </g:if>
                         <g:if test="${dataTableInstance.temporalCoverage.dateAccuracy}">
-                            (${dataTableInstance.temporalCoverage.dateAccuracy.value()})
+                            (${dataTableInstance.temporalCoverage.dateAccuracy.toLowerCase().capitalize()})
                         </g:if>
                     </div>
                 </div>

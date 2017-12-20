@@ -1377,12 +1377,14 @@ class UserGroupService {
 			if(objectIds && objectIds != ""){
 				objectIds.split(",").each {
 					def obj = domainClass.read(Long.parseLong(it.trim()))
-                    if(obj) {
-                        obvs << obj
-                        if(obj.instanceOf(Checklists)){
-                            obvs.addAll(obj.observations)
-                        }
-                    }
+					obvs << obj
+					/*if(obj.instanceOf(Checklists)){
+						obvs.addAll(obj.observations)
+					}*/
+                    /*if(obj.instanceOf(DataTable)){
+                        def dataTableObservations = Observation.findByDataTable(obv);
+						dataTableObvs.addAll(dataTableObservations);
+                    }*/
 				}
 			}
 			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null
@@ -1421,6 +1423,23 @@ class UserGroupService {
 			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, functionString, sendMail)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
+            println "Posting datatable observations into their groups"
+			if(objectIds && objectIds != ""){
+				objectIds.split(",").each {
+					def obj = domainClass.read(Long.parseLong(it.trim()))
+                    if(obj.instanceOf(DataTable)){
+                        def dataTableObservations = Observation.findAllByDataTable(obj);
+			            obvs = []
+						obvs.addAll(dataTableObservations);
+                        log.debug "${submitType}ing datatable ${obj} ${obvs.size()} observations into usergroups ${obj.userGroups}"
+					    functionString = (submitType == 'post')? 'addToObservations' : 'removeFromObservations'            
+					    def uGs = (submitType == 'post')? obj.userGroups : allGroups
+			            println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, 'observations', functionString, sendMail);
+                    }
+				}
+			}
+
+	
 		}catch (Exception e) {
 			e.printStackTrace()
 			r['success'] = false
