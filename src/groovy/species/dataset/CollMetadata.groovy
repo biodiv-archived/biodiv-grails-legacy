@@ -215,7 +215,6 @@ println params.fromDate
                 this.errors.reject('temporalCoverage.fromDate', 'From date and to date cannot be null')
             }
         }
-println  this.temporalCoverage.dateAccuracy
         //taxonomicCoverage
         //SpeciesGroup sG = params.group_id ? SpeciesGroup.findByName(params.group_id) : null
         log.debug "Setting group ${params.group}"
