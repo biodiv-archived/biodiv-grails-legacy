@@ -296,6 +296,6 @@ class DatasetController extends AbstractObjectController {
 
 
         dataTableInstance.dataTableType = DataTableType.list()[params.int('dataTableTypeId')]; 
-        render g.render(template:"/dataTable/addDataTable", model:[dataTableInstance:dataTableInstance]);
+        render g.render(template:"/dataTable/add${dataTableInstance.dataTableType.value()}DataTable", model:[dataTableInstance:dataTableInstance]);
     }       
 }

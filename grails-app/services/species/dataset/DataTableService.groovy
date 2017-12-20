@@ -108,6 +108,7 @@ class DataTableService extends AbstractMetadataService {
     def obvUtilService;
     def observationService;
     def observationsSearchService;
+    def speciesUploadService
     def datatableService;
     def dataSource;
     def grailsApplication;
@@ -209,13 +210,12 @@ class DataTableService extends AbstractMetadataService {
 
                 if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
                     File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
-                    //TODO:schedule datatable for upload
-                    //upload([file:dataTable.uFile.path, notes:dataTable.title, uploadType:dataTable]);   
                     switch(dataTable.dataTableType.ordinal()) {
                         case DataTableType.OBSERVATIONS.ordinal() :
                         uploadObservations(dataTable, dataTableFile, null, mappingFile, null,  new File(dataTableFile.getParentFile(), "upload.log"));  
                         break;
-                        case DataTableType.TRAITS.ordinal(): 
+                        case DataTableType.SPECIES.ordinal(): 
+                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':params.imagesDir, 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers]);
                         break;
                     }
                 }
