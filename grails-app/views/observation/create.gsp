@@ -191,6 +191,23 @@ $(document).ready(function(){
       return false;
     });
 
+ 
+    if ($('input.dateAccuracy[type=radio][name=dateAccuracy]:checked').val() == 'UNKNOWN') {
+        $('.addObservation input.date[name="fromDate"]').attr('disabled', 'disabled');
+        $('.addObservation input.date[name="toDate"]').attr('disabled', 'disabled');
+    } else {
+        $('.addObservation input.date').removeAttr('disabled');
+    }
+
+    $('input.dateAccuracy[type=radio][name=dateAccuracy]').change(function() {
+        if (this.value == 'UNKNOWN') {
+            $('.addObservation input.date[name="fromDate"]').attr('disabled', 'disabled');
+            $('.addObservation input.date[name="toDate"]').attr('disabled', 'disabled');
+        } else {
+            $('.addObservation input.date').removeAttr('disabled');
+        }
+    });
+
 });
 
 function deleteObservation(){

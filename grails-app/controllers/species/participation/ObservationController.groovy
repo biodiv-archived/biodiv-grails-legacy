@@ -34,6 +34,7 @@ import species.Habitat;
 import species.Species;
 import species.Resource;
 import species.BlockedMails;
+import species.Metadata;
 import species.Resource.ResourceType;
 import species.auth.SUser;
 import org.apache.solr.common.SolrException;
@@ -249,6 +250,7 @@ class ObservationController extends AbstractObjectController {
         def observationInstance = new Observation()
         observationInstance.properties = params;
         observationInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
+        observationInstance.dateAccuracy = Metadata.DateAccuracy.ACCURATE;
         def author = springSecurityService.currentUser;
         def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted and obv.id = obv.sourceId and obv.isChecklist = false order by obv.createdOn desc ",[author:author, isDeleted:false]);
         def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();

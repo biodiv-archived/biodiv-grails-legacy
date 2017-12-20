@@ -233,8 +233,7 @@ class AbstractMetadataService extends AbstractObjectService {
             }
         }
 
-        if(instance.metaClass.hasProperty(instance, "dateAccuracy")) {
-            println "qqqqqqqqqqqqqqqqq^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+        /*if(instance.metaClass.hasProperty(instance, "dateAccuracy")) {
             switch(instance.dateAccuracy) {
                 case DateAccuracy.UNKNOWN:
                 case DateAccuracy.APPROXIMATE : 
@@ -242,8 +241,7 @@ class AbstractMetadataService extends AbstractObjectService {
                     break;
            }
         } else {
-            println "NO PROP"
-        }
+        }*/
 
     }
 
