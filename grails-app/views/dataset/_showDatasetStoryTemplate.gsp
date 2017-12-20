@@ -91,7 +91,7 @@
                         datetime="${datasetInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
-           <g:if test="${ ${datasetInstance.temporalCoverage.dateAccuracy}">
+           <g:if test="${datasetInstance.temporalCoverage.dateAccuracy}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-time"></i>Date Accuracy</span>
