@@ -547,15 +547,18 @@ class DataTableService extends AbstractMetadataService {
 
         def cfs = dataTable.fetchCustomFields();
         cfs.each { cf -> 
-            if(cf.key.equalsIgnoreCase('license'))
-                paramsToPropagate[ObvUtilService.LICENSE] = cf.value;
+            //if(cf.key.equalsIgnoreCase('license'))
+            //    paramsToPropagate[ObvUtilService.LICENSE] = cf.value;
             //License.read(dataTable.access.licenseId).name.value().replace("cc ", "");
-            else if(cf.key.equalsIgnoreCase('contributor'))
-                paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = cf.value;
+            //else if(cf.key.equalsIgnoreCase('contributor'))
+            //    paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = cf.value;
                 //SUser.findByEmail(dataTable.party.contributorId).email;
-            else
+//            else
                 paramsToPropagate[cf.key] = cf.value;
         }
+
+        paramsToPropagate[ObvUtilService.LICENSE] = License.read(dataTable.access.licenseId).name.value().replace("cc ", "");
+        paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = dataTable.party.fetchContributor().email;
 
         //geographical coverage
         paramsToPropagate[ObvUtilService.LOCATION] = dataTable.geographicalCoverage.placeName;
