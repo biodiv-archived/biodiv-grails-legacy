@@ -840,6 +840,10 @@ update follow set object_type='species.dataset.DataTable' where object_type='spe
 select max(id) from data_table;
 select setval('datatable_id_seq',,false);
 
+###########################
+## change nginx rules add datatable sataset and dataPapackage
+###########################
+
 #19Dec2017
 alter table observation add column date_accuracy varchar(100);
 alter table data_table add column temporal_coverage_date_accuracy varchar(100);
