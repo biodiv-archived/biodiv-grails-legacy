@@ -99,7 +99,7 @@
                     <i class="pull-left icon-time"></i>
                     </g:else>
                     <div class="value">
-                        ${datasetInstance.dateAccuracy.toLowerCase().capitalize()}
+                        ${datasetInstance.temporalCoverage.dateAccuracy.toLowerCase().capitalize()}
                     </div>
                 </div>
 

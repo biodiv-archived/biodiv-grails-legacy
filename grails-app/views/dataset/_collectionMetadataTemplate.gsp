@@ -60,7 +60,7 @@ if(supportingModules_dp) {
 
     <g:if test="${supportingModules.containsKey(SupportingModules.USAGE_RIGHTS)}">
 <div class="section">
-    <h3><g:message code="default.access.label" /> </h3>
+    <h3><g:message code="default.usageRights.label" /> </h3>
     
     <div class="control-group ${hasErrors(bean: instance.access, field: 'licenseId', 'error')}">
         <label class="control-label" for="License"><g:message code="default.licenses.label" /> </label>
