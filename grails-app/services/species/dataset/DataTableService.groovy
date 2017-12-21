@@ -200,61 +200,36 @@ class DataTableService extends AbstractMetadataService {
       
         dataTable.lastRevised = new Date();
 
-    //    DataTable.withTransaction {
-            result = save(dataTable, params, true, null, feedType, null);
-            if(result.success) {
+        result = save(dataTable, params, true, null, feedType, null);
+        if(result.success) {
 
-                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-                String contentRootDir = config.speciesPortal.content.rootDir
-                File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
+            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            String contentRootDir = config.speciesPortal.content.rootDir
+            File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
 
-                if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
-                    File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
-                    switch(dataTable.dataTableType.ordinal()) {
-                        case DataTableType.OBSERVATIONS.ordinal() :
-                        uploadObservations(dataTable, dataTableFile, null, mappingFile, null,  new File(dataTableFile.getParentFile(), "upload.log"));  
-                        break;
-                        case DataTableType.SPECIES.ordinal(): 
-                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':params.imagesDir, 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers]);
-                        break;
+            if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
+                File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
+                switch(dataTable.dataTableType.ordinal()) {
+                    case DataTableType.OBSERVATIONS.ordinal() :
+                    uploadObservations(dataTable, dataTableFile, null, mappingFile, null,  new File(dataTableFile.getParentFile(), "upload.log"));  
+                    break;
+                    case DataTableType.SPECIES.ordinal(): 
+                    def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':params.imagesDir, 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
+
+                    if(res.sBulkUploadEntry) {
+                        println "Saving upload log entry"
+                        dataTable.uploadLog = res.sBulkUploadEntry;
                     }
+                    break;
+                }
+                if(!dataTable.save()) {
+                    log.error "Error while saving datatable";
                 }
             }
-    //    } 
+        }
         return result;
 	}
-/*
-    private File saveMappingFile(params, File directory) {
-        File mappingFile = new File(directory, "mappingFile.tsv");
-        CSVWriter writer = utilsService.getCSVWriter(mappingFile.getParent(), mappingFile.getName()); 
-        
-        def header = ['Field', 'Column Name', 'Value'];
-        writer.writeNext(header.toArray(new String[0]));
 
-        def dataToWrite = []
-        params.attribute?.each {key,value ->
-            def temp = []
-                log.debug "Writting ${key} : ${value}"
-                temp.add(key[key.indexOf('.')+1]+"");
-                println  value
-                temp.add(value.toString()+"");
-            dataToWrite.add(temp.toArray(new String[0]))
-        }
-        params.trait?.each {key,value ->
-            def temp = []
-                log.debug "Writting ${key} : ${value}"
-                temp.add(key[key.indexOf('.')+1]+"");
-                println  value
-                temp.add(value.toString()+"");
-            dataToWrite.add(temp.toArray(new String[0]))
-        }
-        writer.writeAll(dataToWrite);
-        writer.flush()
-        writer.close()
-
-        return mappingFile;
-    }
-*/
 	Map upload(BulkUpload bulkUploadEntry){
 		def dataFile = bulkUploadEntry.filePath
 		def imagesDir = bulkUploadEntry.imagesDir
@@ -1111,14 +1086,31 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         return features
     }
 
-	def List getObservationData(id, params=[:]){
+	List getDataObjects(DataTable dataTable, Map params=[:]){
         println params
         //Done because of java melody error - junk coming with offset value
         params.offset = params.offset ? params.offset.tokenize("/?")[0] : 0;
 		params.max = params.max ? params.max.toInteger() :10
 		params.offset = params.offset ? params.offset.toInteger() :0
-		def sql =  Sql.newInstance(dataSource);
-		def query = "select id  as obv_id from observation where data_table_id = " + id + " order by id limit " + params.max + " offset " + params.offset;
+	
+        switch(dataTable.dataTableType) {
+            case DataTableType.OBSERVATIONS: return getObservationData(dataTable.id, params);
+            case DataTableType.SPECIES : return Species.findAllByDataTableAndIsDeleted(dataTable, false, [max:params.max, offset:params.offset, order:'id']);
+        }
+        return [];
+    }
+
+	int getDataObjectsCount(DataTable dataTable) {
+        switch(dataTable.dataTableType) {
+            case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(dataTable, false);
+            case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(dataTable, false);
+        }
+        return 0;
+    }
+
+	private List getObservationData(id, params=[:]){
+	    def sql =  Sql.newInstance(dataSource);
+		def query = "select id  as obv_id from observation where data_table_id = " + id + " and is_deleted=false order by id limit " + params.max + " offset " + params.offset;
         log.debug "Running query : ${query}";
 		def res = []
 		sql.rows(query).each{

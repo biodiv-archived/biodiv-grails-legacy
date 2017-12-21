@@ -124,7 +124,7 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
     el += "</tr>";
 
     el += "</tbody></table>";
-    $("#myGrid").html(el);
+    $("#dataTableGrid").html(el);
     $("#gridSection").show();
     $('.mapColumns').multiselect({
         nonSelectedText: "Select Mapping",

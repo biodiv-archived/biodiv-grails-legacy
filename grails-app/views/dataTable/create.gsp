@@ -84,9 +84,6 @@
             select {
                 height:46px;
             }
-            .upload_file div {
-                display:inline-block;
-            }
             .mapColumns.divider {
                 height:20px;
             }

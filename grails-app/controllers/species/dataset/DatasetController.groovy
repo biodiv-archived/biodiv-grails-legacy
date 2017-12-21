@@ -263,6 +263,7 @@ class DatasetController extends AbstractObjectController {
         }
 	}
 
+    @Secured(['ROLE_ADMIN'])
     def dataPackageChangedForDataset() {
         DataPackage dataPackage = DataPackage.read(params.long('dataPackageId'));
 		def datasetInstance = new Dataset1()
@@ -271,6 +272,7 @@ class DatasetController extends AbstractObjectController {
         render g.render(template:"/dataset/collectionMetadataTemplate", model:[instance:datasetInstance, 'autofillUserComp':'contributor_id']);
     }
     
+    @Secured(['ROLE_USER'])
     def dataTableTypeChanged() {
         Dataset1 datasetInstance;
         DataTable dataTableInstance;

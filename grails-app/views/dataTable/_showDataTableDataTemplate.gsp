@@ -17,16 +17,17 @@
             </tr>
         </thead>
         <tbody class="mainContentList rowlink">
-            <g:each in="${observations}" var="observation">
-            <tr class="${'mainContent ' + observation?.maxVotedReco?.name?.replaceAll(' ', '_')}">
-            <% def checklistAnnotations = observation.fetchChecklistAnnotation(); %>
+            <g:each in="${dataObjects}" var="dataObject">
+            <tr>
+            <% def checklistAnnotations = dataObject.fetchChecklistAnnotation(); %>
+          
                 <g:each in="${dataTableInstance.fetchColumnNames()}" var="cName">
                     <g:if test="${cName[0].equalsIgnoreCase('http://rs.tdwg.org/dwc/terms/scientificName')}">
                         <td class="nameColumn">
                         <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
-                        <g:if test="${observation.maxVotedReco?.taxonConcept && observation.maxVotedReco.taxonConcept?.canonicalForm != null}">
-                        <a href="${uGroup.createLink(action:'show', controller:'species', id:observation.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                            <i> ${observation.maxVotedReco.taxonConcept.canonicalForm}</i>
+                        <g:if test="${dataObject.maxVotedReco?.taxonConcept && dataObject.maxVotedReco.taxonConcept?.canonicalForm != null}">
+                        <a href="${uGroup.createLink(action:'show', controller:'species', id:dataObject.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                            <i> ${dataObject.maxVotedReco.taxonConcept.canonicalForm}</i>
                         </a>
                         </g:if>
                         <g:else>
@@ -40,10 +41,12 @@
                     </td>
                     </g:else>
                 </g:each>
-		<td>
-                    <g:render template="/observation/showObservationImagesList" model="['observationInstance':observation]"/>
-                </td>
-                
+                <td>
+                    <a href="${uGroup.createLink(action:'show', controller:checklistAnnotations['type'], id:checklistAnnotations['id'], 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                        ${raw(checklistAnnotations['title'])}
+                    </a>
+
+                </td>      
                 <td class="nolink">
                     <comment:showCommentPopup model="['commentHolder':observation, 'rootHolder':dataTableInstance]" />
                 </td>
@@ -51,7 +54,7 @@
             </g:each>	
         </tbody>
     </table>
-    <g:if test="${observationsCount > (params.max?params.int('max'):10)}">
+    <g:if test="${dataObjectsCount > (params.max?params.int('max'):10)}">
     <div class="centered">
         <div class="btn loadMore">
             <span class="progress" style="display: none;"><g:message code="msg.loading" /> </span> <span
@@ -60,7 +63,7 @@
     </div>
     </g:if>
     <div class="paginateButtons" style="visibility: hidden; clear: both">
-        <p:paginate total="${observationsCount?:0}" action="${'observationData'}" controller="${params.controller?:'checklist'}"
+        <p:paginate total="${dataObjectsCount?:0}" action="${'dataObjects'}" controller="${'dataTable'}"
         userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
         max="${params.max?params.int('max'):10}"  params="${[id:dataTableInstance.id]}"/>
     </div>

@@ -11,6 +11,8 @@ import content.eml.UFile;
 import species.dataset.DataPackage.DataTableType;
 import species.groups.UserGroup;
 import grails.converters.JSON
+import species.participation.UploadLog;
+
 class DataTable extends CollMetadata {
 	
 	
@@ -19,7 +21,9 @@ class DataTable extends CollMetadata {
 	static hasOne = [dataset : Dataset1]
     UFile uFile;
     DataTableType dataTableType;
-	
+
+    UploadLog uploadLog;
+
 	//serialized object to store list of column names
 	String columns;
     Long checklistId;
@@ -33,6 +37,7 @@ class DataTable extends CollMetadata {
 		agreeTerms nullable:true
 		checklistId nullable:true
 		uFile nullable:false
+		uploadLog nullable:true
 		columns nullable:false, blank:false;
 	}
 	
