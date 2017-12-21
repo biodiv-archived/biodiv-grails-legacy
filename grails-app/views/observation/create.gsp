@@ -150,10 +150,12 @@
 
 $(document).ready(function(){
 
-    var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
-    uploadResource.POLICY = "${policy}";
-    uploadResource.SIGNATURE = "${signature}";
-    <%
+    var uploadResource = new $.fn.components.UploadResource($('.observation_create'), {
+        POLICY : "${policy}",
+        SIGNATURE :"${signature}"
+    });
+    $('.filePicker').data('uploadResource', uploadResource);
+   <%
            if(observationInstance?.group) {
            out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
            }

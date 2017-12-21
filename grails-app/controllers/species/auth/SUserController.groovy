@@ -111,13 +111,14 @@ class SUserController extends UserController {
 	@Secured(['ROLE_ADMIN'])
 	def create() {
 		def user = lookupUserClass().newInstance(params)
+        user.email = user.email.toLowerCase();
 		[user: user, authorityList: sortedRoles()]
 	}
 
 	@Secured(['ROLE_ADMIN'])
 	def save() {
 		def user = lookupUserClass().newInstance(params)
-
+        user.email = user.email.toLowerCase();
 		if (params.password) {
 			String salt = saltSource instanceof NullSaltSource ? null : params.username
 			user.password = params.password; //SpringSecurityUiService.encodePassword(params.password, salt)

@@ -8,6 +8,9 @@
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <div class="">
 
+
+ 	<g:render template="/observation/browseObservationMenu" model="[queryParams:queryParams]"/>
+
 	<!-- main_content -->
 	<div class="list" style="margin-left:0px;clear:both">
 		<div class="filters" style="position: relative;">

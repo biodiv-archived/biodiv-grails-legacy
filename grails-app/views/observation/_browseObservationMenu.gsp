@@ -4,13 +4,13 @@
                 <ul class="nav">
                     <li class="${params.isChecklistOnly?'':'active'}"><a
                         href="${uGroup.createLink(
-                        controller:'observation', action:'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                        controller:'observation', action:'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:queryParams)}"
                         > <g:message code="heading.browse.observations" /></a>
                     </li>
                     <!--li class="divider-vertical"></li>
                     <li class="${params.isChecklistOnly?'active':''}"><a
                         href="${uGroup.createLink(
-                        controller:'observation', action:'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':['isChecklistOnly':true, 'areaFilter':'all', 'isMediaFilter':false])}"
+                        controller:'observation', action:'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':cQueryParams)}"
                         > <g:message code="heading.browse.checklists" /></a>
                     </li-->
                 </ul>

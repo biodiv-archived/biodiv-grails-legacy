@@ -104,7 +104,7 @@ class GroupHandlerService {
 	 * A species should not have multiple paths in the same classification 
 	 * @return
      */
-    int updateGroups(boolean runForSynonyms=false) {
+    int updateGroups(boolean runForSynonyms=false, boolean updateWhereNoGroup = false) {
         int noOfUpdations = 0;
         int offset = 0;
         int limit = BATCH_SIZE;
@@ -115,7 +115,7 @@ class GroupHandlerService {
         int count = 0;
 
         int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        dataSource.setUnreturnedConnectionTimeout(500);
+        dataSource.setUnreturnedConnectionTimeout(0);
 
         def conn;
         while(true) {
@@ -124,9 +124,17 @@ class GroupHandlerService {
                 conn = new Sql(dataSource)
 
                 if(runForSynonyms) {
-                    taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.status = '"+NameStatus.SYNONYM.value().toUpperCase()+"' and t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                    if(updateWhereNoGroup) {
+                        taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.group_id is null and t.status = '"+NameStatus.SYNONYM.value().toUpperCase()+"' and t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                    } else {
+                        taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.status = '"+NameStatus.SYNONYM.value().toUpperCase()+"' and t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                    }
                 } else {
-                    taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                    if(updateWhereNoGroup) {
+                        taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.group_id is null and t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                    } else {
+                        taxonConcepts = conn.rows("select id from taxonomy_definition as t where t.rank >= "+TaxonomyRank.SPECIES.ordinal()+" order by t.id asc limit "+limit+" offset "+offset);
+                    }
                 }
                // TaxonomyDefinition.withNewTransaction {
                     taxonConcepts.each { taxonConceptRow ->

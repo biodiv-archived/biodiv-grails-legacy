@@ -146,7 +146,10 @@ class Trait {
         units nullable:true
         traitTypes nullable:false
         dataTypes nullable:false
-    }
+/*      taxon validator : { val, obj ->
+			val && val.size() > 0 
+		}
+*/    }
 
     static mapping = {
         description type:"text"
@@ -257,9 +260,11 @@ class Trait {
         }
 
         if(ibpParentTaxon) {
+            println "Found ibp parent classification to be ${ibpParentTaxon}";
+            println "trait taxon ${trait.taxon}";
             ibpParentTaxon.each { t ->
                 trait.taxon.each { taxon ->
-                    if(trait.taxon.id == t.id)
+                    if(taxon.id == t.id)
                        isValid = true;
                 }
             }

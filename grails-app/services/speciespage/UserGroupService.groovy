@@ -1370,7 +1370,6 @@ class UserGroupService {
             }
             List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
             HashSet<UserGroup> allGroups = new HashSet();
-            allGroups.addAll(userGroupsWithFilterRule);
             allGroups.addAll(groups);
 
 			def objectIds = params['objectIds']
@@ -1397,6 +1396,7 @@ class UserGroupService {
 			String functionString = ""
 			switch (objectType) {
 				case [Observation.class.getCanonicalName(), Checklists.class.getCanonicalName()]:
+                    allGroups.addAll(userGroupsWithFilterRule);
 					groupRes += 'observations'
 					functionString += (submitType == 'post')? 'addToObservations' : 'removeFromObservations'
 					break
@@ -1405,6 +1405,7 @@ class UserGroupService {
 					functionString += (submitType == 'post')? 'addToSpecies' : 'removeFromSpecies'
 					break
 				case Document.class.getCanonicalName():
+                    allGroups.addAll(userGroupsWithFilterRule);
 					groupRes += 'documents'
 					functionString += (submitType == 'post')? 'addToDocuments' : 'removeFromDocuments'
 					break

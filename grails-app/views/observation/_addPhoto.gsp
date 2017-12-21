@@ -17,21 +17,32 @@
                 def counter = 0 
             %>
             <g:if test="${resourceListType != 'fromRelatedObv' && resourceListType != 'fromSpeciesField'}">
-            <li class="add_file addedResource" >
+            <li class="filePicker" style="width:100%;height:330px;"></li>
+            <li class="uploaded_files_list_container" style="line-height:0px">
+            <g:if test="${resourceListType == 'usersResource'}">
+            
+            <a style="margin-bottom:3px;" class="pull-right sortMediaOnExif btn" onclick='sortMediaOnExif()'><g:message code="button.sort.date" /></a>
+            
+            <i class="icon-picture"></i><span style="font-weight:bold;margin-left:2px;"><g:message code="button.my.uploads" /></span> <span> <g:message code="text.stored.period" /></span>
+            </g:if>
+
+
+            <ul class="uploaded_files_list thumbnails" style="margin-left:0px;">
+            <li class="add_file addedResource" style="display:none !important;">
             
             <div class="add_file_container">
-                <div class="add_image"><span class="add_resource_text"><g:message code="default.resource.add.image.label" /></span></div> 
+                <div class="add_image"><span class="add_resource_text"><%--<g:message code="default.resource.add.image.label" />--%></span></div> 
                
-                <div class="add_video editable"><span class="add_resource_text"><g:message code="default.resource.add.video.label" /></span></div>
+                <div class="add_video editable"><span class="add_resource_text"><%--<g:message code="default.resource.add.video.label" />--%></span></div>
                 
-                <div class="add_audio"><span class="add_resource_text"><g:message code="default.resource.add.audio.label" /></span></div>
+                <div class="add_audio"><span class="add_resource_text"><%--<g:message code="default.resource.add.audio.label" />--%></span></div>
 
             </div>
             <div class="progress">
                 <div class="translucent_box"></div>
                 <div class="progress_bar"></div>
                 <div class="progress_msg"></div>
-                <div class="mediaProgressBar" style ="margin-top:117px"></div>
+                <div class="mediaProgressBar" style ="margin-top:0px;height:0px;"></div>
             </div>
             </li>
             </g:if>
@@ -185,4 +196,5 @@
     </div>
     <div class="close_button" onclick="removeResource(event, {{>i}});$('#geotagged_images').trigger('update_map');"></div>
     </li>
+    </ul></li>
 </script>

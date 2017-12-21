@@ -172,11 +172,12 @@ function dropAction(event, ui, ele) {
     $(ele).find(".star_obvcreate").last().children().remove();
     var form = $(ele).closest(".addObservation");
     var $ratingCont = $(ele).find(".star_obvcreate").last();
+    $ratingCont.attr('data-score', $(ui.draggable).find(".star_obvcreate").last().find('input').val());
     rate($ratingCont);
     $(ui.draggable).draggable('disable');
     //var imageID = $(ui.draggable).find("img").first().attr("class").split(" ")[0];
     //$("."+imageID).first().mousedown(function(){console.log("mouse down");return false;});
-    $(ui.draggable).appendTo(".imagesList");
+    $(ui.draggable).appendTo(".uploaded_files_list");
     $(ui.draggable).css("opacity","0.3");
     //$(form).find(".address").trigger('click'); 
     $(".imageHolder .addedResource").click(function(){
@@ -283,7 +284,6 @@ $(".applyAll").click(function(){
 
 function initializers(){
     initializeSpeciesGroupHabitatDropdowns();
-    console.log('bulkCreate');
     $('.propagateGrpHab .control-group  label').show();
 
     $( ".date" ).datepicker({ 
@@ -365,7 +365,7 @@ function sortMediaOnExif() {
     if($(".sortMediaOnExif").hasClass("disabled")) {
         return;
     }
-    var allMedia = $(".imagesList .addedResource.thumbnail");
+    var allMedia = $(".uploaded_files_list .addedResource.thumbnail");
     var unsorted = []
     $.each(allMedia, function(index, value){
         var temp = {};
@@ -388,9 +388,9 @@ function sortMediaOnExif() {
     var sorted = unsorted.slice(0).sort(function(a, b) {
         return (new Date(b.value)) - (new Date(a.value));
     });
-    $(".imagesList .addedResource.thumbnail").remove();
+    $(".uploaded_files_list .addedResource.thumbnail").remove();
     $.each(sorted, function(index, value){
-        $(".imagesList").append(value.key);
+        $(".uploaded_files_list").append(value.key);
     });
-    $(".imagesList .addedResource.thumbnail").draggable({helper:'clone'});  
+    $(".uploaded_files_list .addedResource.thumbnail").draggable({helper:'clone'});  
 }

@@ -634,7 +634,7 @@ class CustomRegisterCommand {
         latitude blank:false, nullable:false, validator : RegisterController.latitudeValidator
         longitude blank:false, nullable:false, validator : RegisterController.longitudeValidator
 		password2 validator: RegisterController.password2Validator
-		captcha_response blank:false, nullable:false, validator: { value, command ->
+		/*captcha_response blank:false, nullable:false, validator: { value, command ->
 			def session = RCH.requestAttributes.session
 			def request = RCH.requestAttributes.request
 			try{
@@ -647,7 +647,7 @@ class CustomRegisterCommand {
 				e.printStackTrace()
 				return 'reCaptcha.invalid.message'
 			}
-		}
+		}*/
 	}
 
 	/* (non-Javadoc)

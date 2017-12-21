@@ -31,7 +31,8 @@ $(document).ready(function() {
         'isMediaFilter' : '${params.isMediaFilter}',
         'resDeleteUrl' : "${uGroup.createLink(controller:'resource', action: 'deleteUsersResourceById')}",
         'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
-        "queryParamsMax":"${queryParams?.max}",
+        'queryParamsMax':"${queryParams?.max}",
+        'filesutraURL':"${grailsApplication.config.speciesPortal.resources.filesutraURL}",
         'getProcessedImageUrl' : "${createLink(controller:'observation',  action:'getProcessedImageStatus')}",
         'curation':{
         'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",

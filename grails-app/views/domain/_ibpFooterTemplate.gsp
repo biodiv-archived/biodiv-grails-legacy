@@ -16,7 +16,7 @@
 
 %>
 	<div class="container outer-wrapper" style="width:940px">
-		<div class="links_box_column">
+		<!--div class="links_box_column">
 			<ul>
 				<li
 					class=" nav-header bold${(params.controller == 'species')?' active':''}"><a
@@ -29,19 +29,19 @@
 				<li
 					class=" nav-header bold${(params.controller == 'checklist')?' active':''}"><a
 					href="${uGroup.createLink(controller:'checklist', action:'list')}" title="Checklists"><g:message code="link.all.checklists" /> </a></li>
-				<!-- li
+				<li
 					class="nav-header bold ${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
 					href="${ uGroup.createLink(controller:"userGroup", "action":"list")}"
 					title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All
 						Groups<sup>Beta</sup> </a>
-				</li-->
+				</li>
 			</ul>
-		</div>
+		</div-->
 
         <g:each var="page" in="${pages}">
         	<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"  style="padding-left: 0px;"><a href="${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':pagesWithNoParent[page.key].id, 'userGroup':userGroupInstance):'/page/'+pagesWithNoParent[page.key].id }">${pagesWithNoParent[page.key].title}</a></li>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href="${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':pagesWithNoParent[page.key]?.id, 'userGroup':userGroupInstance):'/page/'+pagesWithNoParent[page.key]?.id }">${pagesWithNoParent[page.key]?.title}</a></li>
                 <%pagesWithNoParent.remove(page.key)%>
                 <g:each var="sub_page" in="${page.value}">
 				    <li><a href="${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':sub_page.id, 'userGroup':userGroupInstance):'/page/'+sub_page.id }">${sub_page.title}</a></li>
@@ -68,21 +68,21 @@
 				<li><a href="${ '/people/fraternity'}"><g:message code="link.fraternity" /></a></li>
 				<li><a href="${ '/people/team'}"><g:message code="link.team" /></a></li>
 			</ul>
-		</div>
+		</div-->
 
 		<div class="links_box_column">
 			<ul>
-				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/policy'><g:message code="link.policy" /></a>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/page/4250187'><g:message code="link.policy" /></a>
 				</li>
-				<li><a href="${ '/policy/data_sharing'}"><g:message code="link.data.sharing" /></a>
+				<li><a href="/page/4250189"><g:message code="link.data.sharing" /></a>
 				</li>
-				<li><a href="${ '/licenses'}"><g:message code="default.licenses.label" /></a>
+				<li><a href="/page/4250212"><g:message code="default.licenses.label" /></a>
 				</li>
-				<li><a href="${ '/terms'}"><g:message code="link.terms.conditions" /></a>
+				<li><a href="/page/4250246"><g:message code="link.terms.conditions" /></a>
 				</li>
 
 			</ul>
-		</div-->
+		</div>
 		<div class="links_box_column">
 			<ul>
 				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>

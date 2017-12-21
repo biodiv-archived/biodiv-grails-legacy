@@ -550,6 +550,7 @@ class ObservationController extends AbstractObjectController {
                     break;
                 }
                 File obvDir 
+
                 if(!params.resources && !params.videoUrl) {
                     message = g.message(code: 'no.file.attached', default:'No file is attached')
                 }
@@ -558,14 +559,22 @@ class ObservationController extends AbstractObjectController {
                         params.resources = [params.resources]
                 }
                 params.resources.each { f ->                    
+                    def parsedVal;                  
                     String mimetype,filename;
                     if(f instanceof String) {
                         f = JSON.parse(f);
                         if(f.size instanceof String) {
                             f.size = Integer.parseInt(f.size)
                         }
-                        mimetype = f.mimetype
-                        filename = f.filename
+                       if(f.containsKey('contentType')){
+                            mimetype = f.contentType
+                            filename = f.originalFilename
+                            parsedVal = true;
+                        }else{
+                            mimetype = f.mimetype
+                            filename = f.filename
+                            parsedVal = false;
+                        }
                         log.debug "Saving observation file ${f.filename}"
                     } else {
                         mimetype = f.contentType
@@ -646,17 +655,25 @@ class ObservationController extends AbstractObjectController {
                             def url = f.url;
                             def fp = utilsService.filePickerSecurityCodes();
                             //modifying url to give permissions.
-                            url += '?signature=' + fp.signature +'&policy='+fp.policy
-                            download(url, file );                       
+                            //url += '?signature=' + fp.signature +'&policy='+fp.policy
+						    if(parsedVal == true){
+                                log.debug "AntBuilder().copy";
+                                new AntBuilder().copy( file:url,tofile:file)
+                            }else{
+                                log.debug "download"
+                                download(url, file); 
+                            }						
                         } else {
+                            log.debug "file transfer"
                             f.transferTo( file );
                         }
                         String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
                         def thumbnail
                         def type
                         def pi
-                        if(resourcetype == resourceTypeImage){
-                                pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
+						if(resourcetype == resourceTypeImage){
+                                println "==== "+file.getAbsolutePath()+" ==== "+obvDir.toString();
+								pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
                                 //ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
                                 def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                                 //context specific baseUrl for location picker script to work
@@ -673,31 +690,40 @@ class ObservationController extends AbstractObjectController {
                         if(pi)
                             resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
                         else 
-                            resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
-                    }
-                }
-                
-                if(params.videoUrl) {
-                    //TODO:validate url;
-                    def videoUrl = params.videoUrl;
-                    if(videoUrl && Utils.isURL(videoUrl)) {
-                        String videoId = Utils.getYouTubeVideoId(videoUrl);
-                        if(videoId) {
-                        def res = new Resource(fileName:'v', type:ResourceType.VIDEO);      
-                        res.setUrl(videoUrl);               
-                        resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
-                        } else {
-                        message = messageSource.getMessage("default.valid.video.url", ['youtube'] as Object[] , RCU.getLocale(request))
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:'dummyJobId']);
+					       
+                        if(parsedVal == true){
+                            def deleteFile = new File(f.url)
+                            deleteFile.delete()  //deleting the file from fileops folder
                         }
-                    } else {
-                        message = messageSource.getMessage("default.valid.video.url", [''] as Object[] , RCU.getLocale(request))
                     }
-                }
+				}
+				
+				if(params.videoUrl) {
+					//TODO:validate url;
+					def videoUrl = params.videoUrl;
+                    println '--------------------------------';
+                    println '--------------------------------';
+                    println '--------------------------------';
+                    println videoUrl;
+					if(videoUrl && Utils.isURL(videoUrl)) {
+						String videoId = Utils.getYouTubeVideoId(videoUrl);
+						if(videoId) {
+						def res = new Resource(fileName:'v', type:ResourceType.VIDEO);		
+						res.setUrl(videoUrl);				
+						resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
+						} else {
+						message = messageSource.getMessage("default.valid.video.url", ['youtube'] as Object[] , RCU.getLocale(request))
+						}
+					} else {
+						message = messageSource.getMessage("default.valid.video.url", [''] as Object[] , RCU.getLocale(request))
+					}
+				}
 
-            
-                log.debug resourcesInfo
-                // render some XML markup to the response
-                if(resourcesInfo) {
+			
+				log.debug resourcesInfo
+				// render some XML markup to the response
+				if(resourcesInfo) {
                     withFormat {
                         json {    
                             def resourcesList = [];

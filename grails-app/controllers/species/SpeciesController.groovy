@@ -264,6 +264,8 @@ class SpeciesController extends AbstractObjectController {
 		else {
             Map t = speciesInstance.getTraits();
 
+            def allTraitList = traitService.getFilteredList(['sGroup':speciesInstance.taxonConcept.group?.id, 'isNotObservationTrait':true, 'showInObservation':false], -1, -1).instanceList;
+            t['allTraitList'] = allTraitList;
             /*
             def factList = Fact.findAllByObjectIdAndObjectType(speciesInstance.id, speciesInstance.class.getCanonicalName())
              def traitListValue = traitService.getFilteredList(['sGroup':speciesInstance.guid, 'isNotObservationTrait':true,'taxon':speciesInstance.taxonConcept.id], -1, -1).instanceList;
@@ -1872,8 +1874,24 @@ class SpeciesController extends AbstractObjectController {
     @Secured(['ROLE_ADMIN'])
     def postSpeices(){
         String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
-	    def m = [author:"1", userGroups:params.userGroupId, objectType:Species.class.getCanonicalName(), submitType:'post', objectIds: new File(file).text]
+	    def m = [author:"1", userGroups:params.userGroupId, objectType:Species.class.getCanonicalName(), submitType:(params.submitType?:'post'), objectIds: new File(file).text]
 	    println m
-	    userGroupService.updateResourceOnGroup(m)
+	    userGroupService.updateResourceOnGroup(m, params.sendMail?:false)
+        render "done";
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def getSpeciesIdsForTaxonIds(){
+        String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
+        String text = new File(file).text;
+        List speciesIds = [];
+        text.split(',').each { taxonId ->
+            def taxon = TaxonomyDefinition.read(Long.parseLong(taxonId.trim()));
+            if(taxon) {
+                Long speciesId = taxon.findSpeciesId();
+                if(speciesId) speciesIds << speciesId;
+            }        
+        }
+        render speciesIds.join(',');
     }
 }
