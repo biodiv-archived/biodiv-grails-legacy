@@ -24,7 +24,7 @@
                 <g:each in="${dataTableInstance.fetchColumnNames()}" var="cName">
                     <g:if test="${cName[0].equalsIgnoreCase('http://rs.tdwg.org/dwc/terms/scientificName')}">
                         <td class="nameColumn">
-                        <a href="${uGroup.createLink(action:'show', controller:'observation', id:observation.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
+                        <a href="${uGroup.createLink(action:'show', controller:'observation', id:dataObject.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
                         <g:if test="${dataObject.maxVotedReco?.taxonConcept && dataObject.maxVotedReco.taxonConcept?.canonicalForm != null}">
                         <a href="${uGroup.createLink(action:'show', controller:'species', id:dataObject.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                             <i> ${dataObject.maxVotedReco.taxonConcept.canonicalForm}</i>
