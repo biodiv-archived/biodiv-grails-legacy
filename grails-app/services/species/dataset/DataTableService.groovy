@@ -991,9 +991,10 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             activeFilters["dataTableType"] = DataTableType.OBSERVATIONS;
         }
 
-        if(params.dataTableType){
-            filterQuery += " and obv.dataTableType = :dataTableType"
-            queryParams["dataTableType"] = params.dataTableType;
+        if(params.dataTableType || params.type){
+            params.dataTableType = params.dataTableType?:params.type
+            filterQuery += " and lower(obv.dataTableType) = :dataTableType"
+            queryParams["dataTableType"] = params.dataTableType.toLowerCase();
             activeFilters["dataTableType"] = params.dataTableType;
         }
 
@@ -1027,7 +1028,6 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             activeFilters["daterangepicker_end"] =  params.daterangepicker_end
         }
 
-      
         if(params.webaddress) {
 
             def userGroupInstance =	utilsService.getUserGroup(params)
@@ -1100,7 +1100,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         return [];
     }
 
-	int getDataObjectsCount(DataTable dataTable) {
+	static int getDataObjectsCount(DataTable dataTable) {
         switch(dataTable.dataTableType) {
             case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(dataTable, false);
             case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(dataTable, false);
