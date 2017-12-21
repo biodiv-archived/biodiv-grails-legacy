@@ -6,6 +6,8 @@
     <head>
         <g:set var="title" value="${g.message(code:'default.dataTable.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
+
+        <asset:javascript src="slickgrid.js"/>
         <style>
             .btn-group.open .dropdown-menu {
             top: 43px;
@@ -81,9 +83,6 @@
             }
             select {
                 height:46px;
-            }
-            .upload_file div {
-                display:inline-block;
             }
             .mapColumns.divider {
                 height:20px;

@@ -87,6 +87,7 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
+    def dataTableService;
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -1419,18 +1420,25 @@ class UserGroupService {
 			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, functionString, sendMail)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
-            println "Posting datatable observations into their groups"
-			if(objectIds && objectIds != ""){
+			if(objectIds && objectIds != "") {
 				objectIds.split(",").each {
 					def obj = domainClass.read(Long.parseLong(it.trim()))
                     if(obj.instanceOf(DataTable)){
-                        def dataTableObservations = Observation.findAllByDataTable(obj);
-			            obvs = []
-						obvs.addAll(dataTableObservations);
-                        log.debug "${submitType}ing datatable ${obj} ${obvs.size()} observations into usergroups ${obj.userGroups}"
-					    functionString = (submitType == 'post')? 'addToObservations' : 'removeFromObservations'            
-					    def uGs = (submitType == 'post')? obj.userGroups : allGroups
-			            println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, 'observations', functionString, sendMail);
+                        //TODO:batch this posting
+                        int dataObjectsCount = dataTableService.getDataObjectsCount(obj);
+                        int max=100, offset = 0;
+
+                        println "Posting datatable ${obj} objects ${dataObjectsCount} into its groups"
+                        while(offset <= dataObjectsCount) {
+                            def dataObjects = dataTableService.getDataObjects(obj, [max:max, offset:offset]);
+                            obvs = []
+                            obvs.addAll(dataObjects);
+                            log.debug "${submitType}ing datatable ${obj} ${obvs.size()} ${obj.dataTableType} into usergroups ${obj.userGroups}"
+                            functionString = (submitType == 'post')? 'addTo'+obj.dataTableType : 'removeFrom'+obj.dataTableType            
+                            def uGs = (submitType == 'post')? obj.userGroups : allGroups
+                            println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, obj.dataTableType.value().toLowerCase(), functionString, sendMail);
+                            offset += max;
+                        }
                     }
 				}
 			}

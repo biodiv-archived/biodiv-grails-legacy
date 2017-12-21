@@ -551,7 +551,9 @@ println f
                 List s = [];
                 params.sGroup.split(',').each {
                     Long x = Long.parseLong(it); 
-                    taxons.addAll(SpeciesGroup.read(x)?.getTaxon());
+                    def y = SpeciesGroup.read(x)?.getTaxon();
+                    if(y)
+                        taxons.addAll(y);
                     s << x;
                 }
 

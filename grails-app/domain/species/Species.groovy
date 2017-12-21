@@ -21,6 +21,7 @@ import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
 import species.trait.Fact;
 import content.eml.Document;
+import species.dataset.DataTable;
 
 class Species implements Rateable { 
  	String title;
@@ -37,6 +38,7 @@ class Species implements Rateable {
 	StringBuilder sLog;
     boolean hasMedia = false;
 	boolean isDeleted = false;
+    DataTable dataTable;
 	
 	def grailsApplication; 
 	def springSecurityService;
@@ -74,6 +76,7 @@ class Species implements Rateable {
         featureCount nullable:false;
         habitat nullable:true;
 		isDeleted nullable:false;
+		dataTable nullable:true;
 	}
 
 	static mapping = {
@@ -565,6 +568,16 @@ class Species implements Rateable {
         def r = getTraitFacts();
 //        r['allTraitList'] = allTraitList; 
         return r;
+    }
+
+    def fetchChecklistAnnotation(){
+        def res = [:]
+        res['id'] = this.id;
+        res['type'] = 'species';
+        res['speciesid'] = this.id; 
+        res['title'] = this.title();
+ 
+        return res
     }
 
     @Override
