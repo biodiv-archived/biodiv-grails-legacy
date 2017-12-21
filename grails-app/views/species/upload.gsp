@@ -23,11 +23,7 @@
                 <uGroup:rightSidebar/>
                     <div class="super-section span12" style="margin-left: 0px;">
                         <div class="section">
-                            <!--div class="control-group">
-                                <input type="radio" name="isSimpleSheet" value="true" checked="checked">Simple Sheet &nbsp; &nbsp;&nbsp;
-                                <input type="radio" name="isSimpleSheet" value="false">Mapped Sheet
-                            </div-->
-                            <div
+                           <div
                                 class="control-group">
                                 <label class="control-label span2" for="speciesFile"><g:message code="upload.species.file" />  <span
                                         class="req">*</span></label>
@@ -51,17 +47,6 @@
                                     value="${imagesDir}" />
                                 </div>
                             </div>
-
-                            <!--div
-                                class="control-group">
-                                <label for="contributors" class="control-label span2"><g:message
-                                    code="contributors.label" default="Contributors" /> <span
-                                        class="req">*</span></label>
-                                <div class="controls span9 textbox">
-                                    <sUser:selectUsers model="['id':contributor_autofillUsersId]" />
-                                    <input type="hidden" name="contributorIds" id="contributorIds" />
-                                </div>
-                            </div-->
                         </div>
                     </div>
                    
@@ -69,9 +54,6 @@
                     
 
                 <div id="speciesGridSection" style="clear:both;" class="section checklist-slickgrid ${params.action=='upload'?'hide':''}">
-                    %{--<span id="addNewColumn" class="btn-link"><g:message code="checklist.create.add.new.column" /></span>--}%
-                    <!--span class="help-inline"> (Mark scientific and common name column using <img src='${createLinkTo(file:"dropdown_active.gif", base:grailsApplication.config.speciesPortal.resources.serverURL)}'/>)</span-->
-
                     <div id="myGrid" class="" style="width:100%;height:350px;clear:both;"></div>
                     <div id="nameSuggestions" style="display: block;"></div>
                     <div id="legend" class="hide">
@@ -80,12 +62,7 @@
 
                     <div class="section" style="clear:both;margin:0;">
                         <div class="row control-group ${hasErrors(bean: observationInstance, field: 'sciNameColumn', 'error')}">
-                            <!--span class="pull-left span3"><g:message
-                            code="observation.mark.sciNameColumn.label" default="Marked Scientific & Common Name Columns:" /></span-->
                             <div class="controls">
-                                <%-- <input type="hidden" id="sciNameColumn" class="markColumn" name="sciNameColumn" value="${observationInstance.sciNameColumn}"/>
-                                <input type="hidden" id="commonNameColumn" class="markColumn" name="commonNameColumn" value="${observationInstance.commonNameColumn}"/>
-                                --%>
                                 <div class="help-inline">
                                     <g:hasErrors bean="${observationInstance}" field="sciNameColumn">
                                     <g:message code="checklist.scientific_name.validator.invalid" />
@@ -101,7 +78,6 @@
 
                 </div>
                 
-                </table>
                 <div id="tagHeaders" class="section checklist-slickgrid" style="clear:both;display:none;">
                 	<button class="btn btn-primary" id="downloadNamesMapper" style="margin-top: 8px; margin-bottom:8px"><g:message code="button.generate" /></button>
                         <table id="tableHeader" border="1">
@@ -121,7 +97,6 @@
                     </table>
 
 
-                    %{-- <button id="tagHeadersButton"><g:message code="button.mark.header" /></button> --}%
                     <button class="btn btn-primary" id="downloadModifiedSpecies" style="margin-top: 8px"><g:message code="button.download" /></button>
                 </div>
                 
@@ -176,18 +151,7 @@
         </body>
         <asset:script>
         $(document).ready(function() {
-
             intializesSpeciesHabitatInterest(false);
-        /*
-            var contributor_autofillUsersComp = $("#userAndEmailList_${contributor_autofillUsersId}").autofillUsers({
-            usersUrl : '${createLink(controller:'SUser', action: 'terms')}'
-            });
-        
- 	    $("#uploadSpecies").click(function(){
-                //$('#contributorIds').val(contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
-                $('#uploadSpeciesForm').submit();
-            });
-        */            
        });
         </asset:script>
     </html>

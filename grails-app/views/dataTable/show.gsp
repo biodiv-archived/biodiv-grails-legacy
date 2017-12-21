@@ -1,5 +1,6 @@
 <%@page import="species.utils.Utils"%>
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@ page import="species.participation.UploadLog"%>
 
 <html>
     <head>
@@ -67,8 +68,20 @@
 
                 <div class="span8 observation" style="margin:0">
                     <div class="observation_story">
-
-                    <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+                    <g:if test="${dataTableInstance.uploadLog}">
+                        <g:if test="${dataTableInstance.uploadLog.status == UploadLog.Status.UPLOADED}">
+                            <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+                        </g:if> 
+                        <g:else>
+                        <div class="alert alert-info">
+                            Upload is under process <br/>
+                            Current status is : ${dataTableInstance.uploadLog.status}
+                        </div>
+                        </g:else>
+                    </g:if>
+                    <g:else>
+                        <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+                    </g:else>
 
                     <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage]"/>
                     </div>

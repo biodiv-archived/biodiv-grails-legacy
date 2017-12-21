@@ -1,4 +1,5 @@
 function viewGrid(){
+    console.log('viewZGrid');
     var input = $("#speciesfile_path").val();
     var res = "species";
     if($('#textAreaSection').is(':visible')){

@@ -745,6 +745,10 @@ class Observation extends DataObject {
             }
             res = m;
         }
+        res['id'] = this.id;
+        res['type'] = 'observation';
+        res['speciesid'] = this.maxVotedReco.taxonConcept?.findSpeciesId(); 
+        res['title'] = this.maxVotedReco.taxonConcept?.canonicalForm;
         println res;
 		return res
 	}
