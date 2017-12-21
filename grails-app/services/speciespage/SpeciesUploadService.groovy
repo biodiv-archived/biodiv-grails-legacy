@@ -73,6 +73,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import species.participation.NamesReportGenerator
 import species.participation.NamelistService
 import species.participation.UploadLog
+import species.dataset.DataTable;
 
 class SpeciesUploadService {
 
@@ -141,7 +142,7 @@ class SpeciesUploadService {
 			return ['msg': 'File not found !!!' ]
 		}
 		
-		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
+		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType, params.dataTable);
 		
 		if(!validateUserSheetForName(sBulkUploadEntry)){
 			return  ['msg': 'Name validation failed. Please visit your profile page to view status.!!!', 'sBulkUploadEntry': sBulkUploadEntry ]
@@ -427,7 +428,12 @@ class SpeciesUploadService {
 	private Map saveSpeciesElements(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
 		XMLConverter converter = new XMLConverter();
         converter.setLogAppender(fa);
-		
+
+        Map paramsToPropagate = [:];
+        if(sBulkUploadEntry) {
+           paramsToPropagate = sBulkUploadEntry.fetchMapFromText();
+        }
+
 		List species = []
 		//StringBuilder sb = new StringBuilder()
 		int noOfInsertions = 0;
@@ -438,7 +444,7 @@ class SpeciesUploadService {
 					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping"
 					//Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
-						if(s){
+						if(s) {
 							species.add(s)
 							noOfInsertions++;
 						}
@@ -451,8 +457,10 @@ class SpeciesUploadService {
                         utilsService.benchmark ("convertSpecies", {
                             s = converter.convertSpecies(speciesElement);
                         });
-						if(s)
-							species.add(s);
+						if(s) {
+							inheritParams(s, paramsToPropagate);
+                            species.add(s);
+                        }
 					//}
 				}
                 utilsService.benchmark("saveSpecies", {
@@ -786,8 +794,8 @@ class SpeciesUploadService {
 
 
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
-	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null){
-		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType)
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null, DataTable dataTable=null){
+		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType, ['dataTable':dataTable?.id]);
 		
 	}
 	
@@ -1086,4 +1094,11 @@ class SpeciesUploadService {
 		}
 		return true	
 	}		
+    
+    private void inheritParams(species, Map paramsToPropagate) {
+        if(paramsToPropagate['dataTable']) {
+            println "Setting datatable entry"
+            species.dataTable = DataTable.read(Long.parseLong(paramsToPropagate['dataTable']+''));
+        }
+    }
 }

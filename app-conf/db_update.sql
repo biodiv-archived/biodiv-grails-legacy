@@ -848,3 +848,6 @@ select setval('datatable_id_seq',,false);
 alter table observation add column date_accuracy varchar(100);
 alter table data_table add column temporal_coverage_date_accuracy varchar(100);
 alter table dataset1 add column temporal_coverage_date_accuracy varchar(100);
+
+#21Dec2017
+alter table species add column data_table_id bigint references data_table(id);

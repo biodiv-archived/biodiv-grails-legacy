@@ -148,9 +148,78 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
 
 function getMarkedColumns() {
     var selectedOptions = $('.mapColumns option:selected');
-    console.log(selectedOptions);
-    $
-        return selectedOptions;
+    return selectedOptions;
+}
+
+function viewSpeciesGrid() {
+    var input = $("#dataTableFile_path").val();
+    var res = "species";
+    if(input){
+        parseData(  window.params.content.url + input , {callBack:loadSpeciesDataToGrid, res: res });
+    }
+}
+
+function getUploadParams() {
+
+    var speciesGroups = getSelectedGroupArr();
+    $(".addDataTable input.group").remove();
+    $.each(speciesGroups, function(index, element){
+        var input = $("<input>").attr("type", "hidden").attr("name", "group."+index).attr('class','group').val(element);
+        $(".addDataTable").append($(input));	
+    })
+
+    var locationpicker = $(".map_class").data('locationpicker'); 
+    if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
+        var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
+        if(areas.length > 0) {
+            var wkt = new Wkt.Wkt();
+            wkt.fromObject(areas[0]);
+            $("input.areas").val(wkt.write());
+        }
+    }
+
+    //checklist related data
+    if(grid){
+        $("#dataTableFilePath").val($("#dataTableFile_path").val());
+        var markedColumns = getMarkedColumns();
+        if(markedColumns.length > 0) {
+            $("#dataTableColumns").val(JSON.stringify(markedColumns));
+        }
+    }
+
+    for ( instance in CKEDITOR.instances ) {
+        CKEDITOR.instances[instance].updateElement();
+    }
+
+    if(dataTable_contributor_autofillUsersComp.length > 0) {
+        $('input[name="contributorUserIds"]').val(dataTable_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
+    }
+
+
+    //if species type 
+    var params = {};
+    if($('#dataTableType').val() == 2) {
+        params = getSpeciesUploadParams();
+    }
+    return params;
+}
+
+function getSpeciesUploadParams() {
+    getTagsForHeaders();
+    var xlsxFileUrl = $('#xlsxFileUrl').val();
+    var hm = getHeaderMetadata();
+    delete hm["undefined"];
+    var orderedArray = $('#columnOrder').val();
+    orderedArray = JSON.stringify(orderedArray);
+    var headerMarkers = JSON.stringify(hm);
+
+    var params = {};
+    params['headerMarkers'] = headerMarkers;
+    params['orderedArray'] = orderedArray;
+    params['xlsxFileUrl'] = xlsxFileUrl;
+    //params['imagesDir'] = $("#imagesDir").val();
+    params['writeContributor'] = 'true';
+    return params;
 }
 
 $(document).ready(function() {	
@@ -164,57 +233,18 @@ $(document).ready(function() {
     });
 
     $(document).on('click', "#createDataTableSubmit", function(){
-        /*if($(this).hasClass('disabled')) {
-          alert(window.i8ln.observation.bulkObvCreate.up);
-          event.preventDefault();
-          return false; 		 		
-          }*/
+        if($(this).hasClass('disabled')) {
+            alert(window.i8ln.observation.bulkObvCreate.up);
+            event.preventDefault();
+            return false; 		 		
+        }
 
         if (document.getElementById('agreeTerms').checked) {
             //$(this).addClass("disabled");
-
-            var speciesGroups = getSelectedGroupArr();
-            $(".addDataTable input.group").remove();
-            $.each(speciesGroups, function(index, element){
-                var input = $("<input>").attr("type", "hidden").attr("name", "group."+index).attr('class','group').val(element);
-                $(".addDataTable").append($(input));	
-            })
-
-            var locationpicker = $(".map_class").data('locationpicker'); 
-            if(locationpicker && locationpicker.mapLocationPicker.drawnItems) {
-                var areas = locationpicker.mapLocationPicker.drawnItems.getLayers();
-                if(areas.length > 0) {
-                    var wkt = new Wkt.Wkt();
-                    wkt.fromObject(areas[0]);
-                    $("input.areas").val(wkt.write());
-                }
-            }
-
-            //checklist related data
-            if(grid){
-                $("#dataTableFilePath").val($("#dataTableFile_path").val());
-                $("#dataTableColumns").val(JSON.stringify(getMarkedColumns()));
-            }
-
-            for ( instance in CKEDITOR.instances ) {
-                CKEDITOR.instances[instance].updateElement();
-            }
-
-            if(dataTable_contributor_autofillUsersComp.length > 0) {
-                $('input[name="contributorUserIds"]').val(dataTable_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
-            }
             $(".addDataTable").ajaxSubmit({ 
-                dataType: 'json', 
+                dataType: 'json',
+                data: getUploadParams(),
                 beforeSubmit: function(arr, $form, options) { 
-                    // The array of form data takes the following form: 
-                    // [ { name: 'username', value: 'jresig' }, { name: 'password', value: 'secret' } ] 
-                    /*$('#addDataTable').hide();
-                      var str = "<div id='' class='dataTable sidebar_section observation_story'><h5>Uploading dataTable : </h5>";
-                      $.each(arr, function(index, p) {
-                      str += "<div class='prop'><span class='name'>"+p.name+"</span><div class='value'>"+p.value+"</div></div>";
-                      });
-                      $('#workspace').prepend(str+"</div>");
-                      return true;*/
                 },
                 success: function(data, statusText, xhr) {
                     console.log(data);

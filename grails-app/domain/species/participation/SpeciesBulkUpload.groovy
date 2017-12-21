@@ -33,9 +33,10 @@ class SpeciesBulkUpload extends UploadLog {
 	static transients = [ "logFile" ]
 	
 	
-	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, String uploadType=null, Status status = Status.VALIDATION){
+	static SpeciesBulkUpload create(SUser author, Date startDate, Date endDate, String filePath, String imagesDir, String notes=null, String uploadType=null, params=[:], Status status = Status.VALIDATION){
         if(!uploadType) uploadType = UploadJob.SPECIES_BULK_UPLOAD; 
-		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes, uploadType:uploadType)
+        def paramsMapAsText = getTextFromMap(params);
+		SpeciesBulkUpload sbu = new SpeciesBulkUpload (author:author, filePath:filePath, startDate:startDate, endDate:endDate, imagesDir:imagesDir, status:status, notes:notes, uploadType:uploadType, paramsMapAsText:paramsMapAsText)
 		if(!sbu.save(flush:true)){
 			sbu.errors.allErrors.each { println it }
 			return null

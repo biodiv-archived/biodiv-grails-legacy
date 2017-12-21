@@ -154,12 +154,12 @@ class DataTableController extends AbstractObjectController {
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
                 def model = utilsService.getSuccessModel("", dataTableInstance, OK.value());
-                model['observations'] = dataTableService.getObservationData(params.id, params)
-                model['observationsCount'] = Observation.countByDataTableAndIsDeleted(dataTableInstance, false);
+                model['dataObjects'] = dataTableService.getDataObjects(dataTableInstance, params)
+                model['dataObjectsCount'] = dataTableService.getDataObjectsCount(dataTableInstance);
 
                 withFormat {
                     html {
-                            return [dataTableInstance: dataTableInstance, observations:model.observations, observationsCount:model.observationsCount, 'userLanguage':userLanguage, max:10]
+                            return [dataTableInstance: dataTableInstance, dataObjects:model.dataObjects, dataObjectsCount:model.dataObjectsCount, 'userLanguage':userLanguage, max:10]
                     } 
                     json  { render model as JSON }
                     xml { render model as JSON }
@@ -272,15 +272,15 @@ class DataTableController extends AbstractObjectController {
         }
 	}
 
-	def observationData = {
+	def dataObjects = {
         if(!params.id) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'default.dataTable.label', default: 'DataTable'), params.id])}"
             redirect (url:uGroup.createLink(action:'list', controller:"dataTable", 'userGroupWebaddress':params.webaddress))
         }
-		def observations = dataTableService.getObservationData(params.id, params)
         def dataTableInstance = DataTable.read(params.id.toLong());
-        int instanceCount = Observation.countByDataTableAndIsDeleted(dataTableInstance, false);
-		def model =[observations:observations, dataTableInstance:dataTableInstance, observationsCount:instanceCount];
+		def dataObjects = dataTableService.getDataObjects(params.id, params);
+        int dataObjectsCount = dataTableService.getDataObjectsCount(dataTableInstance);
+		def model =[dataTableInstance:dataTableInstance, dataObjects:dataObjects, dataObjectsCount:dataObjectsCount];
 		render(template:"/dataTable/showDataTableDataTemplate", model:model);
 	}
 
