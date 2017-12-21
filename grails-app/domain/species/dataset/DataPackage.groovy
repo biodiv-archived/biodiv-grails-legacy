@@ -9,11 +9,10 @@ class DataPackage {
 	
 	public enum DataTableType {
 		OBSERVATIONS("Observations"),
-		DOCUMENTS("Documents"),
 		SPECIES("Species"),
-		SPECIES_FIELDS("Species Fields"),
         TRAITS("Traits"),
-        FACTS("Facts");
+        FACTS("Facts"),
+		DOCUMENTS("Documents")
 
 		private String value;
 
@@ -24,14 +23,36 @@ class DataPackage {
 		static list() {
 			[
 				OBSERVATIONS,
-				DOCUMENTS,
 				SPECIES,
-				SPECIES_FIELDS,
                 TRAITS,
-                FACTS			
+                FACTS,	
+				DOCUMENTS
 			]
 		}
 
+		static DataTableType getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof DataTableType)
+				return value
+			
+			value = value.toUpperCase().trim()
+            println value
+			switch(value){
+				case 'OBSERVATIONS':
+					return DataTableType.OBSERVATIONS
+				case 'SPECIES':
+					return DataTableType.SPECIES
+				case 'TRAITS':
+					return DataTableType.TRAITS
+				case 'FACTS':
+					return DataTableType.FACTS
+                case 'DOCUMENTS':
+					return DataTableType.DOCUMENTS
+				default:
+					return null	
+			}
+		}
 		String value() {
 			return this.value;
 		}

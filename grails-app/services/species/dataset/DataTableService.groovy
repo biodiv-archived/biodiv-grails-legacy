@@ -993,9 +993,12 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
         if(params.dataTableType || params.type){
             params.dataTableType = params.dataTableType?:params.type
-            filterQuery += " and lower(obv.dataTableType) = :dataTableType"
-            queryParams["dataTableType"] = params.dataTableType.toLowerCase();
-            activeFilters["dataTableType"] = params.dataTableType;
+            if(params.dataTableType) {
+                params.dataTableType = DataTableType.getEnum(params.dataTableType);
+                filterQuery += " and obv.dataTableType = :dataTableType"
+                queryParams["dataTableType"] = params.dataTableType;
+                activeFilters["dataTableType"] = params.dataTableType;
+            }
         }
 
         if(params.user){
