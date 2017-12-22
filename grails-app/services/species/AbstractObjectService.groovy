@@ -423,7 +423,7 @@ class AbstractObjectService {
 	def upload(params) {
         log.debug "creating upload request"
         UploadLog dl = UploadLog.create(springSecurityService.currentUser, new Date(), null, params.file, params.notes, params.uploadType?:params.controller, params);
-        def r = [:];
+        def r = ['uploadLog':dl];
         if(dl) {
             if(!dl.hasErrors()) {
                 r['success'] = true;

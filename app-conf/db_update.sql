@@ -852,3 +852,7 @@ alter table dataset1 add column temporal_coverage_date_accuracy varchar(100);
 
 #21Dec2017
 alter table species add column data_table_id bigint references data_table(id);
+alter table fact add column data_table_id bigint references data_table(id);
+alter table data_table add column upload_log_id bigint references upload_log(id);
+alter table document add column date_accuracy varchar(100);
+

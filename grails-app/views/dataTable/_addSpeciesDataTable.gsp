@@ -33,7 +33,7 @@
                                 } else if(dataTableInstance.dataset && dataTableInstance.dataset.uFile){
                                     uploadDir = (new File(dataTableInstance.dataset.uFile.path)).getAbsolutePath()+'/'+ UUID.randomUUID().toString()
                                 } else {
-                                    uploadDir = 'dataTables';
+                                    uploadDir = 'dataTables'+'/'+ UUID.randomUUID().toString();
                                 }
                                 def fileParams = [uploadDir:uploadDir, fileConvert:true, fromChecklist:false]
                                 %>

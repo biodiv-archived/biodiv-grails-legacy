@@ -198,7 +198,7 @@ function getUploadParams() {
 
     //if species type 
     var params = {};
-    if($('#dataTableType').val() == 2) {
+    if($('#dataTableType').val() == 1) {
         params = getSpeciesUploadParams();
     }
     return params;

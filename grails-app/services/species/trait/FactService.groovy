@@ -29,20 +29,23 @@ import org.apache.log4j.Level;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.SimpleDateFormat;
+import species.dataset.DataTable;
+import speciespage.ObvUtilService;
 
 class FactService extends AbstractObjectService {
 
     static transactional=false;
     def utilsService;
 
+
     Map upload(String file, Map params, UploadLog dl) {
         int noOfFactsLoaded = 0;
 
-        File spreadSheet = new File(params.fFile);
+        File spreadSheet = new File(file?:params.fFile);
         if(!spreadSheet.exists()) {
             return ['success':false, 'msg':"Cant find the file at ${file}."];
         }
-        dl.writeLog("Loading facts from ${params.fFile}", Level.INFO);
+        dl.writeLog("Loading facts from ${file?:params.fFile}", Level.INFO);
 
         SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).eachWithIndex { m,index ->
 
@@ -60,12 +63,18 @@ class FactService extends AbstractObjectService {
             }
 
             Species species = pageTaxon.createSpeciesStub();
+
+            if(params.dataTable) {
+                println "Setting dataTable"
+                DataTable.inheritParams(m, params);
+            }
+
             Trait.withSession { session ->
                 //def session =  sessionFactory.currentSession;
                 session.setFlushMode(FlushMode.MANUAL);
 
                 def r = updateFacts(m, species, dl); 
-                if(r.success) {
+                if(r && r.success) {
                     noOfFactsLoaded += r.noOfFactsLoaded;
                 }
                 session.flush();
@@ -158,9 +167,9 @@ class FactService extends AbstractObjectService {
                 key = key.trim();
 
                 switch(key) {
-                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts'] : break;
+                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts', 'dataTable', ObvUtilService.LOCATION, ObvUtilService.TOPOLOGY, ObvUtilService.LATITUDE, ObvUtilService.LONGITUDE, ObvUtilService.LOCATION_SCALE, ObvUtilService.OBSERVED_ON, ObvUtilService.TO_DATE, ObvUtilService.DATE_ACCURACY, ObvUtilService.AUTHOR_EMAIL] : break;
                     default : 
-                    value = value ? value.trim() : null ;
+                    value = (value && value instanceof String)? value.trim() : null ;
                     
                     writeLog("Loading trait ${key} : ${value}", Level.INFO);
                     Trait trait;
@@ -306,6 +315,9 @@ class FactService extends AbstractObjectService {
                                 fact.contributor = contributor;
                                 fact.license = license;
                                 fact.isDeleted = false;
+                                if(m['dataTable']) {
+                                    fact.dataTable = DataTable.read(Long.parseLong(''+m['dataTable'])); 
+                                }
                                 if(!fact.hasErrors() && !fact.save()) { 
                                     writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
                                     fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }

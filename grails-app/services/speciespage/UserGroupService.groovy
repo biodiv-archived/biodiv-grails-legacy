@@ -72,6 +72,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import species.dataset.DataTable;
+import species.dataset.DataPackage.DataTableType;
 
 class UserGroupService {
 
@@ -87,7 +88,6 @@ class UserGroupService {
 	def emailConfirmationService;
 	def sessionFactory
 	def activityFeedService;
-    def dataTableService;
 
 	private void addPermission(UserGroup userGroup, SUser user, int permission) {
 		addPermission userGroup, user, aclPermissionFactory.buildFromMask(permission)
@@ -1425,19 +1425,22 @@ class UserGroupService {
 					def obj = domainClass.read(Long.parseLong(it.trim()))
                     if(obj.instanceOf(DataTable)){
                         //TODO:batch this posting
-                        int dataObjectsCount = dataTableService.getDataObjectsCount(obj);
+                        int dataObjectsCount = DataTable.getDataObjectsCount(obj);
                         int max=100, offset = 0;
 
-                        println "Posting datatable ${obj} objects ${dataObjectsCount} into its groups"
-                        while(offset <= dataObjectsCount) {
-                            def dataObjects = dataTableService.getDataObjects(obj, [max:max, offset:offset]);
-                            obvs = []
-                            obvs.addAll(dataObjects);
-                            log.debug "${submitType}ing datatable ${obj} ${obvs.size()} ${obj.dataTableType} into usergroups ${obj.userGroups}"
-                            functionString = (submitType == 'post')? 'addTo'+obj.dataTableType : 'removeFrom'+obj.dataTableType            
-                            def uGs = (submitType == 'post')? obj.userGroups : allGroups
-                            println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, obj.dataTableType.value().toLowerCase(), functionString, sendMail);
-                            offset += max;
+                        //HACK
+                        if(obj.dataTableType == DataTableType.SPECIES || obj.dataTableType == DataTableType.OBSERVATIONS || obj.dataTableType == DataTableType.DOCUMENTS) {
+                            println "Posting datatable ${obj} objects ${dataObjectsCount} into its groups"
+                            while(offset <= dataObjectsCount) {
+                                def dataObjects = DataTable.getDataObjects(obj, [max:max, offset:offset]);
+                                obvs = []
+                                obvs.addAll(dataObjects);
+                                log.debug "${submitType}ing datatable ${obj} ${obvs.size()} ${obj.dataTableType} into usergroups ${obj.userGroups}"
+                                functionString = (submitType == 'post')? 'addTo'+obj.dataTableType : 'removeFrom'+obj.dataTableType            
+                                def uGs = (submitType == 'post')? obj.userGroups : allGroups
+                                println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, obj.dataTableType.value().toLowerCase(), functionString, sendMail);
+                                offset += max;
+                            }
                         }
                     }
 				}

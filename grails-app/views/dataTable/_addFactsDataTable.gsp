@@ -1,15 +1,5 @@
 <div>
     <%
-    def allowedExtensions = "['csv', 'xls', 'xlsx']"
-    String uploadDir="";
-    if(dataTableInstance && dataTableInstance.uFile?.path) {
-        uploadDir = (new File(dataTableInstance.uFile.path)).getParent()
-    } else if(dataTableInstance.dataset && dataTableInstance.dataset.uFile){
-        uploadDir = (new File(dataTableInstance.dataset.uFile.path)).getAbsolutePath()+'/'+ UUID.randomUUID().toString()
-    } else {
-        uploadDir = 'dataTables'+'/'+ UUID.randomUUID().toString();
-    }
-    def fileParams = [uploadDir:uploadDir, fileConvert:true]
     def form_id = "addDataTable"
     def form_action = uGroup.createLink(action:'save', controller:'dataTable', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
     def form_button_name = "Add ${dataTableInstance.dataTableType}"
@@ -31,10 +21,24 @@
             <h3><g:message code="default.dataTable.label" /> </h3>
     
                 <div class="upload_file" style="display:${dataTableInstance?.uFile?.path?'none':'inline-block'}">
-                        <div class="row control-group ${hasErrors(bean: dataTableInstance, field: 'uFile', 'errors')}">
+                        <div class="control-group ${hasErrors(bean: dataTableInstance, field: 'uFile', 'errors')}">
+                            <label class="control-label"for="docUpload">${dataTableInstance.dataTableType} File*</label>
+                            <div class="controls">
+                            <%
 
-                            <div class="controls" style="clear:both;margin-left:25px;">
-                                <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
+                                def allowedExtensions = "['xls', 'xlsx']"
+                                String uploadDir="";
+                                if(dataTableInstance && dataTableInstance.uFile?.path) {
+                                    uploadDir = (new File(dataTableInstance.uFile.path)).getParent()
+                                } else if(dataTableInstance.dataset && dataTableInstance.dataset.uFile){
+                                    uploadDir = (new File(dataTableInstance.dataset.uFile.path)).getAbsolutePath()+'/'+ UUID.randomUUID().toString()
+                                } else {
+                                    uploadDir = 'dataTables'+'/'+ UUID.randomUUID().toString();
+                                }
+                                def fileParams = [uploadDir:uploadDir]
+                            %>
+                            
+                            <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {}']" />
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="uFile">
                                     </g:hasErrors>
@@ -42,6 +46,21 @@
                                 
                             </div>
                         </div>	
+                        <small class="help-block"><g:message code="default.fact.upload.fileFormat" />
+                        <ul>
+                        <li><b>Taxon name</b>: The name of the species for which the trait applies</li>
+                        <li><b>TaxonId*</b>: The taxon ID for the species</li>
+                        <li><b>Attribution*</b>: Attribution for the fact</li>
+                        <li><b>Contributor*</b>: Email of the registered user who has provided the fact</li>
+                        <li><b>License*</b>: Creative Commons Licence for the fact (eg: BY)</li>
+                        </ul>
+                        </small>
+                        <small>
+                        <g:message code="default.fact.upload.samplefileFormat" /> 
+                        <a href="${createLinkTo(dir: '/../static/templates/', file:'factTemplate_v1.xlsx' , base:grailsApplication.config.speciesPortal.resources.serverURL)}"><g:message code="msg.here" /></a>
+
+
+                        </small>
 
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">
