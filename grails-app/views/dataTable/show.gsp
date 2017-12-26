@@ -36,7 +36,19 @@
                                             <div class="pull-right">
                                                 <g:if test="${dataTableInstance}">
                                                 <sUser:ifOwns model="['user':dataTableInstance.uploader]">
-                                                
+ 
+                                                <g:if test="${dataTableInstance?.uFile}">
+                                                <a class="btn btn-primary pull-right" style="margin-right: 5px;"
+                                                    href="#"
+                                                    onclick="return downloadDataTable();"><i class="icon-download"></i><g:message code="button.download" /></a>
+ 
+                                                <form id="download" name="downloadForm" action="${uGroup.createLink(action:'download', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="display:none;">
+                                                <input type="hidden" name="id" value="${dataTableInstance?.uFile?.id}">
+                                                </form>
+                                                </g:if>
+                                                </sUser:ifOwns>
+                                                </g:if>
+                                               
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'dataTable', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                                                     <i class="icon-edit"></i><g:message code="button.edit" /></a>
@@ -47,9 +59,6 @@
                                                 <form action="${uGroup.createLink(controller:'dataTable', action:'flagDeleted')}" method='POST' name='deleteForm'>
                                                     <input type="hidden" name="id" value="${dataTableInstance.id}" />
                                                 </form>
- 
-                                                </sUser:ifOwns>
-                                                </g:if>
                                             </div>
  
                        <s:showHeadingAndSubHeading
@@ -60,9 +69,11 @@
                     <div style="clear:both;"></div>
                 </div>	
                 <div class="span12" style="margin-left:0px; padding:4px; background-color:whitesmoke">
- <%--                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
+               
+                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
                     model="['instance':dataTableInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, 'hideFollow':true]" />
---%>
+
+
                 </div>
 
 
@@ -104,11 +115,12 @@
             </div>	
             <asset:script>
             $(document).ready(function(){
-            var species = $.url(decodeURIComponent(window.location.search)).param()["species"]
-            if(species){
-            species = $.trim(species).replace(/ /g, '_') 
-            $(".dataTable-data ." + species).css("background-color","#66FF66");
-            }
+                var species = $.url(decodeURIComponent(window.location.search)).param()["species"]
+                if(species){
+                    species = $.trim(species).replace(/ /g, '_') 
+                    $(".dataTable-data ." + species).css("background-color","#66FF66");
+                }
+
             });
             function deleteDataTable(){
                 var test="${message(code: 'default.delete.confirm.message', args:['data table'])}";
@@ -116,6 +128,10 @@
                 if(confirm(test)){
                     document.forms.deleteForm.submit();
                 }
+            }
+
+            function downloadDataTable(){
+                document.forms.downloadForm.submit();
             }
 </asset:script>
         </body>

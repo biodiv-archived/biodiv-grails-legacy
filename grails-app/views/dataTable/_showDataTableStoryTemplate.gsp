@@ -16,7 +16,7 @@ String instanceType = dataTableInstance.dataTableType;
         <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
         ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
         </g:link>
-    
+ 
     </h5>
     <g:if test="${showFeatured}">
     <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
