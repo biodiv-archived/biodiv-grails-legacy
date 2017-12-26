@@ -1004,38 +1004,6 @@ function openDetails(row, cell) {
 }
 
 $(document).ready(function() {
-    /**
-     *
-     */
-    $('#addResourcesModalSubmit').click(function(){
-        var row = $('#addResourcesModal').data().row;    
-       var cell = $('#addResourcesModal').data().cell;
-       if(row === undefined || cell === undefined) {
-           alert('Either row or cell is missing');
-           $('#addResourcesModal').modal('toggle');
-           return false;
-       }
-        var data = grid.getData()[row]
-        var addedResources = $('#addResourcesModal ul.uploaded_files_list>li');
-        data.Media = new Array($(addedResources).length-1);
-        for(var i=0; i<$(addedResources).length-1; i++) {
-            data.Media[i] = {};
-        }
-        $.each($(addedResources).find('input'), function(index, input){
-            var name = $(input).attr('name');
-            var n = name.substring(0, name.lastIndexOf("_"));
-            var j = parseInt(name.substring(name.indexOf("_")+1));
-            data.Media[j-1][n] = $(input).val();
-            data.Media[j-1]['thumbnail'] = $('.image_'+j).attr('src');
-        });
-
-        grid.getEditController().commitCurrentEdit();
-        addDirtyRows(undefined, {row:row});
-        grid.invalidateRow(row);
-        grid.render();
-        $('#addResourcesModal').modal('toggle');
-    });
-
 });
 
 function selectLicense($this, i) {

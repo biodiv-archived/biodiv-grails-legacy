@@ -792,6 +792,10 @@ alter table newsletter alter column show_in_footer set not null;
 update newsletter set show_in_footer = 't' where user_group_id is null and parent_id !=0 ;
 update newsletter set show_in_footer = true where id in (select parent_id from newsletter  where show_in_footer=true);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 #11 Dec 2017
 alter table data_package alter column supporting_modules type text;
 alter table data_package alter column allowed_data_table_types type text;
@@ -851,3 +855,7 @@ alter table dataset1 add column temporal_coverage_date_accuracy varchar(100);
 
 #21Dec2017
 alter table species add column data_table_id bigint references data_table(id);
+alter table fact add column data_table_id bigint references data_table(id);
+alter table data_table add column upload_log_id bigint references upload_log(id);
+alter table document add column date_accuracy varchar(100);
+update data_package set allowed_data_table_types='[0,1,2,3,4]' where allowed_data_table_types='[0,1,2,3,4,5]';

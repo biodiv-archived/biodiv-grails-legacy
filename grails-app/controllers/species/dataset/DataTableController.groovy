@@ -106,7 +106,7 @@ class DataTableController extends AbstractObjectController {
 			        redirect(controller:'datatable', action: "show", id: result.instance.id)
                 }
                 json {
-                    result.url = uGroup.createLink(action:'show', controller:"dataTable", id:result.instance.id, fragment:result.instance.id, 'userGroupWebaddress':params.webaddress);
+                    result.url = uGroup.createLink(action:'show', controller:"dataTable", id:result.instance.id, 'userGroupWebaddress':params.webaddress);
                     render result as JSON 
                 }
                 xml {
@@ -154,8 +154,8 @@ class DataTableController extends AbstractObjectController {
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
                 def model = utilsService.getSuccessModel("", dataTableInstance, OK.value());
-                model['dataObjects'] = dataTableService.getDataObjects(dataTableInstance, params)
-                model['dataObjectsCount'] = dataTableService.getDataObjectsCount(dataTableInstance);
+                model['dataObjects'] = dataTableInstance.getDataObjects(params)
+                model['dataObjectsCount'] = dataTableInstance.getDataObjectsCount();
 
                 withFormat {
                     html {
@@ -278,8 +278,8 @@ class DataTableController extends AbstractObjectController {
             redirect (url:uGroup.createLink(action:'list', controller:"dataTable", 'userGroupWebaddress':params.webaddress))
         }
         def dataTableInstance = DataTable.read(params.id.toLong());
-		def dataObjects = dataTableService.getDataObjects(params.id, params);
-        int dataObjectsCount = dataTableService.getDataObjectsCount(dataTableInstance);
+		def dataObjects = dataTableInstance.getDataObjects(params);
+        int dataObjectsCount = dataTableInstance.getDataObjectsCount();
 		def model =[dataTableInstance:dataTableInstance, dataObjects:dataObjects, dataObjectsCount:dataObjectsCount];
 		render(template:"/dataTable/showDataTableDataTemplate", model:model);
 	}

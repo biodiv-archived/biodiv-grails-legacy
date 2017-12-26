@@ -1,15 +1,5 @@
 <div>
     <%
-    def allowedExtensions = "['csv', 'xls', 'xlsx']"
-    String uploadDir="";
-    if(dataTableInstance && dataTableInstance.uFile?.path) {
-        uploadDir = (new File(dataTableInstance.uFile.path)).getParent()
-    } else if(dataTableInstance.dataset && dataTableInstance.dataset.uFile){
-        uploadDir = (new File(dataTableInstance.dataset.uFile.path)).getAbsolutePath()+'/'+ UUID.randomUUID().toString()
-    } else {
-        uploadDir = 'dataTables'+'/'+ UUID.randomUUID().toString();
-    }
-    def fileParams = [uploadDir:uploadDir, fileConvert:true]
     def form_id = "addDataTable"
     def form_action = uGroup.createLink(action:'save', controller:'dataTable', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
     def form_button_name = "Add ${dataTableInstance.dataTableType}"
@@ -31,10 +21,24 @@
             <h3><g:message code="default.dataTable.label" /> </h3>
     
                 <div class="upload_file" style="display:${dataTableInstance?.uFile?.path?'none':'inline-block'}">
-                        <div class="row control-group ${hasErrors(bean: dataTableInstance, field: 'uFile', 'errors')}">
+                        <div class="control-group ${hasErrors(bean: dataTableInstance, field: 'uFile', 'errors')}">
+                            <label class="control-label"for="docUpload">${dataTableInstance.dataTableType} File*</label>
+                            <div class="controls">
+                            <%
 
-                            <div class="controls" style="clear:both;margin-left:25px;">
-                                <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
+                                def allowedExtensions = "['xls', 'xlsx']"
+                                String uploadDir="";
+                                if(dataTableInstance && dataTableInstance.uFile?.path) {
+                                    uploadDir = (new File(dataTableInstance.uFile.path)).getParent()
+                                } else if(dataTableInstance.dataset && dataTableInstance.dataset.uFile){
+                                    uploadDir = (new File(dataTableInstance.dataset.uFile.path)).getAbsolutePath()+'/'+ UUID.randomUUID().toString()
+                                } else {
+                                    uploadDir = 'dataTables'+'/'+ UUID.randomUUID().toString();
+                                }
+                                def fileParams = [uploadDir:uploadDir, fileConvert:true]
+                            %>
+                            
+                            <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="uFile">
                                     </g:hasErrors>

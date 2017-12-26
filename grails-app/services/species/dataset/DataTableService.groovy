@@ -47,6 +47,7 @@ import species.participation.RecommendationVote;
 import species.participation.Flag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.participation.Annotation
+import species.participation.UploadLog
 import species.sourcehandler.XMLConverter;
 import species.utils.ImageType;
 import species.utils.Utils;
@@ -95,7 +96,6 @@ import species.NamesMetadata.NameStatus;
 import species.dataset.Dataset.DatasetType;
 import species.dataset.DataPackage.DataTableType;
 import species.participation.Observation.ProtocolType;
-import speciespage.ObvUtilService;
 
 class DataTableService extends AbstractMetadataService {
 
@@ -106,12 +106,12 @@ class DataTableService extends AbstractMetadataService {
     def messageSource;
     def activityFeedService
     def obvUtilService;
-    def observationService;
     def observationsSearchService;
     def speciesUploadService
-    def datatableService;
     def dataSource;
     def grailsApplication;
+    def factService;
+    def userGroupService;
 
     DataTable create(params) {
         def instance = DataTable.class.newInstance();
@@ -209,16 +209,42 @@ class DataTableService extends AbstractMetadataService {
 
             if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
                 File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
+
+                Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
+
                 switch(dataTable.dataTableType.ordinal()) {
+
                     case DataTableType.OBSERVATIONS.ordinal() :
                     uploadObservations(dataTable, dataTableFile, null, mappingFile, null,  new File(dataTableFile.getParentFile(), "upload.log"));  
                     break;
+
                     case DataTableType.SPECIES.ordinal(): 
                     def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':params.imagesDir, 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
 
                     if(res.sBulkUploadEntry) {
                         println "Saving upload log entry"
                         dataTable.uploadLog = res.sBulkUploadEntry;
+                    } else {
+                        log.error "Error in scheduling species upload job"
+                    }
+
+                    break;
+
+                    case DataTableType.FACTS.ordinal():
+                    String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
+                    def fFileValidation = factService.validateFactsFile(xlsxFileUrl, new UploadLog());
+                    if(fFileValidation.success) {
+                        log.debug "Validation of fact file is done. Proceeding with upload"
+                        Map p = ['file':xlsxFileUrl, 'notes':params.notes, 'uploadType':'fact', 'dataTable':dataTable.id];
+                        p.putAll(paramsToPropagate);
+                        def r = factService.upload(p);
+                        if(r.success) {
+                            dataTable.uploadLog = r.uploadLog;
+                        } else {
+                            log.error "Error in scheduling facts upload job"
+                        }
+                    } else {
+                        log.error "Facts file is not valid.  So not scheduling for upload. ${fFileValidation}"
                     }
                     break;
                 }
@@ -445,7 +471,7 @@ class DataTableService extends AbstractMetadataService {
     }
 
     private void uploadObservations(DataTable dataTable, File directory, AbstractObservationImporter importer, Map mediaInfo, File uploadLog) {
-        Map paramsToPropagate = getParamsToPropagate(dataTable);
+        Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
         List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
         int noOfUploadedObv=0, noOfFailedObv=0;
         boolean flushSingle = false;
@@ -462,15 +488,10 @@ class DataTableService extends AbstractMetadataService {
                     }
                     //obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
                     obvParams['dataTable'] = dataTable;
-                    inheritParams(obvParams, paramsToPropagate);
+                    DataTable.inheritParams(obvParams, paramsToPropagate);
                     uploadLog << "\n\n----------------------------------------------------------------------";
                     uploadLog << "\nUploading observation with params ${obvParams}"
                     try {
-                        println "******************************"
-                        println "******************************"
-                        println obvParams['recoName']
-                        println "******************************"
-                        println "******************************"
                         if(obvUtilService.uploadObservation(null, obvParams, resultObv, uploadLog, ProtocolType.LIST )) {
                             tmpNoOfUploadedObv++;
                         } else {
@@ -517,46 +538,6 @@ class DataTableService extends AbstractMetadataService {
         importer.closeReaders();
     }
 
-    private Map getParamsToPropagate(DataTable dataTable) {
-        Map paramsToPropagate = new HashMap();
-
-        def cfs = dataTable.fetchCustomFields();
-        cfs.each { cf -> 
-            //if(cf.key.equalsIgnoreCase('license'))
-            //    paramsToPropagate[ObvUtilService.LICENSE] = cf.value;
-            //License.read(dataTable.access.licenseId).name.value().replace("cc ", "");
-            //else if(cf.key.equalsIgnoreCase('contributor'))
-            //    paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = cf.value;
-                //SUser.findByEmail(dataTable.party.contributorId).email;
-//            else
-                paramsToPropagate[cf.key] = cf.value;
-        }
-
-        paramsToPropagate[ObvUtilService.LICENSE] = License.read(dataTable.access.licenseId).name.value().replace("cc ", "");
-        paramsToPropagate[ObvUtilService.AUTHOR_EMAIL] = dataTable.party.fetchContributor().email;
-
-        //geographical coverage
-        paramsToPropagate[ObvUtilService.LOCATION] = dataTable.geographicalCoverage.placeName;
-        paramsToPropagate[ObvUtilService.TOPOLOGY] = dataTable.geographicalCoverage.topology;
-        paramsToPropagate[ObvUtilService.LATITUDE] = dataTable.geographicalCoverage.latitude;
-        paramsToPropagate[ObvUtilService.LONGITUDE] = dataTable.geographicalCoverage.longitude;
-        paramsToPropagate[ObvUtilService.LOCATION_SCALE] = dataTable.geographicalCoverage.locationScale;
-
-        //temporal coverage
-        paramsToPropagate[ObvUtilService.OBSERVED_ON] = dataTable.temporalCoverage.fromDate;
-        paramsToPropagate[ObvUtilService.TO_DATE] = dataTable.temporalCoverage.toDate;
-        paramsToPropagate[ObvUtilService.DATE_ACCURACY] = dataTable.temporalCoverage.dateAccuracy;
-
-        //taxonomic coverage
-
-        return paramsToPropagate;
-    }
-
-    private void inheritParams(Map obvParams, Map paramsToPropagate) {
-        paramsToPropagate.each { key, value ->
-            if(!obvParams[key]) obvParams[key] = value;
-        }
-    }
 
     //FIX: This code is subjected to SQL INJECTION. Please make sure your data is sanitized
     private void importGBIFObservations(Dataset dataset, File directory, File uploadLog) {
@@ -1060,8 +1041,6 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
     }
 
-    /**
-     */
     def getMapFeatures(DataTable dt) {
         String query = "select t.type as type, t.feature as feature from map_layer_features t where ST_WITHIN('"+dt.geographicalCoverage.topology.toText()+"', t.topology)order by t.type" ;
         log.debug query;
@@ -1089,40 +1068,6 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         return features
     }
 
-	List getDataObjects(DataTable dataTable, Map params=[:]){
-        println params
-        //Done because of java melody error - junk coming with offset value
-        params.offset = params.offset ? params.offset.tokenize("/?")[0] : 0;
-		params.max = params.max ? params.max.toInteger() :10
-		params.offset = params.offset ? params.offset.toInteger() :0
-	
-        switch(dataTable.dataTableType) {
-            case DataTableType.OBSERVATIONS: return getObservationData(dataTable.id, params);
-            case DataTableType.SPECIES : return Species.findAllByDataTableAndIsDeleted(dataTable, false, [max:params.max, offset:params.offset, order:'id']);
-        }
-        return [];
-    }
-
-	static int getDataObjectsCount(DataTable dataTable) {
-        switch(dataTable.dataTableType) {
-            case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(dataTable, false);
-            case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(dataTable, false);
-        }
-        return 0;
-    }
-
-	private List getObservationData(id, params=[:]){
-	    def sql =  Sql.newInstance(dataSource);
-		def query = "select id  as obv_id from observation where data_table_id = " + id + " and is_deleted=false order by id limit " + params.max + " offset " + params.offset;
-        log.debug "Running query : ${query}";
-		def res = []
-		sql.rows(query).each{
-            println "Reading observation ${it.getProperty('obv_id')}"
-			res << Observation.read(it.getProperty("obv_id"));
-		}
-		return res 
-	}
-
     def delete(params){
         String messageCode;
         String url = utilsService.generateLink(params.controller, 'list', []);
@@ -1146,7 +1091,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
                             dataTableInstance.isDeleted = true;
                             //Delete underlying observations of data table
                             dataTableInstance.deleteAllObservations();
-
+                            dataTableInstance.deleteAllFacts();
                             if(!dataTableInstance.hasErrors() && dataTableInstance.save(flush: true)){
                                 utilsService.sendNotificationMail(mailType, dataTableInstance, null, params.webaddress);
                                 //TODO: dataTableSearchService.delete(observationInstance.id);

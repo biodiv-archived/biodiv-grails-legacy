@@ -103,7 +103,6 @@ class ObvUtilService {
 	private static final int BATCH_SIZE = 50
 
     def utilsService
-	def userGroupService
 	def observationService
 	def springSecurityService
 	def grailsApplication

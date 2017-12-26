@@ -3,10 +3,10 @@
 <%@page import="species.Species"%>
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
-<%@page import="species.dataset.DataTableService"%>
+<%@page import="species.dataset.DataTable"%>
 
 <% 
-int instanceCount = DataTableService.getDataObjectsCount(dataTableInstance);
+int instanceCount = dataTableInstance.getDataObjectsCount();
 String instanceType = dataTableInstance.dataTableType;
 %>
 <div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;width:100%">

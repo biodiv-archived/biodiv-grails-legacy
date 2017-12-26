@@ -7,7 +7,7 @@
                         controller:'observation', action:'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:queryParams)}"
                         > <g:message code="heading.browse.observations" /></a>
                     </li>
-                    <!--li class="divider-vertical"></li>
+                   <!--li class="divider-vertical"></li>
                     <li class="${params.isChecklistOnly?'active':''}"><a
                         href="${uGroup.createLink(
                         controller:'observation', action:'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, 'params':cQueryParams)}"
