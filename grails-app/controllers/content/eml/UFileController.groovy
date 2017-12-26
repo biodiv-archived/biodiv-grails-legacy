@@ -239,8 +239,8 @@ class UFileController {
 
 
 
-
-    def download = {
+	@Secured(['ROLE_USER'])
+    def download() {
 
         UFile ufile = UFile.get(params.id)
         if (!ufile) {
@@ -251,21 +251,20 @@ class UFileController {
             return
         }
 
-        def file = new File(ufile.path)
+        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        def file = new File(config.speciesPortal.content.rootDir+ufile.path)
         if (file.exists()) {
             log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
-            ufile.downloads++
-            ufile.save()
+            //ufile.downloads++
+            //ufile.save()
             response.setContentType("application/octet-stream")
             response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${file.name}")
             response.outputStream << file.readBytes()
             return
         } else {
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
+            def msg = messageSource.getMessage("fileupload.download.nofile", [ufile.path] as Object[], RCU.getLocale(request))
             log.error msg
-            flash.message = msg
-            redirect controller: params.errorController, action: params.errorAction
-            return
+            render (['msg':msg] as JSON);
         }
     }
 
