@@ -133,6 +133,9 @@
 //= require biodiv/pages.js
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
 //= require jquery.plugins/ion.rangeSlider.min
+//= require biodiv/dataset/dataset.js
+//= require biodiv/dataset/create.js
+//= require biodiv/datatable/create.js
 //= require dropzone.js
 //= require biodiv/trait.js
 //= require biodiv/customfield.js
