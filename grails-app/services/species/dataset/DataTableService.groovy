@@ -111,6 +111,7 @@ class DataTableService extends AbstractMetadataService {
     def dataSource;
     def grailsApplication;
     def factService;
+    def traitService;
     def userGroupService;
 
     DataTable create(params) {
@@ -245,6 +246,37 @@ class DataTableService extends AbstractMetadataService {
                         }
                     } else {
                         log.error "Facts file is not valid.  So not scheduling for upload. ${fFileValidation}"
+                    }
+                    break;
+
+                    case DataTableType.TRAITS.ordinal():
+
+                    String tFile = params.uFile ? contentRootDir + File.separator + params.uFile.path : null;
+                    String tvFile = params.tvFile ? contentRootDir + File.separator + params.tvFile.path : null;
+                    params.iconsFile = params.iconsFile.path ?  File.separator + params.iconsFile.path : null;
+
+                    def tFileValidation = traitService.validateTraitDefinitions(tFile, new UploadLog());
+                    def tvFileValidation = traitService.validateTraitValues(tvFile, new UploadLog());
+        
+                    if(tFileValidation.success || tvFileValidation.success) {
+                        log.debug "Validation of trait file and traitvalue file is done. Proceeding with upload"
+                        
+                        File iconsFile = params.iconsFile ? new File(params.iconsFile) : null;
+                        if(iconsFile && iconsFile.exists() && FilenameUtils.getExtension(iconsFile.getName()).equals('zip')) {
+                            def ant = new AntBuilder().unzip(src: iconsFile,dest: iconsFile.getParent(), overwrite:true);            
+                        }
+ 
+                        Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':iconsFile, 'notes':params.notes, 'uploadType':'trait', 'dataTable':dataTable.id];
+                        p.putAll(paramsToPropagate);
+
+                        def r = traitService.upload(p);
+                        if(r.success) {
+                            dataTable.uploadLog = r.uploadLog;
+                        } else {
+                            log.error "Error in scheduling traits upload job"
+                        }
+                    } else {
+                        log.error "Traits file is not valid.  So not scheduling for upload. ${tFileValidation} ${tvFileValidation}"
                     }
                     break;
                 }
