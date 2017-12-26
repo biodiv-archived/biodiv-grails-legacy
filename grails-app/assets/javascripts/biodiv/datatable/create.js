@@ -195,18 +195,19 @@ function getUploadParams() {
         $('input[name="contributorUserIds"]').val(dataTable_contributor_autofillUsersComp[0].getEmailAndIdsList().join(","));
     }
 
-
-    //if species type 
+        //if species type 
     var params = {};
     if($('#dataTableType').val() == 1) {
         params = getSpeciesUploadParams();
-    }
+    } 
+    var xlsxFileUrl = $('#xlsxFileUrl').val();
+    params['xlsxFileUrl'] = xlsxFileUrl;
+
     return params;
 }
 
 function getSpeciesUploadParams() {
     getTagsForHeaders();
-    var xlsxFileUrl = $('#xlsxFileUrl').val();
     var hm = getHeaderMetadata();
     delete hm["undefined"];
     var orderedArray = $('#columnOrder').val();
@@ -216,7 +217,6 @@ function getSpeciesUploadParams() {
     var params = {};
     params['headerMarkers'] = headerMarkers;
     params['orderedArray'] = orderedArray;
-    params['xlsxFileUrl'] = xlsxFileUrl;
     //params['imagesDir'] = $("#imagesDir").val();
     params['writeContributor'] = 'true';
     return params;

@@ -1,3 +1,4 @@
+<%@ page import="species.dataset.DataPackage.DataTableType"%>
 <style>
     .reco-comment-table {
     left:auto;
@@ -7,21 +8,39 @@
 <div class="resizable sidebar_section" style="border:1px solid; overflow:auto;max-height:400px;margin-bottom:0px;">
     <table class="table table-striped table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
+            <% 
+            def columnNames = dataTableInstance.fetchColumnNames();
+            if(dataTableInstance.dataTableType == DataTableType.FACTS) {
+                def c =  [];
+                columnNames.each {
+                    if(it[1] == 'sci name' || it[1] == 'taxonid' || it[1] == 'attribution' || it[1] == 'contributor' || it[1] == 'license') {
+                    } else {
+                    c << it;
+                    }
+                }
+                columnNames = c;
+            }
+            %>
         <thead>
             <tr class="filters">
-                <g:each in="${dataTableInstance.fetchColumnNames()}" var="cName">
+                <th title="Title">Title</th>
+                <g:each in="${columnNames}" var="cName">
                 <th title="${cName[1]}">${cName[1]}</th>
                 </g:each>
-                <th title="${g.message(code:'observation.label')}"><g:message code="default.observation.label" /></th>
-                <th title="${g.message(code:'default.comments.label')}"><g:message code="default.comments.label" /></th>
             </tr>
         </thead>
         <tbody class="mainContentList rowlink">
             <g:each in="${dataObjects}" var="dataObject">
+            <%def checklistAnnotations = dataObject.fetchChecklistAnnotation();%>
             <tr>
-            <% def checklistAnnotations = dataObject.fetchChecklistAnnotation(); %>
-          
-                <g:each in="${dataTableInstance.fetchColumnNames()}" var="cName">
+                <td>
+                    <a href="${uGroup.createLink(action:'show', controller:checklistAnnotations['type'], id:checklistAnnotations['id'], 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
+                        ${raw(checklistAnnotations['title'])}
+                    </a>
+
+                </td>      
+ 
+                <g:each in="${columnNames}" var="cName">
                     <g:if test="${cName[0].equalsIgnoreCase('http://rs.tdwg.org/dwc/terms/scientificName')}">
                         <td class="nameColumn">
                         <a href="${uGroup.createLink(action:'show', controller:'observation', id:dataObject.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
@@ -41,16 +60,7 @@
                     </td>
                     </g:else>
                 </g:each>
-                <td>
-                    <a href="${uGroup.createLink(action:'show', controller:checklistAnnotations['type'], id:checklistAnnotations['id'], 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                        ${raw(checklistAnnotations['title'])}
-                    </a>
-
-                </td>      
-                <td class="nolink">
-                    <comment:showCommentPopup model="['commentHolder':observation, 'rootHolder':dataTableInstance]" />
-                </td>
-            </tr>
+           </tr>
             </g:each>	
         </tbody>
     </table>

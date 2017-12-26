@@ -224,22 +224,27 @@ class DataTableService extends AbstractMetadataService {
                     if(res.sBulkUploadEntry) {
                         println "Saving upload log entry"
                         dataTable.uploadLog = res.sBulkUploadEntry;
+                    } else {
+                        log.error "Error in scheduling species upload job"
                     }
+
                     break;
 
                     case DataTableType.FACTS.ordinal():
-
-                    def fFileValidation = factService.validateFactsFile(dataTableFile.getAbsolutePath(), new UploadLog());
-
+                    String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
+                    def fFileValidation = factService.validateFactsFile(xlsxFileUrl, new UploadLog());
                     if(fFileValidation.success) {
                         log.debug "Validation of fact file is done. Proceeding with upload"
-                        Map p = ['file':dataTableFile.getAbsolutePath(), 'notes':params.notes, 'uploadType':'fact', 'dataTable':dataTable.id];
+                        Map p = ['file':xlsxFileUrl, 'notes':params.notes, 'uploadType':'fact', 'dataTable':dataTable.id];
                         p.putAll(paramsToPropagate);
                         def r = factService.upload(p);
                         if(r.success) {
                             dataTable.uploadLog = r.uploadLog;
-                        } 
+                        } else {
+                            log.error "Error in scheduling facts upload job"
+                        }
                     } else {
+                        log.error "Facts file is not valid.  So not scheduling for upload. ${fFileValidation}"
                     }
                     break;
                 }
@@ -1086,7 +1091,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
                             dataTableInstance.isDeleted = true;
                             //Delete underlying observations of data table
                             dataTableInstance.deleteAllObservations();
-
+                            dataTableInstance.deleteAllFacts();
                             if(!dataTableInstance.hasErrors() && dataTableInstance.save(flush: true)){
                                 utilsService.sendNotificationMail(mailType, dataTableInstance, null, params.webaddress);
                                 //TODO: dataTableSearchService.delete(observationInstance.id);

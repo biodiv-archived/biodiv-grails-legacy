@@ -60,9 +60,9 @@
                     <div style="clear:both;"></div>
                 </div>	
                 <div class="span12" style="margin-left:0px; padding:4px; background-color:whitesmoke">
-                    <g:render template="/common/observation/showObservationStoryActionsTemplate"
+ <%--                   <g:render template="/common/observation/showObservationStoryActionsTemplate"
                     model="['instance':dataTableInstance, 'href':canonicalUrl, 'title':title, 'description':description, 'hideFlag':true, 'hideDownload':true, 'hideFollow':true]" />
-
+--%>
                 </div>
 
 

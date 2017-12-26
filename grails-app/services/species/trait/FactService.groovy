@@ -120,6 +120,7 @@ class FactService extends AbstractObjectService {
     }
 
     Map validateFactsFile(String file, UploadLog dl) {
+        println "validateFactsFile"
         File spreadSheet = new File(file);
         if(!spreadSheet.exists()) {
             return ['success':false, 'msg':"Cant find the file at ${file}."];
