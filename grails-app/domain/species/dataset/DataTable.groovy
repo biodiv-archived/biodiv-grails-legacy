@@ -122,26 +122,49 @@ class DataTable extends CollMetadata {
         }
     }
 
-   static List getDataObjects(DataTable dataTable, Map params=[:]){
+   List getDataObjects(Map params=[:]){
        println params
        //Done because of java melody error - junk coming with offset value
        params.offset = params.offset ? params.offset.tokenize("/?")[0] : 0;
        params.max = params.max ? params.max.toInteger() :10
        params.offset = params.offset ? params.offset.toInteger() :0
+//        UtilsService utilsService = grails.util.Holders.applicationContext.getBean('utilsService') as UtilsService
 
-       switch(dataTable.dataTableType) {
-           case DataTableType.OBSERVATIONS: return getObservationData(dataTable.id, params);
-           case DataTableType.SPECIES : return Species.findAllByDataTableAndIsDeleted(dataTable, false, [max:params.max, offset:params.offset, order:'id']);
-           case DataTableType.FACTS : return Fact.findAllByDataTableAndIsDeleted(dataTable, false, [max:params.max, offset:params.offset, order:'id']);
+       switch(dataTableType) {
+           case DataTableType.OBSERVATIONS: return getObservationData(id, params);
+           case DataTableType.SPECIES : return Species.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, order:'id']);
+           case DataTableType.FACTS : 
+           /*def factObjects = [];
+           def r = Fact.executeQuery("select objectType as objectType, objectId as objectId from Fact where dataTable=:dataTable group by objectId, objectType", ['dataTable':this], [max:params.max, offset:params.offset, order:'id']);
+           r.each {
+               println it
+               def obj = utilsService.getDomainObject(it[0], it[1]);
+               def facts = Fact.executeQuery("select * from Fact where dataTable=:dataTable and objectType=:objectType, objectId=:objectId", ['dataTable':this,'objectType':it[0], 'objectId':it[1]]);
+               println facts
+               factObjects << obj;
+           }
+           return factObjects;
+           */def facts = Fact.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, order:'id,objectType,objectId']);
+           List factsByObject = [];
+           Map m = [:];
+           facts.each { fact ->
+               if(!m[fact.objectType+fact.objectId] ) m[fact.objectType+fact.objectId] = []; 
+                m[fact.objectType+fact.objectId] << fact
+           }
+           m.each {k,v ->
+            factsByObject << new FactsByObject(objectId:v[0].objectId, objectType:v[0].objectType, facts:v);
+           }
+           return factsByObject;
+           
        }
        return [];
    }
 
-   static int getDataObjectsCount(DataTable dataTable) {
-       switch(dataTable.dataTableType) {
-           case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(dataTable, false);
-           case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(dataTable, false);
-           case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(dataTable, false);
+   int getDataObjectsCount() {
+       switch(dataTableType) {
+           case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(this, false);
+           case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false);
+           case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false);
        }
        return 0;
    }
@@ -157,5 +180,49 @@ class DataTable extends CollMetadata {
        }
        return res 
    }
+
+    def deleteAllFacts() {
+        def obvs = Fact.findAllByDataTable(this);
+        obvs.each { obv ->    
+            obv.isDeleted = true;
+            if(!obv.save(flush:true)){
+                obv.errors.allErrors.each { log.error obv } 
+            }
+        }
+        return
+    }
 }
 
+class FactsByObject {
+    Long objectId;
+    String objectType;
+    List<Fact> facts;
+   
+    def utilsService;
+    def grailsApplication;
+
+    def fetchChecklistAnnotation(){
+        Map res = [:];
+        res['id'] = objectId;
+        res['type'] = getController(objectType);//utilsService.getResType(grailsApplication.getArtefact("Domain",objectType));
+        def species = facts[0].pageTaxon?.findSpecies(); 
+        if(species) {
+            res['speciesid'] = species.id
+            res['title'] = species.title();
+        }
+        facts.each  { fact->
+            res[fact.trait.name.toLowerCase()] = fact.traitValue?fact.traitValue.value:value
+        }
+        return res
+    }
+
+    private String getController (String objectType) {
+        switch(objectType) {
+            case Species.class.canonicalName:return "species";
+            case Observation.class.canonicalName:return "observation";
+            case Document.class.canonicalName:return "document";
+        }
+    }
+
+
+}

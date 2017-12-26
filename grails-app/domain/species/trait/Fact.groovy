@@ -7,6 +7,8 @@ import species.auth.SUser;
 import species.License;
 import species.dataset.DataTable;
 
+import grails.converters.JSON
+
 class Fact {
 
     Trait trait;
@@ -62,7 +64,7 @@ class Fact {
     }
 
     def fetchChecklistAnnotation(){
-        def res = [:]
+        def res = this as JSON;
         res['id'] = objectId;
         res['type'] = objectType;
         def species = pageTaxon.findSpecies(); 

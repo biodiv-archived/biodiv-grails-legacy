@@ -154,8 +154,8 @@ class DataTableController extends AbstractObjectController {
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
                 def model = utilsService.getSuccessModel("", dataTableInstance, OK.value());
-                model['dataObjects'] = DataTable.getDataObjects(dataTableInstance, params)
-                model['dataObjectsCount'] = DataTable.getDataObjectsCount(dataTableInstance);
+                model['dataObjects'] = dataTableInstance.getDataObjects(params)
+                model['dataObjectsCount'] = dataTableInstance.getDataObjectsCount();
 
                 withFormat {
                     html {
@@ -278,8 +278,8 @@ class DataTableController extends AbstractObjectController {
             redirect (url:uGroup.createLink(action:'list', controller:"dataTable", 'userGroupWebaddress':params.webaddress))
         }
         def dataTableInstance = DataTable.read(params.id.toLong());
-		def dataObjects = DataTable.getDataObjects(params.id, params);
-        int dataObjectsCount = DataTable.getDataObjectsCount(dataTableInstance);
+		def dataObjects = dataTableInstance.getDataObjects(params);
+        int dataObjectsCount = dataTableInstance.getDataObjectsCount();
 		def model =[dataTableInstance:dataTableInstance, dataObjects:dataObjects, dataObjectsCount:dataObjectsCount];
 		render(template:"/dataTable/showDataTableDataTemplate", model:model);
 	}

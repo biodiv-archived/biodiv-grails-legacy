@@ -1425,14 +1425,14 @@ class UserGroupService {
 					def obj = domainClass.read(Long.parseLong(it.trim()))
                     if(obj.instanceOf(DataTable)){
                         //TODO:batch this posting
-                        int dataObjectsCount = DataTable.getDataObjectsCount(obj);
+                        int dataObjectsCount = obj.getDataObjectsCount();
                         int max=100, offset = 0;
 
                         //HACK
                         if(obj.dataTableType == DataTableType.SPECIES || obj.dataTableType == DataTableType.OBSERVATIONS || obj.dataTableType == DataTableType.DOCUMENTS) {
                             println "Posting datatable ${obj} objects ${dataObjectsCount} into its groups"
                             while(offset <= dataObjectsCount) {
-                                def dataObjects = DataTable.getDataObjects(obj, [max:max, offset:offset]);
+                                def dataObjects = obj.getDataObjects([max:max, offset:offset]);
                                 obvs = []
                                 obvs.addAll(dataObjects);
                                 log.debug "${submitType}ing datatable ${obj} ${obvs.size()} ${obj.dataTableType} into usergroups ${obj.userGroups}"

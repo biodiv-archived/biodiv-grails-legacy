@@ -6,7 +6,7 @@
 <%@page import="species.dataset.DataTable"%>
 
 <% 
-int instanceCount = DataTable.getDataObjectsCount(dataTableInstance);
+int instanceCount = dataTableInstance.getDataObjectsCount();
 String instanceType = dataTableInstance.dataTableType;
 %>
 <div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;width:100%">

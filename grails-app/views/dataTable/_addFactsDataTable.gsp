@@ -35,10 +35,10 @@
                                 } else {
                                     uploadDir = 'dataTables'+'/'+ UUID.randomUUID().toString();
                                 }
-                                def fileParams = [uploadDir:uploadDir]
+                                def fileParams = [uploadDir:uploadDir, fileConvert:true]
                             %>
                             
-                            <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {}']" />
+                            <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="uFile">
                                     </g:hasErrors>
@@ -113,5 +113,10 @@
         </div>
 
     </form>
+
+    <div id="xlsxFileUrl" style="display:none;">
+    <input type="text" value="">
+    </div>
+
 
 </div>
