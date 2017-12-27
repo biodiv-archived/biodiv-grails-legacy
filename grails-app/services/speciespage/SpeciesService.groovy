@@ -2522,9 +2522,9 @@ def checking(){
 
             if(params.downloadFrom == 'matchingSpecies') {
                 //HACK: request not available as its from job scheduler
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath, traitIcons]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath, traitIcons, it.fetchOccurence()]
             } else {
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons]
+                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons, it.fetchOccurrence()]
             }
         }
 
