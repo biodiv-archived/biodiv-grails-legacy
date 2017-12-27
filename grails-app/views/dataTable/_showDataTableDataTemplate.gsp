@@ -19,7 +19,10 @@
                     }
                 }
                 columnNames = c;
+            } else if(dataTableInstance.dataTableType == DataTableType.TRAITS) {
+                columnNames =  [['','traitTypes',1],['','dataTypes',1],['','units',1],['','values',1],['','field',1],['','taxon',1],['','isNotObservationTrait',1],['','isParticipatory',1],['','showInObservation',1]];
             }
+             
             %>
         <thead>
             <tr class="filters">
@@ -32,7 +35,7 @@
         <tbody class="mainContentList rowlink">
             <g:each in="${dataObjects}" var="dataObject">
             <%def checklistAnnotations = dataObject.fetchChecklistAnnotation();%>
-            <tr>
+            <tr class="mainContent">
                 <td>
                     <a href="${uGroup.createLink(action:'show', controller:checklistAnnotations['type'], id:checklistAnnotations['id'], 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                         ${raw(checklistAnnotations['title'])}

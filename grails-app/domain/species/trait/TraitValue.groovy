@@ -7,6 +7,8 @@ import species.Resource;
 import species.Resource.ResourceType;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
+import species.dataset.DataTable;
+import grails.converters.JSON
 
 class TraitValue {
 
@@ -19,7 +21,9 @@ class TraitValue {
 	
     def grailsApplication;
     boolean isDeleted = false;
-    
+   
+    DataTable dataTable;
+
     static constraints = {
         trait nullable:false, blank:false, unique:['value']
         value nullable:false, validator : { val, obj ->
@@ -37,6 +41,7 @@ class TraitValue {
         icon nullable:true
         source nullable:true
         //taxon nullable:false
+        dataTable nullable:true
     }
 
     static mapping = {
@@ -80,5 +85,10 @@ class TraitValue {
         }
         return thumbnailUrl;
     }
-    
+ 
+    def fetchChecklistAnnotation(){
+        def res = this as JSON;
+        res['values'] = values();
+        return res
+    }   
 }

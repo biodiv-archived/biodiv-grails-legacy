@@ -109,7 +109,7 @@
                                 <span class="req">*</span>
                             </label>
                             <div class="controls" style="">
-                                <%def allowedExtensions="['xls','xlsx']"%>
+                                <%def allowedExtensions="['xls','xlsx']"%
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'traitsPath', 'inputName': 'tFile', 'path': tFile?.path, 'size':tFile?.size,'fileParams':['uploadDir':uploadDir, 'retainOriginalFileName':true], uploadCallBack:'traits_upload_callback()', 'allowedExtensions':allowedExtensions, retainOriginalFileName:true]" />
                                 <g:if test="${tFile.errors}"> 
