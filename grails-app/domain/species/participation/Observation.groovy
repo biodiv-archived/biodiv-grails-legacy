@@ -751,7 +751,7 @@ class Observation extends DataObject {
             res['speciesid'] = this.maxVotedReco.taxonConcept?.findSpeciesId(); 
             res['title'] = this.maxVotedReco.taxonConcept?.canonicalForm;
         }else if(this.maxVotedReco) {
-            res['title'] = this.maxVotedReco;
+            res['title'] = this.maxVotedReco.name;
         }
 
         println res;

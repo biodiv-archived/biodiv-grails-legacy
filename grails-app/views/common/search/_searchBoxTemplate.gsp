@@ -155,6 +155,7 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         },
         'trait' : {
             'matchingSpeciesListUrl':"${uGroup.createLink(controller:'trait', action: 'matchingSpecies', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+            'matchingObservationsListUrl':"${uGroup.createLink(controller:'trait', action: 'matchingObservations', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
             'listUrl':"${uGroup.createLink(controller:'trait', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
         },
         'fact' : {
