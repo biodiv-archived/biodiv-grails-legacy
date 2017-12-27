@@ -54,7 +54,7 @@ class SpeciesTagLib {
 				out << "<a href=\"${extLink.frlhtUrl}\" title=\"View on FRLHT's ENVIS\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FRLHT32x32.gif', absolute:true)}\"/></a>";
 				break;
             case "fishbaseUrl" :
-				out << "<a href=\"${extLink.fiishbaseUrl}\" title=\"View on Fishbase\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FB_logo.png', absolute:true)}\"/></a>";
+				out << "<a href=\"${extLink.fishbaseUrl}\" title=\"View on Fishbase\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FB_logo.png', absolute:true)}\"/></a>";
 				break;
 
 
