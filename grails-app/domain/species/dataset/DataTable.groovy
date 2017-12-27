@@ -16,6 +16,7 @@ import speciespage.ObvUtilService;
 
 import species.License
 import species.trait.Fact;
+import species.trait.Trait;
 
 class DataTable extends CollMetadata {
 	
@@ -24,6 +25,7 @@ class DataTable extends CollMetadata {
 	boolean agreeTerms = false;
 	static hasOne = [dataset : Dataset1]
     UFile uFile;
+    UFile traitValueFile;
     DataTableType dataTableType;
 
     UploadLog uploadLog;
@@ -42,6 +44,7 @@ class DataTable extends CollMetadata {
 		agreeTerms nullable:true
 		checklistId nullable:true
 		uFile nullable:false
+		traitValueFile nullable:true
 		uploadLog nullable:true
 		columns nullable:false, blank:false;
 	}
@@ -132,29 +135,36 @@ class DataTable extends CollMetadata {
 
        switch(dataTableType) {
            case DataTableType.OBSERVATIONS: return getObservationData(id, params);
-           case DataTableType.SPECIES : return Species.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, order:'id']);
+           case DataTableType.SPECIES : return Species.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'id']);
            case DataTableType.FACTS : 
-           /*def factObjects = [];
-           def r = Fact.executeQuery("select objectType as objectType, objectId as objectId from Fact where dataTable=:dataTable group by objectId, objectType", ['dataTable':this], [max:params.max, offset:params.offset, order:'id']);
-           r.each {
-               println it
-               def obj = utilsService.getDomainObject(it[0], it[1]);
-               def facts = Fact.executeQuery("select * from Fact where dataTable=:dataTable and objectType=:objectType, objectId=:objectId", ['dataTable':this,'objectType':it[0], 'objectId':it[1]]);
-               println facts
-               factObjects << obj;
+           //def facts = Fact.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'objectType,objectId,id']);
+           def c = Fact.createCriteria()
+           def facts = c.list(max:params.max, offset:params.offset) {
+               and {
+                   eq('dataTable', this)
+                   eq('isDeleted', false)
+                   order('objectType','asc')
+                   order('objectId','asc')
+                   order('id','asc')
+               }
            }
-           return factObjects;
-           */def facts = Fact.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, order:'id,objectType,objectId']);
+println facts
            List factsByObject = [];
            Map m = [:];
            facts.each { fact ->
+               println fact
                if(!m[fact.objectType+fact.objectId] ) m[fact.objectType+fact.objectId] = []; 
                 m[fact.objectType+fact.objectId] << fact
            }
            m.each {k,v ->
-            factsByObject << new FactsByObject(objectId:v[0].objectId, objectType:v[0].objectType, facts:v);
+               println k
+               println v;
+            factsByObject << new FactsByObject(objectId:v[0].objectId, objectType:v[0].objectType, facts:m[v[0].objectType+v[0].objectId]);
            }
            return factsByObject;
+           case DataTableType.TRAITS : 
+           def traits = Trait.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, order:'id']);
+           return traits;
            
        }
        return [];
@@ -165,6 +175,7 @@ class DataTable extends CollMetadata {
            case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(this, false);
            case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false);
            case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false);
+           case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false);
        }
        return 0;
    }
@@ -202,6 +213,7 @@ class FactsByObject {
     def grailsApplication;
 
     def fetchChecklistAnnotation(){
+        println facts.size()
         Map res = [:];
         res['id'] = objectId;
         res['type'] = getController(objectType);//utilsService.getResType(grailsApplication.getArtefact("Domain",objectType));
@@ -211,7 +223,9 @@ class FactsByObject {
             res['title'] = species.title();
         }
         facts.each  { fact->
-            res[fact.trait.name.toLowerCase()] = fact.traitValue?fact.traitValue.value:value
+            println "----------------------------${fact}"
+            res[fact.trait.name.toLowerCase()] = fact.traitValue?fact.traitValue.value:(fact.value + (fact.toValue ? ":" + fact.toValue:''))
+fact.value
         }
         return res
     }

@@ -39,7 +39,7 @@ import species.groups.SpeciesGroup;
 import species.TaxonomyDefinition;
 import species.utils.ImageUtils;
 import species.utils.ImageType;
-
+import species.dataset.DataTable;
 
 class TraitService extends AbstractObjectService {
 
@@ -48,13 +48,17 @@ class TraitService extends AbstractObjectService {
         //def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
         Language languageInstance = utilsService.getCurrentLanguage();
         Map result = [success:false, msg:''];
+        DataTable dataTable;
+        if(params['dataTable']) {
+            dataTable = DataTable.read(Long.parseLong(params.dataTable+''));
+        }
         if(params.tFile) {
-            def r = uploadTraitDefinitions(params.tFile, dl, languageInstance);
+            def r = uploadTraitDefinitions(params.tFile, dl, languageInstance, dataTable);
             result.success = r.success;
             result.msg += r.msg;
         }
         if(params.tvFile) {
-            def r = uploadTraitValues(params.tvFile, dl, languageInstance);
+            def r = uploadTraitValues(params.tvFile, dl, languageInstance, dataTable);
             result.success = r.success && result.success;
             result.msg += r.msg;
         }
@@ -67,7 +71,7 @@ class TraitService extends AbstractObjectService {
         return validateSpreadsheetHeaders(file, dl, reqdHeaders);
     }
 
-    Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance) {
+    Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance, DataTable dataTable=null) {
         int noOfTraitsLoaded = 0;
         dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
 
@@ -224,6 +228,10 @@ class TraitService extends AbstractObjectService {
                     } 
                 }
 
+                if(dataTable) {
+                    trait.dataTable = dataTable;//DataTable.read(Long.parseLong(''+m['dataTable'])); 
+                }
+
                 if(!trait.hasErrors() && trait.save(flush:true)) {
                     dl.writeLog("Successfully inserted/updated trait", Level.INFO);
                     noOfTraitsLoaded++;
@@ -280,7 +288,7 @@ println f
         return validateSpreadsheetHeaders(file, dl, reqdHeaders);
     }   
 
-    Map uploadTraitValues(String file, UploadLog dl, Language languageInstance) {
+    Map uploadTraitValues(String file, UploadLog dl, Language languageInstance, DataTable dataTable=null) {
         int noOfValuesLoaded=0;
 
         dl.writeLog("Loading trait values from ${file}", Level.INFO);
@@ -413,6 +421,9 @@ println f
                 } 
             }
 
+            if(dataTable) {
+                traitValue.dataTable = dataTable;
+            }
             if(!traitValue.hasErrors() && traitValue.save(flush:true)) {
                 dl.writeLog("Successfully inserted/updated trait value", Level.INFO);
                 noOfValuesLoaded++;

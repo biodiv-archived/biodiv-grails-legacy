@@ -35,7 +35,8 @@
                                 } else {
                                     uploadDir = 'dataTables'+'/'+ UUID.randomUUID().toString();
                                 }
-                                def fileParams = [uploadDir:uploadDir, fileConvert:true]
+                                def fileParams = [uploadDir:uploadDir]
+                                def iconsFileParams = [uploadDir:uploadDir+"/icons"]
                             %>
                             
                             <g:render template='/UFile/docUpload' model="['name': 'dataTableFile', , 'path': dataTableInstance?.uFile?.path, 'size':dataTableInstance?.uFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
@@ -46,6 +47,86 @@
                                 
                             </div>
                         </div>	
+                        <small class="help-block">
+                        <g:message code="default.trait.upload.fileFormat" /> 
+                        <ul>
+                        <li><b>Trait*</b>: Name of the trait</li>
+                        <li><b>TraitType*</b>: The categorical type of values that the trait can hold. Choose from Single categorical (one value), Multiple  categorical (multiple values) or range (a range of values)</li>
+                        <li><b>DataType*</b>: The data type of the trait. Choose from String, Numeric, Boolean, Date or Color</li>
+                        <li><b>Units</b>: The unit of the values</li>
+                        <li><b>Trait source</b>: The source of the trait</li>
+                        <li><b>Trait definition</b>: The definition of the trait</li>
+                        <li><b>Trait Icon</b>: File name for the icon representing the trait  (files should be uploaded separately)</li>
+                        <li><b>SPM*</b>: The Concept, catergory and subcatergory (if any) from the species profile model separated with the "|" symbol. Eg: Overview|Diagnostic|Description</li>
+                        <li><b>Taxon name</b>: The highest level of taxa for which the trait applies . Ie: the taxonomic scope</li>
+                        <li><b>TaxonID</b>: The taxon ID of the taxa</li>
+                        <li><b>new/update</b>: Denotes whether the trait being uploaded is new or an update of an existing trait.</li>
+                        <li><b>TraitID</b>: If updating an existing trait, mention the ID of the trait to be updated</li>
+                        <li><b>isObvTrait</b>: Mark "True" if the trait can potentially be used within observations. (as opposed to IUCN status which is never an observed trait)</li>
+                        <li><b>isParticipatory</b>: Mark as "True" If it is enabled in observations, and the trait should be available for participants other than the observer to edit.</li>
+                        <li><b>showInObservation</b>: Mark "True" if the trait should be displayed for input during observation upload.</li>
+
+                        </ul>
+                        </small>
+                        <small>
+                        <g:message code="default.trait.upload.samplefileFormat" /> 
+                        <a href="${createLinkTo(dir: '/../static/templates/', file:'traitTemplate_v1.tsv' , base:grailsApplication.config.speciesPortal.resources.serverURL)}"><g:message code="msg.here" /></a>
+                        </small>
+
+
+                        <div class="control-group">
+                            <label class="control-label" for="file">
+                                <g:message code="default.trait.values.label" /> 
+                                <span class="req">*</span>
+                            </label>
+                            <div class="controls" style="">
+
+                            <g:render template='/UFile/docUpload' model="['name': 'tvFile', 'inputName':'tvFile' , 'path': dataTableInstance?.traitValueFile?.path, 'size':dataTableInstance?.traitValueFile?.size, fileParams:fileParams, allowedExtensions:allowedExtensions,uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}']" />
+                            <g:if test="${dataTableInstance?.traitValueFile?.errors}"> 
+                            <div class="help-inline alert-danger">
+                                <g:each in="${dataTableInstance.traitValueFile.errors}" var="err">
+                                ${err}<br/>
+                                </g:each>
+                            </div>
+                            </g:if>
+                           </div>
+                                <small class="help-block">
+                                <g:message code="default.trait.upload.fileFormat" /> 
+                                <ul>
+                                    <li><b>Value*</b>: The Name of the value</li>
+                                    <li><b>Trait*</b>: The Trait name for which this value is applicable</li>
+                                    <li><b>TraitID</b>: If appending to existing trait values, mention the ID of the Trait</li>
+                                    <li><b>Value Icon</b>: File name for the icon representing the value (files should be uploaded separately)</li>
+                                    <li><b>Value Definition</b>: Definition of the trait value</li>
+                                    <li><b>Value Source</b>: Source of the trait value</li>
+                                </ul>
+                                </small><small>
+                                <g:message code="default.trait.values.upload.samplefileFormat" /> 
+                                <a href="${createLinkTo(dir: '/../static/templates/', file:'traitValuesTemplate_v1.tsv' , base:grailsApplication.config.speciesPortal.resources.serverURL)}"><g:message code="msg.here" /></a>
+
+                                </small>
+ 
+                        </div>
+
+                        <%def iconsAllowedExtensions="['zip']"%>
+                        <div class="control-group">
+                            <label class="control-label" for="file">
+                                <g:message code="trait.icon.zip.label" /> 
+                            </label>
+                            <div class="controls" style="">
+                                <g:render template='/UFile/docUpload'
+                                model="['name': 'iconsPath', 'inputName': 'iconsFile', 'path': iconsFile?.path, 'size':iconsFile?.size,'fileParams':iconsFileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+ 
+                                <% def upload_file_text="${g.message(code:'default.upload.file.label')}"%>
+                                <script type="text/javascript">
+                                    $(document).ready(function(){
+                                        $('.qq-upload-button').contents().first().textContent = '${upload_file_text}';
+                                    });
+                                </script>
+                            </div>
+                        </div>
+
+
 
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">
@@ -65,6 +146,7 @@
                                 
                             </div>
                         </div>	
+
                     </div> 
                 </div> 
         </div>
