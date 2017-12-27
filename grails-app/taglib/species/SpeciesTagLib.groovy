@@ -48,11 +48,15 @@ class SpeciesTagLib {
 				out << "<a href=\"http://www.ubio.org/browser/search.php?search_all=${attrs.model.taxonConcept.binomialForm}\" title=\"View on uBio\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/uBio.png', absolute:true)}\"/></a>";
 				break;
 			case "wikipedia" :
-				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm?:attrs.model.taxonConcept.name}\" title=\"View on Wikipedia\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/wiki.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm?:attrs.model.taxonConcept.name}\" title=\"View on Wikipedia\"  target=\"_blank\"><img cl ass=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/wiki.png', absolute:true)}\"/></a>";
 				break;
 			case "frlhtUrl" :
 				out << "<a href=\"${extLink.frlhtUrl}\" title=\"View on FRLHT's ENVIS\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FRLHT32x32.gif', absolute:true)}\"/></a>";
 				break;
+            case "fishbaseUrl" :
+				out << "<a href=\"${extLink.fiishbaseUrl}\" title=\"View on Fishbase\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FB_logo.png', absolute:true)}\"/></a>";
+				break;
+
 
 		}
 	}

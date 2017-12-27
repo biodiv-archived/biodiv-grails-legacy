@@ -134,6 +134,10 @@ class ExternalLinksService {
 			case "frlht" :
 				//log.debug "Setting frlht link id to : "+idVal
 				taxonConcept.externalLinks.frlhtUrl = idVal;
+            case "fishbase" :
+				//log.debug "Setting fishbase link id to : "+idVal
+				taxonConcept.externalLinks.fishbaseUrl = idVal;
+
                 //taxonConcept.externalLinks.noOfDataObjects++;
 
 		}
