@@ -79,8 +79,8 @@ function loadMatchingList($matchingTable, matchingListUrl) {
             }
             $('#matchingSpeciesList .matchingSpeciesHeading').html(data.model.totalCount?(' (' + data.model.totalCount + ')'):'');
             $('#matchingSpeciesFilterMsg').html(data.model.obvFilterMsgHtml);
-            if(data.success == true && data.model.matchingSpeciesList) {
-                $.each(data.model.matchingSpeciesList, function(index, item) {
+            if(data.success == true && data.model.matchingList) {
+                $.each(data.model.matchingList, function(index, item) {
                     var itemMap = {};
                     itemMap.id = item[0];
                     //itemMap.title = item[1];
