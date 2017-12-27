@@ -54,6 +54,7 @@ import species.Metadata
 import species.SpeciesPermission;
 import species.dataset.Dataset;
 import species.dataset.DataTable;
+import au.com.bytecode.opencsv.CSVWriter
 
 
 //import org.apache.lucene.document.DateField;
@@ -91,9 +92,14 @@ import grails.plugin.cache.Cacheable;
 import species.trait.Fact;
 import species.trait.Trait;
 import species.trait.TraitValue;
+
+import species.participation.DownloadLog;
+
 class ObservationService extends AbstractMetadataService {
 
     static transactional = false
+
+    static int BATCH_SIZE = 50;
 
     def recommendationService;
     def observationsSearchService;
@@ -3094,8 +3100,8 @@ println "*******************************************"
 
     def getMatchingObservationsList(params) {
         params.otrait = params.remove('trait')
-        def result = getFilteredObservations(params, params.int('max'), params.int('offset'));
-        def matchingObservationsList = [];
+        def result = getFilteredObservations(params, params.max, params.offset);
+        def matchingList = [];
         result.observationInstanceList.each {it->
             String link = utilsService.createHardLink("observation", "show", it.id);
             def mainImage = it.mainImage();
@@ -3121,14 +3127,71 @@ println "*******************************************"
                 }
             }
 
-            if(params.downloadFrom == 'matchingSpecies') {
+            if(params.downloadFrom == 'matchingobservations') {
                 //HACK: request not available as its from job scheduler
-                matchingObservationsList << [it.id, it.title(), true, 0, link, imagePath, traitIcons]
+                matchingList << [it.id, it.title(), true, 0, link, imagePath, traitIcons]
             } else {
-                matchingObservationsList << [it.id, it.title(), true, 0, link, imagePath,  params.user, traitIcons]
+                matchingList << [it.id, it.title(), true, 0, link, imagePath,  params.user, traitIcons]
             }
         }
 println result;
-        return [matchingSpeciesList:matchingObservationsList, totalCount:result.allObservationCount, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
+        return [matchingList:matchingList, totalCount:result.allObservationCount, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
     }
+
+    File exportMatchingObservationsList(params, DownloadLog dl) {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.offset = params.offset ? params.int('offset') : 0
+        //TODO: distinct reco can be from search also - not handled (ref - obvCont -line -1610)
+        def matchingListResult = getMatchingObservationsList(params);
+        def totalCount = matchingListResult.totalCount;
+        def completeResult = matchingListResult.matchingList;
+        params.offset = params.offset + BATCH_SIZE
+        while(params.offset <= totalCount) {
+            Observation.withNewTransaction {
+                completeResult.addAll(getMatchingObservationsList(params).matchingList);
+                params.offset = params.offset + BATCH_SIZE
+            }
+        }
+        matchingListResult.matchingList = completeResult;
+
+        if(!matchingListResult) {
+            return null;
+        } 
+        if(matchingListResult.totalCount == 0) {
+            return null;
+        }
+        File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		} 
+		return exportMatchingObservationsAsCSV(downloadDir, matchingListResult);
+    }
+	
+    private File exportMatchingObservationsAsCSV(downloadDir, Map matchingListResult){
+        File csvFile = new File(downloadDir, "MatchingObservation_" + new Date().getTime() + ".csv")
+        CSVWriter writer = utilsService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+        
+        def header = ['Observation Id', 'Observation Title', 'URL',  'Traits'];
+        writer.writeNext(header.toArray(new String[0]))
+        def matchingList = matchingListResult.matchingList;
+        def dataToWrite = []
+        matchingList.each {
+            log.debug "Writting " + it
+            def temp = []
+            temp.add("" + it[0]);
+            temp.add("" + it[1]);
+            temp.add("" + it[4]);
+            it[6].each { t ->
+                temp.add("" + t[1]+":"+t[0]);
+            }
+            dataToWrite.add(temp.toArray(new String[0]))
+        }
+        writer.writeAll(dataToWrite);
+        writer.flush()
+        writer.close()
+
+        return csvFile
+    }
+
+
 }

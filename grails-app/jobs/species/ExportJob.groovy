@@ -18,7 +18,8 @@ class ExportJob {
 	def checklistService
 	def speciesService
     def namelistService;
-	
+    def observationService;
+
     static triggers = {
         println "==========================Setting trigger for ExportJob";
       simple name:'ExportJob', startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
@@ -50,6 +51,14 @@ class ExportJob {
                     case TAXONOMY_DEFINITION:
                         log.info "Initiating taxon definition names list export."
                         f = namelistService.export(dl.fetchMapFromText(), dl);
+                    case "Matching species":
+                        log.info "Initiating matching species list export."
+                        f = speciesService.exportMatchingSpeciesList(dl.fetchMapFromText(), dl);
+                        break;
+                    case "Matching observations":
+                        log.info "Initiating matching observations list export."
+                        f = observationService.exportMatchingObservationsList(dl.fetchMapFromText(), dl);
+                        break;
 					default:
 						log.debug "Invalid source Type $dl.sourceType"
 				}

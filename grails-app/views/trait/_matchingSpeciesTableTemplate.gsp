@@ -12,7 +12,7 @@
 
      <span class='pull-right'>
             <obv:download
-            model="['source':'Matching Species', 'requestObject':request, 'downloadTypes':[DownloadType.CSV], 'onlyIcon': 'true', 'downloadFrom' : 'matchingSpecies']" />
+            model="['source':'Matching '+resultType, 'requestObject':request, 'downloadTypes':[DownloadType.CSV], 'onlyIcon': 'true', 'downloadFrom' : 'matching'+resultType]" />
         </span>
 
     <h5>Matching ${resultType?resultType.capitalize():'Species'}${totalCount?' (' + totalCount + ')' :''}
