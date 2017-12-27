@@ -26,6 +26,7 @@ class TraitController extends AbstractObjectController {
 
     def traitService;
     def speciesService;
+    def observationService;
     def messageSource;
     def dataSource;
 
@@ -369,6 +370,46 @@ println "===================+"
                 result.putAll([status:'success', msg:'success']);
             } else {
                 def message = "";
+                if(params.int('offset')  > 0) {
+                    message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
+                } else {
+                    message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
+                }
+                result.putAll([msg:message]);
+            }
+            def model = utilsService.getSuccessModel(result.msg, null, OK.value(), result);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            String msg = g.message(code: 'error', default:'Error while processing the request.');
+            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
+
+    def matchingObservations() {
+        Map result = [:];
+        try {
+            result = observationService.getMatchingObservationsList(params);
+            result.resultType = 'observations';
+            result.hideId = true;
+            result.instanceTotal = result.totalCount;//matchingSpeciesList.size();
+            //result.totalCount = result.instanceTotal;
+            params.action = 'list';
+            result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
+
+            if(result.matchingSpeciesList.size() > 0) {
+                result.putAll([status:'success', msg:'success']);
+            } else {
+                def message = "";
                 if(params.offset  > 0) {
                     message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
                 } else {
@@ -609,6 +650,7 @@ println "===================+"
             }        
         }
     }
+
     def taxonTags = {
         def taxon  = TaxonomyDefinition.findAllByNameIlike("${params.term}%")
         def taxonList = [];

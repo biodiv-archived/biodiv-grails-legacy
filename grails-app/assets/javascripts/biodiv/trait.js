@@ -7,7 +7,17 @@ function updateMatchingSpeciesTable() {
 }
 
 function loadMatchingSpeciesList() {
-    var $me = $(this);
+    var $matchingSpeciesTable = $('#matchingSpeciesTable');
+    return loadMatchingList($matchingSpeciesTable, window.params.trait.matchingSpeciesListUrl);
+}
+
+function loadMatchingObservationsList() {
+    var $matchingSpeciesTable = $('#matchingSpeciesTable');
+    return loadMatchingList($matchingSpeciesTable, window.params.trait.matchingObservationsListUrl);
+}
+
+function loadMatchingList($matchingTable, matchingListUrl) {
+    var $me = $matchingTable.next();
     var target = window.location.pathname + window.location.search;
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
@@ -20,7 +30,7 @@ function loadMatchingSpeciesList() {
     var element = {};
     var listFilter = $('.listFilter');
         listFilter.each(function(){
-        if($(this).hasClass('active')) {
+        if($me.hasClass('active')) {
            var traitType = $(this).val();
            params['traitType'] = traitType;
         }
@@ -30,19 +40,19 @@ function loadMatchingSpeciesList() {
                 if(params[key]=='observation'){
                 element = $('div[data-isNotObservation="true"]');
                     $(element).each(function(){
-                        $(this).parent().parent().hide();
+                        $me.parent().parent().hide();
                     });
             }
             else if (params[key]=='species'){
                 element = $('div[data-isNotObservation="false"]');
                 $(element).each(function(){
-                    $(this).parent().parent().hide();
+                    $me.parent().parent().hide();
                 });
             }
             else{
                 element = $('div[data-isNotObservation]');
                 $(element).each(function(){
-                    $(this).parent().parent().show();
+                    $me.parent().parent().show();
                 });
             }
         }
@@ -55,12 +65,12 @@ function loadMatchingSpeciesList() {
     for(var m in traits) {
         params['trait.'+m] = traits[m];
     }
-    params['max'] = $(this).data('max');
-    params['offset'] = $(this).data('offset');
+    params['max'] = $me.data('max');
+    params['offset'] = $me.data('offset');
+   console.log(params); 
     History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
-    var $matchingSpeciesTable = $('#matchingSpeciesTable');
     $.ajax({
-        url:window.params.trait.matchingSpeciesListUrl,
+        url:matchingListUrl,
         dataType: "json",
         data:params,
         success: function(data) {   
@@ -83,7 +93,7 @@ function loadMatchingSpeciesList() {
                     //$.each(imagepath,function(index1,item1){ alert(item1); });
                     //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
-                    $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
+                    $matchingTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
                     $('#imagediv_'+item[0]).empty();
                     $.each(imagepath,function(index1,item1){ 
                         $('#imagediv_'+item[0]).append(showIcon(item1[0], item1[1], item1[2], item1[3]));

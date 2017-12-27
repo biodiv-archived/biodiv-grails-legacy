@@ -9,13 +9,7 @@
 <div class="row-fluid">
 
 	<!-- main_content -->
-	<div class="list span12 namelist_wrapper" style="margin-left:0px;clear:both">
-        <div class="btn-group" data-toggle="buttons-radio" style="float:right;">
-        <button type="button" class="btn   listFilter default" value="species" id="species">Species Trait</button>
-        <button type="button" class="btn  listFilter" value="observation" id="observation">Observation Trait</button>
-        <button type="button" class="btn  listFilter all" value="all" id="all">All</button>
-    </div>
-		<div class="observation thumbwrap">
+	<div class="observation thumbwrap">
 			<obv:showObservationFilterMessage
 						model="['observationInstanceList':instanceList, 'observationInstanceTotal':instanceTotal, 'queryParams':queryParams, resultType:'trait']" />
 
@@ -39,13 +33,13 @@
                 </div>
             </div>
             <div class="span9 right-shadow-box" style="position: relative;height:388px;overflow-y: scroll;">
-                <g:render template="/observation/showTraitListTemplate" model="['displayAny':true, 'editable':false]"/>
+                <g:render template="showTraitListTemplate" model="['displayAny':true, 'editable':false]"/>
             </div>
         </div>
     </div>
 </div>
 <div class="row-fluid">
-    <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount,, resultType:'species', 'matchingAction':'matchingSpecies', loadListAction:'loadMatchingSpeciesList']"/>
+    <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount, resultType:'observations', 'matchingAction':'matchingObservations', loadListAction:'loadMatchingObservationsList']"/>
 </div>
 <script>
     var taxonRanks = [];
@@ -82,14 +76,14 @@
                 $(this).addClass('active btn-success');
             }
 
-            updateMatchingSpeciesTable();
+            updateMatchingObservationsTable();
             return false;
         });
 
         $('.list').on('updatedGallery', function() {
                 console.log('updatedGallery');
             initTraitFilterControls();
-            updateMatchingSpeciesTable();
+            updateMatchingObservationsTable();
             element = $('button[data-isNotObservation="false"]');
             $(element).each(function(){
                 $(this).attr("disabled", "disabled");
@@ -110,6 +104,8 @@
                 return false;
             });
         });
+        
+        updateMatchingObservationsTable();
     });
 
 $(document).ready(function() {

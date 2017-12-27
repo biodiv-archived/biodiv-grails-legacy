@@ -17,6 +17,7 @@ import speciespage.ObvUtilService;
 import species.License
 import species.trait.Fact;
 import species.trait.Trait;
+import groovy.sql.Sql
 
 class DataTable extends CollMetadata {
 	

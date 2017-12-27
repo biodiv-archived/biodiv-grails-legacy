@@ -44,24 +44,9 @@
                 </td>      
  
                 <g:each in="${columnNames}" var="cName">
-                    <g:if test="${cName[0].equalsIgnoreCase('http://rs.tdwg.org/dwc/terms/scientificName')}">
-                        <td class="nameColumn">
-                        <a href="${uGroup.createLink(action:'show', controller:'observation', id:dataObject.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"></a>
-                        <g:if test="${dataObject.maxVotedReco?.taxonConcept && dataObject.maxVotedReco.taxonConcept?.canonicalForm != null}">
-                        <a href="${uGroup.createLink(action:'show', controller:'species', id:dataObject.maxVotedReco.taxonConcept.findSpeciesId(), 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
-                            <i> ${dataObject.maxVotedReco.taxonConcept.canonicalForm}</i>
-                        </a>
-                        </g:if>
-                        <g:else>
-                        <i>${checklistAnnotations[cName[1]]}</i>
-                        </g:else>
-                        </td>
-                    </g:if>
-                    <g:else>
                     <td>
                         ${checklistAnnotations[cName[1]]?:''}
                     </td>
-                    </g:else>
                 </g:each>
            </tr>
             </g:each>	

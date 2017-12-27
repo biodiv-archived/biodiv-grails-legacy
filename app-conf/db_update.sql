@@ -857,3 +857,31 @@ alter table document add column data_table_id bigint references data_table(id);
 alter table data_table add column upload_log_id bigint references upload_log(id);
 alter table document add column date_accuracy varchar(100);
 update data_package set allowed_data_table_types='[0,1,2,3,4]' where allowed_data_table_types='[0,1,2,3,4,5]';
+
+alter table trait add column data_table_id bigint references data_table(id);
+alter table trait_value add column data_table_id bigint references data_table(id);
+alter table data_table add column trait_value_file_id bigint;
+
+
+#27 Dec 2017
+alter table observation add column traits bigint[][];
+alter table observation alter column traits  type bigint[][] using traits::bigint[][];
+update observation set traits = g.item from (
+             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation') x group by x.object_id
+) g where g.object_id=id;
+
+
+CREATE INDEX observation_traits ON observation using gin(traits);
+
+alter table observation add column traits_json json;
+update observation set traits_json = g.item from (
+     select x1.object_id, format('{%s}', string_agg(x1.item,','))::json as item from (
+        (select x.object_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.object_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' ) x group by x.object_id)
+        union
+        (select x.object_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.object_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation') x group by x.object_id)
+        union
+        (select x.object_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.object_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation') x group by x.object_id)
+    ) x1 group by x1.object_id
+) g where g.object_id=id;
+
+

@@ -2000,4 +2000,94 @@ private printCacheEntries(cache) {
         }
         render m as JSON
     }
+
+    def traits() {
+        def model = getTraitsList(params);
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+        if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
+        else model.displayAny = true;
+        if(params.editable) model.editable = params.editable?.toBoolean();
+        else model.editable = false;
+        if(params.filterable) model.filterable = params.filterable?.toBoolean();
+        else model.filterable = true;
+        if(params.fromObservationShow) model.fromObservationShow = params.fromObservationShow;
+        if(params.ifOwns) model.ifOwns = params.ifOwns.toBoolean();
+        //HACK
+        if(params.trait) {
+            model.queryParams = ['trait':[:]];
+            params.trait.each { t,v ->
+                model.queryParams.trait[Long.parseLong(t)] = v
+            }
+        }
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.resultType = params.controller;
+            model.hackTohideTraits = true;
+            //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+            model['obvListHtml'] =  g.render(template:"/observation/showTraitListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model.remove('instanceList');
+        }
+
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+        withFormat {
+            html {
+                if(params.loadMore?.toBoolean()){
+                    render(template:"/observation/showTraitsListTemplate", model:model.model);
+                    return;
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    model.model.hackTohideTraits = true;
+                    model.model['width'] = 300;
+                    model.model['height'] = 200;
+                    render (view:"traits", model:model.model)
+                    return;
+                } else {
+
+                    return;
+                }
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
+    }
+
+    protected def getTraitsList(params) {
+        try { 
+            params.max = params.max?Integer.parseInt(params.max.toString()):100;
+        } catch(NumberFormatException e) { 
+            params.max = 100;
+        }
+
+        try { 
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
+        } catch(NumberFormatException e) { 
+            params.offset = 0 
+        }
+
+        def max = Math.min(params.max ? params.int('max') : 100, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        params.isObservationTrait = true;
+
+        def filteredList = traitService.getFilteredList(params, max, offset)
+        def instanceList = filteredList.instanceList
+
+        def queryParams = filteredList.queryParams
+        def activeFilters = filteredList.activeFilters
+        def count = filteredList.instanceTotal	
+
+        activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
+
+        if(params.append?.toBoolean() && session["${params.controller}_ids_list"]) {
+            session["${params.controller}_ids_list"].addAll(instanceList.collect {
+                params.fetchField?it[0]:it.id
+            }); 
+        } else {
+            session["${params.controller}_ids_list_params"] = params.clone();
+            session["${params.controller}_ids_list"] = instanceList.collect {
+                params.fetchField?it[0]:it.id
+            };
+        }
+        log.debug "Storing all ${params.controller} ids list in session ${session[params.controller+'_ids_list']} for params ${params}";
+        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:params.controller, 'factInstance':filteredList.traitFactMap, instance:filteredList.object, numericTraitMinMax:filteredList.numericTraitMinMax];
+    }
+
 }
