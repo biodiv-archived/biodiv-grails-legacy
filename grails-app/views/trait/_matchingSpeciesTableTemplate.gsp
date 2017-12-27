@@ -35,6 +35,7 @@
                 </div>
                 </g:else>
             </td>
+            <td>${r[8]}</td>
         </tr>
         </g:each>
     </tbody>
