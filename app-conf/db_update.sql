@@ -866,6 +866,7 @@ alter table data_table add column trait_value_file_id bigint;
 #27 Dec 2017
 alter table observation add column traits bigint[][];
 alter table observation alter column traits  type bigint[][] using traits::bigint[][];
+ALTER TABLE observation DISABLE TRIGGER ALL ;
 update observation set traits = g.item from (
              select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation') x group by x.object_id
 ) g where g.object_id=id;
@@ -884,4 +885,7 @@ update observation set traits_json = g.item from (
     ) x1 group by x1.object_id
 ) g where g.object_id=id;
 
+ALTER TABLE observation ENABLE TRIGGER ALL ;
 
+
+alter table external_links add column frlht_url varchar;

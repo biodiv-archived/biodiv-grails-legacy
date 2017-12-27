@@ -76,14 +76,14 @@
                 $(this).addClass('active btn-success');
             }
 
-            updateMatchingObservationsTable();
+            updateMatchingSpeciesTable();
             return false;
         });
 
         $('.list').on('updatedGallery', function() {
                 console.log('updatedGallery');
             initTraitFilterControls();
-            updateMatchingObservationsTable();
+            updateMatchingSpeciesTable();
             element = $('button[data-isNotObservation="false"]');
             $(element).each(function(){
                 $(this).attr("disabled", "disabled");
@@ -105,7 +105,7 @@
             });
         });
         
-        updateMatchingObservationsTable();
+        updateMatchingSpeciesTable();
     });
 
 $(document).ready(function() {

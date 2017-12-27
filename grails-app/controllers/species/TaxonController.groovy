@@ -1021,7 +1021,7 @@ private List buildlistResult(rs,classSystem) {
                     TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(Long.parseLong(row.get('taxon id')));
                     if(taxonConcept) {
                         println taxonConcept.id+" - "+row.get('link');
-                        externalLinksService.updateExternalLink(taxonConcept, "frlht", row.get('link'), false, new Date());
+                        externalLinksService.updateExternalLink(taxonConcept, "fishbase", row.get('link'), false, new Date());
                     }
                     } catch(e) {
                         e.printStackTrace();
