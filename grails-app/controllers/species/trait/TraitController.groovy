@@ -366,7 +366,7 @@ println "===================+"
             params.action = 'list';
             result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
 
-            if(result.matchingSpeciesList.size() > 0) {
+            if(result.matchingList.size() > 0) {
                 result.putAll([status:'success', msg:'success']);
             } else {
                 def message = "";
@@ -397,6 +397,21 @@ println "===================+"
 
     def matchingObservations() {
         Map result = [:];
+        try { 
+            params.max = params.max?Integer.parseInt(params.max.toString()):10;
+        } catch(NumberFormatException e) { 
+            params.max = 100;
+        }
+
+        try { 
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
+        } catch(NumberFormatException e) { 
+            params.offset = 0 
+        }
+
+        def max = Math.min(params.max ? params.int('max') : 10, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        
         try {
             result = observationService.getMatchingObservationsList(params);
             result.resultType = 'observations';
@@ -406,7 +421,7 @@ println "===================+"
             params.action = 'list';
             result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
 
-            if(result.matchingSpeciesList.size() > 0) {
+            if(result.matchingList.size() > 0) {
                 result.putAll([status:'success', msg:'success']);
             } else {
                 def message = "";
