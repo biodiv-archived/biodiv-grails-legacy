@@ -43,7 +43,7 @@
                 <ul>
                   <li><a href="${uGroup.createLink('controller':'species', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.speciesPage.label')}"><g:message code="default.speciesPage.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'namelist', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.taxonNamelist.label')}"><g:message code="default.taxonNamelist.label" /></a></li>
-                  <li><a href="${uGroup.createLink('controller':'trait', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.speciesTrait.label')}"><g:message code="default.speciesTrait.label" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'species', action:'traits', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.speciesTrait.label')}"><g:message code="default.speciesTrait.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'dataTable', 'action':'list', params:['type':'species'], 'userGroup':userGroupInstance)}" title="${g.message(code:'default.dataTables.label')}"><g:message code="default.dataTables.label" /></a></li>
                 </ul>
               </li>
@@ -64,6 +64,7 @@
                 <ul>
                   <li><a href="${uGroup.createLink('controller':'observation', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'checklist', 'userGroup':userGroupInstance)}" title="${g.message(code:'heading.browse.checklists')}"><g:message code="heading.browse.checklists" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'observation', 'action':'traits', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observationTrait.label')}"><g:message code="default.observationTrait.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'dataTable', 'action':'list', params:['type':'observations'], 'userGroup':userGroupInstance)}" title="${g.message(code:'default.dataTables.label')}"><g:message code="default.dataTables.label" /></a></li>
                   <!--li><a href="${uGroup.createLink('controller':'dataset', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasets.label')}"><g:message code="default.datasets.label" /></a></li-->
                   <!--li><a href="${uGroup.createLink('controller':'datasource', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasource.label')}"><g:message code="default.datasource.label" /></a></li-->

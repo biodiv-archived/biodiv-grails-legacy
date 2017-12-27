@@ -1650,6 +1650,26 @@ println "*******************************************"
             queryParams['trait'] = params.trait;
 
         }
+        
+        if(params.otrait){
+            traitQuery = getTraitQuery(params.otrait);
+            traitQuery.filterQuery = traitQuery.filterQuery.replaceAll("t.traits","obv.traits");
+            traitQuery.orderQuery = traitQuery.orderQuery.replaceAll("t.traits","obv.traits");
+            filterQuery += traitQuery['filterQuery'];
+            orderByClause += traitQuery['orderQuery'];
+            def classification;
+            if(params.classification)
+                classification = Classification.read(Long.parseLong(params.classification));
+            if(!classification)
+                classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+            queryParams['classification'] = classification.id;
+            activeFilters['classification'] = classification.id
+
+            //filterQuery += " and reg.classification_id = :classification";
+            queryParams['otrait'] = params.otrait;
+
+        }
 
         String checklistObvCond = ""
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()) {
@@ -3072,50 +3092,43 @@ println "*******************************************"
         return finalInstanceResult
     }
 
-/*
-    boolean factUpdate(params){
-        println "================="+params
-        def observationInstance = Observation.findById(params.observation);
-        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
-        traitParams.putAll(getTraits(params.traits));
-        Trait trait;
-        TraitValue traitValue;
-        def factInstance;
-        traitParams.each { key, value ->
-                    if(!value) {
-                        return;
-                    }
-                    key = key.trim();
-                    value = value ? value.trim() : null ;
+    def getMatchingObservationsList(params) {
+        params.otrait = params.remove('trait')
+        def result = getFilteredObservations(params, params.int('max'), params.int('offset'));
+        def matchingObservationsList = [];
+        result.observationInstanceList.each {it->
+            String link = utilsService.createHardLink("observation", "show", it.id);
+            def mainImage = it.mainImage();
+            String imagePath = '';
+            List factInstances = Fact.findAllByObjectIdAndObjectType(it.id, it.class.canonicalName);
+            //println "fact Instance"+factInstance?.traitValue?.icon
+            def speciesGroupIcon =  it.group.icon(ImageType.ORIGINAL)
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
 
-                    switch(key) {
-                        case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
-                        default :
-                        trait=Trait.findById(key);
-                        traitValue = TraitValue.findByTraitAndValueIlike(trait, value.trim());
-                        factInstance=Fact.findByIdAndTrait(params.factId,trait);
-
-                    }
+            List traitIcons = [];
+            factInstances?.each { f ->
+                if(f.traitValue) { 
+                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                } else if(f.value && f.toValue) {
+                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                } else if(f.fromDate && f.toDate) {
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                } else if(f.value) {
+                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
                 }
+            }
 
-                if(!factInstance){factInstance = new Fact();}
-                        factInstance.trait = trait
-                        factInstance.traitValue = traitValue;
-                        factInstance.objectId = observationInstance.id
-                        factInstance.attribution = traitParams['attribution'];
-                        factInstance.contributor = traitParams['contributor'] ? SUser.findByEmail(traitParams['contributor']?.trim()) : null;
-                        factInstance.license = traitParams['license']? License.findByName(License.fetchLicenseType(traitParams['license'].trim())) : null;
-                        factInstance.objectType = observationInstance.class.getCanonicalName();
-
-                if(!factInstance.hasErrors() && !factInstance.save()) {
-                    println "Error in Fact upudate"
-                    factInstance.errors.allErrors.each {println it }
-                    return false;
-                } else {
-                    println "Successfully updated fact";
-                    return true;
-                }
-               // factService.updateFacts(traitParams, observationInstance);
+            if(params.downloadFrom == 'matchingSpecies') {
+                //HACK: request not available as its from job scheduler
+                matchingObservationsList << [it.id, it.title(), true, 0, link, imagePath, traitIcons]
+            } else {
+                matchingObservationsList << [it.id, it.title(), true, 0, link, imagePath,  params.user, traitIcons]
+            }
+        }
+println result;
+        return [matchingSpeciesList:matchingObservationsList, totalCount:result.allObservationCount, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
     }
-*/
 }
