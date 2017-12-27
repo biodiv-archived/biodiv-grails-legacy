@@ -891,4 +891,4 @@ update observation set traits_json = g.item from (
 ALTER TABLE observation ENABLE TRIGGER ALL ;
 
 
-alter table external_links add column frlht_url varchar;
+alter table external_links add column fishbase_url varchar;
