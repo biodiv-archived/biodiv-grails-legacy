@@ -93,7 +93,7 @@ function loadMatchingList($matchingTable, matchingListUrl) {
                     //$.each(imagepath,function(index1,item1){ alert(item1); });
                     //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
-                    $matchingTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
+                    $matchingTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td>'+(item[8]?'<td>'+item[8]+'</td>':'')+'</tr>');
                     $('#imagediv_'+item[0]).empty();
                     $.each(imagepath,function(index1,item1){ 
                         $('#imagediv_'+item[0]).append(showIcon(item1[0], item1[1], item1[2], item1[3]));
