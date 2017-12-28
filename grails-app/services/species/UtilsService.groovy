@@ -19,6 +19,7 @@ import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.apache.commons.lang.time.DateUtils;
+import species.dataset.DataTable;
 
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
@@ -943,6 +944,10 @@ class UtilsService {
             return "checklist"
         } else if(domainObj.instanceOf(SUser)){
             return "user"
+        } else if(domainObj.instanceOf(UserGroup)){
+            return "userGroup"
+        } else if(domainObj.instanceOf(DataTable)){
+            return "dataTable"
         } else {
             return domainObj.class.getSimpleName().toLowerCase()
         }
