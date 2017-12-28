@@ -819,7 +819,7 @@ function getSelectedTrait($traitFilter, putValue) {
     });
 
     //hack for trait show default selection
-    if($('input[data-tid]').length == 1 &&  !selTrait[$('input[data-tid]').attr('data-tid')]) {
+    if($('input[data-tid]').length == 1 &&  !selTrait[$('input[data-tid]').attr('data-tid')] && !$('input[data-tid]').hasClass('RANGE')) {
             //is from trait show page
             selTrait[$('input[data-tid]').attr('data-tid')] = 'any,';
         };

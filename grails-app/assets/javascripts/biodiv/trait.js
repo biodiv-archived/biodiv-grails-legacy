@@ -93,7 +93,7 @@ function loadMatchingList($matchingTable, matchingListUrl) {
                     //$.each(imagepath,function(index1,item1){ alert(item1); });
                     //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
-                    $matchingTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td>'+(item[8]?'<td>'+item[8]+'</td>':'')+'</tr>');
+                    $matchingTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td>'+(item[8] != undefined?'<td><a href='+item[9]+'>'+item[8]+'</a></td>':'')+'</tr>');
                     $('#imagediv_'+item[0]).empty();
                     $.each(imagepath,function(index1,item1){ 
                         $('#imagediv_'+item[0]).append(showIcon(item1[0], item1[1], item1[2], item1[3]));
@@ -220,11 +220,33 @@ function initTraits() {
         $(this).addClass('active btn-success')
         updateMatchingSpeciesTable();
         return false;
-    })
+    });
 }
 
 var startFlag = 0;
 function initTraitFilterControls() {
+
+    $('.trait button, .trait .all, .trait .any, .trait .none, .listFilter').unbind('click').click(function(){
+        var wasActive = $(this).hasClass('active btn-success');
+
+        if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+            $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+            if($(this).hasClass('btn-success')) 
+                $(this).removeClass('active btn-success');
+            else
+                $(this).addClass('active btn-success');
+        } else {
+            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+            if(wasActive) 
+                $(this).removeClass('active btn-success');
+            else
+                $(this).addClass('active btn-success');
+        }
+
+        updateMatchingSpeciesTable();
+        return false;
+    });
+
     $('.trait_range_slider').ionRangeSlider({
         grid:'true',
         onChange:function(data) {
