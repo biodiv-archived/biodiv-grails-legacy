@@ -489,6 +489,9 @@ class AbstractObjectService {
         if(andTraitLT) {
             traitQuery = " and t.traits @> cast(ARRAY[ "
             andTraitLT.each { traitId, traitValueId ->
+                //for cases as trait.8= .. ie., with no value 
+                if(!traitValueId) return;
+
                 Trait t = Trait.read(Long.parseLong(traitId));
                 String[] values;
                 if(t.dataTypes == DataTypes.COLOR) {
@@ -524,7 +527,9 @@ class AbstractObjectService {
                             traitJsonQuery += " and cast(traits_json#>>'{${traitId},r}' as integer) is not null "
                             orderQuery += " (sqrt(power(${range[0]} - cast(traits_json#>>'{${traitId},r}' as integer), 2) + power(${range[1]} - cast(traits_json#>>'{${traitId},g}' as integer), 2) + power(${range[2]} - cast(traits_json#>>'{${traitId},b}' as integer), 2))), ";
                     } else {
-                        traitQuery += "[${traitId}, ${tvId}],";
+                        if(traitId && tvId) {
+                            traitQuery += "[${traitId}, ${tvId}],";
+                        }
                     } 
                 }
             }
