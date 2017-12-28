@@ -1017,6 +1017,8 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
                 if(decodeURIComponent(tvStr[i]) != kv[1]) params[kv[0]] += tvStr[i]+',';
             }
             params[kv[0]] = params[kv[0]].substring(0,params[kv[0]].length-1);
+            if(params[kv[0]] == '') 
+                delete params[kv[0]];
         } else {
             delete params[removeParam];
         }
