@@ -2520,11 +2520,12 @@ def checking(){
                 }
             }
 
+            String obvLink = utilsService.userGroupBasedLink([controller:"observation", action:"list", params:[taxon:it.taxonConcept.id]]);
             if(params.downloadFrom == 'matchingspecies') {
                 //HACK: request not available as its from job scheduler
                 matchingList << [it.id, it.title, true, 0, link, imagePath, traitIcons, it.fetchOccurrence()]
             } else {
-                matchingList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons, it.fetchOccurrence()]
+                matchingList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons, it.fetchOccurrence(), obvLink]
             }
         }
         return [matchingList:matchingList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];

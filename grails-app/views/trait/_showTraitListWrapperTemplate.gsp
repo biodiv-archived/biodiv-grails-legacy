@@ -67,49 +67,11 @@
         
         $('.taxonomyBrowser').taxonhierarchy(taxonBrowserOptions);	
         
-        $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none, .listFilter', function(){
-            if($(this).hasClass('active')){
-            return false;
-            }
-            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
-                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
-                if($(this).hasClass('btn-success')) 
-                    $(this).removeClass('active btn-success');
-                else
-                    $(this).addClass('active btn-success');
-            } else {
-                $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-                $(this).addClass('active btn-success');
-            }
-
-            updateMatchingSpeciesTable();
-            return false;
-        });
-
         $('.list').on('updatedGallery', function() {
-                console.log('updatedGallery');
-            initTraitFilterControls();
-            updateMatchingSpeciesTable();
-            element = $('button[data-isNotObservation="false"]');
-            $(element).each(function(){
-                $(this).attr("disabled", "disabled");
-            });
-
-            $('.listFilter').on('click',function(){
-                var element = {};
-                element = $('div[data-isNotObservation]');
-                $(element).each(function(){
-                    $(this).parent().parent().show();
-                });
-                if($(this).hasClass('active')){
-                    return false;
-                }
-                $(this).parent().find('.listFilter').removeClass('active btn-success');
-                $(this).addClass('active btn-success')
-                updateMatchingSpeciesTable();
-                return false;
-            });
+            initTraits();
         });
+
+        initTraits();
     });
 
 $(document).ready(function() {

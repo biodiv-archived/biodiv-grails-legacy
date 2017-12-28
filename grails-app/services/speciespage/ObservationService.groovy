@@ -1659,8 +1659,8 @@ println "*******************************************"
         
         if(params.otrait){
             traitQuery = getTraitQuery(params.otrait);
-            traitQuery.filterQuery = traitQuery.filterQuery.replaceAll("t.traits","obv.traits");
-            traitQuery.orderQuery = traitQuery.orderQuery.replaceAll("t.traits","obv.traits");
+            traitQuery.filterQuery = traitQuery.filterQuery.replaceAll(" t.traits"," obv.traits");
+            traitQuery.orderQuery = traitQuery.orderQuery.replaceAll(" t.traits"," obv.traits");
             filterQuery += traitQuery['filterQuery'];
             orderByClause += traitQuery['orderQuery'];
             def classification;
