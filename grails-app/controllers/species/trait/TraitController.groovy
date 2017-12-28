@@ -363,8 +363,7 @@ println "===================+"
             result.hideId = true;
             result.instanceTotal = result.totalCount;//matchingSpeciesList.size();
             //result.totalCount = result.instanceTotal;
-            result.controller = 'species';
-            result.action = 'traits';
+            result.action = 'list';
             result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
 
             if(result.matchingList.size() > 0) {
@@ -419,7 +418,6 @@ println "===================+"
             result.hideId = true;
             result.instanceTotal = result.totalCount;//matchingSpeciesList.size();
             //result.totalCount = result.instanceTotal;
-            params.controller = 'observation'
             params.action = 'list';
             result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
 
