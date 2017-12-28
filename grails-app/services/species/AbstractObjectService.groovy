@@ -107,7 +107,7 @@ class AbstractObjectService {
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
                     boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist||(obv.hasProperty('dataset') && obv.dataset) ? null: iconBasePath, isChecklist|| ( obv.hasProperty('dataset') && obv.dataset) ? '.png' :null)//thumbnailUrl(iconBasePath)
+					item.imageLink = image.thumbnailUrl(isChecklist||(obv.hasProperty('dataTable') && obv.dataTable) ? null: iconBasePath, isChecklist|| ( obv.hasProperty('dataTable') && obv.dataTable) ? '.png' :null)//thumbnailUrl(iconBasePath)
 				} else if(image.type == ResourceType.VIDEO) {
 					item.imageLink = image.thumbnailUrl()
 				} else if(image.type == ResourceType.AUDIO) {
