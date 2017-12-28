@@ -347,6 +347,7 @@ class SpeciesController extends AbstractObjectController {
                     utilsService.benchmark('mapSpeciesInstanceFields') {
                         map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray,fieldFromName);
                     }
+                    println map
                     //def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
                     //def observationInstanceList = relatedObservations?.observations?.observation
                     //def instanceTotal = relatedObservations?relatedObservations.count:0

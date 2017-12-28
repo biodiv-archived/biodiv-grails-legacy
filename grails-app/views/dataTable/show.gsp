@@ -34,9 +34,7 @@
 
 
                                             <div class="pull-right">
-                                                <g:if test="${dataTableInstance}">
-                                                <sUser:ifOwns model="['user':dataTableInstance.uploader]">
- 
+
                                                 <g:if test="${dataTableInstance?.uFile}">
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                     href="#"
@@ -46,9 +44,10 @@
                                                 <input type="hidden" name="id" value="${dataTableInstance?.uFile?.id}">
                                                 </form>
                                                 </g:if>
-                                                </sUser:ifOwns>
-                                                </g:if>
-                                               
+                                        
+                                                <g:if test="${dataTableInstance}">
+                                                <sUser:ifOwns model="['user':dataTableInstance.uploader]">
+       
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'dataTable', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                                                     <i class="icon-edit"></i><g:message code="button.edit" /></a>
@@ -59,6 +58,9 @@
                                                 <form action="${uGroup.createLink(controller:'dataTable', action:'flagDeleted')}" method='POST' name='deleteForm'>
                                                     <input type="hidden" name="id" value="${dataTableInstance.id}" />
                                                 </form>
+                                                 </sUser:ifOwns>
+                                                </g:if>
+                                        
                                             </div>
  
                        <s:showHeadingAndSubHeading
