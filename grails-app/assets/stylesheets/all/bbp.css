@@ -139,9 +139,9 @@ html {
 	background-color: rgb(222, 239, 222);
 }
 
-.navbar .nav .active a, .navbar .nav .active a:hover, .navbar .nav .active a:focus {
+/*.navbar .nav .active a, .navbar .nav .active a:hover, .navbar .nav .active a:focus {
 	background-color: rgb(255, 227, 209);
-}
+}*/
 
 /*#ibp-footer  {
 	background-color: rgb(244, 233, 201);
@@ -186,9 +186,9 @@ html {
 	height:32px;
 }
 
-.navbar .nav .active a, .navbar .nav .active a:hover, .navbar .nav .active a:focus {
+/*.navbar .nav .active a, .navbar .nav .active a:hover, .navbar .nav .active a:focus {
 	background-color: #B2CC80;
-}
+}*/
 
 .logo  {
 	height: 110px;
