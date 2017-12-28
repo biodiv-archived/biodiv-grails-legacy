@@ -81,31 +81,10 @@
         });
 
         $('.list').on('updatedGallery', function() {
-                console.log('updatedGallery');
-            initTraitFilterControls();
-            updateMatchingSpeciesTable();
-            element = $('button[data-isNotObservation="false"]');
-            $(element).each(function(){
-                $(this).attr("disabled", "disabled");
-            });
-
-            $('.listFilter').on('click',function(){
-                var element = {};
-                element = $('div[data-isNotObservation]');
-                $(element).each(function(){
-                    $(this).parent().parent().show();
-                });
-                if($(this).hasClass('active')){
-                    return false;
-                }
-                $(this).parent().find('.listFilter').removeClass('active btn-success');
-                $(this).addClass('active btn-success')
-                updateMatchingSpeciesTable();
-                return false;
-            });
+            initTraits();
         });
-        
-        updateMatchingSpeciesTable();
+
+        initTraits();
     });
 
 $(document).ready(function() {
