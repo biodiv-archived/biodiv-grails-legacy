@@ -941,7 +941,7 @@ function getSelectedAllChecklistFlag() {
 function getSelectedMedia() {
     var media = ''; 
     media = $("#observationMediaFilter").attr('value');
-    if(media) {
+    if(media && media != "false") {
         media = media.replace(/\s*\,\s*$/,'');
         return media;
     }	

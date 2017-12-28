@@ -329,7 +329,7 @@ def contact_me_text=g.message(code:'button.contact.me')
                                     String description = it.notes
                                     %>
                                    <li style="float: left; list-style: none; width:876px; border: 1px solid #CECECE; background-color: #FFF; border-radius:7px;">
-                                              <g:render template="/species/showSpeciesDocumentTemplate" model="[controller:'document',documentInstance:it,showFeatured:true,showDetails:false, docTitle:docTitle, desc:description]" />
+                                              <g:render template="/species/showSpeciesDocumentTemplate" model="[controller:'document',documentInstance:it,showFeatured:true,showDetails:false, docId:documentId, docTitle:docTitle, desc:description]" />
                                     </li>
                                 <% } %>
                         </ul>
