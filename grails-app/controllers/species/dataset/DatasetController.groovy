@@ -285,12 +285,13 @@ class DatasetController extends AbstractObjectController {
             dataTableInstance = DataTable.read(params.long('dataTableId'));
         } else {
             dataTableInstance = new DataTable()
+            if(datasetInstance) {
+                dataTableInstance.dataset = datasetInstance;
+                dataTableInstance.properties = datasetInstance.properties;
+                dataTableInstance.uFile = null;
+            }
         }
-        if(datasetInstance) {
-            dataTableInstance.dataset = datasetInstance;
-            dataTableInstance.properties = datasetInstance.properties;
-            dataTableInstance.uFile = null;
-        } else {
+        if(!datasetInstance) {
             datasetInstance = new Dataset1();
             datasetInstance.dataPackage = DataPackage.findByTitle('Checklist');
             dataTableInstance.dataset = datasetInstance;
