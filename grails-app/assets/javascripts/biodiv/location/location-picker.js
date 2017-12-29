@@ -39,9 +39,9 @@ function loadMapInput(geotaggedImages=undefined) {
             if(window.params.controller == 'checklist'||window.params.controller == 'dataset' || window.params.controller == 'dataTable'){
                 drawControls = {
                     rectangle:true,
-                    polygon:true,
-                    polyline:true,
-                    marker:false
+                    polygon:false,
+                    polyline:false,
+                    marker:true
                 }
 
                 editControls = {featureGroup: new L.FeatureGroup()}
