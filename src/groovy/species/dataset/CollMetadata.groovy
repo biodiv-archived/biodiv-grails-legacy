@@ -174,17 +174,17 @@ abstract class CollMetadata implements Taggable, Rateable {
                 this.geographicalCoverage.topology = params.topology;
             }
             else {
-            params.areas = params.areas?:params.topology;
-            if(params.areas) {
-                log.debug "Setting topology ${params.areas}"
-                WKTReader wkt = new WKTReader(geometryFactory);
-                try {
-                    Geometry geom = wkt.read(params.areas);
-                    this.geographicalCoverage.topology = geom;
-                } catch(ParseException e) {
-                    log.error "Error parsing polygon wkt : ${params.areas}"
+                params.areas = params.areas?:params.topology;
+                if(params.areas) {
+                    log.debug "Setting topology ${params.areas}"
+                    WKTReader wkt = new WKTReader(geometryFactory);
+                    try {
+                        Geometry geom = wkt.read(params.areas);
+                        this.geographicalCoverage.topology = geom;
+                    } catch(ParseException e) {
+                        log.error "Error parsing polygon wkt : ${params.areas}"
+                    }
                 }
-            }
             }
         }
 
