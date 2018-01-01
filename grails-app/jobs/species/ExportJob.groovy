@@ -51,6 +51,7 @@ class ExportJob {
                     case TAXONOMY_DEFINITION:
                         log.info "Initiating taxon definition names list export."
                         f = namelistService.export(dl.fetchMapFromText(), dl);
+                        break;
                     case "Matching species":
                         log.info "Initiating matching species list export."
                         f = speciesService.exportMatchingSpeciesList(dl.fetchMapFromText(), dl);

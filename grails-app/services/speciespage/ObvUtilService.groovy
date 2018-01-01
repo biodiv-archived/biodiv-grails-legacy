@@ -707,7 +707,10 @@ class ObvUtilService {
         obvParams['locale_language'] = utilsService.getCurrentLanguage();
 		
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        println "populating topology"
+        println "${obvParams.topology}"
         if(!obvParams.topology && obvParams.latitude && obvParams.longitude) {
+            println "constructing areas from lat lng ${obvParams.latitude}"
             obvParams.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(obvParams.longitude?.toFloat(), obvParams.latitude?.toFloat())));
         } 
 
