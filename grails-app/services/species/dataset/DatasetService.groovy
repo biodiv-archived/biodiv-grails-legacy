@@ -103,9 +103,9 @@ class DatasetService extends AbstractMetadataService {
     def obvUtilService;
     def observationService;
     def observationsSearchService;
-    def datasourceService;
     def dataSource;
     def grailsApplication;
+    def dataTableService;
 
     Dataset1 create(params) {
         //return super.create(Dataset.class, params);
@@ -368,7 +368,7 @@ class DatasetService extends AbstractMetadataService {
             messageCode = 'default.not.found.message'
         } else {
             try {
-                def datasetInstance = Dataset.get(params.id.toLong())
+                def datasetInstance = Dataset1.get(params.id.toLong())
                 if (datasetInstance) {
                     //datasetInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
@@ -377,10 +377,10 @@ class DatasetService extends AbstractMetadataService {
                         try {
                             datasetInstance.isDeleted = true;
 
-                            Observation.findAllByDataset(datasetInstance).each {
-                                it.isDeleted = true; 
-                                if(!it.save(flush:true)){
-                                    it.errors.allErrors.each { log.error it } 
+                            DataTable.findAllByDataset(datasetInstance).each {
+                                Map r = dataTableService.delete(['id':it.id])
+                                r.errors.each {
+                                    errors << it;
                                 }
                             }
 
