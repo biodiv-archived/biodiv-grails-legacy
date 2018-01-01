@@ -2541,7 +2541,7 @@ def checking(){
         params.offset = params.offset + BATCH_SIZE
         while(params.offset <= totalCount) {
             Observation.withNewTransaction {
-                completeResult.addAll(getiMatchingSpeciesList(params).matchingList);
+                completeResult.addAll(getMatchingSpeciesList(params).matchingList);
                 params.offset = params.offset + BATCH_SIZE
             }
         }

@@ -4,6 +4,9 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 <%@page import="species.auth.SUser"%>
+<% 
+int instanceCount = datasetInstance.countByDataTable();
+%>
 
 <div name="${datasetInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%">
    <g:if test="${showFeatured}">
@@ -26,7 +29,7 @@
                 <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
 
                 <div class="value">
-                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title}</b></a>
+                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title} (${instanceCount} Datatables)</b></a>
                 </div>
             </div>
         </g:if>
