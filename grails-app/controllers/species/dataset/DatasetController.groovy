@@ -249,6 +249,14 @@ class DatasetController extends AbstractObjectController {
     }
 
     @Secured(['ROLE_ADMIN'])
+	def flagDeleted() {
+        println "00000000000000000000000000";
+		def result = datasetService.delete(params)
+		flash.message = result.message
+		redirect (url:result.url)
+	}
+
+    @Secured(['ROLE_ADMIN'])
 	def delete() {
 		def result = datasetService.delete(params)
         result.remove('url')

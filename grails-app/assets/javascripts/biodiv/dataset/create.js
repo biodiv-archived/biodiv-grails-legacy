@@ -1,6 +1,8 @@
 var dataset_contributor_autofillUsersComp;
-function dataPackageChangedForDataset(dataPackageId) {
+function dataPackageChangedForDataset(event, dataPackageId) {
     console.log(dataPackageId);
+    event.preventDefault();
+    if(CKEDITOR.instances.description)  CKEDITOR.instances.description.destroy();
     if(dataPackageId != "null") {
         $.ajax({
             url:'/dataset/dataPackageChangedForDataset',
@@ -9,15 +11,16 @@ function dataPackageChangedForDataset(dataPackageId) {
             success:function(data,textStatus){
                 $('#datasetEditSection').html(data);
                 initObservationCreate();
+                intializesSpeciesHabitatInterest();
                 initLocationPicker();
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
                 CKEDITOR.replace('description', config);
                 dataset_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
                     usersUrl : window.params.userTermsUrl
                 });
-                intializesSpeciesHabitatInterest();
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
+                console.log('error onDatasetClick');
             }
         });
     }

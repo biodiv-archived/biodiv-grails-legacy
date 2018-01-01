@@ -127,7 +127,7 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
     $("#myGrid").html(el);
     $("#gridSection").show();
     $('.mapColumns').multiselect({
-        nonSelectedText: "Select Mapping",
+        nonSelectedText: "Mark Columns",
         maxHeight:300,
         buttonWidth:200,
         enableCaseInsensitiveFiltering: false,

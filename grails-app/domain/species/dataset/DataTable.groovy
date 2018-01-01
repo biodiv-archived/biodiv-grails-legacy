@@ -105,7 +105,7 @@ class DataTable extends CollMetadata {
 
         //geographical coverage
         paramsToPropagate[ObvUtilService.LOCATION] = dataTable.geographicalCoverage.placeName;
-        paramsToPropagate[ObvUtilService.TOPOLOGY] = dataTable.geographicalCoverage.topology;
+        //paramsToPropagate[ObvUtilService.TOPOLOGY] = dataTable.geographicalCoverage.topology;
         paramsToPropagate[ObvUtilService.LATITUDE] = dataTable.geographicalCoverage.latitude;
         paramsToPropagate[ObvUtilService.LONGITUDE] = dataTable.geographicalCoverage.longitude;
         paramsToPropagate[ObvUtilService.LOCATION_SCALE] = dataTable.geographicalCoverage.locationScale;

@@ -52,10 +52,14 @@
                                 href="${uGroup.createLink(controller:'dataset', action:'edit', id:datasetInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                                 <i class="icon-edit"></i><g:message code="button.edit" /></a>
 
-                            <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataset', action:'flagDeleted', id:datasetInstance.id)}"
-                                onclick="return confirm('${message(code: 'default.dataset.delete.confirm.message', default: 'This dataset will be deleted. Are you sure ?')}');"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+                                                <a class="btn btn-danger btn-primary pull-right" style="margin-right: 5px;"
+                                                    href="#"
+                                                    onclick="return deleteDataset();"><i class="icon-trash"></i><g:message code="button.delete" /></a>
+                                                <form action="${uGroup.createLink(controller:'dataset', action:'flagDeleted')}" method='POST' name='deleteForm'>
 
+                                                    <input type="hidden" name="id" value="${datasetInstance.id}" />
+                                                </form>
+ 
                             </sUser:ifOwns>
 
                         </div>
@@ -91,5 +95,19 @@
 
             </div>	
         </div>
+
+            <asset:script>
+            $(document).ready(function(){
+
+            });
+            function deleteDataset(){
+                var test="${message(code: 'default.delete.confirm.message', args:['dataset'])}";
+
+                if(confirm(test)){
+                    document.forms.deleteForm.submit();
+                }
+            }
+
+            </asset:script>
     </body>
 </html>
