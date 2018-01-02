@@ -38,6 +38,8 @@ import species.groups.CustomField;
 import species.participation.Featured;
 import species.dataset.DataPackage.SupportingModules;
 
+import species.groups.UserGroup.FilterRule;
+
 /**
  * @author sravanthi
  *
@@ -268,5 +270,31 @@ println params.fromDate
 		return commentService.getCount(null, this, null, null)
 	}
 
+    boolean isUserGroupValidForPosting(UserGroup userGroup) {
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        List<FilterRule> filterRule = userGroup.getFilterRules();
+        boolean isValid = true;
+        filterRule.each { fRule ->
+            switch(fRule.fieldName) {
+                case 'topology' : 
+                if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
+                    isValid = isValid && fRule.ruleValues[0].covers(this.geographicalCoverage.topology);
+                }
+                break;
+                case 'taxon' : 
+                if(fRule.ruleName.equalsIgnoreCase('scope')) {
+                    //isValid = fRule.ruleValues[0].covers(instance[fRule.fieldName]);
+                }
+                break;
+            }
+        }
+        return isValid;
+    }
 }
 

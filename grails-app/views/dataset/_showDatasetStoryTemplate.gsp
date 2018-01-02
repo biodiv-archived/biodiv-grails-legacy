@@ -35,38 +35,6 @@ int instanceCount = datasetInstance.countByDataTable();
         </g:if>
 
 
-
-        <g:if test="${datasetInstance.description}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
-                        <div class="value notes_view"> 
-                        <%  def styleVar = 'block';
-                            def clickcontentVar = '' 
-                        %> 
-                            <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
-                                <%  
-                                    styleVar = "none"
-                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
-                                %>
-                            </g:if>
-                            <g:else>
- <%                           clickcontentVar = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%>
-                            </g:else>
-                            ${raw(clickcontentVar)}
-                    
-                        </div>
-                   </g:if>
-                    <g:else>
-                    <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
-                    <div class="value notes_view linktext ellipsis multiline">
-                        ${raw(desc)}
-                    </div>
-
-                    </g:else>
-                </div>
-        </g:if>
-
    
         <g:if test="${showDetails}">
                 <div class="prop">
@@ -124,7 +92,23 @@ int instanceCount = datasetInstance.countByDataTable();
                     </div>
                 </div>
                 </g:if>
-               
+  
+                <g:if test="${datasetInstance.party?.attributions}">
+                <div class="prop" >
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.attribution.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-info-sign"></i>
+                    </g:else>
+                    <div class="value linktext">
+                        ${datasetInstance.party.attributions}
+                    </div>
+                </div>
+                </g:if>
+ 
+
+              
                 <g:if test="${datasetInstance.customFields}">
                 <g:each in="${datasetInstance.fetchCustomFields()}" var="${cf}">
                 <g:each in="${cf}" var="${cfv}">
@@ -144,10 +128,50 @@ int instanceCount = datasetInstance.countByDataTable();
                 </g:each>
                 </g:if>
 
-                
+         <g:if test="${datasetInstance.description}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.summary.label" /></span>
+                        <div class="value notes_view"> 
+                        <%  def styleVar = 'block';
+                            def clickcontentVar = '' 
+                        %> 
+                            <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
+                                <%  
+                                    styleVar = "none"
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
+                                %>
+                            </g:if>
+                            <g:else>
+ <%                           clickcontentVar = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%>
+                            </g:else>
+                            ${raw(clickcontentVar)}
+                    
+                        </div>
+                   </g:if>
+                    <g:else>
+                    <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
+                    <div class="value notes_view linktext ellipsis multiline">
+                        ${raw(desc)}
+                    </div>
+
+                    </g:else>
+                </div>
+        </g:if>
+
+               
                 
   
         </g:if>
+
+                <div class="row observation_footer" style="margin-left:0px;height:40px;">
+
+                    <div class="story-footer" style="right:3px;">
+                        <sUser:showUserTemplate
+                        model="['userInstance':datasetInstance.party.fetchContributor(), 'userGroup':userGroup]" />
+                    </div>
+                </div>
+
 
         </div>
         </g:else>

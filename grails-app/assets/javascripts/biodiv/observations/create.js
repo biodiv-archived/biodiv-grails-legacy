@@ -845,18 +845,18 @@ function initObservationCreate() {
     });
         
     if ($('input.dateAccuracy[type=radio][name=dateAccuracy]:checked').val() == 'UNKNOWN') {
-        $('.addDataTable input.date[name="fromDate"]').attr('disabled', 'disabled');
-        $('.addDataTable input.date[name="toDate"]').attr('disabled', 'disabled');
+        $('.addDataTable input.date[name="fromDate"],#createDataset input.date[name="fromDate"]').attr('disabled', 'disabled');
+        $('.addDataTable input.date[name="toDate"],#createDataset input.date[name="toDate"]').attr('disabled', 'disabled');
     } else {
-        $('.addDataTable input.date').removeAttr('disabled');
+        $('.addDataTable input.date,#createDataset input.date').removeAttr('disabled');
     }
 
     $('input.dateAccuracy[type=radio][name=dateAccuracy]').change(function() {
         if (this.value == 'UNKNOWN') {
-            $('.addDataTable input.date[name="fromDate"]').attr('disabled', 'disabled');
-            $('.addDataTable input.date[name="toDate"]').attr('disabled', 'disabled');
+            $('.addDataTable input.date[name="fromDate"],#createDataset input.date[name="fromDate"]').attr('disabled', 'disabled');
+            $('.addDataTable input.date[name="toDate"],#createDataset input.date[name="toDate"]').attr('disabled', 'disabled');
         } else {
-            $('.addDataTable input.date').removeAttr('disabled');
+            $('.addDataTable input.date,#createDataset input.date').removeAttr('disabled');
         }
     });
 }

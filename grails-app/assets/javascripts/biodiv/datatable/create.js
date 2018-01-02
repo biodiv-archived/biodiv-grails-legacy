@@ -22,6 +22,14 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                 var contributorName = $('#contributorUserIds').data('contributorname'); 
                 if(contributorId != '' )
                     dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
+
+                $('.addDataTable #speciesGroupFilter button').click(function(e){
+                    console.log('speciesGroupFilter button click');
+                    e.preventDefault();
+                    loadSpeciesGroupTraits();
+                    showSampleDataTable();
+                    return false;
+                });
                 loadSpeciesGroupTraits();
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
@@ -224,13 +232,6 @@ function getSpeciesUploadParams() {
 
 $(document).ready(function() {	
 
-    $(document).on('click', '.addDataTable #speciesGroupFilter button', function(e){
-        console.log('speciesGroupFilter button click');
-        e.preventDefault();
-        loadSpeciesGroupTraits();
-        showSampleDataTable();
-        return false;
-    });
 
     $(document).on('click', "#createDataTableSubmit", function(){
         if($(this).hasClass('disabled')) {
