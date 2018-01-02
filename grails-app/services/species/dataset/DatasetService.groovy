@@ -327,7 +327,7 @@ class DatasetService extends AbstractMetadataService {
                             println sGroupId;
                             def sGId = getSpeciesGroupIds(sGroupId);
                             if(sGId) {
-                                groupIdList << sGId;
+                                groupIdList << sGId+'';
                             }
                         }
                     } catch(NumberFormatException e) {
@@ -340,9 +340,9 @@ class DatasetService extends AbstractMetadataService {
             if(!groupIdList){
                 log.debug("No valid groups for id " + groupIdList);
                 }else{
-                    filterQuery += " and obv.taxonomicCoverage.groupId in (:sGroup) "
-                    queryParams["sGroup"] = groupIdList
-                    activeFilters["sGroup"] = groupIdList
+                    filterQuery += " and obv.taxonomicCoverage.groupIds like :sGroup "
+                    queryParams["sGroup"] = '%'+groupIdList[0]+'%'
+                    activeFilters["sGroup"] = groupIdList[0]
                 }
 
         }

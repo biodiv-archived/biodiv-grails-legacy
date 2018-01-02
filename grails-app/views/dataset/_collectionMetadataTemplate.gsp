@@ -27,7 +27,7 @@ if(supportingModules_dp) {
             code="default.title.label" default="${g.message(code:'default.title.label')}" />*</label>
         <div class="controls textbox">
             <div class="" style="z-index: 3;">
-                <g:textField name="title" value="${instance?.title}" placeholder="${g.message(code:'default.title.label')}"/>
+                <g:textField name="title"  class="input-block-level" value="${instance?.title}" placeholder="${g.message(code:'default.title.label')}"/>
                 <div class="help-inline">
                     <g:hasErrors bean="${instance}" field="title">
                     <g:eachError bean="${instance}" field="title">
