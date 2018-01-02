@@ -32,7 +32,7 @@
                 </g:each>
             </tr>
         </thead>
-        <tbody class="mainContentList rowlink">
+        <tbody data-link="row" class="mainContentList rowlink">
             <g:each in="${dataObjects}" var="dataObject">
             <%def checklistAnnotations = dataObject.fetchChecklistAnnotation();%>
             <tr class="mainContent">
@@ -70,6 +70,6 @@
 </div>
 <asset:script>
 $(document).ready(function() {
-    $('tbody.rowlink').rowlink()
+//    $('tbody.rowlink').rowlink()
 });
 </asset:script>

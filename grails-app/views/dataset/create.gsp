@@ -8,6 +8,11 @@
         <g:set var="title" value="${g.message(code:'dataset.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
+            textarea {
+            max-width:100%;
+            min-width:100%;
+            }
+
             .btn-group.open .dropdown-menu {
             top: 43px;
             }
@@ -27,7 +32,7 @@
 
             .textbox input {
             text-align: left;
-            width: 290px;
+            width: 99%;
             height: 34px;
             padding: 5px;
             }
@@ -72,11 +77,11 @@
             .userOrEmail-list {
             clear:none;
             }
-            /*#cke_description {
-            width: 100%;
-            min-width: 100%;
-            max-width: 100%;
-            }*/
+            #cke_description {
+            width: 98%;
+            min-width: 98%;
+            max-width: 98%;
+            }
             .section {
                 border:solid 1px lightgrey;
             }
@@ -136,7 +141,7 @@
                                         noSelection="${['null':'Select One...']}"
                                         value="${dataPackage?:(datasetInstance?.dataPackage?.id)}"
                                         optionKey="id" optionValue="title"
-                                        onchange="dataPackageChangedForDataset(this.value);" />
+                                        onchange="dataPackageChangedForDataset(event, this.value);" />
 
 
                                         <div class="help-inline">

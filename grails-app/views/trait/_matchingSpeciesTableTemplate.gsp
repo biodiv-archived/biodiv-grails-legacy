@@ -18,6 +18,14 @@
     <h5>Matching ${resultType?resultType.capitalize():'Species'}${totalCount?' (' + totalCount + ')' :''}
     </h5>
        <table id="matchingSpeciesTable" class="table table-bordered table-condensed jcarousel-skin-ie7" style="background-color:white;">
+       <thead>
+       <th> ${resultType?resultType.capitalize():'Species'}</th>
+       <th>Traits</th>
+       
+       <g:if test="${resultType == 'species'}">
+       <th>No of Observations</th>
+       </g:if>
+       </thead>
     <tbody>
         <g:each in="${matchingSpeciesList}" var="r">
         <g:set var="reco" value="${r[0]}"/>

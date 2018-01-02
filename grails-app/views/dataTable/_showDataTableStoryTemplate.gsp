@@ -124,7 +124,19 @@ String instanceType = dataTableInstance.dataTableType;
                     </div>
                 </div>
                 </g:if>
- 
+                 <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.dataTableType.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-info-sign"></i>
+                    </g:else>
+                    <div class="value">
+                        ${instanceType}
+                    </div>
+                </div>
+
+
 
 
 
@@ -153,6 +165,34 @@ String instanceType = dataTableInstance.dataTableType;
                     </g:else>
                     <div class="value linktext">
                         ${dataTableInstance.party.attributions}
+                    </div>
+                </div>
+                </g:if>
+ 
+                <g:if test="${dataTableInstance.project}">
+                <div class="prop" >
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.project.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-info-sign"></i>
+                    </g:else>
+                    <div class="value linktext">
+                        ${dataTableInstance.project}
+                    </div>
+                </div>
+                </g:if>
+ 
+                <g:if test="${dataTableInstance.methods}">
+                <div class="prop" >
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.methods.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-info-sign"></i>
+                    </g:else>
+                    <div class="value linktext">
+                        ${dataTableInstance.methods}
                     </div>
                 </div>
                 </g:if>
