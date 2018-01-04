@@ -141,7 +141,7 @@ abstract class CollMetadata implements Taggable, Rateable {
         }
 
         if(params.contributorUserIds)  {
-           this.party.contributorId = SUser.read(Long.parseLong(params.contributorUserIds)).id;
+           this.party.contributorId = SUser.read(Long.parseLong(params.contributorUserIds.split(',')[0])).id;
         } else {
             this.party.contributorId = springSecurityService.currentUser.id; 
         }
