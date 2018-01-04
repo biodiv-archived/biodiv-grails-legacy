@@ -189,6 +189,7 @@ class DatasetController extends AbstractObjectController {
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/dataset/showDatasetListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model['obvListHtml'] = model['obvListHtml'].replaceAll('\u002f','/');
             model.remove('datasetInstanceList');
         }
         

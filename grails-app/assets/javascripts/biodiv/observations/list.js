@@ -1004,6 +1004,18 @@ function getSelectedFilters($ele, noneSelected) {
     if(allSelected == false) return selected.join(' OR ');
 } 
 
+function getSelectedDataPackage() {
+    var dataPackage = ''; 
+    $('.dp_filter_label').each (function() {
+        if($(this).hasClass('active')) {
+            dataPackage += $(this).attr('value') + ',';
+        }
+    });
+
+    dataPackage = dataPackage.replace(/\s*\,\s*$/,'');
+    return dataPackage;	
+} 
+
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
     if(removeParam) {
@@ -1031,6 +1043,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['sort'] = sortBy;
         }
     }
+
     if(getMediaFilterBy() != '') {
         params['hasMedia'] = getMediaFilterBy();
     }
@@ -1267,6 +1280,12 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     } else {
         delete params['status']
     }
+
+    var dataPackage = getSelectedDataPackage();
+    if(dataPackage) {
+        params['dataPackage'] = dataPackage;
+    }
+
     return params;
 }	
 

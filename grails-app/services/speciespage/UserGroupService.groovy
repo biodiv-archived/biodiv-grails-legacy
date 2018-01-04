@@ -846,7 +846,7 @@ class UserGroupService {
 	def getNewsLetters(UserGroup userGroupInstance,  max,  offset, String sort, String order, def currentLanguage= null, def filterParams=null) {
 		String query = "from Newsletter newsletter ";
 		def queryParams = [:]
-		if(userGroupInstance) {
+		if(userGroupInstance && userGroupInstance.id) {
 			queryParams['userGroupInstance'] = userGroupInstance;
 			query += " where newsletter.userGroup=:userGroupInstance"
 			def author = springSecurityService.currentUser
@@ -1142,15 +1142,7 @@ class UserGroupService {
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postDocumentToUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
         addResourceOnGroup(document, userGroup, sendMail);
-/*		userGroup.addToDocuments(document);
-		if(!userGroup.save()) {
-			log.error "Could not add ${document} to ${userGroup}"
-			log.error  userGroup.errors.allErrors.each { log.error it }
-		} else {
-			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
-			log.debug "Added ${document} to userGroup ${userGroup}"
-		}
-*/	}
+    }
 
 	void removeDocumentFromUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
         removeResourceOnGroups(document, userGroupIds, sendMail);
@@ -1169,93 +1161,31 @@ class UserGroupService {
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeDocumentFromUserGroup(Document document, UserGroup userGroup, boolean sendMail=true) {
         removeResourceOnGroup(document, userGroup, sendMail);
-/*		userGroup.documents.remove(document);
-		if(!userGroup.save()) {
-			log.error "Could not remove ${document} from ${userGroup}"
-			log.error  userGroup.errors.allErrors.each { log.error it }
-		} else {
-			activityFeedService.addFeedOnGroupResoucePull(document, userGroup, document.author, sendMail);
-			log.debug "Removed ${document} from userGroup ${userGroup}"
-		}
-*/	}
-
-/*
-    def getDocumentUserGroups(Document documentInstance, int max, long offset) {
-		return documentInstance.userGroups;
 	}
 
-    long getNoOfDocumentUserGroups(Document documentInstance) {
-		String countQuery = "select count(*) from UserGroup userGroup " +
-				"join userGroup.documents document " +
-				"where document=:document and document.isDeleted=:docIsDeleted	and userGroup.isDeleted=:userGroupIsDeleted";
-		def count = UserGroup.executeQuery(countQuery, [document:documentInstance, docIsDeleted:false, userGroupIsDeleted:false])
-		return count[0]
-	}*/
-
-	def long getDocumentCountByGroup(UserGroup userGroupInstance){
+    def long getDocumentCountByGroup(UserGroup userGroupInstance){
         return getCountByGroup(Document.simpleName, userGroupInstance);
-		/*def queryParams = [:]
-		queryParams['userGroup'] = userGroupInstance
-		queryParams['isDeleted'] = false;
-
-		def query = "select count(*) from Document doc join doc.userGroups userGroup where doc.isDeleted = :isDeleted and userGroup=:userGroup"
-		return Document.executeQuery(query, queryParams)[0]
-        */
 	}
 
 	/////////////// Discussion RELATED /////////////////
 	void postDiscussiontoUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
         addResourceOnGroups(discussion, userGroupIds, sendMail);
-		/*log.debug "Posting ${discussion} to userGroups ${userGroupIds}"
-		userGroupIds.each {
-			if(it) {
-				def userGroup = UserGroup.read(Long.parseLong(it));
-				if(userGroup) {
-					postDiscussionToUserGroup(discussion, userGroup, sendMail)
-				}
-			}
-		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postDiscussionToUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
 		addResourceOnGroup(discussion, userGroup, sendMail);
-        /*userGroup.addToDiscussions(discussion);
-		if(!userGroup.save()) {
-			log.error "Could not add ${discussion} to ${userGroup}"
-			log.error  userGroup.errors.allErrors.each { log.error it }
-		} else {
-			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
-			log.debug "Added ${discussion} to userGroup ${userGroup}"
-		}*/
-	}
+   	}
 
 	void removeDiscussionFromUserGroups(Discussion discussion, List userGroupIds, boolean sendMail=true) {
         removeResourceOnGroups(discussion, userGroupIds, sendMail);
-		/*log.debug "Removing ${discussion} from userGroups ${userGroupIds}"
-		userGroupIds.each {
-			if(it) {
-				def userGroup = UserGroup.read(Long.parseLong("" + it));
-				if(userGroup) {
-					removeDiscussionFromUserGroup(discussion, userGroup, sendMail)
-				}
-			}
-		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeDiscussionFromUserGroup(Discussion discussion, UserGroup userGroup, boolean sendMail=true) {
         addResourceOnGroup(discussion, userGroup, sendMail);
-		/*userGroup.discussions.remove(discussion);
-		if(!userGroup.save()) {
-			log.error "Could not remove ${discussion} from ${userGroup}"
-			log.error  userGroup.errors.allErrors.each { log.error it }
-		} else {
-			activityFeedService.addFeedOnGroupResoucePull(discussion, userGroup, discussion.author, sendMail);
-			log.debug "Removed ${discussion} from userGroup ${userGroup}"
-		}*/
 	}
 
 	/////////////// PROJECTS RELATED /////////////////
@@ -1275,43 +1205,17 @@ class UserGroupService {
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void postProjectToUserGroup(Project project, UserGroup userGroup) {
         addResourceOnGroup(project, userGroup);
-		/*userGroup.addToProjects(project);
-		if(!userGroup.save()) {
-			log.error "Could not add ${project} to ${userGroup}"
-			log.error  userGroup.errors.allErrors.each { log.error it }
-		} else {
-			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, true);
-			log.debug "Added ${project} to userGroup ${userGroup}"
-		}*/
 	}
 
 	void removeProjectFromUserGroups(Project project, List userGroupIds) {
         removeResourceOnGroups(project, userGroupIds);
-		/*log.debug "Removing ${project} from userGroups ${userGroupIds}"
-		userGroupIds.each {
-			if(it) {
-				def userGroup = UserGroup.read(Long.parseLong("" + it));
-				if(userGroup) {
-					removeProjectFromUserGroup(project, userGroup)
-				}
-			}
-		}*/
 	}
 
 	@Transactional
 	@PreAuthorize("hasPermission(#userGroup, write)")
 	void removeProjectFromUserGroup(Project project, UserGroup userGroup) {
         removeResourceOnGroup(project, userGroup);
-        /*
-		userGroup.projects.remove(project);
-		if(!userGroup.save()) {
-			log.error "Could not remove ${project} from ${userGroup}"
-			log.error  userGroup.errors.allErrors.each { log.error it }
-		} else {
-			//activityFeedService.addFeedOnGroupResoucePull(project, userGroup, project.author, false);
-			log.debug "Removed ${project} from userGroup ${userGroup}"
-		}*/
-	}
+   	}
 
 	def getProjectUserGroups(Project projectInstance, int max, long offset) {
 		//TODO
