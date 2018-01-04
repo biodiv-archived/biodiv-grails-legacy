@@ -347,6 +347,12 @@ class DatasetService extends AbstractMetadataService {
 
         }
 
+        if(params.dataPackage){
+            filterQuery += " and obv.dataPackage.id = :dataPackage "
+            queryParams["dataPackage"] = params.dataPackage.toLong()
+            activeFilters["dataPackage"] = params.dataPackage.toLong()
+        }
+
 
         
 		def allDatasetCountQuery = "select count(*) from Dataset1 obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery

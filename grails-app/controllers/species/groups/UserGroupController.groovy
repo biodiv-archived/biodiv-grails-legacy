@@ -171,7 +171,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def create() {
 		def userGroupInstance = new UserGroup()
-		userGroupInstance.properties = params
+		//userGroupInstance.properties = params
 		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
 	}
 

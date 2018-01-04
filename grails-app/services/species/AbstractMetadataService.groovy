@@ -177,7 +177,7 @@ class AbstractMetadataService extends AbstractObjectService {
             }
         }
 
-        if(params.dataTable) {
+        if(params.dataTable && instance.metaClass.hasProperty(instance, 'dataTable') ) {
             instance.dataTable = params.dataTable;
         }
 
@@ -272,6 +272,12 @@ class AbstractMetadataService extends AbstractObjectService {
         }
         List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
         userGroupIds.addAll(userGroupsWithFilterRule.collect {it.id})
+
+        //if instance is part of dataTable then all datatable usergroups
+        if(instance.metaClass.hasProperty(instance, 'dataTable') && instance.dataTable) {
+            userGroupIds.addAll(instance.dataTable.userGroups.collect {it.id});
+        }
+
         return new ArrayList(userGroupIds);
 
         /*boolean hasValidUserGroup = instance.metaClass.respondsTo(instance, "isUserGroupValidForPosting");

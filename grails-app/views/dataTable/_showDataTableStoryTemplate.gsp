@@ -48,12 +48,12 @@ String instanceType = dataTableInstance.dataTableType;
                                 %>
                             </g:if>
                             ${raw(clickcontentVar)}
-                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(dataTableInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')))}</div>
+                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(dataTableInstance.description))}</div>
                     
                         </div>
                     </g:if>
                     <g:else>
-                    <% String desc = dataTableInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
+                    <% String desc = dataTableInstance.description%> 
                     <div class="value notes_view linktext ellipsis multiline">
                         ${raw(desc)}
                     </div>
