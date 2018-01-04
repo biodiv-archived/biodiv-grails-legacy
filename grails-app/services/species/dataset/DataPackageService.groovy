@@ -255,7 +255,7 @@ println "sssssssssssssssssssssssssssssssssss"
         }
         query += " from DataPackage obv "
 
-        def filterQuery = " where obv.isDeleted = :isDeleted "
+        def filterQuery = " where obv.isDeleted = :isDeleted and title != 'Checklist' "
         
         //TODO: check logic
         if(params.featureBy == "false") {
