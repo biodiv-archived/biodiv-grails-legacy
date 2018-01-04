@@ -45,7 +45,7 @@ if(supportingModules_dp) {
         <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
         <div class="controls  textbox">
 
-            <textarea id="description" name="description" placeholder="${g.message(code:'dataset.small.description')}">${instance?.description?.replaceAll('(?:\r\n|\r|\n)', '<br />')}</textarea>
+            <textarea id="description" name="description" placeholder="${g.message(code:'dataset.small.description')}">${instance?.description}</textarea>
             <div class="help-inline">
                 <g:hasErrors bean="${instance}" field="description">
                     <g:eachError bean="${instance}" field="description">

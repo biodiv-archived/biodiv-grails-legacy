@@ -584,7 +584,7 @@ class UFileController {
                 StringEscapeUtils.escapeCsv(it.getKey());
             }
             def  joinedHeader = headerNameList.join(separator)
-            bw.write(joinedHeader + "\r\r\n\n")
+            bw.write(joinedHeader +"\r\n")
 
             spread.each { rowMap->  
                 List rowValues = []
@@ -592,7 +592,7 @@ class UFileController {
                     rowValues << StringEscapeUtils.escapeCsv(it.getValue());
                 }
                 def joinedContent = rowValues.join(separator)
-                bw.write(joinedContent + "\r\r\n\n")
+                bw.write(joinedContent +"\r\n")
             }
         }else{
             compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath, 0)
@@ -619,7 +619,7 @@ class UFileController {
                 index = index + 1
             }
             def  joinedHeader = headerRow.join(separator)
-            bw.write(joinedHeader + "\r\r\n\n")
+            bw.write(joinedHeader +"\r\n")
             def counter = 0
             compContent.each{ stringRow ->
                 if(counter >= 4){
@@ -632,7 +632,7 @@ class UFileController {
                         k++;
                     }
                     def joinedContent = rowValues.join(separator)
-                    bw.write(joinedContent + "\r\r\n\n")
+                    bw.write(joinedContent +"\r\n")
                 }
                 counter = counter + 1
             }

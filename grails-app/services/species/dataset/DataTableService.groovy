@@ -202,7 +202,7 @@ class DataTableService extends AbstractMetadataService {
         dataTable.lastRevised = new Date();
 
         result = save(dataTable, params, true, null, feedType, null);
-        if(result.success) {
+        if(result.success && params.action=='save') {
 
             def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
             String contentRootDir = config.speciesPortal.content.rootDir

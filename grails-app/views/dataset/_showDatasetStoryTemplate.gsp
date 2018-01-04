@@ -29,7 +29,7 @@ int instanceCount = datasetInstance.countByDataTable();
                 <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
 
                 <div class="value">
-                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title} (${instanceCount} Datatables)</b></a>
+                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title} </b></a>
                 </div>
             </div>
         </g:if>
@@ -37,6 +37,19 @@ int instanceCount = datasetInstance.countByDataTable();
 
    
         <g:if test="${showDetails}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i>No of DataTables</span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-info-sign"></i>
+                    </g:else>
+                    <div class="value">
+                    ${instanceCount}
+                    </div>
+                </div>
+
+
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-time"></i><g:message code="default.submitted.label" /></span>
@@ -142,15 +155,12 @@ int instanceCount = datasetInstance.countByDataTable();
                                     clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
                                 %>
                             </g:if>
-                            <g:else>
- <%                           clickcontentVar = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%>
-                            </g:else>
                             ${raw(clickcontentVar)}
-                    
+                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${datasetInstance.description.encodeAsRaw()}</div>
                         </div>
                    </g:if>
                     <g:else>
-                    <% String desc = datasetInstance.description.replaceAll('(?:\r\n|\r|\n)', '<br />')%> 
+                    <% String desc = datasetInstance.description%> 
                     <div class="value notes_view linktext ellipsis multiline">
                         ${raw(desc)}
                     </div>

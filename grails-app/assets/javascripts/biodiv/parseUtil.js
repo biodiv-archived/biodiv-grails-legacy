@@ -53,7 +53,7 @@ function parseCSVData(data, options) {
     var rowData = new Array();
     var columns = new Array();
     if(options.res === "species") {
-        var lines = data.split('\r\r\n\n');
+        var lines = data.split('\r\n');
     }
     else {
         var lines = data.replace('\r','').split('\n');

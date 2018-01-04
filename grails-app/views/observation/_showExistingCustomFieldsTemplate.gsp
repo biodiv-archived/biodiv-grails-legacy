@@ -2,11 +2,11 @@
 <% def customFields;
 if(userGroupInstance && userGroupInstance.id) {
     customFields = CustomField.fetchCustomFields(userGroupInstance);
-} else if(dataPackageInstance ** dataPackageInstance.id) {
+} else if(dataPackageInstance && dataPackageInstance.id) {
     customFields = CustomField.fetchCustomFields(dataPackageInstance);
 }
 %>
-<g:if test="${!customFields.isEmpty()}">
+<g:if test="${!customFields?.isEmpty()}">
 <div>
 	<div>
 		<table class="table table-hover" style="margin-left: 0px;">

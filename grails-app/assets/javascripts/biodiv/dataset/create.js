@@ -68,11 +68,26 @@ $(document).ready(function() {
                     $(".datasetShowSection").slideDown();
                 } else {
                     window.scrollTo(0, 0);
-                    $(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(data.msg+"<br/>"+data.errors);
-                    $.each(data.errors, function(index, value) {
-                            $("#createDataset").find('[name='+value.field+']').parents(".control-group").addClass("error");
-                            $("#createDataset").find('[name='+value.field+']').nextAll('.help-inline').append("<li>"+value.message+"</li>")
-                    });
+                        var errorMsg = data.msg+'<br/>';
+                        $.each(data.errors, function(index, value) {
+                 //           errorMsg += value.message+'<br/>';
+                            if(value.field == 'party.contributorId') value.field = 'contributorUserIds';
+                            if(value.field == 'party.attributions') value.field = 'attributions';
+                            if(value.field == 'temporalCoverage') value.field = 'fromDate';
+                            if(value.field == 'geographicalCoverage') value.field = 'placeName';
+                            if(value.field == 'taxonomicCoverage') {
+                                $("#createDataset").find('#speciesGroupFilter').parents(".control-group").addClass("error");
+                                $("#createDataset").find('#speciesGroupFilter').nextAll('.help-inline').html("<li>"+value.message+"</li>")
+                            } else if(value.field == 'uFile'){
+                                $("#createDataset").find('#au-dataTableFile_uploader').parents(".control-group").addClass("error");
+                                $("#createDataset").find('#au-dataTableFile_uploader').nextAll('.help-inline').html("<li>"+value.message+"</li>")
+                            } else {
+                                $("#createDataset").find('[name='+value.field+']').parents(".control-group").addClass("error");
+                                $("#createDataset").find('[name='+value.field+']').nextAll('.help-inline').html("<li>"+value.message+"</li>")
+                            }
+                        });
+
+                        $(".alertMsg").removeClass('alert alert-success').addClass('alert alert-error').html(errorMsg);
                 }    
             }, error:function (xhr, ajaxOptions, thrownError){
                 //successHandler is used when ajax login succedes
