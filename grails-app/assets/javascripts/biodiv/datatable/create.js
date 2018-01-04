@@ -64,6 +64,7 @@ function showSampleDataTable(){
     var input = $("#dataTableFile_path").val();
     var res = "dataTable";
     if(input) {
+        $('#createDataTableSubmit').removeAttr('disabled');
         parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
     }
 }
@@ -165,6 +166,7 @@ function viewSpeciesGrid() {
     var input = $("#dataTableFile_path").val();
     var res = "species";
     if(input){
+        $('#createDataTableSubmit').removeAttr('disabled');
         parseData(  window.params.content.url + input , {callBack:loadSpeciesDataToGrid, res: res });
     }
 }

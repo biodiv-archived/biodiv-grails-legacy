@@ -6,8 +6,9 @@
     def form_button_val = "Add "+dataTableInstance.dataTableType; //"${g.message(code:'button.add.checklist')}"
     if(params.action == 'edit' || params.action == 'update'){
     form_action = uGroup.createLink(action:'update', controller:'dataTable', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-    form_button_name = "Update Checklist"
-    form_button_val = "${g.message(code:'button.update.checklist')}"
+    form_button_name = "Update ${dataTableInstance.dataTableType}"
+    form_button_val = "Update "+dataTableInstance.dataTableType;
+ 
     }
 
     %>
@@ -103,7 +104,7 @@
                 onclick="return confirm('${message(code: 'default.delete.confirm.message', args:['dataset'])}');"><g:message code="button.delete.dataTable" /></a>
                 </div>
                 </g:if>
-                <a id="createDataTableSubmit" class="btn btn-primary" style="float: right; margin-right: 5px;">
+                <a id="createDataTableSubmit" class="btn btn-primary" style="float: right; margin-right: 5px;" ${params.action=='dataTableTypeChanged'?'disabled=true':''}>
                 ${form_button_val} </a>
 
                 <g:checkBox style="margin-left:0px;" name="agreeTerms" value="${dataTableInstance?.agreeTerms}"/>

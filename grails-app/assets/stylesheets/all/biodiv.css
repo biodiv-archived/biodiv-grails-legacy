@@ -3586,3 +3586,5 @@ margin-bottom:5px;
 .span12.row-fluid {
     margin-left:0px;
 }
+
+a[disabled] { pointer-events: none; }
