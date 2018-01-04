@@ -2,6 +2,7 @@ var dataset_contributor_autofillUsersComp;
 function dataPackageChangedForDataset(event, dataPackageId) {
     console.log(dataPackageId);
     event.preventDefault();
+    if(CKEDITOR.instances.summary)  CKEDITOR.instances.summary.destroy();
     if(CKEDITOR.instances.description)  CKEDITOR.instances.description.destroy();
     if(dataPackageId != "null") {
         $.ajax({
@@ -14,6 +15,7 @@ function dataPackageChangedForDataset(event, dataPackageId) {
                 intializesSpeciesHabitatInterest();
                 initLocationPicker();
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+                CKEDITOR.replace('summary', config);
                 CKEDITOR.replace('description', config);
                 dataset_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
                     usersUrl : window.params.userTermsUrl

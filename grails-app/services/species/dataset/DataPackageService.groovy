@@ -133,7 +133,6 @@ class DataPackageService extends AbstractMetadataService {
             feedType = activityFeedService.INSTANCE_CREATED;
         }
       
-println "sssssssssssssssssssssssssssssssssss"
         def customFieldMapList = [];
         if(params.customFieldMapList) {
             customFieldMapList = JSON.parse(params.customFieldMapList);
@@ -144,8 +143,6 @@ println "sssssssssssssssssssssssssssssssssss"
             params.supportingModule.each { sm,v ->
                 List x = [];
                 customFieldMapList.each { m ->
-                    println m
-                    println  sm
                     if(m['supportingModule'] == sm) {
                         x << m;
                     }

@@ -890,3 +890,19 @@ ALTER TABLE observation ENABLE TRIGGER ALL ;
 
 alter table external_links add column fishbase_url varchar;
 insert into field(id,concept,category, description,display_order,url_identifier,connection,language_id) values(185, 'Nomenclature and Classification','Type Information', 'Information about type specimens associated with a given taxon; e.g., label data, the type- ie. holotype or other, the collection where they are stored, type locality, type host, information about the specimens history, etc.',102,'https://terms.tdwg.org/wiki/dwc:typeStatus',102,205);
+
+
+
+#4thJan2018
+alter table dataset1 add column summary varchar(5000);
+update dataset1 set summary=description;
+alter table dataset1 alter column description drop not null;
+update dataset1 set description=null;
+alter table dataset1 alter column summary  set not null;
+
+
+alter table data_table add column summary varchar(5000);
+update data_table set summary=description;
+alter table data_table alter column description drop not null;
+update data_table set description=null;
+alter table data_table alter column summary  set not null;

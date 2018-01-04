@@ -47,6 +47,7 @@ import species.groups.UserGroup.FilterRule;
 abstract class CollMetadata implements Taggable, Rateable {
 
 	String title;
+    String summary;
 	String description;
 
 	//EML-Access fields
@@ -97,7 +98,8 @@ abstract class CollMetadata implements Taggable, Rateable {
 
 	static constraints = {
 		title nullable:false, blank:false;
-		description nullable:false, blank:false, type:'text';
+		summary nullable:false, blank:false, size:0..5000;
+		description nullable:true;
 		language nullable:false
 		externalId nullable:true
 		externalUrl nullable:true
@@ -109,7 +111,7 @@ abstract class CollMetadata implements Taggable, Rateable {
 		
 		uFile nullable:true;
 		customFields nullable:true;
-	}
+	} 
 
 	static mapping = {
 		description type:'text'
@@ -126,6 +128,9 @@ abstract class CollMetadata implements Taggable, Rateable {
 
     def initParams(params) {
 
+        this.summary = params.summary;
+        this.description = params.description;
+
         XMLConverter xmlConverter = new XMLConverter();
 
         //Party
@@ -139,7 +144,7 @@ abstract class CollMetadata implements Taggable, Rateable {
         }
 
         if(params.contributorUserIds)  {
-           this.party.contributorId = SUser.read(Long.parseLong(params.contributorUserIds)).id;
+           this.party.contributorId = SUser.read(Long.parseLong(params.contributorUserIds.split(',')[0])).id;
         } else {
             this.party.contributorId = springSecurityService.currentUser.id; 
         }

@@ -64,6 +64,7 @@ class DataPackage {
 	
     public enum SupportingModules {
 		TITLE("Title"),
+		SUMMARY("Summary"),
 		DESCRIPTION("Description"),
 
 		USAGE_RIGHTS("Usage Rights"),
@@ -90,6 +91,7 @@ class DataPackage {
 		static list() {
 			[
 		        TITLE,
+                SUMMARY,
                 DESCRIPTION,
                 USAGE_RIGHTS,
                 PARTY,
@@ -165,7 +167,7 @@ class DataPackage {
     static Map<SupportingModules, CustomField> defaultSupportingModules() {
         Map<SupportingModules, CustomField> s = [:];
         s[SupportingModules.TITLE] = new CustomField();
-        s[SupportingModules.DESCRIPTION] = new  CustomField(); 
+        s[SupportingModules.SUMMARY] = new  CustomField(); 
         s[SupportingModules.TEMPORAL_COVERAGE] = new  CustomField(); 
         s[SupportingModules.GEOGRAPHICAL_COVERAGE] = new  CustomField(); 
         s[SupportingModules.TAXONOMIC_COVERAGE] = new  CustomField(); 

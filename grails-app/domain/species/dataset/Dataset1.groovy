@@ -8,7 +8,10 @@ class Dataset1 extends CollMetadata {
     UFile uFile;	
 	static hasMany = [dataTables: DataTable];
 
-	static mapping = {
+    static constraints = {
+    }
+
+	static mapping  = {
 		id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "dataset_id_seq"]
 	}
 

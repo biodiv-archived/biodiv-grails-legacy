@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 
+import org.apache.log4j.Level;
 import species.Resource;
 import species.Habitat;
 import species.Language;
@@ -41,7 +42,11 @@ import species.participation.RecommendationVote;
 import species.participation.Flag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.participation.Annotation
+import species.participation.UploadLog
 import species.sourcehandler.XMLConverter;
+import species.sourcehandler.importer.AbstractObservationImporter;
+import species.sourcehandler.importer.FileObservationImporter;
+import species.sourcehandler.importer.DwCObservationImporter;
 import species.utils.ImageType;
 import species.utils.Utils;
 import species.groups.UserGroupMemberRole;
@@ -108,7 +113,6 @@ class ObservationService extends AbstractMetadataService {
     def activityFeedService;
     def SUserService;
     def speciesService;
-    def messageSource;
     def resourcesService;
     def request;
     def speciesPermissionService;
@@ -3192,6 +3196,5 @@ println result;
 
         return csvFile
     }
-
 
 }

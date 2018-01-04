@@ -141,10 +141,39 @@ int instanceCount = datasetInstance.countByDataTable();
                 </g:each>
                 </g:if>
 
-         <g:if test="${datasetInstance.description}">
+         <g:if test="${datasetInstance.summary}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.summary.label" /></span>
+                        <div class="value notes_view"> 
+                        <%  def styleVar = 'block';
+                            def clickcontentVar = '' 
+                        %> 
+                            <g:if test="${datasetInstance?.language?.id != userLanguage?.id}">
+                                <%  
+                                    styleVar = "none"
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+datasetInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
+                                %>
+                            </g:if>
+                            ${raw(clickcontentVar)}
+                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${datasetInstance.summary.encodeAsRaw()}</div>
+                        </div>
+                   </g:if>
+                    <g:else>
+                    <% String desc = datasetInstance.summary%> 
+                    <div class="value notes_view linktext ellipsis multiline">
+                        ${raw(desc)}
+                    </div>
+
+                    </g:else>
+                </div>
+        </g:if>
+
+
+         <g:if test="${datasetInstance.description}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.description.label" /></span>
                         <div class="value notes_view"> 
                         <%  def styleVar = 'block';
                             def clickcontentVar = '' 
