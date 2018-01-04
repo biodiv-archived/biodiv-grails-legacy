@@ -40,6 +40,23 @@ if(supportingModules_dp) {
     </div>
     </g:if>
 
+    <g:if test="${supportingModules.containsKey(SupportingModules.SUMMARY)}">
+    <div class="control-group ${hasErrors(bean: instance, field: 'summary', 'error')}">
+        <label for="summary" class="control-label"><g:message code="default.summary.label" />*</label>
+        <div class="controls  textbox">
+
+            <textarea id="summary" name="summary" placeholder="${g.message(code:'dataset.small.description')}">${instance?.summary}</textarea>
+            <div class="help-inline">
+                <g:hasErrors bean="${instance}" field="summary">
+                    <g:eachError bean="${instance}" field="summary">
+                        <li><g:message error="${it}" /></li>
+                    </g:eachError>
+                </g:hasErrors>
+            </div>
+        </div>
+    </div>
+    </g:if>
+
     <g:if test="${supportingModules.containsKey(SupportingModules.DESCRIPTION)}">
     <div class="control-group ${hasErrors(bean: instance, field: 'description', 'error')}">
         <label for="description" class="control-label"><g:message code="default.description.label" />*</label>

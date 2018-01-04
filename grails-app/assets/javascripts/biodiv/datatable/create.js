@@ -1,6 +1,7 @@
 var dataTable_contributor_autofillUsersComp;
 function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
     event.preventDefault();
+    if(CKEDITOR.instances.summary)  CKEDITOR.instances.summary.destroy();
     if(CKEDITOR.instances.description)  CKEDITOR.instances.description.destroy();
     console.log(dataTableTypeId);
     if(dataTableTypeId != "null") {
@@ -16,6 +17,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                 dataTable_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
                     usersUrl : window.params.userTermsUrl
                 });
+                CKEDITOR.replace('summary', config);
                 CKEDITOR.replace('description', config);
                 showSampleDataTable();
                 var contributorId = $('#contributorUserIds').data('contributorid'); 

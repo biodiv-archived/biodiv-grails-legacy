@@ -33,35 +33,6 @@ String instanceType = dataTableInstance.dataTableType;
     </g:if>
     <g:else>
     <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
-            <g:if test="${dataTableInstance.description}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
-                        <div class="value notes_view"> 
-                        <%  def styleVar = 'block';
-                            def clickcontentVar = '' 
-                        %> 
-                        <g:if test="${dataTableInstance?.language?.id != userLanguage?.id}">
-                                <%  
-                                    styleVar = "none"
-                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataTableInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
-                                %>
-                            </g:if>
-                            ${raw(clickcontentVar)}
-                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(dataTableInstance.description))}</div>
-                    
-                        </div>
-                    </g:if>
-                    <g:else>
-                    <% String desc = dataTableInstance.description%> 
-                    <div class="value notes_view linktext ellipsis multiline">
-                        ${raw(desc)}
-                    </div>
-
-                    </g:else>
-                </div>
-            </g:if>
-
 
                 <div class="prop">
                     <g:if test="${showDetails}">
@@ -197,6 +168,69 @@ String instanceType = dataTableInstance.dataTableType;
                 </div>
                 </g:if>
  
+                <g:if test="${dataTableInstance.summary}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.summary.label" /></span>
+                        <div class="value notes_view"> 
+                        <%  def styleVar = 'block';
+                            def clickcontentVar = '' 
+                        %> 
+                            <g:if test="${dataTableInstance?.language?.id != userLanguage?.id}">
+                                <%  
+                                    styleVar = "none"
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataTableInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
+                                %>
+                            </g:if>
+                            ${raw(clickcontentVar)}
+                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${dataTableInstance.summary.encodeAsRaw()}</div>
+                        </div>
+                   </g:if>
+                    <g:else>
+                    <% String desc = dataTableInstance.summary%> 
+                    <div class="value notes_view linktext ellipsis multiline">
+                        ${raw(desc)}
+                    </div>
+
+                    </g:else>
+                </div>
+        </g:if>
+
+
+
+
+
+            <g:if test="${dataTableInstance.description}">
+                <div class="prop">
+                    <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-info-sign"></i><g:message code="default.notes.label" /></span>
+                        <div class="value notes_view"> 
+                        <%  def styleVar = 'block';
+                            def clickcontentVar = '' 
+                        %> 
+                        <g:if test="${dataTableInstance?.language?.id != userLanguage?.id}">
+                                <%  
+                                    styleVar = "none"
+                                    clickcontentVar = '<a href="javascript:void(0);" class="clickcontent btn btn-mini">'+dataTableInstance?.language?.threeLetterCode?.toUpperCase()+'</a>';
+                                %>
+                            </g:if>
+                            ${raw(clickcontentVar)}
+                            <div class=" linktext ellipsis multiline" style="display:${styleVar}">${raw(Utils.linkifyYoutubeLink(dataTableInstance.description))}</div>
+                    
+                        </div>
+                    </g:if>
+                    <g:else>
+                    <% String desc = dataTableInstance.description%> 
+                    <div class="value notes_view linktext ellipsis multiline">
+                        ${raw(desc)}
+                    </div>
+
+                    </g:else>
+                </div>
+            </g:if>
+
+
+
                 <g:if test="${dataTableInstance.customFields}">
                 <g:each in="${dataTableInstance.fetchCustomFields()}" var="${cf}">
                 <g:each in="${cf}" var="${cfv}">

@@ -99,7 +99,7 @@
 								<div id="groups_div" class="btn-group" style="z-index: 3;width:100%">
                                     <g:each in="${DataPackage.SupportingModules.list()}" var="supportingModule">
                                         <label class="checkbox" style="text-align: left;"> 
-                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" ${supportingModules.containsKey(supportingModule)?'checked=checked':''}  ${defaultSupportingModules.containsKey(supportingModule)?'disabled':''} /> ${supportingModule.value()} 
+                                            <input type="checkbox" name="supportingModule.${supportingModule.ordinal()}" ${supportingModules.containsKey(supportingModule)?'checked=checked':''}  ${defaultSupportingModules.containsKey(supportingModule)?'':''} /> ${supportingModule.value()} 
                                             <g:if test="${supportingModules.containsKey(supportingModule)}">
                                             <input type="hidden" name="supportingModule.${supportingModule.ordinal()}" value="on"/> 
                                             </g:if>

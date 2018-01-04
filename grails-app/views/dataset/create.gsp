@@ -210,10 +210,9 @@
             </g:if>
 
             
-            <g:if test="${params.action != 'create'}">
                 var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+                CKEDITOR.replace('summary', config);
                 CKEDITOR.replace('description', config);
-            </g:if>
         });
 
     </asset:script>
