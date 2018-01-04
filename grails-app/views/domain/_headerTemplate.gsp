@@ -162,11 +162,19 @@
                                             </a>
 		  </li>
         
-          <li class=" ${(params.controller == 'dataset')?'active':''}"><a
+          <li class="dropdown ${(params.controller == 'dataset')?'active':''}"><a class="dropdown-toggle" data-toggle="dropdown"
+		     onmouseover="loadDataPackages($(this).next('ul'), '${uGroup.createLink(controller:'dataPackage', action:'list', params:["isDeleted":false], 'userGroup':userGroupInstance)}',0,true);return false;"
+		     onclick="loadDataPackages($(this).next('ul'), '${uGroup.createLink(controller:'dataPackage', action:'list', params:["isDeleted":false], 'userGroup':userGroupInstance)}',0,true);return false;"
                                             href="${uGroup.createLink("controller":"dataset", "action":"list", 'userGroup':userGroupInstance)}" title="${g.message(code:'button.datasets')}">
                                             <span title="${g.message(code:'updated.today')}" class="statsTicker datasetsUpdateCount"> </span>
                                             <g:message code="button.datasets" />
                                             </a>
+            <ul class="dropdown-menu" style="text-align:left;">
+                    <div id="gallerySpinner" class="spinner">
+                        <img src="${assetPath(src:'/all/spinner.gif', absolute:true)}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
+                    </div>
+            </ul>
+ 
 		  </li>
 
 
