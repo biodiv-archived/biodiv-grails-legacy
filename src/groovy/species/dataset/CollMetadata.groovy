@@ -128,6 +128,9 @@ abstract class CollMetadata implements Taggable, Rateable {
 
     def initParams(params) {
 
+        this.summary = params.summary;
+        this.description = params.description;
+
         XMLConverter xmlConverter = new XMLConverter();
 
         //Party

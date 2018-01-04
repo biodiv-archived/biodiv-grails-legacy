@@ -59,7 +59,7 @@ if(supportingModules_dp) {
 
     <g:if test="${supportingModules.containsKey(SupportingModules.DESCRIPTION)}">
     <div class="control-group ${hasErrors(bean: instance, field: 'description', 'error')}">
-        <label for="description" class="control-label"><g:message code="default.description.label" />*</label>
+        <label for="description" class="control-label"><g:message code="default.description.label" /></label>
         <div class="controls  textbox">
 
             <textarea id="description" name="description" placeholder="${g.message(code:'dataset.small.description')}">${instance?.description}</textarea>

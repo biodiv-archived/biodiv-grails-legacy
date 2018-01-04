@@ -52,11 +52,8 @@ class UploadJob {
                 Map result;
 
                 switch (dl.uploadType.toLowerCase()) {
-                    case [OBSERVATION_LIST, UNIQUE_SPECIES]:
-                    //f = obvUtilService.export(dl.fetchMapFromText(), dl)
-                    break
-                    case CHECKLIST:
-                    //f = checklistService.export(dl.fetchMapFromText(), dl)
+                    case [OBSERVATION_LIST, CHECKLIST, UNIQUE_SPECIES]:
+                    result = obvUtilService.upload(dl.filePath, dl.fetchMapFromText(), dl);
                     break
                     case SPECIES:
                     //f = speciesService.export(dl.fetchMapFromText(), dl)
