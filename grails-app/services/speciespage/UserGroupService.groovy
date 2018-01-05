@@ -1128,15 +1128,6 @@ class UserGroupService {
 	/////////////// DOCUMENTS RELATED /////////////////
 	void postDocumenttoUserGroups(Document document, List userGroupIds, boolean sendMail=true) {
         addResourceOnGroups(document, userGroupIds, sendMail);
-		/*log.debug "Posting ${document} to userGroups ${userGroupIds}"
-		userGroupIds.each {
-			if(it) {
-				def userGroup = UserGroup.read(Long.parseLong(it));
-				if(userGroup) {
-					postDocumentToUserGroup(document, userGroup, sendMail)
-				}
-			}
-		}*/
 	}
 
 	@Transactional
@@ -1256,11 +1247,24 @@ class UserGroupService {
     }
 
     def updateResourceOnGroups(instance, List userGroupIds, String submitType, boolean sendMail=true) {
-        return updateResourceOnGroup([userGroups:userGroupIds.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType], sendMail)
+println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println instance.getAuthor();
+
+        return updateResourceOnGroup([userGroups:userGroupIds.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType, author:instance.getAuthor().id+''], sendMail)
     }
 
     def updateResourceOnGroup(instance, UserGroup userGroup, String submitType, boolean sendMail=true) {
-        return updateResourceOnGroup([userGroups:userGroup.id, objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType], sendMail)
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        println instance.getAuthor();
+        return updateResourceOnGroup([userGroups:userGroup.id, objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType, author:instance.getAuthor().id+''], sendMail)
     }
 
 

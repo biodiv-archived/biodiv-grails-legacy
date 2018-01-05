@@ -255,7 +255,7 @@ println params.fromDate
     }
 
     SUser getAuthor() {
-        return this.uploader;//SUser.read(this.party.contributorId);
+        return this.party.fetchContributor();
     }
 
     def fetchCustomFields() {

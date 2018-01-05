@@ -114,6 +114,7 @@ class DataTableService extends AbstractMetadataService {
     def factService;
     def traitService;
     def userGroupService;
+    def documentService;
 
     DataTable create(params) {
         def instance = DataTable.class.newInstance();
@@ -170,16 +171,18 @@ class DataTableService extends AbstractMetadataService {
             File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
             List colMapping = FileObservationImporter.getInstance().saveObservationMapping(params, mappingFile, null, null);
             List columns = [];
-            params.columns.split(',').each {
-                String url = "";
-                String order = '100000';
-                colMapping.each {colM ->
-                    if(colM[1]==it) {
-                        url = colM[0];
-                        order = colM[2];
+            if(params.columns) {
+                params.columns.split(',').each {
+                    String url = "";
+                    String order = '100000';
+                    colMapping.each {colM ->
+                        if(colM[1]==it) {
+                            url = colM[0];
+                            order = colM[2];
+                        }
                     }
+                    columns << [url,it,order];
                 }
-                columns << [url,it,order];
             }
             instance.columns = columns as JSON;
         }
@@ -212,7 +215,26 @@ class DataTableService extends AbstractMetadataService {
             userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
         }
 
-        if(result.success && params.action=='save') {
+        if(result.success) {
+            if(params.id) {
+                //TODO:delete all existing objects and reupload sheet
+                switch(dataTable.dataTableType.ordinal()) {
+                    case DataTableType.OBSERVATIONS.ordinal():
+                    dataTable.deleteAllObservations();
+                    break;
+                    case DataTableType.SPECIES.ordinal(): 
+                    break;
+                    case DataTableType.FACTS.ordinal():
+                    dataTable.deleteAllFacts();
+                    break;
+                    case DataTableType.TRAITS.ordinal():
+                    break;
+                    case DataTableType.DOCUMENTS.ordinal():
+                    dataTable.deleteAllDocuments();
+                    break;
+                }
+
+            }
 
             def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
             String contentRootDir = config.speciesPortal.content.rootDir
@@ -253,7 +275,7 @@ class DataTableService extends AbstractMetadataService {
                         def fFileValidation = factService.validateFactsFile(xlsxFileUrl, new UploadLog());
                         if(fFileValidation.success) {
                             log.debug "Validation of fact file is done. Proceeding with upload"
-                            Map p = ['file':xlsxFileUrl, 'notes':params.notes, 'uploadType':'fact', 'dataTable':dataTable.id];
+                            Map p = ['file':xlsxFileUrl, 'notes':params.notes, 'uploadType':UploadJob.FACT, 'dataTable':dataTable.id];
                             p.putAll(paramsToPropagate);
                             def r = factService.upload(p);
                             if(r.success) {
@@ -283,7 +305,7 @@ class DataTableService extends AbstractMetadataService {
                                 def ant = new AntBuilder().unzip(src: iconsFile,dest: iconsFile.getParent(), overwrite:true);            
                             }
     
-                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':iconsFile, 'notes':params.notes, 'uploadType':'trait', 'dataTable':dataTable.id];
+                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':iconsFile, 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id];
                             p.putAll(paramsToPropagate);
 
                             def r = traitService.upload(p);
@@ -296,6 +318,19 @@ class DataTableService extends AbstractMetadataService {
                             log.error "Traits file is not valid.  So not scheduling for upload. ${tFileValidation} ${tvFileValidation}"
                         }
                         break;
+                    case DataTableType.DOCUMENTS.ordinal():
+                        //String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
+                        Map p = ['file':dataTableFile.getAbsolutePath(), 'uploadType':UploadJob.DOCUMENT, 'dataTable':dataTable.id, 'locale_language':params.locale_language];
+                        p.putAll(paramsToPropagate);
+                        def r = documentService.upload(p);
+                        if(r.success) {
+                            dataTable.uploadLog = r.uploadLog;
+                        } else {
+                            log.error "Error in scheduling observations upload job"
+                        }
+                        break;
+
+
                 }
                 if(!dataTable.save()) {
                     log.error "Error while saving datatable";

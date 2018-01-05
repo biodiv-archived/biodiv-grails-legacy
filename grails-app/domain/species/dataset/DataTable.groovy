@@ -19,6 +19,8 @@ import species.trait.Fact;
 import species.trait.Trait;
 import groovy.sql.Sql
 
+import content.eml.Document;
+
 class DataTable extends CollMetadata {
 	
 	
@@ -79,17 +81,6 @@ class DataTable extends CollMetadata {
 
     def getMapFeatures() {
         return dataTableService.getMapFeatures(this);
-    }
-
-    def deleteAllObservations() {
-        def obvs = Observation.findAllByDataTable(this);
-        obvs.each { obv ->    
-            obv.isDeleted = true;
-            if(!obv.save(flush:true)){
-                obv.errors.allErrors.each { log.error obv } 
-            }
-        }
-        return
     }
 
    static Map getParamsToPropagate(DataTable dataTable) {
@@ -173,6 +164,7 @@ println facts
            case DataTableType.TRAITS : 
            def traits = Trait.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, order:'id']);
            return traits;
+           case DataTableType.DOCUMENTS : return Document.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'id']);
            
        }
        return [];
@@ -184,6 +176,7 @@ println facts
            case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false);
            case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false);
            case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false);
+           case DataTableType.DOCUMENTS : return Document.countByDataTableAndIsDeleted(this, false);
        }
        return 0;
    }
@@ -200,8 +193,30 @@ println facts
        return res 
    }
 
+    def deleteAllObservations() {
+        def obvs = Observation.findAllByDataTable(this);
+        obvs.each { obv ->    
+            obv.isDeleted = true;
+            if(!obv.save(flush:true)){
+                obv.errors.allErrors.each { log.error obv } 
+            }
+        }
+        return
+    }
+
     def deleteAllFacts() {
         def obvs = Fact.findAllByDataTable(this);
+        obvs.each { obv ->    
+            obv.isDeleted = true;
+            if(!obv.save(flush:true)){
+                obv.errors.allErrors.each { log.error obv } 
+            }
+        }
+        return
+    }
+    
+    def deleteAllDocuments() {
+        def obvs = Document.findAllByDataTable(this);
         obvs.each { obv ->    
             obv.isDeleted = true;
             if(!obv.save(flush:true)){

@@ -276,6 +276,7 @@ class AbstractMetadataService extends AbstractObjectService {
         //if instance is part of dataTable then all datatable usergroups
         if(instance.metaClass.hasProperty(instance, 'dataTable') && instance.dataTable) {
             userGroupIds.addAll(instance.dataTable.userGroups.collect {it.id});
+            userGroupIds.addAll(instance.dataTable.dataset.userGroups.collect {it.id});
         }
 
         return new ArrayList(userGroupIds);
