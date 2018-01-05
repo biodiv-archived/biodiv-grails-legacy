@@ -1,12 +1,15 @@
 package species.dataset
 
 import content.eml.UFile;
+import species.groups.UserGroup;
 
 class Dataset1 extends CollMetadata {
 	
     DataPackage dataPackage;
     UFile uFile;	
-	static hasMany = [dataTables: DataTable];
+	static hasMany = [dataTables: DataTable, userGroups:UserGroup];
+	static belongsTo = [UserGroup]
+
 
     static constraints = {
     }

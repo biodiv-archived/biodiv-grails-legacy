@@ -203,6 +203,15 @@ class DataTableService extends AbstractMetadataService {
         dataTable.lastRevised = new Date();
 
         result = save(dataTable, params, true, null, feedType, null);
+
+        if(dataTable.dataset) {
+            log.debug "Posting dataTable to all user groups that dataset is part of"
+            HashSet uGs = new HashSet();
+            uGs.addAll(dataTable.dataset.userGroups);
+            log.debug uGs
+            userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
+        }
+
         if(result.success && params.action=='save') {
 
             def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config

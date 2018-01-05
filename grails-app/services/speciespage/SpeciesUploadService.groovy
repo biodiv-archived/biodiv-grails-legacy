@@ -626,7 +626,10 @@ class SpeciesUploadService {
 
                 if(s.dataTable) {
                     log.debug "Posting species to all user groups that data table is part of"
-			        userGroupService.addResourceOnGroups(s, s.dataTable.userGroups.collect{it.id}, false);
+                    HashSet uGs = new HashSet();
+                    uGs.addAll(s.dataTable.userGroups);
+                    uGs.addll(s.dataTable.dataset.userGroups);
+			        userGroupService.addResourceOnGroups(s, uGs.collect{it.id}, false);
                 }
 				log.info "post processed spcecies ${s}"
 			}

@@ -37,7 +37,6 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import species.sourcehandler.exporter.DwCObservationExporter; 
-import species.sourcehandler.importer.DwCObservationImporter;
 import species.sourcehandler.exporter.DwCSpeciesExporter
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import grails.converters.JSON;
@@ -46,7 +45,6 @@ import species.participation.Observation.BasisOfRecord;
 import species.participation.Observation.ProtocolType;
 import species.License;
 import species.License.LicenseType;
-import species.sourcehandler.importer.AbstractObservationImporter;
 import species.Metadata.DateAccuracy;
 import species.participation.Flag;
 import species.participation.Flag.FlagType;
@@ -126,6 +124,7 @@ class ObvUtilService {
     def messageSource;
     def sessionFactory;
     def factService;
+    def userGroupService;
 
     SpeciesGroup defaultSpeciesGroup;
     Habitat defaultHabitat;
@@ -856,6 +855,15 @@ class ObvUtilService {
             break;
         }*/
 
+        if(observationInstance.dataTable) {
+            log.debug "Posting observation to all user groups that data table is part of"
+            HashSet uGs = new HashSet();
+            uGs.addAll(observationInstance.dataTable.userGroups);
+            uGs.addAll(observationInstance.dataTable.dataset.userGroups);
+            log.debug uGs
+            userGroupService.addResourceOnGroups(observationInstance, uGs.collect{it.id}, false);
+        }
+
         if(!observationInstance.save()){
             if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
                 observationInstance.errors.allErrors.each { 
@@ -1004,7 +1012,7 @@ class ObvUtilService {
         File mappingFile = new File(params.mappingFile);
         uploadObservations(DataTable.get(params.dataTable), ipFile, null, mappingFile, null,  new File(dl.logFilePath));  
 //        dl.writeLog("\n====================================\nLoaded ${noOfObservationsLoaded} observations\n====================================\n", Level.INFO);
-        return ['success':true, 'msg':"Loaded ${noOfObservationsLoaded} observations."];
+        return ['success':true, 'msg':"Loaded observations."];
     }
 
     private void uploadDWCObservations(DataTable dataTable, File directory, File uploadLog) {

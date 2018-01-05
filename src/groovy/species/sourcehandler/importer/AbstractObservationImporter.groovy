@@ -22,6 +22,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
     protected Map dwcObvMapping;
     protected Map dwcMultimediaMapping;
 
+    private int lineNo = 0;
 
     List next(Map mediaInfo, int limit, File uploadLog=null) {
         return importObservations(mediaInfo, limit, uploadLog);
@@ -34,6 +35,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
 
         log.debug "Initializing readers to observation and multimedia files"
         observationReader = initReader(observationsFile);
+        lineNo = 0;
         if(multimediaFile)
             mediaReader = initReader(multimediaFile);//, 'multimedia.txt')
     }
@@ -132,6 +134,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
 
     protected void readMappingHeaders(Map metaFields, Map multiMediaMetaFields, File uploadLog=null) { 
         dwcObvHeader = observationReader.readNext();
+        lineNo++;
         observationHeader = new ArrayList();//new Map[dwcObvHeader.size()];
         dwcObvHeader.eachWithIndex { h, i ->
             if(h) {
@@ -312,6 +315,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         int no=1;
 
         String[] row = observationReader.readNext()
+        lineNo++;
         while(row) {
             if(row.size() > 0) {
             println "from row ${row} ${row.size()}"
@@ -356,6 +360,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
             }
             if(no++ >= limit) break;
             row = observationReader.readNext()
+            lineNo++;
         }
         log.debug "from params ${obvParams}"
         return obvParams;
