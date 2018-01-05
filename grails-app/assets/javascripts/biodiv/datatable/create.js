@@ -86,7 +86,10 @@ console.log('loadSampleData');
         //alert("Please click a species group to show respective traits");
     }
 
-    var mappedColumns = JSON.parse($('#mappedColumns').val());
+    var mappedColumns;
+    if($('#mappedColumns').val()) {
+        mappedColumns = JSON.parse($('#mappedColumns').val());
+    }
     $.each(columns, function(i, n) {
         var mappedColumn = getMappedColumn(n.name, mappedColumns);
 
@@ -164,6 +167,7 @@ console.log('loadSampleData');
 }
 
 function getMappedColumn(cName, mappedColumns) {
+    if(!mappedColumns) return "";
     for(var i=0; i< mappedColumns.length; i++) {
         if(cName == mappedColumns[i][1]) {
         if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/scientificName') return 'sciNameColumn';
