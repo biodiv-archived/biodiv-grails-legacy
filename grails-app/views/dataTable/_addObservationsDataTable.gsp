@@ -57,6 +57,7 @@
                                 <input type="hidden" id="dataTableFilePath" name="dataTableFilePath" value=""/>
                                 <input type="hidden" id="speciesGroupTraits" name="speciesGroupTraits" value=""/>
                                 <input type="hidden" id="columns" name="columns" value="${dataTableInstance?.columns}"/>
+                                <input type="hidden" id="mappedColumns" name="mappedColumns" value="${dataTableInstance?.columns}"/>
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="sciNameColumn">
                                     <g:message code="checklist.scientific_name.validator.invalid" />

@@ -72,6 +72,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import species.dataset.DataTable;
+import species.dataset.Dataset1;
 import species.dataset.DataPackage.DataTableType;
 
 class UserGroupService {
@@ -1317,6 +1318,11 @@ class UserGroupService {
 					groupRes += 'dataTables'
 					functionString += (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'
 					break
+                case Dataset1.class.getCanonicalName():
+					groupRes += 'datasets'
+					functionString += (submitType == 'post')? 'addToDatasets' : 'removeFromDatasets'
+					break
+
 				default:
 					break
 			}
@@ -1327,23 +1333,37 @@ class UserGroupService {
 			if(objectIds && objectIds != "") {
 				objectIds.split(",").each {
 					def obj = domainClass.read(Long.parseLong(it.trim()))
-                    if(obj.instanceOf(DataTable)){
-                        //TODO:batch this posting
-                        int dataObjectsCount = obj.getDataObjectsCount();
-                        int max=100, offset = 0;
+                    List dataTables = [];
+                    if(obj.instanceOf(Dataset1)){
+                        dataTables.addAll(obj.dataTables);
+                        log.debug "${submitType}ing datatables ${dataTables} into usergroups ${obj.userGroups}"
+                        functionString = (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'            
+                        def uGs = (submitType == 'post')? obj.userGroups : allGroups
+                        println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, dataTables, 'dataTables', functionString, sendMail);
 
-                        //HACK
-                        if(obj.dataTableType == DataTableType.SPECIES || obj.dataTableType == DataTableType.OBSERVATIONS || obj.dataTableType == DataTableType.DOCUMENTS) {
-                            println "Posting datatable ${obj} objects ${dataObjectsCount} into its groups"
-                            while(offset <= dataObjectsCount) {
-                                def dataObjects = obj.getDataObjects([max:max, offset:offset]);
-                                obvs = []
-                                obvs.addAll(dataObjects);
-                                log.debug "${submitType}ing datatable ${obj} ${obvs.size()} ${obj.dataTableType} into usergroups ${obj.userGroups}"
-                                functionString = (submitType == 'post')? 'addTo'+obj.dataTableType : 'removeFrom'+obj.dataTableType            
-                                def uGs = (submitType == 'post')? obj.userGroups : allGroups
-                                println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, obj.dataTableType.value().toLowerCase(), functionString, sendMail);
-                                offset += max;
+                    }
+                    if(obj.instanceOf(DataTable)){
+                        dataTables << obj;
+                    }
+                    if(dataTables) {
+                        dataTables.each {dataTable ->
+                            //TODO:batch this posting
+                            int dataObjectsCount = dataTable.getDataObjectsCount();
+                            int max=100, offset = 0;
+
+                            //HACK
+                            if(dataTable.dataTableType == DataTableType.SPECIES || dataTable.dataTableType == DataTableType.OBSERVATIONS || dataTable.dataTableType == DataTableType.DOCUMENTS) {
+                                println "Posting datatable ${dataTable} objects ${dataObjectsCount} into its groups"
+                                while(offset <= dataObjectsCount) {
+                                    def dataObjects = dataTable.getDataObjects([max:max, offset:offset]);
+                                    obvs = []
+                                    obvs.addAll(dataObjects);
+                                    log.debug "${submitType}ing datatable ${dataTable} ${obvs.size()} ${dataTable.dataTableType} into usergroups ${dataTable.userGroups}"
+                                    functionString = (submitType == 'post')? 'addTo'+dataTable.dataTableType : 'removeFrom'+dataTable.dataTableType            
+                                    def uGs = (submitType == 'post')? dataTable.userGroups : allGroups
+                                    println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, dataTable.dataTableType.value().toLowerCase(), functionString, sendMail);
+                                    offset += max;
+                                }
                             }
                         }
                     }
@@ -1451,7 +1471,11 @@ class UserGroupService {
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
+                    println submitType
+                    println groupRes
+                    println obvs
 					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
+                    println obvs
 					obvs = getFeatureSafeList(ug, obvs)
 				}
 			}
@@ -1521,18 +1545,21 @@ class UserGroupService {
 		private List getFeatureSafeList(ug, obvs){
 			SUser currUser = springSecurityService.currentUser;
 			//if admin or founder or expert then can un post any featured resource
-			if(utilsService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser)){
-				log.debug "prevlidge user in the gropu " + ug + "    uesr " + currUser
+			if(currUser && (utilsService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser))){
+				log.debug "currUser ${currUser} is a previlage user in the group " + ug
+println obvs
 				return obvs
 			}
 
 			def newObvs = []
-			obvs.each { obv ->
+			obvs.each { obv -> 
 				if(( obv.metaClass.hasProperty(obv, 'author') && (obv.author == currUser)) || !Featured.isFeaturedAnyWhere(obv)){
 					newObvs << obv
 					log.debug "User is author or obv is not featured in any group " + currUser
 				}
 			}
+            println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+            println newObvs;
 			return newObvs
 		}
 	}

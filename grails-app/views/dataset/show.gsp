@@ -85,6 +85,10 @@
                             </ul>			
                         </div>
                     </div>
+
+                    <uGroup:objectPostToGroupsWrapper 
+                    model="['observationInstance':datasetInstance, 'objectType':datasetInstance.class.canonicalName]"/>
+ 
                     <div class="union-comment">
                         <feed:showAllActivityFeeds model="['rootHolder':datasetInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                         <comment:showAllComments model="['commentHolder':datasetInstance, commentType:'super','showCommentList':false]" />
