@@ -278,4 +278,17 @@ class Document extends DataObject implements Comparable {
         }
         return validUserGroups;
     }
+
+    def fetchChecklistAnnotation(){
+        def res = [:]
+        res['id'] = this.id;
+        res['type'] = 'document';
+        res['title'] = this.title;
+        res['url'] = this.externalUrl;
+        if(uFile) {
+        res['uFile'] = this.uFile.path;
+        }
+        return res
+    }
+
 }

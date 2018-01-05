@@ -12,15 +12,16 @@ import species.participation.NamelistService
 
 class UploadJob {
 	
-	private final static String OBSERVATION_LIST = "observations";
-	private final static String CHECKLIST = "checklist";
-	private final static String SPECIES = "species";
-	private final static String UNIQUE_SPECIES = "unique species";
-	private final static String TAXONOMY_DEFINITION = "taxonomydefinition";
-	private final static String TRAIT = "trait";
-	private final static String FACT = "fact";
+	public final static String OBSERVATION_LIST = "observations";
+	public final static String CHECKLIST = "checklist";
+	public final static String SPECIES = "species";
+	public final static String UNIQUE_SPECIES = "unique species";
+	public final static String TAXONOMY_DEFINITION = "taxonomydefinition";
+	public final static String TRAIT = "trait";
+	public final static String FACT = "fact";
 	public final static String SPECIES_BULK_UPLOAD = "species bulk upload";
 	public final static String BULK_UPLOAD = "bulk upload";
+	public final static String DOCUMENT = "document";
 	
 	def obvUtilService
     def utilsService;
@@ -31,6 +32,7 @@ class UploadJob {
 	def factService;
     def speciesUploadService
 	def dataSource
+    def documentService;
 	
     protected static volatile boolean JOB_RUNNING = false
 
@@ -57,6 +59,9 @@ class UploadJob {
                     break
                     case SPECIES:
                     //f = speciesService.export(dl.fetchMapFromText(), dl)
+                    break;
+                    case DOCUMENT:
+                    result = documentService.upload(dl.filePath, dl.fetchMapFromText(), dl);
                     break;
                     case TAXONOMY_DEFINITION:
                     //f = namelistService.export(dl.fetchMapFromText(), dl);

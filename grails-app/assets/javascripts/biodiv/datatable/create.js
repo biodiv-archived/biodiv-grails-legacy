@@ -18,7 +18,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                     usersUrl : window.params.userTermsUrl
                 });
                 CKEDITOR.replace('summary', config);
-                CKEDITOR.replace('description', config);
+                CKEDITOR.replace('description', descriptionConfig);
                 showSampleDataTable();
                 var contributorId = $('#contributorUserIds').data('contributorid'); 
                 var contributorName = $('#contributorUserIds').data('contributorname'); 

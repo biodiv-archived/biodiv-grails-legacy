@@ -1069,8 +1069,8 @@ class UtilsService {
     ////////////////////////RESPONSE FORMATS//////////////////
 
     Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
-        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
-        String acceptHeader = request.getHeader('Accept');
+//        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
+//        String acceptHeader = request.getHeader('Accept');
 
         if(!errors) errors = [];
         if(domainObject) {
@@ -1080,7 +1080,12 @@ class UtilsService {
             }
         }
 
-        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        try {
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        } catch(Exception e) {
+            log.error "Error setting status in response"
+        }
+
         def result = [success:false, status:status, msg:msg, errors:errors];
         if(domainObject) 
             result['instance'] = domainObject;
@@ -1088,9 +1093,9 @@ class UtilsService {
     }
 
     Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
-        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+//        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
 //        println "+++++++++++++++++++++++++++++++++++++++"
-        String acceptHeader = request.getHeader('Accept');
+//        String acceptHeader = request.getHeader('Accept');
 //        println acceptHeader
         def result = [success:true, status: status, msg:msg]
         //HACK to handle previous version of api for mobile app 
@@ -1119,7 +1124,11 @@ class UtilsService {
         } else {
 */            if(domainObject) result['instance'] = domainObject;
             if(model) result['model'] = model;
-            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            try {
+                (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            } catch(Exception e) {
+                log.error "Error setting status in response"
+            }
             return result;
 //        } 
     }
