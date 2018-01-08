@@ -25,11 +25,14 @@
                 <div style="width:100%;">
                     <div class="main_heading" style="margin-left:0px; position:relative">
                         <div class="pull-right">
-                            <sUser:ifOwns model="['user':dataPackageInstance.author]">
 
+                            <sUser:hasPermissionForDataset model="['dataPackage':dataPackageInstance]">
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'dataset', action:'create', dataPackage:dataPackageInstance.id)}"
                                 ><i class="icon-plus"></i><g:message code="default.add.label" args="['Dataset']" /></a>
+                            </sUser:hasPermissionForDataset>
+
+                            <sUser:ifOwns model="['user':dataPackageInstance.author]">
 
 
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"

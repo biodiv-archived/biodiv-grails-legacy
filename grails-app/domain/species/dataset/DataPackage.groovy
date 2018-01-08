@@ -120,8 +120,9 @@ class DataPackage {
 	String supportingModules;
 	String allowedDataTableTypes;
 
-    SUser uploader;
     SUser author;
+    String uploaderIds;
+    boolean hasRoleUserAllowed = false; //if false only specific users are going to get permission to add dataset
 
     Date createdOn = new Date();
     Date lastRevised = new Date();
@@ -187,4 +188,16 @@ class DataPackage {
     List<CustomField> fetchCustomFields(SupportingModules supportingModule) {
         return supportingModules().get(supportingModule);
     }
+
+    List<SUser> getUploaders() {
+        List<SUser> uploaders = [];
+        
+        if(!uploaderIds) return uploaders;
+
+        uploaderIds.split(',').each { uId ->
+            uploaders << SUser.read(Long.parseLong(uId));
+        }
+        return uploaders;
+    }
+
 }

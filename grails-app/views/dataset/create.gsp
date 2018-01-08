@@ -140,7 +140,8 @@
                                         from="${DataPackage.list()}"
                                         noSelection="${['null':'Select One...']}"
                                         value="${dataPackage?:(datasetInstance?.dataPackage?.id)}"
-                                        optionKey="id" optionValue="title"
+                                        optionKey="id" optionValue="title" 
+                                        disabled="${datasetInstance?.dataPackage?.id?true:false}"
                                         onchange="dataPackageChangedForDataset(event, this.value);" />
 
 

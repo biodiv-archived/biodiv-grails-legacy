@@ -117,6 +117,14 @@
                                     <i class="icon-plus"></i><g:message code="link.add.document" />  
                                 </a>
                   </li> 
+
+                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.dataset.info')}" data-trigger="hover"
+                                    href="${uGroup.createLink(
+                                    controller:'dataset', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                                    data-original-title="Add Dataset" title="${g.message(code:'button.create.dataset')}">
+                                    <i class="icon-plus"></i><g:message code="button.create.dataset" />  
+                                </a>
+                  </li>
                   <sUser:isAdmin>
                   <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.trait.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
@@ -134,13 +142,6 @@
                                 </a>
                   </li>
 
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.dataset.info')}" data-trigger="hover"
-                                    href="${uGroup.createLink(
-                                    controller:'dataset', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
-                                    data-original-title="Add Dataset" title="${g.message(code:'button.create.dataset')}">
-                                    <i class="icon-plus"></i><g:message code="button.create.dataset" />  
-                                </a>
-                  </li>
                   <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.datapackage.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'dataPackage', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"

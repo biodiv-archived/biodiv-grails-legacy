@@ -859,7 +859,9 @@ class ObvUtilService {
             log.debug "Posting observation to all user groups that data table is part of"
             HashSet uGs = new HashSet();
             uGs.addAll(observationInstance.dataTable.userGroups);
-            uGs.addAll(observationInstance.dataTable.dataset.userGroups);
+            if(observationInstance.dataTable.dataset) {
+                uGs.addAll(observationInstance.dataTable.dataset.userGroups);
+            }
             log.debug uGs
             userGroupService.addResourceOnGroups(observationInstance, uGs.collect{it.id}, false);
         }

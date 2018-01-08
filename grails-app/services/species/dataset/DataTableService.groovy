@@ -115,6 +115,7 @@ class DataTableService extends AbstractMetadataService {
     def traitService;
     def userGroupService;
     def documentService;
+    def dataPackageService;
 
     DataTable create(params) {
         def instance = DataTable.class.newInstance();
@@ -205,49 +206,50 @@ class DataTableService extends AbstractMetadataService {
       
         dataTable.lastRevised = new Date();
 
-        result = save(dataTable, params, true, null, feedType, null);
+        if(hasPermission(dataTable, springSecurityService.currentUser)) {
+            result = save(dataTable, params, true, null, feedType, null);
 
-        if(dataTable.dataset) {
-            log.debug "Posting dataTable to all user groups that dataset is part of"
-            HashSet uGs = new HashSet();
-            uGs.addAll(dataTable.dataset.userGroups);
-            log.debug uGs
-            userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
-        }
-
-        if(result.success) {
-            if(params.id) {
-                //TODO:delete all existing objects and reupload sheet
-                switch(dataTable.dataTableType.ordinal()) {
-                    case DataTableType.OBSERVATIONS.ordinal():
-                    dataTable.deleteAllObservations();
-                    break;
-                    case DataTableType.SPECIES.ordinal(): 
-                    break;
-                    case DataTableType.FACTS.ordinal():
-                    dataTable.deleteAllFacts();
-                    break;
-                    case DataTableType.TRAITS.ordinal():
-                    break;
-                    case DataTableType.DOCUMENTS.ordinal():
-                    dataTable.deleteAllDocuments();
-                    break;
-                }
-
+            if(dataTable.dataset) {
+                log.debug "Posting dataTable to all user groups that dataset is part of"
+                HashSet uGs = new HashSet();
+                uGs.addAll(dataTable.dataset.userGroups);
+                log.debug uGs
+                userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
             }
 
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-            String contentRootDir = config.speciesPortal.content.rootDir
-            File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
+            if(result.success) {
+                if(params.id) {
+                    //TODO:delete all existing objects and reupload sheet
+                    switch(dataTable.dataTableType.ordinal()) {
+                        case DataTableType.OBSERVATIONS.ordinal():
+                        dataTable.deleteAllObservations();
+                        break;
+                        case DataTableType.SPECIES.ordinal(): 
+                        break;
+                        case DataTableType.FACTS.ordinal():
+                        dataTable.deleteAllFacts();
+                        break;
+                        case DataTableType.TRAITS.ordinal():
+                        break;
+                        case DataTableType.DOCUMENTS.ordinal():
+                        dataTable.deleteAllDocuments();
+                        break;
+                    }
 
-            if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
-                File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
+                }
 
-                Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
+                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                String contentRootDir = config.speciesPortal.content.rootDir
+                File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
 
-                switch(dataTable.dataTableType.ordinal()) {
+                if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
+                    File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
 
-                    case DataTableType.OBSERVATIONS.ordinal() :
+                    Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
+
+                    switch(dataTable.dataTableType.ordinal()) {
+
+                        case DataTableType.OBSERVATIONS.ordinal() :
                         Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id];
                         p.putAll(paramsToPropagate);
                         def r = observationService.upload(p);
@@ -258,7 +260,7 @@ class DataTableService extends AbstractMetadataService {
                         }
                         break;
 
-                    case DataTableType.SPECIES.ordinal(): 
+                        case DataTableType.SPECIES.ordinal(): 
                         def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':params.imagesDir, 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
 
                         if(res.sBulkUploadEntry) {
@@ -270,7 +272,7 @@ class DataTableService extends AbstractMetadataService {
 
                         break;
 
-                    case DataTableType.FACTS.ordinal():
+                        case DataTableType.FACTS.ordinal():
                         String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
                         def fFileValidation = factService.validateFactsFile(xlsxFileUrl, new UploadLog());
                         if(fFileValidation.success) {
@@ -288,7 +290,7 @@ class DataTableService extends AbstractMetadataService {
                         }
                         break;
 
-                    case DataTableType.TRAITS.ordinal():
+                        case DataTableType.TRAITS.ordinal():
 
                         String tFile = params.uFile ? contentRootDir + File.separator + params.uFile.path : null;
                         String tvFile = params.tvFile ? contentRootDir + File.separator + params.tvFile.path : null;
@@ -296,15 +298,15 @@ class DataTableService extends AbstractMetadataService {
 
                         def tFileValidation = traitService.validateTraitDefinitions(tFile, new UploadLog());
                         def tvFileValidation = traitService.validateTraitValues(tvFile, new UploadLog());
-            
+
                         if(tFileValidation.success || tvFileValidation.success) {
                             log.debug "Validation of trait file and traitvalue file is done. Proceeding with upload"
-                            
+
                             File iconsFile = params.iconsFile ? new File(params.iconsFile) : null;
                             if(iconsFile && iconsFile.exists() && FilenameUtils.getExtension(iconsFile.getName()).equals('zip')) {
                                 def ant = new AntBuilder().unzip(src: iconsFile,dest: iconsFile.getParent(), overwrite:true);            
                             }
-    
+
                             Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':iconsFile, 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id];
                             p.putAll(paramsToPropagate);
 
@@ -318,7 +320,7 @@ class DataTableService extends AbstractMetadataService {
                             log.error "Traits file is not valid.  So not scheduling for upload. ${tFileValidation} ${tvFileValidation}"
                         }
                         break;
-                    case DataTableType.DOCUMENTS.ordinal():
+                        case DataTableType.DOCUMENTS.ordinal():
                         //String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
                         Map p = ['file':dataTableFile.getAbsolutePath(), 'uploadType':UploadJob.DOCUMENT, 'dataTable':dataTable.id, 'locale_language':params.locale_language];
                         p.putAll(paramsToPropagate);
@@ -331,12 +333,17 @@ class DataTableService extends AbstractMetadataService {
                         break;
 
 
-                }
-                if(!dataTable.save()) {
-                    log.error "Error while saving datatable";
+                    }
+                    if(!dataTable.save()) {
+                        log.error "Error while saving datatable";
+                    }
                 }
             }
+        } else {
+            result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
         }
+ 
+
         return result;
 	}
 
@@ -566,7 +573,7 @@ class DataTableService extends AbstractMetadataService {
                 def dataTableInstance = DataTable.get(params.id.toLong())
                 if (dataTableInstance) {
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(dataTableInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
-                    if(isFeatureDeleted && utilsService.ifOwns(dataTableInstance.uploader)) {
+                    if(isFeatureDeleted  && dataTableInstance.hasPermission(springSecurityService.currentUser)) {
                         def mailType = utilsService.DATATABLE_DELETED
                         try {
                             dataTableInstance.isDeleted = true;
@@ -626,5 +633,19 @@ class DataTableService extends AbstractMetadataService {
         return [success:success, url:url, msg:message, errors:errors]
     }
 
+    boolean hasPermission(DataTable dataTable, SUser user) {
+        boolean isPermitted = false;
+        DataPackage dataPackage = null;
+        if(dataTable.dataset == null) {
+            dataPackage = DataPackage.findByTitle('Checklist');
+        } else {
+            dataPackage = dataTable.dataset.dataPackage;
+        }
+
+        if(dataPackageService.hasPermission(dataPackage, user) && (dataTable.getAuthor().id == user.id || dataTable.uploader.id == user.id)) {
+            isPermitted = true;
+        }
+        return isPermitted;
+    }
 
 } 

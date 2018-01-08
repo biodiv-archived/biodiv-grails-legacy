@@ -147,6 +147,29 @@
 							</div>
 						</div>
 
+						<div
+							class="row control-group left-indent ${hasErrors(bean: dataPackageInstance, field: 'uploaderIds', 'error')}">
+
+							<label for="uploaders" class="control-label"><g:message
+									code="dataPackage.uploaders.label" default="${g.message(code:'dataPackage.uploaders.label')}" /> *</label>
+							<div class="controls textbox">
+			                    <g:set var="autofillUsersId" value="uploader_id" />
+                                <sUser:selectUsers model="['id':autofillUsersId]" />
+                                <input type="hidden" name="uploaderUserIds" id="uploaderUserIds"/>
+                                <div class="help-inline">
+                                <g:hasErrors bean="${dataPackageInstance}" field="uploaderIds">
+                                <g:eachError bean="${dataPackageInstance}" field="uploaderIds">
+                                <li><g:message error="${it}" /></li>
+                                </g:eachError>
+                                </g:hasErrors>
+                                        <label class="checkbox" style="text-align: left;"> 
+                                            <input type="checkbox" name="hasRoleUserAllowed" ${dataPackageInstance.hasRoleUserAllowed?'checked=checked':''}/> Can any logged in user can create dataset and datatable in this package? 
+                                        </label>
+ 
+                                </div>
+    						</div>
+						</div>
+
 
 
 
@@ -184,9 +207,22 @@
 </div>
 	<asset:script>
         $(document).ready(function() {
+
+            var uploader_autofillUsersComp = $("#userAndEmailList_${autofillUsersId}").autofillUsers({
+                usersUrl : '${createLink(controller:'user', action: 'terms')}'
+            });
+	
+            <g:each in="${dataPackageInstance?.getUploaders()}" var="uploader">
+				uploader_autofillUsersComp[0].addUserId({'item':{'userId':'${uploader.id}', 'value':'${uploader.name}'}});
+			</g:each>
+	
             $("#createDataPackageSubmit").click(function(){
                 var cfInput = $("<input>").attr("type", "hidden").attr("name", "customFieldMapList").val(getCustomFields());
                 $('#${form_id}').append($(cfInput));
+
+                if(uploader_autofillUsersComp.length > 0) {
+                    $('input[name="uploaderUserIds"]').val(uploader_autofillUsersComp[0].getEmailAndIdsList().join(","));
+                }
 
                 $("#${form_id}").submit();
                 return false;
@@ -195,6 +231,7 @@
             $(document).on('click', ".addNewCustomField", function() {
                 $(this).parent().prev().prop('checked', true);
             });
+
         });
     </asset:script>
 

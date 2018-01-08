@@ -19,7 +19,7 @@ class DataTableController extends AbstractObjectController {
 	def springSecurityService;
 	def mailService;
 	def messageSource;
-
+    def dataPackageService;
     def dataTableService;
 
 	static allowedMethods = [show:'GET', index:'GET', list:'GET',  update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
@@ -43,7 +43,14 @@ class DataTableController extends AbstractObjectController {
             DataTable dataTableInstance = new DataTable()
             dataTableInstance.dataset = datasetInstance;
             dataTableInstance.properties = params;
-            return [dataTableInstance: dataTableInstance]
+
+
+            if(dataPackageService.hasPermission(dataTableInstance.dataset.dataPackage, springSecurityService.currentUser)) {
+                render(view: "create", model: [dataTableInstance: dataTableInstance])
+            } else {
+                flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'dataTable.label', default: 'DataTable'), dataTableInstance.dataset.dataPackage.title])}"
+                redirect  url: uGroup.createLink(action: "list")
+            }
         } else {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
             redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
@@ -62,7 +69,7 @@ class DataTableController extends AbstractObjectController {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'DataTable'), params.id])}"
 			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
-		} else if(utilsService.ifOwns(dataTableInstance.author)) {
+		} else if(dataTableService.hasPermission(dataTableInstance, springSecurityService.currentUser)) {
             String dir = (new File(grailsApplication.config.speciesPortal.content.rootDir + dataTableInstance.uFile.path).parentFile).getAbsolutePath().replace(grailsApplication.config.speciesPortal.content.rootDir, '');
             String multimediaFile = dir + '/multimediaFile.tsv';
             String mappingFile = dir + '/mappingFile.tsv';
@@ -70,7 +77,7 @@ class DataTableController extends AbstractObjectController {
 			render(view: "create", model: [dataTableInstance: dataTableInstance, multimediaFile:multimediaFile, mappingFile:mappingFile, multimediaMappingFile:multimediaMappingFile, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
-			redirect (url:uGroup.createLink(action:'show', controller:"dataset", id:dataTableInstance.dataset.id, 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'show', controller:"dataTable", id:dataTableInstance.id, 'userGroupWebaddress':params.webaddress))
 		}
 	}
 
@@ -79,7 +86,12 @@ class DataTableController extends AbstractObjectController {
 		def dataTableInstance = DataTable.get(params.long('id'))
         def msg;
 		if(dataTableInstance)	{
-			saveAndRender(params, true)
+            if(dataTableService.hasPermission(dataTableInstance, springSecurityService.currentUser)) {
+    			saveAndRender(params, true)
+            } else {
+			    flash.message = "${message(code: 'edit.denied.message')}"
+			    redirect (url:uGroup.createLink(action:'show', controller:"dataTable", id:dataTableInstance.id, 'userGroupWebaddress':params.webaddress))
+		    }
 		} else {
 			msg = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'DataTable'), params.id])}"
             def model = utilsService.getErrorModel(msg, null, OK.value());
