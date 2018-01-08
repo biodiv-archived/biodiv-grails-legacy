@@ -10,7 +10,8 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
             type:'POST',
             data:{'dataTableTypeId':dataTableTypeId,'datasetId':datasetId, dataTableId:dataTableId}, 
             success:function(data,textStatus){
-                $('#addDataTable').html(data);
+                if(data.success) {
+                $('#addDataTable').html(data.model.tmpl);
                 initObservationCreate();
                 intializesSpeciesHabitatInterest();
                 initLocationPicker();
@@ -32,7 +33,11 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                     showSampleDataTable();
                     return false;
                 });
-                loadSpeciesGroupTraits();
+                    loadSpeciesGroupTraits();
+                }  else {
+                    $('#addDataTable').html(data.msg);
+                }
+
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
                 console.log('error onDataTableClick');

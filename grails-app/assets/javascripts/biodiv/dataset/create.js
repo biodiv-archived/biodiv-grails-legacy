@@ -10,16 +10,20 @@ function dataPackageChangedForDataset(event, dataPackageId) {
             type:'POST',
             data:'dataPackageId='+dataPackageId, 
             success:function(data,textStatus){
-                $('#datasetEditSection').html(data);
-                initObservationCreate();
-                intializesSpeciesHabitatInterest();
-                initLocationPicker();
-                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
-                CKEDITOR.replace('summary', config);
-                CKEDITOR.replace('description', config);
-                dataset_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
-                    usersUrl : window.params.userTermsUrl
-                });
+                if(data.success) {
+                    $('#datasetEditSection').html(data.model.tmpl);
+                    initObservationCreate();
+                    intializesSpeciesHabitatInterest();
+                    initLocationPicker();
+                    var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+                    CKEDITOR.replace('summary', config);
+                    CKEDITOR.replace('description', config);
+                    dataset_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
+                        usersUrl : window.params.userTermsUrl
+                    });
+                } else {
+                    $('#datasetEditSection').html(data.msg);
+                }
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
                 console.log('error onDatasetClick');

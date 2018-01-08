@@ -115,7 +115,10 @@ class DataPackageService extends AbstractMetadataService {
             instance.author = springSecurityService.currentUser;
         }
 
-        instance.uploader = springSecurityService.currentUser;
+        if(params.uploaderUserIds)  {
+           instance.uploaderIds = params.uploaderUserIds;
+        } 
+
        return instance;
     }
 
@@ -315,5 +318,27 @@ class DataPackageService extends AbstractMetadataService {
 
     }
 
+    boolean hasPermission(DataPackage dataPackage, SUser user) {
+        
+        log.debug "Testing is ${user} has permissions on ${dataPackage}"
 
+        if(utilsService.isAdmin(user))
+            return true;
+println dataPackage.hasRoleUserAllowed 
+println springSecurityService.currentUser
+        if(dataPackage.hasRoleUserAllowed && springSecurityService.currentUser) 
+            return true;
+
+        boolean isPermitted = false;
+        if(dataPackage.uploaderIds) {
+            dataPackage.uploaderIds.split(',').each { uId ->
+                println uId
+                println user.id
+                if(Long.parseLong(uId) == user.id) {
+                    isPermitted = true;
+                }
+            }
+        }
+        return isPermitted;
+    }
 } 

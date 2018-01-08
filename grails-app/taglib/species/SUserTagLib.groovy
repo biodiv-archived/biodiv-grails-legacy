@@ -9,7 +9,9 @@ class SUserTagLib {
 	def SUserService;
     def utilsService;
     def observationService
-
+    def datasetService;
+    def dataTableService;
+    def dataPackageService;
 	/**
 	 * 
 	 */
@@ -183,4 +185,21 @@ class SUserTagLib {
 		}
 	}
 
+ 	def ifOwnsDataset = { attrs, body ->
+		if (datasetService.hasPermission(attrs.model.dataset, springSecurityService.currentUser)) {
+			out << body()
+		}
+	}
+ 	
+    def ifOwnsDataTable = { attrs, body ->
+		if (dataTableService.hasPermission(attrs.model.dataTable, springSecurityService.currentUser)) {
+			out << body()
+		}
+	}
+ 	
+    def hasPermissionForDataset = { attrs, body ->
+		if (dataPackageService.hasPermission(attrs.model.dataPackage, springSecurityService.currentUser)) {
+			out << body()
+		}
+	}
 }

@@ -1338,14 +1338,14 @@ println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 				objectIds.split(",").each {
 					def obj = domainClass.read(Long.parseLong(it.trim()))
                     List dataTables = [];
-                    if(obj.instanceOf(Dataset1)){
+                    if(obj.instanceOf(Dataset1) && obj.dataTables){
                         dataTables.addAll(obj.dataTables);
                         log.debug "${submitType}ing datatables ${dataTables} into usergroups ${obj.userGroups}"
                         functionString = (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'            
                         def uGs = (submitType == 'post')? obj.userGroups : allGroups
                         println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, dataTables, 'dataTables', functionString, sendMail);
-
                     }
+
                     if(obj.instanceOf(DataTable)){
                         dataTables << obj;
                     }

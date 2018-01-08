@@ -41,7 +41,7 @@
                         </span>
 
                         <div class="pull-right">
-                            <sUser:ifOwns model="['user':datasetInstance.author]">
+                            <sUser:ifOwnsDataset model="['dataset':datasetInstance]">
 
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'dataTable', action:'create', dataset:datasetInstance.id)}"
@@ -60,7 +60,7 @@
                                                     <input type="hidden" name="id" value="${datasetInstance.id}" />
                                                 </form>
  
-                            </sUser:ifOwns>
+                            </sUser:ifOwnsDataset>
 
                         </div>
                         <s:showHeadingAndSubHeading

@@ -906,3 +906,7 @@ update data_table set summary=description;
 alter table data_table alter column description drop not null;
 update data_table set description=null;
 alter table data_table alter column summary  set not null;
+
+alter table data_package add column has_role_user_allowed boolean;
+alter table data_package add column uploader_ids varchar(255);
+alter table data_package drop column uploader_id;

@@ -46,7 +46,7 @@
                                                 </g:if>
                                         
                                                 <g:if test="${dataTableInstance}">
-                                                <sUser:ifOwns model="['user':dataTableInstance.uploader]">
+                                                <sUser:ifOwnsDataTable model="['dataTable':dataTableInstance]">
        
                                                 <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                                    href="${uGroup.createLink(controller:'dataTable', action:'edit', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
@@ -58,7 +58,7 @@
                                                 <form action="${uGroup.createLink(controller:'dataTable', action:'flagDeleted')}" method='POST' name='deleteForm'>
                                                     <input type="hidden" name="id" value="${dataTableInstance.id}" />
                                                 </form>
-                                                 </sUser:ifOwns>
+                                                 </sUser:ifOwnsDataTable>
                                                 </g:if>
                                         
                                             </div>

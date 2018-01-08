@@ -106,6 +106,8 @@ class DatasetService extends AbstractMetadataService {
     def dataSource;
     def grailsApplication;
     def dataTableService;
+    def dataPackageService;
+    def userGroupService;
 
     Dataset1 create(params) {
         //return super.create(Dataset.class, params);
@@ -171,12 +173,12 @@ class DatasetService extends AbstractMetadataService {
         }
       
         dataset.lastRevised = new Date();
-
-        Dataset1.withTransaction {
+        
+        if(hasPermission(dataset, springSecurityService.currentUser)) {
             result = save(dataset, params, true, null, feedType, null);
-            if(result.success) {
-            }
-        } 
+        } else {
+            result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
+        }
         return result;
     }
 
@@ -377,7 +379,7 @@ class DatasetService extends AbstractMetadataService {
                 if (datasetInstance) {
                     //datasetInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
-                    if(isFeatureDeleted && utilsService.ifOwns(datasetInstance.author)) {
+                    if(isFeatureDeleted && datasetInstance.hasPermission(springSecurityService.currentUser)) {
                         def mailType = activityFeedService.INSTANCE_DELETED
                         try {
                             datasetInstance.isDeleted = true;
@@ -442,4 +444,11 @@ class DatasetService extends AbstractMetadataService {
         return [success:success, url:url, msg:message, errors:errors]
     }
 
+    boolean hasPermission(Dataset1 dataset, SUser user) {
+        boolean isPermitted = false;
+        if(dataPackageService.hasPermission(dataset.dataPackage, user) && (dataset.getAuthor().id == user.id || dataset.uploader.id == user.id)) {
+            isPermitted = true;
+        }
+        return isPermitted;
+    }
 } 
