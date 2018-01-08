@@ -133,6 +133,7 @@ class DataPackage {
 		title nullable:false, blank:false;
 		description nullable:false, blank:false;
 		supportingModules nullable:true;
+		uploaderIds nullable:true;
 		allowedDataTableTypes nullable:false;
 	}
 	

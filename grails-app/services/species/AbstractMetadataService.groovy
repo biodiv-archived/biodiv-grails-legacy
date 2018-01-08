@@ -126,7 +126,11 @@ class AbstractMetadataService extends AbstractObjectService {
             log.debug "got ${instance.fromDate}"
   
             if(params.toDate && (params.toDate instanceof Date)) {
-                instance.toDate = params.toDate;
+                if(params.toDate == new Date(0)) {
+                    instance.toDate = instance.fromDate;
+                } else {
+                    instance.toDate = params.toDate;
+                }
             } else if(params.toDate) {
                 instance.toDate = parseDate(params.toDate);
             } else {

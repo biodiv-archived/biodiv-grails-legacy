@@ -205,49 +205,53 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         def header = ['Field', 'Column', 'Order'];
         writer.writeNext(header.toArray(new String[0]))
         def dataToWrite = [];
-        boolean sciNameFound=false;
-        boolean commonNameColumn=false;
-        boolean observedOn=false;
-        boolean locationTitle=false;
-        boolean latitude=false;
-        boolean longitude=false
-        dwcObvMapping.each { url, fieldMapping ->
-            String column = '';
-            mapping.attribute.each {ipColumnName, mappedColumnName ->
-                if(mappedColumnName == 'sciNameColumn') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/scientificName') {column = ipColumnName
-                        sciNameFound = true;}
-                } else if(mappedColumnName == 'commonNameColumn') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/vernacularName') {column = ipColumnName
-                        commonNameColumn=true;}
-                } else if(mappedColumnName == 'observed on') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/eventDate') {column = ipColumnName
-                        observedOn = true;
-                    }
-                }  else if(mappedColumnName == 'location title') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/locality'){ column = ipColumnName
-                        locationTitle=true;
-                    }
-                }  else if(mappedColumnName == 'latitude') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/decimalLatitude'){ column = ipColumnName
-                        latitude=true;
-                    }
-                }  else if(mappedColumnName == 'longitude') {
-                    if(url == 'http://rs.tdwg.org/dwc/terms/decimalLongitude'){ column = ipColumnName
-                        longitude=true;}
-                }  
-                if(uploadLog) uploadLog << "\nmapping "+ipColumnName+" : "+mappedColumnName+" ("+url+")";
-            }
-            if(column) {
-                def temp = [];
-                temp.add(url+"");
-                temp.add(column);
-                temp.add(fieldMapping.order+"");
-                dataToWrite.add(temp.toArray(new String[0]))
-            }
-        }
         mapping.attribute.each { ipColumnName, mappedColumnName ->
             String column = ipColumnName;
+            String mappedURL;
+            Map mappedFieldMapping;
+            boolean mapped = false;
+            dwcObvMapping.each { url, fieldMapping ->
+                if(mapped) return;
+
+                mappedURL = url;
+                mappedFieldMapping = fieldMapping;
+                if(url == 'http://rs.tdwg.org/dwc/terms/scientificName' && mappedColumnName == 'sciNameColumn') {
+                    mapped = true;
+                } else if(url == 'http://rs.tdwg.org/dwc/terms/vernacularName' && mappedColumnName == 'commonNameColumn') {
+                    mapped=true;
+                } else if(url == 'http://rs.tdwg.org/dwc/terms/eventDate' && mappedColumnName == 'observed on') {
+                    mapped = true;
+                } else if(url == 'http://rs.tdwg.org/dwc/terms/locality' && mappedColumnName == 'location title') {
+                    mapped=true;
+                } else if(url == 'http://rs.tdwg.org/dwc/terms/decimalLatitude' && mappedColumnName == 'latitude') {
+                    mapped=true;
+                } else if(url == 'http://rs.tdwg.org/dwc/terms/decimalLongitude' && mappedColumnName == 'longitude') {
+                    mapped=true;
+                } else if(url == 'http://rs.tdwg.org/dwc/terms/habitat' && mappedColumnName == 'habitat') {
+                    mapped=true;
+                }  else if(url == 'http://purl.org/dc/terms/rights' && mappedColumnName == 'license') {
+                    mapped=true;
+                } else if( mappedColumnName == 'date accuracy' ||  mappedColumnName == 'group' || mappedColumnName == 'location scale' || mappedColumnName == 'geoprivacy' ||  mappedColumnName == 'attribution' || mappedColumnName == 'filename' ||  mappedColumnName == 'comment' || mappedColumnName == 'help identify?' || mappedColumnName == 'post to user groups'|| mappedColumnName == "user email" || mappedColumnName == "notes") {
+                    mapped = true;
+                    mappedURL = "http://ibp.org/terms/observation/"+mappedColumnName;
+                } 
+            }
+            
+            if(uploadLog) 
+                uploadLog << "\nmapping "+ipColumnName+" : "+mappedColumnName+" ("+mappedURL+")";
+            if(mapped && column && mappedURL) {
+                println "^^^^^^^^^^^^^^MAPPED COL^^^^^^^^^^^^^^^^^^^^"
+                println mappedColumnName 
+             
+                def temp = [];
+                temp.add(mappedURL+"");
+                temp.add(column);
+                temp.add(mappedFieldMapping.order+"");
+                dataToWrite.add(temp.toArray(new String[0]))
+                return;
+            }
+
+            
             if(mappedColumnName.startsWith("trait.")) {
                 println "^^^^^^^^^^^^^^TRAIT^^^^^^^^^^^^^^^^^^^^"
                 println mappedColumnName 
@@ -257,10 +261,12 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 temp.add(column);
                 temp.add("10000");
                 dataToWrite.add(temp.toArray(new String[0]))
-            } else if(!(sciNameFound||commonNameColumn||observedOn||locationTitle||latitude||longitude)){
+            } else if(!mapped){
+                println "^^^^^^^^^^^^^^IBP TERMS^^^^^^^^^^^^^^^^^^^^"
+                println mappedColumnName 
                 if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
                 def temp = [];
-                temp.add("http://ibp.org/terms/observation/"+mappedColumnName);
+                temp.add("http://ibp.org/terms/observation/annotation/"+mappedColumnName);
                 temp.add(column);
                 temp.add("1002");
                 dataToWrite.add(temp.toArray(new String[0]))
@@ -398,6 +404,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                         if(!m[TRAIT_HEADER]) m[TRAIT_HEADER] =  new java.util.LinkedHashMap();
                         if(header.url && header.url.startsWith("http://ibp.org/terms/trait") && row[header.column]) {
                             m[TRAIT_HEADER][header.url.replace("http://ibp.org/terms/trait/","")] = value;  
+                        }
+
+                        else if(header.url && header.url.startsWith("http://ibp.org/terms/observation/") && row[header.column]) {
+                            m[dwcObvHeader[header.column]] = value;  
                         }
                     }
                 }

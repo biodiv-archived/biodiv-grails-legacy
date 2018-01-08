@@ -1247,23 +1247,10 @@ class UserGroupService {
     }
 
     def updateResourceOnGroups(instance, List userGroupIds, String submitType, boolean sendMail=true) {
-println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println instance.getAuthor();
-
         return updateResourceOnGroup([userGroups:userGroupIds.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType, author:instance.getAuthor().id+''], sendMail)
     }
 
     def updateResourceOnGroup(instance, UserGroup userGroup, String submitType, boolean sendMail=true) {
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        println instance.getAuthor();
         return updateResourceOnGroup([userGroups:userGroup.id, objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType, author:instance.getAuthor().id+''], sendMail)
     }
 
@@ -1475,11 +1462,7 @@ println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 				if(submitType == 'post'){
 					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
 				}else{
-                    println submitType
-                    println groupRes
-                    println obvs
 					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
-                    println obvs
 					obvs = getFeatureSafeList(ug, obvs)
 				}
 			}
@@ -1551,7 +1534,6 @@ println  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 			//if admin or founder or expert then can un post any featured resource
 			if(currUser && (utilsService.isAdmin(currUser) || ug.isFounder(currUser) || ug.isExpert(currUser))){
 				log.debug "currUser ${currUser} is a previlage user in the group " + ug
-println obvs
 				return obvs
 			}
 

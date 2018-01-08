@@ -115,7 +115,7 @@
                             </label>
                             <div class="controls" style="">
                                 <g:render template='/UFile/docUpload'
-                                model="['name': 'iconsPath', 'inputName': 'iconsFile', 'path': iconsFile?.path, 'size':iconsFile?.size,'fileParams':iconsFileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+                                model="['name': 'imagesPath', 'inputName': 'imagesFile', 'path': imagesFile?.path, 'size':imagesFile?.size,'fileParams':iconsFileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
  
                                 <% def upload_file_text="${g.message(code:'default.upload.file.label')}"%>
                                 <script type="text/javascript">

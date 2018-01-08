@@ -46,6 +46,19 @@
                                 
                             </div>
                         </div>	
+                        
+                        <%def iconsAllowedExtensions="['zip']"%>
+                        <div class="control-group">
+                            <label class="control-label" for="file">
+                                ${dataTableInstance.dataTableType} Images
+                            </label>
+                            <div class="controls" style="">
+                                <g:render template='/UFile/docUpload'
+                                model="['name': 'imagesPath', 'inputName': 'imagesFile', 'path': dataTableInstance?.imagesFile?.path, 'size':dataTableInstance?.imagesFile?.size,'fileParams':fileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+ 
+                            </div>
+                        </div>
+
 
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">

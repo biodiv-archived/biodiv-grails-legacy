@@ -635,10 +635,13 @@ class ObvUtilService {
         if(!defaultSpeciesGroup) defaultSpeciesGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
         if(!defaultHabitat) defaultHabitat = Habitat.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
 
+        log.debug "Uploading observation from params: ${m}"
         utilsService.benchmark ('uploadObv') {
             utilsService.benchmark ('uploadImage') {
                 if(m[IMAGE_FILE_NAMES]) {
                     obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase(), SUser.findByEmail(m[AUTHOR_EMAIL].trim()))
+                } else {
+                    log.info "No images"
                 }
             }
 
@@ -693,6 +696,7 @@ class ObvUtilService {
 		obvParams['dateAccuracy'] = m[DATE_ACCURACY]?:(m[AbstractObservationImporter.ANNOTATION_HEADER]?m[AbstractObservationImporter.ANNOTATION_HEADER][DATE_ACCURACY]:null)
 		//author
         if(m[AUTHOR_EMAIL]) {
+            log.debug "Finding user by email"
 		    obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
         } else {
             obvParams['author'] = springSecurityService.currentUser ?: SUser.read(1L); 
@@ -1012,7 +1016,10 @@ class ObvUtilService {
         dl.writeLog("============================================\n", Level.INFO);            
         File ipFile = new File(params.file);
         File mappingFile = new File(params.mappingFile);
-        uploadObservations(DataTable.get(params.dataTable), ipFile, null, mappingFile, null,  new File(dl.logFilePath));  
+        File imagesDir = new File(params.imagesDir); 
+
+
+        uploadObservations(DataTable.get(params.dataTable), ipFile, null, mappingFile, null,  imagesDir, new File(dl.logFilePath));  
 //        dl.writeLog("\n====================================\nLoaded ${noOfObservationsLoaded} observations\n====================================\n", Level.INFO);
         return ['success':true, 'msg':"Loaded observations."];
     }
@@ -1023,15 +1030,16 @@ class ObvUtilService {
         uploadObservations(dataTable, directory, importer, uploadLog);
     }
 
-    private void uploadObservations(DataTable dataTable, File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File uploadLog) {
+    private void uploadObservations(DataTable dataTable, File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File imagesDir, File uploadLog) {
         FileObservationImporter importer = FileObservationImporter.getInstance();
         importer.separator = ',';
         Map o = importer.importData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
-        uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, uploadLog);
+        uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog);
     }
 
-    private void uploadObservations(DataTable dataTable, File directory, AbstractObservationImporter importer, Map mediaInfo, File uploadLog) {
+    private void uploadObservations(DataTable dataTable, File directory, AbstractObservationImporter importer, Map mediaInfo, File imagesDir, File uploadLog) {
         Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
+
         List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
         int noOfUploadedObv=0, noOfFailedObv=0;
         boolean flushSingle = false;
@@ -1052,7 +1060,7 @@ class ObvUtilService {
                     uploadLog << "\n\n----------------------------------------------------------------------";
                     uploadLog << "\nUploading observation with params ${obvParams}"
                     try {
-                        if(uploadObservation(null, obvParams, resultObv, uploadLog, ProtocolType.LIST )) {
+                        if(uploadObservation(imagesDir, obvParams, resultObv, uploadLog, ProtocolType.LIST )) {
                             tmpNoOfUploadedObv++;
                         } else {
                             tmpNoOfFailedObv++;

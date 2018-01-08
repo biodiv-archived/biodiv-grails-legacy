@@ -29,6 +29,7 @@ class DataTable extends CollMetadata {
 	static hasOne = [dataset : Dataset1]
     UFile uFile;
     UFile traitValueFile;
+    UFile imagesFile;
     DataTableType dataTableType;
 
     UploadLog uploadLog;
@@ -48,6 +49,7 @@ class DataTable extends CollMetadata {
 		checklistId nullable:true
 		uFile nullable:false
 		traitValueFile nullable:true
+		imagesFile nullable:true
 		uploadLog nullable:true
 		columns nullable:false, blank:false;
 	}
