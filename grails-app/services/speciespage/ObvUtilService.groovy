@@ -1016,7 +1016,7 @@ class ObvUtilService {
         dl.writeLog("============================================\n", Level.INFO);            
         File ipFile = new File(params.file);
         File mappingFile = new File(params.mappingFile);
-        File imagesDir = new File(params.imagesDir); 
+        File imagesDir = params.imagesDir ? new File(params.imagesDir):null; 
 
 
         uploadObservations(DataTable.get(params.dataTable), ipFile, null, mappingFile, null,  imagesDir, new File(dl.logFilePath));  

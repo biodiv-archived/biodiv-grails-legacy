@@ -265,7 +265,7 @@ class DataTableService extends AbstractMetadataService {
                 File destDir = imagesFile.getParentFile();
                 File imagesDir;
 
-                if(FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
+                if(imagesFile && FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
                     def ant = new AntBuilder().unzip( src: imagesFile,
                     dest: destDir, overwrite:true)
                     imagesDir = new File(destDir, FilenameUtils.removeExtension(imagesFile.getName()));
@@ -282,7 +282,7 @@ class DataTableService extends AbstractMetadataService {
                     switch(dataTable.dataTableType.ordinal()) {
 
                         case DataTableType.OBSERVATIONS.ordinal() :
-                        Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id];
+                        Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir?.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id];
                         p.putAll(paramsToPropagate);
                         def r = observationService.upload(p);
                         if(r.success) {
@@ -293,7 +293,7 @@ class DataTableService extends AbstractMetadataService {
                         break;
 
                         case DataTableType.SPECIES.ordinal(): 
-                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':imagesDir.getAbsolutePath(), 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
+                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
 
                         if(res.sBulkUploadEntry) {
                             println "Saving upload log entry"
@@ -333,7 +333,7 @@ class DataTableService extends AbstractMetadataService {
                         if(tFileValidation.success || tvFileValidation.success) {
                             log.debug "Validation of trait file and traitvalue file is done. Proceeding with upload"
 
-                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':imagesDir, 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id];
+                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id];
                             p.putAll(paramsToPropagate);
 
                             def r = traitService.upload(p);
