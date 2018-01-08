@@ -146,6 +146,7 @@ class DataTableService extends AbstractMetadataService {
             String contentRootDir = config.speciesPortal.content.rootDir
             try{
                 File destinationFile = new File(contentRootDir, params.uFile.path);
+                File imagesFile = new File(contentRootDir, params.imagesFile.path);
                 if(destinationFile.exists()) {
                     UFile f = new UFile()
                     f.size = destinationFile.length()
@@ -155,11 +156,22 @@ class DataTableService extends AbstractMetadataService {
                         instance.uFile = f
                     }
                 }
+                if(imagesFile.exists()) {
+                    UFile f = new UFile()
+                    f.size = imagesFile.length()
+                    f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
+                    log.debug "============== " + f.path
+                    if(f.save()) {
+                        instance.imagesFile = f
+                    }
+                }
+ 
             }catch(e){
                 e.printStackTrace()
             }
          }
 
+        
         if(params.dataTableType) {
             instance.dataTableType = DataTableType.values()[params.int('dataTableType')];
         }
@@ -185,6 +197,11 @@ class DataTableService extends AbstractMetadataService {
                     columns << [url,it,order];
                 }
             }
+            println "-------------------------------------------------------------"
+            println "-------------------------------------------------------------"
+            println columns;
+            println "-------------------------------------------------------------"
+            println "-------------------------------------------------------------"
             instance.columns = columns as JSON;
         }
        return instance;
@@ -222,16 +239,19 @@ class DataTableService extends AbstractMetadataService {
                     //TODO:delete all existing objects and reupload sheet
                     switch(dataTable.dataTableType.ordinal()) {
                         case DataTableType.OBSERVATIONS.ordinal():
+                        log.info "Deleting all observations from ${dataTable}"
                         dataTable.deleteAllObservations();
                         break;
                         case DataTableType.SPECIES.ordinal(): 
                         break;
                         case DataTableType.FACTS.ordinal():
+                        log.info "Deleting all facts from ${dataTable}"
                         dataTable.deleteAllFacts();
                         break;
                         case DataTableType.TRAITS.ordinal():
                         break;
                         case DataTableType.DOCUMENTS.ordinal():
+                        log.info "Deleting all documents from ${dataTable}"
                         dataTable.deleteAllDocuments();
                         break;
                     }
@@ -241,6 +261,18 @@ class DataTableService extends AbstractMetadataService {
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
+                File imagesFile = new File(contentRootDir, dataTable.imagesFile.path);
+                File destDir = imagesFile.getParentFile();
+                File imagesDir;
+
+                if(imagesFile && FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
+                    def ant = new AntBuilder().unzip( src: imagesFile,
+                    dest: destDir, overwrite:true)
+                    imagesDir = new File(destDir, FilenameUtils.removeExtension(imagesFile.getName()));
+                    if(!imagesDir.exists()) {
+                        imagesDir = destDir;
+                    }
+                }
 
                 if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
                     File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
@@ -250,7 +282,7 @@ class DataTableService extends AbstractMetadataService {
                     switch(dataTable.dataTableType.ordinal()) {
 
                         case DataTableType.OBSERVATIONS.ordinal() :
-                        Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id];
+                        Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir?.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id];
                         p.putAll(paramsToPropagate);
                         def r = observationService.upload(p);
                         if(r.success) {
@@ -261,7 +293,7 @@ class DataTableService extends AbstractMetadataService {
                         break;
 
                         case DataTableType.SPECIES.ordinal(): 
-                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':params.imagesDir, 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
+                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
 
                         if(res.sBulkUploadEntry) {
                             println "Saving upload log entry"
@@ -294,7 +326,6 @@ class DataTableService extends AbstractMetadataService {
 
                         String tFile = params.uFile ? contentRootDir + File.separator + params.uFile.path : null;
                         String tvFile = params.tvFile ? contentRootDir + File.separator + params.tvFile.path : null;
-                        params.iconsFile = params.iconsFile.path ?  File.separator + params.iconsFile.path : null;
 
                         def tFileValidation = traitService.validateTraitDefinitions(tFile, new UploadLog());
                         def tvFileValidation = traitService.validateTraitValues(tvFile, new UploadLog());
@@ -302,12 +333,7 @@ class DataTableService extends AbstractMetadataService {
                         if(tFileValidation.success || tvFileValidation.success) {
                             log.debug "Validation of trait file and traitvalue file is done. Proceeding with upload"
 
-                            File iconsFile = params.iconsFile ? new File(params.iconsFile) : null;
-                            if(iconsFile && iconsFile.exists() && FilenameUtils.getExtension(iconsFile.getName()).equals('zip')) {
-                                def ant = new AntBuilder().unzip(src: iconsFile,dest: iconsFile.getParent(), overwrite:true);            
-                            }
-
-                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':iconsFile, 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id];
+                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id];
                             p.putAll(paramsToPropagate);
 
                             def r = traitService.upload(p);

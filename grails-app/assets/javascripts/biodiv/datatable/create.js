@@ -120,7 +120,7 @@ console.log('loadSampleData');
         el += "<option class='generalColumn' value='attribution' "+((mappedColumn == 'attribution')?'selected':'')+">Attribution</option></optgroup>"; 
         el += "<option class='generalColumn' value='filename' "+((mappedColumn == 'filename')?'selected':'')+">Filenames (CSV)</option></optgroup>"; 
         el += "<option class='generalColumn' value='notes' "+((mappedColumn == 'notes')?'selected':'')+">Notes</option></optgroup>"; 
-        el += "<option class='generalColumn' value='tags' "+((mappedColumn == 'tags')?'selected':'')+">Tags</option></optgroup>"; 
+        //el += "<option class='generalColumn' value='tags' "+((mappedColumn == 'tags')?'selected':'')+">Tags</option></optgroup>"; 
         el += "<option class='generalColumn' value='help identify?' "+((mappedColumn == 'help identify?')?'selected':'')+">Help Identify?</option></optgroup>"; 
         el += "<option class='generalColumn' value='post to user groups' "+((mappedColumn == 'post to user groups')?'selected':'')+">Post to User Groups</option></optgroup>"; 
         el += "<option class='generalColumn' value='comment' "+((mappedColumn == 'comment')?'selected':'')+">Comment</option></optgroup>"; 
@@ -175,14 +175,20 @@ function getMappedColumn(cName, mappedColumns) {
     if(!mappedColumns) return "";
     for(var i=0; i< mappedColumns.length; i++) {
         if(cName == mappedColumns[i][1]) {
-        if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/scientificName') return 'sciNameColumn';
-        else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/vernacularName') return 'commonNameColumn';
-        else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/eventDate') return 'observed on';
-        else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/locality') return 'location title';
-        else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') return 'latitude';
-        else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') return 'longitude';
-        else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/trait/')) return 'trait.'+mappedColumns[0].substring(mappedColumns[0].indexOf('trait/')+7);
-        else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/')) return mappedColumns[0].substring(mappedColumns[0].indexOf('observation/')+13);
+            if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/scientificName') return 'sciNameColumn';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/vernacularName') return 'commonNameColumn';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/eventDate') return 'observed on';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/locality') return 'location title';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') return 'latitude';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') return 'longitude';
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/contributor') return 'user email';
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/description') return 'notes';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/habitat') return 'habitat';
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/rights') return 'license';
+
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/trait/')) return 'trait.'+mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('trait/')+6);
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/')) return mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('observation/')+12);
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/annotation/')) return mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('annotation')+11);
         }
     }
     return "";

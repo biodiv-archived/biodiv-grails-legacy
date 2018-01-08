@@ -910,3 +910,4 @@ alter table data_table alter column summary  set not null;
 alter table data_package add column has_role_user_allowed boolean;
 alter table data_package add column uploader_ids varchar(255);
 alter table data_package drop column uploader_id;
+update data_package set has_role_user_allowed=false;
