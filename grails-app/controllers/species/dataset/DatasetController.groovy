@@ -322,6 +322,7 @@ class DatasetController extends AbstractObjectController {
                 dataTableInstance.dataset = datasetInstance;
                 dataTableInstance.properties = datasetInstance.properties;
                 dataTableInstance.uFile = null;
+                dataTableInstance.description = null; // not propagating dataset description
             }
         }
         if(!datasetInstance) {
