@@ -216,21 +216,27 @@ class DataTableService extends AbstractMetadataService {
     Map save(params, sendMail=true){
         def result;
 
+        params.uploader = springSecurityService.currentUser;
+
         DataTable dataTable;
-        def feedType;
+        def feedType,feedAuthor;
         if(params.id) { 
             dataTable = DataTable.get(Long.parseLong(params.id));
+            params.uploader = dataTable.uploader;
             dataTable = update(dataTable, params);
             feedType = activityFeedService.INSTANCE_UPDATED;
+            feedAuthor = dataTable.author
         } else {
             dataTable = create(params);
             feedType = activityFeedService.INSTANCE_CREATED;
+            feedAuthor = dataTable.author
+
         }
 
         dataTable.lastRevised = new Date();
 
         if(hasPermission(dataTable, springSecurityService.currentUser)) {
-            result = save(dataTable, params, true, null, feedType, null);
+            result = save(dataTable, params, true, feedAuthor, feedType, null);
 
             if(dataTable.dataset) {
                 log.debug "Posting dataTable to all user groups that dataset is part of"
@@ -647,7 +653,7 @@ class DataTableService extends AbstractMetadataService {
                         else {
                             messageArgs.add(0,'delete');
                             messageCode = 'default.not.permitted.message'
-                            log.warn "${dataTableInstance.author} doesn't own object to delete"
+                            log.warn "currentUser doesn't own object to delete"
                         }
                     }
                 } else {
@@ -679,7 +685,7 @@ class DataTableService extends AbstractMetadataService {
             dataPackage = dataTable.dataset.dataPackage;
         }
 
-        if(dataPackageService.hasPermission(dataPackage, user) && (dataTable.getAuthor().id == user.id || dataTable.uploader.id == user.id)) {
+        if(dataPackageService.hasPermission(dataPackage, user) && (utilsService.isAdmin(springSecurityService.currentUser) || dataTable.getAuthor().id == user.id || dataTable.uploader.id == user.id)) {
             isPermitted = true;
         }
         return isPermitted;
