@@ -599,7 +599,7 @@ class DataTableService extends AbstractMetadataService {
                 def dataTableInstance = DataTable.get(params.id.toLong())
                 if (dataTableInstance) {
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(dataTableInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
-                    if(isFeatureDeleted  && dataTableInstance.hasPermission(springSecurityService.currentUser)) {
+                    if(isFeatureDeleted  && dataTableService.hasPermission(dataTableInstance, springSecurityService.currentUser)) {
                         def mailType = utilsService.DATATABLE_DELETED
                         try {
                             dataTableInstance.isDeleted = true;
