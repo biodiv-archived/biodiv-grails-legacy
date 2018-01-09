@@ -580,6 +580,10 @@ class Species implements Rateable {
         return res
     }
 
+    SUser getAuthor() {
+        return SUser.findByEmail('admin@strandls.com');
+    }
+
     @Override
     String toString() {
         return "<${this.class} : ${id} - ${taxonConcept.name}>"

@@ -21,7 +21,10 @@
                 columnNames = c;
             } else if(dataTableInstance.dataTableType == DataTableType.TRAITS) {
                 columnNames =  [['','traitTypes',1],['','dataTypes',1],['','units',1],['','values',1],['','field',1],['','taxon',1],['','isNotObservationTrait',1],['','isParticipatory',1],['','showInObservation',1]];
+            } else if(dataTableInstance.dataTableType == DataTableType.DOCUMENTS) {
+                columnNames =  [['','url',1]];
             }
+
              
             %>
         <thead>
@@ -32,7 +35,7 @@
                 </g:each>
             </tr>
         </thead>
-        <tbody class="mainContentList rowlink">
+        <tbody data-link="row" class="mainContentList rowlink">
             <g:each in="${dataObjects}" var="dataObject">
             <%def checklistAnnotations = dataObject.fetchChecklistAnnotation();%>
             <tr class="mainContent">
@@ -70,6 +73,6 @@
 </div>
 <asset:script>
 $(document).ready(function() {
-    $('tbody.rowlink').rowlink()
+//    $('tbody.rowlink').rowlink()
 });
 </asset:script>

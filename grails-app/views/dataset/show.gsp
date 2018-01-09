@@ -41,7 +41,7 @@
                         </span>
 
                         <div class="pull-right">
-                            <sUser:ifOwns model="['user':datasetInstance.author]">
+                            <sUser:ifOwnsDataset model="['dataset':datasetInstance]">
 
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                                 href="${uGroup.createLink(controller:'dataTable', action:'create', dataset:datasetInstance.id)}"
@@ -60,7 +60,7 @@
                                                     <input type="hidden" name="id" value="${datasetInstance.id}" />
                                                 </form>
  
-                            </sUser:ifOwns>
+                            </sUser:ifOwnsDataset>
 
                         </div>
                         <s:showHeadingAndSubHeading
@@ -78,13 +78,17 @@
                         <div class="mainContent">
                             <ul class="list_view obvListWrapper" style="list-style:none;margin-left:0px;">
                                 <g:each in="${DataTable.findAllByDatasetAndIsDeleted(datasetInstance, false, [sort:'createdOn', order:'desc'])}" var="dataTableInstance">
-                                <li id="dataTable_${dataTableInstance.id}" class="span6" style="margin-top:10px;max-height:200px;overflow:auto;">
+                                <li id="dataTable_${dataTableInstance.id}" style="margin-top:10px;max-height:400px;overflow:auto;">
                                 <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage]"/>
                                 </li>
                                 </g:each>
                             </ul>			
                         </div>
                     </div>
+
+                    <uGroup:objectPostToGroupsWrapper 
+                    model="['observationInstance':datasetInstance, 'objectType':datasetInstance.class.canonicalName]"/>
+ 
                     <div class="union-comment">
                         <feed:showAllActivityFeeds model="['rootHolder':datasetInstance, feedType:'Specific', refreshType:'manual', 'feedPermission':'editable']" />
                         <comment:showAllComments model="['commentHolder':datasetInstance, commentType:'super','showCommentList':false]" />

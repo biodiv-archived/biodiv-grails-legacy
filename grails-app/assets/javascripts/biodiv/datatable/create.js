@@ -1,6 +1,7 @@
 var dataTable_contributor_autofillUsersComp;
 function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
     event.preventDefault();
+    if(CKEDITOR.instances.summary)  CKEDITOR.instances.summary.destroy();
     if(CKEDITOR.instances.description)  CKEDITOR.instances.description.destroy();
     console.log(dataTableTypeId);
     if(dataTableTypeId != "null") {
@@ -9,20 +10,34 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
             type:'POST',
             data:{'dataTableTypeId':dataTableTypeId,'datasetId':datasetId, dataTableId:dataTableId}, 
             success:function(data,textStatus){
-                $('#addDataTable').html(data);
+                if(data.success) {
+                $('#addDataTable').html(data.model.tmpl);
                 initObservationCreate();
                 intializesSpeciesHabitatInterest();
                 initLocationPicker();
                 dataTable_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
                     usersUrl : window.params.userTermsUrl
                 });
-                CKEDITOR.replace('description', config);
+                CKEDITOR.replace('summary', config);
+                CKEDITOR.replace('description', descriptionConfig);
                 showSampleDataTable();
                 var contributorId = $('#contributorUserIds').data('contributorid'); 
                 var contributorName = $('#contributorUserIds').data('contributorname'); 
                 if(contributorId != '' )
                     dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
-                loadSpeciesGroupTraits();
+
+                $('.addDataTable #speciesGroupFilter button').click(function(e){
+                    console.log('speciesGroupFilter button click');
+                    e.preventDefault();
+                    loadSpeciesGroupTraits();
+                    showSampleDataTable();
+                    return false;
+                });
+                    loadSpeciesGroupTraits();
+                }  else {
+                    $('#addDataTable').html(data.msg);
+                }
+
             },
             error:function(XMLHttpRequest,textStatus,errorThrown){
                 console.log('error onDataTableClick');
@@ -54,12 +69,13 @@ function showSampleDataTable(){
     var input = $("#dataTableFile_path").val();
     var res = "dataTable";
     if(input) {
+        $('#createDataTableSubmit').removeAttr('disabled');
         parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
     }
 }
 
 function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
-
+console.log('loadSampleData');
     var cols = '', d = '';
 
     var colStr = '';
@@ -69,44 +85,53 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
         colStr += n.name+',';
     });
     el += "</tr><tr>"
-        $("#columns").val(colStr);
+    $("#columns").val(colStr);
     var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
     if(speciesGroupTraitsList === undefined) {
         //alert("Please click a species group to show respective traits");
-    } 
-    $.each(columns, function(i, n){
+    }
+
+    var mappedColumns;
+    if($('#mappedColumns').val()) {
+        mappedColumns = JSON.parse($('#mappedColumns').val());
+    }
+    $.each(columns, function(i, n) {
+        var mappedColumn = getMappedColumn(n.name, mappedColumns);
+
+        console.log(n.name+"   "+mappedColumn);
+        
         //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
         el += "<th><select class='mapColumns' multiple name='attribute."+n.name+"'>";
         el += "<optgroup label='General'>";
-        el += "<option class='generalColumn' value='sciNameColumn'>Scientific Name</option>"; 
-        el += "<option class='generalColumn' value='commonNameColumn'>Common Name</option>"; 
-        el += "<option class='generalColumn' value='language'>Common Name Language</option>"; 
-        el += "<option class='generalColumn' value='observed on'>Date</option>"; 
-        el += "<option class='generalColumn' value='date accuracy'>Date Accuracy</option>"; 
-        el += "<option class='generalColumn' value='group'>Species Group</option></optgroup>"; 
-        el += "<option class='generalColumn' value='habitat'>Habitat</option></optgroup>"; 
-        el += "<option class='generalColumn' value='location title'>Place Name</option>"; 
-        el += "<option class='generalColumn' value='latitude'>Latitude</option>"; 
-        el += "<option class='generalColumn' value='longitude'>Longitude</option></optgroup>"; 
-        el += "<option class='generalColumn' value='location scale'>Location Scale</option></optgroup>"; 
-        el += "<option class='generalColumn' value='geoprivacy'>Geo-privacy</option></optgroup>"; 
-        el += "<option class='generalColumn' value='license'>License</option></optgroup>"; 
-        el += "<option class='generalColumn' value='user email'>Contributor</option></optgroup>"; 
-        el += "<option class='generalColumn' value='attribution'>Attribution</option></optgroup>"; 
-        el += "<option class='generalColumn' value='filename'>Filenames (CSV)</option></optgroup>"; 
-        el += "<option class='generalColumn' value='notes'>Notes</option></optgroup>"; 
-        el += "<option class='generalColumn' value='tags'>Tags</option></optgroup>"; 
-        el += "<option class='generalColumn' value='help identify?'>Help Identify?</option></optgroup>"; 
-        el += "<option class='generalColumn' value='post to user groups'>Post to User Groups</option></optgroup>"; 
-        el += "<option class='generalColumn' value='comment'>Comment</option></optgroup>"; 
+        el += "<option class='generalColumn' value='sciNameColumn' "+((mappedColumn == 'sciNameColumn')?'selected':'')+">Scientific Name</option>"; 
+        el += "<option class='generalColumn' value='commonNameColumn' "+((mappedColumn == 'commonNameColumn')?'selected':'')+">Common Name</option>"; 
+        el += "<option class='generalColumn' value='language' "+((mappedColumn == 'language')?'selected':'')+">Common Name Language</option>"; 
+        el += "<option class='generalColumn' value='observed on' "+((mappedColumn == 'observed on')?'selected':'')+">Date</option>"; 
+        el += "<option class='generalColumn' value='date accuracy' "+((mappedColumn == 'date accuracy')?'selected':'')+">Date Accuracy</option>"; 
+        el += "<option class='generalColumn' value='group' "+((mappedColumn == 'group')?'selected':'')+">Species Group</option></optgroup>"; 
+        el += "<option class='generalColumn' value='habitat' "+((mappedColumn == 'habitat')?'selected':'')+">Habitat</option></optgroup>"; 
+        el += "<option class='generalColumn' value='location title' "+((mappedColumn == 'location title')?'selected':'')+">Place Name</option>"; 
+        el += "<option class='generalColumn' value='latitude' "+((mappedColumn == 'latitude')?'selected':'')+">Latitude</option>"; 
+        el += "<option class='generalColumn' value='longitude' "+((mappedColumn == 'longitude')?'selected':'')+">Longitude</option></optgroup>"; 
+        el += "<option class='generalColumn' value='location scale' "+((mappedColumn == 'location scale')?'selected':'')+">Location Scale</option></optgroup>"; 
+        el += "<option class='generalColumn' value='geoprivacy' "+((mappedColumn == 'geoprivacy')?'selected':'')+">Geo-privacy</option></optgroup>"; 
+        el += "<option class='generalColumn' value='license' "+((mappedColumn == 'license')?'selected':'')+">License</option></optgroup>"; 
+        el += "<option class='generalColumn' value='user email' "+((mappedColumn == 'user email')?'selected':'')+">Contributor</option></optgroup>"; 
+        el += "<option class='generalColumn' value='attribution' "+((mappedColumn == 'attribution')?'selected':'')+">Attribution</option></optgroup>"; 
+        el += "<option class='generalColumn' value='filename' "+((mappedColumn == 'filename')?'selected':'')+">Filenames (CSV)</option></optgroup>"; 
+        el += "<option class='generalColumn' value='notes' "+((mappedColumn == 'notes')?'selected':'')+">Notes</option></optgroup>"; 
+        //el += "<option class='generalColumn' value='tags' "+((mappedColumn == 'tags')?'selected':'')+">Tags</option></optgroup>"; 
+        el += "<option class='generalColumn' value='help identify?' "+((mappedColumn == 'help identify?')?'selected':'')+">Help Identify?</option></optgroup>"; 
+        el += "<option class='generalColumn' value='post to user groups' "+((mappedColumn == 'post to user groups')?'selected':'')+">Post to User Groups</option></optgroup>"; 
+        el += "<option class='generalColumn' value='comment' "+((mappedColumn == 'comment')?'selected':'')+">Comment</option></optgroup>"; 
 
-        el += "<optgroup label='Traits'>"
-            var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
+        el += "<optgroup label='Traits'>";
+        var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
         if(speciesGroupTraitsList === undefined) {
             //    alert("Please click a species group to show respective traits");
         } else {
             $.each(speciesGroupTraitsList, function(index, val) {
-                el += "<option class='traitColumn' value='trait."+val.id+"'>"+val.name+"</option>"; 
+                el += "<option class='traitColumn' value='trait."+val.id+"' "+((mappedColumn == 'trait.'+val.id)?'selected':'')+">"+val.name+"</option>"; 
             });
         }
         //el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
@@ -146,6 +171,29 @@ function loadSampleData(data, columns, res, sciNameColumn, commonNameColumn) {
     $("#restOfForm").show();
 }
 
+function getMappedColumn(cName, mappedColumns) {
+    if(!mappedColumns) return "";
+    for(var i=0; i< mappedColumns.length; i++) {
+        if(cName == mappedColumns[i][1]) {
+            if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/scientificName') return 'sciNameColumn';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/vernacularName') return 'commonNameColumn';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/eventDate') return 'observed on';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/locality') return 'location title';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') return 'latitude';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') return 'longitude';
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/contributor') return 'user email';
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/description') return 'notes';
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/habitat') return 'habitat';
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/rights') return 'license';
+
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/trait/')) return 'trait.'+mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('trait/')+6);
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/')) return mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('observation/')+12);
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/annotation/')) return mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('annotation')+11);
+        }
+    }
+    return "";
+}
+
 function getMarkedColumns() {
     var selectedOptions = $('.mapColumns option:selected');
     return selectedOptions;
@@ -155,6 +203,7 @@ function viewSpeciesGrid() {
     var input = $("#dataTableFile_path").val();
     var res = "species";
     if(input){
+        $('#createDataTableSubmit').removeAttr('disabled');
         parseData(  window.params.content.url + input , {callBack:loadSpeciesDataToGrid, res: res });
     }
 }
@@ -224,13 +273,6 @@ function getSpeciesUploadParams() {
 
 $(document).ready(function() {	
 
-    $(document).on('click', '.addDataTable #speciesGroupFilter button', function(e){
-        console.log('speciesGroupFilter button click');
-        e.preventDefault();
-        loadSpeciesGroupTraits();
-        showSampleDataTable();
-        return false;
-    });
 
     $(document).on('click', "#createDataTableSubmit", function(){
         if($(this).hasClass('disabled')) {

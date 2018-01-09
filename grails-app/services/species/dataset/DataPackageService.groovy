@@ -115,7 +115,10 @@ class DataPackageService extends AbstractMetadataService {
             instance.author = springSecurityService.currentUser;
         }
 
-        instance.uploader = springSecurityService.currentUser;
+        if(params.uploaderUserIds)  {
+           instance.uploaderIds = params.uploaderUserIds;
+        } 
+
        return instance;
     }
 
@@ -133,7 +136,6 @@ class DataPackageService extends AbstractMetadataService {
             feedType = activityFeedService.INSTANCE_CREATED;
         }
       
-println "sssssssssssssssssssssssssssssssssss"
         def customFieldMapList = [];
         if(params.customFieldMapList) {
             customFieldMapList = JSON.parse(params.customFieldMapList);
@@ -144,8 +146,6 @@ println "sssssssssssssssssssssssssssssssssss"
             params.supportingModule.each { sm,v ->
                 List x = [];
                 customFieldMapList.each { m ->
-                    println m
-                    println  sm
                     if(m['supportingModule'] == sm) {
                         x << m;
                     }
@@ -255,7 +255,7 @@ println "sssssssssssssssssssssssssssssssssss"
         }
         query += " from DataPackage obv "
 
-        def filterQuery = " where obv.isDeleted = :isDeleted "
+        def filterQuery = " where obv.isDeleted = :isDeleted and title != 'Checklist' "
         
         //TODO: check logic
         if(params.featureBy == "false") {
@@ -318,5 +318,27 @@ println "sssssssssssssssssssssssssssssssssss"
 
     }
 
+    boolean hasPermission(DataPackage dataPackage, SUser user) {
+        
+        log.debug "Testing is ${user} has permissions on ${dataPackage}"
 
+        if(utilsService.isAdmin(user))
+            return true;
+println dataPackage.hasRoleUserAllowed 
+println springSecurityService.currentUser
+        if(dataPackage.hasRoleUserAllowed && springSecurityService.currentUser) 
+            return true;
+
+        boolean isPermitted = false;
+        if(dataPackage.uploaderIds) {
+            dataPackage.uploaderIds.split(',').each { uId ->
+                println uId
+                println user.id
+                if(Long.parseLong(uId) == user.id) {
+                    isPermitted = true;
+                }
+            }
+        }
+        return isPermitted;
+    }
 } 

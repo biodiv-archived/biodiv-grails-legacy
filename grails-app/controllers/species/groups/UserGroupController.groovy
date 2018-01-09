@@ -171,7 +171,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def create() {
 		def userGroupInstance = new UserGroup()
-		userGroupInstance.properties = params
+		//userGroupInstance.properties = params
 		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
 	}
 
@@ -281,7 +281,7 @@ class UserGroupController {
 			render(view: "create", model: [userGroupInstance: userGroupInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
-			redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action: "list")
+			redirect  url: uGroup.createLink(action: "list")
 		}
 	}
 

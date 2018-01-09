@@ -19,6 +19,8 @@ import species.trait.Fact;
 import species.trait.Trait;
 import groovy.sql.Sql
 
+import content.eml.Document;
+
 class DataTable extends CollMetadata {
 	
 	
@@ -27,6 +29,7 @@ class DataTable extends CollMetadata {
 	static hasOne = [dataset : Dataset1]
     UFile uFile;
     UFile traitValueFile;
+    UFile imagesFile;
     DataTableType dataTableType;
 
     UploadLog uploadLog;
@@ -46,6 +49,7 @@ class DataTable extends CollMetadata {
 		checklistId nullable:true
 		uFile nullable:false
 		traitValueFile nullable:true
+		imagesFile nullable:true
 		uploadLog nullable:true
 		columns nullable:false, blank:false;
 	}
@@ -81,17 +85,6 @@ class DataTable extends CollMetadata {
         return dataTableService.getMapFeatures(this);
     }
 
-    def deleteAllObservations() {
-        def obvs = Observation.findAllByDataTable(this);
-        obvs.each { obv ->    
-            obv.isDeleted = true;
-            if(!obv.save(flush:true)){
-                obv.errors.allErrors.each { log.error obv } 
-            }
-        }
-        return
-    }
-
    static Map getParamsToPropagate(DataTable dataTable) {
         Map paramsToPropagate = new HashMap();
 
@@ -105,7 +98,7 @@ class DataTable extends CollMetadata {
 
         //geographical coverage
         paramsToPropagate[ObvUtilService.LOCATION] = dataTable.geographicalCoverage.placeName;
-        //paramsToPropagate[ObvUtilService.TOPOLOGY] = dataTable.geographicalCoverage.topology;
+        paramsToPropagate[ObvUtilService.TOPOLOGY] = dataTable.geographicalCoverage.topology;
         paramsToPropagate[ObvUtilService.LATITUDE] = dataTable.geographicalCoverage.latitude;
         paramsToPropagate[ObvUtilService.LONGITUDE] = dataTable.geographicalCoverage.longitude;
         paramsToPropagate[ObvUtilService.LOCATION_SCALE] = dataTable.geographicalCoverage.locationScale;
@@ -122,7 +115,14 @@ class DataTable extends CollMetadata {
 
    static inheritParams(dataObjectParams, dataTableParamsToPropagate) {
         dataTableParamsToPropagate.each { key, value ->
-            if(!dataObjectParams[key]) dataObjectParams[key] = value;
+            if(key.equals(ObvUtilService.TOPOLOGY) && !dataObjectParams[key]) {
+                if(dataObjectParams[ObvUtilService.LATITUDE] && dataObjectParams[ObvUtilService.LONGITUDE]) {
+                    //don't propagate as topology can be constructed from lat long fields
+                } else {
+                    dataObjectParams[key] = value;
+                }
+            }
+            else if(!dataObjectParams[key]) dataObjectParams[key] = value;
         }
     }
 
@@ -166,6 +166,7 @@ println facts
            case DataTableType.TRAITS : 
            def traits = Trait.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, order:'id']);
            return traits;
+           case DataTableType.DOCUMENTS : return Document.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'id']);
            
        }
        return [];
@@ -177,6 +178,7 @@ println facts
            case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false);
            case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false);
            case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false);
+           case DataTableType.DOCUMENTS : return Document.countByDataTableAndIsDeleted(this, false);
        }
        return 0;
    }
@@ -193,8 +195,30 @@ println facts
        return res 
    }
 
+    def deleteAllObservations() {
+        def obvs = Observation.findAllByDataTable(this);
+        obvs.each { obv ->    
+            obv.isDeleted = true;
+            if(!obv.save(flush:true)){
+                obv.errors.allErrors.each { log.error obv } 
+            }
+        }
+        return
+    }
+
     def deleteAllFacts() {
         def obvs = Fact.findAllByDataTable(this);
+        obvs.each { obv ->    
+            obv.isDeleted = true;
+            if(!obv.save(flush:true)){
+                obv.errors.allErrors.each { log.error obv } 
+            }
+        }
+        return
+    }
+    
+    def deleteAllDocuments() {
+        def obvs = Document.findAllByDataTable(this);
         obvs.each { obv ->    
             obv.isDeleted = true;
             if(!obv.save(flush:true)){

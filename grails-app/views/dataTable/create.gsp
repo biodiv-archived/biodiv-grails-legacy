@@ -9,6 +9,10 @@
 
         <asset:javascript src="slickgrid.js"/>
         <style>
+        textarea {
+            max-width:100%;
+            min-width:100%;
+        }
             .btn-group.open .dropdown-menu {
             top: 43px;
             }
@@ -28,7 +32,7 @@
 
             .textbox input {
             text-align: left;
-            width: 290px;
+            width: 99%;
             height: 34px;
             padding: 5px;
             }
@@ -73,11 +77,11 @@
             .userOrEmail-list {
             clear:none;
             }
-            /*#cke_description {
-            width: 100%;
-            min-width: 100%;
-            max-width: 100%;
-            }*/
+            #cke_description {
+            width: 98%;
+            min-width: 98%;
+            max-width: 98%;
+            }
             .section {
                 border:solid 1px lightgrey;
             }
@@ -115,6 +119,23 @@
             CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
 
             var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+            var descriptionConfig = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
+                    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },
+                    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                    '/',
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+                    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                    { name: 'insert', items: [ 'Image', 'Table'] }
+                    ],
+                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/ofm/filemanager&viewMode=grid&space=newsletters/${params.webaddress}&type=Image",
+                    filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/standard/uploader?Type=Image&userSpace=${params.webaddress}",
+
+                        height: '400px'
+                };
+
+
         </script>
 
 

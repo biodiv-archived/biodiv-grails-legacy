@@ -6,8 +6,8 @@
     def form_button_val = "Add "+dataTableInstance.dataTableType; //"${g.message(code:'button.add.checklist')}"
     if(params.action == 'edit' || params.action == 'update'){
     form_action = uGroup.createLink(action:'update', controller:'dataTable', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-    form_button_name = "Update Checklist"
-    form_button_val = "${g.message(code:'button.update.checklist')}"
+    form_button_name = "Update ${dataTableInstance.dataTableType}"
+    form_button_val = "Update "+dataTableInstance.dataTableType;
     }
 
     %>
@@ -115,7 +115,7 @@
                             </label>
                             <div class="controls" style="">
                                 <g:render template='/UFile/docUpload'
-                                model="['name': 'iconsPath', 'inputName': 'iconsFile', 'path': iconsFile?.path, 'size':iconsFile?.size,'fileParams':iconsFileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+                                model="['name': 'imagesPath', 'inputName': 'imagesFile', 'path': imagesFile?.path, 'size':imagesFile?.size,'fileParams':iconsFileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {showSampleDataTable()}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
  
                                 <% def upload_file_text="${g.message(code:'default.upload.file.label')}"%>
                                 <script type="text/javascript">
@@ -137,7 +137,7 @@
                                 <input type="hidden" id="dataTableType" name="dataTableType" value="${dataTableInstance.dataTableType.ordinal()}"/>
                                 <input type="hidden" id="dataTableFilePath" name="dataTableFilePath" value=""/>
                                 <input type="hidden" id="speciesGroupTraits" name="speciesGroupTraits" value=""/>
-                                <input type="hidden" id="columns" name="columns" value="${dataTableInstance?.columns}"/>
+                                <input type="hidden" id="columns" name="columns" value=""/>
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="sciNameColumn">
                                     <g:message code="checklist.scientific_name.validator.invalid" />
@@ -170,7 +170,7 @@
                 onclick="return confirm('${message(code: 'default.delete.confirm.message', args:['dataset'])}');"><g:message code="button.delete.dataTable" /></a>
                 </div>
                 </g:if>
-                <a id="createDataTableSubmit" class="btn btn-primary" style="float: right; margin-right: 5px;">
+                <a id="createDataTableSubmit" class="btn btn-primary" style="float: right; margin-right: 5px;" ${params.action=='dataTableTypeChanged'?'disabled=true':''}>
                 ${form_button_val} </a>
 
                 <g:checkBox style="margin-left:0px;" name="agreeTerms" value="${dataTableInstance?.agreeTerms}"/>

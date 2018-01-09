@@ -19,6 +19,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
+import species.participation.UploadLog;
 import content.eml.Document.DocumentType;
 import species.utils.Utils;
 import species.License
@@ -60,6 +61,9 @@ import species.Metadata
 import species.Classification;
 import au.com.bytecode.opencsv.CSVWriter
 import static org.springframework.http.HttpStatus.*;
+
+import org.apache.log4j.Level;
+import species.dataset.DataTable;
 
 class DocumentService extends AbstractMetadataService {
 
@@ -560,6 +564,11 @@ println queryParts.queryParams
             log.debug "================" + m
 
             if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+                if(params.paramsToPropagate?.dataTable) {
+                    m['dataTable'] = DataTable.read(Long.parseLong(params.paramsToPropagate.dataTable+''));
+                    DataTable.inheritParams(m, params.paramsToPropagate);
+                }
+//                m['language'] = params.paramsToPropagate['locale_language'];
                 uploadDoc(fileDir, m, resultObv)
                 i++
                 if(i > BATCH_SIZE){
@@ -674,16 +683,16 @@ println queryParts.queryParams
             document.addToHabitats(h);
         }
 
-        document.longitude = (m['longitude'] ?:76.658279)
-        document.latitude = (m['lattitude'] ?: 12.32112)
+        document.longitude = (m['longitude'] ?Double.parseDouble(m['longitude']).doubleValue():76.658279)
+        document.latitude = (m['latitude'] ?Double.parseDouble(m['latitude']).doubleValue(): 12.32112)
         document.geoPrivacy = m["geoprivacy"]
 
+        document.language = utilsService.getCurrentLanguage();
 
-        //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        //		if(document.latitude && document.longitude) {
-        //			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
-        //		}
-        //		
+        if(m['dataTable']) {
+            document.dataTable = m['dataTable'];
+        }
+
         saveDoc(document, m)
 
         if(document.id){
@@ -1031,6 +1040,14 @@ println queryParts.queryParams
          
         return model;
     }
+
+    Map upload(String file, Map params, UploadLog dl) {
+        dl.writeLog("============================================\n", Level.INFO);            
+        File ipFile = new File(params.file);
+		processBatch(['fileDir':ipFile.getParentFile().getAbsolutePath(), 'batchFileName':ipFile.getAbsolutePath(), 'paramsToPropagate':params]);
+        return ['success':true, 'msg':"Loaded documents."];
+    }
+
 
 }
 

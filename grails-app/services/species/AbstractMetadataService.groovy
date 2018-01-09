@@ -126,7 +126,11 @@ class AbstractMetadataService extends AbstractObjectService {
             log.debug "got ${instance.fromDate}"
   
             if(params.toDate && (params.toDate instanceof Date)) {
-                instance.toDate = params.toDate;
+                if(params.toDate == new Date(0)) {
+                    instance.toDate = instance.fromDate;
+                } else {
+                    instance.toDate = params.toDate;
+                }
             } else if(params.toDate) {
                 instance.toDate = parseDate(params.toDate);
             } else {
@@ -177,7 +181,7 @@ class AbstractMetadataService extends AbstractObjectService {
             }
         }
 
-        if(params.dataTable) {
+        if(params.dataTable && instance.metaClass.hasProperty(instance, 'dataTable') ) {
             instance.dataTable = params.dataTable;
         }
 
@@ -272,6 +276,15 @@ class AbstractMetadataService extends AbstractObjectService {
         }
         List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
         userGroupIds.addAll(userGroupsWithFilterRule.collect {it.id})
+
+        //if instance is part of dataTable then all datatable usergroups
+        if(instance.metaClass.hasProperty(instance, 'dataTable') && instance.dataTable) {
+            userGroupIds.addAll(instance.dataTable.userGroups.collect {it.id});
+            if(instance.dataTable.dataset) {
+                userGroupIds.addAll(instance.dataTable.dataset.userGroups.collect {it.id});
+            }
+        }
+
         return new ArrayList(userGroupIds);
 
         /*boolean hasValidUserGroup = instance.metaClass.respondsTo(instance, "isUserGroupValidForPosting");

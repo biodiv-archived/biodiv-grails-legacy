@@ -8,6 +8,11 @@
         <g:set var="title" value="${g.message(code:'dataset.label')}"/>
         <g:render template="/common/titleTemplate" model="['title':title]"/>
         <style>
+            textarea {
+            max-width:100%;
+            min-width:100%;
+            }
+
             .btn-group.open .dropdown-menu {
             top: 43px;
             }
@@ -27,7 +32,7 @@
 
             .textbox input {
             text-align: left;
-            width: 290px;
+            width: 99%;
             height: 34px;
             padding: 5px;
             }
@@ -72,11 +77,11 @@
             .userOrEmail-list {
             clear:none;
             }
-            /*#cke_description {
-            width: 100%;
-            min-width: 100%;
-            max-width: 100%;
-            }*/
+            #cke_description {
+            width: 98%;
+            min-width: 98%;
+            max-width: 98%;
+            }
             .section {
                 border:solid 1px lightgrey;
             }
@@ -135,8 +140,9 @@
                                         from="${DataPackage.list()}"
                                         noSelection="${['null':'Select One...']}"
                                         value="${dataPackage?:(datasetInstance?.dataPackage?.id)}"
-                                        optionKey="id" optionValue="title"
-                                        onchange="dataPackageChangedForDataset(this.value);" />
+                                        optionKey="id" optionValue="title" 
+                                        disabled="${datasetInstance?.dataPackage?.id?true:false}"
+                                        onchange="dataPackageChangedForDataset(event, this.value);" />
 
 
                                         <div class="help-inline">
@@ -189,6 +195,31 @@
 
     </div>
 
+        <script type='text/javascript'>
+            CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
+
+            var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
+            var descriptionConfig = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[
+                    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'Preview'  ] },
+                    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                    '/',
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+                    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                    { name: 'insert', items: [ 'Image', 'Table'] }
+                    ],
+                    filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/ofm/filemanager&viewMode=grid&space=newsletters/${params.webaddress}&type=Image",
+                    filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/standard/uploader?Type=Image&userSpace=${params.webaddress}",
+
+                        height: '400px'
+                };
+
+
+        </script>
+
+
+
     <asset:script>
         CKEDITOR.plugins.addExternal( 'confighelper', "${assetPath(src:'ckeditor/confighelper/plugin.js')}" );
  
@@ -205,10 +236,8 @@
             </g:if>
 
             
-            <g:if test="${params.action != 'create'}">
-                var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
-                CKEDITOR.replace('description', config);
-            </g:if>
+                CKEDITOR.replace('summary', config);
+                CKEDITOR.replace('description', descriptionConfig);
         });
 
     </asset:script>

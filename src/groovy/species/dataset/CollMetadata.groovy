@@ -38,6 +38,8 @@ import species.groups.CustomField;
 import species.participation.Featured;
 import species.dataset.DataPackage.SupportingModules;
 
+import species.groups.UserGroup.FilterRule;
+
 /**
  * @author sravanthi
  *
@@ -45,6 +47,7 @@ import species.dataset.DataPackage.SupportingModules;
 abstract class CollMetadata implements Taggable, Rateable {
 
 	String title;
+    String summary;
 	String description;
 
 	//EML-Access fields
@@ -95,7 +98,8 @@ abstract class CollMetadata implements Taggable, Rateable {
 
 	static constraints = {
 		title nullable:false, blank:false;
-		description nullable:false, blank:false, type:'text';
+		summary nullable:false, blank:false, size:0..5000;
+		description nullable:true;
 		language nullable:false
 		externalId nullable:true
 		externalUrl nullable:true
@@ -107,7 +111,7 @@ abstract class CollMetadata implements Taggable, Rateable {
 		
 		uFile nullable:true;
 		customFields nullable:true;
-	}
+	} 
 
 	static mapping = {
 		description type:'text'
@@ -124,6 +128,9 @@ abstract class CollMetadata implements Taggable, Rateable {
 
     def initParams(params) {
 
+        this.summary = params.summary;
+        this.description = params.description;
+
         XMLConverter xmlConverter = new XMLConverter();
 
         //Party
@@ -137,7 +144,7 @@ abstract class CollMetadata implements Taggable, Rateable {
         }
 
         if(params.contributorUserIds)  {
-           this.party.contributorId = SUser.read(Long.parseLong(params.contributorUserIds)).id;
+           this.party.contributorId = SUser.read(Long.parseLong(params.contributorUserIds.split(',')[0])).id;
         } else {
             this.party.contributorId = springSecurityService.currentUser.id; 
         }
@@ -248,7 +255,7 @@ println params.fromDate
     }
 
     SUser getAuthor() {
-        return this.uploader;//SUser.read(this.party.contributorId);
+        return this.party.fetchContributor();
     }
 
     def fetchCustomFields() {
@@ -267,6 +274,33 @@ println params.fromDate
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
 	}
+
+    boolean isUserGroupValidForPosting(UserGroup userGroup) {
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        println "==================================+++++"
+        List<FilterRule> filterRule = userGroup.getFilterRules();
+        boolean isValid = true;
+        filterRule.each { fRule ->
+            switch(fRule.fieldName) {
+                case 'topology' : 
+                if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
+                    isValid = isValid && fRule.ruleValues[0].covers(this.geographicalCoverage.topology);
+                }
+                break;
+                case 'taxon' : 
+                if(fRule.ruleName.equalsIgnoreCase('scope')) {
+                    //isValid = fRule.ruleValues[0].covers(instance[fRule.fieldName]);
+                }
+                break;
+            }
+        }
+        return isValid;
+    }
 
 }
 

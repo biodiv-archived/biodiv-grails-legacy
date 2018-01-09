@@ -8,6 +8,13 @@ import java.util.Map;
 import java.io.File ;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import org.apache.log4j.Level;
+import species.sourcehandler.XMLConverter;
+import species.sourcehandler.importer.AbstractObservationImporter;
+import species.sourcehandler.importer.FileObservationImporter;
+import species.sourcehandler.importer.DwCObservationImporter;
+import species.dataset.DataTable;
+import species.participation.UploadLog
 
 import species.auth.SUser
 import species.groups.SpeciesGroup;
@@ -30,7 +37,6 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import species.sourcehandler.exporter.DwCObservationExporter; 
-import species.sourcehandler.importer.DwCObservationImporter;
 import species.sourcehandler.exporter.DwCSpeciesExporter
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import grails.converters.JSON;
@@ -39,14 +45,20 @@ import species.participation.Observation.BasisOfRecord;
 import species.participation.Observation.ProtocolType;
 import species.License;
 import species.License.LicenseType;
-import species.sourcehandler.importer.AbstractObservationImporter;
 import species.Metadata.DateAccuracy;
 import species.participation.Flag;
 import species.participation.Flag.FlagType;
+import species.NamesParser;
+import groovy.sql.Sql
+import species.dataset.Dataset;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import content.eml.UFile;
 
 class ObvUtilService {
 
 	static transactional = false
+    public static final int IMPORT_BATCH_SIZE = 50;
 
 	static final String IMAGE_PATH = "image file"
 	static final String IMAGE_FILE_NAMES = "filename"
@@ -112,6 +124,7 @@ class ObvUtilService {
     def messageSource;
     def sessionFactory;
     def factService;
+    def userGroupService;
 
     SpeciesGroup defaultSpeciesGroup;
     Habitat defaultHabitat;
@@ -622,10 +635,13 @@ class ObvUtilService {
         if(!defaultSpeciesGroup) defaultSpeciesGroup = SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
         if(!defaultHabitat) defaultHabitat = Habitat.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
 
+        log.debug "Uploading observation from params: ${m}"
         utilsService.benchmark ('uploadObv') {
             utilsService.benchmark ('uploadImage') {
                 if(m[IMAGE_FILE_NAMES]) {
                     obvParams = uploadImageFiles(imageDir, m[IMAGE_FILE_NAMES].trim().split(","), ("cc " + m[LICENSE]).toUpperCase(), SUser.findByEmail(m[AUTHOR_EMAIL].trim()))
+                } else {
+                    log.info "No images"
                 }
             }
 
@@ -680,6 +696,7 @@ class ObvUtilService {
 		obvParams['dateAccuracy'] = m[DATE_ACCURACY]?:(m[AbstractObservationImporter.ANNOTATION_HEADER]?m[AbstractObservationImporter.ANNOTATION_HEADER][DATE_ACCURACY]:null)
 		//author
         if(m[AUTHOR_EMAIL]) {
+            log.debug "Finding user by email"
 		    obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
         } else {
             obvParams['author'] = springSecurityService.currentUser ?: SUser.read(1L); 
@@ -842,6 +859,17 @@ class ObvUtilService {
             break;
         }*/
 
+        if(observationInstance.dataTable) {
+            log.debug "Posting observation to all user groups that data table is part of"
+            HashSet uGs = new HashSet();
+            uGs.addAll(observationInstance.dataTable.userGroups);
+            if(observationInstance.dataTable.dataset) {
+                uGs.addAll(observationInstance.dataTable.dataset.userGroups);
+            }
+            log.debug uGs
+            userGroupService.addResourceOnGroups(observationInstance, uGs.collect{it.id}, false);
+        }
+
         if(!observationInstance.save()){
             if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
                 observationInstance.errors.allErrors.each { 
@@ -983,5 +1011,555 @@ class ObvUtilService {
         }
         return isValid;
     }
+
+    Map upload(String file, Map params, UploadLog dl) {
+        dl.writeLog("============================================\n", Level.INFO);            
+        File ipFile = new File(params.file);
+        File mappingFile = new File(params.mappingFile);
+        File imagesDir = params.imagesDir ? new File(params.imagesDir):null; 
+
+
+        uploadObservations(DataTable.get(params.dataTable), ipFile, null, mappingFile, null,  imagesDir, new File(dl.logFilePath));  
+//        dl.writeLog("\n====================================\nLoaded ${noOfObservationsLoaded} observations\n====================================\n", Level.INFO);
+        return ['success':true, 'msg':"Loaded observations."];
+    }
+
+    private void uploadDWCObservations(DataTable dataTable, File directory, File uploadLog) {
+        DwCObservationImporter importer = DwCObservationImporter.getInstance();
+        Map o = importer.importData(directory.getAbsolutePath(), uploadLog);
+        uploadObservations(dataTable, directory, importer, uploadLog);
+    }
+
+    private void uploadObservations(DataTable dataTable, File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File imagesDir, File uploadLog) {
+        FileObservationImporter importer = FileObservationImporter.getInstance();
+        importer.separator = ',';
+        Map o = importer.importData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
+        uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog);
+    }
+
+    private void uploadObservations(DataTable dataTable, File directory, AbstractObservationImporter importer, Map mediaInfo, File imagesDir, File uploadLog) {
+        Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
+
+        List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
+        int noOfUploadedObv=0, noOfFailedObv=0;
+        boolean flushSingle = false;
+        Date startTime = new Date();
+        int i=0;
+        while(obvParamsList) {
+            List resultObv = [];
+            int tmpNoOfUploadedObv = 0, tmpNoOfFailedObv= 0;
+            try {
+                obvParamsList.each { obvParams ->
+                    if(flushSingle) {
+                        log.info "Retrying batch obv with flushSingle"
+                        uploadLog << "\n Retrying batch obv with flushSingle"
+                    }
+                    //obvParams['observation url'] = 'http://www.gbif.org/occurrence/'+obvParams['externalId'];
+                    obvParams['dataTable'] = dataTable;
+                    DataTable.inheritParams(obvParams, paramsToPropagate);
+                    uploadLog << "\n\n----------------------------------------------------------------------";
+                    uploadLog << "\nUploading observation with params ${obvParams}"
+                    try {
+                        if(uploadObservation(imagesDir, obvParams, resultObv, uploadLog, ProtocolType.LIST )) {
+                            tmpNoOfUploadedObv++;
+                        } else {
+                            tmpNoOfFailedObv++;
+                        }
+                    } catch(Exception e) {
+                        tmpNoOfFailedObv++;
+                        if(flushSingle) { 
+                            utilsService.cleanUpGorm(true)
+                            uploadLog << "\n"+e.getMessage()
+                        }
+                        else
+                            throw e;
+                    }
+                }
+
+                def obvs = resultObv.collect { Observation.read(it) }
+                try {
+                    observationsSearchService.publishSearchIndex(obvs, true);
+                } catch (Exception e) {
+                    log.error e.printStackTrace();
+                }
+
+                noOfUploadedObv += tmpNoOfUploadedObv;
+                noOfFailedObv += tmpNoOfFailedObv;
+                log.debug "Saved observations : noOfUploadedObv : ${noOfUploadedObv} noOfFailedObv : ${noOfFailedObv}";
+                obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
+                flushSingle = false;
+            } catch (Exception e) {
+                log.error "error in creating observation."
+                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}." 
+                    e.printStackTrace();
+                flushSingle = true;
+            }
+            utilsService.cleanUpGorm(true)
+            resultObv.clear();
+        }
+        log.debug "Total number of observations saved for dataTable ${dataTable} are : ${noOfUploadedObv}";
+
+        uploadLog << "\n\n----------------------------------------------------------------------";
+        uploadLog << "\nTotal number of observations saved for dataTable (${dataTable}) are : ${noOfUploadedObv}";
+        uploadLog << "\nTotal number of observations failed in loading for dataTable (${dataTable}) are : ${noOfFailedObv}";
+        uploadLog << "\nTotal time taken for dataTable upload ${((new Date()).getTime() - startTime.getTime())/1000} sec"
+        importer.closeReaders();
+    }
+
+
+    Map uploadDwCDataset(Map params) {
+        def resultModel = [:]
+        String file = params.path?:params.uFile?.path;
+        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        file = config.speciesPortal.content.rootDir + file;
+
+        File f = new File(file);
+        File destDir = f.getParentFile();
+        /*new File(f.getParentFile(),  f.getName())
+        if(!destDir.exists()) {
+            destDir.mkdir()
+        }*/
+        boolean isDwC = false;
+        File directory = f.getParentFile();
+        File metadataFile;
+        if(FilenameUtils.getExtension(f.getName()).equals('zip')) {
+            def ant = new AntBuilder().unzip( src: file,
+            dest: destDir, overwrite:true)
+            directory = new File(destDir, FilenameUtils.removeExtension(f.getName()));
+            if(!directory.exists()) {
+                directory = destDir;
+            }
+            isDwC = true;//validateDwCA(file);
+            if(!isDwC) {
+                return [success:false, msg:'Invalid DwC-A file']
+            } else {
+                metadataFile = new File(directory, "metadata.xml");
+            }
+        }
+
+        
+        File uploadLog = new File(destDir, 'upload.log');
+        if(uploadLog.exists()) uploadLog.delete();
+
+        Date startTime = new Date();
+        if(directory) {
+            params['author'] = springSecurityService.currentUser; 
+            params['type'] = DatasetType.OBSERVATIONS;
+            params['datasource'] = Datasource.read(params.long('datasource'));
+ 
+            if(metadataFile) {
+                uploadLog << "\nUploading dataset in DwCA format present at : ${f.getAbsolutePath()}";
+                uploadLog << "\nDataset upload start time : ${startTime}"
+                String datasetMetadataStr = metadataFile.text;
+
+                def datasetMetadata = new XmlParser().parseText(datasetMetadataStr);
+                params['title'] = params.title?:datasetMetadata.dataset.title.text()
+                params['description'] = params.description?:datasetMetadata.dataset.abstract.para.text();
+                params['externalId'] = datasetMetadata.attributes().packageId;
+                params['externalUrl'] = 'http://doi.org/'+params['externalId'];
+                params['rights'] = datasetMetadata.dataset.intellectualRights.para.text();
+                params['language'] = datasetMetadata.dataset.language.text();
+                params['publicationDate'] = utilsService.parseDate(datasetMetadata.dataset.pubDate.text());
+            } else {
+                params['externalUrl'] = params.externalUrl ?: params['datasource']?.website;
+            }
+
+            UFile f1 = new UFile()
+            f1.size = f.length()
+            f1.path = params.uFile.path;//zipF.getAbsolutePath().replaceFirst(contentRootDir, "")
+            if(f1.save()) {
+                params['uFile'] = f1
+            }
+            //params['uFile'] = params.uFile; 
+    //        params['originalAuthor'] = createContact() 
+            Dataset dataset;
+            def feedType;
+            if(params.id) {
+                dataset = Dataset.get(params.long('id'));
+                dataset = update(dataset, params);
+                feedType = activityFeedService.INSTANCE_UPDATED;
+            } else {
+                dataset = create(params);
+                feedType = activityFeedService.INSTANCE_CREATED;
+            }
+
+
+            resultModel = save(dataset, params, true, null, feedType, null);
+
+            if(resultModel.success) {
+                    if(params.datasource.title.contains('Global Biodiversity Information Facility')) {
+                        importGBIFObservations(dataset, directory, uploadLog)
+                    } else {
+                        if(isDwC) {
+                            importDWCObservations(dataset, directory, uploadLog);
+                        } else {
+                            def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()    
+                            def rs = [:]
+                            if(ServletFileUpload.isMultipartContent(request)) {
+                                MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+                                Utils.populateHttpServletRequestParams(request, rs);
+                            } 
+ 
+                            def multimediaF = params.multimediaFile?:params.multimediaFileUpload;
+                            def mF = params.mappingFile?:params.mappingFileUpload;
+                            def mMF = params.multimediaMappingFile?:params.multimediaMappingFileUpload;
+                            File multimediaFile, mappingFile, multimediaMappingFile;
+                            
+                            if(multimediaF instanceof String) {
+                                multimediaFile = new File(config.speciesPortal.content.rootDir, multimediaF );
+                            } else {
+                                multimediaFile = new File(directory, 'multimediaFile.tsv');
+                                multimediaF.transferTo(multimediaFile);
+                            }
+                            
+                            if(mF instanceof String) {
+                                mappingFile = new File(config.speciesPortal.content.rootDir, mF );
+                            } else {
+                                mappingFile = new File(directory, 'mappingFile.tsv');
+                                mF.transferTo(mappingFile);
+                            }
+
+                            if(mMF instanceof String) {
+                                multimediaMappingFile = new File(config.speciesPortal.content.rootDir, mMF );
+                            } else {
+                                multimediaMappingFile = new File(directory, 'multimediaMappingFile.tsv');
+                                mMF.transferTo(multimediaMappingFile);
+                            }
+
+                            File observationsFile = f;//new File(directory, 'occurence.txt');
+                            //File multimediaFile = params.multimediaFile;//new File(directory, 'multimedia.txt');
+                            importObservations(dataset, observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
+                        }
+                    }
+            } else {
+                log.error "Error while saving dataset ${resultModel}";
+            }
+        } else {
+            resultModel = [success:false, msg:'Invalid file']
+        }
+        uploadLog <<  "\nUpload result while saving dataset ${resultModel}";
+        return resultModel
+    }
+
+    //FIX: This code is subjected to SQL INJECTION. Please make sure your data is sanitized
+    private void importGBIFObservations(Dataset dataset, File directory, File uploadLog) {
+
+        uploadLog << "Starting import of GBIF Observations data";
+        def conn = new Sql(dataSource)
+
+        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+        dataSource.setUnreturnedConnectionTimeout(0);
+	
+
+        def tmpBaseDataTable = "gbifdata";
+        def tmpNewBaseDataTable = "gbifdata_new";
+        def tmpBaseDataTable_multimedia = tmpBaseDataTable+"_multimedia";
+        def tmpBaseDataTable_parsedNamess = tmpBaseDataTable+"_parsed_names";
+        def tmpBaseDataTable_namesList = tmpBaseDataTable+"_namesList";
+
+        String occurencesFileName = (new File(directory, 'occurrence.txt')).getAbsolutePath(); 
+        String multimediaFileName = (new File(directory, 'multimedia.txt')).getAbsolutePath(); 
+        String namesFileName = (new File(directory, 'gbif_names_all_with_idswithoutspchar.csv')).getAbsolutePath(); 
+        Date startTime = new Date();
+         try {
+            uploadLog << "\nCreating base table for ${occurencesFileName}";
+
+            conn.execute('''
+            drop table  if exists '''+tmpBaseDataTable+''';
+            create table '''+tmpBaseDataTable+'''(gbifID text, abstract text, accessRights text, accrualMethod text, accrualPeriodicity text, accrualPolicy text, alternative text, audience text, available text, bibliographicCitation text, conformsTo text, contributor text, coverage text, created text, creator text, date text, dateAccepted text, dateCopyrighted text, dateSubmitted text, description text, educationLevel text, extent text, format text, hasFormat text, hasPart text, hasVersion text, identifier text, instructionalMethod text, isFormatOf text, isPartOf text, isReferencedBy text, isReplacedBy text, isRequiredBy text, isVersionOf text, issued text, language text, license text, mediator text, medium text, modified text, provenance text, publisher text, references1 text, relation text, replaces text, requires text, rights text, rightsHolder text, source text, spatial text, subject text, tableOfContents text, temporal text, title text, type text, valid text, institutionID text, collectionID text, datasetID text, institutionCode text, collectionCode text, datasetName text, ownerInstitutionCode text, basisOfRecord text, informationWithheld text, dataGeneralizations text, dynamicProperties text, occurrenceID text, catalogNumber text, recordNumber text, recordedBy text, individualCount text, organismQuantity text, organismQuantityType text, sex text, lifeStage text, reproductiveCondition text, behavior text, establishmentMeans text, occurrenceStatus text, preparations text, disposition text, associatedReferences text, associatedSequences text, associatedTaxa text, otherCatalogNumbers text, occurrenceRemarks text, organismID text, organismName text, organismScope text, associatedOccurrences text, associatedOrganisms text, previousIdentifications text, organismRemarks text, materialSampleID text, eventID text, parentEventID text, fieldNumber text, eventDate text, eventTime text, startDayOfYear text, endDayOfYear text, year text, month text, day text, verbatimEventDate text, habitat text, samplingProtocol text, samplingEffort text, sampleSizeValue text, sampleSizeUnit text, fieldNotes text, eventRemarks text, locationID text, higherGeographyID text, higherGeography text, continent text, waterBody text, islandGroup text, island text, countryCode text, stateProvince text, county text, municipality text, locality text, verbatimLocality text, verbatimElevation text, verbatimDepth text, minimumDistanceAboveSurfaceInMeters text, maximumDistanceAboveSurfaceInMeters text, locationAccordingTo text, locationRemarks text, decimalLatitude text, decimalLongitude text, coordinateUncertaintyInMeters text, coordinatePrecision text,  pointRadiusSpatialFit text, verbatimCoordinateSystem text, verbatimSRS text, footprintWKT text, footprintSRS text, footprintSpatialFit text, georeferencedBy text, georeferencedDate text, georeferenceProtocol text, georeferenceSources text, georeferenceVerificationStatus text, georeferenceRemarks text, geologicalContextID text, earliestEonOrLowestEonothem text, latestEonOrHighestEonothem text, earliestEraOrLowestErathem text, latestEraOrHighestErathem text, earliestPeriodOrLowestSystem text, latestPeriodOrHighestSystem text, earliestEpochOrLowestSeries text, latestEpochOrHighestSeries text, earliestAgeOrLowestStage text, latestAgeOrHighestStage text, lowestBiostratigraphicZone text, highestBiostratigraphicZone text, lithostratigraphicTerms text, group1 text, formation text, member text, bed text, identificationID text, identificationQualifier text, typeStatus text, identifiedBy text, dateIdentified text, identificationReferences text, identificationVerificationStatus text, identificationRemarks text, taxonID text, scientificNameID text, acceptedNameUsageID text, parentNameUsageID text, originalNameUsageID text, nameAccordingToID text, namePublishedInID text, taxonConceptID text, scientificName text, acceptedNameUsage text, parentNameUsage text, originalNameUsage text, nameAccordingTo text, namePublishedIn text, namePublishedInYear text, higherClassification text, kingdom text, phylum text, class text, order1 text, family text, genus text, subgenus text, specificEpithet text, infraspecificEpithet text, taxonRank text, verbatimTaxonRank text, vernacularName text, nomenclaturalCode text, taxonomicStatus text, nomenclaturalStatus text, taxonRemarks text, datasetKey text, publishingCountry text, lastInterpreted text, elevation text, elevationAccuracy text, depth text, depthAccuracy text, distanceAboveSurface text, distanceAboveSurfaceAccuracy text, issue text, mediaType text, hasCoordinate text, hasGeospatialIssues text, taxonKey text, kingdomKey text, phylumKey text, classKey text, orderKey text, familyKey text, genusKey text, subgenusKey text, speciesKey text, species text, genericName text, typifiedName text, protocol text, lastParsed text, lastCrawled text, repatriated text) with (fillfactor=50);
+
+            copy gbifdata from '''+"'"+occurencesFileName+"'"+'''  with null '';
+            delete from '''+tmpBaseDataTable+''' where gbifid='gbifID';
+            alter table '''+tmpBaseDataTable+''' alter column gbifID type bigint using gbifID::bigint, add constraint gbifid_pk primary key(gbifid);
+
+            alter table '''+tmpBaseDataTable+''' add column clean_sciName text, add column canonicalForm text, add column observation_id bigint, add column recommendation_id bigint, add column commonname_reco_id bigint, add column external_url text, add column eventDate1 timestamp without time zone, add column lastCrawled1 timestamp without time zone, add column lastInterpreted1 timestamp without time zone, add column dateIdentified1 timestamp without time zone, add column place_name text, add column group_id bigint, add column habitat_id bigint, add column topology geometry, alter column  decimallongitude type numeric USING NULLIF(decimallongitude, '')::numeric, alter column decimallatitude type numeric USING NULLIF(decimallatitude, '')::numeric, add column license1 bigint, to_update boolean;
+
+            update '''+tmpBaseDataTable+''' set eventDate1=to_date(eventDate, 'yyyy-MM-ddTHH:miZ'), lastCrawled1=to_date(lastCrawled, 'yyyy-MM-ddTHH:miZ'), lastInterpreted1=to_date(lastInterpreted, 'yyyy-MM-ddTHH:miZ'), dateIdentified1=to_date(dateIdentified, 'yyyy-MM-ddTHH:miZ'), external_url = 'http://www.gbif.org/occurrence/'|| gbifId, place_name=concat_ws(', ', locality, stateProvince, county), topology=CASE WHEN decimallatitude is not null and decimallongitude is not null THEN ST_SetSRID(ST_MakePoint(decimallongitude, decimallatitude), 4326) ELSE NULL END, basisOfRecord=CASE WHEN basisOfRecord IS null THEN 'HUMAN_OBSERVATION' ELSE basisOfRecord END, protocol= CASE WHEN protocol IS null THEN 'DWC_ARCHIVE' ELSE protocol END;
+
+            update '''+tmpBaseDataTable+''' set to_update = 't', observation_id=o.id from observation o where o.external_id::bigint = gbifId;
+            update '''+tmpBaseDataTable+''' set observation_id=nextval('observation_id_seq') where to_update != 't';
+
+            update '''+tmpBaseDataTable+''' set license1= CASE WHEN rights like '%/publicdomain/%' THEN '''+License.findByName('CC_PUBLIC_DOMAIN').id+''' WHEN rights like '%/by/%' THEN '''+License.findByName('CC_BY').id+'''  WHEN rights like '%/by-sa/%' THEN '''+License.findByName('CC_BY_SA').id+'''  WHEN rights like '%/by-nc/%' or rights='Creative Commons Attribution Non Commercial (CC-BY-NC) 4.0 License.' THEN '''+License.findByName('CC_BY_NC').id+'''  WHEN rights like '%/by-nc-sa/%' THEN '''+License.findByName('CC_BY_NC_SA').id+'''  WHEN rights like '%/by-nc-nd/%' THEN '''+License.findByName('CC_BY_NC_ND').id+''' WHEN rights like '%/by-nd/%' THEN '''+License.findByName('CC_BY_ND').id+'''  ELSE '''+License.findByName('CC_BY').id+''' END;
+
+
+            drop table  if exists '''+tmpNewBaseDataTable+''';
+            create table '''+tmpNewBaseDataTable+''' as select g.*,a.data from '''+tmpBaseDataTable+''' g join  (select gbifID, row_to_json((select d from (select 'http://www.gbif.org/occurrence/'||gbifID as gbifID, abstract, accessRights, accrualMethod, accrualPeriodicity, accrualPolicy, alternative, audience, available, bibliographicCitation, conformsTo, contributor, coverage, created, creator, date, dateAccepted, dateCopyrighted, dateSubmitted, description, educationLevel, extent, format, hasFormat, hasPart, hasVersion, identifier, instructionalMethod, isFormatOf, isPartOf, isReferencedBy, isReplacedBy, isRequiredBy, isVersionOf, issued, language, license, mediator, medium, modified, provenance, publisher, references1 as references, relation, replaces, requires, rights, rightsHolder, source, spatial, subject, tableOfContents, temporal, title, type, valid, institutionID, collectionID, datasetID, institutionCode, collectionCode, datasetName, ownerInstitutionCode, basisOfRecord, informationWithheld, dataGeneralizations, dynamicProperties, occurrenceID, catalogNumber, recordNumber, recordedBy, individualCount, organismQuantity, organismQuantityType, sex, lifeStage, reproductiveCondition, behavior, establishmentMeans, occurrenceStatus, preparations, disposition, associatedReferences, associatedSequences, associatedTaxa, otherCatalogNumbers, occurrenceRemarks, organismID, organismName, organismScope, associatedOccurrences, associatedOrganisms, previousIdentifications, organismRemarks, materialSampleID, eventID, parentEventID, fieldNumber, eventDate, eventTime, startDayOfYear, endDayOfYear, year, month, day, verbatimEventDate, habitat, samplingProtocol, samplingEffort, sampleSizeValue, sampleSizeUnit, fieldNotes, eventRemarks, locationID, higherGeographyID, higherGeography, continent, waterBody, islandGroup, island, countryCode, stateProvince, county, municipality, locality, verbatimLocality, verbatimElevation, verbatimDepth, minimumDistanceAboveSurfaceInMeters, maximumDistanceAboveSurfaceInMeters, locationAccordingTo, locationRemarks, decimalLatitude, decimalLongitude,  coordinateUncertaintyInMeters, coordinatePrecision, pointRadiusSpatialFit, verbatimCoordinateSystem, verbatimSRS, footprintWKT, footprintSRS, footprintSpatialFit, georeferencedBy, georeferencedDate, georeferenceProtocol, georeferenceSources, georeferenceVerificationStatus, georeferenceRemarks, geologicalContextID, earliestEonOrLowestEonothem, latestEonOrHighestEonothem, earliestEraOrLowestErathem, latestEraOrHighestErathem, earliestPeriodOrLowestSystem, latestPeriodOrHighestSystem, earliestEpochOrLowestSeries, latestEpochOrHighestSeries, earliestAgeOrLowestStage, latestAgeOrHighestStage, lowestBiostratigraphicZone, highestBiostratigraphicZone, lithostratigraphicTerms, group1 as group, formation, member, bed, identificationID, identificationQualifier, typeStatus, identifiedBy, dateIdentified, identificationReferences, identificationVerificationStatus, identificationRemarks, taxonID, scientificNameID, acceptedNameUsageID, parentNameUsageID, originalNameUsageID, nameAccordingToID, namePublishedInID, taxonConceptID, scientificName, acceptedNameUsage, parentNameUsage, originalNameUsage, nameAccordingTo, namePublishedIn, namePublishedInYear, higherClassification, kingdom, phylum, class, order1 as order, family, genus, subgenus, specificEpithet, infraspecificEpithet, taxonRank, verbatimTaxonRank, vernacularName, nomenclaturalCode, taxonomicStatus, nomenclaturalStatus, taxonRemarks, datasetKey, publishingCountry, lastInterpreted, elevation, elevationAccuracy, depth, depthAccuracy, distanceAboveSurface, distanceAboveSurfaceAccuracy, issue, mediaType, hasCoordinate, hasGeospatialIssues, taxonKey, kingdomKey, phylumKey, classKey, orderKey, familyKey, genusKey, subgenusKey, speciesKey, species, genericName, typifiedName, protocol, lastParsed, lastCrawled, repatriated ) d))::text as data from gbifdata) a on g.gbifid=a.gbifid order by g.gbifid;
+
+            alter table '''+tmpNewBaseDataTable+''' alter column gbifID type bigint using gbifID::bigint, add constraint gbifid_new_pk primary key(gbifid);
+            alter table '''+tmpNewBaseDataTable+''' add column key text;
+            update '''+tmpNewBaseDataTable+''' set key=concat(scientificname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
+            ''');
+            
+            uploadLog << "\nCreating distinct sciName table for parsing";
+            conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);
+            conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_parsedNamess+"(id serial primary key, sciName text, clean_sciName text, canonicalForm text, species text, genus text, family text, order1 text, class text, phylum text, kingdom text, commonName text, taxonrank text, taxonId bigint, acceptedId bigint, recommendation_id bigint)");
+            conn.executeInsert("INSERT INTO "+ tmpBaseDataTable_parsedNamess +  " (sciName, species, genus, family, order1, class, phylum, kingdom, commonname, taxonrank) select scientificname, species, genus, family, order1, class, phylum, kingdom, vernacularname,taxonrank from "+tmpNewBaseDataTable + " group by scientificname, species, genus, family, order1, class,phylum,kingdom, vernacularname,taxonrank");
+            conn.execute('''
+            alter table '''+tmpBaseDataTable_parsedNamess+''' add column key text;
+            update '''+tmpBaseDataTable_parsedNamess+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
+            ''')
+
+
+            uploadLog << "\nTime taken for creating annotations ${((new Date()).getTime() - startTime.getTime())/1000} sec"
+
+            uploadLog << "\nPopulating with canonicalform and taxonIds";
+            conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_namesList);
+            conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_namesList+"(id bigint, sciName text, clean_sciName text, canonicalForm text, commonname text, species text, genus text, family text, order1 text, class text, phylum text, kingdom text, taxonId bigint, acceptedId bigint, taxonrank varchar(255))");
+            conn.execute("copy "+tmpBaseDataTable_namesList+" from "+"'"+namesFileName+"'"+"  with null '' delimiter '\t' csv header");
+
+conn.execute('''
+alter table '''+tmpBaseDataTable_namesList+''' add column key text;
+update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
+''')
+
+            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " as x set canonicalForm = n.canonicalForm, taxonId = n.taxonId, acceptedId = n.acceptedId from "+tmpBaseDataTable_namesList+" n where n.key=x.key");
+
+            uploadLog << "\nTime taken for creating annotations ${((new Date()).getTime() - startTime.getTime())/1000} sec"
+
+
+        } finally {
+            conn.close();
+        }
+        uploadLog << "\nTime taken for creating tables ${((new Date()).getTime() - startTime.getTime())/1000} sec"
+
+        ///////////////////////////
+        //Parsing Names
+        ///////////////////////////
+        uploadLog << "\nStarting parsing distinct sciNames";
+        NamesParser namesParser = new NamesParser();
+        SUser currentUser = springSecurityService.currentUser;
+        List resultObv = [];
+        int limit = 5000, offset 
+        def noOfSciNames, noOfCommonNames;
+        
+        Date s = new Date();
+        Date t_date = new Date();
+/*        while(true) {
+            s = new Date();
+
+            try {
+                conn = new Sql(dataSource);
+                resultObv = conn.rows("select * from " + tmpBaseDataTable_parsedNamess + " order by id limit " + limit + " offset " + offset);
+            } finally {
+                conn.close();
+            }
+
+            if(!resultObv) break;
+
+            uploadLog << "\n\n-----------------------------------------------"
+            uploadLog << "\n limit : ${limit}, offset : ${offset}";
+
+            def names = resultObv.collect { it.sciName };
+            def parsedNames;
+            Date n = new Date();
+            try {
+                parsedNames = namesParser.parse(names)
+            } catch (Exception e) {
+                uploadLog << "\n"+e.getMessage();
+                log.error e.printStackTrace();
+            }
+            uploadLog << "\nTime taken for parsing ${limit} names ${((new Date()).getTime() - n.getTime())/1000} sec"
+
+            uploadLog << "\nUpdating each distinct name with canonicalForm";
+            n = new Date();
+            try {
+                conn = new Sql(dataSource);
+                resultObv.eachWithIndex { t, index ->
+                    conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set canonicalForm = :canonicalForm, clean_sciName=:clean_sciName where sciName = :sciName and species = :species and genus=:genus and family=:family and order1=:order1 and class=:class and phylum=:phylum and kingdom=:kingdom and commonname=:commonname and taxonrank=:taxonrank", [canonicalForm:parsedNames[index]?.canonicalForm, clean_sciName:parsedNames[index]?.name, sciName:t.sciName, species:t.species, genus:t.genus, family:t.family, order1:t.order1, class:t.class, phylum:t.phylum, kingdom:t.kingdom, commonname:t.commonname, taxonrank:t.taxonrank]);
+                }
+            } finally {
+                conn.close();
+            }
+            uploadLog << "\nTime taken for updating ${limit} canonicalForms ${((new Date()).getTime() - n.getTime())/1000} sec"
+
+            resultObv.clear();
+            offset = offset + limit;
+            uploadLog << "\nTime taken for parsing and updating ${limit} distinct names ${((new Date()).getTime() - s.getTime())/1000} sec"
+        }
+        uploadLog << "\nTime taken for parsing and updating canonical forms for distinct names is ${((new Date()).getTime() - t_date.getTime())/1000} sec"
+*/
+        uploadLog << "\nInserting new names into recommendations";
+        s = new Date();
+        try {
+            conn = new Sql(dataSource);
+
+            uploadLog << "\nInserting new sci names into recommendations";
+            noOfSciNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name,taxon_concept_id, accepted_name_id, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.canonicalform, 't', t.taxonId, t.acceptedId, lower(t.canonicalForm), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.canonicalForm) = r.lowercase_name and (t.taxonId=r.taxon_concept_id or (t.taxonId is null and r.taxon_concept_id is null)) and r.is_scientific_name='t' where r.name is null and t.canonicalForm is not null group by t.canonicalForm, t.taxonId,t.acceptedId");
+
+            //handling canonical form null by taking in sciname as is
+            noOfSciNames += conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name,taxon_concept_id, accepted_name_id, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.sciname, 't', t.taxonId, t.acceptedId, lower(t.sciname), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on t.sciName=r.name where r.name is null and t.canonicalForm is null and t.sciname is not null");
+
+            println noOfSciNames;
+            uploadLog << "\nInserting new common names into recommendations";
+            noOfCommonNames = conn.executeInsert("INSERT INTO recommendation(id, last_modified, name, is_scientific_name, lowercase_name, is_flagged) select nextval('hibernate_sequence') as id, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, t.commonname, 'f', lower(t.commonname), 'f' from "+tmpBaseDataTable_parsedNamess+" t left outer join recommendation r on lower(t.commonname) = r.lowercase_name and (r.is_scientific_name='f' or r.is_scientific_name is null) and r.language_id=:defaultLanguageId where r.name is null and t.commonname is not null group by t.commonname", [defaultLanguageId:Language.getLanguage().id]);
+        } finally {
+            conn.close();
+        }
+        uploadLog << "\nTime taken for inserting new recommendations ${noOfSciNames.size()} and ${noOfCommonNames.size()} ${((new Date()).getTime() - s.getTime())/1000} sec"
+
+        uploadLog << "\nUpdating all sciNames with their recommendaitonIds";
+        s = new Date();
+        try {
+            conn = new Sql(dataSource);
+            //FIX:sciName could be repeated in parsed_names table
+            conn.executeUpdate("update " + tmpBaseDataTable_parsedNamess + " set recommendation_id = r.id from recommendation r where ((canonicalform is not null and r.lowercase_name = lower(canonicalform)) or (sciname is not null and r.lowercase_name = lower(sciname))) and ((taxonId is null and r.taxon_concept_id is null) or (taxonId = r.taxon_concept_id)) and ((acceptedId is null and r.accepted_name_id is null) or (acceptedId = r.accepted_name_id))");
+        } finally {
+            conn.close();
+        }
+        uploadLog << "\nTime taken for updating all canonicalForms ${((new Date()).getTime() - s.getTime())/1000} sec"
+
+
+/*        uploadLog << "\nUpdating all sciNames with their canonicalForm";
+        s = new Date();
+        try {
+            conn = new Sql(dataSource);
+            //FIX:sciName could be repeated in parsed_names table
+            conn.executeUpdate("update " + tmpNewBaseDataTable + " set canonicalForm = t1.canonicalForm, clean_sciName = t1.clean_sciName from " + tmpBaseDataTable_parsedNamess + " t1 where t1.sciName = scientificname");
+        } finally {
+            conn.close();
+        }
+        uploadLog << "\nTime taken for updating all canonicalForms ${((new Date()).getTime() - s.getTime())/1000} sec"
+*/
+
+        uploadLog << "\nUpdating all sciNames with their reco ids";
+        s = new Date();
+        try {
+            conn = new Sql(dataSource);
+
+            conn.executeUpdate("update " + tmpNewBaseDataTable + " as g set recommendation_id = t1.recommendation_id, group_id=t2.group_id, habitat_id=:defaultHabitatId from "+tmpBaseDataTable_parsedNamess+" t1 join taxonomy_definition t2 on t1.taxonid is not null and t1.taxonid = t2.id where t1.key=g.key",  [defaultHabitatId:Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]) ;
+
+            //handling taxonid null case
+            conn.executeUpdate("update " + tmpNewBaseDataTable +"  as g set recommendation_id = t1.recommendation_id, group_id=:defaultSpeciesGroupId,habitat_id=:defaultHabitatId from gbifdata_parsed_names  t1 where g.key=t1.key and t1.taxonid is null and t1.recommendation_id is not null and g.scientificname is not null",  ['defaultSpeciesGroupId':SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).id, 'defaultHabitatId':Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id]);
+
+            conn.executeUpdate("update " + tmpNewBaseDataTable + " set commonname_reco_id = t1.id from recommendation t1 where t1.name = vernacularname;") ;
+        } finally {
+            conn.close();
+        }
+        uploadLog << "\nTime taken for updating all recoids ${((new Date()).getTime() - s.getTime())/1000} sec"
+
+
+        uploadLog << "\nInserting observation and creating recovotes";
+        s = new Date();
+        try {
+            conn = new Sql(dataSource);
+            //TODO: this is risky as any other obv creation during this time will happen without constraints
+            conn.executeUpdate("ALTER TABLE observation DISABLE TRIGGER ALL ;");
+            conn.executeUpdate("insert into observation (id, version, access_rights, agree_terms, author_id, basis_of_record, catalog_number, checklist_annotations, created_on, dataset_id, external_dataset_key, external_id, external_url, feature_count, flag_count, from_date, geo_privacy, group_id, habitat_id, information_withheld, is_checklist, is_deleted, is_locked, is_showable, language_id, last_crawled, last_interpreted, last_revised, latitude, license_id, location_accuracy, location_scale, longitude, max_voted_reco_id, notes, original_author, place_name, protocol, publishing_country, rating, reverse_geocoded_name, search_text, source_id, to_date, topology, via_code, via_id, visit_count) select observation_id, 0, accessRights, 't', "+currentUser.id+", basisOfRecord, catalogNumber, data, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, "+dataset.id+", datasetKey, gbifID, external_url, 0, 0, eventDate1, 'f', COALESCE(group_id, "+SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id+"), COALESCE(habitat_id, "+Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id+" ), informationWithheld, 'f', 'f', 'f', 'f', "+Language.getLanguage().id+", lastCrawled1, lastInterpreted1, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp, decimalLatitude, license1, 'Approximate', 'APPROXIMATE', decimalLongitude, recommendation_id, null, recordedBy, place_name, 'DWC_ARCHIVE', publishingCountry, 0, place_name, null, null, eventDate1, topology, collectionCode, collectionID, 0 from "+tmpNewBaseDataTable+" where decimallatitude is not null and decimallongitude is not null and eventDate1 is not null and decimallatitude>=26.647 and decimallatitude<=28.280 and decimallongitude>=88.692 and decimallongitude<=92.170 and to_update != 't' order by gbifId");
+
+            println "Inserted observations "
+
+            conn.executeUpdate("update observation set access_rights = tmp.access_rights, set agree_terms=tmp.agree_terms, set author_id=tmp.author_id, set basis_of_record=tmp.basis_of_record, set catalog_number=tmp.catalog_number, set checklist_annotations=tmp.checklist_annotations, set created_on=tmp.created_on, set dataset_id=tmp.dataset_id, set external_dataset_key=tmp.external_dataset_key, set external_id=tmp.external_id, set external_url=tmp.external_url, set feature_count=tmp.feature_count, set flag_count=tmp.flag_count, set from_date= tmp.from_date, set geo_privacy=tmp.geo_privacy, set group_id=tmp.group_id, set habitat_id=tmp.habitat_id, set information_withheld=tmp.information_withheld, set is_checklist=tmp.is_checklist, set is_deleted=tmp.is_deleted, set is_locked=tmp.is_locked, set is_showable=tmp.is_showable, set language_id=tmp.language_id, set last_crawled=tmp.last_crawled, set last_interpreted=tmp.last_interpreted, set last_revised=tmp.last_revised, set latitude=tmp.latitude, set license_id=tmp.license_id, set location_accuracy=tmp.location_accuracy, set location_scale=tmp.location_scale, set longitude=tmp.longitude, set max_voted_reco_id=tmp.max_voted_reco_id, set notes=tmp.notes, set original_author=tmp.original_author, set place_name=tmp.place_name, set protocol=tmp.protocol, set publishing_country=tmp.publishingCountry, set rating=tmp.rating, set reverse_geocoded_name=tmp.reverse_geocoded_name, set search_text=tmp.search_text, set source_id=tmp.source_id, set to_date=tmp.to_date, set topology=tmp.topology, set via_code=tmp.via_code, set via_id=tmp.via_id, set visit_count=tmp.visit_count) select accessRights as access_rights, 't' as agree_terms, "+currentUser.id+" as author_id, basisOfRecord as basis_of_record, catalogNumber as catalog_number, data as checklist_annotations, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp as created_on, "+dataset.id+" as dataset_id, datasetKey as external_dataset_key, gbifID as external_id, external_url as external_url, 0 as feature_count, 0 as flag_count, eventDate1 as from_date, 'f' as geo_privacy, COALESCE(group_id, "+SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id+") as group_id, COALESCE(habitat_id, "+Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id+" ) as habitat_id, informationWithheld as information_withheld, 'f' as is_checklist, 'f' as is_deleted, 'f' as is_locked, 'f' as is_showable, "+Language.getLanguage().id+" as language_id, lastCrawled1 as last_crawled, lastInterpreted1 as last_interpreted, '"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'::timestamp as last_revised, decimalLatitude as latitude, license1 as license_id, 'Approximate' as location_accuracy, 'APPROXIMATE' as location_scale, decimalLongitude as longitude, recommendation_id as max_voted_reco_id, null as notes, recordedBy as original_author, place_name as place_name, 'DWC_ARCHIVE' as protocol, publishingCountry as publishing_country, 0 as rating, place_name as reverse_geocoded_name, null as search_text, null as source_id, eventDate1 as to_date, topology, collectionCode as via_code, collectionID as via_id, 0 as visit_count from "+tmpNewBaseDataTable+" where decimallatitude is not null and decimallongitude is not null and eventDate1 is not null and decimallatitude>=26.647 and decimallatitude<=28.280 and decimallongitude>=88.692 and decimallongitude<=92.170 and to_update = 't' order by gbifId");
+            //, [datasetId:dataset.id, languageId:Language.getLanguage().id, defaultHabitatId:Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id, defaultSpeciesGroupId:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS).id]);
+            conn.executeUpdate("ALTER TABLE observation ENABLE TRIGGER ALL ;");
+            println "updated old observations "
+
+            //conn.executeUpdate("update observation set protocol=CASE WHEN protocol='TAPIR' or protocol='DIGIR_MANIS' THEN 'OTHER' ELSE protocol END");
+
+            conn.executeUpdate("delete from recommendation_vote where observation_id = id from "+tmpNewBaseDataTable+", observation where to_update='t' and recommendation_id is not null and observation_id is not null and observation_id=id");
+
+            conn.executeUpdate("insert into recommendation_vote(id, version, author_id, confidence, observation_id, recommendation_id, user_weight, voted_on, comment, common_name_reco_id, given_sci_name, given_common_name, original_author) select nextval('hibernate_sequence'), 0, "+currentUser.id+", 'CERTAIN', observation_id, recommendation_id, 0, COALESCE(dateIdentified1, '"+((new Date()).format('yyyy-MM-dd HH:mm:ss.SSS'))+"'), null, commonname_reco_id,  scientificname as given_sci_name, vernacularname as given_common_name, identifiedby as original_author from "+tmpNewBaseDataTable+", observation where recommendation_id is not null and observation_id is not null and observation_id=id");
+        } finally {
+            conn.close();
+        }
+        uploadLog << "\nTime taken for creating observations and recovote ${((new Date()).getTime() - s.getTime())/1000} sec"
+
+
+        uploadLog << "\nInserting resources";
+        s = new Date();
+        try {
+            conn = new Sql(dataSource);
+
+            conn.execute('''
+            drop table if exists '''+tmpBaseDataTable_multimedia+''';
+            alter table resource drop column IF EXISTS gbifID;
+            create table '''+tmpBaseDataTable_multimedia+'''(id serial primary key, gbifID   text, type     text,  format   text,  identifier   text,  references1 text, title  text,  description   text, created   text, creator   text, contributor   text, publisher   text,   audience    text,   source  text, license text, rightsHolder text);
+
+            copy '''+tmpBaseDataTable_multimedia+'''(gbifID,type,format,identifier,references1,title,description,created,creator,contributor,publisher,audience,source,license,rightsHolder) from '''+"'"+multimediaFileName+"';"+''' ;
+            delete from '''+tmpBaseDataTable_multimedia+''' where gbifID='gbifID';
+            alter table '''+tmpBaseDataTable_multimedia+''' alter column gbifID type bigint using gbifID::bigint;
+
+            alter table '''+tmpBaseDataTable_multimedia+''' add column annotations text, add column type1 text, add column license1 bigint, add column to_update boolean, resource_id bigint;
+
+            update '''+tmpBaseDataTable_multimedia+''' set type1= CASE WHEN type='StillImage' THEN 'IMAGE'  WHEN type='MovingImage' THEN 'VIDEO' WHEN type='SOUND' THEN 'AUDIO' ELSE 'IMAGE' END, license1=CASE WHEN license like '%/publicdomain/%' THEN '''+License.findByName('CC_PUBLIC_DOMAIN').id+''' WHEN license like '%/by/%' THEN '''+License.findByName('CC_BY').id+'''  WHEN license like '%/by-sa/%' THEN '''+License.findByName('CC_BY_SA').id+'''  WHEN license like '%/by-nc/%' or license='Creative Commons Attribution Non Commercial (CC-BY-NC) 4.0 License.' THEN '''+License.findByName('CC_BY_NC').id+'''  WHEN license like '%/by-nc-sa/%' THEN '''+License.findByName('CC_BY_NC_SA').id+'''  WHEN license like '%/by-nc-nd/%' THEN '''+License.findByName('CC_BY_NC_ND').id+''' WHEN license like '%/by-nd/%' THEN '''+License.findByName('CC_BY_ND').id+'''  ELSE '''+License.findByName('CC_BY').id+''' END, identifier= CASE WHEN identifier IS NULL THEN '''+"'"+grailsApplication.config.speciesPortal.resources.serverURL.toString()+"/no-image.jpg"+"'"+''' ELSE identifier END;
+
+            update '''+tmpBaseDataTable_multimedia+''' set annotations = g.data from (select id as xid, row_to_json((select d from (select 'http://www.gbif.org/occurrence/'||gbifId as gbifId, type, identifier, format, license, references1 as references, rightsHolder, title, publisher, source, description, created, creator, contributor, audience) d))::text as data from gbifdata_multimedia) as  g where g.xid=id;
+
+            update '''+tmpBaseDataTable_multimedia+''' set to_update = 't', set resource_id = r.id from resource r where r.gbifid = gbifID;
+            
+            delete from resource_contributor where resource_contributors_id in (select resource_id from '''+tmpBaseDataTable_multimedia+''' where to_update = 't');
+            delete from observation_resource where resource_id in (select resource_id from '''+tmpBaseDataTable_multimedia+''' where to_update = 't');
+
+            delete from resource where gbifid = gbifID from '''+tmpBaseDataTable_multimedia+''';
+
+            insert into resource (id, version,description,file_name,mime_type,type,url,rating,upload_time,uploader_id,context,language_id,access_rights,annotations,gbifID,license_id) select nextval('hibernate_sequence'), 0,title,'i',format,type1,identifier,0,'''+"'"+(new Date()).format('yyyy-MM-dd HH:mm:ss.SSS')+"'"+'''::timestamp,'''+currentUser.id+''','OBSERVATION','''+Language.getLanguage().id+''',license,annotations,gbifID,license1  from '''+tmpBaseDataTable_multimedia+''' where identifier is not null;
+
+            insert into observation_resource(observation_id, resource_id) select o.id, r.id from observation o, resource r where cast(o.external_id as integer)=r.gbifID;
+
+            insert into contributor(id, name) select nextval('hibernate_sequence') as id, rightsholder from '''+tmpBaseDataTable_multimedia+''' where rightsholder is not null and rightsholder not in (select distinct(name) from contributor) group by rightsholder;
+
+        insert into resource_contributor(resource_contributors_id,contributor_id) select r.id, c.id from '''+tmpBaseDataTable_multimedia+''' o, resource r, contributor c where o.gbifId=r.gbifID and o.rightsholder=c.name;
+
+        ALTER TABLE observation DISABLE TRIGGER ALL;
+        update observation set is_showable='t' where id in (select o.observation_id from observation_resource o, resource r where o.resource_id=r.id and r.gbifid is not null);
+
+        ''');
+
+           conn.execute("delete from observation as o1 where o1.id in (select id from observation left outer join observation_resource on id=observation_id where external_id is not null and max_voted_reco_id is null and resource_id is null)");
+
+           conn.execute('''
+           update observation set no_of_images = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='IMAGE' group by observation_id) g where g.observation_id = id;
+           update observation set no_of_videos = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='VIDEO' group by observation_id) g where g.observation_id = id;
+           update observation set no_of_audio = g.count from (select observation_id, count(*) as count from resource r inner join observation_resource or1 on r.id=or1.resource_id and r.type='AUDIO' group by observation_id) g where g.observation_id = id;
+
+           create table tmp as select observation_id, count(*) as count from recommendation_vote group by observation_id;
+
+           update observation set no_of_identifications = g.count from (select * from tmp) g where g.observation_id=id;
+
+           drop table tmp;
+                    
+            create table tmp as select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='resource' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref order by observation_id asc, avg desc, resource_id asc;
+
+            update observation set repr_image_id = g.resource_id from (select b.observation_id,b.resource_id from (select observation_id, max(avg) as max_avg from tmp group by observation_id) a inner join tmp b on a.observation_id=b.observation_id where b.avg=a.max_avg) g where g.observation_id=id;
+
+            drop table tmp;
+
+
+           '''
+           );
+        conn.executeUpdate("ALTER TABLE observation ENABLE TRIGGER ALL ;");
+
+        } finally {
+        conn.close();
+        }
+        uploadLog << "\nTime taken for resources ${((new Date()).getTime() - s.getTime())/1000} sec"
+         
+
+
+        /*uploadLog << "\n Publishing search index"
+        d = new Date();
+        try {
+        utilsService.logSql {
+        observationsSearchService.publishSearchIndex(obvs, true);
+        }
+        uploadLog << "\nTime taken for search index commit : ${((new Date()).getTime() - d.getTime())/1000} sec"
+        } catch (Exception e) {
+        log.error e.printStackTrace();
+        }*/
+
+
+        try {
+            //conn = new Sql(dataSource);
+            //conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);	
+            //conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);	
+        } finally {
+            //conn.close();
+            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+        }
+
+        uploadLog << "\n\n----------------------------------------------------------------------";
+        uploadLog << "\nTotal time taken for uploading ${((new Date()).getTime() - startTime.getTime())/1000} sec"
+    }
+
 
 }

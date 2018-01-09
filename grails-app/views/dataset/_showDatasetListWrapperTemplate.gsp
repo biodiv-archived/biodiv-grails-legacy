@@ -1,3 +1,4 @@
+<%@page import="species.dataset.DataPackage"%>
 <style>
     .observation .prop .value {
         margin-left:260px;
@@ -9,8 +10,10 @@
 	<div class="list" style="margin-left:0px;clear:both">
 		<div class="filters" style="position: relative;">
 		<div class="filters" style="position: relative;">
-			<obv:showGroupFilter
+		<%--
+            <obv:showGroupFilter
 			    model="[forObservations:false, hideHabitatFilter:true]" />
+        --%>
 		</div>
 	
 		</div>
@@ -46,7 +49,26 @@
 
 				</div>
 
-				
+					
+
+                <div class="btn-group pull-left" style="z-index: 10">
+                    <button id="selected_dp" class="btn dropdown-toggle"
+                        data-toggle="dropdown" href="#" rel="tooltip"
+                        data-original-title="Filter by data package">
+                        All Data Packages 
+                        <span class="caret"></span>
+                    </button>
+                    <ul id="dataPackageFilter" class="dropdown-menu" style="width: auto;">
+                        <g:each in="${DataPackage.findAllByIsDeleted(false)}" var="dataPackage">
+                            <li class="group_option">
+                                <a class=" dp_filter_label" value="${dataPackage.id}"> ${dataPackage.title} </a>
+                            </li>
+                        </g:each>
+					</ul>
+
+
+				</div>
+
 			</div>
             <div class="span12 right-shadow-box" style="margin:0px;clear:both;">
                 <g:render template="/dataset/showDatasetListTemplate"/>
@@ -93,6 +115,21 @@ $(document).ready(function() {
         refreshMapBounds(mapLocationPicker);
     });
     mapViewSlideToggleHandler();
+
+
+    $('.dp_filter_label').click(function(){
+        var caret = '<span class="caret"></span>'
+        if(stringTrim(($(this).html())) == stringTrim($("#selected_dp").html().replace(caret, ''))){
+            return true;
+        }
+	    $('.dp_filter_label.active').removeClass('active');
+	    $(this).addClass('active');
+	    $("#selected_dp").html($(this).html() + caret);
+	    updateGallery(undefined, window.params.queryParamsMax, window.params.offset, undefined, window.params.isGalleryUpdate);
+	    return true;   
+    });
+
+	$('.dp_filter_label[value="${params.dataPackage}"]').trigger('click');
 });
 </asset:script>
 

@@ -64,6 +64,7 @@ class DataPackage {
 	
     public enum SupportingModules {
 		TITLE("Title"),
+		SUMMARY("Summary"),
 		DESCRIPTION("Description"),
 
 		USAGE_RIGHTS("Usage Rights"),
@@ -90,6 +91,7 @@ class DataPackage {
 		static list() {
 			[
 		        TITLE,
+                SUMMARY,
                 DESCRIPTION,
                 USAGE_RIGHTS,
                 PARTY,
@@ -118,8 +120,9 @@ class DataPackage {
 	String supportingModules;
 	String allowedDataTableTypes;
 
-    SUser uploader;
     SUser author;
+    String uploaderIds;
+    boolean hasRoleUserAllowed = false; //if false only specific users are going to get permission to add dataset
 
     Date createdOn = new Date();
     Date lastRevised = new Date();
@@ -130,6 +133,7 @@ class DataPackage {
 		title nullable:false, blank:false;
 		description nullable:false, blank:false;
 		supportingModules nullable:true;
+		uploaderIds nullable:true;
 		allowedDataTableTypes nullable:false;
 	}
 	
@@ -165,7 +169,7 @@ class DataPackage {
     static Map<SupportingModules, CustomField> defaultSupportingModules() {
         Map<SupportingModules, CustomField> s = [:];
         s[SupportingModules.TITLE] = new CustomField();
-        s[SupportingModules.DESCRIPTION] = new  CustomField(); 
+        s[SupportingModules.SUMMARY] = new  CustomField(); 
         s[SupportingModules.TEMPORAL_COVERAGE] = new  CustomField(); 
         s[SupportingModules.GEOGRAPHICAL_COVERAGE] = new  CustomField(); 
         s[SupportingModules.TAXONOMIC_COVERAGE] = new  CustomField(); 
@@ -185,4 +189,16 @@ class DataPackage {
     List<CustomField> fetchCustomFields(SupportingModules supportingModule) {
         return supportingModules().get(supportingModule);
     }
+
+    List<SUser> getUploaders() {
+        List<SUser> uploaders = [];
+        
+        if(!uploaderIds) return uploaders;
+
+        uploaderIds.split(',').each { uId ->
+            uploaders << SUser.read(Long.parseLong(uId));
+        }
+        return uploaders;
+    }
+
 }

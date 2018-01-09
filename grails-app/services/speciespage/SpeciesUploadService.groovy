@@ -95,6 +95,7 @@ class SpeciesUploadService {
 	def springSecurityService
 	def speciesPermissionService;
     //def namelistService;
+    def userGroupService;
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -623,6 +624,15 @@ class SpeciesUploadService {
 				externalLinksService.updateExternalLinks(s.taxonConcept)
                 });
 
+                if(s.dataTable) {
+                    log.debug "Posting species to all user groups that data table is part of"
+                    HashSet uGs = new HashSet();
+                    uGs.addAll(s.dataTable.userGroups);
+                    if(s.dataTable.dataset) {
+                        uGs.addll(s.dataTable.dataset.userGroups);
+                    }
+			        userGroupService.addResourceOnGroups(s, uGs.collect{it.id}, false);
+                }
 				log.info "post processed spcecies ${s}"
 			}
 			catch(e) {

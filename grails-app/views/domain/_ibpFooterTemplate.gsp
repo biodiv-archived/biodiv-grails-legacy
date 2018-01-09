@@ -2,6 +2,7 @@
 <div id="ibp-footer" class="gradient-bg-reverse navbar">
 <g:set var="userGroupService" bean="userGroupService"/>
 <%
+userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstance : null;
 	def newsletters = userGroupService.getNewsLetters(userGroupInstance, -1, 0, "displayOrder", "asc", null, ['showInFooter':true]);
     def pages = [:];
     def pagesWithNoParent = [:];
