@@ -18,6 +18,14 @@ import species.License
 import species.trait.Fact;
 import species.trait.Trait;
 import groovy.sql.Sql
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 
 import content.eml.Document;
 
@@ -42,7 +50,7 @@ class DataTable extends CollMetadata {
 
     def dataSource;
     def dataTableService;
-    
+
 	static constraints = {
 		dataset nullable:true
 		agreeTerms nullable:true
@@ -114,12 +122,19 @@ class DataTable extends CollMetadata {
     }
 
    static inheritParams(dataObjectParams, dataTableParamsToPropagate) {
+    //    GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         dataTableParamsToPropagate.each { key, value ->
             if(key.equals(ObvUtilService.TOPOLOGY) && !dataObjectParams[key]) {
                 if(dataObjectParams[ObvUtilService.LATITUDE] && dataObjectParams[ObvUtilService.LONGITUDE]) {
                     //don't propagate as topology can be constructed from lat long fields
                 } else {
-                    dataObjectParams[key] = value;
+//                    WKTReader wkt = new WKTReader(geometryFactory);
+//                    try {
+//                        Geometry geom = wkt.read(value);
+                        dataObjectParams['areas'] = value;
+//                    } catch(ParseException e) {
+//                        log.error "Error parsing polygon wkt : ${params.areas}"
+//                   }
                 }
             }
             else if(!dataObjectParams[key]) dataObjectParams[key] = value;

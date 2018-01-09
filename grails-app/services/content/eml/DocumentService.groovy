@@ -658,7 +658,7 @@ println queryParts.queryParams
             return
         }
         //other params
-        document.author = SUser.findByEmail(m['user email'].trim())
+        document.author = SUser.findByEmail(m[ObvUtilService.AUTHOR_EMAIL].trim())
         document.type = Document.fetchDocumentType(m['type'])
         document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
 
@@ -671,14 +671,16 @@ println queryParts.queryParams
         document.notes =  m['description']
 
         document.speciesGroups = []
-        m['species groups'].split(",").each {
+        m[ObvUtilService.SPECIES_GROUP] = m['species groups']
+        m[ObvUtilService.SPECIES_GROUP].split(",").each {
             def s = SpeciesGroup.findByName(it.trim())
             if(s)
                 document.addToSpeciesGroups(s);
         }
 
         document.habitats  = []
-        m['habitat'].split(",").each {
+        m[ObvUtilService.HABITAT] = m['habitat']
+        m[ObvUtilService.HABITAT].split(",").each {
             def h = Habitat.findByName(it.trim())
             document.addToHabitats(h);
         }
@@ -687,8 +689,20 @@ println queryParts.queryParams
         //document.latitude = (m['latitude'] ?Double.parseDouble(m['latitude']).doubleValue(): 12.32112)
         //document.geoPrivacy = m["geoprivacy"]
 
-        m['locale_language'] = utilsService.getCurrentLanguage();
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        println "populating topology"
+        println "${m.topology}"
+        if(!m.topology && m.latitude && m.longitude) {
+            println "constructing areas from lat lng ${m.latitude}"
+            m.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(m.longitude?.toFloat(), m.latitude?.toFloat())));
+        } 
 
+
+        m['locale_language'] = utilsService.getCurrentLanguage();
+        println "################################################&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+println m
+println m['topology']
+        println "################################################&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
         m.remove('group')
         m.remove('habitat')
         document = super.update(document, m, Document.class);
