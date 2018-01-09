@@ -22,7 +22,7 @@
             } else if(dataTableInstance.dataTableType == DataTableType.TRAITS) {
                 columnNames =  [['','traitTypes',1],['','dataTypes',1],['','units',1],['','values',1],['','field',1],['','taxon',1],['','isNotObservationTrait',1],['','isParticipatory',1],['','showInObservation',1]];
             } else if(dataTableInstance.dataTableType == DataTableType.DOCUMENTS) {
-                columnNames =  [['','url',1]];
+                columnNames =  [];
             }
 
              

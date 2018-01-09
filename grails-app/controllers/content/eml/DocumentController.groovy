@@ -437,7 +437,7 @@ class DocumentController extends AbstractObjectController {
         docSciNames.save()
                
     }
-
+/*
     @Secured(['ROLE_ADMIN'])
     def linkBulkUpload(){
         log.debug params
@@ -445,5 +445,5 @@ class DocumentController extends AbstractObjectController {
         documentService.processLinkBatch(params)
         render " done "
     }
-
+*/
 }
