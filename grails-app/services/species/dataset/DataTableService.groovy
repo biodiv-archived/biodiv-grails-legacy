@@ -188,13 +188,17 @@ class DataTableService extends AbstractMetadataService {
                 params.columns.split(',').each {
                     String url = "";
                     String order = '100000';
+                    String desc = '';
                     colMapping.each {colM ->
                         if(colM[1]==it) {
                             url = colM[0];
                             order = colM[2];
                         }
                     }
-                    columns << [url,it,order];
+                    if(params.descColumn && params.descColumn[it]) {
+                        desc = params.descColumn[it];
+                    }
+                    columns << [url,it,order,desc];
                 }
             }
             println "-------------------------------------------------------------"
@@ -207,7 +211,7 @@ class DataTableService extends AbstractMetadataService {
        return instance;
     } 
 
-	Map save(params, sendMail=true){
+    Map save(params, sendMail=true){
         def result;
 
         DataTable dataTable;
@@ -220,7 +224,7 @@ class DataTableService extends AbstractMetadataService {
             dataTable = create(params);
             feedType = activityFeedService.INSTANCE_CREATED;
         }
-      
+
         dataTable.lastRevised = new Date();
 
         if(hasPermission(dataTable, springSecurityService.currentUser)) {
@@ -368,10 +372,10 @@ class DataTableService extends AbstractMetadataService {
         } else {
             result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
         }
- 
+
 
         return result;
-	}
+    }
 
     Map getFilteredDataTables(params, max, offset, isMapView = false) {
 
