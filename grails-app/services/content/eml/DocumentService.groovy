@@ -683,11 +683,15 @@ println queryParts.queryParams
             document.addToHabitats(h);
         }
 
-        document.longitude = (m['longitude'] ?Double.parseDouble(m['longitude']).doubleValue():76.658279)
-        document.latitude = (m['latitude'] ?Double.parseDouble(m['latitude']).doubleValue(): 12.32112)
-        document.geoPrivacy = m["geoprivacy"]
+        //document.longitude = (m['longitude'] ?Double.parseDouble(m['longitude']).doubleValue():76.658279)
+        //document.latitude = (m['latitude'] ?Double.parseDouble(m['latitude']).doubleValue(): 12.32112)
+        //document.geoPrivacy = m["geoprivacy"]
 
-        document.language = utilsService.getCurrentLanguage();
+        m['locale_language'] = utilsService.getCurrentLanguage();
+
+        m.remove('group')
+        m.remove('habitat')
+        document = super.update(document, m, Document.class);
 
         if(m['dataTable']) {
             document.dataTable = m['dataTable'];
