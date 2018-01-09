@@ -668,6 +668,9 @@ class DataTableService extends AbstractMetadataService {
     }
 
     boolean hasPermission(DataTable dataTable, SUser user) {
+
+        if(!user || !dataTable) return false;
+
         boolean isPermitted = false;
         DataPackage dataPackage = null;
         if(dataTable.dataset == null) {

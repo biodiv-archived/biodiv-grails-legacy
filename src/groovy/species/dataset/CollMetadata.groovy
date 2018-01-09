@@ -177,7 +177,7 @@ abstract class CollMetadata implements Taggable, Rateable {
             this.geographicalCoverage.locationAccuracy = params.locationAccuracy;
 
             GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-            if(params.topology) {
+            if(params.topology && params.topology instanceof Geometry) {
                 this.geographicalCoverage.topology = params.topology;
             }
             else {
