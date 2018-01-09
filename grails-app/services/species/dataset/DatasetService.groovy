@@ -379,7 +379,7 @@ class DatasetService extends AbstractMetadataService {
                 if (datasetInstance) {
                     //datasetInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
-                    if(isFeatureDeleted && datasetService.hasPermission(datasetInstance, springSecurityService.currentUser)) {
+                    if(isFeatureDeleted && hasPermission(datasetInstance, springSecurityService.currentUser)) {
                         def mailType = activityFeedService.INSTANCE_DELETED
                         try {
                             datasetInstance.isDeleted = true;

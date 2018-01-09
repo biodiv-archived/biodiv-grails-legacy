@@ -99,8 +99,8 @@ console.log('loadSampleData');
         var mappedColumn = getMappedColumn(n.name, mappedColumns);
 
         console.log(n.name+"   "+mappedColumn);
-        
-        //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
+
+       //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
         el += "<th><select class='mapColumns' multiple name='attribute."+n.name+"'>";
         el += "<optgroup label='General'>";
         el += "<option class='generalColumn' value='sciNameColumn' "+((mappedColumn[1] == 'sciNameColumn')?'selected':'')+">Scientific Name</option>"; 
@@ -145,6 +145,7 @@ console.log('loadSampleData');
         console.log(mappedColumn);
         el += "<th><textarea class='descColumn' name='descColumn."+n.name+"' placeholder='Add column description' value='' style='min-width:inherit;max-width:inherit;'>"+(mappedColumn[3] ? mappedColumn[3] : '')+"</textarea></th>";
     });
+
     el += "</tr></thead><tbody><tr>";
     $.each(columns, function(i, n){
         el += "<td>"+data[0][n.name]+"</td>";
@@ -172,6 +173,24 @@ console.log('loadSampleData');
             });                                                                                             
             option.parent().parent().multiselect('deselect', values);
             $('.mapColumns').next().removeClass('open');
+            var markedColumn = option.parent().parent().parent().index()+1; 
+            if(checked) {
+                $('#myGrid table tr th:nth-child('+markedColumn+')').css("background-color","beige");
+                $('#myGrid table tr td:nth-child('+markedColumn+')').css("background-color","beige");
+            } else {
+                $('#myGrid table tr th:nth-child('+markedColumn+')').css("background-color","");
+                $('#myGrid table tr td:nth-child('+markedColumn+')').css("background-color","");
+            }
+        }
+    });
+
+    $.each(columns, function(i, n) {
+        var mappedColumn = getMappedColumn(n.name, mappedColumns);
+ 
+        if(mappedColumn != '') {
+            console.log('ddddddddddddddddddddddddddddddddddddddddddddddddd');
+            $('#myGrid table tr th:nth-child('+(i+1)+')').css("background-color","beige");
+            $('#myGrid table tr td:nth-child('+(i+1)+')').css("background-color","beige");
         }
     });
 
