@@ -31,7 +31,9 @@
             <tr class="filters">
                 <th title="Title">Title</th>
                 <g:each in="${columnNames}" var="cName">
-                <th title="${cName[1]}">${cName[1]}</th>
+                <th title="${cName[3]}">${cName[1]}
+                <g:if test="${cName[3]}"><i class="icon-info-sign" title="${cName[3]}"></i></g:if>
+                </th>
                 </g:each>
             </tr>
         </thead>

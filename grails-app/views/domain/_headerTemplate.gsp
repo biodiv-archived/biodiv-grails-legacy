@@ -84,12 +84,25 @@
           <li class="${(request.getHeader('referer')?.contains('/map') && params.action == 'header')?' active':''}">
           		<a href="${map_href}" title="${g.message(code:'button.maps')}"><g:message code="button.maps" /></a>
           </li>          
-		<li	class="${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}">
-			<a href="${uGroup.createLink('controller':'document', 'action':'browser', 'userGroup':userGroupInstance)}"
+
+
+		<li	class="dropdown ${((params.controller == 'document' && params.action == 'browser') ||(params.controller == 'browser'))?' active':''}">
+			<a href="#"
                title="${g.message(code:'button.documents')}">
                <span title="${g.message(code:'updated.today')}" class="statsTicker docUpdateCount"> </span>
                <g:message code="button.documents" />
+		 		<b class="caret"></b>
                </a>
+            <ul class="dropdown-menu mega-menu">
+              <li class="mega-menu-column">
+                <ul>
+                  <li><a href="${uGroup.createLink('controller':'document', action:'browser','userGroup':userGroupInstance)}" title="${g.message(code:'button.documents')}"><g:message code="button.documents" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'dataTable', 'action':'list', params:['type':'documents'], 'userGroup':userGroupInstance)}" title="${g.message(code:'default.document.dataTables.label')}"><g:message code="default.document.dataTables.label" /></a></li>
+ 
+                </ul>
+              </li>
+            </ul>
+ 
          </li>	
           <li class="dropdown" > 
           		<a href="javascript:void(0);" class="dropdown-toggle contributeButton" data-toggle="dropdown" ><g:message code="button.contribute" /> <b class="caret"></b></a>

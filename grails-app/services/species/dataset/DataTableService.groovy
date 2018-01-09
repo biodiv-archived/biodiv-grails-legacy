@@ -146,7 +146,6 @@ class DataTableService extends AbstractMetadataService {
             String contentRootDir = config.speciesPortal.content.rootDir
             try{
                 File destinationFile = new File(contentRootDir, params.uFile.path);
-                File imagesFile = new File(contentRootDir, params.imagesFile.path);
                 if(destinationFile.exists()) {
                     UFile f = new UFile()
                     f.size = destinationFile.length()
@@ -156,13 +155,16 @@ class DataTableService extends AbstractMetadataService {
                         instance.uFile = f
                     }
                 }
-                if(imagesFile.exists()) {
-                    UFile f = new UFile()
-                    f.size = imagesFile.length()
-                    f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
-                    log.debug "============== " + f.path
-                    if(f.save()) {
-                        instance.imagesFile = f
+                if(params.imagesFile) {
+                    File imagesFile = new File(contentRootDir, params.imagesFile.path);
+                    if(imagesFile.exists()) {
+                        UFile f = new UFile()
+                        f.size = imagesFile.length()
+                        f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
+                        log.debug "============== " + f.path
+                        if(f.save()) {
+                            instance.imagesFile = f
+                        }
                     }
                 }
  
@@ -188,13 +190,17 @@ class DataTableService extends AbstractMetadataService {
                 params.columns.split(',').each {
                     String url = "";
                     String order = '100000';
+                    String desc = '';
                     colMapping.each {colM ->
                         if(colM[1]==it) {
                             url = colM[0];
                             order = colM[2];
                         }
                     }
-                    columns << [url,it,order];
+                    if(params.descColumn && params.descColumn[it]) {
+                        desc = params.descColumn[it];
+                    }
+                    columns << [url,it,order,desc];
                 }
             }
             println "-------------------------------------------------------------"
@@ -207,7 +213,7 @@ class DataTableService extends AbstractMetadataService {
        return instance;
     } 
 
-	Map save(params, sendMail=true){
+    Map save(params, sendMail=true){
         def result;
 
         DataTable dataTable;
@@ -220,7 +226,7 @@ class DataTableService extends AbstractMetadataService {
             dataTable = create(params);
             feedType = activityFeedService.INSTANCE_CREATED;
         }
-      
+
         dataTable.lastRevised = new Date();
 
         if(hasPermission(dataTable, springSecurityService.currentUser)) {
@@ -261,16 +267,18 @@ class DataTableService extends AbstractMetadataService {
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
-                File imagesFile = new File(contentRootDir, dataTable.imagesFile.path);
-                File destDir = imagesFile.getParentFile();
                 File imagesDir;
+                if(dataTable.imagesFile) {
+                    File imagesFile = new File(contentRootDir, dataTable.imagesFile.path);
+                    File destDir = imagesFile.getParentFile();
 
-                if(imagesFile && FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
-                    def ant = new AntBuilder().unzip( src: imagesFile,
-                    dest: destDir, overwrite:true)
-                    imagesDir = new File(destDir, FilenameUtils.removeExtension(imagesFile.getName()));
-                    if(!imagesDir.exists()) {
-                        imagesDir = destDir;
+                    if(imagesFile && FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
+                        def ant = new AntBuilder().unzip( src: imagesFile,
+                        dest: destDir, overwrite:true)
+                        imagesDir = new File(destDir, FilenameUtils.removeExtension(imagesFile.getName()));
+                        if(!imagesDir.exists()) {
+                            imagesDir = destDir;
+                        }
                     }
                 }
 
@@ -368,10 +376,10 @@ class DataTableService extends AbstractMetadataService {
         } else {
             result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
         }
- 
+
 
         return result;
-	}
+    }
 
     Map getFilteredDataTables(params, max, offset, isMapView = false) {
 
@@ -599,7 +607,7 @@ class DataTableService extends AbstractMetadataService {
                 def dataTableInstance = DataTable.get(params.id.toLong())
                 if (dataTableInstance) {
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(dataTableInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
-                    if(isFeatureDeleted  && dataTableService.hasPermission(dataTableInstance, springSecurityService.currentUser)) {
+                    if(isFeatureDeleted  && hasPermission(dataTableInstance, springSecurityService.currentUser)) {
                         def mailType = utilsService.DATATABLE_DELETED
                         try {
                             dataTableInstance.isDeleted = true;
