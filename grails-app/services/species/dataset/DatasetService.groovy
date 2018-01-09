@@ -445,6 +445,7 @@ class DatasetService extends AbstractMetadataService {
     }
 
     boolean hasPermission(Dataset1 dataset, SUser user) {
+        if(!user || !dataset) return false;
         boolean isPermitted = false;
         if(dataPackageService.hasPermission(dataset.dataPackage, user) && (dataset.getAuthor().id == user.id || dataset.uploader.id == user.id)) {
             isPermitted = true;
