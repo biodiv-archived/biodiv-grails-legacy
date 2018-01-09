@@ -99,31 +99,31 @@ console.log('loadSampleData');
         var mappedColumn = getMappedColumn(n.name, mappedColumns);
 
         console.log(n.name+"   "+mappedColumn);
-        
-        //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
+
+       //<div class='btn-group'><a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>Select mapping <span class='caret'></span></a>"
         el += "<th><select class='mapColumns' multiple name='attribute."+n.name+"'>";
         el += "<optgroup label='General'>";
-        el += "<option class='generalColumn' value='sciNameColumn' "+((mappedColumn == 'sciNameColumn')?'selected':'')+">Scientific Name</option>"; 
-        el += "<option class='generalColumn' value='commonNameColumn' "+((mappedColumn == 'commonNameColumn')?'selected':'')+">Common Name</option>"; 
-        el += "<option class='generalColumn' value='language' "+((mappedColumn == 'language')?'selected':'')+">Common Name Language</option>"; 
-        el += "<option class='generalColumn' value='observed on' "+((mappedColumn == 'observed on')?'selected':'')+">Date</option>"; 
-        el += "<option class='generalColumn' value='date accuracy' "+((mappedColumn == 'date accuracy')?'selected':'')+">Date Accuracy</option>"; 
-        el += "<option class='generalColumn' value='group' "+((mappedColumn == 'group')?'selected':'')+">Species Group</option></optgroup>"; 
-        el += "<option class='generalColumn' value='habitat' "+((mappedColumn == 'habitat')?'selected':'')+">Habitat</option></optgroup>"; 
-        el += "<option class='generalColumn' value='location title' "+((mappedColumn == 'location title')?'selected':'')+">Place Name</option>"; 
-        el += "<option class='generalColumn' value='latitude' "+((mappedColumn == 'latitude')?'selected':'')+">Latitude</option>"; 
-        el += "<option class='generalColumn' value='longitude' "+((mappedColumn == 'longitude')?'selected':'')+">Longitude</option></optgroup>"; 
-        el += "<option class='generalColumn' value='location scale' "+((mappedColumn == 'location scale')?'selected':'')+">Location Scale</option></optgroup>"; 
-        el += "<option class='generalColumn' value='geoprivacy' "+((mappedColumn == 'geoprivacy')?'selected':'')+">Geo-privacy</option></optgroup>"; 
-        el += "<option class='generalColumn' value='license' "+((mappedColumn == 'license')?'selected':'')+">License</option></optgroup>"; 
-        el += "<option class='generalColumn' value='user email' "+((mappedColumn == 'user email')?'selected':'')+">Contributor</option></optgroup>"; 
-        el += "<option class='generalColumn' value='attribution' "+((mappedColumn == 'attribution')?'selected':'')+">Attribution</option></optgroup>"; 
-        el += "<option class='generalColumn' value='filename' "+((mappedColumn == 'filename')?'selected':'')+">Filenames (CSV)</option></optgroup>"; 
-        el += "<option class='generalColumn' value='notes' "+((mappedColumn == 'notes')?'selected':'')+">Notes</option></optgroup>"; 
-        //el += "<option class='generalColumn' value='tags' "+((mappedColumn == 'tags')?'selected':'')+">Tags</option></optgroup>"; 
-        el += "<option class='generalColumn' value='help identify?' "+((mappedColumn == 'help identify?')?'selected':'')+">Help Identify?</option></optgroup>"; 
-        el += "<option class='generalColumn' value='post to user groups' "+((mappedColumn == 'post to user groups')?'selected':'')+">Post to User Groups</option></optgroup>"; 
-        el += "<option class='generalColumn' value='comment' "+((mappedColumn == 'comment')?'selected':'')+">Comment</option></optgroup>"; 
+        el += "<option class='generalColumn' value='sciNameColumn' "+((mappedColumn[1] == 'sciNameColumn')?'selected':'')+">Scientific Name</option>"; 
+        el += "<option class='generalColumn' value='commonNameColumn' "+((mappedColumn[1] == 'commonNameColumn')?'selected':'')+">Common Name</option>"; 
+        el += "<option class='generalColumn' value='language' "+((mappedColumn[1] == 'language')?'selected':'')+">Common Name Language</option>"; 
+        el += "<option class='generalColumn' value='observed on' "+((mappedColumn[1] == 'observed on')?'selected':'')+">Date</option>"; 
+        el += "<option class='generalColumn' value='date accuracy' "+((mappedColumn[1] == 'date accuracy')?'selected':'')+">Date Accuracy</option>"; 
+        el += "<option class='generalColumn' value='group' "+((mappedColumn[1] == 'group')?'selected':'')+">Species Group</option></optgroup>"; 
+        el += "<option class='generalColumn' value='habitat' "+((mappedColumn[1] == 'habitat')?'selected':'')+">Habitat</option></optgroup>"; 
+        el += "<option class='generalColumn' value='location title' "+((mappedColumn[1] == 'location title')?'selected':'')+">Place Name</option>"; 
+        el += "<option class='generalColumn' value='latitude' "+((mappedColumn[1] == 'latitude')?'selected':'')+">Latitude</option>"; 
+        el += "<option class='generalColumn' value='longitude' "+((mappedColumn[1] == 'longitude')?'selected':'')+">Longitude</option></optgroup>"; 
+        el += "<option class='generalColumn' value='location scale' "+((mappedColumn[1] == 'location scale')?'selected':'')+">Location Scale</option></optgroup>"; 
+        el += "<option class='generalColumn' value='geoprivacy' "+((mappedColumn[1] == 'geoprivacy')?'selected':'')+">Geo-privacy</option></optgroup>"; 
+        el += "<option class='generalColumn' value='license' "+((mappedColumn[1] == 'license')?'selected':'')+">License</option></optgroup>"; 
+        el += "<option class='generalColumn' value='user email' "+((mappedColumn[1] == 'user email')?'selected':'')+">Contributor</option></optgroup>"; 
+        el += "<option class='generalColumn' value='attribution' "+((mappedColumn[1] == 'attribution')?'selected':'')+">Attribution</option></optgroup>"; 
+        el += "<option class='generalColumn' value='filename' "+((mappedColumn[1] == 'filename')?'selected':'')+">Filenames (CSV)</option></optgroup>"; 
+        el += "<option class='generalColumn' value='notes' "+((mappedColumn[1] == 'notes')?'selected':'')+">Notes</option></optgroup>"; 
+        //el += "<option class='generalColumn' value='tags' "+((mappedColumn[1] == 'tags')?'selected':'')+">Tags</option></optgroup>"; 
+        el += "<option class='generalColumn' value='help identify?' "+((mappedColumn[1] == 'help identify?')?'selected':'')+">Help Identify?</option></optgroup>"; 
+        el += "<option class='generalColumn' value='post to user groups' "+((mappedColumn[1] == 'post to user groups')?'selected':'')+">Post to User Groups</option></optgroup>"; 
+        el += "<option class='generalColumn' value='comment' "+((mappedColumn[1] == 'comment')?'selected':'')+">Comment</option></optgroup>"; 
 
         el += "<optgroup label='Traits'>";
         var speciesGroupTraitsList = $('#speciesGroupTraits').data('speciesGroupTraitsList');
@@ -131,13 +131,21 @@ console.log('loadSampleData');
             //    alert("Please click a species group to show respective traits");
         } else {
             $.each(speciesGroupTraitsList, function(index, val) {
-                el += "<option class='traitColumn' value='trait."+val.id+"' "+((mappedColumn == 'trait.'+val.id)?'selected':'')+">"+val.name+"</option>"; 
+                el += "<option class='traitColumn' value='trait."+val.id+"' "+((mappedColumn[1] == 'trait.'+val.id)?'selected':'')+">"+val.name+"</option>"; 
             });
         }
         //el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
         el += "</select>";
         el += "</th>";
     });
+    el += "</tr><tr>";
+
+    $.each(columns, function(i, n) {
+        var mappedColumn = getMappedColumn(n.name, mappedColumns);
+        console.log(mappedColumn);
+        el += "<th><textarea class='descColumn' name='descColumn."+n.name+"' placeholder='Add column description' value='' style='min-width:inherit;max-width:inherit;'>"+(mappedColumn[3] ? mappedColumn[3] : '')+"</textarea></th>";
+    });
+
     el += "</tr></thead><tbody><tr>";
     $.each(columns, function(i, n){
         el += "<td>"+data[0][n.name]+"</td>";
@@ -165,6 +173,24 @@ console.log('loadSampleData');
             });                                                                                             
             option.parent().parent().multiselect('deselect', values);
             $('.mapColumns').next().removeClass('open');
+            var markedColumn = option.parent().parent().parent().index()+1; 
+            if(checked) {
+                $('#myGrid table tr th:nth-child('+markedColumn+')').css("background-color","beige");
+                $('#myGrid table tr td:nth-child('+markedColumn+')').css("background-color","beige");
+            } else {
+                $('#myGrid table tr th:nth-child('+markedColumn+')').css("background-color","");
+                $('#myGrid table tr td:nth-child('+markedColumn+')').css("background-color","");
+            }
+        }
+    });
+
+    $.each(columns, function(i, n) {
+        var mappedColumn = getMappedColumn(n.name, mappedColumns);
+ 
+        if(mappedColumn != '') {
+            console.log('ddddddddddddddddddddddddddddddddddddddddddddddddd');
+            $('#myGrid table tr th:nth-child('+(i+1)+')').css("background-color","beige");
+            $('#myGrid table tr td:nth-child('+(i+1)+')').css("background-color","beige");
         }
     });
 
@@ -173,22 +199,26 @@ console.log('loadSampleData');
 
 function getMappedColumn(cName, mappedColumns) {
     if(!mappedColumns) return "";
+    var mapped = false;
+    var retMapping;
     for(var i=0; i< mappedColumns.length; i++) {
+        retMapping = jQuery.extend({}, mappedColumns[i]);
         if(cName == mappedColumns[i][1]) {
-            if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/scientificName') return 'sciNameColumn';
-            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/vernacularName') return 'commonNameColumn';
-            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/eventDate') return 'observed on';
-            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/locality') return 'location title';
-            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') return 'latitude';
-            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') return 'longitude';
-            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/contributor') return 'user email';
-            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/description') return 'notes';
-            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/habitat') return 'habitat';
-            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/rights') return 'license';
+            if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/scientificName') {mapped=true; retMapping[1] = 'sciNameColumn'}
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/vernacularName') {mapped=true; retMapping[1] = 'commonNameColumn'}
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/eventDate') {mapped=true; retMapping[1] = 'observed on'}
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/locality') {mapped=true; retMapping[1] = 'location title'}
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLatitude') {mapped=true; retMapping[1] = 'latitude'}
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/decimalLongitude') {mapped=true; retMapping[1] = 'longitude'}
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/contributor') {mapped=true; retMapping[1] = 'user email'}
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/description') {mapped=true; retMapping[1] = 'notes'}
+            else if(mappedColumns[i][0] == 'http://rs.tdwg.org/dwc/terms/habitat') {mapped=true; retMapping[1] = 'habitat'}
+            else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/rights') {mapped=true; retMapping[1] = 'license'}
 
-            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/trait/')) return 'trait.'+mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('trait/')+6);
-            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/')) return mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('observation/')+12);
-            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/annotation/')) return mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('annotation')+11);
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/trait/')) {mapped=true; retMapping[1] = 'trait.'+mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('trait/')+6)}
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/')) {mapped=true; retMapping[1] = mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('observation/')+12)}
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/annotation/')) {mapped=true; retMapping[1] = mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('annotation')+11)}
+            if(mapped) return retMapping;
         }
     }
     return "";
