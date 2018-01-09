@@ -568,7 +568,12 @@ println queryParts.queryParams
                     m['dataTable'] = DataTable.read(Long.parseLong(params.paramsToPropagate.dataTable+''));
                     DataTable.inheritParams(m, params.paramsToPropagate);
                 }
-//                m['language'] = params.paramsToPropagate['locale_language'];
+                def tags = (m['tags'] && (m['tags'].trim() != "")) ? m['tags'].trim().split(",").collect{it.trim()} : new ArrayList();
+                m['tags'] = tags;
+
+                def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
+                m['userGroupsList'] = userGroupIds.join(',');
+
                 uploadDoc(fileDir, m, resultObv)
                 i++
                 if(i > BATCH_SIZE){
@@ -585,7 +590,7 @@ println queryParts.queryParams
             }
         }
     }
-
+/*
     def processLinkBatch(params){
         File spreadSheet = new File(params.batchFileName)
         if(!spreadSheet.exists()){
@@ -623,7 +628,7 @@ println queryParts.queryParams
             }
         }
     }
-
+*/
     private uploadDoc(fileDir, Map m, resultObv){
         Document document = new Document()
 
@@ -712,12 +717,12 @@ println m['topology']
         }
 
         saveDoc(document, m)
-
+        runCurrentDocuments(document,m)
         if(document.id){
             resultObv << document.id
         }
     }
-
+/*
     private uploadLinkDoc(Map m, resultObv,params, boolean sendMail=true){
         Document document = new Document()
         println "========================================================="
@@ -779,7 +784,7 @@ println m['topology']
             resultObv << document.id
         }
     }
-
+*/
     Map saveDocument(params, sendMail=true, boolean updateResources = true) {
         params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
 		params.author = springSecurityService.currentUser;
