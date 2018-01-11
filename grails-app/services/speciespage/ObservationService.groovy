@@ -1619,18 +1619,18 @@ println "*******************************************"
         }
 
         /*
-		if(params.isMediaFilter && params.isMediaFilter.toBoolean()){
-			filterQuery += " and obv.is_showable = true ";
-		}
-    if(params.isMediaFilter && !params.isMediaFilter.toBoolean()){
-			filterQuery += " and obv.is_showable = false ";
-		}
-*/
-    if(params.isMediaFilter) {
-      filterQuery += " and obv.is_showable = :isMediaFilter "
-     queryParams['isMediaFilter'] = params.isMediaFilter.toBoolean();
+        if(params.isMediaFilter && params.isMediaFilter.toBoolean()){
+        filterQuery += " and obv.is_showable = true ";
+        }
+        if(params.isMediaFilter && !params.isMediaFilter.toBoolean()){
+        filterQuery += " and obv.is_showable = false ";
+        }
+         */
+        if(params.isMediaFilter) {
+            filterQuery += " and obv.is_showable = :isMediaFilter "
+            queryParams['isMediaFilter'] = params.isMediaFilter.toBoolean();
 
-    }
+        }
 
 
 		if(params.areaFilter && (!params.areaFilter.trim().equalsIgnoreCase('all'))){

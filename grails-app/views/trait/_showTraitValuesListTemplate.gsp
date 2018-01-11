@@ -136,7 +136,7 @@
                 Undefined
             </div> 
             </g:if>
-            </g:if>
+</g:if>
 
 
             <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">

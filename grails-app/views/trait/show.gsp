@@ -82,35 +82,13 @@
 			    	<div class="trait thumbnail" data-toggle="buttons-radio">
   	                    <g:render template="/trait/showTraitValuesListTemplate" model="['trait':traitInstance, 'traitValues':factInstance?factInstance[trait.id]:(editable?null:traitValue), 'displayAny':false,'fromTraitShow':true, 'traitTypes':traitInstance.traitTypes, 'queryParams':queryParams]"/>
 			    	</div>
-			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount]"/>	
+			      	 <g:render template="/trait/matchingSpeciesTableTemplate" model="[matchingSpeciesList:matchingSpeciesList, totalCount:totalCount, resultType:'species', 'matchingAction':'matchingSpecies', loadListAction:'loadMatchingSpeciesList']"/>	
 	    			</div>
 	    		</div>
 	 	</div>
 	<script>
 	    $(document).ready (function() {
-            $(document).on('click', '.trait button, .trait .all, .trait .any, .trait .none, .listFilter', function(){
-                if($(this).hasClass('active')){
-                return false;
-                }
-                if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
-                    $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
-                    if($(this).hasClass('btn-success')) 
-                        $(this).removeClass('active btn-success');
-                    else
-                        $(this).addClass('active btn-success');
-                } else {
-                    $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
-                    $(this).addClass('active btn-success');
-                }
-
-                updateMatchingSpeciesTable();
-                return false;
-            });
-            $('.list').on('updatedGallery', function() {
-                    //TODO:THIS is being run twice on page load .. one call from ionRangeFilter onFinish and other on page load from list.js
-                    initTraitFilterControls();
-                updateMatchingSpeciesTable();
-            });
+            initTraits();
 	    });
 	</script>
 	<asset:script type="text/javascript">
