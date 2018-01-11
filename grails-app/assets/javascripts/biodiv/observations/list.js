@@ -440,6 +440,11 @@ $(document).ready(function(){
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
     $('.observation').on("click", ".loadMore", function() {
+        console.log('##################################');
+        console.log($(this));
+        var ele = $(this).parent().prev('.mainContentList');
+        if(ele.length == 0) ele = $(this).parent().prev().find('.mainContentList');
+        if(ele.length == 0) ele = $('.mainContentList:first');
         $.autopager({
 
             autoLoad : true,
@@ -450,7 +455,7 @@ $(document).ready(function(){
             content : '.mainContent',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-            appendTo : '.mainContentList:first',
+            appendTo : ele,
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
@@ -917,6 +922,8 @@ function getMediaFilterBy() {
             hasMedia += $(this).attr('value');
         }
     });
+    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+    console.log(hasMedia);
     return hasMedia;	
 }
 
@@ -941,7 +948,7 @@ function getSelectedAllChecklistFlag() {
 function getSelectedMedia() {
     var media = ''; 
     media = $("#observationMediaFilter").attr('value');
-    if(media && media != "false") {
+    if(media) {// && media != "false") {
         media = media.replace(/\s*\,\s*$/,'');
         return media;
     }	
@@ -1065,7 +1072,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     var mediaFilter = getSelectedMedia();
     if(mediaFilter) {
     	params['isMediaFilter'] = mediaFilter;
+    }else{
+        delete params['isMediaFilter'];
     }
+
+
 
     var areaFilter = getSelectedAreaFilter();
     if(areaFilter) {
