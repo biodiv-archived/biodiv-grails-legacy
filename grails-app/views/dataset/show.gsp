@@ -84,7 +84,7 @@
                         <div class="mainContent">
                             <ul class="list_view obvListWrapper" style="list-style:none;margin-left:0px;">
                                 <g:each in="${DataTable.findAllByDatasetAndIsDeleted(datasetInstance, false, [sort:'createdOn', order:'desc'])}" var="dataTableInstance">
-                                <li id="dataTable_${dataTableInstance.id}" style="margin-top:10px;max-height:400px;overflow:auto;">
+                                <li id="dataTable_${dataTableInstance.id}" style="margin-top:10px;overflow:auto;">
                                 <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage, showTitleDetail:true, hideBody:true]"/>
                                 </li>
                                 </g:each>
