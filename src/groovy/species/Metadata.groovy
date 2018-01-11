@@ -289,12 +289,16 @@ abstract class Metadata {
                 queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
             } else if(fact.value) {
                 traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+                queryParams['trait'][fact.trait.id] += fact.value+(fact.toValue?":"+fact.toValue:'') +','
             } 
-            if(fact.fromDate && fact.toDate)
+            if(fact.fromDate && fact.toDate) {
                 traitFactMap[fact.trait.id] << fact.fromDate+";"+fact.toDate
+                queryParams['trait'][fact.trait.id] += fact.fromDate+";"+fact.toDate+',';
+            }
 
             traitFactMap['fact'] << fact.id
         }
+
         if(queryParams.trait) {
             queryParams.trait.each {k,v->
                 if(queryParams.trait[k]) {
