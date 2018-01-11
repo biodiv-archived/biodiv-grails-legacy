@@ -103,7 +103,7 @@ $(document).ready(function(){
 <g:if test="${forObservations}">
 <div style="height:30px;">
 	<g:if test="${!params.isChecklistOnly}">
-		<div id="observationMediaFilter" class="btn-group"
+		<div class="btn-group"
 			style="float: right;">
 			<input type="text" id="observationMediaFilter"
 				value="${params.isMediaFilter}" style="display: none" />

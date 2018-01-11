@@ -922,6 +922,8 @@ function getMediaFilterBy() {
             hasMedia += $(this).attr('value');
         }
     });
+    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+    console.log(hasMedia);
     return hasMedia;	
 }
 
@@ -946,7 +948,7 @@ function getSelectedAllChecklistFlag() {
 function getSelectedMedia() {
     var media = ''; 
     media = $("#observationMediaFilter").attr('value');
-    if(media && media != "false") {
+    if(media) {// && media != "false") {
         media = media.replace(/\s*\,\s*$/,'');
         return media;
     }	
@@ -1070,7 +1072,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     var mediaFilter = getSelectedMedia();
     if(mediaFilter) {
     	params['isMediaFilter'] = mediaFilter;
+    }else{
+        delete params['isMediaFilter'];
     }
+
+
 
     var areaFilter = getSelectedAreaFilter();
     if(areaFilter) {
