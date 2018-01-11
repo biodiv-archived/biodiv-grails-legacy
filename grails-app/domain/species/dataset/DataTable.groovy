@@ -144,7 +144,7 @@ class DataTable extends CollMetadata {
    List getDataObjects(Map params=[:]){
        println params
        //Done because of java melody error - junk coming with offset value
-       params.offset = params.offset ? params.offset.tokenize("/?")[0] : 0;
+       params.offset = params.offset ? params.offset.toInteger() : 0;
        params.max = params.max ? params.max.toInteger() :10
        params.offset = params.offset ? params.offset.toInteger() :0
 //        UtilsService utilsService = grails.util.Holders.applicationContext.getBean('utilsService') as UtilsService

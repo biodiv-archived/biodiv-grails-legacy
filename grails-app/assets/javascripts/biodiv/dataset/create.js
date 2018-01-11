@@ -17,7 +17,7 @@ function dataPackageChangedForDataset(event, dataPackageId) {
                     initLocationPicker();
                     var config = { extraPlugins: 'confighelper', toolbar:'EditorToolbar', toolbar_EditorToolbar:[[ 'Bold', 'Italic' ]]};
                     CKEDITOR.replace('summary', config);
-                    CKEDITOR.replace('description', config);
+                    CKEDITOR.replace('description', descriptionConfig);
                     dataset_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
                         usersUrl : window.params.userTermsUrl
                     });

@@ -248,6 +248,7 @@ class DatasetService extends AbstractMetadataService {
         def queryParams = [isDeleted : false]
         def activeFilters = [:]
 
+        String userGroupQuery = "";
         def query = "select "
 
         if(!params.sort || params.sort == 'score') {
@@ -360,8 +361,29 @@ class DatasetService extends AbstractMetadataService {
             activeFilters["dataPackage"] = params.dataPackage.toLong()
         }
 
-        
-		def allDatasetCountQuery = "select count(*) from Dataset1 obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+        if(params.webaddress) {
+
+            def userGroupInstance =	utilsService.getUserGroup(params)
+            params.userGroup = userGroupInstance;
+        }
+
+        if(params.userGroup) {
+            log.debug "Filtering from usergourp : ${params.userGroup}"
+            query += " join obv.userGroups userGroup "
+            userGroupQuery += " join obv.userGroups userGroup "
+            filterQuery += " and userGroup = :userGroup "
+            queryParams['userGroup'] = params.userGroup;
+        }
+
+        if(params.notInUserGroup) {
+            log.debug "Filtering from notInUsergourp : ${params.userGroup}"
+            query += " join obv.userGroups userGroup "
+            userGroupQuery += " join obv.userGroups userGroup "
+            filterQuery += " and userGroup is null "
+        }
+
+
+		def allDatasetCountQuery = "select count(*) from Dataset1 obv " +((userGroupQuery)?userGroupQuery:'') +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 	
         orderByClause = " order by " + orderByClause;
 

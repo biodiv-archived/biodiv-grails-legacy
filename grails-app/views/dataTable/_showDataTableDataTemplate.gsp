@@ -9,6 +9,9 @@
     <table class="table table-striped table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
             <% 
+            def dataObjects = dataTableInstance.getDataObjects(params)
+            def dataObjectsCount = dataTableInstance.getDataObjectsCount();
+
             def columnNames = dataTableInstance.fetchColumnNames();
             if(dataTableInstance.dataTableType == DataTableType.FACTS) {
                 def c =  [];

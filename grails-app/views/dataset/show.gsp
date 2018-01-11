@@ -2,6 +2,9 @@
 <%@ page import="species.participation.DownloadLog.DownloadType"%>
 <%@page import="species.dataset.Dataset1"%>
 <%@page import="species.dataset.DataTable"%>
+<%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@ page import="species.participation.UploadLog"%>
+
 
 <html>
     <head>
@@ -19,6 +22,9 @@
             }
             .list_view li:nth-child(even) {
                 clear:right;
+            }
+            .observation_story h5 {
+                background-color:beige;
             }
         </style>
     </head>
@@ -79,7 +85,7 @@
                             <ul class="list_view obvListWrapper" style="list-style:none;margin-left:0px;">
                                 <g:each in="${DataTable.findAllByDatasetAndIsDeleted(datasetInstance, false, [sort:'createdOn', order:'desc'])}" var="dataTableInstance">
                                 <li id="dataTable_${dataTableInstance.id}" style="margin-top:10px;max-height:400px;overflow:auto;">
-                                <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage]"/>
+                                <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage, showTitleDetail:true, hideBody:true]"/>
                                 </li>
                                 </g:each>
                             </ul>			
