@@ -440,6 +440,11 @@ $(document).ready(function(){
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
     $('.observation').on("click", ".loadMore", function() {
+        console.log('##################################');
+        console.log($(this));
+        var ele = $(this).parent().prev('.mainContentList');
+        if(ele.length == 0) ele = $(this).parent().prev().find('.mainContentList');
+        if(ele.length == 0) ele = $('.mainContentList:first');
         $.autopager({
 
             autoLoad : true,
@@ -450,7 +455,7 @@ $(document).ready(function(){
             content : '.mainContent',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-            appendTo : '.mainContentList:first',
+            appendTo : ele,
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
