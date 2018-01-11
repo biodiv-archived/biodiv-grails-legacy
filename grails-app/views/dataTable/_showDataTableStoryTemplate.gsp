@@ -19,9 +19,9 @@ String instanceType = dataTableInstance.dataTableType;
         <span><g:message code="default.dataTable.label" /> : </span>
         <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
         ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
-        <span class="pull-right icon-chevron-down"></span>
         </g:link>
  
+        <span class="pull-right icon-chevron-down"></span>
     </h5>
     </button>
    <div id="dataTable_${dataTableInstance.id}_body" class="observation_story_body collapse ${showDetails && !hideBody ?'in':''} ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
