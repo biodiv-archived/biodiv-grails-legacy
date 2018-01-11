@@ -274,26 +274,8 @@ $(document).ready(function(){
         initializeSpeciesGroupHabitatDropdowns();
 
 
-        $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
-            if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
-                $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
-                if($(this).hasClass('btn-success')) 
-                    $(this).removeClass('active btn-success');
-                else
-                    $(this).addClass('active btn-success');
-            } else if($(this).hasClass('SINGLE_CATEGORICAL')){
-                if($(this).hasClass('btn-success')) {
-                    $(this).removeClass('active btn-success');
-                }
-                else{
-                    $(this).parent().parent().find('.all, .any, .none, button').removeClass('active btn-success');
-                    $(this).addClass('active btn-success');
-                }
-            }
-            return false;
-        });
-
-
+        initTraitFilterControls();
+       
     });
     function deleteObservation(){
         var test="${message(code: 'default.observatoin.delete.confirm.message', default: 'This observation will be deleted. Are you sure ?')}";

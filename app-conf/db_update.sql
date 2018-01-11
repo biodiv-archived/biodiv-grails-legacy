@@ -914,3 +914,8 @@ alter table data_package add column has_role_user_allowed boolean;
 alter table data_package add column uploader_ids varchar(255);
 alter table data_package drop column uploader_id;
 update data_package set has_role_user_allowed=false;
+
+
+alter table data_table add column images_file_id bigint;
+alter table data_table add constraint fk_images_file_id foreign key(images_file_id) references ufile(id);
+

@@ -52,6 +52,26 @@ int instanceCount = datasetInstance.countByDataTable();
 
                 <div class="prop">
                     <g:if test="${showDetails}">
+                    <span class="name"><i class="icon-time"></i><g:message code="default.observed.on.label" /></span>
+                    </g:if>
+                    <g:else>
+                    <i class="pull-left icon-time"></i>
+                    </g:else>
+                    <div class="value">
+                        <time class="timeago"
+                        datetime="${datasetInstance.temporalCoverage.fromDate.getTime()}"></time>
+                        <g:if test="${datasetInstance.temporalCoverage.toDate && datasetInstance.temporalCoverage.fromDate != datasetInstance.temporalCoverage.toDate}">&nbsp;
+                        <b>-</b>&nbsp; <time class="timeago" datetime="${datasetInstance.temporalCoverage.toDate.getTime()}"></time>
+                        </g:if>
+                        <g:if test="${datasetInstance.temporalCoverage.dateAccuracy}">
+                            (${datasetInstance.temporalCoverage.dateAccuracy.toLowerCase().capitalize()})
+                        </g:if>
+                    </div>
+                </div>
+
+
+                <div class="prop">
+                    <g:if test="${showDetails}">
                     <span class="name"><i class="icon-time"></i><g:message code="default.submitted.label" /></span>
                     </g:if>
                     <g:else>
@@ -75,21 +95,6 @@ int instanceCount = datasetInstance.countByDataTable();
                         datetime="${datasetInstance.lastRevised?.getTime()}"></time>
                     </div>
                 </div>
-           <g:if test="${datasetInstance.temporalCoverage.dateAccuracy}">
-                <div class="prop">
-                    <g:if test="${showDetails}">
-                    <span class="name"><i class="icon-time"></i>Date Accuracy</span>
-                    </g:if>
-                    <g:else>
-                    <i class="pull-left icon-time"></i>
-                    </g:else>
-                    <div class="value">
-                        ${datasetInstance.temporalCoverage.dateAccuracy.toLowerCase().capitalize()}
-                    </div>
-                </div>
-           </g:if>
-
-
 
                 <g:if test="${datasetInstance.externalUrl}">
                 <div class="prop">

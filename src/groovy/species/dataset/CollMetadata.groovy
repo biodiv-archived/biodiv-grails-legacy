@@ -134,10 +134,10 @@ abstract class CollMetadata implements Taggable, Rateable {
         XMLConverter xmlConverter = new XMLConverter();
 
         //Party
-        this.uploader = springSecurityService.currentUser;
-        if(params.author)  {
-            log.debug "Setting access to ${params.author}"
-            this.party = new Party(uploaderId:params.author.id);
+        this.uploader = params.uploader;
+        if(params.uploader)  {
+            log.debug "Setting access to ${params.uploader}"
+            this.party = new Party(uploaderId:params.uploader.id);
         } else {
             log.debug "Setting access to ${springSecurityService.currentUser}"
             this.party = new Party(uploaderId:springSecurityService.currentUser.id);
@@ -177,7 +177,7 @@ abstract class CollMetadata implements Taggable, Rateable {
             this.geographicalCoverage.locationAccuracy = params.locationAccuracy;
 
             GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-            if(params.topology) {
+            if(params.topology && params.topology instanceof Geometry) {
                 this.geographicalCoverage.topology = params.topology;
             }
             else {

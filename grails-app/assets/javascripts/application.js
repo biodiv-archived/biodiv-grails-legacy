@@ -112,7 +112,6 @@
 //= require biodiv/maps/cookie-chef.js
 
 ////= require show
-//= require jquery.plugins/jsrender.js
 //= require biodiv/observations/show.js
 //= require biodiv/content.js
 

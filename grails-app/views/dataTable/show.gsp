@@ -81,22 +81,7 @@
 
                 <div class="span8 observation" style="margin:0">
                     <div class="observation_story">
-                    <g:if test="${dataTableInstance.uploadLog}">
-                        <g:if test="${dataTableInstance.uploadLog.status == UploadLog.Status.UPLOADED}">
-                            <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
-                        </g:if> 
-                        <g:else>
-                        <div class="alert alert-info">
-                            Upload is under process <br/>
-                            Current status is : ${dataTableInstance.uploadLog.status}
-                        </div>
-                        </g:else>
-                    </g:if>
-                    <g:else>
-                        <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
-                    </g:else>
-
-                    <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage]"/>
+                   <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage, showTitleDetail:false]"/>
                     </div>
                     <uGroup:objectPostToGroupsWrapper 
                     model="['observationInstance':dataTableInstance, 'objectType':dataTableInstance.class.canonicalName]"/>

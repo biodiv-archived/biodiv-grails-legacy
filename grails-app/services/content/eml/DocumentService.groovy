@@ -568,7 +568,12 @@ println queryParts.queryParams
                     m['dataTable'] = DataTable.read(Long.parseLong(params.paramsToPropagate.dataTable+''));
                     DataTable.inheritParams(m, params.paramsToPropagate);
                 }
-//                m['language'] = params.paramsToPropagate['locale_language'];
+                def tags = (m['tags'] && (m['tags'].trim() != "")) ? m['tags'].trim().split(",").collect{it.trim()} : new ArrayList();
+                m['tags'] = tags;
+
+                def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
+                m['userGroupsList'] = userGroupIds.join(',');
+
                 uploadDoc(fileDir, m, resultObv)
                 i++
                 if(i > BATCH_SIZE){
@@ -585,7 +590,7 @@ println queryParts.queryParams
             }
         }
     }
-
+/*
     def processLinkBatch(params){
         File spreadSheet = new File(params.batchFileName)
         if(!spreadSheet.exists()){
@@ -623,7 +628,7 @@ println queryParts.queryParams
             }
         }
     }
-
+*/
     private uploadDoc(fileDir, Map m, resultObv){
         Document document = new Document()
 
@@ -658,7 +663,7 @@ println queryParts.queryParams
             return
         }
         //other params
-        document.author = SUser.findByEmail(m['user email'].trim())
+        document.author = SUser.findByEmail(m[ObvUtilService.AUTHOR_EMAIL].trim())
         document.type = Document.fetchDocumentType(m['type'])
         document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
 
@@ -671,35 +676,53 @@ println queryParts.queryParams
         document.notes =  m['description']
 
         document.speciesGroups = []
-        m['species groups'].split(",").each {
+        m[ObvUtilService.SPECIES_GROUP] = m['species groups']
+        m[ObvUtilService.SPECIES_GROUP].split(",").each {
             def s = SpeciesGroup.findByName(it.trim())
             if(s)
                 document.addToSpeciesGroups(s);
         }
 
         document.habitats  = []
-        m['habitat'].split(",").each {
+        m[ObvUtilService.HABITAT] = m['habitat']
+        m[ObvUtilService.HABITAT].split(",").each {
             def h = Habitat.findByName(it.trim())
             document.addToHabitats(h);
         }
 
-        document.longitude = (m['longitude'] ?Double.parseDouble(m['longitude']).doubleValue():76.658279)
-        document.latitude = (m['latitude'] ?Double.parseDouble(m['latitude']).doubleValue(): 12.32112)
-        document.geoPrivacy = m["geoprivacy"]
+        //document.longitude = (m['longitude'] ?Double.parseDouble(m['longitude']).doubleValue():76.658279)
+        //document.latitude = (m['latitude'] ?Double.parseDouble(m['latitude']).doubleValue(): 12.32112)
+        //document.geoPrivacy = m["geoprivacy"]
 
-        document.language = utilsService.getCurrentLanguage();
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        println "populating topology"
+        println "${m.topology}"
+        if(!m.topology && m.latitude && m.longitude) {
+            println "constructing areas from lat lng ${m.latitude}"
+            m.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(m.longitude?.toFloat(), m.latitude?.toFloat())));
+        } 
+
+
+        m['locale_language'] = utilsService.getCurrentLanguage();
+        println "################################################&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+println m
+println m['topology']
+        println "################################################&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+        m.remove('group')
+        m.remove('habitat')
+        document = super.update(document, m, Document.class);
 
         if(m['dataTable']) {
             document.dataTable = m['dataTable'];
         }
 
         saveDoc(document, m)
-
+        runCurrentDocuments(document,m)
         if(document.id){
             resultObv << document.id
         }
     }
-
+/*
     private uploadLinkDoc(Map m, resultObv,params, boolean sendMail=true){
         Document document = new Document()
         println "========================================================="
@@ -761,7 +784,7 @@ println queryParts.queryParams
             resultObv << document.id
         }
     }
-
+*/
     Map saveDocument(params, sendMail=true, boolean updateResources = true) {
         params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
 		params.author = springSecurityService.currentUser;

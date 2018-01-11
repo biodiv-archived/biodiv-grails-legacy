@@ -161,21 +161,26 @@ class DatasetService extends AbstractMetadataService {
     def save(params, sendMail) {
         def result;
 
+        params.uploader = springSecurityService.currentUser;
+
         Dataset1 dataset;
-        def feedType;
+        def feedType, feedAuthor;
         if(params.id) {
             dataset = Dataset1.get(Long.parseLong(params.id));
+            params.uploader = dataset.uploader;
             dataset = update(dataset, params);
             feedType = activityFeedService.INSTANCE_UPDATED;
+            feedAuthor = dataset.author
         } else {
             dataset = create(params);
             feedType = activityFeedService.INSTANCE_CREATED;
+            feedAuthor = dataset.author
         }
       
         dataset.lastRevised = new Date();
         
         if(hasPermission(dataset, springSecurityService.currentUser)) {
-            result = save(dataset, params, true, null, feedType, null);
+            result = save(dataset, params, true, feedAuthor, feedType, null);
         } else {
             result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
         }
@@ -243,6 +248,7 @@ class DatasetService extends AbstractMetadataService {
         def queryParams = [isDeleted : false]
         def activeFilters = [:]
 
+        String userGroupQuery = "";
         def query = "select "
 
         if(!params.sort || params.sort == 'score') {
@@ -355,8 +361,29 @@ class DatasetService extends AbstractMetadataService {
             activeFilters["dataPackage"] = params.dataPackage.toLong()
         }
 
-        
-		def allDatasetCountQuery = "select count(*) from Dataset1 obv " +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
+        if(params.webaddress) {
+
+            def userGroupInstance =	utilsService.getUserGroup(params)
+            params.userGroup = userGroupInstance;
+        }
+
+        if(params.userGroup) {
+            log.debug "Filtering from usergourp : ${params.userGroup}"
+            query += " join obv.userGroups userGroup "
+            userGroupQuery += " join obv.userGroups userGroup "
+            filterQuery += " and userGroup = :userGroup "
+            queryParams['userGroup'] = params.userGroup;
+        }
+
+        if(params.notInUserGroup) {
+            log.debug "Filtering from notInUsergourp : ${params.userGroup}"
+            query += " join obv.userGroups userGroup "
+            userGroupQuery += " join obv.userGroups userGroup "
+            filterQuery += " and userGroup is null "
+        }
+
+
+		def allDatasetCountQuery = "select count(*) from Dataset1 obv " +((userGroupQuery)?userGroupQuery:'') +((params.tag)?tagQuery:'')+((params.featureBy)?featureQuery:'')+filterQuery
 	
         orderByClause = " order by " + orderByClause;
 
@@ -379,7 +406,7 @@ class DatasetService extends AbstractMetadataService {
                 if (datasetInstance) {
                     //datasetInstance.removeResourcesFromSpecies()
                     boolean isFeatureDeleted = Featured.deleteFeatureOnObv(datasetInstance, springSecurityService.currentUser, utilsService.getUserGroup(params))
-                    if(isFeatureDeleted && datasetService.hasPermission(datasetInstance, springSecurityService.currentUser)) {
+                    if(isFeatureDeleted && hasPermission(datasetInstance, springSecurityService.currentUser)) {
                         def mailType = activityFeedService.INSTANCE_DELETED
                         try {
                             datasetInstance.isDeleted = true;
@@ -445,8 +472,9 @@ class DatasetService extends AbstractMetadataService {
     }
 
     boolean hasPermission(Dataset1 dataset, SUser user) {
+        if(!user || !dataset) return false;
         boolean isPermitted = false;
-        if(dataPackageService.hasPermission(dataset.dataPackage, user) && (dataset.getAuthor().id == user.id || dataset.uploader.id == user.id)) {
+        if(dataPackageService.hasPermission(dataset.dataPackage, user) && (utilsService.isAdmin(springSecurityService.currentUser) ||dataset.getAuthor().id == user.id || dataset.uploader.id == user.id)) {
             isPermitted = true;
         }
         return isPermitted;

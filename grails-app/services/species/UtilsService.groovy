@@ -369,7 +369,7 @@ class UtilsService {
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
                     templateMap["trait"] = otherParams["trait"]
-                    templateMap["traitValue"] = otherParams["traitValue"]
+                    templateMap["traitValueStr"] = otherParams["traitValueStr"]
                     bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/factUpdate"
                     populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                     toUsers.add(user)
@@ -1359,6 +1359,9 @@ class UtilsService {
                     String[] x = it.split(':');
                     if(x.size() == 2)
                         traits[x[0]] = x[1].trim();
+                    else if(x.size() == 3) //for range
+                        traits[x[0]] = x[1].trim()+':'+x[2].trim();
+
                 }
             }
         }

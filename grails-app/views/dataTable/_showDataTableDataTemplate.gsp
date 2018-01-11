@@ -9,6 +9,9 @@
     <table class="table table-striped table-hover tablesorter checklist-data" style="margin-left: 0px;">
 
             <% 
+            def dataObjects = dataTableInstance.getDataObjects(params)
+            def dataObjectsCount = dataTableInstance.getDataObjectsCount();
+
             def columnNames = dataTableInstance.fetchColumnNames();
             if(dataTableInstance.dataTableType == DataTableType.FACTS) {
                 def c =  [];
@@ -22,7 +25,7 @@
             } else if(dataTableInstance.dataTableType == DataTableType.TRAITS) {
                 columnNames =  [['','traitTypes',1],['','dataTypes',1],['','units',1],['','values',1],['','field',1],['','taxon',1],['','isNotObservationTrait',1],['','isParticipatory',1],['','showInObservation',1]];
             } else if(dataTableInstance.dataTableType == DataTableType.DOCUMENTS) {
-                columnNames =  [['','url',1]];
+                columnNames =  [];
             }
 
              
@@ -31,7 +34,9 @@
             <tr class="filters">
                 <th title="Title">Title</th>
                 <g:each in="${columnNames}" var="cName">
-                <th title="${cName[1]}">${cName[1]}</th>
+                <th title="${cName[3]}">${cName[1]}
+                <g:if test="${cName[3]}"><i class="icon-info-sign" title="${cName[3]}"></i></g:if>
+                </th>
                 </g:each>
             </tr>
         </thead>
