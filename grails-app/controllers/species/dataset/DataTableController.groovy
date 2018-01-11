@@ -165,16 +165,16 @@ class DataTableController extends AbstractObjectController {
 				//dataTableInstance.incrementPageVisit()
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
-                def model = utilsService.getSuccessModel("", dataTableInstance, OK.value());
-                model['dataObjects'] = dataTableInstance.getDataObjects(params)
-                model['dataObjectsCount'] = dataTableInstance.getDataObjectsCount();
-
                 withFormat {
                     html {
-                            return [dataTableInstance: dataTableInstance, dataObjects:model.dataObjects, dataObjectsCount:model.dataObjectsCount, 'userLanguage':userLanguage, max:10]
+                        return [dataTableInstance: dataTableInstance, 'userLanguage':userLanguage, max:10]
                     } 
-                    json  { render model as JSON }
-                    xml { render model as JSON }
+                    json  { 
+                        def model = utilsService.getSuccessModel("", dataTableInstance, OK.value());
+                        model['dataObjects'] = dataTableInstance.getDataObjects(params)
+                        model['dataObjectsCount'] = dataTableInstance.getDataObjectsCount();
+                        render model as JSON 
+                    }
                 }
 			}
 		} else {

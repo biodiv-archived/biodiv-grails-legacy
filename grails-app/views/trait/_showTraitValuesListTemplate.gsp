@@ -43,6 +43,37 @@
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
                     </button>
                 </g:if>
+                <g:else>
+                    <g:if test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
+                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        class="btn span2 input-prepend single-post disabled"
+                            style="">
+
+                            <g:if test="${trait.units == Units.MONTH}">
+                                ${UtilsService.getMonthName(traitValue.split(';')[0])} 
+                                - ${UtilsService.getMonthName(traitValue.split(';')[1])} 
+                            </g:if>
+                            <g:else>
+                                ${traitValue}
+                            </g:else>
+                        </span>
+                        </g:if>
+                        <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
+                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        class="btn span2 input-prepend single-post disabled" title="${traitValue}"
+                            style="">
+                        </span>
+                        </g:elseif>
+
+                        <g:else>
+                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        class="btn span2 input-prepend single-post disabled"
+                            style="">
+                            ${traitValue} 
+                        </span>
+                        </g:else>
+                    
+                    </g:else>
             </g:each> 
         </g:if>
         
@@ -106,6 +137,8 @@
             </div> 
             </g:if>
             </g:if>
+
+
             <g:elseif test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
             <g:if test="${trait.units == Units.MONTH}">
             <div style="width:280px;">

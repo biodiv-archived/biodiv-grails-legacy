@@ -4,36 +4,48 @@
 <%@page import="species.utils.ImageType"%>
 <%@page import="species.participation.Observation"%>
 <%@page import="species.dataset.DataTable"%>
+<%@ page import="species.participation.DownloadLog.DownloadType"%>
+<%@ page import="species.participation.UploadLog"%>
+
 
 <% 
 int instanceCount = dataTableInstance.getDataObjectsCount();
 String instanceType = dataTableInstance.dataTableType;
 %>
-<div name="${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;width:100%">
-    <h5>
-        <a name="${dataTableInstance.id}"></a>
+<div name="dataTable_${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;width:99.9%;padding:0px;">
+        <button type="button" data-toggle="collapse" data-parent="#dataTable_${dataTableInstance.id}" data-target="#dataTable_${dataTableInstance.id}_body" style="width:100%; text-align:left;${showTitleDetail?:'display:none;'}">
+<h5>
+
         <span><g:message code="default.dataTable.label" /> : </span>
         <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
         ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
+        <span class="pull-right icon-chevron-down"></span>
         </g:link>
  
     </h5>
-    <g:if test="${showFeatured}">
-    <span class="featured_details btn" style="display:none;"><i class="icon-list"></i></span>
-    </g:if>
-
-    <g:if test="${showFeatured}">
-    <div class="featured_body">
-        <div class="featured_title ellipsis"> 
-            <div class="heading">
+    </button>
+   <div id="dataTable_${dataTableInstance.id}_body" class="observation_story_body collapse ${showDetails && !hideBody ?'in':''} ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
+            <div>
+                <div id="dataTable_${dataTableInstance.id}_table">
+                    <g:if test="${dataTableInstance.uploadLog}">
+                        <g:if test="${dataTableInstance.uploadLog.status == UploadLog.Status.UPLOADED}">
+                            <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+                        </g:if> 
+                        <g:else>
+                        <div class="alert alert-info">
+                            Upload is under process <br/>
+                            Current status is : ${dataTableInstance.uploadLog.status}
+                        </div>
+                        </g:else>
+                    </g:if>
+                    <g:else>
+                        <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+                    </g:else>
+                </div>
             </div>
-        </div>
-        <g:render template="/common/featureNotesTemplate" model="['instance':dataTableInstance, 'featuredNotes':featuredNotes, 'userLanguage': userLanguage]"/>
-    </div>
-    </g:if>
-    <g:else>
-    <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
 
+
+ 
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-time"></i><g:message code="default.observed.on.label" /></span>
@@ -253,7 +265,7 @@ String instanceType = dataTableInstance.dataTableType;
   
            </g:if>
 
-                <div class="row observation_footer" style="margin-left:0px;height:40px;">
+               <div class="row observation_footer" style="margin-left:0px;height:40px;">
                     <g:render template="/dataTable/showDataTableStoryFooterTemplate" model="['instance':dataTableInstance, 'showDetails':showDetails, 'showLike':true]" />
 
                     <div class="story-footer" style="right:3px;">
@@ -263,7 +275,6 @@ String instanceType = dataTableInstance.dataTableType;
                 </div>
 
         </div>
-        </g:else>
     </div>
 <style>
     <g:if test="${!showDetails}">
@@ -314,7 +325,9 @@ String instanceType = dataTableInstance.dataTableType;
         float: right;
         margin-top: -5px;
     }
-    
+.thumbnail .observation_story_body {
+    padding:0px;
+}
     </g:if>
 
 </style>

@@ -94,10 +94,6 @@
 
             <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
 
-                <g:if test="${observationInstance.dataset}">
-                <g:render template="/datasource/showDatasourceSignatureTemplate" model="['instance':observationInstance.dataset.datasource, 'showDetails':true]"/>
-                </g:if>
-
                 <%--g:if test="${observationInstance.dataTable}">
                 <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':observationInstance.dataTable.dataset, 'showDetails':true, showTitleDetail:true ]"/>
                 </g:if--%>

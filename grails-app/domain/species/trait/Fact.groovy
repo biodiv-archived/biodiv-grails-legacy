@@ -6,6 +6,7 @@ import species.UtilsService;
 import species.auth.SUser;
 import species.License;
 import species.dataset.DataTable;
+import species.trait.Trait.DataTypes;
 
 import grails.converters.JSON
 
@@ -50,7 +51,13 @@ class Fact {
     }
 
     String getActivityDescription() {
-        return trait.name +':'+ traitValue.value;
+        if(this.traitValue) {
+            return trait.name +':'+ traitValue.value;
+        } else if (trait.dataTypes == DataTypes.DATE) {
+            return trait.name +':'+ fromDate + (toDate ? "-" + toDate:'')
+        }else {
+            return trait.name +':'+ value + (toValue ? "-" + toValue:'')
+        }
     }
 
     String getIcon() {
