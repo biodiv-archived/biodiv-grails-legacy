@@ -788,7 +788,7 @@ environments {
             debug   'grails.app.services.speciespage.ObservationService'
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
-
+            debug   'org.gualdi.grails.plugins.ckeditor'
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']

@@ -130,7 +130,7 @@
                     { name: 'insert', items: [ 'Image', 'Table'] }
                     ],
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/ofm/filemanager&viewMode=grid&space=newsletters/${params.webaddress}&type=Image",
-                    filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/uploader?Type=Image&userSpace=${params.webaddress}",
+                    filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/uploader?type=Image&userSpace=${params.webaddress}",
 
                         height: '400px'
                 };
