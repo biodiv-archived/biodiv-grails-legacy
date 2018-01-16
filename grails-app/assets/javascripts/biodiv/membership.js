@@ -391,6 +391,7 @@ function last_actions() {
     $(".ellipsis.multiline").trunk8({
         lines:4,
         tooltip:false,
+        parseHTML:true,
         fill: '&hellip; <a class="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
     });
 
