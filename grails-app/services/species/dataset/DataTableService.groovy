@@ -238,7 +238,7 @@ class DataTableService extends AbstractMetadataService {
         if(hasPermission(dataTable, springSecurityService.currentUser)) {
             result = save(dataTable, params, true, feedAuthor, feedType, null);
 
-            if(dataTable.dataset) {
+            if(result.success && dataTable.dataset) {
                 log.debug "Posting dataTable to all user groups that dataset is part of"
                 HashSet uGs = new HashSet();
                 uGs.addAll(dataTable.dataset.userGroups);
@@ -620,6 +620,7 @@ class DataTableService extends AbstractMetadataService {
                             //Delete underlying observations of data table
                             dataTableInstance.deleteAllObservations();
                             dataTableInstance.deleteAllFacts();
+                            dataTableInstance.deleteAllDocuments();
                             if(!dataTableInstance.hasErrors() && dataTableInstance.save(flush: true)){
                                 utilsService.sendNotificationMail(mailType, dataTableInstance, null, params.webaddress);
                                 //TODO: dataTableSearchService.delete(observationInstance.id);
