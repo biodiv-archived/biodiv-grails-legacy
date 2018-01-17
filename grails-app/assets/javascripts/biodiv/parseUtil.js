@@ -31,7 +31,10 @@ String.prototype.splitCSV = function(sep) {
 function parseData(csvFile, options) {
     $.get(csvFile, function(data) {
         parseCSVData(data, options);	
-    });
+    })
+    .fail(function() {
+        console.log( "parseData" );
+    })
 }
 
 function parseCSVData(data, options) {
