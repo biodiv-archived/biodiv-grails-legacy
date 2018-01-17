@@ -710,7 +710,9 @@ println m['topology']
         println "################################################&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
         m.remove('group')
         m.remove('habitat')
+        println document.externalUrl
         document = super.update(document, m, Document.class);
+        document.externalUrl = m['externalurl']
 
         if(m['dataTable']) {
             document.dataTable = m['dataTable'];

@@ -391,10 +391,11 @@ function last_actions() {
     $(".ellipsis.multiline").trunk8({
         lines:4,
         tooltip:false,
+        parseHTML:true,
         fill: '&hellip; <a class="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
     });
 
-    $('.read-more').on('click', function (event) {
+    $(document).on('click', '.read-more', function (event) {
         $(this).parent().trunk8('revert').append(' <a class="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
 
         return false;

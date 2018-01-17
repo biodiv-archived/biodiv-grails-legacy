@@ -178,7 +178,7 @@
                     { name: 'insert', items: ['Table'] }
                     ],
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/${grailsApplication.metadata['app.name']}ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
-                    //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
+                    //filebrowserImageUploadUrl: "/biodiv/ck/uploader?type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
                     height: '300px',
                     ignoreEmptyParagraph: true,

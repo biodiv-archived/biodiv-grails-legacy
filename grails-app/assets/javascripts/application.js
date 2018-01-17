@@ -18,7 +18,7 @@
 //= require biodiv/users.js
 //= require jquery.plugins/jquery.linkify-1.0.js
 //= require jquery.plugins/timeago.js
-//= require jquery.plugins/trunk8.min.js
+//= require jquery.plugins/trunk8.js
 //= require biodiv/membership.js
 //= require jquery.plugins/date.js
 //= require jquery.plugins/moment.min.js
