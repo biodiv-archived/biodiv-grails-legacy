@@ -718,7 +718,7 @@ println m['topology']
             document.dataTable = m['dataTable'];
         }
 
-        saveDoc(document, m)
+        saveDoc(document, m, false);
         runCurrentDocuments(document,m)
         if(document.id){
             resultObv << document.id
