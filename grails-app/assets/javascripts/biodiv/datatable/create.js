@@ -150,11 +150,14 @@ console.log('loadSampleData');
     $.each(columns, function(i, n){
         el += "<td>"+data[0][n.name]+"</td>";
     });
-    el += "</tr><tr>"
+    el += "</tr>";
+    if(data[1]) {
+        el += "<tr>";
         $.each(columns, function(i, n){
             el += "<td>"+data[1][n.name]+"</td>";
         });
-    el += "</tr>";
+        el += "</tr>";
+    }
 
     el += "</tbody></table>";
     $("#myGrid").html(el);

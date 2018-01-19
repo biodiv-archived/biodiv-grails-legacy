@@ -933,6 +933,7 @@ class ObvUtilService {
 
 	private Map uploadImageFiles(imageDir, imagePaths, license, author){
 		Map resourcesInfo = [:];
+        if(imageDir && imageDir.exists()) { 
 		String rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 		File obvDir
 		int index = 1
@@ -968,6 +969,9 @@ class ObvUtilService {
                 log.error " File not found please check the image folder " + f
             }
 		}
+        } else {
+            log.error "Images dir doesnt exist ${imageDir}";
+        }
 		return resourcesInfo
 	}
 	

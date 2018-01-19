@@ -709,11 +709,13 @@ class Observation extends DataObject {
 				res.put(name, m[name])
 			}
 		} else if(dataTable) {
-            def m = JSON.parse(checklistAnnotations)
-			this.dataTable.fetchColumnNames().each { name ->
-                println name
-				res.put(name[1], m[name[1]])
-			}
+            if(checklistAnnotations) {
+                def m = JSON.parse(checklistAnnotations)
+                this.dataTable.fetchColumnNames().each { name ->
+                    println name
+                    res.put(name[1], m[name[1]])
+                }
+            }
         } else if(checklistAnnotations) {
             res = JSON.parse(checklistAnnotations);
             println res
