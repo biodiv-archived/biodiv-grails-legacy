@@ -411,7 +411,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                         }
 
                         else if(header.url && header.url.startsWith("http://ibp.org/terms/observation/") && row[header.column]) {
-                            m[dwcObvHeader[header.column]] = value;  
+                            m[header.url.replace("http://ibp.org/terms/observation/","")] = value;  
                         }
                     }
                 }
