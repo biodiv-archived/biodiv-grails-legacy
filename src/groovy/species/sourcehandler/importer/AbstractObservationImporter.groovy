@@ -231,7 +231,11 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                     mapped=true;
                 }  else if(url == 'http://purl.org/dc/terms/rights' && mappedColumnName == 'license') {
                     mapped=true;
-                } else if( mappedColumnName == 'date accuracy' ||  mappedColumnName == 'group' || mappedColumnName == 'location scale' || mappedColumnName == 'geoprivacy' ||  mappedColumnName == 'attribution' || mappedColumnName == 'filename' ||  mappedColumnName == 'comment' || mappedColumnName == 'help identify?' || mappedColumnName == 'post to user groups'|| mappedColumnName == "user email" || mappedColumnName == "notes") {
+                } else if( mappedColumnName == 'date accuracy' ||  mappedColumnName == 'group' || mappedColumnName == 'location scale' || mappedColumnName == 'geoprivacy' ||  mappedColumnName == 'attribution' || mappedColumnName == 'filename' ||  mappedColumnName == 'comment' || mappedColumnName == 'help identify?' || mappedColumnName == 'post to user groups'|| mappedColumnName == "user email" || mappedColumnName == "notes" || mappedColumnName == "language") {
+                    println "******************************"
+                    println "******************************"
+                    println "******************************"
+                    println "******************************"
                     mapped = true;
                     mappedURL = "http://ibp.org/terms/observation/"+mappedColumnName;
                 } 
