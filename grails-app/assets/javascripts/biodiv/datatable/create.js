@@ -11,28 +11,28 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
             data:{'dataTableTypeId':dataTableTypeId,'datasetId':datasetId, dataTableId:dataTableId}, 
             success:function(data,textStatus){
                 if(data.success) {
-                $('#addDataTable').html(data.model.tmpl);
-                initObservationCreate();
-                intializesSpeciesHabitatInterest();
-                initLocationPicker();
-                dataTable_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
-                    usersUrl : window.params.userTermsUrl
-                });
-                CKEDITOR.replace('summary', config);
-                CKEDITOR.replace('description', descriptionConfig);
-                showSampleDataTable();
-                var contributorId = $('#contributorUserIds').data('contributorid'); 
-                var contributorName = $('#contributorUserIds').data('contributorname'); 
-                if(contributorId != '' )
-                    dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
-
-                $('.addDataTable #speciesGroupFilter button').click(function(e){
-                    console.log('speciesGroupFilter button click');
-                    e.preventDefault();
-                    loadSpeciesGroupTraits();
+                    $('#addDataTable').html(data.model.tmpl);
+                    initObservationCreate();
+                    intializesSpeciesHabitatInterest();
+                    initLocationPicker();
+                    dataTable_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
+                        usersUrl : window.params.userTermsUrl
+                    });
+                    CKEDITOR.replace('summary', config);
+                    CKEDITOR.replace('description', descriptionConfig);
                     showSampleDataTable();
-                    return false;
-                });
+                    var contributorId = $('#contributorUserIds').data('contributorid'); 
+                    var contributorName = $('#contributorUserIds').data('contributorname'); 
+                    if(contributorId != '' )
+                        dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
+
+                    $('.addDataTable #speciesGroupFilter button').click(function(e){
+                        console.log('speciesGroupFilter button click');
+                        e.preventDefault();
+                        loadSpeciesGroupTraits();
+                        showSampleDataTable();
+                        return false;
+                    });
                     loadSpeciesGroupTraits();
                 }  else {
                     $('#addDataTable').html(data.msg);
@@ -370,5 +370,4 @@ $(document).ready(function() {
 
         return false;
     });
-
 });

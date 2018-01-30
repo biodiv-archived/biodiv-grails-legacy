@@ -96,13 +96,15 @@ class FactController extends AbstractObjectController {
                 }
                 if(object) {
                     println params;
-                    params['contributor'] = springSecurityService.currentUser.email;
-                    params['attribution'] = springSecurityService.currentUser.email;
-                    params['license'] = License.LicenseType.CC_BY.value();
-                    if(params.traits) {
-                        params.putAll(factService.getTraits(params.remove('traits')));
-                        params['replaceFacts'] = 'true';
-                        Map r = factService.updateFacts(params, object, null, true);
+                    Map p = [:];
+                    p['contributor'] = springSecurityService.currentUser.email;
+                    p['attribution'] = springSecurityService.currentUser.email;
+                    p['license'] = License.LicenseType.CC_BY.value();
+                    Map traits = factService.getTraits(params.traits);
+                    if(traits && traits[trait.id+'']) {
+                        p.putAll(traits);
+                        p['replaceFacts'] = 'true';
+                        Map r = factService.updateFacts(p, object, null, true);
                         //TODO: to update this from approprite result from factService.update
                         success = r.success;
                         result = [success:success, msg:success?'Successfully updated fact':'Error updating fact'];
@@ -156,15 +158,16 @@ class FactController extends AbstractObjectController {
                         } else {
 
                         }
-                    }else{
+                    } else {
                         // if no traitValue selected 
+                        log.debug "No trait value .. so deleting all facts for this trait ${trait}"
                         List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
 
                         facts.each { fact ->
                             fact.isDeleted = true;
                             fact.save();
                             result = [success:true, msg:'Successfully deleted fact']
-                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'queryParams':'', displayAny:false, editable:true]);
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'object':object, 'queryParams':'', displayAny:false, editable:true]);
                         }
 
                     }

@@ -109,6 +109,8 @@
                         </div>
                         </g:else>
                     </g:elseif>
+                    <g:else>
+                    </g:else>
                     </g:each>
                 </div>
                 </div>
