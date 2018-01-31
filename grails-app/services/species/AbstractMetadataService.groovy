@@ -188,7 +188,7 @@ class AbstractMetadataService extends AbstractObjectService {
        return instance;
     }
 
-    def save(instance, params, sendMail, feedAuthor, feedType, searchService) {
+    def save(instance, params, boolean sendMail, SUser feedAuthor, String feedType, searchService, String feedDesc=null) {
         log.debug( "saving instance with params assigned >>>>>>>>>>>>>>>>: "+ instance)
 
         instance.clearErrors();
@@ -196,7 +196,7 @@ class AbstractMetadataService extends AbstractObjectService {
         if (!instance.hasErrors() && instance.save(flush: true)) {
             //mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
             //String msg = messageSource.getMessage("instance.label", [instance.id], LCH.getLocale())
-            activityFeedService.addActivityFeed(instance, null, instance.getAuthor(), feedType);
+            activityFeedService.addActivityFeed(instance, null, instance.getAuthor(), feedType, feedDesc);
             setAssociations(instance, params, sendMail);
             if(sendMail)
                 utilsService.sendNotificationMail(feedType, instance, null, params.webaddress);

@@ -47,6 +47,10 @@ class DataTable extends CollMetadata {
     Long checklistId;
     static hasMany = [userGroups:UserGroup];
 	static belongsTo = [UserGroup]
+	
+    boolean isMarkingDirty = false;
+    Map changedCols;
+    static transients = ['isMarkingDirty', 'changedCols']
 
     def dataSource;
     def dataTableService;
