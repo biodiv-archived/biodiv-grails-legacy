@@ -629,7 +629,7 @@ class SpeciesUploadService {
                     HashSet uGs = new HashSet();
                     uGs.addAll(s.dataTable.userGroups);
                     if(s.dataTable.dataset) {
-                        uGs.addll(s.dataTable.dataset.userGroups);
+                        uGs.addAll(s.dataTable.dataset.userGroups);
                     }
 			        userGroupService.addResourceOnGroups(s, uGs.collect{it.id}, false);
                 }
