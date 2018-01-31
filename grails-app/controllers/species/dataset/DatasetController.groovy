@@ -310,14 +310,14 @@ class DatasetController extends AbstractObjectController {
         Dataset1 datasetInstance;
         DataTable dataTableInstance;
         
-        if(params.datasetId) {
+        if(params.datasetId) { 
             datasetInstance = Dataset1.read(params.long('datasetId'));
         }
             
         if(params.dataTableId) {
             dataTableInstance = DataTable.read(params.long('dataTableId'));
         } else {
-            dataTableInstance = new DataTable()
+            dataTableInstance = new DataTable();
             if(datasetInstance) {
                 dataTableInstance.dataset = datasetInstance;
                 dataTableInstance.properties = datasetInstance.properties;

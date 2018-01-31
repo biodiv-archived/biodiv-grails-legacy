@@ -4,10 +4,10 @@
     def form_action = uGroup.createLink(action:'save', controller:'dataTable', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
     def form_button_name = "Add ${dataTableInstance.dataTableType}"
     def form_button_val = "Add "+dataTableInstance.dataTableType; //"${g.message(code:'button.add.checklist')}"
-    if(params.action == 'edit' || params.action == 'update'){
+    if(updateDataObjects == false) {
     form_action = uGroup.createLink(action:'update', controller:'dataTable', id:dataTableInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)
-    form_button_name = "Update ${dataTableInstance.dataTableType}"
-    form_button_val = "Update "+dataTableInstance.dataTableType;
+    form_button_name = "Update Datatable"
+    form_button_val = "Update Datatable";
     }
 
     %>
@@ -17,7 +17,7 @@
         <input type="hidden" name="dataset" value="${dataTableInstance?.dataset?.id}"/>
         <g:set var="dataset_contributor_autofillUsersId" value="contributor_id" />
         <g:render template="/dataset/collectionMetadataTemplate" model="['instance':dataTableInstance, autofillUserComp:dataset_contributor_autofillUsersId]"/>
-        <div class="section">
+        <div id="updateDataObjectsSection" class="section">
             <h3><g:message code="default.dataTable.label" /> </h3>
     
                 <div class="upload_file" style="display:${dataTableInstance?.uFile?.path?'none':'inline-block'}">
@@ -71,6 +71,7 @@
                                 <input type="hidden" id="speciesGroupTraits" name="speciesGroupTraits" value=""/>
                                 <input type="hidden" id="columns" name="columns" value="${dataTableInstance?.columns}"/>
                                 <input type="hidden" id="mappedColumns" name="mappedColumns" value="${dataTableInstance?.columns}"/>
+
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="sciNameColumn">
                                     <g:message code="checklist.scientific_name.validator.invalid" />

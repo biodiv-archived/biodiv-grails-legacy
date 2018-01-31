@@ -377,6 +377,17 @@ class Observation extends DataObject {
 		return result[0]["count"]
 	}
 
+    RecommendationVote getRecommendationVote(SUser recoVoteAuthor) {
+        RecommendationVote v;
+        this.recommendationVote.each {
+            if(it.author.id == recoVoteAuthor.id){
+                v=it;
+                return;
+            }
+        }
+        return v;
+    }
+
 	//XXX: comment this method before checklist migration
 	def beforeUpdate() {
         log.debug 'Observation beforeUpdate'
@@ -481,7 +492,7 @@ class Observation extends DataObject {
 			return
 		}
 		
-        if(sourceId && !datasetId) {
+        if(isChecklist && sourceId && !datasetId) {
             Checklists cl = Checklists.read(sourceId)
             if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
                 m[cl.sciNameColumn] = recoVote.recommendation.name

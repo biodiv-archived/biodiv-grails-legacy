@@ -445,6 +445,8 @@ $(document).ready(function(){
         var ele = $(this).parent().prev('.mainContentList');
         if(ele.length == 0) ele = $(this).parent().prev().find('.mainContentList');
         if(ele.length == 0) ele = $('.mainContentList:first');
+        
+        var eleParentParent = ele.parent().parent();
         $.autopager({
 
             autoLoad : true,
@@ -459,23 +461,21 @@ $(document).ready(function(){
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
-
-                $(".loadMore .progress").show();
-                $(".loadMore .buttonTitle").hide();
+                eleParentParent.find(".loadMore .progress").show();
+                eleParentParent.find(".loadMore .buttonTitle").hide();
             },
 
             // a function to be executed when next page was loaded. 
             // "this" points to the element of loaded content.
             load : function(current, next) {
                 checkList();
-                $(".mainContent:last").hide().fadeIn(3000);
-
-                $("div.paginateButtons a.nextLink").attr('href', next.url);
+                eleParentParent.find(".mainContent:last").hide().fadeIn(3000);
+                eleParentParent.find("div.paginateButtons a.nextLink").attr('href', next.url);
                 if (next.url == undefined) {
-                    $(".loadMore").hide();
+                    eleParentParent.find(".loadMore").hide();
                 } else {
-                    $(".loadMore .progress").hide();
-                    $(".loadMore .buttonTitle").show();
+                    eleParentParent.find(".loadMore .progress").hide();
+                    eleParentParent.find(".loadMore .buttonTitle").show();
                 }
     
                 var a = $('<a href="'+current.url+'"></a>');
@@ -491,7 +491,9 @@ $(document).ready(function(){
                 params['max'] = parseInt(params['offset'])+parseInt(params['max']);
                 params['offset'] = 0;
                 var History = window.History;
-                History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
+                var p = $.extend({},params);
+                delete p['max'];
+                History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(p))); 
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
@@ -646,6 +648,8 @@ $(document).ready(function(){
 
     $(document).on('submit','.addRecommendation', function(event) {
         var that = $(this);
+        var observationId = that.find('input[name=obvId]').val(); 
+        var seeMoreMessage = $("#seeMoreMessage_"+observationId);
         $(this).ajaxSubmit({
             url:window.params.observation.addRecommendationVoteURL,
             dataType: 'json', 
@@ -666,12 +670,12 @@ $(document).ready(function(){
                             updateFeeds();
                         }
                         setFollowButton();
-                        showUpdateStatus(data.msg, data.success?'success':'error');
+                        showUpdateStatus(data.msg, data.success?'success':'error', seeMoreMessage);
                     }
                     $(".addRecommendation_"+data.instance.observation)[0].reset();
                     that.find(".canName").val("");   
                 } else {
-                    showUpdateStatus(data.msg, data.success?'success':'error');
+                    showUpdateStatus(data.msg, data.success?'success':'error', seeMoreMessage);
                 }                    
                 return false;
             },
@@ -1262,7 +1266,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     if(tagFilter) {
         params['tagFilter'] = tagFilter
     } else {
-        delete params['tagiFilter']
+        delete params['tagFilter']
     }
 
     var taxon = $("input#taxon").val();
@@ -1382,7 +1386,9 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var History = window.History;
     delete params["isGalleryUpdate"]
     if(updateHistory != false){
-        History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
+        var p = $.extend({}, params);
+        delete p['max'];
+        History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(p))); 
     }
     if(isGalleryUpdate) {
         $.ajax({

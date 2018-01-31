@@ -161,8 +161,9 @@ class FactService extends AbstractObjectService {
         m.each { key, value ->
             try {
                 if(!value) {
-                    //writeLog("Value is null\n", Level.ERROR);
-                    return;
+                    writeLog("Value is null for trait ${key}\n", Level.ERROR);
+                    log.debug "Value is null for trait ${key}."
+                    //return;
                 }
                 key = key.trim();
 
@@ -231,7 +232,7 @@ class FactService extends AbstractObjectService {
                                     }
                                     facts.clear();
                                 }
-                                value.split(',').each { v ->
+                                value?.split(',').each { v ->
                                     writeLog("Loading trait ${trait} with value ${v.trim()}");
                                     def x = getTraitValue(trait, v.trim());
                                     if(x) traitValues << x;
@@ -248,6 +249,7 @@ class FactService extends AbstractObjectService {
                                 return;
                             }
 
+                            if(traitValues) {
                             if(!facts) {
                                 //writeLog("Creating new fact");
                                 Fact fact = new Fact();
@@ -333,6 +335,7 @@ class FactService extends AbstractObjectService {
 
                                     writeLog("Successfully added fact\n", Level.INFO);
                                 }
+                            }
                             }
                         }
                     }
