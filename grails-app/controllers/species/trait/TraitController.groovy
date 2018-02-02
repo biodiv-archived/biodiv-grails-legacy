@@ -19,11 +19,14 @@ import species.TaxonomyDefinition;
 import species.utils.ImageType;
 import groovy.sql.Sql
 import species.trait.Trait.DataTypes;
+import org.apache.commons.io.FilenameUtils;
+
 
 class TraitController extends AbstractObjectController {
 
     def traitService;
     def speciesService;
+    def observationService;
     def messageSource;
     def dataSource;
 
@@ -99,7 +102,7 @@ class TraitController extends AbstractObjectController {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
         }  else {
-            render(view: "create", model: [traitInstance: traitInstance , field: field.concept+'|'+field.category])
+            render(view: "create", model: [traitInstance: traitInstance , traitValues:TraitValue.findAllByTrait(traitInstance), field: field.concept+'|'+field.category])
         }
         return;
     }
@@ -109,46 +112,77 @@ class TraitController extends AbstractObjectController {
         def msg = "";
         Trait traitInstance;
         Language languageInstance = utilsService.getCurrentLanguage();
-        if(params.id){
-            traitInstance=Trait.findById(params.id)
+        if(params.id) {
+            traitInstance = Trait.findById(params.id)
         }
-        else{traitInstance=new Trait();
-            traitInstance.traitTypes=Trait.fetchTraitTypes(params.traittype);
-            traitInstance.dataTypes=Trait.fetchDataTypes(params.datatype);
+        else {
+            traitInstance = new Trait();
+            traitInstance.traitTypes = Trait.fetchTraitTypes(params.traittype);
+            traitInstance.dataTypes = Trait.fetchDataTypes(params.datatype);
         }
         params.isNotObservationTrait = (params.isNotObservationTrait)?true:false;
         params.isParticipatory = (params.isParticipatory)?true:false;
         params.showInObservation = (params.showInObservation)?true:false;
         
         traitInstance.properties = params;
-        def speciesField=params.fieldid.replaceAll(">", "|").trim()
-        def fieldInstance=traitService.getField(speciesField,languageInstance)
-        traitInstance.field=fieldInstance
-        traitInstance.taxon.clear()
-        if(params.taxonName){
-        def taxonId
-        params.taxonName.each{
-            taxonId=it
-            taxonId = taxonId.substring(taxonId.indexOf("(") + 1);
-            taxonId = taxonId.substring(0, taxonId.indexOf("-"));
-            TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
-            traitInstance.addToTaxon(taxon);
-        }
-    }
 
+        if(params.fieldid) {
+            log.debug "Fetching field ${params.fieldid}";
+            def speciesField = params.fieldid.replaceAll(">", "|").trim();
+            println speciesField
+            if(speciesField) {
+                def fieldInstance = traitService.getField(speciesField, languageInstance);
+                println fieldInstance
+                traitInstance.field = fieldInstance
+            }
+        }
+
+        traitInstance.taxon?.clear()
+        if(params.taxonName){
+            if(params.taxonName instanceof String) {
+                def taxonId = params.taxonName;
+                taxonId = taxonId.substring(taxonId.lastIndexOf("(") + 1);
+                taxonId = taxonId.substring(0, taxonId.indexOf("-"));
+                TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
+                traitInstance.addToTaxon(taxon);
+
+            } else {
+                params.taxonName.each { taxonId ->
+                    taxonId = taxonId.substring(taxonId.lastIndexOf("(") + 1);
+                    taxonId = taxonId.substring(0, taxonId.indexOf("-"));
+                    TaxonomyDefinition taxon = TaxonomyDefinition.findById(taxonId);
+                    traitInstance.addToTaxon(taxon);
+                }
+            }
+        }
+
+        List<TraitValue> traitValues = traitService.createTraitValues(traitInstance, params)
+println traitValues;
+println "===================+"
         if (!traitInstance.hasErrors() && traitInstance.save(flush: true)) {
             msg = "${message(code: 'default.updated.message', args: [message(code: 'trait.label', default: 'Trait'), traitInstance.id])}"
-            def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
-            if(params.action=='update'){
-                traitService.createTraitValue(traitInstance,params)
-            }
-            withFormat {
-                html {
-                    flash.message = msg;
-                    redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
+            Map r = traitService.saveTraitValues(traitValues);
+            if(r.success) {
+                def model = utilsService.getSuccessModel(msg, traitInstance, OK.value());
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        redirect(url: uGroup.createLink(controller:"trait" , action: "show", id: traitInstance.id, 'userGroupWebaddress':params.webaddress))
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
                 }
-                json { render model as JSON }
-                xml { render model as XML }
+            } else {
+                def model = utilsService.getErrorModel(msg, traitInstance, OK.value(), r.errors);
+                withFormat {
+                    html {
+                        flash.message = msg;
+                        render(view: "create", model:[traitInstance:traitInstance, traitValues:traitValues]);
+                    }
+                    json { render model as JSON }
+                    xml { render model as XML }
+                }
+
             }
             return
         }
@@ -158,11 +192,12 @@ class TraitController extends AbstractObjectController {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
             }
+            log.error errors;
 
             def model = utilsService.getErrorModel("Failed to update trait", traitInstance, OK.value(), errors);
             withFormat {
                 html {
-                    render(view: "create", model: [traitInstance: traitInstance])
+                    render(view: "create", model: [traitInstance: traitInstance, traitValues: traitValues])
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -277,18 +312,47 @@ class TraitController extends AbstractObjectController {
         return
     }
 
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
     def upload() {
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir + File.separator + params.controller);          
+
+        if(!params.tFile?.path && ! params.tvFile?.path) {
+            flash.message = "Traits definition or values file is required";
+            render (view:'upload', model:[tFile:['path':params.tFile?.path,'size':params.tFile?.size], tvFile:['path':params.tvFile?.path, 'size':params.tvFile?.size], iconsFile:['path':params.iconsFile?.path, 'size':params.iconsFile?.size]]);
+            return;
+        }
+
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir);
         if(!contentRootDir.exists()) {
             contentRootDir.mkdir();
         }
 
-        params.file = contentRootDir.getAbsolutePath() + File.separator + params.file;
-        params.tvFile = contentRootDir.getAbsolutePath() + File.separator + params.tvFile;
+        params.tFile = params.tFile.path ? contentRootDir.getAbsolutePath() + File.separator + params.tFile.path : null;
+        params.tvFile = params.tvFile ? contentRootDir.getAbsolutePath() + File.separator + params.tvFile.path : null;
+        params.iconsFile = params.iconsFile.path ? contentRootDir.getAbsolutePath() + File.separator + params.iconsFile.path : null;
+        params.file = params.tFile?:params.tvFile;
 
-        def r = traitService.upload(params);
-        redirect(action: "list")
+        def tFileValidation = traitService.validateTraitDefinitions(params.tFile, new UploadLog());
+        def tvFileValidation = traitService.validateTraitValues(params.tvFile, new UploadLog());
+        
+        if(tFileValidation.success || tvFileValidation.success) {
+            log.debug "Validation of trait files done. Proceeding with upload"
+            File iconsFile = params.iconsFile ? new File(params.iconsFile) : null;
+            if(iconsFile && iconsFile.exists() && FilenameUtils.getExtension(iconsFile.getName()).equals('zip')) {
+                def ant = new AntBuilder().unzip(src: iconsFile,dest: iconsFile.getParent(), overwrite:true);            
+            }
+            def r = traitService.upload(params);
+            if(r.success) {
+                flash.message = r.msg;
+                redirect(action: "list")
+            } else {
+                flash.message = r.msg;
+                render (view:'upload', model:[tFile:['path':params.tFile], tvFile:['path':params.tvFile], iconsFile:['path':params.iconsFile], errors:r.errors]);
+            }
+        } else {
+            String msg = g.message(code: 'newsletter.create.fix.error', default:'Please fix the errors before proceeding');
+            flash.message = msg;
+            render (view:'upload', model:[tFile:['path':params.tFile, errors:tFileValidation.errors], tvFile:['path':params.tvFile, 'errors':tvFileValidation.errors], iconsFile:['path':params.iconsFile]]);
+        }
     }
 
     def matchingSpecies() {
@@ -299,10 +363,65 @@ class TraitController extends AbstractObjectController {
             result.hideId = true;
             result.instanceTotal = result.totalCount;//matchingSpeciesList.size();
             //result.totalCount = result.instanceTotal;
+            result.action = 'list';
+            result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
+
+            if(result.matchingList.size() > 0) {
+                result.putAll([status:'success', msg:'success']);
+            } else {
+                def message = "";
+                if(params.int('offset')  > 0) {
+                    message = g.message(code: 'recommendations.nomore.message', default:'No more distinct species. Please contribute');
+                } else {
+                    message = g.message(code: 'recommendations.zero.message', default:'No species. Please contribute');
+                }
+                result.putAll([msg:message]);
+            }
+            def model = utilsService.getSuccessModel(result.msg, null, OK.value(), result);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+
+        } catch(e) {
+            e.printStackTrace();
+            log.error e.getMessage();
+            String msg = g.message(code: 'error', default:'Error while processing the request.');
+            def model = utilsService.getErrorModel(msg, null, OK.value(), [e.getMessage()]);
+            withFormat {
+                json { render model as JSON }
+                xml { render model as XML }
+            }
+        }
+    }
+
+    def matchingObservations() {
+        Map result = [:];
+        try { 
+            params.max = params.max?Integer.parseInt(params.max.toString()):10;
+        } catch(NumberFormatException e) { 
+            params.max = 100;
+        }
+
+        try { 
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
+        } catch(NumberFormatException e) { 
+            params.offset = 0 
+        }
+
+        def max = Math.min(params.max ? params.int('max') : 10, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        
+        try {
+            result = observationService.getMatchingObservationsList(params);
+            result.resultType = 'observations';
+            result.hideId = true;
+            result.instanceTotal = result.totalCount;//matchingSpeciesList.size();
+            //result.totalCount = result.instanceTotal;
             params.action = 'list';
             result['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:result);
 
-            if(result.matchingSpeciesList.size() > 0) {
+            if(result.matchingList.size() > 0) {
                 result.putAll([status:'success', msg:'success']);
             } else {
                 def message = "";
@@ -546,6 +665,7 @@ class TraitController extends AbstractObjectController {
             }        
         }
     }
+
     def taxonTags = {
         def taxon  = TaxonomyDefinition.findAllByNameIlike("${params.term}%")
         def taxonList = [];

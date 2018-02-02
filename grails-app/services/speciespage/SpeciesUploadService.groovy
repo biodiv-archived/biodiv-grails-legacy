@@ -73,6 +73,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import species.participation.NamesReportGenerator
 import species.participation.NamelistService
 import species.participation.UploadLog
+import species.dataset.DataTable;
 
 class SpeciesUploadService {
 
@@ -94,6 +95,7 @@ class SpeciesUploadService {
 	def springSecurityService
 	def speciesPermissionService;
     //def namelistService;
+    def userGroupService;
 
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
 
@@ -141,7 +143,7 @@ class SpeciesUploadService {
 			return ['msg': 'File not found !!!' ]
 		}
 		
-		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType)
+		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType, params.dataTable);
 		
 		if(!validateUserSheetForName(sBulkUploadEntry)){
 			return  ['msg': 'Name validation failed. Please visit your profile page to view status.!!!', 'sBulkUploadEntry': sBulkUploadEntry ]
@@ -159,19 +161,21 @@ class SpeciesUploadService {
 		def speciesDataFile = sBulkUploadEntry.filePath
 		def imagesDir = sBulkUploadEntry.imagesDir
 		sBulkUploadEntry.updateStatus(UploadLog.Status.RUNNING)
+		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		
+		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
+
 		def res = uploadMappedSpreadsheet(speciesDataFile, speciesDataFile, 2,0,0,0, imagesDir?1:-1, imagesDir, sBulkUploadEntry)
 		
 		//writing log after upload
 		def mylog = (!res.success) ?  "ERROR WHILE UPLOADING SPECIES "  : ""
 		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " 
 		//mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
-		mylog += "  \n\n    Developer log \n\n" + res.log
-		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
-		errorFile.write(mylog)
-		
-		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
-		
+		//mylog += "  \n\n    Developer log \n\n" + res.log
+        errorFile.withWriterAppend("UTF-8") { 
+            it.write(mylog);
+        }
+			
 		if(!sBulkUploadEntry.save(flush:true)){
 			sBulkUploadEntry.errors.allErrors.each { log.error it }
 		}
@@ -375,8 +379,19 @@ class SpeciesUploadService {
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
-				sBulkUploadEntry?.writeLog(res.idSummary)
-				
+				sBulkUploadEntry?.writeLog(res.idSummary);
+                if(sBulkUploadEntry && sBulkUploadEntry.errorFilePath) {
+                    def ln = System.getProperty('line.separator');
+				    new File(sBulkUploadEntry?.errorFilePath).withWriterAppend("UTF-8") { 
+                        it.write(ln+converter.getLogs()?:'');
+                    }
+                    log.info "================================ LOG ============================="
+                    println  converter.getLogs()
+                    log.info "=================================================================="
+
+                    converter.clearLogs();
+                }
+            				
 			}
 			
 			processNameCount += contentSubList.size()
@@ -390,9 +405,6 @@ class SpeciesUploadService {
 			sBulkUploadEntry.updateStatus(isAborted ? UploadLog.Status.ABORTED : UploadLog.Status.UPLOADED)
 		//}
 		
-		log.info "================================ LOG ============================="
-		println  converter.getLogs()
-		log.info "=================================================================="
 		
 		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
 		log.info "Total number of species that got added : ${noOfInsertions}"
@@ -427,7 +439,12 @@ class SpeciesUploadService {
 	private Map saveSpeciesElements(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
 		XMLConverter converter = new XMLConverter();
         converter.setLogAppender(fa);
-		
+
+        Map paramsToPropagate = [:];
+        if(sBulkUploadEntry) {
+           paramsToPropagate = sBulkUploadEntry.fetchMapFromText();
+        }
+
 		List species = []
 		//StringBuilder sb = new StringBuilder()
 		int noOfInsertions = 0;
@@ -438,7 +455,7 @@ class SpeciesUploadService {
 					currSpeciesName = currSpeciesName ?: "Name Not found in Species XML Skipping"
 					//Species.withNewTransaction { status ->
 						def s = converter.convertName(speciesElement)
-						if(s){
+						if(s) {
 							species.add(s)
 							noOfInsertions++;
 						}
@@ -451,8 +468,10 @@ class SpeciesUploadService {
                         utilsService.benchmark ("convertSpecies", {
                             s = converter.convertSpecies(speciesElement);
                         });
-						if(s)
-							species.add(s);
+						if(s) {
+							inheritParams(s, paramsToPropagate);
+                            species.add(s);
+                        }
 					//}
 				}
                 utilsService.benchmark("saveSpecies", {
@@ -605,6 +624,15 @@ class SpeciesUploadService {
 				externalLinksService.updateExternalLinks(s.taxonConcept)
                 });
 
+                if(s.dataTable) {
+                    log.debug "Posting species to all user groups that data table is part of"
+                    HashSet uGs = new HashSet();
+                    uGs.addAll(s.dataTable.userGroups);
+                    if(s.dataTable.dataset) {
+                        uGs.addAll(s.dataTable.dataset.userGroups);
+                    }
+			        userGroupService.addResourceOnGroups(s, uGs.collect{it.id}, false);
+                }
 				log.info "post processed spcecies ${s}"
 			}
 			catch(e) {
@@ -786,8 +814,8 @@ class SpeciesUploadService {
 
 
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
-	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null){
-		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType)
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null, DataTable dataTable=null){
+		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType, ['dataTable':dataTable?.id]);
 		
 	}
 	
@@ -1086,4 +1114,11 @@ class SpeciesUploadService {
 		}
 		return true	
 	}		
+    
+    private void inheritParams(species, Map paramsToPropagate) {
+        if(paramsToPropagate['dataTable']) {
+            println "Setting datatable entry"
+            species.dataTable = DataTable.read(Long.parseLong(paramsToPropagate['dataTable']+''));
+        }
+    }
 }

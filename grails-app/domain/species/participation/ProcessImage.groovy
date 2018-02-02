@@ -12,11 +12,13 @@ class ProcessImage {
 	private static log = LogFactory.getLog(this);
     
     Date createdOn;
+    Date finishedOn;
 	String filePath;
     String directory;
     String status;
 
     static constraints = {
+        finishedOn nullable:true
     }
 	
     static createLog(String filePath, String directory) {

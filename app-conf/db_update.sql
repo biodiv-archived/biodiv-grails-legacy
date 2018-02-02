@@ -785,3 +785,134 @@ alter table external_links add column frlht_url varchar;
 #2nd June 2017
 alter table user_group add column filter_rule text;
 
+#24 Oct 2017
+alter table newsletter add column show_in_footer boolean;
+update newsletter set show_in_footer = 'f';
+alter table newsletter alter column show_in_footer set not null;
+update newsletter set show_in_footer = 't' where user_group_id is null and parent_id !=0 ;
+update newsletter set show_in_footer = true where id in (select parent_id from newsletter  where show_in_footer=true);
+
+
+#11 Dec 2017
+alter table data_package alter column supporting_modules type text;
+alter table data_package alter column allowed_data_table_types type text;
+create index on observation(id,data_table_id) where data_table_id is not null;
+alter table data_table alter column dataset_id drop not null;
+alter table dataset1 add column taxonomic_coverage_group_ids varchar;
+alter table dataset1 add column geographical_coverage_location_accuracy varchar;
+alter table data_table add column taxonomic_coverage_group_ids varchar;
+alter table data_table add column geographical_coverage_location_accuracy varchar;
+ alter table data_table alter column party_attributions type text;
+ alter table dataset1 alter column party_attributions type text;
+create table user_group_data_tables(user_group_id bigint references user_group(id), data_table_id bigint REFERENCES data_table(id), primary key (user_group_id, data_table_id));
+alter table data_table alter column access_license_id set not null;
+alter table data_table alter column party_contributor_id set not null;
+alter table data_table alter column temporal_coverage_from_date set not null;
+alter table data_table alter column taxonomic_coverage_group_ids set not null;
+alter table data_table alter column columns type text;
+alter table dataset1 alter column custom_fields type text;
+alter table dataset1 alter column description type text;
+alter table data_table alter column description type text;
+alter table data_table alter column custom_fields type text;
+alter table data_table alter column geographical_coverage_place_name type text;
+alter table dataset1 alter column geographical_coverage_place_name type text;
+alter table dataset1 alter column methods type text;
+alter table data_table alter column methods type text;
+alter table data_table alter column project type text;
+alter table dataset1 alter column project type text;
+alter table dataset1 alter column title type text;
+alter table data_table alter column title type text;
+
+####15 Dec 2017 CHECKLIST 2 Datatable migration related
+# run this target to move all checklists to datatable /checklist/migrateChecklistToDataTable
+# and then make following db changes
+## stop system before running these stmts
+
+alter table user_group_data_tables drop constraint user_group_data_tables_data_table_id_fkey;
+alter table observation drop constraint fk74ad82c50fa501d;
+update user_group_data_tables set data_table_id = g.checklist_id from (select id, checklist_id from data_table where checklist_id is not null) g where g.id = data_table_id;
+ update observation set data_table_id = g.checklist_id from (select id, checklist_id from data_table where checklist_id is not null) g where g.id = data_table_id;
+update data_table set id=checklist_id where dataset_id is null and checklist_id is not null;
+alter table user_group_data_tables add FOREIGN KEY (data_table_id) REFERENCES data_table(id);
+ alter table observation add FOREIGN KEY (data_table_id) REFERENCES data_table(id);
+update activity_feed set root_holder_type='species.dataset.DataTable' where root_holder_type='species.participation.Checklists';
+update follow set object_type='species.dataset.DataTable' where object_type='species.participation.Checklists';
+
+select max(id) from data_table;
+select setval('datatable_id_seq',,false);
+
+###########################
+## change nginx rules add datatable sataset and dataPapackage
+###########################
+
+#19Dec2017
+alter table observation add column date_accuracy varchar(100);
+alter table data_table add column temporal_coverage_date_accuracy varchar(100);
+alter table dataset1 add column temporal_coverage_date_accuracy varchar(100);
+
+#21Dec2017
+alter table species add column data_table_id bigint references data_table(id);
+alter table fact add column data_table_id bigint references data_table(id);
+alter table document add column data_table_id bigint references data_table(id);
+alter table data_table add column upload_log_id bigint references upload_log(id);
+alter table document add column date_accuracy varchar(100);
+update data_package set allowed_data_table_types='[0,1,2,3,4]' where allowed_data_table_types='[0,1,2,3,4,5]';
+
+alter table trait add column data_table_id bigint references data_table(id);
+alter table trait_value add column data_table_id bigint references data_table(id);
+alter table data_table add column trait_value_file_id bigint;
+
+
+#27 Dec 2017
+alter table observation add column traits bigint[][];
+alter table observation alter column traits  type bigint[][] using traits::bigint[][];
+ALTER TABLE observation DISABLE TRIGGER ALL ;
+update observation set traits = g.item from (
+             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation') x group by x.object_id
+) g where g.object_id=id;
+
+
+CREATE INDEX observation_traits ON observation using gin(traits);
+
+alter table observation add column traits_json json;
+update observation set traits_json = g.item from (
+     select x1.object_id, format('{%s}', string_agg(x1.item,','))::json as item from (
+        (select x.object_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.object_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' ) x group by x.object_id)
+        union
+        (select x.object_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.object_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation') x group by x.object_id)
+        union
+        (select x.object_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.object_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation') x group by x.object_id)
+    ) x1 group by x1.object_id
+) g where g.object_id=id;
+
+ALTER TABLE observation ENABLE TRIGGER ALL ;
+
+
+alter table external_links add column fishbase_url varchar;
+insert into field(id,concept,category, description,display_order,url_identifier,connection,language_id) values(185, 'Nomenclature and Classification','Type Information', 'Information about type specimens associated with a given taxon; e.g., label data, the type- ie. holotype or other, the collection where they are stored, type locality, type host, information about the specimens history, etc.',102,'https://terms.tdwg.org/wiki/dwc:typeStatus',102,205);
+
+
+
+#4thJan2018
+alter table dataset1 add column summary varchar(5000);
+update dataset1 set summary=description;
+alter table dataset1 alter column description drop not null;
+update dataset1 set description=null;
+alter table dataset1 alter column summary  set not null;
+
+
+alter table data_table add column summary varchar(5000);
+update data_table set summary=description;
+alter table data_table alter column description drop not null;
+update data_table set description=null;
+alter table data_table alter column summary  set not null;
+
+alter table data_package add column has_role_user_allowed boolean;
+alter table data_package add column uploader_ids varchar(255);
+alter table data_package drop column uploader_id;
+update data_package set has_role_user_allowed=false;
+
+
+alter table data_table add column images_file_id bigint;
+alter table data_table add constraint fk_images_file_id foreign key(images_file_id) references ufile(id);
+

@@ -178,7 +178,7 @@
                     { name: 'insert', items: ['Table'] }
                     ],
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/${grailsApplication.metadata['app.name']}ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/biodivofm/filemanager&viewMode=grid&space=img/${speciesInstance.taxonConcept.canonicalForm}",
-                    //filebrowserImageUploadUrl: "/biodiv/ck/standard/uploader?Type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
+                    //filebrowserImageUploadUrl: "/biodiv/ck/uploader?type=Image&userSpace=${speciesInstance.taxonConcept.canonicalForm}",
 
                     height: '300px',
                     ignoreEmptyParagraph: true,
@@ -223,32 +223,23 @@
                 <g:render template="/species/showSpeciesIntro" model="['speciesInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor, fieldFromName:fieldFromName, userLanguage:userLanguage]"/>
                 
                 <div class="span12" style="margin-left:0px">
-                    <g:if  test="${traitInstanceList}">
-                    <div class="trait_panel">
                     <div class="sidebar_section" style="margin:10px 0px;">
-                    <g:if test="${isSpeciesContributor}">
+                    <g:if test="${isSpeciesContributor && editable}">
                     <button class="btn btn-primary pull-right edit_trait"> ${g.message(code:'default.button.edit.label')}</button>
                     </g:if>
+
+                    <g:if  test="${traitInstanceList}">
+                    <div class="trait_panel sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
                     <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>${g.message(code:'traits.label')}</h5></a>
-                    <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
-                    <div id="traits" class="trait">
                    <g:render template="/trait/showTraitListTemplate" model="['instanceList':traitInstanceList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true]"/>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-                    <div class="trait_edit_panel">
-                    <div class="sidebar_section" style="margin:10px 0px;">
-                    <button class="btn btn-primary pull-right edit_save">Save</button>
+                   </div>
+                    </g:if>
+                    <div class="trait_edit_panel sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;display:none;">
                     <a class="speciesFieldHeader" data-toggle="collapse" href="#traits"><h5>${g.message(code:'traits.label')}</h5></a>
-                    <div class="sidebar_section pre-scrollable" style="max-height:419px;overflow-x:hidden;">
-                    <div id="traits" class="trait">
                     <g:render template="/trait/showTraitListTemplate" model="['instanceList':allTraitList, 'factInstance':factInstanceList, 'speciesInstance': speciesInstance, 'instance':speciesInstance, 'fromSpeciesShow':true,'editable':true]"/>
                     </div>
                     </div>
-                    </div>
-                    </div>
-                    </g:if>
+                    
                     <g:render template="/species/speciesImageUpload" model="['speciesInstance': speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>                    
                     
                     <g:render template="/species/addSpeciesFieldMedia" model="['observationInstance':speciesInstance, 'isSpeciesContributor':isSpeciesContributor]"/>
@@ -259,7 +250,7 @@
                         <g:each in="${fields}" var="concept">
                         <s:hasContent model="['map':concept.value]">
                         <g:if
-                        test="${concept.key.equalsIgnoreCase(fieldFromName.tri) || concept.key.equalsIgnoreCase(fieldFromName.gui) || concept.key.equalsIgnoreCase(fieldFromName.nc) || concept.key.equalsIgnoreCase(fieldFromName.md)}">
+                        test="${concept.key.equalsIgnoreCase(fieldFromName.tri) || concept.key.equalsIgnoreCase(fieldFromName.gui) || concept.key.equalsIgnoreCase(fieldFromName.md)}">
                         </g:if>
                         <g:else>
 
@@ -366,7 +357,6 @@
             <asset:script>
             $(document).ready(function() {
                 var uploadResource; 
-                $('.trait_edit_panel').hide();
                 window.params.carousel = {maxHeight:150, maxWidth:210}
                 window.params.species.name = "${speciesName}"
                 $('input#taxon').val("${speciesInstance.taxonConcept.id}");
@@ -376,7 +366,7 @@
                 updateGallery('/species/list', 8, 0, undefined, true,undefined,undefined,undefined,undefined,false);
                 var getResourceUrl = "${uGroup.createLink(controller:'species', action:'getObjResources', userGroupWebaddress:params.webaddress)}";
                 galleryAjax(getResourceUrl+'/'+${speciesInstance.id},'species');
-
+        });
         $(document).on('click', '.trait button, .trait .none, .trait .any', function(){
             if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
                 $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
@@ -395,16 +385,7 @@
             }
             return false;
         });
-        $('.edit_trait').click(function(){
-            $('.trait_edit_panel').show();
-            $('.trait_panel').hide();
-        });
-        $('.edit_save').click(function(){
-            $('.trait_edit_panel').hide();
-            $('.trait_panel').show();
-            });
-        });
-            </asset:script>
+           </asset:script>
         </body>
 
     </html>

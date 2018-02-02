@@ -4,7 +4,8 @@ import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSu
 import grails.plugin.springsecurity.userdetails.DefaultPostAuthenticationChecks;
 import grails.plugin.springsecurity.userdetails.DefaultPreAuthenticationChecks;
 import grails.plugin.springsecurity.SpringSecurityUtils;
-import grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService;
+//import grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService;
+import species.auth.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.facebook.api.Facebook;
@@ -397,6 +398,7 @@ beans = {
     customObjectMarshallers( CustomObjectMarshallers ) {
         grailsApplication = ref('grailsApplication') 
         userGroupService = ref('userGroupService') 
+        observationService = ref('observationService') 
 
         marshallers = [
             new ObservationMarshaller(),

@@ -7,7 +7,7 @@
 </g:if>
 <g:else>
 	<a id="uBioIframeLink"
-		href="http://www.ubio.org/browser/search.php?search_all=${speciesInstance.name.genus + ' '+speciesInstance.name.species}">
+		href="http://www.ubio.org/browser/search.php?search_all=${speciesInstance.taxonConcept.canonicalForm}">
 		${speciesFieldInstance.field.category}
 	</a>
 	<iframe class="iframe" id="uBioIframe" frameborder="0"><g:message code="msg.iframe.capable.browser.required" /></iframe>

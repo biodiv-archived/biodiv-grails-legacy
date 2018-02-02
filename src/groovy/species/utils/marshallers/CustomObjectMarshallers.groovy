@@ -48,10 +48,11 @@ import species.trait.TraitValue;
 import species.trait.Fact;
 
 class CustomObjectMarshallers {
-    
+
     def grailsApplication;
     def userGroupService;
-	
+    def observationService;
+
     List marshallers = []
 
     def register() {
@@ -83,7 +84,7 @@ class CustomObjectMarshallers {
         }
 
         JSON.registerObjectMarshaller(Featured) {
-            if(it.userGroup) 
+            if(it.userGroup)
                 return ['createdOn':it.createdOn, 'notes': it.notes, 'userGroupId':it.userGroup.id, 'userGroupName':it.userGroup.name, 'userGroupUrl':userGroupService.userGroupBasedLink(['mapping':'userGroup', 'controller':'userGroup', 'action':'show', 'userGroup':it.userGroup])]
             else
                 return ['createdOn':it.createdOn, 'notes': it.notes]
@@ -92,7 +93,7 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(Synonyms) {
             def syn =  ['id':it.id, 'name':it.name,  'canonicalForm': it.canonicalForm, 'italicisedForm':it.italicisedForm, 'taxonConcept':['id':it.taxonConcept.id], 'isContributor':it.isContributor()]
             if(it.relationship) {
-                syn['relationship'] = ['name':it.relationship.value()] 
+                syn['relationship'] = ['name':it.relationship.value()]
             }
             return syn;
         }
@@ -104,7 +105,7 @@ class CustomObjectMarshallers {
             }
             return commonname;
         }
-        
+
         JSON.registerObjectMarshaller(TaxonomyDefinition) {
             List<TaxonomyDefinition> defaultHierarchy = it.fetchDefaultHierarchy();
             String parentName = defaultHierarchy ? (defaultHierarchy.size()==1?null:defaultHierarchy[-2].canonicalForm) : null
@@ -120,11 +121,11 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(TaxonomyRegistry) {
             return ['id':it.id, 'classification': ['id':it.classification.id, name : it.classification.name + it.contributors], 'parentTaxon':it.parentTaxon, 'taxonConcept':it.taxonDefinition]
         }
-        
+
         JSON.registerObjectMarshaller(SUser) {
             return ['id':it.id, 'name':it.name, 'icon':it.profilePicture()]
         }
- 
+
         JSON.registerObjectMarshaller(Recommendation) {
             def r = ['id':it.id, 'name':it.name];
             if(it.taxonConcept) {
@@ -138,6 +139,8 @@ class CustomObjectMarshallers {
             if(it.languageId) {
                 r['language'] = Language.read(it.languageId);
             }
+            r['hasObvLockPerm'] = observationService.hasObvLockPerm(null, it.id);
+
             return r;
         }
 
@@ -165,7 +168,7 @@ class CustomObjectMarshallers {
             if(imagePath) result['icon'] = imagePath;
             return result;
         }
-	
+
 		JSON.registerObjectMarshaller(Comment) {
 			return ['id':it.id, 'text':it.body, 'author':it.author, 'lastUpdated' : it.lastUpdated, 'commentHolderType':it.commentHolderType];
 		}
@@ -183,7 +186,7 @@ class CustomObjectMarshallers {
             result['language'] = it.language
             return result;
         }
-        
+
         JSON.registerObjectMarshaller(Reference) {
             Map result = [:];
             if(it.title) result['title'] = it.title;
@@ -194,22 +197,22 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(Language) {
             return ['id':it.id, 'name':it.name, 'threeLetterCode':it.threeLetterCode, 'twoLetterCode':it.twoLetterCode]
         }
- 
+
         JSON.registerObjectMarshaller(UFile) {
             return ['path': grailsApplication.config.speciesPortal.content.serverURL + it.path, 'size':it.size, 'mimetype':it.mimetype]
         }
-        
+
         JSON.registerObjectMarshaller(ActivityFeed) {
             def map = [:];
             if(it.activityRootType) map['activityRootType'] = it.activityRootType;
             if(it.rootHolderId) { map['rootHolderId'] = it.rootHolderId; map['rootHolderType'] = it.rootHolderType; }
             map['activityType'] = it.activityType;
             if(it.activityDescrption) map['activityDescription'] = it.activityDescrption;
-        
+
             if(it.activityHolderId) { map['activityHolderId'] = it.activityHolderId; map['activityHolderType'] = it.activityHolderType; }
             if(it.subRootHolderId) { map['subRootHolderId'] = it.subRootHolderId; map['subRootHolderType'] = it.subRootHolderType; }
             map['author'] = it.author;
-            
+
             map['dateCreated'] = it.dateCreated;
             map['lastUpdated'] = it.lastUpdated;
             return map;
@@ -232,19 +235,19 @@ class CustomObjectMarshallers {
         JSON.registerObjectMarshaller(NamePosition) {
             return it.value();
         }
-        
+
         JSON.registerObjectMarshaller(Contributor) {
             return ['name':it.name];
         }
 
         JSON.registerObjectMarshaller(Trait) {
-            return ['id':it.id, 'name':it.name, 'description':it.description, 'createdOn':it.createdOn, 'source':it.source, 'icon':it.icon, 'ontologyUrl':it.ontologyUrl, 'field':it.field, 'taxon':it.taxon, 'traitTypes':it.traitTypes, 'dataTypes':it.dataTypes, 'units':it.units, values:it.values()];
+            return ['id':it.id, 'name':it.name,'isParticipatory':it.isParticipatory,'description':it.description, 'createdOn':it.createdOn, 'source':it.source, 'icon':it.icon, 'ontologyUrl':it.ontologyUrl, 'field':it.field, 'taxon':it.taxon, 'traitTypes':it.traitTypes, 'dataTypes':it.dataTypes, 'units':it.units, values:it.values()];
         }
 
         JSON.registerObjectMarshaller(TraitValue) {
             return ['id':it.id, 'value':it.value, 'description':it.description, 'icon':it.icon, 'source':it.source];
         }
-        
+
         JSON.registerObjectMarshaller(Fact) {
             return ['id':it.id, 'objectId':it.objectId, 'objectType':it.objectType, 'trait':it.trait, 'traitValue':it.traitValue, 'value':it.value, 'attribution':it.attribution, 'contributor':it.contributor, 'license':it.license, 'pageTaxon':it.pageTaxon];
         }

@@ -17,9 +17,7 @@
                 border-top: 1px solid #9E9E9E;
                 box-shadow: 0 2px 11px -3px inset;
                 padding: 10px;
-                min-height: 212px;
-                height:250px;
-                width:870px;
+                min-height: 260px;
             }
             td {
                 text-align:center;
@@ -139,41 +137,49 @@
             .controls.textbox {
                 height:40px !important;
             }
-            .imagesListWrapper {
+            .uploaded_files_list_container {
                 overflow-x:scroll;
                 overflow-y:hidden;
-                height: 284px;
+                clear:both;
+                margin-left:0px;
+                width:100%;
+                line-height:20px !important;
+                /*height: 284px;
                 width:884px;
                 margin-left:2px;
+            */
             }
             .imageHolder {
                 border: 1px solid grey ;
                 background-color: lightgrey ;
                 margin-bottom:90px !important;
                 position: relative; 
-                left: 50px; 
+                left: 25px; 
                 top: 0; 
-                width: 150px; 
+                width: 200px; 
                 height: 250px; 
                 padding: 0.5em; 
                 margin: 10px;
-                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)})
+                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)});
+                background-position: 38px;
+
+
             }
             .imageDr{
                 position: absolute;
                 top: 46%;
-                width: 127px;
+                width: 200px;
                 margin-left: 15px;
                 font-size: 19px;
                 color: grey;
                 line-height: 23px;
             }
-            .imagesListWrapper .imagesList {
+            .uploaded_files_list {
                 width:100000px;
                 white-space:nowrap !important;
             }
             .imagesListWrapper .imagesList .addedResource {
-                display : inline !important;   
+                //display : inline !important;   
                 z-index:15;             
             }
             .resources .addedResource input[type="text"]{
@@ -222,6 +228,7 @@
             .sortMediaOnExif {
                 margin-right:2px;
                 margin-top:2px;
+                clear:both;
             }            
             .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div{
                 width: 220px;
@@ -369,9 +376,11 @@
 
 
     $(document).ready(function(){
-        var uploadResource = new $.fn.components.UploadResource($('.bulk_observation_create'));
-        uploadResource.POLICY = "${policy}";
-        uploadResource.SIGNATURE = "${signature}";
+        var uploadResource = new $.fn.components.UploadResource($('.bulk_observation_create'),{
+            POLICY : "${policy}",
+            SIGNATURE :"${signature}" 
+        });
+        $('.filePicker').data('uploadResource', uploadResource);
 
             <%
                 if(observationInstance?.group) {

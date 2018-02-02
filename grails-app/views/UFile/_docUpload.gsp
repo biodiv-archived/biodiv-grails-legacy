@@ -17,6 +17,7 @@
             $('#${name}_path').val(responseJSON.filePath);
             $('#${name}_name').val(fileName);
             $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
+            console.log('-------------------------------------');
             $('#isSimpleSheet').val(responseJSON.isSimpleSheet);
             $('#headerMetadata').val(responseJSON.headerMetadata);
         }
@@ -39,7 +40,7 @@ fileURL = g.createLinkTo(base:grailsApplication.config.speciesPortal.content.ser
  %>
 	<i class="icon-file"></i> <a id="${name}_file" href="${fileURL}">${fileName}</a>
 
-    <input type="hidden" name="uFile.path"  id="${name}_path" value="${path}">
-    <input type="hidden" name="uFile.size"  id="${name}_size" value="${size}">
+    <input type="hidden" name="${inputName?inputName+'.path':'uFile.path'}"  id="${name}_path" value="${path}">
+    <input type="hidden" name="${inputName?inputName+'.size':'uFile.size'}"  id="${name}_size" value="${size}">
 	
 </div>

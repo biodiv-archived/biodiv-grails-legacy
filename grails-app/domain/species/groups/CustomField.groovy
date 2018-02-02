@@ -4,6 +4,7 @@ import javassist.bytecode.stackmap.BasicBlock.Catch;
 import grails.converters.JSON
 import species.auth.SUser
 import species.participation.Observation
+import species.dataset.DataPackage
 
 class CustomField {
 	public static final String PREFIX = 'CustomField_'

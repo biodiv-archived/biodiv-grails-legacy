@@ -2478,17 +2478,14 @@ class XMLConverter extends SourceConverter {
     static Species findDuplicateSpecies(s) {
         def species = Species.withCriteria() {
                 eq("guid", s.guid);
-                fetchMode 'userGroups', FetchMode.JOIN
-                fetchMode 'resources', FetchMode.JOIN
-                fetchMode 'fields', FetchMode.JOIN
-                fetchMode 'globalDistributionEntities', FetchMode.JOIN
-                fetchMode 'globalEndemicityEntities', FetchMode.JOIN
-                fetchMode 'indianDistributionEntities', FetchMode.JOIN
-                fetchMode 'indianEndemicityEntities', FetchMode.JOIN
         //      if(!species.isAttached()) {
         //          species.attach();
         //      }
         }
+        println "***********************************";
+        println s.guid;
+        println "***********************************";
+        println species;
         if(species)
             return species[0]
     }

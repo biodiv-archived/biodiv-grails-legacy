@@ -900,9 +900,9 @@ private List buildlistResult(rs,classSystem) {
             TaxonomyRegistry reg = TaxonomyRegistry.read(r.regid);
 
             def p = reg.parentTaxon
-            print p;
+            
             while(p) {
-                result.add(reg.taxonDefinition.id);
+                result.add(p.path);
                 p = p.parentTaxon;
             }
         }
@@ -922,10 +922,12 @@ private List buildlistResult(rs,classSystem) {
         def result = [:];
         if(ids) {
             ids.split(',').each { id ->
+                println id;
                 def rs = new ArrayList<GroovyRowResult>();
                 getHierarchyNodes(rs, 0, 1, id, classification.id, false, false, null);
 
                 result[id] =  buildHierarchyResult(rs, classification.id)
+                    println result[id]
             }
         }
 
@@ -1019,7 +1021,7 @@ private List buildlistResult(rs,classSystem) {
                     TaxonomyDefinition taxonConcept = TaxonomyDefinition.get(Long.parseLong(row.get('taxon id')));
                     if(taxonConcept) {
                         println taxonConcept.id+" - "+row.get('link');
-                        externalLinksService.updateExternalLink(taxonConcept, "frlht", row.get('link'), false, new Date());
+                        externalLinksService.updateExternalLink(taxonConcept, "fishbase", row.get('link'), false, new Date());
                     }
                     } catch(e) {
                         e.printStackTrace();

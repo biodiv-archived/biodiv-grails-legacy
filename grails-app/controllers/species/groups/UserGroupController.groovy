@@ -171,7 +171,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def create() {
 		def userGroupInstance = new UserGroup()
-		userGroupInstance.properties = params
+		//userGroupInstance.properties = params
 		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
 	}
 
@@ -281,7 +281,7 @@ class UserGroupController {
 			render(view: "create", model: [userGroupInstance: userGroupInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
-			redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action: "list")
+			redirect  url: uGroup.createLink(action: "list")
 		}
 	}
 
@@ -381,9 +381,7 @@ class UserGroupController {
 
 	def user() {
 		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
-        println "11111111111111111111111"
 		if (!userGroupInstance) return
-println "2222222222222222222"
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
@@ -1444,19 +1442,19 @@ println "2222222222222222222"
 	   UserGroup ug = UserGroup.read(params.groupId.toLong())
 	   boolean sendMail = (params.sendMail ? params.sendMail.toBoolean() : false)
 	   boolean postObs = (params.postObs ? params.postObs.toBoolean() : false)
-	   def res = createFromFile("/tmp/users.tsv")
+	   boolean areIds = (params.areIds ? params.areIds.toBoolean() : false)
+	   def res = createFromFile(params.file, areIds)
 	   def oldUsers = res[0]
 	   def newUsers = res[1]
-	   
-	   SUser.withTransaction(){
-		   log.debug "adding new uesr " + user
-		   newUsers.each{ user ->
+	   SUser.withTransaction() { 
+		   newUsers.each { user ->
+		        log.debug "adding new uesr " + user
 			   ug.addMember(user);
-			   if(sendMail){
+			   if(sendMail) { 
 				   sendNotificationMail(user, request, params, true, ug)
 			   }
 		   }
-		   oldUsers.each{ user ->
+		   oldUsers.each { user ->
 			   log.debug "======== adding old user " + user
 			   ug.addMember(user);
 			   if(sendMail){
@@ -1541,22 +1539,31 @@ println "2222222222222222222"
 	   new SimpleTemplateEngine().createTemplate(s).make(binding)
    }
    
-   private createFromFile(String fileName){
+   private createFromFile(String fileName, boolean areIds=false){
+       if(!fileName) return;
+
+       File f = new File(fileName)
+       if(!f.exists()) return;
 	   Set emailList = new HashSet()
 	   new File(fileName).splitEachLine("\\t") {
 		   def fields = it;
 		   def email = fields[0].trim()
 		   emailList.add(email)
 	   }
-	   return createUserByEmail(emailList)
+	   return createUserByEmail(emailList, areIds)
 	}
    
-   private createUserByEmail(emailList){
+   private createUserByEmail(emailList, boolean areIds=false){
 	   Set oldUsers = new HashSet()
 	   Set newUsers = new HashSet() 
 	   def defaultRoleNames = ['ROLE_USER']
-	   emailList.each { email ->
-		   def user = SUser.findByEmail(email)
+	   emailList.each { email -> 
+		   def user;
+           if(areIds) {
+               user = SUser.get(Long.parseLong(email));
+           } else {
+               user = SUser.findByEmail(email);
+           }
 		   if(user){
 			   oldUsers.add(user)
 		   }else{

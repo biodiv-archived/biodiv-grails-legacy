@@ -18,7 +18,9 @@ import species.participation.Featured;
 import species.utils.Utils;
 import species.Language;
 import species.dataset.Dataset;
+import species.dataset.DataTable;
 import species.trait.Fact;
+
 abstract class Metadata {
 	
 	public enum LocationScale {
@@ -63,6 +65,46 @@ abstract class Metadata {
 		}
 	}
 	
+	public enum DateAccuracy {
+		ACCURATE ("Accurate"),
+		APPROXIMATE ("Approximate"),
+		UNKNOWN ("Unknown")
+		
+		private String value;
+
+		DateAccuracy(String value) {
+			this.value = value;
+		}
+
+		String value() {
+			return this.value;
+		}
+
+        static List list() {
+            return [ACCURATE, APPROXIMATE, UNKNOWN];
+        }
+
+		static DateAccuracy getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof DateAccuracy)
+				return value
+			
+			value = value.toUpperCase().trim()
+            println value
+			switch(value){
+				case 'APPROXIMATE':
+					return DateAccuracy.APPROXIMATE
+				case 'ACCURATE':
+					return DateAccuracy.ACCURATE
+				case 'UNKNOWN':
+					return DateAccuracy.UNKNOWN
+				default:
+					return null	
+			}
+		}
+	}
+
 	//Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
@@ -83,7 +125,8 @@ abstract class Metadata {
     //Temporal Coverage
 	Date fromDate;
 	Date toDate;
-	
+	DateAccuracy dateAccuracy;
+
     Date createdOn = new Date();
 	Date lastRevised = createdOn;
 
@@ -101,6 +144,7 @@ abstract class Metadata {
     Date lastCrawled;
 
     Dataset dataset;
+    DataTable dataTable;
 
     def grailsApplication
 	def activityFeedService
@@ -132,6 +176,7 @@ abstract class Metadata {
 			}
 			return val < new Date() && val >= obj.fromDate
 		}
+		dateAccuracy(nullable: true)
 		license nullable:false
 		language nullable:false
 		externalId nullable:true
@@ -139,6 +184,7 @@ abstract class Metadata {
 		viaId nullable:true
 		viaCode nullable:true
 		dataset nullable:true
+		dataTable nullable:true
         lastInterpreted nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
@@ -243,22 +289,37 @@ abstract class Metadata {
                 queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
             } else if(fact.value) {
                 traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+                queryParams['trait'][fact.trait.id] += fact.value+(fact.toValue?":"+fact.toValue:'') +','
             } 
-            if(fact.fromDate && fact.toDate)
+            if(fact.fromDate && fact.toDate) {
                 traitFactMap[fact.trait.id] << fact.fromDate+";"+fact.toDate
+                queryParams['trait'][fact.trait.id] += fact.fromDate+";"+fact.toDate+',';
+            }
 
             traitFactMap['fact'] << fact.id
         }
-        queryParams.trait.each {k,v->
-            queryParams.trait[k] = v[0..-2];
+
+        if(queryParams.trait) {
+            queryParams.trait.each {k,v->
+                if(queryParams.trait[k]) {
+                    queryParams.trait[k] = v[0..-2];
+                }
+            }
         }
         return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
     }
 
-    Map getTraits(boolean isObservationTrait=false, boolean isParticipatory = true, boolean showInObservation=false) {
-        def traitList = traitService.getFilteredList(['sGroup':this.group.id, 'isObservationTrait':isObservationTrait,'isParticipatory':isParticipatory, 'showInObservation':showInObservation], -1, -1).instanceList;
+    Map getTraits(Boolean isObservationTrait=false, Boolean isParticipatory = true, Boolean showInObservation=false) {
+        Map queryParams = ['sGroup':this.group.id];
+        
+        if(isObservationTrait != null) queryParams['isObservationTrait'] = isObservationTrait;
+        if(isParticipatory != null) queryParams['isParticipatory'] = isParticipatory;
+        if(!showInObservation != null) queryParams['showInObservation'] = showInObservation;
+        
+        def traitList = traitService.getFilteredList(queryParams, -1, -1).instanceList;
         def r = getTraitFacts();
         r['traitList'] = traitList; 
+
         return r;
     }
 

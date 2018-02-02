@@ -5,6 +5,10 @@ import species.Field;
 import species.UtilsService;
 import species.auth.SUser;
 import species.License;
+import species.dataset.DataTable;
+import species.trait.Trait.DataTypes;
+
+import grails.converters.JSON
 
 class Fact {
 
@@ -20,10 +24,11 @@ class Fact {
     TaxonomyDefinition pageTaxon;
     Long objectId;
     String objectType
-    
+    DataTable dataTable
+
     boolean isDeleted = false;
 
-    static constraints = {
+     static constraints = {
       trait nullable:false, unique:['objectType', 'objectId','traitValue']
       //attribution nullable:true
       //contributor nullable:true
@@ -36,6 +41,7 @@ class Fact {
       objectId nullable:false
       objectType nullable:false
       pageTaxon nullable:true
+      dataTable nullable:true
     }
 
     static mapping = {
@@ -45,7 +51,13 @@ class Fact {
     }
 
     String getActivityDescription() {
-        return trait.name +':'+ traitValue.value;
+        if(this.traitValue) {
+            return trait.name +':'+ traitValue.value;
+        } else if (trait.dataTypes == DataTypes.DATE) {
+            return trait.name +':'+ fromDate + (toDate ? "-" + toDate:'')
+        }else {
+            return trait.name +':'+ value + (toValue ? "-" + toValue:'')
+        }
     }
 
     String getIcon() {
@@ -57,8 +69,19 @@ class Fact {
             return value + (toValue ? ":" + toValue:'')
         }
     }
+
+    def fetchChecklistAnnotation(){
+        def res = this as JSON;
+        res['id'] = objectId;
+        res['type'] = objectType;
+        def species = pageTaxon.findSpecies(); 
+        res['speciesid'] = species.id
+        res['title'] = getActivityDescription();
+        return res
+    }
+
     @Override
     String toString() {
-        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}-${toValue})>";
+        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}${toValue?'-'+toValue:''})>";
     }
 }

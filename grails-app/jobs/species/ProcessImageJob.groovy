@@ -25,10 +25,12 @@ class ProcessImageJob {
 				log.debug "starting task $pi"
                 println "===========PROCESSING ============== " + pi
 			    ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
+                pi.finishedOn = new Date();
                 setStatus(pi, ObvUtilService.SUCCESS)
 			}catch (Exception e) {
 				log.debug " Error while running task $pi"
 				e.printStackTrace()
+                pi.finishedOn = new Date();
 				setStatus(pi, ObvUtilService.FAILED)
 			}
 		}

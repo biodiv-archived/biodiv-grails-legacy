@@ -19,6 +19,7 @@
             <g:if test="${concept.value.containsKey('speciesFieldInstance')}">
 
             <g:if test="${isSpeciesContributor && concept.value.isContributor!=2}">
+ 
             <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:concept.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance, isSpeciesContributor:isSpeciesContributor]"/>
             </g:if>
             <g:each in="${ concept.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
@@ -29,7 +30,11 @@
             <g:else>
             <g:each in="${concept.value}" var="category">
             <s:hasContent model="['map':category.value]">
-            <g:if test="${!category.key.equalsIgnoreCase(fieldFromName.summary)}">
+            <g:if test="${concept.key.equalsIgnoreCase(fieldFromName.nc) && !category.key.equalsIgnoreCase('Type Information')}">
+                        <!-- ignore all fields under nc except type information-->
+            </g:if>
+
+            <g:elseif test="${!category.key.equalsIgnoreCase(fieldFromName.summary)}">
 
             <div id="speciesField${conceptCounter}_${fieldCounter++}" class="clearfix speciesCategory ${category.value.hasContent?'':'emptyField'}" <%=category.value.hasContent?'':'style=\"display:none\"'%> >
                 <h6>
@@ -81,32 +86,38 @@
                     </g:if>
                     <g:elseif
                     test="${!it.key.equals('field') && !it.key.equals('speciesFieldInstance') && !it.key.equals('hasContent') && !it.key.equals('isContributor')  && !it.key.equals('lang') }">
-
-                    <div class="clearfix speciesSubCategory ${it.value.hasContent?'':'emptyField'}" <%=it.value.hasContent?'':'style=\"display:none\"'%> >
-                        <g:if test="${it.value.field?.subCategory}">
-                        <h6 style="margin-bottom: 0px">
-                            ${it.value.field?.subCategory}
-                        </h6>
-                        <div>
-                            <g:if test="${isSpeciesContributor && it.value.isContributor != 2}">
-
-                                <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:it.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
-                           </g:if>
-                        </div>
+                        <g:if test="${concept.key.equalsIgnoreCase(fieldFromName.nc) && !category.key.equalsIgnoreCase('Type Information')}">
+                        <!-- ignore all fields under nc except type information-->
                         </g:if>
-                        <g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
-                        <g:showSpeciesField
-                        model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor, 'userLanguage':userLanguage]" />
-                        </g:each>
-                    </div>
+                        <g:else>
+                        <div class="clearfix speciesSubCategory ${it.value.hasContent?'':'emptyField'}" <%=it.value.hasContent?'':'style=\"display:none\"'%> >
+                            <g:if test="${it.value.field?.subCategory}">
+                            <h6 style="margin-bottom: 0px">
+                                ${it.value.field?.subCategory}
+                            </h6>
+                            <div>
+                                <g:if test="${isSpeciesContributor && it.value.isContributor != 2}">
+
+                                    <g:render template="/species/newSpeciesFieldTemplate" model="[fieldInstance:it.value.get('field'), speciesInstance:speciesInstance, newSpeciesFieldInstance:newSpeciesFieldInstance,  isSpeciesContributor:isSpeciesContributor]"/>
+                            </g:if>
+                            </div>
+                            </g:if>
+                            <g:each in="${ it.value.get('speciesFieldInstance')}" var="speciesFieldInstance">
+                            <g:showSpeciesField
+                            model="['speciesInstance': speciesInstance, 'speciesFieldInstance':speciesFieldInstance, 'speciesId':speciesInstance.id, 'fieldInstance':it.value.get('field'), 'isSpeciesContributor':isSpeciesContributor, 'userLanguage':userLanguage]" />
+                            </g:each>
+                        </div>
+                        </g:else>
                     </g:elseif>
+                    <g:else>
+                    </g:else>
                     </g:each>
                 </div>
                 </div>
                 <br/>
             </div>
             </div>
-            </g:if>
+            </g:elseif>
             </s:hasContent>
             </g:each>
 

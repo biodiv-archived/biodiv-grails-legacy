@@ -16,6 +16,7 @@ import species.groups.CustomField;
 import species.auth.SUser;
 import species.License;
 import species.Species;
+import species.trait.Trait.DataTypes;
 
 class FactController extends AbstractObjectController {
 
@@ -95,56 +96,81 @@ class FactController extends AbstractObjectController {
                 }
                 if(object) {
                     println params;
-                    params['contributor'] = springSecurityService.currentUser.email;
-                    params['attribution'] = springSecurityService.currentUser.email;
-                    params['license'] = License.LicenseType.CC_BY.value();
-                    if(params.traits) {
-                    params.putAll(factService.getTraits(params.remove('traits')));
-                    params['replaceFacts'] = 'true';
-                    Map r = factService.updateFacts(params, object, null, true);
-                    //TODO: to update this from approprite result from factService.update
-                    success = r.success;
-                    result = [success:success, msg:success?'Successfully updated fact':'Error updating fact'];
-                    def activityFeed;
-                    if(success) {
-                        r.facts_updated.each { fact ->
-                            activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_UPDATED, fact.getActivityDescription());
-                        }
-                        r.facts_created.each { fact ->
-                            activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
-                        }
-                        
-                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
-                        Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
-                        queryParams.trait[trait.id] = '';
-                        facts.each { fact ->
-                            queryParams.trait[trait.id] += fact.traitValue.id+',';
-                            if(!factInstance[trait.id]) {
-                                factInstance[trait.id] = [];
+                    Map p = [:];
+                    p['contributor'] = springSecurityService.currentUser.email;
+                    p['attribution'] = springSecurityService.currentUser.email;
+                    p['license'] = License.LicenseType.CC_BY.value();
+                    Map traits = factService.getTraits(params.traits);
+                    if(traits && traits[trait.id+'']) {
+                        p.putAll(traits);
+                        p['replaceFacts'] = 'true';
+                        Map r = factService.updateFacts(p, object, null, true);
+                        //TODO: to update this from approprite result from factService.update
+                        success = r.success;
+                        result = [success:success, msg:success?'Successfully updated fact':'Error updating fact'];
+                        def activityFeed;
+                        if(success) {
+                            r.facts_updated.each { fact ->
+                                activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_UPDATED, fact.getActivityDescription());
                             }
-                            factInstance[trait.id] << fact.traitValue;
-                            otherParams["trait"] = trait.name
-                            otherParams["traitValue"] = fact.traitValue
-                            utilsService.sendNotificationMail(utilsService.FACT_UPDATE,object,null,null,null,otherParams)
-                        }
-                        println "======================"
-                        println queryParams
-                        model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
-                    } else {
+                            r.facts_created.each { fact ->
+                                activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
+                            }
 
-                    }
-                }else{
+                            List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
+                            Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
+                            queryParams.trait[trait.id] = '';
+                            facts.each { fact ->
+                                String tvStr = '';
+                                if(fact.traitValue) {
+                                    tvStr = fact.traitValue.id;
+                                } else if (trait.dataTypes == DataTypes.DATE) {
+                                    tvStr = fact.fromDate + (fact.toDate ? ":" + fact.toDate:'')
+                                }else {
+                                    tvStr = fact.value + (fact.toValue ? ":" + fact.toValue:'')
+                                }
+
+                                queryParams.trait[trait.id] += tvStr+',';
+                                if(!factInstance[trait.id]) {
+                                    factInstance[trait.id] = [];
+                                }
+                                factInstance[trait.id] << (fact.traitValue ?: tvStr);
+
+                                otherParams["trait"] = trait.name
+                                otherParams["traitValueStr"] = fact.getActivityDescription()
+                                utilsService.sendNotificationMail(utilsService.FACT_UPDATE,object,null,null,null,otherParams)
+                            }
+                            if(queryParams.trait) {
+                                queryParams.trait.each {k,v->
+                                    println k
+                                    println queryParams.trait[k]
+                                    if(queryParams.trait[k]) {
+                                        println v[0..-2]
+                                        queryParams.trait[k] = v[0..-2];
+                                    }
+                                }
+                            }
+
+                            println "======================"
+                            println queryParams
+
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
+                        } else {
+
+                        }
+                    } else {
                         // if no traitValue selected 
+                        log.debug "No trait value .. so deleting all facts for this trait ${trait}"
                         List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
 
                         facts.each { fact ->
                             fact.isDeleted = true;
                             fact.save();
                             result = [success:true, msg:'Successfully deleted fact']
-                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'queryParams':'', displayAny:false, editable:true]);
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'object':object, 'queryParams':'', displayAny:false, editable:true]);
                         }
 
-                }
+                    }
 
                 } else {
                     result['msg'] = 'Not a valid object'; 
@@ -191,16 +217,40 @@ class FactController extends AbstractObjectController {
     }
 
 
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
     def upload() {
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);          
+
+        if(!params.fFile?.path) {
+            flash.message = "Facts file is required";
+            render (view:'upload', model:[fFile:['path':params.fFile?.path,'size':params.fFile?.size]]);
+            return;
+        }
+
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir);
         if(!contentRootDir.exists()) {
             contentRootDir.mkdir();
         }
+
+        params.fFile = contentRootDir.getAbsolutePath() + File.separator + params.fFile.path;
+        params.file = params.fFile;
+
+        def fFileValidation = factService.validateFactsFile(params.fFile, new UploadLog());
         
-        params.file = contentRootDir.getAbsolutePath()+File.separator+params.file;
-        def r = factService.upload(params);
-        redirect(action: "list")
+        if(fFileValidation.success) {
+            log.debug "Validation of fact file is done. Proceeding with upload"
+            def r = factService.upload(params);
+            if(r.success) {
+                flash.message = r.msg;
+                redirect(controller:'trait', action: "list")
+            } else {
+                flash.message = r.msg;
+                render (view:'upload', model:[fFile:['path':params.fFile], errors:r.errors]);
+            }
+        } else {
+            String msg = g.message(code: 'newsletter.create.fix.error', default:'Please fix the errors before proceeding');
+            flash.message = msg;
+            render (view:'upload', model:[fFile:['path':params.fFile, errors:fFileValidation.errors]]);
+        }
     }
 
     def migrateCustomFields() {

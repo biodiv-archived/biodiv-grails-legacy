@@ -6,6 +6,8 @@ import species.UtilsService;
 import species.Classification;
 import species.SynonymsMerged;
 import grails.util.Holders;
+import species.dataset.DataTable;
+import grails.converters.JSON
 
 class Trait {
 
@@ -133,6 +135,8 @@ class Trait {
     boolean isParticipatory = true;
     boolean showInObservation = false;
 
+    DataTable dataTable;
+
     static hasMany = [taxon:TaxonomyDefinition]
 
     static constraints = {
@@ -146,7 +150,11 @@ class Trait {
         units nullable:true
         traitTypes nullable:false
         dataTypes nullable:false
-    }
+        dataTable nullable:true
+/*      taxon validator : { val, obj ->
+			val && val.size() > 0 
+		}
+*/    }
 
     static mapping = {
         description type:"text"
@@ -257,9 +265,11 @@ class Trait {
         }
 
         if(ibpParentTaxon) {
+            println "Found ibp parent classification to be ${ibpParentTaxon}";
+            println "trait taxon ${trait.taxon}";
             ibpParentTaxon.each { t ->
                 trait.taxon.each { taxon ->
-                    if(trait.taxon.id == t.id)
+                    if(taxon.id == t.id)
                        isValid = true;
                 }
             }
@@ -269,5 +279,22 @@ class Trait {
 
     List values() {
         return TraitValue.findAllByTrait(this);
+    }
+
+    def fetchChecklistAnnotation(){
+        def res = [:];
+        res['title'] = this.name;
+        res['id'] = this.id;
+        res['type'] = 'trait';
+        res['values'] = this.values();
+        res['units'] = this.units;
+        res['traitTypes'] = this.traitTypes;
+        res['dataTypes'] = this.dataTypes;
+        res['field'] = this.field.toString();
+        res['taxon'] = this.taxon.collect{it.name}.join(',');
+        res['isNotObservationTrait'] = this.isNotObservationTrait;
+        res['isParticipatory'] = this.isParticipatory;
+        res['showInObservation'] = this.showInObservation;
+        return res
     }
 }

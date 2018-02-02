@@ -2,7 +2,7 @@ package content.eml
 
 import java.util.Date;
 import species.License
-
+import species.dataset.DataTable;
 
 
 /**
@@ -22,7 +22,7 @@ class UFile{
 	
 	static transients = [ 'deleted' ]
 	
-	static belongsTo = [Document]
+	static belongsTo = [Document, DataTable]
 
 	static mapping = {
 	}

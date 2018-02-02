@@ -944,6 +944,9 @@ $(document).ready(function() {
             //$('.hidePoint').show();
             $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>'+window.i8ln.species.specie.eem);
             if($e) rate($e.find('.star_rating'));
+
+            $('.trait_edit_panel').show();
+            $('.trait_panel').hide();
         }
 
         $('#editSpecies').click(function() {

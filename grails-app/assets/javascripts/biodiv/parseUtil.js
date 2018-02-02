@@ -31,7 +31,10 @@ String.prototype.splitCSV = function(sep) {
 function parseData(csvFile, options) {
     $.get(csvFile, function(data) {
         parseCSVData(data, options);	
-    });
+    })
+    .fail(function() {
+        console.log( "parseData" );
+    })
 }
 
 function parseCSVData(data, options) {
@@ -53,7 +56,7 @@ function parseCSVData(data, options) {
     var rowData = new Array();
     var columns = new Array();
     if(options.res === "species") {
-        var lines = data.split('\r\r\n\n');
+        var lines = data.split('\r\n');
     }
     else {
         var lines = data.replace('\r','').split('\n');
@@ -85,7 +88,8 @@ function parseCSVData(data, options) {
 			        headerCount = headers.length;
 			        $.each(headers, function(headerCount, header) {
 			            var columnName = header;
-			            columns.push({id:columnName, name: columnName, field: columnName, editor: Slick.Editors.Text, sortable:false, resizable : true, minWidth: 60, header: headerFunction()});
+                        var editor = undefined;//(typeof Slick === undefined)? undefined : Slick.Editors.Text;
+			            columns.push({id:columnName, name: columnName, field: columnName, editor: editor, sortable:false, resizable : true, minWidth: 60, header: headerFunction()});
 			        });
 			    }
 			    
@@ -113,6 +117,7 @@ function parseCSVData(data, options) {
             }
         }catch(e){
             error += e + '\n';
+            console.log(e);
         }
 
     });
