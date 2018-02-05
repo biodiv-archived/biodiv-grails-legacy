@@ -451,7 +451,7 @@ $(document).ready(function(){
 
             autoLoad : true,
             // a selector that matches a element of next page link
-            link : 'div.paginateButtons a.nextLink',
+            link : eleParentParent.find('div.paginateButtons:last a.nextLink'),
 
             // a selector that matches page contents
             content : '.mainContent',
@@ -461,8 +461,8 @@ $(document).ready(function(){
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
-                eleParentParent.find(".loadMore .progress").show();
-                eleParentParent.find(".loadMore .buttonTitle").hide();
+                eleParentParent.find(".loadMore:last .progress").show();
+                eleParentParent.find(".loadMore:last .buttonTitle").hide();
             },
 
             // a function to be executed when next page was loaded. 
@@ -470,12 +470,14 @@ $(document).ready(function(){
             load : function(current, next) {
                 checkList();
                 eleParentParent.find(".mainContent:last").hide().fadeIn(3000);
-                eleParentParent.find("div.paginateButtons a.nextLink").attr('href', next.url);
+                console.log($(this));
+console.log(next.url)
+                eleParentParent.find("div.paginateButtons:last a.nextLink").attr('href', next.url);
                 if (next.url == undefined) {
-                    eleParentParent.find(".loadMore").hide();
+                    eleParentParent.find(".loadMore:last").hide();
                 } else {
-                    eleParentParent.find(".loadMore .progress").hide();
-                    eleParentParent.find(".loadMore .buttonTitle").show();
+                    eleParentParent.find(".loadMore:last .progress").hide();
+                    eleParentParent.find(".loadMore:last .buttonTitle").show();
                 }
     
                 var a = $('<a href="'+current.url+'"></a>');
