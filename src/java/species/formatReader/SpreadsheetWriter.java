@@ -28,7 +28,7 @@ public class SpreadsheetWriter {
     static final String COLUMN_SEP = "#12#";
     static final String FIELD_SEP = "#13#";
     
-    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, JSONElement headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
+    public static void writeSpreadsheet(File f, InputStream inp, JSONElement headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
         //System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
 //            Workbook wb = WorkbookFactory.create(inp);

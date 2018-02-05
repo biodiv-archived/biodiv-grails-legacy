@@ -49,7 +49,7 @@ class UserGroupController {
 	def activityFeedService;
     def digestService;
 	def customFieldService;
-	
+def dataSource;	
     def messageSource;
 	
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
@@ -1446,31 +1446,36 @@ class UserGroupController {
 	   def res = createFromFile(params.file, areIds)
 	   def oldUsers = res[0]
 	   def newUsers = res[1]
-	   SUser.withTransaction() { 
-		   newUsers.each { user ->
-		        log.debug "adding new uesr " + user
-			   ug.addMember(user);
-			   if(sendMail) { 
-				   sendNotificationMail(user, request, params, true, ug)
-			   }
-		   }
-		   oldUsers.each { user ->
-			   log.debug "======== adding old user " + user
-			   ug.addMember(user);
-			   if(sendMail){
-				   sendNotificationMail(user, request, params, false, ug)
-			   }
-		   } 
-	   }
-	   
-	   SUser.withTransaction(){
-		   oldUsers.each{ user ->
-			   if(postObs){
-				   postObvToGroup(ug, user)
-			   }
-		   }
-	   }
-	   
+       int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+       dataSource.setUnreturnedConnectionTimeout(100000);
+
+       SUser.withTransaction() { 
+           newUsers.each { user ->
+               log.debug "adding new uesr " + user
+               ug.addMember(user);
+               if(sendMail) { 
+                   sendNotificationMail(user, request, params, true, ug)
+               }
+           }
+           oldUsers.each { user ->
+               log.debug "======== adding old user " + user
+               ug.addMember(user);
+               if(sendMail){
+                   sendNotificationMail(user, request, params, false, ug)
+               }
+           } 
+       }
+
+       SUser.withTransaction(){
+           oldUsers.each{ user ->
+               if(postObs){
+                   postObvToGroup(ug, user)
+               }
+           }
+       }
+       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+
 	   render "== done"
    }
    

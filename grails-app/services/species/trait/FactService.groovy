@@ -49,7 +49,7 @@ class FactService extends AbstractObjectService {
 
         SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).eachWithIndex { m,index ->
 
-            dl.writeLog("============================================\n", Level.INFO);            
+            dl.writeLog("============================================\n", Level.INFO);
             dl.writeLog("Loading facts ${m} from row no ${index+2}", Level.INFO);
             if(!m['taxonid']) {
                 dl.writeLog("Finding species from species name ${m['name']}");
@@ -73,7 +73,7 @@ class FactService extends AbstractObjectService {
                 //def session =  sessionFactory.currentSession;
                 session.setFlushMode(FlushMode.MANUAL);
 
-                def r = updateFacts(m, species, dl); 
+                def r = updateFacts(m, species, dl);
                 if(r && r.success) {
                     noOfFactsLoaded += r.noOfFactsLoaded;
                 }
@@ -128,7 +128,7 @@ class FactService extends AbstractObjectService {
         dl.writeLog("Loading facts from ${file}", Level.INFO);
 
         List reqdHeaders = ['taxonid', 'attribution', 'contributor', 'license'];
-        return validateSpreadsheetHeaders(file, dl, reqdHeaders);       
+        return validateSpreadsheetHeaders(file, dl, reqdHeaders);
     }
 
     Map updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {
@@ -170,14 +170,14 @@ class FactService extends AbstractObjectService {
 
                 switch(key) {
                     case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts', 'dataTable', ObvUtilService.LOCATION, ObvUtilService.TOPOLOGY, ObvUtilService.LATITUDE, ObvUtilService.LONGITUDE, ObvUtilService.LOCATION_SCALE, ObvUtilService.OBSERVED_ON, ObvUtilService.TO_DATE, ObvUtilService.DATE_ACCURACY, ObvUtilService.AUTHOR_EMAIL] : break;
-                    default : 
+                    default :
                     value = (value && value instanceof String)? value.trim() : null ;
-                    
+
                     writeLog("Loading trait ${key} : ${value}", Level.INFO);
                     Trait trait;
                     TaxonomyDefinition pageTaxon;
                     switch(object.class.getCanonicalName()) {
-                        case 'species.Species': 
+                        case 'species.Species':
                         pageTaxon = object.taxonConcept;
                         if(pageTaxon) {
                             println m.traitId
@@ -195,7 +195,7 @@ class FactService extends AbstractObjectService {
                             }
                         }
                         break;
-                        case 'species.participation.Observation': 
+                        case 'species.participation.Observation':
                         //TODO:validatetrait as per speciesgroup taxon list for observations
                         def t = Trait.read(Long.parseLong(key));
                         if(Trait.isValidTrait(t, object.group.getTaxon())) {
@@ -260,7 +260,7 @@ class FactService extends AbstractObjectService {
                                 fact.objectType = object.class.getCanonicalName();
                                 setTraitValue(fact, traitValues[0]);
                                 facts << fact;
-                            } 
+                            }
                             println facts;
                             //fact = facts[0];
 
@@ -302,7 +302,7 @@ class FactService extends AbstractObjectService {
                                     }
                                 }
                             } else {
-                                setTraitValue(facts[0], traitValues[0]); 
+                                setTraitValue(facts[0], traitValues[0]);
                             }
 
                             boolean isUpdate = false;
@@ -319,9 +319,9 @@ class FactService extends AbstractObjectService {
                                 fact.license = license;
                                 fact.isDeleted = false;
                                 if(m['dataTable']) {
-                                    fact.dataTable = DataTable.read(Long.parseLong(''+m['dataTable'])); 
+                                    fact.dataTable = DataTable.read(Long.parseLong(''+m['dataTable']));
                                 }
-                                if(!fact.hasErrors() && !fact.save()) { 
+                                if(!fact.hasErrors() && !fact.save()) {
                                     writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
                                     fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
                                     writeLog('\n');
@@ -329,7 +329,7 @@ class FactService extends AbstractObjectService {
                                 } else {
                                     success = true;
                                     noOfFactsLoaded++;
-                                    if(isUpdate) 
+                                    if(isUpdate)
                                         result['facts_updated'] << fact;
                                     else
                                         result['facts_created'] << fact;
@@ -345,14 +345,14 @@ class FactService extends AbstractObjectService {
                 e.printStackTrace();
                 writeLog("Error saving fact ${key} : ${value} for ${object}\n", Level.ERROR);
             }
-        } 
+        }
         println "=========================================================================="
 
         if(object instanceof Observation) {
             Sql sql = Sql.newInstance(dataSource);
             println sql.executeUpdate("""
             update observation set traits = g.item from (
-                             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id   
+                             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id
                              ) g where g.object_id=id
             """);
             println sql.executeUpdate("""
@@ -370,6 +370,7 @@ update observation set traits_json = g.item from (
                         """);
 
             observationsSearchService.publishSearchIndex(object,true);
+
         }
 
         result['success'] = success;
@@ -379,7 +380,7 @@ update observation set traits_json = g.item from (
 
     private def getTraitValue(Trait trait, String value) {
         if(!value) return;
-        if(!(trait.traitTypes == TraitTypes.RANGE || trait.dataTypes == DataTypes.COLOR)) { 
+        if(!(trait.traitTypes == TraitTypes.RANGE || trait.dataTypes == DataTypes.COLOR)) {
             return TraitValue.findByTraitAndValueIlike(trait, value.trim());
         } else {
             return value.trim();
@@ -388,7 +389,7 @@ update observation set traits_json = g.item from (
 
     private void setTraitValue(Fact fact, value) {
         switch(fact.trait.traitTypes) {
-            case Trait.TraitTypes.RANGE : 
+            case Trait.TraitTypes.RANGE :
             setTraitRange(fact, value);
             break;
             default:
@@ -413,7 +414,7 @@ update observation set traits_json = g.item from (
                     fact.toDate = x;
                 }
                 break;
-                default: 
+                default:
                 fact.value = v[0];
                 fact.toValue = v[1];
             }
@@ -423,7 +424,7 @@ update observation set traits_json = g.item from (
                 fact.fromDate = getFromDate(v[0]);
                 fact.toDate = getToDate(v[0]);
                 break;
-                default: 
+                default:
                 fact.value = v[0];
                 fact.toValue = v[0];
             }

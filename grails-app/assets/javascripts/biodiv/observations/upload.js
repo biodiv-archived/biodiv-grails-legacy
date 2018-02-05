@@ -331,20 +331,31 @@ function updateMetadataValues() {
         });
 }
 
+function getColumnOrder() {
+    var columnOrder = $('#columnOrder').val();
+    return JSON.parse(columnOrder);
+}
+
+function saveColumnOrder(columnOrder) {
+    $("#columnOrder").val(JSON.stringify(columnOrder));
+}
+
 function getHeaderMetadata() {
     var headerMetadata = $('#headerMetadata').val();
-    return headerMetadata;
+    return JSON.parse(headerMetadata);
 }
 
 function saveHeaderMetadata(headerMetadata) {
-    $('#headerMetadata').val(headerMetadata);
+    $('#headerMetadata').val(JSON.stringify(headerMetadata));
 }
 
 function populateHeaderMetadata(headerName, headerInfo) {
     console.log(headerName);
     console.log(headerInfo);
     var headerMetadata = getHeaderMetadata();
-    headerMetadata[headerName] = headerInfo;
+    if(headerName) {
+        headerMetadata[headerName] = headerInfo;
+    }
     saveHeaderMetadata(headerMetadata);
 }
 
@@ -390,7 +401,7 @@ $('#downloadModifiedSpecies').click(function() {
     var gData// = JSON.stringify(grid.getData());
     //console.log(grid.getData().length);
     //console.log(gData);
-    var orderedArray = $('#columnOrder').val();
+    var orderedArray = getColumnOrder();;
     //console.log(orderedArray);
     orderedArray = JSON.stringify(orderedArray);
     //headerMarkers = JSON.stringify(headerMarkers);
@@ -455,7 +466,7 @@ function uploadSpecies(url){
     var gData //= JSON.stringify(grid.getData());
     var hm = getHeaderMetadata();
     delete hm["undefined"];
-    var orderedArray = $('#columnOrder').val();
+    var orderedArray = getColumnOrder();
     orderedArray = JSON.stringify(orderedArray);
     var headerMarkers = JSON.stringify(hm);
     if(url == undefined)

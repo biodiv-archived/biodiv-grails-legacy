@@ -133,17 +133,19 @@ class SpeciesUploadService {
 	
 	Map basicUploadValidation(params){
 		if(!params.xlsxFileUrl){
-			return ['msg': 'File not found !!!' ]
+			return ['msg': "File not found at path :${params.xlsxFileUrl}" ]
 		}
 		
 		File speciesDataFile = saveModifiedSpeciesFile(params)
 		log.debug "THE FILE BEING UPLOADED " + speciesDataFile
 		
-		if(!speciesDataFile.exists()){
+		if(!speciesDataFile || !speciesDataFile.exists()){
 			return ['msg': 'File not found !!!' ]
 		}
 		
-		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType, params.dataTable);
+		SpeciesBulkUpload sBulkUploadEntry = createRollBackEntry(new Date(), null, speciesDataFile.getAbsolutePath(), params.imagesDir, params.notes, params.uploadType, params.dataTable, params.xlsxFileUrl, params.headerMarkers, params.orderedArray);
+        //SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType, params);
+		
 		
 		if(!validateUserSheetForName(sBulkUploadEntry)){
 			return  ['msg': 'Name validation failed. Please visit your profile page to view status.!!!', 'sBulkUploadEntry': sBulkUploadEntry ]
@@ -774,37 +776,40 @@ class SpeciesUploadService {
 
     File saveModifiedSpeciesFile(params){
         try{
-        def gData //= JSON.parse(params.gridData)
-        def headerMarkers = JSON.parse(params.headerMarkers)
-        def orderedArray = JSON.parse(params.orderedArray);
 
-        //storing current locale language information
-        //this will be available in mappingConfig for each field
-        if(headerMarkers) {
-            def newHeaders = new JSONObject();
-            headerMarkers.each {
-                it.value.language = params.locale_language.id.toString();
-                newHeaders.put(it.key, it.value);
+            String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
+
+            //if(params.isMarkingDirty) return new File(xlsxFileUrl);
+
+            def gData //= JSON.parse(params.gridData)
+            def headerMarkers = JSON.parse(params.headerMarkers)
+            def orderedArray = JSON.parse(params.orderedArray);
+            //storing current locale language information
+            //this will be available in mappingConfig for each field
+            if(headerMarkers) {
+                def newHeaders = new JSONObject();
+                headerMarkers.each {
+                    it.value.language = params.locale_language.id.toString();
+                    newHeaders.put(it.key, it.value);
+                }
+                headerMarkers = newHeaders;
             }
-            headerMarkers = newHeaders;
-        }
 
-        String fileName = "speciesSpreadsheet"
-        String uploadDir = "species"
-        def ext = params.xlsxFileUrl.split("\\.")[-1];
-        println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
-        println "=========THE SPLITED LIST ================ " + ext
-        String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
-        String writeContributor = params.writeContributor.replace("\"","").trim();
-        println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
-        fileName = fileName + "."+ext;
-        println "===FILE NAME CREATED ================ " + fileName
-        File file = utilsService.createFile(fileName , uploadDir, contentRootDir);
-		println "=== NEW MODIFIED SPECIES FILE === " + file
-        String contEmail = springSecurityService.currentUser.email;
-        InputStream input = new FileInputStream(xlsxFileUrl);
-        SpreadsheetWriter.writeSpreadsheet(file, input, gData, headerMarkers, writeContributor, contEmail, orderedArray);
-        return file
+            String fileName = "speciesSpreadsheet"
+            String uploadDir = params.dataDir?:'species';
+            def ext = params.xlsxFileUrl.split("\\.")[-1];
+            println "=========PARAMS XLSXURL  on which split ============= " + params.xlsxFileUrl
+            println "=========THE SPLITED LIST ================ " + ext
+            String writeContributor = params.writeContributor.replace("\"","").trim();
+            println "======= INITIAL UPLOADED XLSX FILE URL ======= " + xlsxFileUrl;
+            fileName = fileName + "."+ext;
+            println "===FILE NAME CREATED ================ " + fileName
+            File file = utilsService.createFile(fileName , uploadDir.replace(contentRootDir, ''), contentRootDir);
+            println "=== NEW MODIFIED SPECIES FILE === " + file
+            String contEmail = springSecurityService.currentUser.email;
+            InputStream input = new FileInputStream(xlsxFileUrl);
+            SpreadsheetWriter.writeSpreadsheet(file, input, headerMarkers, writeContributor, contEmail, orderedArray);
+            return file
         } catch(Exception e) {
             e.printStackTrace();
             log.error e.getMessage();
@@ -814,8 +819,8 @@ class SpeciesUploadService {
 
 
 	//////////////////////////////////////// ROLL BACK //////////////////////////////
-	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null, DataTable dataTable=null){
-		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType, ['dataTable':dataTable?.id]);
+	def createRollBackEntry(Date startDate, Date endDate, String filePath, String imagesDir, String notes = null, String uploadType = null, DataTable dataTable=null, String xlsxFileUrl, String headerMarkers, String orderedArray){
+		return SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType, ['dataTable':dataTable?.id, xlsxFileUrl:xlsxFileUrl, headerMarkers:headerMarkers, orderedArray:orderedArray]);
 		
 	}
 	

@@ -14,12 +14,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
  *
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class OpenIdUserDetailsService extends GormUserDetailsService {
+class OpenIdUserDetailsService extends grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService {
 
 	@Override
 	UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
+        println "*******************************************"
+        println "*******************************************"
         username = username.toLowerCase();
-        return super.loadUserByUsername(username, loadRoles);
+        println username;
+        println  "=======================+++++"
+        def userDetails = super.loadUserByUsername(username, loadRoles);
+        println userDetails
+        return userDetails;
     }
 
 }
