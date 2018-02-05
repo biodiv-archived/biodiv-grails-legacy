@@ -55,6 +55,8 @@
                             <div class="controls" style="">
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'imagesPath', 'inputName': 'imagesFile', 'path': dataTableInstance?.imagesFile?.path, 'size':dataTableInstance?.imagesFile?.size,'fileParams':fileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+                                or
+                                <input type="text" name="imagesFilePath" placeholder="Specify absolute path on server" val="${dataTableInstance?.imagesFile?.path}"/>
  
                             </div>
                         </div>
@@ -67,7 +69,7 @@
                                 <input type="hidden" id="dataTableType" name="dataTableType" value="${dataTableInstance.dataTableType.ordinal()}"/>
                                 <input type="hidden" id="dataTableFilePath" name="dataTableFilePath" value=""/>
                                 <input type="hidden" id="speciesGroupTraits" name="speciesGroupTraits" value=""/>
-                                <input type="hidden" id="columns" name="columns" value="${dataTableInstance?.columns}"/>
+                                <input type="hidden" id="columns" name="columns" value=""/>
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="sciNameColumn">
                                     <g:message code="checklist.scientific_name.validator.invalid" />

@@ -152,25 +152,36 @@ class DataTableService extends AbstractMetadataService {
                         UFile f = new UFile()
                         f.size = destinationFile.length()
                         f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "");
-                        log.debug "============== " + f.path
+                        log.debug "DATATABLE FILE PATH ============== " + f.path
                         if(f.save()) {
                             instance.uFile = f
                         }
                     }
-                    if(params.imagesFile) {
-                        File imagesFile = new File(contentRootDir, params.imagesFile.path);
-                        if(imagesFile.exists()) {
-                            UFile f = new UFile()
-                            f.size = imagesFile.length()
-                            f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
-                            log.debug "============== " + f.path
-                            if(f.save()) {
-                                instance.imagesFile = f
-                            }
+                    File imagesFile;
+                    if(params.imagesFilePath) {
+                        imagesFile = new File(params.imagesFilePath);
+                    } else if(params.imagesFile.path) {
+                        imagesFile = new File(contentRootDir, params.imagesFile.path);
+                    }
+                    println  imagesFile
+
+                    if(imagesFile && imagesFile.exists()) {
+                        if(FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
+                            File destDir = destinationFile.getParentFile();
+                            def ant = new AntBuilder().unzip( src: imagesFile, dest: destDir, overwrite:true)
+                            imagesFile = destDir;
+                        }
+
+                        UFile f = new UFile()
+                        f.size = imagesFile.length()
+                        f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
+                        log.debug "IMAGES DIR============== " + f.path
+                        if(f.save()) {
+                            instance.imagesFile = f
                         }
                     }
 
-                }catch(e){
+                } catch(e){
                     e.printStackTrace()
                 }
             }
@@ -346,21 +357,7 @@ class DataTableService extends AbstractMetadataService {
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
-                File imagesDir;
-                if(dataTable.imagesFile) {
-                    File imagesFile = new File(contentRootDir, dataTable.imagesFile.path);
-                    File destDir = imagesFile.getParentFile();
-
-                    if(imagesFile && FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
-                        def ant = new AntBuilder().unzip( src: imagesFile,
-                        dest: destDir, overwrite:true)
-                        imagesDir = new File(destDir, FilenameUtils.removeExtension(imagesFile.getName()));
-                        if(!imagesDir.exists()) {
-                            imagesDir = destDir;
-                        }
-                    }
-                }
-
+                File imagesDir = new File(contentRootDir, dataTable.imagesFile.path);
                 if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
                     File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
 
