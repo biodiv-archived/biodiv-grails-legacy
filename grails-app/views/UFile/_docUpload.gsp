@@ -16,10 +16,14 @@
             $('#${name}_file').html(fileName);
             $('#${name}_path').val(responseJSON.filePath);
             $('#${name}_name').val(fileName);
-            $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
-            console.log('-------------------------------------');
-            $('#isSimpleSheet').val(responseJSON.isSimpleSheet);
-            $('#headerMetadata').val(responseJSON.headerMetadata);
+            if(responseJSON.xlsxFileUrl) {
+                //dont reset these fields if the upload is for images dir
+                $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
+                console.log('-------------------------------------');
+                console.log(responseJSON.xlsxFileUrl);
+                $('#isSimpleSheet').val(responseJSON.isSimpleSheet);
+                $('#headerMetadata').val(JSON.stringify(responseJSON.headerMetadata));
+            }
         }
 
         <g:if test="${uploadCallBack}">

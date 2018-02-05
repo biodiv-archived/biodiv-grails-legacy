@@ -20,7 +20,7 @@
         <div class="section">
             <h3><g:message code="default.dataTable.label" /> </h3>
     
-                <div class="upload_file" style="display:${dataTableInstance?.uFile?.path?'none':'inline-block'}">
+                <div class="upload_file" style="display:inline-block">
                         <div class="control-group ${hasErrors(bean: dataTableInstance, field: 'uFile', 'errors')}"  style="width:100%;">
                             <label class="control-label"for="docUpload">${dataTableInstance.dataTableType} File*</label>
 
@@ -46,15 +46,20 @@
                                 
                             </div>
                         </div>	
-                        <div class="control-group" style="width:100%;">
-                            <label class="control-label" for="imagesDir"><g:message code="upload.images.url" /> </label>
-                            <div class="controls">
-                                <input id="imagesDir" type="text" class="input-block-level" name="imagesDir"
-                                placeholder="${g.message(code:'placeholder.species.enter.url')}"
-                                value="${imagesDir}" />
+
+                        <%def iconsAllowedExtensions="['zip']"%>
+                        <div class="control-group">
+                            <label class="control-label" for="file">
+                                ${dataTableInstance.dataTableType} Images
+                            </label>
+                            <div class="controls" style="">
+                                <g:render template='/UFile/docUpload'
+                                model="['name': 'imagesPath', 'inputName': 'imagesFile', 'path': dataTableInstance?.imagesFile?.path, 'size':dataTableInstance?.imagesFile?.size,'fileParams':fileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+                                or
+                                <input type="text" name="imagesFilePath" placeholder="Specify absolute path on server" val="${dataTableInstance?.imagesFile?.path}"/>
+ 
                             </div>
                         </div>
-
                 </div>
                 <div id="gridSection" class="section" style="display:none; width:100%;margin-left:0px;">
                     <div id="myGrid" class=" ${hasErrors(bean: dataTableInstance, field: 'sciNameColumn', 'errors')}" style="width:100%;overflow-x:scroll"></div>
@@ -64,7 +69,7 @@
                                 <input type="hidden" id="dataTableType" name="dataTableType" value="${dataTableInstance.dataTableType.ordinal()}"/>
                                 <input type="hidden" id="dataTableFilePath" name="dataTableFilePath" value=""/>
                                 <input type="hidden" id="speciesGroupTraits" name="speciesGroupTraits" value=""/>
-                                <input type="hidden" id="columns" name="columns" value="${dataTableInstance?.columns}"/>
+                                <input type="hidden" id="columns" name="columns" value=""/>
                                 <div class="help-inline">
                                     <g:hasErrors bean="${dataTableInstance}" field="sciNameColumn">
                                     <g:message code="checklist.scientific_name.validator.invalid" />
@@ -130,18 +135,12 @@
         </div>
 
     </form>
-    <div id="xlsxFileUrl" style="display:none;">
-        <input type="text" value="">
-    </div>
-    <div id="isSimpleSheet" style="display:none;">
-        <input type="text" value="">
-    </div>
-    <div id="headerMetadata" style="display:none;">
-        <input type="text" value="">
-    </div>
-    <div id="columnOrder" style="display:none;">
-        <input type="text" value="">
-    </div>
+
+    <%def uploadLogParams = dataTableInstance?.uploadLog?.fetchMapFromText();%> 
+    <input type="hidden" id="xlsxFileUrl" value="${uploadLogParams?.xlsxFileUrl}">
+    <input type="hidden" id="isSimpleSheet" value="${uploadLogParams?.isSimpleSheet}">
+    <input type="hidden" id="headerMetadata" value="${uploadLogParams?.headerMarkers}">
+    <input type="hidden" id="columnOrder" value="${uploadLogParams?.orderedArray}">
 
 
     <form id="downloadSpeciesFile" action="${uGroup.createLink(action:'downloadSpeciesFile', controller:'UFile', 'userGroup':userGroupInstance)}" method="post" style="visibility:hidden;">

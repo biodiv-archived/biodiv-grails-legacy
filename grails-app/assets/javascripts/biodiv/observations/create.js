@@ -220,7 +220,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             for(var z= 0; z < col.length; z++) {
                 infoCol[z] = col[z].name;
             }
-            $('#columnOrder').val(infoCol);
+            saveColumnOrder(infoCol);
 
             populateTagHeaders(col);
             $.ajax({

@@ -439,11 +439,12 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-    $('.observation').on("click", ".loadMore", function() {
+    $('.observation').on("click", ".loadMore", function(event) {
         console.log('##################################');
         console.log($(this));
-        var ele = $(this).parent().prev('.mainContentList');
-        if(ele.length == 0) ele = $(this).parent().prev().find('.mainContentList');
+        var me = $(event.currentTarget);
+        var ele = me.parent().prev('.mainContentList');
+        if(ele.length == 0) ele = me.parent().prev().find('.mainContentList');
         if(ele.length == 0) ele = $('.mainContentList:first');
         
         var eleParentParent = ele.parent().parent();
@@ -451,10 +452,11 @@ $(document).ready(function(){
 
             autoLoad : true,
             // a selector that matches a element of next page link
-            link : 'div.paginateButtons a.nextLink',
+            link : 'div.paginateButtons:last a.nextLink',
+
 
             // a selector that matches page contents
-            content : '.mainContent',
+            content : '.mainContent:first',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
             appendTo : ele,
@@ -470,7 +472,9 @@ $(document).ready(function(){
             load : function(current, next) {
                 checkList();
                 eleParentParent.find(".mainContent:last").hide().fadeIn(3000);
-                eleParentParent.find("div.paginateButtons a.nextLink").attr('href', next.url);
+                console.log($(this));
+                console.log(next.url)
+                $("div.paginateButtons:last a.nextLink").attr('href', next.url);
                 if (next.url == undefined) {
                     eleParentParent.find(".loadMore").hide();
                 } else {

@@ -1256,6 +1256,7 @@ class UserGroupService {
 
 
 	def updateResourceOnGroup(params, boolean sendMail=true){
+        log.debug "Updating resource on group ${params}"
 		def r = [:]
 		try{
 			List groups = [];

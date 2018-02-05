@@ -14,17 +14,17 @@ String instanceType = dataTableInstance.dataTableType;
 %>
 <div name="dataTable_${dataTableInstance.id}" class="sidebar_section observation_story" style="margin:0px;height:100%;width:99.9%;padding:0px;">
         <button type="button" data-toggle="collapse" data-parent="#dataTable_${dataTableInstance.id}" data-target="#dataTable_${dataTableInstance.id}_body" style="width:100%; text-align:left;${showTitleDetail?:'display:none;'}">
-<h5>
+            <h5>
 
-        <span><g:message code="default.dataTable.label" /> : </span>
-        <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
-        ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
-        </g:link>
- 
-        <span class="pull-right icon-chevron-down"></span>
-    </h5>
-    </button>
-   <div id="dataTable_${dataTableInstance.id}_body" class="observation_story_body collapse ${showDetails && !hideBody ?'in':''} ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
+                <span><g:message code="default.dataTable.label" /> : </span>
+                <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
+                ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
+                </g:link>
+    
+                <span class="pull-right icon-chevron-down"></span>
+            </h5>
+        </button>
+        <div id="dataTable_${dataTableInstance.id}_body" class="observation_story_body collapse ${showDetails && !hideBody ?'in':''} ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
             <div>
                 <div id="dataTable_${dataTableInstance.id}_table">
                     <g:if test="${dataTableInstance.uploadLog}">

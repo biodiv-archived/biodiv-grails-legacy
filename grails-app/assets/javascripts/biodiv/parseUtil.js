@@ -33,7 +33,7 @@ function parseData(csvFile, options) {
         parseCSVData(data, options);	
     })
     .fail(function() {
-        console.log( "parseData" );
+        console.log( "parseData fail" );
     })
 }
 
