@@ -60,19 +60,30 @@
             </g:each>	
         </tbody>
     </table>
-    <g:if test="${dataObjectsCount > (params.max?params.int('max'):10)}">
-    <div class="centered">
-        <div class="btn loadMore">
-            <span class="progress" style="display: none;"><g:message code="msg.loading" /> </span> <span
-                class="buttonTitle"><g:message code="msg.load.more" /></span>
+    <g:if test="${params.action == 'show'}">
+        <g:if test="${dataObjectsCount > (params.max?params.int('max'):10)}">
+            <div class="centered">
+                <div class="btn loadMore">
+                    <span class="progress" style="display: none;"><g:message code="msg.loading" /> </span> <span
+                        class="buttonTitle"><g:message code="msg.load.more" /></span>
+                </div>
+            </div>
+        </g:if>
+        <div class="paginateButtons" style="visibility: hidden; clear: both">
+            <p:paginate total="${dataObjectsCount?:0}" action="${'dataObjects'}" controller="${'dataTable'}"
+            userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
+            max="${params.max?params.int('max'):10}"  params="${[id:dataTableInstance.id]}"/>
         </div>
-    </div>
     </g:if>
-    <div class="paginateButtons" style="visibility: hidden; clear: both">
-        <p:paginate total="${dataObjectsCount?:0}" action="${'dataObjects'}" controller="${'dataTable'}"
-        userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
-        max="${params.max?params.int('max'):10}"  params="${[id:dataTableInstance.id]}"/>
-    </div>
+    <g:else>
+        <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
+        <div class="centered">
+        <div class="btn " style="width:50%;margin-top:50px;">
+       View in show page
+        </div> 
+        </div>
+        </g:link>
+    </g:else>
 
                                 
 </div>

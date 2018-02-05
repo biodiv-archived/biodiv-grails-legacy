@@ -439,11 +439,12 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-    $('.observation').on("click", ".loadMore", function() {
+    $('.observation').on("click", ".loadMore", function(event) {
         console.log('##################################');
         console.log($(this));
-        var ele = $(this).parent().prev('.mainContentList');
-        if(ele.length == 0) ele = $(this).parent().prev().find('.mainContentList');
+        var me = $(event.currentTarget);
+        var ele = me.parent().prev('.mainContentList');
+        if(ele.length == 0) ele = me.parent().prev().find('.mainContentList');
         if(ele.length == 0) ele = $('.mainContentList:first');
         
         var eleParentParent = ele.parent().parent();
@@ -451,18 +452,19 @@ $(document).ready(function(){
 
             autoLoad : true,
             // a selector that matches a element of next page link
-            link : eleParentParent.find('div.paginateButtons:last a.nextLink'),
+            link : 'div.paginateButtons:last a.nextLink',
+
 
             // a selector that matches page contents
-            content : '.mainContent',
+            content : '.mainContent:first',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
             appendTo : ele,
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
-                eleParentParent.find(".loadMore:last .progress").show();
-                eleParentParent.find(".loadMore:last .buttonTitle").hide();
+                eleParentParent.find(".loadMore .progress").show();
+                eleParentParent.find(".loadMore .buttonTitle").hide();
             },
 
             // a function to be executed when next page was loaded. 
@@ -471,13 +473,13 @@ $(document).ready(function(){
                 checkList();
                 eleParentParent.find(".mainContent:last").hide().fadeIn(3000);
                 console.log($(this));
-console.log(next.url)
-                eleParentParent.find("div.paginateButtons:last a.nextLink").attr('href', next.url);
+                console.log(next.url)
+                $("div.paginateButtons:last a.nextLink").attr('href', next.url);
                 if (next.url == undefined) {
-                    eleParentParent.find(".loadMore:last").hide();
+                    eleParentParent.find(".loadMore").hide();
                 } else {
-                    eleParentParent.find(".loadMore:last .progress").hide();
-                    eleParentParent.find(".loadMore:last .buttonTitle").show();
+                    eleParentParent.find(".loadMore .progress").hide();
+                    eleParentParent.find(".loadMore .buttonTitle").show();
                 }
     
                 var a = $('<a href="'+current.url+'"></a>');
