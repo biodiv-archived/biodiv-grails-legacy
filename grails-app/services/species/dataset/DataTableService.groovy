@@ -124,91 +124,142 @@ class DataTableService extends AbstractMetadataService {
     }
 
     DataTable update(DataTable instance, params) {
-        instance.properties = params;
+        //rollback any changes to instance on error
+        DataTable.withTransaction {
+            instance.properties = params;
 
-        instance.clearErrors();
+            instance.clearErrors();
 
-        instance.initParams(params);
+            instance.initParams(params);
 
-        if(params.dataset) {
-            Dataset1 ds = params.dataset instanceof Dataset1 ? params.dataset : Dataset1.read(params.long('dataset'));
-            if(ds)
-                instance.dataset = ds;
-            else { 
-                instance.dataset = null;
-                log.warn "NO DATASET WITH ID ${params.dataset}"
-            }
-        }
-
-        //setting ufile and uri
-        if(params.uFile.path) {
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-            String contentRootDir = config.speciesPortal.content.rootDir
-            try{
-                File destinationFile = new File(contentRootDir, params.uFile.path);
-                if(destinationFile.exists()) {
-                    UFile f = new UFile()
-                    f.size = destinationFile.length()
-                    f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "");
-                    log.debug "============== " + f.path
-                    if(f.save()) {
-                        instance.uFile = f
-                    }
+            if(params.dataset) {
+                Dataset1 ds = params.dataset instanceof Dataset1 ? params.dataset : Dataset1.read(params.long('dataset'));
+                if(ds)
+                    instance.dataset = ds;
+                else { 
+                    instance.dataset = null;
+                    log.warn "NO DATASET WITH ID ${params.dataset}"
                 }
-                if(params.imagesFile) {
-                    File imagesFile = new File(contentRootDir, params.imagesFile.path);
-                    if(imagesFile.exists()) {
+            }
+
+            //setting ufile and uri
+            if(params.uFile.path) {
+                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                String contentRootDir = config.speciesPortal.content.rootDir
+                try{
+                    File destinationFile = new File(contentRootDir, params.uFile.path);
+                    if(destinationFile.exists()) {
                         UFile f = new UFile()
-                        f.size = imagesFile.length()
-                        f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
+                        f.size = destinationFile.length()
+                        f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "");
                         log.debug "============== " + f.path
                         if(f.save()) {
-                            instance.imagesFile = f
+                            instance.uFile = f
                         }
                     }
-                }
- 
-            }catch(e){
-                e.printStackTrace()
-            }
-         }
-
-        
-        if(params.dataTableType) {
-            instance.dataTableType = DataTableType.values()[params.int('dataTableType')];
-        }
-
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
-        String contentRootDir = config.speciesPortal.content.rootDir
-        if(instance.uFile) {
-            File dataTableFile = new File(contentRootDir, instance.uFile.path);
-
-            File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
-            List colMapping = FileObservationImporter.getInstance().saveObservationMapping(params, mappingFile, null, null);
-            List columns = [];
-            if(params.columns) {
-                params.columns.split(',').each {
-                    String url = "";
-                    String order = '100000';
-                    String desc = '';
-                    colMapping.each {colM ->
-                        if(colM[1]==it) {
-                            url = colM[0];
-                            order = colM[2];
+                    if(params.imagesFile) {
+                        File imagesFile = new File(contentRootDir, params.imagesFile.path);
+                        if(imagesFile.exists()) {
+                            UFile f = new UFile()
+                            f.size = imagesFile.length()
+                            f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
+                            log.debug "============== " + f.path
+                            if(f.save()) {
+                                instance.imagesFile = f
+                            }
                         }
                     }
-                    if(params.descColumn && params.descColumn[it]) {
-                        desc = params.descColumn[it];
-                    }
-                    columns << [url,it,order,desc];
+
+                }catch(e){
+                    e.printStackTrace()
                 }
             }
-            println "-------------------------------------------------------------"
-            println "-------------------------------------------------------------"
-            println columns;
-            println "-------------------------------------------------------------"
-            println "-------------------------------------------------------------"
-            instance.columns = columns as JSON;
+
+
+            if(params.dataTableType) {
+                instance.dataTableType = DataTableType.values()[params.int('dataTableType')];
+            }
+
+            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            String contentRootDir = config.speciesPortal.content.rootDir
+            if(instance.uFile) {
+                File dataTableFile = new File(contentRootDir, instance.uFile.path);
+
+                File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
+                //if mapping already exists .. chk if there has been any diff in marking
+                List<String[]> oldColMapping = [];
+
+                if(mappingFile.exists()) {
+                    mappingFile.eachLine { line, count ->
+                        //skipping first line [Field, Column, Order]
+                        if(count > 1)
+                            oldColMapping << line.split("\t");
+                    }
+                }
+                List<String[]> newColMapping = FileObservationImporter.getInstance().getObservationMapping(params, null);
+
+                FileObservationImporter.getInstance().saveObservationMapping(newColMapping, mappingFile, null, null);
+                log.info "Saved new column marking."
+                List columns = [];
+                boolean isMarkingDirty = false;
+              
+
+
+                Map changedCols = [:]
+                if(params.columns) {
+                    params.columns.split(',').each {
+                        String url = "";
+                        String order = '100000';
+                        String desc = '';
+                        newColMapping.each {colM ->
+                            if(colM[1]==it) {
+                                url = colM[0];
+                                order = colM[2];
+                            }
+                        }
+                        boolean isNew = true;
+                        oldColMapping.each {colM ->
+                            println colM
+                            if(colM[1]==it) {
+                                isNew = false;
+                                println colM[0]+"   "+url
+                                if(colM[0] != url) {
+                                    isMarkingDirty = true;
+                                    println "Marking changed for col ${colM[1]}"
+                                    changedCols[it]= ['newMarking':url, 'oldMarking':colM[0]];
+                                }
+                            }
+                        }
+                        if(isNew && url) {
+                            changedCols[it] = ['newMarking':url];
+                            isMarkingDirty = true;
+                            println "New col marking was made ${it}"
+                        } 
+                        if(params.descColumn && params.descColumn[it]) {
+                            desc = params.descColumn[it];
+                        }
+                        columns << [url,it,order,desc];
+                    }
+                }
+                println "-------------------------------------------------------------"
+                println "-------------------------------------------------------------"
+                println columns;
+
+                println "\n\nOLDCOLMAPPING : ${oldColMapping}"
+                println "\n\nNEWCOLMAPPING : ${newColMapping}"
+
+
+                if(isMarkingDirty) { 
+                    instance.isMarkingDirty = isMarkingDirty;
+                    instance.changedCols = changedCols;
+                    log.debug "######### Reuploading datatable as marking is changed. Changed columns are ${changedCols}"
+                } else {
+                    log.debug "######### Ignoring updating data objects as marking was not changed"
+                }
+                println "-------------------------------------------------------------"
+                println "-------------------------------------------------------------"
+                instance.columns = columns as JSON;
+            }
         }
        return instance;
     } 
@@ -219,24 +270,45 @@ class DataTableService extends AbstractMetadataService {
         params.uploader = springSecurityService.currentUser;
 
         DataTable dataTable;
-        def feedType,feedAuthor;
+        String feedType;
+        SUser feedAuthor;
+        String feedDesc;
+
         if(params.id) { 
             dataTable = DataTable.get(Long.parseLong(params.id));
             params.uploader = dataTable.uploader;
             dataTable = update(dataTable, params);
             feedType = activityFeedService.INSTANCE_UPDATED;
             feedAuthor = dataTable.author
+            def p = params.clone();
+            p.remove('description')
+            p.remove('summary')
+            p.remove('uFile.path')
+            p.remove('uFile.size')
+            feedDesc = '';//p;
+            if(dataTable.isMarkingDirty) {
+                feedDesc += "Marking got changed ... so reuploading the sheet for new marking";
+                feedDesc += "\n Changed Marking : ${dataTable.changedCols}"
+            }
+            //HACK to reupload species on edit
+            switch(dataTable.dataTableType.ordinal()) {
+                case DataTableType.SPECIES.ordinal(): 
+                dataTable.isMarkingDirty = true;
+                break;
+            }
+
         } else {
             dataTable = create(params);
             feedType = activityFeedService.INSTANCE_CREATED;
             feedAuthor = dataTable.author
-
+            //on creation of datatable ... we shd not use dataTableObservationImporter
+            dataTable.isMarkingDirty = false;
         }
 
         dataTable.lastRevised = new Date();
 
         if(hasPermission(dataTable, springSecurityService.currentUser)) {
-            result = save(dataTable, params, true, feedAuthor, feedType, null);
+            result = save(dataTable, params, true, feedAuthor, feedType, null, feedDesc);
 
             if(result.success && dataTable.dataset) {
                 log.debug "Posting dataTable to all user groups that dataset is part of"
@@ -246,8 +318,9 @@ class DataTableService extends AbstractMetadataService {
                 userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
             }
 
-            if(result.success) {
-                if(params.id) {
+            //resave dataObjects only if requested for.
+            if(result.success && (dataTable.isMarkingDirty || feedType == activityFeedService.INSTANCE_CREATED)) {
+                if(params.id && params.replaceDataObjects) {
                     //TODO:delete all existing objects and reupload sheet
                     switch(dataTable.dataTableType.ordinal()) {
                         case DataTableType.OBSERVATIONS.ordinal():
@@ -266,9 +339,9 @@ class DataTableService extends AbstractMetadataService {
                         log.info "Deleting all documents from ${dataTable}"
                         dataTable.deleteAllDocuments();
                         break;
-                    }
+                     }
 
-                }
+                 }
 
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
                 String contentRootDir = config.speciesPortal.content.rootDir
@@ -296,7 +369,7 @@ class DataTableService extends AbstractMetadataService {
                     switch(dataTable.dataTableType.ordinal()) {
 
                         case DataTableType.OBSERVATIONS.ordinal() :
-                        Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir?.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id];
+                        Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir?.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id, 'isMarkingDirty':dataTable.isMarkingDirty, 'changedCols':dataTable.changedCols];
                         p.putAll(paramsToPropagate);
                         def r = observationService.upload(p);
                         if(r.success) {
@@ -307,13 +380,15 @@ class DataTableService extends AbstractMetadataService {
                         break;
 
                         case DataTableType.SPECIES.ordinal(): 
-                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable]);
+                        def res = speciesUploadService.basicUploadValidation(['xlsxFileUrl':params.xlsxFileUrl, 'imagesDir':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':params.uploadType, 'writeContributor':params.writeContributor, 'locale_language':params.locale_language, 'orderedArray':params.orderedArray, 'headerMarkers':params.headerMarkers, 'dataTable':dataTable, 'isMarkingDirty':dataTable.isMarkingDirty, 'dataDir':dataTableFile.getParentFile().getAbsolutePath()]);
 
                         if(res.sBulkUploadEntry) {
                             println "Saving upload log entry"
                             dataTable.uploadLog = res.sBulkUploadEntry;
+                            //dataTable.uFile.path = res.sBulkUploadEntry.filePath.replace(contentRootDir,''); 
+                            //dataTable.uFile.save();
                         } else {
-                            log.error "Error in scheduling species upload job"
+                            log.error "Error in scheduling species upload job. Msg: ${res.msg}"
                         }
 
                         break;
@@ -323,7 +398,7 @@ class DataTableService extends AbstractMetadataService {
                         def fFileValidation = factService.validateFactsFile(xlsxFileUrl, new UploadLog());
                         if(fFileValidation.success) {
                             log.debug "Validation of fact file is done. Proceeding with upload"
-                            Map p = ['file':xlsxFileUrl, 'notes':params.notes, 'uploadType':UploadJob.FACT, 'dataTable':dataTable.id];
+                            Map p = ['file':xlsxFileUrl, 'notes':params.notes, 'uploadType':UploadJob.FACT, 'dataTable':dataTable.id, 'isMarkingDirty':dataTable.isMarkingDirty];
                             p.putAll(paramsToPropagate);
                             def r = factService.upload(p);
                             if(r.success) {
@@ -347,7 +422,7 @@ class DataTableService extends AbstractMetadataService {
                         if(tFileValidation.success || tvFileValidation.success) {
                             log.debug "Validation of trait file and traitvalue file is done. Proceeding with upload"
 
-                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id];
+                            Map p = ['file':tFile, 'tFile':tFile, 'tvFile':params.traitValueFile, 'iconsFile':imagesDir?.getAbsolutePath(), 'notes':params.notes, 'uploadType':UploadJob.TRAIT, 'dataTable':dataTable.id, 'isMarkingDirty':dataTable.isMarkingDirty];
                             p.putAll(paramsToPropagate);
 
                             def r = traitService.upload(p);
@@ -362,7 +437,7 @@ class DataTableService extends AbstractMetadataService {
                         break;
                         case DataTableType.DOCUMENTS.ordinal():
                         //String xlsxFileUrl = params.xlsxFileUrl.replace("\"", "").trim().replaceFirst(config.speciesPortal.content.serverURL, config.speciesPortal.content.rootDir);
-                        Map p = ['file':dataTableFile.getAbsolutePath(), 'uploadType':UploadJob.DOCUMENT, 'dataTable':dataTable.id, 'locale_language':params.locale_language];
+                        Map p = ['file':dataTableFile.getAbsolutePath(), 'uploadType':UploadJob.DOCUMENT, 'dataTable':dataTable.id, 'locale_language':params.locale_language, 'isMarkingDirty':dataTable.isMarkingDirty];
                         p.putAll(paramsToPropagate);
                         def r = documentService.upload(p);
                         if(r.success) {
@@ -378,10 +453,10 @@ class DataTableService extends AbstractMetadataService {
                         log.error "Error while saving datatable";
                     }
                 }
-            }
+             }
         } else {
             result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
-        }
+        } 
 
 
         return result;

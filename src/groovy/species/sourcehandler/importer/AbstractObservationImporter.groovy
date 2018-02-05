@@ -198,12 +198,20 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         return dwcMediaMapping[header];
      }
 
-    public List saveObservationMapping(Map mapping, File mappingFile, File multimediaMappingFile, File uploadLog=null) {
-        readHeaders(uploadLog);
-
+    public void saveObservationMapping(List dataToWrite, File mappingFile, File multimediaMappingFile, File uploadLog=null) {
         def writer = getCSVWriter(mappingFile.getParent(), mappingFile.getName());
         def header = ['Field', 'Column', 'Order'];
-        writer.writeNext(header.toArray(new String[0]))
+        writer.writeNext(header.toArray(new String[0]));
+        writer.writeAll(dataToWrite);
+        writer.flush();
+        writer.close();
+
+        log.debug "Observation Mapping file ${mappingFile.getAbsolutePath()}"
+        if(uploadLog) uploadLog << "\n\n ObservationMappingFile : ${mappingFile}";
+    }
+
+    public List getObservationMapping(Map mapping, File uploadLog=null) {
+        readHeaders(uploadLog);
         def dataToWrite = [];
         mapping.attribute.each { ipColumnName, mappedColumnName ->
             String column = ipColumnName;
@@ -276,14 +284,6 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 dataToWrite.add(temp.toArray(new String[0]))
             }
         }
-
-        writer.writeAll(dataToWrite);
-        writer.flush();
-        writer.close();
-
-        //observationHeader.sort {it?it.order:10000000}
-        log.debug "Observation Mapping file ${mappingFile.getAbsolutePath()}"
-        if(uploadLog) uploadLog << "\n\n ObservationMappingFile : ${mappingFile}";
         return dataToWrite;
     }
 

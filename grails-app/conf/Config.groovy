@@ -635,10 +635,12 @@ environments {
             debug   'org.hibernate.cache.EhCache'
             debug   'org.hibernate.cache.internal.StandardQueryCache'
             info   'org.hibernate.cache'
-/*            trace 'org.springframework.security.web.authentication.rememberme',
+            trace 'org.springframework.security.web.authentication.rememberme',
                   'org.springframework.security.web.authentication',
-                        'org.springframework.security.web'
-*/
+                  'org.springframework.security.web.authentication.*'
+                  'org.springframework.security.web.authentication.dao'
+            info  'org.springframework.security.web'
+
             debug 'species'
             info    'com.linkedin.grails.ProfilerPlugin'
             debug 'org.apache.http.wire'

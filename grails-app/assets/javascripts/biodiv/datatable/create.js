@@ -12,15 +12,19 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
             success:function(data,textStatus){
                 if(data.success) {
                     $('#addDataTable').html(data.model.tmpl);
+
                     initObservationCreate();
                     intializesSpeciesHabitatInterest();
                     initLocationPicker();
+
                     dataTable_contributor_autofillUsersComp = $("#userAndEmailList_contributor_id").autofillUsers({
                         usersUrl : window.params.userTermsUrl
                     });
                     CKEDITOR.replace('summary', config);
                     CKEDITOR.replace('description', descriptionConfig);
+
                     showSampleDataTable();
+
                     var contributorId = $('#contributorUserIds').data('contributorid'); 
                     var contributorName = $('#contributorUserIds').data('contributorname'); 
                     if(contributorId != '' )
@@ -33,6 +37,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                         showSampleDataTable();
                         return false;
                     });
+
                     loadSpeciesGroupTraits();
                 }  else {
                     $('#addDataTable').html(data.msg);
@@ -68,9 +73,14 @@ function loadSpeciesGroupTraits() {
 function showSampleDataTable(){
     var input = $("#dataTableFile_path").val();
     var res = "dataTable";
-    if(input) {
-        $('#createDataTableSubmit').removeAttr('disabled');
-        parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+    var headerMetadata = getHeaderMetadata();
+    if(headerMetadata) {
+        viewSpeciesGrid();
+    } else {
+        if(input) {
+            $('#createDataTableSubmit').removeAttr('disabled');
+            parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+        }
     }
 }
 
@@ -233,6 +243,7 @@ function getMarkedColumns() {
 }
 
 function viewSpeciesGrid() {
+    $("#myGrid").hide();
     var input = $("#dataTableFile_path").val();
     var res = "species";
     if(input){
@@ -282,7 +293,7 @@ function getUploadParams() {
     if($('#dataTableType').val() == 1) {
         params = getSpeciesUploadParams();
     } 
-    var xlsxFileUrl = $('#xlsxFileUrl').val();
+    var xlsxFileUrl = $('#xlsxFileUrl:first').val();
     params['xlsxFileUrl'] = xlsxFileUrl;
 
     return params;
@@ -292,7 +303,7 @@ function getSpeciesUploadParams() {
     getTagsForHeaders();
     var hm = getHeaderMetadata();
     delete hm["undefined"];
-    var orderedArray = $('#columnOrder').val();
+    var orderedArray = getColumnOrder();
     orderedArray = JSON.stringify(orderedArray);
     var headerMarkers = JSON.stringify(hm);
 

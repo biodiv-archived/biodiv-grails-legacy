@@ -13,8 +13,10 @@ import species.sourcehandler.XMLConverter;
 import species.sourcehandler.importer.AbstractObservationImporter;
 import species.sourcehandler.importer.FileObservationImporter;
 import species.sourcehandler.importer.DwCObservationImporter;
+import species.sourcehandler.importer.DataTableObservationImporter;
 import species.dataset.DataTable;
 import species.participation.UploadLog
+import species.Language;
 
 import species.auth.SUser
 import species.groups.SpeciesGroup;
@@ -27,6 +29,7 @@ import species.formatReader.SpreadsheetReader;
 import species.utils.ImageType;
 import species.utils.ImageUtils
 import species.ResourceFetcher;
+import species.trait.TraitValue;
 
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.GeometryFactory
@@ -54,6 +57,8 @@ import species.dataset.Dataset;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import content.eml.UFile;
+
+import java.text.SimpleDateFormat;
 
 class ObvUtilService {
 
@@ -666,6 +671,7 @@ class ObvUtilService {
 	private void populateParams(Map obvParams, Map m, ProtocolType protocolType){
 		
 		//mandatory
+        obvParams['id'] = m['id']?:null;
         SpeciesGroup sG = m[SPECIES_GROUP] ? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()) : null
 		obvParams['group_id'] = m[SPECIES_GROUP]?(sG ? sG.id : defaultSpeciesGroup.id):defaultSpeciesGroup.id
         Habitat h = m[HABITAT] ? Habitat.findByName(m[HABITAT].trim()) : null;
@@ -783,7 +789,14 @@ class ObvUtilService {
 
 		def observationInstance;
 		try {
-			observationInstance =  observationService.create(params);
+            if(params.id) {
+                observationInstance = Observation.get(params.id);
+            }
+            if(observationInstance) {
+                observationService.update(observationInstance, params);
+            } else {
+    			observationInstance =  observationService.create(params);
+            }
             observationInstance.protocol = protocolType;
             observationInstance.clearErrors();
             //following line was needed as : image saving in XMLConverter was calling observation before and afterUpdate.... so obv is gng out of sync
@@ -885,19 +898,27 @@ class ObvUtilService {
 		def recoResultMap;
         params.flushImmediately = false;
         recoResultMap = observationService.getRecommendation(params);
+        println recoResultMap
 		def reco = recoResultMap.mainReco;
+        println "main reco ${reco}"
 		def commonNameReco =  recoResultMap.commonNameReco;
+        println "commonNameReco : ${commonNameReco}"
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
 		
 		def recommendationVoteInstance
         Date dateIdentified = params.dateIdentified ? utilsService.parseDate(params.dateIdentified) : observationInstance.createdOn;
-		if(reco){
+		if(reco) {
             utilsService.benchmark('RecommendationVote.findByAuthorAndObservation') {
 		        recommendationVoteInstance = RecommendationVote.findByAuthorAndObservation(params.author, observationInstance);
+                println "Existing recoVoteInstance ${recommendationVoteInstance}"
             }
 		    if(!recommendationVoteInstance) {
+                println "creating new vote"
 			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
             } else {
+                println "Changing existing names"
+                recommendationVoteInstance.recommendation = reco;
+                recommendationVoteInstance.commonNameReco = commonNameReco;
                 recommendationVoteInstance.givenSciName = params.recoName;
                 recommendationVoteInstance.givenCommonName = params.commonName;
                 recommendationVoteInstance.author = params.author;
@@ -931,7 +952,7 @@ class ObvUtilService {
 			
 	}
 
-	private Map uploadImageFiles(imageDir, imagePaths, license, author){
+	private Map uploadImageFiles(imageDir, imagePaths, license, author) {
 		Map resourcesInfo = [:];
         if(imageDir && imageDir.exists()) { 
 		String rootDir = grailsApplication.config.speciesPortal.observations.rootDir
@@ -942,7 +963,7 @@ class ObvUtilService {
             if(f.exists()){
 				log.debug "uploading file $f"
 				if(f.length()  > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-					log.debug  'File size cannot exceed ${104857600/1024}KB' 
+					log.debug  "File size cannot exceed 100MB" 
 				} else if(f.length() == 0) {
 					log.debug 'File cannot be empty'
 				} else {
@@ -1016,31 +1037,135 @@ class ObvUtilService {
         return isValid;
     }
 
+    /**
+    * Return observations properties
+    */
+    static Map getObservationProperties(Observation obv) {
+		Map obvParams = [:];
+		//mandatory
+        obvParams['id'] = obv.id;
+		obvParams[SPECIES_GROUP] = obv.group.name
+        obvParams[HABITAT] = obv.habitat.name;
+		obvParams[LONGITUDE] = obv.latitude
+		obvParams[LATITUDE] = obv.longitude
+		obvParams['location_accuracy'] = obv.locationAccuracy
+		obvParams[LOCATION_SCALE] = obv.locationScale.value()
+		obvParams[LOCATION] = obv.placeName
+		obvParams['reverse_geocoded_name'] = obv.reverseGeocodedName
+        //TODO:chk topology shd be in wkt
+		obvParams[TOPOLOGY] = obv.topology
+		//reco related
+        def recoVote = obv.getRecommendationVote(obv.author);
+        if(recoVote) {
+            //TODO:chk if commonname is recomemndation is is_sci_name=false
+            obvParams[SN] = recoVote.recommendation?.name
+            obvParams[CN] = recoVote.commonNameReco?.name
+            obvParams[LANGUAGE] =  recoVote?.commonNameReco?.languageId? Language.read(recoVote.commonNameReco.languageId).name:null;
+
+            obvParams[COMMENT] = recoVote.comment
+            obvParams[IDENTIFIED_BY] = recoVote.originalAuthor
+            obvParams[DATE_IDENTIFIED] = (new SimpleDateFormat("dd/MM/yyyy")).format(recoVote.votedOn)
+        }
+		
+		//tags, grouplist, notes
+		obvParams[NOTES] = obv.notes
+
+//		obvParams['tags'] = (m[TAGS] ? m[TAGS].trim().split(",").collect { it.trim() } : null)
+		obvParams['userGroupsList'] = obv.userGroups.collect {it.name}.join(',');
+		
+		obvParams[OBSERVED_ON] =  (new SimpleDateFormat("dd/MM/yyyy")).format(obv.fromDate)
+		obvParams[TO_DATE] =  (new SimpleDateFormat("dd/MM/yyyy")).format(obv.toDate)
+		obvParams[DATE_ACCURACY] = obv.dateAccuracy.value();
+		obvParams[AUTHOR_EMAIL] = obv.author.email;
+		
+		obvParams[EXTERNAL_ID] = obv.externalId
+		obvParams[OBSERVATION_URL] = obv.externalUrl
+		obvParams[COLLECTION_ID] = obv.viaId
+        obvParams[COLLECTION_CODE] = obv.viaCode
+        obvParams['dataTable'] = obv.dataTable.id;
+        obvParams['sourceId'] = obv.dataTable.id;
+
+    	obvParams['geoPrivacy'] = obv.geoPrivacy;
+
+		obvParams['agreeTerms'] = "on"
+        
+//        obvParams['locale_language'] = utilsService.getCurrentLanguage();
+		
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);//grailsApplication.config.speciesPortal.maps.SRID);
+        println "populating topology"
+        println "${obvParams.topology}"
+        if(obvParams.topology) {
+            println "constructing areas from lat lng ${obvParams.latitude}"
+            obvParams.areas = Utils.GeometryAsWKT(obv.topology);
+        } 
+        obvParams[AbstractObservationImporter.ANNOTATION_HEADER] = obv.fetchChecklistAnnotation();
+        Map traits = obv.getTraitFacts().traitFactMap;
+        Map obvTraits = [:];
+        traits.each {k,v ->
+            if(!k.equals('fact')) {
+                println v.class
+                if(v instanceof TraitValue)
+                    obvTraits[k+''] = v.value
+                else
+                    obvTraits[k+''] = v
+            }
+        }
+
+        obvParams[AbstractObservationImporter.TRAIT_HEADER] = obvTraits;
+println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
+
+
+		obvParams[BASISOFRECORD] = obv.basisOfRecord;
+		obvParams[PROTOCOL] = obv.protocol;
+		obvParams[EXTERNAL_DATASET_KEY] = obv.externalDatasetKey
+		obvParams[LAST_CRAWLED] = obv.lastCrawled?((new SimpleDateFormat("dd/MM/yyyy")).format(obv.lastCrawled)):null
+		obvParams[CATALOG_NUMBER] = obv.catalogNumber
+		obvParams[PUBLISHING_COUNTRY] = obv.publishingCountry
+		obvParams[ACCESS_RIGHTS] = obv.accessRights;
+		obvParams[INFORMATION_WITHHELD] = obv.informationWithheld;
+        return obvParams;
+ 	}
+
+
+    /**
+    *   Upload observations from file
+    */
     Map upload(String file, Map params, UploadLog dl) {
         dl.writeLog("============================================\n", Level.INFO);            
-        File ipFile = new File(params.file);
+        File observationsFile = new File(params.file);
+        File multimediaFile = null;
         File mappingFile = new File(params.mappingFile);
+        File multimediaMappingFile = null;
         File imagesDir = params.imagesDir ? new File(params.imagesDir):null; 
+        File uploadLog =  new File(dl.logFilePath);
 
+        DataTable dataTable = DataTable.get(params.dataTable)
+        if(params.isMarkingDirty) {
+            //make inplace changes for existing observations
+            dl.writeLog("Marking has changed. So doing a inplace edit for existing observations\n", Level.INFO);            
+            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            DataTableObservationImporter importer = DataTableObservationImporter.getInstance();
+            importer.separator = ',';
+            Map o = importer.importData(dataTable, mappingFile, multimediaMappingFile, uploadLog, params.changedCols);
+            uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog);
 
-        uploadObservations(DataTable.get(params.dataTable), ipFile, null, mappingFile, null,  imagesDir, new File(dl.logFilePath));  
-//        dl.writeLog("\n====================================\nLoaded ${noOfObservationsLoaded} observations\n====================================\n", Level.INFO);
+        } else {
+            //do a fresh upload from file
+            dl.writeLog("Doing a fresh upload from file\n", Level.INFO);            
+            FileObservationImporter importer = FileObservationImporter.getInstance();
+            importer.separator = ',';
+            Map o = importer.importData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
+            uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog);
+        }
         return ['success':true, 'msg':"Loaded observations."];
     }
 
-    private void uploadDWCObservations(DataTable dataTable, File directory, File uploadLog) {
-        DwCObservationImporter importer = DwCObservationImporter.getInstance();
-        Map o = importer.importData(directory.getAbsolutePath(), uploadLog);
-        uploadObservations(dataTable, directory, importer, uploadLog);
-    }
-
-    private void uploadObservations(DataTable dataTable, File observationsFile, File multimediaFile, File mappingFile, File multimediaMappingFile, File imagesDir, File uploadLog) {
-        FileObservationImporter importer = FileObservationImporter.getInstance();
-        importer.separator = ',';
-        Map o = importer.importData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
-        uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog);
-    }
-
+    /**
+    * Upload observations using importer
+    */
     private void uploadObservations(DataTable dataTable, File directory, AbstractObservationImporter importer, Map mediaInfo, File imagesDir, File uploadLog) {
         Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
 
@@ -1110,6 +1235,11 @@ class ObvUtilService {
         importer.closeReaders();
     }
 
+    private void uploadDWCObservations(DataTable dataTable, File directory, File uploadLog) {
+        DwCObservationImporter importer = DwCObservationImporter.getInstance();
+        Map o = importer.importData(directory.getAbsolutePath(), uploadLog);
+        uploadObservations(dataTable, directory, importer, uploadLog);
+    }
 
     Map uploadDwCDataset(Map params) {
         def resultModel = [:]
@@ -1564,6 +1694,5 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         uploadLog << "\n\n----------------------------------------------------------------------";
         uploadLog << "\nTotal time taken for uploading ${((new Date()).getTime() - startTime.getTime())/1000} sec"
     }
-
 
 }
