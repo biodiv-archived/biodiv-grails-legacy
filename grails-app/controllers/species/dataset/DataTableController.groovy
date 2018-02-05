@@ -226,9 +226,9 @@ class DataTableController extends AbstractObjectController {
 
 	protected def getDataTableList(params) {
         try { 
-            params.max = params.max?Integer.parseInt(params.max.toString()):24 
+            params.max = params.max?Integer.parseInt(params.max.toString()):12 
         } catch(NumberFormatException e) { 
-            params.max = 24 
+            params.max = 12 
         }
         try { 
             params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
@@ -236,7 +236,7 @@ class DataTableController extends AbstractObjectController {
             params.offset = 0 
         }
 
-        def max = Math.min(params.max ? params.int('max') : 24, 100)
+        def max = Math.min(params.max ? params.int('max') : 12, 100)
         def offset = params.offset ? params.int('offset') : 0
         def filteredDataTable = dataTableService.getFilteredDataTables(params, max, offset, false)
         def instanceList = filteredDataTable.instanceList
