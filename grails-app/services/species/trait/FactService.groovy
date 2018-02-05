@@ -36,6 +36,7 @@ import species.participation.Observation;
 class FactService extends AbstractObjectService {
 
     static transactional=false;
+    def observationsSearchService;
 
     Map upload(String file, Map params, UploadLog dl) {
         int noOfFactsLoaded = 0;
@@ -368,7 +369,7 @@ update observation set traits_json = g.item from (
 
                         """);
 
-
+            observationsSearchService.publishSearchIndex(object,true);
         }
 
         result['success'] = success;
