@@ -21,6 +21,7 @@ import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
 import species.trait.Fact;
 import content.eml.Document;
+import species.dataset.DataTable;
 
 class Species implements Rateable { 
  	String title;
@@ -37,6 +38,7 @@ class Species implements Rateable {
 	StringBuilder sLog;
     boolean hasMedia = false;
 	boolean isDeleted = false;
+    DataTable dataTable;
 	
 	def grailsApplication; 
 	def springSecurityService;
@@ -74,6 +76,7 @@ class Species implements Rateable {
         featureCount nullable:false;
         habitat nullable:true;
 		isDeleted nullable:false;
+		dataTable nullable:true;
 	}
 
 	static mapping = {
@@ -393,6 +396,9 @@ class Species implements Rateable {
 	 * @return
 	 */
 	def clearBasicContent(){
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
 		//this.resources?.clear();
         def tmp = [] ;
         tmp.addAll fields;
@@ -558,10 +564,24 @@ class Species implements Rateable {
 
     Map getTraits() {
         //def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
-        def allTraitList = traitService.getFilteredList(['sGroup':this.guid, 'isNotObservationTrait':true,'taxon':this.taxonConcept.id], -1, -1).instanceList;
+//        def allTraitList = traitService.getFilteredList(['isNotObservationTrait':true, 'showInObservation':false, 'taxon':this.taxonConcept.id], -1, -1).instanceList;
         def r = getTraitFacts();
-        r['allTraitList'] = allTraitList; 
+//        r['allTraitList'] = allTraitList; 
         return r;
+    }
+
+    def fetchChecklistAnnotation(){
+        def res = [:]
+        res['id'] = this.id;
+        res['type'] = 'species';
+        res['speciesid'] = this.id; 
+        res['title'] = this.title();
+ 
+        return res
+    }
+
+    SUser getAuthor() {
+        return SUser.findByEmail('admin@strandls.com');
     }
 
     @Override

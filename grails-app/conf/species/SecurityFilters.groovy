@@ -236,14 +236,13 @@ class SecurityFilters {
 
                     log.info """
 ############## Hibernate Stats ##############
-Action:                     /${controllerName}/${actionName} : ${end-start}ms
-Transaction Count:          ${stats.transactionCount}
-Flush Count:                ${stats.flushCount}
-Prepared Statement Count:   ${stats.prepareStatementCount}
-Total time:                 ${end - start} ms
+# Action:                     /${controllerName}/${actionName} : ${end-start}ms
+# Transaction Count:          ${stats.transactionCount}
+# Flush Count:                ${stats.flushCount}
+# Prepared Statement Count:   ${stats.prepareStatementCount}
+# Total time:                 ${end - start} ms
 #############################################
 """
-
 stats.clear() // We assume no one else is using stats
                 }
             }

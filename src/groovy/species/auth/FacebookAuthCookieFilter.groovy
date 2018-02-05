@@ -90,9 +90,13 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                 //logger.debug("Found fbsr & fb_login cookie");
                 try {
                     if (token != null) {
-                        //logger.debug("Got fbAuthToken $token");
-                        Authentication authentication = null;
+                        logger.debug("Got fbAuthToken $token");
+                        token = request.getSession().getAttribute("LAST_FACEBOOK_USER");
+                        logger.debug("Got fbAuthToken user $token.user");
+                        Authentication authentication = null
                         authentication = authenticationManager.authenticate(token);
+                        println authentication
+                        println "+++++++++++++++++++++++++++++++++++++++"
                         if (authentication && authentication.authenticated) {
 
 
@@ -118,9 +122,12 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                         }
                     }
                 } catch(UsernameNotFoundException e) {
+                    e.printStackTrace();
                     logger.info("UsernameNotFoundException: $e.message")
+                    println url;
                     def referer = request.getHeader("referer");
                     if(url == '/login/authSuccess' || url == '/oauth/google/success') {
+                        log.debug "Handling Usernamenotfound for token ${token}"
                         handleAuthSuccess(request, response, token, e);
                         return;
                     }

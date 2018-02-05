@@ -12,6 +12,7 @@ import species.sourcehandler.XMLConverter;
 import species.TaxonomyDefinition;
 import species.ScientificName.TaxonomyRank
 
+import species.formatReader.SpreadsheetReader;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import species.trait.Trait;
@@ -38,7 +39,7 @@ import species.groups.SpeciesGroup;
 import species.TaxonomyDefinition;
 import species.utils.ImageUtils;
 import species.utils.ImageType;
-
+import species.dataset.DataTable;
 
 class TraitService extends AbstractObjectService {
 
@@ -46,34 +47,49 @@ class TraitService extends AbstractObjectService {
     Map upload(String file, Map params, UploadLog dl) {
         //def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
         Language languageInstance = utilsService.getCurrentLanguage();
-        Map result = uploadTraitDefinitions(file, dl, languageInstance);
-        uploadTraitValues(params.tvFile, dl, languageInstance);
+        Map result = [success:false, msg:''];
+        DataTable dataTable;
+        if(params['dataTable']) {
+            dataTable = DataTable.read(Long.parseLong(params.dataTable+''));
+        }
+        if(params.tFile) {
+            def r = uploadTraitDefinitions(params.tFile, dl, languageInstance, dataTable);
+            result.success = r.success;
+            result.msg += r.msg;
+        }
+        if(params.tvFile) {
+            def r = uploadTraitValues(params.tvFile, dl, languageInstance, dataTable);
+            result.success = r.success && result.success;
+            result.msg += r.msg;
+        }
         return result;
     }
 
-    //TO BE DELETED AND MOVED TO UTILSSERVICE
-    private CSVReader getCSVReader(File file) {
-        char separator = '\t'
-        if(file.exists()) {
-            CSVReader reader = new CSVReader(new FileReader(file), separator, CSVWriter.NO_QUOTE_CHARACTER);
-            return reader
-        }
-        return null;
+    Map validateTraitDefinitions(String file, UploadLog dl) {
+        dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
+        List reqdHeaders = ['trait', 'traittype', 'datatype', 'spm'];
+        return validateSpreadsheetHeaders(file, dl, reqdHeaders);
     }
 
-    Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance) {
+    Map uploadTraitDefinitions(String file, UploadLog dl, Language languageInstance, DataTable dataTable=null) {
         int noOfTraitsLoaded = 0;
         dl.writeLog("Loading trait definitions from ${file}", Level.INFO);
 
-        CSVReader reader = getCSVReader(new File(file))
+        def validationResult = validateTraitDefinitions(file, dl);
+        if(!validationResult.success) {
+            return validationResult;
+        }
+        String traitNameHeaderIndex = 'trait';
+        String taxonIdHeaderIndex = 'taxonid';
+        String traitIdHeaderIndex = 'traitid';
+        String updateHeaderIndex = 'new/update';
+/*        CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
         int traitNameHeaderIndex = -1;
         int taxonIdHeaderIndex = -1;
         int traitIdHeaderIndex = -1;
         int updateHeaderIndex = -1;
-        println headers
-        dl.writeLog("Reading headers : "+headers)
         for(int i=0; i<headers.size(); i++) {
             if(headers[i].trim().equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
@@ -85,14 +101,7 @@ class TraitService extends AbstractObjectService {
                 updateHeaderIndex = i;
             }
         }
-        dl.writeLog("Found required columns at indexes ${traitNameHeaderIndex} ${taxonIdHeaderIndex} ${updateHeaderIndex}");
-        println traitNameHeaderIndex;
-        println taxonIdHeaderIndex
-        println updateHeaderIndex
-        if (traitNameHeaderIndex == -1 || taxonIdHeaderIndex == -1 || updateHeaderIndex == -1) {
-            dl.writeLog("Trait name column and/or taxonId column or update column is not defined", Level.ERROR);
-            return ['noOfTraitsLoaded':noOfTraitsLoaded, 'msg':"Trait name column and/or taxonId column or update column is not defined"];
-        }
+*/
 
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File traitResourceDir = new File(rootDir);
@@ -103,17 +112,21 @@ class TraitService extends AbstractObjectService {
         traitResourceDir.mkdirs();
         String resourceFromDir = (new File(file)).getParent();
 
-        while(row) {
-            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
-                dl.writeLog("Ignoring row " + row, Level.WARN);
+        SpreadsheetReader.readSpreadSheet(new File(file).getAbsolutePath()).get(0).eachWithIndex { row, rowNo ->
+            /*if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '') {
+                dl.writeLog("============================================\n", Level.INFO);
+                dl.writeLog("Ignoring row (${rowNo}) : " + row, Level.WARN);
                 row = reader.readNext();
+                rowNo++;
                 continue;
-            }
+            }*/
+            dl.writeLog("============================================\n", Level.INFO);            
+            dl.writeLog("Processing row (${rowNo}) : " + row, Level.INFO);            
 
             List taxons_scope = [];
-            row[taxonIdHeaderIndex].tokenize(",").each { taxonId ->
+            row[taxonIdHeaderIndex].tokenize(",").each { taxonId -> 
                 taxonId = taxonId.replaceAll('"','');
-                try {
+                try { 
                     TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(taxonId?.trim()));
                     if(t) taxons_scope << t;
                     else {
@@ -130,7 +143,7 @@ class TraitService extends AbstractObjectService {
             if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {
                 if(row[traitIdHeaderIndex]) {
                     traitInstance = Trait.get(Long.parseLong(row[traitIdHeaderIndex]));
-                    dl.writeLog("Updating trait ${traitInstance} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
+                    dl.writeLog("Updating trait ${traitInstance} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}", Level.INFO);
                 } 
                 else {
                     if(taxon_scope.size() == 1) {
@@ -141,46 +154,46 @@ class TraitService extends AbstractObjectService {
                 }
             } else if( row[updateHeaderIndex]?.equalsIgnoreCase('new') ){
                 traitInstance = new Trait();
-                dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]}");
+                dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]}", Level.INFO);
             }
 
             if(traitInstance) {
                 //trait = new Trait();
-                headers.eachWithIndex { header, index ->
-
+                //headers.eachWithIndex { header, index ->
+                row.each { header, value ->
                     switch(header.toLowerCase()) {
 
                         case 'trait' :
-                        //traitInstance = Trait.findByName(row[index].toLowerCase().trim())
-                        //if(!traitInstance){trait.name = row[index].toLowerCase().trim();}
+                        //traitInstance = Trait.findByName(value.toLowerCase().trim())
+                        //if(!traitInstance){trait.name = value.toLowerCase().trim();}
                         //else{i 
-                        if(!traitInstance.name) traitInstance.name = row[index].trim();
+                        if(!traitInstance.name) trait.name = value.trim();
                         //}
                         break;
 
                         /*case 'values' : 
-                        if(!traitInstance){traitInstance.values = row[index].trim()}
-                        else{traitInstance.values = row[index].trim()}
+                       if(!traitInstance){traitInstance.values = value.trim()}
+                        else{traitInstance.values = value.trim()}
                         break;
                          */
                         case 'datatype' : 
-                        traitInstance.dataTypes = Trait.fetchDataTypes(row[index].trim());
+                        traitInstance.dataTypes = Trait.fetchDataTypes(value.trim());
                         break;
 
                         case 'traittype' :
-                        traitInstance.traitTypes = Trait.fetchTraitTypes(row[index].trim());
+                        traitInstance.traitTypes = Trait.fetchTraitTypes(value.trim());
                         break;
 
                         case 'units' : 
-                        traitInstance.units = Trait.fetchUnits(row[index].trim());
+                        traitInstance.units = Trait.fetchUnits(value.trim());
                         break;
 
                         case 'trait source' : 
-                        traitInstance.source = row[index].trim();
+                        traitInstance.source = value.trim();
                         break;
 
                         case 'trait icon' : 
-                        traitInstance.icon = migrateIcons(row[index].trim(), traitResourceDir, resourceFromDir);
+                        traitInstance.icon = migrateIcons(value.trim(), traitResourceDir, resourceFromDir);
                         break;
 
                         case 'taxonid':
@@ -192,31 +205,35 @@ class TraitService extends AbstractObjectService {
                         break;
 
                         case 'trait definition':
-                        traitInstance.description = row[index].trim();
+                        traitInstance.description = value.trim();
                         break;
 
                         case 'spm':
-                        traitInstance.field = getField(row[index], languageInstance);
+                        traitInstance.field = getField(value, languageInstance);
                         break;
 
                         case 'isobvtrait':
-                        traitInstance.isNotObservationTrait = !row[index]?.trim()?.toBoolean();
+                        traitInstance.isNotObservationTrait = !value?.trim()?.toBoolean();
                         break;
 
                         case 'isparticipatory':
-                        traitInstance.isParticipatory = row[index]?.trim()?.toBoolean();
+                        traitInstance.isParticipatory = value?.trim()?.toBoolean();
                         break;
 
                         case 'showinobservation':
-                        traitInstance.showInObservation = row[index]?.trim()?.toBoolean();
+                        traitInstance.showInObservation = value?.trim()?.toBoolean();
                         break;
 
 
                     } 
                 }
 
+                if(dataTable) {
+                    traitInstance.dataTable = dataTable;//DataTable.read(Long.parseLong(''+m['dataTable'])); 
+                }
+
                 if(!traitInstance.hasErrors() && traitInstance.save(flush:true)) {
-                    dl.writeLog("Successfully inserted/updated trait");
+                    dl.writeLog("Successfully inserted/updated trait", Level.INFO);
                     noOfTraitsLoaded++;
                 } else {
                     dl.writeLog("Failed to save trait", Level.ERROR);
@@ -231,25 +248,31 @@ class TraitService extends AbstractObjectService {
 
 
             //}
-            row = reader.readNext();
+            //row = reader.readNext();
+            //rowNo++;
         }
 
-        dl.writeLog("\n====================================\nSuccessfully added ${noOfTraitsLoaded} traits\n====================================\n");
+        dl.writeLog("====================================\nLoaded ${noOfTraitsLoaded} traits\n====================================\n", Level.INFO);
         return ['success':true, 'msg':"Loaded ${noOfTraitsLoaded} traits."];
-    }
+     }
 
     private Field getField(String string, Language languageInstance) {
+        if(!string) return null;
 
-        def f = string.tokenize("|");
-
+        String[] f = string.tokenize("|");
+println f
         Field field;
         if(f.size() == 1) {
-            f = Field.findByLanguageAndConcept(languageInstance, f[0].trim());
+            field = Field.findByLanguageAndConcept(languageInstance, f[0].trim());
         } else if (f.size() == 2) {
-            f = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
+            println f[0]
+            println f[1]
+            println languageInstance
+            field = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
         } else  if (f.size() == 3) {
-            f = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
+            field = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
         } 
+        return field;
     }
 
     private getTaxon(String taxonList) {
@@ -259,21 +282,32 @@ class TraitService extends AbstractObjectService {
         }
     }
 
-    Map uploadTraitValues(String file, UploadLog dl, Language languageInstance) {
+    Map validateTraitValues(String file, UploadLog dl) {
+        dl.writeLog("Loading trait values from ${file}", Level.INFO);
+        List reqdHeaders = ['trait', 'value'];
+        return validateSpreadsheetHeaders(file, dl, reqdHeaders);
+    }   
+
+    Map uploadTraitValues(String file, UploadLog dl, Language languageInstance, DataTable dataTable=null) {
         int noOfValuesLoaded=0;
 
         dl.writeLog("Loading trait values from ${file}", Level.INFO);
 
-        CSVReader reader = getCSVReader(new File(file))
+        def validationResult = validateTraitValues(file, dl);
+        if(!validationResult.success) {
+            return validationResult;
+        }
+
+/*      CSVReader reader = getCSVReader(new File(file))
         String[] headers = reader.readNext();//headers
         String[] row = reader.readNext();
+*/
+        String traitNameHeaderIndex = 'trait';
+        String valueHeaderIndex = 'value';
+        String taxonIdHeaderIndex='taxonid';
+        String traitIdHeaderIndex='traitid';
 
-        int traitNameHeaderIndex = -1;
-        int valueHeaderIndex = -1;
-        int taxonIdHeaderIndex=-1;
-        int traitIdHeaderIndex=-1;
-
-        for(int i=0; i<headers.size(); i++) {
+/*        for(int i=0; i<headers.size(); i++) {
             if(headers[i].equalsIgnoreCase('trait')) {
                 traitNameHeaderIndex = i;
             }
@@ -287,11 +321,7 @@ class TraitService extends AbstractObjectService {
                 traitIdHeaderIndex = i;
             }
         }
-        if (traitNameHeaderIndex == -1 || valueHeaderIndex == -1 || traitIdHeaderIndex == -1) {
-            dl.writeLog("Some of trait name, value and traitid columns are not defined", Level.ERROR);
-            return ['noOfvalueLoaded':noOfValuesLoaded, 'msg':"Some of trait name, value and traitid columns are not defined"];
-        }
-
+*/
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File traitResourceDir = new File(rootDir);
         if(!traitResourceDir.exists()) {
@@ -301,14 +331,21 @@ class TraitService extends AbstractObjectService {
         traitResourceDir.mkdirs();
 
         String resourceFromDir = (new File(file)).getParent();
+        //int rowNo = 1;
+        //while(row) {
+        SpreadsheetReader.readSpreadSheet(new File(file).getAbsolutePath()).get(0).eachWithIndex { row, rowNo ->
 
-        while(row) {
-
-            if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
-                dl.writeLog("Ignoring row " + row, Level.WARN);
+            /*if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
+                dl.writeLog("============================================\n", Level.INFO);            
+                dl.writeLog("Ignoring row (${rowNo})" + row, Level.WARN);
                 row = reader.readNext();
-                continue;
-            }
+                rowNo++;
+                return;
+            }*/
+            dl.writeLog("============================================\n", Level.INFO);            
+            dl.writeLog("Processing row (${rowNo})" + row, Level.INFO);            
+
+
 
             /*            TaxonomyDefinition taxon;
             try {
@@ -329,10 +366,14 @@ class TraitService extends AbstractObjectService {
                     List traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon.id = ?", [row[traitNameHeaderIndex], Long.parseLong(row[taxonIdHeaderIndex])]);
                     if(traits?.size() == 1)
                         traitInstance = traits[0];
+                    else
+                        dl.writeLog("There are multiple traits ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${traits}", Level.ERROR);
                 } else {
                     List traits = Trait.executeQuery("select t from Trait t where t.name=? ", [row[traitNameHeaderIndex].trim()]);
                     if(traits?.size() == 1)
                         traitInstance = traits[0];
+                    else
+                        dl.writeLog("There are multiple traits ${row[traitNameHeaderIndex]} : ${traits}", Level.ERROR);
                     //trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex].trim(), taxon);
                 }
             } catch(e) {
@@ -341,38 +382,38 @@ class TraitService extends AbstractObjectService {
             }
             if(!traitInstance){
                 dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]}", Level.ERROR);
-                row = reader.readNext();
-                continue;
+                //row = reader.readNext();
+                return;
             }
 
 
             TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), traitInstance);
 
             if(!traitValue) {
-                dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${traitInstance.name}");
+                dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name}", Level.INFO);
                 traitValue = new TraitValue();
             } else {
-                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${traitInstance.name}");
+                dl.writeLog("Updating trait value ${traitValue} with ${row[valueHeaderIndex]} for trait ${trait.name}", Level.INFO);
             }
 
-            headers.eachWithIndex { header, index ->
+            row.each { header, value ->
                 switch(header.toLowerCase()) {
                     case 'trait' :
                     traitValue.trait = traitInstance;
                     break;
                     case 'value' :
                     println "====="
-                    println row[index];
-                    traitValue.value=row[index].trim();
+                    println value;
+                    traitValue.value=value.trim();
                     break;
                     case 'value source' : 
-                    traitValue.source=row[index].trim()
+                    traitValue.source=value.trim()
                     break;
                     case 'value icon' : 
-                    traitValue.icon=migrateIcons(row[index].trim(),traitResourceDir, resourceFromDir);
+                    traitValue.icon=migrateIcons(value.trim(),traitResourceDir, resourceFromDir);
                     break;
                     case 'value definition' : 
-                    traitValue.description=row[index].trim()
+                    traitValue.description=value.trim()
                     break;
                     //case 'taxon id' : 
                     //traitValue.taxon = taxon
@@ -380,8 +421,11 @@ class TraitService extends AbstractObjectService {
                 } 
             }
 
+            if(dataTable) {
+                traitValue.dataTable = dataTable;
+            }
             if(!traitValue.hasErrors() && traitValue.save(flush:true)) {
-                dl.writeLog("Successfully inserted/updated trait value");
+                dl.writeLog("Successfully inserted/updated trait value", Level.INFO);
                 noOfValuesLoaded++;
             }
             else {
@@ -391,10 +435,10 @@ class TraitService extends AbstractObjectService {
                 }
             }
 
-            row = reader.readNext();
+            //row = reader.readNext();
         }
 
-        dl.writeLog("\n====================================\nSuccessfully added ${noOfValuesLoaded} trait values\n====================================\n");
+        dl.writeLog("====================================\nLoaded ${noOfValuesLoaded} trait values\n====================================\n");
         return ['success':true, 'msg':"Loaded ${noOfValuesLoaded} trait values."];
     }
 
@@ -509,33 +553,44 @@ class TraitService extends AbstractObjectService {
         }
 
         if(params.sGroup) {
-            params.sGroup = params.sGroup.toLong()
             //def groupId = getSpeciesGroupIds(params.sGroup)
+            if(params.sGroup instanceof Long) params.sGroup = params.sGroup+'';
             if(!params.sGroup){
                 log.debug("No groups for id " + params.sGroup)
             }else{
-                List<TaxonomyDefinition> taxons = SpeciesGroup.read(params.sGroup)?.getTaxon(); 
+                List<TaxonomyDefinition> taxons = [];
+                List s = [];
+                params.sGroup.split(',').each {
+                    Long x = Long.parseLong(it); 
+                    def y = SpeciesGroup.read(x)?.getTaxon();
+                    if(y)
+                        taxons.addAll(y);
+                    s << x;
+                }
+
                 def classification;
                 if(params.classification)
-                    classification = Classification.read(Long.parseLong(params.classification))
-                        if(!classification)
-                            classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                    classification = Classification.read(Long.parseLong(params.classification));
+
+                if(!classification)
+                    classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+                
                 List parentTaxon = [];
                 taxons.each {taxon ->
                     if(taxon) {
-                    parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
+                        parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
                     }
                 }
                 queryParams['classification'] = classification.id; 
-                queryParams['sGroup'] = params.sGroup;
+                queryParams['sGroup'] = s;
                 queryParams['parentTaxon'] = parentTaxon ;
                 //queryParams['taxons'] = taxons;
                 activeFilters['classification'] = classification.id;
-                activeFilters['sGroup'] = params.sGroup;
+                activeFilters['sGroup'] = s;
 
-                  if(params.showInObservation && params.showInObservation.toBoolean()){
-                 filterQuery += ' and obv.showInObservation = :showInObservation '
-                 queryParams['showInObservation'] = true ; 
+                if(params.showInObservation && params.showInObservation.toBoolean()){
+                    filterQuery += ' and obv.showInObservation = :showInObservation '
+                    queryParams['showInObservation'] = true ; 
                 }
 
  
@@ -548,7 +603,7 @@ class TraitService extends AbstractObjectService {
                     filterQuery += " ";// and reg.classification.id = :classification and ( ${inQuery} ) and taxon is null  ";
                 } else if(parentTaxon) {
                     inQuery = " taxon.id in (:parentTaxon) or " 
-                    filterQuery += " and (taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id = :sGroup) ";
+                    filterQuery += " and (taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id in (:sGroup)) ";
                 }
 
 
@@ -587,6 +642,12 @@ class TraitService extends AbstractObjectService {
             filterQuery += " and obv.isNotObservationTrait = :isNotObservationTrait "
             queryParams["isNotObservationTrait"] = !params.isObservationTrait.toBoolean()
             activeFilters["isNotObservationTrait"] = !params.isObservationTrait.toBoolean()
+        }
+
+        if(params.isNotObservationTrait && params.isNotObservationTrait.toBoolean()){
+            filterQuery += " and obv.isNotObservationTrait = :isNotObservationTrait "
+            queryParams["isNotObservationTrait"] = params.isNotObservationTrait.toBoolean()
+            activeFilters["isNotObservationTrait"] = params.isNotObservationTrait.toBoolean()
         }
 
         if(params.isParticipatory && params.isParticipatory.toBoolean()){
@@ -635,10 +696,11 @@ class TraitService extends AbstractObjectService {
         return traitFilter
     }    
 
-    def createTraitValue(Trait traitInstance, params){
+    List createTraitValues(Trait traitInstance, params){
 
-        def valueCount = params.valueCount?params.valueCount:0;
-        for(def i=1;i<=valueCount;i++){
+        int valueCount = params.valueCount?params.int('valueCount'):0;
+        List traitValues = [];
+        for(int i=1; i<=valueCount; i++) {
             TraitValue traitValueInstance = new TraitValue();
             traitValueInstance.value = params["value_"+i];
             traitValueInstance.description = params["traitDesc_"+i];
@@ -646,17 +708,35 @@ class TraitService extends AbstractObjectService {
             traitValueInstance.trait = traitInstance
             traitValueInstance.icon = getTraitIcon(params["icon_"+i])
 
-            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
-                def msg = "Trait Value Added Successfully"
-            }
-            else{
-                def errors = [];
-                traitValueInstance.errors.allErrors .each {
+            traitValueInstance.validate();
+            traitValueInstance.errors.allErrors .each {
                     def formattedMessage = messageSource.getMessage(it, null);
-                    errors << [field: it.field, message: formattedMessage]
+                    log.error formattedMessage
                 }
+     
+            traitValues << traitValueInstance; 
+        }
+        return traitValues;
+    }
+    
+    Map saveTraitValues(List<TraitValue> traitValues) {
+        log.debug "saving trait values";
+        def valueCount = traitValues.size();
+        Map result = ['success':true, errors:[]];
+        for(int i=0; i<valueCount; i++) {
+            if (traitValues[i].save(flush: true)) {
+                log.debug "saved trait value ${traitValues[i]} for trait ${traitValues[i].trait}"
+            } else {
+                traitValues[i].errors.allErrors .each {
+                    def formattedMessage = messageSource.getMessage(it, null);
+                    result.errors << [field: it.field, message: formattedMessage]
+                }
+                result.success = false;
+                log.error result.errors;
             }
         }
+        return result;
+       
     }
 
     private String getTraitIcon(String icon) {    
@@ -735,7 +815,7 @@ class TraitService extends AbstractObjectService {
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(icon));
         if(!fromDir) fromDir = grailsApplication.config.speciesPortal.content.rootDir; 
-        File fi = new File(fromDir+"/trait/"+icon);
+        File fi = new File(fromDir+"/icons/"+icon);
         if(fi.exists()) {
             (new AntBuilder()).copy(file: fi, tofile: file)
             ImageUtils.createScaledImages(file, usersDir,true);

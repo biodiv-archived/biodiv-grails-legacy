@@ -216,7 +216,7 @@ class LoginController {
 	 * The Ajax success redirect url.
 	 */
 	def ajaxSuccess = {
-/*        def requestCache = new HttpSessionRequestCache();
+        def requestCache = new HttpSessionRequestCache();
         println request;
         def defaultSavedRequest = requestCache.getRequest(request, response);
         log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
@@ -228,7 +228,7 @@ class LoginController {
         } finally {
             requestCache.removeRequest request, response
         }
-*/		render([success: true, username: springSecurityService.authentication.name, redirectUrl:redirectUrl] as JSON)
+//		render([success: true, username: springSecurityService.authentication.name, redirectUrl:redirectUrl] as JSON)
 	}
 
 	/**

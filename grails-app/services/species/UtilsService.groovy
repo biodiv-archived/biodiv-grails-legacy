@@ -19,6 +19,7 @@ import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.apache.commons.lang.time.DateUtils;
+import species.dataset.DataTable;
 
 import org.springframework.context.i18n.LocaleContextHolder as LCH; 
 import org.apache.log4j.Logger
@@ -75,6 +76,7 @@ class UtilsService {
     static final String OBSERVATION_FLAGGED = "observationFlagged";
     static final String OBSERVATION_DELETED = "observationDeleted";
     static final String CHECKLIST_DELETED= "checklistDeleted";
+    static final String DATATABLE_DELETED= "dataTableDeleted";
     static final String DOWNLOAD_REQUEST = "downloadRequest";
     static final String IMPORT_REQUEST = "importRequest";
     //static final int MAX_EXPORT_SIZE = -1;
@@ -155,22 +157,25 @@ class UtilsService {
             def userGroup = attrs.remove('userGroup');
             attrs.remove('userGroupWebaddress');
             boolean absolute = attrs.remove('absolute');
+            String fragment = attrs.remove('fragment')
+
+            fragment = fragment?:'';
             if(attrs.params) {
                 attrs.putAll(attrs.params);
                 attrs.remove('params');
             }
             if(base) {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, fragment:fragment, params:attrs);
                 String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
                 url = url.replace(onlyGroupUrl, "");
             } else {
 
                 if((userGroup?.domainName)) { 
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName,  fragment:fragment, 'action':action, absolute:absolute, params:attrs);
                     String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
                     url = url.replace(onlyGroupUrl, "");
                 } else {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(),  fragment:fragment, 'action':action, absolute:absolute, params:attrs);
                 }
             }
 
@@ -183,6 +188,9 @@ class UtilsService {
             def userGroup = attrs.remove('userGroup');
             String userGroupWebaddress = attrs.remove('userGroupWebaddress');
             boolean absolute = attrs.remove('absolute');
+            String fragment = attrs.remove('fragment')
+
+            fragment = fragment?:'';
             def userGroupController = new UserGroupController();
             userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
             if(attrs.params) {
@@ -190,17 +198,17 @@ class UtilsService {
                 attrs.remove('params');
             }
             if(base) {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base,  fragment:fragment, absolute:absolute, params:attrs)
                 String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
                 url = url.replace(onlyGroupUrl, "");
             } else {
 
                 if((userGroup?.domainName)) { 
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName,  fragment:fragment, 'action':action, absolute:absolute, params:attrs)
                     String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
                     url = url.replace(onlyGroupUrl, "");
                 } else {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(),  fragment:fragment, 'action':action, absolute:absolute, params:attrs)
                 }
             }
 
@@ -212,17 +220,21 @@ class UtilsService {
             attrs.remove('userGroupWebaddress');
             String mappingName = attrs.remove('mapping');
             boolean absolute = attrs.remove('absolute');
+
+            String fragment = attrs.remove('fragment')
+            fragment = fragment?:'';
             if(attrs.params) {
                 attrs.putAll(attrs.params);
                 attrs.remove('params');
             }
             if(base) {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute,  fragment:fragment, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             } else {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute,  fragment:fragment, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             }
         }
-        return url;//.replaceAll('//', '/');
+        if(url.endsWith('#')) url = url.replaceAll('#','');
+        return url;//.replace('/api/', '/');
     }
 
     File getUniqueFile(File root, String fileName){
@@ -357,7 +369,7 @@ class UtilsService {
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
                     templateMap["traitInstance"] = otherParams["trait"]
-                    templateMap["traitValue"] = otherParams["traitValue"]
+                    templateMap["traitValueStr"] = otherParams["traitValueStr"]
                     bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/factUpdate"
                     populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                     toUsers.add(user)
@@ -442,7 +454,7 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
-                case CHECKLIST_DELETED :
+                case [CHECKLIST_DELETED,DATATABLE_DELETED] :
                 mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.checklistDeleted.emailSubject", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["actionObject"] = messageSource.getMessage("default.checklist.label", null, LCH.getLocale())
@@ -932,6 +944,10 @@ class UtilsService {
             return "checklist"
         } else if(domainObj.instanceOf(SUser)){
             return "user"
+        } else if(domainObj.instanceOf(UserGroup)){
+            return "userGroup"
+        } else if(domainObj.instanceOf(DataTable)){
+            return "dataTable"
         } else {
             return domainObj.class.getSimpleName().toLowerCase()
         }
@@ -966,6 +982,7 @@ class UtilsService {
         if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
             println "%%%%%%%%%%%% logging sql ${blockName}"  
             sqlLogger.setLevel(Level.TRACE)
+            println "%%%%%%%%%%%% END logging sql ${blockName}"  
         }
         def result = closure.call()
 
@@ -1063,8 +1080,8 @@ class UtilsService {
     ////////////////////////RESPONSE FORMATS//////////////////
 
     Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
-        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
-        String acceptHeader = request.getHeader('Accept');
+//        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
+//        String acceptHeader = request.getHeader('Accept');
 
         if(!errors) errors = [];
         if(domainObject) {
@@ -1074,7 +1091,12 @@ class UtilsService {
             }
         }
 
-        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        try {
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        } catch(Exception e) {
+            log.error "Error setting status in response"
+        }
+
         def result = [success:false, status:status, msg:msg, errors:errors];
         if(domainObject) 
             result['instance'] = domainObject;
@@ -1082,9 +1104,9 @@ class UtilsService {
     }
 
     Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
-        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+//        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
 //        println "+++++++++++++++++++++++++++++++++++++++"
-        String acceptHeader = request.getHeader('Accept');
+//        String acceptHeader = request.getHeader('Accept');
 //        println acceptHeader
         def result = [success:true, status: status, msg:msg]
         //HACK to handle previous version of api for mobile app 
@@ -1113,7 +1135,11 @@ class UtilsService {
         } else {
 */            if(domainObject) result['instance'] = domainObject;
             if(model) result['model'] = model;
-            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            try {
+                (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            } catch(Exception e) {
+                log.error "Error setting status in response"
+            }
             return result;
 //        } 
     }
@@ -1334,6 +1360,23 @@ class UtilsService {
             String s = formatter.format(date);
                 System.out.println(s);
                 return s;
+    }
+    
+    public Map getTraits(String t) {
+        Map traits = [:];
+        if(t) {
+            t.split(';').each {
+                if(it) {
+                    String[] x = it.split(':');
+                    if(x.size() == 2)
+                        traits[x[0]] = x[1].trim();
+                    else if(x.size() == 3) //for range
+                        traits[x[0]] = x[1].trim()+':'+x[2].trim();
+
+                }
+            }
+        }
+        return traits;
     }
 }
 

@@ -33,25 +33,58 @@
            </div> 
             </g:if>
         
-        <g:if test="${fromSpeciesShow!=true}">
+        <g:if test="${fromSpeciesShow!=true || editable}">
             <g:each in="${traitValues}" var="traitValue" status="i">
+                <g:if test="${(traitValue instanceof TraitValue)}">
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue?.traitInstance.id}' data-isNotObservation='${traitValue.traitInstance.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post ${traitTypes} ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue?.traitInstance.id]?.contains(traitValue.id+'')?'active btn-success':''}"
                         value="${traitValue.value}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;width:inherit;">
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
                     </button>
+                </g:if>
+                <g:else>
+                    <g:if test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
+                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        class="btn span2 input-prepend single-post disabled"
+                            style="">
+
+                            <g:if test="${trait.units == Units.MONTH}">
+                                ${UtilsService.getMonthName(traitValue.split(';')[0])} 
+                                - ${UtilsService.getMonthName(traitValue.split(';')[1])} 
+                            </g:if>
+                            <g:else>
+                                ${traitValue}
+                            </g:else>
+                        </span>
+                        </g:if>
+                        <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
+                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        class="btn span2 input-prepend single-post disabled" title="${traitValue}"
+                            style="">
+                        </span>
+                        </g:elseif>
+
+                        <g:else>
+                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        class="btn span2 input-prepend single-post disabled"
+                            style="">
+                            ${traitValue} 
+                        </span>
+                        </g:else>
+                    
+                    </g:else>
             </g:each> 
         </g:if>
         
-        <g:if test="${fromSpeciesShow==true}">
+        <g:if test="${fromSpeciesShow==true && !editable}">
             <g:each in="${traitValues}" var="traitValue" status="i">
             <g:if test="${(traitValue instanceof TraitValue)}">
                 <% String link="${"/trait/show/"+traitInstance.id+"?trait."+traitInstance.id+"="+traitValue.id}" %>
                 <a href='${link}'>
                     <button type="button" id="value_btn_${traitValue.id}" data-tvid='${traitValue.id}' data-tid='${traitValue.traitInstance.id}' data-isnotobservation='${traitValue.traitInstance.isNotObservationTrait}'
                     class="btn span2 input-prepend single-post ${queryParams && queryParams.trait && traitValue && queryParams.trait[traitValue.traitInstance.id]?.contains(traitValue.id+'')?'active btn-success':''}"
-                        value="${traitValue.id}"
+                        value="${traitValue.value}"
                         style="padding: 0px; height: 36px; border-radius: 6px; margin:5px;">
 
                         <g:render template="/trait/showTraitValueSignatureTemplate" model="['traitValue':traitValue]"/>
@@ -103,7 +136,9 @@
                 Undefined
             </div> 
             </g:if>
-            </g:if>
+</g:if>
+
+
             <g:elseif test="${traitInstance.traitTypes == TraitTypes.RANGE && traitInstance.dataTypes == DataTypes.DATE}">
             <g:if test="${traitInstance.units == Units.MONTH}">
             <div style="width:280px;">

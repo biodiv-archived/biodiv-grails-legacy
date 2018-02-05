@@ -147,3 +147,22 @@ RewriteCond %{REQUEST_URI} !(^/(species|observation|activity|SUser|user|page|pag
     RewriteRule ^(.*)$ $1 [QSA,L]
 </VirtualHost>
 
+<VirtualHost *:80>
+    ProxyRequests Off
+    ServerName localhost.fileops.indiabiodiversity.org
+    ServerAlias www.localhost.fileops.indiabiodiversity.org
+    DirectoryIndex index.php index.html index.html index.htm index.shtml
+    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+	
+    DocumentRoot /var/www
+    RewriteEngine on
+
+
+
+    ProxyPass / http://localhost.fileops.indiabiodiversity.org:5000/Filesutra/
+    ProxyPassReverse / http://localhost.fileops.indiabiodiversity.org:5000/Filesutra/
+
+    ProxyPassReverseCookiePath /Filesutra /
+    
+</VirtualHost>
+

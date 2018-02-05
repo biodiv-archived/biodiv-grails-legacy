@@ -4,7 +4,7 @@ function removeResource(event, imageId) {
     if (event.target) targ = event.target;
     else if (event.srcElement) targ = event.srcElement; //for IE
     else {}
-    if(($(targ).closest(".imagesList").size() == 1) && ($( "input[name='resType']" ).val() == "species.auth.SUser")){
+    if(($(targ).closest(".uploaded_files_list").size() == 1) && ($( "input[name='resType']" ).val() == "species.auth.SUser")){
         var resId =  $(targ).parent('.addedResource').find(".resId").val();
         var fileName = $(targ).parent('.addedResource').find(".fileName").val();
         var resDeleteUrl = window.params.resDeleteUrl;
@@ -47,16 +47,15 @@ function attachThumbnailAndProcess(me , images) {
         });
     }
     rate(metadataEle.find('.star_obvcreate'));
-    me.$ele.find(".imagesList li:first" ).after (metadataEle);
+    me.$ele.find(".uploaded_files_list li:first" ).after (metadataEle);
     me.$ele.find(".add_file" ).fadeIn(3000);
     me.$ele.find(".image-resources-msg").parent(".resources").removeClass("error");
     me.$ele.find(".image-resources-msg").html("");
     me.$form.find("input[name='resources']").remove();
     me.$ele.find('.videoUrl').val('');
     me.$ele.find('.audioUrl').val('');
-    me.$ele.find('.add_video').editable('setValue','', false);
+//    me.$ele.find('.add_video').editable('setValue','', false);
     // me.$ele.find('.add_audio').editable('setValue','', false);		
-    me.$ele.find('.add_video').editable('setValue','', false);	
 
     if($( "input[name='resType']" ).val() == "species.auth.SUser") {
         var count = $("input[name='lastUploaded']").val();
@@ -94,6 +93,7 @@ function submitNextUpload(me) {
         }
         me.submitRes();
     } else {
+        $('.add_file.addedResource').hide();
         me.$ele.find(".progress").css('z-index',90);
         me.$ele.find(".mediaProgressBar").progressbar("destroy");
         me.$ele.find('.progress_msg').html('');
@@ -105,7 +105,13 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
     if(!jobId) {
         console.log("NO JOB ID");
         return;
+    } else if(jobId == 'dummyJobId') {
+        flag = false;
+        attachThumbnailAndProcess(me, images);
+        submitNextUpload(me);
+        return;
     }
+
     $.ajax({
         url:window.params.getProcessedImageUrl,
         dataType: "json",
@@ -152,6 +158,7 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
                 return;
 
             } else if(data.imageStatus == "Failed") {
+                $('.add_file.addedResource').hide();
                 me.$ele.find(".progress").css('z-index',90);
                 me.$ele.find('.progress_msg').html('');
                 flag = false;
@@ -170,10 +177,10 @@ function getProcessedImageStatusInAjax(jobId, images, me) {
 }
 
 function getProcessedImageStatus(jobId, images, me) {
-    if(!jobId) {
+    /*if(!jobId) {
         console.log("NO JOB ID");
         return;
-    }
+    }*/
     getProcessedImageStatusInAjax(jobId, images, me);
 }
 
@@ -227,66 +234,97 @@ function createResources(start, end, w, count) {
     UploadResource.prototype = {
 
         initForm : function(options) {
-            var me = this;
-            me.$ele.find('.add_image').bind('click', $.proxy(me.filePick, me));
-            me.$ele.find('.add_audio').bind('click', $.proxy(me.filePickAudio, me));
+           var me = this;
+            me.options = options;
+            me.filesutraApp = true;
 
-            var videoOptions = {
-                type : 'text',
-                mode : 'popup',
-                emptytext : '',
-                placement : 'right', 
-                url : function(params) {
-                    var d = new $.Deferred;
-                    if(!params.value) {
-                        return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
-                    } else {
-                        me.$form.find('.videoUrl').val(params.value);
-                        me.submitRes();
-                        d.resolve();
-                    }
-                    return d.promise() 
-                }, 
+            function loadFilesutraDialog() {
+                var ifrm = document.createElement("iframe");
+                ifrm.src =  window.params.filesutraURL;
+                ifrm.style.width = "100%";
+                ifrm.style.height = "330px";
+                ifrm.style.border = "1px solid";
+                $('.filePicker').prepend(ifrm);
+
+                window.filesutraCallback = me.filePick;
+            }
+
+            function loadFilepickerDialog() {
+
+                me.$ele.find('.add_image').bind('click', $.proxy(me.filePick, me));
+                me.$ele.find('.add_audio').bind('click', $.proxy(me.filePickAudio, me));
+
+                var videoOptions = {
+                    type : 'text',
+                    mode : 'popup',
+                    emptytext : '',
+                    placement : 'right', 
+                    url : function(params) {
+                        var d = new $.Deferred;
+                        if(!params.value) {
+                            return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
+                        } else {
+                            me.$form.find('.videoUrl').val(params.value);
+                            me.submitRes();
+                            d.resolve();
+                        }
+                        return d.promise() 
+                    }, 
+                        validate :  function(value) {
+                            if($.trim(value) == '') {
+                                return window.i8ln.observation.addResource.fr;
+                            }
+                        }, 
+                    title : window.i8ln.observation.addResource.youtube
+                };
+
+
+
+                var audioOptions = {
+                    type : 'text',
+                    mode : 'popup',
+                    emptytext : '',
+                    placement : 'bottom', 
+                    url : function(params) {
+                        var d = new $.Deferred;
+                        if(!params.value) {
+                            return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
+                        } else {
+                            me.$form.find('.audioUrl').val(params.value);
+                            me.submitRes();
+                            d.resolve();
+                        }
+                        return d.promise() 
+                    }, 
                     validate :  function(value) {
                         if($.trim(value) == '') {
                             return window.i8ln.observation.addResource.fr;
                         }
                     }, 
-                title : window.i8ln.observation.addResource.youtube
-            };
+                    title : window.i8ln.observation.addResource.ayoutube
+                };
 
 
+                $.extend( videoOptions, options);
+                me.$ele.find('.add_video').editable(videoOptions);
+                me.$ele.find('.add_audio').editable(audioOptions);
 
-            var audioOptions = {
-                type : 'text',
-                mode : 'popup',
-                emptytext : '',
-                placement : 'bottom', 
-                url : function(params) {
-                    var d = new $.Deferred;
-                    if(!params.value) {
-                        return d.reject(window.i8ln.observation.addResource.fr); //returning error via deferred object
-                    } else {
-                        me.$form.find('.audioUrl').val(params.value);
-                        me.submitRes();
-                        d.resolve();
-                    }
-                    return d.promise() 
-                }, 
-                    validate :  function(value) {
-                        if($.trim(value) == '') {
-                            return window.i8ln.observation.addResource.fr;
-                        }
-                    }, 
-                title : window.i8ln.observation.addResource.ayoutube
-            };
+                var ifrm = document.createElement("iframe");
+                ifrm.setAttribute('id','biodiv_filePicker');
+                ifrm.style.width = "100%";
+                ifrm.style.height = "330px";
+                ifrm.style.border = "1px solid";
+                $('.filePicker').prepend(ifrm);
 
 
-            $.extend( videoOptions, options);
-            me.$ele.find('.add_video').editable(videoOptions);
-           // me.$ele.find('.add_audio').editable(audioOptions);
+                me.$ele.find('.add_image').trigger('click');
+            }
 
-
+            if(me.filesutraApp == true) {
+                loadFilesutraDialog();
+            } else {
+                loadFilepickerDialog();
+            }
 
 
             me.$form.ajaxForm({ 
@@ -314,22 +352,35 @@ function createResources(start, end, w, count) {
 
         filePick : function(e) {
             var me = this;
-            var onSuccess = function(FPFiles){
+            var onSuccess = function(FPFiles) {
+                console.log(FPFiles);
                 $(".sortMediaOnExif").addClass("disabled");
                 var count = 0;
-                me.uploadedFiles = FPFiles;
-                me.uploadedFilesSize = FPFiles.length;
-                me.start = 0;
-                me.w = 1;
+                if(me.uploadedFiles == undefined) {
+                    me.start = 0;
+                    me.w = 1;
+                    me.uploadedFiles = [];
+                }
+                console.log(me.start);
+                me.uploadedFiles = me.uploadedFiles.concat(FPFiles);
+                console.log(me.uploadedFiles);
+                me.uploadedFilesSize = me.uploadedFiles.length;
                 var FPF = me.uploadedFiles.slice(me.start, me.start + me.w);
                 me.start = me.start + me.w;
                 me.$form.find("input[name='resources']").remove();
+
                 $.each(FPF, function(){
-                    $('<input>').attr({
-                        type: 'hidden',
-                        name: 'resources',
-                        value:JSON.stringify(this)
-                    }).appendTo(me.$form);
+                    console.log('each');
+                    console.log(JSON.stringify(this));
+                    if(e.contentType == 'videoUrl') {
+                        $('.videoUrl').val(JSON.stringify(this).replace(new RegExp('"', 'g'), ''));
+                    } else {
+                        $('<input>').attr({
+                            type: 'hidden',
+                            name: 'resources',
+                            value:JSON.stringify(this)
+                        }).appendTo(me.$form);
+                    }
                     count = count + 1;
                 });
                 if($( "input[name='resType']" ).val() == "species.auth.SUser") {
@@ -340,42 +391,43 @@ function createResources(start, end, w, count) {
                         value: count
                     }).appendTo(me.$form);
                 }
+                $('.add_file.addedResource').show();
                 me.$ele.find(".progress").css('z-index',110);
-                me.$ele.find('.progress_msg').html('Processing <br> Images...');
+                me.$ele.find('.progress_msg').html('Processing...');
                 me.$ele.find(".mediaProgressBar").progressbar({
                     value:0
                 });
                 me.$ele.find(".ui-progressbar-value").css('background','darkgoldenrod');
                 me.submitRes();
             };
-
-            var filepickerOptions = {
-                maxSize: 104857600,
-                services:['COMPUTER', 
-                'FACEBOOK', 
-                'FLICKR', 
-                'PICASA', 
-                'GOOGLE_DRIVE', 
-                'DROPBOX'],
-                mimetypes: ['image/*'],
-                policy: me.POLICY, 
-                signature: me.SIGNATURE
-            };
-            try {
-            filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
-                console.log(FPError.toString());
-            });
-            } catch(e) {
-                console.log('filepicker error : '+e);
-            }
-                                    
+            if(e.type == 'filesutra') {
+                me = $('.filePicker').data('uploadResource');
+                onSuccess(e.data);                                  
+            } else {
+                var filepickerOptions = {
+                    maxSize: 104857600,
+                    services:['COMPUTER', 
+                    'FACEBOOK', 
+                    'FLICKR', 
+                    'PICASA', 
+                    'GOOGLE_DRIVE', 
+                    'DROPBOX'],
+                    mimetypes: ['image/*','audio/*'],
+                    container: 'biodiv_filePicker',
+                    policy: me.options.POLICY, 
+                    signature: me.options.SIGNATURE
+                };
+                try {
+                filepicker.pickMultiple(filepickerOptions, onSuccess, function(FPError){ 
+                    console.log(FPError.toString());
+                });
+                } catch(e) {
+                    console.log('filepicker error : '+e);
+                }
+            } 
         },
 
-
-
-
-
-
+/*
          filePickAudio : function(e) {
             var me = this;
             var onSuccess = function(FPFiles){
@@ -413,8 +465,8 @@ function createResources(start, end, w, count) {
                 'GOOGLE_DRIVE', 
                 'DROPBOX'],
                 mimetypes: ['audio/*'],
-                policy: me.POLICY, 
-                signature: me.SIGNATURE
+                policy: me.options.POLICY, 
+                signature: me.options.SIGNATURE
             };
             try {
             filepicker.pickMultiple(filepickerOptions1, onSuccess, function(FPError){ 
@@ -425,7 +477,7 @@ function createResources(start, end, w, count) {
             }
                                     
         },
-
+*/
 
 
 
@@ -435,7 +487,6 @@ function createResources(start, end, w, count) {
             me.$ele.find("#addObservationSubmit").removeClass('disabled');
             $(form).find("span.msg").html("");
             //me.$ele.find(".progress").css('z-index',90);
-            //me.$ele.find('.progress_msg').html('Processing Image......');
             me.$ele.find(".iemsg").html("");
             //var rootDir = '${grailsApplication.config.speciesPortal.observations.serverURL}'
             //var rootDir = '${Utils.getDomainServerUrlWithContext(request)}' + '/observations'
@@ -463,11 +514,12 @@ function createResources(start, end, w, count) {
                 x--;
             });
             console.log(uploadedObjType);
-            if(uploadedObjType == "IMAGE"){
+            if(uploadedObjType == "IMAGE" || uploadedObjType == "AUDIO"){
                 getProcessedImageStatus(me.jobId, images, me); 
             } else {
                 attachThumbnailAndProcess(me, images); 
             }
+            //me.$ele.find('.progress_msg').html('');
         },
 
         onUploadResourceError : function (xhr, ajaxOptions, thrownError) {
@@ -483,8 +535,9 @@ function createResources(start, end, w, count) {
                 me.$form.find("span.msg").html("");
                 me.$ele.find('.videoUrl').val('');
                 me.$ele.find('.audioUrl').val('');
+                $('.add_file.addedResource').hide();
                 me.$ele.find(".progress").css('z-index',90);
-                me.$ele.find('.add_video').editable('setValue','', false);
+                //me.$ele.find('.add_video').editable('setValue','', false);
               //  me.$ele.find('.add_audio').editable('setValue','', false);
                 //xhr.upload.removeEventListener( 'progress', progressHandlingFunction, false); 
 
@@ -519,26 +572,6 @@ $(document).ready(function(){
     /**
      * upload_resource & FilePicker
      */
-    /*
-       function filePick() {
-       var onSuccess = function(FPFiles){
-       $.each(FPFiles, function(){
-       $('<input>').attr({
-       type: 'hidden',
-       name: 'resources',
-       value:JSON.stringify(this)
-       }).appendTo('.upload_resource');
-       });
-       uploadResource.submit();
-       };
-       filepicker.pickMultiple({
-       maxSize: 104857600,
-       services:['COMPUTER', 'FACEBOOK', 'FLICKR', 'PICASA', 'GOOGLE_DRIVE', 'DROPBOX'],
-       mimetypes: ['image/*'] }, onSuccess, function(FPError){ console.log(FPError.toString()); });
-
-       }
-       */
-
     function newPicker() {
         google.load('picker', '1', {"callback" : createPicker});
     }

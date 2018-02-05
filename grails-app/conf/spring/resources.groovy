@@ -4,7 +4,8 @@ import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSu
 import grails.plugin.springsecurity.userdetails.DefaultPostAuthenticationChecks;
 import grails.plugin.springsecurity.userdetails.DefaultPreAuthenticationChecks;
 import grails.plugin.springsecurity.SpringSecurityUtils;
-import grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService;
+//import grails.plugin.springsecurity.openid.userdetails.OpenIdUserDetailsService;
+import species.auth.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao;

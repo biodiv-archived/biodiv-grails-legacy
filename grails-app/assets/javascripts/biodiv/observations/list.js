@@ -439,38 +439,47 @@ $(document).ready(function(){
     var tmpTarget =  window.location.pathname + window.location.search;
     setActiveTag($('<a href="'+ tmpTarget +'"></a>').url().param()["tag"]);
 
-    $('.observation').on("click", ".loadMore", function() {
+    $('.observation').on("click", ".loadMore", function(event) {
+        console.log('##################################');
+        console.log($(this));
+        var me = $(event.currentTarget);
+        var ele = me.parent().prev('.mainContentList');
+        if(ele.length == 0) ele = me.parent().prev().find('.mainContentList');
+        if(ele.length == 0) ele = $('.mainContentList:first');
+        
+        var eleParentParent = ele.parent().parent();
         $.autopager({
 
             autoLoad : true,
             // a selector that matches a element of next page link
-            link : 'div.paginateButtons a.nextLink',
+            link : 'div.paginateButtons:last a.nextLink',
+
 
             // a selector that matches page contents
-            content : '.mainContent',
+            content : '.mainContent:first',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
-            appendTo : '.mainContentList:first',
+            appendTo : ele,
 
             // a callback function to be triggered when loading start 
             start : function(current, next) {
-
-                $(".loadMore .progress").show();
-                $(".loadMore .buttonTitle").hide();
+                eleParentParent.find(".loadMore .progress").show();
+                eleParentParent.find(".loadMore .buttonTitle").hide();
             },
 
             // a function to be executed when next page was loaded. 
             // "this" points to the element of loaded content.
             load : function(current, next) {
                 checkList();
-                $(".mainContent:last").hide().fadeIn(3000);
-
-                $("div.paginateButtons a.nextLink").attr('href', next.url);
+                eleParentParent.find(".mainContent:last").hide().fadeIn(3000);
+                console.log($(this));
+                console.log(next.url)
+                $("div.paginateButtons:last a.nextLink").attr('href', next.url);
                 if (next.url == undefined) {
-                    $(".loadMore").hide();
+                    eleParentParent.find(".loadMore").hide();
                 } else {
-                    $(".loadMore .progress").hide();
-                    $(".loadMore .buttonTitle").show();
+                    eleParentParent.find(".loadMore .progress").hide();
+                    eleParentParent.find(".loadMore .buttonTitle").show();
                 }
     
                 var a = $('<a href="'+current.url+'"></a>');
@@ -486,7 +495,9 @@ $(document).ready(function(){
                 params['max'] = parseInt(params['offset'])+parseInt(params['max']);
                 params['offset'] = 0;
                 var History = window.History;
-                History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(params))); 
+                var p = $.extend({},params);
+                delete p['max'];
+                History.pushState({state:1}, "Portal", '?'+decodeURIComponent($.param(p))); 
                 updateRelativeTime();
                 last_actions();
                 eatCookies();
@@ -644,6 +655,8 @@ $(document).ready(function(){
 
     $(document).on('submit','.addRecommendation', function(event) {
         var that = $(this);
+        var observationId = that.find('input[name=obvId]').val(); 
+        var seeMoreMessage = $("#seeMoreMessage_"+observationId);
         $(this).ajaxSubmit({
             url:window.params.observation.addRecommendationVoteURL,
             dataType: 'json', 
@@ -664,12 +677,12 @@ $(document).ready(function(){
                             updateFeeds();
                         }
                         setFollowButton();
-                        showUpdateStatus(data.msg, data.success?'success':'error');
+                        showUpdateStatus(data.msg, data.success?'success':'error', seeMoreMessage);
                     }
                     $(".addRecommendation_"+data.instance.observation)[0].reset();
                     that.find(".canName").val("");   
                 } else {
-                    showUpdateStatus(data.msg, data.success?'success':'error');
+                    showUpdateStatus(data.msg, data.success?'success':'error', seeMoreMessage);
                 }                    
                 return false;
             },
@@ -822,7 +835,7 @@ function getSelectedTrait($traitFilter, putValue) {
     });
 
     //hack for trait show default selection
-    if($('input[data-tid]').length == 1 &&  !selTrait[$('input[data-tid]').attr('data-tid')]) {
+    if($('input[data-tid]').length == 1 &&  !selTrait[$('input[data-tid]').attr('data-tid')] && !$('input[data-tid]').hasClass('RANGE')) {
             //is from trait show page
             selTrait[$('input[data-tid]').attr('data-tid')] = 'any,';
         };
@@ -920,6 +933,8 @@ function getMediaFilterBy() {
             hasMedia += $(this).attr('value');
         }
     });
+    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+    console.log(hasMedia);
     return hasMedia;	
 }
 
@@ -944,7 +959,7 @@ function getSelectedAllChecklistFlag() {
 function getSelectedMedia() {
     var media = ''; 
     media = $("#observationMediaFilter").attr('value');
-    if(media) {
+    if(media) {// && media != "false") {
         media = media.replace(/\s*\,\s*$/,'');
         return media;
     }	
@@ -1007,6 +1022,18 @@ function getSelectedFilters($ele, noneSelected) {
     if(allSelected == false) return selected.join(' OR ');
 } 
 
+function getSelectedDataPackage() {
+    var dataPackage = ''; 
+    $('.dp_filter_label').each (function() {
+        if($(this).hasClass('active')) {
+            dataPackage += $(this).attr('value') + ',';
+        }
+    });
+
+    dataPackage = dataPackage.replace(/\s*\,\s*$/,'');
+    return dataPackage;	
+} 
+
 function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSort, isRegularSearch, removeParam) {
     var params = url.param();
     if(removeParam) {
@@ -1020,6 +1047,8 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
                 if(decodeURIComponent(tvStr[i]) != kv[1]) params[kv[0]] += tvStr[i]+',';
             }
             params[kv[0]] = params[kv[0]].substring(0,params[kv[0]].length-1);
+            if(params[kv[0]] == '') 
+                delete params[kv[0]];
         } else {
             delete params[removeParam];
         }
@@ -1032,6 +1061,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
             params['sort'] = sortBy;
         }
     }
+
     if(getMediaFilterBy() != '') {
         params['hasMedia'] = getMediaFilterBy();
     }
@@ -1053,7 +1083,11 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     var mediaFilter = getSelectedMedia();
     if(mediaFilter) {
     	params['isMediaFilter'] = mediaFilter;
+    }else{
+        delete params['isMediaFilter'];
     }
+
+
 
     var areaFilter = getSelectedAreaFilter();
     if(areaFilter) {
@@ -1239,7 +1273,7 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     if(tagFilter) {
         params['tagFilter'] = tagFilter
     } else {
-        delete params['tagiFilter']
+        delete params['tagFilter']
     }
 
     var taxon = $("input#taxon").val();
@@ -1268,6 +1302,12 @@ function getFilterParameters(url, limit, offset, removeUser, removeObv, removeSo
     } else {
         delete params['status']
     }
+
+    var dataPackage = getSelectedDataPackage();
+    if(dataPackage) {
+        params['dataPackage'] = dataPackage;
+    }
+
     return params;
 }	
 
@@ -1299,6 +1339,7 @@ function setActiveTag(activeTag){
 
 function updateListPage(activeTag) {
     return function (data) {
+    console.log(data);
         $('.observations_list:first').replaceWith(data.model.obvListHtml);
         $('#info-message').replaceWith(data.model.obvFilterMsgHtml);
         $('#tags_section').replaceWith(data.model.tagsHtml);
@@ -1352,7 +1393,9 @@ function updateGallery(target, limit, offset, removeUser, isGalleryUpdate, remov
     var History = window.History;
     delete params["isGalleryUpdate"]
     if(updateHistory != false){
-        History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
+        var p = $.extend({}, params);
+        delete p['max'];
+        History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(p))); 
     }
     if(isGalleryUpdate) {
         $.ajax({

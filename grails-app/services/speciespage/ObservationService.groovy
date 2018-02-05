@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 
+import org.apache.log4j.Level;
 import species.Resource;
 import species.Habitat;
 import species.Language;
@@ -41,7 +42,11 @@ import species.participation.RecommendationVote;
 import species.participation.Flag.FlagType
 import species.participation.RecommendationVote.ConfidenceType;
 import species.participation.Annotation
+import species.participation.UploadLog
 import species.sourcehandler.XMLConverter;
+import species.sourcehandler.importer.AbstractObservationImporter;
+import species.sourcehandler.importer.FileObservationImporter;
+import species.sourcehandler.importer.DwCObservationImporter;
 import species.utils.ImageType;
 import species.utils.Utils;
 import species.groups.UserGroupMemberRole;
@@ -53,6 +58,8 @@ import species.Species;
 import species.Metadata
 import species.SpeciesPermission;
 import species.dataset.Dataset;
+import species.dataset.DataTable;
+import au.com.bytecode.opencsv.CSVWriter
 
 
 //import org.apache.lucene.document.DateField;
@@ -90,9 +97,14 @@ import grails.plugin.cache.Cacheable;
 import species.trait.Fact;
 import species.trait.Trait;
 import species.trait.TraitValue;
+
+import species.participation.DownloadLog;
+
 class ObservationService extends AbstractMetadataService {
 
     static transactional = false
+
+    static int BATCH_SIZE = 50;
 
     def recommendationService;
     def observationsSearchService;
@@ -101,7 +113,6 @@ class ObservationService extends AbstractMetadataService {
     def activityFeedService;
     def SUserService;
     def speciesService;
-    def messageSource;
     def resourcesService;
     def request;
     def speciesPermissionService;
@@ -770,6 +781,9 @@ class ObservationService extends AbstractMetadataService {
             }
         }
         utilsService.benchmark('findReco.sciName') {
+            println "--------------------"
+            println "--------------------"
+            println "--------------------"
             scientificNameReco = recommendationService.findReco(recoName, true, null, null, true, false);
         }
 
@@ -880,7 +894,7 @@ class ObservationService extends AbstractMetadataService {
         def sql =  Sql.newInstance(dataSource);
         try {
             String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
-            def rows = sql.rows("select count(*) as count from observation as g2 where ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false", [maxRadius:maxRadius]);
+            def rows = sql.rows("select count(*) as count from observation as g2 where ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false");
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
             def resultSet = sql.rows("select g2.id,  ROUND(ST_Distance_Sphere(${point}, ST_Centroid(g2.topology))/1000) as distance from observation as g2 where  ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false order by ${point} <-> g2.topology, g2.last_revised desc limit :max offset :offset", [maxRadius:maxRadius, max:limit, offset:offset])
@@ -1065,14 +1079,17 @@ class ObservationService extends AbstractMetadataService {
             allObservationCount = observationInstanceList.size()
         }
         else {
+            utilsService.logSql {
             observationInstanceList = hqlQuery.addEntity('obv', Observation).list();
             for(int i=0;i < observationInstanceList.size(); i++) {
-                println observationInstanceList[i].isChecklist
                 if(observationInstanceList[i].isChecklist) {
                     //observationInstanceList[i] = Checklists.read(observationInstanceList[i].id);
                 }
             }
-
+            }
+println "*******************************************"
+println "*******************************************"
+println "*******************************************"
             if(checklistCountQuery){
                 checklistCountQuery.setProperties(queryParts.queryParams);
                 checklistCount = checklistCountQuery.list()[0];
@@ -1302,10 +1319,10 @@ class ObservationService extends AbstractMetadataService {
         }
 
         if(params.tag){
-            tagQuery = ",  TagLink tagLink, Tags tag "
+            tagQuery = ",  tag_link tagLink, tags tag "
             query += tagQuery;
             //mapViewQuery = "select obv.topology from Observation obv, TagLink tagLink "
-            filterQuery +=  " and obv.id = tagLink.tag_ref and tagLink.type = :tagType and tagLink.tag_id = tag.id and tag.name = :tag "
+            filterQuery +=  " and obv.id = tag_link.tag_ref and tag_link.type = :tagType and tag_link.tag_id = tag.id and tag.name = :tag "
 
             queryParams["tag"] = params.tag
             queryParams["tagType"] = GrailsNameUtils.getPropertyName(Observation.class);
@@ -1317,7 +1334,25 @@ class ObservationService extends AbstractMetadataService {
             queryParams["habitat"] = params.habitat
             activeFilters["habitat"] = params.habitat
         }
+        if(params.user){
+          if(params.user.indexOf(',') != -1) {
+          filterQuery += " and obv.author_id in (:user) "
 
+
+          List<Long> userIds = new ArrayList<Long>();
+          for (String userId : params.user.split(","))
+          userIds.add(Long.valueOf(userId));
+          queryParams["user"] = userIds
+          activeFilters["user"] = userIds
+
+          } else {
+
+          filterQuery += " and obv.author_id = :user "
+          queryParams["user"] = params.user.toLong()
+          activeFilters["user"] = params.user.toLong()
+          }
+      }
+          /*
         if(params.user){
             if(params.user.indexOf(',') != -1) {
             filterQuery += " and obv.author_id in :user "
@@ -1332,14 +1367,14 @@ class ObservationService extends AbstractMetadataService {
             activeFilters["user"] = params.user.toLong()
             }
         }
-  /*
+
         if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
             filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
             //queryParams["speciesName"] = params.speciesName
             activeFilters["speciesName"] = params.speciesName
         }
        */
-        if(params.speciesName && (params.speciesName.equalsIgnoreCase('UNIDENTIFED'))){
+        if(params.speciesName && ((params.speciesName.equalsIgnoreCase('UNIDENTIFED')) || (params.speciesName.equalsIgnoreCase('Unknown')))){
           filterQuery += " and (obv.is_checklist = false and obv.max_voted_reco_id is null) "
           //queryParams["speciesName"] = params.speciesName
           activeFilters["speciesName"] = params.speciesName
@@ -1586,19 +1621,30 @@ class ObservationService extends AbstractMetadataService {
                 }
             }
         }
-        /*
-		if(params.isMediaFilter && params.isMediaFilter.toBoolean()){
-			filterQuery += " and obv.is_showable = true ";
-		}
-    if(params.isMediaFilter && !params.isMediaFilter.toBoolean()){
-			filterQuery += " and obv.is_showable = false ";
-		}
-*/
-    if(params.isMediaFilter) {
-      filterQuery += " and obv.is_showable = :isMediaFilter "
-     queryParams['isMediaFilter'] = params.isMediaFilter.toBoolean();
 
-    }
+        if(params.dataTable) {
+            if(params.dataTable == 'false') {
+                filterQuery += " and obv.data_table_id is null ";
+                queryParams['dataTable'] = false
+                activeFilters['dataTable'] = false
+            } else {
+                def dataTable = DataTable.read(params.dataTable.toLong());
+                if(dataTable) {
+                    queryParams['dataTable'] = dataTable.id
+                    activeFilters['dataTable'] = dataTable.id
+
+                    filterQuery += " and obv.data_table_id = :dataTable ";
+                }
+            }
+        }
+
+        
+        if(params.isMediaFilter && params.isMediaFilter.toBoolean()){
+            filterQuery += " and obv.is_showable = true ";
+        }
+        //if(params.isMediaFilter && !params.isMediaFilter.toBoolean()){
+        //filterQuery += " and obv.is_showable = false ";
+        //}
 
 
 		if(params.areaFilter && (!params.areaFilter.trim().equalsIgnoreCase('all'))){
@@ -1626,6 +1672,26 @@ class ObservationService extends AbstractMetadataService {
 
             //filterQuery += " and reg.classification_id = :classification";
             queryParams['trait'] = params.trait;
+
+        }
+        
+        if(params.otrait){
+            traitQuery = getTraitQuery(params.otrait);
+            traitQuery.filterQuery = traitQuery.filterQuery.replaceAll(" t.traits"," obv.traits");
+            traitQuery.orderQuery = traitQuery.orderQuery.replaceAll(" t.traits"," obv.traits");
+            filterQuery += traitQuery['filterQuery'];
+            orderByClause += traitQuery['orderQuery'];
+            def classification;
+            if(params.classification)
+                classification = Classification.read(Long.parseLong(params.classification));
+            if(!classification)
+                classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
+
+            queryParams['classification'] = classification.id;
+            activeFilters['classification'] = classification.id
+
+            //filterQuery += " and reg.classification_id = :classification";
+            queryParams['otrait'] = params.otrait;
 
         }
 
@@ -3050,50 +3116,99 @@ class ObservationService extends AbstractMetadataService {
         return finalInstanceResult
     }
 
-/*
-    boolean factUpdate(params){
-        println "================="+params
-        def observationInstance = Observation.findById(params.observation);
-        def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value()];
-        traitParams.putAll(getTraits(params.traits));
-        Trait trait;
-        TraitValue traitValue;
-        def factInstance;
-        traitParams.each { key, value ->
-                    if(!value) {
-                        return;
-                    }
-                    key = key.trim();
-                    value = value ? value.trim() : null ;
+    def getMatchingObservationsList(params) {
+        params.otrait = params.remove('trait')
+        def result = getFilteredObservations(params, params.max, params.offset);
+        def matchingList = [];
+        result.observationInstanceList.each {it->
+            String link = utilsService.createHardLink("observation", "show", it.id);
+            def mainImage = it.mainImage();
+            String imagePath = '';
+            List factInstances = Fact.findAllByObjectIdAndObjectType(it.id, it.class.canonicalName);
+            //println "fact Instance"+factInstance?.traitValue?.icon
+            def speciesGroupIcon =  it.group.icon(ImageType.ORIGINAL)
+            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
 
-                    switch(key) {
-                        case ['name', 'taxonid', 'attribution','contributor', 'license'] : break;
-                        default :
-                        trait=Trait.findById(key);
-                        traitValue = TraitValue.findByTraitAndValueIlike(trait, value.trim());
-                        factInstance=Fact.findByIdAndTrait(params.factId,trait);
-
-                    }
+            List traitIcons = [];
+            factInstances?.each { f ->
+                if(f.traitValue) { 
+                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                } else if(f.value && f.toValue) {
+                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                } else if(f.fromDate && f.toDate) {
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                } else if(f.value) {
+                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
                 }
+            }
 
-                if(!factInstance){factInstance = new Fact();}
-                        factInstance.trait = trait
-                        factInstance.traitValue = traitValue;
-                        factInstance.objectId = observationInstance.id
-                        factInstance.attribution = traitParams['attribution'];
-                        factInstance.contributor = traitParams['contributor'] ? SUser.findByEmail(traitParams['contributor']?.trim()) : null;
-                        factInstance.license = traitParams['license']? License.findByName(License.fetchLicenseType(traitParams['license'].trim())) : null;
-                        factInstance.objectType = observationInstance.class.getCanonicalName();
-
-                if(!factInstance.hasErrors() && !factInstance.save()) {
-                    println "Error in Fact upudate"
-                    factInstance.errors.allErrors.each {println it }
-                    return false;
-                } else {
-                    println "Successfully updated fact";
-                    return true;
-                }
-               // factService.updateFacts(traitParams, observationInstance);
+            if(params.downloadFrom == 'matchingobservations') {
+                //HACK: request not available as its from job scheduler
+                matchingList << [it.id, it.title(), true, 0, link, imagePath, traitIcons]
+            } else {
+                matchingList << [it.id, it.title(), true, 0, link, imagePath,  params.user, traitIcons]
+            }
+        }
+println result;
+        return [matchingList:matchingList, totalCount:result.allObservationCount, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
     }
-*/
+
+    File exportMatchingObservationsList(params, DownloadLog dl) {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.offset = params.offset ? params.int('offset') : 0
+        //TODO: distinct reco can be from search also - not handled (ref - obvCont -line -1610)
+        def matchingListResult = getMatchingObservationsList(params);
+        def totalCount = matchingListResult.totalCount;
+        def completeResult = matchingListResult.matchingList;
+        params.offset = params.offset + BATCH_SIZE
+        while(params.offset <= totalCount) {
+            Observation.withNewTransaction {
+                completeResult.addAll(getMatchingObservationsList(params).matchingList);
+                params.offset = params.offset + BATCH_SIZE
+            }
+        }
+        matchingListResult.matchingList = completeResult;
+
+        if(!matchingListResult) {
+            return null;
+        } 
+        if(matchingListResult.totalCount == 0) {
+            return null;
+        }
+        File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		} 
+		return exportMatchingObservationsAsCSV(downloadDir, matchingListResult);
+    }
+	
+    private File exportMatchingObservationsAsCSV(downloadDir, Map matchingListResult){
+        File csvFile = new File(downloadDir, "MatchingObservation_" + new Date().getTime() + ".csv")
+        CSVWriter writer = utilsService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+        
+        def header = ['Observation Id', 'Observation Title', 'URL',  'Traits'];
+        writer.writeNext(header.toArray(new String[0]))
+        def matchingList = matchingListResult.matchingList;
+        def dataToWrite = []
+        matchingList.each {
+            log.debug "Writting " + it
+            def temp = []
+            temp.add("" + it[0]);
+            temp.add("" + it[1]);
+            temp.add("" + it[4]);
+            it[6].each { t ->
+                temp.add("" + t[1]+":"+t[0]);
+            }
+            dataToWrite.add(temp.toArray(new String[0]))
+        }
+        writer.writeAll(dataToWrite);
+        writer.flush()
+        writer.close()
+
+        return csvFile
+    }
+
 }

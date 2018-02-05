@@ -36,12 +36,12 @@ function loadMapInput(geotaggedImages=undefined) {
             locationPicker.initialize();
             $(map_class).find('.spinner').hide();
             
-            if(window.params.controller == 'checklist'){
+            if(window.params.controller == 'checklist'||window.params.controller == 'dataset' || window.params.controller == 'dataTable'){
                 drawControls = {
                     rectangle:true,
-                    polygon:true,
-                    polyline:true,
-                    marker:false
+                    polygon:false,
+                    polyline:false,
+                    marker:true
                 }
 
                 editControls = {featureGroup: new L.FeatureGroup()}
@@ -345,9 +345,9 @@ function useTitle(obj){
         validateBounds : function(latlng) {
             var me = this;
             if(typeof latlng === undefined || !latlng.lat || !latlng.lng) {
-                 me.$ele.next('.alert').html('Location is compulsory').show();      
+                me.$ele.next('.alert').html('Location is compulsory. Please provide a valid location.').show();
                 return true;
-            }
+            }    
             //if marker is not in allowed bounds return;
             if(!me.allowedBounds.contains(latlng)) {
                 me.$ele.next('.alert').html('Location is outside allowed bounds').show();      
@@ -974,7 +974,7 @@ function useTitle(obj){
 
 }(window.jQuery)); 
 
-$(document).ready(function() { 
+function initLocationPicker() {
   $('.placeName').attr('placeholder', $(".placeName").attr('rel')); 
 
 //alert($(".placename").attr('rel'));
@@ -995,9 +995,10 @@ $(document).ready(function() {
   });
   $(".address").unbind('click').click(loadMapInput);
 
-  $(function() {
 
-  });
+}
 
+$(document).ready(function() { 
+    initLocationPicker();
 });
 

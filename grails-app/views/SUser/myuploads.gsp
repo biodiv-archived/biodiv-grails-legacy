@@ -70,6 +70,7 @@
 
         $(document).ready(function(){
             var uploadResource = new $.fn.components.UploadResource($('.bulk_observation_create'));
+            $('.filePicker').data('uploadResource', uploadResource);
             <%
                 if(observationInstance?.group) {
                     out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";

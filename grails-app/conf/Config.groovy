@@ -160,7 +160,7 @@ else if (new File("${userHome}/.grails/${appName}-config.properties").exists()) 
     "file:${userHome}/.grails/${appName}-config.properties"
     ]
 }
-else if (new File(System.getenv(ENV_NAME)).exists()) {
+else if (new File("${userHome}/.grails/additional-config.groovy").exists()) {
     println "*** Additional config: file:${userHome}/.grails/additional-config.groovy. ***"
     grails.config.locations << "file:${userHome}/.grails/additional-config.groovy"
 }
@@ -197,6 +197,7 @@ speciesPortal {
     resources {
         rootDir = "${app.rootDir}/img"
         serverURL = "http://localhost.indiabiodiversity.org/${appName}/img"
+        filesutraURL = "http://localhost.fileops.indiabiodiversity.org"
         images {
             defaultType = "jpg"
             thumbnail {
@@ -224,7 +225,7 @@ speciesPortal {
         serverURL = "http://localhost.indiabiodiversity.org/${appName}/observations"
         //serverURL = "http://localhost/${appName}/observations"
         MAX_IMAGE_SIZE = 104857600
-    } 
+    }
     userGroups {
         rootDir = "${app.rootDir}/userGroups"
         serverURL = "http://localhost.indiabiodiversity.org/${appName}/userGroups"
@@ -272,7 +273,7 @@ speciesPortal {
     namelist {
         rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
         downloadDir = "${download.rootDir}/namelist"
-    }	
+    }
     traits{
         rootDir = "${app.rootDir}/traits"
         serverURL = "http://localhost.indiabiodiversity.org/${appName}/traits"
@@ -372,7 +373,7 @@ speciesPortal {
 		NAME_SOURCE = "Name Source"
 		VIA_SOURCE = "Via Source"
 		NAME_SOURCE_ID = "Name Source Id"
-		
+
     }
     group {
         ALL = "All"
@@ -484,7 +485,7 @@ speciesPortal {
     flushImmediately = true
     usersResource {
         rootDir = "${app.rootDir}/usersRes"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/usersRes"   
+        serverURL = "http://localhost.indiabiodiversity.org/${appName}/usersRes"
     }
 
     ibpMapDatabase {
@@ -497,8 +498,8 @@ speciesPortal {
     localeLanguages = [['name':'English','code':'eng','twoletter':'en']]
     hideLanguages = true
     bannerFilePath = "${app.rootDir}/bannerMessage.txt"
-    userDetailsFilePath = "${app.rootDir}/userInfo.csv" 
-    filterFilePath = "${app.rootDir}/filters.txt" 
+    userDetailsFilePath = "${app.rootDir}/userInfo.csv"
+    filterFilePath = "${app.rootDir}/filters.txt"
 }
 
 speciesPortal.validCrossDomainOrigins = [
@@ -519,7 +520,8 @@ environments {
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
-            names.parser.serverURL = "10.0.0.10"
+            search.nakshaURL = "http://localhost:8090/biodiv-api"
+            //names.parser.serverURL = "10.0.0.10"
         }
         google.analytics.enabled = false
         grails.resources.debug = false
@@ -542,7 +544,7 @@ environments {
                 baseurl = "/newsletters"
                 basedir = "${speciesPortal.app.rootDir}/newsletters/"
                 image.browser = true
-                image.upload = true    
+                image.upload = true
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
                 image.denied = []
             }
@@ -569,8 +571,8 @@ environments {
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
             'grails.util'
-            info 'org.codehaus.groovy.grails.plugin' // plugins
-            info "grails.plugin" 
+            info 'org.codehaus.groovy.grails.plugins' // plugins
+            info "grails.plugin"
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
@@ -584,7 +586,7 @@ environments {
             warn   'org.springframework.security.authentication'
             debug   'speciespage',
             'species'
-            debug   'com.the6hours', 
+            debug   'com.the6hours',
             'grails.app.taglib.com.the6hours'
             debug   'species.auth'
             debug   'com.odobo',
@@ -635,10 +637,12 @@ environments {
             debug   'org.hibernate.cache.EhCache'
             debug   'org.hibernate.cache.internal.StandardQueryCache'
             info   'org.hibernate.cache'
-/*            trace 'org.springframework.security.web.authentication.rememberme',
+            trace 'org.springframework.security.web.authentication.rememberme',
                   'org.springframework.security.web.authentication',
-                        'org.springframework.security.web'
-*/
+                  'org.springframework.security.web.authentication.*'
+                  'org.springframework.security.web.authentication.dao'
+            info  'org.springframework.security.web'
+
             debug 'species'
             info    'com.linkedin.grails.ProfilerPlugin'
             debug 'org.apache.http.wire'
@@ -659,6 +663,7 @@ environments {
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
+                filesutraURL = "http://fileops.pamba.strandls.com"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
@@ -682,7 +687,7 @@ environments {
             content{
                 rootDir = "${app.rootDir}/content"
                 serverURL = "https://${servername}/${appName}/content"
-            }	
+            }
             maps {
                 serverURL = "https://${servername}/${appName}/maps"
             }
@@ -699,7 +704,7 @@ environments {
 
                 databaseDir = "${app.rootDir}/traits"
                 traitValueFile="${app.rootDir}/icons.csv"
-            }	
+            }
             filterFilePath = "${app.rootDir}/filters.txt"
 
             search.serverURL="http://${servername}:8080/solr"
@@ -712,7 +717,7 @@ environments {
         }
 
         ibp.domain=servername
-        wgp.domain="thewesternghats.${servername}" 
+        wgp.domain="thewesternghats.${servername}"
 
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
         grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
@@ -723,7 +728,7 @@ environments {
                 basedir = "${speciesPortal.app.rootDir}/newsletters/"
 
                 image.browser = true
-                image.upload = true    
+                image.upload = true
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
                 image.denied = []
             }
@@ -751,7 +756,7 @@ environments {
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
             'grails.util'
-            error "grails.plugin" 
+            error "grails.plugin"
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
@@ -766,7 +771,7 @@ environments {
 
             debug   'speciespage',
             'species'
-            debug   'com.the6hours', 
+            debug   'com.the6hours',
             'grails.app.taglib.com.the6hours'
             debug   'species.auth'
             debug   'com.odobo',
@@ -788,7 +793,7 @@ environments {
             debug   'grails.app.services.speciespage.ObservationService'
             debug   'grails.app.services.speciespage'
             debug   'grails.app.services.species'
-
+            debug   'org.gualdi.grails.plugins.ckeditor'
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']
@@ -807,6 +812,7 @@ environments {
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "http://${servername}/${appName}/img"
+                filesutraURL = "http://fileops.indiabiodiversity.org"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
@@ -830,13 +836,13 @@ environments {
             content{
                 rootDir = "${app.rootDir}/content"
                 serverURL = "http://${servername}/${appName}/content"
-            }	
+            }
             maps {
                 serverURL = "http://${servername}/${appName}/maps"
             }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
-                serverURL = "http://${servername}/${appName}/usersRes"   
+                serverURL = "http://${servername}/${appName}/usersRes"
             }
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
@@ -847,9 +853,9 @@ environments {
 
                 databaseDir = "${app.rootDir}/traits"
                 traitValueFile="${app.rootDir}/icons.csv"
-            }	
+            }
             filterFilePath = "${app.rootDir}/filters.txt"
-	
+
             search.serverURL="http://${servername}:8080/solr"
             grails {
                 mail {
@@ -860,7 +866,7 @@ environments {
         }
 
         ibp.domain=servername
-        wgp.domain="thewesternghats.${servername}" 
+        wgp.domain="thewesternghats.${servername}"
 
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
         grails.plugin.springsecurity.logout.afterLogoutUrl = '/'
@@ -871,7 +877,7 @@ environments {
                 basedir = "${speciesPortal.app.rootDir}/newsletters/"
 
                 image.browser = true
-                image.upload = true    
+                image.upload = true
                 image.allowed = ['jpg', 'gif', 'jpeg', 'png']
                 image.denied = []
             }
@@ -891,7 +897,7 @@ environments {
             'grails.app.tagLib.org.grails.plugin.resource',
             'org.hibernate',
             'grails.util'
-            error "grails.plugin" 
+            error "grails.plugin"
             error 'grails.app.services.org.grails.plugin.resource'
             error 'grails.app.taglib.org.grails.plugin.resource'
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
@@ -907,7 +913,7 @@ environments {
 
             info	'species',
             'speciespage',
-            'com.mchange.v2.resourcepool.BasicResourcePool' 
+            'com.mchange.v2.resourcepool.BasicResourcePool'
             off   'jdbc.sqltiming'
             off   'jdbc.connection'
             off   'jdbc.sqlonly'
@@ -942,7 +948,7 @@ navigation.observation_dashboard = [
 
 navigation.users_dashboard = [
 [controller:'species', title:'Species Gallery', order:1, action:"list"],
-[controller:'observation', title:'Browse Observations', order:1, action:'list'],	
+[controller:'observation', title:'Browse Observations', order:1, action:'list'],
 [controller:'userGroup', title:'Groups', order:20, action:'list'],
 [controller:'SUser', title:'Users', order:20, action:'list']
 ]
@@ -1059,7 +1065,7 @@ grails.plugin.springsecurity.ui.newuser.emailBody = '''\
     Hi $username,<br/>
     <br/>
     Thank you for registering with us at <b>$domain</b>.<br/>
-    <br/> 
+    <br/>
     We look forward to your contribution on the portal. The portal is a public participatory portal that thrives by participation from users like you. Will also appreciate any feedback you may have to offer.<br/>
     <br/>
     You will be notified by mail on any social activity on the observation.<br/>
@@ -1238,10 +1244,10 @@ grails.plugin.springsecurity.ui.newuser.emailBody = '''\
                         grails.plugin.springsecurity.ui.downloadRequest.emailBody = '''\
                             Hi $username,<br/>
                             <br/>
-                            Your data download request on the <b>$domain</b> has been processed. 
+                            Your data download request on the <b>$domain</b> has been processed.
                             <br/>
                             You can download your data from your <a href="$userProfileUrl">user profile</a>.
-                            <br/> 
+                            <br/>
                             Please note that you will need to be logged in to see the download link.
                             <br/><br/>
                             -The portal team
@@ -1332,7 +1338,7 @@ grails.plugin.springsecurity.acl.authority.modifyAuditingDetails = 'ROLE_ADMIN'/
 grails.plugin.springsecurity.acl.authority.changeOwnership =       'ROLE_ADMIN'
 grails.plugin.springsecurity.acl.authority.changeAclDetails =      'ROLE_RUN_AS_ADMIN'//'ROLE_ACL_CHANGE_DETAILS'
 
-grails.plugin.springsecurity.securityConfigType = SecurityConfigType.Annotation 
+grails.plugin.springsecurity.securityConfigType = SecurityConfigType.Annotation
 //grails.plugin.springsecurity.rejectIfNoRule = false;
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 '/*/create/**':                  ['ROLE_USER'],
@@ -1407,7 +1413,7 @@ new Color(0, 0, 0)
 NamesIndexerService.FILENAME = "${appName}_tstLookup.dat";
 ObservationController.COMMIT = false;
 
-grails.rateable.rater.evaluator = { 
+grails.rateable.rater.evaluator = {
     Class<?> User = SUser.class
     if (!User) {
         println "Can't find domain: $domainClassName"
@@ -1422,7 +1428,7 @@ grails.rateable.rater.evaluator = {
 
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements
 
-/* remove this line 
+/* remove this line
 // GSP settings
 grails {
 views {
@@ -1641,7 +1647,7 @@ grails.cache.config = {
         overflowToDisk false
         maxElementsOnDisk 0
     }
-   
+
     cache {
         name "featured"
         eternal false

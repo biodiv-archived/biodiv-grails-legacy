@@ -72,6 +72,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 		def user = UserDomainClass.newInstance(propsMap);
         if(!userLanguage) userLanguage = utilsService.getCurrentLanguage();
+        user.email = propsMap.email.toLowerCase();
         user.language = userLanguage;
 		user.enabled = true;
 		return user;

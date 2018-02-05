@@ -12,8 +12,6 @@ import species.sourcehandler.XMLConverter;
 import species.TaxonomyDefinition;
 import species.ScientificName.TaxonomyRank
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 import species.trait.Trait;
 import species.Species;
 import species.Field;
@@ -31,26 +29,30 @@ import org.apache.log4j.Level;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.SimpleDateFormat;
+import species.dataset.DataTable;
+import speciespage.ObvUtilService;
+import species.participation.Observation;
 
 class FactService extends AbstractObjectService {
 
     static transactional=false;
-    def utilsService;
+    def observationsSearchService;
 
     Map upload(String file, Map params, UploadLog dl) {
         int noOfFactsLoaded = 0;
 
-        File spreadSheet = new File(file);
+        File spreadSheet = new File(file?:params.fFile);
         if(!spreadSheet.exists()) {
             return ['success':false, 'msg':"Cant find the file at ${file}."];
         }
-        dl.writeLog("Loading facts from ${file}", Level.INFO);
+        dl.writeLog("Loading facts from ${file?:params.fFile}", Level.INFO);
 
         SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).eachWithIndex { m,index ->
 
-            dl.writeLog("Loading facts ${m}");
+            dl.writeLog("============================================\n", Level.INFO);
+            dl.writeLog("Loading facts ${m} from row no ${index+2}", Level.INFO);
             if(!m['taxonid']) {
-                writeLog("Finding species from species name ${m['name']}");
+                dl.writeLog("Finding species from species name ${m['name']}");
                 m['taxonid'] = findSpeciesIdFromName(m['name'])?.taxonConcept?.id;
             }
 
@@ -61,19 +63,25 @@ class FactService extends AbstractObjectService {
             }
 
             Species species = pageTaxon.createSpeciesStub();
+
+            if(params.dataTable) {
+                println "Setting dataTable"
+                DataTable.inheritParams(m, params);
+            }
+
             Trait.withSession { session ->
                 //def session =  sessionFactory.currentSession;
                 session.setFlushMode(FlushMode.MANUAL);
 
-                if(updateFacts(m, species, dl)) {
-                    noOfFactsLoaded++;
+                def r = updateFacts(m, species, dl);
+                if(r && r.success) {
+                    noOfFactsLoaded += r.noOfFactsLoaded;
                 }
                 session.flush();
                 session.clear();
                 // we need to disconnect and get a new DB connection here
                 def connection = session.disconnect();
                 if(connection) {
-                    println "---------------------------------";
                     connection.close();
                 }
 
@@ -101,7 +109,7 @@ class FactService extends AbstractObjectService {
 
 
         }
-        dl.writeLog("Successfully added ${noOfFactsLoaded} facts");
+        dl.writeLog("\n====================================\nLoaded ${noOfFactsLoaded} facts\n====================================\n", Level.INFO);
         return ['success':true, 'msg':"Loaded ${noOfFactsLoaded} facts."];
     }
 
@@ -111,6 +119,18 @@ class FactService extends AbstractObjectService {
         return taxon ? taxon.findSpeciesId() : null;
     }
 
+    Map validateFactsFile(String file, UploadLog dl) {
+        println "validateFactsFile"
+        File spreadSheet = new File(file);
+        if(!spreadSheet.exists()) {
+            return ['success':false, 'msg':"Cant find the file at ${file}."];
+        }
+        dl.writeLog("Loading facts from ${file}", Level.INFO);
+
+        List reqdHeaders = ['taxonid', 'attribution', 'contributor', 'license'];
+        return validateSpreadsheetHeaders(file, dl, reqdHeaders);
+    }
+
     Map updateFacts(Map m, object, UploadLog dl=null, boolean replaceFacts = false) {
         def writeLog;
         if(dl) writeLog = dl.writeLog;
@@ -118,6 +138,8 @@ class FactService extends AbstractObjectService {
 
         boolean success = false;
         Map result = [:]
+        int noOfFactsLoaded = 0;
+
         result['facts_updated'] = [];
         result['facts_created'] = [];
         writeLog("Loading facts ${m}");
@@ -136,43 +158,55 @@ class FactService extends AbstractObjectService {
             return;
         }
 
-        writeLog("Loading facts for object ${object.class}:${object.id}");
+        writeLog("Loading facts for object ${object.class}:${object.id}\n");
         m.each { key, value ->
             try {
                 if(!value) {
-                    return;
+                    writeLog("Value is null for trait ${key}\n", Level.ERROR);
+                    log.debug "Value is null for trait ${key}."
+                    //return;
                 }
                 key = key.trim();
 
                 switch(key) {
-                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts'] : break;
-                    default : 
-                    value = value ? value.trim() : null ;
-                    writeLog("Loading trait ${key} : ${value}");
+                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts', 'dataTable', ObvUtilService.LOCATION, ObvUtilService.TOPOLOGY, ObvUtilService.LATITUDE, ObvUtilService.LONGITUDE, ObvUtilService.LOCATION_SCALE, ObvUtilService.OBSERVED_ON, ObvUtilService.TO_DATE, ObvUtilService.DATE_ACCURACY, ObvUtilService.AUTHOR_EMAIL] : break;
+                    default :
+                    value = (value && value instanceof String)? value.trim() : null ;
 
+                    writeLog("Loading trait ${key} : ${value}", Level.INFO);
                     Trait traitInstance;
                     TaxonomyDefinition pageTaxon;
-                    println object.class.getCanonicalName();
                     switch(object.class.getCanonicalName()) {
-                        case 'species.Species': 
+                        case 'species.Species':
                         pageTaxon = object.taxonConcept;
                         if(pageTaxon) {
+                            println m.traitId
                             writeLog("validate if this trait ${key} can be given to this pageTaxon ${pageTaxon} as per traits taxon scope");
-                            traitInstance = Trait.getValidTrait(key, pageTaxon);
+                            if(m.traitId) {
+                                Trait t  = Trait.read(Long.parseLong(m.traitId));
+                                println t
+                                if(Trait.isValidTrait(t, pageTaxon)) {
+                                    traitInstance = t;
+                                } else {
+                                    writeLog("Trait ${t} is not valid as per taxon", Level.ERROR);
+                                }
+                            } else {
+                                traitInstance = Trait.getValidTrait(key, pageTaxon);
+                            }
                         }
                         break;
-                        case 'species.participation.Observation': 
+                        case 'species.participation.Observation':
                         //TODO:validatetrait as per speciesgroup taxon list for observations
                         def t = Trait.read(Long.parseLong(key));
                         if(Trait.isValidTrait(t, object.group.getTaxon())) {
                             traitInstance = t;
                         } else {
-                            writeLog("${t} is not valid as per taxon", Level.ERROR);
+                            writeLog("Trait ${t} is not valid as per taxon", Level.ERROR);
                         }
 
                         if(t.isNotObservationTrait) {
                             traitInstance = null;
-                            writeLog("${t} is not observation trait", Level.ERROR);
+                            writeLog("Trait ${t} is not observation trait", Level.ERROR);
                         }
                         break;
                     }
@@ -180,7 +214,7 @@ class FactService extends AbstractObjectService {
                     println "Got trait ${traitInstance}";
 
                     if(!traitInstance) {
-                        writeLog("Cannot find trait ${key}", Level.ERROR);
+                        writeLog("Cannot find trait ${key}\n", Level.ERROR);
                     } else {
                         Fact.withTransaction {
                             def factsCriteria = Fact.createCriteria();
@@ -193,12 +227,13 @@ class FactService extends AbstractObjectService {
                             List traitValues = [];
                             if(traitInstance.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
                                 if(replaceFacts) {
+                                    writeLog("Replacing old facts with new ones");
                                     facts.each {fact ->
                                         fact.delete(flush:true);
                                     }
                                     facts.clear();
                                 }
-                                value.split(',').each { v ->
+                                value?.split(',').each { v ->
                                     writeLog("Loading trait ${traitInstance} with value ${v.trim()}");
                                     def x = getTraitValue(traitInstance, v.trim());
                                     if(x) traitValues << x;
@@ -215,6 +250,7 @@ class FactService extends AbstractObjectService {
                                 return;
                             }
 
+                            if(traitValues) {
                             if(!facts) {
                                 //writeLog("Creating new fact");
                                 Fact fact = new Fact();
@@ -224,7 +260,7 @@ class FactService extends AbstractObjectService {
                                 fact.objectType = object.class.getCanonicalName();
                                 setTraitValue(fact, traitValues[0]);
                                 facts << fact;
-                            } 
+                            }
                             println facts;
                             //fact = facts[0];
 
@@ -266,47 +302,79 @@ class FactService extends AbstractObjectService {
                                     }
                                 }
                             } else {
-                                setTraitValue(facts[0], traitValues[0]); 
+                                setTraitValue(facts[0], traitValues[0]);
                             }
 
                             boolean isUpdate = false;
                             facts.each { fact ->
                                 if(fact.id) {
                                     isUpdate = true;
-                                    writeLog("Updating fact ${fact}");
+                                    writeLog("Updating fact ${fact}", Level.INFO);
                                 } else {
                                     isUpdate = false;
-                                    writeLog("Creating new fact ${fact}");
+                                    writeLog("Creating new fact ${fact}", Level.INFO);
                                 }
                                 fact.attribution = attribution;
                                 fact.contributor = contributor;
                                 fact.license = license;
                                 fact.isDeleted = false;
-                                if(!fact.hasErrors() && !fact.save()) { 
+                                if(m['dataTable']) {
+                                    fact.dataTable = DataTable.read(Long.parseLong(''+m['dataTable']));
+                                }
+                                if(!fact.hasErrors() && !fact.save()) {
                                     writeLog("Error saving fact ${fact.id} ${fact.traitInstance.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
                                     fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
+                                    writeLog('\n');
                                     success = false;
                                 } else {
                                     success = true;
-                                    if(isUpdate) 
+                                    noOfFactsLoaded++;
+                                    if(isUpdate)
                                         result['facts_updated'] << fact;
                                     else
                                         result['facts_created'] << fact;
 
-                                    writeLog("Successfully added fact");
+                                    writeLog("Successfully added fact\n", Level.INFO);
                                 }
+                            }
                             }
                         }
                     }
                 }
             } catch(Exception e) {
                 e.printStackTrace();
-                writeLog("Error saving fact ${key} : ${value} for ${object}", Level.ERROR);
+                writeLog("Error saving fact ${key} : ${value} for ${object}\n", Level.ERROR);
             }
-        } 
+        }
         println "=========================================================================="
 
+        if(object instanceof Observation) {
+            Sql sql = Sql.newInstance(dataSource);
+            println sql.executeUpdate("""
+            update observation set traits = g.item from (
+                             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id
+                             ) g where g.object_id=id
+            """);
+            println sql.executeUpdate("""
+update observation set traits_json = g.item from (
+     select x1.object_id, format('{%s}', string_agg(x1.item,','))::json as item from (
+        (select x.object_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.object_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        union
+        (select x.object_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.object_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        union
+        (select x.object_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.object_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+    ) x1 group by x1.object_id
+) g where g.object_id=id;
+
+
+                        """);
+
+            observationsSearchService.publishSearchIndex(object,true);
+
+        }
+
         result['success'] = success;
+        result['noOfFactsLoaded'] = noOfFactsLoaded;
         return result;
     }
 
@@ -346,7 +414,7 @@ class FactService extends AbstractObjectService {
                     fact.toDate = x;
                 }
                 break;
-                default: 
+                default:
                 fact.value = v[0];
                 fact.toValue = v[1];
             }
@@ -356,7 +424,7 @@ class FactService extends AbstractObjectService {
                 fact.fromDate = getFromDate(v[0]);
                 fact.toDate = getToDate(v[0]);
                 break;
-                default: 
+                default:
                 fact.value = v[0];
                 fact.toValue = v[0];
             }

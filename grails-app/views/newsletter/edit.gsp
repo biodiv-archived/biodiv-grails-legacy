@@ -61,6 +61,16 @@
 									code="newsletter.sticky" />
 							</td>
 						</tr>
+
+						<tr class="prop">
+							<td valign="top"
+								class="value ${hasErrors(bean: newsletterInstance, field: 'showInFooter', 'errors')}">
+
+								<g:checkBox style="margin-left:0px;" name="showInFooter"
+									checked="${newsletterInstance.showInFooter}" /> <g:message
+									code="newsletter.showInFooter" />
+							</td>
+						</tr>
 						<g:if test="${newsletterInstance.userGroup}">
 							<input type="hidden" name="userGroup"
 								value="${newsletterInstance.userGroup.webaddress}" />
@@ -95,7 +105,7 @@
                     { name: 'insert', items: [ 'Image', 'Table'] }
                     ],
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/ofm/filemanager&viewMode=grid&space=newsletters/${params.webaddress}&type=Image",
-                    filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/standard/uploader?Type=Image&userSpace=${params.webaddress}",
+                    filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/uploader?type=Image&userSpace=${params.webaddress}",
 
                         height: '400px'
                 };

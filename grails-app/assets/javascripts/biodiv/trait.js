@@ -7,7 +7,17 @@ function updateMatchingSpeciesTable() {
 }
 
 function loadMatchingSpeciesList() {
-    var $me = $(this);
+    var $matchingSpeciesTable = $('#matchingSpeciesTable');
+    return loadMatchingList($matchingSpeciesTable, window.params.trait.matchingSpeciesListUrl);
+}
+
+function loadMatchingObservationsList() {
+    var $matchingSpeciesTable = $('#matchingSpeciesTable');
+    return loadMatchingList($matchingSpeciesTable, window.params.trait.matchingObservationsListUrl);
+}
+
+function loadMatchingList($matchingTable, matchingListUrl) {
+    var $me = $matchingTable.next();
     var target = window.location.pathname + window.location.search;
     var a = $('<a href="'+target+'"></a>');
     var url = a.url();
@@ -20,7 +30,7 @@ function loadMatchingSpeciesList() {
     var element = {};
     var listFilter = $('.listFilter');
         listFilter.each(function(){
-        if($(this).hasClass('active')) {
+        if($me.hasClass('active')) {
            var traitType = $(this).val();
            params['traitType'] = traitType;
         }
@@ -30,19 +40,19 @@ function loadMatchingSpeciesList() {
                 if(params[key]=='observation'){
                 element = $('div[data-isNotObservation="true"]');
                     $(element).each(function(){
-                        $(this).parent().parent().hide();
+                        $me.parent().parent().hide();
                     });
             }
             else if (params[key]=='species'){
                 element = $('div[data-isNotObservation="false"]');
                 $(element).each(function(){
-                    $(this).parent().parent().hide();
+                    $me.parent().parent().hide();
                 });
             }
             else{
                 element = $('div[data-isNotObservation]');
                 $(element).each(function(){
-                    $(this).parent().parent().show();
+                    $me.parent().parent().show();
                 });
             }
         }
@@ -55,12 +65,12 @@ function loadMatchingSpeciesList() {
     for(var m in traits) {
         params['trait.'+m] = traits[m];
     }
-    params['max'] = $(this).data('max');
-    params['offset'] = $(this).data('offset');
+    params['max'] = $me.data('max');
+    params['offset'] = $me.data('offset');
+   console.log(params); 
     History.pushState({state:1}, document.title, '?'+decodeURIComponent($.param(params))); 
-    var $matchingSpeciesTable = $('#matchingSpeciesTable');
     $.ajax({
-        url:window.params.trait.matchingSpeciesListUrl,
+        url:matchingListUrl,
         dataType: "json",
         data:params,
         success: function(data) {   
@@ -69,8 +79,8 @@ function loadMatchingSpeciesList() {
             }
             $('#matchingSpeciesList .matchingSpeciesHeading').html(data.model.totalCount?(' (' + data.model.totalCount + ')'):'');
             $('#matchingSpeciesFilterMsg').html(data.model.obvFilterMsgHtml);
-            if(data.success == true && data.model.matchingSpeciesList) {
-                $.each(data.model.matchingSpeciesList, function(index, item) {
+            if(data.success == true && data.model.matchingList) {
+                $.each(data.model.matchingList, function(index, item) {
                     var itemMap = {};
                     itemMap.id = item[0];
                     //itemMap.title = item[1];
@@ -83,7 +93,7 @@ function loadMatchingSpeciesList() {
                     //$.each(imagepath,function(index1,item1){ alert(item1); });
                     //alert(array.split(','));
                     var snippetTabletHtml = getSnippetTabletHTML(undefined, itemMap);
-                    $matchingSpeciesTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td></tr>');
+                    $matchingTable.append('<tr class="jcarousel-item jcarousel-item-horizontal"><td>'+snippetTabletHtml+'<a href='+item[4]+'>'+item[1]+'</a></td><td><div id=imagediv_'+item[0]+'></div></td>'+(item[8] != undefined?'<td><a href='+item[9]+'>'+item[8]+'</a></td>':'')+'</tr>');
                     $('#imagediv_'+item[0]).empty();
                     $.each(imagepath,function(index1,item1){ 
                         $('#imagediv_'+item[0]).append(showIcon(item1[0], item1[1], item1[2], item1[3]));
@@ -132,6 +142,7 @@ function onSubmitFact($me, objectId, objectType) {
                 $me.parent().parent().find('.row:first').show();
                 $me.hide();
                 $me.parent().find('.editFact').show();//.css("position","");
+                initTraitFilterControls();
                 updateFeeds();
             } else {
                 $me.parent().parent().find('.alert').removeClass('alert alert-info').addClass('alert alert-error').html(data.msg).show();
@@ -188,8 +199,55 @@ function loadCustomFields($me, compId) {
     });
 }
 
+function initTraits() {
+    console.log('updatedGallery');
+    initTraitFilterControls();
+    updateMatchingSpeciesTable();
+    /*element = $('button[data-isNotObservation="false"]');
+    $(element).each(function(){
+        $(this).attr("disabled", "disabled");
+    });*/
+
+    $('.listFilter').unbind('click').click(function(){
+        var element = {};
+        element = $('div[data-isNotObservation]');
+        $(element).each(function(){
+            $(this).parent().parent().show();
+        });
+        if($(this).hasClass('active')){
+            return false;
+        }
+        $(this).parent().find('.listFilter').removeClass('active btn-success');
+        $(this).addClass('active btn-success')
+        updateMatchingSpeciesTable();
+        return false;
+    });
+}
+
 var startFlag = 0;
 function initTraitFilterControls() {
+
+    $('.trait button, .trait .all, .trait .any, .trait .none, .listFilter').unbind('click').click(function(){
+        var wasActive = $(this).hasClass('active btn-success');
+
+        if($(this).hasClass('MULTIPLE_CATEGORICAL')) {
+            $(this).parent().parent().find('.all, .any, .none').removeClass('active btn-success');
+            if($(this).hasClass('btn-success')) 
+                $(this).removeClass('active btn-success');
+            else
+                $(this).addClass('active btn-success');
+        } else {
+            $(this).parent().parent().find('button, .all, .any, .none').removeClass('active btn-success');
+            if(wasActive) 
+                $(this).removeClass('active btn-success');
+            else
+                $(this).addClass('active btn-success');
+        }
+
+        updateMatchingSpeciesTable();
+        return false;
+    });
+
     $('.trait_range_slider').ionRangeSlider({
         grid:'true',
         onChange:function(data) {

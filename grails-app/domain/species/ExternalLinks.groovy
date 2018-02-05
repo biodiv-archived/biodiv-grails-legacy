@@ -9,6 +9,7 @@ class ExternalLinks {
 	String ncbiId;
 	String colId
     String frlhtUrl;
+    String fishbaseUrl;
 	
 	Date eolFetchDate;
 	Integer noOfDataObjects;
@@ -23,6 +24,7 @@ class ExternalLinks {
 		ncbiId(nullable:true);
 		colId(nullable:true)
 		frlhtUrl(nullable:true)
+		fishbaseUrl(nullable:true)
 		eolFetchDate(nullable:true);
 		noOfDataObjects(nullable:true);
     }

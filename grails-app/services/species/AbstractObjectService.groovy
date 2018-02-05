@@ -26,10 +26,13 @@ import species.trait.Trait.Units;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.SimpleDateFormat;
+import au.com.bytecode.opencsv.CSVReader;
+import species.formatReader.SpreadsheetReader;
 
              
 import org.apache.commons.logging.LogFactory;
 import grails.plugin.cache.Cacheable;
+import org.apache.log4j.Level;
 
 class AbstractObjectService {
     
@@ -104,7 +107,7 @@ class AbstractObjectService {
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
                     boolean isChecklist = obv.hasProperty("isChecklist")?obv.isChecklist:false ;
-					item.imageLink = image.thumbnailUrl(isChecklist||(obv.hasProperty('dataset') && obv.dataset) ? null: iconBasePath, isChecklist|| ( obv.hasProperty('dataset') && obv.dataset) ? '.png' :null)//thumbnailUrl(iconBasePath)
+					item.imageLink = image.thumbnailUrl(isChecklist||(obv.hasProperty('dataTable') && obv.dataTable) ? null: iconBasePath, isChecklist|| ( obv.hasProperty('dataTable') && obv.dataTable) ? '.png' :null)//thumbnailUrl(iconBasePath)
 				} else if(image.type == ResourceType.VIDEO) {
 					item.imageLink = image.thumbnailUrl()
 				} else if(image.type == ResourceType.AUDIO) {
@@ -418,9 +421,10 @@ class AbstractObjectService {
     }
 	
 	def upload(params) {
-        log.debug "creating upload request"
+        println "creating upload request"
+        log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^creating upload request"
         UploadLog dl = UploadLog.create(springSecurityService.currentUser, new Date(), null, params.file, params.notes, params.uploadType?:params.controller, params);
-        def r = [:];
+        def r = ['uploadLog':dl];
         if(dl) {
             if(!dl.hasErrors()) {
                 r['success'] = true;
@@ -485,6 +489,9 @@ class AbstractObjectService {
         if(andTraitLT) {
             traitQuery = " and t.traits @> cast(ARRAY[ "
             andTraitLT.each { traitId, traitValueId ->
+                //for cases as trait.8= .. ie., with no value 
+                if(!traitValueId) return;
+
                 Trait t = Trait.read(Long.parseLong(traitId));
                 String[] values;
                 if(t.dataTypes == DataTypes.COLOR) {
@@ -520,7 +527,9 @@ class AbstractObjectService {
                             traitJsonQuery += " and cast(traits_json#>>'{${traitId},r}' as integer) is not null "
                             orderQuery += " (sqrt(power(${range[0]} - cast(traits_json#>>'{${traitId},r}' as integer), 2) + power(${range[1]} - cast(traits_json#>>'{${traitId},g}' as integer), 2) + power(${range[2]} - cast(traits_json#>>'{${traitId},b}' as integer), 2))), ";
                     } else {
-                        traitQuery += "[${traitId}, ${tvId}],";
+                        if(traitId && tvId) {
+                            traitQuery += "[${traitId}, ${tvId}],";
+                        }
                     } 
                 }
             }
@@ -531,17 +540,91 @@ class AbstractObjectService {
     }
 
     Map getTraits(String t) {
-        Map traits = [:];
-        if(t) {
-            t.split(';').each {
-                if(it) {
-                    String[] x = it.split(':');
-                    if(x.size() == 2)
-                        traits[x[0]] = x[1].trim();
+        //HACK to use this fn from obvUtilService in bulk upload... shd be placed in obvutil
+        return utilsService.getTraits(t);
+    }
+
+    //TO BE DELETED AND MOVED TO UTILSSERVICE
+    private CSVReader getCSVReader(File file) {
+        char separator = '\t'
+        if(file.exists()) {
+            CSVReader reader = new CSVReader(new FileReader(file), separator, CSVWriter.NO_QUOTE_CHARACTER);
+            return reader
+        }
+        return null;
+    }
+
+    Map validateCSVHeaders(String file, UploadLog dl, List reqdHeaders) {
+        List errors = [];
+        CSVReader reader = getCSVReader(new File(file))
+        String[] headers = reader.readNext();//headers
+        dl.writeLog("Reading headers : "+headers, Level.INFO);
+
+        Map headerNames = [:];
+        boolean[] reqdColIndexes = new boolean[headers.size()];
+        for(int i=0; i<headers.size(); i++) {
+            String lowercaseHeader = headers[i].trim().toLowerCase();
+            headerNames[lowercaseHeader] = true;
+            for(int j=0; j<reqdHeaders.size(); j++) {
+                if(reqdHeaders[j].toLowerCase() == lowercaseHeader) {
+                    reqdColIndexes[i] = true
                 }
             }
         }
-        return traits;
+        
+        List missingHeaders = reqdHeaders - headerNames.keySet();
+        if(missingHeaders.size() != 0) {
+            errors << "Columns missing : ${missingHeaders}";
+            return ['success':false, 'errors':errors];
+        }
+
+        int rowNo = 2;
+        String[] row = reader.readNext();
+        while(row) {
+            for(int i=0; i<row.size(); i++) {
+                if(!row[i] && reqdColIndexes[i]) {
+                    errors << "Row ${rowNo} has missing value for ${headers[i]}";
+                }
+            }
+            row = reader.readNext();
+            rowNo++;
+        }
+
+        if(errors) {
+            return ['success':false, 'errors':errors];
+        }
+        return ['success':true];
     }
 
+    Map validateSpreadsheetHeaders(String file, UploadLog dl, List reqdHeaders) {
+
+        List errors = [];
+        Map headerNames = [:];
+        File f = file?new File(file):null;
+        if(f && f.exists()) {
+            def v = SpreadsheetReader.readSpreadSheet(f.getAbsolutePath()).get(0);
+            dl.writeLog("Reading headers : "+v[0])
+
+            List missingHeaders = reqdHeaders - v[0].keySet();
+            if(missingHeaders.size() != 0) {
+                errors << "Columns missing : ${missingHeaders}";
+                return ['success':false, 'errors':errors];
+            }
+
+            v.eachWithIndex { m,index ->
+                for(int i=0; i<reqdHeaders.size(); i++) {
+                    if(!m[reqdHeaders[i]]) {
+                        errors << "Row ${index+2} has missing value for ${reqdHeaders[i]}";
+                    }
+                }
+            }
+            if(errors) {
+                return ['success':false, 'errors':errors];
+            }
+        } else {
+            errors << "File ${file} doesn't exist."
+            return ['success':false, 'msg':""];
+        }
+        return ['success':true, 'msg':""];
+    }
 }

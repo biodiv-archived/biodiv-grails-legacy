@@ -14,7 +14,8 @@ class Flag extends AbstractAction {
 	
 	public enum FlagType {
 		DETAILS_INAPPROPRIATE("Inappropriate details"),
-		LOCATION_INAPPROPRIATE("Inappropriate location")
+		LOCATION_INAPPROPRIATE("Inappropriate location"),
+		DATE_INAPPROPRIATE("Inappropriate date")
 		
 		private String value;
 
@@ -23,9 +24,29 @@ class Flag extends AbstractAction {
 		}
 		
 		static list() {
-			return [DETAILS_INAPPROPRIATE, LOCATION_INAPPROPRIATE];
+			return [DETAILS_INAPPROPRIATE, LOCATION_INAPPROPRIATE, DATE_INAPPROPRIATE];
 		}
 		
+		static FlagType getEnum(value){
+			if(!value) return null
+			
+			if(value instanceof FlagType)
+				return value
+			
+			value = value.toUpperCase().trim()
+            println value
+			switch(value){
+				case 'DETAILS INAPPROPRIATE':
+					return FlagType.DETAILS_INAPPROPRIATE
+				case 'LOCATION INAPPROPRIATE':
+					return FlagType.LOCATION_INAPPROPRIATE
+				case 'DATE_INAPPROPRIATE':
+					return FlagType.DATE_INAPPROPRIATE
+				default:
+					return null	
+			}
+		}
+
 		String value() {
 			return this.value;
 		}

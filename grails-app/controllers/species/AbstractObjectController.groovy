@@ -110,15 +110,15 @@ abstract class AbstractObjectController {
 	def getTargetInstance(Class clazz, id){
 		if( id instanceof String){
 			id = id.trim().toLong()
-		}
+	 	}
 		def instance = clazz.get(id)
 		
 		if(!instance || (instance.hasProperty('isDeleted') && instance.isDeleted)){
 			instance = new ResourceRedirect().fetchTargetInstance(clazz.canonicalName, id)
-		}
+	 	}
 		
 		return instance
-	}
+	} 
 
     def getObjResources(){
         def result = [:];
@@ -158,4 +158,15 @@ abstract class AbstractObjectController {
         }
     }
 
+    def getUserGroups(Class clazz, id) {
+        return getTargetInstance(clazz, id).userGroups; 
+    }
+
+    def userGroups() {
+        def result = [];
+        switch(params.controller.toLowerCase()) {
+            case 'observation' : result = getUserGroups(Observation.class, params.id);
+        }
+        render result as JSON;
+    }
 }

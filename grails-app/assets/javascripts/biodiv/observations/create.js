@@ -204,8 +204,8 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
 
         
         
-        $("#myGrid").show();
-        $('#checklistStartFile_uploaded').hide();
+        $("#myGrid, #gridSection").show();
+        //$('#checklistStartFile_uploaded').hide();
 
         if(res === "species") {
             var col = new Array();
@@ -220,7 +220,7 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
             for(var z= 0; z < col.length; z++) {
                 infoCol[z] = col[z].name;
             }
-            $('#columnOrder').val(infoCol);
+            saveColumnOrder(infoCol);
 
             populateTagHeaders(col);
             $.ajax({
@@ -343,6 +343,11 @@ function initGrid(data, columns, res, sciNameColumn, commonNameColumn) {
 //            selectNameColumn($('#commonNameColumn'), commonNameFormatter);
 //        }
     });
+    
+    $('#addNewColumn').unbind('click').click(function(){
+        grid.addNewColumn();
+    }); 
+
 } 
 
 function clearCloumnSelectIfExist(cloumnDropdown,cloumnName){
@@ -421,8 +426,9 @@ function loadDataToGrid(data, columns, res, sciNameColumn, commonNameColumn) {
         line = line.slice(1);
         d = d + '\n' + line
     });
-        $("#checklistData").val(d);
-        $("#checklistColumns").val(cols.slice(1));
+    
+    $("#checklistData").val(d);
+    $("#checklistColumns").val(cols.slice(1));
 
     loadTextToGrid(data, columns, res, sciNameColumn, commonNameColumn);
 }
@@ -473,18 +479,6 @@ function loadGrid(url, id){
 		}
 	});
 }
-
-$('#addNewColumn').unbind('click').click(function(){
-    grid.addNewColumn();
-}); 
-
-$( ".date" ).datepicker({ 
-    changeMonth: true,
-    changeYear: true,
-    dateFormat: 'dd/mm/yy',
-    maxDate:0
-});
-
 /**
  *
  */
@@ -548,20 +542,23 @@ function selectNameColumn(selectedColumn, formatter) {
     grid.invalidate();
 }
 
-
-/**
- * document ready
- */
-$(document).ready(function(){
-    $('.dropdown-toggle').dropdown();
+function initObservationCreate() {
+  $('.dropdown-toggle').dropdown();
 //    intializesSpeciesHabitatInterest(false);
 
     //$(".tagit-input").watermark("Add some tags");
-    
+    $( ".date" ).datepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy',
+        maxDate:0
+    });
+
+   
 
     $(".tagit-hiddenSelect").css('display','none');
 
-    $('input:radio[name=groupsWithSharingNotAllowed]').click(function() {
+    $('input:radio[name=groupsWithSharingNotAllowed]').unbind('click').click(function() {
         var previousValue = $(this).attr('previousValue');
 
         if(previousValue == 'true'){
@@ -573,7 +570,7 @@ $(document).ready(function(){
 
     /**
      */
-    $('.use_dms').click(function(){
+    $('.use_dms').unbind('click').click(function(){
         var map_class = $(this).closest(".map_class");
         if ($(this).is(':checked')) {
             $(map_class).find('.dms_field').fadeIn();
@@ -588,7 +585,7 @@ $(document).ready(function(){
 
     /**
      */
-    $(".help-identify input").click(function(){
+    $(".help-identify input").unbind('click').click(function(){
         if ($(this).is(':checked')){
             $(this).closest('.addObservation').find('.nameContainer input').val('');
             $(this).closest('.addObservation').find('.nameContainer input').attr('disabled', 'disabled');
@@ -600,7 +597,7 @@ $(document).ready(function(){
     /**
      *
      */
-    $("#addNames").click(function() {
+    $("#addNames").unbind('click').click(function() {
         var cols = $('#checklistColumns').val();
         var data = $("#checklistData").val();
 
@@ -617,7 +614,8 @@ $(document).ready(function(){
     /**
      *
      */
-    $("#createChecklist").click(function() {
+    //$(document).on('click', "#createChecklist", function() {
+    $("#createChecklist").unbind('click').click(function() {
         $('#restOfForm').show();
         /*$('html, body').animate({
             scrollTop: $("#restOfForm").offset().top
@@ -655,7 +653,8 @@ $(document).ready(function(){
     /**
      *
      */
-    $('#parseNames').click(function() {
+    $('#parseNames').unbind('click').click(function() {
+
         var sciNameColumn = $('#sciNameColumn').val();
         var commonNameColumn = $('#commonNameColumn').val();
 
@@ -761,7 +760,7 @@ $(document).ready(function(){
     /**
      *
      */
-    $("#addObservationSubmit").click(function(event){
+    $("#addObservationSubmit").unbind('click').click(function(event){
         if($(this).hasClass('disabled')) {
             alert(window.i8ln.observation.bulkObvCreate.up);
             event.preventDefault();
@@ -816,10 +815,53 @@ $(document).ready(function(){
         }
     });
 
-    
-});	
+    $('#addResourcesModalSubmit').unbind('click').click(function(){
+        var row = $('#addResourcesModal').data().row;    
+       var cell = $('#addResourcesModal').data().cell;
+       if(row === undefined || cell === undefined) {
+           alert('Either row or cell is missing');
+           $('#addResourcesModal').modal('toggle');
+           return false;
+       }
+        var data = grid.getData()[row]
+        var addedResources = $('#addResourcesModal ul.imagesList>li');
+        data.Media = new Array($(addedResources).length-1);
+        for(var i=0; i<$(addedResources).length-1; i++) {
+            data.Media[i] = {};
+        }
+        $.each($(addedResources).find('input'), function(index, input){
+            var name = $(input).attr('name');
+            var n = name.substring(0, name.lastIndexOf("_"));
+            var j = parseInt(name.substring(name.indexOf("_")+1));
+            data.Media[j-1][n] = $(input).val();
+            data.Media[j-1]['thumbnail'] = $('.image_'+j).attr('src');
+        });
 
- function AutoCompleteEditor(args) {
+        grid.getEditController().commitCurrentEdit();
+        addDirtyRows(undefined, {row:row});
+        grid.invalidateRow(row);
+        grid.render();
+        $('#addResourcesModal').modal('toggle');
+    });
+        
+    if ($('input.dateAccuracy[type=radio][name=dateAccuracy]:checked').val() == 'UNKNOWN') {
+        $('.addDataTable input.date[name="fromDate"],#createDataset input.date[name="fromDate"]').attr('disabled', 'disabled');
+        $('.addDataTable input.date[name="toDate"],#createDataset input.date[name="toDate"]').attr('disabled', 'disabled');
+    } else {
+        $('.addDataTable input.date,#createDataset input.date').removeAttr('disabled');
+    }
+
+    $('input.dateAccuracy[type=radio][name=dateAccuracy]').change(function() {
+        if (this.value == 'UNKNOWN') {
+            $('.addDataTable input.date[name="fromDate"],#createDataset input.date[name="fromDate"]').attr('disabled', 'disabled');
+            $('.addDataTable input.date[name="toDate"],#createDataset input.date[name="toDate"]').attr('disabled', 'disabled');
+        } else {
+            $('.addDataTable input.date,#createDataset input.date').removeAttr('disabled');
+        }
+    });
+}
+
+function AutoCompleteEditor(args) {
     var $input;
     var defaultValue;
     var scope = this;
@@ -919,7 +961,7 @@ function openDetails(row, cell) {
         return false;
     }
 
-    $('#addResourcesModal ul.imagesList>li.addedResource.thumbnail').remove();
+    $('#addResourcesModal ul.uploaded_files_list>li.addedResource.thumbnail').remove();
 
     var data = grid.getData()[row];
     var media = data.Media;
@@ -953,7 +995,7 @@ function openDetails(row, cell) {
             rate($ratingContainer)
         })
 
-        $(".imagesList li:first" ).after (metadataEle);
+        $(".uploaded_files_list" ).after (metadataEle);
     }
 
     $('#addResourcesModal').data({'row':row, 'cell':cell}).modal('show');
@@ -962,37 +1004,6 @@ function openDetails(row, cell) {
 }
 
 $(document).ready(function() {
-    /**
-     *
-     */
-    $('#addResourcesModalSubmit').click(function(){
-        var row = $('#addResourcesModal').data().row;    
-       var cell = $('#addResourcesModal').data().cell;
-       if(row === undefined || cell === undefined) {
-           alert('Either row or cell is missing');
-           $('#addResourcesModal').modal('toggle');
-           return false;
-       }
-        var data = grid.getData()[row]
-        var addedResources = $('#addResourcesModal ul.imagesList>li');
-        data.Media = new Array($(addedResources).length-1);
-        for(var i=0; i<$(addedResources).length-1; i++) {
-            data.Media[i] = {};
-        }
-        $.each($(addedResources).find('input'), function(index, input){
-            var name = $(input).attr('name');
-            var n = name.substring(0, name.lastIndexOf("_"));
-            var j = parseInt(name.substring(name.indexOf("_")+1));
-            data.Media[j-1][n] = $(input).val();
-            data.Media[j-1]['thumbnail'] = $('.image_'+j).attr('src');
-        });
-
-        grid.getEditController().commitCurrentEdit();
-        addDirtyRows(undefined, {row:row});
-        grid.invalidateRow(row);
-        grid.render();
-        $('#addResourcesModal').modal('toggle');
-    });
 });
 
 function selectLicense($this, i) {
@@ -1003,3 +1014,9 @@ function selectLicense($this, i) {
     //$('#selected_license_'+i).find('img:first').replaceWith($this.html());
     return false;
 }
+
+$(document).ready(function(){
+    initObservationCreate();
+});	
+
+

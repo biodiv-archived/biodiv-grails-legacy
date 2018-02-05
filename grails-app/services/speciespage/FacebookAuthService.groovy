@@ -26,8 +26,14 @@ class FacebookAuthService {
             String accessToken = token.accessToken.accessToken;
 			FacebookTemplate facebook = new FacebookTemplate(accessToken);
 			//TODO:enable facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), accessToken, facebook.getOAuth2Version()));
-			User fbProfile = facebook.userOperations().getUserProfile();
-
+			//CHK CHK CHK for new version User fbProfile = facebook.userOperations().getUserProfile();
+			facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), accessToken, facebook.getOAuth2Version()));
+			FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
+println "+++++++++++++++++++++++++"
+println "+++++++++++++++++++++++++"
+log.debug "fbProfile : ${fbProfile}";
+println token;
+println "+++++++++++++++++++++++++"
 			def securityConf = SpringSecurityUtils.securityConfig
 			Class<?> UserDomainClass = grailsApplication.getDomainClass(userDomainClassName).clazz
 

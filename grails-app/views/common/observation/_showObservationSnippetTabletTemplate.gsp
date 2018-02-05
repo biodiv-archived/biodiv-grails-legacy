@@ -114,11 +114,11 @@ def obvId = observationInstance?.id
         </div>
         <div style="float:right">
             <div style="float: left;">
-                <span class="habitat_icon_show group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}" title="${observationInstance.habitat}"></span>
+                <span class="habitat_icon_show group_icon habitats_sprites active ${observationInstance.habitat.iconClass()}" title="${observationInstance.habitat.name}"></span>
 
             </div>
             <div class="group_icon_show_wrap">
-                <span class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left" title="Plants"></span>
+                <span class="group_icon group_icon_show species_groups_sprites active ${observationInstance.group.iconClass()} pull-left" title="${observationInstance.group.name}"></span>
                 <div class="btn btn-small btn-primary edit_group_btn pull-left">${g.message(code:'default.button.edit.label')}
                 </div>
             </div>
@@ -161,7 +161,7 @@ def obvId = observationInstance?.id
 
         <li class="active"><a href="#${observationInstance.id}_groups" data-toggle="tab">Groups</a></li>
 
-        <li><a href="#${observationInstance.id}_traits" data-toggle="tab" class="traits" data-objectId="${observationInstance.id}" data-objectType="${observationInstance.class.getCanonicalName()}" data-sGroup = "${observationInstance.group.id}" data-isObservationTrait="true" data-ifOwns="${utilsService.ifOwns(observationInstance.author)}" data-isParticipatory="true" data-showInObservation="true">Traits</a></li>
+        <li><a href="#${observationInstance.id}_traits" data-toggle="tab" class="traits" data-objectId="${observationInstance.id}" data-objectType="${observationInstance.class.getCanonicalName()}" data-sGroup = "${observationInstance.group.id}" data-isObservationTrait="true" data-ifOwns="${utilsService.ifOwns(observationInstance.author)}" data-showInObservation="true">Traits</a></li>
 
         <li><a href="#${observationInstance.id}_customFields" data-toggle="tab" class="customFields" data-objectId="${observationInstance.id}">Custom Fields</a></li>
 

@@ -21,17 +21,19 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.codehaus.groovy.grails.web.json.JSONArray;
 import org.codehaus.groovy.grails.web.json.JSONElement;
 import org.codehaus.groovy.grails.web.json.JSONObject;
-
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class SpreadsheetWriter {
 
     static final String KEYVALUE_SEP = "#11#";
     static final String COLUMN_SEP = "#12#";
     static final String FIELD_SEP = "#13#";
     
-    public static void writeSpreadsheet(File f, InputStream inp, JSONArray gridData, JSONElement headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
+    public static void writeSpreadsheet(File f, InputStream inp, JSONElement headerMarkers, String writeContributor, String contEmail, JSONArray orderedArray) {
         //System.out.println ("params in write SPREADSHEET " + gridData + " ----- " + headerMarkers);
         try {
-            Workbook wb = WorkbookFactory.create(inp);
+//            Workbook wb = WorkbookFactory.create(inp);
+//            TESTING following line
+            Workbook wb = new XSSFWorkbook(inp);
             int sheetNo = 0;
             //writeDataInSheet(wb, gridData, sheetNo, writeContributor, contEmail, orderedArray);
             writeHeadersInFormat(wb, headerMarkers, orderedArray);
@@ -48,9 +50,10 @@ public class SpreadsheetWriter {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
         }
+        //catch (InvalidFormatException e) {
+       //     e.printStackTrace();
+       // }
 
     }
 

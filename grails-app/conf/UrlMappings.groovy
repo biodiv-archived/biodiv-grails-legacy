@@ -272,7 +272,6 @@ class UrlMappings {
 
     "/admin/manage/$action?"(controller: "adminManage")
     "/adminManage/$action?"(controller: "errors", action: "urlMapping")
-     
-    }
-
+    
+} 
 }
