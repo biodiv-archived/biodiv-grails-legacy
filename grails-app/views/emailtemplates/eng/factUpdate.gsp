@@ -98,7 +98,7 @@
 					</tr>
 				</table>
 			</div>
-			<b>${trait} </b>: ${traitValueStr} <br /><br />
+			${traitValueStr} <br /><br />
 				<g:if test="${(currentAction == 'downloadRequest' || currentAction == 'Document created' || actionObject == 'checklist' || domainObjectType == 'document' || domainObjectType == 'checklists' || domainObjectType == 'usergroup' || domainObjectType == 'newsletter' || domainObjectType == 'discussion')}">
 				 		<div class="clear" class="content" style="margin: 0 auto;padding: 10px 0px;font-family: &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif;max-width: 600px;display: block; background-color:#D4ECE3; align:left; clear: both;">
 							<!-- Callout Panel -->
