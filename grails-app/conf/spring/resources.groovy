@@ -91,7 +91,7 @@ beans = {
     def configRoot = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
     def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
 
-    if (Environment.current == Environment.DEVELOPMENT) {
+/*    if (Environment.current == Environment.DEVELOPMENT) {
         // In development we use messageLocalService as implementation
         // of MessageService.
 	//File home = new File("${configRoot.speciesPortal.app.rootDir}/solr" );
@@ -111,43 +111,7 @@ beans = {
         biodivSolrServer(EmbeddedSolrServer, container, "biodiv" );
 
     } else {
-/*        speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
-            setSoTimeout(config.soTimeout);
-            setConnectionTimeout(config.connectionTimeout);
-            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-            setMaxTotalConnections(config.maxTotalConnections);
-            setFollowRedirects(config.followRedirects);
-            setAllowCompression(config.allowCompression);
-            setMaxRetries(config.maxRetries);
-            //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/species"
-        }
-
-        observationsSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
-            setSoTimeout(config.soTimeout);
-            setConnectionTimeout(config.connectionTimeout);
-            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-            setMaxTotalConnections(config.maxTotalConnections);
-            setFollowRedirects(config.followRedirects);
-            setAllowCompression(config.allowCompression);
-            setMaxRetries(config.maxRetries);
-            //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/observations"
-        }
-
-        newsletterSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
-            setSoTimeout(config.soTimeout);
-            setConnectionTimeout(config.connectionTimeout);
-            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-            setMaxTotalConnections(config.maxTotalConnections);
-            setFollowRedirects(config.followRedirects);
-            setAllowCompression(config.allowCompression);
-            setMaxRetries(config.maxRetries);
-            //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/newsletters"
-        }
-*/
-        projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
+*/      projectSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL +"/projects", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
             setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
@@ -158,31 +122,6 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             println "Initialized search server to "+config.serverURL+"/projects"
         }
-/*
-        documentSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
-            setSoTimeout(config.soTimeout);
-            setConnectionTimeout(config.connectionTimeout);
-            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-            setMaxTotalConnections(config.maxTotalConnections);
-            setFollowRedirects(config.followRedirects);
-            setAllowCompression(config.allowCompression);
-            setMaxRetries(config.maxRetries);
-            //setParser(new XMLResponseParser()); // binary parser is used by default
-            println "Initialized search server to "+config.serverURL+"/documents"
-         }
-        
-        userGroupSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
-            setSoTimeout(config.soTimeout);
-            setConnectionTimeout(config.connectionTimeout);
-            setDefaultMaxConnectionsPerHost(config.defaultMaxConnectionsPerHost);
-            setMaxTotalConnections(config.maxTotalConnections);
-            setFollowRedirects(config.followRedirects);
-            setAllowCompression(config.allowCompression);
-            setMaxRetries(config.maxRetries);
-            //setParser(new XMLResponseParser()); // binary parser is used by default
-            log.debug "Initialized user groups search server to "+config.serverURL+"/biodiv"
-        }
-*/
         biodivSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
@@ -194,7 +133,7 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             println "Initialized search server to "+config.serverURL+"/biodiv"
          }
-    }//end of initializing solr Server
+//    }//end of initializing solr Server
     
     resourceSearchService(speciespage.search.ResourceSearchService) {
         solrServer = ref('biodivSolrServer');

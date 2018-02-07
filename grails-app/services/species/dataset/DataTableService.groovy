@@ -357,7 +357,7 @@ class DataTableService extends AbstractMetadataService {
                 def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
-                File imagesDir = new File(contentRootDir, dataTable.imagesFile.path);
+                File imagesDir = dataTable.imagesFile ? new File(contentRootDir, dataTable.imagesFile.path) : null;
                 if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
                     File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
 

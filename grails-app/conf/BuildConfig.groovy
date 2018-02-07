@@ -238,3 +238,7 @@ grails.project.dependency.resolution = {
 
     grails.tomcat.jvmArgs = ["-server", "-noverify", "-XX:PermSize=256m", "-XX:MaxPermSize=256m", "-Xmx3G", "-Xms2048M", "-XX:+UseParallelGC", "-Djava.net.preferIPv4Stack=true", "-Dsun.reflect.inflationThreshold=100000", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]
 }
+
+development {
+    grails.server.port.http = 8090
+} 
