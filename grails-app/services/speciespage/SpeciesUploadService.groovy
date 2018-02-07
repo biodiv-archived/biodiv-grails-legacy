@@ -163,9 +163,12 @@ class SpeciesUploadService {
 		def speciesDataFile = sBulkUploadEntry.filePath
 		def imagesDir = sBulkUploadEntry.imagesDir
 		sBulkUploadEntry.updateStatus(UploadLog.Status.RUNNING)
-		File errorFile = utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
+
+        sBulkUploadEntry.writeLog("Initalizing species bulk upload", Level.INFO);
+
+		//File errorFile = new File(sBulkUploadEntry.errorFilePath);//utilsService.createFile("ErrorLog.txt" , "species", contentRootDir);
 		
-		sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
+		//sBulkUploadEntry.errorFilePath = errorFile.getAbsolutePath()
 
 		def res = uploadMappedSpreadsheet(speciesDataFile, speciesDataFile, 2,0,0,0, imagesDir?1:-1, imagesDir, sBulkUploadEntry)
 		
@@ -174,9 +177,7 @@ class SpeciesUploadService {
 		mylog += "Start Date  " + sBulkUploadEntry.startDate + "   End Date " + sBulkUploadEntry.endDate + "\n\n " 
 		//mylog += "  \n\n    Name assigned \n\n" + res.idSummary + "\n\n " 
 		//mylog += "  \n\n    Developer log \n\n" + res.log
-        errorFile.withWriterAppend("UTF-8") { 
-            it.write(mylog);
-        }
+        sBulkUploadEntry.writeLog(mylog, Level.INFO);
 			
 		if(!sBulkUploadEntry.save(flush:true)){
 			sBulkUploadEntry.errors.allErrors.each { log.error it }
@@ -262,11 +263,15 @@ class SpeciesUploadService {
 	 * @return
 	 */
 	Map uploadMappedSpreadsheet (String file, String mappingFile, int mappingSheetNo, int mappingHeaderRowNo, int contentSheetNo, int contentHeaderRowNo, int imageMetaDataSheetNo = -1, String imagesDir="", SpeciesBulkUpload sBulkUploadEntry=null) {
+        def writeLog;
+        if(sBulkUploadEntry) writeLog = sBulkUploadEntry.writeLog;
+        else writeLog = utilsService.writeLog;
+
 		Map result = ['success':false]
 		MappedSpreadsheetConverter converter
 		def uploadCount = 0
 		try {
-			log.info "Uploading mapped spreadsheet : "+file;
+			writeLog("Uploading mapped spreadsheet : "+file, Level.INFO);
 	
 			List<Species> species = new ArrayList<Species>();
 			converter = new MappedSpreadsheetConverter();
@@ -352,20 +357,23 @@ class SpeciesUploadService {
 	}
 
 	int saveSpecies(SourceConverter converter, List content, String imagesDir="", SpeciesBulkUpload sBulkUploadEntry=null) {
-		converter.setLogAppender(fa);
+        def writeLog;
+        if(sBulkUploadEntry) writeLog = sBulkUploadEntry.writeLog;
+        else writeLog = utilsService.writeLog;
+
 		def startTime = System.currentTimeMillis()
 		int noOfInsertions = 0;
 		List speciesElements = [];
 		int noOfSpecies = content.size();
 		
-		log.info " CONTENT SIZE " + noOfSpecies
+		writeLog(" CONTENT SIZE " + noOfSpecies);
 		int processNameCount = 0
 		boolean isAborted = false
 		List contentSubLists = content.collate(BATCH_SIZE)
 		contentSubLists.each { contentSubList ->
 			if(isAborted || shouldAbortUpload(sBulkUploadEntry)){
 				isAborted = true
-				log.debug "Aborting bulk upload"
+				writeLog("Aborting bulk upload")
 			}
 			
 			if(!isAborted){
@@ -381,15 +389,17 @@ class SpeciesUploadService {
 				converter.addToSummary(res.summary);
 				converter.addToSummary(res.species.collect{it.fetchLogSummary()}.join("\n"))
 				converter.addToSummary("======================== FINISHED BATCH =============================\n")
-				sBulkUploadEntry?.writeLog(res.idSummary);
+				writeLog(res.idSummary);
                 if(sBulkUploadEntry && sBulkUploadEntry.errorFilePath) {
                     def ln = System.getProperty('line.separator');
-				    new File(sBulkUploadEntry?.errorFilePath).withWriterAppend("UTF-8") { 
+		/*		    new File(sBulkUploadEntry?.errorFilePath).withWriterAppend("UTF-8") { 
                         it.write(ln+converter.getLogs()?:'');
                     }
-                    log.info "================================ LOG ============================="
-                    println  converter.getLogs()
-                    log.info "=================================================================="
+        */
+                    writeLog(converter.getLogs()?:'');
+        //            log.info "================================ LOG ============================="
+        //            log.info  converter.getLogs()
+        //            log.info "=================================================================="
 
                     converter.clearLogs();
                 }
@@ -408,8 +418,8 @@ class SpeciesUploadService {
 		//}
 		
 		
-		log.info "Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)"
-		log.info "Total number of species that got added : ${noOfInsertions}"
+		writeLog("Total time taken to save : "+(( System.currentTimeMillis()-startTime)/1000) + "(sec)", Level.INFO);
+		writeLog("Total number of species that got added : ${noOfInsertions}",Level.INFO);
 		return noOfInsertions;
 	}
 
@@ -440,7 +450,7 @@ class SpeciesUploadService {
 	
 	private Map saveSpeciesElements(List speciesElements, SpeciesBulkUpload sBulkUploadEntry=null) {
 		XMLConverter converter = new XMLConverter();
-        converter.setLogAppender(fa);
+        
 
         Map paramsToPropagate = [:];
         if(sBulkUploadEntry) {
