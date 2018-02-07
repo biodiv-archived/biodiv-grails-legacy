@@ -243,7 +243,9 @@ function getMarkedColumns() {
 }
 
 function viewSpeciesGrid() {
-    $("#myGrid").hide();
+    //$("#myGrid").hide();
+    $("#myGrid").empty();
+    $("#tagHeaders tr:not(:first-child)").remove();
     var input = $("#dataTableFile_path").val();
     var res = "species";
     if(input){
