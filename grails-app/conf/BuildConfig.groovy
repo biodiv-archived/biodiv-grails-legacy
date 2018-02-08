@@ -43,11 +43,11 @@ grails.project.dependency.resolution = {
 
         grailsPlugins()
         grailsHome()
+        mavenLocal()
         grailsCentral()
 
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
-        mavenLocal()
         mavenCentral()
         //mavenRepo "http://repository.codehaus.org"
         mavenRepo "https://repo.grails.org/grails/plugins/" 
@@ -145,16 +145,17 @@ grails.project.dependency.resolution = {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }*/
 
-        compile "org.pac4j:pac4j-jwt:2.1.0"
+        runtime "org.pac4j:pac4j-jwt:2.1.0"
         compile "org.pac4j:pac4j-oauth:2.1.0"
+
     }
 
     plugins { 
-         build   ":tomcat:7.0.54"
+         build   ":tomcat:7.0.55"
         //build ":tomcat8:8.0.5"
         //build ':jetty:2.0.3'
 
-        //compile ":scaffolding:2.0.1"
+        compile ":scaffolding:2.1.2"
         compile group: 'org.grails.plugins', name: 'platform-core', version: '1.0.0'
         //TODO enable this plugin
         compile (':cache:1.1.8') {
@@ -163,12 +164,12 @@ grails.project.dependency.resolution = {
         compile "org.grails.plugins:cache-ehcache:1.0.5"
 //        runtime ":database-migration:1.4.0"
 
-        compile (':hibernate:3.6.10.16') {
+        runtime (':hibernate:3.6.10.16') {
             excludes 'ehcache-core'
         }
 
-        compile ':hibernate-spatial:0.0.4'
-        compile ':hibernate-spatial-postgresql:0.0.4'
+        runtime ':hibernate-spatial:0.0.4'
+        runtime ':hibernate-spatial-postgresql:0.0.4'
 //        runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 
@@ -210,7 +211,7 @@ grails.project.dependency.resolution = {
         compile ":quartz:1.0.2"
         compile ":rateable:0.7.1"
         //      compile ":recaptcha:0.5.2"
-        compile ':recaptcha:1.6.0'
+        //compile ':recaptcha:1.6.0'
         compile ":rest:0.8"
         compile ":tagcloud:0.3"
         compile ":taggable:1.0.1"
@@ -242,4 +243,8 @@ grails.project.dependency.resolution = {
     "-XX:+CMSIncrementalMode", "-XX:-UseGCOverheadLimit", "-XX:+ExplicitGCInvokesConcurrent", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]*/
 
     grails.tomcat.jvmArgs = ["-server", "-noverify", "-XX:PermSize=256m", "-XX:MaxPermSize=256m", "-Xmx3G", "-Xms2048M", "-XX:+UseParallelGC", "-Djava.net.preferIPv4Stack=true", "-Dsun.reflect.inflationThreshold=100000", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]
+}
+
+development {
+    grails.server.port.http = 8081
 }

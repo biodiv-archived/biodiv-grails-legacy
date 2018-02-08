@@ -225,14 +225,18 @@ class OpenIdController {
 		log.debug "Processing facebook registration in createAccount"
         log.debug "LAST_FACEBOOK_USER : ${token}"
 		FacebookTemplate facebook = new FacebookTemplate(token.accessToken.accessToken);
-       log.debug facebook
+        //TODO:following line shd be enabled
+//		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
+		User fbProfile = facebook.userOperations().getUserProfile();
+
+        /*log.debug facebook
         println ClientHttpRequestFactorySelector.getRequestFactory();
         
         /*def facebookConnectionFactory = new FacebookConnectionFactory(client, secret);
         facebookConnectionFactory.setScope("public_profile,email");
         Connection<Facebook> connection = facebookConnectionFactory.findPrimaryConnection(Facebook.class);
         Facebook facebook = connection != null ? connection.getApi() : null;
-*/
+/*
 		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
         MultiValueMap map = new LinkedMultiValueMap();
         map.addAll('fields', 'id, name, email');
@@ -244,6 +248,7 @@ class OpenIdController {
         println "--------------------------------------------"
 		//FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
 log.debug fbProfile
+*/
 		//TODO: if there are multiple email accounts available choose among them
 		String email = fbProfile.email;
 

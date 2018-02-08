@@ -5,7 +5,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.grails.taggable.TagLink;
 import species.Classification;
 import content.eml.UFile;
@@ -144,7 +144,7 @@ class DataTableService extends AbstractMetadataService {
 
             //setting ufile and uri
             if(params.uFile.path) {
-                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                def config = Holders.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 try{
                     File destinationFile = new File(contentRootDir, params.uFile.path);
@@ -191,7 +191,7 @@ class DataTableService extends AbstractMetadataService {
                 instance.dataTableType = DataTableType.values()[params.int('dataTableType')];
             }
 
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir
             if(instance.uFile) {
                 File dataTableFile = new File(contentRootDir, instance.uFile.path);
@@ -354,7 +354,7 @@ class DataTableService extends AbstractMetadataService {
 
                  }
 
-                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                def config = Holders.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
                 File imagesDir = new File(contentRootDir, dataTable.imagesFile.path);

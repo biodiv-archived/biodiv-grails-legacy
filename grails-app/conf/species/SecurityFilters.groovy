@@ -31,6 +31,7 @@ class SecurityFilters {
         all(controller:'*', action:'*') {
 
             before = {
+                println "security filters ======================================="
                 log.info "^Request ${request.getRequestURL()} with params: ${params}"
 
                 grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);

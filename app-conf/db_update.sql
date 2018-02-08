@@ -999,4 +999,20 @@ create index on token(value,user_id);
 alter table trait_value rename trait_id to trait_instance_id;
 alter table fact rename trait_id to trait_instance_id;
 
+#7th Feb2018 grails 2.3.9 to grails 2.4.3
+#change applicationContext.xml .. create new app with 2.4.3 and update applicationContext.xml
+#remove ~/.grails/2.4.3/....project/biodiv folder
+#compile
+#replace ConfigurationHolder & ApplicationHolder with grails.util.Holders
+#correct RedirectAction import path
+#replace BaseOAuthClient to OAuth20Client
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy
+sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy
 

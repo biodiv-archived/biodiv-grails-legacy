@@ -253,11 +253,11 @@ class Utils {
 		def domain = getDomain(request);
 		def config = grails.util.Holders.config
 
-		if(domain.startsWith(config.wgp.domain)) {
-			return "The Westernghats Portal"
-		} else {
+		//if(domain.startsWith(config.wgp.domain)) {
+		//	return "The Westernghats Portal"
+		//} else {
 			return config.speciesPortal.app.siteName
-		}
+		//}
 		return "";
 	}
 

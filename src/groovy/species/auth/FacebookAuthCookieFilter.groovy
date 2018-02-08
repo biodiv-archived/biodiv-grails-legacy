@@ -65,6 +65,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
         HttpServletResponse response = servletResponse
         String url = request.requestURI.substring(request.contextPath.length())
         println "+++++++++++++++++++++++++++++++++++++++++++++++++++"+url;
+        println chain
         println SecurityContextHolder.context
         logger.debug("Processing url: $url with params : ${request.getParameterMap()} with method : ${request.getMethod()}")
         //logger.debug("SecurityContext authentication : ${SecurityContextHolder.context.authentication }");
@@ -163,6 +164,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
         }
 
         //when not authenticated, don't have auth cookie or bad credentials
+        println "Continuing filter chain==========================="
         chain.doFilter(request, response)
     }
 

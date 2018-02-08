@@ -117,6 +117,10 @@ class ObservationController extends AbstractObjectController {
     }
 
     def list() {
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
+        println "++++++++++++++++++++++++++++++++++"
         def model;
         params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         model = runLastListQuery(params);

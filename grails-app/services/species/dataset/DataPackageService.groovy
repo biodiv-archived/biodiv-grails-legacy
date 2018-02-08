@@ -1,13 +1,7 @@
 package species.dataset;
 
-import species.sourcehandler.importer.DwCObservationImporter;
-import grails.util.Environment;
 import grails.util.GrailsNameUtils;
-import groovy.sql.Sql
-import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.taggable.TagLink;
-import species.Classification;
 
 import java.util.Date;
 import java.util.List;

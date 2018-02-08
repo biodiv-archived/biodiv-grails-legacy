@@ -266,7 +266,7 @@ class Trait {
 
         if(ibpParentTaxon) {
             println "Found ibp parent classification to be ${ibpParentTaxon}";
-            println "trait taxon ${trait.taxon}";
+            println "trait taxon ${traitInstance.taxon}";
             ibpParentTaxon.each { t ->
                 traitInstance.taxon.each { taxon ->
                     if(traitInstance.taxon.id == t.id)

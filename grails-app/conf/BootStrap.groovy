@@ -59,7 +59,7 @@ class BootStrap {
         initBannerMessageMap();
         initFiltersMap();
         //speciesTraitsService.init();
-
+        log.debug "BouncyCastleProviderSingleton.getInstance"
         Provider bc = BouncyCastleProviderSingleton.getInstance();
         Security.addProvider(bc);
   	}

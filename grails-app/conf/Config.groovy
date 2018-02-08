@@ -168,8 +168,8 @@ else {
     //println "*** No external configuration file defined. ***"
 }
 
-grails.app.context = "/"
-
+//grails.app.context = "/${appName}"
+//println "Deploying at context ${grails.app.context}------------------------------------------"
 speciesPortal {
     app.siteName = "India Biodiversity Portal"
     app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
@@ -196,7 +196,7 @@ speciesPortal {
     domain = "localhost"
     resources {
         rootDir = "${app.rootDir}/img"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/img"
+        serverURL = "http://hybrid.indiabiodiversity.org/${appName}/img"
         filesutraURL = "http://localhost.fileops.indiabiodiversity.org"
         images {
             defaultType = "jpg"
@@ -222,13 +222,13 @@ speciesPortal {
     observations {
         rootDir = "${app.rootDir}/observations"
         observationDownloadDir = "${download.rootDir}/observations"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/observations"
+        serverURL = "http://hybrid.indiabiodiversity.org/${appName}/observations"
         //serverURL = "http://localhost/${appName}/observations"
         MAX_IMAGE_SIZE = 104857600
     }
     userGroups {
         rootDir = "${app.rootDir}/userGroups"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/userGroups"
+        serverURL = "http://hybrid.indiabiodiversity.org/${appName}/userGroups"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -237,7 +237,7 @@ speciesPortal {
 
     datasource {
         rootDir = "${app.rootDir}/datasources"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/datasources"
+        serverURL = "http://hybrid.indiabiodiversity.org/${appName}/datasources"
         //serverURL = "http://localhost/${appName}/userGroups"
         logo {
             MAX_IMAGE_SIZE = 51200
@@ -261,7 +261,7 @@ speciesPortal {
 
     maps {
         SRID = 4326;
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/maps"
+        serverURL = "http://hybrid.indiabiodiversity.org/${appName}/maps"
     }
 
     content{
@@ -276,7 +276,7 @@ speciesPortal {
     }
     traits{
         rootDir = "${app.rootDir}/traits"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/traits"
+        serverURL = "http://hybrid.indiabiodiversity.org/${appName}/traits"
 
             databaseDir = "${app.rootDir}/traits"
             traitValueFile="${app.rootDir}/icons.csv"
@@ -485,7 +485,7 @@ speciesPortal {
     flushImmediately = true
     usersResource {
         rootDir = "${app.rootDir}/usersRes"
-        serverURL = "http://localhost.indiabiodiversity.org/${appName}/usersRes"
+        serverURL = "http://hybrid.indiabiodiversity.org/${appName}/usersRes"
     }
 
     ibpMapDatabase {
@@ -516,7 +516,7 @@ jpegOptimProg = "/usr/bin/jpegoptim";
 
 environments {
     development {
-        grails.serverURL = "http://localhost.indiabiodiversity.org"
+        grails.serverURL = "http://hybrid.indiabiodiversity.org"
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://localhost:8090/solr"
@@ -532,8 +532,8 @@ environments {
                 port = 25
             }
         }
-        ibp.domain='localhost.indiabiodiversity.org'
-        wgp.domain='thewesternghats.localhost.indiabiodiversity.org'
+        ibp.domain='hybrid.indiabiodiversity.org'
+        wgp.domain='thewesternghats.hybrid.indiabiodiversity.org'
         //grails.resources.debug=true
         //        grails.resources.mappers.hashandcache.excludes = ['**']
         //grails.resources.flatten = false
@@ -564,7 +564,7 @@ environments {
             error stdout:"StackTrace"
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages' //  GSP
-            error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
+            debug    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
             error    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
             error   'org.codehaus.groovy.grails.commons', // core / classloading
             'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
@@ -578,7 +578,7 @@ environments {
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
             warn "org.grails.plugin.resource"
 
-            warn    'org.springframework.security',
+            debug    'org.springframework.security',
             'org.codehaus.groovy.grails.web.servlet',  //  controllers
             'grails.app'
             warn   'org.springframework.security'
@@ -617,7 +617,8 @@ environments {
             fatal   'jdbc.resultsettable'
             //            debug 'org.hibernate.SQL'
             //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            /*debug 'org.springframework.security.acls'
+            /*
+            debug 'org.springframework.security.acls'
             debug 'org.hibernate.jdbc'
             debug 'org.hibernate.persister.entity'
             debug 'org.hibernate.action.EntityUpdateAction'
@@ -626,7 +627,7 @@ environments {
             debug 'org.hibernate.transaction'
             debug 'org.springframework.transaction'
             info    'org.hibernate.jdbc.ConnectionManager'
-             */
+            */ 
             trace   'com.grailsrocks.emailconfirmation'
             debug   'com.odobo.grails.plugin.springsecurity.rest'
             debug   'com.odobo.grails.plugin.springsecurity.openid'
@@ -637,11 +638,13 @@ environments {
             debug   'org.hibernate.cache.EhCache'
             debug   'org.hibernate.cache.internal.StandardQueryCache'
             info   'org.hibernate.cache'
-            trace 'org.springframework.security.web.authentication.rememberme',
+            debug 'org.springframework.security.web.authentication.rememberme',
                   'org.springframework.security.web.authentication',
                   'org.springframework.security.web.authentication.*'
                   'org.springframework.security.web.authentication.dao'
             info  'org.springframework.security.web'
+            debug  'org.springframework.security'
+            info  'org.springframework.security.access'
 
             debug 'species'
             info    'com.linkedin.grails.ProfilerPlugin'
@@ -1599,7 +1602,7 @@ grails.plugins.dynamicController.mixins = [
 ]
 //'securityContextPersistenceFilter',
 //'rememberMeAuthenticationFilter', 
-grails.plugin.springsecurity.filterChain.filterNames = [
+grails.plugins.springsecurity.filterChain.filterNames = [
     'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
          'anonymousAuthenticationFilter',

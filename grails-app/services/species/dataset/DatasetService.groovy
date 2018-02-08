@@ -5,7 +5,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.grails.taggable.TagLink;
 import species.Classification;
 import content.eml.UFile;
@@ -132,7 +132,7 @@ class DatasetService extends AbstractMetadataService {
         }
 
         //setting ufile and uri
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        def config = Holders.config
         String contentRootDir = config.speciesPortal.content.rootDir
         if(!instance.uFile) {
             String uploadDir = "datasets/"+ UUID.randomUUID().toString()	

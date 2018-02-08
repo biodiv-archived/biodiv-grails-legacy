@@ -263,12 +263,7 @@ beans = {
         defaultRoleNames = ['ROLE_USER']
 
     }
-println "++++++++++++++++++++++++++++++"
-println "++++++++++++++++++++++++++++++"
-println conf.facebook.apiKey
-println conf.facebook.secret
-println "++++++++++++++++++++++++++++++"
-println "++++++++++++++++++++++++++++++"
+
     facebookAuthUtils(FacebookAuthUtils) { 
         grailsApplication = ref('grailsApplication') 
         apiKey = conf.facebook.apiKey
