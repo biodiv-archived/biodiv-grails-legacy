@@ -301,10 +301,10 @@ class DataTableService extends AbstractMetadataService {
                 feedDesc += "Marking got changed ... so reuploading the sheet for new marking";
                 feedDesc += "\n Changed Marking : ${dataTable.changedCols}"
             }
-            //HACK to reupload species on edit
+            //HACK to reupload species on edit ... disabled by isMarkingDirty=false;
             switch(dataTable.dataTableType.ordinal()) {
                 case DataTableType.SPECIES.ordinal(): 
-                dataTable.isMarkingDirty = true;
+                dataTable.isMarkingDirty = false;
                 break;
             }
 
