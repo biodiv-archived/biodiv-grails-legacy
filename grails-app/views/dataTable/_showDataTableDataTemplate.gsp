@@ -60,7 +60,17 @@
             </g:each>	
         </tbody>
     </table>
-    <g:if test="${params.action == 'show'}">
+    <g:if test="${params.action == 'list' && params.controller=='dataTable'}">
+        <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
+        <div class="centered">
+        <div class="btn " style="width:50%;margin-top:50px;">
+       View in show page
+        </div> 
+        </div>
+        </g:link>
+
+    </g:if>
+    <g:else>
         <g:if test="${dataObjectsCount > (params.max?params.int('max'):10)}">
             <div class="centered">
                 <div class="btn loadMore">
@@ -74,15 +84,7 @@
             userGroup="${userGroupInstance}" userGroupWebaddress="${userGroupWebaddress?:params.webaddress}"
             max="${params.max?params.int('max'):10}"  params="${[id:dataTableInstance.id]}"/>
         </div>
-    </g:if>
-    <g:else>
-        <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
-        <div class="centered">
-        <div class="btn " style="width:50%;margin-top:50px;">
-       View in show page
-        </div> 
-        </div>
-        </g:link>
+ 
     </g:else>
 
                                 

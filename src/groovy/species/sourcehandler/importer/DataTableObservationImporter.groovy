@@ -160,6 +160,7 @@ class DataTableObservationImporter extends AbstractObservationImporter {
         log.debug "Got existing obv params as : ${obvParams}"
         log.debug "Changed columns are : ${changedCols}"
         Map m = obvParams.clone();
+        
         observationHeader.eachWithIndex { headers, i ->
 
             headers.each { header ->
@@ -167,21 +168,18 @@ class DataTableObservationImporter extends AbstractObservationImporter {
 
                 if(header) {
                     Map changedColMarking = changedCols[header[1]];
-                    String newColUrl,oldColUrl;
+                    String oldColUrl;
                     if(changedColMarking) {
                         log.debug "This column marking got changed ${changedColMarking}"
-                        newColUrl = changedColMarking.newMarking;
-                        oldColUrl = changedColMarking.oldMarking;
-                    } else {
-                        //to force parsing values as per current marking
-                        newColUrl = header[0];
-                        //oldColUrl = header[0];
-                    }
+                        oldColUrl = changedColMarking.oldMarking?:null;//getOldColMarking(newColUrl, changedCols);
+                    } 
 
-                    if(oldColUrl || newColUrl) {
+                    if(oldColUrl) {
                         //delete old marking value
                         if(oldColUrl) {
+                            log.debug "Removing ${oldColUrl}"
                             if(dwcObvMapping[oldColUrl]) {
+                                log.debug "Removing ${dwcObvMapping[oldColUrl].field}"
                                 m.remove(dwcObvMapping[oldColUrl].field);
                             } else if(oldColUrl.startsWith("http://ibp.org/terms/observation/")) {
                                 m.remove(oldColUrl.replace("http://ibp.org/terms/observation/",""));
@@ -192,10 +190,39 @@ class DataTableObservationImporter extends AbstractObservationImporter {
                                 log.debug "Could not remove ${oldColUrl}"
                             }
                         }
+                     }
+                }
+            }
+        }
 
+        observationHeader.eachWithIndex { headers, i ->
+
+            headers.each { header ->
+                println "Header : "+header
+
+                if(header) {
+                    Map changedColMarking = changedCols[header[1]];
+                    String newColUrl, oldColUrl;
+                    if(changedColMarking) {
+                        log.debug "This column marking got changed ${changedColMarking}"
+                        newColUrl = changedColMarking.newMarking;
+                        oldColUrl = changedColMarking.oldMarking?:null;//getOldColMarking(newColUrl, changedCols);
+                    } else {
+                        //to force parsing values as per current marking
+                        newColUrl = header[0];
+                        //oldColUrl = header[0];
+                    }
+
+                    if(newColUrl) {
                         //create new marking value
+                        boolean match = false;
+                        if( newColUrl =~ /http:\/\/rs.tdwg.org\/dwc\/terms\/*/) match = true;
+                                                        println match
                         if(newColUrl =~ /http:\/\/rs.tdwg.org\/dwc\/terms\/*/) {
+                            println "matched"
                             m[dwcObvMapping[newColUrl].field] =  getValue(obvParams, header[1], oldColUrl);
+                            println dwcObvMapping[newColUrl]
+                            println m[dwcObvMapping[newColUrl].field]
                         } else if(newColUrl =~ /http:\/\/purl.org\/dc\/terms\/*/) {
                             m[dwcObvMapping[newColUrl].field] =  getValue(obvParams, header[1], oldColUrl);
                         } else if(newColUrl.startsWith("http://ibp.org/terms/observation/")) {
@@ -216,11 +243,24 @@ class DataTableObservationImporter extends AbstractObservationImporter {
         return m;
     }
 
+    /*private String getOldColMarking(String newColUrl, Map changedCols) {
+        String oldColUrl = null;
+        changedCols.each {col, markings ->
+            if(markings.oldMarking == newColUrl) {
+                oldColUrl = 
+            }
+        }
+    }*/
+
     private String getValue(Map obvParams, String column, String oldColUrl) {
-    println column
-    println oldColUrl
-        if(!oldColUrl) 
+        println column
+        println oldColUrl
+
+        if(oldColUrl == null) {
+            println obvParams[AbstractObservationImporter.ANNOTATION_HEADER][column];
             return obvParams[AbstractObservationImporter.ANNOTATION_HEADER][column];
+        }
+
         if(dwcObvMapping[oldColUrl]) {
             return obvParams.get(dwcObvMapping[oldColUrl].field);
         } else if(oldColUrl.startsWith("http://ibp.org/terms/observation/")) {
