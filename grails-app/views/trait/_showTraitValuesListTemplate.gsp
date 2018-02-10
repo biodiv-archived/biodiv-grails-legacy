@@ -44,12 +44,12 @@
                     </button>
                 </g:if>
                 <g:else>
-                    <g:if test="${trait.traitTypes == TraitTypes.RANGE && trait.dataTypes == DataTypes.DATE}">
-                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                    <g:if test="${traitInstance.traitTypes == TraitTypes.RANGE && traitInstance.dataTypes == DataTypes.DATE}">
+                        <span data-tid='${traitInstance.id}' data-isnotobservation='${traitInstance.isNotObservationTrait}'
                         class="btn span2 input-prepend single-post disabled"
                             style="">
 
-                            <g:if test="${trait.units == Units.MONTH}">
+                            <g:if test="${traitInstance.units == Units.MONTH}">
                                 ${UtilsService.getMonthName(traitValue.split(';')[0])} 
                                 - ${UtilsService.getMonthName(traitValue.split(';')[1])} 
                             </g:if>
@@ -58,15 +58,15 @@
                             </g:else>
                         </span>
                         </g:if>
-                        <g:elseif test="${trait.dataTypes == DataTypes.COLOR}">
-                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        <g:elseif test="${traitInstance.dataTypes == DataTypes.COLOR}">
+                        <span data-tid='${traitInstance.id}' data-isnotobservation='${traitInstance.isNotObservationTrait}'
                         class="btn span2 input-prepend single-post disabled" title="${traitValue}"
                             style="">
                         </span>
                         </g:elseif>
 
                         <g:else>
-                        <span data-tid='${trait.id}' data-isnotobservation='${trait.isNotObservationTrait}'
+                        <span data-tid='${traitInstance.id}' data-isnotobservation='${traitInstance.isNotObservationTrait}'
                         class="btn span2 input-prepend single-post disabled"
                             style="">
                             ${traitValue} 
