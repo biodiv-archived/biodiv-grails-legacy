@@ -285,15 +285,15 @@
 			</g:if>
 			<g:if test="${queryParam.key=='otrait' && queryParam.value && hackTohideTraits != true}"> 
             <g:message code="trait.for.key" />  
-            <g:each in="${queryParam.value}" var="trait">
-            <g:each in="${trait.value.startsWith('rgb')?[trait.value]:trait.value.split(',')}" var="tv">
+            <g:each in="${queryParam.value}" var="traitInstance">
+            <g:each in="${traitInstance.value.startsWith('rgb')?[traitInstance.value]:traitInstance.value.split(',')}" var="tv">
                                     <span
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
-					action:params.action, params:[('trait.'+trait.key): tv])}">
-                    <%Trait t = Trait.read(trait.key)%>
+					action:params.action, params:[('trait.'+traitInstance.key): tv])}">
+                    <%Trait t = Trait.read(traitInstance.key)%>
 						${t?.name}:${tv.equalsIgnoreCase('none')||tv.equalsIgnoreCase('all')||tv.equalsIgnoreCase('any')||tv.contains(':')||tv.contains('-')||t.dataTypes == DataTypes.COLOR?tv.capitalize():TraitValue.read(tv)?.value} 
-                        <a class="removeQueryFilter" data-target="trait.${trait.key}=${tv}" href="#">[X]</a> 
+                        <a class="removeQueryFilter" data-target="traitInstance.${traitInstance.key}=${tv}" href="#">[X]</a> 
                         </span>
                         </g:each>
                         </g:each>
