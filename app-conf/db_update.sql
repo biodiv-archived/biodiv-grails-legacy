@@ -1006,13 +1006,20 @@ alter table fact rename trait_id to trait_instance_id;
 #replace ConfigurationHolder & ApplicationHolder with grails.util.Holders
 #correct RedirectAction import path
 #replace BaseOAuthClient to OAuth20Client
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy
-sravanthi@chitravathi:~/git/biodiv/src$ vim /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy sunil@192.168.4.176:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy
+
 

@@ -197,7 +197,7 @@ speciesPortal {
     resources {
         rootDir = "${app.rootDir}/img"
         serverURL = "http://hybrid.indiabiodiversity.org/${appName}/img"
-        filesutraURL = "http://localhost.fileops.indiabiodiversity.org"
+        filesutraURL = "http://fileops.pamba.strandls.com"
         images {
             defaultType = "jpg"
             thumbnail {
@@ -1602,7 +1602,7 @@ grails.plugins.dynamicController.mixins = [
 ]
 //'securityContextPersistenceFilter',
 //'rememberMeAuthenticationFilter', 
-grails.plugins.springsecurity.filterChain.filterNames = [
+grails.plugin.springsecurity.filterChain.filterNames = [
     'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
          'anonymousAuthenticationFilter',

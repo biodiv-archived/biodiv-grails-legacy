@@ -352,17 +352,17 @@ class FactService extends AbstractObjectService {
             Sql sql = Sql.newInstance(dataSource);
             println sql.executeUpdate("""
             update observation set traits = g.item from (
-                             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id
+                             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_instance_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id
                              ) g where g.object_id=id
             """);
             println sql.executeUpdate("""
 update observation set traits_json = g.item from (
      select x1.object_id, format('{%s}', string_agg(x1.item,','))::json as item from (
-        (select x.object_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.object_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        (select x.object_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.object_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_instance_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
         union
-        (select x.object_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.object_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        (select x.object_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.object_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_instance_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
         union
-        (select x.object_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.object_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        (select x.object_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.object_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_instance_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
     ) x1 group by x1.object_id
 ) g where g.object_id=id;
 
