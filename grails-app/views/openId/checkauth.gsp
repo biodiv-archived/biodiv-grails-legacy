@@ -44,6 +44,8 @@
 <asset:javascript src="jquery.plugins/jquery.form.js"/>
 <asset:javascript src="jquery.plugins/popuplib.js"/>
 <asset:javascript src="jquery.plugins/jquery.cookie.js"/>
+<asset:javascript src="jquery.plugins/jquery.cookie.js"/>
+<asset:javascript src="jwt-decode.js"/>
 <script src="https://apis.google.com/js/auth.js" type="text/javascript">
 
 <asset:javascript src="biodiv/util.js"/>
@@ -57,7 +59,7 @@
                 "expires_in":"${expires_in}",
                 "refresh_token":"${refresh_token}"
             };
-            window.opener.setLoginInfo(loginInfo);
+            window.setLoginInfo(loginInfo);
             window.close();
         });
 	</script>	
