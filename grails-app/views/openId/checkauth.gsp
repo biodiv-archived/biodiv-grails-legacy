@@ -60,7 +60,7 @@
                 "refresh_token":"${refresh_token}"
             };
             window.setLoginInfo(loginInfo);
-            window.close();
+            window.location.href='/';
         });
 	</script>	
 </body>
