@@ -52,11 +52,11 @@ class Fact {
 
     String getActivityDescription() {
         if(this.traitValue) {
-            return trait.name +':'+ traitValue.value;
-        } else if (trait.dataTypes == DataTypes.DATE) {
-            return trait.name +':'+ fromDate + (toDate ? "-" + toDate:'')
+            return traitInstance.name +':'+ traitValue.value;
+        } else if (traitInstance.dataTypes == DataTypes.DATE) {
+            return traitInstance.name +':'+ fromDate + (toDate ? "-" + toDate:'')
         }else {
-            return trait.name +':'+ value + (toValue ? "-" + toValue:'')
+            return traitInstance.name +':'+ value + (toValue ? "-" + toValue:'')
         }
     }
 
@@ -82,6 +82,6 @@ class Fact {
 
     @Override
     String toString() {
-        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}${toValue?'-'+toValue:''})>";
+        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${traitInstance.name}, ${traitValue?traitValue.value:value}${toValue?'-'+toValue:''})>";
     }
 }
