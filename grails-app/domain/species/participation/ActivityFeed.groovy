@@ -13,7 +13,6 @@ import species.auth.SUser
 import species.groups.UserGroup;
 import species.participation.ActivityFeedService
 import species.JSONType
-import species.MyType
 
 class ActivityFeed {
 	def activityFeedService;
@@ -41,6 +40,8 @@ class ActivityFeed {
 	String subRootHolderType;
 
 	boolean isShowable = true;
+
+
 	String descriptionJson;
 	static belongsTo = [author:SUser];
 
