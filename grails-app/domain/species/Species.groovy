@@ -538,20 +538,20 @@ class Species implements Rateable {
         Map queryParams = ['trait':[:]];
         def traitList = [];
         factList.each { fact ->
-            if(!traitFactMap[fact.trait.id]) {
-                traitFactMap[fact.trait.id] = []
+            if(!traitFactMap[fact.traitInstance.id]) {
+                traitFactMap[fact.traitInstance.id] = []
                 if(fact.traitValue)
-                    queryParams['trait'][fact.trait.id] = '';
+                    queryParams['trait'][fact.traitInstance.id] = '';
                 traitFactMap['fact'] = []
-                traitList << fact.trait;
+                traitList << fact.traitInstance;
             }
             if(fact.traitValue) {
-                traitFactMap[fact.trait.id] << fact.traitValue
-                queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+                traitFactMap[fact.traitInstance.id] << fact.traitValue
+                queryParams['trait'][fact.traitInstance.id] += fact.traitValue.id+',';
             } else if(fact.value)
-                traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+                traitFactMap[fact.traitInstance.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
             if(fact.fromDate && fact.toDate)
-                traitFactMap[fact.trait.id] << fact.fromDate.toString()+";"+fact.toDate.toString()
+                traitFactMap[fact.traitInstance.id] << fact.fromDate.toString()+";"+fact.toDate.toString()
 
             traitFactMap['fact'] << fact.id
         }

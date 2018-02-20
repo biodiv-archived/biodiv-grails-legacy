@@ -219,7 +219,7 @@ class FactService extends AbstractObjectService {
                         Fact.withTransaction {
                             def factsCriteria = Fact.createCriteria();
                             List<Fact> facts = factsCriteria.list {
-                                eq ('trait', traitInstance)
+                                eq ('traitInstance', traitInstance)
                                 eq ('objectType', object.class.getCanonicalName())
                                 eq ('objectId', object.id)
                             }
@@ -380,8 +380,8 @@ update observation set traits_json = g.item from (
 
     private def getTraitValue(Trait traitInstance, String value) {
         if(!value) return;
-        if(!(traitInstance.traitTypes == TraitTypes.RANGE || trait.dataTypes == DataTypes.COLOR)) { 
-            return TraitValue.findByTraitAndValueIlike(traitInstance, value.trim());
+        if(!(traitInstance.traitTypes == TraitTypes.RANGE || traitInstance.dataTypes == DataTypes.COLOR)) { 
+            return TraitValue.findByTraitInstanceAndValueIlike(traitInstance, value.trim());
         } else {
             return value.trim();
         }

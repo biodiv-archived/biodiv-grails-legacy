@@ -185,7 +185,7 @@ function isLoggedIn() {
 }
 
 function setLoginInfo(data, isAjax) {
-
+console.log(data);
     var decoded = jwt_decode(data.access_token);
     var expires_in = new Date();
     expires_in.setTime(decoded.exp);
