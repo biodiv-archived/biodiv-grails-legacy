@@ -13,7 +13,6 @@ import groovy.sql.Sql
 
 import species.NamesMetadata;
 import species.JSONType
-import species.MyType
 import groovy.json.JsonBuilder
 
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
